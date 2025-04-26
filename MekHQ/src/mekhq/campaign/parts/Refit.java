@@ -41,6 +41,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.equipment.MiscMounted;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.util.C3Util;
 import megamek.common.verifier.EntityVerifier;
 import megamek.common.verifier.TestAero;
 import megamek.common.verifier.TestEntity;
@@ -1691,7 +1692,7 @@ public class Refit extends Part implements IAcquisitionWork {
             part.updateConditionFromPart();
         }
 
-        oldUnit.getEntity().setC3UUIDAsString(oldEntity.getC3UUIDAsString());
+        C3Util.copyC3Networks(oldEntity, oldUnit.getEntity());
         oldUnit.getEntity().setExternalIdAsString(oldUnit.getId().toString());
         getCampaign().clearGameData(oldUnit.getEntity());
         getCampaign().reloadGameEntities();
@@ -1745,7 +1746,8 @@ public class Refit extends Part implements IAcquisitionWork {
         UnitUtil.compactCriticals(newEntity);
 
         String unitName = newEntity.getShortNameRaw();
-        String fileName = MHQXMLUtility.escape(unitName);
+        // MHQXMLUtility.escape() doesn't include `/` or `\` so we need to include them explicitly.
+        String fileName = MHQXMLUtility.escape(unitName).replace("/", "_").replace("\\", "_");
         String sCustomsDir = String.join(File.separator, "data", "mekfiles", "customs"); // TODO : Remove inline file
         // path
         String sCustomsDirCampaign = sCustomsDir + File.separator + getCampaign().getName();
@@ -2611,7 +2613,7 @@ public class Refit extends Part implements IAcquisitionWork {
     @Override
     public String failToFind() {
         return ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
-              " refit kit not found.");
+              " <b>refit kit not found</b>.");
     }
 
     /**

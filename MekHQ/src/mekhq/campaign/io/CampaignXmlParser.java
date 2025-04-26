@@ -76,7 +76,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.Kill;
-import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.enums.CampaignTransportType;
@@ -114,6 +113,7 @@ import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
+import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillDeprecationTool;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
@@ -311,8 +311,10 @@ public class CampaignXmlParser {
                     processFinances(campaign, wn);
                 } else if (xn.equalsIgnoreCase("location")) {
                     campaign.setLocation(CurrentLocation.generateInstanceFromXML(wn, campaign));
+                } else if (xn.equalsIgnoreCase("isAvoidingEmptySystems")) {
+                    campaign.setIsAvoidingEmptySystems(Boolean.parseBoolean(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase("skillTypes")) {
-                    processSkillTypeNodes(wn);
+                    processSkillTypeNodes(wn, version);
                 } else if (xn.equalsIgnoreCase("specialAbilities")) {
                     processSpecialAbilityNodes(campaign, wn, version);
                 } else if (xn.equalsIgnoreCase("storyArc")) {
@@ -363,6 +365,8 @@ public class CampaignXmlParser {
                     processPartsInUse(campaign, wn);
                 } else if (xn.equalsIgnoreCase("temporaryPrisonerCapacity")) {
                     campaign.setTemporaryPrisonerCapacity(Integer.parseInt(wn.getTextContent().trim()));
+                } else if (xn.equalsIgnoreCase("processProcurement")) {
+                    campaign.setProcessProcurement(Boolean.parseBoolean(wn.getTextContent().trim()));
                 }
             } else {
                 // If it's a text node or attribute or whatever at this level,
@@ -992,7 +996,7 @@ public class CampaignXmlParser {
         logger.info("Load Personnel Nodes Complete!");
     }
 
-    private static void processSkillTypeNodes(Node wn) {
+    private static void processSkillTypeNodes(Node wn, Version version) {
         logger.info("Loading Skill Type Nodes from XML...");
 
         NodeList wList = wn.getChildNodes();
@@ -1016,7 +1020,7 @@ public class CampaignXmlParser {
             }
 
             // TODO: make SkillType a Campaign instance
-            SkillType.generateInstanceFromXML(wn2);
+            SkillType.generateInstanceFromXML(wn2, version);
         }
 
         logger.info("Load Skill Type Nodes Complete!");

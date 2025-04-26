@@ -54,10 +54,10 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Profession;
+import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.displayWrappers.RankDisplay;
 
@@ -134,7 +134,7 @@ public class HireBulkPersonnelDialog extends JDialog {
 
         DefaultComboBoxModel<PersonTypeItem> personTypeModel = new DefaultComboBoxModel<>();
         for (final PersonnelRole personnelRole : PersonnelRole.getPrimaryRoles()) {
-            personTypeModel.addElement(new PersonTypeItem(personnelRole.getName(campaign.getFaction().isClan()),
+            personTypeModel.addElement(new PersonTypeItem(personnelRole.getLabel(campaign.getFaction().isClan()),
                   personnelRole));
         }
         choiceType.setModel(personTypeModel);

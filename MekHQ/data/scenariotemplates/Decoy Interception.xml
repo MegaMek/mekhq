@@ -2,13 +2,13 @@
 <ScenarioTemplate>
     <name>Decoy Interception</name>
     <shortBriefing>Intercept enemy, act as decoy.</shortBriefing>
-    <detailedBriefing>Your mission is to intercept and engage enemy forces to draw them away from their primary objective. Our intelligence indicates that they are moving to secure a critical target, but by forcing an engagement, you will divert their attention and disrupt their plans. Your task is to hold them in combat for the specified duration or, if the opportunity presents itself, destroy 75% of their forces to rout them completely.
+    <detailedBriefing><![CDATA[Your mission is to intercept and engage enemy forces to draw them away from their primary objective. Our intelligence indicates that they are moving to secure a critical target, but by forcing an engagement, you will divert their attention and disrupt their plans. Your task is to hold them in combat for the specified duration or, if the opportunity presents itself, destroy 75% of their forces to rout them completely.
 
 This battle is about control and endurance. The longer you keep the enemy occupied, the more time our allies will have to complete their objectives elsewhere. Expect a determined enemy response, as they will attempt to break through and reestablish their mission. You must balance aggression with resilience—hold them long enough, or cripple them so severely that they can no longer continue the fight.
 
 Should you succeed in routing 75% of their forces, we will seize control of the battlefield at the end of the engagement. This will allow us to recover any remaining assets and deny the enemy any chance of regrouping. Whether by sheer endurance or decisive firepower, your success here will determine the outcome of operations across the sector.
 
-Stand firm, draw them in, and ensure they never reach their goal. If they break, the field is ours.</detailedBriefing>
+Stand firm, draw them in, and ensure they never reach their goal. If they break, the field is ours.]]></detailedBriefing>
     <battlefieldControl>VICTOR</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
@@ -42,8 +42,6 @@ Stand firm, draw them in, and ensure they never reach their goal. If they break,
                     <deploymentZone>6</deploymentZone>
                     <deploymentZone>7</deploymentZone>
                     <deploymentZone>8</deploymentZone>
-                    <deploymentZone>9</deploymentZone>
-                    <deploymentZone>10</deploymentZone>
                 </deploymentZones>
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>

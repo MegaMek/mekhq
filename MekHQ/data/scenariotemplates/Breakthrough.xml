@@ -2,15 +2,15 @@
 <ScenarioTemplate>
     <name>Breakthrough</name>
     <shortBriefing>Break through or destroy enemy.</shortBriefing>
-    <detailedBriefing>Your objective is to break through enemy lines and reach the far side of the engagement zone. At least 50% of your forces must reach the destination, and only fully operational units will count.
+    <detailedBriefing><![CDATA[Your objective is to break through enemy lines and reach the far side of the engagement zone. At least 50% of your forces must reach the destination, and only fully operational units will count.
 
 If the enemy resistance proves too strong, you have an alternative path to victory: destroy at least 50% of enemy forces to force them into disarray and open the way.
 
-Be advised: the enemy will control the field when this is over. Move fast, strike hard, and don’t look back.</detailedBriefing>
+Be advised: the enemy will control the field when this is over. Move fast, strike hard, and don’t look back.]]></detailedBriefing>
     <battlefieldControl>ENEMY</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
-        <allowRotation>true</allowRotation>
+        <allowRotation>false</allowRotation>
         <baseHeight>50</baseHeight>
         <baseWidth>17</baseWidth>
         <heightScalingIncrement>0</heightScalingIncrement>
@@ -34,7 +34,7 @@ Be advised: the enemy will control the field when this is over. Move fast, strik
                 <deploymentZones>
                     <deploymentZone>6</deploymentZone>
                 </deploymentZones>
-                <destinationZone>5</destinationZone>
+                <destinationZone>6</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>0</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>

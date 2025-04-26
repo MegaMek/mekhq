@@ -44,7 +44,6 @@ import mekhq.campaign.event.PersonNewEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
@@ -61,10 +60,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * This StoryPoint opens a {@link CreateCharacterDialog CreateCharacterDialog}
- * which allows a player to create a new
- * character. Various initial values can be set, as well as an initial
- * experience point pool. Additionally, the ability
+ * This StoryPoint opens a {@link CreateCharacterDialog CreateCharacterDialog} which allows a player to create a new
+ * character. Various initial values can be set, as well as an initial experience point pool. Additionally, the ability
  * to edit certain parts of the character can be restricted.
  */
 public class CreateCharacterStoryPoint extends StoryPoint {
@@ -88,8 +85,7 @@ public class CreateCharacterStoryPoint extends StoryPoint {
     private int edge;
 
     /**
-     * The id of the person in the campaign. This will otherwise be set randomly. By
-     * setting it manually we can
+     * The id of the person in the campaign. This will otherwise be set randomly. By setting it manually we can
      * reference it later.
      */
     private UUID personId;
@@ -219,9 +215,17 @@ public class CreateCharacterStoryPoint extends StoryPoint {
     public void start() {
         super.start();
         Person person = createPerson();
-        final CreateCharacterDialog personDialog = new CreateCharacterDialog(null, true, person,
-                getCampaign(), xpPool, instructions, editOrigin, editBirthday, editGender, nameRestrictions,
-                limitFaction);
+        final CreateCharacterDialog personDialog = new CreateCharacterDialog(null,
+              true,
+              person,
+              getCampaign(),
+              xpPool,
+              instructions,
+              editOrigin,
+              editBirthday,
+              editGender,
+              nameRestrictions,
+              limitFaction);
         getCampaign().importPerson(person);
         personDialog.setVisible(true);
         if (null != assignedUnitId) {
@@ -244,8 +248,7 @@ public class CreateCharacterStoryPoint extends StoryPoint {
         // role at the moment
         PersonnelOptions options = p.getOptions();
 
-        for (Enumeration<IOptionGroup> i = options.getGroups(); i
-                .hasMoreElements();) {
+        for (Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements(); ) {
             IOptionGroup group = i.nextElement();
 
             if (!group.getKey().equalsIgnoreCase(PersonnelOptions.EDGE_ADVANTAGES)) {
@@ -253,7 +256,7 @@ public class CreateCharacterStoryPoint extends StoryPoint {
             }
 
             IOption option;
-            for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
+            for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements(); ) {
                 option = j.nextElement();
                 if (null != option && option.getType() == IOption.BOOLEAN) {
                     p.setEdgeTrigger(option.getName(), true);
@@ -319,9 +322,9 @@ public class CreateCharacterStoryPoint extends StoryPoint {
                 } else if (wn2.getNodeName().equalsIgnoreCase("commander")) {
                     commander = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("primaryRole")) {
-                    primaryRole = PersonnelRole.parseFromString(wn2.getTextContent().trim());
+                    primaryRole = PersonnelRole.fromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("phenotype")) {
-                    phenotype = Phenotype.parseFromString(wn2.getTextContent().trim());
+                    phenotype = Phenotype.fromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("faction")) {
                     faction = Factions.getInstance().getFaction(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("editOrigin")) {

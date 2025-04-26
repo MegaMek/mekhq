@@ -3,17 +3,17 @@
     <name>Emergency Convoy Defense</name>
     <stratConScenarioType>SPECIAL_RESUPPLY</stratConScenarioType>
     <shortBriefing>Escort DropShip, defeat enemy forces.</shortBriefing>
-    <detailedBriefing>Your aircraft convoy is being intercepted mid-flight by enemy forces executing a pincer maneuver. Their goal is to cut off all possible escape routes and eliminate or capture the supplies your convoy carries. If the convoy is lost, it will be a significant blow to your operational readiness. Your mission is to ensure the convoy reaches the opposite edge of the engagement zone while simultaneously routing the enemy by destroying at least 50% of their forces.
+    <detailedBriefing><![CDATA[Your aircraft convoy is being intercepted mid-flight by enemy forces executing a pincer maneuver. Their goal is to cut off all possible escape routes and eliminate or capture the supplies your convoy carries. If the convoy is lost, it will be a significant blow to your operational readiness. Your mission is to ensure the convoy reaches the opposite edge of the engagement zone while simultaneously routing the enemy by destroying at least 50% of their forces.
 
 The enemy has chosen a pincer formation to box you in, which means they are expecting to trap and overwhelm your forces. Break their formation before they can fully close the noose. Use superior positioning, speed, and tactical maneuvers to punch through their weakest link and deny them the ability to completely surround the convoy. If necessary, sacrifice the convoy to ensure the enemy force is broken—routing them is the priority, as failure to do so will allow them to wreak havoc on our logistics in future operations.
 
-We will control the battlefield at the end of this engagement, ensuring that any salvageable assets fall into our hands. This battle determines more than just one convoy’s fate—crush the enemy’s ability to operate in our skies and secure our logistics for the future.</detailedBriefing>
+We will control the battlefield at the end of this engagement, ensuring that any salvageable assets fall into our hands. This battle determines more than just one convoy’s fate—crush the enemy’s ability to operate in our skies and secure our logistics for the future.]]></detailedBriefing>
     <battlefieldControl>PLAYER</battlefieldControl>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>
         <allowedTerrainTypes />
-        <allowRotation>true</allowRotation>
+        <allowRotation>false</allowRotation>
         <baseHeight>75</baseHeight>
         <baseWidth>17</baseWidth>
         <heightScalingIncrement>0</heightScalingIncrement>
@@ -37,7 +37,7 @@ We will control the battlefield at the end of this engagement, ensuring that any
                 <deploymentZones>
                     <deploymentZone>6</deploymentZone>
                 </deploymentZones>
-                <destinationZone>2</destinationZone>
+                <destinationZone>6</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>0</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
@@ -68,7 +68,7 @@ We will control the battlefield at the end of this engagement, ensuring that any
                 <deploymentZones>
                     <deploymentZone>6</deploymentZone>
                 </deploymentZones>
-                <destinationZone>2</destinationZone>
+                <destinationZone>6</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>

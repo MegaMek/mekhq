@@ -27,10 +27,34 @@
  */
 package mekhq.campaign.randomEvents.prisoners;
 
+import static java.lang.Math.round;
+import static megamek.common.Board.T_SPACE;
+import static megamek.common.MiscType.createBeagleActiveProbe;
+import static megamek.common.MiscType.createCLImprovedSensors;
+import static megamek.common.MiscType.createISImprovedSensors;
+import static mekhq.campaign.personnel.enums.PersonnelStatus.BONDSREF;
+import static mekhq.campaign.personnel.enums.PersonnelStatus.DEFECTED;
+import static mekhq.campaign.personnel.enums.PersonnelStatus.ENEMY_BONDSMAN;
+import static mekhq.campaign.personnel.enums.PersonnelStatus.KIA;
+import static mekhq.campaign.personnel.enums.PersonnelStatus.MIA;
+import static mekhq.campaign.personnel.enums.PersonnelStatus.POW;
+import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.BECOMING_BONDSMAN;
+import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.PRISONER;
+import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.PRISONER_DEFECTOR;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import megamek.common.Compute;
 import megamek.common.ITechnology;
 import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Scenario;
@@ -42,31 +66,13 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.enums.HonorRating;
 import mekhq.gui.dialog.DefectionOffer;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import static java.lang.Math.round;
-import static megamek.common.Board.T_SPACE;
-import static megamek.common.MiscType.createBeagleActiveProbe;
-import static megamek.common.MiscType.createCLImprovedSensors;
-import static megamek.common.MiscType.createISImprovedSensors;
-import static mekhq.campaign.personnel.enums.PersonnelStatus.*;
-import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.BECOMING_BONDSMAN;
-import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.PRISONER;
-import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.PRISONER_DEFECTOR;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
-import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
-import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
-
 /**
  * Handles events and processes related to capturing prisoners.
  *
  * <p>This class manages the capture mechanics for both NPCs and player characters, based on
- * SAR (Search and Rescue) quality, faction alignment, and campaign rules. It applies various
- * modifiers to determine the likelihood of successfully capturing prisoners and processes
- * their capture outcome (e.g., statuses such as prisoner, bondsman, or defector).</p>
+ * SAR (Search and Rescue) quality, faction alignment, and campaign rules. It applies various modifiers to determine the
+ * likelihood of successfully capturing prisoners and processes their capture outcome (e.g., statuses such as prisoner,
+ * bondsman, or defector).</p>
  *
  * <p>The class supports different capture styles (e.g., MekHQ Capture Mode) and adjusts outcomes
  * based on honor ratings, faction-specific rules (e.g., Clan or IS), and campaign configurations.</p>
@@ -75,6 +81,7 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
  * mechanics, and provides support for defection offers.</p>
  */
 public class CapturePrisoners {
+    private static final MMLogger logger = MMLogger.create(CapturePrisoners.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
 
     private final Campaign campaign;
@@ -103,21 +110,20 @@ public class CapturePrisoners {
     private TargetRoll sarTargetNumber = new TargetRoll(BASE_TARGET_NUMBER, "Base TN");
 
     /**
-     * Constructs a {@link CapturePrisoners} object and initializes modifiers
-     * based on the faction, scenario, and SAR (Search and Rescue) qualities.
+     * Constructs a {@link CapturePrisoners} object and initializes modifiers based on the faction, scenario, and SAR
+     * (Search and Rescue) qualities.
      *
      * <p>This constructor applies SAR-related modifiers, including checking for active probes,
-     * improved sensors, VTOL/DropShips, and orbit-related penalties. It also ensures proper
-     * faction-related checks, such as whether the searching faction is Clan, and sets the
-     * appropriate base target rolls for capturing prisoners.</p>
+     * improved sensors, VTOL/DropShips, and orbit-related penalties. It also ensures proper faction-related checks,
+     * such as whether the searching faction is Clan, and sets the appropriate base target rolls for capturing
+     * prisoners.</p>
      *
-     * @param campaign          The active {@link Campaign} being played.
-     * @param searchingFaction  The {@link Faction} conducting the prisoner search.
-     * @param scenario          The {@link Scenario} representing the current mission or battle.
-     * @param sarQuality        Search and Rescue quality level, affecting capture difficulty.
+     * @param campaign         The active {@link Campaign} being played.
+     * @param searchingFaction The {@link Faction} conducting the prisoner search.
+     * @param scenario         The {@link Scenario} representing the current mission or battle.
+     * @param sarQuality       Search and Rescue quality level, affecting capture difficulty.
      */
-    public CapturePrisoners(Campaign campaign, @Nullable Faction searchingFaction, Scenario scenario,
-                            int sarQuality) {
+    public CapturePrisoners(Campaign campaign, @Nullable Faction searchingFaction, Scenario scenario, int sarQuality) {
         this.campaign = campaign;
 
         if (searchingFaction == null) {
@@ -130,7 +136,9 @@ public class CapturePrisoners {
         int today = campaign.getLocalDate().getYear();
         searchingFactionIsClan = searchingFaction != null && searchingFaction.isClan();
 
-        int techFaction = searchingFactionIsClan ? ITechnology.getCodeFromMMAbbr("CLAN") : ITechnology.getCodeFromMMAbbr("IS");
+        int techFaction = searchingFactionIsClan ?
+                                ITechnology.getCodeFromMMAbbr("CLAN") :
+                                ITechnology.getCodeFromMMAbbr("IS");
         try {
             // searchingFaction being null is fine because we're just ignoring any exceptions
             techFaction = ITechnology.getCodeFromMMAbbr(searchingFaction.getShortName());
@@ -147,15 +155,20 @@ public class CapturePrisoners {
             sarTargetNumber.addModifier(GOING_TO_GROUND, "Potential Prisoner Going to Ground");
             sarTargetNumber.addModifier(SAR_CONTAINS_VTOL_OR_WIGE, "SAR Contains VTOL or WIGE");
 
-            final int isImprovedSensorsAvailability = createISImprovedSensors().calcYearAvailability(
-                today, searchingFactionIsClan, techFaction);
-            final int clanImprovedSensorsAvailability = createCLImprovedSensors().calcYearAvailability(
-                today, searchingFactionIsClan, techFaction);
+            final int isImprovedSensorsAvailability = createISImprovedSensors().calcYearAvailability(today,
+                  searchingFactionIsClan,
+                  techFaction);
+            final int clanImprovedSensorsAvailability = createCLImprovedSensors().calcYearAvailability(today,
+                  searchingFactionIsClan,
+                  techFaction);
 
-            final int improvedSensorsAvailability = searchingFactionIsClan ? clanImprovedSensorsAvailability : isImprovedSensorsAvailability;
+            final int improvedSensorsAvailability = searchingFactionIsClan ?
+                                                          clanImprovedSensorsAvailability :
+                                                          isImprovedSensorsAvailability;
 
-            final int activeProbeAvailability = createBeagleActiveProbe().calcYearAvailability(
-                today, searchingFactionIsClan, techFaction);
+            final int activeProbeAvailability = createBeagleActiveProbe().calcYearAvailability(today,
+                  searchingFactionIsClan,
+                  techFaction);
 
             if (sarQuality >= improvedSensorsAvailability) {
                 sarTargetNumber.addModifier(SAR_HAS_IMPROVED_SENSORS, "SAR has Improved Sensors");
@@ -163,11 +176,13 @@ public class CapturePrisoners {
                 sarTargetNumber.addModifier(SAR_HAS_ACTIVE_PROBE, "SAR has Active Probe");
             }
         }
+
+        logger.info(sarTargetNumber.toString());
     }
 
     /**
-     * Retrieves the target roll number used for Search and Rescue (SAR) operations
-     * to determine the success of capturing prisoners.
+     * Retrieves the target roll number used for Search and Rescue (SAR) operations to determine the success of
+     * capturing prisoners.
      *
      * @return The {@link TargetRoll} object representing the SAR target number.
      */
@@ -179,6 +194,7 @@ public class CapturePrisoners {
      * Attempts to determine the capture of an NPC prisoner.
      *
      * @param wasPickedUp Whether the target prisoner was already picked up.
+     *
      * @return {@code true} if the prisoner capture was successful, otherwise {@code false}.
      */
     public boolean attemptCaptureOfNPC(boolean wasPickedUp) {
@@ -193,8 +209,8 @@ public class CapturePrisoners {
      * Processes the capture of an NPC prisoner.
      *
      * <p>This method evaluates the capture style and adjusts the handling of the prisoner
-     * accordingly. It accounts for different capture styles, such as MekHQ's mode, and processes
-     * unique rules for Clan-related factions.</p>
+     * accordingly. It accounts for different capture styles, such as MekHQ's mode, and processes unique rules for
+     * Clan-related factions.</p>
      *
      * @param prisoner The {@link Person} object representing the captured NPC.
      */
@@ -220,19 +236,21 @@ public class CapturePrisoners {
         }
 
         // Attempt defection
-        int defectionChance = determineDefectionChance(prisoner, true);
+        if (!campaignFaction.isClan()) {
+            int defectionChance = determineDefectionChance(prisoner, true);
 
-        if (randomInt(defectionChance) == 0) {
-            if (prisoner.isClanPersonnel()) {
-                prisoner.setPrisonerStatus(campaign, BECOMING_BONDSMAN, true);
+            if (randomInt(defectionChance) == 0) {
+                if (prisoner.isClanPersonnel()) {
+                    prisoner.setPrisonerStatus(campaign, BECOMING_BONDSMAN, true);
 
-                LocalDate today = campaign.getLocalDate();
-                prisoner.setBecomingBondsmanEndDate(today.plusWeeks(d6(1)));
-            } else {
-                prisoner.setPrisonerStatus(campaign, PRISONER_DEFECTOR, false);
+                    LocalDate today = campaign.getLocalDate();
+                    prisoner.setBecomingBondsmanEndDate(today.plusWeeks(d6(1)));
+                } else {
+                    prisoner.setPrisonerStatus(campaign, PRISONER_DEFECTOR, false);
+                }
+
+                new DefectionOffer(campaign, prisoner, prisoner.isClanPersonnel());
             }
-
-            new DefectionOffer(campaign, prisoner, prisoner.isClanPersonnel());
         }
 
         handlePostCapture(prisoner, prisoner.getPrisonerStatus());
@@ -242,16 +260,16 @@ public class CapturePrisoners {
      * Processes the outcome for a captured prisoner based on faction-related logic.
      *
      * <p>The method determines if the prisoner should be made a bondsman, added as a prisoner of
-     * war, or handled according to ruler rules defined for the faction. It differentiates between
-     * NPCs and player characters.</p>
+     * war, or handled according to ruler rules defined for the faction. It differentiates between NPCs and player
+     * characters.</p>
      *
-     * @param prisoner               The {@link Person} being processed.
-     * @param capturingFaction                The {@link Faction} processing the prisoner.
-     * @param isMekHQCaptureStyle    Indicates whether MekHQ's custom capture style is active.
-     * @param isNPC                  {@code true} if the prisoner is an NPC, otherwise {@code false}.
+     * @param prisoner            The {@link Person} being processed.
+     * @param capturingFaction    The {@link Faction} processing the prisoner.
+     * @param isMekHQCaptureStyle Indicates whether MekHQ's custom capture style is active.
+     * @param isNPC               {@code true} if the prisoner is an NPC, otherwise {@code false}.
      */
     void processPrisoner(Person prisoner, @Nullable Faction capturingFaction, boolean isMekHQCaptureStyle,
-                         boolean isNPC) {
+          boolean isNPC) {
         LocalDate today = campaign.getLocalDate();
         HonorRating prisonerHonorRating = prisoner.getOriginFaction().getHonorRating(campaign);
 
@@ -259,10 +277,11 @@ public class CapturePrisoners {
         if (capturingFaction != null && capturingFaction.isClan()) {
             if (isMekHQCaptureStyle && prisoner.isClanPersonnel() && (bondsmanRoll == 1)) {
                 if (isNPC) {
-                    campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "bondsref.report",
-                            prisoner.getFullName(),
-                            spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
-                            CLOSING_SPAN_TAG));
+                    campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+                          "bondsref.report",
+                          prisoner.getFullName(),
+                          spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                          CLOSING_SPAN_TAG));
 
                     campaign.removePerson(prisoner);
                 } else {
@@ -288,16 +307,17 @@ public class CapturePrisoners {
     }
 
     /**
-     * Attempts to calculate the likelihood of a defection by evaluating various factors
-     * including the origin faction of the potential defector, their status as clan personnel,
-     * and whether the defector is controlled by the AI or the player.
+     * Attempts to calculate the likelihood of a defection by evaluating various factors including the origin faction of
+     * the potential defector, their status as clan personnel, and whether the defector is controlled by the AI or the
+     * player.
      *
-     * @param potentialDefector The {@link Person} being evaluated for a potential defection.
-     *                          This person may originate from a faction that affects defection probability.
-     * @param isNPC             {@code true} if the defection attempt involves a non-player character (NPC),
-     *                          otherwise {@code false}.
-     * @return The adjusted defection probability as an integer value based on the base defection
-     *         chance and applicable multipliers.
+     * @param potentialDefector The {@link Person} being evaluated for a potential defection. This person may originate
+     *                          from a faction that affects defection probability.
+     * @param isNPC             {@code true} if the defection attempt involves a non-player character (NPC), otherwise
+     *                          {@code false}.
+     *
+     * @return The adjusted defection probability as an integer value based on the base defection chance and applicable
+     *       multipliers.
      */
     int determineDefectionChance(Person potentialDefector, boolean isNPC) {
         int adjustedDefectionChance = DEFECTION_CHANCE;
@@ -326,11 +346,11 @@ public class CapturePrisoners {
      * Attempts to capture or determine the fate of a player character prisoner.
      *
      * <p>If the capture attempt fails, the player character is marked as missing in action (MIA).
-     * Otherwise, the prisoner is processed further, using either standard or MekHQ-specific capture
-     * rules. Defection rolls are applied if applicable, and post-capture events are handled.</p>
+     * Otherwise, the prisoner is processed further, using either standard or MekHQ-specific capture rules. Defection
+     * rolls are applied if applicable, and post-capture events are handled.</p>
      *
-     * @param prisoner     The {@link Person} representing the player-character prisoner.
-     * @param wasPickedUp  Whether the prisoner was picked up as part of the scenario outcome.
+     * @param prisoner    The {@link Person} representing the player-character prisoner.
+     * @param wasPickedUp Whether the prisoner was picked up as part of the scenario outcome.
      */
     public void attemptCaptureOfPlayerCharacter(Person prisoner, boolean wasPickedUp, boolean isSpace) {
         LocalDate today = campaign.getLocalDate();
@@ -411,8 +431,8 @@ public class CapturePrisoners {
      * <p>This includes loyalty adjustments, prisoner recruitment, and campaign interaction logging
      * (e.g., offers of defection or bondsman status).</p>
      *
-     * @param prisoner   The {@link Person} being processed as a captured prisoner.
-     * @param newStatus  The resulting {@link PrisonerStatus} of the prisoner post-capture.
+     * @param prisoner  The {@link Person} being processed as a captured prisoner.
+     * @param newStatus The resulting {@link PrisonerStatus} of the prisoner post-capture.
      */
     private void handlePostCapture(Person prisoner, PrisonerStatus newStatus) {
         final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
@@ -427,13 +447,11 @@ public class CapturePrisoners {
         campaign.recruitPerson(prisoner, prisonerStatus);
 
         if (prisonerStatus.isPrisonerDefector()) {
-            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "defection.report",
-                prisoner.getHyperlinkedName()));
+            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "defection.report", prisoner.getHyperlinkedName()));
         }
 
         if (prisonerStatus.isBecomingBondsman()) {
-            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "bondsman.report",
-                prisoner.getHyperlinkedName()));
+            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "bondsman.report", prisoner.getHyperlinkedName()));
         }
     }
 
@@ -441,8 +459,8 @@ public class CapturePrisoners {
      * Sets the loyalty level for a captured prisoner.
      *
      * <p>This method calculates the loyalty value by performing four dice rolls,
-     * taking the highest three rolls, and summing their results. The calculated
-     * value is then assigned as the prisoner's loyalty attribute.</p>
+     * taking the highest three rolls, and summing their results. The calculated value is then assigned as the
+     * prisoner's loyalty attribute.</p>
      *
      * @param prisoner The captured prisoner whose loyalty is being calculated and set.
      */
@@ -464,6 +482,7 @@ public class CapturePrisoners {
      * <p>This method allows us to pass in explicit values in during Unit Testing.</p>
      *
      * @param dice The number of six-sided dice to roll.
+     *
      * @return The total result of rolling the specified number of six-sided dice.
      */
     protected int d6(int dice) {
@@ -474,6 +493,7 @@ public class CapturePrisoners {
      * Generates a random integer value between 0 (inclusive) and the specified maximum value (exclusive).
      *
      * @param maxValue The upper bound (exclusive) for the random integer generation. Must be a positive integer.
+     *
      * @return A randomly generated integer value between 0 (inclusive) and maxValue (exclusive).
      */
     protected int randomInt(int maxValue) {

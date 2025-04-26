@@ -33,11 +33,9 @@ import java.util.Objects;
 
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 
@@ -78,6 +76,15 @@ public abstract class AbstractSkillGenerator {
      */
     public abstract void generateSkills(Campaign campaign, Person person, int expLvl);
 
+    public abstract void generateTraits(Person person);
+
+    /**
+     * Generates attributes for a specified person based on their phenotype.
+     *
+     * @param person The {@link Person} for whom attributes are to be generated.
+     */
+    public abstract void generateAttributes(Person person);
+
     /**
      * Generates the default skills for a {@link Person} based on their primary role.
      *
@@ -88,7 +95,7 @@ public abstract class AbstractSkillGenerator {
      * @param rollModifier A roll modifier to apply to any randomizations.
      */
     protected void generateDefaultSkills(Person person, PersonnelRole primaryRole, int expLvl, int bonus,
-                                         int rollModifier) {
+          int rollModifier) {
         switch (primaryRole) {
             case MEKWARRIOR:
                 addSkill(person, SkillType.S_PILOT_MEK, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
@@ -195,9 +202,17 @@ public abstract class AbstractSkillGenerator {
         }
     }
 
-    public void generateRoleplaySkills(final Person person, final int experienceLevel) {
+    /**
+     * @deprecated use {@link #generateRoleplaySkills(Person)} instead.
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
+    public void generateRoleplaySkills(final Person person, int experienceLevel) {
+        generateRoleplaySkills(person);
+    }
+
+    public void generateRoleplaySkills(final Person person) {
         for (SkillType skillType : getRoleplaySkills()) {
-            int roleplaySkillLevel = Utilities.generateExpLevel(rskillPrefs.getRoleplaySkillsModifier(experienceLevel));
+            int roleplaySkillLevel = Utilities.generateExpLevel(rskillPrefs.getRoleplaySkillModifier());
             if (roleplaySkillLevel > SkillType.EXP_ULTRA_GREEN) {
                 addSkill(person, skillType.getName(), roleplaySkillLevel, rskillPrefs.randomizeSkill(), 0);
             }
@@ -209,12 +224,12 @@ public abstract class AbstractSkillGenerator {
     }
 
     protected static void addSkill(Person person, String skillName, int experienceLevel, boolean randomizeLevel,
-                                   int bonus) {
+          int bonus) {
         addSkill(person, skillName, experienceLevel, randomizeLevel, bonus, 0);
     }
 
     protected static void addSkill(Person person, String skillName, int experienceLevel, boolean randomizeLevel,
-                                   int bonus, int rollMod) {
+          int bonus, int rollMod) {
         if (randomizeLevel) {
             person.addSkill(skillName, Skill.randomizeLevel(skillName, experienceLevel, bonus, rollMod));
         } else {

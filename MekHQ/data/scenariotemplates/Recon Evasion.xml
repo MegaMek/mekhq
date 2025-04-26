@@ -2,11 +2,11 @@
 <ScenarioTemplate>
     <name>Recon Evasion</name>
     <shortBriefing>Evade patrols until scan is complete.</shortBriefing>
-    <detailedBriefing>We have a rare opportunity to gather critical intelligence on enemy operations by monitoring their movements. Your mission is to remain in position for the required duration, observing and collecting data on enemy activity while avoiding direct engagement. The information you gather will be far more valuable than any destruction you could inflict.
+    <detailedBriefing><![CDATA[We have a rare opportunity to gather critical intelligence on enemy operations by monitoring their movements. Your mission is to remain in position for the required duration, observing and collecting data on enemy activity while avoiding direct engagement. The information you gather will be far more valuable than any destruction you could inflict.
 
 The enemy is unaware of our presence, but if discovered, they will respond with overwhelming force. Stealth and discretion are paramount—engage only if absolutely necessary, and prioritize survival over combat. Avoid unnecessary detection, maintain a low profile, and ensure you remain operational for the duration of the mission.
 
-The enemy will control the field at the end of the engagement, meaning there will be no opportunity for salvage or reinforcement. This is about intelligence, not confrontation—stay hidden, gather what we need, and withdraw before they know you were ever there. At least one of your units must survive.</detailedBriefing>
+The enemy will control the field at the end of the engagement, meaning there will be no opportunity for salvage or reinforcement. This is about intelligence, not confrontation—stay hidden, gather what we need, and withdraw before they know you were ever there. At least one of your units must survive.]]></detailedBriefing>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <battlefieldControl>ENEMY</battlefieldControl>
@@ -42,8 +42,6 @@ The enemy will control the field at the end of the engagement, meaning there wil
                     <deploymentZone>6</deploymentZone>
                     <deploymentZone>7</deploymentZone>
                     <deploymentZone>8</deploymentZone>
-                    <deploymentZone>9</deploymentZone>
-                    <deploymentZone>10</deploymentZone>
                 </deploymentZones>
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>

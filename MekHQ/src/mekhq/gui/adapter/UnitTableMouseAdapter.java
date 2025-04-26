@@ -72,7 +72,7 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.RandomSkillPreferences;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.event.RepairStatusChangedEvent;
 import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.finances.Money;
@@ -83,6 +83,7 @@ import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.ActivateUnitAction;
 import mekhq.campaign.unit.actions.CancelMothballUnitAction;
@@ -160,6 +161,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     public static final String COMMAND_REFIT_KIT = "REFIT_KIT";
     public static final String COMMAND_FLUFF_NAME = "FLUFF_NAME";
     public static final String COMMAND_CHANGE_MAINT_MULTI = "CHANGE_MAINT_MULT";
+    public static final String COMMAND_PERFORM_AD_HOC_MAINTENANCE = "PERFORM_AD_HOC_MAINTENANCE";
     // endregion Standard Commands
 
     // region GM Commands
@@ -591,11 +593,56 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             } catch (Exception e) {
                 logger.error("", e);
             }
+        } else if (command.startsWith(COMMAND_PERFORM_AD_HOC_MAINTENANCE)) {
+            final Campaign campaign = gui.getCampaign();
+            final CampaignOptions campaignOptions = campaign.getCampaignOptions();
+            final boolean isUseMaintenance = campaignOptions.isCheckMaintenance();
+            final boolean techsUseAdmin = campaign.getCampaignOptions().isTechsUseAdministration();
+
+            if (!isUseMaintenance) {
+                return;
+            }
+
+            for (Unit unit : units) {
+                if (!unit.requiresMaintenance()) {
+                    campaign.addReport(String.format(resources.getString("maintenanceAdHoc.noNeed"),
+                          unit.getHyperlinkedName()));
+                    continue;
+                }
+
+                Person tech = unit.getTech(); // This gets the engineer, instead, if appropriate
+                if (tech == null) {
+                    continue;
+                }
+
+                int time = tech.getDailyAvailableTechTime(techsUseAdmin);
+                int maintenanceTime = unit.getMaintenanceTime();
+
+                if ((time - maintenanceTime) >= 0) {
+                    campaign.doMaintenance(unit);
+                } else {
+                    campaign.addReport(String.format(resources.getString("maintenanceAdHoc.unable"),
+                          tech.getHyperlinkedFullTitle(),
+                          unit.getHyperlinkedName()));
+                }
+            }
         }
     }
 
     private @Nullable Person pickTechForMothballOrActivation(Unit unit, String description) {
         Person tech = null;
+
+        if (unit.isConventionalInfantry()) {
+            return null;
+        }
+
+        if (unit.isSelfCrewed()) {
+            if (unit.engineerResponsible().isPresent()) {
+                tech = unit.engineerResponsible().get();
+                return tech;
+            }
+        }
+
         if (!unit.isSelfCrewed() || isSelfCrewedButHasNoTech(unit)) {
             UUID id = gui.selectTech(unit, description, true);
             if (null != id) {
@@ -614,6 +661,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 }
             }
         }
+
         return tech;
     }
 
@@ -872,17 +920,15 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             // if we're using maintenance and have selected something that requires
             // maintenance and
             // isn't mothballed or being mothballed
-            if (gui.getCampaign().getCampaignOptions().isCheckMaintenance() &&
-                      (maintenanceTime > 0) &&
-                      Stream.of(units).anyMatch(u -> !u.isMothballing() && !u.isMothballed())) {
-                menuItem = new JMenu("Set Maintenance Extra Time");
+            if (gui.getCampaign().getCampaignOptions().isCheckMaintenance()) {
+                menuItem = new JMenu(resources.getString("maintenanceExtraTime.text"));
 
                 for (int x = 1; x <= 4; x++) {
                     JMenuItem maintenanceMultiplierItem = new JCheckBoxMenuItem("x" + x);
 
                     // if we've got just one unit selected,
                     // have the courtesy to show the multiplier if relevant
-                    if (oneSelected && (unit.getMaintenanceMultiplier() == x) && !unit.isSelfCrewed()) {
+                    if (oneSelected && (unit.getMaintenanceMultiplier() == x)) {
                         maintenanceMultiplierItem.setSelected(true);
                     }
 
@@ -890,6 +936,13 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     maintenanceMultiplierItem.addActionListener(this);
                     menuItem.add(maintenanceMultiplierItem);
                 }
+
+                popup.add(menuItem);
+
+                menuItem = new JMenuItem(resources.getString("maintenanceAdHoc.text"));
+                menuItem.setActionCommand(COMMAND_PERFORM_AD_HOC_MAINTENANCE);
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(gui.getCampaign().getCampaignOptions().isCheckMaintenance());
 
                 popup.add(menuItem);
             }

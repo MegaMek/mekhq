@@ -1,6 +1,9 @@
 MEKHQ VERSION HISTORY:
 ---------------
-0.50.05-SNAPSHOT
+0.50.06
++ PR #6767: Updated Rank System XML Version to 0.50.06
+
+0.50.05 (2025-04-25 1800 UTC)
 + PR #6284: Fixed Unique Interaction when Loading Player Campaigns with Custom Rank Systems
 + PR #6285: Added Mercenary Auction Events
 + Fix #910, #3644, #4762, #6179: Added Auto-Optimize Medical Assignments Feature
@@ -163,6 +166,126 @@ MEKHQ VERSION HISTORY:
 + Fix #2968, #2996, #3758, #5332, #6469: Fixed Missing Part Resets when Failing or Cancelling Work Job
 + PR #6598: Fixed Refitting Units With Bays
 + PR #6863: Fixed Princess Not Acting of Their Rounds
++ Fix #305: Added Medical Log, Assignment Log, Performance Report
++ Fix #1460: Corrected Naming of the Planet Herculaneum/Marius's Tears
++ Fix #2183, #3819, #4788: Corrected Hydrogen-Based Fuel Cost Calculation
++ Fix #3799: Added Option To Avoid Empty Systems In Pathfinding
++ Fix #3964: Added Clan Tech Refit Restrictions Before Battle Of Tukayyid
++ Fix #4710: Added Ad-Hoc Maintenance Option
++ Fix #4717: Added Display Of Days Till Next Maintenance Check To Hangar Table
++ Fix #4828, #6476: Updated Maintenance Handling and Tech Assignment Display
++ Fix 6245: Moved logic for adding refit kits from to ensure it works when added via GM Commands
++ Fix #6341: Improved Name Escaping when Saving Unit in MekHQ's MekLab
++ Fix #6409: Corrected Crew Gunnery Skill Limits From 7 to 8
++ Fix #6439: Fixed Turnover Unit Assignment for Characters Breaking Contract
++ Fix #6449: Fixed Find Planet and Planet View Panel Interaction
++ Fix #6544: Restored Ability to Salvage Turrets
++ Fix #6545: Prevented Self-Crewed Unit Crew from Going on Maternity Leave Mid-Refit, Mid-Repair, or Mid-Mothballing
++ Fix #6546: Fixed Display of Misc Award Images; Upgraded Award Image Scaling
++ Fix #6563: Fixed In Transit Sorting in Warehouse Tab
++ PR #6564: Refactored Phenotype Enum; Added ATOW Attributes to Character Generation; Added 'Extra Attribute Randomization' Campaign Option
++ PR #6565: Added Discretionary Spending System Based on Wealth Trait
++ PR #6568: Fixed Facility Capacities Display Logic In Command Center Tab
++ PR #6569: Added Campaign Option To Reset Criminal Record
++ PR #6570: Added Option To Reset Temporary Prisoner Capacity
++ PR #6572: Added Randomize Traits Option For Character Creation
++ PR #6573: Refactored Edge Handling to Use Adjusted Edge Values
++ PR #6575: Updated Aging Effects to Include Clan Reputation Modifiers & Glass Jaw Gain
++ PR #6578: Added Skill Check Dialog Using New Centralized Skill Check Utility
++ PR #6579: Updated Edge Handling and GUI Support (Sentry)
++ PR #6580: Fixed Infinite Loop in getAvailableForceIDs (Sentry)
++ PR #6581: Ensured StratCon Campaigns Always Generate At Least One Track (Sentry)
++ PR #6593: Added Prisoner Capture Target Number to Logs
++ Fix #6596: Added Off-Board Deployment Validation and Improved Generation Safety
++ PR #6597: Refactored Temporary Prisoner Capacity Management
++ PR #6602: Fixed 24-hour Work Day in Refit Display
++ PR #6604: Fixed Mercenary Auction Decline Auction Option
++ PR #6607: Added 29 Brand New, Fully Implemented SPAs from A Time of War; Added 2 New Unofficial SPAs
++ PR #6608: Added Option to Award Children a Single SPA When They Turn 16
++ Fix #6609: Increased Width of Finance Summary
++ PR #6613: Added Tint To Campaign Options Tab Images
++ PR #6615: Fixed Skills Failing to Load into Campaign Options if Out-of-Date
++ Fix #6616: Fixed Convoys Not Deploying to Scenarios
++ Fix #6618: Implemented Pre-Tukayyid Clan Tech Restrictions to Force Generation
++ PR #6625: Adjusted Missing Team Fallback Logging
++ PR #6626: Implemented Graceful Failure when Loading Random Marriage Settings from Older Versions
++ PR #6627: Implemented Graceful Failure when Loading Random Procreation Settings from Older Versions
++ PR #6628: Fixed Error On Loading Campaign That Predates Combat Teams
++ PR #6634: Fixed NPE When Loading Units Without an Engine
++ PR #6635: Implemented Graceful Failure when Loading Random Divorce Settings from Older Versions
++ PR #6636: Fixed Formatting Issue in Campaign Load Prompt
++ PR #6637: Fixed Retirement Transaction Type Compatibility for Older Versions
++ PR #6638: Added Support For the "ROUT" Morale Level Used in Older Versions
++ PR #6639: Fixed Commander's Day Dialog To Scale Banner Image Properly
++ PR #6640: Fixed Incorrect Constants and Pronoun Placement in BirthAnnouncement
++ PR #6641: Fixed Null Pointer Issue in Refit Handling
++ Fix #6646: Fixed Skill XP Costs Resetting
++ PR #6650: Better differentiate transport type in TOE
++ PR #6649: Fix what units are passed to detach trailer/tractor so it only shows when needed
++ Fix #6651: Removed Partial Maintenance and fixed Shorthanded Penalty
++ Fix #6652: Fixed Use Player DropShips Always Picking the Same Unit
++ Fix #6653: Updated Doctor/Tech Uses Administration to No Longer Factor Administration into Experience Level
++ Fix #6654: Added New Player Quickstart Option
++ PR #6657: Renamed "Company Generator" to "Quick Start Company Generator"
++ PR #6661: Updated Presets to 50.05
++ PR #6662: A Couple of SPA XML Fixes
++ PR #6663: Fixed Skill Panel Layout Calculation in Campaign Options IIC
++ PR #6667: Fixed an NPE During Contract Resolution (Sentry)
++ Fix #6668: Fixed Creative Accounting for Ammunition in Resupplies
++ Fix #6672: Corrected swapped new day Optimize Medical Assignments and MRMS
++ Fix #6619: Fixed C3 Links made in MM lobby persist back into MekHQ 
++ PR #6648: Tractor transport types can now be used for leadership bonus unit selections
++ PR #6675: Fixed Command Skills Counting Down not Up
++ PR #6677: Fixed NPE in updateCommander (Sentry)
++ Fix #6688: Corrected Fuel Cost Calculation for DS
++ Fix #6412, #6422: Fixed Multiple Scenario Template Issues
++ Fix #6669: acar move entity by copy and fix the problem with ammo
++ PR #6690: Fixed Sorting and Updating of Procurement Table
++ PR #6692: Improved Handling of Unit Rating Report for Older Campaigns
++ PR #6693: Improved SkillLevel Parsing from Older Campaigns
++ PR #6694: Made 'Invalid Profession' Errors More Visible With Advance for Older Campaigns
++ PR #6695: Skip Turrets / Gun Emplacements when auto-configuring NPC ammo loadouts
++ PR #6696: Updated New Player Guide for 50.05; Added Print Friendly Version
++ PR #6699: Thunderbird Battle Armor (3145/NTNU RS Upgrade versions) had no space between (Upgrade) and [Wepaon Type] in MHQ, but it did in MM.
++ Fix #6700: Fixed Company Kill Awards not awarded
++ PR #6703: Added Null Protection to ReportHyperlinkListener
++ PR #6706: Refactored Centralized Skill Check Class to Use TargetRoll; Fixed Multiple Bugs 
++ PR #6705: Fixed SPA Grouping Logic in Campaign Options IIC
++ PR #6713: Fixed Two Invalid and Removable SPAs
++ PR #6714: Fixed Target Number Display in Skill Check Utility
++ PR #6715: Replaced Placeholder Art in Skill Check Dialog
++ PR #6716: Corrected Resupply Documentation; Archived Outdated Parts Procurement Documentation
++ Fix #6717: Fixed Skill Compatibility Version Check
++ Fix #6720: Stopped Deleted Personnel Returning to the Campaign When Activating a Mothballed Unit
++ PR #6729: Moved RandomSkillPreferences to Skills Package
++ Fix #3000, #4097: Updated Comms Center Functionality to Match Description
++ PR #6733: Adjusted Resupply Scaling Factor in Convoy Raid and Facility Hostile Capture
++ Fix #6734: Fixed Prisoner Capacity of Injured Prisoners
++ PR #6735: Added Seed Force to Log During Scenario Generation
++ PR #6738: Remove Redundant Logging in SkillType Updates
++ Fix #3624, #4039: Fixed Transport Report Counting Mothballed Units as Occupying Bays
++ Fix #4014: Fixed OmniPod Handling in Repair Bay Acquisitions Dialog
++ Fix #4120: Updated Global Tooltip Behavior for Instant and Persistent Display
++ Fix #4086: Added GM ability to increase warehouse item counts
++ Fix #6718: Ensured Only Active Techs are Reassigned When Activating Units from a Mothballed State
++ Fix #6701: Added Colorblind Assistance to Refit Not Found Text
++ Fix #1914: Refactored Contract Terms Negotiations to Be Closer to RAW
++ PR #6727: Fix sorting the units in the Unit Market by price
++ Fix #6711: Fixed Conventional Infantry & Large Vessel (DropShip) Mothballing and Activation
++ Fix #3870: Allowed Extra Maintenance Time for Self-Crewed Units (Such as DropShips); Allowed Maintenance Time Changes for Mothballed Units
++ Fix #3963: Added the Ability to GM Increase the Number of Each Part in the Warehouse
++ Fix #4086: Added Parts In Use Button to Warehouse Tab
++ PR #6730: Added Option to Disable ATOW Attribute Scores
++ PR #6736: Simplified Roleplay Skills Randomization
++ PR #6737: Adjusted Maintenance Cycle Hangar Display
++ PR #6745: Updated "The Learning Ropes" Campaign Save File
++ PR #6757: Fixed Defection Logic for Prisoners
++ Fix #6758: Fixed Ransom Events Not Ransoming Prisoners
++ PR #6760: Added Missing 'Has Documentation' Icon to Unit Market Options in Campaign Options IIC
++ PR #6762: Slightly Adjusted Tooltip Initial Delay Setting
++ PR #6756: Fixed Exception When Adopting Child with Existing Parents (Sentry)
++ Fix #6761: Fixed Birthday Generation Logic
++ PR #6763: Fixed Loophole That Allowed Players to Acquire Clantech Prior to Tukayyid.
 
 0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times
@@ -368,8 +491,6 @@ MEKHQ VERSION HISTORY:
 + PR #6319: Added Early Exit for Objective Determination Self-Correction Loop
 + PR #6323: Added MekHQ New Player Guide
 + PR #6325: Updated New Player Guide PDF
-+ Fix #6596: Added Off-Board Deployment Validation and Improved Generation Safety
-
 
 0.50.03 (2025-02-02 2030 UTC)
 + PR #5568: Spare parts rules reference adjustment

@@ -48,7 +48,6 @@ import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.AllGround
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.LowAtmosphere;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.Space;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.SpecificGroundTerrain;
-import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_TACTICS;
 import static mekhq.campaign.personnel.skills.SkillType.getSkillHash;
@@ -981,7 +980,11 @@ public class StratconRulesManager {
 
         if (explicitForceID == FORCE_NONE) {
             // Include all units in the campaign's TO&E
-            for (UUID unitId : campaign.getForces().getAllUnits(false)) {
+            List<UUID> allUnits = campaign.getAllUnitsInTheTOE(false);
+            // We need to shuffle the list, otherwise the same unit will always be selected
+            Collections.shuffle(allUnits);
+
+            for (UUID unitId : allUnits) {
                 try {
                     potentialUnits.add(campaign.getUnit(unitId));
                 } catch (Exception exception) {
@@ -1566,9 +1569,7 @@ public class StratconRulesManager {
         for (UUID unit : campaign.getForce(forceID).getAllUnits(false)) {
             for (Person person : campaign.getUnit(unit).getCrew()) {
                 int fatigueChangeRate = campaign.getCampaignOptions().getFatigueRate();
-                boolean hasGlassJaw = person.getOptions().booleanOption(FLAW_GLASS_JAW);
-
-                person.changeFatigue(hasGlassJaw ? fatigueChangeRate * 2 : fatigueChangeRate);
+                person.changeFatigue(fatigueChangeRate);
 
                 if (campaign.getCampaignOptions().isUseFatigue()) {
                     Fatigue.processFatigueActions(campaign, person);
@@ -2413,7 +2414,13 @@ public class StratconRulesManager {
         }
 
         if (suitableForces.isEmpty()) {
-            suitableForces = getAvailableForceIDs(campaign, contract, true);
+            if (!bypassRoleRestrictions) {
+                logger.info("No suitable combat teams found for contract {}. Relaxing restrictions", contract.getId());
+                suitableForces = getAvailableForceIDs(campaign, contract, true);
+            } else {
+                logger.info("No suitable combat teams found for contract {} despite relaxed restrictions." +
+                                  " Scenario generation will likely be skipped.", contract.getId());
+            }
         }
 
         return suitableForces;
@@ -2544,7 +2551,7 @@ public class StratconRulesManager {
         List<Unit> defensiveUnits = new ArrayList<>();
 
         // Retrieve the list of units from force 0
-        Vector<UUID> unitIDs = campaign.getForce(0).getAllUnits(true);
+        List<UUID> unitIDs = campaign.getAllUnitsInTheTOE(true);
 
         for (UUID unitId : unitIDs) {
             Unit unit = campaign.getUnit(unitId);
@@ -2681,7 +2688,7 @@ public class StratconRulesManager {
 
 
         // Retrieve the list of units from force 0
-        Vector<UUID> unitIDs = campaign.getForce(0).getAllUnits(true);
+        List<UUID> unitIDs = campaign.getAllUnitsInTheTOE(true);
 
         for (UUID unitId : unitIDs) {
             Unit unit = campaign.getUnit(unitId);

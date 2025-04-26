@@ -27,13 +27,24 @@
  */
 package mekhq.campaign.personnel.skills;
 
+import static megamek.common.options.PilotOptions.LVL3_ADVANTAGES;
+import static mekhq.campaign.personnel.PersonnelOptions.ATOW_FAST_LEARNER;
+import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
+import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
+import static mekhq.campaign.personnel.PersonnelOptions.FLAW_SLOW_LEARNER;
+import static mekhq.campaign.personnel.skills.enums.AgingMilestone.CLAN_REPUTATION_MULTIPLIER;
 import static mekhq.campaign.personnel.skills.enums.AgingMilestone.NONE;
+import static mekhq.campaign.personnel.skills.enums.AgingMilestone.STAR_CAPTAIN_RANK_INDEX;
+import static mekhq.campaign.personnel.skills.enums.AgingMilestone.STAR_CAPTAIN_REPUTATION_MULTIPLIER;
+import static mekhq.campaign.personnel.skills.enums.AgingMilestone.STAR_COLONEL_RANK_INDEX;
+import static mekhq.campaign.personnel.skills.enums.AgingMilestone.STAR_COLONEL_REPUTATION_MULTIPLIER;
 import static mekhq.campaign.personnel.skills.enums.AgingMilestone.TWENTY_FIVE;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NO_SKILL_ATTRIBUTE;
 
 import java.time.LocalDate;
 
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.enums.AgingMilestone;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 
@@ -89,6 +100,17 @@ public class Aging {
         }
     }
 
+    /**
+     * Resets all age-related modifiers for the skills of a given person to zero.
+     *
+     * <p>This method iterates through all skills in the {@code SkillType.skillList} and, for each skill that
+     * the person possesses, sets its aging modifier to zero. Skills that the person does not have are ignored.</p>
+     *
+     * @param person The person whose skill age modifiers will be cleared.
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
     public static void clearAllAgeModifiers(Person person) {
         for (String skillName : SkillType.skillList) {
             boolean hasSkill = person.hasSkill(skillName);
@@ -156,7 +178,7 @@ public class Aging {
      *       0} if no valid combination or milestone exists
      */
     public static int getAgeModifier(AgingMilestone milestone, SkillAttribute firstAttribute,
-                                     SkillAttribute secondAttribute) {
+          SkillAttribute secondAttribute) {
         // If no milestone applies, return no modifier
         if (milestone == NONE) {
             return 0;
@@ -178,6 +200,98 @@ public class Aging {
 
         // Average the two modifiers and apply the aging skill adjustment
         return applyAgingModifier((firstModifier + secondModifier) / 2);
+    }
+
+    /**
+     * Calculates the reputation age modifier for a character based on their age, clan affiliation, bloodname status,
+     * and military rank.
+     *
+     * <p>This method determines a character's reputation age modifier by evaluating their age against a predefined
+     * aging milestone, their clan affiliation, their possession of a bloodname, and their rank in the clan hierarchy.
+     * If the character meets specific conditions, such as holding a high enough rank or possessing a bloodname, the
+     * reputation multiplier is adjusted. The final result is scaled by a clan-specific reputation multiplier.</p>
+     *
+     * @param characterAge The age of the character for which the reputation modifier is being calculated.
+     * @param isClan       Indicates whether the character is part of a clan. If {@code false}, the method returns 0.
+     * @param hasBloodname Indicates whether the character possesses a bloodname, which can decrease the reputation
+     *                     multiplier under certain conditions.
+     * @param rankIndex    The rank index of the character, used to determine if they meet rank-specific milestone
+     *                     conditions for reputation adjustment.
+     *
+     * @return The calculated reputation age modifier. Returns 0 if the character is not a clan member.
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public static int getReputationAgeModifier(int characterAge, boolean isClan, boolean hasBloodname, int rankIndex) {
+        if (!isClan) {
+            return 0;
+        }
+
+        AgingMilestone milestone = getMilestone(characterAge);
+
+        int reputationMultiplier = milestone.getReputation();
+        boolean hasHitRankTarget = false;
+
+        if (reputationMultiplier == STAR_CAPTAIN_REPUTATION_MULTIPLIER && rankIndex >= STAR_CAPTAIN_RANK_INDEX) {
+            hasHitRankTarget = true;
+        }
+
+        if (reputationMultiplier == STAR_COLONEL_REPUTATION_MULTIPLIER && rankIndex >= STAR_COLONEL_RANK_INDEX) {
+            hasHitRankTarget = true;
+        }
+
+        if (hasHitRankTarget || hasBloodname) {
+            reputationMultiplier--;
+        }
+
+        return reputationMultiplier * CLAN_REPUTATION_MULTIPLIER;
+    }
+
+    /**
+     * Applies age-related special abilities or flaws to a given person based on their age.
+     *
+     * <p>This method evaluates the character's age against predefined aging milestones, and if the age matches
+     * a milestone, specific effects such as applying flaws or adjusting abilities are triggered. For example, it may
+     * apply the "Glass Jaw" flaw or interact with existing abilities like "Toughness".</p>
+     *
+     * @param characterAge The age of the character, used to determine applicable aging milestones and effects.
+     * @param person       The person to whom the aging-related effects will be applied.
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public static void applyAgingSPA(int characterAge, Person person) {
+        PersonnelOptions options = person.getOptions();
+        for (AgingMilestone milestone : AgingMilestone.values()) {
+            if (characterAge == milestone.getMilestone()) {
+                // Glass Jaw
+                if (milestone.isGlassJaw()) {
+                    boolean hasGlassJaw = options.booleanOption(FLAW_GLASS_JAW);
+                    boolean hasToughness = options.booleanOption(ATOW_TOUGHNESS);
+
+                    if (hasToughness) {
+                        person.getOptions().getOption(ATOW_TOUGHNESS).setValue(false);
+                    } else if (!hasGlassJaw) {
+                        options.acquireAbility(LVL3_ADVANTAGES, FLAW_GLASS_JAW, true);
+                    }
+                }
+
+                // Slow Learner
+                if (milestone.isSlowLearner()) {
+                    boolean hasSlowLearner = options.booleanOption(FLAW_SLOW_LEARNER);
+                    boolean hasFastLearner = options.booleanOption(ATOW_FAST_LEARNER);
+
+                    if (hasFastLearner) {
+                        person.getOptions().getOption(ATOW_FAST_LEARNER).setValue(false);
+                    } else if (!hasSlowLearner) {
+                        options.acquireAbility(LVL3_ADVANTAGES, FLAW_SLOW_LEARNER, true);
+                    }
+                }
+
+                break;
+            }
+        }
     }
 
     /**

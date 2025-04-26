@@ -54,6 +54,32 @@ import java.util.function.Consumer;
 import javax.swing.JTable;
 import javax.swing.table.TableModel;
 
+import static java.lang.Math.max;
+import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_GREEN;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_ULTRA_GREEN;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_VETERAN;
+
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FilenameFilter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.function.Consumer;
+import javax.swing.JTable;
+import javax.swing.table.TableModel;
+
 import megamek.client.Client;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.codeUtilities.MathUtility;
@@ -78,6 +104,7 @@ import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.ITransportAssignment;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTechProgression;
+import mekhq.campaign.universe.Faction;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.w3c.dom.Node;
@@ -276,6 +303,18 @@ public class Utilities {
             } else if (!campaign.isLegal(techProg)) {
                 continue;
             }
+
+            Faction campaignFaction = campaign.getFaction();
+            boolean campaignIsClan = campaignFaction.isClan();
+            String techBase = summary.getTechBase().toLowerCase();
+            boolean modelIsClan = summary.isClan() || techBase.contains("clan") || techBase.contains("mixed");
+
+            LocalDate today = campaign.getLocalDate();
+
+            if (!campaignIsClan && modelIsClan && today.isBefore(BATTLE_OF_TUKAYYID)) {
+                continue;
+            }
+
             // Otherwise, we can offer it for selection
             variants.add(summary.getModel());
         }

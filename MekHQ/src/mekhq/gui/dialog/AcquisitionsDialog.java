@@ -100,7 +100,7 @@ public class AcquisitionsDialog extends JDialog {
 
         JPanel pnlMain = new JPanel();
         pnlMain.setLayout(new GridBagLayout());
- 
+
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.fill    = GridBagConstraints.BOTH;
         gridBagConstraints.anchor  = GridBagConstraints.NORTHWEST;
@@ -362,7 +362,7 @@ public class AcquisitionsDialog extends JDialog {
                                        countModifier +
                                        " on order";
 
-                if (partCountInfo.getOmniPodCount() > 0) {
+                if (partCountInfo.getOmniPodCount() > 0 && part.isOmniPoddable()) {
                     inventoryInfo += ", " + partCountInfo.getOmniPodCount() + countModifier + " OmniPod";
                 }
 
@@ -549,7 +549,9 @@ public class AcquisitionsDialog extends JDialog {
             btnDepod = new JButton("Remove One From Pod");
             btnDepod.setToolTipText("Remove replacement from pod");
             btnDepod.setName("btnDepod");
-            btnDepod.setVisible(partCountInfo.getOmniPodCount() > 0);
+            btnDepod.setVisible(partCountInfo.getOmniPodCount() > 0 &&
+                                      part.getMissingPart() != null &&
+                                      part.isOmniPoddable());
             btnDepod.addActionListener(ev -> {
                 MissingPart podded = part.getMissingPart();
                 podded.setOmniPodded(true);

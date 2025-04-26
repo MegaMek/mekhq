@@ -2,11 +2,11 @@
 <ScenarioTemplate>
     <name>Diversion Engagement</name>
     <shortBriefing>Bypass or destroy diversionary force.</shortBriefing>
-    <detailedBriefing>The enemy has deployed a delaying force to stall our advance toward a critical objective. Their mission is to slow us down, bleed our forces, and buy time for their reinforcements to fortify their position. Your task is to push through their blockade and continue the advance.
+    <detailedBriefing><![CDATA[The enemy has deployed a delaying force to stall our advance toward a critical objective. Their mission is to slow us down, bleed our forces, and buy time for their reinforcements to fortify their position. Your task is to push through their blockade and continue the advance.
 
 Victory can be achieved in one of two ways. Ensure at least 50% of your forces reach the far edge of the engagement zone, bypassing the enemy’s attempt to hold you in place. Alternatively, if they commit too heavily to blocking your path, destroy at least 75% of their forces, breaking their ability to resist and forcing them to withdraw.
 
-Be advised: the enemy will control the field at the end of the engagement. There will be no time for salvage or securing the area. Speed and decisive action are key—either break through or break them entirely, but do not allow them to stall our momentum.</detailedBriefing>
+Be advised: the enemy will control the field at the end of the engagement. There will be no time for salvage or securing the area. Speed and decisive action are key—either break through or break them entirely, but do not allow them to stall our momentum.]]></detailedBriefing>
     <battlefieldControl>ENEMY</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
@@ -34,7 +34,7 @@ Be advised: the enemy will control the field at the end of the engagement. There
                 <deploymentZones>
                     <deploymentZone>6</deploymentZone>
                 </deploymentZones>
-                <destinationZone>2</destinationZone>
+                <destinationZone>6</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>0</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>

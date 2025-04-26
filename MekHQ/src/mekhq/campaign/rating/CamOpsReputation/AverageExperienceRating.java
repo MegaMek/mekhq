@@ -39,6 +39,7 @@ import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -226,14 +227,28 @@ public class AverageExperienceRating {
         PersonnelOptions options = person.getOptions();
         if (unit.isDriver(person)) {
             skillType = SkillType.getDrivingSkillFor(entity);
-            skillValue += max(0, person.getSkill(skillType).getFinalSkillValue(options));
-            skillCount++;
+            Skill skill = person.getSkill(skillType);
+
+            if (skill != null) {
+                skillValue += max(0,skill.getFinalSkillValue(options));
+                skillCount++;
+            } else {
+                logger.warn("(calculateRegularExperience) unable to fetch diving skill {} for {}. Skipping",
+                      skillType, entity);
+            }
         }
 
         if (unit.isGunner(person)) {
             skillType = SkillType.getGunnerySkillFor(entity);
-            skillValue += max(0, person.getSkill(skillType).getFinalSkillValue(options));
-            skillCount++;
+
+            Skill skill = person.getSkill(skillType);
+            if (skill != null) {
+                skillValue += max(0,skill.getFinalSkillValue(options));
+                skillCount++;
+            } else {
+                logger.warn("(calculateRegularExperience) unable to fetch gunnery skill {} for {}. Skipping",
+                      skillType, entity);
+            }
         }
 
         if (skillCount == 0) {

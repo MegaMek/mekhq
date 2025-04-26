@@ -51,6 +51,7 @@ public class PersonnelReport extends AbstractReport {
         int countMIA = 0;
         int countKIA = 0;
         int countDead = 0;
+        int countStudents = 0;
         int countRetired = 0;
         Money salary = Money.zero();
 
@@ -63,8 +64,7 @@ public class PersonnelReport extends AbstractReport {
             if (p.getStatus().isActive()) {
                 countPersonByType[p.getPrimaryRole().ordinal()]++;
                 countTotal++;
-                if (getCampaign().getCampaignOptions().isUseAdvancedMedical()
-                        && !p.getInjuries().isEmpty()) {
+                if (getCampaign().getCampaignOptions().isUseAdvancedMedical() && !p.getInjuries().isEmpty()) {
                     countInjured++;
                 } else if (p.getHits() > 0) {
                     countInjured++;
@@ -83,6 +83,8 @@ public class PersonnelReport extends AbstractReport {
                 countDead++;
             } else if (p.getStatus().isDead()) {
                 countDead++;
+            } else if (p.getStatus().isStudent()) {
+                countStudents++;
             }
 
         }
@@ -93,18 +95,21 @@ public class PersonnelReport extends AbstractReport {
 
         for (PersonnelRole role : personnelRoles) {
             if (role.isCombat()) {
-                sb.append(String.format("    %-30s    %4s\n", role.getName(getCampaign().getFaction().isClan()),
-                        countPersonByType[role.ordinal()]));
+                sb.append(String.format("    %-30s    %4s\n",
+                      role.getLabel(getCampaign().getFaction().isClan()),
+                      countPersonByType[role.ordinal()]));
             }
         }
 
         sb.append('\n')
-                .append(String.format("%-30s        %4s\n", "Injured Combat Personnel", countInjured))
-                .append(String.format("%-30s        %4s\n", "MIA Combat Personnel", countMIA))
-                .append(String.format("%-30s        %4s\n", "KIA Combat Personnel", countKIA))
-                .append(String.format("%-30s        %4s\n", "Retired Combat Personnel", countRetired))
-                .append(String.format("%-30s        %4s\n", "Dead Combat Personnel", countDead))
-                .append("\nMonthly Salary For Combat Personnel: ").append(salary.toAmountAndSymbolString());
+              .append(String.format("%-30s        %4s\n", "Injured Combat Personnel", countInjured))
+              .append(String.format("%-30s        %4s\n", "MIA Combat Personnel", countMIA))
+              .append(String.format("%-30s        %4s\n", "KIA Combat Personnel", countKIA))
+              .append(String.format("%-30s        %4s\n", "Retired Combat Personnel", countRetired))
+              .append(String.format("%-30s        %4s\n", "Dead Combat Personnel", countDead))
+              .append(String.format("%-30s        %4s\n", "Student Combat Personnel", countStudents))
+              .append("\nMonthly Salary For Combat Personnel: ")
+              .append(salary.toAmountAndSymbolString());
 
         return sb.toString();
     }
@@ -117,6 +122,7 @@ public class PersonnelReport extends AbstractReport {
         int countMIA = 0;
         int countKIA = 0;
         int countDead = 0;
+        int countStudents = 0;
         int countRetired = 0;
         Money salary = Money.zero();
         int prisoners = 0;
@@ -150,6 +156,8 @@ public class PersonnelReport extends AbstractReport {
                 countDead++;
             } else if (primarySupport && p.getStatus().isDead()) {
                 countDead++;
+            } else if (primarySupport && p.getStatus().isStudent()) {
+                countStudents++;
             }
 
             if (p.getPrimaryRole().isDependent() && p.getStatus().isActive() && p.getPrisonerStatus().isFree()) {
@@ -160,10 +168,12 @@ public class PersonnelReport extends AbstractReport {
         }
 
         //Add Salaries of Temp Workers
-        salary = salary.plus(getCampaign().getCampaignOptions().getRoleBaseSalaries()[PersonnelRole.ASTECH.ordinal()].getAmount().doubleValue()
-                * getCampaign().getAstechPool());
-        salary = salary.plus(getCampaign().getCampaignOptions().getRoleBaseSalaries()[PersonnelRole.MEDIC.ordinal()].getAmount().doubleValue()
-                * getCampaign().getMedicPool());
+        salary = salary.plus(getCampaign().getCampaignOptions()
+                                   .getRoleBaseSalaries()[PersonnelRole.ASTECH.ordinal()].getAmount().doubleValue() *
+                                   getCampaign().getAstechPool());
+        salary = salary.plus(getCampaign().getCampaignOptions()
+                                   .getRoleBaseSalaries()[PersonnelRole.MEDIC.ordinal()].getAmount().doubleValue() *
+                                   getCampaign().getMedicPool());
 
         StringBuilder sb = new StringBuilder("Support Personnel\n\n");
 
@@ -171,8 +181,9 @@ public class PersonnelReport extends AbstractReport {
 
         for (PersonnelRole role : personnelRoles) {
             if (role.isSupport(true)) {
-                sb.append(String.format("    %-30s    %4s\n", role.getName(getCampaign().getFaction().isClan()),
-                        countPersonByType[role.ordinal()]));
+                sb.append(String.format("    %-30s    %4s\n",
+                      role.getLabel(getCampaign().getFaction().isClan()),
+                      countPersonByType[role.ordinal()]));
             }
         }
 
@@ -181,15 +192,17 @@ public class PersonnelReport extends AbstractReport {
         sb.append(String.format("    %-30s    %4s\n", "Temp Astechs", getCampaign().getAstechPool()));
 
         sb.append('\n')
-                .append(String.format("%-30s        %4s\n", "Injured Support Personnel", countInjured))
-                .append(String.format("%-30s        %4s\n", "MIA Support Personnel", countMIA))
-                .append(String.format("%-30s        %4s\n", "KIA Support Personnel", countKIA))
-                .append(String.format("%-30s        %4s\n", "Retired Support Personnel", countRetired))
-                .append(String.format("%-30s        %4s\n", "Dead Support Personnel", countDead))
-                .append("\nMonthly Salary For Support Personnel: ").append(salary.toAmountAndSymbolString())
-                .append(String.format("\nYou have " + dependents + " %s", (dependents == 1) ? "dependent" : "dependents"))
-                .append(String.format("\nYou have " + prisoners + " prisoner%s", prisoners == 1 ? "" : "s"))
-                .append(String.format("\nYou have " + bondsmen + " %s", (bondsmen == 1) ? "bondsman" : "bondsmen"));
+              .append(String.format("%-30s        %4s\n", "Injured Support Personnel", countInjured))
+              .append(String.format("%-30s        %4s\n", "MIA Support Personnel", countMIA))
+              .append(String.format("%-30s        %4s\n", "KIA Support Personnel", countKIA))
+              .append(String.format("%-30s        %4s\n", "Retired Support Personnel", countRetired))
+              .append(String.format("%-30s        %4s\n", "Dead Support Personnel", countDead))
+              .append(String.format("%-30s        %4s\n", "Student Support Personnel", countStudents))
+              .append("\nMonthly Salary For Support Personnel: ")
+              .append(salary.toAmountAndSymbolString())
+              .append(String.format("\nYou have " + dependents + " %s", (dependents == 1) ? "dependent" : "dependents"))
+              .append(String.format("\nYou have " + prisoners + " prisoner%s", prisoners == 1 ? "" : "s"))
+              .append(String.format("\nYou have " + bondsmen + " %s", (bondsmen == 1) ? "bondsman" : "bondsmen"));
 
         return sb.toString();
     }

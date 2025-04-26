@@ -29,12 +29,25 @@
 package mekhq.campaign.personnel;
 
 import static java.lang.Math.abs;
+import static java.lang.Math.floor;
+import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.REGULAR;
+import static mekhq.campaign.log.LogEntryType.ASSIGNMENT;
+import static mekhq.campaign.log.LogEntryType.MEDICAL;
+import static mekhq.campaign.log.LogEntryType.PERFORMANCE;
+import static mekhq.campaign.log.LogEntryType.SERVICE;
+import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
+import static mekhq.campaign.personnel.skills.Aging.getReputationAgeModifier;
+import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE;
+import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
+import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
@@ -70,10 +83,12 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.LogEntryFactory;
+import mekhq.campaign.log.LogEntryType;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.enums.BloodGroup;
 import mekhq.campaign.personnel.enums.ManeiDominiClass;
 import mekhq.campaign.personnel.enums.ManeiDominiRank;
@@ -184,7 +199,10 @@ public class Person {
     private LocalDate lastRankChangeDate;
     private LocalDate dateOfDeath;
     private List<LogEntry> personnelLog;
+    private List<LogEntry> medicalLog;
     private List<LogEntry> scenarioLog;
+    private List<LogEntry> assignmentLog;
+    private List<LogEntry> performanceLog;
 
     // this is used by autoAwards to abstract the support person of the year award
     private int autoAwardSupportPoints;
@@ -199,6 +217,7 @@ public class Person {
     private int toughness;
     private int connections;
     private int wealth;
+    private boolean hasPerformedExtremeExpenditure;
     private int reputation;
     private int unlucky;
     private Attributes atowAttributes;
@@ -215,7 +234,7 @@ public class Person {
 
     // Supports edge usage by a ship's engineer composite crewman
     private int edgeUsedThisRound;
-    // To track how many edge points support personnel have left until next refresh
+    // To track how many edge points personnel have left until next refresh
     private int currentEdge;
 
     // phenotype and background
@@ -316,7 +335,7 @@ public class Person {
     // Generic extra data, for use with plugins and mods
     private ExtraData extraData;
 
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+    private final static ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
           MekHQ.getMHQOptions().getLocale());
     private static final MMLogger logger = MMLogger.create(Person.class);
 
@@ -432,6 +451,7 @@ public class Person {
         toughness = 0;
         connections = 0;
         wealth = 0;
+        hasPerformedExtremeExpenditure = false;
         reputation = 0;
         unlucky = 0;
         atowAttributes = new Attributes();
@@ -449,7 +469,10 @@ public class Person {
         currentEdge = 0;
         techUnits = new ArrayList<>();
         personnelLog = new ArrayList<>();
+        medicalLog = new ArrayList<>();
         scenarioLog = new ArrayList<>();
+        assignmentLog = new ArrayList<>();
+        performanceLog = new ArrayList<>();
         awardController = new PersonAwardController(this);
         injuries = new ArrayList<>();
         originalUnitWeight = EntityWeightClass.WEIGHT_ULTRA_LIGHT;
@@ -979,11 +1002,11 @@ public class Person {
         if (isClanPersonnel()) {
             bgPrefix = getPhenotype().getShortName() + ' ';
         }
-        return bgPrefix + getPrimaryRole().getName(isClanPersonnel());
+        return bgPrefix + getPrimaryRole().getLabel(isClanPersonnel());
     }
 
     public String getSecondaryRoleDesc() {
-        return getSecondaryRole().getName(isClanPersonnel());
+        return getSecondaryRole().getLabel(isClanPersonnel());
     }
 
     public boolean canPerformRole(LocalDate today, final PersonnelRole role, final boolean primary) {
@@ -1688,18 +1711,23 @@ public class Person {
     }
 
     /**
-     * Adjusts the current fatigue level by the specified amount.
+     * Adjusts the current fatigue level by the specified amount, applying an SPA fatigue multiplier where applicable.
      *
-     * <p>
-     * This method modifies the fatigue level by adding the value of {@code change} to the current fatigue. Positive
-     * values will increase the fatigue, while negative values will decrease it.
-     * </p>
+     * <p>This method modifies the fatigue level based on the given {@code delta} value. Positive values, which
+     * indicate an increase in fatigue, are scaled by the result of {@link #getFatigueMultiplier()} and rounded down
+     * using {@link Math#floor(double)} to ensure consistent results. Negative values, which indicate a reduction in
+     * fatigue, are applied directly without modification.</p>
      *
-     * @param change The amount to adjust the fatigue by. Positive values increase fatigue, and negative values decrease
-     *               it.
+     * @param delta The amount to adjust the fatigue by. Positive values represent fatigue gain and are scaled by the
+     *              fatigue multiplier, while negative values represent fatigue reduction and are applied as-is.
      */
-    public void changeFatigue(final int change) {
-        this.fatigue = this.fatigue + change;
+    public void changeFatigue(int delta) {
+        if (delta > 0) {
+            // Only fatigue gain is modified by SPAs, not reduction.
+            delta = (int) floor(delta * getFatigueMultiplier());
+        }
+
+        this.fatigue = this.fatigue + delta;
     }
 
     public boolean getIsRecoveringFromFatigue() {
@@ -1708,6 +1736,65 @@ public class Person {
 
     public void setIsRecoveringFromFatigue(final boolean isRecoveringFromFatigue) {
         this.isRecoveringFromFatigue = isRecoveringFromFatigue;
+    }
+
+    /**
+     * Calculates the fatigue multiplier for a character based on their traits and fitness-related options.
+     *
+     * <p>The calculation is influenced by the following conditions:</p>
+     * <ul>
+     *     <li><b>{@code FLAW_GLASS_JAW}</b>: If set, increases the multiplier by 1.</li>
+     *     <li><b>{@code ATOW_TOUGHNESS}</b>: If set, decreases the multiplier by 1.</li>
+     *     <li>Both {@code FLAW_GLASS_JAW} and {@code ATOW_TOUGHNESS} cannot modify the multiplier if both are
+     *     present, as they cancel each other out.</li>
+     *     <li><b>{@code ATOW_FIT}</b>: If set, decreases the multiplier by 1.</li>
+     *     <li><b>{@code FLAW_UNFIT}</b>: If set, increases the multiplier by 1.</li>
+     *     <li>Both {@code ATOW_FIT} and {@code FLAW_UNFIT}, when present simultaneously, cancel each other out and
+     *     do not affect the multiplier.</li>
+     * </ul>
+     *
+     * <p>After calculating the initial multiplier, the following adjustments are applied:</p>
+     * <ul>
+     *     <li>If the resulting multiplier equals {@code 0}, it is set to {@code 0.5} to avoid zeroing Fatigue.</li>
+     *     <li>If the resulting multiplier is less than {@code 0}, it is set to a minimum value of {@code 0.25}.</li>
+     * </ul>
+     *
+     * @return the calculated fatigue multiplier, adjusted based on the character's traits and options
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    private double getFatigueMultiplier() {
+        double fatigueMultiplier = 1;
+
+        // Glass Jaw and Toughness
+        boolean hasGlassJaw = options.booleanOption(FLAW_GLASS_JAW);
+        boolean hasToughness = options.booleanOption(ATOW_TOUGHNESS);
+        boolean modifyForGlassJawToughness = !(hasGlassJaw && hasToughness);
+
+        if (modifyForGlassJawToughness) {
+            fatigueMultiplier += (hasGlassJaw ? 1 : 0);
+            fatigueMultiplier -= (hasToughness ? 1 : 0);
+        }
+
+        // Fit and Unfit
+        boolean hasFit = options.booleanOption(ATOW_FIT);
+        boolean hasUnfit = options.booleanOption(FLAW_UNFIT);
+        boolean modifyForFitness = !(hasFit && hasUnfit);
+
+        if (modifyForFitness) {
+            fatigueMultiplier += (hasUnfit ? 1 : 0);
+            fatigueMultiplier -= (hasFit ? 1 : 0);
+        }
+
+        // Conclusion
+        if (fatigueMultiplier == 0) {
+            fatigueMultiplier = 0.5;
+        } else if (fatigueMultiplier < 0) {
+            fatigueMultiplier = 0.25;
+        }
+
+        return fatigueMultiplier;
     }
     // region Turnover and Retention
 
@@ -2371,6 +2458,10 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "wealth", wealth);
             }
 
+            if (hasPerformedExtremeExpenditure) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hasPerformedExtremeExpenditure", true);
+            }
+
             if (reputation != 0) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "reputation", reputation);
             }
@@ -2415,10 +2506,7 @@ public class Person {
                       indent,
                       "edge",
                       getOptionList("::", PersonnelOptions.EDGE_ADVANTAGES));
-                // For support personnel, write an available edge value
-                if (hasSupportRole(true) || isEngineer()) {
-                    MHQXMLUtility.writeSimpleXMLTag(pw, indent, "edgeAvailable", getCurrentEdge());
-                }
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "edgeAvailable", getCurrentEdge());
             }
 
             if (countOptions(PersonnelOptions.MD_ADVANTAGES) > 0) {
@@ -2444,12 +2532,36 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "personnelLog");
             }
 
+            if (!medicalLog.isEmpty()) {
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "medicalLog");
+                for (LogEntry entry : medicalLog) {
+                    entry.writeToXML(pw, indent);
+                }
+                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "medicalLog");
+            }
+
             if (!scenarioLog.isEmpty()) {
                 MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "scenarioLog");
                 for (LogEntry entry : scenarioLog) {
                     entry.writeToXML(pw, indent);
                 }
                 MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "scenarioLog");
+            }
+
+            if (!assignmentLog.isEmpty()) {
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "assignmentLog");
+                for (LogEntry entry : assignmentLog) {
+                    entry.writeToXML(pw, indent);
+                }
+                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "assignmentLog");
+            }
+
+            if (!performanceLog.isEmpty()) {
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "performanceLog");
+                for (LogEntry entry : performanceLog) {
+                    entry.writeToXML(pw, indent);
+                }
+                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "performanceLog");
             }
 
             if (!getAwardController().getAwards().isEmpty()) {
@@ -2675,16 +2787,16 @@ public class Person {
                 } else if (nodeName.equalsIgnoreCase("becomingBondsmanEndDate")) {
                     person.becomingBondsmanEndDate = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("phenotype")) {
-                    person.phenotype = Phenotype.parseFromString(wn2.getTextContent().trim());
+                    person.phenotype = Phenotype.fromString(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("bloodname")) {
                     person.bloodname = wn2.getTextContent();
                 } else if (nodeName.equalsIgnoreCase("biography")) {
                     person.biography = wn2.getTextContent();
                 } else if (nodeName.equalsIgnoreCase("primaryRole")) {
-                    final PersonnelRole primaryRole = PersonnelRole.parseFromString(wn2.getTextContent().trim());
+                    final PersonnelRole primaryRole = PersonnelRole.fromString(wn2.getTextContent().trim());
                     person.setPrimaryRoleDirect(primaryRole);
                 } else if (nodeName.equalsIgnoreCase("secondaryRole")) {
-                    person.setSecondaryRoleDirect(PersonnelRole.parseFromString(wn2.getTextContent().trim()));
+                    person.setSecondaryRoleDirect(PersonnelRole.fromString(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("acquisitions")) {
                     person.acquisitions = MathUtility.parseInt(wn2.getTextContent());
                 } else if (nodeName.equalsIgnoreCase("primaryDesignator")) {
@@ -2789,6 +2901,8 @@ public class Person {
                     person.connections = MathUtility.parseInt(wn2.getTextContent());
                 } else if (nodeName.equalsIgnoreCase("wealth")) {
                     person.wealth = MathUtility.parseInt(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("hasPerformedExtremeExpenditure")) {
+                    person.hasPerformedExtremeExpenditure = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (nodeName.equalsIgnoreCase("reputation")) {
                     person.reputation = MathUtility.parseInt(wn2.getTextContent());
                 } else if (nodeName.equalsIgnoreCase("unlucky")) {
@@ -2812,7 +2926,8 @@ public class Person {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("id")) {
-                            logger.error("Unknown node type not loaded in techUnitIds nodes: {}", wn3.getNodeName());
+                            logger.error("(techUnitIds) Unknown node type not loaded in techUnitIds nodes: {}",
+                                  wn3.getNodeName());
                             continue;
                         }
                         person.addTechUnit(new PersonUnitRef(UUID.fromString(wn3.getTextContent())));
@@ -2827,14 +2942,75 @@ public class Person {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
-                            logger.error("Unknown node type not loaded in personnel logEntry nodes: {}",
+                            logger.error("(personnelLog) Unknown node type not loaded in personnel logEntry nodes: {}",
                                   wn3.getNodeName());
                             continue;
                         }
 
                         final LogEntry logEntry = LogEntryFactory.getInstance().generateInstanceFromXML(wn3);
                         if (logEntry != null) {
-                            person.addLogEntry(logEntry);
+                            // <50.05 compatibility handler
+                            LogEntryType logEntryType = logEntry.getType();
+                            String logEntryDescription = logEntry.getDesc();
+                            if (logEntryType == MEDICAL) {
+                                person.addMedicalLogEntry(logEntry);
+                            } else if (logEntryType == SERVICE) {
+                                // < 50.05 compatibility handler
+                                List<String> assignmentTargetStrings = List.of("Assigned to",
+                                      "Reassigned from",
+                                      "Removed from",
+                                      "Added to");
+
+                                for (String targetString : assignmentTargetStrings) {
+                                    if (logEntryDescription.startsWith(targetString)) {
+                                        logEntry.setType(ASSIGNMENT);
+                                        person.addAssignmentLogEntry(logEntry);
+                                        break;
+                                    }
+                                }
+                            } else {
+                                // < 50.05 compatibility handler
+                                List<String> performanceTargetStrings = List.of("Changed edge to",
+                                      "Gained",
+                                      "Improved",
+                                      "injuries, gaining",
+                                      "XP from successful medical work");
+
+                                boolean foundPerformanceTarget = false;
+                                for (String targetString : performanceTargetStrings) {
+                                    if (logEntryDescription.startsWith(targetString)) {
+                                        foundPerformanceTarget = true;
+                                        break;
+                                    }
+                                }
+
+                                if (foundPerformanceTarget) {
+                                    logEntry.setType(PERFORMANCE);
+                                    person.addPerformanceLogEntry(logEntry);
+                                } else {
+                                    person.addPersonalLogEntry(logEntry);
+                                }
+                            }
+                        }
+                    }
+                } else if (nodeName.equalsIgnoreCase("medicalLog")) {
+                    NodeList nl2 = wn2.getChildNodes();
+                    for (int y = 0; y < nl2.getLength(); y++) {
+                        Node wn3 = nl2.item(y);
+                        // If it's not an element node, we ignore it.
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                            continue;
+                        }
+
+                        if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
+                            logger.error("(medicalLog) Unknown node type not loaded in personnel logEntry nodes: {}",
+                                  wn3.getNodeName());
+                            continue;
+                        }
+
+                        final LogEntry logEntry = LogEntryFactory.getInstance().generateInstanceFromXML(wn3);
+                        if (logEntry != null) {
+                            person.addMedicalLogEntry(logEntry);
                         }
                     }
                 } else if (nodeName.equalsIgnoreCase("scenarioLog")) {
@@ -2855,6 +3031,46 @@ public class Person {
                         final LogEntry logEntry = LogEntryFactory.getInstance().generateInstanceFromXML(wn3);
                         if (logEntry != null) {
                             person.addScenarioLogEntry(logEntry);
+                        }
+                    }
+                } else if (nodeName.equalsIgnoreCase("assignmentLog")) {
+                    NodeList nl2 = wn2.getChildNodes();
+                    for (int y = 0; y < nl2.getLength(); y++) {
+                        Node wn3 = nl2.item(y);
+                        // If it's not an element node, we ignore it.
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                            continue;
+                        }
+
+                        if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
+                            logger.error("(assignmentLog) Unknown node type not loaded in scenario logEntry nodes: {}",
+                                  wn3.getNodeName());
+                            continue;
+                        }
+
+                        final LogEntry logEntry = LogEntryFactory.getInstance().generateInstanceFromXML(wn3);
+                        if (logEntry != null) {
+                            person.addAssignmentLogEntry(logEntry);
+                        }
+                    }
+                } else if (nodeName.equalsIgnoreCase("performanceLog")) {
+                    NodeList nl2 = wn2.getChildNodes();
+                    for (int y = 0; y < nl2.getLength(); y++) {
+                        Node wn3 = nl2.item(y);
+                        // If it's not an element node, we ignore it.
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                            continue;
+                        }
+
+                        if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
+                            logger.error("(performanceLog) Unknown node type not loaded in scenario logEntry nodes: {}",
+                                  wn3.getNodeName());
+                            continue;
+                        }
+
+                        final LogEntry logEntry = LogEntryFactory.getInstance().generateInstanceFromXML(wn3);
+                        if (logEntry != null) {
+                            person.addPerformanceLogEntry(logEntry);
                         }
                     }
                 } else if (nodeName.equalsIgnoreCase("awards")) {
@@ -3054,14 +3270,18 @@ public class Person {
             // potentially as far back as 2014. The next two handlers should never be removed.
             if (!person.canPerformRole(campaign.getLocalDate(), person.getPrimaryRole(), true)) {
                 person.setPrimaryRole(campaign, PersonnelRole.NONE);
-                logger.info("{} was found to be ineligible for their primary role. That role has been removed and " +
-                                  "they were assigned the NONE role.", person.getFullTitle());
+
+                campaign.addReport(String.format(resources.getString("ineligibleForPrimaryRole"),
+                      spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                      CLOSING_SPAN_TAG, person.getHyperlinkedFullTitle()));
             }
 
             if (!person.canPerformRole(campaign.getLocalDate(), person.getSecondaryRole(), false)) {
                 person.setSecondaryRole(PersonnelRole.NONE);
-                logger.info("{} was found to be ineligible for their secondary role. That role has been removed and " +
-                                  "they were assigned the NONE role.", person.getFullTitle());
+
+                campaign.addReport(String.format(resources.getString("ineligibleForSecondaryRole"),
+                      spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor()),
+                      CLOSING_SPAN_TAG, person.getHyperlinkedFullTitle()));
             }
         } catch (Exception e) {
             logger.error(e, "Failed to read person {} from file", person.getFullName());
@@ -3450,8 +3670,6 @@ public class Person {
         final PersonnelRole role = secondary ? getSecondaryRole() : getPrimaryRole();
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
         final boolean isAlternativeQualityAveraging = campaignOptions.isAlternativeQualityAveraging();
-        final boolean isDoctorsHaveAdministration = campaignOptions.isDoctorsUseAdministration();
-        final boolean isTechsHaveAdministration = campaignOptions.isTechsUseAdministration();
 
         switch (role) {
             case MEKWARRIOR:
@@ -3461,16 +3679,16 @@ public class Person {
                      * non-standard experience thresholds then fall back on lower precision averaging See Bug #140
                      */
                     if (isAlternativeQualityAveraging) {
-                        int rawScore = (int) Math.floor((getSkill(SkillType.S_GUN_MEK).getLevel() +
-                                                               getSkill(SkillType.S_PILOT_MEK).getLevel()) / 2.0);
+                        int rawScore = (int) floor((getSkill(SkillType.S_GUN_MEK).getLevel() +
+                                                          getSkill(SkillType.S_PILOT_MEK).getLevel()) / 2.0);
                         if (getSkill(SkillType.S_GUN_MEK).getType().getExperienceLevel(rawScore) ==
                                   getSkill(SkillType.S_PILOT_MEK).getType().getExperienceLevel(rawScore)) {
                             return getSkill(SkillType.S_GUN_MEK).getType().getExperienceLevel(rawScore);
                         }
                     }
 
-                    return (int) Math.floor((getSkill(SkillType.S_GUN_MEK).getExperienceLevel() +
-                                                   getSkill(SkillType.S_PILOT_MEK).getExperienceLevel()) / 2.0);
+                    return (int) floor((getSkill(SkillType.S_GUN_MEK).getExperienceLevel() +
+                                              getSkill(SkillType.S_PILOT_MEK).getExperienceLevel()) / 2.0);
                 } else {
                     return SkillType.EXP_NONE;
                 }
@@ -3482,7 +3700,7 @@ public class Person {
                      * non-standard experience thresholds then fall back on lower precision averaging See Bug #140
                      */
                     if (isAlternativeQualityAveraging) {
-                        int rawScore = (int) Math.floor((Stream.of(SkillType.S_GUN_MEK,
+                        int rawScore = (int) floor((Stream.of(SkillType.S_GUN_MEK,
                               SkillType.S_PILOT_MEK,
                               SkillType.S_GUN_AERO,
                               SkillType.S_PILOT_AERO).mapToInt(s -> getSkill(s).getLevel()).sum()) / 4.0);
@@ -3501,10 +3719,10 @@ public class Person {
                         }
                     }
 
-                    return (int) Math.floor((getSkill(SkillType.S_GUN_MEK).getExperienceLevel() +
-                                                   getSkill(SkillType.S_PILOT_MEK).getExperienceLevel() +
-                                                   getSkill(SkillType.S_GUN_AERO).getExperienceLevel() +
-                                                   getSkill(SkillType.S_PILOT_AERO).getExperienceLevel()) / 4.0);
+                    return (int) floor((getSkill(SkillType.S_GUN_MEK).getExperienceLevel() +
+                                              getSkill(SkillType.S_PILOT_MEK).getExperienceLevel() +
+                                              getSkill(SkillType.S_GUN_AERO).getExperienceLevel() +
+                                              getSkill(SkillType.S_PILOT_AERO).getExperienceLevel()) / 4.0);
                 } else {
                     return SkillType.EXP_NONE;
                 }
@@ -3537,61 +3755,39 @@ public class Person {
                         return SkillType.EXP_NONE;
                     }
                 }
-            case VEHICLE_CREW:
+            case VEHICLE_CREW, MECHANIC:
                 return hasSkill(SkillType.S_TECH_MECHANIC) ?
                              getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() :
                              SkillType.EXP_NONE;
-            case MECHANIC:
-                if (isTechsHaveAdministration) {
-                    if (hasSkill(SkillType.S_TECH_MECHANIC) && hasSkill(S_ADMIN)) {
-                        if (isAlternativeQualityAveraging) {
-                            int rawScore = (int) Math.floor((getSkill(SkillType.S_TECH_MECHANIC).getLevel() +
-                                                                   getSkill(S_ADMIN).getLevel()) / 2.0);
-                            if (getSkill(SkillType.S_TECH_MECHANIC).getType().getExperienceLevel(rawScore) ==
-                                      getSkill(S_ADMIN).getType().getExperienceLevel(rawScore)) {
-                                return getSkill(SkillType.S_TECH_MECHANIC).getType().getExperienceLevel(rawScore);
-                            }
-                        }
-
-                        return (int) Math.floor((getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() +
-                                                       getSkill(S_ADMIN).getExperienceLevel()) / 2.0);
-                    } else {
-                        return SkillType.EXP_NONE;
-                    }
-                } else {
-                    return hasSkill(SkillType.S_TECH_MECHANIC) ?
-                                 getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() :
-                                 SkillType.EXP_NONE;
-                }
             case AEROSPACE_PILOT:
                 if (hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO)) {
                     if (isAlternativeQualityAveraging) {
-                        int rawScore = (int) Math.floor((getSkill(SkillType.S_GUN_AERO).getLevel() +
-                                                               getSkill(SkillType.S_PILOT_AERO).getLevel()) / 2.0);
+                        int rawScore = (int) floor((getSkill(SkillType.S_GUN_AERO).getLevel() +
+                                                          getSkill(SkillType.S_PILOT_AERO).getLevel()) / 2.0);
                         if (getSkill(SkillType.S_GUN_AERO).getType().getExperienceLevel(rawScore) ==
                                   getSkill(SkillType.S_PILOT_AERO).getType().getExperienceLevel(rawScore)) {
                             return getSkill(SkillType.S_GUN_AERO).getType().getExperienceLevel(rawScore);
                         }
                     }
 
-                    return (int) Math.floor((getSkill(SkillType.S_GUN_AERO).getExperienceLevel() +
-                                                   getSkill(SkillType.S_PILOT_AERO).getExperienceLevel()) / 2.0);
+                    return (int) floor((getSkill(SkillType.S_GUN_AERO).getExperienceLevel() +
+                                              getSkill(SkillType.S_PILOT_AERO).getExperienceLevel()) / 2.0);
                 } else {
                     return SkillType.EXP_NONE;
                 }
             case CONVENTIONAL_AIRCRAFT_PILOT:
                 if (hasSkill(SkillType.S_GUN_JET) && hasSkill(SkillType.S_PILOT_JET)) {
                     if (isAlternativeQualityAveraging) {
-                        int rawScore = (int) Math.floor((getSkill(SkillType.S_GUN_JET).getLevel() +
-                                                               getSkill(SkillType.S_PILOT_JET).getLevel()) / 2.0);
+                        int rawScore = (int) floor((getSkill(SkillType.S_GUN_JET).getLevel() +
+                                                          getSkill(SkillType.S_PILOT_JET).getLevel()) / 2.0);
                         if (getSkill(SkillType.S_GUN_JET).getType().getExperienceLevel(rawScore) ==
                                   getSkill(SkillType.S_PILOT_JET).getType().getExperienceLevel(rawScore)) {
                             return getSkill(SkillType.S_GUN_JET).getType().getExperienceLevel(rawScore);
                         }
                     }
 
-                    return (int) Math.floor((getSkill(SkillType.S_GUN_JET).getExperienceLevel() +
-                                                   getSkill(SkillType.S_PILOT_JET).getExperienceLevel()) / 2.0);
+                    return (int) floor((getSkill(SkillType.S_GUN_JET).getExperienceLevel() +
+                                              getSkill(SkillType.S_PILOT_JET).getExperienceLevel()) / 2.0);
                 } else {
                     return SkillType.EXP_NONE;
                 }
@@ -3602,16 +3798,16 @@ public class Person {
             case BATTLE_ARMOUR:
                 if (hasSkill(SkillType.S_GUN_BA) && hasSkill(SkillType.S_ANTI_MEK)) {
                     if (isAlternativeQualityAveraging) {
-                        int rawScore = (int) Math.floor((getSkill(SkillType.S_GUN_BA).getLevel() +
-                                                               getSkill(SkillType.S_ANTI_MEK).getLevel()) / 2.0);
+                        int rawScore = (int) floor((getSkill(SkillType.S_GUN_BA).getLevel() +
+                                                          getSkill(SkillType.S_ANTI_MEK).getLevel()) / 2.0);
                         if (getSkill(SkillType.S_GUN_BA).getType().getExperienceLevel(rawScore) ==
                                   getSkill(SkillType.S_ANTI_MEK).getType().getExperienceLevel(rawScore)) {
                             return getSkill(SkillType.S_GUN_BA).getType().getExperienceLevel(rawScore);
                         }
                     }
 
-                    return (int) Math.floor((getSkill(SkillType.S_GUN_BA).getExperienceLevel() +
-                                                   getSkill(SkillType.S_ANTI_MEK).getExperienceLevel()) / 2.0);
+                    return (int) floor((getSkill(SkillType.S_GUN_BA).getExperienceLevel() +
+                                              getSkill(SkillType.S_ANTI_MEK).getExperienceLevel()) / 2.0);
                 } else {
                     return SkillType.EXP_NONE;
                 }
@@ -3628,121 +3824,31 @@ public class Person {
                              getSkill(SkillType.S_GUN_SPACE).getExperienceLevel() :
                              SkillType.EXP_NONE;
             case VESSEL_CREW:
-                if (isTechsHaveAdministration) {
-                    if (hasSkill(SkillType.S_TECH_VESSEL) && hasSkill(S_ADMIN)) {
-                        if (isAlternativeQualityAveraging) {
-                            int rawScore = (int) Math.floor((getSkill(SkillType.S_TECH_VESSEL).getLevel() +
-                                                                   getSkill(S_ADMIN).getLevel()) / 2.0);
-                            if (getSkill(SkillType.S_TECH_VESSEL).getType().getExperienceLevel(rawScore) ==
-                                      getSkill(S_ADMIN).getType().getExperienceLevel(rawScore)) {
-                                return getSkill(SkillType.S_TECH_VESSEL).getType().getExperienceLevel(rawScore);
-                            }
-                        }
-
-                        return (int) Math.floor((getSkill(SkillType.S_TECH_VESSEL).getExperienceLevel() +
-                                                       getSkill(S_ADMIN).getExperienceLevel()) / 2.0);
-                    } else {
-                        return SkillType.EXP_NONE;
-                    }
-                } else {
-                    return hasSkill(SkillType.S_TECH_VESSEL) ?
-                                 getSkill(SkillType.S_TECH_VESSEL).getExperienceLevel() :
-                                 SkillType.EXP_NONE;
-                }
+                return hasSkill(SkillType.S_TECH_VESSEL) ?
+                             getSkill(SkillType.S_TECH_VESSEL).getExperienceLevel() :
+                             SkillType.EXP_NONE;
             case VESSEL_NAVIGATOR:
                 return hasSkill(SkillType.S_NAV) ? getSkill(SkillType.S_NAV).getExperienceLevel() : SkillType.EXP_NONE;
             case MEK_TECH:
-                if (isTechsHaveAdministration) {
-                    if (hasSkill(SkillType.S_TECH_MEK) && hasSkill(S_ADMIN)) {
-                        if (isAlternativeQualityAveraging) {
-                            int rawScore = (int) Math.floor((getSkill(SkillType.S_TECH_MEK).getLevel() +
-                                                                   getSkill(S_ADMIN).getLevel()) / 2.0);
-                            if (getSkill(SkillType.S_TECH_MEK).getType().getExperienceLevel(rawScore) ==
-                                      getSkill(S_ADMIN).getType().getExperienceLevel(rawScore)) {
-                                return getSkill(SkillType.S_TECH_MEK).getType().getExperienceLevel(rawScore);
-                            }
-                        }
-
-                        return (int) Math.floor((getSkill(SkillType.S_TECH_MEK).getExperienceLevel() +
-                                                       getSkill(S_ADMIN).getExperienceLevel()) / 2.0);
-                    } else {
-                        return SkillType.EXP_NONE;
-                    }
-                } else {
-                    return hasSkill(SkillType.S_TECH_MEK) ?
-                                 getSkill(SkillType.S_TECH_MEK).getExperienceLevel() :
-                                 SkillType.EXP_NONE;
-                }
+                return hasSkill(SkillType.S_TECH_MEK) ?
+                             getSkill(SkillType.S_TECH_MEK).getExperienceLevel() :
+                             SkillType.EXP_NONE;
             case AERO_TEK:
-                if (isTechsHaveAdministration) {
-                    if (hasSkill(SkillType.S_TECH_AERO) && hasSkill(S_ADMIN)) {
-                        if (isAlternativeQualityAveraging) {
-                            int rawScore = (int) Math.floor((getSkill(SkillType.S_TECH_AERO).getLevel() +
-                                                                   getSkill(S_ADMIN).getLevel()) / 2.0);
-                            if (getSkill(SkillType.S_TECH_AERO).getType().getExperienceLevel(rawScore) ==
-                                      getSkill(S_ADMIN).getType().getExperienceLevel(rawScore)) {
-                                return getSkill(SkillType.S_TECH_AERO).getType().getExperienceLevel(rawScore);
-                            }
-                        }
-
-                        return (int) Math.floor((getSkill(SkillType.S_TECH_AERO).getExperienceLevel() +
-                                                       getSkill(S_ADMIN).getExperienceLevel()) / 2.0);
-                    } else {
-                        return SkillType.EXP_NONE;
-                    }
-                } else {
-                    return hasSkill(SkillType.S_TECH_AERO) ?
-                                 getSkill(SkillType.S_TECH_AERO).getExperienceLevel() :
-                                 SkillType.EXP_NONE;
-                }
+                return hasSkill(SkillType.S_TECH_AERO) ?
+                             getSkill(SkillType.S_TECH_AERO).getExperienceLevel() :
+                             SkillType.EXP_NONE;
             case BA_TECH:
-                if (isTechsHaveAdministration) {
-                    if (hasSkill(SkillType.S_TECH_BA) && hasSkill(S_ADMIN)) {
-                        if (isAlternativeQualityAveraging) {
-                            int rawScore = (int) Math.floor((getSkill(SkillType.S_TECH_BA).getLevel() +
-                                                                   getSkill(S_ADMIN).getLevel()) / 2.0);
-                            if (getSkill(SkillType.S_TECH_BA).getType().getExperienceLevel(rawScore) ==
-                                      getSkill(S_ADMIN).getType().getExperienceLevel(rawScore)) {
-                                return getSkill(SkillType.S_TECH_BA).getType().getExperienceLevel(rawScore);
-                            }
-                        }
-
-                        return (int) Math.floor((getSkill(SkillType.S_TECH_BA).getExperienceLevel() +
-                                                       getSkill(S_ADMIN).getExperienceLevel()) / 2.0);
-                    } else {
-                        return SkillType.EXP_NONE;
-                    }
-                } else {
-                    return hasSkill(SkillType.S_TECH_BA) ?
-                                 getSkill(SkillType.S_TECH_BA).getExperienceLevel() :
-                                 SkillType.EXP_NONE;
-                }
+                return hasSkill(SkillType.S_TECH_BA) ?
+                             getSkill(SkillType.S_TECH_BA).getExperienceLevel() :
+                             SkillType.EXP_NONE;
             case ASTECH:
                 return hasSkill(SkillType.S_ASTECH) ?
                              getSkill(SkillType.S_ASTECH).getExperienceLevel() :
                              SkillType.EXP_NONE;
             case DOCTOR:
-                if (isDoctorsHaveAdministration) {
-                    if (hasSkill(SkillType.S_DOCTOR) && hasSkill(S_ADMIN)) {
-                        if (isAlternativeQualityAveraging) {
-                            int rawScore = (int) Math.floor((getSkill(SkillType.S_DOCTOR).getLevel() +
-                                                                   getSkill(S_ADMIN).getLevel()) / 2.0);
-                            if (getSkill(SkillType.S_DOCTOR).getType().getExperienceLevel(rawScore) ==
-                                      getSkill(S_ADMIN).getType().getExperienceLevel(rawScore)) {
-                                return getSkill(SkillType.S_DOCTOR).getType().getExperienceLevel(rawScore);
-                            }
-                        }
-
-                        return (int) Math.floor((getSkill(SkillType.S_DOCTOR).getExperienceLevel() +
-                                                       getSkill(S_ADMIN).getExperienceLevel()) / 2.0);
-                    } else {
-                        return SkillType.EXP_NONE;
-                    }
-                } else {
-                    return hasSkill(SkillType.S_DOCTOR) ?
-                                 getSkill(SkillType.S_DOCTOR).getExperienceLevel() :
-                                 SkillType.EXP_NONE;
-                }
+                return hasSkill(SkillType.S_DOCTOR) ?
+                             getSkill(SkillType.S_DOCTOR).getExperienceLevel() :
+                             SkillType.EXP_NONE;
             case MEDIC:
                 return hasSkill(SkillType.S_MEDTECH) ?
                              getSkill(SkillType.S_MEDTECH).getExperienceLevel() :
@@ -4054,11 +4160,29 @@ public class Person {
      *       0 if the specified skill does not currently exist.
      */
     public int getCostToImprove(final String skillName, final boolean useReasoning) {
-        int cost = hasSkill(skillName) ?
-                         getSkill(skillName).getCostToImprove() :
-                         SkillType.getType(skillName).getCost(0);
+        final Skill skill = getSkill(skillName);
+        final SkillType skillType = SkillType.getType(skillName);
+        int cost = hasSkill(skillName) ? skill.getCostToImprove() : skillType.getCost(0);
 
         double multiplier = getReasoningXpCostMultiplier(useReasoning);
+
+        if (options.booleanOption(FLAW_SLOW_LEARNER)) {
+            multiplier += 0.2;
+        }
+
+        if (options.booleanOption(ATOW_FAST_LEARNER)) {
+            multiplier -= 0.2;
+        }
+
+        if (skillType.isAffectedByGremlinsOrTechEmpathy()) {
+            if (options.booleanOption(FLAW_GREMLINS)) {
+                multiplier += 0.1;
+            }
+
+            if (options.booleanOption(ATOW_TECH_EMPATHY)) {
+                multiplier -= 0.1;
+            }
+        }
 
         return (int) round(cost * multiplier);
     }
@@ -4212,7 +4336,28 @@ public class Person {
     // endregion Personnel Options
 
     // region edge
+
+    /**
+     * Retrieves the edge value for the current person.
+     *
+     * <p><b>Usage:</b> This method gets the character's raw Edge score. Generally you likely want to use
+     * {@link #getAdjustedEdge()} instead, as that includes adjustments for the character's {@code unlucky} trait.</p>
+     *
+     * @return The edge value defined in the person's options.
+     */
     public int getEdge() {
+        return getOptions().intOption(OptionsConstants.EDGE);
+    }
+
+    /**
+     * Retrieves the adjusted edge value for the current person.
+     *
+     * <p>The adjusted Edge value is calculated by subtracting the person's level of bad luck (unlucky)
+     * from their base Edge value.</p>
+     *
+     * @return The adjusted edge value after accounting for the person's level of bad luck.
+     */
+    public int getAdjustedEdge() {
         return getOptions().intOption(OptionsConstants.EDGE) - unlucky;
     }
 
@@ -4230,14 +4375,14 @@ public class Person {
     }
 
     /**
-     * Resets support personnel edge points to the purchased level. Used for weekly refresh.
+     * Resets edge points to the purchased level. Used for weekly refresh.
      */
     public void resetCurrentEdge() {
-        setCurrentEdge(getEdge());
+        setCurrentEdge(getAdjustedEdge());
     }
 
     /**
-     * Sets support personnel edge points to the value 'currentEdge'. Used for weekly refresh.
+     * Sets edge points to the value 'currentEdge'. Used for weekly refresh.
      *
      * @param currentEdge - integer used to track this person's edge points available for the current week
      */
@@ -4388,32 +4533,31 @@ public class Person {
     }
 
     /**
-     * Calculates and retrieves the person's current daily available tech time. This does NOT account for any expended
-     * time, but it factors in administrative adjustments if specified.
+     * Calculates and retrieves the current daily available tech time for the person.
      *
-     * <p>The returned value is determined based on the person's role:</p>
+     * <p>This calculation does not account for any expended time but incorporates potential administrative
+     * adjustments if specified.</p>
+     *
+     * <p>The calculation follows these rules:</p>
      * <ul>
-     *   <li>If the primary role is a technician, the primary role's base support
-     *       time is used.</li>
-     *   <li>Otherwise, the secondary role's base support time is used.</li>
+     *   <li>If the person's primary role is a technician, the base support time is determined from the primary
+     *   role.</li>
+     *   <li>Otherwise, the base support time is taken from the secondary role.</li>
      * </ul>
      *
-     * <p>The base time is then adjusted by a multiplier if administrative adjustments
-     * are enabled (via the {@code isTechsUseAdministration} parameter). Maintenance
-     * time is also deducted from the result.</p>
+     * <p>If administrative adjustments are enabled (via the {@code isTechsUseAdministration} parameter),
+     * the support time is multiplied by an administrative adjustment multiplier.</p>
      *
-     * @param isTechsUseAdministration Determines whether administrative adjustments should be applied when calculating
-     *                                 the person's time.
+     * @param isTechsUseAdministration A boolean flag indicating whether administrative adjustments should be applied in
+     *                                 the calculation.
      *
-     * @return The person's current daily available tech time, after applying the multiplier for administrative
-     *       adjustments (if applicable) and deducting maintenance time.
+     * @return The adjusted daily available tech time for the person, after factoring in the appropriate role support
+     *       time, applying the administrative multiplier (if enabled), and deducting maintenance time.
      */
     public int getDailyAvailableTechTime(final boolean isTechsUseAdministration) {
         int baseTime = (getPrimaryRole().isTech() ? PRIMARY_ROLE_SUPPORT_TIME : SECONDARY_ROLE_SUPPORT_TIME);
 
-        // TODO maintenance time should only be deducted when we make a maintenance check
-        return (int) round(baseTime * calculateTechTimeMultiplier(isTechsUseAdministration)) -
-                     getMaintenanceTimeUsing();
+        return (int) round(baseTime * calculateTechTimeMultiplier(isTechsUseAdministration));
     }
 
     public int getMaintenanceTimeUsing() {
@@ -4425,6 +4569,81 @@ public class Person {
 
     public boolean isMothballing() {
         return isTech() && techUnits.stream().anyMatch(Unit::isMothballing);
+    }
+
+    /**
+     * Determines whether this {@code Person} is considered "busy" based on their current status, unit assignment, and
+     * associated tasks.
+     *
+     * <p>This method checks:</p>
+     * <ol>
+     *     <li>If the personnel is active (i.e., has an active {@link PersonnelStatus}).</li>
+     *     <li>Special cases for units that are self-crewed, including activities such as
+     *         mothballing, refitting, or undergoing repairs, during which crew members are
+     *         considered busy.</li>
+     *     <li>If the personnel is a technician, by reviewing their current tech assignments,
+     *         such as units being mothballed, refitted, or repaired.</li>
+     *     <li>If the personnel has a unit assignment and whether that unit is currently deployed.</li>
+     * </ol>
+     *
+     * @return {@code true} if the person is deemed busy due to one of the above conditions; {@code false} otherwise.
+     */
+    public boolean isBusy() {
+        // Personnel status
+        if (!status.isActive()) {
+            return false;
+        }
+
+        final boolean hasUnitAssignment = unit != null;
+        final Entity entity = hasUnitAssignment ? unit.getEntity() : null;
+        final boolean isSpecialCase = entity != null && unit.isSelfCrewed();
+
+        // Special case handlers (self crewed units have their tech teams formed as a composite of their crew, so all
+        // crew are considered to be busy during these states)
+        if (isSpecialCase) {
+            if (unit.isMothballing()) {
+                return true;
+            }
+
+            if (unit.isRefitting()) {
+                return true;
+            }
+
+            if (unit.isUnderRepair()) {
+                return true;
+            }
+        }
+
+        // Tech assignments
+        if (isTech()) {
+            for (Unit unit : techUnits) {
+                Refit refit = unit.getRefit();
+                boolean isActiveTech = refit != null && Objects.equals(refit.getTech(), this);
+
+                if (unit.isMothballing() && isActiveTech) {
+                    return true;
+                }
+
+                if (unit.isRefitting() && isActiveTech) {
+                    return true;
+                }
+
+                if (unit.isUnderRepair()) {
+                    for (Part part : unit.getParts()) {
+                        if (Objects.equals(part.getTech(), this)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Unit assignments
+        if (hasUnitAssignment) {
+            return unit.isDeployed();
+        }
+
+        return false;
     }
 
     public @Nullable Unit getUnit() {
@@ -4920,7 +5139,20 @@ public class Person {
     }
 
     public void setConnections(final int connections) {
-        this.connections = connections;
+        this.connections = clamp(connections, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
+    }
+
+    /**
+     * Adjusts the person's Connections score by the specified amount.
+     *
+     * <p>The change in connections can be positive or negative, depending on the provided delta value.</p>
+     *
+     * @param delta The amount by which to adjust the number of connections. A positive value increases the connections,
+     *              while a negative value decreases them.
+     */
+    public void changeConnections(final int delta) {
+        int newValue = connections + delta;
+        connections = clamp(newValue, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
     }
 
     public int getWealth() {
@@ -4928,15 +5160,87 @@ public class Person {
     }
 
     public void setWealth(final int wealth) {
-        this.wealth = wealth;
+        this.wealth = clamp(wealth, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
     }
 
+    /**
+     * Adjusts the person's wealth by the specified amount.
+     *
+     * <p>The change in wealth can be positive or negative, depending on the provided delta value.</p>
+     *
+     * @param delta The amount by which to adjust the wealth. A positive value increases the wealth, while a negative
+     *              value decreases it.
+     */
+    public void changeWealth(final int delta) {
+        int newValue = wealth + delta;
+        wealth = clamp(newValue, MINIMUM_WEALTH, MAXIMUM_WEALTH);
+    }
+
+    public boolean isHasPerformedExtremeExpenditure() {
+        return hasPerformedExtremeExpenditure;
+    }
+
+    public void setHasPerformedExtremeExpenditure(final boolean hasPerformedExtremeExpenditure) {
+        this.hasPerformedExtremeExpenditure = hasPerformedExtremeExpenditure;
+    }
+
+    /**
+     * Retrieves the raw reputation value of the character.
+     *
+     * <p>This method returns the unadjusted reputation value associated with the character.</p>
+     *
+     * <p><b>Usage:</b> If aging effects are enabled, you likely want to use
+     * {@link #getAdjustedReputation(boolean, boolean, LocalDate, int)}  instead.</p>
+     *
+     * @return The raw reputation value.
+     */
     public int getReputation() {
         return reputation;
     }
 
+    /**
+     * Calculates the adjusted reputation value for the character based on aging effects, the current campaign type,
+     * date, and rank.
+     *
+     * <p>This method computes the character's reputation by applying age-based modifiers, which depend on factors such
+     * as whether aging effects are enabled, whether the campaign is clan-specific, the character's bloodname status,
+     * and their rank in the clan hierarchy. If aging effects are disabled, the reputation remains unchanged.</p>
+     *
+     * <p><b>Usage:</b> If aging effects are disabled, the result will be equivalent to the base reputation value
+     * provided by {@link #getReputation()}.</p>
+     *
+     * @param isUseAgingEffects Indicates whether aging effects should be applied to the reputation calculation.
+     * @param isClanCampaign    Indicates whether the current campaign is specific to a clan.
+     * @param today             The current date used to calculate the character's age.
+     * @param rankIndex         The rank index of the character, which can adjust the reputation modifier in clan-based
+     *                          campaigns.
+     *
+     * @return The adjusted reputation value, accounting for factors like age, clan campaign status, bloodname
+     *       possession, and rank. If aging effects are disabled, the base reputation value is returned.
+     */
+    public int getAdjustedReputation(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today,
+          int rankIndex) {
+        return reputation +
+                     (isUseAgingEffects ?
+                            getReputationAgeModifier(getAge(today), isClanCampaign, !bloodname.isBlank(), rankIndex) :
+                            0);
+    }
+
     public void setReputation(final int reputation) {
-        this.reputation = reputation;
+        this.reputation = clamp(reputation, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
+    }
+
+    /**
+     * Adjusts the person's reputation by the specified amount.
+     *
+     * <p>The change in reputation can be positive or negative, depending on the provided delta value.</p>
+     *
+     * @param delta The amount by which to adjust the reputation. A positive value increases the reputation, while a
+     *              negative value decreases it.
+     */
+    public void changeReputation(final int delta) {
+        int newValue = reputation + delta;
+        reputation = clamp(newValue, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
     }
 
     public int getUnlucky() {
@@ -4944,7 +5248,12 @@ public class Person {
     }
 
     public void setUnlucky(final int unlucky) {
-        this.unlucky = unlucky;
+        this.unlucky = clamp(unlucky, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY);
+    }
+
+    public void changeUnlucky(final int delta) {
+        int newValue = unlucky + delta;
+        unlucky = clamp(newValue, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY);
     }
 
     /**
@@ -4962,67 +5271,108 @@ public class Person {
     }
 
     /**
-     * Updates the score of a specific attribute to a new value.
+     * Updates the score for a specific skill attribute.
      *
-     * <p>This method modifies the score of an attribute specified by the {@link SkillAttribute} parameter. If the
-     * provided attribute is {@code NONE}, no changes will be made. If the attribute is {@code null}, the method logs an
-     * error and exits without making changes.</p>
+     * <p>This method sets the provided score for the given {@link SkillAttribute}. If the attribute is
+     * <code>null</code> or represents "NONE", the method logs a warning and exits without making any changes.</p>
      *
-     * @param attribute the {@link SkillAttribute} to update. Must not be {@code null}.
-     * @param newScore  the new score to set for the specified attribute.
+     * <p>The actual attribute score update is delegated to the underlying attribute handler.</p>
      *
-     * @since 0.50.5
+     * @param attribute The {@link SkillAttribute} to be updated. Must not be <code>null</code> or "NONE".
+     * @param newScore  The new score to assign to the specified skill attribute.
+     *
+     * @author Illiani
+     * @since 0.50.05
      */
     public void setAttributeScore(final SkillAttribute attribute, final int newScore) {
-        if (attribute == null) {
-            logger.error("(setAttributeScore) SkillAttribute is null.");
+        if (attribute == null || attribute == SkillAttribute.NONE) {
+            logger.warn("(setAttributeScore) SkillAttribute is null or NONE.");
             return;
         }
 
-        switch (attribute) {
-            case NONE -> {
-            }
-            case STRENGTH -> atowAttributes.setStrength(newScore);
-            case BODY -> atowAttributes.setBody(newScore);
-            case REFLEXES -> atowAttributes.setReflexes(newScore);
-            case DEXTERITY -> atowAttributes.setDexterity(newScore);
-            case INTELLIGENCE -> atowAttributes.setIntelligence(newScore);
-            case WILLPOWER -> atowAttributes.setWillpower(newScore);
-            case CHARISMA -> atowAttributes.setCharisma(newScore);
-        }
-        ;
+        atowAttributes.setAttributeScore(phenotype, options, attribute, newScore);
     }
 
     /**
      * Retrieves the score of a specified attribute.
      *
-     * <p>The method maps the provided {@link SkillAttribute} to its corresponding attribute in
-     * the {@link Attributes} object and returns its value. If the {@link SkillAttribute} is {@code NONE}, the method
-     * returns a score of 0. If the {@code attribute} is {@code null}, an error is logged, and the method returns a
-     * score of 0.</p>
-     *
      * @param attribute the {@link SkillAttribute} to retrieve the score for.
      *
-     * @return the score of the specified attribute, or 0 if the attribute is {@code NONE} or {@code null}.
+     * @return the score of the specified attribute, or {@link Attributes#DEFAULT_ATTRIBUTE_SCORE} if the attribute is
+     *       {@code NONE} or {@code null}.
      *
      * @since 0.50.5
      */
     public int getAttributeScore(final SkillAttribute attribute) {
-        if (attribute == null) {
-            logger.error("(getAttributeScore) SkillAttribute is null.");
-            return 0;
+        if (attribute == null || attribute.isNone()) {
+            logger.error("(getAttributeScore) SkillAttribute is null or NONE.");
+            return DEFAULT_ATTRIBUTE_SCORE;
         }
+
+        boolean hasFreakishStrength = options.booleanOption(MUTATION_FREAKISH_STRENGTH);
+        boolean hasExoticAppearance = options.booleanOption(MUTATION_EXOTIC_APPEARANCE);
+        boolean hasFacialHair = options.booleanOption(MUTATION_FACIAL_HAIR);
+        boolean hasSeriousDisfigurement = options.booleanOption(MUTATION_SERIOUS_DISFIGUREMENT);
+        boolean isCatGirl = options.booleanOption(MUTATION_CAT_GIRL);
+        boolean isCatGirlUnofficial = options.booleanOption(MUTATION_CAT_GIRL_UNOFFICIAL);
 
         return switch (attribute) {
             case NONE -> 0;
-            case STRENGTH -> atowAttributes.getStrength();
-            case BODY -> atowAttributes.getBody();
-            case REFLEXES -> atowAttributes.getReflexes();
-            case DEXTERITY -> atowAttributes.getDexterity();
-            case INTELLIGENCE -> atowAttributes.getIntelligence();
-            case WILLPOWER -> atowAttributes.getWillpower();
-            case CHARISMA -> atowAttributes.getCharisma();
+            case STRENGTH -> {
+                int attributeScore = atowAttributes.getAttributeScore(attribute);
+                if (hasFreakishStrength) {
+                    attributeScore += 2;
+                }
+                yield min(attributeScore, MAXIMUM_ATTRIBUTE_SCORE);
+            }
+            case BODY, REFLEXES, DEXTERITY, INTELLIGENCE, WILLPOWER -> atowAttributes.getAttributeScore(attribute);
+            case CHARISMA -> {
+                int attributeScore = atowAttributes.getAttributeScore(attribute);
+                if (hasExoticAppearance) {
+                    attributeScore++;
+                }
+                if (hasFacialHair) {
+                    attributeScore--;
+                }
+                if (hasSeriousDisfigurement) {
+                    attributeScore -= 3;
+                }
+                if (isCatGirl) {
+                    attributeScore -= 3;
+                }
+                if (isCatGirlUnofficial) {
+                    attributeScore++;
+                }
+                yield clamp(attributeScore, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
+            }
         };
+    }
+
+    /**
+     * Retrieves the maximum allowed value (cap) for the specified {@link SkillAttribute}.
+     *
+     * <p>If the attribute is {@code null} or marked as {@link SkillAttribute#NONE}, a default maximum attribute score
+     * is returned, and a warning is logged.</p>
+     *
+     * <p>For valid attributes, this method delegates to
+     * {@link Attributes#getAttributeCap(Phenotype, PersonnelOptions, SkillAttribute)}.</p>
+     *
+     * @param attribute The {@link SkillAttribute} for which the maximum value is being retrieved. Must not be
+     *                  {@code null} or {@link SkillAttribute#NONE}.
+     *
+     * @return The maximum allowed value (cap) for the given attribute. Returns the default maximum value if the input
+     *       attribute is invalid.
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public int getAttributeCap(final SkillAttribute attribute) {
+        if (attribute == null || attribute.isNone()) {
+            logger.warn("(getAttributeCap) SkillAttribute is null or NONE.");
+            return MAXIMUM_ATTRIBUTE_SCORE;
+        }
+
+        return atowAttributes.getAttributeCap(phenotype, options, attribute);
     }
 
     /**
@@ -5041,35 +5391,32 @@ public class Person {
     }
 
     /**
-     * Modifies the score of a specified attribute by applying a delta value.
+     * Modifies the score of a specified skill attribute by a given delta value.
      *
-     * <p>This method maps the provided {@link SkillAttribute} to its corresponding attribute in the
-     * {@link Attributes} object and adjusts its value by the specified delta. If the {@code attribute} is {@code NONE},
-     * the method does nothing. If {@code attribute} is {@code null}, an error is logged, and the method returns without
-     * performing any operation.</p>
+     * <p>This method adjusts the current score of the provided {@link SkillAttribute} by adding the specified delta
+     * to it. If the attribute is {@code null} or {@link SkillAttribute#NONE}, a warning is logged, and the method exits
+     * without making any changes.</p>
      *
-     * @param attribute the {@link SkillAttribute} to modify the score for.
-     * @param delta     the value to add to (or subtract from) the current score of the specified attribute.
+     * <p>The new score is computed as the sum of the current score and the delta, and it is passed
+     * to {@link Attributes#setAttributeScore(Phenotype, PersonnelOptions, SkillAttribute, int)} to ensure is compiles
+     * with the character's minimum and maximum attribute score values.</p>
      *
-     * @since 0.50.5
+     * @param attribute The {@link SkillAttribute} whose score is to be modified. Must not be <code>null</code>.
+     * @param delta     The value to add to the current score of the specified skill attribute.
+     *
+     * @author Illiani
+     * @since 0.50.05
      */
     public void changeAttributeScore(final SkillAttribute attribute, final int delta) {
-        if (attribute == null) {
-            logger.error("(changeAttributeScore) SkillAttribute is null.");
+        if (attribute == null || attribute.isNone()) {
+            logger.warn("(changeAttributeScore) SkillAttribute is null or NONE.");
             return;
         }
 
-        switch (attribute) {
-            case NONE -> {
-            }
-            case STRENGTH -> atowAttributes.changeStrength(delta);
-            case BODY -> atowAttributes.changeBody(delta);
-            case REFLEXES -> atowAttributes.changeReflexes(delta);
-            case DEXTERITY -> atowAttributes.changeDexterity(delta);
-            case INTELLIGENCE -> atowAttributes.changeIntelligence(delta);
-            case WILLPOWER -> atowAttributes.changeWillpower(delta);
-            case CHARISMA -> atowAttributes.changeCharisma(delta);
-        }
+        int current = atowAttributes.getAttributeScore(attribute);
+        int newScore = current + delta;
+
+        setAttributeScore(attribute, newScore);
     }
 
     public void resetSkillTypes() {
@@ -5084,9 +5431,22 @@ public class Person {
         this.nTasks = nTasks;
     }
 
+    /**
+     * @deprecated use {@link #getPersonalLog()} instead.
+     */
+    @Deprecated(forRemoval = true, since = "0.50.5")
     public List<LogEntry> getPersonnelLog() {
+        return getPersonalLog();
+    }
+
+    public List<LogEntry> getPersonalLog() {
         personnelLog.sort(Comparator.comparing(LogEntry::getDate));
         return personnelLog;
+    }
+
+    public List<LogEntry> getMedicalLog() {
+        medicalLog.sort(Comparator.comparing(LogEntry::getDate));
+        return medicalLog;
     }
 
     public List<LogEntry> getScenarioLog() {
@@ -5094,12 +5454,42 @@ public class Person {
         return scenarioLog;
     }
 
+    public List<LogEntry> getAssignmentLog() {
+        assignmentLog.sort(Comparator.comparing(LogEntry::getDate));
+        return assignmentLog;
+    }
+
+    public List<LogEntry> getPerformanceLog() {
+        performanceLog.sort(Comparator.comparing(LogEntry::getDate));
+        return performanceLog;
+    }
+
+    /**
+     * @deprecated use {@link #addPersonalLogEntry(LogEntry)} instead.
+     */
+    @Deprecated(forRemoval = true, since = "0.50.5")
     public void addLogEntry(final LogEntry entry) {
+        addPersonalLogEntry(entry);
+    }
+
+    public void addPersonalLogEntry(final LogEntry entry) {
         personnelLog.add(entry);
+    }
+
+    public void addMedicalLogEntry(final LogEntry entry) {
+        medicalLog.add(entry);
     }
 
     public void addScenarioLogEntry(final LogEntry entry) {
         scenarioLog.add(entry);
+    }
+
+    public void addAssignmentLogEntry(final LogEntry entry) {
+        assignmentLog.add(entry);
+    }
+
+    public void addPerformanceLogEntry(final LogEntry entry) {
+        performanceLog.add(entry);
     }
 
     // region injuries
@@ -5164,14 +5554,102 @@ public class Person {
                      injuries.stream().anyMatch(injury -> (injury.getTime() > 0) || !injury.isPermanent());
     }
 
-    public int getPilotingInjuryMod() {
-        return Modifier.calcTotalModifier(injuries.stream().flatMap(injury -> injury.getModifiers().stream()),
-              ModifierValue.PILOTING);
+    /**
+     * Calculates the total injury modifier for the pilot, based on the character's injuries and ambidextrous trait (if
+     * present). This modifier can apply to either piloting or gunnery checks depending on the input parameter.
+     *
+     * <p>This method examines all injuries and their associated modifiers, distinguishing between left-side and
+     * right-side injuries if the character is ambidextrous, and the injury implies a missing body location. If the
+     * character is not ambidextrous, all modifiers are considered uniformly.</p>
+     *
+     * <p>The method performs the following steps:</p>
+     * <ul>
+     *    <li>If the character is ambidextrous and the injury implies a missing location:
+     *        <ul>
+     *            <li>Classifies injuries into left-side or right-side based on their body location.</li>
+     *            <li>Adds associated modifiers to separate lists for left-side and right-side injuries.</li>
+     *            <li>If injuries are only present on one side, the modifiers for the opposite side are removed.</li>
+     *        </ul>
+     *    </li>
+     *    <li>If the character is not ambidextrous or the injury does not imply a missing body location all modifiers
+     *    from all injuries are included without distinguishing between left and right sides.</li>
+     * </ul>
+     *
+     * <p>After processing the injuries, the method calculates the total injury modifier by summing up the relevant
+     * modifier values, taking into account whether the modifier applies to piloting or gunnery checks.</p>
+     *
+     * @param isPiloting A boolean value indicating whether the modifier calculation is for piloting checks
+     *                   ({@code true}) or gunnery checks ({@code false}).
+     *
+     * @return The total injury modifier calculated from the character's injuries, specific to piloting or gunnery.
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public int getInjuryModifiers(boolean isPiloting) {
+        boolean isAmbidextrous = options.booleanOption(ATOW_AMBIDEXTROUS);
+
+        List<Modifier> leftSideModifiers = new ArrayList<>();
+        List<Modifier> rightSideModifiers = new ArrayList<>();
+
+        List<Modifier> allModifiers = new ArrayList<>();
+        for (Injury injury : injuries) {
+            boolean isLeftSide = false;
+            boolean isRightSide = false;
+            if (isAmbidextrous && injury.getType().impliesMissingLocation()) {
+                BodyLocation location = injury.getLocation();
+                if (location.isLimb()) {
+                    if (location == BodyLocation.LEFT_ARM || location == BodyLocation.LEFT_HAND) {
+                        isLeftSide = true;
+                    } else if (location == BodyLocation.RIGHT_ARM || location == BodyLocation.RIGHT_HAND) {
+                        isRightSide = true;
+                    }
+                }
+            }
+
+            for (Modifier modifier : injury.getModifiers()) {
+                if (isAmbidextrous) {
+                    if (isLeftSide) {
+                        leftSideModifiers.add(modifier);
+                    }
+
+                    if (isRightSide) {
+                        rightSideModifiers.add(modifier);
+                    }
+                }
+
+                allModifiers.add(modifier);
+            }
+        }
+
+        if (isAmbidextrous) {
+            if (leftSideModifiers.isEmpty() && !rightSideModifiers.isEmpty()) {
+                allModifiers.removeAll(rightSideModifiers);
+            }
+
+            if (rightSideModifiers.isEmpty() && !leftSideModifiers.isEmpty()) {
+                allModifiers.removeAll(leftSideModifiers);
+            }
+        }
+
+        return Modifier.calcTotalModifier(allModifiers.stream(),
+              isPiloting ? ModifierValue.PILOTING : ModifierValue.GUNNERY);
     }
 
+    /**
+     * @deprecated use {@link #getInjuryModifiers(boolean)} instead.
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
+    public int getPilotingInjuryMod() {
+        return getInjuryModifiers(true);
+    }
+
+    /**
+     * @deprecated use {@link #getInjuryModifiers(boolean)} instead.
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public int getGunneryInjuryMod() {
-        return Modifier.calcTotalModifier(injuries.stream().flatMap(injury -> injury.getModifiers().stream()),
-              ModifierValue.GUNNERY);
+        return getInjuryModifiers(false);
     }
 
     public boolean hasInjuries(final boolean permanentCheck) {

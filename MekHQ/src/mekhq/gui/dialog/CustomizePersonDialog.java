@@ -108,7 +108,8 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.control.EditKillLogControl;
-import mekhq.gui.control.EditPersonnelLogControl;
+import mekhq.gui.control.EditLogControl;
+import mekhq.gui.control.EditLogControl.LogType;
 import mekhq.gui.control.EditScenarioLogControl;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.MarkdownEditorPanel;
@@ -1153,7 +1154,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             tabStats.addTab(resourceMap.getString("scrOptions.TabConstraints.tabTitle"), scrOptions);
         }
         tabStats.add(resourceMap.getString("panLog.TabConstraints.tabTitle"),
-              new EditPersonnelLogControl(frame, campaign, person));
+              new EditLogControl(frame, person, campaign.getLocalDate(), LogType.PERSONAL_LOG));
         tabStats.add(resourceMap.getString("panScenarios.title"), new EditScenarioLogControl(frame, campaign, person));
         tabStats.add(resourceMap.getString("panKills.TabConstraints.tabTitle"),
               new EditKillLogControl(frame, campaign, person));
@@ -1585,9 +1586,12 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
                 int level = (Integer) skillLevels.get(type).getModel().getValue();
                 int bonus = (Integer) skillBonus.get(type).getModel().getValue();
                 SkillType skillType = SkillType.getType(type);
-                int ageModifier = getAgeModifier(milestone,
-                      skillType.getFirstAttribute(),
-                      skillType.getSecondAttribute());
+                int ageModifier = 0;
+                if (campaign.getCampaignOptions().isUseAgeEffects()) {
+                    ageModifier = getAgeModifier(milestone,
+                          skillType.getFirstAttribute(),
+                          skillType.getSecondAttribute());
+                }
                 person.addSkill(type, level, bonus, ageModifier);
             } else {
                 person.removeSkill(type);
@@ -1737,9 +1741,12 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
         int level = (Integer) skillLevels.get(type).getModel().getValue();
         int bonus = (Integer) skillBonus.get(type).getModel().getValue();
-        int ageModifier = getAgeModifier(getMilestone(person.getAge(campaign.getLocalDate())),
-              skillType.getFirstAttribute(),
-              skillType.getSecondAttribute());
+        int ageModifier = 0;
+        if (campaign.getCampaignOptions().isUseAgeEffects()) {
+            ageModifier = getAgeModifier(getMilestone(person.getAge(campaign.getLocalDate())),
+                  skillType.getFirstAttribute(),
+                  skillType.getSecondAttribute());
+        }
 
         if (skillType.isCountUp()) {
             int target = min(getCountUpMaxValue(), skillType.getTarget() + level + bonus + ageModifier);

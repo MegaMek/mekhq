@@ -27,6 +27,14 @@
  */
 package mekhq.gui;
 
+import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_NONE;
+
+import java.awt.Component;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JTree;
+import javax.swing.tree.DefaultTreeCellRenderer;
+
 import megamek.client.ui.Messages;
 import megamek.common.Entity;
 import megamek.common.GunEmplacement;
@@ -38,12 +46,6 @@ import mekhq.campaign.force.ForceType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.ReportingUtilities;
-
-import javax.swing.*;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import java.awt.*;
-
-import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_NONE;
 
 public class ForceRenderer extends DefaultTreeCellRenderer {
     private static final MMLogger logger = MMLogger.create(ForceRenderer.class);
@@ -135,12 +137,12 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
             }
 
             if (unit.hasTransportShipAssignment()) {
-                transport.append("<br>Transported by: ")
+                transport.append("<br>Transported (Ship) by: ")
                         .append(unit.getTransportShipAssignment().getTransportShip().getName());
             }
             String tacticalTransport = "";
             if (unit.hasTacticalTransportAssignment()) {
-                transport.append("<br>Transported by: ")
+                transport.append("<br>Transported (Tactical) by: ")
                     .append(unit.getTacticalTransportAssignment().getTransport().getName());
             }
             String towTransport = "";

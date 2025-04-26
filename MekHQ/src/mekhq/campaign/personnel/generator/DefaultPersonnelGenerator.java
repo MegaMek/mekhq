@@ -36,12 +36,12 @@ import megamek.common.Compute;
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.randomEvents.personalities.PersonalityController;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
@@ -52,6 +52,7 @@ import mekhq.campaign.universe.selectors.planetSelectors.AbstractPlanetSelector;
  * Creates {@link Person} instances using the default MekHQ algorithm.
  */
 public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
+
 
     private final AbstractFactionSelector factionSelector;
     private final AbstractPlanetSelector planetSelector;
@@ -103,6 +104,8 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
 
         AbstractSkillGenerator skillGenerator = new DefaultSkillGenerator(getSkillPreferences());
         skillGenerator.generateSkills(campaign, person, expLvl);
+        skillGenerator.generateAttributes(person);
+        skillGenerator.generateTraits(person);
 
         // Limit skills by age for children and adolescents
         int age = person.getAge(campaign.getLocalDate());

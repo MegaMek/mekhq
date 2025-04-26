@@ -203,7 +203,7 @@ public class SkillsTab {
             SkillSubType subType = skill.getSubType();
 
             boolean isCorrectType = switch (category) {
-                case COMBAT_GUNNERY -> subType == COMBAT_GUNNERY;
+                case NONE, COMBAT_GUNNERY -> subType == COMBAT_GUNNERY;
                 case COMBAT_PILOTING -> subType == COMBAT_PILOTING;
                 case SUPPORT -> subType == SUPPORT || subType == SUPPORT_COMMAND;
                 case ROLEPLAY_GENERAL -> subType == ROLEPLAY_GENERAL ||
@@ -277,15 +277,16 @@ public class SkillsTab {
         layout.gridx = 0;
         layout.gridy++;
         int tableCounter = 0;
-        for (int i = 0; i < 4; i++) {
+        int rows = (int) Math.ceil(skillPanels.size() / 5.0);
+        for (int i = 0; i < rows; i++) {
             layout.gridy++;
             layout.gridx = 0;
             for (int j = 0; j < 5; j++) {
-                if (tableCounter < skillPanels.size()) {
-                    panel.add(skillPanels.get(tableCounter), layout);
-                    layout.gridx++;
+                int index = i * 5 + j;
+                if (index < skillPanels.size()) {
+                    panel.add(skillPanels.get(index), layout);
                 }
-                tableCounter++;
+                layout.gridx++;
             }
         }
 

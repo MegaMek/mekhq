@@ -28,8 +28,10 @@
  */
 package mekhq.campaign;
 
+import static java.lang.Math.ceil;
 import static mekhq.campaign.mission.Scenario.T_SPACE;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_D;
+import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
 
 import java.io.File;
@@ -44,6 +46,7 @@ import megamek.common.event.PostGameResolution;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.OptionsConstants;
 import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.event.PersonBattleFinishedEvent;
@@ -417,12 +420,6 @@ public class ResolveScenarioTracker {
                     }
                 }
             } else if (wreck.getOwner().isEnemyOf(client.getLocalPlayer())) {
-                // MekHQ doesn't support gun emplacements, so we don't want the player salvaging them
-                if (wreck instanceof GunEmplacement) {
-                    appendKillCredit(wreck);
-                    continue;
-                }
-
                 if (wreck.isDropShip() && scenario.getBoardType() != T_SPACE) {
                     double dropShipBonusPercentage = (double) campaign.getCampaignOptions()
                                                                     .getDropShipBonusPercentage() / 100;
@@ -841,7 +838,7 @@ public class ResolveScenarioTracker {
             currentHits = 6;
         }
         int newHits = Math.max(0, currentHits - existingHits);
-        casualties = (int) Math.ceil(Compute.getFullCrewSize(en) * (newHits / 6.0));
+        casualties = (int) ceil(Compute.getFullCrewSize(en) * (newHits / 6.0));
         // Now reduce the casualties if some "hits" were caused by ejection
         casualties = Math.max(0, casualties - rescuedCrew);
 
@@ -1079,7 +1076,7 @@ public class ResolveScenarioTracker {
                     currentHits = entity.getCrew().getHits();
                 }
                 int newHits = Math.max(0, currentHits - existingHits);
-                casualties = (int) Math.ceil(Compute.getFullCrewSize(entity) * (newHits / 6.0));
+                casualties = (int) ceil(Compute.getFullCrewSize(entity) * (newHits / 6.0));
             }
 
             for (Person person : crew) {
@@ -1543,21 +1540,25 @@ public class ResolveScenarioTracker {
             }
 
             MekHQ.triggerEvent(new PersonBattleFinishedEvent(person, status));
+            int fatigueRate = campaign.getCampaignOptions().getFatigueRate();
             if (status.getHits() > person.getHits()) {
                 int statusHits = status.getHits();
                 int priorHits = person.getHits();
                 int newHits = statusHits - priorHits;
-                int extraHits = 0;
+                int adjustedHits = 0;
 
                 boolean hasGlassJaw = person.getOptions().booleanOption(FLAW_GLASS_JAW);
+                boolean hasToughness = person.getOptions().booleanOption(ATOW_TOUGHNESS);
+                boolean hasGlassJawAndToughness = hasGlassJaw && hasToughness;
 
-                if (hasGlassJaw) {
-                    extraHits = newHits;
+                if (hasGlassJaw && !hasGlassJawAndToughness) {
+                    adjustedHits = newHits * 2;
+                } else if (hasToughness && !hasGlassJawAndToughness) {
+                    adjustedHits = (int) ceil(newHits * 0.75);
                 }
 
                 if (campaign.getCampaignOptions().isUseInjuryFatigue()) {
-                    int fatigueRate = campaign.getCampaignOptions().getFatigueRate();
-                    int fatigueIncrease = (hasGlassJaw ? fatigueRate * 2 : fatigueRate) * (newHits + extraHits);
+                    int fatigueIncrease = fatigueRate * newHits;
 
                     person.changeFatigue(fatigueIncrease);
 
@@ -1565,7 +1566,7 @@ public class ResolveScenarioTracker {
                 }
 
                 person.setHitsPrior(priorHits);
-                person.setHits(statusHits + extraHits);
+                person.setHits(statusHits + adjustedHits);
             }
 
             if (status.wasDeployed()) {
@@ -1594,10 +1595,7 @@ public class ResolveScenarioTracker {
             }
 
             if (!status.isDead()) {
-                int fatigueChangeRate = campaign.getCampaignOptions().getFatigueRate();
-                boolean hasGlassJaw = person.getOptions().booleanOption(FLAW_GLASS_JAW);
-
-                person.changeFatigue(hasGlassJaw ? fatigueChangeRate * 2 : fatigueChangeRate);
+                person.changeFatigue(fatigueRate);
 
                 if (campaign.getCampaignOptions().isUseFatigue()) {
                     Fatigue.processFatigueActions(campaign, person);
@@ -1762,7 +1760,7 @@ public class ResolveScenarioTracker {
             for (Unit salvageUnit : getLeftoverSalvage()) {
                 value = value.plus(salvageUnit.getSellValue());
             }
-            if (((Contract) mission).isSalvageExchange()) {
+            if (usesSalvageExchange()) {
                 value = value.multipliedBy(((Contract) mission).getSalvagePct()).dividedBy(100);
                 campaign.getFinances()
                       .credit(TransactionType.SALVAGE_EXCHANGE,
@@ -1898,8 +1896,37 @@ public class ResolveScenarioTracker {
         return toReturn;
     }
 
+    /**
+     * Determines whether a salvage exchange is used based on the current contract's conditions.
+     *
+     * <p>This method checks the type of the mission and evaluates specific conditions to determine if a salvage
+     * exchange approach applies. For AtB (Against the Bot) contracts, it evaluates if the enemy and employer's factions
+     * are Clan and if the date is before the Battle of Tukayyid. If these conditions are met, it returns true.</p>
+     *
+     * <p>Additionally, in general contracts, it checks if the salvage exchange is explicitly enabled.</p>
+     *
+     * @return {@code true} if the current mission uses a salvage exchange, {@code false} otherwise.
+     */
     public boolean usesSalvageExchange() {
-        return (getMission() instanceof Contract) && ((Contract) getMission()).isSalvageExchange();
+        if (getMission() instanceof Contract contract) {
+            if (contract.isSalvageExchange()) {
+                return true;
+            }
+        }
+
+        return isEmployerEvokingSpecialClause();
+    }
+
+    public boolean isEmployerEvokingSpecialClause() {
+        if (getMission() instanceof AtBContract atbContract) {
+            boolean enemyIsClan = atbContract.getEnemy().isClan();
+            boolean employerIsClan = atbContract.getEmployerFaction().isClan();
+            boolean isBeforeTukayyid = campaign.getLocalDate().isBefore(MHQConstants.BATTLE_OF_TUKAYYID);
+
+            return enemyIsClan && !employerIsClan && isBeforeTukayyid;
+        }
+
+        return false;
     }
 
     /**

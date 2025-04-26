@@ -42,9 +42,9 @@ import javax.swing.SpinnerNumberModel;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
@@ -113,6 +113,7 @@ public class AdvancementTab {
 
     //start Skill Randomization Tab
     private JCheckBox chkExtraRandomness;
+    private JCheckBox chkComingOfAgeSPAs;
 
     private JPanel pnlPhenotype;
     private JLabel[] phenotypeLabels;
@@ -136,7 +137,7 @@ public class AdvancementTab {
 
     private JPanel pnlSkillGroups;
 
-    private JPanel pnlTactics;
+    private JPanel pnlCommandSkills;
     private JLabel lblCommandSkillsUltraGreen;
     private JSpinner spnCommandSkillsUltraGreen;
     private JLabel lblCommandSkillsGreen;
@@ -171,22 +172,13 @@ public class AdvancementTab {
     private JSpinner spnSecondProb;
     private JLabel lblSecondBonus;
     private JSpinner spnSecondBonus;
+    private JLabel lblRoleplaySkillsModifier;
+    private JSpinner spnRoleplaySkillsModifier;
 
-    private JPanel pnlRoleplaySkills;
-    private JLabel lblRoleplaySkillsUltraGreen;
-    private JSpinner spnRoleplaySkillsUltraGreen;
-    private JLabel lblRoleplaySkillsGreen;
-    private JSpinner spnRoleplaySkillsGreen;
-    private JLabel lblRoleplaySkillsReg;
-    private JSpinner spnRoleplaySkillsReg;
-    private JLabel lblRoleplaySkillsVet;
-    private JSpinner spnRoleplaySkillsVet;
-    private JLabel lblRoleplaySkillsElite;
-    private JSpinner spnRoleplaySkillsElite;
-    private JLabel lblRoleplaySkillsHeroic;
-    private JSpinner spnRoleplaySkillsHeroic;
-    private JLabel lblRoleplaySkillsLegendary;
-    private JSpinner spnRoleplaySkillsLegendary;
+    private JPanel pnlATOWAttributes;
+    private JCheckBox chkUseAttributes;
+    private JCheckBox chkRandomizeAttributes;
+    private JCheckBox chkRandomizeTraits;
     //end Skill Randomization Tab
 
     //start Recruitment Bonus Tab
@@ -533,6 +525,12 @@ public class AdvancementTab {
      */
     private void initializeSkillRandomizationTab() {
         chkExtraRandomness = new JCheckBox();
+        chkUseAttributes = new JCheckBox();
+        chkRandomizeAttributes = new JCheckBox();
+
+        pnlATOWAttributes = new JPanel();
+        chkRandomizeTraits = new JCheckBox();
+        chkComingOfAgeSPAs = new JCheckBox();
 
         pnlPhenotype = new JPanel();
         phenotypeLabels = new JLabel[] {}; // This will be initialized properly later
@@ -540,7 +538,7 @@ public class AdvancementTab {
 
         pnlSkillGroups = new JPanel();
 
-        pnlTactics = new JPanel();
+        pnlCommandSkills = new JPanel();
         lblCommandSkillsUltraGreen = new JLabel();
         spnCommandSkillsUltraGreen = new JSpinner();
         lblCommandSkillsGreen = new JLabel();
@@ -576,21 +574,8 @@ public class AdvancementTab {
         lblSecondBonus = new JLabel();
         spnSecondBonus = new JSpinner();
 
-        pnlRoleplaySkills = new JPanel();
-        lblRoleplaySkillsUltraGreen = new JLabel();
-        spnRoleplaySkillsUltraGreen = new JSpinner();
-        lblRoleplaySkillsGreen = new JLabel();
-        spnRoleplaySkillsGreen = new JSpinner();
-        lblRoleplaySkillsReg = new JLabel();
-        spnRoleplaySkillsReg = new JSpinner();
-        lblRoleplaySkillsVet = new JLabel();
-        spnRoleplaySkillsVet = new JSpinner();
-        lblRoleplaySkillsElite = new JLabel();
-        spnRoleplaySkillsElite = new JSpinner();
-        lblRoleplaySkillsHeroic = new JLabel();
-        spnRoleplaySkillsHeroic = new JSpinner();
-        lblRoleplaySkillsLegendary = new JLabel();
-        spnRoleplaySkillsLegendary = new JSpinner();
+        lblRoleplaySkillsModifier = new JLabel();
+        spnRoleplaySkillsModifier = new JSpinner();
 
         pnlRandomAbilities = new JPanel();
         lblAbilityGreen = new JLabel();
@@ -631,6 +616,7 @@ public class AdvancementTab {
 
         // Contents
         chkExtraRandomness = new CampaignOptionsCheckBox("ExtraRandomness");
+        chkComingOfAgeSPAs = new CampaignOptionsCheckBox("ComingOfAgeAbilities");
 
         pnlPhenotype = createPhenotypePanel();
         pnlRandomAbilities = createAbilityPanel();
@@ -648,6 +634,9 @@ public class AdvancementTab {
         layout.gridwidth = 1;
         panel.add(chkExtraRandomness, layout);
 
+        layout.gridy++;
+        panel.add(chkComingOfAgeSPAs, layout);
+
         layout.gridx = 0;
         layout.gridy++;
         panel.add(pnlPhenotype, layout);
@@ -661,6 +650,37 @@ public class AdvancementTab {
 
         // Create Parent Panel and return
         return createParentPanel(panel, "XpAwardsTab");
+    }
+
+    /**
+     * Creates and returns the ATOW panel, which allows users to configure settings for attribute and traits
+     * probabilities.
+     *
+     * @return A {@code JPanel} containing configuration options for phenotype probabilities.
+     */
+    private JPanel createATOWAttributesPanel() {
+        // Contents
+        chkUseAttributes = new CampaignOptionsCheckBox("UseAttributes");
+        chkRandomizeAttributes = new CampaignOptionsCheckBox("RandomizeAttributes");
+        chkRandomizeTraits = new CampaignOptionsCheckBox("RandomizeTraits");
+
+        final JPanel panel = new CampaignOptionsStandardPanel("ATOWAttributesPanel", true, "ATOWAttributesPanel");
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+        layout.gridwidth = 1;
+        layout.gridx = 0;
+        layout.gridy = 0;
+
+        layout.gridy++;
+        panel.add(chkUseAttributes, layout);
+
+        layout.gridx++;
+        panel.add(chkRandomizeTraits, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(chkRandomizeAttributes, layout);
+
+        return panel;
     }
 
     /**
@@ -682,8 +702,8 @@ public class AdvancementTab {
         layout.gridy = 0;
 
         for (int i = 0; i < phenotypes.size(); i++) {
-            phenotypeLabels[i] = new CampaignOptionsLabel(phenotypes.get(i).getName());
-            phenotypeSpinners[i] = new CampaignOptionsSpinner(phenotypes.get(i).getName(), 0, 0, 100, 1);
+            phenotypeLabels[i] = new CampaignOptionsLabel(phenotypes.get(i).getLabel());
+            phenotypeSpinners[i] = new CampaignOptionsSpinner(phenotypes.get(i).getLabel(), 0, 0, 100, 1);
 
             layout.gridx++;
             panel.add(phenotypeLabels[i], layout);
@@ -779,11 +799,11 @@ public class AdvancementTab {
      */
     private JPanel createSkillGroupPanel() {
         // Contents
-        pnlTactics = createTacticsPanel();
-        pnlRoleplaySkills = createRoleplaySkillsPanel();
+        pnlCommandSkills = createCommandSkillsPanel();
         pnlArtillery = createArtilleryPanel();
         pnlSmallArms = createSmallArmsPanel();
         pnlSecondarySkills = createSecondarySkillPanel();
+        pnlATOWAttributes = createATOWAttributesPanel();
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("SkillGroupsPanel");
@@ -791,9 +811,9 @@ public class AdvancementTab {
         layout.gridwidth = 1;
         layout.gridx = 0;
         layout.gridy = 0;
-        panel.add(pnlTactics, layout);
+        panel.add(pnlCommandSkills, layout);
         layout.gridx++;
-        panel.add(pnlRoleplaySkills, layout);
+        panel.add(pnlSecondarySkills, layout);
 
         layout.gridx = 0;
         layout.gridy++;
@@ -803,18 +823,18 @@ public class AdvancementTab {
 
         layout.gridx = 0;
         layout.gridy++;
-        panel.add(pnlSecondarySkills, layout);
+        panel.add(pnlATOWAttributes, layout);
 
         return panel;
     }
 
     /**
-     * Creates and returns the Tactics panel, which allows users to configure settings for Tactics modifiers for
-     * different skill levels, such as green, regular, veteran, and elite.
+     * Creates and returns the Command Skills panel, which allows users to configure settings for Command Skill
+     * modifiers for different skill levels, such as green, regular, veteran, and elite.
      *
-     * @return A {@code JPanel} containing configuration options for Tactics modifiers.
+     * @return A {@code JPanel} containing configuration options for Command Skill modifiers.
      */
-    private JPanel createTacticsPanel() {
+    private JPanel createCommandSkillsPanel() {
         // Contents
         lblCommandSkillsUltraGreen = new CampaignOptionsLabel("CommandSkillsUltraGreen");
         spnCommandSkillsUltraGreen = new CampaignOptionsSpinner("CommandSkillsUltraGreen", 0, -12, 12, 1);
@@ -880,22 +900,14 @@ public class AdvancementTab {
         return panel;
     }
 
+    /**
+     * @deprecated unused.
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     private JPanel createRoleplaySkillsPanel() {
         // Contents
-        lblRoleplaySkillsUltraGreen = new CampaignOptionsLabel("RoleplaySkillsUltraGreen");
-        spnRoleplaySkillsUltraGreen = new CampaignOptionsSpinner("RoleplaySkillsUltraGreen", 0, -12, 12, 1);
-
-        lblRoleplaySkillsGreen = new CampaignOptionsLabel("RoleplaySkillsGreen");
-        spnRoleplaySkillsGreen = new CampaignOptionsSpinner("RoleplaySkillsGreen", 0, -12, 12, 1);
-
-        lblRoleplaySkillsReg = new CampaignOptionsLabel("RoleplaySkillsRegular");
-        spnRoleplaySkillsReg = new CampaignOptionsSpinner("RoleplaySkillsRegular", 0, -12, 12, 1);
-
-        lblRoleplaySkillsVet = new CampaignOptionsLabel("RoleplaySkillsVeteran");
-        spnRoleplaySkillsVet = new CampaignOptionsSpinner("RoleplaySkillsVeteran", 0, -12, 12, 1);
-
-        lblRoleplaySkillsElite = new CampaignOptionsLabel("RoleplaySkillsElite");
-        spnRoleplaySkillsElite = new CampaignOptionsSpinner("RoleplaySkillsElite", 0, -12, 12, 1);
+        lblRoleplaySkillsModifier = new CampaignOptionsLabel("RoleplaySkillsModifier");
+        spnRoleplaySkillsModifier = new CampaignOptionsSpinner("RoleplaySkillsModifier", 0, -12, 12, 1);
 
         lblRoleplaySkillsHeroic = new CampaignOptionsLabel("RoleplaySkillsHeroic");
         spnRoleplaySkillsHeroic = new CampaignOptionsSpinner("RoleplaySkillsHeroic", 0, -12, 12, 1);
@@ -909,39 +921,9 @@ public class AdvancementTab {
         layout.gridwidth = 1;
         layout.gridx = 0;
         layout.gridy = 0;
-        panel.add(lblRoleplaySkillsUltraGreen, layout);
+        panel.add(lblRoleplaySkillsModifier, layout);
         layout.gridx++;
-        panel.add(spnRoleplaySkillsUltraGreen, layout);
-        layout.gridx++;
-        panel.add(lblRoleplaySkillsGreen, layout);
-        layout.gridx++;
-        panel.add(spnRoleplaySkillsGreen, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblRoleplaySkillsReg, layout);
-        layout.gridx++;
-        panel.add(spnRoleplaySkillsReg, layout);
-        layout.gridx++;
-        panel.add(lblRoleplaySkillsVet, layout);
-        layout.gridx++;
-        panel.add(spnRoleplaySkillsVet, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblRoleplaySkillsElite, layout);
-        layout.gridx++;
-        panel.add(spnRoleplaySkillsElite, layout);
-        layout.gridx++;
-        panel.add(lblRoleplaySkillsHeroic, layout);
-        layout.gridx++;
-        panel.add(spnRoleplaySkillsHeroic, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblRoleplaySkillsLegendary, layout);
-        layout.gridx++;
-        panel.add(spnRoleplaySkillsLegendary, layout);
+        panel.add(spnRoleplaySkillsModifier, layout);
 
         return panel;
     }
@@ -1025,6 +1007,9 @@ public class AdvancementTab {
         lblSecondBonus = new CampaignOptionsLabel("SecondarySkillBonus");
         spnSecondBonus = new CampaignOptionsSpinner("SecondarySkillBonus", 0, -12, 12, 1);
 
+        lblRoleplaySkillsModifier = new CampaignOptionsLabel("RoleplaySkillsModifier");
+        spnRoleplaySkillsModifier = new CampaignOptionsSpinner("RoleplaySkillsModifier", 0, -12, 12, 1);
+
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("SecondarySkillPanel", true, "SecondarySkillPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
@@ -1034,6 +1019,10 @@ public class AdvancementTab {
         panel.add(lblAntiMekSkill, layout);
         layout.gridx++;
         panel.add(spnAntiMekSkill, layout);
+        layout.gridx++;
+        panel.add(lblRoleplaySkillsModifier, layout);
+        layout.gridx++;
+        panel.add(spnRoleplaySkillsModifier, layout);
 
         layout.gridx = 0;
         layout.gridy++;
@@ -1113,7 +1102,7 @@ public class AdvancementTab {
             layout.gridx = currentColumn * 2;
             layout.gridy = currentRow;
 
-            lblRecruitmentBonusCombat[i] = new JLabel(roles.get(i).getName(false));
+            lblRecruitmentBonusCombat[i] = new JLabel(roles.get(i).getLabel(false));
             spnRecruitmentBonusCombat[i] = new JSpinner(new SpinnerNumberModel(0, -12, 12, 1));
 
             panel.add(lblRecruitmentBonusCombat[i], layout);
@@ -1155,7 +1144,7 @@ public class AdvancementTab {
             layout.gridx = currentColumn * 2;
             layout.gridy = currentRow;
 
-            lblRecruitmentBonusSupport[i] = new JLabel(roles.get(i).getName(false));
+            lblRecruitmentBonusSupport[i] = new JLabel(roles.get(i).getLabel(false));
             spnRecruitmentBonusSupport[i] = new JSpinner(new SpinnerNumberModel(0, -12, 12, 1));
 
             panel.add(lblRecruitmentBonusSupport[i], layout);
@@ -1217,6 +1206,10 @@ public class AdvancementTab {
 
         //start Skill Randomization Tab
         chkExtraRandomness.setSelected(skillPreferences.randomizeSkill());
+        chkUseAttributes.setSelected(skillPreferences.isUseAttributes());
+        chkRandomizeAttributes.setSelected(skillPreferences.isRandomizeAttributes());
+        chkRandomizeTraits.setSelected(skillPreferences.isRandomizeTraits());
+        chkComingOfAgeSPAs.setSelected(options.isRewardComingOfAgeAbilities());
         final int[] phenotypeProbabilities = options.getPhenotypeProbabilities();
         for (int i = 0; i < phenotypeSpinners.length; i++) {
             phenotypeSpinners[i].setValue(phenotypeProbabilities[i]);
@@ -1245,19 +1238,7 @@ public class AdvancementTab {
         } catch (NullPointerException e) {
             // This is expected for campaigns <50.05. In those cases, we're just going to use the default values.
         }
-
-        spnRoleplaySkillsUltraGreen.setValue(skillPreferences.getRoleplaySkillsModifier(SkillType.EXP_ULTRA_GREEN));
-        spnRoleplaySkillsGreen.setValue(skillPreferences.getRoleplaySkillsModifier(SkillType.EXP_GREEN));
-        spnRoleplaySkillsReg.setValue(skillPreferences.getRoleplaySkillsModifier(SkillType.EXP_REGULAR));
-        spnRoleplaySkillsVet.setValue(skillPreferences.getRoleplaySkillsModifier(SkillType.EXP_VETERAN));
-        spnRoleplaySkillsElite.setValue(skillPreferences.getRoleplaySkillsModifier(SkillType.EXP_ELITE));
-        try {
-            spnRoleplaySkillsHeroic.setValue(skillPreferences.getRoleplaySkillsModifier(SkillType.EXP_HEROIC));
-            spnRoleplaySkillsLegendary.setValue(skillPreferences.getRoleplaySkillsModifier(SkillType.EXP_LEGENDARY));
-        } catch (NullPointerException e) {
-            // This is expected for campaigns <50.05. In those cases, we're just going to use the default values.
-        }
-
+        spnRoleplaySkillsModifier.setValue(skillPreferences.getRoleplaySkillModifier());
         spnCombatSA.setValue(skillPreferences.getCombatSmallArmsBonus());
         spnSupportSA.setValue(skillPreferences.getSupportSmallArmsBonus());
         spnArtyProb.setValue(skillPreferences.getArtilleryProb());
@@ -1321,9 +1302,13 @@ public class AdvancementTab {
         options.setContractNegotiationXP((int) spnContractNegotiationXP.getValue());
         options.setAdminXP((int) spnAdminWeeklyXP.getValue());
         options.setAdminXPPeriod((int) spnAdminWeeklyXPPeriod.getValue());
+        options.setRewardComingOfAgeAbilities(chkComingOfAgeSPAs.isSelected());
 
         //start Skill Randomization Tab
         skillPreferences.setRandomizeSkill(chkExtraRandomness.isSelected());
+        skillPreferences.setUseAttributes(chkUseAttributes.isSelected());
+        skillPreferences.setRandomizeAttributes(chkRandomizeAttributes.isSelected());
+        skillPreferences.setRandomizeTraits(chkRandomizeTraits.isSelected());
         for (int i = 0; i < phenotypeSpinners.length; i++) {
             options.setPhenotypeProbability(i, (int) phenotypeSpinners[i].getValue());
         }
@@ -1342,12 +1327,7 @@ public class AdvancementTab {
         skillPreferences.setCommandSkillsMod(SkillType.EXP_HEROIC, (int) spnCommandSkillsHeroic.getValue());
         skillPreferences.setCommandSkillsMod(SkillType.EXP_LEGENDARY, (int) spnCommandSkillsLegendary.getValue());
 
-        skillPreferences.setRoleplaySkillsModifier(SkillType.EXP_ULTRA_GREEN,
-              (int) spnRoleplaySkillsUltraGreen.getValue());
-        skillPreferences.setRoleplaySkillsModifier(SkillType.EXP_GREEN, (int) spnRoleplaySkillsGreen.getValue());
-        skillPreferences.setRoleplaySkillsModifier(SkillType.EXP_REGULAR, (int) spnRoleplaySkillsReg.getValue());
-        skillPreferences.setRoleplaySkillsModifier(SkillType.EXP_VETERAN, (int) spnRoleplaySkillsVet.getValue());
-        skillPreferences.setRoleplaySkillsModifier(SkillType.EXP_ELITE, (int) spnRoleplaySkillsElite.getValue());
+        skillPreferences.setRoleplaySkillModifier((int) spnRoleplaySkillsModifier.getValue());
         skillPreferences.setCombatSmallArmsBonus((int) spnCombatSA.getValue());
         skillPreferences.setSupportSmallArmsBonus((int) spnSupportSA.getValue());
 
