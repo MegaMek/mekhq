@@ -909,12 +909,6 @@ public class AdvancementTab {
         lblRoleplaySkillsModifier = new CampaignOptionsLabel("RoleplaySkillsModifier");
         spnRoleplaySkillsModifier = new CampaignOptionsSpinner("RoleplaySkillsModifier", 0, -12, 12, 1);
 
-        lblRoleplaySkillsHeroic = new CampaignOptionsLabel("RoleplaySkillsHeroic");
-        spnRoleplaySkillsHeroic = new CampaignOptionsSpinner("RoleplaySkillsHeroic", 0, -12, 12, 1);
-
-        lblRoleplaySkillsLegendary = new CampaignOptionsLabel("RoleplaySkillsLegendary");
-        spnRoleplaySkillsLegendary = new CampaignOptionsSpinner("RoleplaySkillsLegendary", 0, -12, 12, 1);
-
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("RoleplaySkillsPanel", true, "RoleplaySkillsPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
