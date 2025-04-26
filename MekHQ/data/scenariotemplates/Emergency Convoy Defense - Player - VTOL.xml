@@ -3,17 +3,17 @@
     <name>Emergency Convoy Defense</name>
     <stratConScenarioType>SPECIAL_RESUPPLY</stratConScenarioType>
     <shortBriefing>Prevent your resupply falling into the hands of the enemy.</shortBriefing>
-    <detailedBriefing>Your convoy has been trapped by an enemy force specialized in hunting down fast-moving targets. They are well-equipped for this type of engagement, and their goal is to intercept and capture your supplies. While securing the convoy is important, your primary objective is to eliminate at least 50% of the enemy force to ensure they cannot continue their raids. If they are not routed here, they will be free to attack other convoys, posing a long-term threat to our supply lines.
+    <detailedBriefing><![CDATA[Your convoy has been trapped by an enemy force specialized in hunting down fast-moving targets. They are well-equipped for this type of engagement, and their goal is to intercept and capture your supplies. While securing the convoy is important, your primary objective is to eliminate at least 50% of the enemy force to ensure they cannot continue their raids. If they are not routed here, they will be free to attack other convoys, posing a long-term threat to our supply lines.
 
 The enemy is built for speed and pursuit, meaning direct engagements may not always be favorable. Use ambush tactics, force them into unfavorable terrain, and disrupt their ability to maneuver. They rely on overwhelming pursuit capabilities—deny them the chance to use it effectively. If the convoy can be safely extracted, do so, but not at the expense of allowing the enemy to regroup for future strikes.
 
-We will control the battlefield at the conclusion of this engagement, ensuring that any remaining salvage remains in our possession. Turn the hunters into the hunted, cripple their forces, and make certain they never threaten our supply lines again.</detailedBriefing>
+We will control the battlefield at the conclusion of this engagement, ensuring that any remaining salvage remains in our possession. Turn the hunters into the hunted, cripple their forces, and make certain they never threaten our supply lines again.]]></detailedBriefing>
     <battlefieldControl>PLAYER</battlefieldControl>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>
         <allowedTerrainTypes />
-        <allowRotation>true</allowRotation>
+        <allowRotation>false</allowRotation>
         <baseHeight>50</baseHeight>
         <baseWidth>17</baseWidth>
         <heightScalingIncrement>0</heightScalingIncrement>
@@ -37,7 +37,7 @@ We will control the battlefield at the conclusion of this engagement, ensuring t
                 <deploymentZones>
                     <deploymentZone>6</deploymentZone>
                 </deploymentZones>
-                <destinationZone>2</destinationZone>
+                <destinationZone>6</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>0</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
@@ -47,7 +47,7 @@ We will control the battlefield at the conclusion of this engagement, ensuring t
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>
                 <objectiveLinkedForces />
-                <retreatThreshold>0</retreatThreshold>
+                <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
                 <useArtillery>false</useArtillery>

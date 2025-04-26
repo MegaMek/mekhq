@@ -11,10 +11,10 @@
 /MekHQ/.settings/
 /MekHQ/bin/
 /MekHQ/build/
-/MekHQ/campaigns/
-!/MekHQ/campaigns/Fist and Falcon/
-!/MekHQ/campaigns/Sword and Dragon/
-!/MekHQ/campaigns/Wolf and Blake/
+/MekHQ/campaigns/*
+!/MekHQ/campaigns/archive
+!/MekHQ/campaigns/archive/**
+!/MekHQ/campaigns/The Learning Ropes.cpnx.gz
 /MekHQ/classes/
 /MekHQ/data/images/awards/
 !/MekHQ/data/images/awards/standard/

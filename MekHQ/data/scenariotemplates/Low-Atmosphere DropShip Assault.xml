@@ -2,11 +2,11 @@
 <ScenarioTemplate>
     <name>Low-Atmosphere DropShip Assault</name>
     <shortBriefing>Destroy DropShip before it escape.</shortBriefing>
-    <detailedBriefing>A hostile DropShip is attempting to escape in low atmosphere, and we cannot allow it to break free. Whether it carries enemy personnel, critical cargo, or valuable intelligence, its destruction is paramount. Your mission is to intercept and destroy the DropShip before it can escape.
+    <detailedBriefing><![CDATA[A hostile DropShip is attempting to escape in low atmosphere, and we cannot allow it to break free. Whether it carries enemy personnel, critical cargo, or valuable intelligence, its destruction is paramount. Your mission is to intercept and destroy the DropShip before it can escape.
 
 Expect the enemy to deploy defensive escorts and countermeasures to protect their vessel. They may attempt evasive maneuvers or a high-speed burn to reach the upper atmosphere. You must strike decisively and disable or destroy the DropShip before it leaves your engagement range.
 
-We will control the field at the end of the engagement, ensuring that any wreckage or surviving assets remain in our hands. This is a one-shot opportunity—do not let them escape.</detailedBriefing>
+We will control the field at the end of the engagement, ensuring that any wreckage or surviving assets remain in our hands. This is a one-shot opportunity—do not let them escape.]]></detailedBriefing>
     <battlefieldControl>PLAYER</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
@@ -31,12 +31,7 @@ We will control the field at the end of the engagement, ensuring that any wrecka
                 <contributesToMapSize>true</contributesToMapSize>
                 <contributesToUnitCount>true</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
-                <deploymentZones>
-                    <deploymentZone>2</deploymentZone>
-                    <deploymentZone>4</deploymentZone>
-                    <deploymentZone>6</deploymentZone>
-                    <deploymentZone>8</deploymentZone>
-                </deploymentZones>
+                <deploymentZones />
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>0</forceAlignment>
@@ -49,7 +44,8 @@ We will control the field at the end of the engagement, ensuring that any wrecka
                 <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>5</startingAltitude>
-                <syncDeploymentType>None</syncDeploymentType>
+                <syncDeploymentType>OppositeEdge</syncDeploymentType>
+                <syncedForceName>DropShip</syncedForceName>
                 <useArtillery>false</useArtillery>
             </value>
         </entry>
@@ -65,7 +61,9 @@ We will control the field at the end of the engagement, ensuring that any wrecka
                 <contributesToMapSize>true</contributesToMapSize>
                 <contributesToUnitCount>false</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
-                <deploymentZones />
+                <deploymentZones>
+                    <deploymentZone>6</deploymentZone>
+                </deploymentZones>
                 <destinationZone>6</destinationZone>
                 <fixedUnitCount>1</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>

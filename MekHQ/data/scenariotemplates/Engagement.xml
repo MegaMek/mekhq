@@ -2,11 +2,11 @@
 <ScenarioTemplate>
     <name>Engagement</name>
     <shortBriefing>Engage and destroy enemy at the front.</shortBriefing>
-    <detailedBriefing>Your orders are simple—engage and destroy at least 50% of enemy forces. This is not a hit-and-run operation or a delaying action. You are to commit fully to the engagement and break their strength through superior firepower and tactical positioning.
+    <detailedBriefing><![CDATA[Your orders are simple—engage and destroy at least 50% of enemy forces. This is not a hit-and-run operation or a delaying action. You are to commit fully to the engagement and break their strength through superior firepower and tactical positioning.
 
 This battle will determine control of the battlefield. The victor will hold the field at the end of the engagement, securing any salvage and denying the enemy any chance of recovery. Every enemy unit destroyed weakens their ability to wage war—make sure they do not leave this battlefield intact.
 
-Strike hard, eliminate the opposition, and take control. Victory is absolute, or it is meaningless.</detailedBriefing>
+Strike hard, eliminate the opposition, and take control. Victory is absolute, or it is meaningless.]]></detailedBriefing>
     <battlefieldControl>VICTOR</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
@@ -40,8 +40,6 @@ Strike hard, eliminate the opposition, and take control. Victory is absolute, or
                     <deploymentZone>6</deploymentZone>
                     <deploymentZone>7</deploymentZone>
                     <deploymentZone>8</deploymentZone>
-                    <deploymentZone>9</deploymentZone>
-                    <deploymentZone>10</deploymentZone>
                 </deploymentZones>
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>

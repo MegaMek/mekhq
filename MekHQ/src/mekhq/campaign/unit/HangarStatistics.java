@@ -28,10 +28,10 @@
 
 package mekhq.campaign.unit;
 
+import java.util.HashMap;
+
 import megamek.common.*;
 import mekhq.campaign.Hangar;
-
-import java.util.HashMap;
 
 /**
  * Provides methods to gather statistics on units in a hangar.
@@ -71,6 +71,7 @@ public class HangarStatistics {
             }
             if (unit.isMothballed()) {
                 hashMap.put((long) Unit.ETYPE_MOTHBALLED, hashMap.getOrDefault((long) Unit.ETYPE_MOTHBALLED, 0) + 1);
+                continue;
             }
 
             Entity en = unit.getEntity();

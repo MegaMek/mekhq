@@ -3,11 +3,11 @@
     <name>Convoy Interdiction</name>
     <stratConScenarioType>CONVOY</stratConScenarioType>
     <shortBriefing>Intercept and neutralize enemy convoy.</shortBriefing>
-    <detailedBriefing>An enemy convoy is on the move, and your orders are simple—hit them hard and stop at least 50% of their forces from reaching the far edge of the engagement zone. This is a direct strike, not a prolonged engagement. Destroy or cripple the convoy units with no regard for salvage or escort interference. Speed and overwhelming firepower are your greatest assets.
+    <detailedBriefing><![CDATA[An enemy convoy is on the move, and your orders are simple—hit them hard and stop at least 50% of their forces from reaching the far edge of the engagement zone. This is a direct strike, not a prolonged engagement. Destroy or cripple the convoy units with no regard for salvage or escort interference. Speed and overwhelming firepower are your greatest assets.
 
 There is no need to concern yourself with minimizing damage or securing the spoils. We do not have the luxury of holding the field, and enemy reinforcements will arrive quickly. Do not waste time engaging the escorts unless necessary—focus all efforts on neutralizing the convoy itself. Once the job is done, withdraw immediately.
 
-No distractions. No delays. No mercy. Execute the raid, cripple their supply line, and get out before the enemy can mount a counterattack.</detailedBriefing>
+No distractions. No delays. No mercy. Execute the raid, cripple their supply line, and get out before the enemy can mount a counterattack.]]></detailedBriefing>
     <battlefieldControl>ENEMY</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
@@ -32,7 +32,9 @@ No distractions. No delays. No mercy. Execute the raid, cripple their supply lin
                 <contributesToMapSize>true</contributesToMapSize>
                 <contributesToUnitCount>true</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
-                <deploymentZones />
+                <deploymentZones>
+                    <deploymentZone>10</deploymentZone>
+                </deploymentZones>
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>0</forceAlignment>
@@ -44,8 +46,7 @@ No distractions. No delays. No mercy. Execute the raid, cripple their supply lin
                 <minWeightClass>0</minWeightClass>
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
-                <syncDeploymentType>OppositeArc</syncDeploymentType>
-                <syncedForceName>Convoy</syncedForceName>
+                <syncDeploymentType>None</syncDeploymentType>
                 <useArtillery>false</useArtillery>
             </value>
         </entry>
@@ -91,10 +92,7 @@ No distractions. No delays. No mercy. Execute the raid, cripple their supply lin
                 <contributesToUnitCount>false</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
                 <deploymentZones>
-                    <deploymentZone>2</deploymentZone>
-                    <deploymentZone>4</deploymentZone>
                     <deploymentZone>6</deploymentZone>
-                    <deploymentZone>8</deploymentZone>
                 </deploymentZones>
                 <destinationZone>6</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
@@ -105,7 +103,7 @@ No distractions. No delays. No mercy. Execute the raid, cripple their supply lin
                 <generationOrder>5</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>1</minWeightClass>
-                <retreatThreshold>50</retreatThreshold>
+                <retreatThreshold>0</retreatThreshold>
                 <subjectToRandomRemoval>false</subjectToRandomRemoval>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>

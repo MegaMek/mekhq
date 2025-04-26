@@ -3,17 +3,17 @@
     <name>Emergency Convoy Defense</name>
     <stratConScenarioType>SPECIAL_RESUPPLY</stratConScenarioType>
     <shortBriefing>Prevent your resupply falling into the hands of the enemy.</shortBriefing>
-    <detailedBriefing>An enemy force has breached our lines and is in pursuit of an allied convoy, carrying supplies critical to your operations. If these supplies are lost, so is a vital piece of our logistical network. Your mission is to ensure the successful extraction of the convoy by escorting it to the opposite edge of the engagement zone while simultaneously routing the enemy by destroying at least 50% of their forces.
+    <detailedBriefing><![CDATA[An enemy force has breached our lines and is in pursuit of an allied convoy, carrying supplies critical to your operations. If these supplies are lost, so is a vital piece of our logistical network. Your mission is to ensure the successful extraction of the convoy by escorting it to the opposite edge of the engagement zone while simultaneously routing the enemy by destroying at least 50% of their forces.
 
 This enemy assault is a direct attempt to cripple our supply chain. If they are not stopped here, they will continue to strike at our convoys, causing immeasurable damage to our war effort. The convoy is a priority, but if ensuring the destruction of the enemy requires sacrificing the supplies, do not hesitate. Breaking their offensive strength is the ultimate objective.
 
-We will control the battlefield at the end of this engagement, allowing us to recover whatever remains and prevent further incursions. Ensure the convoy escapes if possible, but above all, crush the enemy’s ability to wage war in our territory. This ends here.</detailedBriefing>
+We will control the battlefield at the end of this engagement, allowing us to recover whatever remains and prevent further incursions. Ensure the convoy escapes if possible, but above all, crush the enemy’s ability to wage war in our territory. This ends here.]]></detailedBriefing>
     <battlefieldControl>PLAYER</battlefieldControl>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>
         <allowedTerrainTypes />
-        <allowRotation>true</allowRotation>
+        <allowRotation>false</allowRotation>
         <baseHeight>50</baseHeight>
         <baseWidth>17</baseWidth>
         <heightScalingIncrement>0</heightScalingIncrement>
@@ -47,7 +47,7 @@ We will control the battlefield at the end of this engagement, allowing us to re
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>
                 <objectiveLinkedForces />
-                <retreatThreshold>0</retreatThreshold>
+                <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
                 <useArtillery>false</useArtillery>
@@ -113,7 +113,7 @@ We will control the battlefield at the end of this engagement, allowing us to re
                     <objectiveLinkedForce>OpFor</objectiveLinkedForce>
                 </objectiveLinkedForces>
                 <syncDeploymentType>SameEdge</syncDeploymentType>
-                <syncedForceName>Player</syncedForceName>
+                <syncedForceName>Resupply Convoy</syncedForceName>
                 <useArtillery>false</useArtillery>
                 <roleChoices>
                     <forceRole>RAIDER</forceRole>
@@ -136,7 +136,7 @@ We will control the battlefield at the end of this engagement, allowing us to re
                 <deploymentZones>
                     <deploymentZone>6</deploymentZone>
                 </deploymentZones>
-                <destinationZone>2</destinationZone>
+                <destinationZone>6</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>0</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
@@ -146,7 +146,7 @@ We will control the battlefield at the end of this engagement, allowing us to re
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>
                 <objectiveLinkedForces />
-                <retreatThreshold>0</retreatThreshold>
+                <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
                 <useArtillery>false</useArtillery>

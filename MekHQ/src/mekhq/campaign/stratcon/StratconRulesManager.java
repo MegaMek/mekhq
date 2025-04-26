@@ -980,7 +980,11 @@ public class StratconRulesManager {
 
         if (explicitForceID == FORCE_NONE) {
             // Include all units in the campaign's TO&E
-            for (UUID unitId : campaign.getForces().getAllUnits(false)) {
+            List<UUID> allUnits = campaign.getAllUnitsInTheTOE(false);
+            // We need to shuffle the list, otherwise the same unit will always be selected
+            Collections.shuffle(allUnits);
+
+            for (UUID unitId : allUnits) {
                 try {
                     potentialUnits.add(campaign.getUnit(unitId));
                 } catch (Exception exception) {
@@ -2547,7 +2551,7 @@ public class StratconRulesManager {
         List<Unit> defensiveUnits = new ArrayList<>();
 
         // Retrieve the list of units from force 0
-        Vector<UUID> unitIDs = campaign.getForce(0).getAllUnits(true);
+        List<UUID> unitIDs = campaign.getAllUnitsInTheTOE(true);
 
         for (UUID unitId : unitIDs) {
             Unit unit = campaign.getUnit(unitId);
@@ -2684,7 +2688,7 @@ public class StratconRulesManager {
 
 
         // Retrieve the list of units from force 0
-        Vector<UUID> unitIDs = campaign.getForce(0).getAllUnits(true);
+        List<UUID> unitIDs = campaign.getAllUnitsInTheTOE(true);
 
         for (UUID unitId : unitIDs) {
             Unit unit = campaign.getUnit(unitId);

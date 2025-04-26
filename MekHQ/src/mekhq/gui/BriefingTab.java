@@ -55,6 +55,7 @@ import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
 import megamek.common.Game;
+import megamek.common.GunEmplacement;
 import megamek.common.annotations.Nullable;
 import megamek.common.containers.MunitionTree;
 import megamek.common.event.Subscribe;
@@ -83,6 +84,7 @@ import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent;
+import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -559,9 +561,14 @@ public final class BriefingTab extends CampaignGuiTab {
             case FAILED, BREACH -> getCampaign().getCampaignOptions().getMissionXpFail();
             case SUCCESS, PARTIAL -> {
                 if ((getCampaign().getCampaignOptions().isUseStratCon()) &&
-                          (mission instanceof AtBContract) &&
-                          (((AtBContract) mission).getStratconCampaignState().getVictoryPoints() >= 3)) {
-                    yield getCampaign().getCampaignOptions().getMissionXpOutstandingSuccess();
+                          (mission instanceof AtBContract)) {
+                    StratconCampaignState stratConCampaignState = ((AtBContract) mission).getStratconCampaignState();
+
+                    if (stratConCampaignState == null || stratConCampaignState.getVictoryPoints() < 3) {
+                        yield getCampaign().getCampaignOptions().getMissionXpSuccess();
+                    } else {
+                        yield getCampaign().getCampaignOptions().getMissionXpOutstandingSuccess();
+                    }
                 } else {
                     yield getCampaign().getCampaignOptions().getMissionXpSuccess();
                 }
@@ -1099,16 +1106,21 @@ public final class BriefingTab extends CampaignGuiTab {
 
         // Split up bot forces into teams for separate handling
         for (final BotForce botForce : scenario.getBotForces()) {
+            // Do not include Turrets
+            List<Entity> filteredEntityList =
+                  botForce.getFixedEntityList().stream().filter(
+                        e -> !(e instanceof GunEmplacement)
+                  ).toList();
             if (botForce.getName().contains(allyFaction)) {
                 // Stuff with our employer's name should be with us.
-                playerEntities.addAll(botForce.getFixedEntityList());
-                alliedEntities.addAll(botForce.getFixedEntityList());
+                playerEntities.addAll(filteredEntityList);
+                alliedEntities.addAll(filteredEntityList);
             } else {
                 int botTeam = botForce.getTeam();
                 if (!botTeamMappings.containsKey(botTeam)) {
                     botTeamMappings.put(botTeam, new ArrayList<>());
                 }
-                botTeamMappings.get(botTeam).addAll(botForce.getFixedEntityList());
+                botTeamMappings.get(botTeam).addAll(filteredEntityList);
             }
         }
 
