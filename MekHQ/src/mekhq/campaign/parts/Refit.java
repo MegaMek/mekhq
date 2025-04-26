@@ -41,6 +41,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.equipment.MiscMounted;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.util.C3Util;
 import megamek.common.verifier.EntityVerifier;
 import megamek.common.verifier.TestAero;
 import megamek.common.verifier.TestEntity;
@@ -1691,7 +1692,7 @@ public class Refit extends Part implements IAcquisitionWork {
             part.updateConditionFromPart();
         }
 
-        oldUnit.getEntity().setC3UUIDAsString(oldEntity.getC3UUIDAsString());
+        C3Util.copyC3Networks(oldEntity, oldUnit.getEntity());
         oldUnit.getEntity().setExternalIdAsString(oldUnit.getId().toString());
         getCampaign().clearGameData(oldUnit.getEntity());
         getCampaign().reloadGameEntities();
@@ -2612,7 +2613,7 @@ public class Refit extends Part implements IAcquisitionWork {
     @Override
     public String failToFind() {
         return ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
-              " refit kit not found.");
+              " <b>refit kit not found</b>.");
     }
 
     /**

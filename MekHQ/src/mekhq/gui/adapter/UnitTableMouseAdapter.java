@@ -73,7 +73,6 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.event.RepairStatusChangedEvent;
 import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.finances.Money;
@@ -84,6 +83,7 @@ import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.ActivateUnitAction;
 import mekhq.campaign.unit.actions.CancelMothballUnitAction;
@@ -631,6 +631,18 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
     private @Nullable Person pickTechForMothballOrActivation(Unit unit, String description) {
         Person tech = null;
+
+        if (unit.isConventionalInfantry()) {
+            return null;
+        }
+
+        if (unit.isSelfCrewed()) {
+            if (unit.engineerResponsible().isPresent()) {
+                tech = unit.engineerResponsible().get();
+                return tech;
+            }
+        }
+
         if (!unit.isSelfCrewed() || isSelfCrewedButHasNoTech(unit)) {
             UUID id = gui.selectTech(unit, description, true);
             if (null != id) {
@@ -649,6 +661,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 }
             }
         }
+
         return tech;
     }
 
@@ -907,9 +920,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             // if we're using maintenance and have selected something that requires
             // maintenance and
             // isn't mothballed or being mothballed
-            if (gui.getCampaign().getCampaignOptions().isCheckMaintenance() &&
-                      (maintenanceTime > 0) &&
-                      Stream.of(units).anyMatch(u -> !u.isMothballing() && !u.isMothballed())) {
+            if (gui.getCampaign().getCampaignOptions().isCheckMaintenance()) {
                 menuItem = new JMenu(resources.getString("maintenanceExtraTime.text"));
 
                 for (int x = 1; x <= 4; x++) {
@@ -917,7 +928,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
                     // if we've got just one unit selected,
                     // have the courtesy to show the multiplier if relevant
-                    if (oneSelected && (unit.getMaintenanceMultiplier() == x) && !unit.isSelfCrewed()) {
+                    if (oneSelected && (unit.getMaintenanceMultiplier() == x)) {
                         maintenanceMultiplierItem.setSelected(true);
                     }
 

@@ -1465,14 +1465,11 @@ public class BiographyTab {
         RandomGenderGenerator.setPercentFemale(sldGender.getValue());
         options.setNonBinaryDiceSize((int) spnNonBinaryDiceSize.getValue());
         options.setFamilyDisplayLevel(comboFamilyDisplayLevel.getSelectedItem());
-        if (options.isUseAgeEffects() != chkUseAgeEffects.isSelected()) {
-            for (Person person : campaign.getPersonnel()) {
-
-                if (chkUseAgeEffects.isSelected()) {
-                    updateAllSkillAgeModifiers(generalTab.getDate(), person);
-                } else {
-                    clearAllAgeModifiers(person);
-                }
+        for (Person person : campaign.getPersonnel()) {
+            if (chkUseAgeEffects.isSelected()) {
+                updateAllSkillAgeModifiers(generalTab.getDate(), person);
+            } else {
+                clearAllAgeModifiers(person);
             }
         }
         options.setUseAgeEffects(chkUseAgeEffects.isSelected());

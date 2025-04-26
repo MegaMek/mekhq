@@ -31,6 +31,8 @@ package mekhq.gui.dialog;
 
 import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.RESUPPLY_LOOT_BOX_NAME;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.awt.Color;
 import java.awt.FlowLayout;
@@ -271,7 +273,20 @@ public class ResolveScenarioWizardDialog extends JDialog {
               PILOTPANEL);
 
         pnlSalvage = makeSalvagePanel();
-        tabMain.add(wrapWithInstructions(pnlSalvage, null, resourceMap.getString("txtInstructions.text.salvage")),
+
+        String report = resourceMap.getString("txtInstructions.text.salvage");
+        if (tracker.isEmployerEvokingSpecialClause()) {
+            String colorOpenWarning = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
+            String colorOpenNegative = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor());
+            campaign.addReport(String.format(resourceMap.getString("txtInstructions.text.salvage.special"),
+                  colorOpenWarning,
+                  CLOSING_SPAN_TAG,
+                  colorOpenNegative,
+                  CLOSING_SPAN_TAG));
+
+            report = resourceMap.getString("txtInstructions.text.salvage.special.unformatted");
+        }
+        tabMain.add(wrapWithInstructions(pnlSalvage, null, report),
               SALVAGEPANEL);
 
         pnlPrisonerStatus = makePrisonerStatusPanel();

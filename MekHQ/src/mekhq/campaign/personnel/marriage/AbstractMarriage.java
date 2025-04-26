@@ -34,7 +34,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import megamek.client.generator.RandomGenderGenerator;
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
@@ -344,6 +343,7 @@ public abstract class AbstractMarriage {
                 isSameSex = true;
             }
 
+
             marryRandomSpouse(campaign, today, person, isSameSex, false, true);
         }
     }
@@ -371,32 +371,25 @@ public abstract class AbstractMarriage {
     protected void marryRandomSpouse(final Campaign campaign, final LocalDate today, final Person person,
                                      final boolean sameSex, boolean isInterUnit, boolean isBackground) {
         Gender personGender = person.getGender();
-
-        boolean isNonBinary = (campaign.getCampaignOptions().getNonBinaryDiceSize() > 0) &&
-                                    (Compute.randomInt(campaign.getCampaignOptions().getNonBinaryDiceSize()) == 0);
-
-        Gender spouseGender = switch (personGender) {
-            case MALE, OTHER_MALE -> sameSex ?
-                                           (isNonBinary ? Gender.OTHER_MALE : Gender.MALE) :
-                                           (isNonBinary ? Gender.OTHER_FEMALE : Gender.FEMALE);
-            case FEMALE, OTHER_FEMALE -> sameSex ?
-                                               (isNonBinary ? Gender.OTHER_FEMALE : Gender.FEMALE) :
-                                               (isNonBinary ? Gender.OTHER_MALE : Gender.MALE);
-            case RANDOMIZE -> RandomGenderGenerator.generate();
-        };
+        Gender spouseGender;
+        if (sameSex) {
+            spouseGender = personGender.isMale() ? Gender.MALE : Gender.FEMALE;
+        } else {
+            spouseGender = personGender.isMale() ? Gender.FEMALE : Gender.MALE;
+        }
 
         List<Person> potentialSpouses = new ArrayList<>();
         Person spouse = null;
 
         if (isInterUnit) {
-            potentialSpouses = campaign.getActivePersonnel()
-                                     .stream()
-                                     .filter(potentialSpouse -> isPotentialRandomSpouse(campaign,
-                                           today,
-                                           person,
-                                           potentialSpouse,
-                                           spouseGender))
-                                     .toList();
+            List<Person> activePersonnel = campaign.getActivePersonnel(false);
+            potentialSpouses = new ArrayList<>();
+
+            for (Person potentialSpouse : activePersonnel) {
+                if (isPotentialRandomSpouse(campaign, today, person, potentialSpouse, spouseGender)) {
+                    potentialSpouses.add(potentialSpouse);
+                }
+            }
 
             if (!potentialSpouses.isEmpty()) {
                 spouse = potentialSpouses.get(Compute.randomInt(potentialSpouses.size()));
@@ -421,8 +414,14 @@ public abstract class AbstractMarriage {
      * @return the created external spouse
      */
     Person createExternalSpouse(final Campaign campaign, final LocalDate today, final Person person, Gender gender) {
-        Person externalSpouse = campaign.newDependent(gender);
+        boolean isNonBinary = (campaign.getCampaignOptions().getNonBinaryDiceSize() > 0) &&
+                                    (Compute.randomInt(campaign.getCampaignOptions().getNonBinaryDiceSize()) == 0);
 
+        if (isNonBinary) {
+            gender = gender.isMale() ? Gender.OTHER_MALE : Gender.OTHER_FEMALE;
+        }
+
+        Person externalSpouse = campaign.newDependent(gender);
 
         // Calculate person's age and the maximum and minimum allowable spouse ages
         int personAge = person.getAge(today);
@@ -456,20 +455,29 @@ public abstract class AbstractMarriage {
      * @param today           the current day
      * @param person          the person who is trying to find a random spouse
      * @param potentialSpouse the person to determine if they are a valid potential random spouse
-     * @param gender          the desired gender to be married to
+     * @param desiredGender          the desired gender to be married to
      *
      * @return true if they are a valid potential random spouse
      */
     protected boolean isPotentialRandomSpouse(final Campaign campaign, final LocalDate today, final Person person,
-                                              final Person potentialSpouse, final Gender gender) {
+          final Person potentialSpouse, final Gender desiredGender) {
         // A Potential Spouse must:
         // 1. Be the specified gender
-        // 2. Be a safe spouse for the current person
-        // 3. Be within the random marriage age range
-        if ((potentialSpouse.getGender() != gender) || !safeSpouse(campaign, today, person, potentialSpouse, true)) {
+        Gender potentialSpouseGender = potentialSpouse.getGender();
+        if (desiredGender.isMale() && !potentialSpouseGender.isMale()) {
             return false;
         }
 
+        if (desiredGender.isFemale() && !potentialSpouseGender.isFemale()) {
+            return false;
+        }
+
+        // 2. Be a safe spouse for the current person
+        if (!safeSpouse(campaign, today, person, potentialSpouse, true)) {
+            return false;
+        }
+
+        // 3. Be within the random marriage age range
         final int ageDifference = Math.abs(potentialSpouse.getAge(today) - person.getAge(today));
         return ageDifference <= campaign.getCampaignOptions().getRandomMarriageAgeRange();
     }
