@@ -29,58 +29,69 @@ package mekhq.gui.sorter;
 
 import java.util.Comparator;
 
+import megamek.common.enums.SkillLevel;
+
 /**
- * A comparator for skills levels (e.g. Regular, Veteran, etc)
- *   * @author Jay Lawson
- *
+ * A comparator for skills levels (e.g. Regular, Veteran, etc) * @author Jay Lawson
  */
 public class LevelSorter implements Comparator<String> {
 
+    /**
+     * Compares two strings that may contain skill level descriptions.
+     * <p>The comparison follows these rules:</p>
+     *
+     * <ul>
+     *   <li>If both strings are "-", they are considered equal</li>
+     *   <li>Strings containing "-" are sorted before any actual skill level</li>
+     *   <li>Actual skill levels are compared based on their experience level values</li>
+     * </ul>
+     *
+     * @param firstString  the first string to compare
+     * @param secondString the second string to compare
+     *
+     * @return a negative {@link Integer} if {@code firstString} is less than {@code secondString}, {@code 0} if they
+     *       are equal, or a positive {@link Integer} if {@code firstString} is greater
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
     @Override
-    public int compare(String s0, String s1) {
-        if (s0.equals("-") && s1.equals("-")) {
-            return 0;
-        } else if (s0.equals("-")) {
-            return -1;
-        } else if (s1.equals("-")) {
-            return 1;
-        } else {
-            // TODO : Switch these to instead use RandomSkillGenerator.levelNames
-            //probably easiest to turn into numbers and then sort that way
-            int l0 = 0;
-            int l1 = 0;
-            if (s0.contains("Green")) {
-                l0 = 2;
-            }
-            if (s1.contains("Green")) {
-                l1 = 2;
-            }
-            // Ultra-Green has to be below Green when using String.contains() because it contains Green
-            if (s0.contains("Ultra-Green")) {
-                l0 = 1;
-            }
-            if (s1.contains("Ultra-Green")) {
-                l1 = 1;
-            }
-            if (s0.contains("Regular")) {
-                l0 = 3;
-            }
-            if (s1.contains("Regular")) {
-                l1 = 3;
-            }
-            if (s0.contains("Veteran")) {
-                l0 = 4;
-            }
-            if (s1.contains("Veteran")) {
-                l1 = 4;
-            }
-            if (s0.contains("Elite")) {
-                l0 = 5;
-            }
-            if (s1.contains("Elite")) {
-                l1 = 5;
-            }
-            return ((Comparable<Integer>) l0).compareTo(l1);
+    public int compare(String firstString, String secondString) {
+        // Handle the special case of "-" values
+        if (firstString.equals("-") && secondString.equals("-")) {
+            return 0; // Equal values should return 0
+        } else if (firstString.equals("-")) {
+            return -1; // By convention, "-" sort before actual values
+        } else if (secondString.equals("-")) {
+            return 1;  // firstString is not "-", but secondString is, so firstString comes after
         }
+
+        // Convert strings to SkillLevel enums and compare their experience levels
+        SkillLevel firstStringLevel = parseSkillLevel(firstString);
+        SkillLevel secondStringLevel = parseSkillLevel(secondString);
+
+        return Integer.compare(firstStringLevel.getExperienceLevel(), secondStringLevel.getExperienceLevel());
+    }
+
+    /**
+     * Parses a string to find the matching SkillLevel.
+     *
+     * <p>Checks if the input string contains the name of any skill level. The check is performed in the order
+     * defined by {@link SkillLevel#values()} to avoid substring matching issues (e.g., ULTRA_GREEN vs. GREEN).</p>
+     *
+     * @param str String that may contain a skill level name
+     *
+     * @return The corresponding {@link SkillLevel}, or {@link SkillLevel#NONE} if no match is found
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    private SkillLevel parseSkillLevel(String str) {
+        for (SkillLevel level : SkillLevel.values()) {
+            if (str.contains(level.toString())) {
+                return level;
+            }
+        }
+        return SkillLevel.NONE; // Default if no match found
     }
 }
