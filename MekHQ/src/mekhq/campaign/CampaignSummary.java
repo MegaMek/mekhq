@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign;
 
@@ -109,18 +114,20 @@ public class CampaignSummary {
         totalCombatPersonnel = 0;
         totalSupportPersonnel = 0;
         totalInjuries = 0;
-        for (Person p : campaign.getActivePersonnel()) {
+        for (Person p : campaign.getActivePersonnel(true)) {
             // Add them to the total count
             if (!p.getPrisonerStatus().isFree()) {
                 continue;
             }
-            if (p.getHits() > 0) {
+            {
                 totalInjuries++;
             }
-            if (p.getPrimaryRole().isCombat()) {
-                totalCombatPersonnel++;
-            } else {
-                totalSupportPersonnel++;
+            if (p.getHits() > 0) {
+                if (p.getPrimaryRole().isCombat()) {
+                    totalCombatPersonnel++;
+                } else {
+                    totalSupportPersonnel++;
+                }
             }
         }
 

@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -59,13 +64,13 @@ import mekhq.gui.utilities.JMoneyTextField;
 public class EditTransactionDialog extends JDialog implements ActionListener, FocusListener, MouseListener {
     private static final MMLogger logger = MMLogger.create(EditTransactionDialog.class);
 
-    private Transaction oldTransaction;
-    private Transaction newTransaction;
-    private JFrame      parent;
+    private final Transaction oldTransaction;
+    private final Transaction newTransaction;
+    private final JFrame parent;
 
-    private JMoneyTextField             amountField;
-    private JTextField                  descriptionField;
-    private JButton                     dateButton;
+    private JMoneyTextField amountField;
+    private JTextField descriptionField;
+    private JButton dateButton;
     private MMComboBox<TransactionType> categoryCombo;
 
     private JButton saveButton;
@@ -81,7 +86,7 @@ public class EditTransactionDialog extends JDialog implements ActionListener, Fo
         // it to the dialog
         oldTransaction = new Transaction(transaction);
         newTransaction = transaction;
-        this.parent    = parent;
+        this.parent = parent;
 
         initGUI();
         setTitle(resourceMap.getString("dialog.title"));
@@ -98,11 +103,7 @@ public class EditTransactionDialog extends JDialog implements ActionListener, Fo
 
     /**
      * These need to be migrated to the Suite Constants / Suite Options Setup
-     *
-     * @since 0.50.04
-     * @deprecated Move to Suite Constants / Suite Options Setup
      */
-    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditTransactionDialog.class);
@@ -117,15 +118,15 @@ public class EditTransactionDialog extends JDialog implements ActionListener, Fo
         JPanel panel = new JPanel();
 
         GridBagConstraints c = new GridBagConstraints();
-        c.gridx      = 0;
-        c.gridy      = 0;
+        c.gridx = 0;
+        c.gridy = 0;
         c.gridheight = 1;
-        c.gridwidth  = 1;
-        c.anchor     = GridBagConstraints.BASELINE;
-        c.fill       = GridBagConstraints.HORIZONTAL;
-        c.weightx    = 0;
-        c.weighty    = 0;
-        c.insets     = new Insets(2, 2, 2, 2);
+        c.gridwidth = 1;
+        c.anchor = GridBagConstraints.BASELINE;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.weightx = 0;
+        c.weighty = 0;
+        c.insets = new Insets(2, 2, 2, 2);
 
         GridBagLayout l = new GridBagLayout();
         panel.setLayout(l);
@@ -204,15 +205,6 @@ public class EditTransactionDialog extends JDialog implements ActionListener, Fo
 
     public Transaction getOldTransaction() {
         return oldTransaction;
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated No indicated uses
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public Transaction getNewTransaction() {
-        return newTransaction;
     }
 
     @Override

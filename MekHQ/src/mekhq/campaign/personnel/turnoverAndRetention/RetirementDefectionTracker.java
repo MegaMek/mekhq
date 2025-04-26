@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.turnoverAndRetention;
 
@@ -52,7 +57,6 @@ import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -129,7 +133,7 @@ public class RetirementDefectionTracker {
             getManagementSkillValues(campaign);
         }
 
-        for (Person person : campaign.getActivePersonnel()) {
+        for (Person person : campaign.getActivePersonnel(true)) {
             if ((person.getPrimaryRole().isCivilian()) ||
                       (!person.getPrisonerStatus().isFree()) ||
                       (person.isDeployed())) {
@@ -218,7 +222,8 @@ public class RetirementDefectionTracker {
                 if (campaign.getCampaignOptions().isUseCommanderLeadershipOnly()) {
                     Person flaggedCommander = campaign.getFlaggedCommander();
                     if (flaggedCommander != null && flaggedCommander.hasSkill((SkillType.S_LEADER))) {
-                        modifier -= flaggedCommander.getSkill(SkillType.S_LEADER).getFinalSkillValue(flaggedCommander.getOptions());
+                        modifier -= flaggedCommander.getSkill(SkillType.S_LEADER)
+                                          .getFinalSkillValue(flaggedCommander.getOptions());
                     }
                 } else {
                     modifier -= getManagementSkillModifier(person);
@@ -500,7 +505,7 @@ public class RetirementDefectionTracker {
      * @param campaign The Campaign object for which to calculate the management skill values.
      */
     private void getManagementSkillValues(Campaign campaign) {
-        for (Person person : campaign.getActivePersonnel()) {
+        for (Person person : campaign.getActivePersonnel(true)) {
             if ((person.getPrimaryRole().isCivilian()) ||
                       (person.getPrisonerStatus().isPrisoner()) ||
                       (person.getPrisonerStatus().isPrisonerDefector())) {
@@ -657,7 +662,7 @@ public class RetirementDefectionTracker {
         int multiCrew = 0;
         int other = 0;
 
-        for (Person person : campaign.getActivePersonnel()) {
+        for (Person person : campaign.getActivePersonnel(true)) {
             if ((person.getPrimaryRole().isCivilian()) ||
                       (person.getPrisonerStatus().isPrisoner()) ||
                       (person.getPrisonerStatus().isPrisonerDefector())) {
@@ -702,7 +707,7 @@ public class RetirementDefectionTracker {
     public static int getCombinedSkillValues(Campaign campaign, String skillType) {
         int combinedSkillValues = 0;
 
-        for (Person person : campaign.getActivePersonnel()) {
+        for (Person person : campaign.getActivePersonnel(true)) {
             if ((!person.getPrisonerStatus().isPrisoner()) || (!person.getPrisonerStatus().isPrisonerDefector())) {
                 if (person.getPrimaryRole().isAdministratorHR()) {
                     if (person.hasSkill(skillType)) {
@@ -776,7 +781,7 @@ public class RetirementDefectionTracker {
 
         Money profits = campaign.getFinances().getProfits();
 
-        int totalShares = campaign.getActivePersonnel()
+        int totalShares = campaign.getActivePersonnel(true)
                                 .stream()
                                 .mapToInt(p -> p.getNumShares(campaign, campaign.getCampaignOptions().isSharesForAll()))
                                 .sum();
@@ -825,7 +830,8 @@ public class RetirementDefectionTracker {
      * @param shareValue The value of each share in the unit; if not using the share system, this is zero.
      * @param campaign   the current campaign
      */
-    public void rollRetirement(final @Nullable Mission mission, final Map<UUID, TargetRoll> targets, final Money shareValue, final Campaign campaign) {
+    public void rollRetirement(final @Nullable Mission mission, final Map<UUID, TargetRoll> targets,
+          final Money shareValue, final Campaign campaign) {
         if ((mission != null) && !unresolvedPersonnel.containsKey(mission.getId())) {
             unresolvedPersonnel.put(mission.getId(), new HashSet<>());
         }
@@ -906,7 +912,8 @@ public class RetirementDefectionTracker {
      *
      * @return True if the person was successfully removed from the campaign, false otherwise.
      */
-    public boolean removeFromCampaign(Person person, boolean killed, boolean sacked, Campaign campaign, Mission contract) {
+    public boolean removeFromCampaign(Person person, boolean killed, boolean sacked, Campaign campaign,
+          Mission contract) {
         if (!person.getPrisonerStatus().isFree()) {
             return false;
         }
@@ -1033,7 +1040,8 @@ public class RetirementDefectionTracker {
 
         }
 
-        public Payout(final Campaign campaign, final Person person, final Money shareValue, final boolean killed, final boolean sacked, final boolean sharesForAll) {
+        public Payout(final Campaign campaign, final Person person, final Money shareValue, final boolean killed,
+              final boolean sacked, final boolean sharesForAll) {
             if (killed) {
                 setWasKilled(true);
             } else if (sacked) {
@@ -1047,7 +1055,8 @@ public class RetirementDefectionTracker {
             }
         }
 
-        private void calculatePayout(final Campaign campaign, final Person person, final boolean killed, final boolean sacked, final boolean shareSystem) {
+        private void calculatePayout(final Campaign campaign, final Person person, final boolean killed,
+              final boolean sacked, final boolean shareSystem) {
             final Profession profession = Profession.getProfessionFromPersonnelRole(person.getPrimaryRole());
 
             // person was killed

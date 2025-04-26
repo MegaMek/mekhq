@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -64,30 +69,31 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
 public class EditPersonnelInjuriesDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(EditPersonnelInjuriesDialog.class);
 
-    private JFrame           frame;
-    private Campaign         campaign;
-    private Person           person;
-    private InjuryTableModel injuryModel;
+    private final JFrame frame;
+    private final Campaign campaign;
+    private final Person person;
+    private final InjuryTableModel injuryModel;
 
     private JButton btnEdit;
     private JButton btnDelete;
-    private JTable  injuriesTable;
+    private JTable injuriesTable;
 
-    public EditPersonnelInjuriesDialog(final JFrame frame, final boolean modal, final Campaign campaign, final Person person) {
+    public EditPersonnelInjuriesDialog(final JFrame frame, final boolean modal, final Campaign campaign,
+          final Person person) {
         super(frame, modal);
-        this.frame    = frame;
+        this.frame = frame;
         this.campaign = campaign;
-        this.person   = person;
-        injuryModel   = new InjuryTableModel(person.getInjuries());
+        this.person = person;
+        injuryModel = new InjuryTableModel(person.getInjuries());
         initComponents();
         setLocationRelativeTo(frame);
         setUserPreferences();
     }
 
     private void initComponents() {
-        JButton btnOK  = new JButton();
+        JButton btnOK = new JButton();
         JButton btnAdd = new JButton();
-        btnEdit   = new JButton();
+        btnEdit = new JButton();
         btnDelete = new JButton();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditPersonnelInjuriesDialog",
@@ -117,7 +123,7 @@ public class EditPersonnelInjuriesDialog extends JDialog {
         injuriesTable = new JTable(injuryModel);
         injuriesTable.setName("injuriesTable");
         TableColumn column;
-        int         width = 0;
+        int width = 0;
         for (int i = 0; i < InjuryTableModel.N_COL; i++) {
             column = injuriesTable.getColumnModel().getColumn(i);
             column.setPreferredWidth(injuryModel.getColumnWidth(i));
@@ -145,11 +151,7 @@ public class EditPersonnelInjuriesDialog extends JDialog {
 
     /**
      * These need to be migrated to the Suite Constants / Suite Options Setup
-     *
-     * @since 0.50.04
-     * @deprecated Move to Suite Constants / Suite Options Setup
      */
-    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditPersonnelInjuriesDialog.class);
@@ -214,18 +216,18 @@ public class EditPersonnelInjuriesDialog extends JDialog {
      * A table model for displaying parts - similar to the one in CampaignGUI, but not exactly
      */
     public static class InjuryTableModel extends AbstractTableModel {
-        protected String[]     columnNames;
+        protected String[] columnNames;
         protected List<Injury> data;
 
-        public final static int COL_DAYS      = 0;
-        public final static int COL_LOCATION  = 1;
-        public final static int COL_TYPE      = 2;
-        public final static int COL_FLUFF     = 3;
-        public final static int COL_HITS      = 4;
+        public final static int COL_DAYS = 0;
+        public final static int COL_LOCATION = 1;
+        public final static int COL_TYPE = 2;
+        public final static int COL_FLUFF = 3;
+        public final static int COL_HITS = 4;
         public final static int COL_PERMANENT = 5;
-        public final static int COL_WORKEDON  = 6;
-        public final static int COL_EXTENDED  = 7;
-        public final static int N_COL         = 8;
+        public final static int COL_WORKEDON = 6;
+        public final static int COL_EXTENDED = 7;
+        public final static int N_COL = 8;
 
         public InjuryTableModel(List<Injury> entries) {
             data = entries;
@@ -319,7 +321,8 @@ public class EditPersonnelInjuriesDialog extends JDialog {
 
         public class Renderer extends DefaultTableCellRenderer {
             @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                  boolean hasFocus, int row, int column) {
                 super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 setOpaque(true);
                 int actualCol = table.convertColumnIndexToModel(column);

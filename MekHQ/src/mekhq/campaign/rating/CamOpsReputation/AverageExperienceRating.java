@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.rating.CamOpsReputation;
 
@@ -39,9 +44,8 @@ import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 
@@ -49,22 +53,19 @@ public class AverageExperienceRating {
     private static final MMLogger logger = MMLogger.create(AverageExperienceRating.class);
 
     /**
-     * Calculates the skill level based on the average experience rating of a
-     * campaign.
+     * Calculates the skill level based on the average experience rating of a campaign.
      *
      * @param campaign the campaign to calculate the average experience rating from
      * @param log      whether to log the calculation in mekhq.log
+     *
      * @return the skill level based on the average experience rating
-     * @throws IllegalStateException if the experience score is not within the
-     *                               expected range
+     *
+     * @throws IllegalStateException if the experience score is not within the expected range
      */
     protected static SkillLevel getSkillLevel(Campaign campaign, boolean log) {
         // values below 0 are treated as 'Legendary',
         // values above 7 are treated as 'wet behind the ears' which we call 'None'
-        int experienceScore = MathUtility.clamp(
-                calculateAverageExperienceRating(campaign, log),
-                0,
-                7);
+        int experienceScore = MathUtility.clamp(calculateAverageExperienceRating(campaign, log), 0, 7);
 
         return switch (experienceScore) {
             case 7 -> SkillLevel.NONE;
@@ -76,16 +77,16 @@ public class AverageExperienceRating {
             case 1 -> SkillLevel.HEROIC;
             case 0 -> SkillLevel.LEGENDARY;
             default -> throw new IllegalStateException(
-                    "Unexpected value in mekhq/campaign/rating/CamOpsRatingV2/AverageExperienceRating.java/getSkillLevel: "
-                            + experienceScore);
+                  "Unexpected value in mekhq/campaign/rating/CamOpsRatingV2/AverageExperienceRating.java/getSkillLevel: " +
+                        experienceScore);
         };
     }
 
     /**
      * Retrieves the average experience level of the campaign. Useful for AtB Systems.
      *
-     * @param averageSkillLevel the average skill level for which to calculate the reputation
-     *                          modifier
+     * @param averageSkillLevel the average skill level for which to calculate the reputation modifier
+     *
      * @return the reputation modifier for the camera operator
      */
     protected static int getAverageExperienceModifier(SkillLevel averageSkillLevel) {
@@ -96,26 +97,24 @@ public class AverageExperienceRating {
             case ELITE, HEROIC, LEGENDARY -> 40;
         };
 
-        logger.debug("Reputation Rating = {}, +{}",
-            averageSkillLevel.toString(),
-            modifier);
+        logger.debug("Reputation Rating = {}, +{}", averageSkillLevel.toString(), modifier);
 
         return modifier;
     }
 
     /**
-     * Calculates the average experience rating of combat personnel in the given
-     * campaign.
+     * Calculates the average experience rating of combat personnel in the given campaign.
      *
      * @param campaign the campaign to calculate the average experience rating for
      * @param log      whether to log the calculation to mekhq.log
+     *
      * @return the average experience rating of personnel in the campaign
      */
     private static int calculateAverageExperienceRating(Campaign campaign, boolean log) {
         int personnelCount = 0;
         double totalExperience = 0.0;
 
-        for (Person person : campaign.getActivePersonnel()) {
+        for (Person person : campaign.getActivePersonnel(true)) {
             Unit unit = person.getUnit();
 
             // if the person does not belong to a unit, then skip this person
@@ -147,12 +146,13 @@ public class AverageExperienceRating {
 
                 // For Infantry, average experience is calculated using a different method.
                 totalExperience += calculateInfantryExperience((Infantry) entity, crew); // add the average experience
-                                                                                         // to the total
+                // to the total
                 personnelCount++;
             } else if (entity instanceof ProtoMek) {
                 // ProtoMek entities only use gunnery for calculation
                 if (person.hasSkill(SkillType.S_GUN_PROTO)) {
-                    totalExperience += max(0, person.getSkill(SkillType.S_GUN_PROTO).getFinalSkillValue(person.getOptions()));
+                    totalExperience += max(0,
+                          person.getSkill(SkillType.S_GUN_PROTO).getFinalSkillValue(person.getOptions()));
                 }
 
                 personnelCount++;
@@ -186,9 +186,9 @@ public class AverageExperienceRating {
         // and so the user can easily see if there is a mistake
         if (log) {
             logger.debug("Average Experience Rating: {} / {} = {}",
-                    totalExperience,
-                    personnelCount,
-                    averageExperienceRating);
+                  totalExperience,
+                  personnelCount,
+                  averageExperienceRating);
         }
 
         // Return the average experience rating
@@ -200,6 +200,7 @@ public class AverageExperienceRating {
      *
      * @param infantry The Infantry entity, which also includes some crew details.
      * @param crew     The unit crew.
+     *
      * @return The average experience of the Infantry crew.
      */
     private static double calculateInfantryExperience(Infantry infantry, Crew crew) {
@@ -216,6 +217,7 @@ public class AverageExperienceRating {
      * @param person The person in the crew.
      * @param entity The entity associated with the crew.
      * @param unit   The unit the crew belongs to.
+     *
      * @return The average experience of the crew.
      */
     private static double calculateRegularExperience(Person person, Entity entity, Unit unit) {
@@ -230,11 +232,12 @@ public class AverageExperienceRating {
             Skill skill = person.getSkill(skillType);
 
             if (skill != null) {
-                skillValue += max(0,skill.getFinalSkillValue(options));
+                skillValue += max(0, skill.getFinalSkillValue(options));
                 skillCount++;
             } else {
                 logger.warn("(calculateRegularExperience) unable to fetch diving skill {} for {}. Skipping",
-                      skillType, entity);
+                      skillType,
+                      entity);
             }
         }
 
@@ -243,11 +246,12 @@ public class AverageExperienceRating {
 
             Skill skill = person.getSkill(skillType);
             if (skill != null) {
-                skillValue += max(0,skill.getFinalSkillValue(options));
+                skillValue += max(0, skill.getFinalSkillValue(options));
                 skillCount++;
             } else {
                 logger.warn("(calculateRegularExperience) unable to fetch gunnery skill {} for {}. Skipping",
-                      skillType, entity);
+                      skillType,
+                      entity);
             }
         }
 

@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -58,9 +63,9 @@ import mekhq.campaign.unit.Unit;
 public class SmallSVAmmoSwapDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(SmallSVAmmoSwapDialog.class);
 
-    private final           List<WeaponRow> rows        = new ArrayList<>();
-    private                 boolean         canceled    = true;
-    private final transient ResourceBundle  resourceMap = ResourceBundle.getBundle(
+    private final List<WeaponRow> rows = new ArrayList<>();
+    private boolean canceled = true;
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle(
           "mekhq.resources.SmallSVAmmoSwapDialog",
           MekHQ.getMHQOptions().getLocale());
 
@@ -76,15 +81,15 @@ public class SmallSVAmmoSwapDialog extends JDialog {
         // with inferno ammo and build from there.
         for (Part part : unit.getParts()) {
             if ((part instanceof InfantryAmmoBin infantryAmmoBin) &&
-                (infantryAmmoBin.getType().getMunitionType().contains(AmmoType.Munitions.M_INFERNO))) {
+                      (infantryAmmoBin.getType().getMunitionType().contains(AmmoType.Munitions.M_INFERNO))) {
                 WeaponRow row = new WeaponRow(infantryAmmoBin);
                 rows.add(row);
                 panMain.add(row);
             }
         }
 
-        JPanel  panButtons = new JPanel();
-        JButton button     = new JButton(resourceMap.getString("cancel"));
+        JPanel panButtons = new JPanel();
+        JButton button = new JButton(resourceMap.getString("cancel"));
         button.addActionListener(ev -> setVisible(false));
         panButtons.add(button);
         button = new JButton(resourceMap.getString("ok"));
@@ -102,11 +107,7 @@ public class SmallSVAmmoSwapDialog extends JDialog {
 
     /**
      * These need to be migrated to the Suite Constants / Suite Options Setup
-     *
-     * @since 0.50.04
-     * @deprecated Move to Suite Constants / Suite Options Setup
      */
-    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(SmallSVAmmoSwapDialog.class);
@@ -124,12 +125,12 @@ public class SmallSVAmmoSwapDialog extends JDialog {
     private class WeaponRow extends JPanel {
         private final InfantryAmmoBin standardBin;
         private final InfantryAmmoBin infernoBin;
-        private       int             totalClips;
-        private final JSpinner        spnInferno       = new JSpinner();
-        private final JLabel          lblStandardClips = new JLabel();
+        private int totalClips;
+        private final JSpinner spnInferno = new JSpinner();
+        private final JLabel lblStandardClips = new JLabel();
 
         WeaponRow(InfantryAmmoBin infernoBin) {
-            this.infernoBin  = infernoBin;
+            this.infernoBin = infernoBin;
             this.standardBin = infernoBin.findPartnerBin();
             if (standardBin != null) {
                 totalClips = infernoBin.getClips() + standardBin.getClips();
@@ -143,13 +144,13 @@ public class SmallSVAmmoSwapDialog extends JDialog {
             spnInferno.setModel(new SpinnerNumberModel(infernoBin.getClips(), 0, totalClips, 1));
             setLayout(new GridBagLayout());
             GridBagConstraints gbc = new GridBagConstraints();
-            gbc.anchor    = GridBagConstraints.WEST;
-            gbc.insets    = new Insets(5, 5, 5, 5);
-            gbc.gridx     = 0;
-            gbc.gridy     = 0;
+            gbc.anchor = GridBagConstraints.WEST;
+            gbc.insets = new Insets(5, 5, 5, 5);
+            gbc.gridx = 0;
+            gbc.gridy = 0;
             gbc.gridwidth = 4;
             add(new JLabel(title), gbc);
-            gbc.gridx     = 4;
+            gbc.gridx = 4;
             gbc.gridwidth = 1;
             add(new JLabel(String.format(resourceMap.getString("shotsPerClip.format"),
                   infernoBin.getWeaponType().getShots())), gbc);
@@ -168,7 +169,7 @@ public class SmallSVAmmoSwapDialog extends JDialog {
                 gbc.gridx++;
                 add(spnInferno, gbc);
                 spnInferno.addChangeListener(ev -> lblStandardClips.setText(String.valueOf(totalClips -
-                                                                                           ((Integer) spnInferno.getValue()))));
+                                                                                                 ((Integer) spnInferno.getValue()))));
             } else {
                 gbc.gridwidth = GridBagConstraints.REMAINDER;
                 add(new JLabel(resourceMap.getString("noStandardBin")), gbc);

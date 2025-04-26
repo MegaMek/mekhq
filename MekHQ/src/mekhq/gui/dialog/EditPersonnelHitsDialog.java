@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -51,9 +56,9 @@ import mekhq.campaign.personnel.Person;
 public class EditPersonnelHitsDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(EditPersonnelHitsDialog.class);
 
-    private Person             person;
-    private JButton            btnOK;
-    private JSpinner           spinnerHits;
+    private final Person person;
+    private JButton btnOK;
+    private JSpinner spinnerHits;
     private SpinnerNumberModel spinnerModel;
 
     public EditPersonnelHitsDialog(final Frame frame, final boolean modal, final Person person) {
@@ -66,7 +71,7 @@ public class EditPersonnelHitsDialog extends JDialog {
 
     private void initComponents() {
         spinnerHits = new JSpinner();
-        btnOK       = new JButton();
+        btnOK = new JButton();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditPersonnelHitsDialog",
               MekHQ.getMHQOptions().getLocale());
@@ -92,11 +97,7 @@ public class EditPersonnelHitsDialog extends JDialog {
 
     /**
      * These need to be migrated to the Suite Constants / Suite Options Setup
-     *
-     * @since 0.50.04
-     * @deprecated Move to Suite Constants / Suite Options Setup
      */
-    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditPersonnelHitsDialog.class);

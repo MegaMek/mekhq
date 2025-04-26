@@ -66,31 +66,12 @@ import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-
-import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
-import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
-import static mekhq.campaign.personnel.skills.SkillType.S_DOCTOR;
-import static mekhq.campaign.personnel.skills.SkillType.S_SMALL_ARMS;
-import static mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR_LOGISTICS;
-import static mekhq.campaign.personnel.enums.PersonnelRole.DEPENDENT;
-import static mekhq.campaign.personnel.enums.PersonnelRole.NONE;
-import static mekhq.campaign.personnel.enums.PersonnelRole.SOLDIER;
-import static mekhq.campaign.randomEvents.prisoners.enums.EventResultEffect.*;
-import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerEvent.*;
-import static mekhq.campaign.randomEvents.prisoners.enums.ResponseQuality.RESPONSE_NEUTRAL;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 /**
  * Unit test class for the {@link EventEffectsManager}.
  *
  * <p>This class contains test cases to verify the behavior and effects of different events
- * handled by the {@link EventEffectsManager}. Each test method corresponds to a specific event
- * effect and evaluates its outcomes under various conditions.</p>
+ * handled by the {@link EventEffectsManager}. Each test method corresponds to a specific event effect and evaluates its
+ * outcomes under various conditions.</p>
  */
 class EventEffectsManagerTest {
     @Test
@@ -99,10 +80,15 @@ class EventEffectsManagerTest {
 
         // Setup
         Campaign mockCampaign = mock(Campaign.class);
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         EventResult eventResult = new EventResult(PRISONER_CAPACITY, false, MAGNITUDE, "");
         PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
-            List.of(eventResult), List.of(eventResult));
+              List.of(eventResult),
+              List.of(eventResult));
         PrisonerEventData eventData = new PrisonerEventData(BREAKOUT, List.of(responseEntry));
 
         // Act
@@ -121,13 +107,18 @@ class EventEffectsManagerTest {
 
         // Setup
         Campaign mockCampaign = mock(Campaign.class);
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
         EventResult eventResult = new EventResult(INJURY, false, MAGNITUDE, "");
         PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
-            List.of(eventResult), List.of(eventResult));
+              List.of(eventResult),
+              List.of(eventResult));
         PrisonerEventData eventData = new PrisonerEventData(BREAKOUT, List.of(responseEntry));
 
         Person prisoner = new Person(mockCampaign);
@@ -146,6 +137,10 @@ class EventEffectsManagerTest {
 
         // Setup
         Campaign mockCampaign = mock(Campaign.class);
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
@@ -156,7 +151,8 @@ class EventEffectsManagerTest {
 
         EventResult eventResult = new EventResult(INJURY, false, MAGNITUDE, "");
         PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
-            List.of(eventResult), List.of(eventResult));
+              List.of(eventResult),
+              List.of(eventResult));
         PrisonerEventData eventData = new PrisonerEventData(BREAKOUT, List.of(responseEntry));
 
         Person prisoner = new Person(mockCampaign);
@@ -178,21 +174,25 @@ class EventEffectsManagerTest {
 
         // Setup
         Campaign mockCampaign = mock(Campaign.class);
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
         EventResult eventResult = new EventResult(INJURY_PERCENT, false, MAGNITUDE, "");
         PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
-            List.of(eventResult), List.of(eventResult));
+              List.of(eventResult),
+              List.of(eventResult));
         PrisonerEventData eventData = new PrisonerEventData(BREAKOUT, List.of(responseEntry));
 
         Person prisoner0 = new Person(mockCampaign);
         Person prisoner1 = new Person(mockCampaign);
         Person prisoner2 = new Person(mockCampaign);
         Person prisoner3 = new Person(mockCampaign);
-        when(mockCampaign.getCurrentPrisoners()).thenReturn(List.of(prisoner0, prisoner1, prisoner2,
-            prisoner3));
+        when(mockCampaign.getCurrentPrisoners()).thenReturn(List.of(prisoner0, prisoner1, prisoner2, prisoner3));
 
         // Act
         new EventEffectsManager(mockCampaign, eventData, 0, true);
@@ -214,6 +214,10 @@ class EventEffectsManagerTest {
 
         // Setup
         Campaign mockCampaign = mock(Campaign.class);
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
@@ -224,15 +228,15 @@ class EventEffectsManagerTest {
 
         EventResult eventResult = new EventResult(INJURY_PERCENT, false, MAGNITUDE, "");
         PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
-            List.of(eventResult), List.of(eventResult));
+              List.of(eventResult),
+              List.of(eventResult));
         PrisonerEventData eventData = new PrisonerEventData(BREAKOUT, List.of(responseEntry));
 
         Person prisoner0 = new Person(mockCampaign);
         Person prisoner1 = new Person(mockCampaign);
         Person prisoner2 = new Person(mockCampaign);
         Person prisoner3 = new Person(mockCampaign);
-        when(mockCampaign.getCurrentPrisoners()).thenReturn(List.of(prisoner0, prisoner1, prisoner2,
-            prisoner3));
+        when(mockCampaign.getCurrentPrisoners()).thenReturn(List.of(prisoner0, prisoner1, prisoner2, prisoner3));
 
         // Act
         new EventEffectsManager(mockCampaign, eventData, 0, true);
@@ -254,13 +258,18 @@ class EventEffectsManagerTest {
 
         // Setup
         Campaign mockCampaign = mock(Campaign.class);
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
         EventResult eventResult = new EventResult(DEATH, false, MAGNITUDE, "");
         PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
-            List.of(eventResult), List.of(eventResult));
+              List.of(eventResult),
+              List.of(eventResult));
         PrisonerEventData eventData = new PrisonerEventData(BREAKOUT, List.of(responseEntry));
 
         Person prisoner = new Person(mockCampaign);
@@ -284,6 +293,10 @@ class EventEffectsManagerTest {
 
         // Setup
         Campaign mockCampaign = mock(Campaign.class);
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
@@ -294,15 +307,15 @@ class EventEffectsManagerTest {
 
         EventResult eventResult = new EventResult(DEATH_PERCENT, false, MAGNITUDE, "");
         PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
-            List.of(eventResult), List.of(eventResult));
+              List.of(eventResult),
+              List.of(eventResult));
         PrisonerEventData eventData = new PrisonerEventData(BREAKOUT, List.of(responseEntry));
 
         Person prisoner0 = new Person(mockCampaign);
         Person prisoner1 = new Person(mockCampaign);
         Person prisoner2 = new Person(mockCampaign);
         Person prisoner3 = new Person(mockCampaign);
-        when(mockCampaign.getCurrentPrisoners()).thenReturn(List.of(prisoner0, prisoner1, prisoner2,
-            prisoner3));
+        when(mockCampaign.getCurrentPrisoners()).thenReturn(List.of(prisoner0, prisoner1, prisoner2, prisoner3));
 
         // Act
         EventEffectsManager effectsManager = new EventEffectsManager(mockCampaign, eventData, 0, true);
@@ -323,6 +336,10 @@ class EventEffectsManagerTest {
 
         // Setup
         Campaign mockCampaign = mock(Campaign.class);
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
@@ -330,7 +347,8 @@ class EventEffectsManagerTest {
 
         EventResult eventResult = new EventResult(SKILL, false, MAGNITUDE, S_ADMIN);
         PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
-            List.of(eventResult), List.of(eventResult));
+              List.of(eventResult),
+              List.of(eventResult));
         PrisonerEventData eventData = new PrisonerEventData(BREAKOUT, List.of(responseEntry));
 
         Person prisoner = new Person(mockCampaign);
@@ -352,6 +370,10 @@ class EventEffectsManagerTest {
 
         // Setup
         Campaign mockCampaign = mock(Campaign.class);
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
@@ -359,7 +381,8 @@ class EventEffectsManagerTest {
 
         EventResult eventResult = new EventResult(LOYALTY_ONE, false, MAGNITUDE, "");
         PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
-            List.of(eventResult), List.of(eventResult));
+              List.of(eventResult),
+              List.of(eventResult));
         PrisonerEventData eventData = new PrisonerEventData(BREAKOUT, List.of(responseEntry));
 
         Person prisoner = new Person(mockCampaign);
@@ -382,6 +405,10 @@ class EventEffectsManagerTest {
 
         // Setup
         Campaign mockCampaign = mock(Campaign.class);
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
@@ -389,17 +416,19 @@ class EventEffectsManagerTest {
 
         EventResult eventResult = new EventResult(LOYALTY_ALL, false, MAGNITUDE, "");
         PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
-            List.of(eventResult), List.of(eventResult));
+              List.of(eventResult),
+              List.of(eventResult));
         PrisonerEventData eventData = new PrisonerEventData(BREAKOUT, List.of(responseEntry));
 
         Person prisoner0 = new Person(mockCampaign);
         Person prisoner1 = new Person(mockCampaign);
         Person prisoner2 = new Person(mockCampaign);
         Person prisoner3 = new Person(mockCampaign);
-        when(mockCampaign.getCurrentPrisoners()).thenReturn(List.of(prisoner0, prisoner1, prisoner2,
-            prisoner3));
-        List<Integer> oldLoyalties = List.of(prisoner0.getLoyalty(), prisoner1.getLoyalty(),
-            prisoner2.getLoyalty(), prisoner3.getLoyalty());
+        when(mockCampaign.getCurrentPrisoners()).thenReturn(List.of(prisoner0, prisoner1, prisoner2, prisoner3));
+        List<Integer> oldLoyalties = List.of(prisoner0.getLoyalty(),
+              prisoner1.getLoyalty(),
+              prisoner2.getLoyalty(),
+              prisoner3.getLoyalty());
 
         // Act
         new EventEffectsManager(mockCampaign, eventData, 0, true);
@@ -420,21 +449,25 @@ class EventEffectsManagerTest {
 
         // Setup
         Campaign mockCampaign = mock(Campaign.class);
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
         EventResult eventResult = new EventResult(ESCAPE, false, MAGNITUDE, "");
         PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
-            List.of(eventResult), List.of(eventResult));
+              List.of(eventResult),
+              List.of(eventResult));
         PrisonerEventData eventData = new PrisonerEventData(BREAKOUT, List.of(responseEntry));
 
         Person prisoner0 = new Person(mockCampaign);
         Person prisoner1 = new Person(mockCampaign);
         Person prisoner2 = new Person(mockCampaign);
         Person prisoner3 = new Person(mockCampaign);
-        when(mockCampaign.getCurrentPrisoners()).thenReturn(List.of(prisoner0, prisoner1, prisoner2,
-            prisoner3));
+        when(mockCampaign.getCurrentPrisoners()).thenReturn(List.of(prisoner0, prisoner1, prisoner2, prisoner3));
 
         // Act
         new EventEffectsManager(mockCampaign, eventData, 0, true);
@@ -454,21 +487,25 @@ class EventEffectsManagerTest {
 
         // Setup
         Campaign mockCampaign = mock(Campaign.class);
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
         EventResult eventResult = new EventResult(ESCAPE_PERCENT, false, MAGNITUDE, "");
         PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
-            List.of(eventResult), List.of(eventResult));
+              List.of(eventResult),
+              List.of(eventResult));
         PrisonerEventData eventData = new PrisonerEventData(BREAKOUT, List.of(responseEntry));
 
         Person prisoner0 = new Person(mockCampaign);
         Person prisoner1 = new Person(mockCampaign);
         Person prisoner2 = new Person(mockCampaign);
         Person prisoner3 = new Person(mockCampaign);
-        when(mockCampaign.getCurrentPrisoners()).thenReturn(List.of(prisoner0, prisoner1, prisoner2,
-            prisoner3));
+        when(mockCampaign.getCurrentPrisoners()).thenReturn(List.of(prisoner0, prisoner1, prisoner2, prisoner3));
 
         // Act
         new EventEffectsManager(mockCampaign, eventData, 0, true);
@@ -488,6 +525,10 @@ class EventEffectsManagerTest {
 
         // Setup
         Campaign mockCampaign = mock(Campaign.class);
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
@@ -495,7 +536,8 @@ class EventEffectsManagerTest {
 
         EventResult eventResult = new EventResult(FATIGUE_ONE, false, MAGNITUDE, "");
         PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
-            List.of(eventResult), List.of(eventResult));
+              List.of(eventResult),
+              List.of(eventResult));
         PrisonerEventData eventData = new PrisonerEventData(BREAKOUT, List.of(responseEntry));
 
         Person prisoner = new Person(mockCampaign);
@@ -518,6 +560,10 @@ class EventEffectsManagerTest {
 
         // Setup
         Campaign mockCampaign = mock(Campaign.class);
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
@@ -525,17 +571,19 @@ class EventEffectsManagerTest {
 
         EventResult eventResult = new EventResult(FATIGUE_ALL, false, MAGNITUDE, "");
         PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
-            List.of(eventResult), List.of(eventResult));
+              List.of(eventResult),
+              List.of(eventResult));
         PrisonerEventData eventData = new PrisonerEventData(BREAKOUT, List.of(responseEntry));
 
         Person prisoner0 = new Person(mockCampaign);
         Person prisoner1 = new Person(mockCampaign);
         Person prisoner2 = new Person(mockCampaign);
         Person prisoner3 = new Person(mockCampaign);
-        when(mockCampaign.getCurrentPrisoners()).thenReturn(List.of(prisoner0, prisoner1, prisoner2,
-            prisoner3));
-        List<Integer> oldFatigues = List.of(prisoner0.getFatigue(), prisoner1.getFatigue(),
-            prisoner2.getFatigue(), prisoner3.getFatigue());
+        when(mockCampaign.getCurrentPrisoners()).thenReturn(List.of(prisoner0, prisoner1, prisoner2, prisoner3));
+        List<Integer> oldFatigues = List.of(prisoner0.getFatigue(),
+              prisoner1.getFatigue(),
+              prisoner2.getFatigue(),
+              prisoner3.getFatigue());
 
         // Act
         new EventEffectsManager(mockCampaign, eventData, 0, true);
@@ -556,6 +604,10 @@ class EventEffectsManagerTest {
 
         // Setup
         Campaign mockCampaign = mock(Campaign.class);
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
@@ -568,7 +620,8 @@ class EventEffectsManagerTest {
 
         EventResult eventResult = new EventResult(SUPPORT_POINT, false, MAGNITUDE, "");
         PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
-            List.of(eventResult), List.of(eventResult));
+              List.of(eventResult),
+              List.of(eventResult));
         PrisonerEventData eventData = new PrisonerEventData(BREAKOUT, List.of(responseEntry));
 
         // Act
@@ -587,6 +640,10 @@ class EventEffectsManagerTest {
 
         // Setup
         Campaign mockCampaign = mock(Campaign.class);
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
@@ -598,7 +655,8 @@ class EventEffectsManagerTest {
 
         EventResult eventResult = new EventResult(UNIQUE, false, MAGNITUDE, "");
         PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
-            List.of(eventResult), List.of(eventResult));
+              List.of(eventResult),
+              List.of(eventResult));
         PrisonerEventData eventData = new PrisonerEventData(BARTERING, List.of(responseEntry));
 
         // Act
@@ -617,6 +675,10 @@ class EventEffectsManagerTest {
 
         // Setup
         Campaign mockCampaign = mock(Campaign.class);
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
@@ -624,7 +686,8 @@ class EventEffectsManagerTest {
 
         EventResult eventResult = new EventResult(UNIQUE, false, MAGNITUDE, "");
         PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
-            List.of(eventResult), List.of(eventResult));
+              List.of(eventResult),
+              List.of(eventResult));
         PrisonerEventData eventData = new PrisonerEventData(MISTAKE, List.of(responseEntry));
 
         SkillType.initializeTypes();
@@ -658,6 +721,10 @@ class EventEffectsManagerTest {
 
         // Setup
         Campaign mockCampaign = mock(Campaign.class);
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
@@ -671,7 +738,8 @@ class EventEffectsManagerTest {
 
         EventResult eventResult = new EventResult(UNIQUE, false, MAGNITUDE, "");
         PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
-            List.of(eventResult), List.of(eventResult));
+              List.of(eventResult),
+              List.of(eventResult));
         PrisonerEventData eventData = new PrisonerEventData(UNDERCOVER, List.of(responseEntry));
 
         Person prisoner = new Person(mockCampaign);
@@ -695,6 +763,10 @@ class EventEffectsManagerTest {
 
         // Setup
         Campaign mockCampaign = mock(Campaign.class);
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
@@ -702,7 +774,8 @@ class EventEffectsManagerTest {
 
         EventResult eventResult = new EventResult(UNIQUE, false, MAGNITUDE, "");
         PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
-            List.of(eventResult), List.of(eventResult));
+              List.of(eventResult),
+              List.of(eventResult));
         PrisonerEventData eventData = new PrisonerEventData(POISON, List.of(responseEntry));
 
         Person soldier0 = new Person(mockCampaign);

@@ -27,22 +27,6 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import megamek.client.generator.RandomNameGenerator;
-import megamek.common.util.weightedMaps.WeightedIntMap;
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.personnel.Person;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.ResourceBundle;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -51,6 +35,23 @@ import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ResourceBundle;
+
+import megamek.client.generator.RandomNameGenerator;
+import megamek.common.util.weightedMaps.WeightedIntMap;
+import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.universe.Faction;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(value = MockitoExtension.class)
 public class SplittingSurnameStyleTest {
@@ -64,7 +65,7 @@ public class SplittingSurnameStyleTest {
     private CampaignOptions mockCampaignOptions;
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     @BeforeEach
@@ -76,17 +77,17 @@ public class SplittingSurnameStyleTest {
     @Test
     public void testGetToolTipText() {
         assertEquals(resources.getString("SplittingSurnameStyle.ORIGIN_CHANGES_SURNAME.toolTipText"),
-                SplittingSurnameStyle.ORIGIN_CHANGES_SURNAME.getToolTipText());
+              SplittingSurnameStyle.ORIGIN_CHANGES_SURNAME.getToolTipText());
         assertEquals(resources.getString("SplittingSurnameStyle.WEIGHTED.toolTipText"),
-                SplittingSurnameStyle.WEIGHTED.getToolTipText());
+              SplittingSurnameStyle.WEIGHTED.getToolTipText());
     }
 
     @Test
     public void testGetDropDownText() {
         assertEquals(resources.getString("SplittingSurnameStyle.ORIGIN_CHANGES_SURNAME.dropDownText"),
-                SplittingSurnameStyle.ORIGIN_CHANGES_SURNAME.getDropDownText());
+              SplittingSurnameStyle.ORIGIN_CHANGES_SURNAME.getDropDownText());
         assertEquals(resources.getString("SplittingSurnameStyle.WEIGHTED.dropDownText"),
-                SplittingSurnameStyle.WEIGHTED.getDropDownText());
+              SplittingSurnameStyle.WEIGHTED.getDropDownText());
     }
     //endregion Getters
 
@@ -149,6 +150,10 @@ public class SplittingSurnameStyleTest {
 
     @Test
     public void testApplyOriginChangesSurname() {
+        Faction campaignFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
+
         final Person person = new Person(mockCampaign);
 
         SplittingSurnameStyle.ORIGIN_CHANGES_SURNAME.apply(mockCampaign, person, mock(Person.class));
@@ -161,6 +166,10 @@ public class SplittingSurnameStyleTest {
 
     @Test
     public void testApplySpouseChangesSurname() {
+        Faction campaignFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
+
         final Person person = new Person(mockCampaign);
 
         SplittingSurnameStyle.SPOUSE_CHANGES_SURNAME.apply(mockCampaign, mock(Person.class), person);
@@ -173,6 +182,10 @@ public class SplittingSurnameStyleTest {
 
     @Test
     public void testApplyBothChangeSurname() {
+        Faction campaignFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
+
         final Person origin = new Person(mockCampaign);
         final Person spouse = new Person(mockCampaign);
 
@@ -189,6 +202,9 @@ public class SplittingSurnameStyleTest {
 
     @Test
     public void testApplyBothKeepSurname() {
+        Faction campaignFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
         final Person origin = new Person(mockCampaign);
         origin.setMaidenName("origin");
 
@@ -202,6 +218,9 @@ public class SplittingSurnameStyleTest {
 
     @Test
     public void testApplyWeighted() {
+        Faction campaignFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
         final WeightedIntMap<SplittingSurnameStyle> weightMap = new WeightedIntMap<>();
         weightMap.add(1, SplittingSurnameStyle.WEIGHTED);
 
@@ -221,14 +240,15 @@ public class SplittingSurnameStyleTest {
         for (final SplittingSurnameStyle style : styles) {
             weights.put(style, 1);
         }
-        assertFalse(SplittingSurnameStyle.WEIGHTED.createWeightedSurnameMap(weights).containsValue(SplittingSurnameStyle.WEIGHTED));
+        assertFalse(SplittingSurnameStyle.WEIGHTED.createWeightedSurnameMap(weights)
+                          .containsValue(SplittingSurnameStyle.WEIGHTED));
     }
 
     @Test
     public void testToStringOverride() {
         assertEquals(resources.getString("SplittingSurnameStyle.ORIGIN_CHANGES_SURNAME.text"),
-                SplittingSurnameStyle.ORIGIN_CHANGES_SURNAME.toString());
+              SplittingSurnameStyle.ORIGIN_CHANGES_SURNAME.toString());
         assertEquals(resources.getString("SplittingSurnameStyle.WEIGHTED.text"),
-                SplittingSurnameStyle.WEIGHTED.toString());
+              SplittingSurnameStyle.WEIGHTED.toString());
     }
 }
