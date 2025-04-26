@@ -46,6 +46,7 @@ import javax.swing.InputMap;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.text.DefaultEditorKit;
@@ -204,10 +205,30 @@ public class MekHQ implements GameListener {
 
         setUserPreferences();
         updateGuiScaling(); // also sets the look-and-feel
+        setTooltipSettings();
 
         initEventHandlers();
         // create a start-up frame and display it
         new StartupScreenPanel(this).getFrame().setVisible(true);
+    }
+
+    /**
+     * Configures the global tooltip display settings to show tooltips immediately and keep them visible.
+     *
+     * <p>This method sets three tooltip behaviors:</p>
+     * <ul>
+     *     <li>Initial Delay: 0 ms (tooltips appear instantly when hovering)</li>
+     *     <li>Dismiss Delay: Maximum integer value (tooltips stay visible indefinitely)</li>
+     *     <li>Reshow Delay: 0 ms (tooltips reappear instantly when moving between components)</li>
+     * </ul>
+     * <p>
+     * These settings affect all tooltips application-wide through the shared ToolTipManager instance.
+     */
+    private static void setTooltipSettings() {
+        ToolTipManager tooltipManager = ToolTipManager.sharedInstance();
+        tooltipManager.setInitialDelay(100);
+        tooltipManager.setDismissDelay(Integer.MAX_VALUE);
+        tooltipManager.setReshowDelay(0);
     }
 
     /**

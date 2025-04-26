@@ -102,7 +102,7 @@ We will control the field at the end of the battle, giving you full authority to
                 <deploymentZones>
                     <deploymentZone>6</deploymentZone>
                 </deploymentZones>
-                <destinationZone>2</destinationZone>
+                <destinationZone>6</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>1</forceAlignment>
                 <forceMultiplier>0.5</forceMultiplier>

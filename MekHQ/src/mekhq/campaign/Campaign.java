@@ -71,6 +71,7 @@ import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.BONDSMA
 import static mekhq.campaign.stratcon.StratconRulesManager.processIgnoredDynamicScenario;
 import static mekhq.campaign.stratcon.SupportPointNegotiation.negotiateAdditionalSupportPoints;
 import static mekhq.campaign.unit.Unit.SITE_FACILITY_BASIC;
+import static mekhq.campaign.unit.Unit.TECH_WORK_DAY;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick.isIneligibleToPerformProcurement;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -195,6 +196,7 @@ import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
@@ -381,6 +383,7 @@ public class Campaign implements ITechManager {
     private BehaviorSettings autoResolveBehaviorSettings;
     private List<Unit> automatedMothballUnits;
     private int temporaryPrisonerCapacity;
+    private boolean processProcurement;
 
     // options relating to parts in use and restock
     private boolean ignoreMothballed;
@@ -480,6 +483,7 @@ public class Campaign implements ITechManager {
         autoResolveBehaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR;
         automatedMothballUnits = new ArrayList<>();
         temporaryPrisonerCapacity = DEFAULT_TEMPORARY_CAPACITY;
+        processProcurement = true;
         topUpWeekly = false;
         ignoreMothballed = true;
         ignoreSparesUnderQuality = QUALITY_A;
@@ -3951,115 +3955,168 @@ public class Campaign implements ITechManager {
     /**
      * Performs work to either mothball or activate a unit.
      *
-     * @param u The unit to either work towards mothballing or activation.
+     * @param unit The unit to either work towards mothballing or activation.
      */
-    public void workOnMothballingOrActivation(Unit u) {
-        if (u.isMothballed()) {
-            activate(u);
+    public void workOnMothballingOrActivation(Unit unit) {
+        if (unit.isMothballed()) {
+            activate(unit);
         } else {
-            mothball(u);
+            mothball(unit);
         }
     }
 
     /**
-     * Performs work to mothball a unit.
+     * Performs work to mothball a unit, preparing it for long-term storage.
      *
-     * @param u The unit on which to perform mothball work.
+     * <p>Mothballing process varies based on unit type:</p>
+     * <ul>
+     *   <li>Non-Infantry Units:
+     *     <ul>
+     *       <li>Requires an assigned tech</li>
+     *       <li>Consumes tech work minutes</li>
+     *       <li>Requires astech support time (6 minutes per tech minute)</li>
+     *     </ul>
+     *   </li>
+     *   <li>Infantry Units:
+     *     <ul>
+     *       <li>Uses standard work day time</li>
+     *       <li>No tech required</li>
+     *     </ul>
+     *   </li>
+     * </ul>
+     *
+     * The process tracks progress and can span multiple work periods until complete.
+     *
+     * @param unit The unit to mothball. Must be active (not already mothballed)
      */
-    public void mothball(Unit u) {
-        if (u.isMothballed()) {
+    public void mothball(Unit unit) {
+        if (unit.isMothballed()) {
             logger.warn("Unit is already mothballed, cannot mothball.");
             return;
         }
 
-        Person tech = u.getTech();
-        if (null == tech) {
-            // uh-oh
-            addReport("No tech assigned to the mothballing of " + u.getHyperlinkedName());
-            return;
-        }
+        String report;
+        if (!unit.isConventionalInfantry()) {
+            Person tech = unit.getTech();
+            if (null == tech) {
+                // uh-oh
+                addReport(String.format(resources.getString("noTech.mothballing"), unit.getHyperlinkedName()));
+                unit.cancelMothballOrActivation();
+                return;
+            }
 
-        // don't allow overtime minutes for mothballing because it's cheating
-        // since you don't roll
-        int minutes = Math.min(tech.getMinutesLeft(), u.getMothballTime());
+            // don't allow overtime minutes for mothballing because it's cheating since you don't roll
+            int minutes = Math.min(tech.getMinutesLeft(), unit.getMothballTime());
 
-        // check astech time
-        if (!u.isSelfCrewed() && astechPoolMinutes < minutes * 6) {
-            // uh-oh
-            addReport("Not enough astechs to work on mothballing of " + u.getHyperlinkedName());
-            return;
-        }
+            // check astech time
+            if (!unit.isSelfCrewed() && astechPoolMinutes < minutes * 6) {
+                // uh-oh
+                addReport(String.format(resources.getString("notEnoughAstechTime.mothballing"), unit.getHyperlinkedName()));
+                return;
+            }
 
-        u.setMothballTime(u.getMothballTime() - minutes);
+            unit.setMothballTime(unit.getMothballTime() - minutes);
 
-        String report = tech.getHyperlinkedFullTitle() +
-                              " spent " +
-                              minutes +
-                              " minutes mothballing " +
-                              u.getHyperlinkedName();
-        if (!u.isMothballing()) {
-            u.completeMothball();
-            report += ". Mothballing complete.";
+            tech.setMinutesLeft(tech.getMinutesLeft() - minutes);
+            if (!unit.isSelfCrewed()) {
+                astechPoolMinutes -= 6 * minutes;
+            }
+
+            report = String.format(resources.getString("timeSpent.mothballing.tech"), tech.getHyperlinkedFullTitle(),
+                  minutes, unit.getHyperlinkedName());
         } else {
-            report += ". " + u.getMothballTime() + " minutes remaining.";
+            unit.setMothballTime(unit.getMothballTime() - TECH_WORK_DAY);
+
+            report = String.format(resources.getString("timeSpent.mothballing.noTech"), TECH_WORK_DAY,
+                  unit.getHyperlinkedName());
         }
 
-        tech.setMinutesLeft(tech.getMinutesLeft() - minutes);
-
-        if (!u.isSelfCrewed()) {
-            astechPoolMinutes -= 6 * minutes;
+        if (!unit.isMothballing()) {
+            unit.completeMothball();
+            report += String.format(resources.getString("complete.mothballing"));
+        } else {
+            report += String.format(resources.getString("remaining.text"), unit.getMothballTime());
         }
 
         addReport(report);
     }
 
     /**
-     * Performs work to activate a unit.
+     * Performs work to activate a unit from its mothballed state. This process requires either:
      *
-     * @param u The unit on which to perform activation work.
+     * <ul>
+     *   <li>A tech and sufficient astech support time for non-self-crewed units</li>
+     *   <li>Only time for self-crewed units</li>
+     * </ul>
+     *
+     * <p>The activation process:</p>
+     * <ol>
+     *   <li>Verifies the unit is mothballed</li>
+     *   <li>For non-self-crewed units:
+     *     <ul>
+     *       <li>Checks for assigned tech</li>
+     *       <li>Verifies sufficient tech and astech time</li>
+     *       <li>Consumes tech and astech time</li>
+     *     </ul>
+     *   </li>
+     *   <li>For self-crewed units:
+     *     <ul>
+     *       <li>Uses standard work day time</li>
+     *     </ul>
+     *   </li>
+     *   <li>Updates mothball status</li>
+     *   <li>Reports progress or completion</li>
+     * </ol>
+     *
+     * @param unit The unit to activate. Must be mothballed for activation to proceed.
      */
-    public void activate(Unit u) {
-        if (!u.isMothballed()) {
+    public void activate(Unit unit) {
+        if (!unit.isMothballed()) {
             logger.warn("Unit is already activated, cannot activate.");
             return;
         }
 
-        Person tech = u.getTech();
-        if (null == tech) {
-            // uh-oh
-            addReport("No tech assigned to the activation of " + u.getHyperlinkedName());
-            return;
-        }
+        String report;
+        if (!unit.isConventionalInfantry()) {
+            Person tech = unit.getTech();
+            if (null == tech) {
+                // uh-oh
+                addReport(String.format(resources.getString("noTech.activation"), unit.getHyperlinkedName()));
+                unit.cancelMothballOrActivation();
+                return;
+            }
 
-        // don't allow overtime minutes for activation because it's cheating
-        // since you don't roll
-        int minutes = Math.min(tech.getMinutesLeft(), u.getMothballTime());
+            // don't allow overtime minutes for activation because it's cheating since you don't roll
+            int minutes = Math.min(tech.getMinutesLeft(), unit.getMothballTime());
 
-        // check astech time
-        if (!u.isSelfCrewed() && astechPoolMinutes < minutes * 6) {
-            // uh-oh
-            addReport("Not enough astechs to work on activation of " + u.getHyperlinkedName());
-            return;
-        }
+            // check astech time
+            if (!unit.isSelfCrewed() && astechPoolMinutes < minutes * 6) {
+                // uh-oh
+                addReport(String.format(resources.getString("notEnoughAstechTime.activation"), unit.getHyperlinkedName()));
+                return;
+            }
 
-        u.setMothballTime(u.getMothballTime() - minutes);
+            unit.setMothballTime(unit.getMothballTime() - minutes);
 
-        String report = tech.getHyperlinkedFullTitle() +
-                              " spent " +
-                              minutes +
-                              " minutes activating " +
-                              u.getHyperlinkedName();
+            tech.setMinutesLeft(tech.getMinutesLeft() - minutes);
+            if (!unit.isSelfCrewed()) {
+                astechPoolMinutes -= 6 * minutes;
+            }
 
-        tech.setMinutesLeft(tech.getMinutesLeft() - minutes);
-        if (!u.isSelfCrewed()) {
-            astechPoolMinutes -= 6 * minutes;
-        }
-
-        if (!u.isMothballing()) {
-            u.completeActivation();
-            report += ". Activation complete.";
+            report = String.format(resources.getString("timeSpent.activation.tech"), tech.getHyperlinkedFullTitle(),
+                  minutes, unit.getHyperlinkedName());
         } else {
-            report += ". " + u.getMothballTime() + " minutes remaining.";
+            unit.setMothballTime(unit.getMothballTime() - TECH_WORK_DAY);
+
+            report = String.format(resources.getString("timeSpent.activation.noTech"), TECH_WORK_DAY,
+                  unit.getHyperlinkedName());
+        }
+
+        if (!unit.isMothballing()) {
+            unit.completeActivation();
+            report += String.format(resources.getString("complete.activation"));
+        } else {
+            report += String.format(resources.getString("remaining.text"), unit.getMothballTime());
         }
 
         addReport(report);
@@ -5215,18 +5272,18 @@ public class Campaign implements ITechManager {
 
         // ok now we can check for other stuff we might need to do to units
         List<UUID> unitsToRemove = new ArrayList<>();
-        for (Unit u : getUnits()) {
-            if (u.isRefitting()) {
-                refit(u.getRefit());
+        for (Unit unit : getUnits()) {
+            if (unit.isRefitting()) {
+                refit(unit.getRefit());
             }
-            if (u.isMothballing()) {
-                workOnMothballingOrActivation(u);
+            if (unit.isMothballing()) {
+                workOnMothballingOrActivation(unit);
             }
-            if (!u.isPresent()) {
-                u.checkArrival();
+            if (!unit.isPresent()) {
+                unit.checkArrival();
             }
-            if (!u.isRepairable() && !u.hasSalvageableParts()) {
-                unitsToRemove.add(u.getId());
+            if (!unit.isRepairable() && !unit.hasSalvageableParts()) {
+                unitsToRemove.add(unit.getId());
             }
         }
         // Remove any unrepairable, unsalvageable units
@@ -5362,7 +5419,9 @@ public class Campaign implements ITechManager {
 
         processNewDayForces();
 
-        setShoppingList(goShopping(getShoppingList()));
+        if (processProcurement) {
+            setShoppingList(goShopping(getShoppingList()));
+        }
 
         // check for anything in finances
         finances.newDay(this, yesterday, getLocalDate());
@@ -5717,6 +5776,7 @@ public class Campaign implements ITechManager {
             return;
         }
 
+
         Force force = getForceFor(person);
         if (force != null) {
             force.updateCommander(this);
@@ -5732,7 +5792,6 @@ public class Campaign implements ITechManager {
         person.removeAllTechJobs(this);
         removeKillsFor(person.getId());
         getRetirementDefectionTracker().removePerson(person);
-
         if (log) {
             addReport(person.getFullTitle() + " has been removed from the personnel roster.");
         }
@@ -6577,6 +6636,7 @@ public class Campaign implements ITechManager {
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "automatedMothballUnits");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "temporaryPrisonerCapacity", temporaryPrisonerCapacity);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "processProcurement", processProcurement);
 
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, ++indent, "partsInUse");
         writePartInUseToXML(pw, indent);
@@ -9486,6 +9546,14 @@ public class Campaign implements ITechManager {
         }
 
         return toBuy;
+    }
+
+    public boolean isProcessProcurement() {
+        return processProcurement;
+    }
+
+    public void setProcessProcurement(boolean processProcurement) {
+        this.processProcurement = processProcurement;
     }
 
     // Simple getters and setters for our stock map

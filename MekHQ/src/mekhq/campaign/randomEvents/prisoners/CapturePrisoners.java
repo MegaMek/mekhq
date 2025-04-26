@@ -236,19 +236,21 @@ public class CapturePrisoners {
         }
 
         // Attempt defection
-        int defectionChance = determineDefectionChance(prisoner, true);
+        if (!campaignFaction.isClan()) {
+            int defectionChance = determineDefectionChance(prisoner, true);
 
-        if (randomInt(defectionChance) == 0) {
-            if (prisoner.isClanPersonnel()) {
-                prisoner.setPrisonerStatus(campaign, BECOMING_BONDSMAN, true);
+            if (randomInt(defectionChance) == 0) {
+                if (prisoner.isClanPersonnel()) {
+                    prisoner.setPrisonerStatus(campaign, BECOMING_BONDSMAN, true);
 
-                LocalDate today = campaign.getLocalDate();
-                prisoner.setBecomingBondsmanEndDate(today.plusWeeks(d6(1)));
-            } else {
-                prisoner.setPrisonerStatus(campaign, PRISONER_DEFECTOR, false);
+                    LocalDate today = campaign.getLocalDate();
+                    prisoner.setBecomingBondsmanEndDate(today.plusWeeks(d6(1)));
+                } else {
+                    prisoner.setPrisonerStatus(campaign, PRISONER_DEFECTOR, false);
+                }
+
+                new DefectionOffer(campaign, prisoner, prisoner.isClanPersonnel());
             }
-
-            new DefectionOffer(campaign, prisoner, prisoner.isClanPersonnel());
         }
 
         handlePostCapture(prisoner, prisoner.getPrisonerStatus());

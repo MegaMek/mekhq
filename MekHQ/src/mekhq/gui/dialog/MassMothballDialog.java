@@ -205,8 +205,8 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
 
         JScrollPane techListPane = new JScrollPaneWithSpeed();
         techListPane.setViewportView(techList);
-        techListPane.setMaximumSize(new Dimension(200, 100));
-        techListPane.setPreferredSize(new Dimension(200, 50));
+        techListPane.setMaximumSize(new Dimension(200, 400));
+        techListPane.setMinimumSize(new Dimension(200, 150));
 
         contentPanel.add(techListPane, gbc);
         techListsByUnitType.put(unitType, techList);
