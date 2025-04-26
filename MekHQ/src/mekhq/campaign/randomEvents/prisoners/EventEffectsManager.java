@@ -56,6 +56,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomOriginOptions;
+import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
@@ -292,6 +293,8 @@ public class EventEffectsManager {
             target.diagnose(campaign, wounds);
         }
 
+        MekHQ.triggerEvent(new PersonChangedEvent(target));
+
         String colorOpen = isGuard ?
                                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()) :
                                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
@@ -342,6 +345,8 @@ public class EventEffectsManager {
             if (isUseAdvancedMedical) {
                 target.diagnose(campaign, wounds);
             }
+
+            MekHQ.triggerEvent(new PersonChangedEvent(target));
 
             potentialTargets.remove(target);
         }
@@ -402,6 +407,8 @@ public class EventEffectsManager {
             } else {
                 campaign.removePerson(target, false);
             }
+
+            MekHQ.triggerEvent(new PersonChangedEvent(target));
 
             potentialTargets.remove(target);
         }
@@ -466,6 +473,8 @@ public class EventEffectsManager {
             } else {
                 campaign.removePerson(target, false);
             }
+
+            MekHQ.triggerEvent(new PersonChangedEvent(target));
 
             potentialTargets.remove(target);
         }
@@ -550,6 +559,8 @@ public class EventEffectsManager {
             return "";
         }
 
+        MekHQ.triggerEvent(new PersonChangedEvent(target));
+
         String colorOpen = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor());
 
         String context = getFormattedTextAt(RESOURCE_BUNDLE,
@@ -592,6 +603,8 @@ public class EventEffectsManager {
         }
 
         target.changeLoyalty(magnitude);
+
+        MekHQ.triggerEvent(new PersonChangedEvent(target));
 
         String context = getFormattedTextAt(RESOURCE_BUNDLE,
               magnitude > 0 ? "context.guard.singular" : "context.prisoner.singular");
@@ -640,6 +653,8 @@ public class EventEffectsManager {
 
         for (Person target : targets) {
             target.changeLoyalty(magnitude);
+
+            MekHQ.triggerEvent(new PersonChangedEvent(target));
         }
 
         String context;
@@ -796,6 +811,8 @@ public class EventEffectsManager {
 
         if (campaign.getCampaignOptions().isUseFatigue()) {
             Fatigue.processFatigueActions(campaign, target);
+
+            MekHQ.triggerEvent(new PersonChangedEvent(target));
         }
 
         String context = getFormattedTextAt(RESOURCE_BUNDLE,
@@ -847,6 +864,8 @@ public class EventEffectsManager {
 
             if (campaign.getCampaignOptions().isUseFatigue()) {
                 Fatigue.processFatigueActions(campaign, target);
+
+                MekHQ.triggerEvent(new PersonChangedEvent(target));
             }
         }
 
@@ -1011,6 +1030,8 @@ public class EventEffectsManager {
         target.setPrimaryRole(campaign, DEPENDENT);
         target.setSecondaryRole(NONE);
 
+        MekHQ.triggerEvent(new PersonChangedEvent(target));
+
         return getFormattedTextAt(RESOURCE_BUNDLE, "MISTAKE.report", target.getFullTitle());
     }
 
@@ -1036,6 +1057,8 @@ public class EventEffectsManager {
         Faction newFaction = targetContract.getEmployerFaction();
         targetCharacter.setOriginFaction(newFaction);
         targetCharacter.setClanPersonnel(newFaction.isClan());
+
+        MekHQ.triggerEvent(new PersonChangedEvent(targetCharacter));
 
         // We can reuse the MISTAKE report here, too.
         return getFormattedTextAt(RESOURCE_BUNDLE, "MISTAKE.report", targetCharacter.getFullTitle());
@@ -1081,6 +1104,8 @@ public class EventEffectsManager {
             if (campaign.getCampaignOptions().isUseFatigue()) {
                 Fatigue.processFatigueActions(campaign, target);
             }
+
+            MekHQ.triggerEvent(new PersonChangedEvent(target));
 
             potentialTargets.remove(target);
         }
