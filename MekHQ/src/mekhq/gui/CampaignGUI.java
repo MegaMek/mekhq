@@ -37,6 +37,7 @@ import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.personnel.skills.SkillType.getExperienceLevelName;
+import static mekhq.gui.dialog.nagDialogs.NagController.triggerDailyNags;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.awt.*;
@@ -85,15 +86,7 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.event.AssetEvent;
-import mekhq.campaign.event.AstechPoolChangedEvent;
-import mekhq.campaign.event.DayEndingEvent;
-import mekhq.campaign.event.DeploymentChangedEvent;
-import mekhq.campaign.event.LoanEvent;
-import mekhq.campaign.event.MedicPoolChangedEvent;
-import mekhq.campaign.event.OptionsChangedEvent;
-import mekhq.campaign.event.OrganizationChangedEvent;
-import mekhq.campaign.event.TransactionEvent;
+import mekhq.campaign.event.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
 import mekhq.campaign.force.Force;
@@ -2499,6 +2492,124 @@ public class CampaignGUI extends JPanel {
     // region Subscriptions
 
     /**
+     * Handles the {@link DayEndingEvent} that is published immediately before a day ends in the campaign.
+     *
+     * <p>This method is subscribed to day-ending events and implements logic that can block or allow the end of the
+     * day,
+     * depending on the current campaign state and conditions. If certain criteria are met (such as outstanding loans,
+     * faction issues, overdue scenarios, or random retirement prompts), the event will be cancelled—preventing day
+     * transition.</p>
+     *
+     * <ul>
+     *   <li>Checks if daily nag dialogs should be shown and blocks day end if needed.</li>
+     *   <li>Blocks new day progression for overdue loans, invalid faction status, or due scenarios.</li>
+     *   <li>Handles the random retirement option, prompting the user and conditionally blocking end-of-day if required.</li>
+     * </ul>
+     *
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is wrong.</p>
+     *
+     * @param dayEndingEvent the event signaling the end of the day; may be canceled by this handler to halt day
+     *                       progression
+     */
+    @Subscribe
+    public void handleDayEnding(DayEndingEvent dayEndingEvent) {
+        if (triggerDailyNags(getCampaign())) {
+            dayEndingEvent.cancel();
+            return;
+        }
+
+        // Compulsory New Day Blockers
+        if (checkForOverdueLoans(dayEndingEvent)) {
+            return;
+        }
+
+        if (checkForInvalidFaction(dayEndingEvent)) {
+            return;
+        }
+
+        if (checkForDueScenarios(dayEndingEvent)) {
+            return;
+        }
+
+        // Optional New Day Blocker
+        if (getCampaign().getCampaignOptions().isUseRandomRetirement()) {
+            int turnoverPrompt = getCampaign().checkTurnoverPrompt();
+
+            switch (turnoverPrompt) {
+                case -1:
+                    // the user wasn't presented with the dialog
+                    break;
+                case 0:
+                    // the user launched the turnover dialog
+                    if (!showRetirementDefectionDialog()) {
+                        dayEndingEvent.cancel();
+                        return;
+                    }
+                case 1:
+                    // the user picked 'Advance Day Regardless'
+                    break;
+                case 2:
+                    // the user canceled
+                    dayEndingEvent.cancel();
+                    return;
+                default:
+                    throw new IllegalStateException("Unexpected value in mekhq/gui/CampaignGUI.java/handleDayEnding: " +
+                                                          turnoverPrompt);
+            }
+        }
+    }
+
+    /**
+     * Handles changes to the campaign's current location.
+     *
+     * <p>Invokes an update to ensure the location information is current within the user interface and data model.</p>
+     *
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
+     * wrong.</p>
+     *
+     * @param locationChangedEvent the event indicating that the campaign location has changed
+     */
+    @Subscribe
+    public void handleLocationChanged(LocationChangedEvent locationChangedEvent) {
+        refreshLocation();
+    }
+
+    /**
+     * Handles updates when a mission event occurs.
+     *
+     * <p>Refreshes the availability of parts to ensure inventory and options reflect the latest mission context.</p>
+     *
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
+     * wrong.</p>
+     *
+     * @param missionEvent the event signaling a mission change
+     */
+    @Subscribe
+    public void handleMissionChanged(MissionEvent missionEvent) {
+        refreshPartsAvailability();
+    }
+
+    /**
+     * Handles updates to personnel records.
+     *
+     * <p>If a logistics administrator has been updated, recalculates AtB parts availability, ensuring that changes
+     * in roles are properly reflected in inventory calculations.</p>
+     *
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
+     * wrong.</p>
+     *
+     * @param personEvent the event containing updates related to a person in the campaign
+     */
+    @Subscribe
+    public void handlePersonUpdate(PersonEvent personEvent) {
+        // only bother recalculating AtB parts availability if a logistics admin has been changed
+        // refreshPartsAvailability cuts out early with a "use AtB" check so it's not necessary here
+        if (personEvent.getPerson().hasRole(PersonnelRole.ADMINISTRATOR_LOGISTICS)) {
+            refreshPartsAvailability();
+        }
+    }
+
+    /**
      * Checks if there are any due instances of the {@link Scenario} class. If the {@code checkScenariosDue()} method of
      * the {@link Campaign} associated with the given {@link DayEndingEvent} returns {@code true}, a dialog shows up
      * informing the user of the due scenarios, and the {@link DayEndingEvent} is canceled.
@@ -2607,8 +2718,39 @@ public class CampaignGUI extends JPanel {
         return false;
     }
 
+    /**
+     * Handles the transition to a new day in the campaign.
+     *
+     * <p>Refreshes the calendar, location, funds, parts availability, and all relevant UI tabs to ensure the user
+     * interface and data are up to date at the beginning of a new day.</p>
+     *
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
+     * wrong.</p>
+     *
+     * @param newDayEvent the event signalling that a new day has started
+     */
     @Subscribe
-    public void handle(final OptionsChangedEvent evt) {
+    public void handleNewDay(NewDayEvent newDayEvent) {
+        refreshCalendar();
+        refreshLocation();
+        refreshFunds();
+        refreshPartsAvailability();
+
+        refreshAllTabs();
+    }
+
+    /**
+     * Processes changes in campaign options.
+     *
+     * <p>Updates the visibility and availability of UI tabs and menu items based on the new campaign settings.
+     * Also triggers a refresh of all tabs and schedules updates for funds and parts availability.</p>
+     *
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is wrong.</p>
+     *
+     * @param optionsChangedEvent the event containing the updated options
+     */
+    @Subscribe
+    public void handle(final OptionsChangedEvent optionsChangedEvent) {
         if (!getCampaign().getCampaignOptions().isUseStratCon() && (getTab(MHQTabType.STRAT_CON) != null)) {
             removeStandardTab(MHQTabType.STRAT_CON);
         } else if (getCampaign().getCampaignOptions().isUseStratCon() && (getTab(MHQTabType.STRAT_CON) == null)) {
@@ -2619,40 +2761,95 @@ public class CampaignGUI extends JPanel {
         fundsScheduler.schedule();
         refreshPartsAvailability();
 
-        miRetirementDefectionDialog.setVisible(evt.getOptions().isUseRandomRetirement());
-        miAwardEligibilityDialog.setVisible((evt.getOptions().isEnableAutoAwards()));
-        miUnitMarket.setVisible(!evt.getOptions().getUnitMarketMethod().isNone());
+        miRetirementDefectionDialog.setVisible(optionsChangedEvent.getOptions().isUseRandomRetirement());
+        miAwardEligibilityDialog.setVisible((optionsChangedEvent.getOptions().isEnableAutoAwards()));
+        miUnitMarket.setVisible(!optionsChangedEvent.getOptions().getUnitMarketMethod().isNone());
     }
 
+    /**
+     * Handles updates to campaign state following a transaction event.
+     *
+     * <p>Schedules an update to the funds and refreshes parts availability to reflect the new state after
+     * a transaction has occurred.</p>
+     *
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is wrong.</p>
+     *
+     * @param transactionEvent the event signaling the completion of a transaction
+     */
     @Subscribe
-    public void handle(TransactionEvent ev) {
+    public void handle(TransactionEvent transactionEvent) {
         fundsScheduler.schedule();
         refreshPartsAvailability();
     }
 
+    /**
+     * Handles changes in campaign funds due to a loan event.
+     *
+     * <p>Schedules a funds update and refreshes parts availability after a loan transaction is processed.</p>
+     *
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is wrong.</p>
+     *
+     * @param loanEvent the event representing a loan-related action
+     */
     @Subscribe
-    public void handle(LoanEvent ev) {
+    public void handle(LoanEvent loanEvent) {
         fundsScheduler.schedule();
         refreshPartsAvailability();
     }
 
+    /**
+     * Handles updates related to assets within the campaign.
+     *
+     * <p>Schedules a funds update to ensure the campaign's financial state is current when assets change.</p>
+     *
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is wrong.</p>
+     *
+     * @param assetEvent the event indicating a change in assets
+     */
     @Subscribe
-    public void handle(AssetEvent ev) {
+    public void handle(AssetEvent assetEvent) {
         fundsScheduler.schedule();
     }
 
+    /**
+     * Handles updates when the pool of available astechs changes.
+     *
+     * <p>Refreshes the temporary astech pool, updating the related UI and game state.</p>
+     *
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is wrong.</p>
+     *
+     * @param astechPoolChangedEvent the event indicating a change in the astech pool
+     */
     @Subscribe
-    public void handle(AstechPoolChangedEvent ev) {
+    public void handle(AstechPoolChangedEvent astechPoolChangedEvent) {
         refreshTempAstechs();
     }
 
+    /**
+     * Handles updates when the pool of available medics changes.
+     *
+     * <p>Refreshes the temporary medic pool, updating the related UI and game state.</p>
+     *
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is wrong.</p>
+     *
+     * @param medicPoolChangedEvent the event indicating a change in the medic pool
+     */
     @Subscribe
-    public void handle(MedicPoolChangedEvent ev) {
+    public void handle(MedicPoolChangedEvent medicPoolChangedEvent) {
         refreshTempMedics();
     }
 
+    /**
+     * Handles changes to general application options.
+     *
+     * <p>Updates the visibility of the company generator menu item according to the new option settings.</p>
+     *
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is wrong.</p>
+     *
+     * @param mhqOptionsChangedEvent the event containing the updated general options
+     */
     @Subscribe
-    public void handle(final MHQOptionsChangedEvent evt) {
+    public void handle(final MHQOptionsChangedEvent mhqOptionsChangedEvent) {
         miCompanyGenerator.setVisible(MekHQ.getMHQOptions().getShowCompanyGenerator());
     }
     // endregion Subscriptions
