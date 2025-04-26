@@ -462,6 +462,26 @@
 
     <!-- Misc SPA -->
     <ability>
+        <lookupName>admin_coordinator</lookupName>
+        <displayName>Coordinator (Unofficial)</displayName>
+        <desc><![CDATA[This character is exceptionally skilled at liaising with allied forces, ensuring reinforcements arrive where they're needed.
+
+If this character is the senior Admin/Command character, the reinforcement target number is reduced by 1.]]></desc>
+        <xpCost>100</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+    </ability>
+    <ability>
+        <lookupName>admin_logistician</lookupName>
+        <displayName>Logistician (Unofficial)</displayName>
+        <desc><![CDATA[This character is an expert at managing interstellar supply lines.
+
+Parts procured by this character have their delivery time reduced by 10%]]></desc>
+        <xpCost>50</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+    </ability>
+    <ability>
         <lookupName>admin_mediator</lookupName>
         <displayName>Mediator (Unofficial)</displayName>
         <desc><![CDATA[Whether with a smoothing word or a calming presence, this character knows how to solve disputes.

@@ -48,6 +48,7 @@ import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.AllGround
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.LowAtmosphere;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.Space;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.SpecificGroundTerrain;
+import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_COORDINATOR;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_TACTICS;
 import static mekhq.campaign.personnel.skills.SkillType.getSkillHash;
@@ -105,6 +106,7 @@ import mekhq.campaign.mission.enums.ScenarioType;
 import mekhq.campaign.mission.resupplyAndCaches.StarLeagueCache;
 import mekhq.campaign.mission.resupplyAndCaches.StarLeagueCache.CacheType;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
@@ -1904,6 +1906,15 @@ public class StratconRulesManager {
         if (commandRights.isLiaison()) {
             int liaisonModifier = -1;
             reinforcementTargetNumber.addModifier(liaisonModifier, "Liaison Command Rights");
+        }
+
+        // Liaison SPA
+        if (commandLiaison != null) {
+            PersonnelOptions options = commandLiaison.getOptions();
+            if (options.booleanOption(ADMIN_COORDINATOR)) {
+                int liaisonModifier = -1;
+                reinforcementTargetNumber.addModifier(liaisonModifier, "Coordinator SPA");
+            }
         }
 
         // Return final value

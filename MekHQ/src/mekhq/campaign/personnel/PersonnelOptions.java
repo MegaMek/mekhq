@@ -106,6 +106,8 @@ public class PersonnelOptions extends PilotOptions {
 
     public static final String ADMIN_SCROUNGE = "admin_scrounge";
     public static final String ADMIN_MEDIATOR = "admin_mediator";
+    public static final String ADMIN_LOGISTICIAN = "admin_logistician";
+    public static final String ADMIN_COORDINATOR = "admin_coordinator";
 
     @Override
     public void initialize() {
@@ -192,6 +194,8 @@ public class PersonnelOptions extends PilotOptions {
 
         addOption(l3a, ADMIN_SCROUNGE, false);
         addOption(l3a, ADMIN_MEDIATOR, false);
+        addOption(l3a, ADMIN_LOGISTICIAN, false);
+        addOption(l3a, ADMIN_COORDINATOR, false);
 
         addOption(edge, EDGE_MEDICAL, true);
         addOption(edge, EDGE_REPAIR_BREAK_PART, true);
