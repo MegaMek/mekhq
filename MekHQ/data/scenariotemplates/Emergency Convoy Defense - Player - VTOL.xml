@@ -37,7 +37,7 @@ We will control the battlefield at the conclusion of this engagement, ensuring t
                 <deploymentZones>
                     <deploymentZone>6</deploymentZone>
                 </deploymentZones>
-                <destinationZone>2</destinationZone>
+                <destinationZone>6</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>0</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>

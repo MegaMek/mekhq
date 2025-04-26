@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -54,10 +59,10 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Profession;
+import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.displayWrappers.RankDisplay;
 
@@ -324,11 +329,7 @@ public class HireBulkPersonnelDialog extends JDialog {
 
     /**
      * These need to be migrated to the Suite Constants / Suite Options Setup
-     *
-     * @since 0.50.04
-     * @deprecated Move to Suite Constants / Suite Options Setup
      */
-    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(HireBulkPersonnelDialog.class);

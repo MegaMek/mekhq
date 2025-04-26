@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.io;
 
@@ -76,7 +81,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.Kill;
-import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.enums.CampaignTransportType;
@@ -114,6 +118,7 @@ import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
+import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillDeprecationTool;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
@@ -122,6 +127,8 @@ import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.cleanup.EquipmentUnscrambler;
 import mekhq.campaign.unit.cleanup.EquipmentUnscramblerResult;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.fameAndInfamy.FameAndInfamyController;
 import mekhq.io.idReferenceClasses.PersonIdReference;
 import mekhq.module.atb.AtBEventProcessor;
@@ -365,6 +372,8 @@ public class CampaignXmlParser {
                     processPartsInUse(campaign, wn);
                 } else if (xn.equalsIgnoreCase("temporaryPrisonerCapacity")) {
                     campaign.setTemporaryPrisonerCapacity(Integer.parseInt(wn.getTextContent().trim()));
+                } else if (xn.equalsIgnoreCase("processProcurement")) {
+                    campaign.setProcessProcurement(Boolean.parseBoolean(wn.getTextContent().trim()));
                 }
             } else {
                 // If it's a text node or attribute or whatever at this level,
@@ -774,7 +783,8 @@ public class CampaignXmlParser {
                         }
                     }
                 } else if (xn.equalsIgnoreCase("faction")) {
-                    retVal.setFactionCode(wn.getTextContent());
+                    Faction faction = Factions.getInstance().getFaction(wn.getTextContent());
+                    retVal.setFaction(faction);
                 } else if (xn.equalsIgnoreCase("retainerEmployerCode")) {
                     retVal.setRetainerEmployerCode(wn.getTextContent());
                 } else if (xn.equalsIgnoreCase("retainerStartDate")) {

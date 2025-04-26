@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.adapter;
 
@@ -88,7 +93,6 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.Kill;
-import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.event.PersonLogEvent;
 import mekhq.campaign.event.PersonStatusChangedEvent;
@@ -120,6 +124,7 @@ import mekhq.campaign.personnel.enums.ROMDesignation;
 import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
+import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.personnel.generator.AbstractSkillGenerator;
 import mekhq.campaign.personnel.generator.DefaultSkillGenerator;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
@@ -127,6 +132,7 @@ import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
@@ -870,24 +876,47 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_ADOPTION: {
                 Person orphan = getCampaign().getPerson(UUID.fromString(data[1]));
+                if (orphan == null) {
+                    logger.error("Could not find orphaned person with UUID {}. No changes will be made.", data[1]);
+                    return;
+                }
+
+                Genealogy orphanGenealogy = orphan.getGenealogy();
+                if (orphanGenealogy == null) {
+                    logger.error("Could not find orphaned person's genealogy. No changes will be made.");
+                    return;
+                }
 
                 // clear the old parents
-                for (Person parent : orphan.getGenealogy().getParents()) {
-                    orphan.getGenealogy().removeFamilyMember(FamilialRelationshipType.PARENT, parent);
+                List<Person> originalParents = orphanGenealogy.getParents();
+                for (Person parent : originalParents) {
+                    orphanGenealogy.removeFamilyMember(FamilialRelationshipType.PARENT, parent);
                 }
 
                 // add the new
                 for (Person person : people) {
-                    person.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, orphan);
-                    orphan.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, person);
+                    Genealogy personGenealogy = person.getGenealogy();
+                    if (personGenealogy == null) {
+                        logger.error("Could not find {}'s genealogy. No changes will be made.", person.getFullTitle());
+                        continue;
+                    }
+
+                    personGenealogy.addFamilyMember(FamilialRelationshipType.CHILD, orphan);
+                    orphanGenealogy.addFamilyMember(FamilialRelationshipType.PARENT, person);
 
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
 
-                    if (person.getGenealogy().hasSpouse()) {
-                        Person spouse = person.getGenealogy().getSpouse();
+                    if (personGenealogy.hasSpouse()) {
+                        Person spouse = personGenealogy.getSpouse();
+                        Genealogy spouseGenealogy = spouse.getGenealogy();
+                        if (spouseGenealogy == null) {
+                            logger.error("Could not find {}'s (spouse) genealogy. No changes will be made.",
+                                  spouse.getFullTitle());
+                            continue;
+                        }
 
                         spouse.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, orphan);
-                        orphan.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, spouse);
+                        orphanGenealogy.addFamilyMember(FamilialRelationshipType.PARENT, spouse);
 
                         MekHQ.triggerEvent(new PersonChangedEvent(spouse));
                     }
@@ -1469,7 +1498,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 RandomSkillPreferences skillPreferences = getCampaign().getRandomSkillPreferences();
                 AbstractSkillGenerator skillGenerator = new DefaultSkillGenerator(skillPreferences);
                 for (Person person : people) {
-                    skillGenerator.generateRoleplaySkills(person, person.getExperienceLevel(getCampaign(), false));
+                    skillGenerator.generateRoleplaySkills(person);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
@@ -1957,7 +1986,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         }
 
         if ((oneSelected) && (!person.isChild(getCampaign().getLocalDate()))) {
-            List<Person> orphans = getCampaign().getActivePersonnel()
+            List<Person> orphans = getCampaign().getActivePersonnel(true)
                                          .stream()
                                          .filter(child -> (child.isChild(getCampaign().getLocalDate())) &&
                                                                 (!child.getGenealogy().hasLivingParents()))

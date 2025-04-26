@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -66,13 +71,13 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
     private static final MMLogger logger = MMLogger.create(MassMothballDialog.class);
 
     // region Variable Declarations
-    private Map<Integer, List<Unit>>    unitsByType          = new HashMap<>();
-    private Map<Integer, JList<Person>> techListsByUnitType  = new HashMap<>();
-    private Map<Integer, JLabel>        timeLabelsByUnitType = new HashMap<>();
-    private Campaign                    campaign;
-    private boolean                     activating;
+    private final Map<Integer, List<Unit>> unitsByType = new HashMap<>();
+    private final Map<Integer, JList<Person>> techListsByUnitType = new HashMap<>();
+    private final Map<Integer, JLabel> timeLabelsByUnitType = new HashMap<>();
+    private final Campaign campaign;
+    private boolean activating;
 
-    private JPanel contentPanel = new JPanel();
+    private final JPanel contentPanel = new JPanel();
     // endregion Variable Declarations
 
     /**
@@ -88,26 +93,26 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
         setLocationRelativeTo(frame);
 
         sortUnitsByType(units);
-        this.campaign   = campaign;
+        this.campaign = campaign;
         this.activating = activate;
 
         contentPanel.setLayout(new GridBagLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridwidth = 3;
-        gbc.gridx     = 0;
-        gbc.gridy     = 0;
-        gbc.ipadx     = 4;
-        gbc.ipady     = 4;
-        gbc.insets    = new Insets(2, 2, 2, 2);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.ipadx = 4;
+        gbc.ipady = 4;
+        gbc.insets = new Insets(2, 2, 2, 2);
 
         gbc.weightx = 3;
         JLabel instructionLabel = new JLabel();
         instructionLabel.setBorder(new LineBorder(Color.BLUE));
         instructionLabel.setText("<html>Choose the techs to carry out " +
-                                 (activating ? "activation" : "mothballing") +
-                                 " operations on the displayed units. <br/>" +
-                                 "A * indicates that the tech is currently maintaining units.</html>");
+                                       (activating ? "activation" : "mothballing") +
+                                       " operations on the displayed units. <br/>" +
+                                       "A * indicates that the tech is currently maintaining units.</html>");
         contentPanel.add(instructionLabel, gbc);
 
         gbc.weightx = 1;
@@ -142,9 +147,9 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
      */
     private void addTableHeaders(GridBagConstraints gbc) {
         gbc.gridwidth = 1;
-        gbc.weightx   = 0.3;
-        gbc.anchor    = GridBagConstraints.WEST;
-        gbc.fill      = GridBagConstraints.BOTH;
+        gbc.weightx = 0.3;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.BOTH;
 
         gbc.gridx = 0;
         JLabel labelUnitNames = new JLabel();
@@ -170,10 +175,10 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
      */
     private void addUnitTypePanel(int unitType, GridBagConstraints gbc) {
         gbc.gridwidth = 1;
-        gbc.weightx   = 0.3;
-        gbc.gridx     = 0;
-        gbc.fill      = GridBagConstraints.BOTH;
-        gbc.anchor    = GridBagConstraints.NORTHWEST;
+        gbc.weightx = 0.3;
+        gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
 
         JPanel unitPanel = new JPanel();
         unitPanel.setLayout(new GridLayout(unitsByType.get(unitType).size(), 1, 1, 0));
@@ -187,9 +192,9 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
         unitPanel.setBorder(new LineBorder(Color.GRAY, 1));
         contentPanel.add(unitPanel, gbc);
 
-        gbc.gridx   = 1;
+        gbc.gridx = 1;
         gbc.weightx = 2.0;
-        JList<Person>            techList  = new JList<>();
+        JList<Person> techList = new JList<>();
         DefaultListModel<Person> listModel = new DefaultListModel<>();
 
         for (Person tech : campaign.getTechs()) {
@@ -205,15 +210,15 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
 
         JScrollPane techListPane = new JScrollPaneWithSpeed();
         techListPane.setViewportView(techList);
-        techListPane.setMaximumSize(new Dimension(200, 100));
-        techListPane.setPreferredSize(new Dimension(200, 50));
+        techListPane.setMaximumSize(new Dimension(200, 400));
+        techListPane.setMinimumSize(new Dimension(200, 150));
 
         contentPanel.add(techListPane, gbc);
         techListsByUnitType.put(unitType, techList);
 
-        gbc.gridx   = 2;
+        gbc.gridx = 2;
         gbc.weightx = 0.5;
-        gbc.fill    = GridBagConstraints.HORIZONTAL;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         JLabel labelTotalTime = new JLabel();
         labelTotalTime.setBorder(new LineBorder(Color.BLUE));
         labelTotalTime.setText(getCompletionTimeText(0));
@@ -228,10 +233,10 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
      * @param gbc      the input gridBagConstraints to use
      */
     private void addExecuteButton(boolean activate, GridBagConstraints gbc) {
-        gbc.gridx   = 1;
+        gbc.gridx = 1;
         gbc.weightx = 0.8;
         gbc.weighty = 0.8;
-        gbc.anchor  = GridBagConstraints.CENTER;
+        gbc.anchor = GridBagConstraints.CENTER;
         JButton buttonExecute = new JButton();
         activating = activate;
         buttonExecute.setText(activating ? "Activate" : "Mothball");
@@ -244,11 +249,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
 
     /**
      * These need to be migrated to the Suite Constants / Suite Options Setup
-     *
-     * @since 0.50.04
-     * @deprecated Move to Suite Constants / Suite Options Setup
      */
-    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(MassMothballDialog.class);
@@ -282,7 +283,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
     @Override
     public void actionPerformed(ActionEvent e) {
         if (!e.getActionCommand().equals(UnitTableMouseAdapter.COMMAND_MOTHBALL) &&
-            !e.getActionCommand().equals(UnitTableMouseAdapter.COMMAND_ACTIVATE)) {
+                  !e.getActionCommand().equals(UnitTableMouseAdapter.COMMAND_ACTIVATE)) {
             return;
         }
 
@@ -299,7 +300,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
             // this is a "naive" approach, where we assign each of the selected techs
             // to approximately # units / # techs in mothball/reactivation tasks
             for (Unit unit : unitsByType.get(unitType)) {
-                UUID   id   = selectedTechs.get(techIndex).getId();
+                UUID id = selectedTechs.get(techIndex).getId();
                 Person tech = campaign.getPerson(id);
                 if (isMothballing) {
                     unit.startMothballing(tech);
@@ -357,8 +358,8 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
             return String.format("Completion Time: %d minutes", completionTime);
         } else {
             return "<html>Completion Time: <span color='" +
-                   MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
-                   "'>Never</span></html>";
+                         MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                         "'>Never</span></html>";
         }
     }
 
@@ -370,7 +371,8 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
     private static class TechListCellRenderer extends DefaultListCellRenderer {
 
         @Override
-        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
+              boolean cellHasFocus) {
             super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
             Person person = (Person) value;

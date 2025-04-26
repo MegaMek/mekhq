@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign;
 
@@ -70,6 +75,7 @@ import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.BONDSMA
 import static mekhq.campaign.stratcon.StratconRulesManager.processIgnoredDynamicScenario;
 import static mekhq.campaign.stratcon.SupportPointNegotiation.negotiateAdditionalSupportPoints;
 import static mekhq.campaign.unit.Unit.SITE_FACILITY_BASIC;
+import static mekhq.campaign.unit.Unit.TECH_WORK_DAY;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick.isIneligibleToPerformProcurement;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -194,6 +200,7 @@ import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
@@ -380,6 +387,7 @@ public class Campaign implements ITechManager {
     private BehaviorSettings autoResolveBehaviorSettings;
     private List<Unit> automatedMothballUnits;
     private int temporaryPrisonerCapacity;
+    private boolean processProcurement;
 
     // options relating to parts in use and restock
     private boolean ignoreMothballed;
@@ -479,6 +487,7 @@ public class Campaign implements ITechManager {
         autoResolveBehaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR;
         automatedMothballUnits = new ArrayList<>();
         temporaryPrisonerCapacity = DEFAULT_TEMPORARY_CAPACITY;
+        processProcurement = true;
         topUpWeekly = false;
         ignoreMothballed = true;
         ignoreSparesUnderQuality = QUALITY_A;
@@ -500,17 +509,6 @@ public class Campaign implements ITechManager {
      */
     public void setApp(MekHQ app) {
         this.app = app;
-    }
-
-    /**
-     * @return the overviewLoadingValue
-     *
-     * @since 0.50.04
-     * @deprecated - Not shown in use.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public boolean isOverviewLoadingValue() {
-        return overviewLoadingValue;
     }
 
     /**
@@ -803,24 +801,6 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * @since 0.50.04
-     * @deprecated No indicated Uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public List<String> getTurnoverRetirementInformation() {
-        return turnoverRetirementInformation;
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated No indicated Uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void setTurnoverRetirementInformation(final List<String> turnoverRetirementInformation) {
-        this.turnoverRetirementInformation = turnoverRetirementInformation;
-    }
-
-    /**
      * Initializes the unit generator based on the method chosen in campaignOptions. Called when the unit generator is
      * first used or when the method has been changed in campaignOptions.
      */
@@ -953,7 +933,7 @@ public class Campaign implements ITechManager {
             if (roll >= target.getValue()) {
                 report.append("<br/>Search successful. ");
 
-                MekSummary ms = getUnitGenerator().generate(getFactionCode(),
+                MekSummary ms = getUnitGenerator().generate(getFaction().getShortName(),
                       shipSearchType,
                       -1,
                       getGameYear(),
@@ -1785,7 +1765,7 @@ public class Campaign implements ITechManager {
         if (allowNewPilots) {
             Map<CrewType, Collection<Person>> newCrew = Utilities.genRandomCrewWithCombinedSkill(this,
                   unit,
-                  getFactionCode());
+                  getFaction().getShortName());
             newCrew.forEach((type, personnel) -> personnel.forEach(p -> type.getAddMethod().accept(unit, p)));
         }
 
@@ -1848,18 +1828,6 @@ public class Campaign implements ITechManager {
      */
     public Collection<Unit> getActiveUnits() {
         return getHangar().getUnits().stream().filter(unit -> !unit.isMothballed() && !unit.isSalvage()).toList();
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated Not shonw in use.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public Collection<Unit> getLargeCraftAndWarShips() {
-        return getHangar().getUnits()
-                     .stream()
-                     .filter(unit -> (unit.getEntity().isLargeCraft()) || (unit.getEntity().isWarShip()))
-                     .collect(Collectors.toList());
     }
 
     public List<Entity> getEntities() {
@@ -2001,15 +1969,6 @@ public class Campaign implements ITechManager {
 
     public Boolean getFieldKitchenWithinCapacity() {
         return fieldKitchenWithinCapacity;
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated Not shown in use.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void setFieldKitchenWithinCapacity(final Boolean fieldKitchenWithinCapacity) {
-        this.fieldKitchenWithinCapacity = fieldKitchenWithinCapacity;
     }
     // endregion Person Creation
 
@@ -2506,14 +2465,15 @@ public class Campaign implements ITechManager {
      * <p>
      * This method was Deprecated during 50.04's dev cycle. In prior versions this method wasn't explicit in its
      * inclusion of prisoners in the return. I've opted to Deprecate this method as it is far better to be explicit in
-     * whether you want to include prisoners or not. This avoids a lot of potentially weird bugs.
+     * whether you want to include prisoners or not. This avoids a lot of potentially unique bugs.
      * </p>
      *
      * @return A {@link List} of {@link Person} objects representing all active personnel, including prisoners.
      *
-     * @deprecated Use {@link #getActivePersonnel(boolean)} to specify whether to include prisoners.
+     * @deprecated Use {@link #getActivePersonnel(boolean)} to specify whether to include prisoners. Mediated in 0.50
+     *       .06, remove in 0.50.07
      */
-    @Deprecated(since = "0.50.04")
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public List<Person> getActivePersonnel() {
         return getActivePersonnel(true);
     }
@@ -2589,7 +2549,7 @@ public class Campaign implements ITechManager {
      * @return a {@link Person} <code>List</code> containing all active personnel
      */
     public List<Person> getCurrentPrisoners() {
-        return getActivePersonnel().stream()
+        return getActivePersonnel(true).stream()
                      .filter(person -> person.getPrisonerStatus().isCurrentPrisoner())
                      .collect(Collectors.toList());
     }
@@ -2612,19 +2572,6 @@ public class Campaign implements ITechManager {
      */
     public List<Person> getFriendlyPrisoners() {
         return getPersonnel().stream().filter(p -> p.getStatus().isPoW()).collect(Collectors.toList());
-    }
-
-    /**
-     * Provides a filtered list of personnel including only Persons with the AWOL status.
-     *
-     * @return a {@link Person} <code>List</code> containing all active personnel
-     *
-     * @since 0.50.04
-     * @deprecated - Not shown in use.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public List<Person> getAwolPersonnel() {
-        return getPersonnel().stream().filter(p -> p.getStatus().isAwol()).collect(Collectors.toList());
     }
 
     /**
@@ -2768,10 +2715,7 @@ public class Campaign implements ITechManager {
 
     /**
      * @return A collection of parts in the Warehouse.
-     *
-     * @deprecated - Nothing indicated for replacement.
      */
-    @Deprecated(since = "0.50.04")
     public Collection<Part> getParts() {
         return parts.getParts();
     }
@@ -3033,11 +2977,6 @@ public class Campaign implements ITechManager {
                      .collect(Collectors.toSet());
     }
 
-    /**
-     * @since 0.50.04
-     * @deprecated - Nothing indicated for replacement.
-     */
-    @Deprecated(since = "0.50.04")
     public Part getPart(int id) {
         return parts.getPart(id);
     }
@@ -3083,7 +3022,7 @@ public class Campaign implements ITechManager {
     public Person findBestInRole(PersonnelRole role, String primary, String secondary) {
         int highest = 0;
         Person retVal = null;
-        for (Person p : getActivePersonnel()) {
+        for (Person p : getActivePersonnel(true)) {
             if (((p.getPrimaryRole() == role) || (p.getSecondaryRole() == role)) && (p.getSkill(primary) != null)) {
                 if (p.getSkill(primary).getLevel() > highest) {
                     retVal = p;
@@ -3118,7 +3057,7 @@ public class Campaign implements ITechManager {
     public @Nullable Person findBestAtSkill(String skill) {
         Person person = null;
         int highest = 0;
-        for (Person p : getActivePersonnel()) {
+        for (Person p : getActivePersonnel(true)) {
             if (p.getSkill(skill) != null && p.getSkill(skill).getLevel() > highest) {
                 highest = p.getSkill(skill).getLevel();
                 person = p;
@@ -3178,7 +3117,7 @@ public class Campaign implements ITechManager {
      *       skill, available time, and rank as specified by the input parameters.
      */
     public List<Person> getTechsExpanded(final boolean noZeroMinute, final boolean eliteFirst, final boolean expanded) {
-        final List<Person> techs = getActivePersonnel().stream()
+        final List<Person> techs = getActivePersonnel(true).stream()
                                          .filter(person -> (expanded ? person.isTechExpanded() : person.isTech()) &&
                                                                  (!noZeroMinute || (person.getMinutesLeft() > 0)))
                                          .collect(Collectors.toList());
@@ -3217,7 +3156,7 @@ public class Campaign implements ITechManager {
 
     public List<Person> getAdmins() {
         List<Person> admins = new ArrayList<>();
-        for (Person p : getActivePersonnel()) {
+        for (Person p : getActivePersonnel(true)) {
             if (p.isAdministrator()) {
                 admins.add(p);
             }
@@ -3234,7 +3173,7 @@ public class Campaign implements ITechManager {
 
     public List<Person> getDoctors() {
         List<Person> docs = new ArrayList<>();
-        for (Person p : getActivePersonnel()) {
+        for (Person p : getActivePersonnel(true)) {
             if (p.isDoctor()) {
                 docs.add(p);
             }
@@ -3244,7 +3183,7 @@ public class Campaign implements ITechManager {
 
     public int getPatientsFor(Person doctor) {
         int patients = 0;
-        for (Person person : getActivePersonnel()) {
+        for (Person person : getActivePersonnel(true)) {
             if ((null != person.getDoctorId()) && person.getDoctorId().equals(doctor.getId())) {
                 patients++;
             }
@@ -3521,7 +3460,7 @@ public class Campaign implements ITechManager {
             final ProcurementPersonnelPick acquisitionCategory = campaignOptions.getAcquisitionPersonnelCategory();
             List<Person> logisticsPersonnel = new ArrayList<>();
 
-            for (Person person : getActivePersonnel()) {
+            for (Person person : getActivePersonnel(true)) {
                 if (isIneligibleToPerformProcurement(person, acquisitionCategory)) {
                     continue;
                 }
@@ -4036,115 +3975,176 @@ public class Campaign implements ITechManager {
     /**
      * Performs work to either mothball or activate a unit.
      *
-     * @param u The unit to either work towards mothballing or activation.
+     * @param unit The unit to either work towards mothballing or activation.
      */
-    public void workOnMothballingOrActivation(Unit u) {
-        if (u.isMothballed()) {
-            activate(u);
+    public void workOnMothballingOrActivation(Unit unit) {
+        if (unit.isMothballed()) {
+            activate(unit);
         } else {
-            mothball(u);
+            mothball(unit);
         }
     }
 
     /**
-     * Performs work to mothball a unit.
+     * Performs work to mothball a unit, preparing it for long-term storage.
      *
-     * @param u The unit on which to perform mothball work.
+     * <p>Mothballing process varies based on unit type:</p>
+     * <ul>
+     *   <li>Non-Infantry Units:
+     *     <ul>
+     *       <li>Requires an assigned tech</li>
+     *       <li>Consumes tech work minutes</li>
+     *       <li>Requires astech support time (6 minutes per tech minute)</li>
+     *     </ul>
+     *   </li>
+     *   <li>Infantry Units:
+     *     <ul>
+     *       <li>Uses standard work day time</li>
+     *       <li>No tech required</li>
+     *     </ul>
+     *   </li>
+     * </ul>
+     * <p>
+     * The process tracks progress and can span multiple work periods until complete.
+     *
+     * @param unit The unit to mothball. Must be active (not already mothballed)
      */
-    public void mothball(Unit u) {
-        if (u.isMothballed()) {
+    public void mothball(Unit unit) {
+        if (unit.isMothballed()) {
             logger.warn("Unit is already mothballed, cannot mothball.");
             return;
         }
 
-        Person tech = u.getTech();
-        if (null == tech) {
-            // uh-oh
-            addReport("No tech assigned to the mothballing of " + u.getHyperlinkedName());
-            return;
-        }
+        String report;
+        if (!unit.isConventionalInfantry()) {
+            Person tech = unit.getTech();
+            if (null == tech) {
+                // uh-oh
+                addReport(String.format(resources.getString("noTech.mothballing"), unit.getHyperlinkedName()));
+                unit.cancelMothballOrActivation();
+                return;
+            }
 
-        // don't allow overtime minutes for mothballing because it's cheating
-        // since you don't roll
-        int minutes = Math.min(tech.getMinutesLeft(), u.getMothballTime());
+            // don't allow overtime minutes for mothballing because it's cheating since you don't roll
+            int minutes = Math.min(tech.getMinutesLeft(), unit.getMothballTime());
 
-        // check astech time
-        if (!u.isSelfCrewed() && astechPoolMinutes < minutes * 6) {
-            // uh-oh
-            addReport("Not enough astechs to work on mothballing of " + u.getHyperlinkedName());
-            return;
-        }
+            // check astech time
+            if (!unit.isSelfCrewed() && astechPoolMinutes < minutes * 6) {
+                // uh-oh
+                addReport(String.format(resources.getString("notEnoughAstechTime.mothballing"),
+                      unit.getHyperlinkedName()));
+                return;
+            }
 
-        u.setMothballTime(u.getMothballTime() - minutes);
+            unit.setMothballTime(unit.getMothballTime() - minutes);
 
-        String report = tech.getHyperlinkedFullTitle() +
-                              " spent " +
-                              minutes +
-                              " minutes mothballing " +
-                              u.getHyperlinkedName();
-        if (!u.isMothballing()) {
-            u.completeMothball();
-            report += ". Mothballing complete.";
+            tech.setMinutesLeft(tech.getMinutesLeft() - minutes);
+            if (!unit.isSelfCrewed()) {
+                astechPoolMinutes -= 6 * minutes;
+            }
+
+            report = String.format(resources.getString("timeSpent.mothballing.tech"),
+                  tech.getHyperlinkedFullTitle(),
+                  minutes,
+                  unit.getHyperlinkedName());
         } else {
-            report += ". " + u.getMothballTime() + " minutes remaining.";
+            unit.setMothballTime(unit.getMothballTime() - TECH_WORK_DAY);
+
+            report = String.format(resources.getString("timeSpent.mothballing.noTech"),
+                  TECH_WORK_DAY,
+                  unit.getHyperlinkedName());
         }
 
-        tech.setMinutesLeft(tech.getMinutesLeft() - minutes);
-
-        if (!u.isSelfCrewed()) {
-            astechPoolMinutes -= 6 * minutes;
+        if (!unit.isMothballing()) {
+            unit.completeMothball();
+            report += String.format(resources.getString("complete.mothballing"));
+        } else {
+            report += String.format(resources.getString("remaining.text"), unit.getMothballTime());
         }
 
         addReport(report);
     }
 
     /**
-     * Performs work to activate a unit.
+     * Performs work to activate a unit from its mothballed state. This process requires either:
      *
-     * @param u The unit on which to perform activation work.
+     * <ul>
+     *   <li>A tech and sufficient astech support time for non-self-crewed units</li>
+     *   <li>Only time for self-crewed units</li>
+     * </ul>
+     *
+     * <p>The activation process:</p>
+     * <ol>
+     *   <li>Verifies the unit is mothballed</li>
+     *   <li>For non-self-crewed units:
+     *     <ul>
+     *       <li>Checks for assigned tech</li>
+     *       <li>Verifies sufficient tech and astech time</li>
+     *       <li>Consumes tech and astech time</li>
+     *     </ul>
+     *   </li>
+     *   <li>For self-crewed units:
+     *     <ul>
+     *       <li>Uses standard work day time</li>
+     *     </ul>
+     *   </li>
+     *   <li>Updates mothball status</li>
+     *   <li>Reports progress or completion</li>
+     * </ol>
+     *
+     * @param unit The unit to activate. Must be mothballed for activation to proceed.
      */
-    public void activate(Unit u) {
-        if (!u.isMothballed()) {
+    public void activate(Unit unit) {
+        if (!unit.isMothballed()) {
             logger.warn("Unit is already activated, cannot activate.");
             return;
         }
 
-        Person tech = u.getTech();
-        if (null == tech) {
-            // uh-oh
-            addReport("No tech assigned to the activation of " + u.getHyperlinkedName());
-            return;
-        }
+        String report;
+        if (!unit.isConventionalInfantry()) {
+            Person tech = unit.getTech();
+            if (null == tech) {
+                // uh-oh
+                addReport(String.format(resources.getString("noTech.activation"), unit.getHyperlinkedName()));
+                unit.cancelMothballOrActivation();
+                return;
+            }
 
-        // don't allow overtime minutes for activation because it's cheating
-        // since you don't roll
-        int minutes = Math.min(tech.getMinutesLeft(), u.getMothballTime());
+            // don't allow overtime minutes for activation because it's cheating since you don't roll
+            int minutes = Math.min(tech.getMinutesLeft(), unit.getMothballTime());
 
-        // check astech time
-        if (!u.isSelfCrewed() && astechPoolMinutes < minutes * 6) {
-            // uh-oh
-            addReport("Not enough astechs to work on activation of " + u.getHyperlinkedName());
-            return;
-        }
+            // check astech time
+            if (!unit.isSelfCrewed() && astechPoolMinutes < minutes * 6) {
+                // uh-oh
+                addReport(String.format(resources.getString("notEnoughAstechTime.activation"),
+                      unit.getHyperlinkedName()));
+                return;
+            }
 
-        u.setMothballTime(u.getMothballTime() - minutes);
+            unit.setMothballTime(unit.getMothballTime() - minutes);
 
-        String report = tech.getHyperlinkedFullTitle() +
-                              " spent " +
-                              minutes +
-                              " minutes activating " +
-                              u.getHyperlinkedName();
+            tech.setMinutesLeft(tech.getMinutesLeft() - minutes);
+            if (!unit.isSelfCrewed()) {
+                astechPoolMinutes -= 6 * minutes;
+            }
 
-        tech.setMinutesLeft(tech.getMinutesLeft() - minutes);
-        if (!u.isSelfCrewed()) {
-            astechPoolMinutes -= 6 * minutes;
-        }
-
-        if (!u.isMothballing()) {
-            u.completeActivation();
-            report += ". Activation complete.";
+            report = String.format(resources.getString("timeSpent.activation.tech"),
+                  tech.getHyperlinkedFullTitle(),
+                  minutes,
+                  unit.getHyperlinkedName());
         } else {
-            report += ". " + u.getMothballTime() + " minutes remaining.";
+            unit.setMothballTime(unit.getMothballTime() - TECH_WORK_DAY);
+
+            report = String.format(resources.getString("timeSpent.activation.noTech"),
+                  TECH_WORK_DAY,
+                  unit.getHyperlinkedName());
+        }
+
+        if (!unit.isMothballing()) {
+            unit.completeActivation();
+            report += String.format(resources.getString("complete.activation"));
+        } else {
+            report += String.format(resources.getString("remaining.text"), unit.getMothballTime());
         }
 
         addReport(report);
@@ -5205,30 +5205,6 @@ public class Campaign implements ITechManager {
         person.changeAutoAwardSupportPoints((int) (score * multiplier));
     }
 
-    /**
-     * Retrieves the date of birth of the youngest child among the provided list of children.
-     *
-     * @param children the list children
-     *
-     * @return the date of birth of the youngest child
-     *
-     * @since 0.50.04
-     * @deprecated - Not shown in use.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    private LocalDate getYoungestChildDateOfBirth(List<Person> children) {
-        LocalDate youngestChildBirthDate = LocalDate.MIN;
-
-        for (Person child : children) {
-            LocalDate dateOfBirth = child.getDateOfBirth();
-            if (dateOfBirth.isAfter(youngestChildBirthDate)) {
-                youngestChildBirthDate = dateOfBirth;
-            }
-        }
-
-        return youngestChildBirthDate;
-    }
-
     public void processNewDayUnits() {
         // need to loop through units twice, the first time to do all maintenance and
         // the second time to do whatever else. Otherwise, maintenance minutes might
@@ -5330,18 +5306,18 @@ public class Campaign implements ITechManager {
 
         // ok now we can check for other stuff we might need to do to units
         List<UUID> unitsToRemove = new ArrayList<>();
-        for (Unit u : getUnits()) {
-            if (u.isRefitting()) {
-                refit(u.getRefit());
+        for (Unit unit : getUnits()) {
+            if (unit.isRefitting()) {
+                refit(unit.getRefit());
             }
-            if (u.isMothballing()) {
-                workOnMothballingOrActivation(u);
+            if (unit.isMothballing()) {
+                workOnMothballingOrActivation(unit);
             }
-            if (!u.isPresent()) {
-                u.checkArrival();
+            if (!unit.isPresent()) {
+                unit.checkArrival();
             }
-            if (!u.isRepairable() && !u.hasSalvageableParts()) {
-                unitsToRemove.add(u.getId());
+            if (!unit.isRepairable() && !unit.hasSalvageableParts()) {
+                unitsToRemove.add(unit.getId());
             }
         }
         // Remove any unrepairable, unsalvageable units
@@ -5477,7 +5453,9 @@ public class Campaign implements ITechManager {
 
         processNewDayForces();
 
-        setShoppingList(goShopping(getShoppingList()));
+        if (processProcurement) {
+            setShoppingList(goShopping(getShoppingList()));
+        }
 
         // check for anything in finances
         finances.newDay(this, yesterday, getLocalDate());
@@ -5753,7 +5731,7 @@ public class Campaign implements ITechManager {
      */
     public Person getSeniorCommander() {
         Person commander = null;
-        for (Person p : getActivePersonnel()) {
+        for (Person p : getActivePersonnel(true)) {
             if (p.isCommander()) {
                 return p;
             }
@@ -5832,6 +5810,7 @@ public class Campaign implements ITechManager {
             return;
         }
 
+
         Force force = getForceFor(person);
         if (force != null) {
             force.updateCommander(this);
@@ -5847,7 +5826,6 @@ public class Campaign implements ITechManager {
         person.removeAllTechJobs(this);
         removeKillsFor(person.getId());
         getRetirementDefectionTracker().removePerson(person);
-
         if (log) {
             addReport(person.getFullTitle() + " has been removed from the personnel roster.");
         }
@@ -6161,29 +6139,20 @@ public class Campaign implements ITechManager {
 
     /**
      * @since 0.50.04
-     * @deprecated {@link Campaign#getFaction()}.getShortName() instead.
+     * @deprecated {@link Campaign#getFaction()}.getShortName() instead. Mitigated in 0.50.06, remove in 0.50.07
      */
-    @Deprecated(since = "0.50.04")
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public String getFactionCode() {
         return getFaction().getShortName();
     }
 
     /**
      * @since 0.50.04
-     * @deprecated Use {@link Campaign#setFaction(Faction)} instead.
+     * @deprecated Use {@link Campaign#setFaction(Faction)} instead. Mitigated in 0.50.06, remove in 0.50.07
      */
-    @Deprecated(since = "0.50.04")
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public void setFactionCode(final String factionCode) {
         setFaction(Factions.getInstance().getFaction(factionCode));
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated - No indicated uses
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public Faction getRetainerEmployer() {
-        return Factions.getInstance().getFaction(getRetainerEmployerCode());
     }
 
     public String getRetainerEmployerCode() {
@@ -6344,15 +6313,6 @@ public class Campaign implements ITechManager {
 
     public void setUnitIcon(final StandardForceIcon unitIcon) {
         this.unitIcon = unitIcon;
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated - No indicated use.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void addFunds(final Money quantity) {
-        addFunds(TransactionType.MISCELLANEOUS, quantity, null);
     }
 
     public void addFunds(final TransactionType type, final Money quantity, @Nullable String description) {
@@ -6692,6 +6652,7 @@ public class Campaign implements ITechManager {
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "automatedMothballUnits");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "temporaryPrisonerCapacity", temporaryPrisonerCapacity);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "processProcurement", processProcurement);
 
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, ++indent, "partsInUse");
         writePartInUseToXML(pw, indent);
@@ -6806,38 +6767,6 @@ public class Campaign implements ITechManager {
 
     public void setRankSystemDirect(final RankSystem rankSystem) {
         this.rankSystem = rankSystem;
-    }
-
-    /**
-     * Returns the highest ranked person from the given list of personnel.
-     *
-     * @param personnel          the list of personnel from which to find the highest ranked person
-     * @param useSkillTiebreaker determines whether to use an experience level tiebreaker when comparing ranks (true -
-     *                           use skill tiebreaker, false - do not use skill tiebreaker)
-     *
-     * @return the highest ranked person from the list, or null if the provided personnel list is empty
-     *
-     * @since 0.50.04
-     * @deprecated No indicated Use.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public Person getHighestRankedPerson(List<Person> personnel, boolean useSkillTiebreaker) {
-        Person highestRankedPerson = null;
-
-        if (!personnel.isEmpty()) {
-            for (Person person : personnel) {
-                if (useSkillTiebreaker) {
-                    if (person.outRanksUsingSkillTiebreaker(this, highestRankedPerson)) {
-                        highestRankedPerson = person;
-                    }
-                } else {
-                    if (person.outRanks(highestRankedPerson)) {
-                        highestRankedPerson = person;
-                    }
-                }
-            }
-        }
-        return highestRankedPerson;
     }
     // endregion Ranks
 
@@ -7692,7 +7621,8 @@ public class Campaign implements ITechManager {
     }
 
     public int getAstechNeed() {
-        return (Math.toIntExact(getActivePersonnel().stream().filter(Person::isTech).count()) * 6) - getNumberAstechs();
+        return (Math.toIntExact(getActivePersonnel(true).stream().filter(Person::isTech).count()) * 6) -
+                     getNumberAstechs();
     }
 
     public void increaseAstechPool(int i) {
@@ -7723,7 +7653,7 @@ public class Campaign implements ITechManager {
 
     public int getNumberPrimaryAstechs() {
         int astechs = getAstechPool();
-        for (Person p : getActivePersonnel()) {
+        for (Person p : getActivePersonnel(true)) {
             if (p.getPrimaryRole().isAstech() && !p.isDeployed()) {
                 astechs++;
             }
@@ -7733,7 +7663,7 @@ public class Campaign implements ITechManager {
 
     public int getNumberSecondaryAstechs() {
         int astechs = 0;
-        for (Person p : getActivePersonnel()) {
+        for (Person p : getActivePersonnel(true)) {
             if (p.getSecondaryRole().isAstech() && !p.isDeployed()) {
                 astechs++;
             }
@@ -7815,7 +7745,7 @@ public class Campaign implements ITechManager {
      */
     public int getNumberMedics() {
         return getMedicPool() +
-                     Math.toIntExact(getActivePersonnel().stream()
+                     Math.toIntExact(getActivePersonnel(true).stream()
                                            .filter(p -> (p.getPrimaryRole().isMedic() ||
                                                                p.getSecondaryRole().isMedic()) && !p.isDeployed())
                                            .count());
@@ -8001,15 +7931,6 @@ public class Campaign implements ITechManager {
             cmdrStrategy = getFlaggedCommander().getSkill(SkillType.S_STRATEGY).getLevel();
         }
         return cmdrStrategy;
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated - No indicated Uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public int getUnitRatingAsInteger() {
-        return getAtBUnitRatingMod();
     }
 
     public RandomSkillPreferences getRandomSkillPreferences() {
@@ -8755,34 +8676,6 @@ public class Campaign implements ITechManager {
         }
     }
 
-    /**
-     * @since 0.50.04
-     * @deprecated - No indicated uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void setHealingTimeOptions(int newHeal, int newNaturalHeal) {
-        // we need to check the current values and then if necessary change the times for all personnel, giving them
-        // credit for their current waiting time
-        int currentHeal = getCampaignOptions().getHealingWaitingPeriod();
-        int currentNaturalHeal = getCampaignOptions().getNaturalHealingWaitingPeriod();
-
-        getCampaignOptions().setHealingWaitingPeriod(newHeal);
-        getCampaignOptions().setNaturalHealingWaitingPeriod(newNaturalHeal);
-
-        int healDiff = newHeal - currentHeal;
-        int naturalDiff = newNaturalHeal - currentNaturalHeal;
-
-        if (healDiff != 0 || naturalDiff != 0) {
-            for (Person p : getPersonnel()) {
-                if (p.getDoctorId() != null) {
-                    p.setDaysToWaitForHealing(max(p.getDaysToWaitForHealing() + healDiff, 1));
-                } else {
-                    p.setDaysToWaitForHealing(max(p.getDaysToWaitForHealing() + naturalDiff, 1));
-                }
-            }
-        }
-    }
-
     private CampaignTransporterMap getCampaignTransporterMap(CampaignTransportType campaignTransportType) {
         if (campaignTransportType.isTacticalTransport()) {
             return tacticalTransporters;
@@ -8939,7 +8832,11 @@ public class Campaign implements ITechManager {
                                                                       " performing maintenance</strong><br><br>");
             for (Part part : unit.getParts()) {
                 try {
-                    String partReport = doMaintenanceOnUnitPart(unit, part, partsToDamage, paidMaintenance, asTechsUsed);
+                    String partReport = doMaintenanceOnUnitPart(unit,
+                          part,
+                          partsToDamage,
+                          paidMaintenance,
+                          asTechsUsed);
                     if (partReport != null) {
                         maintenanceReport.append(partReport).append("<br>");
                     }
@@ -9034,8 +8931,8 @@ public class Campaign implements ITechManager {
         }
     }
 
-    private String doMaintenanceOnUnitPart(Unit unit, Part part, Map<Part, Integer> partsToDamage, boolean paidMaintenance,
-          int asTechsUsed) {
+    private String doMaintenanceOnUnitPart(Unit unit, Part part, Map<Part, Integer> partsToDamage,
+          boolean paidMaintenance, int asTechsUsed) {
         String partReport = "<b>" + part.getName() + "</b> (Quality " + part.getQualityName() + ')';
         if (!part.needsMaintenance()) {
             return null;
@@ -9408,11 +9305,7 @@ public class Campaign implements ITechManager {
     /**
      * Returns the type of rating method as selected in the Campaign Options dialog. Lazy-loaded for performance.
      * Default is CampaignOpsReputation
-     *
-     * @since 0.50.04
-     * @deprecated Unknown replacement.
      */
-    @Deprecated(since = "0.50.04")
     public IUnitRating getUnitRating() {
         // if we switched unit rating methods,
         if (unitRating != null && (unitRating.getUnitRatingMethod() != getCampaignOptions().getUnitRatingMethod())) {
@@ -9601,6 +9494,14 @@ public class Campaign implements ITechManager {
         }
 
         return toBuy;
+    }
+
+    public boolean isProcessProcurement() {
+        return processProcurement;
+    }
+
+    public void setProcessProcurement(boolean processProcurement) {
+        this.processProcurement = processProcurement;
     }
 
     // Simple getters and setters for our stock map

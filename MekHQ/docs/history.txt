@@ -1,6 +1,10 @@
 MEKHQ VERSION HISTORY:
 ---------------
-0.50.05-SNAPSHOT
+0.50.06
++ PR #6767: Updated Rank System XML Version to 0.50.06
++ PR #6768: 0.50.06 Deprecation Removal and Clean up 
+
+0.50.05 (2025-04-25 1800 UTC)
 + PR #6284: Fixed Unique Interaction when Loading Player Campaigns with Custom Rank Systems
 + PR #6285: Added Mercenary Auction Events
 + Fix #910, #3644, #4762, #6179: Added Auto-Optimize Medical Assignments Feature
@@ -246,6 +250,43 @@ MEKHQ VERSION HISTORY:
 + PR #6699: Thunderbird Battle Armor (3145/NTNU RS Upgrade versions) had no space between (Upgrade) and [Wepaon Type] in MHQ, but it did in MM.
 + Fix #6700: Fixed Company Kill Awards not awarded
 + PR #6703: Added Null Protection to ReportHyperlinkListener
++ PR #6706: Refactored Centralized Skill Check Class to Use TargetRoll; Fixed Multiple Bugs 
++ PR #6705: Fixed SPA Grouping Logic in Campaign Options IIC
++ PR #6713: Fixed Two Invalid and Removable SPAs
++ PR #6714: Fixed Target Number Display in Skill Check Utility
++ PR #6715: Replaced Placeholder Art in Skill Check Dialog
++ PR #6716: Corrected Resupply Documentation; Archived Outdated Parts Procurement Documentation
++ Fix #6717: Fixed Skill Compatibility Version Check
++ Fix #6720: Stopped Deleted Personnel Returning to the Campaign When Activating a Mothballed Unit
++ PR #6729: Moved RandomSkillPreferences to Skills Package
++ Fix #3000, #4097: Updated Comms Center Functionality to Match Description
++ PR #6733: Adjusted Resupply Scaling Factor in Convoy Raid and Facility Hostile Capture
++ Fix #6734: Fixed Prisoner Capacity of Injured Prisoners
++ PR #6735: Added Seed Force to Log During Scenario Generation
++ PR #6738: Remove Redundant Logging in SkillType Updates
++ Fix #3624, #4039: Fixed Transport Report Counting Mothballed Units as Occupying Bays
++ Fix #4014: Fixed OmniPod Handling in Repair Bay Acquisitions Dialog
++ Fix #4120: Updated Global Tooltip Behavior for Instant and Persistent Display
++ Fix #4086: Added GM ability to increase warehouse item counts
++ Fix #6718: Ensured Only Active Techs are Reassigned When Activating Units from a Mothballed State
++ Fix #6701: Added Colorblind Assistance to Refit Not Found Text
++ Fix #1914: Refactored Contract Terms Negotiations to Be Closer to RAW
++ PR #6727: Fix sorting the units in the Unit Market by price
++ Fix #6711: Fixed Conventional Infantry & Large Vessel (DropShip) Mothballing and Activation
++ Fix #3870: Allowed Extra Maintenance Time for Self-Crewed Units (Such as DropShips); Allowed Maintenance Time Changes for Mothballed Units
++ Fix #3963: Added the Ability to GM Increase the Number of Each Part in the Warehouse
++ Fix #4086: Added Parts In Use Button to Warehouse Tab
++ PR #6730: Added Option to Disable ATOW Attribute Scores
++ PR #6736: Simplified Roleplay Skills Randomization
++ PR #6737: Adjusted Maintenance Cycle Hangar Display
++ PR #6745: Updated "The Learning Ropes" Campaign Save File
++ PR #6757: Fixed Defection Logic for Prisoners
++ Fix #6758: Fixed Ransom Events Not Ransoming Prisoners
++ PR #6760: Added Missing 'Has Documentation' Icon to Unit Market Options in Campaign Options IIC
++ PR #6762: Slightly Adjusted Tooltip Initial Delay Setting
++ PR #6756: Fixed Exception When Adopting Child with Existing Parents (Sentry)
++ Fix #6761: Fixed Birthday Generation Logic
++ PR #6763: Fixed Loophole That Allowed Players to Acquire Clantech Prior to Tukayyid.
 
 0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times

@@ -496,7 +496,6 @@ While this SPA does exist in ATOW (and that's where you'll find its description)
         <xpCost>200</xpCost>
         <weight>1</weight>
         <skillPrereq/>
-        <removeAbilities>flaw_animal_antipathy</removeAbilities>
     </ability>
     <ability>
         <lookupName>flaw_unattractive</lookupName>
@@ -670,6 +669,7 @@ The Target Number of all Perception checks decreased by 1 due to improved hearin
         <xpCost>-300</xpCost>
         <weight>1</weight>
         <skillPrereq/>
+        <invalidAbilities>mutation_cat_girl_unofficial</invalidAbilities>
     </ability>
     <ability>
         <lookupName>mutation_cat_girl_unofficial</lookupName>

@@ -24,13 +24,18 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.adapter;
 
+import java.time.LocalDate;
+
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import mekhq.utilities.MHQXMLUtility;
-
-import java.time.LocalDate;
 
 public class DateAdapter extends XmlAdapter<String, LocalDate> {
     @Override
@@ -40,6 +45,6 @@ public class DateAdapter extends XmlAdapter<String, LocalDate> {
 
     @Override
     public String marshal(final LocalDate object) throws Exception {
-        return MHQXMLUtility.saveFormattedDate(object);
+        return object.toString();
     }
 }

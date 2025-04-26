@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.finances;
 
@@ -41,7 +46,7 @@ import org.joda.money.BigMoney;
  * @author Vicente Cartas Espinel (vicente.cartas at outlook.com)
  */
 public class Money implements Comparable<Money> {
-    private BigMoney wrapped;
+    private final BigMoney wrapped;
 
     private Money(BigMoney money) {
         Objects.requireNonNull(money);
@@ -163,17 +168,6 @@ public class Money implements Comparable<Money> {
     public String toAmountAndSymbolString() {
         return CurrencyManager.getInstance()
                      .getUiAmountAndSymbolPrinter()
-                     .print(getWrapped().toMoney(RoundingMode.HALF_EVEN));
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated use {@link #toAmountAndSymbolString()} instead
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public String toAmountAndNameString() {
-        return CurrencyManager.getInstance()
-                     .getUiAmountAndNamePrinter()
                      .print(getWrapped().toMoney(RoundingMode.HALF_EVEN));
     }
 

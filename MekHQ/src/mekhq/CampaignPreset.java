@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq;
 
@@ -57,13 +62,11 @@ import megamek.common.preference.PreferenceManager;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import megamek.utilities.xml.MMXMLUtility;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.RandomSkillPreferences;
-import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.ranks.RankSystem;
+import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -136,29 +139,6 @@ public class CampaignPreset {
               null,
               new HashMap<>(),
               new HashMap<>());
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated - no indicated uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public CampaignPreset(final Campaign campaign) {
-        this(campaign.getName(),
-              "",
-              true,
-              campaign.getLocalDate(),
-              campaign.getFaction(),
-              campaign.getCurrentSystem().getPrimaryPlanet(),
-              campaign.getRankSystem(),
-              2,
-              campaign.isGM(),
-              null,
-              campaign.getGameOptions(),
-              campaign.getCampaignOptions(),
-              campaign.getRandomSkillPreferences(),
-              SkillType.getSkillHash(),
-              SpecialAbility.getSpecialAbilities());
     }
 
     public CampaignPreset(final String title, final String description, final boolean userData,
@@ -350,38 +330,6 @@ public class CampaignPreset {
         presets.sort((p0, p1) -> naturalOrderComparator.compare(p0.toString(), p1.toString()));
 
         return presets;
-    }
-
-    /**
-     * @since 50.04
-     * @deprecated This method is scheduled to be removed following the next milestone
-     */
-    @Deprecated(since = "50.04", forRemoval = true)
-    public void applyContinuousToCampaign(final Campaign campaign) {
-        if (getGameOptions() != null) {
-            campaign.setGameOptions(getGameOptions());
-            if (getCampaignOptions() == null) {
-                campaign.getCampaignOptions().updateCampaignOptionsFromGameOptions(campaign.getGameOptions());
-                MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
-            }
-        }
-
-        if (getCampaignOptions() != null) {
-            campaign.setCampaignOptions(getCampaignOptions());
-            MekHQ.triggerEvent(new OptionsChangedEvent(campaign, getCampaignOptions()));
-        }
-
-        if (getRandomSkillPreferences() != null) {
-            campaign.setRandomSkillPreferences(getRandomSkillPreferences());
-        }
-
-        if (!getSkills().isEmpty()) {
-            SkillType.setSkillHash(getSkills());
-        }
-
-        if (!getSpecialAbilities().isEmpty()) {
-            SpecialAbility.setSpecialAbilities(getSpecialAbilities());
-        }
     }
 
     // region File I/O

@@ -65,7 +65,7 @@ public class ReportingUtilities {
     /**
      * Takes the color and a message to create a full <span></span> message
      * for output to simplify the process. Uses
-     * {@link #spanOpeningWithCustomColor(String)} and {@link CLOSING_SPAN_TAG} in
+     * {@link #spanOpeningWithCustomColor(String)} and {@link #CLOSING_SPAN_TAG} in
      * the process of formation.
      *
      * @param colorToUse Color for the text within the span tag.

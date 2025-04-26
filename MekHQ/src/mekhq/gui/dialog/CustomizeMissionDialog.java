@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -34,7 +39,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.ResourceBundle;
-
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -59,9 +63,9 @@ import mekhq.gui.utilities.MarkdownEditorPanel;
 public class CustomizeMissionDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(CustomizeMissionDialog.class);
 
-    private Mission mission;
-    private Campaign campaign;
-    private boolean newMission;
+    private final Mission mission;
+    private final Campaign campaign;
+    private final boolean newMission;
 
     private JButton btnClose;
     private JButton btnOK;
@@ -105,7 +109,7 @@ public class CustomizeMissionDialog extends JDialog {
         lblPlanetName = new JLabel();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizeMissionDialog",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form");
         setTitle(resourceMap.getString("title"));
@@ -223,11 +227,7 @@ public class CustomizeMissionDialog extends JDialog {
 
     /**
      * These need to be migrated to the Suite Constants / Suite Options Setup
-     *
-     * @deprecated Move to Suite Constants / Suite Options Setup
-     * @since 0.50.04
      */
-    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(CustomizeMissionDialog.class);
@@ -242,15 +242,15 @@ public class CustomizeMissionDialog extends JDialog {
         mission.setName(txtName.getText());
         mission.setType(txtType.getText());
 
-        PlanetarySystem canonSystem = Systems.getInstance().getSystemByName(suggestPlanet.getText(),
-                campaign.getLocalDate());
+        PlanetarySystem canonSystem = Systems.getInstance()
+                                            .getSystemByName(suggestPlanet.getText(), campaign.getLocalDate());
 
         if (canonSystem != null) {
             mission.setSystemId(canonSystem.getId());
         } else {
             mission.setSystemId(null);
             mission.setLegacyPlanetName(suggestPlanet.getText()); // Is this method actual Legacy or just related to
-                                                                  // history of planet
+            // history of planet
         }
 
         mission.setDesc(txtDesc.getText());

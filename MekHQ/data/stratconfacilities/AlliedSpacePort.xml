@@ -4,6 +4,6 @@
 	<facilityType>SpacePort</facilityType>
 	<owner>Allied</owner>
 	<monthlySPModifier>2</monthlySPModifier>
-	<userDescription>Provides 2 SP/month of allied logistical support.</userDescription>
+    <userDescription><![CDATA[Provides 2 SP/month of allied logistical support.]]></userDescription>
 	<visible>true</visible>
 </StratconFacility>
