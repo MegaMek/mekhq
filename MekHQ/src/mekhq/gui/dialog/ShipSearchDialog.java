@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -62,13 +67,13 @@ import mekhq.gui.CampaignGUI;
 public class ShipSearchDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(ShipSearchDialog.class);
 
-    private JRadioButton btnDropship = new JRadioButton();
-    private JRadioButton btnJumpship = new JRadioButton();
-    private JRadioButton btnWarship  = new JRadioButton();
+    private final JRadioButton btnDropship = new JRadioButton();
+    private final JRadioButton btnJumpship = new JRadioButton();
+    private final JRadioButton btnWarship = new JRadioButton();
 
-    private JLabel lblDropshipTarget = new JLabel();
-    private JLabel lblJumpshipTarget = new JLabel();
-    private JLabel lblWarshipTarget  = new JLabel();
+    private final JLabel lblDropshipTarget = new JLabel();
+    private final JLabel lblJumpshipTarget = new JLabel();
+    private final JLabel lblWarshipTarget = new JLabel();
 
     CampaignGUI gui;
 
@@ -90,17 +95,20 @@ public class ShipSearchDialog extends JDialog {
 
         JLabel lblInstructions = new JLabel();
         lblInstructions.setText("<html>" +
-                                String.format(resourceMap.getString("instructions.text"),
-                                      gui.getCampaign().getAtBConfig().getShipSearchCost().toAmountAndSymbolString()) +
-                                "</html>");
+                                      String.format(resourceMap.getString("instructions.text"),
+                                            gui.getCampaign()
+                                                  .getAtBConfig()
+                                                  .getShipSearchCost()
+                                                  .toAmountAndSymbolString()) +
+                                      "</html>");
         contentPane.add(lblInstructions, BorderLayout.NORTH);
 
-        JPanel             mainPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc       = new GridBagConstraints();
+        JPanel mainPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
 
         gbc.gridwidth = GridBagConstraints.REMAINDER;
-        gbc.anchor    = GridBagConstraints.NORTHWEST;
-        gbc.insets    = new Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
 
         ButtonGroup group = new ButtonGroup();
         if (gui.getCampaign().getAtBConfig().shipSearchTargetBase(UnitType.DROPSHIP) != null) {
@@ -195,7 +203,7 @@ public class ShipSearchDialog extends JDialog {
                     lblAvailable.setText("Cannot find entry for " + gui.getCampaign().getShipSearchResult());
                 } else {
                     lblAvailable.setText(resourceMap.getString("lblAvailable.text") +
-                                         gui.getCampaign().getShipSearchResult());
+                                               gui.getCampaign().getShipSearchResult());
                 }
                 gbc.gridx = 0;
                 gbc.gridy = 8;
@@ -233,11 +241,7 @@ public class ShipSearchDialog extends JDialog {
 
     /**
      * These need to be migrated to the Suite Constants / Suite Options Setup
-     *
-     * @since 0.50.04
-     * @deprecated Move to Suite Constants / Suite Options Setup
      */
-    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ShipSearchDialog.class);
@@ -256,33 +260,6 @@ public class ShipSearchDialog extends JDialog {
         } catch (Exception ex) {
             logger.error("Failed to set user preferences", ex);
         }
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated No indicated users.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public TargetRoll getDSTarget() {
-        return gui.getCampaign().getAtBConfig().shipSearchTargetRoll(UnitType.DROPSHIP, gui.getCampaign());
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated No indicated users.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public TargetRoll getJSTarget() {
-        return gui.getCampaign().getAtBConfig().shipSearchTargetRoll(UnitType.JUMPSHIP, gui.getCampaign());
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated No indicated users.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public TargetRoll getWSTarget() {
-        return gui.getCampaign().getAtBConfig().shipSearchTargetRoll(UnitType.WARSHIP, gui.getCampaign());
     }
 
     private int getUnitType() {

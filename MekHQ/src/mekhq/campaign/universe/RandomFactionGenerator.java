@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe;
 
@@ -43,23 +48,19 @@ import java.util.stream.Collectors;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
-import megamek.common.event.Subscribe;
 import megamek.common.util.weightedMaps.WeightedIntMap;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.event.OptionsChangedEvent;
 
 /**
  * @author Neoancient
  *       <p>
  *       Uses Factions and Planets to weighted lists of potential employers and enemies for contract generation. Also
  *       finds a suitable planet for the action.
- *                                                                                                               TODO : Account for the de facto alliance of the invading Clans and
- *                                                                                                               the
- *                                                                                                               TODO : Fortress Republic in a way that doesn't involve hard-coding
- *                                                                                                               them here.
+ *             TODO : Account for the de facto alliance of the invading Clans and the
+ *             TODO : Fortress Republic in a way that doesn't involve hard-coding them here.
  */
 public class RandomFactionGenerator {
     private static final MMLogger logger = MMLogger.create(RandomFactionGenerator.class);
@@ -67,7 +68,7 @@ public class RandomFactionGenerator {
     private static RandomFactionGenerator rfg = null;
 
     private FactionBorderTracker borderTracker;
-    private FactionHints         factionHints;
+    private FactionHints factionHints;
 
     public RandomFactionGenerator() {
         this(null, null);
@@ -75,7 +76,7 @@ public class RandomFactionGenerator {
 
     public RandomFactionGenerator(FactionBorderTracker borderTracker, FactionHints factionHints) {
         this.borderTracker = borderTracker;
-        this.factionHints  = factionHints;
+        this.factionHints = factionHints;
         if (null == borderTracker) {
             initDefaultBorderTracker();
         }
@@ -122,45 +123,8 @@ public class RandomFactionGenerator {
         borderTracker.setDate(date);
     }
 
-    /**
-     * @since 0.50.04
-     * @deprecated shows no usage
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void setSearchCenter(double x, double y) {
-        borderTracker.setRegionCenter(x, y);
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated shows no usage
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void setSearchCenter(Planet p) {
-        borderTracker.setRegionCenter(p.getX(), p.getY());
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated shows no usage
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void setSearchRadius(double radius) {
-        borderTracker.setRegionRadius(radius);
-    }
-
     public FactionHints getFactionHints() {
         return factionHints;
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated shows no usage
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    @Subscribe
-    public void handleCampaignOptionsChanged(OptionsChangedEvent event) {
-        borderTracker.setRegionRadius(event.getOptions().getContractSearchRadius());
     }
 
     public void dispose() {
@@ -220,8 +184,9 @@ public class RandomFactionGenerator {
                 if (null != cfaction) {
                     if (!cfaction.isClan()) {
                         weight = (int) Math.floor((borderTracker.getBorders(f).getSystems().size() *
-                                                   factionHints.getAltLocationFraction(f, cfaction, getCurrentDate())) +
-                                                  0.5);
+                                                         factionHints.getAltLocationFraction(f,
+                                                               cfaction,
+                                                               getCurrentDate())) + 0.5);
                         retVal.add(weight, f);
                     }
                 }
@@ -247,7 +212,7 @@ public class RandomFactionGenerator {
     @Deprecated(since = "0.50.04")
     public String getEmployer() {
         WeightedIntMap<Faction> employers = buildEmployerMap();
-        Faction                 f         = employers.randomItem();
+        Faction f = employers.randomItem();
         if (null != f) {
             return f.getShortName();
         }
@@ -357,12 +322,12 @@ public class RandomFactionGenerator {
                 continue;
             }
 
-            int    totalCount = borderTracker.getBorderSystems(employer, enemy).size();
-            double count      = totalCount;
+            int totalCount = borderTracker.getBorderSystems(employer, enemy).size();
+            double count = totalCount;
             // Split the border between main controlling faction and any contained factions.
             for (Faction cFaction : factionHints.getContainedFactions(employer, getCurrentDate())) {
                 if ((null == cFaction) ||
-                    !factionHints.isContainedFactionOpponent(enemy, cFaction, employer, getCurrentDate())) {
+                          !factionHints.isContainedFactionOpponent(enemy, cFaction, employer, getCurrentDate())) {
                     continue;
                 }
 
@@ -371,7 +336,7 @@ public class RandomFactionGenerator {
                 }
 
                 if (factionHints.isNeutral(cFaction, enemy, getCurrentDate()) ||
-                    factionHints.isNeutral(enemy, cFaction, getCurrentDate())) {
+                          factionHints.isNeutral(enemy, cFaction, getCurrentDate())) {
                     continue;
                 }
                 double cfCount = totalCount;
@@ -434,8 +399,8 @@ public class RandomFactionGenerator {
      * @return A list of faction that share a border
      */
     public List<String> getEnemyList(Faction employer) {
-        Set<Faction> list  = new HashSet<>();
-        Faction      outer = factionHints.getContainedFactionHost(employer, getCurrentDate());
+        Set<Faction> list = new HashSet<>();
+        Faction outer = factionHints.getContainedFactionHost(employer, getCurrentDate());
         for (Faction enemy : borderTracker.getFactionsInRegion()) {
             if (FactionHints.isEmptyFaction(enemy)) {
                 continue;
@@ -447,7 +412,7 @@ public class RandomFactionGenerator {
                 continue;
             }
             if (factionHints.isNeutral(employer, enemy, getCurrentDate()) ||
-                factionHints.isNeutral(enemy, employer, getCurrentDate())) {
+                      factionHints.isNeutral(enemy, employer, getCurrentDate())) {
                 continue;
             }
             Faction useBorder = employer;
@@ -462,7 +427,7 @@ public class RandomFactionGenerator {
                 list.add(enemy);
                 for (Faction cf : factionHints.getContainedFactions(enemy, getCurrentDate())) {
                     if ((null != cf) &&
-                        factionHints.isContainedFactionOpponent(enemy, cf, employer, getCurrentDate())) {
+                              factionHints.isContainedFactionOpponent(enemy, cf, employer, getCurrentDate())) {
                         list.add(cf);
                     }
                 }
@@ -492,9 +457,9 @@ public class RandomFactionGenerator {
             return 0;
         }
         if (f.isClan() &&
-            enemy.isClan() &&
-            (factionHints.isAlliedWith(f, enemy, date) ||
-             (date.isBefore(TUKKAYID) && (borderTracker.getCenterY() < 600)))) {
+                  enemy.isClan() &&
+                  (factionHints.isAlliedWith(f, enemy, date) ||
+                         (date.isBefore(TUKKAYID) && (borderTracker.getCenterY() < 600)))) {
             /* Treat invading Clans as allies in the Inner Sphere */
             count /= 4.0;
         }
@@ -602,7 +567,7 @@ public class RandomFactionGenerator {
         // If mission is against generic pirates (those that don't control any systems),
         // add all border systems as possible locations
         if ((attacker.isPirate() && !borderTracker.getFactionsInRegion().contains(attacker)) ||
-            (defender.isPirate() && !borderTracker.getFactionsInRegion().contains(defender))) {
+                  (defender.isPirate() && !borderTracker.getFactionsInRegion().contains(defender))) {
             for (Faction f : borderTracker.getFactionsInRegion()) {
                 planetSet.addAll(borderTracker.getBorderSystems(f, attacker));
                 planetSet.addAll(borderTracker.getBorderSystems(attacker, f));
@@ -618,11 +583,11 @@ public class RandomFactionGenerator {
             for (Faction f : borderTracker.getFactionsInRegion()) {
                 for (Faction cf : factionHints.getContainedFactions(f, getCurrentDate())) {
                     if (cf.equals(attacker) &&
-                        factionHints.isContainedFactionOpponent(f, cf, defender, getCurrentDate())) {
+                              factionHints.isContainedFactionOpponent(f, cf, defender, getCurrentDate())) {
                         planetSet.addAll(borderTracker.getBorderSystems(f, defender));
                     }
                     if (cf.equals(defender) &&
-                        factionHints.isContainedFactionOpponent(f, cf, attacker, getCurrentDate())) {
+                              factionHints.isContainedFactionOpponent(f, cf, attacker, getCurrentDate())) {
                         planetSet.addAll(borderTracker.getBorderSystems(attacker, f));
                     }
                 }

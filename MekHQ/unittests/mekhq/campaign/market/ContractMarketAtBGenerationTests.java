@@ -24,10 +24,39 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.market;
 
-import mekhq.campaign.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.Mockito.anyDouble;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
+import java.util.Vector;
+
+import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.CurrentLocation;
+import mekhq.campaign.Hangar;
+import mekhq.campaign.JumpPath;
 import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
@@ -35,19 +64,16 @@ import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.rating.UnitRatingMethod;
-import mekhq.campaign.universe.*;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.FactionHints;
+import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.RandomFactionGenerator;
+import mekhq.campaign.universe.Systems;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-
-import java.time.LocalDate;
-import java.util.*;
-
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.*;
 
 public class ContractMarketAtBGenerationTests {
 
@@ -65,9 +91,9 @@ public class ContractMarketAtBGenerationTests {
     @ParameterizedTest
     @MethodSource(value = "generateData")
     public void addMercWithoutRetainerAtBContractSucceeds(final int gameYear, final int unitRating,
-                                                          final boolean isClanEnemy) {
+          final boolean isClanEnemy) {
         Campaign campaign = mock(Campaign.class);
-        when(campaign.getFactionCode()).thenReturn("MERC");
+        when(campaign.getFaction().getShortName()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
         when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
@@ -165,11 +191,10 @@ public class ContractMarketAtBGenerationTests {
 
     @ParameterizedTest
     @MethodSource(value = "generateData")
-    public void addMercWithoutRetainerMinorPowerAtBContractSucceeds(final int gameYear,
-                                                                    final int unitRating,
-                                                                    final boolean isClanEnemy) {
+    public void addMercWithoutRetainerMinorPowerAtBContractSucceeds(final int gameYear, final int unitRating,
+          final boolean isClanEnemy) {
         Campaign campaign = mock(Campaign.class);
-        when(campaign.getFactionCode()).thenReturn("MERC");
+        when(campaign.getFaction().getShortName()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
         when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
@@ -270,11 +295,10 @@ public class ContractMarketAtBGenerationTests {
 
     @ParameterizedTest
     @MethodSource(value = "generateData")
-    public void addMercWithoutRetainerEmployerNeutralAtBContractSucceeds(final int gameYear,
-                                                                         final int unitRating,
-                                                                         final boolean isClanEnemy) {
+    public void addMercWithoutRetainerEmployerNeutralAtBContractSucceeds(final int gameYear, final int unitRating,
+          final boolean isClanEnemy) {
         Campaign campaign = mock(Campaign.class);
-        when(campaign.getFactionCode()).thenReturn("MERC");
+        when(campaign.getFaction().getShortName()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
         when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
@@ -375,11 +399,10 @@ public class ContractMarketAtBGenerationTests {
 
     @ParameterizedTest
     @MethodSource(value = "generateData")
-    public void addMercWithoutRetainerEmployerNeutralAtWarAtBContractSucceeds(final int gameYear,
-                                                                              final int unitRating,
-                                                                              final boolean isClanEnemy) {
+    public void addMercWithoutRetainerEmployerNeutralAtWarAtBContractSucceeds(final int gameYear, final int unitRating,
+          final boolean isClanEnemy) {
         Campaign campaign = mock(Campaign.class);
-        when(campaign.getFactionCode()).thenReturn("MERC");
+        when(campaign.getFaction().getShortName()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
         when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
@@ -481,10 +504,9 @@ public class ContractMarketAtBGenerationTests {
 
     @ParameterizedTest
     @MethodSource(value = "generateData")
-    public void mercEmployerRetries(final int gameYear, final int unitRating,
-                                    final boolean isClanEnemy) {
+    public void mercEmployerRetries(final int gameYear, final int unitRating, final boolean isClanEnemy) {
         Campaign campaign = mock(Campaign.class);
-        when(campaign.getFactionCode()).thenReturn("MERC");
+        when(campaign.getFaction().getShortName()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
         when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
@@ -538,7 +560,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(rebels).when(factions).getFaction(eq("REB"));
 
         Faction mercenary = mock(Faction.class);
-	when(mercenary.isMercenary()).thenReturn(true);
+        when(mercenary.isMercenary()).thenReturn(true);
         doReturn(mercenary).when(factions).getFaction(eq("MERC"));
 
         Systems systems = mock(Systems.class);
@@ -591,10 +613,9 @@ public class ContractMarketAtBGenerationTests {
 
     @ParameterizedTest
     @MethodSource(value = "generateData")
-    public void mercEmployerRetriesFail(final int gameYear, final int unitRating,
-                                        final boolean isClanEnemy) {
+    public void mercEmployerRetriesFail(final int gameYear, final int unitRating, final boolean isClanEnemy) {
         Campaign campaign = mock(Campaign.class);
-        when(campaign.getFactionCode()).thenReturn("MERC");
+        when(campaign.getFaction().getShortName()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
         when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
@@ -607,7 +628,7 @@ public class ContractMarketAtBGenerationTests {
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
 
-	// Make a fake "MERC" employer for getFaction purposes in the rfg
+        // Make a fake "MERC" employer for getFaction purposes in the rfg
         Faction employerFaction = mock(Faction.class);
         when(employerFaction.isMercenary()).thenReturn(true);
 
@@ -626,10 +647,9 @@ public class ContractMarketAtBGenerationTests {
 
     @ParameterizedTest
     @MethodSource(value = "generateData")
-    public void mercMissiongTargetRetries(final int gameYear, final int unitRating,
-                                          final boolean isClanEnemy) {
+    public void mercMissiongTargetRetries(final int gameYear, final int unitRating, final boolean isClanEnemy) {
         Campaign campaign = mock(Campaign.class);
-        when(campaign.getFactionCode()).thenReturn("MERC");
+        when(campaign.getFaction().getShortName()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
         when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
@@ -731,10 +751,9 @@ public class ContractMarketAtBGenerationTests {
 
     @ParameterizedTest
     @MethodSource(value = "generateData")
-    public void mercMissionTargetRetriesFail(final int gameYear, final int unitRating,
-                                             final boolean isClanEnemy) {
+    public void mercMissionTargetRetriesFail(final int gameYear, final int unitRating, final boolean isClanEnemy) {
         Campaign campaign = mock(Campaign.class);
-        when(campaign.getFactionCode()).thenReturn("MERC");
+        when(campaign.getFaction().getShortName()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
         when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
@@ -828,10 +847,9 @@ public class ContractMarketAtBGenerationTests {
 
     @ParameterizedTest
     @MethodSource(value = "generateData")
-    public void mercJumpPathRetries(final int gameYear, final int unitRating,
-                                    final boolean isClanEnemy) {
+    public void mercJumpPathRetries(final int gameYear, final int unitRating, final boolean isClanEnemy) {
         Campaign campaign = mock(Campaign.class);
-        when(campaign.getFactionCode()).thenReturn("MERC");
+        when(campaign.getFaction().getShortName()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
         when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
@@ -933,10 +951,9 @@ public class ContractMarketAtBGenerationTests {
 
     @ParameterizedTest
     @MethodSource(value = "generateData")
-    public void mercJumpPathFails(final int gameYear, final int unitRating,
-                                  final boolean isClanEnemy) {
+    public void mercJumpPathFails(final int gameYear, final int unitRating, final boolean isClanEnemy) {
         Campaign campaign = mock(Campaign.class);
-        when(campaign.getFactionCode()).thenReturn("MERC");
+        when(campaign.getFaction().getShortName()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
         when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
@@ -1033,10 +1050,10 @@ public class ContractMarketAtBGenerationTests {
     @ParameterizedTest
     @MethodSource(value = "generateData")
     public void addMercWithRetainerAtBContractSucceeds(final int gameYear, final int unitRating,
-                                                       final boolean isClanEnemy) {
+          final boolean isClanEnemy) {
         String employer = "EMPLOYER";
         Campaign campaign = mock(Campaign.class);
-        when(campaign.getFactionCode()).thenReturn("MERC");
+        when(campaign.getFaction().getShortName()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(employer);
         when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
@@ -1136,12 +1153,11 @@ public class ContractMarketAtBGenerationTests {
 
     @ParameterizedTest
     @MethodSource(value = "generateData")
-    public void addMercWithRetainerMinorPowerAtBContractSucceeds(final int gameYear,
-                                                                 final int unitRating,
-                                                                 final boolean isClanEnemy) {
+    public void addMercWithRetainerMinorPowerAtBContractSucceeds(final int gameYear, final int unitRating,
+          final boolean isClanEnemy) {
         String employer = "EMPLOYER";
         Campaign campaign = mock(Campaign.class);
-        when(campaign.getFactionCode()).thenReturn("MERC");
+        when(campaign.getFaction().getShortName()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(employer);
         when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
@@ -1241,12 +1257,11 @@ public class ContractMarketAtBGenerationTests {
 
     @ParameterizedTest
     @MethodSource(value = "generateData")
-    public void addMercWithRetainerEmployerNeutralAtBContractSucceeds(final int gameYear,
-                                                                      final int unitRating,
-                                                                      final boolean isClanEnemy) {
+    public void addMercWithRetainerEmployerNeutralAtBContractSucceeds(final int gameYear, final int unitRating,
+          final boolean isClanEnemy) {
         String employer = "EMPLOYER";
         Campaign campaign = mock(Campaign.class);
-        when(campaign.getFactionCode()).thenReturn("MERC");
+        when(campaign.getFaction().getShortName()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(employer);
         when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
@@ -1346,12 +1361,11 @@ public class ContractMarketAtBGenerationTests {
 
     @ParameterizedTest
     @MethodSource(value = "generateData")
-    public void addMercWithRetainerEmployerNeutralAtWarAtBContractSucceeds(final int gameYear,
-                                                                           final int unitRating,
-                                                                           final boolean isClanEnemy) {
+    public void addMercWithRetainerEmployerNeutralAtWarAtBContractSucceeds(final int gameYear, final int unitRating,
+          final boolean isClanEnemy) {
         String employer = "EMPLOYER";
         Campaign campaign = mock(Campaign.class);
-        when(campaign.getFactionCode()).thenReturn("MERC");
+        when(campaign.getFaction().getShortName()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(employer);
         when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
@@ -1451,11 +1465,10 @@ public class ContractMarketAtBGenerationTests {
 
     @ParameterizedTest
     @MethodSource(value = "generateData")
-    public void nonMercAtBContractSucceeds(final int gameYear, final int unitRating,
-                                           final boolean isClanEnemy) {
+    public void nonMercAtBContractSucceeds(final int gameYear, final int unitRating, final boolean isClanEnemy) {
         String employer = "EMPLOYER";
         Campaign campaign = mock(Campaign.class);
-        when(campaign.getFactionCode()).thenReturn(employer);
+        when(campaign.getFaction().getShortName()).thenReturn(employer);
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
         when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
@@ -1557,10 +1570,10 @@ public class ContractMarketAtBGenerationTests {
     @ParameterizedTest
     @MethodSource(value = "generateData")
     public void nonMercMinorPowerAtBContractSucceeds(final int gameYear, final int unitRating,
-                                                     final boolean isClanEnemy) {
+          final boolean isClanEnemy) {
         String employer = "EMPLOYER";
         Campaign campaign = mock(Campaign.class);
-        when(campaign.getFactionCode()).thenReturn(employer);
+        when(campaign.getFaction().getShortName()).thenReturn(employer);
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
         when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
@@ -1661,11 +1674,10 @@ public class ContractMarketAtBGenerationTests {
 
     @ParameterizedTest
     @MethodSource(value = "generateData")
-    public void nonMercNeutralAtBContractSucceeds(final int gameYear, final int unitRating,
-                                                  final boolean isClanEnemy) {
+    public void nonMercNeutralAtBContractSucceeds(final int gameYear, final int unitRating, final boolean isClanEnemy) {
         String employer = "EMPLOYER";
         Campaign campaign = mock(Campaign.class);
-        when(campaign.getFactionCode()).thenReturn(employer);
+        when(campaign.getFaction().getShortName()).thenReturn(employer);
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
         when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
@@ -1767,10 +1779,10 @@ public class ContractMarketAtBGenerationTests {
     @ParameterizedTest
     @MethodSource(value = "generateData")
     public void nonMercNeutralAtWarAtBContractSucceeds(final int gameYear, final int unitRating,
-                                                       final boolean isClanEnemy) {
+          final boolean isClanEnemy) {
         String employer = "EMPLOYER";
         Campaign campaign = mock(Campaign.class);
-        when(campaign.getFactionCode()).thenReturn(employer);
+        when(campaign.getFaction().getShortName()).thenReturn(employer);
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
         when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
