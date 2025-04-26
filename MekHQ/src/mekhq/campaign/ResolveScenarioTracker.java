@@ -1747,7 +1747,7 @@ public class ResolveScenarioTracker {
                             "Unit sales for " + getScenario().getName());
                 getCampaign().addReport(unitRansoms.toAmountAndSymbolString() +
                                               " has been credited to your account from unit salvage sold following " +
-                                              getScenario().getName() +
+                                              getScenario().getHyperlinkedName() +
                                               '.');
                 if (isContract) {
                     ((Contract) mission).addSalvageByUnit(unitRansoms);

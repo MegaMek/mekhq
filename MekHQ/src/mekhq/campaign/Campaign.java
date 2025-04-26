@@ -1554,7 +1554,7 @@ public class Campaign implements ITechManager {
 
         if (newScenario && !suppressReport) {
             addReport(MessageFormat.format(resources.getString("newAtBScenario.format"),
-                  s.getName(),
+                  s.getHyperlinkedName(),
                   MekHQ.getMHQOptions().getDisplayFormattedDate(s.getDate())));
         }
 
@@ -4599,7 +4599,7 @@ public class Campaign implements ITechManager {
                 // transitTime is measured in days; so we round up to the next whole day
                 contract.setStartAndEndDate(getLocalDate().plusDays((int) Math.ceil(getLocation().getTransitTime())));
                 addReport("The start and end dates of " +
-                                contract.getName() +
+                                contract.getHyperlinkedName() +
                                 " have been shifted to reflect the current ETA.");
 
                 if (campaignOptions.isUseStratCon() && contract.getMoraleLevel().isRouted()) {
@@ -4620,7 +4620,7 @@ public class Campaign implements ITechManager {
 
                 if (campaignState != null && deficit > 0) {
                     addReport(String.format(resources.getString("contractBreach.text"),
-                          contract.getName(),
+                          contract.getHyperlinkedName(),
                           spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
                           CLOSING_SPAN_TAG));
 
@@ -4628,7 +4628,7 @@ public class Campaign implements ITechManager {
                 } else if (deficit > 0) {
                     contract.addPlayerMinorBreaches(deficit);
                     addReport("Failure to meet " +
-                                    contract.getName() +
+                                    contract.getHyperlinkedName() +
                                     " requirements resulted in " +
                                     deficit +
                                     ((deficit == 1) ? " minor contract breach" : " minor contract breaches"));
@@ -4664,7 +4664,7 @@ public class Campaign implements ITechManager {
                         contract.addPlayerMinorBreach();
 
                         addReport("Failure to deploy for " +
-                                        scenario.getName() +
+                                        scenario.getHyperlinkedName() +
                                         " resulted in a minor contract breach.");
                     }
                 }
@@ -4701,25 +4701,25 @@ public class Campaign implements ITechManager {
                             atBScenario.addForces(forceId);
 
                             addReport(MessageFormat.format(resources.getString("atbScenarioTodayWithForce.format"),
-                                  atBScenario.getName(),
+                                  atBScenario.getHyperlinkedName(),
                                   forceIds.get(forceId).getName()));
                             MekHQ.triggerEvent(new DeploymentChangedEvent(forceIds.get(forceId), atBScenario));
                         } else {
                             if (atBScenario.getHasTrack()) {
                                 addReport(MessageFormat.format(resources.getString("atbScenarioToday.stratCon"),
-                                      atBScenario.getName()));
+                                      atBScenario.getHyperlinkedName()));
                             } else {
                                 addReport(MessageFormat.format(resources.getString("atbScenarioToday.atb"),
-                                      atBScenario.getName()));
+                                      atBScenario.getHyperlinkedName()));
                             }
                         }
                     } else {
                         if (atBScenario.getHasTrack()) {
                             addReport(MessageFormat.format(resources.getString("atbScenarioToday.stratCon"),
-                                  atBScenario.getName()));
+                                  atBScenario.getHyperlinkedName()));
                         } else {
                             addReport(MessageFormat.format(resources.getString("atbScenarioToday.atb"),
-                                  atBScenario.getName()));
+                                  atBScenario.getHyperlinkedName()));
                         }
                     }
                 }
@@ -4773,7 +4773,7 @@ public class Campaign implements ITechManager {
                 } else if (oldMorale != newMorale) {
                     report = String.format(resources.getString("contractMoraleReport.text"),
                           newMorale,
-                          contract.getName(),
+                          contract.getHyperlinkedName(),
                           newMorale.getToolTipText());
                 }
 
@@ -8470,7 +8470,7 @@ public class Campaign implements ITechManager {
                 addReport("Your account has been credited for " +
                                 remainingMoney.toAmountAndSymbolString() +
                                 " for the remaining payout from contract " +
-                                contract.getName());
+                                contract.getHyperlinkedName());
             } else if (remainingMoney.isNegative()) {
                 getFinances().credit(TransactionType.CONTRACT_PAYMENT,
                       getLocalDate(),
@@ -8479,7 +8479,7 @@ public class Campaign implements ITechManager {
                 addReport("Your account has been debited for " +
                                 remainingMoney.absolute().toAmountAndSymbolString() +
                                 " to repay payment overages occurred during the contract " +
-                                contract.getName());
+                                contract.getHyperlinkedName());
             }
 
             // This relies on the mission being a Contract, and AtB to be on
