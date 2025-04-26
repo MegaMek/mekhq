@@ -126,7 +126,7 @@ public class MercenaryAuction {
               maximumBid,
               AUCTION_TIER_SUCCESS_PERCENT,
               max(requiredCombatTeams, 1));
-        int finalBidPercentChance = (mercenaryAuctionDialog.getSpinnerValue() / minimumBid) *
+        int bidSuccessChance = (mercenaryAuctionDialog.getSpinnerValue() / minimumBid) *
                                           AUCTION_TIER_SUCCESS_PERCENT;
 
         // If the player confirmed the auction, then check whether they were successful,
@@ -137,7 +137,7 @@ public class MercenaryAuction {
 
         // The use of <= is important here as it ensures that even if the user bids 50 %, they can
         // still win.
-        if (randomInt(100) <= finalBidPercentChance) {
+        if (randomInt(100) <= bidSuccessChance) {
             campaignState.changeSupportPoints(-mercenaryAuctionDialog.getSpinnerValue());
 
             // The delivery time is so that the unit addition is picked up by the 'mothball'
