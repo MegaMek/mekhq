@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -68,18 +73,18 @@ import mekhq.gui.utilities.MarkdownEditorPanel;
 public class NewAtBContractDialog extends NewContractDialog {
     private static final MMLogger logger = MMLogger.create(NewAtBContractDialog.class);
 
-    protected FactionComboBox             cbEmployer;
-    protected FactionComboBox             cbEnemy;
-    protected JCheckBox                   chkShowAllFactions;
-    protected JComboBox<String>           cbPlanets;
-    protected JCheckBox                   chkShowAllPlanets;
+    protected FactionComboBox cbEmployer;
+    protected FactionComboBox cbEnemy;
+    protected JCheckBox chkShowAllFactions;
+    protected JComboBox<String> cbPlanets;
+    protected JCheckBox chkShowAllPlanets;
     protected MMComboBox<AtBContractType> comboContractType;
-    protected MMComboBox<SkillLevel>      comboAllySkill;
-    protected JComboBox<String>           cbAllyQuality;
-    protected MMComboBox<SkillLevel>      comboEnemySkill;
-    protected JComboBox<String>           cbEnemyQuality;
-    protected JSpinner                    spnShares;
-    protected JLabel                      lblRequiredLances;
+    protected MMComboBox<SkillLevel> comboAllySkill;
+    protected JComboBox<String> cbAllyQuality;
+    protected MMComboBox<SkillLevel> comboEnemySkill;
+    protected JComboBox<String> cbEnemyQuality;
+    protected JSpinner spnShares;
+    protected JLabel lblRequiredLances;
 
     Set<String> currentFactions;
     Set<String> employerSet;
@@ -93,11 +98,7 @@ public class NewAtBContractDialog extends NewContractDialog {
 
     /**
      * These need to be migrated to the Suite Constants / Suite Options Setup
-     *
-     * @since 0.50.04
-     * @deprecated Move to Suite Constants / Suite Options Setup
      */
-    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(NewAtBContractDialog.class);
@@ -111,8 +112,8 @@ public class NewAtBContractDialog extends NewContractDialog {
     @Override
     protected void initComponents() {
         currentFactions = RandomFactionGenerator.getInstance().getCurrentFactions();
-        employerSet     = RandomFactionGenerator.getInstance().getEmployerSet();
-        contract        = new AtBContract("New Contract");
+        employerSet = RandomFactionGenerator.getInstance().getEmployerSet();
+        contract = new AtBContract("New Contract");
         contract.calculateContract(campaign);
         ((AtBContract) contract).initContractDetails(campaign);
         dragoonRating = campaign.getAtBUnitRatingMod();
@@ -156,13 +157,13 @@ public class NewAtBContractDialog extends NewContractDialog {
         cbEnemy = new FactionComboBox();
         JLabel lblEnemy = new JLabel();
         chkShowAllFactions = new JCheckBox();
-        cbPlanets          = new JComboBox<>();
+        cbPlanets = new JComboBox<>();
         cbPlanets.setModel(new SortedComboBoxModel<>());
         chkShowAllPlanets = new JCheckBox();
         JLabel lblType = new JLabel();
-        btnOK    = new JButton();
+        btnOK = new JButton();
         btnClose = new JButton();
-        txtDesc  = new MarkdownEditorPanel();
+        txtDesc = new MarkdownEditorPanel();
         JLabel lblPlanetName = new JLabel();
         // TODO : Switch me to use IUnitRating
         String[] ratingNames = { "F", "D", "C", "B", "A" };
@@ -170,106 +171,106 @@ public class NewAtBContractDialog extends NewContractDialog {
         final DefaultComboBoxModel<SkillLevel> allySkillModel = new DefaultComboBoxModel<>();
         allySkillModel.addAll(SkillLevel.getGeneratableValues());
         comboAllySkill = new MMComboBox<>("comboAllySkill", allySkillModel);
-        cbAllyQuality  = new JComboBox<>(ratingNames);
-        JLabel                                 lblAllyRating   = new JLabel();
+        cbAllyQuality = new JComboBox<>(ratingNames);
+        JLabel lblAllyRating = new JLabel();
         final DefaultComboBoxModel<SkillLevel> enemySkillModel = new DefaultComboBoxModel<>();
         enemySkillModel.addAll(SkillLevel.getGeneratableValues());
         comboEnemySkill = new MMComboBox<>("comboEnemySkill", enemySkillModel);
-        cbEnemyQuality  = new JComboBox<>(ratingNames);
+        cbEnemyQuality = new JComboBox<>(ratingNames);
         JLabel lblEnemyRating = new JLabel();
-        JLabel lblShares      = new JLabel();
-        spnShares         = new JSpinner(new SpinnerNumberModel(20, 20, 50, 10));
+        JLabel lblShares = new JLabel();
+        spnShares = new JSpinner(new SpinnerNumberModel(20, 20, 50, 10));
         lblRequiredLances = new JLabel();
 
         int y = 0;
 
         lblName.setText(resourceMap.getString("lblName.text"));
         lblName.setName("lblName");
-        gbc           = new GridBagConstraints();
-        gbc.gridx     = 0;
-        gbc.gridy     = y;
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = y;
         gbc.gridwidth = 1;
-        gbc.anchor    = GridBagConstraints.WEST;
-        gbc.insets    = new Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
         descPanel.add(lblName, gbc);
 
         txtName.setText(contract.getName());
         txtName.setName("txtName");
 
-        gbc.gridx     = 1;
-        gbc.gridy     = y++;
+        gbc.gridx = 1;
+        gbc.gridy = y++;
         gbc.gridwidth = 2;
-        gbc.fill      = GridBagConstraints.HORIZONTAL;
-        gbc.anchor    = GridBagConstraints.WEST;
-        gbc.insets    = new Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
         descPanel.add(txtName, gbc);
 
         if (campaign.getFaction().isMercenary()) {
             lblEmployer.setText(resourceMap.getString("lblEmployer.text"));
             lblEmployer.setName("lblEmployer");
-            gbc.gridx     = 0;
-            gbc.gridy     = y;
+            gbc.gridx = 0;
+            gbc.gridy = y;
             gbc.gridwidth = 1;
-            gbc.anchor    = GridBagConstraints.WEST;
-            gbc.insets    = new Insets(5, 5, 5, 5);
+            gbc.anchor = GridBagConstraints.WEST;
+            gbc.insets = new Insets(5, 5, 5, 5);
             descPanel.add(lblEmployer, gbc);
 
-            gbc.gridx     = 1;
-            gbc.gridy     = y++;
+            gbc.gridx = 1;
+            gbc.gridy = y++;
             gbc.gridwidth = 2;
-            gbc.fill      = GridBagConstraints.HORIZONTAL;
-            gbc.anchor    = GridBagConstraints.WEST;
-            gbc.insets    = new Insets(5, 5, 5, 5);
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+            gbc.anchor = GridBagConstraints.WEST;
+            gbc.insets = new Insets(5, 5, 5, 5);
             descPanel.add(cbEmployer, gbc);
         }
 
         lblEnemy.setText(resourceMap.getString("lblEnemy.text"));
         lblEnemy.setName("lblEnemy");
 
-        gbc.gridx     = 0;
-        gbc.gridy     = y;
+        gbc.gridx = 0;
+        gbc.gridy = y;
         gbc.gridwidth = 1;
-        gbc.anchor    = GridBagConstraints.WEST;
-        gbc.insets    = new Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
         descPanel.add(lblEnemy, gbc);
 
-        gbc.gridx     = 1;
-        gbc.gridy     = y++;
+        gbc.gridx = 1;
+        gbc.gridy = y++;
         gbc.gridwidth = 2;
-        gbc.fill      = GridBagConstraints.HORIZONTAL;
-        gbc.anchor    = GridBagConstraints.WEST;
-        gbc.insets    = new Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
         descPanel.add(cbEnemy, gbc);
 
         chkShowAllFactions.setText(resourceMap.getString("chkShowAllFactions.text"));
         chkShowAllFactions.setName("chkShowAllFactions");
         chkShowAllFactions.setSelected(false);
 
-        gbc.gridx     = 1;
-        gbc.gridy     = y++;
+        gbc.gridx = 1;
+        gbc.gridy = y++;
         gbc.gridwidth = 2;
-        gbc.fill      = GridBagConstraints.HORIZONTAL;
-        gbc.anchor    = GridBagConstraints.WEST;
-        gbc.insets    = new Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
         descPanel.add(chkShowAllFactions, gbc);
         chkShowAllFactions.addActionListener(evt -> showAllFactions(chkShowAllFactions.isSelected()));
 
         lblPlanetName.setText(resourceMap.getString("lblPlanetName.text"));
         lblPlanetName.setName("lblPlanetName");
-        gbc.gridx     = 0;
-        gbc.gridy     = y;
+        gbc.gridx = 0;
+        gbc.gridy = y;
         gbc.gridwidth = 1;
-        gbc.anchor    = GridBagConstraints.WEST;
-        gbc.insets    = new Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
         descPanel.add(lblPlanetName, gbc);
 
         suggestPlanet = new JSuggestField(this, campaign.getSystemNames());
-        gbc.gridx     = 1;
-        gbc.gridy     = y++;
+        gbc.gridx = 1;
+        gbc.gridy = y++;
         gbc.gridwidth = 2;
-        gbc.fill      = GridBagConstraints.HORIZONTAL;
-        gbc.anchor    = GridBagConstraints.WEST;
-        gbc.insets    = new Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
         descPanel.add(suggestPlanet, gbc);
         descPanel.add(cbPlanets, gbc);
         suggestPlanet.setVisible(false);
@@ -278,30 +279,31 @@ public class NewAtBContractDialog extends NewContractDialog {
         chkShowAllPlanets.setName("chkShowAllPlanets");
         chkShowAllPlanets.setSelected(false);
 
-        gbc.gridx     = 1;
-        gbc.gridy     = y++;
+        gbc.gridx = 1;
+        gbc.gridy = y++;
         gbc.gridwidth = 2;
-        gbc.fill      = GridBagConstraints.HORIZONTAL;
-        gbc.anchor    = GridBagConstraints.WEST;
-        gbc.insets    = new Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
         descPanel.add(chkShowAllPlanets, gbc);
         chkShowAllPlanets.addActionListener(evt -> showAllPlanets(chkShowAllPlanets.isSelected()));
 
         lblType.setText(resourceMap.getString("lblType.text"));
         lblType.setName("lblType");
 
-        gbc.gridx     = 0;
-        gbc.gridy     = y;
+        gbc.gridx = 0;
+        gbc.gridy = y;
         gbc.gridwidth = 1;
-        gbc.anchor    = GridBagConstraints.WEST;
-        gbc.insets    = new Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
         descPanel.add(lblType, gbc);
 
         comboContractType = new MMComboBox<>("comboContractType", AtBContractType.values());
         comboContractType.setSelectedItem(contract.getContractType());
         comboContractType.setRenderer(new DefaultListCellRenderer() {
             @Override
-            public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index, final boolean isSelected, final boolean cellHasFocus) {
+            public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
+                  final boolean isSelected, final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof AtBContractType) {
                     list.setToolTipText(((AtBContractType) value).getToolTipText());
@@ -310,101 +312,101 @@ public class NewAtBContractDialog extends NewContractDialog {
             }
         });
 
-        gbc.gridx     = 1;
-        gbc.gridy     = y++;
+        gbc.gridx = 1;
+        gbc.gridy = y++;
         gbc.gridwidth = 2;
-        gbc.fill      = GridBagConstraints.HORIZONTAL;
-        gbc.anchor    = GridBagConstraints.WEST;
-        gbc.insets    = new Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
         descPanel.add(comboContractType, gbc);
 
         lblAllyRating.setText(resourceMap.getString("lblAllyRating.text"));
         lblEnemy.setName("lblAllyRating");
 
-        gbc.gridx     = 0;
-        gbc.gridy     = y;
+        gbc.gridx = 0;
+        gbc.gridy = y;
         gbc.gridwidth = 1;
-        gbc.anchor    = GridBagConstraints.WEST;
-        gbc.insets    = new Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
         descPanel.add(lblAllyRating, gbc);
 
         comboAllySkill.setSelectedItem(contract.getAllySkill());
 
-        gbc.gridx     = 1;
-        gbc.gridy     = y;
+        gbc.gridx = 1;
+        gbc.gridy = y;
         gbc.gridwidth = 1;
-        gbc.weightx   = 1.0;
-        gbc.fill      = GridBagConstraints.HORIZONTAL;
-        gbc.anchor    = GridBagConstraints.WEST;
-        gbc.insets    = new Insets(5, 5, 5, 5);
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
         descPanel.add(comboAllySkill, gbc);
 
         cbAllyQuality.setSelectedIndex(contract.getAllyQuality());
-        gbc.gridx     = 2;
-        gbc.gridy     = y++;
+        gbc.gridx = 2;
+        gbc.gridy = y++;
         gbc.gridwidth = 1;
-        gbc.fill      = GridBagConstraints.HORIZONTAL;
-        gbc.anchor    = GridBagConstraints.WEST;
-        gbc.insets    = new Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
         descPanel.add(cbAllyQuality, gbc);
 
         lblEnemyRating.setText(resourceMap.getString("lblEnemyRating.text"));
         lblEnemyRating.setName("lblAllyRating");
-        gbc.gridx     = 0;
-        gbc.gridy     = y;
+        gbc.gridx = 0;
+        gbc.gridy = y;
         gbc.gridwidth = 1;
-        gbc.anchor    = GridBagConstraints.WEST;
-        gbc.insets    = new Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
         descPanel.add(lblEnemyRating, gbc);
 
         comboEnemySkill.setSelectedItem(contract.getEnemySkill());
-        gbc.gridx     = 1;
-        gbc.gridy     = y;
+        gbc.gridx = 1;
+        gbc.gridy = y;
         gbc.gridwidth = 1;
-        gbc.weightx   = 1.0;
-        gbc.fill      = GridBagConstraints.HORIZONTAL;
-        gbc.anchor    = GridBagConstraints.WEST;
-        gbc.insets    = new Insets(5, 5, 5, 5);
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
         descPanel.add(comboEnemySkill, gbc);
 
         cbEnemyQuality.setSelectedIndex(contract.getEnemyQuality());
-        gbc.gridx     = 2;
-        gbc.gridy     = y++;
+        gbc.gridx = 2;
+        gbc.gridy = y++;
         gbc.gridwidth = 1;
-        gbc.fill      = GridBagConstraints.HORIZONTAL;
-        gbc.anchor    = GridBagConstraints.WEST;
-        gbc.insets    = new Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
         descPanel.add(cbEnemyQuality, gbc);
 
         lblShares.setText(resourceMap.getString("lblShares.text"));
         lblShares.setName("lblShares");
-        gbc.gridx     = 0;
-        gbc.gridy     = y;
+        gbc.gridx = 0;
+        gbc.gridy = y;
         gbc.gridwidth = 1;
-        gbc.anchor    = GridBagConstraints.WEST;
-        gbc.insets    = new Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
         descPanel.add(lblShares, gbc);
 
         spnShares.setName("spnShares");
-        gbc.gridx     = 1;
-        gbc.gridy     = y++;
+        gbc.gridx = 1;
+        gbc.gridy = y++;
         gbc.gridwidth = 1;
-        gbc.fill      = GridBagConstraints.HORIZONTAL;
-        gbc.anchor    = GridBagConstraints.WEST;
-        gbc.insets    = new Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
         descPanel.add(spnShares, gbc);
 
         txtDesc.setText(contract.getDescription());
         txtDesc.setPreferredSize(new Dimension(400, 200));
         txtDesc.setMinimumSize(new Dimension(400, 200));
-        gbc.gridx     = 0;
-        gbc.gridy     = y++;
+        gbc.gridx = 0;
+        gbc.gridy = y++;
         gbc.gridwidth = 3;
-        gbc.weightx   = 1.0;
-        gbc.weighty   = 1.0;
-        gbc.fill      = GridBagConstraints.BOTH;
-        gbc.anchor    = GridBagConstraints.NORTHWEST;
-        gbc.insets    = new Insets(5, 5, 5, 5);
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
         descPanel.add(txtDesc, gbc);
     }
 
@@ -488,10 +490,10 @@ public class NewAtBContractDialog extends NewContractDialog {
         if (chkShowAllPlanets.isSelected() || getCurrentEmployerCode() == null || getCurrentEnemyCode() == null) {
             return;
         }
-        AtBContract     contract = (AtBContract) this.contract;
-        HashSet<String> systems  = new HashSet<>();
+        AtBContract contract = (AtBContract) this.contract;
+        HashSet<String> systems = new HashSet<>();
         if (!contract.getContractType().isGarrisonType() ||
-            Factions.getInstance().getFaction(getCurrentEnemyCode()).isRebelOrPirate()) {
+                  Factions.getInstance().getFaction(getCurrentEnemyCode()).isRebelOrPirate()) {
             for (PlanetarySystem p : RandomFactionGenerator.getInstance()
                                            .getMissionTargetList(getCurrentEmployerCode(), getCurrentEnemyCode())) {
                 systems.add(p.getName(campaign.getLocalDate()));
@@ -499,7 +501,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         }
 
         if ((contract.getContractType().isGarrisonType() || contract.getContractType().isReliefDuty()) &&
-            !contract.getEnemy().isRebel()) {
+                  !contract.getEnemy().isRebel()) {
             for (PlanetarySystem p : RandomFactionGenerator.getInstance()
                                            .getMissionTargetList(getCurrentEnemyCode(), getCurrentEmployerCode())) {
                 systems.add(p.getName(campaign.getLocalDate()));
@@ -601,8 +603,8 @@ public class NewAtBContractDialog extends NewContractDialog {
     protected void doUpdateContract(Object source) {
         removeAllListeners();
 
-        boolean     needUpdatePayment = false;
-        AtBContract contract          = (AtBContract) this.contract;
+        boolean needUpdatePayment = false;
+        AtBContract contract = (AtBContract) this.contract;
         if (cbPlanets.equals(source) && null != cbPlanets.getSelectedItem()) {
             contract.setSystemId((Systems.getInstance()
                                         .getSystemByName((String) cbPlanets.getSelectedItem(),

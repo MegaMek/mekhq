@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -48,15 +53,15 @@ import mekhq.campaign.ResolveScenarioTracker;
 public class ChooseMulFilesDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(ChooseMulFilesDialog.class);
 
-    private ResolveScenarioTracker tracker;
+    private final ResolveScenarioTracker tracker;
 
     private JTextField txtUnitFile;
-    private boolean    cancelled;
+    private boolean cancelled;
 
     public ChooseMulFilesDialog(JFrame parent, boolean modal, ResolveScenarioTracker t) {
         super(parent, modal);
         this.tracker = t;
-        cancelled    = false;
+        cancelled = false;
         initComponents();
         setLocationRelativeTo(parent);
         setUserPreferences();
@@ -90,15 +95,15 @@ public class ChooseMulFilesDialog extends JDialog {
         txtInstructions.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(resourceMap.getString(
               "txtInstructions.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         txtInstructions.setPreferredSize(new Dimension(400, 200));
-        gridBagConstraints           = new GridBagConstraints();
-        gridBagConstraints.gridx     = 0;
-        gridBagConstraints.gridy     = 0;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.weightx   = 1.0;
-        gridBagConstraints.weighty   = 0.0;
-        gridBagConstraints.fill      = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor    = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets    = new Insets(5, 5, 0, 0);
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         getContentPane().add(txtInstructions, gridBagConstraints);
 
         JButton btnUnitFile = new JButton(resourceMap.getString("btnUnitFile.text"));
@@ -108,27 +113,27 @@ public class ChooseMulFilesDialog extends JDialog {
             tracker.findUnitFile();
             txtUnitFile.setText(tracker.getUnitFilePath());
         });
-        gridBagConstraints           = new GridBagConstraints();
-        gridBagConstraints.gridx     = 0;
-        gridBagConstraints.gridy     = 1;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor    = GridBagConstraints.WEST;
-        gridBagConstraints.insets    = new Insets(5, 5, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         getContentPane().add(btnUnitFile, gridBagConstraints);
 
         txtUnitFile = new JTextField(tracker.getUnitFilePath());
         txtUnitFile.setName("txtUnitFile");
         txtUnitFile.setEditable(false);
         txtUnitFile.setOpaque(false);
-        gridBagConstraints           = new GridBagConstraints();
-        gridBagConstraints.gridx     = 1;
-        gridBagConstraints.gridy     = 1;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx   = 1.0;
-        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor    = GridBagConstraints.WEST;
-        gridBagConstraints.insets    = new Insets(5, 5, 0, 0);
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         getContentPane().add(txtUnitFile, gridBagConstraints);
 
         JPanel panButtons = new JPanel();
@@ -139,36 +144,36 @@ public class ChooseMulFilesDialog extends JDialog {
         btnCancel.setName("btnClose");
         btnCancel.setMnemonic(KeyEvent.VK_C);
         btnCancel.addActionListener(e -> btnCancelActionPerformed());
-        gridBagConstraints           = new GridBagConstraints();
-        gridBagConstraints.gridx     = 0;
-        gridBagConstraints.gridy     = 0;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx   = 1.0;
-        gridBagConstraints.anchor    = GridBagConstraints.EAST;
-        gridBagConstraints.insets    = new Insets(5, 5, 0, 0);
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.anchor = GridBagConstraints.EAST;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         panButtons.add(btnCancel, gridBagConstraints);
 
         JButton btnNext = new JButton(resourceMap.getString("btnNext.text"));
         btnNext.setName("btnNext");
         btnNext.setMnemonic(KeyEvent.VK_O);
         btnNext.addActionListener(e -> btnNextActionPerformed());
-        gridBagConstraints           = new GridBagConstraints();
-        gridBagConstraints.gridx     = 1;
-        gridBagConstraints.gridy     = 0;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx   = 0;
-        gridBagConstraints.anchor    = GridBagConstraints.EAST;
-        gridBagConstraints.insets    = new Insets(5, 5, 0, 0);
+        gridBagConstraints.weightx = 0;
+        gridBagConstraints.anchor = GridBagConstraints.EAST;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         panButtons.add(btnNext, gridBagConstraints);
 
-        gridBagConstraints           = new GridBagConstraints();
-        gridBagConstraints.gridx     = 0;
-        gridBagConstraints.gridy     = 2;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.weightx   = 1.0;
-        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor    = GridBagConstraints.WEST;
-        gridBagConstraints.insets    = new Insets(5, 5, 0, 0);
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         getContentPane().add(panButtons, gridBagConstraints);
 
         pack();
@@ -176,11 +181,7 @@ public class ChooseMulFilesDialog extends JDialog {
 
     /**
      * These need to be migrated to the Suite Constants / Suite Options Setup
-     *
-     * @since 0.50.04
-     * @deprecated Move to Suite Constants / Suite Options Setup
      */
-    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ChooseMulFilesDialog.class);

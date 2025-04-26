@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel;
 
@@ -383,7 +388,7 @@ public class Person {
     }
 
     public Person(final String givenName, final String surname, final Campaign campaign) {
-        this(givenName, surname, campaign, campaign.getFactionCode());
+        this(givenName, surname, campaign, campaign.getFaction().getShortName());
     }
 
     public Person(final String givenName, final String surname, final @Nullable Campaign campaign,
@@ -3273,7 +3278,8 @@ public class Person {
 
                 campaign.addReport(String.format(resources.getString("ineligibleForPrimaryRole"),
                       spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
-                      CLOSING_SPAN_TAG, person.getHyperlinkedFullTitle()));
+                      CLOSING_SPAN_TAG,
+                      person.getHyperlinkedFullTitle()));
             }
 
             if (!person.canPerformRole(campaign.getLocalDate(), person.getSecondaryRole(), false)) {
@@ -3281,7 +3287,8 @@ public class Person {
 
                 campaign.addReport(String.format(resources.getString("ineligibleForSecondaryRole"),
                       spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor()),
-                      CLOSING_SPAN_TAG, person.getHyperlinkedFullTitle()));
+                      CLOSING_SPAN_TAG,
+                      person.getHyperlinkedFullTitle()));
             }
         } catch (Exception e) {
             logger.error(e, "Failed to read person {} from file", person.getFullName());

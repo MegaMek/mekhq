@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.menus;
 
@@ -201,8 +206,8 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                               .collect(Collectors.toList());
         } else if (isConventionalAircraft) {
             personnel = personnel.stream()
-                              .filter(person -> person.getPrimaryRole().isConventionalAirGrouping() ||
-                                                      person.getSecondaryRole().isConventionalAirGrouping())
+                              .filter(person -> person.getPrimaryRole().isConventionalAircraftPilot() ||
+                                                      person.getSecondaryRole().isConventionalAircraftPilot())
                               .collect(Collectors.toList());
         } else if (isAero) {
             personnel = personnel.stream()
@@ -249,9 +254,9 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                                               .collect(Collectors.toList());
                 } else if (isConventionalAircraft) {
                     filteredPersonnel = personnel.stream()
-                                              .filter(person -> person.getPrimaryRole().isConventionalAirGrouping() ||
+                                              .filter(person -> person.getPrimaryRole().isConventionalAircraftPilot() ||
                                                                       person.getSecondaryRole()
-                                                                            .isConventionalAirGrouping())
+                                                                            .isConventionalAircraftPilot())
                                               .collect(Collectors.toList());
                 } else if (isAero) {
                     filteredPersonnel = personnel.stream()
@@ -295,7 +300,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                             skillLevel = person.getSkillLevel(campaign, !person.getPrimaryRole().isVesselPilot());
                         } else if (isConventionalAircraft) {
                             skillLevel = person.getSkillLevel(campaign,
-                                  !person.getPrimaryRole().isConventionalAirGrouping());
+                                  !person.getPrimaryRole().isConventionalAircraftPilot());
                         } else if (isAero) {
                             skillLevel = person.getSkillLevel(campaign, !person.getPrimaryRole().isAerospaceGrouping());
                         } else { // it's a VTOL

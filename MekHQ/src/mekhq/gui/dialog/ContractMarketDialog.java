@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -81,38 +86,38 @@ public class ContractMarketDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(ContractMarketDialog.class);
 
     /* Save these settings between instantiations */
-    private static boolean payMRBC      = true;
-    private static int     advance      = 25;
-    private static int     signingBonus = 0;
-    private static int     sharePct     = 20;
+    private static boolean payMRBC = true;
+    private static int advance = 25;
+    private static int signingBonus = 0;
+    private static int sharePct = 20;
 
-    private Campaign               campaign;
+    private Campaign campaign;
     private AbstractContractMarket contractMarket;
-    private Contract               selectedContract = null;
-    private List<String>           possibleRetainerContracts;
+    private Contract selectedContract = null;
+    private List<String> possibleRetainerContracts;
 
-    private JScrollPane          scrollContractView;
+    private JScrollPane scrollContractView;
     private ContractSummaryPanel contractView;
 
-    private JCheckBox       chkMRBC;
-    private JSpinner        spnSigningBonus;
-    private JSpinner        spnAdvance;
-    private JSpinner        spnSharePct;
-    private JTable          tableContracts;
-    private JLabel          lblCurrentRetainer;
-    private JLabel          lblRetainerEmployer;
-    private JButton         btnEndRetainer;
-    private JLabel          lblRetainerAvailable;
+    private JCheckBox chkMRBC;
+    private JSpinner spnSigningBonus;
+    private JSpinner spnAdvance;
+    private JSpinner spnSharePct;
+    private JTable tableContracts;
+    private JLabel lblCurrentRetainer;
+    private JLabel lblRetainerEmployer;
+    private JButton btnEndRetainer;
+    private JLabel lblRetainerAvailable;
     private FactionComboBox cbRetainerEmployer;
-    private JButton         btnStartRetainer;
+    private JButton btnStartRetainer;
 
     final static ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractMarketDialog",
           MekHQ.getMHQOptions().getLocale());
 
     public ContractMarketDialog(final JFrame frame, final Campaign campaign) {
         super(frame, true);
-        this.campaign             = campaign;
-        contractMarket            = campaign.getContractMarket();
+        this.campaign = campaign;
+        contractMarket = campaign.getContractMarket();
         possibleRetainerContracts = new ArrayList<>();
         if (campaign.getFaction().isMercenary()) {
             countSuccessfulContracts();
@@ -145,15 +150,15 @@ public class ContractMarketDialog extends JDialog {
     private void initComponents() {
         JScrollPane scrollTableContracts = new JScrollPaneWithSpeed();
         scrollContractView = new JScrollPaneWithSpeed();
-        JPanel panelTable    = new JPanel();
-        JPanel panelFees     = new JPanel();
+        JPanel panelTable = new JPanel();
+        JPanel panelFees = new JPanel();
         JPanel panelRetainer = new JPanel();
-        JPanel panelOKBtns   = new JPanel();
+        JPanel panelOKBtns = new JPanel();
         contractView = null;
         JButton btnGenerate = new JButton();
-        JButton btnRemove   = new JButton();
-        JButton btnAccept   = new JButton();
-        JButton btnClose    = new JButton();
+        JButton btnRemove = new JButton();
+        JButton btnAccept = new JButton();
+        JButton btnClose = new JButton();
 
         chkMRBC = new JCheckBox();
         chkMRBC.addItemListener(evt -> {
@@ -197,8 +202,8 @@ public class ContractMarketDialog extends JDialog {
             sharePct = (Integer) spnSharePct.getValue();
             for (Contract c : contractMarket.getContracts()) {
                 if (campaign.getCampaignOptions().isUseAtB() &&
-                    campaign.getCampaignOptions().isUseShareSystem() &&
-                    c instanceof AtBContract) {
+                          campaign.getCampaignOptions().isUseShareSystem() &&
+                          c instanceof AtBContract) {
                     ((AtBContract) c).setAtBSharesPercent(sharePct);
                     c.calculateContract(campaign);
                 }
@@ -208,12 +213,12 @@ public class ContractMarketDialog extends JDialog {
             }
         });
 
-        lblCurrentRetainer   = new JLabel();
-        lblRetainerEmployer  = new JLabel();
-        btnEndRetainer       = new JButton();
+        lblCurrentRetainer = new JLabel();
+        lblRetainerEmployer = new JLabel();
+        btnEndRetainer = new JButton();
         lblRetainerAvailable = new JLabel();
-        cbRetainerEmployer   = new FactionComboBox();
-        btnStartRetainer     = new JButton();
+        cbRetainerEmployer = new FactionComboBox();
+        btnStartRetainer = new JButton();
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(resourceMap.getString("Form.title"));
@@ -340,10 +345,10 @@ public class ContractMarketDialog extends JDialog {
         GridBagConstraints gbc = new GridBagConstraints();
 
         lblCurrentRetainer.setText(resourceMap.getString("lblCurrentRetainer.text"));
-        gbc.gridx  = 0;
-        gbc.gridy  = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.fill   = GridBagConstraints.NONE;
+        gbc.fill = GridBagConstraints.NONE;
         panelRetainer.add(lblCurrentRetainer, gbc);
         if (null != campaign.getRetainerEmployerCode()) {
             lblRetainerEmployer.setText(Factions.getInstance()
@@ -479,11 +484,7 @@ public class ContractMarketDialog extends JDialog {
 
     /**
      * These need to be migrated to the Suite Constants / Suite Options Setup
-     *
-     * @since 0.50.04
-     * @deprecated Move to Suite Constants / Suite Options Setup
      */
-    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ContractMarketDialog.class);
@@ -603,7 +604,7 @@ public class ContractMarketDialog extends JDialog {
         textPane.setEditable(false);
 
         // Create a panel to display the icon and the message
-        JPanel panel      = new JPanel(new BorderLayout());
+        JPanel panel = new JPanel(new BorderLayout());
         JLabel imageLabel = new JLabel(icon);
         panel.add(imageLabel, BorderLayout.CENTER);
         panel.add(textPane, BorderLayout.SOUTH);
@@ -623,8 +624,8 @@ public class ContractMarketDialog extends JDialog {
 
         // Create a refuse button and add its action listener.
         // When clicked, it will trigger a refusal confirmation dialog
-        String  refusalOption = resourceMap.getString("responseReturn.text");
-        JButton refuseButton  = new JButton(refusalOption);
+        String refusalOption = resourceMap.getString("responseReturn.text");
+        JButton refuseButton = new JButton(refusalOption);
         refuseButton.addActionListener(e -> {
             result[0] = false;
             dialog.dispose();
@@ -688,8 +689,8 @@ public class ContractMarketDialog extends JDialog {
         contractView = new ContractSummaryPanel(selectedContract,
               campaign,
               campaign.getCampaignOptions().isUseAtB() &&
-              selectedContract instanceof AtBContract &&
-              !((AtBContract) selectedContract).isSubcontract());
+                    selectedContract instanceof AtBContract &&
+                    !((AtBContract) selectedContract).isSubcontract());
         scrollContractView.setViewportView(contractView);
         // This odd code is to make sure that the scrollbar stays at the top
         // I can't just call it here, because it ends up getting reset somewhere later

@@ -27,11 +27,6 @@
  */
 package mekhq.campaign.randomEvents.personalities.enums;
 
-import megamek.common.enums.Gender;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Person;
-import org.junit.jupiter.api.Test;
-
 import static mekhq.campaign.randomEvents.personalities.enums.Social.ENCOURAGING;
 import static mekhq.campaign.randomEvents.personalities.enums.Social.FRIENDLY;
 import static mekhq.campaign.randomEvents.personalities.enums.Social.MAXIMUM_VARIATIONS;
@@ -40,6 +35,13 @@ import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import megamek.common.enums.Gender;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.universe.Faction;
+import org.junit.jupiter.api.Test;
 
 public class SocialTest {
     @Test
@@ -87,6 +89,10 @@ public class SocialTest {
     @Test
     public void testGetDescription_notInvalid() {
         Campaign campaign = mock(Campaign.class);
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(campaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(campaign);
 
