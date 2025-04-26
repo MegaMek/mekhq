@@ -29,6 +29,8 @@ package mekhq.campaign.market.contractMarket;
 
 import static megamek.common.Compute.d6;
 import static megamek.common.enums.SkillLevel.REGULAR;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
+import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_NETWORKER;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 
 import java.time.format.DateTimeFormatter;
@@ -49,6 +51,7 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.rating.IUnitRating;
@@ -108,8 +111,18 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         int ratingMod = campaign.getReputation().getReputationModifier();
         HiringHallModifiers hiringHallModifiers = getHiringHallModifiers(campaign);
         int negotiationSkill = findNegotiationSkill(campaign);
+
+        Person negotiator = campaign.getSeniorAdminPerson(COMMAND);
+        int negotiatorModifier = 0;
+        if (negotiator != null) {
+            PersonnelOptions options = negotiator.getOptions();
+            if (options.booleanOption(ADMIN_NETWORKER)) {
+                negotiatorModifier++;
+            }
+        }
+
         int numOffers = getNumberOfOffers(rollNegotiation(negotiationSkill, ratingMod + hiringHallModifiers.offersMod) -
-                                                BASE_NEGOTIATION_TARGET);
+                BASE_NEGOTIATION_TARGET) + negotiatorModifier;
 
         if (isGrayMonday) {
             for (int i = 0; i < numOffers; i++) {

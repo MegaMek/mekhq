@@ -108,6 +108,9 @@ public class PersonnelOptions extends PilotOptions {
     public static final String ADMIN_MEDIATOR = "admin_mediator";
     public static final String ADMIN_LOGISTICIAN = "admin_logistician";
     public static final String ADMIN_COORDINATOR = "admin_coordinator";
+    public static final String ADMIN_TETRIS_MASTER = "admin_tetris_master";
+    public static final String ADMIN_NETWORKER = "admin_networker";
+    public static final String ADMIN_INTERSTELLAR_NEGOTIATOR = "admin_interstellar_negotiator";
 
     @Override
     public void initialize() {
@@ -196,6 +199,9 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, ADMIN_MEDIATOR, false);
         addOption(l3a, ADMIN_LOGISTICIAN, false);
         addOption(l3a, ADMIN_COORDINATOR, false);
+        addOption(l3a, ADMIN_TETRIS_MASTER, false);
+        addOption(l3a, ADMIN_NETWORKER, false);
+        addOption(l3a, ADMIN_INTERSTELLAR_NEGOTIATOR, false);
 
         addOption(edge, EDGE_MEDICAL, true);
         addOption(edge, EDGE_REPAIR_BREAK_PART, true);

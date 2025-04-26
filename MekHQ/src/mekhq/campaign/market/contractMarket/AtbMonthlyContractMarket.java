@@ -38,6 +38,7 @@ import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 import static mekhq.campaign.mission.AtBContract.getEffectiveNumUnits;
+import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_NETWORKER;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 
 import java.time.format.DateTimeFormatter;
@@ -57,8 +58,7 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.rating.IUnitRating;
@@ -123,7 +123,16 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                 return;
             }
 
-            int numContracts = d6() - 4 + unitRatingMod;
+            Person negotiator = campaign.getSeniorAdminPerson(COMMAND);
+            int negotiatorModifier = 0;
+            if (negotiator != null) {
+                PersonnelOptions options = negotiator.getOptions();
+                if (options.booleanOption(ADMIN_NETWORKER)) {
+                    negotiatorModifier++;
+                }
+            }
+
+            int numContracts = d6() - 4 + unitRatingMod + negotiatorModifier;
 
             if (newCampaign) {
                 // For a similar reason as previously stated, we want the user to be able to jump into the action off

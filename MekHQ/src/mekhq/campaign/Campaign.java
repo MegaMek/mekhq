@@ -52,6 +52,7 @@ import static mekhq.campaign.mission.resupplyAndCaches.Resupply.isProhibitedUnit
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.processAbandonedConvoy;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
 import static mekhq.campaign.personnel.DiscretionarySpending.performDiscretionarySpending;
+import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_INTERSTELLAR_NEGOTIATOR;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_LOGISTICIAN;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_SCROUNGE;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
@@ -7157,6 +7158,14 @@ public class Campaign implements ITechManager {
             }
 
             totalCost = totalCost.plus(ownDropshipCost).plus(ownJumpshipCost);
+        }
+
+        Person negotiator = getSeniorAdminPerson(AdministratorSpecialization.TRANSPORT);
+        if (negotiator != null) {
+            PersonnelOptions options = negotiator.getOptions();
+            if (options.booleanOption(ADMIN_INTERSTELLAR_NEGOTIATOR) && totalCost.isPositive()) {
+                totalCost = totalCost.multipliedBy(0.15);
+            }
         }
 
         return totalCost;

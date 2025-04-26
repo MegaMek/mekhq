@@ -462,6 +462,42 @@
 
     <!-- Misc SPA -->
     <ability>
+        <lookupName>admin_interstellar_negotiator</lookupName>
+        <displayName>Interstellar Negotiator (Unofficial)</displayName>
+        <desc><![CDATA[No matter who's in charge, this character always has a way of bringing down the price.
+
+If this character is the senior-most Admin/Transport character, the cost of interstellar travel is reduced by 15%]]></desc>
+        <xpCost>100</xpCost>
+        <weight>1</weight>
+        <skillPrereq>
+            <skill>Administration::Veteran</skill>
+        </skillPrereq>
+    </ability>
+    <ability>
+        <lookupName>admin_networker</lookupName>
+        <displayName>Networker (Unofficial)</displayName>
+        <desc><![CDATA[This character knows people in high places.
+
+If this character is the senior-most Admin/Command character, the number of contracts offered each month is increased by 1 (may still be 0).]]></desc>
+        <xpCost>200</xpCost>
+        <weight>1</weight>
+        <skillPrereq>
+            <skill>Administration::Elite</skill>
+        </skillPrereq>
+    </ability>
+    <ability>
+        <lookupName>admin_tetris_master</lookupName>
+        <displayName>Tetris Master (Unofficial)</displayName>
+        <desc><![CDATA[This character has mastered the subtle art of stacking cargo boxes.
+
+The campaign's cargo capacity is increased by 5% per character with this SPA.]]></desc>
+        <xpCost>100</xpCost>
+        <weight>1</weight>
+        <skillPrereq>
+            <skill>Administration::Regular</skill>
+        </skillPrereq>
+    </ability>
+    <ability>
         <lookupName>admin_coordinator</lookupName>
         <displayName>Coordinator (Unofficial)</displayName>
         <desc><![CDATA[This character is exceptionally skilled at liaising with allied forces, ensuring reinforcements arrive where they're needed.
@@ -469,7 +505,9 @@
 If this character is the senior Admin/Command character, the reinforcement target number is reduced by 1.]]></desc>
         <xpCost>100</xpCost>
         <weight>1</weight>
-        <skillPrereq/>
+        <skillPrereq>
+            <skill>Administration::Veteran</skill>
+        </skillPrereq>
     </ability>
     <ability>
         <lookupName>admin_logistician</lookupName>
@@ -479,7 +517,9 @@ If this character is the senior Admin/Command character, the reinforcement targe
 Parts procured by this character have their delivery time reduced by 10%]]></desc>
         <xpCost>50</xpCost>
         <weight>1</weight>
-        <skillPrereq/>
+        <skillPrereq>
+            <skill>Administration::Veteran</skill>
+        </skillPrereq>
     </ability>
     <ability>
         <lookupName>admin_mediator</lookupName>
@@ -489,7 +529,9 @@ Parts procured by this character have their delivery time reduced by 10%]]></des
 This character's Administration skill is increased by 1 when calculating the campaign's Admin Capacity.]]></desc>
         <xpCost>50</xpCost>
         <weight>1</weight>
-        <skillPrereq/>
+        <skillPrereq>
+            <skill>Administration::Regular</skill>
+        </skillPrereq>
     </ability>
     <ability>
         <lookupName>admin_scrounge</lookupName>
@@ -499,7 +541,9 @@ This character's Administration skill is increased by 1 when calculating the cam
 They can make one additional procurement attempt per day.]]></desc>
         <xpCost>200</xpCost>
         <weight>1</weight>
-        <skillPrereq/>
+        <skillPrereq>
+            <skill>Administration::Elite</skill>
+        </skillPrereq>
     </ability>
     <ability>
         <lookupName>atow_alternate_id</lookupName>
