@@ -47,6 +47,7 @@ import java.util.List;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.Test;
 
 class RandomDependentsTest {
@@ -57,6 +58,10 @@ class RandomDependentsTest {
 
         // Setup
         Campaign mockCampaign = mock(Campaign.class);
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
@@ -99,6 +104,10 @@ class RandomDependentsTest {
 
         // Setup
         Campaign mockCampaign = mock(Campaign.class);
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);

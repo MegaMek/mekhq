@@ -49,6 +49,7 @@ import mekhq.campaign.personnel.enums.RandomMarriageMethod;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
+import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -447,6 +448,9 @@ public class AbstractMarriageTest {
     @Test
     public void testMarry() {
         doCallRealMethod().when(mockMarriage).marry(any(), any(), any(), any(), any(), anyBoolean());
+        Faction campaignFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         when(mockCampaign.getRankSystem()).thenReturn(mock(RankSystem.class));
         doNothing().when(mockCampaign).addReport(any());
@@ -517,8 +521,8 @@ public class AbstractMarriageTest {
         mockMarriage.marryRandomSpouse(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, true, true, true);
 
         // Replace AbstractMarriage::isPotentialRandomSpouse with this simple gender comparison
-        doAnswer(invocation -> invocation.getArgument(3, Person.class).getGender() == invocation.getArgument(4))
-                .when(mockMarriage).isPotentialRandomSpouse(any(), any(), any(), any(), any());
+        doAnswer(invocation -> invocation.getArgument(3, Person.class).getGender() == invocation.getArgument(4)).when(
+              mockMarriage).isPotentialRandomSpouse(any(), any(), any(), any(), any());
 
         // Same-sex, Female: Expect marry to be called with mockFemale as the spouse
         doAnswer(invocation -> {
@@ -566,33 +570,54 @@ public class AbstractMarriageTest {
         final Person mockPotentialSpouse = mock(Person.class);
         when(mockPotentialSpouse.getGender()).thenReturn(Gender.MALE);
 
-        assertFalse(mockMarriage.isPotentialRandomSpouse(mockCampaign, LocalDate.ofYearDay(3025, 1),
-                mockPerson, mockPotentialSpouse, Gender.FEMALE));
+        assertFalse(mockMarriage.isPotentialRandomSpouse(mockCampaign,
+              LocalDate.ofYearDay(3025, 1),
+              mockPerson,
+              mockPotentialSpouse,
+              Gender.FEMALE));
 
         when(mockMarriage.safeSpouse(any(), any(), any(), any(), anyBoolean())).thenReturn(false);
-        assertFalse(mockMarriage.isPotentialRandomSpouse(mockCampaign, LocalDate.ofYearDay(3025, 1),
-                mockPerson, mockPotentialSpouse, Gender.MALE));
+        assertFalse(mockMarriage.isPotentialRandomSpouse(mockCampaign,
+              LocalDate.ofYearDay(3025, 1),
+              mockPerson,
+              mockPotentialSpouse,
+              Gender.MALE));
 
         when(mockMarriage.safeSpouse(any(), any(), any(), any(), anyBoolean())).thenReturn(true);
         when(mockPotentialSpouse.getAge(any())).thenReturn(20);
-        assertFalse(mockMarriage.isPotentialRandomSpouse(mockCampaign, LocalDate.ofYearDay(3025, 1),
-                mockPerson, mockPotentialSpouse, Gender.MALE));
+        assertFalse(mockMarriage.isPotentialRandomSpouse(mockCampaign,
+              LocalDate.ofYearDay(3025, 1),
+              mockPerson,
+              mockPotentialSpouse,
+              Gender.MALE));
 
         when(mockPotentialSpouse.getAge(any())).thenReturn(25);
-        assertTrue(mockMarriage.isPotentialRandomSpouse(mockCampaign, LocalDate.ofYearDay(3025, 1),
-                mockPerson, mockPotentialSpouse, Gender.MALE));
+        assertTrue(mockMarriage.isPotentialRandomSpouse(mockCampaign,
+              LocalDate.ofYearDay(3025, 1),
+              mockPerson,
+              mockPotentialSpouse,
+              Gender.MALE));
 
         when(mockPotentialSpouse.getAge(any())).thenReturn(35);
-        assertTrue(mockMarriage.isPotentialRandomSpouse(mockCampaign, LocalDate.ofYearDay(3025, 1),
-                mockPerson, mockPotentialSpouse, Gender.MALE));
+        assertTrue(mockMarriage.isPotentialRandomSpouse(mockCampaign,
+              LocalDate.ofYearDay(3025, 1),
+              mockPerson,
+              mockPotentialSpouse,
+              Gender.MALE));
 
         when(mockPotentialSpouse.getAge(any())).thenReturn(45);
-        assertTrue(mockMarriage.isPotentialRandomSpouse(mockCampaign, LocalDate.ofYearDay(3025, 1),
-                mockPerson, mockPotentialSpouse, Gender.MALE));
+        assertTrue(mockMarriage.isPotentialRandomSpouse(mockCampaign,
+              LocalDate.ofYearDay(3025, 1),
+              mockPerson,
+              mockPotentialSpouse,
+              Gender.MALE));
 
         when(mockPotentialSpouse.getAge(any())).thenReturn(50);
-        assertFalse(mockMarriage.isPotentialRandomSpouse(mockCampaign, LocalDate.ofYearDay(3025, 1),
-                mockPerson, mockPotentialSpouse, Gender.MALE));
+        assertFalse(mockMarriage.isPotentialRandomSpouse(mockCampaign,
+              LocalDate.ofYearDay(3025, 1),
+              mockPerson,
+              mockPotentialSpouse,
+              Gender.MALE));
     }
     //endregion Random Marriage
     //endregion New Day
