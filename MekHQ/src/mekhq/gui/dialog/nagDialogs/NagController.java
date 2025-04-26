@@ -36,6 +36,7 @@ import java.util.List;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.finances.Finances;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -134,6 +135,17 @@ public class NagController {
             UnableToAffordLoanPaymentNagDialog unableToAffordLoanPaymentNagDialog = new UnableToAffordLoanPaymentNagDialog(
                   campaign);
             if (unableToAffordLoanPaymentNagDialog.shouldCancelAdvanceDay()) {
+                return true;
+            }
+        }
+
+        // Unable to afford all items on shopping list
+        final Money totalBuyCost = campaign.getShoppingList().getTotalBuyCost();
+        final Money currentFunds = campaign.getFunds();
+        if (UnableToAffordShoppingListNagDialog.checkNag(totalBuyCost, currentFunds)) {
+            UnableToAffordShoppingListNagDialog unableToAffordShoppingListNagDialog = new UnableToAffordShoppingListNagDialog(
+                  campaign);
+            if (unableToAffordShoppingListNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
         }
