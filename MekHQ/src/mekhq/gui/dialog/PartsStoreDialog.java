@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -113,7 +118,7 @@ public class PartsStoreDialog extends JDialog {
     }
 
     public PartsStoreDialog(final JFrame frame, final boolean modal, final CampaignGUI gui, final Campaign campaign,
-                            final boolean add) {
+          final boolean add) {
         super(frame, modal);
         this.campaignGUI = gui;
         this.campaign = campaign;
@@ -368,11 +373,7 @@ public class PartsStoreDialog extends JDialog {
 
     /**
      * These need to be migrated to the Suite Constants / Suite Options Setup
-     *
-     * @since 0.50.04
-     * @deprecated Move to Suite Constants / Suite Options Setup
      */
-    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(PartsStoreDialog.class);
@@ -954,20 +955,6 @@ public class PartsStoreDialog extends JDialog {
             return data.get(row).getPart();
         }
 
-        /**
-         * @since 0.50.04
-         * @deprecated no indicated uses
-         */
-        @Deprecated(since = "0.50.04", forRemoval = true)
-        public Part[] getPartstAt(int[] rows) {
-            Part[] parts = new Part[rows.length];
-            for (int i = 0; i < rows.length; i++) {
-                int row = rows[i];
-                parts[i] = data.get(row).getPart();
-            }
-            return parts;
-        }
-
         public int getColumnWidth(int c) {
             return switch (c) {
                 case COL_NAME, COL_DETAIL -> 100;
@@ -1005,7 +992,7 @@ public class PartsStoreDialog extends JDialog {
         public class Renderer extends DefaultTableCellRenderer {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                                                           boolean hasFocus, int row, int column) {
+                  boolean hasFocus, int row, int column) {
                 super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 setOpaque(true);
                 int actualCol = table.convertColumnIndexToModel(column);

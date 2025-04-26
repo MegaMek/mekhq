@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign;
 
@@ -39,24 +44,25 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
-import java.util.*;
-
-import megamek.common.Bay;
-import mekhq.campaign.enums.CampaignTransportType;
-import mekhq.campaign.unit.AbstractTransportedUnitsSummary;
-import org.apache.logging.log4j.LogManager;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.UUID;
 
 import megamek.common.Dropship;
 import megamek.common.EquipmentType;
 import megamek.common.enums.SkillLevel;
+import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.unit.AbstractTransportedUnitsSummary;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Systems;
+import org.apache.logging.log4j.LogManager;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
@@ -143,7 +149,7 @@ public class CampaignTest {
 
         Campaign testCampaign = mock(Campaign.class);
         when(testCampaign.getPersonnel()).thenReturn(testPersonList);
-        when(testCampaign.getActivePersonnel()).thenReturn(testActivePersonList);
+        when(testCampaign.getActivePersonnel(true)).thenReturn(testActivePersonList);
         when(testCampaign.getTechs()).thenCallRealMethod();
         when(testCampaign.getTechs(anyBoolean())).thenCallRealMethod();
         when(testCampaign.getTechs(anyBoolean(), anyBoolean())).thenCallRealMethod();

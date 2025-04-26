@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -61,7 +66,7 @@ import mekhq.campaign.personnel.SpecialAbility;
 public class EditSpecialAbilityDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(EditSpecialAbilityDialog.class);
 
-    private SpecialAbility ability;
+    private final SpecialAbility ability;
 
     private JButton btnClose;
     private JButton btnOK;
@@ -78,7 +83,7 @@ public class EditSpecialAbilityDialog extends JDialog {
     private Vector<String> invalidAbilities;
     private Vector<String> removeAbilities;
 
-    private Map<String, SpecialAbility> allSPAs;
+    private final Map<String, SpecialAbility> allSPAs;
 
     private JLabel lblPrerequisiteAbility;
     private JLabel lblInvalidAbility;
@@ -405,11 +410,7 @@ public class EditSpecialAbilityDialog extends JDialog {
 
     /**
      * These need to be migrated to the Suite Constants / Suite Options Setup
-     *
-     * @since 0.50.04
-     * @deprecated Move to Suite Constants / Suite Options Setup
      */
-    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditSpecialAbilityDialog.class);
@@ -426,53 +427,18 @@ public class EditSpecialAbilityDialog extends JDialog {
         return allSPAs;
     }
 
-    /**
-     * @since 0.50.04
-     * @deprecated No indicated uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void setAllSPAs(Map<String, SpecialAbility> allSPAs) {
-        this.allSPAs = allSPAs;
-    }
-
     public Vector<String> getPrerequisiteAbilities() {
         return prerequisiteAbilities;
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated No indicated uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void setPrerequisiteAbilities(Vector<String> prerequisiteAbilities) {
-        this.prerequisiteAbilities = prerequisiteAbilities;
     }
 
     public Vector<String> getInvalidAbilities() {
         return invalidAbilities;
     }
 
-    /**
-     * @since 0.50.04
-     * @deprecated No indicated uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void setInvalidAbilities(Vector<String> invalidAbilities) {
-        this.invalidAbilities = invalidAbilities;
-    }
-
     public Vector<String> getRemoveAbilities() {
         return removeAbilities;
     }
 
-    /**
-     * @since 0.50.04
-     * @deprecated No indicated uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void setRemoveAbilities(Vector<String> removeAbilities) {
-        this.removeAbilities = removeAbilities;
-    }
     // endregion Getters/Setters
 
     private void edit() {

@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts.equipment;
 
@@ -58,17 +63,18 @@ import org.w3c.dom.NodeList;
 public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     private static final MMLogger logger = MMLogger.create(AmmoBin.class);
 
-    protected int     shotsNeeded;
+    protected int shotsNeeded;
     protected boolean oneShot;
 
     public AmmoBin() {
         this(0, null, -1, 0, false, false, null);
     }
 
-    public AmmoBin(int tonnage, @Nullable AmmoType et, int equipNum, int shotsNeeded, boolean singleShot, boolean omniPodded, @Nullable Campaign c) {
+    public AmmoBin(int tonnage, @Nullable AmmoType et, int equipNum, int shotsNeeded, boolean singleShot,
+          boolean omniPodded, @Nullable Campaign c) {
         super(tonnage, et, equipNum, 1.0, omniPodded, c);
         this.shotsNeeded = shotsNeeded;
-        this.oneShot     = singleShot;
+        this.oneShot = singleShot;
         if (name != null) {
             this.name += " Bin";
         }
@@ -100,8 +106,8 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     @Override
     public String getLocationName() {
         if (unit != null &&
-            unit.getEntity() instanceof Aero &&
-            !((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))) {
+                  unit.getEntity() instanceof Aero &&
+                  !((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))) {
             return "Fuselage";
         }
         return super.getLocationName();
@@ -110,8 +116,8 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     @Override
     public int getLocation() {
         if (unit != null &&
-            unit.getEntity() instanceof Aero &&
-            !((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))) {
+                  unit.getEntity() instanceof Aero &&
+                  !((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))) {
             return Aero.LOC_NONE;
         }
         return super.getLocation();
@@ -201,8 +207,8 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
 
     public void changeMunition(final AmmoType type) {
-        this.type     = type;
-        this.name     = type.getName();
+        this.type = type;
+        this.name = type.getName();
         this.typeName = type.getInternalName();
         updateConditionFromEntity(false);
     }
@@ -245,15 +251,6 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         }
 
         super.loadFieldsFromXmlNode(wn);
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated - No indicated uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public EnumSet<AmmoType.Munitions> getMunitionType() {
-        return getType().getMunitionType();
     }
 
     @Override
@@ -350,15 +347,15 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     @Override
     public String find(int transitDays) {
         return "<font color='" +
-               MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
-               "'> You shouldn't be here (AmmoBin.find()).</font>";
+                     MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                     "'> You shouldn't be here (AmmoBin.find()).</font>";
     }
 
     @Override
     public String failToFind() {
         return "<font color='" +
-               MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
-               "'> You shouldn't be here (AmmoBin.failToFind()).</font>";
+                     MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                     "'> You shouldn't be here (AmmoBin.failToFind()).</font>";
     }
 
     public void unload() {
@@ -369,8 +366,8 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         // some AmmoStorage instead if we implement customization of these units
         int shots = getFullShots() - shotsNeeded;
 
-        Mounted<?> mounted  = getMounted();
-        AmmoType   ammoType = (mounted != null) ? ((AmmoType) mounted.getType()) : getType();
+        Mounted<?> mounted = getMounted();
+        AmmoType ammoType = (mounted != null) ? ((AmmoType) mounted.getType()) : getType();
         if (mounted != null) {
             shots = mounted.getBaseShotsLeft();
             mounted.setShotsLeft(0);
@@ -490,9 +487,9 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         // AmmoType and number of rounds of ammo (i.e. they are the same
         // irrespective of "munition type" or "bomb type").
         return (getClass() == part.getClass()) &&
-            ((getType().isCompatibleWith(((AmmoBin) part).getType())) ||
-                   (getType().equals(((AmmoBin) part).getType()))) &&
-            (((AmmoBin) part).getFullShots() == getFullShots());
+                     ((getType().isCompatibleWith(((AmmoBin) part).getType())) ||
+                            (getType().equals(((AmmoBin) part).getType()))) &&
+                     (((AmmoBin) part).getFullShots() == getFullShots());
     }
 
     @Override
@@ -507,15 +504,15 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         }
 
         return "<html>" +
-               "<b>Reload " +
-               getName() +
-               "</b><br/>" +
-               getDetails() +
-               "<br/>" +
-               getTimeLeft() +
-               " minutes" +
-               (null != getTech() ? " (scheduled) " : "") +
-               "</html>";
+                     "<b>Reload " +
+                     getName() +
+                     "</b><br/>" +
+                     getDetails() +
+                     "<br/>" +
+                     getTimeLeft() +
+                     " minutes" +
+                     (null != getTech() ? " (scheduled) " : "") +
+                     "</html>";
     }
 
     @Override
@@ -529,8 +526,8 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
             return super.getDetails(includeRepairDetails);
         }
         if (null != unit) {
-            int           shotsAvailable = getAmountAvailable();
-            PartInventory inventories    = campaign.getPartInventory(getNewPart());
+            int shotsAvailable = getAmountAvailable();
+            PartInventory inventories = campaign.getPartInventory(getNewPart());
 
             StringBuilder toReturn = new StringBuilder();
             toReturn.append(getType().getDesc())
@@ -646,7 +643,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
             target.addModifier(campaign.getCampaignOptions().getIsAcquisitionPenalty(), "Inner Sphere tech");
         }
         // availability mod
-        int avail           = getAvailability();
+        int avail = getAvailability();
         int availabilityMod = Availability.getAvailabilityModifier(avail);
         target.addModifier(availabilityMod, "availability (" + ITechnology.getRatingName(avail) + ")");
         return target;

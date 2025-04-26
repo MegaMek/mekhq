@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission.atb.scenario;
 
@@ -54,7 +59,7 @@ import mekhq.campaign.universe.Factions;
 
 @AtBScenarioEnabled
 public class StarLeagueCache1BuiltInScenario extends AtBScenario {
-    private static String TECH_FORCE_ID = "Tech";
+    private static final String TECH_FORCE_ID = "Tech";
 
     @Override
     public boolean isSpecialScenario() {
@@ -104,7 +109,7 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
 
     @Override
     public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
-            ArrayList<Entity> enemyEntities) {
+          ArrayList<Entity> enemyEntities) {
         setStartingPos(Board.START_CENTER);
         int enemyStart = Board.START_N;
 
@@ -115,8 +120,11 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
                 enemyEntities = new ArrayList<>();
                 for (int i = 0; i < 3; i++) {
                     enemyEntities.add(getEntity(getContract(campaign).getEnemyCode(),
-                            getContract(campaign).getEnemySkill(),
-                            getContract(campaign).getEnemyQuality(), UnitType.MEK, weight, campaign));
+                          getContract(campaign).getEnemySkill(),
+                          getContract(campaign).getEnemyQuality(),
+                          UnitType.MEK,
+                          weight,
+                          campaign));
                 }
             }
 
@@ -137,13 +145,19 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
         } else {
             // TODO : AtB Star League RAT Roll Year Option
             final Faction faction = Factions.getInstance().getFaction("SL");
-            ms = campaign.getUnitGenerator().generate(faction.getShortName(), UnitType.MEK,
-                    AtBStaticWeightGenerator.getRandomWeight(campaign, UnitType.MEK, faction), 2750,
-                    (roll == 6) ? IUnitRating.DRAGOON_A : IUnitRating.DRAGOON_D);
+            ms = campaign.getUnitGenerator()
+                       .generate(faction.getShortName(),
+                             UnitType.MEK,
+                             AtBStaticWeightGenerator.getRandomWeight(campaign, UnitType.MEK, faction),
+                             2750,
+                             (roll == 6) ? IUnitRating.DRAGOON_A : IUnitRating.DRAGOON_D);
         }
-        Entity en = (ms == null) ? null
-                : AtBDynamicScenarioFactory.createEntityWithCrew(campaign.getFactionCode(),
-                        SkillLevel.GREEN, campaign, ms);
+        Entity en = (ms == null) ?
+                          null :
+                          AtBDynamicScenarioFactory.createEntityWithCrew(campaign.getFaction().getShortName(),
+                                SkillLevel.GREEN,
+                                campaign,
+                                ms);
         otherForce.add(en);
 
         // TODO: During SW offer a choice between an employer exchange or a contract
@@ -160,11 +174,16 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
         super.setObjectives(campaign, contract);
 
         ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 1, 100);
-        ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this,
-                1,
-                1, true);
-        ScenarioObjective keepTechAlive = CommonObjectiveFactory.getPreserveSpecificFriendlies(TECH_FORCE_ID, 1, 1,
-                true);
+        ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign,
+              contract,
+              this,
+              1,
+              1,
+              true);
+        ScenarioObjective keepTechAlive = CommonObjectiveFactory.getPreserveSpecificFriendlies(TECH_FORCE_ID,
+              1,
+              1,
+              true);
 
         getScenarioObjectives().add(destroyHostiles);
         getScenarioObjectives().add(keepFriendliesAlive);
