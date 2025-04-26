@@ -49,10 +49,8 @@ import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.AllGround
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.LowAtmosphere;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.Space;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.SpecificGroundTerrain;
-import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_TACTICS;
-import static mekhq.campaign.personnel.skills.SkillType.getSkillHash;
 import static mekhq.campaign.stratcon.StratconContractInitializer.getUnoccupiedCoords;
 import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementEligibilityType.AUXILIARY;
 import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.DELAYED;
@@ -74,7 +72,6 @@ import megamek.common.Entity;
 import megamek.common.Minefield;
 import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;
-import megamek.common.enums.SkillLevel;
 import megamek.common.event.Subscribe;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
@@ -109,7 +106,6 @@ import mekhq.campaign.mission.resupplyAndCaches.StarLeagueCache.CacheType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillCheckUtility;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
@@ -1738,7 +1734,7 @@ public class StratconRulesManager {
         int targetNumber = 9;
         Skill tactics = commander.getSkill(S_TACTICS);
 
-        SkillCheckUtility skillCheckUtility = new SkillCheckUtility(commander, S_TACTICS, 0, true);
+        SkillCheckUtility skillCheckUtility = new SkillCheckUtility(commander, S_TACTICS, null, 0, true, false);
         campaign.addReport(skillCheckUtility.getResultsText());
 
         if (skillCheckUtility.isSuccess()) {
