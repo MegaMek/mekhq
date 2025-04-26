@@ -2,11 +2,11 @@
 <ScenarioTemplate>
     <name>Space DropShip Intercept</name>
     <shortBriefing>Prevent DropShip escape.</shortBriefing>
-    <detailedBriefing>A hostile DropShip is attempting to evade our AeroSpace forces in space, seeking to escape or reposition for a future operation. Your mission is to intercept and destroy the DropShip before it can escape our engagement zone.
+    <detailedBriefing><![CDATA[A hostile DropShip is attempting to evade our AeroSpace forces in space, seeking to escape or reposition for a future operation. Your mission is to intercept and destroy the DropShip before it can escape our engagement zone.
 
 Expect the target to engage in evasive maneuvers, using vector thrusting, and potential escort craft to delay or deflect your attack. You must act swiftly and decisively—disable their engines, breach their hull, and ensure they do not survive this encounter.
 
-We will control the battlefield at the end of the engagement, guaranteeing any wreckage or surviving assets remain in our hands. Eliminate the DropShip, secure the battlespace, and leave nothing for the enemy to salvage.</detailedBriefing>
+We will control the battlefield at the end of the engagement, guaranteeing any wreckage or surviving assets remain in our hands. Eliminate the DropShip, secure the battlespace, and leave nothing for the enemy to salvage.]]></detailedBriefing>
     <battlefieldControl>PLAYER</battlefieldControl>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
@@ -33,12 +33,7 @@ We will control the battlefield at the end of the engagement, guaranteeing any w
                 <contributesToMapSize>true</contributesToMapSize>
                 <contributesToUnitCount>true</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
-                <deploymentZones>
-                    <deploymentZone>2</deploymentZone>
-                    <deploymentZone>4</deploymentZone>
-                    <deploymentZone>6</deploymentZone>
-                    <deploymentZone>8</deploymentZone>
-                </deploymentZones>
+                <deploymentZones />
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>0</forceAlignment>
@@ -50,8 +45,9 @@ We will control the battlefield at the end of the engagement, guaranteeing any w
                 <minWeightClass>0</minWeightClass>
                 <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
-                <startingAltitude>0</startingAltitude>
-                <syncDeploymentType>None</syncDeploymentType>
+                <startingAltitude>5</startingAltitude>
+                <syncDeploymentType>OppositeEdge</syncDeploymentType>
+                <syncedForceName>DropShip</syncedForceName>
                 <useArtillery>false</useArtillery>
             </value>
         </entry>
@@ -68,7 +64,7 @@ We will control the battlefield at the end of the engagement, guaranteeing any w
                 <contributesToUnitCount>false</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
                 <deploymentZones />
-                <destinationZone>5</destinationZone>
+                <destinationZone>6</destinationZone>
                 <fixedUnitCount>1</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
@@ -79,9 +75,9 @@ We will control the battlefield at the end of the engagement, guaranteeing any w
                 <minWeightClass>1</minWeightClass>
                 <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
-                <startingAltitude>0</startingAltitude>
-                <syncDeploymentType>OppositeEdge</syncDeploymentType>
-                <syncedForceName>Player</syncedForceName>
+                <startingAltitude>5</startingAltitude>
+                <syncDeploymentType>SameEdge</syncDeploymentType>
+                <syncedForceName>DropShip</syncedForceName>
                 <useArtillery>false</useArtillery>
                 <roleChoices>
                     <forceRole>ESCORT</forceRole>
@@ -100,7 +96,9 @@ We will control the battlefield at the end of the engagement, guaranteeing any w
                 <contributesToMapSize>true</contributesToMapSize>
                 <contributesToUnitCount>false</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
-                <deploymentZones />
+                <deploymentZones>
+                    <deploymentZone>6</deploymentZone>
+                </deploymentZones>
                 <destinationZone>6</destinationZone>
                 <fixedUnitCount>1</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
@@ -112,10 +110,9 @@ We will control the battlefield at the end of the engagement, guaranteeing any w
                 <minWeightClass>0</minWeightClass>
                 <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
-                <startingAltitude>0</startingAltitude>
+                <startingAltitude>5</startingAltitude>
                 <subjectToRandomRemoval>false</subjectToRandomRemoval>
-                <syncDeploymentType>OppositeEdge</syncDeploymentType>
-                <syncedForceName>Player</syncedForceName>
+                <syncDeploymentType>None</syncDeploymentType>
                 <useArtillery>false</useArtillery>
                 <roleChoices>
                     <forceRole>MEK_CARRIER</forceRole>

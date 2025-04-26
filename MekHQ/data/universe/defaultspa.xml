@@ -496,7 +496,6 @@ While this SPA does exist in ATOW (and that's where you'll find its description)
         <xpCost>200</xpCost>
         <weight>1</weight>
         <skillPrereq/>
-        <removeAbilities>flaw_animal_antipathy</removeAbilities>
     </ability>
     <ability>
         <lookupName>flaw_unattractive</lookupName>
@@ -670,6 +669,7 @@ The Target Number of all Perception checks decreased by 1 due to improved hearin
         <xpCost>-300</xpCost>
         <weight>1</weight>
         <skillPrereq/>
+        <invalidAbilities>mutation_cat_girl_unofficial</invalidAbilities>
     </ability>
     <ability>
         <lookupName>mutation_cat_girl_unofficial</lookupName>
@@ -1064,7 +1064,7 @@ If individual initiative is enabled, this bonus applies only to the pilot's unit
     <ability>
         <lookupName>tech_internal_specialist</lookupName>
         <displayName>Tech Specialist, Internal (Unofficial)</displayName>
-        <desc><![CDATA[-1 to repair and maintenance checks when working with internal systems</desc>
+        <desc><![CDATA[-1 to repair and maintenance checks when working with internal systems]]></desc>
         <xpCost>100</xpCost>
         <weight>2</weight>
         <skillPrereq>
@@ -1077,7 +1077,7 @@ If individual initiative is enabled, this bonus applies only to the pilot's unit
     </ability>
     <ability>
         <lookupName>tech_engineer</lookupName>
-        <displayName>Engineer (unofficial)</displayName>
+        <displayName>Engineer (Unofficial)</displayName>
         <desc><![CDATA[-2 on refit rolls.]]></desc>
         <xpCost>100</xpCost>
         <weight>2</weight>
@@ -1091,8 +1091,8 @@ If individual initiative is enabled, this bonus applies only to the pilot's unit
     </ability>
     <ability>
         <lookupName>tech_fixer</lookupName>
-        <displayName>Mr/Ms Fix-it (unofficial)</displayName>
-        <desc><![CDATA[Ignore first point of penalty for repair and maintenance on low quality equipment.]]></desc>
+        <displayName>Mr/Ms Fix-it (Unofficial)</displayName>
+        <desc><![CDATA[Ignore the first point of penalty for repair and maintenance on low quality equipment.]]></desc>
         <xpCost>50</xpCost>
         <weight>2</weight>
         <skillPrereq>

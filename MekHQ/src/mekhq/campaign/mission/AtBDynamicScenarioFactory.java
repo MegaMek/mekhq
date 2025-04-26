@@ -80,7 +80,6 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.Hangar;
-import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBDynamicScenario.BenchedEntityData;
@@ -95,6 +94,7 @@ import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.stratcon.StratconBiomeManifest;
@@ -819,8 +819,10 @@ public class AtBDynamicScenarioFactory {
                 Game cGame = campaign.getGame();
                 TeamLoadOutGenerator tlg = new TeamLoadOutGenerator(cGame);
                 if (campaign.getCampaignOptions().isAutoConfigMunitions()) {
-                    // Configure *all* generated units with appropriate munitions (for BV calcs)
-                    ArrayList<Entity> arrayGeneratedLance = new ArrayList<>(generatedLance);
+                    // Configure non-Turret generated units with appropriate munitions (for BV calcs)
+                    ArrayList<Entity> arrayGeneratedLance = new ArrayList<>(
+                          generatedLance.stream().filter(e -> !(e instanceof GunEmplacement)).toList()
+                    );
                     // bin fill ratio will be adjusted by the load out generator based on piracy and
                     // quality
                     ReconfigurationParameters rp = TeamLoadOutGenerator.generateParameters(cGame,
@@ -3306,7 +3308,11 @@ public class AtBDynamicScenarioFactory {
         for (int forceID : scenario.getForceIDs()) {
             ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
             if (forceTemplate != null && forceTemplate.getContributesToBV()) {
-                bvBudget += campaign.getForce(forceID).getTotalBV(campaign, forceStandardBattleValue);
+                Force force = campaign.getForce(forceID);
+                if (force != null) {
+                    bvBudget += campaign.getForce(forceID).getTotalBV(campaign, forceStandardBattleValue);
+                    logger.info("Forced BV contribution for {}: {}", force.getName(), bvBudget);
+                }
             }
         }
 

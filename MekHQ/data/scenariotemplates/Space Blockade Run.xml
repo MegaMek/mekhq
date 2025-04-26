@@ -2,11 +2,11 @@
 <ScenarioTemplate>
     <name>Space Blockade Run</name>
     <shortBriefing>Break enemy blockade, escort DropShip.</shortBriefing>
-    <detailedBriefing>An allied DropShip must bypass an enemy space blockade, and you are its only chance at breaking through. Your mission is to escort the DropShip safely to the far edge of the engagement area, ensuring it can escape enemy interdiction. If a direct escort proves too difficult, an alternative objective is available—destroy at least 50% of the enemy forces to weaken their blockade and force them to disengage.
+    <detailedBriefing><![CDATA[An allied DropShip must bypass an enemy space blockade, and you are its only chance at breaking through. Your mission is to escort the DropShip safely to the far edge of the engagement area, ensuring it can escape enemy interdiction. If a direct escort proves too difficult, an alternative objective is available—destroy at least 50% of the enemy forces to weaken their blockade and force them to disengage.
 
 The enemy will attempt to intercept, disable, or destroy the DropShip before it can escape. Expect interdiction fighters and AeroSpace superiority craft. Protect the DropShip at all costs—keep the enemy occupied, disrupt their formations, and eliminate high-threat targets before they can close in.
 
-The enemy will control the battlefield at the end of the engagement, meaning there will be no chance for salvage or recovery. Your priority is to see the DropShip through or cripple enough enemy forces to force a retreat. Ensure the mission succeeds—our strategic mobility depends on it.</detailedBriefing>
+The enemy will control the battlefield at the end of the engagement, meaning there will be no chance for salvage or recovery. Your priority is to see the DropShip through or cripple enough enemy forces to force a retreat. Ensure the mission succeeds—our strategic mobility depends on it.]]></detailedBriefing>
     <battlefieldControl>ENEMY</battlefieldControl>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
@@ -36,7 +36,7 @@ The enemy will control the battlefield at the end of the engagement, meaning the
                 <deploymentZones>
                     <deploymentZone>6</deploymentZone>
                 </deploymentZones>
-                <destinationZone>2</destinationZone>
+                <destinationZone>6</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>0</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
@@ -47,7 +47,7 @@ The enemy will control the battlefield at the end of the engagement, meaning the
                 <minWeightClass>0</minWeightClass>
                 <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
-                <startingAltitude>0</startingAltitude>
+                <startingAltitude>5</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
                 <useArtillery>false</useArtillery>
             </value>
@@ -65,7 +65,7 @@ The enemy will control the battlefield at the end of the engagement, meaning the
                 <contributesToUnitCount>false</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
                 <deploymentZones />
-                <destinationZone>2</destinationZone>
+                <destinationZone>6</destinationZone>
                 <fixedUnitCount>1</fixedUnitCount>
                 <forceAlignment>1</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
@@ -76,8 +76,8 @@ The enemy will control the battlefield at the end of the engagement, meaning the
                 <minWeightClass>1</minWeightClass>
                 <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
-                <startingAltitude>0</startingAltitude>
-                <syncDeploymentType>OppositeEdge</syncDeploymentType>
+                <startingAltitude>5</startingAltitude>
+                <syncDeploymentType>SameEdge</syncDeploymentType>
                 <syncedForceName>Player</syncedForceName>
                 <useArtillery>false</useArtillery>
                 <roleChoices>
@@ -115,7 +115,7 @@ The enemy will control the battlefield at the end of the engagement, meaning the
                 <minWeightClass>1</minWeightClass>
                 <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
-                <startingAltitude>0</startingAltitude>
+                <startingAltitude>5</startingAltitude>
                 <syncDeploymentType>OppositeEdge</syncDeploymentType>
                 <syncedForceName>Player</syncedForceName>
                 <useArtillery>false</useArtillery>

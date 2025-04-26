@@ -2,11 +2,11 @@
 <ScenarioTemplate>
     <name>Irregular Force Assault</name>
     <shortBriefing>Engage infantry supported by frontline forces.</shortBriefing>
-    <detailedBriefing>Hostile infantry and local insurgents are being reinforced by frontline enemy units, creating a growing threat in this sector. If left unchecked, their combined strength will destabilize our operations and undermine our control of the region. Your mission is to engage and destroy at least 50% of the combined enemy force, neutralizing their ability to continue resistance.
+    <detailedBriefing><![CDATA[Hostile infantry and local insurgents are being reinforced by frontline enemy units, creating a growing threat in this sector. If left unchecked, their combined strength will destabilize our operations and undermine our control of the region. Your mission is to engage and destroy at least 50% of the combined enemy force, neutralizing their ability to continue resistance.
 
 Expect a mix of tactics—the insurgents will use terrain, ambushes, and guerrilla warfare, while the frontline units will provide structured firepower and coordination. Do not underestimate either force. Eliminate them with precision, break their ability to fight, and ensure this sector is pacified.
 
-The victor will control the battlefield at the end of the engagement, securing any remaining assets and preventing further insurgent activity. This is a mission of suppression and dominance—strike hard, eliminate resistance, and leave no doubt who commands this region.</detailedBriefing>
+The victor will control the battlefield at the end of the engagement, securing any remaining assets and preventing further insurgent activity. This is a mission of suppression and dominance—strike hard, eliminate resistance, and leave no doubt who commands this region.]]></detailedBriefing>
     <battlefieldControl>VICTOR</battlefieldControl>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
@@ -46,7 +46,6 @@ The victor will control the battlefield at the end of the engagement, securing a
                     <deploymentZone>6</deploymentZone>
                     <deploymentZone>7</deploymentZone>
                     <deploymentZone>8</deploymentZone>
-                    <deploymentZone>9</deploymentZone>
                 </deploymentZones>
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>

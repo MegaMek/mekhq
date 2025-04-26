@@ -63,6 +63,17 @@ public class ReportHyperlinkListener implements HyperlinkListener {
 
     @Override
     public void hyperlinkUpdate(final HyperlinkEvent evt) {
+        if (evt == null) {
+            logger.error("(hyperlinkUpdate) Null HyperlinkEvent.", new IllegalArgumentException());
+            return;
+        }
+
+        if (evt.getDescription() == null || evt.getDescription().isBlank()) {
+            logger.error("(hyperlinkUpdate) Null or Blank HyperlinkEvent description.",
+                  new IllegalArgumentException());
+            return;
+        }
+
         if (evt.getEventType() == EventType.ACTIVATED) {
             if (evt.getDescription().startsWith(UNIT_MARKET)) { // Must come before UNIT since it starts with UNIT as
                                                                 // well

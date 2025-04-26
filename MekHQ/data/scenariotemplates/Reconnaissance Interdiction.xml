@@ -2,11 +2,11 @@
 <ScenarioTemplate>
     <name>Reconnaissance Interdiction</name>
     <shortBriefing>Prevent hostile reconnaissance.</shortBriefing>
-    <detailedBriefing>Enemy reconnaissance units have been deployed to gather intelligence on our movements, threatening the security of our operations. Your mission is to eliminate them before they can complete their reconnaissance. If they succeed, our positions will be compromised, giving the enemy a critical advantage.
+    <detailedBriefing><![CDATA[Enemy reconnaissance units have been deployed to gather intelligence on our movements, threatening the security of our operations. Your mission is to eliminate them before they can complete their reconnaissance. If they succeed, our positions will be compromised, giving the enemy a critical advantage.
 
 Expect these forces to prioritize speed, evasion, and long-range observation tactics. They will attempt to avoid direct engagement and may have stealth capabilities or electronic warfare support to mask their presence. You must act quickly, intercept their units, and wipe them out before they can relay any useful data.
 
-We will control the battlefield at the end of the engagement, ensuring that any remaining enemy assets or reconnaissance equipment are in our hands. Hunt them down, erase all traces of their mission, and ensure our movements remain hidden.</detailedBriefing>
+We will control the battlefield at the end of the engagement, ensuring that any remaining enemy assets or reconnaissance equipment are in our hands. Hunt them down, erase all traces of their mission, and ensure our movements remain hidden.]]></detailedBriefing>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <battlefieldControl>PLAYER</battlefieldControl>
@@ -42,8 +42,6 @@ We will control the battlefield at the end of the engagement, ensuring that any 
                     <deploymentZone>6</deploymentZone>
                     <deploymentZone>7</deploymentZone>
                     <deploymentZone>8</deploymentZone>
-                    <deploymentZone>9</deploymentZone>
-                    <deploymentZone>10</deploymentZone>
                 </deploymentZones>
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>

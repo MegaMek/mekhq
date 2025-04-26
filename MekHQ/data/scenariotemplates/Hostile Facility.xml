@@ -2,11 +2,11 @@
 <ScenarioTemplate>
     <name>Facility Assault</name>
     <shortBriefing>Assault and weaken enemy-held facility.</shortBriefing>
-    <detailedBriefing>An enemy-controlled facility has been designated for destruction. This installation is too valuable to remain in enemy hands, and its defenders must be eliminated to ensure it is no longer operational. Your mission is to destroy at least 75% of the defending forces. This is not an occupation—this is eradication.
+    <detailedBriefing><![CDATA[An enemy-controlled facility has been designated for destruction. This installation is too valuable to remain in enemy hands, and its defenders must be eliminated to ensure it is no longer operational. Your mission is to destroy at least 75% of the defending forces. This is not an occupation—this is eradication.
 
 The priority is destruction, not capture. Do not concern yourself with securing the facility unless it becomes strategically viable after the defenders are wiped out. The enemy will fight to protect this installation, but their defenses will crumble under sustained pressure. Crush their forces, level their defenses, and ensure that when this battle is over, the facility is either in our hands or of no use to anyone.
 
-The victor will control the battlefield at the end of the engagement. If the facility remains salvageable after the assault, we will claim it. If not, the enemy will be left with nothing but ruins. Execute with overwhelming force and leave no doubt who owns this battlefield.</detailedBriefing>
+The victor will control the battlefield at the end of the engagement. If the facility remains salvageable after the assault, we will claim it. If not, the enemy will be left with nothing but ruins. Execute with overwhelming force and leave no doubt who owns this battlefield.]]></detailedBriefing>
     <battlefieldControl>VICTOR</battlefieldControl>
     <isHostileFacility>true</isHostileFacility>
     <mapParameters>
@@ -76,7 +76,6 @@ The victor will control the battlefield at the end of the engagement. If the fac
                     <deploymentZone>6</deploymentZone>
                     <deploymentZone>7</deploymentZone>
                     <deploymentZone>8</deploymentZone>
-                    <deploymentZone>9</deploymentZone>
                 </deploymentZones>
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
