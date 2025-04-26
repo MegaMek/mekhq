@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui;
 
@@ -73,14 +78,14 @@ public final class PersonnelTab extends CampaignGuiTab {
 
     public static final int PERSONNEL_VIEW_WIDTH = 490;
 
-    private JSplitPane                   splitPersonnel;
-    private JTable                       personnelTable;
-    private MMComboBox<PersonnelFilter>  choicePerson;
+    private JSplitPane splitPersonnel;
+    private JTable personnelTable;
+    private MMComboBox<PersonnelFilter> choicePerson;
     private MMComboBox<PersonnelTabView> choicePersonView;
-    private JScrollPane                  scrollPersonnelView;
-    private JCheckBox                    chkGroupByUnit;
+    private JScrollPane scrollPersonnelView;
+    private JCheckBox chkGroupByUnit;
 
-    private PersonnelTableModel                 personModel;
+    private PersonnelTableModel personModel;
     private TableRowSorter<PersonnelTableModel> personnelSorter;
 
     private final IPreferenceChangeListener scalingChangeListener = e -> changePersonnelView();
@@ -112,18 +117,19 @@ public final class PersonnelTab extends CampaignGuiTab {
         setLayout(new GridBagLayout());
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx   = 0;
-        gridBagConstraints.gridy   = 0;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.anchor  = GridBagConstraints.WEST;
-        gridBagConstraints.insets  = new Insets(5, 5, 0, 0);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         add(new JLabel(resourceMap.getString("lblPersonChoice.text")), gridBagConstraints);
 
         choicePerson = new MMComboBox<>("choicePerson", createPersonGroupModel());
         choicePerson.setSelectedItem(PersonnelFilter.ACTIVE);
         choicePerson.setRenderer(new DefaultListCellRenderer() {
             @Override
-            public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index, final boolean isSelected, final boolean cellHasFocus) {
+            public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
+                  final boolean isSelected, final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof PersonnelFilter) {
                     list.setToolTipText(((PersonnelFilter) value).getToolTipText());
@@ -132,31 +138,32 @@ public final class PersonnelTab extends CampaignGuiTab {
             }
         });
         choicePerson.addActionListener(ev -> filterPersonnel());
-        gridBagConstraints         = new GridBagConstraints();
-        gridBagConstraints.gridx   = 1;
-        gridBagConstraints.gridy   = 0;
-        gridBagConstraints.fill    = GridBagConstraints.NONE;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor  = GridBagConstraints.WEST;
-        gridBagConstraints.insets  = new Insets(5, 5, 0, 0);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         add(choicePerson, gridBagConstraints);
 
-        gridBagConstraints         = new GridBagConstraints();
-        gridBagConstraints.gridx   = 2;
-        gridBagConstraints.gridy   = 0;
-        gridBagConstraints.fill    = GridBagConstraints.NONE;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor  = GridBagConstraints.WEST;
-        gridBagConstraints.insets  = new Insets(5, 5, 0, 0);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         add(new JLabel(resourceMap.getString("lblPersonView.text")), gridBagConstraints);
 
         choicePersonView = new MMComboBox<>("choicePersonView", PersonnelTabView.values());
         choicePersonView.setSelectedItem(PersonnelTabView.GENERAL);
         choicePersonView.setRenderer(new DefaultListCellRenderer() {
             @Override
-            public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index, final boolean isSelected, final boolean cellHasFocus) {
+            public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
+                  final boolean isSelected, final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof PersonnelTabView) {
                     list.setToolTipText(((PersonnelTabView) value).getToolTipText());
@@ -165,14 +172,14 @@ public final class PersonnelTab extends CampaignGuiTab {
             }
         });
         choicePersonView.addActionListener(ev -> changePersonnelView());
-        gridBagConstraints         = new GridBagConstraints();
-        gridBagConstraints.gridx   = 3;
-        gridBagConstraints.gridy   = 0;
-        gridBagConstraints.fill    = GridBagConstraints.NONE;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor  = GridBagConstraints.WEST;
-        gridBagConstraints.insets  = new Insets(5, 5, 0, 0);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         add(choicePersonView, gridBagConstraints);
 
         chkGroupByUnit = new JCheckBox(resourceMap.getString("chkGroupByUnit.text"));
@@ -181,17 +188,17 @@ public final class PersonnelTab extends CampaignGuiTab {
             personModel.setGroupByUnit(chkGroupByUnit.isSelected());
             personModel.refreshData();
         });
-        gridBagConstraints         = new GridBagConstraints();
-        gridBagConstraints.gridx   = 4;
-        gridBagConstraints.gridy   = 0;
-        gridBagConstraints.fill    = GridBagConstraints.NONE;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor  = GridBagConstraints.WEST;
-        gridBagConstraints.insets  = new Insets(5, 5, 0, 0);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         add(chkGroupByUnit, gridBagConstraints);
 
-        personModel    = new PersonnelTableModel(getCampaign());
+        personModel = new PersonnelTableModel(getCampaign());
         personnelTable = new JTable(personModel);
         personnelTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         personnelTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
@@ -226,12 +233,12 @@ public final class PersonnelTab extends CampaignGuiTab {
         splitPersonnel.setOneTouchExpandable(true);
         splitPersonnel.setResizeWeight(1.0);
         splitPersonnel.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, ev -> refreshPersonnelView());
-        gridBagConstraints.gridx     = 0;
-        gridBagConstraints.gridy     = 1;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 5;
-        gridBagConstraints.fill      = GridBagConstraints.BOTH;
-        gridBagConstraints.weightx   = 1.0;
-        gridBagConstraints.weighty   = 1.0;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
         add(splitPersonnel, gridBagConstraints);
 
         PersonnelTableMouseAdapter.connect(getCampaignGui(), personnelTable, personModel, splitPersonnel);
@@ -255,11 +262,7 @@ public final class PersonnelTab extends CampaignGuiTab {
 
     /**
      * These need to be migrated to the Suite Constants / Suite Options Setup
-     *
-     * @since 0.50.04
-     * @deprecated Move to Suite Constants / Suite Options Setup
      */
-    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(PersonnelTab.class);
@@ -361,7 +364,7 @@ public final class PersonnelTab extends CampaignGuiTab {
      */
     public void refreshPersonnelList() {
         UUID selectedUUID = null;
-        int  selectedRow  = personnelTable.getSelectedRow();
+        int selectedRow = personnelTable.getSelectedRow();
         if (selectedRow != -1) {
             Person p = personModel.getPerson(personnelTable.convertRowIndexToModel(selectedRow));
             if (null != p) {
@@ -394,7 +397,7 @@ public final class PersonnelTab extends CampaignGuiTab {
         SwingUtilities.invokeLater(() -> scrollPersonnelView.getVerticalScrollBar().setValue(0));
     }
 
-    private ActionScheduler personnelListScheduler   = new ActionScheduler(this::refreshPersonnelList);
+    private ActionScheduler personnelListScheduler = new ActionScheduler(this::refreshPersonnelList);
     private ActionScheduler filterPersonnelScheduler = new ActionScheduler(this::filterPersonnel);
 
     @Subscribe

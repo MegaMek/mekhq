@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -69,21 +74,21 @@ public class ChooseRefitDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(ChooseRefitDialog.class);
 
     // region Variable Declarations
-    private Campaign        campaign;
-    private Unit            unit;
+    private Campaign campaign;
+    private Unit unit;
     private RefitTableModel refitModel;
 
-    private JButton       btnClose;
-    private JButton       btnRefit;
-    private JButton       btnCustomize;
-    private JTable        refitTable;
-    private JScrollPane   scrRefitTable;
+    private JButton btnClose;
+    private JButton btnRefit;
+    private JButton btnCustomize;
+    private JTable refitTable;
+    private JScrollPane scrRefitTable;
     private JList<String> lstShopping;
-    private JScrollPane   scrShoppingList;
-    private JTextPane     txtOldUnit;
-    private JTextPane     txtNewUnit;
-    private JScrollPane   scrOldUnit;
-    private JScrollPane   scrNewUnit;
+    private JScrollPane scrShoppingList;
+    private JTextPane txtOldUnit;
+    private JTextPane txtNewUnit;
+    private JScrollPane scrOldUnit;
+    private JScrollPane scrNewUnit;
 
     private boolean confirmed = false;
     private boolean customize = false;
@@ -94,7 +99,7 @@ public class ChooseRefitDialog extends JDialog {
     /** Creates new form EditPersonnelLogDialog */
     public ChooseRefitDialog(JFrame parent, boolean modal, Campaign c, Unit unit) {
         super(parent, modal);
-        campaign  = c;
+        campaign = c;
         this.unit = unit;
         populateRefits();
         initComponents();
@@ -132,26 +137,26 @@ public class ChooseRefitDialog extends JDialog {
         scrRefitTable.setViewportView(refitTable);
         scrRefitTable.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("refitTable.title")));
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx   = 0;
-        gridBagConstraints.gridy   = 0;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill    = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor  = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets  = new Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(scrRefitTable, gridBagConstraints);
 
         scrShoppingList = new JScrollPaneWithSpeed();
         scrShoppingList.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(resourceMap.getString(
               "shoppingList.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-        gridBagConstraints         = new GridBagConstraints();
-        gridBagConstraints.gridx   = 0;
-        gridBagConstraints.gridy   = 1;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill    = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor  = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets  = new Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         scrShoppingList.setMinimumSize(new Dimension(300, 200));
         scrShoppingList.setPreferredSize(new Dimension(300, 200));
         getContentPane().add(scrShoppingList, gridBagConstraints);
@@ -167,15 +172,15 @@ public class ChooseRefitDialog extends JDialog {
         scrOldUnit.setMinimumSize(new Dimension(300, 400));
         scrOldUnit.setPreferredSize(new Dimension(300, 400));
         SwingUtilities.invokeLater(() -> scrOldUnit.getVerticalScrollBar().setValue(0));
-        gridBagConstraints            = new GridBagConstraints();
-        gridBagConstraints.gridx      = 1;
-        gridBagConstraints.gridy      = 0;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.gridheight = 2;
-        gridBagConstraints.weightx    = 1.0;
-        gridBagConstraints.weighty    = 1.0;
-        gridBagConstraints.fill       = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor     = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets     = new Insets(5, 5, 5, 5);
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(scrOldUnit, gridBagConstraints);
 
         txtNewUnit = new JTextPane();
@@ -205,15 +210,15 @@ public class ChooseRefitDialog extends JDialog {
         btnClose.addActionListener(evt -> cancel());
         panBtn.add(btnClose, new GridBagConstraints());
 
-        gridBagConstraints           = new GridBagConstraints();
-        gridBagConstraints.gridx     = 0;
-        gridBagConstraints.gridy     = 2;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.weightx   = 1.0;
-        gridBagConstraints.weighty   = 0.0;
-        gridBagConstraints.fill      = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor    = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(panBtn, gridBagConstraints);
 
         pack();
@@ -221,11 +226,7 @@ public class ChooseRefitDialog extends JDialog {
 
     /**
      * These need to be migrated to the Suite Constants / Suite Options Setup
-     *
-     * @since 0.50.04
-     * @deprecated Move to Suite Constants / Suite Options Setup
      */
-    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ChooseRefitDialog.class);
@@ -290,14 +291,14 @@ public class ChooseRefitDialog extends JDialog {
     }
 
     private void populateRefits() {
-        List<Refit> refits  = new ArrayList<>();
-        Entity      e       = unit.getEntity();
-        String      chassis = e.getFullChassis();
+        List<Refit> refits = new ArrayList<>();
+        Entity e = unit.getEntity();
+        String chassis = e.getFullChassis();
         for (String model : Utilities.getAllVariants(e, campaign)) {
             model = StringUtility.isNullOrBlank(model) ? "" : " " + model;
             try {
                 MekSummary summary = Utilities.retrieveUnit(chassis + model);
-                Entity     refitEn = new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+                Entity refitEn = new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
                 if (null != refitEn) {
                     Refit r = new Refit(unit, refitEn, false, false, false);
                     if (null == r.checkFixable()) {
@@ -315,17 +316,17 @@ public class ChooseRefitDialog extends JDialog {
      * A table model for displaying parts - similar to the one in CampaignGUI, but not exactly
      */
     public class RefitTableModel extends AbstractTableModel {
-        protected String[]    columnNames;
+        protected String[] columnNames;
         protected List<Refit> data;
 
-        public final static int COL_MODEL  = 0;
-        public final static int COL_CLASS  = 1;
-        public final static int COL_BV     = 2;
-        public final static int COL_TIME   = 3;
-        public final static int COL_NPART  = 4;
+        public final static int COL_MODEL = 0;
+        public final static int COL_CLASS = 1;
+        public final static int COL_BV = 2;
+        public final static int COL_TIME = 3;
+        public final static int COL_NPART = 4;
         public final static int COL_TARGET = 5;
-        public final static int COL_COST   = 6;
-        public final static int N_COL      = 7;
+        public final static int COL_COST = 6;
+        public final static int N_COL = 7;
 
         public RefitTableModel(List<Refit> refits) {
             data = refits;
@@ -433,7 +434,8 @@ public class ChooseRefitDialog extends JDialog {
 
         public class Renderer extends DefaultTableCellRenderer {
             @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                  boolean hasFocus, int row, int column) {
                 super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 setOpaque(true);
                 int actualCol = table.convertColumnIndexToModel(column);
@@ -456,7 +458,7 @@ public class ChooseRefitDialog extends JDialog {
         public int compare(String s0, String s1) {
             // let's find the weight class integer for each name
             DecimalFormat format = new DecimalFormat();
-            int           l0     = 0;
+            int l0 = 0;
             try {
                 l0 = format.parse(s0).intValue();
             } catch (ParseException e) {

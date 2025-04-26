@@ -27,18 +27,16 @@
  */
 package mekhq.campaign.personnel.familyTree;
 
-import megamek.common.enums.Gender;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.FamilialRelationshipType;
-import mekhq.campaign.personnel.enums.FormerSpouseReason;
-import mekhq.utilities.MHQXMLUtility;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import static mekhq.campaign.personnel.PersonnelTestUtilities.matchPersonUUID;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -51,16 +49,19 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
-import static mekhq.campaign.personnel.PersonnelTestUtilities.matchPersonUUID;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import megamek.common.enums.Gender;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.FamilialRelationshipType;
+import mekhq.campaign.personnel.enums.FormerSpouseReason;
+import mekhq.campaign.universe.Faction;
+import mekhq.utilities.MHQXMLUtility;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 public class GenealogyTest {
     private static Campaign mockCampaign;
@@ -87,6 +88,10 @@ public class GenealogyTest {
     @BeforeAll
     public static void createFamilyTree() {
         mockCampaign = mock(Campaign.class);
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         // Create a bunch of people
         alpha = new Person("Alpha", "Alpha", mockCampaign, "MERC");
@@ -191,15 +196,15 @@ public class GenealogyTest {
         pi.getGenealogy().setSpouse(iota);
         iota.getGenealogy().setSpouse(pi);
 
-        lambda.getGenealogy().addFormerSpouse(new FormerSpouse(sigma,
-                LocalDate.ofYearDay(3025, 1), FormerSpouseReason.DIVORCE));
-        sigma.getGenealogy().addFormerSpouse(new FormerSpouse(lambda,
-                LocalDate.ofYearDay(3025, 1), FormerSpouseReason.DIVORCE));
+        lambda.getGenealogy()
+              .addFormerSpouse(new FormerSpouse(sigma, LocalDate.ofYearDay(3025, 1), FormerSpouseReason.DIVORCE));
+        sigma.getGenealogy()
+              .addFormerSpouse(new FormerSpouse(lambda, LocalDate.ofYearDay(3025, 1), FormerSpouseReason.DIVORCE));
 
-        lambda.getGenealogy().addFormerSpouse(new FormerSpouse(tau,
-                LocalDate.ofYearDay(3026, 1), FormerSpouseReason.WIDOWED));
-        tau.getGenealogy().addFormerSpouse(new FormerSpouse(lambda,
-                LocalDate.ofYearDay(3026, 1), FormerSpouseReason.WIDOWED));
+        lambda.getGenealogy()
+              .addFormerSpouse(new FormerSpouse(tau, LocalDate.ofYearDay(3026, 1), FormerSpouseReason.WIDOWED));
+        tau.getGenealogy()
+              .addFormerSpouse(new FormerSpouse(lambda, LocalDate.ofYearDay(3026, 1), FormerSpouseReason.WIDOWED));
     }
 
     //region Getters/Setters
@@ -211,9 +216,11 @@ public class GenealogyTest {
     @Test
     public void testAddAndRemoveFormerSpouse() {
         final FormerSpouse formerSpouse1 = new FormerSpouse(new Person(mockCampaign, "MERC"),
-                LocalDate.now(), FormerSpouseReason.DIVORCE);
+              LocalDate.now(),
+              FormerSpouseReason.DIVORCE);
         final FormerSpouse formerSpouse2 = new FormerSpouse(new Person(mockCampaign, "MERC"),
-                LocalDate.now(), FormerSpouseReason.DIVORCE);
+              LocalDate.now(),
+              FormerSpouseReason.DIVORCE);
 
         final Person person = new Person(mockCampaign, "MERC");
         person.getGenealogy().addFormerSpouse(formerSpouse1);
@@ -231,7 +238,10 @@ public class GenealogyTest {
     public void testAddFamilyMember() {
         final Person person = new Person(mockCampaign, "MERC");
         person.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, null);
-        assertTrue(person.getGenealogy().getFamily().getOrDefault(FamilialRelationshipType.CHILD, new ArrayList<>()).isEmpty());
+        assertTrue(person.getGenealogy()
+                         .getFamily()
+                         .getOrDefault(FamilialRelationshipType.CHILD, new ArrayList<>())
+                         .isEmpty());
 
         person.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, new Person(mockCampaign, "MERC"));
         assertEquals(1, person.getGenealogy().getParents().size());
@@ -558,9 +568,10 @@ public class GenealogyTest {
 
             genealogy.writeToXML(pw, 0);
             assertEquals(String.format(
-                    "<genealogy>\t<spouse>%s</spouse>\t<formerSpouses>\t\t<formerSpouse>\t\t\t<id>%s</id>\t\t\t<date>3025-01-01</date>\t\t\t<reason>DIVORCE</reason>\t\t</formerSpouse>\t</formerSpouses>\t<family>\t\t<relationship>\t\t\t<type>CHILD</type>\t\t\t<personId>%s</personId>\t\t</relationship>\t</family></genealogy>",
-                            spouseId, formerSpouseId, childId),
-                    sw.toString().replaceAll("\\n|\\r\\n", ""));
+                  "<genealogy>\t<spouse>%s</spouse>\t<formerSpouses>\t\t<formerSpouse>\t\t\t<id>%s</id>\t\t\t<date>3025-01-01</date>\t\t\t<reason>DIVORCE</reason>\t\t</formerSpouse>\t</formerSpouses>\t<family>\t\t<relationship>\t\t\t<type>CHILD</type>\t\t\t<personId>%s</personId>\t\t</relationship>\t</family></genealogy>",
+                  spouseId,
+                  formerSpouseId,
+                  childId), sw.toString().replaceAll("\\n|\\r\\n", ""));
         }
     }
 
@@ -574,8 +585,10 @@ public class GenealogyTest {
         given(mockCampaign.getPerson(argThat(matchPersonUUID(child.getId())))).willReturn(child);
 
         final String text = String.format(
-                "<genealogy>\t<spouse>%s</spouse>\t<formerSpouses>\t\t<formerSpouse>\t\t\t<id>%s</id>\t\t\t<date>3025-01-01</date>\t\t\t<reason>DIVORCE</reason>\t\t</formerSpouse>\t</formerSpouses>\t<family>\t\t<relationship>\t\t\t<type>CHILD</type>\t\t\t<personId>%s</personId>\t\t</relationship>\t</family></genealogy>",
-                spouse.getId(), formerSpouse.getId(), child.getId());
+              "<genealogy>\t<spouse>%s</spouse>\t<formerSpouses>\t\t<formerSpouse>\t\t\t<id>%s</id>\t\t\t<date>3025-01-01</date>\t\t\t<reason>DIVORCE</reason>\t\t</formerSpouse>\t</formerSpouses>\t<family>\t\t<relationship>\t\t\t<type>CHILD</type>\t\t\t<personId>%s</personId>\t\t</relationship>\t</family></genealogy>",
+              spouse.getId(),
+              formerSpouse.getId(),
+              child.getId());
 
         final Document document;
         try (ByteArrayInputStream bais = new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8))) {
@@ -618,9 +631,11 @@ public class GenealogyTest {
         final Genealogy genealogy = new Genealogy(mock(Person.class));
 
         try (MockedStatic<FormerSpouse> formerSpouse = Mockito.mockStatic(FormerSpouse.class);
-             MockedStatic<FamilialRelationshipType> familialRelationshipType = Mockito.mockStatic(FamilialRelationshipType.class)) {
+              MockedStatic<FamilialRelationshipType> familialRelationshipType = Mockito.mockStatic(
+                    FamilialRelationshipType.class)) {
             formerSpouse.when(() -> FormerSpouse.generateInstanceFromXML(any())).thenThrow(new Exception());
-            familialRelationshipType.when(() -> FamilialRelationshipType.valueOf("break")).thenThrow(new IllegalArgumentException());
+            familialRelationshipType.when(() -> FamilialRelationshipType.valueOf("break"))
+                  .thenThrow(new IllegalArgumentException());
 
             genealogy.fillFromXML(element.getChildNodes());
 
@@ -648,8 +663,10 @@ public class GenealogyTest {
         final Person origin = new Person(mockCampaign, "MERC");
         final Person formerSpouse = new Person(mockCampaign, "MERC");
 
-        origin.getGenealogy().addFormerSpouse(new FormerSpouse(formerSpouse, LocalDate.now(), FormerSpouseReason.WIDOWED));
-        formerSpouse.getGenealogy().addFormerSpouse(new FormerSpouse(origin, LocalDate.now(), FormerSpouseReason.WIDOWED));
+        origin.getGenealogy()
+              .addFormerSpouse(new FormerSpouse(formerSpouse, LocalDate.now(), FormerSpouseReason.WIDOWED));
+        formerSpouse.getGenealogy()
+              .addFormerSpouse(new FormerSpouse(origin, LocalDate.now(), FormerSpouseReason.WIDOWED));
 
         origin.getGenealogy().clearGenealogyLinks();
 
@@ -679,8 +696,10 @@ public class GenealogyTest {
         origin.getGenealogy().setSpouse(spouse);
         spouse.getGenealogy().setSpouse(origin);
 
-        origin.getGenealogy().addFormerSpouse(new FormerSpouse(formerSpouse, LocalDate.now(), FormerSpouseReason.WIDOWED));
-        formerSpouse.getGenealogy().addFormerSpouse(new FormerSpouse(origin, LocalDate.now(), FormerSpouseReason.WIDOWED));
+        origin.getGenealogy()
+              .addFormerSpouse(new FormerSpouse(formerSpouse, LocalDate.now(), FormerSpouseReason.WIDOWED));
+        formerSpouse.getGenealogy()
+              .addFormerSpouse(new FormerSpouse(origin, LocalDate.now(), FormerSpouseReason.WIDOWED));
 
         origin.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, child);
         child.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, origin);
