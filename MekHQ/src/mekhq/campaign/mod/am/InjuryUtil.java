@@ -164,10 +164,10 @@ public final class InjuryUtil {
             case RIGHT_FOOT:
                 switch (hits) {
                     case 1:
-                        newInjuries.add(gen.apply(Compute.randomInt(2) == 0 ? InjuryTypes.CUT : InjuryTypes.BRUISE, 1));
+                        newInjuries.add(gen.apply(Compute.randomInt(2) == 0 ? InjuryTypes.PUNCTURE : InjuryTypes.FRACTURE, 1));
                         break;
                     case 2:
-                        newInjuries.add(gen.apply(InjuryTypes.SPRAIN, 1));
+                        newInjuries.add(gen.apply(InjuryTypes.TORN_MUSCLE, 1));
                         break;
                     case 3:
                         newInjuries.add(gen.apply(InjuryTypes.BROKEN_LIMB, 1));
@@ -197,7 +197,7 @@ public final class InjuryUtil {
             case CHEST:
                 switch (hits) {
                     case 1:
-                        newInjuries.add(gen.apply(Compute.randomInt(2) == 0 ? InjuryTypes.CUT : InjuryTypes.BRUISE, 1));
+                        newInjuries.add(gen.apply(Compute.randomInt(2) == 0 ? InjuryTypes.PUNCTURE : InjuryTypes.FRACTURE, 1));
                         break;
                     case 2:
                         newInjuries.add(gen.apply(InjuryTypes.BROKEN_RIB, 1));
@@ -219,7 +219,7 @@ public final class InjuryUtil {
             case ABDOMEN:
                 switch (hits) {
                     case 1:
-                        newInjuries.add(gen.apply(Compute.randomInt(2) == 0 ? InjuryTypes.CUT : InjuryTypes.BRUISE, 1));
+                        newInjuries.add(gen.apply(Compute.randomInt(2) == 0 ? InjuryTypes.PUNCTURE : InjuryTypes.FRACTURE, 1));
                         break;
                     case 2:
                         newInjuries.add(gen.apply(InjuryTypes.BRUISED_KIDNEY, 1));
@@ -407,37 +407,37 @@ public final class InjuryUtil {
     }
 
     /** Generate the effects of "natural" healing (daily) */
-    public static List<GameEffect> genNaturalHealing(Campaign c, Person p) {
+    public static List<GameEffect> genNaturalHealing(Campaign c, Person person) {
         Objects.requireNonNull(c);
-        Objects.requireNonNull(p);
+        Objects.requireNonNull(person);
 
         List<GameEffect> result = new ArrayList<>();
 
-        p.getInjuries().forEach((i) -> {
+        person.getInjuries().forEach((i) -> {
             if (i.getTime() <= 1 && !i.isPermanent()) {
                 InjuryType type = i.getType();
                 if (!i.isWorkedOn() &&
-                          ((type == InjuryTypes.BROKEN_LIMB) ||
-                                 (type == InjuryTypes.SPRAIN) ||
-                                 (type == InjuryTypes.CONCUSSION) ||
-                                 (type == InjuryTypes.BROKEN_COLLAR_BONE))) {
+                          ((Objects.equals(type, InjuryTypes.BROKEN_LIMB)) ||
+                                 (Objects.equals(type, InjuryTypes.TORN_MUSCLE)) ||
+                                 (Objects.equals(type, InjuryTypes.CONCUSSION)) ||
+                                 (Objects.equals(type, InjuryTypes.BROKEN_COLLAR_BONE)))) {
                     result.add(new GameEffect(String.format(
                           "83%% chance of %s healing, 17%% chance of it becoming permanent.",
                           i.getName()), rnd -> {
                         i.setTime(0);
                         if (rnd.applyAsInt(6) == 0) {
                             i.setPermanent(true);
-                            MedicalLogger.injuryDidntHealProperly(p, c.getLocalDate(), i);
+                            MedicalLogger.injuryDidntHealProperly(person, c.getLocalDate(), i);
                         } else {
-                            p.removeInjury(i);
-                            MedicalLogger.injuryHealed(p, c.getLocalDate(), i);
+                            person.removeInjury(i);
+                            MedicalLogger.injuryHealed(person, c.getLocalDate(), i);
                         }
                     }));
                 } else {
                     result.add(new GameEffect(String.format("%s heals", i.getName()), rnd -> {
                         i.setTime(0);
-                        p.removeInjury(i);
-                        MedicalLogger.injuryHealed(p, c.getLocalDate(), i);
+                        person.removeInjury(i);
+                        MedicalLogger.injuryHealed(person, c.getLocalDate(), i);
                     }));
                 }
             } else if (i.getTime() > 1) {
@@ -446,30 +446,30 @@ public final class InjuryUtil {
             } else if ((i.getTime() == 1) && i.isPermanent()) {
                 result.add(new GameEffect(String.format("%s becomes permanent", i.getName()), rnd -> {
                     i.setTime(0);
-                    MedicalLogger.injuryBecamePermanent(p, c.getLocalDate(), i);
+                    MedicalLogger.injuryBecamePermanent(person, c.getLocalDate(), i);
                 }));
             }
         });
-        if (null != p.getDoctorId()) {
+        if (null != person.getDoctorId()) {
             result.add(new GameEffect("Infirmary health check-up", rnd -> {
                 boolean dismissed = false;
-                if (p.getStatus().isDead()) {
+                if (person.getStatus().isDead()) {
                     dismissed = true;
-                    MedicalLogger.diedInInfirmary(p, c.getLocalDate());
-                } else if (p.getStatus().isMIA()) {
+                    MedicalLogger.diedInInfirmary(person, c.getLocalDate());
+                } else if (person.getStatus().isMIA()) {
                     // What? How?
                     dismissed = true;
-                    MedicalLogger.abductedFromInfirmary(p, c.getLocalDate());
-                } else if (p.getStatus().isRetired()) {
+                    MedicalLogger.abductedFromInfirmary(person, c.getLocalDate());
+                } else if (person.getStatus().isRetired()) {
                     dismissed = true;
-                    MedicalLogger.retiredAndTransferredFromInfirmary(p, c.getLocalDate());
-                } else if (!p.needsFixing()) {
+                    MedicalLogger.retiredAndTransferredFromInfirmary(person, c.getLocalDate());
+                } else if (!person.needsFixing()) {
                     dismissed = true;
-                    MedicalLogger.dismissedFromInfirmary(p, c.getLocalDate());
+                    MedicalLogger.dismissedFromInfirmary(person, c.getLocalDate());
                 }
 
                 if (dismissed) {
-                    p.setDoctorId(null, c.getCampaignOptions().getHealingWaitingPeriod());
+                    person.setDoctorId(null, c.getCampaignOptions().getHealingWaitingPeriod());
                 }
             }));
         }
