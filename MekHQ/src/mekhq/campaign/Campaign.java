@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign;
 
@@ -508,17 +513,6 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * @return the overviewLoadingValue
-     *
-     * @since 0.50.04
-     * @deprecated - Not shown in use.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public boolean isOverviewLoadingValue() {
-        return overviewLoadingValue;
-    }
-
-    /**
      * @param overviewLoadingValue the overviewLoadingValue to set
      */
     public void setOverviewLoadingValue(boolean overviewLoadingValue) {
@@ -808,24 +802,6 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * @since 0.50.04
-     * @deprecated No indicated Uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public List<String> getTurnoverRetirementInformation() {
-        return turnoverRetirementInformation;
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated No indicated Uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void setTurnoverRetirementInformation(final List<String> turnoverRetirementInformation) {
-        this.turnoverRetirementInformation = turnoverRetirementInformation;
-    }
-
-    /**
      * Initializes the unit generator based on the method chosen in campaignOptions. Called when the unit generator is
      * first used or when the method has been changed in campaignOptions.
      */
@@ -958,7 +934,7 @@ public class Campaign implements ITechManager {
             if (roll >= target.getValue()) {
                 report.append("<br/>Search successful. ");
 
-                MekSummary ms = getUnitGenerator().generate(getFactionCode(),
+                MekSummary ms = getUnitGenerator().generate(getFaction().getShortName(),
                       shipSearchType,
                       -1,
                       getGameYear(),
@@ -1790,7 +1766,7 @@ public class Campaign implements ITechManager {
         if (allowNewPilots) {
             Map<CrewType, Collection<Person>> newCrew = Utilities.genRandomCrewWithCombinedSkill(this,
                   unit,
-                  getFactionCode());
+                  getFaction().getShortName());
             newCrew.forEach((type, personnel) -> personnel.forEach(p -> type.getAddMethod().accept(unit, p)));
         }
 
@@ -1853,18 +1829,6 @@ public class Campaign implements ITechManager {
      */
     public Collection<Unit> getActiveUnits() {
         return getHangar().getUnits().stream().filter(unit -> !unit.isMothballed() && !unit.isSalvage()).toList();
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated Not shonw in use.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public Collection<Unit> getLargeCraftAndWarShips() {
-        return getHangar().getUnits()
-                     .stream()
-                     .filter(unit -> (unit.getEntity().isLargeCraft()) || (unit.getEntity().isWarShip()))
-                     .collect(Collectors.toList());
     }
 
     public List<Entity> getEntities() {
@@ -2006,15 +1970,6 @@ public class Campaign implements ITechManager {
 
     public Boolean getFieldKitchenWithinCapacity() {
         return fieldKitchenWithinCapacity;
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated Not shown in use.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void setFieldKitchenWithinCapacity(final Boolean fieldKitchenWithinCapacity) {
-        this.fieldKitchenWithinCapacity = fieldKitchenWithinCapacity;
     }
     // endregion Person Creation
 
@@ -2511,14 +2466,15 @@ public class Campaign implements ITechManager {
      * <p>
      * This method was Deprecated during 50.04's dev cycle. In prior versions this method wasn't explicit in its
      * inclusion of prisoners in the return. I've opted to Deprecate this method as it is far better to be explicit in
-     * whether you want to include prisoners or not. This avoids a lot of potentially weird bugs.
+     * whether you want to include prisoners or not. This avoids a lot of potentially unique bugs.
      * </p>
      *
      * @return A {@link List} of {@link Person} objects representing all active personnel, including prisoners.
      *
-     * @deprecated Use {@link #getActivePersonnel(boolean)} to specify whether to include prisoners.
+     * @deprecated Use {@link #getActivePersonnel(boolean)} to specify whether to include prisoners. Mediated in 0.50
+     *       .06, remove in 0.50.07
      */
-    @Deprecated(since = "0.50.04")
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public List<Person> getActivePersonnel() {
         return getActivePersonnel(true);
     }
@@ -2594,7 +2550,7 @@ public class Campaign implements ITechManager {
      * @return a {@link Person} <code>List</code> containing all active personnel
      */
     public List<Person> getCurrentPrisoners() {
-        return getActivePersonnel().stream()
+        return getActivePersonnel(true).stream()
                      .filter(person -> person.getPrisonerStatus().isCurrentPrisoner())
                      .collect(Collectors.toList());
     }
@@ -2617,19 +2573,6 @@ public class Campaign implements ITechManager {
      */
     public List<Person> getFriendlyPrisoners() {
         return getPersonnel().stream().filter(p -> p.getStatus().isPoW()).collect(Collectors.toList());
-    }
-
-    /**
-     * Provides a filtered list of personnel including only Persons with the AWOL status.
-     *
-     * @return a {@link Person} <code>List</code> containing all active personnel
-     *
-     * @since 0.50.04
-     * @deprecated - Not shown in use.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public List<Person> getAwolPersonnel() {
-        return getPersonnel().stream().filter(p -> p.getStatus().isAwol()).collect(Collectors.toList());
     }
 
     /**
@@ -2773,10 +2716,7 @@ public class Campaign implements ITechManager {
 
     /**
      * @return A collection of parts in the Warehouse.
-     *
-     * @deprecated - Nothing indicated for replacement.
      */
-    @Deprecated(since = "0.50.04")
     public Collection<Part> getParts() {
         return parts.getParts();
     }
@@ -3038,11 +2978,6 @@ public class Campaign implements ITechManager {
                      .collect(Collectors.toSet());
     }
 
-    /**
-     * @since 0.50.04
-     * @deprecated - Nothing indicated for replacement.
-     */
-    @Deprecated(since = "0.50.04")
     public Part getPart(int id) {
         return parts.getPart(id);
     }
@@ -3088,7 +3023,7 @@ public class Campaign implements ITechManager {
     public Person findBestInRole(PersonnelRole role, String primary, String secondary) {
         int highest = 0;
         Person retVal = null;
-        for (Person p : getActivePersonnel()) {
+        for (Person p : getActivePersonnel(true)) {
             if (((p.getPrimaryRole() == role) || (p.getSecondaryRole() == role)) && (p.getSkill(primary) != null)) {
                 if (p.getSkill(primary).getLevel() > highest) {
                     retVal = p;
@@ -3123,7 +3058,7 @@ public class Campaign implements ITechManager {
     public @Nullable Person findBestAtSkill(String skill) {
         Person person = null;
         int highest = 0;
-        for (Person p : getActivePersonnel()) {
+        for (Person p : getActivePersonnel(true)) {
             if (p.getSkill(skill) != null && p.getSkill(skill).getLevel() > highest) {
                 highest = p.getSkill(skill).getLevel();
                 person = p;
@@ -3183,7 +3118,7 @@ public class Campaign implements ITechManager {
      *       skill, available time, and rank as specified by the input parameters.
      */
     public List<Person> getTechsExpanded(final boolean noZeroMinute, final boolean eliteFirst, final boolean expanded) {
-        final List<Person> techs = getActivePersonnel().stream()
+        final List<Person> techs = getActivePersonnel(true).stream()
                                          .filter(person -> (expanded ? person.isTechExpanded() : person.isTech()) &&
                                                                  (!noZeroMinute || (person.getMinutesLeft() > 0)))
                                          .collect(Collectors.toList());
@@ -3222,7 +3157,7 @@ public class Campaign implements ITechManager {
 
     public List<Person> getAdmins() {
         List<Person> admins = new ArrayList<>();
-        for (Person p : getActivePersonnel()) {
+        for (Person p : getActivePersonnel(true)) {
             if (p.isAdministrator()) {
                 admins.add(p);
             }
@@ -3239,7 +3174,7 @@ public class Campaign implements ITechManager {
 
     public List<Person> getDoctors() {
         List<Person> docs = new ArrayList<>();
-        for (Person p : getActivePersonnel()) {
+        for (Person p : getActivePersonnel(true)) {
             if (p.isDoctor()) {
                 docs.add(p);
             }
@@ -3249,7 +3184,7 @@ public class Campaign implements ITechManager {
 
     public int getPatientsFor(Person doctor) {
         int patients = 0;
-        for (Person person : getActivePersonnel()) {
+        for (Person person : getActivePersonnel(true)) {
             if ((null != person.getDoctorId()) && person.getDoctorId().equals(doctor.getId())) {
                 patients++;
             }
@@ -3440,7 +3375,7 @@ public class Campaign implements ITechManager {
             final ProcurementPersonnelPick acquisitionCategory = campaignOptions.getAcquisitionPersonnelCategory();
             List<Person> logisticsPersonnel = new ArrayList<>();
 
-            for (Person person : getActivePersonnel()) {
+            for (Person person : getActivePersonnel(true)) {
                 if (isIneligibleToPerformProcurement(person, acquisitionCategory)) {
                     continue;
                 }
@@ -3984,7 +3919,7 @@ public class Campaign implements ITechManager {
      *     </ul>
      *   </li>
      * </ul>
-     *
+     * <p>
      * The process tracks progress and can span multiple work periods until complete.
      *
      * @param unit The unit to mothball. Must be active (not already mothballed)
@@ -4011,7 +3946,8 @@ public class Campaign implements ITechManager {
             // check astech time
             if (!unit.isSelfCrewed() && astechPoolMinutes < minutes * 6) {
                 // uh-oh
-                addReport(String.format(resources.getString("notEnoughAstechTime.mothballing"), unit.getHyperlinkedName()));
+                addReport(String.format(resources.getString("notEnoughAstechTime.mothballing"),
+                      unit.getHyperlinkedName()));
                 return;
             }
 
@@ -4022,12 +3958,15 @@ public class Campaign implements ITechManager {
                 astechPoolMinutes -= 6 * minutes;
             }
 
-            report = String.format(resources.getString("timeSpent.mothballing.tech"), tech.getHyperlinkedFullTitle(),
-                  minutes, unit.getHyperlinkedName());
+            report = String.format(resources.getString("timeSpent.mothballing.tech"),
+                  tech.getHyperlinkedFullTitle(),
+                  minutes,
+                  unit.getHyperlinkedName());
         } else {
             unit.setMothballTime(unit.getMothballTime() - TECH_WORK_DAY);
 
-            report = String.format(resources.getString("timeSpent.mothballing.noTech"), TECH_WORK_DAY,
+            report = String.format(resources.getString("timeSpent.mothballing.noTech"),
+                  TECH_WORK_DAY,
                   unit.getHyperlinkedName());
         }
 
@@ -4092,7 +4031,8 @@ public class Campaign implements ITechManager {
             // check astech time
             if (!unit.isSelfCrewed() && astechPoolMinutes < minutes * 6) {
                 // uh-oh
-                addReport(String.format(resources.getString("notEnoughAstechTime.activation"), unit.getHyperlinkedName()));
+                addReport(String.format(resources.getString("notEnoughAstechTime.activation"),
+                      unit.getHyperlinkedName()));
                 return;
             }
 
@@ -4103,12 +4043,15 @@ public class Campaign implements ITechManager {
                 astechPoolMinutes -= 6 * minutes;
             }
 
-            report = String.format(resources.getString("timeSpent.activation.tech"), tech.getHyperlinkedFullTitle(),
-                  minutes, unit.getHyperlinkedName());
+            report = String.format(resources.getString("timeSpent.activation.tech"),
+                  tech.getHyperlinkedFullTitle(),
+                  minutes,
+                  unit.getHyperlinkedName());
         } else {
             unit.setMothballTime(unit.getMothballTime() - TECH_WORK_DAY);
 
-            report = String.format(resources.getString("timeSpent.activation.noTech"), TECH_WORK_DAY,
+            report = String.format(resources.getString("timeSpent.activation.noTech"),
+                  TECH_WORK_DAY,
                   unit.getHyperlinkedName());
         }
 
@@ -5147,30 +5090,6 @@ public class Campaign implements ITechManager {
         person.changeAutoAwardSupportPoints((int) (score * multiplier));
     }
 
-    /**
-     * Retrieves the date of birth of the youngest child among the provided list of children.
-     *
-     * @param children the list children
-     *
-     * @return the date of birth of the youngest child
-     *
-     * @since 0.50.04
-     * @deprecated - Not shown in use.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    private LocalDate getYoungestChildDateOfBirth(List<Person> children) {
-        LocalDate youngestChildBirthDate = LocalDate.MIN;
-
-        for (Person child : children) {
-            LocalDate dateOfBirth = child.getDateOfBirth();
-            if (dateOfBirth.isAfter(youngestChildBirthDate)) {
-                youngestChildBirthDate = dateOfBirth;
-            }
-        }
-
-        return youngestChildBirthDate;
-    }
-
     public void processNewDayUnits() {
         // need to loop through units twice, the first time to do all maintenance and
         // the second time to do whatever else. Otherwise, maintenance minutes might
@@ -5697,7 +5616,7 @@ public class Campaign implements ITechManager {
      */
     public Person getSeniorCommander() {
         Person commander = null;
-        for (Person p : getActivePersonnel()) {
+        for (Person p : getActivePersonnel(true)) {
             if (p.isCommander()) {
                 return p;
             }
@@ -6105,29 +6024,20 @@ public class Campaign implements ITechManager {
 
     /**
      * @since 0.50.04
-     * @deprecated {@link Campaign#getFaction()}.getShortName() instead.
+     * @deprecated {@link Campaign#getFaction()}.getShortName() instead. Mitigated in 0.50.06, remove in 0.50.07
      */
-    @Deprecated(since = "0.50.04")
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public String getFactionCode() {
         return getFaction().getShortName();
     }
 
     /**
      * @since 0.50.04
-     * @deprecated Use {@link Campaign#setFaction(Faction)} instead.
+     * @deprecated Use {@link Campaign#setFaction(Faction)} instead. Mitigated in 0.50.06, remove in 0.50.07
      */
-    @Deprecated(since = "0.50.04")
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public void setFactionCode(final String factionCode) {
         setFaction(Factions.getInstance().getFaction(factionCode));
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated - No indicated uses
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public Faction getRetainerEmployer() {
-        return Factions.getInstance().getFaction(getRetainerEmployerCode());
     }
 
     public String getRetainerEmployerCode() {
@@ -6288,15 +6198,6 @@ public class Campaign implements ITechManager {
 
     public void setUnitIcon(final StandardForceIcon unitIcon) {
         this.unitIcon = unitIcon;
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated - No indicated use.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void addFunds(final Money quantity) {
-        addFunds(TransactionType.MISCELLANEOUS, quantity, null);
     }
 
     public void addFunds(final TransactionType type, final Money quantity, @Nullable String description) {
@@ -6751,38 +6652,6 @@ public class Campaign implements ITechManager {
 
     public void setRankSystemDirect(final RankSystem rankSystem) {
         this.rankSystem = rankSystem;
-    }
-
-    /**
-     * Returns the highest ranked person from the given list of personnel.
-     *
-     * @param personnel          the list of personnel from which to find the highest ranked person
-     * @param useSkillTiebreaker determines whether to use an experience level tiebreaker when comparing ranks (true -
-     *                           use skill tiebreaker, false - do not use skill tiebreaker)
-     *
-     * @return the highest ranked person from the list, or null if the provided personnel list is empty
-     *
-     * @since 0.50.04
-     * @deprecated No indicated Use.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public Person getHighestRankedPerson(List<Person> personnel, boolean useSkillTiebreaker) {
-        Person highestRankedPerson = null;
-
-        if (!personnel.isEmpty()) {
-            for (Person person : personnel) {
-                if (useSkillTiebreaker) {
-                    if (person.outRanksUsingSkillTiebreaker(this, highestRankedPerson)) {
-                        highestRankedPerson = person;
-                    }
-                } else {
-                    if (person.outRanks(highestRankedPerson)) {
-                        highestRankedPerson = person;
-                    }
-                }
-            }
-        }
-        return highestRankedPerson;
     }
     // endregion Ranks
 
@@ -7637,7 +7506,8 @@ public class Campaign implements ITechManager {
     }
 
     public int getAstechNeed() {
-        return (Math.toIntExact(getActivePersonnel().stream().filter(Person::isTech).count()) * 6) - getNumberAstechs();
+        return (Math.toIntExact(getActivePersonnel(true).stream().filter(Person::isTech).count()) * 6) -
+                     getNumberAstechs();
     }
 
     public void increaseAstechPool(int i) {
@@ -7668,7 +7538,7 @@ public class Campaign implements ITechManager {
 
     public int getNumberPrimaryAstechs() {
         int astechs = getAstechPool();
-        for (Person p : getActivePersonnel()) {
+        for (Person p : getActivePersonnel(true)) {
             if (p.getPrimaryRole().isAstech() && !p.isDeployed()) {
                 astechs++;
             }
@@ -7678,7 +7548,7 @@ public class Campaign implements ITechManager {
 
     public int getNumberSecondaryAstechs() {
         int astechs = 0;
-        for (Person p : getActivePersonnel()) {
+        for (Person p : getActivePersonnel(true)) {
             if (p.getSecondaryRole().isAstech() && !p.isDeployed()) {
                 astechs++;
             }
@@ -7760,7 +7630,7 @@ public class Campaign implements ITechManager {
      */
     public int getNumberMedics() {
         return getMedicPool() +
-                     Math.toIntExact(getActivePersonnel().stream()
+                     Math.toIntExact(getActivePersonnel(true).stream()
                                            .filter(p -> (p.getPrimaryRole().isMedic() ||
                                                                p.getSecondaryRole().isMedic()) && !p.isDeployed())
                                            .count());
@@ -7946,15 +7816,6 @@ public class Campaign implements ITechManager {
             cmdrStrategy = getFlaggedCommander().getSkill(SkillType.S_STRATEGY).getLevel();
         }
         return cmdrStrategy;
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated - No indicated Uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public int getUnitRatingAsInteger() {
-        return getAtBUnitRatingMod();
     }
 
     public RandomSkillPreferences getRandomSkillPreferences() {
@@ -8700,34 +8561,6 @@ public class Campaign implements ITechManager {
         }
     }
 
-    /**
-     * @since 0.50.04
-     * @deprecated - No indicated uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void setHealingTimeOptions(int newHeal, int newNaturalHeal) {
-        // we need to check the current values and then if necessary change the times for all personnel, giving them
-        // credit for their current waiting time
-        int currentHeal = getCampaignOptions().getHealingWaitingPeriod();
-        int currentNaturalHeal = getCampaignOptions().getNaturalHealingWaitingPeriod();
-
-        getCampaignOptions().setHealingWaitingPeriod(newHeal);
-        getCampaignOptions().setNaturalHealingWaitingPeriod(newNaturalHeal);
-
-        int healDiff = newHeal - currentHeal;
-        int naturalDiff = newNaturalHeal - currentNaturalHeal;
-
-        if (healDiff != 0 || naturalDiff != 0) {
-            for (Person p : getPersonnel()) {
-                if (p.getDoctorId() != null) {
-                    p.setDaysToWaitForHealing(max(p.getDaysToWaitForHealing() + healDiff, 1));
-                } else {
-                    p.setDaysToWaitForHealing(max(p.getDaysToWaitForHealing() + naturalDiff, 1));
-                }
-            }
-        }
-    }
-
     private CampaignTransporterMap getCampaignTransporterMap(CampaignTransportType campaignTransportType) {
         if (campaignTransportType.isTacticalTransport()) {
             return tacticalTransporters;
@@ -8884,7 +8717,11 @@ public class Campaign implements ITechManager {
                                                                       " performing maintenance</strong><br><br>");
             for (Part part : unit.getParts()) {
                 try {
-                    String partReport = doMaintenanceOnUnitPart(unit, part, partsToDamage, paidMaintenance, asTechsUsed);
+                    String partReport = doMaintenanceOnUnitPart(unit,
+                          part,
+                          partsToDamage,
+                          paidMaintenance,
+                          asTechsUsed);
                     if (partReport != null) {
                         maintenanceReport.append(partReport).append("<br>");
                     }
@@ -8979,8 +8816,8 @@ public class Campaign implements ITechManager {
         }
     }
 
-    private String doMaintenanceOnUnitPart(Unit unit, Part part, Map<Part, Integer> partsToDamage, boolean paidMaintenance,
-          int asTechsUsed) {
+    private String doMaintenanceOnUnitPart(Unit unit, Part part, Map<Part, Integer> partsToDamage,
+          boolean paidMaintenance, int asTechsUsed) {
         String partReport = "<b>" + part.getName() + "</b> (Quality " + part.getQualityName() + ')';
         if (!part.needsMaintenance()) {
             return null;
@@ -9353,11 +9190,7 @@ public class Campaign implements ITechManager {
     /**
      * Returns the type of rating method as selected in the Campaign Options dialog. Lazy-loaded for performance.
      * Default is CampaignOpsReputation
-     *
-     * @since 0.50.04
-     * @deprecated Unknown replacement.
      */
-    @Deprecated(since = "0.50.04")
     public IUnitRating getUnitRating() {
         // if we switched unit rating methods,
         if (unitRating != null && (unitRating.getUnitRatingMethod() != getCampaignOptions().getUnitRatingMethod())) {

@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -53,9 +58,9 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
 public class LargeCraftAmmoSwapDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(LargeCraftAmmoSwapDialog.class);
 
-    private final Unit                    unit;
+    private final Unit unit;
     private final BayMunitionsChoicePanel mainPanel;
-    private       boolean                 canceled = true;
+    private boolean canceled = true;
 
     public LargeCraftAmmoSwapDialog(final JFrame frame, final Unit unit) {
         super(frame, true);
@@ -64,8 +69,8 @@ public class LargeCraftAmmoSwapDialog extends JDialog {
         getContentPane().setLayout(new BorderLayout());
         mainPanel = new BayMunitionsChoicePanel(unit.getEntity(), unit.getCampaign().getGame());
         getContentPane().add(new JScrollPaneWithSpeed(mainPanel), BorderLayout.CENTER);
-        JPanel  panButtons = new JPanel();
-        JButton button     = new JButton("OK");
+        JPanel panButtons = new JPanel();
+        JButton button = new JButton("OK");
         button.addActionListener(ev -> apply());
         panButtons.add(button);
         button = new JButton("Cancel");
@@ -79,11 +84,7 @@ public class LargeCraftAmmoSwapDialog extends JDialog {
 
     /**
      * These need to be migrated to the Suite Constants / Suite Options Setup
-     *
-     * @since 0.50.04
-     * @deprecated Move to Suite Constants / Suite Options Setup
      */
-    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(LargeCraftAmmoSwapDialog.class);
@@ -118,8 +119,8 @@ public class LargeCraftAmmoSwapDialog extends JDialog {
         for (Part p : unit.getParts()) {
             if (p instanceof LargeCraftAmmoBin bin) {
                 bin.updateConditionFromEntity(false);
-                Mounted<?> ammo     = unit.getEntity().getEquipment(bin.getEquipmentNum());
-                int        oldShots = shotsByBay.get(bin.getBay()).getOrDefault(bin.getType().getInternalName(), 0);
+                Mounted<?> ammo = unit.getEntity().getEquipment(bin.getEquipmentNum());
+                int oldShots = shotsByBay.get(bin.getBay()).getOrDefault(bin.getType().getInternalName(), 0);
 
                 // If we're removing ammo, add it the warehouse
                 int shotsToChange = oldShots - ammo.getBaseShotsLeft();
@@ -131,7 +132,7 @@ public class LargeCraftAmmoSwapDialog extends JDialog {
                 if (shotsToChange > 0) {
                     unit.getCampaign().getQuartermaster().addAmmo(bin.getType(), shotsToChange);
                 }
-                
+
                 if (shotsByBay.containsKey(bin.getBay())) {
                     Map<String, Integer> oldAmmo = shotsByBay.get(bin.getBay());
                     if (oldAmmo.containsKey(bin.getType().getInternalName())) {

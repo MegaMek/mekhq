@@ -27,17 +27,6 @@
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
-import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.unit.Unit;
-import mekhq.gui.dialog.nagDialogs.PregnantCombatantNagDialog;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.time.LocalDate;
-import java.util.List;
-
 import static mekhq.campaign.force.Force.FORCE_NONE;
 import static mekhq.campaign.force.Force.FORCE_ORIGIN;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.PregnantCombatantNagLogic.hasActivePregnantCombatant;
@@ -46,9 +35,21 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
+import java.util.List;
+
+import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.Mission;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Faction;
+import mekhq.gui.dialog.nagDialogs.PregnantCombatantNagDialog;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 /**
- * This class is a test class for the {@link PregnantCombatantNagDialog} class.
- * It contains tests for various scenarios related to the {@code isPregnantCombatant} method
+ * This class is a test class for the {@link PregnantCombatantNagDialog} class. It contains tests for various scenarios
+ * related to the {@code isPregnantCombatant} method
  */
 class PregnantCombatantNagLogicTest {
     // Mock objects for the tests
@@ -59,13 +60,19 @@ class PregnantCombatantNagLogicTest {
     private Unit unit;
 
     /**
-     * Test setup for each test, runs before each test.
-     * Initializes the mock objects and sets up the necessary mock behaviors.
+     * Test setup for each test, runs before each test. Initializes the mock objects and sets up the necessary mock
+     * behaviors.
      */
     @BeforeEach
     void init() {
         // Initialize the mock objects
         campaign = mock(Campaign.class);
+
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(campaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
+
         personNotPregnant = new Person(campaign);
         personPregnant = new Person(campaign);
         personPregnant.setDueDate(LocalDate.of(3151, 1, 1));

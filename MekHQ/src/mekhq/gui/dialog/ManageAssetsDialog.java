@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -66,15 +71,15 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
 public class ManageAssetsDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(ManageAssetsDialog.class);
 
-    private JFrame          frame;
-    private Campaign        campaign;
+    private JFrame frame;
+    private Campaign campaign;
     private AssetTableModel assetModel;
 
-    private JButton     btnAdd;
-    private JButton     btnEdit;
-    private JButton     btnDelete;
-    private JButton     btnOK;
-    private JTable      assetTable;
+    private JButton btnAdd;
+    private JButton btnEdit;
+    private JButton btnDelete;
+    private JButton btnOK;
+    private JTable assetTable;
     private JScrollPane scrollAssetTable;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ManageAssetsDialog",
@@ -84,16 +89,16 @@ public class ManageAssetsDialog extends JDialog {
     public ManageAssetsDialog(JFrame parent, Campaign c) {
         super(parent, true);
         this.frame = parent;
-        campaign   = c;
+        campaign = c;
         assetModel = new AssetTableModel(campaign.getFinances().getAssets());
         initComponents();
         setLocationRelativeTo(parent);
     }
 
     private void initComponents() {
-        btnOK     = new JButton();
-        btnAdd    = new JButton();
-        btnEdit   = new JButton();
+        btnOK = new JButton();
+        btnAdd = new JButton();
+        btnEdit = new JButton();
         btnDelete = new JButton();
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -142,11 +147,7 @@ public class ManageAssetsDialog extends JDialog {
 
     /**
      * These need to be migrated to the Suite Constants / Suite Options Setup
-     *
-     * @since 0.50.04
-     * @deprecated Move to Suite Constants / Suite Options Setup
      */
-    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ManageAssetsDialog.class);
@@ -168,7 +169,7 @@ public class ManageAssetsDialog extends JDialog {
     }
 
     private void addAsset() {
-        Asset           a   = new Asset();
+        Asset a = new Asset();
         EditAssetDialog ead = new EditAssetDialog(frame, a);
         ead.setTitle(resourceMap.getString("addAssetDialogTitle.text"));
         ead.setVisible(true);
@@ -218,11 +219,11 @@ public class ManageAssetsDialog extends JDialog {
      * A table model for displaying parts - similar to the one in CampaignGUI, but not exactly
      */
     public static class AssetTableModel extends DataTableModel {
-        public final static int COL_NAME     = 0;
-        public final static int COL_VALUE    = 1;
+        public final static int COL_NAME = 0;
+        public final static int COL_VALUE = 1;
         public final static int COL_SCHEDULE = 2;
-        public final static int COL_INCOME   = 3;
-        public final static int N_COL        = 4;
+        public final static int COL_INCOME = 3;
+        public final static int N_COL = 4;
 
         public AssetTableModel(List<Asset> assets) {
             data = assets;
@@ -292,7 +293,8 @@ public class ManageAssetsDialog extends JDialog {
 
         public class Renderer extends DefaultTableCellRenderer {
             @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                  boolean hasFocus, int row, int column) {
                 super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 setOpaque(true);
                 int actualCol = table.convertColumnIndexToModel(column);

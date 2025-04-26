@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -48,14 +53,16 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  * @since July 15, 2009, 9:30 PM
+ * @deprecated No indicated Uses.
  */
+@Deprecated(since = "0.50.06", forRemoval = true)
 public class MekViewDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(MekViewDialog.class);
 
-    private MekView     mekView;
-    private JButton     btnOkay;
+    private MekView mekView;
+    private JButton btnOkay;
     private JScrollPane jScrollPane2;
-    private JTextPane   txtMek;
+    private JTextPane txtMek;
 
     /** Creates new form MekViewDialog */
     public MekViewDialog(JFrame parent, boolean modal, MekView mv) {
@@ -68,8 +75,8 @@ public class MekViewDialog extends JDialog {
     private void initComponents() {
 
         jScrollPane2 = new JScrollPaneWithSpeed();
-        txtMek       = new JTextPane();
-        btnOkay      = new JButton();
+        txtMek = new JTextPane();
+        btnOkay = new JButton();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekViewDialog",
               MekHQ.getMHQOptions().getLocale());
@@ -97,11 +104,7 @@ public class MekViewDialog extends JDialog {
 
     /**
      * These need to be migrated to the Suite Constants / Suite Options Setup
-     *
-     * @since 0.50.04
-     * @deprecated Move to Suite Constants / Suite Options Setup
      */
-    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(MekViewDialog.class);

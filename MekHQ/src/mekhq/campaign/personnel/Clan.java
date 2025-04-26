@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel;
 
@@ -59,23 +64,23 @@ public class Clan {
     // region Variable Declarations
     private static Map<String, Clan> allClans;
 
-    private String            code;
-    private String            generationCode; // this is used to enable RA name generation using CSR lists, for example
-    private String            fullName;
-    private int               startDate;
-    private int               endDate;
-    private int               abjurationDate;
-    private List<DatedRecord> rivals;
-    private List<DatedRecord> nameChanges;
-    private boolean           homeClan;
+    private String code;
+    private String generationCode; // this is used to enable RA name generation using CSR lists, for example
+    private String fullName;
+    private int startDate;
+    private int endDate;
+    private int abjurationDate;
+    private final List<DatedRecord> rivals;
+    private final List<DatedRecord> nameChanges;
+    private boolean homeClan;
     // endregion Variable Declarations
 
     public Clan() {
-        startDate      = 2807;
-        endDate        = 9999;
+        startDate = 2807;
+        endDate = 9999;
         abjurationDate = 0;
-        rivals         = new ArrayList<>();
-        nameChanges    = new ArrayList<>();
+        rivals = new ArrayList<>();
+        nameChanges = new ArrayList<>();
     }
 
     /**
@@ -171,23 +176,6 @@ public class Clan {
     }
 
     /**
-     * @param year the year to determine if the Clan has been abjured by
-     *
-     * @return whether the Clan has been abjured
-     *
-     * @since 0.50.04
-     * @deprecated no indicated uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public boolean isAbjured(int year) {
-        if (abjurationDate == 0) {
-            return false;
-        } else {
-            return abjurationDate < year;
-        }
-    }
-
-    /**
      * @param year the year to get the Clan's rivals in
      *
      * @return a list of all the Clan's rivals in the specified year
@@ -219,7 +207,7 @@ public class Clan {
      */
     public Clan getRivalClan(int year) {
         List<Clan> rivals = getRivals(year);
-        int        roll   = Compute.randomInt(rivals.size() + 1);
+        int roll = Compute.randomInt(rivals.size() + 1);
         if (roll > rivals.size() - 1) {
             return randomClan(year, isHomeClan());
         }
@@ -259,8 +247,8 @@ public class Clan {
             return;
         }
 
-        Element  clanElement = doc.getDocumentElement();
-        NodeList nl          = clanElement.getChildNodes();
+        Element clanElement = doc.getDocumentElement();
+        NodeList nl = clanElement.getChildNodes();
         clanElement.normalize();
 
         for (int i = 0; i < nl.getLength(); i++) {
@@ -293,7 +281,7 @@ public class Clan {
                     retVal.abjurationDate = Integer.parseInt(wn.getTextContent().trim());
                 } else if (wn.getNodeName().equalsIgnoreCase("nameChange")) {
                     int start = retVal.startDate;
-                    int end   = retVal.endDate;
+                    int end = retVal.endDate;
                     if (null != wn.getAttributes().getNamedItem("start")) {
                         start = Integer.parseInt(wn.getAttributes().getNamedItem("start").getTextContent().trim());
                     }
@@ -303,7 +291,7 @@ public class Clan {
                     retVal.nameChanges.add(new DatedRecord(start, end, wn.getTextContent().trim()));
                 } else if (wn.getNodeName().equalsIgnoreCase("rivals")) {
                     int start = retVal.startDate;
-                    int end   = retVal.endDate;
+                    int end = retVal.endDate;
                     if (null != wn.getAttributes().getNamedItem("start")) {
                         start = Integer.parseInt(wn.getAttributes().getNamedItem("start").getTextContent().trim());
                     }
@@ -331,8 +319,8 @@ public class Clan {
      * This holds dated records for Clan events
      */
     private static class DatedRecord {
-        private int    startDate;
-        private int    endDate;
+        private int startDate;
+        private int endDate;
         private String description;
 
         public DatedRecord(int s, int e, String d) {
