@@ -414,8 +414,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
 
                 if ((null != patient) &&
                           (patient.needsFixing()) &&
-                          (getCampaign().getPatientsFor(doctor) < doctorCapacity) &&
-                          (getCampaign().getTargetFor(patient, doctor).getValue() != TargetRoll.IMPOSSIBLE)) {
+                          (getCampaign().getPatientsFor(doctor) < doctorCapacity)) {
                     patient.setDoctorId(doctor.getId(), healingWaitingPeriod);
                     MekHQ.triggerEvent(new PersonMedicalAssignmentEvent(doctor, patient));
                     break;
@@ -426,8 +425,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
             for (Person patient : selectedPatients) {
                 if ((null != patient) &&
                           (patient.needsFixing()) &&
-                          (getCampaign().getPatientsFor(doctor) < doctorCapacity) &&
-                          (getCampaign().getTargetFor(patient, doctor).getValue() != TargetRoll.IMPOSSIBLE)) {
+                          (getCampaign().getPatientsFor(doctor) < doctorCapacity)) {
                     patient.setDoctorId(doctor.getId(), healingWaitingPeriod);
                     MekHQ.triggerEvent(new PersonMedicalAssignmentEvent(doctor, patient));
                 }
