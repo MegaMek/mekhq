@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -50,21 +55,21 @@ import mekhq.gui.control.EditKillLogControl;
 public class EditKillLogDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(EditKillLogDialog.class);
 
-    private JFrame   frame;
-    private Campaign campaign;
-    private Person   person;
+    private final JFrame frame;
+    private final Campaign campaign;
+    private final Person person;
 
     private EditKillLogControl editKillLogControl;
-    private JButton            btnOK;
+    private JButton btnOK;
 
     public EditKillLogDialog(JFrame parent, boolean modal, Campaign campaign, Person person) {
         super(parent, modal);
         Objects.requireNonNull(campaign);
         Objects.requireNonNull(person);
 
-        this.frame    = parent;
+        this.frame = parent;
         this.campaign = campaign;
-        this.person   = person;
+        this.person = person;
 
         initComponents();
         setLocationRelativeTo(parent);
@@ -94,11 +99,7 @@ public class EditKillLogDialog extends JDialog {
 
     /**
      * These need to be migrated to the Suite Constants / Suite Options Setup
-     *
-     * @since 0.50.04
-     * @deprecated Move to Suite Constants / Suite Options Setup
      */
-    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditKillLogDialog.class);

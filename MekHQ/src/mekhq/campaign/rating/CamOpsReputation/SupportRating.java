@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.rating.CamOpsReputation;
 
@@ -46,15 +51,13 @@ public class SupportRating {
     /**
      * This method calculates the support rating for a campaign.
      *
-     * @param campaign                   The campaign object on which the
-     *                                   calculation is based.
-     * @param transportationRequirements A map representing the transportation
-     *                                   requirements.
-     * @return A map containing maps with the calculated support rating, as well as
-     *         individual requirements.
+     * @param campaign                   The campaign object on which the calculation is based.
+     * @param transportationRequirements A map representing the transportation requirements.
+     *
+     * @return A map containing maps with the calculated support rating, as well as individual requirements.
      */
     protected static Map<String, Map<String, ?>> calculateSupportRating(Campaign campaign,
-            Map<String, Integer> transportationRequirements) {
+          Map<String, Integer> transportationRequirements) {
         // Create a map to store the results
         Map<String, Map<String, ?>> supportRating = new HashMap<>();
 
@@ -62,10 +65,10 @@ public class SupportRating {
         Map<String, Integer> crewRequirements = calculateCrewRequirements(campaign);
         // Calculate the technician requirements for this campaign
         Map<String, List<Integer>> technicianRequirements = calculateTechnicianRequirements(campaign,
-                transportationRequirements);
+              transportationRequirements);
         // Calculate the administration requirements for this campaign
         Map<String, Integer> administrationRequirements = calculateAdministratorRequirements(campaign,
-                technicianRequirements.get("totals").get(0));
+              technicianRequirements.get("totals").get(0));
 
         // Add the calculated requirements into the supportRating map
         supportRating.put("administrationRequirements", administrationRequirements);
@@ -73,9 +76,9 @@ public class SupportRating {
         supportRating.put("technicianRequirements", technicianRequirements);
 
         // Calculate the total of requirements
-        int total = administrationRequirements.get("total")
-                + crewRequirements.get("crewRequirements")
-                + technicianRequirements.get("rating").get(0);
+        int total = administrationRequirements.get("total") +
+                          crewRequirements.get("crewRequirements") +
+                          technicianRequirements.get("rating").get(0);
 
         // Add the total value into the supportRating map
         supportRating.put("total", Map.of("total", total));
@@ -89,32 +92,26 @@ public class SupportRating {
     /**
      * Calculates the campaign's administrative requirements.
      *
-     * @param campaign               The campaign for which to calculate the
-     *                               administrative requirements.
-     * @param technicianRequirements The number of technicians required by the
-     *                               campaign.
-     * @return A map containing the following information:
-     *         - "totalPersonnelCount": The total number of personnel in the
-     *         campaign.
-     *         - "administratorCount": The number of administrators in the campaign.
-     *         - "personnelCount": The calculated number of non-administrator
-     *         personnel required based on the campaign faction.
-     *         - "total": A calculated value indicating the total administrative
-     *         requirement, where 0 indicates
-     *         a sufficient of non-administrator personnel compared to
-     *         administrators, and -5 indicates
-     *         a shortage.
+     * @param campaign               The campaign for which to calculate the administrative requirements.
+     * @param technicianRequirements The number of technicians required by the campaign.
+     *
+     * @return A map containing the following information: - "totalPersonnelCount": The total number of personnel in the
+     *       campaign. - "administratorCount": The number of administrators in the campaign. - "personnelCount": The
+     *       calculated number of non-administrator personnel required based on the campaign faction. - "total": A
+     *       calculated value indicating the total administrative requirement, where 0 indicates a sufficient of
+     *       non-administrator personnel compared to administrators, and -5 indicates a shortage.
      */
     private static Map<String, Integer> calculateAdministratorRequirements(Campaign campaign,
-            int technicianRequirements) {
+          int technicianRequirements) {
         Map<String, Integer> administrationRequirements = new HashMap<>();
 
         // Get the total sums of personnel and administrators
         int totalPersonnelCount = getTotalPersonnelCount(campaign, technicianRequirements);
 
-        int administratorCount = (int) campaign.getActivePersonnel().stream()
-                .filter(Person::isAdministrator)
-                .count();
+        int administratorCount = (int) campaign.getActivePersonnel(true)
+                                             .stream()
+                                             .filter(Person::isAdministrator)
+                                             .count();
 
         // Calculate personnel count based on campaign faction
         double divisor = campaign.getFaction().isPirate() || campaign.getFaction().isMercenary() ? 10 : 20;
@@ -129,21 +126,20 @@ public class SupportRating {
         administrationRequirements.put("total", total);
 
         logger.debug("Administrator Requirements = {}",
-                administrationRequirements.entrySet().stream()
-                        .map(entry -> entry.getKey() + ": " + entry.getValue() + '\n')
-                        .collect(Collectors.joining()));
+              administrationRequirements.entrySet()
+                    .stream()
+                    .map(entry -> entry.getKey() + ": " + entry.getValue() + '\n')
+                    .collect(Collectors.joining()));
 
         return administrationRequirements;
     }
 
     /**
-     * Calculates the total personnel count required for the campaign, taking into
-     * account technician requirements.
+     * Calculates the total personnel count required for the campaign, taking into account technician requirements.
      *
-     * @param campaign               The campaign for which to calculate the total
-     *                               personnel count.
-     * @param technicianRequirements The number of technicians required for the
-     *                               campaign.
+     * @param campaign               The campaign for which to calculate the total personnel count.
+     * @param technicianRequirements The number of technicians required for the campaign.
+     *
      * @return The total personnel count required for the campaign.
      */
     private static int getTotalPersonnelCount(Campaign campaign, int technicianRequirements) {
@@ -170,14 +166,12 @@ public class SupportRating {
     }
 
     /**
-     * Calculates the crew requirements for the campaign.
-     * If a not fully crewed LargeCraft is found, the crew requirements are set to
-     * -5.
-     * Otherwise, the crew requirements are set to 0.
+     * Calculates the crew requirements for the campaign. If a not fully crewed LargeCraft is found, the crew
+     * requirements are set to -5. Otherwise, the crew requirements are set to 0.
      *
      * @param campaign the campaign for which to calculate the crew requirements
-     * @return a map containing the crew requirements, with the key
-     *         "crewRequirements" and the value either -5 or 0
+     *
+     * @return a map containing the crew requirements, with the key "crewRequirements" and the value either -5 or 0
      */
     private static Map<String, Integer> calculateCrewRequirements(Campaign campaign) {
         int crewRequirements = 0;
@@ -199,15 +193,14 @@ public class SupportRating {
     /**
      * Calculates the technician requirements based on transportation requirements.
      *
-     * @param campaign                   The campaign for which to calculate the
-     *                                   technician requirements.
-     * @param transportationRequirements The transportation requirements for the
-     *                                   campaign.
-     * @return A map where the keys represent the technician type and the values
-     *         represent a list of the technician count and the tech count.
+     * @param campaign                   The campaign for which to calculate the technician requirements.
+     * @param transportationRequirements The transportation requirements for the campaign.
+     *
+     * @return A map where the keys represent the technician type and the values represent a list of the technician
+     *       count and the tech count.
      */
     private static Map<String, List<Integer>> calculateTechnicianRequirements(Campaign campaign,
-            Map<String, Integer> transportationRequirements) {
+          Map<String, Integer> transportationRequirements) {
         Map<String, List<Integer>> technicianRequirements = new HashMap<>();
 
         // Calculate counts for each unit type
@@ -238,20 +231,21 @@ public class SupportRating {
         technicianRequirements.put("rating", List.of(calculateTechRating(percentage)));
 
         logger.debug("Technician Requirements = {}",
-                technicianRequirements.entrySet().stream()
-                        .map(entry -> entry.getKey() + ": " + entry.getValue() + '\n')
-                        .collect(Collectors.joining()));
+              technicianRequirements.entrySet()
+                    .stream()
+                    .map(entry -> entry.getKey() + ": " + entry.getValue() + '\n')
+                    .collect(Collectors.joining()));
 
         return technicianRequirements;
     }
 
     /**
-     * Calculates the total count of battle armor and proto meks in a given
-     * campaign.
+     * Calculates the total count of battle armor and proto meks in a given campaign.
      *
      * @param campaign the campaign containing the units to be counted
-     * @return a map containing the counts of battle armor and proto meks, with the
-     *         keys "battleArmorCount" and "protoMekCount"
+     *
+     * @return a map containing the counts of battle armor and proto meks, with the keys "battleArmorCount" and
+     *       "protoMekCount"
      */
     private static Map<String, Integer> calculateBattleArmorAndProtoMekCounts(Campaign campaign) {
         Map<String, Integer> counts = new HashMap<>();
@@ -276,16 +270,14 @@ public class SupportRating {
     }
 
     /**
-     * Calculates the number of personnel with different tech roles in the given
-     * campaign.
+     * Calculates the number of personnel with different tech roles in the given campaign.
      *
      * @param campaign the campaign object from which to calculate the tech counts
-     * @return a map that contains the counts of different tech roles. The keys are
-     *         as follows:
-     *         - "techMekCount" for personnel with the role "TechMek"
-     *         - "techMechanicCount" for personnel with the role "TechMechanic"
-     *         - "techAeroCount" for personnel with the role "TechAero"
-     *         - "techBattleArmorCount" for personnel with the role "TechBA"
+     *
+     * @return a map that contains the counts of different tech roles. The keys are as follows: - "techMekCount" for
+     *       personnel with the role "TechMek" - "techMechanicCount" for personnel with the role "TechMechanic" -
+     *       "techAeroCount" for personnel with the role "TechAero" - "techBattleArmorCount" for personnel with the role
+     *       "TechBA"
      */
     private static Map<String, Integer> calculateTechCounts(Campaign campaign) {
         Map<String, Integer> techCounts = new HashMap<>();
@@ -295,7 +287,7 @@ public class SupportRating {
         techCounts.put("techAeroCount", 0);
         techCounts.put("techBattleArmorCount", 0);
 
-        for (Person person : campaign.getActivePersonnel()) {
+        for (Person person : campaign.getActivePersonnel(true)) {
             updateCount(person::isTechMek, "techMekCount", techCounts);
             updateCount(person::isTechMechanic, "techMechanicCount", techCounts);
             updateCount(person::isTechAero, "techAeroCount", techCounts);
@@ -306,9 +298,8 @@ public class SupportRating {
     }
 
     /**
-     * Updates the count in the given map based on a condition.
-     * If the condition is true, the count for the specified key in the map is
-     * incremented by 1.
+     * Updates the count in the given map based on a condition. If the condition is true, the count for the specified
+     * key in the map is incremented by 1.
      *
      * @param condition The condition to check. If true, the count will be updated.
      * @param key       The key in the map for which to update the count.
@@ -321,16 +312,14 @@ public class SupportRating {
     }
 
     /**
-     * Calculates the technician rating based on the percentage of total technicians
-     * to total requirements.
+     * Calculates the technician rating based on the percentage of total technicians to total requirements.
      *
      * @param percentage The percentage of total technicians to total requirements.
-     * @return The technician rating based on the given percentage:
-     *         - If the percentage is less than 100, returns -5.
-     *         - If the percentage is between 100 and 150 (inclusive), returns 0.
-     *         - If the percentage is between 151 and 175 (inclusive), returns 5.
-     *         - If the percentage is between 176 and 200 (inclusive), returns 10.
-     *         - If the percentage is greater than 200, returns 15.
+     *
+     * @return The technician rating based on the given percentage: - If the percentage is less than 100, returns -5. -
+     *       If the percentage is between 100 and 150 (inclusive), returns 0. - If the percentage is between 151 and 175
+     *       (inclusive), returns 5. - If the percentage is between 176 and 200 (inclusive), returns 10. - If the
+     *       percentage is greater than 200, returns 15.
      */
     private static int calculateTechRating(int percentage) {
         if (percentage < 100) {

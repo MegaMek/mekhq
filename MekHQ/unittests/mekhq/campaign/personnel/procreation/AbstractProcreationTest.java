@@ -27,6 +27,20 @@
  */
 package mekhq.campaign.personnel.procreation;
 
+import static mekhq.campaign.personnel.PersonnelTestUtilities.matchPersonUUID;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
+
+import java.time.LocalDate;
+
 import megamek.common.Compute;
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
@@ -36,6 +50,7 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.RandomProcreationMethod;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
+import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,16 +58,6 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.time.LocalDate;
-
-import static mekhq.campaign.personnel.PersonnelTestUtilities.matchPersonUUID;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(value = MockitoExtension.class)
 public class AbstractProcreationTest {
@@ -130,6 +135,9 @@ public class AbstractProcreationTest {
     @Test
     public void testDetermineFather() {
         when(mockProcreation.determineFather(any(), any())).thenCallRealMethod();
+        Faction campaignFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         final Person mother = new Person(mockCampaign);
         final Person father = new Person(mockCampaign);
@@ -708,6 +716,9 @@ public class AbstractProcreationTest {
     public void testAddPregnancy() {
         doCallRealMethod().when(mockProcreation).addPregnancy(any(), any(), any(), eq(false));
         doCallRealMethod().when(mockProcreation).addPregnancy(any(), any(), any(), anyInt(), eq(false));
+        Faction campaignFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         final Person mother = new Person(mockCampaign);
         final Person father = new Person(mockCampaign);
@@ -750,6 +761,9 @@ public class AbstractProcreationTest {
     @Test
     public void testRemovePregnancy() {
         doCallRealMethod().when(mockProcreation).removePregnancy(any());
+        Faction campaignFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         final Person mother = new Person(mockCampaign);
         mother.setDueDate(LocalDate.ofYearDay(3025, 1));
@@ -902,6 +916,9 @@ public class AbstractProcreationTest {
     @Test
     public void testRandomlyProcreates() {
         doCallRealMethod().when(mockProcreation).randomlyProcreates(any(), any());
+        Faction campaignFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         final Person person = new Person(mockCampaign);
 
