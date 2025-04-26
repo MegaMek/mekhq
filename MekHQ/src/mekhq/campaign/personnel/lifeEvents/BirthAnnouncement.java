@@ -92,7 +92,7 @@ public class BirthAnnouncement {
 
         if (dialog.getDialogChoice() == SUPPRESS_DIALOG_RESPONSE_INDEX) {
             CampaignOptions campaignOptions = campaign.getCampaignOptions();
-            campaignOptions.setShowLifeEventDialogBirths(true);
+            campaignOptions.setShowLifeEventDialogBirths(false);
         }
     }
 
