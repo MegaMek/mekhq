@@ -462,6 +462,14 @@
 
     <!-- Misc SPA -->
     <ability>
+        <lookupName>admin_scrounge</lookupName>
+        <displayName>Scrounge (Unofficial)</displayName>
+        <desc><![CDATA[The character can make one additional procurement attempt per day.]]></desc>
+        <xpCost>200</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+    </ability>
+    <ability>
         <lookupName>atow_alternate_id</lookupName>
         <displayName>Alternate ID (ATOW)</displayName>
         <desc><![CDATA[A low Reputation trait infers a penalty to Negotiation, Streetwise and Protocols skill checks. This SPA reduces that penalty by 2.
