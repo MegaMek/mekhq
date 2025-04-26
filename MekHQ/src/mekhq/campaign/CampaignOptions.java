@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign;
 
@@ -2559,28 +2564,6 @@ public class CampaignOptions {
         this.randomMarriageMethod = randomMarriageMethod;
     }
 
-    /**
-     * @return whether to use random same-sex marriages
-     *
-     * @since 0.50.04
-     * @deprecated - No indicated replacement. No indicated uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public boolean isUseRandomSameSexMarriages() {
-        return useRandomSameSexMarriages;
-    }
-
-    /**
-     * @param useRandomSameSexMarriages whether to use random same-sex marriages
-     *
-     * @since 0.50.04
-     * @deprecated - No indicated replacement. No indicated uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void setUseRandomSameSexMarriages(final boolean useRandomSameSexMarriages) {
-        this.useRandomSameSexMarriages = useRandomSameSexMarriages;
-    }
-
     public boolean isUseRandomClanPersonnelMarriages() {
         return useRandomClanPersonnelMarriages;
     }
@@ -3911,15 +3894,6 @@ public class CampaignOptions {
 
     public boolean isFactionIntroDate() {
         return factionIntroDate;
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated no indicated uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void setFactionIntroDate(final boolean factionIntroDate) {
-        this.factionIntroDate = factionIntroDate;
     }
 
     public boolean isUseAmmoByType() {

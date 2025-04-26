@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -62,22 +67,22 @@ public class BombsDialog extends JDialog implements ActionListener {
     private static final MMLogger logger = MMLogger.create(BombsDialog.class);
 
     private BombChoicePanel bombPanel;
-    private IBomber         bomber;
-    private Campaign        campaign;
+    private final IBomber bomber;
+    private final Campaign campaign;
 
-    private int[] bombChoices;
-    private int[] bombCatalog = new int[BombType.B_NUM];
-    private int[] availBombs  = new int[BombType.B_NUM];
-    private int[] typeMax     = new int[BombType.B_NUM];
+    private final int[] bombChoices;
+    private final int[] bombCatalog = new int[BombType.B_NUM];
+    private final int[] availBombs = new int[BombType.B_NUM];
+    private final int[] typeMax = new int[BombType.B_NUM];
 
     private JButton okayButton;
     private JButton cancelButton;
 
     public BombsDialog(IBomber iBomber, Campaign campaign, JFrame parent) {
         super(parent, "Select Bombs", true);
-        this.bomber   = iBomber;
+        this.bomber = iBomber;
         this.campaign = campaign;
-        bombChoices   = bomber.getBombChoices();
+        bombChoices = bomber.getBombChoices();
 
         initGUI();
         validate();
@@ -91,12 +96,12 @@ public class BombsDialog extends JDialog implements ActionListener {
         // for ease of access later
         campaign.getWarehouse().forEachSparePart(spare -> {
             if ((spare instanceof AmmoStorage) &&
-                (((EquipmentPart) spare).getType() instanceof BombType) &&
-                spare.isPresent()) {
+                      (((EquipmentPart) spare).getType() instanceof BombType) &&
+                      spare.isPresent()) {
                 int bombType = (BombType.getBombTypeFromInternalName(((AmmoStorage) spare).getType()
                                                                            .getInternalName()));
                 bombCatalog[bombType] = spare.getId();
-                availBombs[bombType]  = ((AmmoStorage) spare).getShots();
+                availBombs[bombType] = ((AmmoStorage) spare).getShots();
             }
         });
 
@@ -133,11 +138,7 @@ public class BombsDialog extends JDialog implements ActionListener {
 
     /**
      * These need to be migrated to the Suite Constants / Suite Options Setup
-     *
-     * @since 0.50.04
-     * @deprecated Move to Suite Constants / Suite Options Setup
      */
-    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(BombsDialog.class);

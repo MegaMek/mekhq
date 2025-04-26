@@ -27,22 +27,8 @@
  */
 package mekhq.campaign.randomEvents.prisoners;
 
-import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.SkillType;
-import org.junit.jupiter.api.Test;
-
-import java.time.LocalDate;
-import java.util.List;
-
 import static mekhq.campaign.personnel.Person.MEKWARRIOR_AERO_RANSOM_VALUES;
 import static mekhq.campaign.personnel.Person.OTHER_RANSOM_VALUES;
-import static mekhq.campaign.personnel.skills.SkillType.S_GUN_MEK;
-import static mekhq.campaign.personnel.skills.SkillType.S_PILOT_MEK;
-import static mekhq.campaign.personnel.skills.SkillType.S_SMALL_ARMS;
 import static mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR;
 import static mekhq.campaign.personnel.enums.PersonnelRole.SOLDIER;
 import static mekhq.campaign.personnel.skills.SkillType.S_GUN_MEK;
@@ -62,22 +48,26 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.Test;
 
 /**
- * This class contains unit tests for the {@link PrisonerMissionEndEvent} class, focusing on the
- * functionality and correctness of methods such as {@code determineGoodEventChance} and {@code getRansom}.
+ * This class contains unit tests for the {@link PrisonerMissionEndEvent} class, focusing on the functionality and
+ * correctness of methods such as {@code determineGoodEventChance} and {@code getRansom}.
  *
  * <p>The tests validate different scenarios such as determining the chance for a good event based
- * on crime history and calculation of ransom values for prisoners with different roles and skills.
- * Mocked objects are used to isolate dependencies and ensure the test logic is independent of
- * external factors.</p>
+ * on crime history and calculation of ransom values for prisoners with different roles and skills. Mocked objects are
+ * used to isolate dependencies and ensure the test logic is independent of external factors.</p>
  */
 class PrisonerMissionEndEventTest {
     @Test
     void testDetermineGoodEventChance_NoCrime() {
         // Setup
         Campaign mockCampaign = mock(Campaign.class);
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         LocalDate today = LocalDate.of(3151, 1, 1);
         when(mockCampaign.getDateOfLastCrime()).thenReturn(null);
@@ -102,6 +92,10 @@ class PrisonerMissionEndEventTest {
         // Setup
         Campaign mockCampaign = mock(Campaign.class);
         when(mockCampaign.getAdjustedCrimeRating()).thenReturn(CRIME_RATING);
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         LocalDate today = LocalDate.of(3151, 1, 1);
         when(mockCampaign.getDateOfLastCrime()).thenReturn(today);
@@ -126,6 +120,10 @@ class PrisonerMissionEndEventTest {
         // Setup
         Campaign mockCampaign = mock(Campaign.class);
         when(mockCampaign.getAdjustedCrimeRating()).thenReturn(CRIME_RATING);
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         LocalDate today = LocalDate.of(3151, 1, 1);
         when(mockCampaign.getDateOfLastCrime()).thenReturn(today);
@@ -148,6 +146,10 @@ class PrisonerMissionEndEventTest {
         final int SKILL_LEVEL = 3;
         // Setup
         Campaign mockCampaign = mock(Campaign.class);
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaignOptions.isAlternativeQualityAveraging()).thenReturn(false);
@@ -177,6 +179,10 @@ class PrisonerMissionEndEventTest {
         final int SKILL_LEVEL = 3;
         // Setup
         Campaign mockCampaign = mock(Campaign.class);
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaignOptions.isAlternativeQualityAveraging()).thenReturn(false);

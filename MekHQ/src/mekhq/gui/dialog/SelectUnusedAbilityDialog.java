@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -52,34 +57,37 @@ import mekhq.campaign.personnel.SpecialAbility;
 
 /**
  * @author Taharqa
+ * @deprecated no indicated uses outside of own class.
  */
+@Deprecated(since = "0.50.06", forRemoval = true)
 public class SelectUnusedAbilityDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(SelectUnusedAbilityDialog.class);
 
-    private JButton                     btnClose;
-    private JButton                     btnOK;
-    private ButtonGroup                 group;
-    private Vector<String>              choices;
-    private boolean                     cancelled;
+    private JButton btnClose;
+    private JButton btnOK;
+    private ButtonGroup group;
+    private Vector<String> choices;
+    private boolean cancelled;
     private Map<String, SpecialAbility> currentSPA;
 
-    public SelectUnusedAbilityDialog(final JFrame frame, final Vector<String> unused, final Map<String, SpecialAbility> c) {
+    public SelectUnusedAbilityDialog(final JFrame frame, final Vector<String> unused,
+          final Map<String, SpecialAbility> c) {
         super(frame, true);
-        choices    = unused;
+        choices = unused;
         currentSPA = c;
-        cancelled  = false;
+        cancelled = false;
         initComponents();
         setLocationRelativeTo(frame);
         setUserPreferences();
     }
 
     private void initComponents() {
-        btnOK    = new JButton();
+        btnOK = new JButton();
         btnClose = new JButton();
 
         group = new ButtonGroup();
 
-        int    ncol    = 2;
+        int ncol = 2;
         JPanel panMain = new JPanel(new GridLayout((int) Math.ceil(choices.size() / (ncol * 1.0)), ncol));
 
         JRadioButton chk;
@@ -114,11 +122,7 @@ public class SelectUnusedAbilityDialog extends JDialog {
 
     /**
      * These need to be migrated to the Suite Constants / Suite Options Setup
-     *
-     * @since 0.50.04
-     * @deprecated Move to Suite Constants / Suite Options Setup
      */
-    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(SelectUnusedAbilityDialog.class);
@@ -131,9 +135,9 @@ public class SelectUnusedAbilityDialog extends JDialog {
 
     private void done() {
         if (null != group.getSelection()) {
-            String name        = group.getSelection().getActionCommand();
+            String name = group.getSelection().getActionCommand();
             String displayName = "";
-            String desc        = "";
+            String desc = "";
 
             PersonnelOptions poptions = new PersonnelOptions();
             for (Enumeration<IOptionGroup> i = poptions.getGroups(); i.hasMoreElements(); ) {
@@ -147,7 +151,7 @@ public class SelectUnusedAbilityDialog extends JDialog {
                     IOption option = j.nextElement();
                     if (option.getName().equals(name)) {
                         displayName = option.getDisplayableName();
-                        desc        = option.getDescription();
+                        desc = option.getDescription();
                     }
                 }
             }

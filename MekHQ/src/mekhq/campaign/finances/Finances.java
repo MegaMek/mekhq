@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.finances;
 
@@ -589,14 +594,14 @@ public class Finances {
         if (campaign.getCampaignOptions().isTrackTotalEarnings()) {
             boolean sharesForAll = campaign.getCampaignOptions().isSharesForAll();
 
-            int numberOfShares = campaign.getActivePersonnel()
+            int numberOfShares = campaign.getActivePersonnel(true)
                                        .stream()
                                        .mapToInt(person -> person.getNumShares(campaign, sharesForAll))
                                        .sum();
 
             Money singleShare = shares.dividedBy(numberOfShares);
 
-            for (Person person : campaign.getActivePersonnel()) {
+            for (Person person : campaign.getActivePersonnel(true)) {
                 person.payPersonShares(campaign, singleShare, sharesForAll);
             }
         }

@@ -24,8 +24,21 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.*;
+
+import java.util.ArrayList;
+import java.util.stream.Stream;
 
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.common.EquipmentType;
@@ -45,12 +58,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-
-import java.util.ArrayList;
-import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 public class AtBContractTest {
     private AtBContract contract;
@@ -185,33 +192,29 @@ public class AtBContractTest {
     }
 
     /*
-     *  TODO: The following tests prefixed with old_* should be removed along with the deprecated methods
-     *  they're testing when deemed safe to do so (roughly 0.50.4 or 0.50.5).
+     *  TODO: The following tests prefixed with old_* should be removed along with the deprecated methods they're
+     *   testing when deemed safe to do so (roughly 0.50.4 or 0.50.5).
      */
 
     private static Stream<Arguments> provideContractDifficultyParameters() {
-        return Stream.of(
-            Arguments.of(500.0, 0.0, true, 10),
-            Arguments.of(500.0, 0.0, false, 10),
-            Arguments.of(500.0, 500.0, true, 5),
-            Arguments.of(500.0, 500.0, false, 5),
-            Arguments.of(500.0, 2000.0, true, 1),
-            Arguments.of(500.0, 2000.0, false, 1),
-            Arguments.of(500.0, 525.0, true, 4),
-            Arguments.of(500.0, 525.0, false, 4),
-            Arguments.of(500.0, 350.0, true, 7),
-            Arguments.of(500.0, 350.0, false, 7),
-            Arguments.of(0.0, 0.0, true, -99),
-            Arguments.of(0.0, 0.0, false, -99)
-        );
+        return Stream.of(Arguments.of(500.0, 0.0, true, 10),
+              Arguments.of(500.0, 0.0, false, 10),
+              Arguments.of(500.0, 500.0, true, 5),
+              Arguments.of(500.0, 500.0, false, 5),
+              Arguments.of(500.0, 2000.0, true, 1),
+              Arguments.of(500.0, 2000.0, false, 1),
+              Arguments.of(500.0, 525.0, true, 4),
+              Arguments.of(500.0, 525.0, false, 4),
+              Arguments.of(500.0, 350.0, true, 7),
+              Arguments.of(500.0, 350.0, false, 7),
+              Arguments.of(0.0, 0.0, true, -99),
+              Arguments.of(0.0, 0.0, false, -99));
     }
 
     @ParameterizedTest
     @MethodSource("provideContractDifficultyParameters")
-    public void old_calculateContractDifficultySameSkillMatchesExpectedRating(double enemyBV,
-                                                                              double playerBV,
-                                                                              boolean useGenericBattleValue,
-                                                                              int expectedResult) {
+    public void old_calculateContractDifficultySameSkillMatchesExpectedRating(double enemyBV, double playerBV,
+          boolean useGenericBattleValue, int expectedResult) {
         contract = spy(contract);
         doReturn(SkillLevel.REGULAR).when(contract).modifySkillLevelBasedOnFaction(anyString(), any(SkillLevel.class));
         doReturn(enemyBV).when(contract).estimateMekStrength(anyInt(), anyBoolean(), anyString(), anyInt());
@@ -225,10 +228,8 @@ public class AtBContractTest {
 
     @ParameterizedTest
     @MethodSource("provideContractDifficultyParameters")
-    public void new_calculateContractDifficultySameSkillMatchesExpectedRating(double enemyBV,
-                                                                              double playerBV,
-                                                                              boolean useGenericBattleValue,
-                                                                              int expectedResult) {
+    public void new_calculateContractDifficultySameSkillMatchesExpectedRating(double enemyBV, double playerBV,
+          boolean useGenericBattleValue, int expectedResult) {
         contract = spy(contract);
         doReturn(SkillLevel.REGULAR).when(contract).modifySkillLevelBasedOnFaction(anyString(), any(SkillLevel.class));
         doReturn(enemyBV).when(contract).estimateMekStrength(anyInt(), anyBoolean(), anyString(), anyInt());
@@ -248,12 +249,10 @@ public class AtBContractTest {
     }
 
     private static Stream<Arguments> provideEnemyFactionAndYear() {
-        return Stream.of(
-            Arguments.of(3025, "LA", "Lyran Commonwealth"),
-            Arguments.of(3059, "LA", "Lyran Alliance"),
-            Arguments.of(-1, "LA", "Lyran Commonwealth"),
-            Arguments.of(3025, "??", "Unknown")
-        );
+        return Stream.of(Arguments.of(3025, "LA", "Lyran Commonwealth"),
+              Arguments.of(3059, "LA", "Lyran Alliance"),
+              Arguments.of(-1, "LA", "Lyran Commonwealth"),
+              Arguments.of(3025, "??", "Unknown"));
     }
 
     @ParameterizedTest
@@ -278,19 +277,18 @@ public class AtBContractTest {
     }
 
     private static Stream<Arguments> provideEmployerNamesAndMercStatus() {
-        return Stream.of(
-            Arguments.of(3025, false, "LA", "Lyran Commonwealth"),
-            Arguments.of(3059, false, "LA", "Lyran Alliance"),
-            Arguments.of(3025, true, "LA", "Mercenary (Lyran Commonwealth)"),
-            Arguments.of(3059, true, "LA", "Mercenary (Lyran Alliance)"),
-            Arguments.of(-1, true, "LA", "Mercenary (Lyran Commonwealth)"),
-            Arguments.of(3025, true, "??", "Mercenary (Unknown)")
-        );
+        return Stream.of(Arguments.of(3025, false, "LA", "Lyran Commonwealth"),
+              Arguments.of(3059, false, "LA", "Lyran Alliance"),
+              Arguments.of(3025, true, "LA", "Mercenary (Lyran Commonwealth)"),
+              Arguments.of(3059, true, "LA", "Mercenary (Lyran Alliance)"),
+              Arguments.of(-1, true, "LA", "Mercenary (Lyran Commonwealth)"),
+              Arguments.of(3025, true, "??", "Mercenary (Unknown)"));
     }
 
     @ParameterizedTest
     @MethodSource("provideEmployerNamesAndMercStatus")
-    public void getEmployerNameReturnsCorrectName(int year, boolean isMercSubcontract, String employerCode, String fullName) {
+    public void getEmployerNameReturnsCorrectName(int year, boolean isMercSubcontract, String employerCode,
+          String fullName) {
         contract.setEmployerCode(employerCode, year);
         contract.setMercSubcontract(isMercSubcontract);
         assertEquals(fullName, contract.getEmployerName(year));

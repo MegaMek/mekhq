@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui;
 
@@ -32,7 +37,6 @@ import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.personnel.skills.SkillType.getExperienceLevelName;
-import static mekhq.gui.dialog.nagDialogs.NagController.triggerDailyNags;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.awt.*;
@@ -81,7 +85,15 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.event.*;
+import mekhq.campaign.event.AssetEvent;
+import mekhq.campaign.event.AstechPoolChangedEvent;
+import mekhq.campaign.event.DayEndingEvent;
+import mekhq.campaign.event.DeploymentChangedEvent;
+import mekhq.campaign.event.LoanEvent;
+import mekhq.campaign.event.MedicPoolChangedEvent;
+import mekhq.campaign.event.OptionsChangedEvent;
+import mekhq.campaign.event.OrganizationChangedEvent;
+import mekhq.campaign.event.TransactionEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
 import mekhq.campaign.force.Force;
@@ -326,11 +338,7 @@ public class CampaignGUI extends JPanel {
 
     /**
      * These need to be migrated to the Suite Constants / Suite Options Setup
-     *
-     * @since 0.50.04
-     * @deprecated - Move to Suite Constants / Suite Options Setup
      */
-    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(CampaignGUI.class);
@@ -1824,7 +1832,7 @@ public class CampaignGUI extends JPanel {
     /**
      * Shows a dialog that lets the user select a tech for a task on a particular unit
      *
-     * @param unit                 The unit to be serviced, used to filter techs for skill on the unit.
+     * @param unit              The unit to be serviced, used to filter techs for skill on the unit.
      * @param desc              The description of the task
      * @param ignoreMaintenance If true, ignores the time required for maintenance tasks when displaying the tech's time
      *                          available.
@@ -2497,18 +2505,6 @@ public class CampaignGUI extends JPanel {
         MekHQ.triggerEvent(new DeploymentChangedEvent(u, s));
     }
 
-    /**
-     * @since 0.50.04
-     * @deprecated - Only located used is reciprocal
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void undeployForces(Vector<Force> forces) {
-        for (Force force : forces) {
-            undeployForce(force);
-            undeployForces(force.getSubForces());
-        }
-    }
-
     public void undeployForce(Force f) {
         undeployForce(f, true);
     }
@@ -2555,59 +2551,6 @@ public class CampaignGUI extends JPanel {
     }
 
     // region Subscriptions
-
-    /**
-     * @since 0.50.04
-     * @deprecated no known uses
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    @Subscribe
-    public void handleDayEnding(DayEndingEvent dayEndingEvent) {
-        if (triggerDailyNags(getCampaign())) {
-            dayEndingEvent.cancel();
-            return;
-        }
-
-        // Compulsory New Day Blockers
-        if (checkForOverdueLoans(dayEndingEvent)) {
-            return;
-        }
-
-        if (checkForInvalidFaction(dayEndingEvent)) {
-            return;
-        }
-
-        if (checkForDueScenarios(dayEndingEvent)) {
-            return;
-        }
-
-        // Optional New Day Blocker
-        if (getCampaign().getCampaignOptions().isUseRandomRetirement()) {
-            int turnoverPrompt = getCampaign().checkTurnoverPrompt();
-
-            switch (turnoverPrompt) {
-                case -1:
-                    // the user wasn't presented with the dialog
-                    break;
-                case 0:
-                    // the user launched the turnover dialog
-                    if (!showRetirementDefectionDialog()) {
-                        dayEndingEvent.cancel();
-                        return;
-                    }
-                case 1:
-                    // the user picked 'Advance Day Regardless'
-                    break;
-                case 2:
-                    // the user canceled
-                    dayEndingEvent.cancel();
-                    return;
-                default:
-                    throw new IllegalStateException("Unexpected value in mekhq/gui/CampaignGUI.java/handleDayEnding: " +
-                                                          turnoverPrompt);
-            }
-        }
-    }
 
     /**
      * Checks if there are any due instances of the {@link Scenario} class. If the {@code checkScenariosDue()} method of
@@ -2718,21 +2661,6 @@ public class CampaignGUI extends JPanel {
         return false;
     }
 
-    /**
-     * @since 0.50.04
-     * @deprecated no indicated uses
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    @Subscribe
-    public void handleNewDay(NewDayEvent evt) {
-        refreshCalendar();
-        refreshLocation();
-        refreshFunds();
-        refreshPartsAvailability();
-
-        refreshAllTabs();
-    }
-
     @Subscribe
     public void handle(final OptionsChangedEvent evt) {
         if (!getCampaign().getCampaignOptions().isUseStratCon() && (getTab(MHQTabType.STRAT_CON) != null)) {
@@ -2775,40 +2703,6 @@ public class CampaignGUI extends JPanel {
     @Subscribe
     public void handle(MedicPoolChangedEvent ev) {
         refreshTempMedics();
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated no indicated uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    @Subscribe
-    public void handleLocationChanged(LocationChangedEvent ev) {
-        refreshLocation();
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated no indicated uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    @Subscribe
-    public void handleMissionChanged(MissionEvent ev) {
-        refreshPartsAvailability();
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated - No indicated Uses.
-     */
-    @Subscribe
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void handlePersonUpdate(PersonEvent ev) {
-        // only bother recalculating AtB parts availability if a logistics admin has been changed
-        // refreshPartsAvailability cuts out early with a "use AtB" check so it's not necessary here
-        if (ev.getPerson().hasRole(PersonnelRole.ADMINISTRATOR_LOGISTICS)) {
-            refreshPartsAvailability();
-        }
     }
 
     @Subscribe

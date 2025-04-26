@@ -24,16 +24,13 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel;
-
-import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
-import org.junit.jupiter.api.Test;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 import static java.lang.Math.max;
 import static java.lang.Math.round;
@@ -44,6 +41,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.universe.Faction;
+import org.junit.jupiter.api.Test;
+
 class RandomDependentsTest {
     @Test
     void testPrepareData() {
@@ -52,6 +58,10 @@ class RandomDependentsTest {
 
         // Setup
         Campaign mockCampaign = mock(Campaign.class);
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
@@ -94,6 +104,10 @@ class RandomDependentsTest {
 
         // Setup
         Campaign mockCampaign = mock(Campaign.class);
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
@@ -108,14 +122,13 @@ class RandomDependentsTest {
 
             activeNonDependent.add(nonDependent);
         }
-        when(mockCampaign.getActivePersonnel()).thenReturn(activeNonDependent);
+        when(mockCampaign.getActivePersonnel(true)).thenReturn(activeNonDependent);
 
         // Act
         RandomDependents randomDependents = new RandomDependents(mockCampaign);
         int actualValue = randomDependents.calculateDependentCapacity();
-        int expectedValue = DEPENDENT_CAPACITY;
 
         // Assert
-        assertEquals(expectedValue, actualValue);
+        assertEquals(DEPENDENT_CAPACITY, actualValue);
     }
 }

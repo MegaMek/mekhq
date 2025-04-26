@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -57,31 +62,27 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
+/**
+ * @deprecated no indicated uses outside own class.
+ */
+@Deprecated(since = "0.50.06", forRemoval = true)
 public class ChooseFactionsDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(ChooseFactionsDialog.class);
 
     private LocalDate date;
 
     private JList<Faction> factionList;
-    private List<String>   result;
-    private boolean        changed;
+    private List<String> result;
+    private boolean changed;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ChooseFactionsDialog",
           MekHQ.getMHQOptions().getLocale());
 
-    /**
-     * @since 0.50.04
-     * @deprecated No indicated uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public ChooseFactionsDialog(final JFrame frame, final LocalDate date, final List<String> defaults) {
-        this(frame, true, date, defaults);
-    }
-
-    public ChooseFactionsDialog(final JFrame frame, final boolean modal, final LocalDate date, final List<String> defaults) {
+    public ChooseFactionsDialog(final JFrame frame, final boolean modal, final LocalDate date,
+          final List<String> defaults) {
         super(frame, modal);
-        this.date    = Objects.requireNonNull(date);
-        this.result  = defaults;
+        this.date = Objects.requireNonNull(date);
+        this.result = defaults;
         this.changed = false;
         initComponents();
         setLocationRelativeTo(frame);
@@ -97,17 +98,18 @@ public class ChooseFactionsDialog extends JDialog {
         final Container content = getContentPane();
         content.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx     = 0;
-        gbc.gridy     = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
         gbc.gridwidth = 2;
-        gbc.weightx   = 1.0;
-        gbc.weighty   = 1.0;
-        gbc.fill      = GridBagConstraints.BOTH;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
         JScrollPane scrollPane = new JScrollPaneWithSpeed();
         factionList = new JList<>(new FactionListModel(date));
         factionList.setCellRenderer(new DefaultListCellRenderer() {
             @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
+                  boolean cellHasFocus) {
                 DefaultListCellRenderer result = (DefaultListCellRenderer) super.getListCellRendererComponent(list,
                       value,
                       index,
@@ -123,11 +125,11 @@ public class ChooseFactionsDialog extends JDialog {
         scrollPane.setViewportView(factionList);
         content.add(scrollPane, gbc);
 
-        gbc.gridy     = 1;
+        gbc.gridy = 1;
         gbc.gridwidth = 1;
-        gbc.weighty   = 0.0;
-        gbc.anchor    = GridBagConstraints.WEST;
-        gbc.fill      = GridBagConstraints.NONE;
+        gbc.weighty = 0.0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.NONE;
         content.add(new JButton(new AbstractAction(resourceMap.getString("ok.label")) {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -140,7 +142,7 @@ public class ChooseFactionsDialog extends JDialog {
             }
         }), gbc);
 
-        gbc.gridx  = 1;
+        gbc.gridx = 1;
         gbc.anchor = GridBagConstraints.EAST;
         content.add(new JButton(new AbstractAction(resourceMap.getString("cancel.label")) {
             @Override
@@ -153,11 +155,7 @@ public class ChooseFactionsDialog extends JDialog {
 
     /**
      * These need to be migrated to the Suite Constants / Suite Options Setup
-     *
-     * @since 0.50.04
-     * @deprecated Move to Suite Constants / Suite Options Setup
      */
-    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ChooseFactionsDialog.class);
@@ -178,7 +176,7 @@ public class ChooseFactionsDialog extends JDialog {
 
     private static class FactionListModel extends AbstractListModel<Faction> {
         private TreeMap<String, Faction> factionMap = new TreeMap<>();
-        private List<String>             names;
+        private List<String> names;
 
         public FactionListModel(LocalDate date) {
             for (Faction faction : Factions.getInstance().getFactions()) {

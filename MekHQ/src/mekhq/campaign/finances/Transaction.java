@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.finances;
 
@@ -47,9 +52,9 @@ public class Transaction {
 
     // region Variable Declarations
     private TransactionType type;
-    private LocalDate       date;
-    private Money           amount;
-    private String          description;
+    private LocalDate date;
+    private Money amount;
+    private String description;
     // endregion Variable Declarations
 
     // region Constructors
@@ -105,18 +110,14 @@ public class Transaction {
 
     /**
      * I'd be better as part of the GUI class
-     *
-     * @since 0.50.04
-     * @deprecated - Move to GUI Class
      */
-    @Deprecated(since = "0.50.04")
     public String updateTransaction(Transaction previousTransaction) {
         return "Edited Transaction: {" +
-               "Previous = " +
-               previousTransaction.toString() +
-               "} -> {New = " +
-               toString() +
-               "}";
+                     "Previous = " +
+                     previousTransaction.toString() +
+                     "} -> {New = " +
+                     toString() +
+                     "}";
     }
 
     /**
@@ -140,7 +141,7 @@ public class Transaction {
 
     public static Transaction generateInstanceFromXML(final Node wn) {
         final Transaction transaction = new Transaction();
-        final NodeList    nl          = wn.getChildNodes();
+        final NodeList nl = wn.getChildNodes();
         for (int x = 0; x < nl.getLength(); x++) {
             final Node wn2 = nl.item(x);
             try {
@@ -164,12 +165,12 @@ public class Transaction {
     @Override
     public String toString() {
         return getType() +
-               ", " +
-               MekHQ.getMHQOptions().getDisplayFormattedDate(getDate()) +
-               ", " +
-               getAmount() +
-               ", " +
-               getDescription();
+                     ", " +
+                     MekHQ.getMHQOptions().getDisplayFormattedDate(getDate()) +
+                     ", " +
+                     getAmount() +
+                     ", " +
+                     getDescription();
     }
 
     @Override
@@ -180,9 +181,9 @@ public class Transaction {
             return true;
         } else if (other instanceof Transaction transaction) {
             return (getType() == transaction.getType()) &&
-                   getDate().equals(transaction.getDate()) &&
-                   getAmount().equals(transaction.getAmount()) &&
-                   getDescription().equals(transaction.getDescription());
+                         getDate().equals(transaction.getDate()) &&
+                         getAmount().equals(transaction.getAmount()) &&
+                         getDescription().equals(transaction.getDescription());
         } else {
             return false;
         }

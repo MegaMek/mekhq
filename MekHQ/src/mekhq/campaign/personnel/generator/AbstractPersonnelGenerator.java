@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.generator;
 
@@ -98,7 +103,8 @@ public abstract class AbstractPersonnelGenerator {
      *
      * @return A new {@link Person}.
      */
-    public abstract Person generate(Campaign campaign, PersonnelRole primaryRole, PersonnelRole secondaryRole, Gender gender);
+    public abstract Person generate(Campaign campaign, PersonnelRole primaryRole, PersonnelRole secondaryRole,
+          Gender gender);
 
     /**
      * Creates a {@link Person} object for the given {@link Campaign}.
@@ -108,7 +114,7 @@ public abstract class AbstractPersonnelGenerator {
      * @return A new {@link Person} object for the given campaign.
      */
     protected Person createPerson(Campaign campaign) {
-        return new Person(campaign, campaign.getFactionCode());
+        return new Person(campaign, campaign.getFaction().getShortName());
     }
 
     /**
@@ -244,9 +250,9 @@ public abstract class AbstractPersonnelGenerator {
     /**
      * Assigns a realistic date of birth to the specified {@link Person} using their experience level and affiliation.
      *
-     * <p>This method determines the person's approximate age based on their experience, then calculates a date of birth
-     * ensuring the resulting age matches the campaign's timeline. The generated birthday always falls on or before
-     * the current campaign date, guaranteeing age accuracy.</p>
+     * <p>This method determines the person's approximate age based on their experience, then calculates a date of
+     * birth ensuring the resulting age matches the campaign's timeline. The generated birthday always falls on or
+     * before the current campaign date, guaranteeing age accuracy.</p>
      *
      * @param campaign        The current campaign, used to obtain the reference date for calculation.
      * @param person          The person whose birthday is being set.
