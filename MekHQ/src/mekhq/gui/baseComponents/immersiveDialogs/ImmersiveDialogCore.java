@@ -417,14 +417,14 @@ public class ImmersiveDialogCore extends JDialog {
                 final int targetId = MathUtility.parseInt(entryKey, -1);
                 campaignGUI.focusOnMission(targetId);
             } catch (Exception e) {
-                logger.error("", e);
+                logger.error("Failed to parse mission ID: " + entryKey, e);
             }
         } else if (commandKey.equalsIgnoreCase(SCENARIO_COMMAND_STRING)) {
             try {
                 final int targetId = MathUtility.parseInt(entryKey, -1);
                 campaignGUI.focusOnScenario(targetId);
             } catch (Exception e) {
-                logger.error("", e);
+                logger.error("Failed to parse scenario ID: " + entryKey, e);
             }
         }
     }
