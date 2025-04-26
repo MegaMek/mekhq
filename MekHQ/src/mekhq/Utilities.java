@@ -29,6 +29,32 @@
 package mekhq;
 
 import static java.lang.Math.max;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_GREEN;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_HEROIC;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_ULTRA_GREEN;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_VETERAN;
+
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FilenameFilter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.function.Consumer;
+import javax.swing.JTable;
+import javax.swing.table.TableModel;
+
+import static java.lang.Math.max;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_GREEN;
@@ -937,8 +963,8 @@ public class Utilities {
      * @return The calculated age of the character based on the input parameters.
      */
     public static int getAgeByExpLevel(int experienceLevel, boolean isClan) {
-        if (experienceLevel > EXP_ELITE) {
-            experienceLevel = EXP_ELITE;
+        if (experienceLevel > EXP_LEGENDARY) {
+            experienceLevel = EXP_LEGENDARY;
         }
 
         int baseAge = 16;
@@ -956,6 +982,8 @@ public class Utilities {
             case EXP_REGULAR -> 2;
             case EXP_VETERAN -> 3;
             case EXP_ELITE -> 4;
+            case EXP_HEROIC -> 5;
+            case EXP_LEGENDARY -> 6;
             default -> 0;
         };
 

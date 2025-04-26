@@ -336,7 +336,7 @@ public class Finances {
                       String.format(resourceMap.getString("MonthlyContractPayment.text"), contract.getName()));
                 campaign.addReport(String.format(resourceMap.getString("ContractPaymentCredit.text"),
                       contract.getMonthlyPayOut().toAmountAndSymbolString(),
-                      contract.getName()));
+                      contract.getHyperlinkedName()));
 
                 payoutShares(campaign, contract, today);
             }
