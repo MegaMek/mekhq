@@ -745,7 +745,6 @@ public final class InjuryTypes {
             allowedLocations = EnumSet.of(BodyLocation.CHEST);
             simpleName = "fracture";
             level = InjuryLevel.MINOR;
-            recoveryTime = 20;
         }
 
         @Override
