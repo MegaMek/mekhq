@@ -11,6 +11,7 @@ MEKHQ VERSION HISTORY:
 + PR #6670: Made Injuries Appear More Serious By Changing Terms
 + PR #6708: Updated Command Skills to Match RAW Values
 + PR #6707: Refactored Medical Systems
++ PR #6776: Fixed Advanced Medical Fracture Injuries
 
 0.50.05 (2025-04-25 1800 UTC)
 + PR #6284: Fixed Unique Interaction when Loading Player Campaigns with Custom Rank Systems
