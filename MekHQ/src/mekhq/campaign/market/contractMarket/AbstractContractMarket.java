@@ -633,8 +633,11 @@ public abstract class AbstractContractMarket {
         int mod = calculateFactionModifiers(contract.getEmployerFaction());
         mod += calculateContractTypeModifiers(contract.getContractType(), contract.isAttacker());
 
+        // The less skilled the player, the easier their contract.
+        int dynamicDifficultyModifier = REGULAR.getExperienceLevel() - averageSkillLevel.getExperienceLevel();
+
         // Assign ally skill rating
-        contract.setAllySkill(getSkillRating(d6(2) + mod));
+        contract.setAllySkill(getSkillRating(d6(2) + mod + dynamicDifficultyModifier));
 
         // Apply faction modifiers
         if (employerFaction.isClan()) {
@@ -655,9 +658,6 @@ public abstract class AbstractContractMarket {
                 mod += 2;
             }
         }
-
-        // The less skilled the player, the easier their contract.
-        mod += REGULAR.getExperienceLevel() - averageSkillLevel.getExperienceLevel();
 
         // Assign ally quality rating
         contract.setAllyQuality(getQualityRating(d6(2) + mod));
@@ -709,8 +709,11 @@ public abstract class AbstractContractMarket {
             mod += 1;
         }
 
+        // The less skilled the player, the easier their contract.
+        int dynamicDifficultyModifier = averageSkillLevel.getExperienceLevel() - REGULAR.getExperienceLevel();
+
         // Assign enemy skill rating
-        contract.setEnemySkill(getSkillRating(d6(2) + mod));
+        contract.setEnemySkill(getSkillRating(d6(2) + mod + dynamicDifficultyModifier));
 
         // Apply faction modifiers
         if (enemyFaction.isClan()) {
@@ -729,10 +732,6 @@ public abstract class AbstractContractMarket {
 
             if (enemyFaction.isComStarOrWoB()) {
                 mod += 2;
-            } else {
-                // The less skilled the player, the easier their contract. We only do this for non-ComStar and Clan
-                // opponents, as they're meant to be pinnacle opponents. Even in Clan campaigns.
-                mod += averageSkillLevel.getExperienceLevel() - REGULAR.getExperienceLevel();
             }
         }
 
