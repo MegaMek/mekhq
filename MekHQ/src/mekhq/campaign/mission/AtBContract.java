@@ -652,11 +652,11 @@ public class AtBContract extends Contract {
                 routEnd = today.plusMonths(max(1, d6() - 3)).minusDays(1);
 
                 PrisonerMissionEndEvent prisoners = new PrisonerMissionEndEvent(campaign, this);
-                if (campaign.getFriendlyPrisoners().isEmpty()) {
+                if (!campaign.getFriendlyPrisoners().isEmpty()) {
                     prisoners.handlePrisoners(true, true);
                 }
 
-                if (campaign.getCurrentPrisoners().isEmpty()) {
+                if (!campaign.getCurrentPrisoners().isEmpty()) {
                     prisoners.handlePrisoners(true, false);
                 }
 
