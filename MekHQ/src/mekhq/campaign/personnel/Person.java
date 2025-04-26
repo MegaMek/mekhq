@@ -91,7 +91,7 @@ import mekhq.campaign.log.LogEntryFactory;
 import mekhq.campaign.log.LogEntryType;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.log.ServiceLogger;
-import mekhq.campaign.mod.am.InjuryUtil;
+import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.enums.BloodGroup;
@@ -1928,15 +1928,6 @@ public class Person {
     public void setDoctorId(final @Nullable UUID doctorId, final int daysToWaitForHealing) {
         this.doctorId = doctorId;
         this.daysToWaitForHealing = daysToWaitForHealing;
-    }
-
-    public boolean checkNaturalHealing(final int daysToWait) {
-        if (needsFixing() && (getDaysToWaitForHealing() <= 0) && (getDoctorId() == null)) {
-            heal();
-            daysToWaitForHealing = daysToWait;
-            return true;
-        }
-        return false;
     }
 
     public void decrementDaysToWaitForHealing() {
@@ -4056,8 +4047,8 @@ public class Person {
         return campaign.getCampaignOptions().isTougherHealing() ? Math.max(0, getHits() - 2) : 0;
     }
 
-    public TargetRoll getHealingMods(final Campaign campaign) {
-        return new TargetRoll(getHealingDifficulty(campaign), "difficulty");
+    public TargetRollModifier getHealingMods(final Campaign campaign) {
+        return new TargetRollModifier(getHealingDifficulty(campaign), "difficulty");
     }
 
     public String fail() {
@@ -4249,6 +4240,10 @@ public class Person {
         return ((hits > 0) || needsAMFixing()) && getStatus().isActive();
     }
 
+    /**
+     * @deprecated No longer in use
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public String succeed() {
         heal();
         return " <font color='" +

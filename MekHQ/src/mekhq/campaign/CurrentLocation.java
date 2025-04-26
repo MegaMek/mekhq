@@ -30,7 +30,7 @@ package mekhq.campaign;
 
 import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
-import static mekhq.campaign.mod.am.InjuryTypes.TRANSIT_DISORIENTATION_SYNDROME;
+import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.TRANSIT_DISORIENTATION_SYNDROME;
 import static mekhq.campaign.personnel.BodyLocation.INTERNAL;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_TRANSIT_DISORIENTATION_SYNDROME;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
