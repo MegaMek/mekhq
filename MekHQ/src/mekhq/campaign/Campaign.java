@@ -7165,6 +7165,7 @@ public class Campaign implements ITechManager {
             PersonnelOptions options = negotiator.getOptions();
             if (options.booleanOption(ADMIN_INTERSTELLAR_NEGOTIATOR) && totalCost.isPositive()) {
                 totalCost = totalCost.multipliedBy(0.85);
+            }
         }
 
         return totalCost;
