@@ -39,6 +39,7 @@ import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 import static mekhq.campaign.mission.AtBContract.getEffectiveNumUnits;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_NETWORKER;
+import static mekhq.campaign.personnel.skills.SkillType.S_NEG;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 
 import java.time.format.DateTimeFormatter;
@@ -58,6 +59,7 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
@@ -642,15 +644,27 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         Person adminCommand = campaign.getSeniorAdminPerson(COMMAND);
         Person adminTransport = campaign.getSeniorAdminPerson(TRANSPORT);
         Person adminLogistics = campaign.getSeniorAdminPerson(LOGISTICS);
-        int adminCommandExp = (adminCommand == null) ?
-                                    SkillType.EXP_NONE :
-                                    adminCommand.getSkill(SkillType.S_NEG).getExperienceLevel();
-        int adminTransportExp = (adminTransport == null) ?
-                                      SkillType.EXP_NONE :
-                                      adminTransport.getSkill(SkillType.S_NEG).getExperienceLevel();
-        int adminLogisticsExp = (adminLogistics == null) ?
-                                      SkillType.EXP_NONE :
-                                      adminLogistics.getSkill(SkillType.S_NEG).getExperienceLevel();
+        int adminCommandExp = SkillType.EXP_NONE;
+        if (adminCommand != null) {
+            Skill skill = adminCommand.getSkill(S_NEG);
+            if (skill != null) {
+                adminCommandExp = skill.getExperienceLevel();
+            }
+        }
+        int adminTransportExp = SkillType.EXP_NONE;
+        if (adminTransport != null) {
+            Skill skill = adminTransport.getSkill(S_NEG);
+            if (skill != null) {
+                adminTransportExp = skill.getExperienceLevel();
+            }
+        }
+        int adminLogisticsExp = SkillType.EXP_NONE;
+        if (adminLogistics != null) {
+            Skill skill = adminLogistics.getSkill(S_NEG);
+            if (skill != null) {
+                adminLogisticsExp = skill.getExperienceLevel();
+            }
+        }
 
         /* Treat government units like merc units that have a retainer contract */
         if ((!campaign.getFaction().isMercenary() && !campaign.getFaction().isPirate()) ||
