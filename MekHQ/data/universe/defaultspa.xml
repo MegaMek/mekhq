@@ -462,9 +462,21 @@
 
     <!-- Misc SPA -->
     <ability>
+        <lookupName>admin_mediator</lookupName>
+        <displayName>Mediator (Unofficial)</displayName>
+        <desc><![CDATA[Whether with a smoothing word or a calming presence, this character knows how to solve disputes.
+
+This character's Administration skill is increased by 1 when calculating the campaign's Admin Capacity.]]></desc>
+        <xpCost>50</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+    </ability>
+    <ability>
         <lookupName>admin_scrounge</lookupName>
         <displayName>Scrounge (Unofficial)</displayName>
-        <desc><![CDATA[The character can make one additional procurement attempt per day.]]></desc>
+        <desc><![CDATA[The character is adept at finding resources in places nobody else would think to look.
+
+They can make one additional procurement attempt per day.]]></desc>
         <xpCost>200</xpCost>
         <weight>1</weight>
         <skillPrereq/>

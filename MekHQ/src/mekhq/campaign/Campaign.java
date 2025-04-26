@@ -3230,7 +3230,7 @@ public class Campaign implements ITechManager {
                 int effectiveMaxAcquisitions = defaultMaxAcquisitions;
 
                 PersonnelOptions options = person.getOptions();
-                if (options.getOption(ADMIN_SCROUNGE).booleanValue()) {
+                if (options.booleanOption(ADMIN_SCROUNGE)) {
                     effectiveMaxAcquisitions++;
                 }
 
@@ -3252,7 +3252,7 @@ public class Campaign implements ITechManager {
                 int effectiveMaxAcquisitions = defaultMaxAcquisitions;
 
                 PersonnelOptions options = person.getOptions();
-                if (options.getOption(ADMIN_SCROUNGE).booleanValue()) {
+                if (options.booleanOption(ADMIN_SCROUNGE)) {
                     effectiveMaxAcquisitions++;
                 }
 

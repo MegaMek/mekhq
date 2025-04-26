@@ -105,6 +105,7 @@ public class PersonnelOptions extends PilotOptions {
     public static final String EXCEPTIONAL_ATTRIBUTE_CHARISMA = "exceptional_attribute_charisma";
 
     public static final String ADMIN_SCROUNGE = "admin_scrounge";
+    public static final String ADMIN_MEDIATOR = "admin_mediator";
 
     @Override
     public void initialize() {
@@ -190,6 +191,7 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, EXCEPTIONAL_ATTRIBUTE_CHARISMA, false);
 
         addOption(l3a, ADMIN_SCROUNGE, false);
+        addOption(l3a, ADMIN_MEDIATOR, false);
 
         addOption(edge, EDGE_MEDICAL, true);
         addOption(edge, EDGE_REPAIR_BREAK_PART, true);

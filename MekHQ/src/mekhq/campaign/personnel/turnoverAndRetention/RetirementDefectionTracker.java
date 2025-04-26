@@ -34,6 +34,7 @@
 package mekhq.campaign.personnel.turnoverAndRetention;
 
 import static mekhq.campaign.personnel.Person.getLoyaltyName;
+import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_MEDIATOR;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
 
 import java.io.PrintWriter;
@@ -59,6 +60,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Profession;
+import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.FactionHints;
@@ -707,21 +709,24 @@ public class RetirementDefectionTracker {
     public static int getCombinedSkillValues(Campaign campaign, String skillType) {
         int combinedSkillValues = 0;
 
-        for (Person person : campaign.getActivePersonnel(true)) {
-            if ((!person.getPrisonerStatus().isPrisoner()) || (!person.getPrisonerStatus().isPrisonerDefector())) {
-                if (person.getPrimaryRole().isAdministratorHR()) {
-                    if (person.hasSkill(skillType)) {
-                        combinedSkillValues += person.getSkill(skillType).getLevel();
-                        combinedSkillValues += person.getSkill(skillType).getBonus();
-                    }
-                } else if (person.getSecondaryRole().isAdministratorHR()) {
-                    if (person.hasSkill(skillType)) {
-                        combinedSkillValues += person.getSkill(skillType).getLevel();
-                        combinedSkillValues += person.getSkill(skillType).getBonus();
-                    }
-                }
+        for (Person person : campaign.getActivePersonnel(false)) {
+            boolean isAdmin = person.getPrimaryRole().isAdministratorHR() ||
+                                    person.getSecondaryRole().isAdministratorHR();
+            if (!isAdmin) {
+                continue;
             }
+
+            PersonnelOptions options = person.getOptions();
+            int mediatorModifier = options.booleanOption(ADMIN_MEDIATOR) ? 1 : 0;
+
+            Skill skill = person.getSkill(skillType);
+            if (skill == null) {
+                continue;
+            }
+
+            combinedSkillValues += skill.getTotalSkillLevel() + mediatorModifier;
         }
+
         return combinedSkillValues;
     }
 
