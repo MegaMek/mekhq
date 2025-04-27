@@ -1474,6 +1474,107 @@ public final class BriefingTab extends CampaignGuiTab {
         scenarioTable.setFillsViewportHeight(true);
     }
 
+    /**
+     * Focuses the UI on a specific scenario by its ID.
+     *
+     * <p>This method searches through all missions in the campaign to find the scenario with the matching ID. If
+     * found, it will:</p>
+     *
+     * <ol>
+     *   <li>Select the parent mission in the mission combo box (if available)</li>
+     *   <li>Select the scenario in the scenario table (if the table contains rows)</li>
+     *   <li>Scroll the scenario table to make the selected scenario visible</li>
+     *   <li>Update the selectedScenario tracking variable</li>
+     * </ol>
+     *
+     * <p>If the parent mission is not available in the mission combo box, or if the scenario table is empty, those
+     * selection steps will be skipped.</p>
+     *
+     * @param targetId The unique identifier of the scenario to focus on
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public void focusOnScenario(int targetId) {
+        Mission targetMission = null;
+
+        // First find the mission and scenario
+        for (Mission mission : getCampaign().getMissions()) {
+            for (Scenario scenario : mission.getScenarios()) {
+                if (scenario.getId() == targetId) {
+                    targetMission = mission;
+                    break;
+                }
+            }
+
+            if (targetMission != null) {
+                break;
+            }
+        }
+
+        // If we found the mission, select it
+        if (targetMission != null) {
+            // Check if the targetMission is actually in the comboMission items
+            boolean missionInCombo = false;
+            for (int i = 0; i < comboMission.getItemCount(); i++) {
+                if (comboMission.getItemAt(i).equals(targetMission)) {
+                    missionInCombo = true;
+                    break;
+                }
+            }
+
+            if (missionInCombo) {
+                comboMission.setSelectedItem(targetMission);
+
+                // Only try to select in the table if the table has rows
+                if (scenarioTable.getRowCount() > 0) {
+                    for (int row = 0; row < scenarioTable.getRowCount(); row++) {
+                        Scenario currentScenario = scenarioModel.getScenario(row);
+                        if (currentScenario.getId() == targetId) {
+                            // Select the row in the table
+                            scenarioTable.setRowSelectionInterval(row, row);
+                            // Ensure the selected row is visible
+                            scenarioTable.scrollRectToVisible(scenarioTable.getCellRect(row, 0, true));
+                            selectedScenario = row;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Focuses the UI on a specific mission by its ID.
+     *
+     * <p>This method retrieves the mission with the matching ID from the campaign. If the mission is found and is
+     * available in the mission combo box, it will be selected, making it the currently displayed mission in the
+     * UI.</p>
+     *
+     * <p>If the mission cannot be found in the campaign, or if it is not available in the mission combo box items,
+     * no selection will occur.</p>
+     *
+     * @param targetId The unique identifier of the mission to focus on
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public void focusOnMission(int targetId) {
+        Mission mission = getCampaign().getMission(targetId);
+
+        if (mission == null) {
+            return;
+        }
+
+        // Check if the targetMission is actually in the comboMission items
+        for (int i = 0; i < comboMission.getItemCount(); i++) {
+            if (comboMission.getItemAt(i).equals(mission)) {
+                comboMission.setSelectedItem(mission);
+                break;
+            }
+        }
+    }
+
     private final ActionScheduler scenarioDataScheduler = new ActionScheduler(this::refreshScenarioTableData);
     private final ActionScheduler scenarioViewScheduler = new ActionScheduler(this::refreshScenarioView);
     private final ActionScheduler missionsScheduler = new ActionScheduler(this::refreshMissions);

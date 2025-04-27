@@ -24,16 +24,25 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.unit.actions;
 
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.UUID;
-
-import org.junit.jupiter.api.Test;
 
 import megamek.common.Entity;
 import megamek.common.Game;
@@ -46,6 +55,7 @@ import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.RestoreUnitAction.IEntityCopyFactory;
+import org.junit.jupiter.api.Test;
 
 public class RestoreUnitActionTest {
     @Test
@@ -88,7 +98,7 @@ public class RestoreUnitActionTest {
         verify(mockNewEntity, times(1)).setExternalIdAsString(eq(id.toString()));
 
         verify(mockGame, times(1)).removeEntity(eq(entityId), anyInt());
-        verify(mockGame, times(1)).addEntity(eq(entityId), eq(mockNewEntity));
+        verify(mockGame, times(1)).addEntity(eq(mockNewEntity));
 
         verify(unit, times(1)).setEntity(eq(mockNewEntity));
         verify(unit, times(1)).removeParts();

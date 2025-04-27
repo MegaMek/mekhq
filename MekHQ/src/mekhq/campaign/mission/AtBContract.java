@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission;
 
@@ -51,8 +56,6 @@ import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 import static mekhq.campaign.force.ForceType.STANDARD;
 import static mekhq.campaign.force.FormationLevel.BATTALION;
 import static mekhq.campaign.force.FormationLevel.COMPANY;
-import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getEntity;
-import static mekhq.campaign.mission.BotForceRandomizer.UNIT_WEIGHT_UNSPECIFIED;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.ADVANCING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.DOMINATING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.OVERWHELMING;
@@ -487,19 +490,6 @@ public class AtBContract extends Contract {
     }
 
     /**
-     * Is not used.
-     *
-     * @since 0.50.04
-     * @deprecated No indicated uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public static boolean isMinorPower(final String factionCode) {
-        // TODO : Windchild move me to AtBContractMarket
-        final Faction faction = Factions.getInstance().getFaction(factionCode);
-        return !faction.isMajorOrSuperPower() && !faction.isClan();
-    }
-
-    /**
      * Checks and updates the morale which depends on various conditions such as the rout end date, skill levels,
      * victories, defeats, etc. This method also updates the enemy status based on the morale level.
      *
@@ -662,11 +652,11 @@ public class AtBContract extends Contract {
                 routEnd = today.plusMonths(max(1, d6() - 3)).minusDays(1);
 
                 PrisonerMissionEndEvent prisoners = new PrisonerMissionEndEvent(campaign, this);
-                if (campaign.getFriendlyPrisoners().isEmpty()) {
+                if (!campaign.getFriendlyPrisoners().isEmpty()) {
                     prisoners.handlePrisoners(true, true);
                 }
 
-                if (campaign.getCurrentPrisoners().isEmpty()) {
+                if (!campaign.getCurrentPrisoners().isEmpty()) {
                     prisoners.handlePrisoners(true, false);
                 }
 
@@ -741,15 +731,6 @@ public class AtBContract extends Contract {
         }
 
         return min(repairLocation, Unit.SITE_FACTORY_CONDITIONS);
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated Not in use
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void addMoraleMod(int mod) {
-        moraleMod += mod;
     }
 
     public int getScore() {
@@ -880,37 +861,6 @@ public class AtBContract extends Contract {
             default -> throw new IllegalStateException(
                   "Unexpected value in mekhq/campaign/mission/AtBContract.java/doBonusRoll: " + roll);
         };
-    }
-
-    /**
-     * Generates a bonus unit for a given campaign and unit type.
-     *
-     * @param campaign the campaign object to add the bonus unit to
-     * @param unitType the type of unit for the bonus
-     *
-     * @deprecated deprecated as superceded by {@link MercenaryAuction}
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    private void addBonusUnit(Campaign campaign, int unitType) {
-        // Determine faction and quality
-        String faction = (randomInt(2) > 0) ? enemyCode : employerCode;
-        int quality = (faction.equals(enemyCode)) ? enemyQuality : allyQuality;
-
-        // Try to generate the new unit
-        Entity newUnit = getEntity(faction, REGULAR, quality, unitType, UNIT_WEIGHT_UNSPECIFIED, null, campaign);
-
-        // If failed, try again with the campaign's faction
-        if (newUnit == null) {
-            String defaultFaction = campaign.getFaction().getShortName();
-            newUnit = getEntity(defaultFaction, REGULAR, quality, unitType, UNIT_WEIGHT_UNSPECIFIED, null, campaign);
-        }
-
-        // Add the unit to the campaign if successfully generated
-        if (newUnit != null) {
-            // The 1-day delivery time is so that the unit addition is picked up by the 'mothball' campaign option.
-            // It also makes sense the unit wouldn't magically materialize in your hangar and has to get there.
-            campaign.addNewUnit(newUnit, false, 1);
-        }
     }
 
     public boolean isSubcontract() {
@@ -1393,17 +1343,6 @@ public class AtBContract extends Contract {
         return employerCode;
     }
 
-    /**
-     * @since 0.50.04
-     * @deprecated use {@link #setEmployerCode(String, int)} instead
-     */
-    @Deprecated(since = "0.50.04")
-    public void setEmployerCode(final String code, final LocalDate date) {
-        employerCode = code;
-        setEmployer(getEmployerName(date.getYear()));
-        enemyCamouflage = pickRandomCamouflage(date.getYear(), enemyCode);
-    }
-
     public void setEmployerCode(String code, int year) {
         employerCode = code;
         setEmployer(getEmployerName(year));
@@ -1598,14 +1537,9 @@ public class AtBContract extends Contract {
     }
 
     /**
-     * @since 0.50.04
-     * @deprecated - Not in use.
+     * @deprecated no indicated uses.
      */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void addEmployerMinorBreach() {
-        employerMinorBreaches++;
-    }
-
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public void addEmployerMinorBreaches(int num) {
         employerMinorBreaches += num;
     }

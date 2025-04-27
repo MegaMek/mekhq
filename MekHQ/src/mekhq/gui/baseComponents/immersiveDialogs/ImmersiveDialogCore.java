@@ -57,6 +57,7 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkEvent.EventType;
 
 import megamek.client.ui.baseComponents.MMComboBox;
+import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Portrait;
 import megamek.logging.MMLogger;
@@ -82,6 +83,8 @@ public class ImmersiveDialogCore extends JDialog {
     private final String RESOURCE_BUNDLE = "mekhq.resources.GUI";
     public final static String GLOSSARY_COMMAND_STRING = "GLOSSARY";
     public final static String PERSON_COMMAND_STRING = "PERSON";
+    public final static String MISSION_COMMAND_STRING = "MISSION";
+    public final static String SCENARIO_COMMAND_STRING = "SCENARIO";
 
     private Campaign campaign;
 
@@ -402,13 +405,27 @@ public class ImmersiveDialogCore extends JDialog {
         String commandKey = splitReference[0];
         String entryKey = splitReference[1];
 
-        if (commandKey.equals(GLOSSARY_COMMAND_STRING)) {
-            new GlossaryDialog(parent, campaign, entryKey);
-        } else if (commandKey.equals(PERSON_COMMAND_STRING)) {
-            CampaignGUI campaignGUI = campaign.getApp().getCampaigngui();
+        CampaignGUI campaignGUI = campaign.getApp().getCampaigngui();
 
+        if (commandKey.equalsIgnoreCase(GLOSSARY_COMMAND_STRING)) {
+            new GlossaryDialog(parent, campaign, entryKey);
+        } else if (commandKey.equalsIgnoreCase(PERSON_COMMAND_STRING)) {
             final UUID id = UUID.fromString(reference.split(":")[1]);
             campaignGUI.focusOnPerson(id);
+        } else if (commandKey.equalsIgnoreCase(MISSION_COMMAND_STRING)) {
+            try {
+                final int targetId = MathUtility.parseInt(entryKey, -1);
+                campaignGUI.focusOnMission(targetId);
+            } catch (Exception e) {
+                logger.error("Failed to parse mission ID: " + entryKey, e);
+            }
+        } else if (commandKey.equalsIgnoreCase(SCENARIO_COMMAND_STRING)) {
+            try {
+                final int targetId = MathUtility.parseInt(entryKey, -1);
+                campaignGUI.focusOnScenario(targetId);
+            } catch (Exception e) {
+                logger.error("Failed to parse scenario ID: " + entryKey, e);
+            }
         }
     }
 

@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -54,19 +59,19 @@ import mekhq.campaign.personnel.SpecialAbility;
 public class SelectAbilitiesDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(SelectAbilitiesDialog.class);
 
-    private JButton         btnClose;
-    private JButton         btnOK;
+    private JButton btnClose;
+    private JButton btnOK;
     private List<JCheckBox> chkAbility;
-    private Vector<String>  selected;
-    private List<String>    spaNames;
-    private boolean         cancelled;
+    private Vector<String> selected;
+    private List<String> spaNames;
+    private boolean cancelled;
 
-    private Map<String, SpecialAbility> allSPA;
+    private final Map<String, SpecialAbility> allSPA;
 
     public SelectAbilitiesDialog(JFrame parent, Vector<String> s, Map<String, SpecialAbility> hash) {
         super(parent, true);
-        selected  = s;
-        allSPA    = hash;
+        selected = s;
+        allSPA = hash;
         cancelled = false;
         initComponents();
         setLocationRelativeTo(parent);
@@ -74,11 +79,11 @@ public class SelectAbilitiesDialog extends JDialog {
     }
 
     private void initComponents() {
-        btnOK    = new JButton();
+        btnOK = new JButton();
         btnClose = new JButton();
 
         chkAbility = new ArrayList<>();
-        spaNames   = new ArrayList<>();
+        spaNames = new ArrayList<>();
 
         JPanel panMain = new JPanel(new GridLayout(0, 3));
 
@@ -119,11 +124,7 @@ public class SelectAbilitiesDialog extends JDialog {
 
     /**
      * These need to be migrated to the Suite Constants / Suite Options Setup
-     *
-     * @since 0.50.04
-     * @deprecated Move to Suite Constants / Suite Options Setup
      */
-    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(SelectAbilitiesDialog.class);

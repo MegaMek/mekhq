@@ -30,13 +30,10 @@ package mekhq.campaign.randomEvents.prisoners;
 import static java.lang.Math.ceil;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
-import static java.lang.Math.round;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static megamek.common.Compute.d6;
 import static mekhq.campaign.force.ForceType.SECURITY;
-import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
-import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_POISON_RESISTANCE;
 import static mekhq.campaign.personnel.enums.PersonnelRole.DEPENDENT;
 import static mekhq.campaign.personnel.enums.PersonnelRole.NONE;
@@ -59,6 +56,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomOriginOptions;
+import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
@@ -295,6 +293,8 @@ public class EventEffectsManager {
             target.diagnose(campaign, wounds);
         }
 
+        MekHQ.triggerEvent(new PersonChangedEvent(target));
+
         String colorOpen = isGuard ?
                                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()) :
                                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
@@ -345,6 +345,8 @@ public class EventEffectsManager {
             if (isUseAdvancedMedical) {
                 target.diagnose(campaign, wounds);
             }
+
+            MekHQ.triggerEvent(new PersonChangedEvent(target));
 
             potentialTargets.remove(target);
         }
@@ -405,6 +407,8 @@ public class EventEffectsManager {
             } else {
                 campaign.removePerson(target, false);
             }
+
+            MekHQ.triggerEvent(new PersonChangedEvent(target));
 
             potentialTargets.remove(target);
         }
@@ -469,6 +473,8 @@ public class EventEffectsManager {
             } else {
                 campaign.removePerson(target, false);
             }
+
+            MekHQ.triggerEvent(new PersonChangedEvent(target));
 
             potentialTargets.remove(target);
         }
@@ -553,6 +559,8 @@ public class EventEffectsManager {
             return "";
         }
 
+        MekHQ.triggerEvent(new PersonChangedEvent(target));
+
         String colorOpen = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor());
 
         String context = getFormattedTextAt(RESOURCE_BUNDLE,
@@ -595,6 +603,8 @@ public class EventEffectsManager {
         }
 
         target.changeLoyalty(magnitude);
+
+        MekHQ.triggerEvent(new PersonChangedEvent(target));
 
         String context = getFormattedTextAt(RESOURCE_BUNDLE,
               magnitude > 0 ? "context.guard.singular" : "context.prisoner.singular");
@@ -643,6 +653,8 @@ public class EventEffectsManager {
 
         for (Person target : targets) {
             target.changeLoyalty(magnitude);
+
+            MekHQ.triggerEvent(new PersonChangedEvent(target));
         }
 
         String context;
@@ -799,6 +811,8 @@ public class EventEffectsManager {
 
         if (campaign.getCampaignOptions().isUseFatigue()) {
             Fatigue.processFatigueActions(campaign, target);
+
+            MekHQ.triggerEvent(new PersonChangedEvent(target));
         }
 
         String context = getFormattedTextAt(RESOURCE_BUNDLE,
@@ -850,6 +864,8 @@ public class EventEffectsManager {
 
             if (campaign.getCampaignOptions().isUseFatigue()) {
                 Fatigue.processFatigueActions(campaign, target);
+
+                MekHQ.triggerEvent(new PersonChangedEvent(target));
             }
         }
 
@@ -925,7 +941,7 @@ public class EventEffectsManager {
         return getFormattedTextAt(RESOURCE_BUNDLE,
               "SUPPORT_POINT.report",
               context,
-              target.getName(),
+              target.getHyperlinkedName(),
               colorOpen,
               direction,
               CLOSING_SPAN_TAG,
@@ -1014,6 +1030,8 @@ public class EventEffectsManager {
         target.setPrimaryRole(campaign, DEPENDENT);
         target.setSecondaryRole(NONE);
 
+        MekHQ.triggerEvent(new PersonChangedEvent(target));
+
         return getFormattedTextAt(RESOURCE_BUNDLE, "MISTAKE.report", target.getFullTitle());
     }
 
@@ -1039,6 +1057,8 @@ public class EventEffectsManager {
         Faction newFaction = targetContract.getEmployerFaction();
         targetCharacter.setOriginFaction(newFaction);
         targetCharacter.setClanPersonnel(newFaction.isClan());
+
+        MekHQ.triggerEvent(new PersonChangedEvent(targetCharacter));
 
         // We can reuse the MISTAKE report here, too.
         return getFormattedTextAt(RESOURCE_BUNDLE, "MISTAKE.report", targetCharacter.getFullTitle());
@@ -1084,6 +1104,8 @@ public class EventEffectsManager {
             if (campaign.getCampaignOptions().isUseFatigue()) {
                 Fatigue.processFatigueActions(campaign, target);
             }
+
+            MekHQ.triggerEvent(new PersonChangedEvent(target));
 
             potentialTargets.remove(target);
         }

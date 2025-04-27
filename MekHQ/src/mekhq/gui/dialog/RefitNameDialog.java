@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -55,22 +60,22 @@ import mekhq.campaign.parts.Refit;
 public class RefitNameDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(RefitNameDialog.class);
 
-    private JFrame  frame;
-    private Refit   refit;
+    private JFrame frame;
+    private final Refit refit;
     private boolean cancelled;
 
-    private JButton    btnCancel;
-    private JButton    btnOK;
-    private JLabel     lblChassis;
+    private JButton btnCancel;
+    private JButton btnOK;
+    private JLabel lblChassis;
     private JTextField txtChassis;
-    private JLabel     lblModel;
+    private JLabel lblModel;
     private JTextField txtModel;
 
     public RefitNameDialog(final JFrame frame, final boolean modal, final Refit refit) {
         super(frame, modal);
         this.frame = frame;
         this.refit = refit;
-        cancelled  = false;
+        cancelled = false;
         initComponents();
         setLocationRelativeTo(frame);
         setUserPreferences();
@@ -80,10 +85,10 @@ public class RefitNameDialog extends JDialog {
 
         txtChassis = new JTextField();
         lblChassis = new JLabel();
-        txtModel   = new JTextField();
-        lblModel   = new JLabel();
-        btnOK      = new JButton();
-        btnCancel  = new JButton();
+        txtModel = new JTextField();
+        lblModel = new JLabel();
+        btnOK = new JButton();
+        btnCancel = new JButton();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.RefitNameDialog",
               MekHQ.getMHQOptions().getLocale());
@@ -94,11 +99,11 @@ public class RefitNameDialog extends JDialog {
 
         lblChassis.setText(resourceMap.getString("lblChassis.text"));
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx     = 0;
-        gridBagConstraints.gridy     = 0;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor    = GridBagConstraints.WEST;
-        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(lblChassis, gridBagConstraints);
 
         txtChassis.setText(refit.getNewEntity().getChassis());
@@ -108,57 +113,57 @@ public class RefitNameDialog extends JDialog {
             txtChassis.setEditable(false);
             txtChassis.setEnabled(false);
         }
-        gridBagConstraints           = new GridBagConstraints();
-        gridBagConstraints.gridx     = 1;
-        gridBagConstraints.gridy     = 0;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx   = 1.0;
-        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor    = GridBagConstraints.WEST;
-        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(txtChassis, gridBagConstraints);
 
         lblModel.setText(resourceMap.getString("lblModel.text"));
-        gridBagConstraints           = new GridBagConstraints();
-        gridBagConstraints.gridx     = 0;
-        gridBagConstraints.gridy     = 1;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor    = GridBagConstraints.WEST;
-        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(lblModel, gridBagConstraints);
 
         txtModel.setText(refit.getNewEntity().getModel());
         txtModel.setMinimumSize(new Dimension(150, 28));
-        gridBagConstraints           = new GridBagConstraints();
-        gridBagConstraints.gridx     = 1;
-        gridBagConstraints.gridy     = 1;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx   = 1.0;
-        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor    = GridBagConstraints.WEST;
-        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(txtModel, gridBagConstraints);
 
         btnOK.setText(resourceMap.getString("btnOK.text"));
         btnOK.setName("btnOK");
         btnOK.addActionListener(this::btnOKActionPerformed);
-        gridBagConstraints           = new GridBagConstraints();
-        gridBagConstraints.gridx     = 0;
-        gridBagConstraints.gridy     = 2;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor    = GridBagConstraints.EAST;
-        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.EAST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(btnOK, gridBagConstraints);
 
         btnCancel.setText(resourceMap.getString("btnCancel.text"));
         btnCancel.setName("btnClose");
         btnCancel.addActionListener(this::btnCloseActionPerformed);
-        gridBagConstraints           = new GridBagConstraints();
-        gridBagConstraints.gridx     = 1;
-        gridBagConstraints.gridy     = 2;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor    = GridBagConstraints.WEST;
-        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(btnCancel, gridBagConstraints);
 
         pack();
@@ -166,11 +171,7 @@ public class RefitNameDialog extends JDialog {
 
     /**
      * These need to be migrated to the Suite Constants / Suite Options Setup
-     *
-     * @since 0.50.04
-     * @deprecated Move to Suite Constants / Suite Options Setup
      */
-    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(RefitNameDialog.class);
@@ -183,7 +184,7 @@ public class RefitNameDialog extends JDialog {
 
     private void btnOKActionPerformed(ActionEvent evt) {
         String chassis = txtChassis.getText().trim();
-        String model   = txtModel.getText().trim();
+        String model = txtModel.getText().trim();
         if (chassis.isEmpty()) {
             chassis = refit.getOriginalEntity().getChassis();
         }

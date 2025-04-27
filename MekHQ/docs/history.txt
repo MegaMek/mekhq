@@ -1,6 +1,26 @@
 MEKHQ VERSION HISTORY:
 ---------------
-0.50.05
+0.50.06
++ PR #6767: Updated Rank System XML Version to 0.50.06
++ PR #6768: 0.50.06 Deprecation Removal and Clean up 
++ PR #6772: Restored Event Handlers for Campaign State Management
++ Fix #3111: Added Heroic and Legendary Skill Levels
++ Fix #4551: Added Double-Click Functionality to the Infirmary Tab to Jump to Patients in Personnel Tab
++ PR #6643: Added Support for Mission and Scenario Hyperlinking
++ Fix #6058: display cost of orderd parts
++ PR #6670: Made Injuries Appear More Serious By Changing Terms
++ PR #6708: Updated Command Skills to Match RAW Values
++ PR #6707: Refactored Medical Systems
++ PR #6776: Fixed Advanced Medical Fracture Injuries
++ PR #6709: Refactor StratCon Reinforcement Logic and Improve Skill Checks
++ Fix #6773: Fixed Birth Announcement Dialog Suppression Behavior
++ Fix #6771: Loosened Government Force Command Rights Re-Roll Restrictions
++ Fix #6777: Fixed Dynamic Difficulty Modifiers
++ Fix #6778: Prisoners Are Now Correctly Released When Enemy Routs
++ Fix #6678, #6679, #6681, #6686: Added 7 New Unofficial SPAs for Admin Characters
++ Fix #6785: Fixed NPE on New Contract when Negotiator Lacks Negotiation Skill
+
+0.50.05 (2025-04-25 1800 UTC)
 + PR #6284: Fixed Unique Interaction when Loading Player Campaigns with Custom Rank Systems
 + PR #6285: Added Mercenary Auction Events
 + Fix #910, #3644, #4762, #6179: Added Auto-Optimize Medical Assignments Feature

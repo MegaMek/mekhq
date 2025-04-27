@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
@@ -301,7 +306,7 @@ public abstract class Part implements IPartWork, ITechnology {
         }
 
         if (!ignoreDamage && needsFixing() && !isPriceAdjustedForAmount()) {
-            cost = cost.multipliedBy((getSkillMin() > SkillType.EXP_ELITE) ?
+            cost = cost.multipliedBy((getSkillMin() > SkillType.EXP_LEGENDARY) ?
                                            campaign.getCampaignOptions().getUnrepairablePartsValueMultiplier() :
                                            campaign.getCampaignOptions().getDamagedPartsValueMultiplier());
         }
@@ -456,7 +461,7 @@ public abstract class Part implements IPartWork, ITechnology {
             toReturn.append("<br>");
         }
 
-        if (getSkillMin() <= SkillType.EXP_ELITE) {
+        if (getSkillMin() <= SkillType.EXP_LEGENDARY) {
             toReturn.append(getTimeLeft())
                   .append(" minutes")
                   .append(null != getTech() ? " (scheduled)" : "")
@@ -1411,18 +1416,6 @@ public abstract class Part implements IPartWork, ITechnology {
 
     public boolean needsMaintenance() {
         return true;
-    }
-
-    /**
-     * @deprecated use {@link IPartWork#cancelAssignment(boolean)} instead.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void cancelAssignment() {
-        setTech(null);
-        setShorthandedMod(0);
-        cancelReservation();
-        resetOvertime();
-        resetTimeSpent();
     }
 
     public abstract String getLocationName();

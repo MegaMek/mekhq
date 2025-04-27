@@ -25,7 +25,7 @@
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
  */
-package mekhq.campaign.mod.am;
+package mekhq.campaign.personnel.medical.advancedMedical;
 
 import static mekhq.campaign.personnel.enums.ModifierValue.GUNNERY;
 import static mekhq.campaign.personnel.enums.ModifierValue.PILOTING;
@@ -60,10 +60,25 @@ public final class InjuryTypes {
     private static final MMLogger logger = MMLogger.create(InjuryType.class);
 
     // Predefined types
-    public static final InjuryType CUT = new Cut();
-    public static final InjuryType BRUISE = new Bruise();
+    /**
+     * @deprecated use {@link #PUNCTURE} instead.
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
+    public static final InjuryType CUT = new Puncture();
+    public static final InjuryType PUNCTURE = new Puncture();
+    /**
+     * @deprecated use {@link #FRACTURE} instead.
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
+    public static final InjuryType BRUISE = new Fracture();
+    public static final InjuryType FRACTURE = new Fracture();
     public static final InjuryType LACERATION = new Laceration();
-    public static final InjuryType SPRAIN = new Sprain();
+    /**
+     * @deprecated use {@link #TORN_MUSCLE} instead.
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
+    public static final InjuryType SPRAIN = new TornMuscle();
+    public static final InjuryType TORN_MUSCLE = new TornMuscle();
     public static final InjuryType CONCUSSION = new Concussion();
     public static final InjuryType BROKEN_RIB = new BrokenRib();
     public static final InjuryType BRUISED_KIDNEY = new BruisedKidney();
@@ -95,10 +110,12 @@ public final class InjuryTypes {
      */
     public static synchronized void registerAll() {
         if (!registered) {
-            InjuryType.register(0, "am:cut", CUT);
-            InjuryType.register(1, "am:bruise", BRUISE);
+            // `am:cut`, `am:bruise`, and `am:sprain` are the old codes for those injury types.
+            // We maintain them to avoid breaking compatibility
+            InjuryType.register(0, "am:cut", PUNCTURE);
+            InjuryType.register(1, "am:bruise", FRACTURE);
             InjuryType.register(2, "am:laceration", LACERATION);
-            InjuryType.register(3, "am:sprain", SPRAIN);
+            InjuryType.register(3, "am:sprain", TORN_MUSCLE);
             InjuryType.register(4, "am:concussion", CONCUSSION);
             InjuryType.register(5, "am:broken_rib", BROKEN_RIB);
             InjuryType.register(6, "am:bruised_kidney", BRUISED_KIDNEY);
@@ -662,10 +679,10 @@ public final class InjuryTypes {
         }
     }
 
-    public static final class Sprain extends AMInjuryType {
-        public Sprain() {
+    public static final class TornMuscle extends AMInjuryType {
+        public TornMuscle() {
             recoveryTime = 12;
-            simpleName = "sprained";
+            simpleName = "torn muscle";
             level = InjuryLevel.MINOR;
         }
 
@@ -676,37 +693,27 @@ public final class InjuryTypes {
 
         @Override
         public String getName(BodyLocation loc, int severity) {
-            return "Sprained " + Utilities.capitalize(loc.locationName());
+            return "Torn " + Utilities.capitalize(loc.locationName());
         }
 
         @Override
         public String getFluffText(BodyLocation loc, int severity, Gender gender) {
-            return "A sprained " + loc.locationName();
+            return "A torn muscle in " + GenderDescriptors.HIS_HER_THEIR.getDescriptor(gender) + ' ' + loc.locationName();
         }
 
         @Override
         public Collection<Modifier> getModifiers(Injury inj) {
             BodyLocation loc = inj.getLocation();
-            switch (loc) {
-                case LEFT_ARM:
-                case LEFT_HAND:
-                case RIGHT_ARM:
-                case RIGHT_HAND:
-                    return Collections.singletonList(new Modifier(ModifierValue.GUNNERY,
-                          1,
-                          null,
-                          InjuryType.MODTAG_INJURY));
-                case LEFT_LEG:
-                case LEFT_FOOT:
-                case RIGHT_LEG:
-                case RIGHT_FOOT:
-                    return Collections.singletonList(new Modifier(ModifierValue.PILOTING,
-                          1,
-                          null,
-                          InjuryType.MODTAG_INJURY));
-                default:
-                    return Collections.emptyList();
-            }
+            return switch (loc) {
+                case LEFT_ARM, LEFT_HAND, RIGHT_ARM, RIGHT_HAND ->
+                      Collections.singletonList(new Modifier(ModifierValue.GUNNERY, 1, null, InjuryType.MODTAG_INJURY));
+                case LEFT_LEG, LEFT_FOOT, RIGHT_LEG, RIGHT_FOOT ->
+                      Collections.singletonList(new Modifier(ModifierValue.PILOTING,
+                            1,
+                            null,
+                            InjuryType.MODTAG_INJURY));
+                default -> Collections.emptyList();
+            };
         }
     }
 
@@ -733,10 +740,10 @@ public final class InjuryTypes {
         }
     }
 
-    public static final class Bruise extends AMInjuryType {
-        public Bruise() {
-            allowedLocations = EnumSet.of(BodyLocation.CHEST, BodyLocation.ABDOMEN);
-            simpleName = "bruised";
+    public static final class Fracture extends AMInjuryType {
+        public Fracture() {
+            allowedLocations = EnumSet.of(BodyLocation.CHEST);
+            simpleName = "fracture";
             level = InjuryLevel.MINOR;
         }
 
@@ -747,12 +754,12 @@ public final class InjuryTypes {
 
         @Override
         public String getName(BodyLocation loc, int severity) {
-            return "Bruised " + Utilities.capitalize(loc.locationName());
+            return "Fractured " + Utilities.capitalize(loc.locationName());
         }
 
         @Override
         public String getFluffText(BodyLocation loc, int severity, Gender gender) {
-            return "A bruise on " + GenderDescriptors.HIS_HER_THEIR.getDescriptor(gender) + ' ' + loc.locationName();
+            return "A fractured " + loc.locationName();
         }
 
         @Override
@@ -761,10 +768,10 @@ public final class InjuryTypes {
         }
     }
 
-    public static final class Cut extends AMInjuryType {
-        public Cut() {
+    public static final class Puncture extends AMInjuryType {
+        public Puncture() {
             allowedLocations = EnumSet.of(BodyLocation.CHEST, BodyLocation.ABDOMEN);
-            simpleName = "cut";
+            simpleName = "puncture";
             level = InjuryLevel.MINOR;
         }
 
@@ -775,12 +782,12 @@ public final class InjuryTypes {
 
         @Override
         public String getName(BodyLocation loc, int severity) {
-            return "Cut " + Utilities.capitalize(loc.locationName());
+            return "Punctured " + Utilities.capitalize(loc.locationName());
         }
 
         @Override
         public String getFluffText(BodyLocation loc, int severity, Gender gender) {
-            return "Some cuts on " + GenderDescriptors.HIS_HER_THEIR.getDescriptor(gender) + ' ' + loc.locationName();
+            return "Puncture wound to the " + loc.locationName();
         }
 
         @Override

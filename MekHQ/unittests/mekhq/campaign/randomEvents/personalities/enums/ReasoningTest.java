@@ -35,10 +35,12 @@ import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.Test;
 
 public class ReasoningTest {
@@ -87,6 +89,9 @@ public class ReasoningTest {
     @Test
     public void testGetDescription_notInvalid() {
         Campaign campaign = mock(Campaign.class);
+        Faction campaignFaction = mock(Faction.class);
+        when(campaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
         Person person = new Person(campaign);
 
         for (Reasoning trait : Reasoning.values()) {
