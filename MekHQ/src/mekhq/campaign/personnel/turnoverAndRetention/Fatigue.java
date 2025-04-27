@@ -27,6 +27,12 @@
  */
 package mekhq.campaign.personnel.turnoverAndRetention;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
+
+import java.util.List;
+
 import megamek.common.Entity;
 import megamek.common.MiscType;
 import megamek.common.enums.SkillLevel;
@@ -36,12 +42,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
-
-import java.util.List;
-
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
-import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
-import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 /**
  * The {@code Fatigue} class provides utility methods for managing and processing
@@ -143,7 +143,7 @@ public class Fatigue {
      * @return {@code true} if the available capacity is sufficient; {@code false} otherwise.
      */
     public static boolean areFieldKitchensWithinCapacity(int fieldKitchenCapacity, int fieldKitchenUsage) {
-        return fieldKitchenCapacity <= fieldKitchenUsage;
+        return fieldKitchenCapacity >= fieldKitchenUsage;
     }
 
     /**
