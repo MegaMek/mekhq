@@ -634,10 +634,10 @@ public abstract class AbstractContractMarket {
         mod += calculateContractTypeModifiers(contract.getContractType(), contract.isAttacker());
 
         // The less skilled the player, the easier their contract.
-        int dynamicDifficultyModifier = REGULAR.getExperienceLevel() - averageSkillLevel.getExperienceLevel();
+        mod += REGULAR.getExperienceLevel() - averageSkillLevel.getExperienceLevel();
 
         // Assign ally skill rating
-        contract.setAllySkill(getSkillRating(d6(2) + mod + dynamicDifficultyModifier));
+        contract.setAllySkill(getSkillRating(d6(2) + mod));
 
         // Apply faction modifiers
         if (employerFaction.isClan()) {
@@ -710,10 +710,10 @@ public abstract class AbstractContractMarket {
         }
 
         // The less skilled the player, the easier their contract.
-        int dynamicDifficultyModifier = averageSkillLevel.getExperienceLevel() - REGULAR.getExperienceLevel();
+        mod += averageSkillLevel.getExperienceLevel() - REGULAR.getExperienceLevel();
 
         // Assign enemy skill rating
-        contract.setEnemySkill(getSkillRating(d6(2) + mod + dynamicDifficultyModifier));
+        contract.setEnemySkill(getSkillRating(d6(2) + mod));
 
         // Apply faction modifiers
         if (enemyFaction.isClan()) {
