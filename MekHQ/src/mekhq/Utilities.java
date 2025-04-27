@@ -29,35 +29,11 @@
 package mekhq;
 
 import static java.lang.Math.max;
+import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_GREEN;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_HEROIC;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
-import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
-import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
-import static mekhq.campaign.personnel.skills.SkillType.EXP_ULTRA_GREEN;
-import static mekhq.campaign.personnel.skills.SkillType.EXP_VETERAN;
-
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.image.BufferedImage;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FilenameFilter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.function.Consumer;
-import javax.swing.JTable;
-import javax.swing.table.TableModel;
-
-import static java.lang.Math.max;
-import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
-import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
-import static mekhq.campaign.personnel.skills.SkillType.EXP_GREEN;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_ULTRA_GREEN;
@@ -815,14 +791,14 @@ public class Utilities {
      * a pre-selected portrait, provided one is to their index Additionally, any extraData parameters should be migrated
      * here
      *
-     * @param p           the person to be renamed, if applicable
+     * @param person           the person to be renamed, if applicable
      * @param oldCrew     the crew object they were a part of
      * @param crewIndex   the index of the person in the crew
      * @param crewOptions whether or not to run the populateOptionsFromCrew for this person
      */
-    private static void migrateCrewData(Person p, Crew oldCrew, int crewIndex, boolean crewOptions) {
+    private static void migrateCrewData(Person person, Crew oldCrew, int crewIndex, boolean crewOptions) {
         if (crewOptions) {
-            populateOptionsFromCrew(p, oldCrew);
+            populateOptionsFromCrew(person, oldCrew);
         }
 
         // this is a bit of a hack, but instead of tracking it elsewhere we only set
@@ -839,26 +815,27 @@ public class Utilities {
 
                 if (!(name.equalsIgnoreCase(RandomNameGenerator.UNNAMED) ||
                             name.equalsIgnoreCase(RandomNameGenerator.UNNAMED_FULL_NAME))) {
-                    p.migrateName(name);
+                    person.migrateName(name);
                 }
             } else {
-                p.setGivenName(givenName);
-                p.setSurname(oldCrew.getExtraDataValue(crewIndex, Crew.MAP_SURNAME));
-                if (p.getSurname() == null) {
-                    p.setSurname("");
+                person.setGivenName(givenName);
+                person.setSurname(oldCrew.getExtraDataValue(crewIndex, Crew.MAP_SURNAME));
+                if (person.getSurname() == null) {
+                    person.setSurname("");
                 }
 
                 String phenotype = oldCrew.getExtraDataValue(crewIndex, Crew.MAP_PHENOTYPE);
                 if (phenotype != null) {
-                    p.setPhenotype(Phenotype.parseFromString(phenotype));
+                    person.setPhenotype(Phenotype.parseFromString(phenotype));
                 }
 
-                p.setBloodname(oldCrew.getExtraDataValue(crewIndex, Crew.MAP_BLOODNAME));
+                String bloodname = oldCrew.getExtraDataValue(crewIndex, Crew.MAP_BLOODNAME);
+                person.setBloodname(bloodname == null ? "" : bloodname);
             }
 
             // Only created crew can be assigned a portrait, so this is safe to put in here
             if (!oldCrew.getPortrait(crewIndex).isDefault()) {
-                p.setPortrait(oldCrew.getPortrait(crewIndex).clone());
+                person.setPortrait(oldCrew.getPortrait(crewIndex).clone());
             }
         }
     }
