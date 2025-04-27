@@ -826,7 +826,7 @@ public class Utilities {
 
                 String phenotype = oldCrew.getExtraDataValue(crewIndex, Crew.MAP_PHENOTYPE);
                 if (phenotype != null) {
-                    person.setPhenotype(Phenotype.parseFromString(phenotype));
+                    person.setPhenotype(Phenotype.fromString(phenotype));
                 }
 
                 String bloodname = oldCrew.getExtraDataValue(crewIndex, Crew.MAP_BLOODNAME);
