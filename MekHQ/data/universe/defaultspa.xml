@@ -479,7 +479,7 @@ If this character is the senior-most Admin/Transport character, the cost of inte
         <desc><![CDATA[This character knows people in high places.
 
 If this character is the senior-most Admin/Command character, the number of contracts offered each month is increased by 1 (may still be 0).]]></desc>
-        <xpCost>200</xpCost>
+        <xpCost>400</xpCost>
         <weight>1</weight>
         <skillPrereq>
             <skill>Administration::Elite</skill>
