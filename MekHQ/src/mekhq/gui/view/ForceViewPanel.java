@@ -182,16 +182,15 @@ public class ForceViewPanel extends JScrollablePanel {
         }
 
         for (UUID uid : force.getAllUnits(false)) {
-            bv = force.getTotalBV(campaign, true);
-
-            Unit u = campaign.getUnit(uid);
-            if (null != u) {
-                cost = cost.plus(u.getEntity().getCost(true));
-                ton += u.getEntity().getWeight();
-                String utype = UnitType.getTypeDisplayableName(u.getEntity().getUnitType());
+            Unit unit = campaign.getUnit(uid);
+            if (null != unit) {
+                bv += unit.getEntity().calculateBattleValue(true, !unit.hasPilot());
+                cost = cost.plus(unit.getEntity().getCost(true));
+                ton += unit.getEntity().getWeight();
+                String unitTypeName = UnitType.getTypeDisplayableName(unit.getEntity().getUnitType());
                 if (null == type) {
-                    type = utype;
-                } else if (!utype.equals(type)) {
+                    type = unitTypeName;
+                } else if (!unitTypeName.equals(type)) {
                     type = resourceMap.getString("mixed");
                 }
             }
@@ -555,7 +554,9 @@ public class ForceViewPanel extends JScrollablePanel {
 
     public String getForceSummary(Unit unit) {
         String toReturn = "<html><font size='4'><b>" + unit.getName() + "</b></font><br/>";
-        toReturn += "<font><b>BV:</b> " + unit.getEntity().calculateBattleValue() + "<br/>";
+        toReturn += "<font><b>BV:</b> " +
+                          unit.getEntity().calculateBattleValue(true, null == unit.getEntity().getCrew()) +
+                          "<br/>";
         toReturn += unit.getStatus();
         Entity entity = unit.getEntity();
         if (entity.hasNavalC3()) {
