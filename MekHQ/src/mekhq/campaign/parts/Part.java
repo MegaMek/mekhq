@@ -306,7 +306,7 @@ public abstract class Part implements IPartWork, ITechnology {
         }
 
         if (!ignoreDamage && needsFixing() && !isPriceAdjustedForAmount()) {
-            cost = cost.multipliedBy((getSkillMin() > SkillType.EXP_LEGENDARY) ?
+            cost = cost.multipliedBy((getSkillMin() > SkillType.EXP_ELITE) ?
                                            campaign.getCampaignOptions().getUnrepairablePartsValueMultiplier() :
                                            campaign.getCampaignOptions().getDamagedPartsValueMultiplier());
         }
@@ -461,7 +461,7 @@ public abstract class Part implements IPartWork, ITechnology {
             toReturn.append("<br>");
         }
 
-        if (getSkillMin() <= SkillType.EXP_LEGENDARY) {
+        if (getSkillMin() <= SkillType.EXP_ELITE) {
             toReturn.append(getTimeLeft())
                   .append(" minutes")
                   .append(null != getTech() ? " (scheduled)" : "")

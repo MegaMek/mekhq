@@ -517,7 +517,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
                 int modePenalty = part.getMode().expReduction;
                 if (skill == null) {
                     return false;
-                } else if (part.getSkillMin() > SkillType.EXP_LEGENDARY) {
+                } else if (part.getSkillMin() > SkillType.EXP_ELITE) {
                     return false;
                 } else if (tech.getMinutesLeft() <= 0) {
                     return false;
