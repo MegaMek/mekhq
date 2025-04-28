@@ -189,6 +189,7 @@ public class ForceViewPanel extends JScrollablePanel {
         for (UUID uid : force.getAllUnits(false)) {
             Unit unit = campaign.getUnit(uid);
             if (null != unit) {
+                // Never factor in C3 in this check. It will cause the TO&E to lock up for large campaigns.
                 bv += unit.getEntity().calculateBattleValue(true, !unit.hasPilot());
                 cost = cost.plus(unit.getEntity().getCost(true));
                 ton += unit.getEntity().getWeight();
@@ -559,6 +560,8 @@ public class ForceViewPanel extends JScrollablePanel {
 
     public String getForceSummary(Unit unit) {
         String toReturn = "<html><font size='4'><b>" + unit.getName() + "</b></font><br/>";
+
+        // Never factor in C3 in this check. It will cause the TO&E to lock up for large campaigns.
         toReturn += "<font><b>BV:</b> " +
                           unit.getEntity().calculateBattleValue(true, null == unit.getEntity().getCrew()) +
                           "<br/>";
