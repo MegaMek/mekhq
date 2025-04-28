@@ -284,6 +284,10 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             DefaultMutableTreeNode top = new DefaultMutableTreeNode(botStub.getName());
             List<String> allEntries = botStub.getEntityList();
             for (String entry : allEntries) {
+                if (!scenario.getStatus().isCurrent()) {
+                    continue;
+                }
+
                 if ((team != 1) && isTrueBlindDrop) {
                     continue;
                 }
