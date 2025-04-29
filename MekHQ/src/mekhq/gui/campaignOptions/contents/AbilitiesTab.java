@@ -24,11 +24,6 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
- *
- * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
- * Microsoft's "Game Content Usage Rules"
- * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
- * affiliated with Microsoft.
  */
 package mekhq.gui.campaignOptions.contents;
 
@@ -38,13 +33,13 @@ import static mekhq.campaign.personnel.skills.SkillType.S_GUN_PROTO;
 import static mekhq.campaign.personnel.skills.SkillType.getExperienceLevelName;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_GUNNERY;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_PILOTING;
+import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.CHARACTER_CREATION_ONLY;
+import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.CHARACTER_FLAW;
+import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.COMBAT_ABILITY;
+import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.MANEUVERING_ABILITY;
+import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.UTILITY_ABILITY;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
-import static mekhq.utilities.spaUtilities.enums.AbilityInfo.AbilityCategory.CHARACTER_CREATION_ONLY;
-import static mekhq.utilities.spaUtilities.enums.AbilityInfo.AbilityCategory.CHARACTER_FLAW;
-import static mekhq.utilities.spaUtilities.enums.AbilityInfo.AbilityCategory.COMBAT_ABILITY;
-import static mekhq.utilities.spaUtilities.enums.AbilityInfo.AbilityCategory.MANEUVERING_ABILITY;
-import static mekhq.utilities.spaUtilities.enums.AbilityInfo.AbilityCategory.UTILITY_ABILITY;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -73,13 +68,13 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillPerquisite;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo;
+import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory;
 import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 import mekhq.gui.dialog.EditSpecialAbilityDialog;
-import mekhq.utilities.spaUtilities.enums.AbilityInfo;
-import mekhq.utilities.spaUtilities.enums.AbilityInfo.AbilityCategory;
 
 /**
  * The {@code AbilitiesTab} class represents a GUI tab for configuring and managing special abilities in a campaign.
@@ -93,7 +88,7 @@ public class AbilitiesTab {
     private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
 
     private ArrayList<String> level3Abilities;
-    private Map<String, AbilityInfo> allAbilityInfo;
+    private Map<String, CampaignOptionsAbilityInfo> allAbilityInfo;
     private JPanel combatTab;
     private JPanel maneuveringTab;
     private JPanel utilityTab;
@@ -218,7 +213,8 @@ public class AbilitiesTab {
             }
 
             // Mark the ability as active
-            allAbilityInfo.put(abilityName, new AbilityInfo(abilityName, clonedAbility, isEnabled, category));
+            allAbilityInfo.put(abilityName,
+                  new CampaignOptionsAbilityInfo(abilityName, clonedAbility, isEnabled, category));
         }
     }
 
@@ -306,7 +302,7 @@ public class AbilitiesTab {
         // Contents
         JButton btnEnableAll = new CampaignOptionsButton("AddAll");
         btnEnableAll.addActionListener(e -> {
-            for (AbilityInfo abilityInfo : allAbilityInfo.values()) {
+            for (CampaignOptionsAbilityInfo abilityInfo : allAbilityInfo.values()) {
                 abilityInfo.setEnabled(true);
             }
 
@@ -315,7 +311,7 @@ public class AbilitiesTab {
 
         JButton btnRemoveAll = new CampaignOptionsButton("RemoveAll");
         btnRemoveAll.addActionListener(e -> {
-            for (AbilityInfo abilityInfo : allAbilityInfo.values()) {
+            for (CampaignOptionsAbilityInfo abilityInfo : allAbilityInfo.values()) {
                 abilityInfo.setEnabled(false);
             }
 
@@ -345,7 +341,7 @@ public class AbilitiesTab {
         Collections.sort(sortedAbilityNames);
 
         for (String abilityName : sortedAbilityNames) {
-            AbilityInfo abilityInfo = allAbilityInfo.get(abilityName);
+            CampaignOptionsAbilityInfo abilityInfo = allAbilityInfo.get(abilityName);
 
             if (abilityInfo.getCategory() == abilityCategory) {
                 JPanel abilityPanel = createSPAPanel(abilityInfo);
@@ -394,7 +390,7 @@ public class AbilitiesTab {
      *
      * @return A {@code JPanel} containing the UI elements related to the ability.
      */
-    private JPanel createSPAPanel(AbilityInfo abilityInfo) {
+    private JPanel createSPAPanel(CampaignOptionsAbilityInfo abilityInfo) {
         SpecialAbility ability = abilityInfo.getAbility();
 
         // Initialization
@@ -481,7 +477,7 @@ public class AbilitiesTab {
     private boolean editSPA(SpecialAbility ability) {
         Map<String, SpecialAbility> temporaryMap = new HashMap<>();
 
-        for (Entry<String, AbilityInfo> info : allAbilityInfo.entrySet()) {
+        for (Entry<String, CampaignOptionsAbilityInfo> info : allAbilityInfo.entrySet()) {
             temporaryMap.put(info.getKey(), info.getValue().getAbility());
         }
 
@@ -554,7 +550,7 @@ public class AbilitiesTab {
     public void applyCampaignOptionsToCampaign(@Nullable CampaignPreset preset) {
         Map<String, SpecialAbility> enabledAbilities = new HashMap<>();
 
-        for (AbilityInfo abilityInfo : allAbilityInfo.values()) {
+        for (CampaignOptionsAbilityInfo abilityInfo : allAbilityInfo.values()) {
             if (abilityInfo.isEnabled()) {
                 enabledAbilities.put(abilityInfo.getAbility().getName(), abilityInfo.getAbility());
             }
