@@ -86,7 +86,7 @@ public class Warehouse {
             Part mergedPart = mergePartWithExisting(part);
 
             // CAW: intentional reference equality
-            if (mergedPart != part) {
+            if (!mergedPart.equals(part)) {
                 // We've merged parts, so let interested parties know we've
                 // updated the merged part.
                 MekHQ.triggerEvent(new PartChangedEvent(mergedPart));
