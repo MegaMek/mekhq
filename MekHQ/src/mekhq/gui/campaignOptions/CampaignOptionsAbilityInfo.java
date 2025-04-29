@@ -24,10 +24,16 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.campaignOptions;
 
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.utilities.spaUtilities.enums.AbilityCategory;
 
 /**
  * The {@code AbilityInfo} class represents information about a specific ability, encapsulating its name, the associated
@@ -38,18 +44,6 @@ public class CampaignOptionsAbilityInfo {
     private SpecialAbility ability;
     private boolean isEnabled;
     private AbilityCategory category;
-
-    /**
-     * Enum {@code AbilityCategory} represents the categories abilities can belong to. Categories available:
-     * <ul>
-     *     <li>{@code COMBAT_ABILITIES}: Abilities related to combat actions</li>
-     *     <li>{@code MANEUVERING_ABILITIES}: Abilities related to movement and maneuvering</li>
-     *     <li>{@code UTILITY_ABILITIES}: Abilities providing utility or non-combat benefits</li>
-     * </ul>
-     */
-    public enum AbilityCategory {
-        COMBAT_ABILITY, MANEUVERING_ABILITY, UTILITY_ABILITY, CHARACTER_FLAW, CHARACTER_CREATION_ONLY
-    }
 
     /**
      * Constructs an {@code AbilityInfo} object with all fields initialized.

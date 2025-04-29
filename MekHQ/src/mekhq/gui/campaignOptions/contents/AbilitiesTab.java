@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.campaignOptions.contents;
 
@@ -33,13 +38,13 @@ import static mekhq.campaign.personnel.skills.SkillType.S_GUN_PROTO;
 import static mekhq.campaign.personnel.skills.SkillType.getExperienceLevelName;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_GUNNERY;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_PILOTING;
-import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.CHARACTER_CREATION_ONLY;
-import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.CHARACTER_FLAW;
-import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.COMBAT_ABILITY;
-import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.MANEUVERING_ABILITY;
-import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.UTILITY_ABILITY;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+import static mekhq.utilities.spaUtilities.enums.AbilityCategory.CHARACTER_CREATION_ONLY;
+import static mekhq.utilities.spaUtilities.enums.AbilityCategory.CHARACTER_FLAW;
+import static mekhq.utilities.spaUtilities.enums.AbilityCategory.COMBAT_ABILITY;
+import static mekhq.utilities.spaUtilities.enums.AbilityCategory.MANEUVERING_ABILITY;
+import static mekhq.utilities.spaUtilities.enums.AbilityCategory.UTILITY_ABILITY;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -69,12 +74,12 @@ import mekhq.campaign.personnel.SkillPerquisite;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo;
-import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory;
 import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 import mekhq.gui.dialog.EditSpecialAbilityDialog;
+import mekhq.utilities.spaUtilities.enums.AbilityCategory;
 
 /**
  * The {@code AbilitiesTab} class represents a GUI tab for configuring and managing special abilities in a campaign.

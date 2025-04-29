@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.campaignOptions;
 
@@ -33,14 +38,14 @@ import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_GUNNERY;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_PILOTING;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_GENERAL;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT;
-import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.CHARACTER_CREATION_ONLY;
-import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.CHARACTER_FLAW;
-import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.COMBAT_ABILITY;
-import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.MANEUVERING_ABILITY;
-import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.UTILITY_ABILITY;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.ABRIDGED;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP_ABRIDGED;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createSubTabs;
+import static mekhq.utilities.spaUtilities.enums.AbilityCategory.CHARACTER_CREATION_ONLY;
+import static mekhq.utilities.spaUtilities.enums.AbilityCategory.CHARACTER_FLAW;
+import static mekhq.utilities.spaUtilities.enums.AbilityCategory.COMBAT_ABILITY;
+import static mekhq.utilities.spaUtilities.enums.AbilityCategory.MANEUVERING_ABILITY;
+import static mekhq.utilities.spaUtilities.enums.AbilityCategory.UTILITY_ABILITY;
 
 import java.time.LocalDate;
 import java.util.Map;
