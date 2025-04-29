@@ -2928,6 +2928,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                             SkillSubType subType = skillType.getSubType();
                             switch (subType) {
+                                case NONE -> currentMenu.add(menuItem);
                                 case COMBAT_GUNNERY -> combatGunnerySkillsCurrent.add(menuItem);
                                 case COMBAT_PILOTING -> combatPilotingSkillsCurrent.add(menuItem);
                                 case SUPPORT -> supportSkillsCurrent.add(menuItem);
@@ -2937,7 +2938,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                 case ROLEPLAY_INTEREST -> roleplaySkillsInterestCurrent.add(menuItem);
                                 case ROLEPLAY_SCIENCE -> roleplaySkillsScienceCurrent.add(menuItem);
                                 case ROLEPLAY_SECURITY -> roleplaySkillsSecurityCurrent.add(menuItem);
-                                default -> logger.error("Unknown skill sub type: {}", subType);
+                                default -> logger.error("(Current Skills) Unknown skill sub type: {}", subType);
                             }
                         }
                     } else {
@@ -2949,6 +2950,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                         SkillSubType subType = skillType.getSubType();
                         switch (subType) {
+                            case NONE -> newSkillsMenu.add(menuItem);
                             case COMBAT_GUNNERY -> combatGunnerySkillsNew.add(menuItem);
                             case COMBAT_PILOTING -> combatPilotingSkillsNew.add(menuItem);
                             case SUPPORT -> supportSkillsNew.add(menuItem);
@@ -2958,7 +2960,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             case ROLEPLAY_INTEREST -> roleplaySkillsInterestNew.add(menuItem);
                             case ROLEPLAY_SCIENCE -> roleplaySkillsScienceNew.add(menuItem);
                             case ROLEPLAY_SECURITY -> roleplaySkillsSecurityNew.add(menuItem);
-                            default -> logger.error("Unknown skill sub type: {}", subType);
+                            default -> logger.error("(New Skills) Unknown skill sub type: {}", subType);
                         }
                     }
                 }
