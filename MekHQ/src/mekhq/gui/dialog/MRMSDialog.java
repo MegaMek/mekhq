@@ -265,7 +265,7 @@ public class MRMSDialog extends JDialog {
                 if (!part.isBeingWorkedOn() &&
                           part.needsFixing() &&
                           !(part instanceof AmmoBin) &&
-                          (part.getSkillMin() <= SkillType.EXP_LEGENDARY)) {
+                          (part.getSkillMin() <= SkillType.EXP_ELITE)) {
                     completePartsList.add(part);
                 }
             });
@@ -759,8 +759,6 @@ public class MRMSDialog extends JDialog {
         skillModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_REGULAR));
         skillModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_VETERAN));
         skillModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_ELITE));
-        skillModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_HEROIC));
-        skillModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_LEGENDARY));
         skillModel.setSelectedItem(SkillType.getExperienceLevelName(selectedValue));
         JComboBox<String> skillCBox = new JComboBox<>(skillModel);
         skillCBox.setEnabled(enabled);

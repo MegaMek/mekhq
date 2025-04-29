@@ -307,16 +307,32 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                             skillLevel = person.getSkillLevel(campaign, !person.getPrimaryRole().isVTOLPilot());
                         }
 
-                        subMenu = switch (skillLevel) {
-                            case LEGENDARY -> legendaryMenu;
-                            case HEROIC -> heroicMenu;
-                            case ELITE -> eliteMenu;
-                            case VETERAN -> veteranMenu;
-                            case REGULAR -> regularMenu;
-                            case GREEN -> greenMenu;
-                            case ULTRA_GREEN -> ultraGreenMenu;
-                            default -> null;
-                        };
+                        switch (skillLevel) {
+                            case LEGENDARY:
+                                subMenu = legendaryMenu;
+                                break;
+                            case HEROIC:
+                                subMenu = heroicMenu;
+                                break;
+                            case ELITE:
+                                subMenu = eliteMenu;
+                                break;
+                            case VETERAN:
+                                subMenu = veteranMenu;
+                                break;
+                            case REGULAR:
+                                subMenu = regularMenu;
+                                break;
+                            case GREEN:
+                                subMenu = greenMenu;
+                                break;
+                            case ULTRA_GREEN:
+                                subMenu = ultraGreenMenu;
+                                break;
+                            default:
+                                subMenu = null;
+                                break;
+                        }
 
                         if (subMenu != null) {
                             final JMenuItem miPilot = new JMenuItem(person.getFullTitle());
@@ -371,19 +387,36 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
 
                     // Add the person to the proper menu
                     for (final Person person : filteredPersonnel) {
-                        final JScrollableMenu subMenu = switch (person.getSkillLevel(campaign,
+                        final JScrollableMenu subMenu;
+                        switch (person.getSkillLevel(campaign,
                               isNaval ?
                                     !person.getPrimaryRole().isNavalVehicleDriver() :
                                     !person.getPrimaryRole().isGroundVehicleDriver())) {
-                            case LEGENDARY -> legendaryMenu;
-                            case HEROIC -> heroicMenu;
-                            case ELITE -> eliteMenu;
-                            case VETERAN -> veteranMenu;
-                            case REGULAR -> regularMenu;
-                            case GREEN -> greenMenu;
-                            case ULTRA_GREEN -> ultraGreenMenu;
-                            default -> null;
-                        };
+                            case LEGENDARY:
+                                subMenu = legendaryMenu;
+                                break;
+                            case HEROIC:
+                                subMenu = heroicMenu;
+                                break;
+                            case ELITE:
+                                subMenu = eliteMenu;
+                                break;
+                            case VETERAN:
+                                subMenu = veteranMenu;
+                                break;
+                            case REGULAR:
+                                subMenu = regularMenu;
+                                break;
+                            case GREEN:
+                                subMenu = greenMenu;
+                                break;
+                            case ULTRA_GREEN:
+                                subMenu = ultraGreenMenu;
+                                break;
+                            default:
+                                subMenu = null;
+                                break;
+                        }
 
                         if (subMenu != null) {
                             final JMenuItem miDriver = new JMenuItem(person.getFullTitle());
@@ -447,16 +480,32 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                         skillLevel = person.getSkillLevel(campaign, !person.getPrimaryRole().isMekWarriorGrouping());
                     }
 
-                    subMenu = switch (skillLevel) {
-                        case LEGENDARY -> legendaryMenu;
-                        case HEROIC -> heroicMenu;
-                        case ELITE -> eliteMenu;
-                        case VETERAN -> veteranMenu;
-                        case REGULAR -> regularMenu;
-                        case GREEN -> greenMenu;
-                        case ULTRA_GREEN -> ultraGreenMenu;
-                        default -> null;
-                    };
+                    switch (skillLevel) {
+                        case LEGENDARY:
+                            subMenu = legendaryMenu;
+                            break;
+                        case HEROIC:
+                            subMenu = heroicMenu;
+                            break;
+                        case ELITE:
+                            subMenu = eliteMenu;
+                            break;
+                        case VETERAN:
+                            subMenu = veteranMenu;
+                            break;
+                        case REGULAR:
+                            subMenu = regularMenu;
+                            break;
+                        case GREEN:
+                            subMenu = greenMenu;
+                            break;
+                        case ULTRA_GREEN:
+                            subMenu = ultraGreenMenu;
+                            break;
+                        default:
+                            subMenu = null;
+                            break;
+                    }
 
                     if (subMenu != null) {
                         final JMenuItem miGunner = new JMenuItem(person.getFullTitle());
@@ -503,19 +552,36 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
 
                 // Add the person to the proper menu
                 for (final Person person : filteredPersonnel) {
-                    final JScrollableMenu subMenu = switch (person.getSkillLevel(campaign,
+                    final JScrollableMenu subMenu;
+                    switch (person.getSkillLevel(campaign,
                           isAero ?
                                 !person.getPrimaryRole().isVesselCrew() :
                                 !person.getPrimaryRole().isVehicleCrew())) {
-                        case LEGENDARY -> legendaryMenu;
-                        case HEROIC -> heroicMenu;
-                        case ELITE -> eliteMenu;
-                        case VETERAN -> veteranMenu;
-                        case REGULAR -> regularMenu;
-                        case GREEN -> greenMenu;
-                        case ULTRA_GREEN -> ultraGreenMenu;
-                        default -> null;
-                    };
+                        case LEGENDARY:
+                            subMenu = legendaryMenu;
+                            break;
+                        case HEROIC:
+                            subMenu = heroicMenu;
+                            break;
+                        case ELITE:
+                            subMenu = eliteMenu;
+                            break;
+                        case VETERAN:
+                            subMenu = veteranMenu;
+                            break;
+                        case REGULAR:
+                            subMenu = regularMenu;
+                            break;
+                        case GREEN:
+                            subMenu = greenMenu;
+                            break;
+                        case ULTRA_GREEN:
+                            subMenu = ultraGreenMenu;
+                            break;
+                        default:
+                            subMenu = null;
+                            break;
+                    }
 
                     if (subMenu != null) {
                         final JMenuItem miCrewmember = new JMenuItem(person.getFullTitle());
@@ -608,19 +674,36 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
 
                 // Add the person to the proper menu
                 for (final Person person : filteredPersonnel) {
-                    final JScrollableMenu subMenu = switch (person.getSkillLevel(campaign,
+                    final JScrollableMenu subMenu;
+                    switch (person.getSkillLevel(campaign,
                           isConventionalInfantry ?
                                 !person.getPrimaryRole().isSoldier() :
                                 !person.getPrimaryRole().isBattleArmour())) {
-                        case LEGENDARY -> legendaryMenu;
-                        case HEROIC -> heroicMenu;
-                        case ELITE -> eliteMenu;
-                        case VETERAN -> veteranMenu;
-                        case REGULAR -> regularMenu;
-                        case GREEN -> greenMenu;
-                        case ULTRA_GREEN -> ultraGreenMenu;
-                        default -> null;
-                    };
+                        case LEGENDARY:
+                            subMenu = legendaryMenu;
+                            break;
+                        case HEROIC:
+                            subMenu = heroicMenu;
+                            break;
+                        case ELITE:
+                            subMenu = eliteMenu;
+                            break;
+                        case VETERAN:
+                            subMenu = veteranMenu;
+                            break;
+                        case REGULAR:
+                            subMenu = regularMenu;
+                            break;
+                        case GREEN:
+                            subMenu = greenMenu;
+                            break;
+                        case ULTRA_GREEN:
+                            subMenu = ultraGreenMenu;
+                            break;
+                        default:
+                            subMenu = null;
+                            break;
+                    }
 
                     if (subMenu != null) {
                         final JMenuItem miSoldier = new JMenuItem(person.getFullTitle());
@@ -666,17 +749,33 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
 
                 // Add the person to the proper menu
                 for (final Person person : filteredPersonnel) {
-                    final JScrollableMenu subMenu = switch (person.getSkillLevel(campaign,
-                          !person.getPrimaryRole().isVesselNavigator())) {
-                        case LEGENDARY -> legendaryMenu;
-                        case HEROIC -> heroicMenu;
-                        case ELITE -> eliteMenu;
-                        case VETERAN -> veteranMenu;
-                        case REGULAR -> regularMenu;
-                        case GREEN -> greenMenu;
-                        case ULTRA_GREEN -> ultraGreenMenu;
-                        default -> null;
-                    };
+                    final JScrollableMenu subMenu;
+                    switch (person.getSkillLevel(campaign, !person.getPrimaryRole().isVesselNavigator())) {
+                        case LEGENDARY:
+                            subMenu = legendaryMenu;
+                            break;
+                        case HEROIC:
+                            subMenu = heroicMenu;
+                            break;
+                        case ELITE:
+                            subMenu = eliteMenu;
+                            break;
+                        case VETERAN:
+                            subMenu = veteranMenu;
+                            break;
+                        case REGULAR:
+                            subMenu = regularMenu;
+                            break;
+                        case GREEN:
+                            subMenu = greenMenu;
+                            break;
+                        case ULTRA_GREEN:
+                            subMenu = ultraGreenMenu;
+                            break;
+                        default:
+                            subMenu = null;
+                            break;
+                    }
 
                     if (subMenu != null) {
                         final JMenuItem miNavigator = new JMenuItem(person.getFullTitle());
