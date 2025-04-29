@@ -24,8 +24,13 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
-package mekhq.gui.campaignOptions;
+package mekhq.utilities.spaUtilities.enums;
 
 import mekhq.campaign.personnel.SpecialAbility;
 
@@ -33,7 +38,7 @@ import mekhq.campaign.personnel.SpecialAbility;
  * The {@code AbilityInfo} class represents information about a specific ability, encapsulating its name, the associated
  * {@link SpecialAbility}, its active status, and its category.
  */
-public class CampaignOptionsAbilityInfo {
+public class AbilityInfo {
     private String name;
     private SpecialAbility ability;
     private boolean isEnabled;
@@ -59,8 +64,7 @@ public class CampaignOptionsAbilityInfo {
      * @param isEnabled {@code true} if the ability is enabled, otherwise {@code false}
      * @param category  the category of the ability, represented as an {@link AbilityCategory}
      */
-    public CampaignOptionsAbilityInfo(String name, SpecialAbility ability, boolean isEnabled,
-                                      AbilityCategory category) {
+    public AbilityInfo(String name, SpecialAbility ability, boolean isEnabled, AbilityCategory category) {
         this.name = name;
         this.ability = ability;
         this.isEnabled = isEnabled;
