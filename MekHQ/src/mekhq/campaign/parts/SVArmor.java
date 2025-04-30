@@ -27,6 +27,11 @@
  */
 package mekhq.campaign.parts;
 
+import static megamek.common.EquipmentType.T_ARMOR_SV_BAR_2;
+
+import java.io.PrintWriter;
+import java.util.Objects;
+
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
@@ -38,11 +43,6 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
-
-import java.io.PrintWriter;
-import java.util.Objects;
-
-import static megamek.common.EquipmentType.T_ARMOR_SV_BAR_2;
 
 /**
  * Standard support vehicle armor, which can differ by BAR and tech rating.
@@ -157,18 +157,7 @@ public class SVArmor extends Armor {
     }
 
     @Override
-    public int getAmountAvailable() {
-        SVArmor a = (SVArmor) campaign.getWarehouse().findSparePart(part -> {
-            return isSamePartType(part)
-                    && part.isPresent()
-                    && !part.isReservedForRefit();
-        });
-
-        return a != null ? a.getAmount() : 0;
-    }
-
-    @Override
-    public void changeAmountAvailable(int amount) {
+    protected int changeAmountAvailableSingle(int amount) {
         SVArmor a = (SVArmor) campaign.getWarehouse().findSparePart(part -> {
             return isSamePartType(part)
                     && part.isPresent()
@@ -176,13 +165,16 @@ public class SVArmor extends Armor {
         });
 
         if (null != a) {
-            a.setAmount(a.getAmount() + amount);
+            int amountRemaining = a.getAmount() + amount;
+            a.setAmount(amountRemaining);
             if (a.getAmount() <= 0) {
                 campaign.getWarehouse().removePart(a);
+                return Math.min(0, amountRemaining);
             }
         } else if (amount > 0) {
             campaign.getQuartermaster().addPart(new SVArmor(bar, techRating, amount, -1, campaign), 0);
         }
+        return 0;
     }
 
     @Override

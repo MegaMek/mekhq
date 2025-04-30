@@ -572,17 +572,48 @@ public class Armor extends Part implements IAcquisitionWork {
         return getAmountAvailable() >= amountNeeded;
     }
 
+    /**
+     * Searches the warehouse for a compatible parts and returns how many points of armor are found.
+     * @return returns points of armor are found
+     */
     public int getAmountAvailable() {
-        Armor a = (Armor) campaign.getWarehouse()
-                                .findSparePart(part -> (part instanceof Armor) &&
-                                                             part.isPresent() &&
-                                                             !part.isReservedForRefit() &&
-                                                             isSameType((Armor) part));
-
-        return (a == null) ? 0 : a.getAmount();
+        return campaign.getWarehouse()
+                     .streamSpareParts()
+                     .mapToInt(part -> ((part instanceof Armor armor) &&
+                                              armor.isPresent() &&
+                                              !armor.isReservedForRefit() &&
+                                              isSameType(armor)) ? armor.getAmount() : 0)
+                     .sum();
     }
 
+    /**
+     * Searches the warehouse for a compatible parts changes the amount available. This will continue to remove parts
+     * if more than one part needs to be removed to cover the amount.
+     * @param amount points of armor to add or remove
+     */
     public void changeAmountAvailable(int amount) {
+        if (amount == 0) {
+            return;
+        }
+
+        int amountRemaining = amount;
+        int priorAmount = 0;
+
+
+        while ((amountRemaining != 0) && priorAmount != amountRemaining) {
+            priorAmount = amountRemaining;
+
+            amountRemaining = changeAmountAvailableSingle(amountRemaining);
+        }
+
+        if (amountRemaining > 0) {
+            logger.error("Still trying to add armor but that shouldn't have been a problem!");
+        } else if (amount < 0) {
+            logger.error("Still trying to remove armor but no more armor is in the warehouse!");
+        }
+    }
+
+    protected int changeAmountAvailableSingle(int amount) {
         Armor a = (Armor) campaign.getWarehouse()
                                 .findSparePart(part -> (part instanceof Armor) &&
                                                              part.isPresent() &&
@@ -590,15 +621,19 @@ public class Armor extends Part implements IAcquisitionWork {
                                                              isSameType((Armor) part));
 
         if (null != a) {
-            a.setAmount(a.getAmount() + amount);
+            int amountRemaining = a.getAmount() + amount;
+            a.setAmount(amountRemaining);
             if (a.getAmount() <= 0) {
                 campaign.getWarehouse().removePart(a);
+                return Math.min(0, amountRemaining);
             }
         } else if (amount > 0) {
             campaign.getQuartermaster()
                   .addPart(new Armor(getUnitTonnage(), type, amount, -1, false, isClanTechBase(), campaign), 0);
         }
+        return 0;
     }
+
 
     @Override
     public String fail(int rating) {

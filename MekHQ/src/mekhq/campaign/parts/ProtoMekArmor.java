@@ -137,29 +137,33 @@ public class ProtoMekArmor extends Armor {
 
     @Override
     public int getAmountAvailable() {
-        ProtoMekArmor a = (ProtoMekArmor) campaign.getWarehouse().findSparePart(part ->
-                (part instanceof ProtoMekArmor)
-                        && part.isPresent()
-                        && !part.isReservedForRefit()
-                        && isClanTechBase() == part.isClanTechBase()
-                        && (getType() == ((ProtoMekArmor) part).getType()));
-
-        return a != null ? a.getAmount() : 0;
+        return campaign.getWarehouse()
+                     .streamSpareParts()
+                     .mapToInt(part -> (part instanceof ProtoMekArmor protoMekArmor) &&
+                                             protoMekArmor.isPresent() &&
+                                             !protoMekArmor.isReservedForRefit() &&
+                                             isClanTechBase() == protoMekArmor.isClanTechBase() &&
+                                             (getType() == (protoMekArmor).getType()) ? protoMekArmor.getAmount() : 0)
+                     .sum();
     }
 
     @Override
-    public void changeAmountAvailable(int amount) {
-        ProtoMekArmor a = (ProtoMekArmor) campaign.getWarehouse().findSparePart(part ->
-                isSamePartType(part) && part.isPresent());
+    protected int changeAmountAvailableSingle(int amount) {
+        ProtoMekArmor a = (ProtoMekArmor) campaign.getWarehouse()
+                                                .findSparePart(part -> isSamePartType(part) && part.isPresent());
 
         if (null != a) {
-            a.setAmount(a.getAmount() + amount);
+            int amountRemaining = a.getAmount() + amount;
+            a.setAmount(amountRemaining);
             if (a.getAmount() <= 0) {
                 campaign.getWarehouse().removePart(a);
+                return Math.min(0, amountRemaining);
             }
         } else if (amount > 0) {
-            campaign.getQuartermaster().addPart(new ProtoMekArmor(getUnitTonnage(), type, amount, -1, isClanTechBase(), campaign), 0);
+            campaign.getQuartermaster()
+                  .addPart(new ProtoMekArmor(getUnitTonnage(), type, amount, -1, isClanTechBase(), campaign), 0);
         }
+        return 0;
     }
 
     @Override

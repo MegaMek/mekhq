@@ -161,27 +161,31 @@ public class BaArmor extends Armor {
 
     @Override
     public int getAmountAvailable() {
-        BaArmor a = (BaArmor) campaign.getWarehouse().findSparePart(part -> (part instanceof BaArmor)
-                && part.isPresent()
-                && !part.isReservedForRefit()
-                && isClanTechBase() == part.isClanTechBase()
-                && ((BaArmor) part).getType() == getType());
-
-        return a != null ? a.getAmount() : 0;
+        return campaign.getWarehouse()
+                     .streamSpareParts()
+                     .mapToInt(part -> ((part instanceof BaArmor armor) &&
+                                              armor.isPresent() &&
+                                              !armor.isReservedForRefit() &&
+                                              isClanTechBase() == part.isClanTechBase() &&
+                                              armor.getType() == getType()) ? armor.getAmount() : 0)
+                     .sum();
     }
 
     @Override
-    public void changeAmountAvailable(int amount) {
+    protected int changeAmountAvailableSingle(int amount) {
         BaArmor a = (BaArmor) campaign.getWarehouse().findSparePart(part -> isSamePartType(part) && part.isPresent());
 
         if (null != a) {
-            a.setAmount(a.getAmount() + amount);
+            int amountRemaining = a.getAmount() + amount;
+            a.setAmount(amountRemaining);
             if (a.getAmount() <= 0) {
                 campaign.getWarehouse().removePart(a);
+                return Math.min(0, amountRemaining);
             }
         } else if (amount > 0) {
             campaign.getQuartermaster()
-                    .addPart(new BaArmor(getUnitTonnage(), amount, type, -1, isClanTechBase(), campaign), 0);
+                  .addPart(new BaArmor(getUnitTonnage(), amount, type, -1, isClanTechBase(), campaign), 0);
         }
+        return 0;
     }
 }
