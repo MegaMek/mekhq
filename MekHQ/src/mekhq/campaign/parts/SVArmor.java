@@ -163,21 +163,19 @@ public class SVArmor extends Armor {
 
     @Override
     protected int changeAmountAvailableSingle(int amount) {
-        SVArmor a = (SVArmor) campaign.getWarehouse().findSparePart(part -> {
-            return isSamePartType(part)
-                    && part.isPresent()
-                    && Objects.equals(getRefitUnit(), part.getRefitUnit());
+        SVArmor armor = (SVArmor) campaign.getWarehouse().findSparePart(part -> {
+            return isSamePartType(part) && part.isPresent() && Objects.equals(getRefitUnit(), part.getRefitUnit());
         });
 
-        if (null != a) {
-            int amountRemaining = a.getAmount() + amount;
-            a.setAmount(amountRemaining);
-            if (a.getAmount() <= 0) {
-                campaign.getWarehouse().removePart(a);
+        if (null != armor) {
+            int amountRemaining = armor.getAmount() + amount;
+            armor.setAmount(amountRemaining);
+            if (armor.getAmount() <= 0) {
+                campaign.getWarehouse().removePart(armor);
                 return Math.min(0, amountRemaining);
             }
         } else if (amount > 0) {
-            campaign.getQuartermaster().addPart(new SVArmor(bar, techRating, amount, -1, campaign), 0);
+            campaign.getQuartermaster().addPart(new SVArmor(bar, techRating, amount, -1, campaign), 0, false);
         }
         return 0;
     }

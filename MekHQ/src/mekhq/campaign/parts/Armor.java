@@ -722,22 +722,22 @@ public class Armor extends Part implements IAcquisitionWork {
      * @return leftover amount; should be 0 except when removing if the part removed didn't have enough
      */
     protected int changeAmountAvailableSingle(int amount) {
-        Armor a = (Armor) campaign.getWarehouse()
-                                .findSparePart(part -> (part instanceof Armor) &&
-                                                             part.isPresent() &&
-                                                             Objects.equals(getRefitUnit(), part.getRefitUnit()) &&
-                                                             isSameType((Armor) part));
+        Armor armor = (Armor) campaign.getWarehouse()
+                                    .findSparePart(part -> (part instanceof Armor) &&
+                                                                 part.isPresent() &&
+                                                                 Objects.equals(getRefitUnit(), part.getRefitUnit()) &&
+                                                                 isSameType((Armor) part));
 
-        if (null != a) {
-            int amountRemaining = a.getAmount() + amount;
-            a.setAmount(amountRemaining);
-            if (a.getAmount() <= 0) {
-                campaign.getWarehouse().removePart(a);
+        if (null != armor) {
+            int amountRemaining = armor.getAmount() + amount;
+            armor.setAmount(amountRemaining);
+            if (armor.getAmount() <= 0) {
+                campaign.getWarehouse().removePart(armor);
                 return Math.min(0, amountRemaining);
             }
         } else if (amount > 0) {
             campaign.getQuartermaster()
-                  .addPart(new Armor(getUnitTonnage(), type, amount, -1, false, isClanTechBase(), campaign), 0);
+                  .addPart(new Armor(getUnitTonnage(), type, amount, -1, false, isClanTechBase(), campaign), 0, false);
         }
         return 0;
     }
