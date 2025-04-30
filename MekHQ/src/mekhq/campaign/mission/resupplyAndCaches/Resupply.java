@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission.resupplyAndCaches;
 
@@ -38,6 +43,7 @@ import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 import static mekhq.campaign.force.ForceType.CONVOY;
 import static mekhq.campaign.force.ForceType.STANDARD;
 import static mekhq.campaign.market.procurement.Procurement.getFactionTechCode;
+import static mekhq.campaign.personnel.skills.SkillCheckUtility.getTotalAttributeModifier;
 import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
 
 import java.time.LocalDate;
@@ -52,6 +58,7 @@ import java.util.UUID;
 
 import megamek.common.Entity;
 import megamek.common.Mek;
+import megamek.common.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -783,7 +790,10 @@ public class Resupply {
                       campaign.getLocalDate(),
                       negotiator.getRankLevel());
                 int skillLevel = skill.getFinalSkillValue(negotiator.getOptions(), reputation);
-                negotiatorSkill = skill.getType().getExperienceLevel(skillLevel);
+                int attributeModifiers = getTotalAttributeModifier(new TargetRoll(),
+                      negotiator.getATOWAttributes(),
+                      skill.getType());
+                negotiatorSkill = skill.getType().getExperienceLevel(skillLevel + attributeModifiers);
             }
         }
     }
