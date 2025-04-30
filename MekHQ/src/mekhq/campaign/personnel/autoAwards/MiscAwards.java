@@ -1,14 +1,14 @@
 /*
  * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
  *
- * This file is part of MekHQ.
+ * This file is part of <Package Name>.
  *
- * MekHQ is free software: you can redistribute it and/or modify
+ * <Package Name> is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License (GPL),
  * version 3 or (at your option) any later version,
  * as published by the Free Software Foundation.
  *
- * MekHQ is distributed in the hope that it will be useful,
+ * <Package Name> is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
@@ -24,9 +24,20 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. <Package Name> was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
-
 package mekhq.campaign.personnel.autoAwards;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.UUID;
 
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
@@ -39,9 +50,6 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
-
-import java.time.LocalDate;
-import java.util.*;
 
 public class MiscAwards {
 
@@ -287,7 +295,7 @@ public class MiscAwards {
      *         award, false otherwise
      */
     private static boolean drillInstructor(Campaign campaign, Award award, UUID person) {
-        if (award.canBeAwarded(campaign.getPerson(person))) {
+        if (award.canBeAwarded(campaign.getPerson(person)) && !campaign.hasActiveAtBContract(false)) {
             return campaign.getAllCombatTeams().stream()
                     .anyMatch(lance -> (lance.getRole().isTraining()) && (lance.getCommanderId().equals(person)));
         }
