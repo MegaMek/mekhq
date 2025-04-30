@@ -24,9 +24,15 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.generator;
 
+import static mekhq.campaign.personnel.Bloodname.checkBloodnameAdd;
 import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
 import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
 
@@ -139,7 +145,13 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
         generateNameAndGender(campaign, person, gender);
 
         //check for Bloodname
-        campaign.checkBloodnameAdd(person, false);
+        checkBloodnameAdd(person,
+              false,
+              campaign.getCampaignOptions().getUnitRatingMethod().isEnabled(),
+              campaign.getAtBUnitRatingMod(),
+              campaign.getGameYear(),
+              campaign.getRankSystem().getOfficerCut(),
+              campaign.getFaction());
 
         if (person.getOriginFaction().isClan() &&
                   campaignOptions.isUseAbilities() &&

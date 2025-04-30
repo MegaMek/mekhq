@@ -25,8 +25,17 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel;
+
+import static megamek.common.Compute.d6;
+import static mekhq.campaign.personnel.skills.SkillCheckUtility.getTotalAttributeModifier;
+import static mekhq.campaign.personnel.skills.SkillType.*;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -38,19 +47,24 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
+import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 
+import megamek.common.Compute;
+import megamek.common.TargetRoll;
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+import mekhq.campaign.event.PersonChangedEvent;
+import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.personnel.skills.Attributes;
+import mekhq.campaign.rating.IUnitRating;
+import mekhq.campaign.universe.Faction;
+import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import megamek.common.Compute;
-import megamek.common.annotations.Nullable;
-import megamek.logging.MMLogger;
-import mekhq.campaign.personnel.enums.Phenotype;
-import mekhq.utilities.MHQXMLUtility;
 
 /**
  * @author Neoancient
@@ -212,7 +226,7 @@ public class Bloodname {
                 } else if (wn.getNodeName().equalsIgnoreCase("reactivated")) {
                     retVal.reactivated = Integer.parseInt(wn.getTextContent().trim() + 20);
                 } else if (wn.getNodeName().equalsIgnoreCase("phenotype")) {
-                    retVal.phenotype = Phenotype.parseFromString(wn.getTextContent().trim());
+                    retVal.phenotype = Phenotype.fromString(wn.getTextContent().trim());
                 } else if (wn.getNodeName().equalsIgnoreCase("postReaving")) {
                     String[] clans = wn.getTextContent().trim().split(",");
                     for (String c : clans) {
@@ -491,6 +505,240 @@ public class Bloodname {
             }
         }
         logger.info("Loaded " + bloodnames.size() + " Bloodname records.");
+    }
+
+    /**
+     * If the person does not already have a bloodname, assigns a chance of having one based on skill and rank. If the
+     * roll indicates there should be a bloodname, one is assigned as appropriate to the person's phenotype and the
+     * player's faction.
+     *
+     * @param person     The Bloodname candidate
+     * @param ignoreDice If true, skips the random roll and assigns a Bloodname automatically
+     */
+    public static void checkBloodnameAdd(Person person, boolean ignoreDice, boolean isUseUnitRating,
+          int atbUnitRatingModifier, int currentYear, int officerCutOff, Faction campaignFaction) {
+        // if person is non-clan or does not have a phenotype
+        if (!person.isClanPersonnel() || person.getPhenotype().isNone()) {
+            return;
+        }
+
+        // Person already has a bloodname, we open up the dialog to ask if they want to
+        // keep the current bloodname or assign a new one
+        if (!person.getBloodname().isEmpty()) {
+            int result = JOptionPane.showConfirmDialog(null,
+                  person.getFullTitle() +
+                        " already has the bloodname " +
+                        person.getBloodname() +
+                        "\nDo you wish to remove that bloodname and generate a new one?",
+                  "Already Has Bloodname",
+                  JOptionPane.YES_NO_OPTION,
+                  JOptionPane.QUESTION_MESSAGE);
+            if (result == JOptionPane.NO_OPTION) {
+                return;
+            } else {
+                ignoreDice = true;
+            }
+        }
+
+        // Go ahead and generate a new bloodname
+        TargetRoll targetRoll = new TargetRoll(6, "Base Target Number");
+        PersonnelOptions options = person.getOptions();
+        Attributes attributes = person.getATOWAttributes();
+        if (!ignoreDice) {
+            switch (person.getPhenotype()) {
+                case MEKWARRIOR -> {
+                    if (person.hasSkill(S_GUN_MEK) && person.hasSkill(S_PILOT_MEK)) {
+                        targetRoll.addModifier(person.getSkill(S_GUN_MEK).getFinalSkillValue(options), S_GUN_MEK);
+                        targetRoll.addModifier(getTotalAttributeModifier(attributes, getType(S_GUN_MEK)),
+                              S_GUN_MEK + ":Attributes");
+
+                        targetRoll.addModifier(person.getSkill(S_PILOT_MEK).getFinalSkillValue(options), S_PILOT_MEK);
+                        targetRoll.addModifier(getTotalAttributeModifier(attributes, getType(S_PILOT_MEK)),
+                              S_PILOT_MEK + ":Attributes");
+                    } else {
+                        logger.info("Lacks necessary skills for a Mekwarrior");
+                        return; // automatic fail
+                    }
+                }
+                case AEROSPACE -> {
+                    if (person.hasSkill(S_GUN_AERO) && person.hasSkill(S_PILOT_MEK)) {
+                        targetRoll.addModifier(person.getSkill(S_GUN_AERO).getFinalSkillValue(options), S_GUN_AERO);
+                        targetRoll.addModifier(getTotalAttributeModifier(attributes, getType(S_GUN_AERO)),
+                              S_GUN_AERO + ":Attributes");
+
+                        targetRoll.addModifier(person.getSkill(S_PILOT_AERO).getFinalSkillValue(options), S_PILOT_AERO);
+                        targetRoll.addModifier(getTotalAttributeModifier(attributes, getType(S_PILOT_AERO)),
+                              S_PILOT_AERO + ":Attributes");
+                    } else {
+                        logger.info("Lacks necessary skills for an Aerospace Pilot");
+                        return; // automatic fail
+                    }
+                }
+                case ELEMENTAL -> {
+                    if (person.hasSkill(S_GUN_BA) && person.hasSkill(S_GUN_BA)) {
+                        targetRoll.addModifier(person.getSkill(S_GUN_BA).getFinalSkillValue(options), S_GUN_BA);
+                        targetRoll.addModifier(getTotalAttributeModifier(attributes, getType(S_GUN_BA)),
+                              S_GUN_BA + ":Attributes");
+
+                        targetRoll.addModifier(person.getSkill(S_ANTI_MEK).getFinalSkillValue(options), S_ANTI_MEK);
+                        targetRoll.addModifier(getTotalAttributeModifier(attributes, getType(S_ANTI_MEK)),
+                              S_ANTI_MEK + ":Attributes");
+                    } else {
+                        logger.info("Lacks necessary skills for a Battle Armor pilot");
+                        return; // automatic fail
+                    }
+                }
+                case VEHICLE -> {
+                    switch (person.getPrimaryRole()) {
+                        case GROUND_VEHICLE_DRIVER -> {
+                            if (person.hasSkill(S_PILOT_GVEE)) {
+                                targetRoll.addModifier(person.getSkill(S_PILOT_GVEE).getFinalSkillValue(options),
+                                      S_PILOT_GVEE);
+                                targetRoll.addModifier(getTotalAttributeModifier(attributes, getType(S_PILOT_GVEE)),
+                                      S_PILOT_GVEE + ":Attributes");
+                            } else {
+                                logger.info("Lacks necessary skills for a vehicle driver");
+                                return; // automatic fail
+                            }
+                        }
+                        case NAVAL_VEHICLE_DRIVER -> {
+                            if (person.hasSkill(S_PILOT_NVEE)) {
+                                targetRoll.addModifier(person.getSkill(S_PILOT_NVEE).getFinalSkillValue(options),
+                                      S_PILOT_NVEE);
+                                targetRoll.addModifier(getTotalAttributeModifier(attributes, getType(S_PILOT_NVEE)),
+                                      S_PILOT_NVEE + ":Attributes");
+                            } else {
+                                logger.info("Lacks necessary skills for a Naval Driver");
+                                return; // automatic fail
+                            }
+                        }
+                        case VTOL_PILOT -> {
+                            if (person.hasSkill(S_PILOT_VTOL)) {
+                                targetRoll.addModifier(person.getSkill(S_PILOT_VTOL).getFinalSkillValue(options),
+                                      S_PILOT_VTOL);
+                                targetRoll.addModifier(getTotalAttributeModifier(attributes, getType(S_PILOT_VTOL)),
+                                      S_PILOT_VTOL + ":Attributes");
+                            } else {
+                                logger.info("Lacks necessary skills for a VTOL pilot");
+                                return; // automatic fail
+                            }
+                        }
+                        case VEHICLE_GUNNER -> {
+                            if (person.hasSkill(S_GUN_VEE)) {
+                                targetRoll.addModifier(person.getSkill(S_GUN_VEE).getFinalSkillValue(options),
+                                      S_GUN_VEE);
+                                targetRoll.addModifier(getTotalAttributeModifier(attributes, getType(S_GUN_VEE)),
+                                      S_GUN_VEE + ":Attributes");
+                            } else {
+                                logger.info("Lacks necessary skills for a Vehicle Gunner");
+                                return; // automatic fail
+                            }
+                        }
+                        default -> {
+                            return;
+                        }
+                    }
+                }
+                case PROTOMEK -> {
+                    if (person.hasSkill(S_GUN_PROTO)) {
+                        targetRoll.addModifier(person.getSkill(S_GUN_PROTO).getFinalSkillValue(options) * 2,
+                              S_GUN_PROTO);
+                        targetRoll.addModifier(getTotalAttributeModifier(attributes, getType(S_GUN_PROTO)) * 2,
+                              S_GUN_PROTO + ":Attributes");
+                    } else {
+                        logger.info("Lacks necessary skills for a ProtoMek Warrior");
+                        return; // automatic fail
+                    }
+                }
+                case NAVAL -> {
+                    switch (person.getPrimaryRole()) {
+                        case VESSEL_PILOT -> {
+                            if (person.hasSkill(S_PILOT_SPACE)) {
+                                targetRoll.addModifier(person.getSkill(S_PILOT_SPACE).getFinalSkillValue(options) * 2,
+                                      S_PILOT_SPACE);
+                                targetRoll.addModifier(getTotalAttributeModifier(attributes, getType(S_PILOT_SPACE)) *
+                                                             2, S_PILOT_SPACE + ":Attributes");
+                            } else {
+                                logger.info("Lacks necessary skills for a Vessel Pilot");
+                                return; // automatic fail
+                            }
+                        }
+                        case VESSEL_GUNNER -> {
+                            if (person.hasSkill(S_GUN_SPACE)) {
+                                targetRoll.addModifier(person.getSkill(S_GUN_SPACE).getFinalSkillValue(options) * 2,
+                                      S_PILOT_SPACE);
+                                targetRoll.addModifier(getTotalAttributeModifier(attributes, getType(S_GUN_SPACE)) * 2,
+                                      S_GUN_SPACE + ":Attributes");
+                            } else {
+                                logger.info("Lacks necessary skills for a Vessel Gunner");
+                                return; // automatic fail
+                            }
+                        }
+                        case VESSEL_CREW -> {
+                            if (person.hasSkill(S_TECH_VESSEL)) {
+                                targetRoll.addModifier(person.getSkill(S_TECH_VESSEL).getFinalSkillValue(options) * 2,
+                                      S_TECH_VESSEL);
+                                targetRoll.addModifier(getTotalAttributeModifier(attributes, getType(S_TECH_VESSEL)) *
+                                                             2, S_TECH_VESSEL + ":Attributes");
+                            } else {
+                                logger.info("Lacks necessary skills for a Vessel Tech");
+                                return; // automatic fail
+                            }
+                        }
+                        default -> {
+                            return;
+                        }
+                    }
+                }
+                default -> {
+                    return;
+                }
+            }
+
+            // Higher-rated units are more likely to have Bloodnamed
+            if (isUseUnitRating) {
+                targetRoll.addModifier(IUnitRating.DRAGOON_C - atbUnitRatingModifier, "Unit Rating");
+            }
+
+            // Reavings diminish the number of available Bloodrights in later eras
+            int eraModifier = 0;
+            if (currentYear <= 2950) {
+                eraModifier--;
+            }
+
+            if (currentYear > 3055) {
+                eraModifier++;
+            }
+
+            if (currentYear > 3065) {
+                eraModifier++;
+            }
+
+            if (currentYear > 3080) {
+                eraModifier++;
+            }
+
+            if (eraModifier > 0) {
+                targetRoll.addModifier(eraModifier, "Era");
+            }
+
+            // Officers have better chance; no penalty for non-officer
+            targetRoll.addModifier(Math.min(0, officerCutOff - person.getRankNumeric()), "Rank");
+        }
+
+        if (ignoreDice || (d6(2) >= targetRoll.getValue())) {
+            final Phenotype phenotype = person.getPhenotype().isNone() ? Phenotype.GENERAL : person.getPhenotype();
+
+            final Bloodname bloodname = Bloodname.randomBloodname((campaignFaction.isClan() ?
+                                                                         campaignFaction :
+                                                                         person.getOriginFaction()).getShortName(),
+                  phenotype,
+                  currentYear);
+            if (bloodname != null) {
+                person.setBloodname(bloodname.getName());
+                MekHQ.triggerEvent(new PersonChangedEvent(person));
+            }
+        }
     }
 
     private static class NameAcquired {

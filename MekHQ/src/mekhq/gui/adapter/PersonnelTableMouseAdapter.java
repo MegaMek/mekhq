@@ -38,12 +38,7 @@ import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.finances.enums.TransactionType.MEDICAL_EXPENSES;
-import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.REPLACEMENT_LIMB_COST_ARM_TYPE_5;
-import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.REPLACEMENT_LIMB_COST_FOOT_TYPE_5;
-import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.REPLACEMENT_LIMB_COST_HAND_TYPE_5;
-import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.REPLACEMENT_LIMB_COST_LEG_TYPE_5;
-import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.REPLACEMENT_LIMB_MINIMUM_SKILL_REQUIRED_TYPES_3_4_5;
-import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.REPLACEMENT_LIMB_RECOVERY;
+import static mekhq.campaign.personnel.Bloodname.checkBloodnameAdd;
 import static mekhq.campaign.personnel.DiscretionarySpending.getExpenditure;
 import static mekhq.campaign.personnel.DiscretionarySpending.getExpenditureExhaustedReportMessage;
 import static mekhq.campaign.personnel.DiscretionarySpending.performExtremeExpenditure;
@@ -53,6 +48,12 @@ import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.EducationController.makeEnrollmentCheck;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.statusValidator;
 import static mekhq.campaign.personnel.enums.education.EducationLevel.DOCTORATE;
+import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.REPLACEMENT_LIMB_COST_ARM_TYPE_5;
+import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.REPLACEMENT_LIMB_COST_FOOT_TYPE_5;
+import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.REPLACEMENT_LIMB_COST_HAND_TYPE_5;
+import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.REPLACEMENT_LIMB_COST_LEG_TYPE_5;
+import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.REPLACEMENT_LIMB_MINIMUM_SKILL_REQUIRED_TYPES_3_4_5;
+import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.REPLACEMENT_LIMB_RECOVERY;
 import static mekhq.campaign.personnel.skills.Attributes.ATTRIBUTE_IMPROVEMENT_COST;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
@@ -100,7 +101,6 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.PerformanceLogger;
-import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.AwardsFactory;
 import mekhq.campaign.personnel.BodyLocation;
@@ -128,6 +128,7 @@ import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.personnel.generator.AbstractSkillGenerator;
 import mekhq.campaign.personnel.generator.DefaultSkillGenerator;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
+import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -1539,7 +1540,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_RANDOM_BLOODNAME: {
                 final boolean ignoreDice = (data.length > 1) && Boolean.parseBoolean(data[1]);
                 for (final Person person : people) {
-                    getCampaign().checkBloodnameAdd(person, ignoreDice);
+                    checkBloodnameAdd(person,
+                          ignoreDice,
+                          getCampaignOptions().getUnitRatingMethod().isEnabled(),
+                          getCampaign().getAtBUnitRatingMod(),
+                          getCampaign().getGameYear(),
+                          getCampaign().getRankSystem().getOfficerCut(),
+                          getCampaign().getFaction());
                 }
                 break;
             }

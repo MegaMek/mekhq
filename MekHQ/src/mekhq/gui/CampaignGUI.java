@@ -36,6 +36,7 @@ package mekhq.gui;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
+import static mekhq.campaign.personnel.Bloodname.checkBloodnameAdd;
 import static mekhq.campaign.personnel.skills.SkillType.getExperienceLevelName;
 import static mekhq.gui.dialog.nagDialogs.NagController.triggerDailyNags;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -982,7 +983,13 @@ public class CampaignGUI extends JPanel {
         miBloodnames.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, InputEvent.ALT_DOWN_MASK));
         miBloodnames.addActionListener(evt -> {
             for (final Person person : getCampaign().getPersonnel()) {
-                getCampaign().checkBloodnameAdd(person, false);
+                checkBloodnameAdd(person,
+                      false,
+                      getCampaign().getCampaignOptions().getUnitRatingMethod().isEnabled(),
+                      getCampaign().getAtBUnitRatingMod(),
+                      getCampaign().getGameYear(),
+                      getCampaign().getRankSystem().getOfficerCut(),
+                      getCampaign().getFaction());
             }
         });
         menuManage.add(miBloodnames);
