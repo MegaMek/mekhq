@@ -157,6 +157,11 @@ public class SVArmor extends Armor {
     }
 
     @Override
+    public TechAdvancement getTechAdvancement() {
+        return ArmorType.svArmor(bar).getTechAdvancement();
+    }
+
+    @Override
     protected int changeAmountAvailableSingle(int amount) {
         SVArmor a = (SVArmor) campaign.getWarehouse().findSparePart(part -> {
             return isSamePartType(part)
@@ -207,10 +212,5 @@ public class SVArmor extends Armor {
                 logger.error("", e);
             }
         }
-    }
-
-    @Override
-    public TechAdvancement getTechAdvancement() {
-        return ArmorType.svArmor(bar).getTechAdvancement();
     }
 }

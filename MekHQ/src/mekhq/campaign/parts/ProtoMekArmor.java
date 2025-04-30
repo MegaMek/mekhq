@@ -148,6 +148,19 @@ public class ProtoMekArmor extends Armor {
     }
 
     @Override
+    public TechAdvancement getTechAdvancement() {
+        if (type != EquipmentType.T_ARMOR_STANDARD_PROTOMEK) {
+            final EquipmentType eq = EquipmentType.get(EquipmentType.getArmorTypeName(type, clan));
+            if (null != eq) {
+                return eq.getTechAdvancement();
+            }
+        }
+        // Standard ProtoMek armor is not the same as Standard armor, but does not have an associated
+        // type entry so we can just use the base protomek advancement
+        return ProtoMek.TA_STANDARD_PROTOMEK;
+    }
+
+    @Override
     protected int changeAmountAvailableSingle(int amount) {
         ProtoMekArmor a = (ProtoMekArmor) campaign.getWarehouse()
                                                 .findSparePart(part -> isSamePartType(part) && part.isPresent());
@@ -164,18 +177,5 @@ public class ProtoMekArmor extends Armor {
                   .addPart(new ProtoMekArmor(getUnitTonnage(), type, amount, -1, isClanTechBase(), campaign), 0);
         }
         return 0;
-    }
-
-    @Override
-    public TechAdvancement getTechAdvancement() {
-        if (type != EquipmentType.T_ARMOR_STANDARD_PROTOMEK) {
-            final EquipmentType eq = EquipmentType.get(EquipmentType.getArmorTypeName(type, clan));
-            if (null != eq) {
-                return eq.getTechAdvancement();
-            }
-        }
-        // Standard ProtoMek armor is not the same as Standard armor, but does not have an associated
-        // type entry so we can just use the base protomek advancement
-        return ProtoMek.TA_STANDARD_PROTOMEK;
     }
 }

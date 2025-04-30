@@ -945,7 +945,7 @@ public class Force {
             if (campaign.getCampaignOptions().isUseGenericBattleValue() && !forceStandardBattleValue) {
                 bvTotal += campaign.getUnit(unitId).getEntity().getGenericBattleValue();
             } else {
-                bvTotal += campaign.getUnit(unitId).getEntity().calculateBattleValue();
+                bvTotal += campaign.getUnit(unitId).getEntity().getInitialBV();
             }
         }
 

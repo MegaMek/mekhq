@@ -613,28 +613,6 @@ public class Armor extends Part implements IAcquisitionWork {
         }
     }
 
-    protected int changeAmountAvailableSingle(int amount) {
-        Armor a = (Armor) campaign.getWarehouse()
-                                .findSparePart(part -> (part instanceof Armor) &&
-                                                             part.isPresent() &&
-                                                             Objects.equals(getRefitUnit(), part.getRefitUnit()) &&
-                                                             isSameType((Armor) part));
-
-        if (null != a) {
-            int amountRemaining = a.getAmount() + amount;
-            a.setAmount(amountRemaining);
-            if (a.getAmount() <= 0) {
-                campaign.getWarehouse().removePart(a);
-                return Math.min(0, amountRemaining);
-            }
-        } else if (amount > 0) {
-            campaign.getQuartermaster()
-                  .addPart(new Armor(getUnitTonnage(), type, amount, -1, false, isClanTechBase(), campaign), 0);
-        }
-        return 0;
-    }
-
-
     @Override
     public String fail(int rating) {
         skillMin = ++rating;
@@ -736,5 +714,31 @@ public class Armor extends Part implements IAcquisitionWork {
     @Override
     public boolean isExtinctIn(int year, boolean clan, int techFaction) {
         return isExtinct(year, clan, techFaction);
+    }
+
+    /**
+     * Finds a spare part, if applicable, and changes its amount, creating a new part if needed.
+     * @param amount value to change the part's amount by. Can be positive to add or negative to remove.
+     * @return leftover amount; should be 0 except when removing if the part removed didn't have enough
+     */
+    protected int changeAmountAvailableSingle(int amount) {
+        Armor a = (Armor) campaign.getWarehouse()
+                                .findSparePart(part -> (part instanceof Armor) &&
+                                                             part.isPresent() &&
+                                                             Objects.equals(getRefitUnit(), part.getRefitUnit()) &&
+                                                             isSameType((Armor) part));
+
+        if (null != a) {
+            int amountRemaining = a.getAmount() + amount;
+            a.setAmount(amountRemaining);
+            if (a.getAmount() <= 0) {
+                campaign.getWarehouse().removePart(a);
+                return Math.min(0, amountRemaining);
+            }
+        } else if (amount > 0) {
+            campaign.getQuartermaster()
+                  .addPart(new Armor(getUnitTonnage(), type, amount, -1, false, isClanTechBase(), campaign), 0);
+        }
+        return 0;
     }
 }
