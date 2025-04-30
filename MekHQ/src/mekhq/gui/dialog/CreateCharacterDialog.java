@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -1159,7 +1164,10 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             lblName = new JLabel(type);
             lblValue = new JLabel();
             if (person.hasSkill(type)) {
-                lblValue.setText(person.getSkill(type).toString(person.getOptions(), person.getReputation()));
+                lblValue.setText(person.getSkill(type)
+                                       .toString(person.getOptions(),
+                                             person.getATOWAttributes(),
+                                             person.getReputation()));
             } else {
                 lblValue.setText("-");
             }

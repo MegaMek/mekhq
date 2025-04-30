@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.stratcon;
 
@@ -181,7 +186,7 @@ public class SupportPointNegotiation {
             Person admin = iterator.next();
             int rollResult = Compute.d6(2);
 
-            int adminSkill = admin.getSkill(S_ADMIN).getFinalSkillValue(admin.getOptions());
+            int adminSkill = admin.getSkill(S_ADMIN).getFinalSkillValue(admin.getOptions(), admin.getATOWAttributes());
             if (rollResult >= adminSkill) {
                 negotiatedSupportPoints++;
             }

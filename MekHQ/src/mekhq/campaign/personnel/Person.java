@@ -91,7 +91,6 @@ import mekhq.campaign.log.LogEntryFactory;
 import mekhq.campaign.log.LogEntryType;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.log.ServiceLogger;
-import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.enums.BloodGroup;
@@ -106,6 +105,7 @@ import mekhq.campaign.personnel.enums.ROMDesignation;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.Genealogy;
+import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -4972,32 +4972,36 @@ public class Person {
 
         if (part.isRightTechType(SkillType.S_TECH_BA) && hasSkill(SkillType.S_TECH_BA)) {
             if ((skill == null) ||
-                      (skill.getFinalSkillValue(options, reputation) >
-                             getSkill(SkillType.S_TECH_BA).getFinalSkillValue(options, reputation))) {
+                      (skill.getFinalSkillValue(options, atowAttributes, reputation) >
+                             getSkill(SkillType.S_TECH_BA).getFinalSkillValue(options, atowAttributes, reputation))) {
                 skill = getSkill(SkillType.S_TECH_BA);
             }
         }
 
         if (part.isRightTechType(SkillType.S_TECH_AERO) && hasSkill(SkillType.S_TECH_AERO)) {
             if ((skill == null) ||
-                      (skill.getFinalSkillValue(options, reputation) >
-                             getSkill(SkillType.S_TECH_AERO).getFinalSkillValue(options, reputation))) {
+                      (skill.getFinalSkillValue(options, atowAttributes, reputation) >
+                             getSkill(SkillType.S_TECH_AERO).getFinalSkillValue(options, atowAttributes, reputation))) {
                 skill = getSkill(SkillType.S_TECH_AERO);
             }
         }
 
         if (part.isRightTechType(SkillType.S_TECH_MECHANIC) && hasSkill(SkillType.S_TECH_MECHANIC)) {
             if ((skill == null) ||
-                      (skill.getFinalSkillValue(options, reputation) >
-                             getSkill(SkillType.S_TECH_MECHANIC).getFinalSkillValue(options, reputation))) {
+                      (skill.getFinalSkillValue(options, atowAttributes, reputation) >
+                             getSkill(SkillType.S_TECH_MECHANIC).getFinalSkillValue(options,
+                                   atowAttributes,
+                                   reputation))) {
                 skill = getSkill(SkillType.S_TECH_MECHANIC);
             }
         }
 
         if (part.isRightTechType(SkillType.S_TECH_VESSEL) && hasSkill(SkillType.S_TECH_VESSEL)) {
             if ((skill == null) ||
-                      (skill.getFinalSkillValue(options, reputation) >
-                             getSkill(SkillType.S_TECH_VESSEL).getFinalSkillValue(options, reputation))) {
+                      (skill.getFinalSkillValue(options, atowAttributes, reputation) >
+                             getSkill(SkillType.S_TECH_VESSEL).getFinalSkillValue(options,
+                                   atowAttributes,
+                                   reputation))) {
                 skill = getSkill(SkillType.S_TECH_VESSEL);
             }
         }
@@ -5014,24 +5018,26 @@ public class Person {
 
         if (hasSkill(SkillType.S_TECH_BA)) {
             if ((skill == null) ||
-                      (skill.getFinalSkillValue(options, reputation) >
-                             getSkill(SkillType.S_TECH_BA).getFinalSkillValue(options, reputation))) {
+                      (skill.getFinalSkillValue(options, atowAttributes, reputation) >
+                             getSkill(SkillType.S_TECH_BA).getFinalSkillValue(options, atowAttributes, reputation))) {
                 skill = getSkill(SkillType.S_TECH_BA);
             }
         }
 
         if (hasSkill(SkillType.S_TECH_MECHANIC)) {
             if ((skill == null) ||
-                      (skill.getFinalSkillValue(options, reputation) >
-                             getSkill(SkillType.S_TECH_MECHANIC).getFinalSkillValue(options, reputation))) {
+                      (skill.getFinalSkillValue(options, atowAttributes, reputation) >
+                             getSkill(SkillType.S_TECH_MECHANIC).getFinalSkillValue(options,
+                                   atowAttributes,
+                                   reputation))) {
                 skill = getSkill(SkillType.S_TECH_MECHANIC);
             }
         }
 
         if (hasSkill(SkillType.S_TECH_AERO)) {
             if ((skill == null) ||
-                      (skill.getFinalSkillValue(options, reputation) >
-                             getSkill(SkillType.S_TECH_AERO).getFinalSkillValue(options, reputation))) {
+                      (skill.getFinalSkillValue(options, atowAttributes, reputation) >
+                             getSkill(SkillType.S_TECH_AERO).getFinalSkillValue(options, atowAttributes, reputation))) {
                 skill = getSkill(SkillType.S_TECH_AERO);
             }
         }

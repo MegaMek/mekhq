@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.view;
 
@@ -1594,7 +1599,8 @@ public class PersonViewPanel extends JScrollablePanel {
                       campaign.isClanCampaign(),
                       campaign.getLocalDate(),
                       person.getRankLevel());
-                lblValue = new JLabel(person.getSkill(skillName).toString(person.getOptions(), reputation));
+                lblValue = new JLabel(person.getSkill(skillName)
+                                            .toString(person.getOptions(), person.getATOWAttributes(), reputation));
                 lblName.setLabelFor(lblValue);
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = addition;
