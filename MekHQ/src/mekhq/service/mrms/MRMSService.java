@@ -27,6 +27,8 @@
  */
 package mekhq.service.mrms;
 
+import static mekhq.campaign.personnel.skills.SkillCheckUtility.determineTargetNumber;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -1223,16 +1225,16 @@ public class MRMSService {
         @Override
         public int compare(Person tech1, Person tech2) {
             // Sort the valid techs by applicable skill. Let's start with the least
-            // experienced and
-            // work our way up until we find someone who can perform the work. If we have
-            // two techs
-            // with the same skill, put the one with the lesser XP in the front. If we have
-            // tech
-            // with the same XP, put the one with the more time ahead.
+            // experienced and work our way up until we find someone who can perform the work. If we have
+            // two techs with the same skill, put the one with the lesser XP in the front. If we have
+            // tech with the same XP, put the one with the more time ahead.
             Skill skill1 = tech1.getSkillForWorkingOn(partWork);
-            Skill skill2 = tech2.getSkillForWorkingOn(partWork);
+            int skill1TargetNumber = determineTargetNumber(tech1, skill1.getType(), 0).getValue();
 
-            if (skill1.getExperienceLevel() == skill2.getExperienceLevel()) {
+            Skill skill2 = tech2.getSkillForWorkingOn(partWork);
+            int skill2TargetNumber = determineTargetNumber(tech2, skill2.getType(), 0).getValue();
+
+            if (skill1TargetNumber == skill2TargetNumber) {
                 if ((tech1.getXP() == tech2.getXP()) || (skill1.getLevel() == SkillType.EXP_ELITE)) {
                     return tech1.getMinutesLeft() - tech2.getMinutesLeft();
                 } else {
@@ -1240,7 +1242,7 @@ public class MRMSService {
                 }
             }
 
-            return skill1.getExperienceLevel() < skill2.getExperienceLevel() ? -1 : 1;
+            return skill1TargetNumber > skill2TargetNumber ? -1 : 1;
         }
     }
 

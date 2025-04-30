@@ -61,6 +61,7 @@ import static mekhq.campaign.personnel.lifeEvents.NewYearsDayAnnouncement.isNewY
 import static mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement.isWinterHolidayMajorDay;
 import static mekhq.campaign.personnel.skills.Aging.applyAgingSPA;
 import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
+import static mekhq.campaign.personnel.skills.SkillCheckUtility.determineTargetNumber;
 import static mekhq.campaign.personnel.skills.SkillType.getType;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.areFieldKitchensWithinCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenCapacity;
@@ -171,7 +172,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.RandomDependents;
 import mekhq.campaign.personnel.SpecialAbility;
-import mekhq.campaign.personnel.medical.MedicalController;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.death.RandomDeath;
 import mekhq.campaign.personnel.divorce.AbstractDivorce;
@@ -196,6 +196,7 @@ import mekhq.campaign.personnel.lifeEvents.NewYearsDayAnnouncement;
 import mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.marriage.DisabledRandomMarriage;
+import mekhq.campaign.personnel.medical.MedicalController;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -7219,14 +7220,8 @@ public class Campaign implements ITechManager {
             modePenalty = 0;
         }
 
-        // this is ugly, if the mode penalty drops you to green, you drop two
-        // levels instead of two
-        int value = skill.getFinalSkillValue(tech.getOptions()) + modePenalty;
-        if ((modePenalty > 0) && (SkillType.EXP_GREEN == (skill.getExperienceLevel() - modePenalty))) {
-            value++;
-        }
-        final TargetRoll target = new TargetRoll(value,
-              SkillType.getExperienceLevelName(skill.getExperienceLevel() - modePenalty));
+        final TargetRoll target = determineTargetNumber(tech, skill.getType(), -modePenalty);
+
         if (target.getValue() == TargetRoll.IMPOSSIBLE) {
             return target;
         }
@@ -7273,18 +7268,18 @@ public class Campaign implements ITechManager {
         return target;
     }
 
-    public TargetRoll getTargetForMaintenance(IPartWork partWork, Person tech, int asTechsUsed) {
-        int value = 10;
+    public TargetRoll getTargetForMaintenance(IPartWork partWork, @Nullable Person tech, int asTechsUsed) {
+        final int UNMAINTAINED_TARGET_NUMBER = 10; // CamOps p191
         String skillLevel = "Unmaintained";
+        TargetRoll target = new TargetRoll(UNMAINTAINED_TARGET_NUMBER, skillLevel);
+
         if (null != tech) {
             Skill skill = tech.getSkillForWorkingOn(partWork);
             if (null != skill) {
-                value = skill.getFinalSkillValue(tech.getOptions());
-                skillLevel = skill.getSkillLevel().toString();
+                target = determineTargetNumber(tech, skill.getType(), 0);
             }
         }
 
-        TargetRoll target = new TargetRoll(value, skillLevel);
         if (target.getValue() == TargetRoll.IMPOSSIBLE) {
             return target;
         }

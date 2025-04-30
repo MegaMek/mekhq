@@ -50,7 +50,14 @@ import static mekhq.campaign.personnel.skills.Aging.getReputationAgeModifier;
 import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
+import static mekhq.campaign.personnel.skills.SkillCheckUtility.determineTargetNumber;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
+import static mekhq.campaign.personnel.skills.SkillType.S_TECH_AERO;
+import static mekhq.campaign.personnel.skills.SkillType.S_TECH_BA;
+import static mekhq.campaign.personnel.skills.SkillType.S_TECH_MECHANIC;
+import static mekhq.campaign.personnel.skills.SkillType.S_TECH_MEK;
+import static mekhq.campaign.personnel.skills.SkillType.S_TECH_VESSEL;
+import static mekhq.campaign.personnel.skills.SkillType.getType;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
@@ -91,7 +98,6 @@ import mekhq.campaign.log.LogEntryFactory;
 import mekhq.campaign.log.LogEntryType;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.log.ServiceLogger;
-import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.enums.BloodGroup;
@@ -106,6 +112,7 @@ import mekhq.campaign.personnel.enums.ROMDesignation;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.Genealogy;
+import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -1058,11 +1065,8 @@ public class Person {
             case NAVAL_VEHICLE_DRIVER -> hasSkill(SkillType.S_PILOT_NVEE);
             case VTOL_PILOT -> hasSkill(SkillType.S_PILOT_VTOL);
             case VEHICLE_GUNNER -> hasSkill(SkillType.S_GUN_VEE);
-            case MECHANIC -> hasSkill(SkillType.S_TECH_MECHANIC);
-            case VEHICLE_CREW -> Stream.of(SkillType.S_TECH_MEK,
-                  SkillType.S_TECH_AERO,
-                  SkillType.S_TECH_MECHANIC,
-                  SkillType.S_TECH_BA,
+            case MECHANIC -> hasSkill(S_TECH_MECHANIC);
+            case VEHICLE_CREW -> Stream.of(S_TECH_MEK, S_TECH_AERO, S_TECH_MECHANIC, S_TECH_BA,
                   SkillType.S_DOCTOR,
                   SkillType.S_MEDTECH,
                   SkillType.S_ASTECH).anyMatch(this::hasSkill);
@@ -1072,12 +1076,12 @@ public class Person {
             case BATTLE_ARMOUR -> hasSkill(SkillType.S_GUN_BA);
             case SOLDIER -> hasSkill(SkillType.S_SMALL_ARMS);
             case VESSEL_PILOT -> hasSkill(SkillType.S_PILOT_SPACE);
-            case VESSEL_CREW -> hasSkill(SkillType.S_TECH_VESSEL);
+            case VESSEL_CREW -> hasSkill(S_TECH_VESSEL);
             case VESSEL_GUNNER -> hasSkill(SkillType.S_GUN_SPACE);
             case VESSEL_NAVIGATOR -> hasSkill(SkillType.S_NAV);
-            case MEK_TECH -> hasSkill(SkillType.S_TECH_MEK);
-            case AERO_TEK -> hasSkill(SkillType.S_TECH_AERO);
-            case BA_TECH -> hasSkill(SkillType.S_TECH_BA);
+            case MEK_TECH -> hasSkill(S_TECH_MEK);
+            case AERO_TEK -> hasSkill(S_TECH_AERO);
+            case BA_TECH -> hasSkill(S_TECH_BA);
             case ASTECH -> hasSkill(SkillType.S_ASTECH);
             case DOCTOR -> hasSkill(SkillType.S_DOCTOR);
             case MEDIC -> hasSkill(SkillType.S_MEDTECH);
@@ -3750,8 +3754,7 @@ public class Person {
                     }
                 }
             case VEHICLE_CREW, MECHANIC:
-                return hasSkill(SkillType.S_TECH_MECHANIC) ?
-                             getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() :
+                return hasSkill(S_TECH_MECHANIC) ? getSkill(S_TECH_MECHANIC).getExperienceLevel() :
                              SkillType.EXP_NONE;
             case AEROSPACE_PILOT:
                 if (hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO)) {
@@ -3818,22 +3821,18 @@ public class Person {
                              getSkill(SkillType.S_GUN_SPACE).getExperienceLevel() :
                              SkillType.EXP_NONE;
             case VESSEL_CREW:
-                return hasSkill(SkillType.S_TECH_VESSEL) ?
-                             getSkill(SkillType.S_TECH_VESSEL).getExperienceLevel() :
+                return hasSkill(S_TECH_VESSEL) ? getSkill(S_TECH_VESSEL).getExperienceLevel() :
                              SkillType.EXP_NONE;
             case VESSEL_NAVIGATOR:
                 return hasSkill(SkillType.S_NAV) ? getSkill(SkillType.S_NAV).getExperienceLevel() : SkillType.EXP_NONE;
             case MEK_TECH:
-                return hasSkill(SkillType.S_TECH_MEK) ?
-                             getSkill(SkillType.S_TECH_MEK).getExperienceLevel() :
+                return hasSkill(S_TECH_MEK) ? getSkill(S_TECH_MEK).getExperienceLevel() :
                              SkillType.EXP_NONE;
             case AERO_TEK:
-                return hasSkill(SkillType.S_TECH_AERO) ?
-                             getSkill(SkillType.S_TECH_AERO).getExperienceLevel() :
+                return hasSkill(S_TECH_AERO) ? getSkill(S_TECH_AERO).getExperienceLevel() :
                              SkillType.EXP_NONE;
             case BA_TECH:
-                return hasSkill(SkillType.S_TECH_BA) ?
-                             getSkill(SkillType.S_TECH_BA).getExperienceLevel() :
+                return hasSkill(S_TECH_BA) ? getSkill(S_TECH_BA).getExperienceLevel() :
                              SkillType.EXP_NONE;
             case ASTECH:
                 return hasSkill(SkillType.S_ASTECH) ?
@@ -3939,7 +3938,7 @@ public class Person {
                     yield List.of(SkillType.S_GUN_VEE);
                 }
             }
-            case VEHICLE_CREW, MECHANIC -> List.of(SkillType.S_TECH_MECHANIC);
+            case VEHICLE_CREW, MECHANIC -> List.of(S_TECH_MECHANIC);
             case AEROSPACE_PILOT -> List.of(SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO);
             case CONVENTIONAL_AIRCRAFT_PILOT -> List.of(SkillType.S_GUN_JET, SkillType.S_PILOT_JET);
             case PROTOMEK_PILOT -> List.of(SkillType.S_GUN_PROTO, SkillType.S_GUN_PROTO);
@@ -3947,11 +3946,11 @@ public class Person {
             case SOLDIER -> List.of(SkillType.S_SMALL_ARMS);
             case VESSEL_PILOT -> List.of(SkillType.S_PILOT_SPACE);
             case VESSEL_GUNNER -> List.of(SkillType.S_GUN_SPACE);
-            case VESSEL_CREW -> List.of(SkillType.S_TECH_VESSEL);
+            case VESSEL_CREW -> List.of(S_TECH_VESSEL);
             case VESSEL_NAVIGATOR -> List.of(SkillType.S_NAV);
-            case MEK_TECH -> List.of(SkillType.S_TECH_MEK);
-            case AERO_TEK -> List.of(SkillType.S_TECH_AERO);
-            case BA_TECH -> List.of(SkillType.S_TECH_BA);
+            case MEK_TECH -> List.of(S_TECH_MEK);
+            case AERO_TEK -> List.of(S_TECH_AERO);
+            case BA_TECH -> List.of(S_TECH_BA);
             case ASTECH -> List.of(SkillType.S_ASTECH);
             case DOCTOR -> List.of(SkillType.S_DOCTOR);
             case MEDIC -> List.of(SkillType.S_MEDTECH);
@@ -4155,7 +4154,7 @@ public class Person {
      */
     public int getCostToImprove(final String skillName, final boolean useReasoning) {
         final Skill skill = getSkill(skillName);
-        final SkillType skillType = SkillType.getType(skillName);
+        final SkillType skillType = getType(skillName);
         int cost = hasSkill(skillName) ? skill.getCostToImprove() : skillType.getCost(0);
 
         double multiplier = getReasoningXpCostMultiplier(useReasoning);
@@ -4508,15 +4507,15 @@ public class Person {
             return false;
         }
         if ((entity instanceof Mek) || (entity instanceof ProtoMek)) {
-            return hasSkill(SkillType.S_TECH_MEK);
+            return hasSkill(S_TECH_MEK);
         } else if (entity instanceof Dropship || entity instanceof Jumpship) {
-            return hasSkill(SkillType.S_TECH_VESSEL);
+            return hasSkill(S_TECH_VESSEL);
         } else if (entity instanceof Aero) {
-            return hasSkill(SkillType.S_TECH_AERO);
+            return hasSkill(S_TECH_AERO);
         } else if (entity instanceof BattleArmor) {
-            return hasSkill(SkillType.S_TECH_BA);
+            return hasSkill(S_TECH_BA);
         } else if (entity instanceof Tank) {
-            return hasSkill(SkillType.S_TECH_MECHANIC);
+            return hasSkill(S_TECH_MECHANIC);
         } else {
             return false;
         }
@@ -4794,20 +4793,20 @@ public class Person {
     public Skill getBestTechSkill() {
         Skill skill = null;
         int lvl = SkillType.EXP_NONE;
-        if (hasSkill(SkillType.S_TECH_MEK) && getSkill(SkillType.S_TECH_MEK).getExperienceLevel() > lvl) {
-            skill = getSkill(SkillType.S_TECH_MEK);
-            lvl = getSkill(SkillType.S_TECH_MEK).getExperienceLevel();
+        if (hasSkill(S_TECH_MEK) && getSkill(S_TECH_MEK).getExperienceLevel() > lvl) {
+            skill = getSkill(S_TECH_MEK);
+            lvl = getSkill(S_TECH_MEK).getExperienceLevel();
         }
-        if (hasSkill(SkillType.S_TECH_AERO) && getSkill(SkillType.S_TECH_AERO).getExperienceLevel() > lvl) {
-            skill = getSkill(SkillType.S_TECH_AERO);
-            lvl = getSkill(SkillType.S_TECH_AERO).getExperienceLevel();
+        if (hasSkill(S_TECH_AERO) && getSkill(S_TECH_AERO).getExperienceLevel() > lvl) {
+            skill = getSkill(S_TECH_AERO);
+            lvl = getSkill(S_TECH_AERO).getExperienceLevel();
         }
-        if (hasSkill(SkillType.S_TECH_MECHANIC) && getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() > lvl) {
-            skill = getSkill(SkillType.S_TECH_MECHANIC);
-            lvl = getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel();
+        if (hasSkill(S_TECH_MECHANIC) && getSkill(S_TECH_MECHANIC).getExperienceLevel() > lvl) {
+            skill = getSkill(S_TECH_MECHANIC);
+            lvl = getSkill(S_TECH_MECHANIC).getExperienceLevel();
         }
-        if (hasSkill(SkillType.S_TECH_BA) && getSkill(SkillType.S_TECH_BA).getExperienceLevel() > lvl) {
-            skill = getSkill(SkillType.S_TECH_BA);
+        if (hasSkill(S_TECH_BA) && getSkill(S_TECH_BA).getExperienceLevel() > lvl) {
+            skill = getSkill(S_TECH_BA);
         }
         return skill;
     }
@@ -4826,27 +4825,27 @@ public class Person {
     }
 
     public boolean isTechLargeVessel() {
-        boolean hasSkill = hasSkill(SkillType.S_TECH_VESSEL);
+        boolean hasSkill = hasSkill(S_TECH_VESSEL);
         return hasSkill && (getPrimaryRole().isVesselCrew() || getSecondaryRole().isVesselCrew());
     }
 
     public boolean isTechMek() {
-        boolean hasSkill = hasSkill(SkillType.S_TECH_MEK);
+        boolean hasSkill = hasSkill(S_TECH_MEK);
         return hasSkill && (getPrimaryRole().isMekTech() || getSecondaryRole().isMekTech());
     }
 
     public boolean isTechAero() {
-        boolean hasSkill = hasSkill(SkillType.S_TECH_AERO);
+        boolean hasSkill = hasSkill(S_TECH_AERO);
         return hasSkill && (getPrimaryRole().isAeroTek() || getSecondaryRole().isAeroTek());
     }
 
     public boolean isTechMechanic() {
-        boolean hasSkill = hasSkill(SkillType.S_TECH_MECHANIC);
+        boolean hasSkill = hasSkill(S_TECH_MECHANIC);
         return hasSkill && (getPrimaryRole().isMechanic() || getSecondaryRole().isMechanic());
     }
 
     public boolean isTechBA() {
-        boolean hasSkill = hasSkill(SkillType.S_TECH_BA);
+        boolean hasSkill = hasSkill(S_TECH_BA);
         return hasSkill && (getPrimaryRole().isBATech() || getSecondaryRole().isBATech());
     }
 
@@ -4958,105 +4957,78 @@ public class Person {
         return (partWork.getTimeLeft() > getMinutesLeft()) && (getOvertimeLeft() > 0);
     }
 
+    /**
+     * Selects the most suitable {@link Skill} for working on the specified part.
+     *
+     * <p>This method first attempts to find the best applicable skill that directly matches the technical type
+     * required
+     * by the part, choosing the one with the lowest target number for the task. If no matching skill is found, it falls
+     * back to select the best available general technical skill, again prioritizing the lowest target number among
+     * possessed skills.</p>
+     *
+     * @param part the {@link IPartWork} that work is to be performed on
+     *
+     * @return the most appropriate {@link Skill} to use for working on the given part, or {@code null} if none is found
+     */
     public Skill getSkillForWorkingOn(final IPartWork part) {
         final Unit unit = part.getUnit();
         Skill skill = getSkillForWorkingOn(unit);
         if (skill != null) {
             return skill;
         }
-        // check spare parts
-        // return the best one
-        if (part.isRightTechType(SkillType.S_TECH_MEK) && hasSkill(SkillType.S_TECH_MEK)) {
-            skill = getSkill(SkillType.S_TECH_MEK);
+
+        String[] skillTypeNames = { S_TECH_MEK, S_TECH_BA, S_TECH_AERO, S_TECH_MECHANIC, S_TECH_VESSEL };
+
+        Skill bestSkill = null;
+        int bestValue = Integer.MAX_VALUE;
+
+        // First: among tech types specifically matching part requirement
+        for (String typeName : skillTypeNames) {
+            if (part.isRightTechType(typeName) && hasSkill(typeName)) {
+                Skill candidate = getSkill(typeName);
+                int value = determineTargetNumber(this, candidate.getType(), 0).getValue();
+                if (bestSkill == null || value < bestValue) {
+                    bestSkill = candidate;
+                    bestValue = value;
+                }
+            }
+        }
+        if (bestSkill != null) {
+            return bestSkill;
         }
 
-        if (part.isRightTechType(SkillType.S_TECH_BA) && hasSkill(SkillType.S_TECH_BA)) {
-            if ((skill == null) ||
-                      (skill.getFinalSkillValue(options, reputation) >
-                             getSkill(SkillType.S_TECH_BA).getFinalSkillValue(options, reputation))) {
-                skill = getSkill(SkillType.S_TECH_BA);
+        // Second: among any tech skills possessed
+        for (String typeName : skillTypeNames) {
+            if (hasSkill(typeName)) {
+                Skill candidate = getSkill(typeName);
+                int value = determineTargetNumber(this, candidate.getType(), 0).getValue();
+                if (bestSkill == null || value < bestValue) {
+                    bestSkill = candidate;
+                    bestValue = value;
+                }
             }
         }
 
-        if (part.isRightTechType(SkillType.S_TECH_AERO) && hasSkill(SkillType.S_TECH_AERO)) {
-            if ((skill == null) ||
-                      (skill.getFinalSkillValue(options, reputation) >
-                             getSkill(SkillType.S_TECH_AERO).getFinalSkillValue(options, reputation))) {
-                skill = getSkill(SkillType.S_TECH_AERO);
-            }
-        }
-
-        if (part.isRightTechType(SkillType.S_TECH_MECHANIC) && hasSkill(SkillType.S_TECH_MECHANIC)) {
-            if ((skill == null) ||
-                      (skill.getFinalSkillValue(options, reputation) >
-                             getSkill(SkillType.S_TECH_MECHANIC).getFinalSkillValue(options, reputation))) {
-                skill = getSkill(SkillType.S_TECH_MECHANIC);
-            }
-        }
-
-        if (part.isRightTechType(SkillType.S_TECH_VESSEL) && hasSkill(SkillType.S_TECH_VESSEL)) {
-            if ((skill == null) ||
-                      (skill.getFinalSkillValue(options, reputation) >
-                             getSkill(SkillType.S_TECH_VESSEL).getFinalSkillValue(options, reputation))) {
-                skill = getSkill(SkillType.S_TECH_VESSEL);
-            }
-        }
-
-        if (skill != null) {
-            return skill;
-        }
-        // if we are still here then we didn't have the right tech skill, so return the
-        // highest
-        // of any tech skills that we do have
-        if (hasSkill(SkillType.S_TECH_MEK)) {
-            skill = getSkill(SkillType.S_TECH_MEK);
-        }
-
-        if (hasSkill(SkillType.S_TECH_BA)) {
-            if ((skill == null) ||
-                      (skill.getFinalSkillValue(options, reputation) >
-                             getSkill(SkillType.S_TECH_BA).getFinalSkillValue(options, reputation))) {
-                skill = getSkill(SkillType.S_TECH_BA);
-            }
-        }
-
-        if (hasSkill(SkillType.S_TECH_MECHANIC)) {
-            if ((skill == null) ||
-                      (skill.getFinalSkillValue(options, reputation) >
-                             getSkill(SkillType.S_TECH_MECHANIC).getFinalSkillValue(options, reputation))) {
-                skill = getSkill(SkillType.S_TECH_MECHANIC);
-            }
-        }
-
-        if (hasSkill(SkillType.S_TECH_AERO)) {
-            if ((skill == null) ||
-                      (skill.getFinalSkillValue(options, reputation) >
-                             getSkill(SkillType.S_TECH_AERO).getFinalSkillValue(options, reputation))) {
-                skill = getSkill(SkillType.S_TECH_AERO);
-            }
-        }
-
-        return skill;
+        return bestSkill;
     }
 
     public @Nullable Skill getSkillForWorkingOn(final @Nullable Unit unit) {
         if (unit == null) {
             return null;
         } else if (((unit.getEntity() instanceof Mek) || (unit.getEntity() instanceof ProtoMek)) &&
-                         hasSkill(SkillType.S_TECH_MEK)) {
-            return getSkill(SkillType.S_TECH_MEK);
-        } else if ((unit.getEntity() instanceof BattleArmor) && hasSkill(SkillType.S_TECH_BA)) {
-            return getSkill(SkillType.S_TECH_BA);
-        } else if ((unit.getEntity() instanceof Tank) && hasSkill(SkillType.S_TECH_MECHANIC)) {
-            return getSkill(SkillType.S_TECH_MECHANIC);
+                                                   hasSkill(S_TECH_MEK)) {
+            return getSkill(S_TECH_MEK);
+        } else if ((unit.getEntity() instanceof BattleArmor) && hasSkill(S_TECH_BA)) {
+            return getSkill(S_TECH_BA);
+        } else if ((unit.getEntity() instanceof Tank) && hasSkill(S_TECH_MECHANIC)) {
+            return getSkill(S_TECH_MECHANIC);
         } else if (((unit.getEntity() instanceof Dropship) || (unit.getEntity() instanceof Jumpship)) &&
-                         hasSkill(SkillType.S_TECH_VESSEL)) {
-            return getSkill(SkillType.S_TECH_VESSEL);
+                         hasSkill(S_TECH_VESSEL)) {
+            return getSkill(S_TECH_VESSEL);
         } else if ((unit.getEntity() instanceof Aero) &&
                          !(unit.getEntity() instanceof Dropship) &&
-                         !(unit.getEntity() instanceof Jumpship) &&
-                         hasSkill(SkillType.S_TECH_AERO)) {
-            return getSkill(SkillType.S_TECH_AERO);
+                         !(unit.getEntity() instanceof Jumpship) && hasSkill(S_TECH_AERO)) {
+            return getSkill(S_TECH_AERO);
         } else {
             return null;
         }
@@ -5074,10 +5046,10 @@ public class Person {
 
     public int getBestTechLevel() {
         int level = SkillType.EXP_NONE;
-        final Skill mekSkill = getSkill(SkillType.S_TECH_MEK);
-        final Skill mechanicSkill = getSkill(SkillType.S_TECH_MECHANIC);
-        final Skill baSkill = getSkill(SkillType.S_TECH_BA);
-        final Skill aeroSkill = getSkill(SkillType.S_TECH_AERO);
+        final Skill mekSkill = getSkill(S_TECH_MEK);
+        final Skill mechanicSkill = getSkill(S_TECH_MECHANIC);
+        final Skill baSkill = getSkill(S_TECH_BA);
+        final Skill aeroSkill = getSkill(S_TECH_AERO);
         if ((mekSkill != null) && (mekSkill.getLevel() > level)) {
             level = mekSkill.getLevel();
         }
@@ -5100,21 +5072,21 @@ public class Person {
     public boolean isRightTechTypeFor(final IPartWork part) {
         Unit unit = part.getUnit();
         if (unit == null) {
-            return (hasSkill(SkillType.S_TECH_MEK) && part.isRightTechType(SkillType.S_TECH_MEK)) ||
-                         (hasSkill(SkillType.S_TECH_AERO) && part.isRightTechType(SkillType.S_TECH_AERO)) ||
-                         (hasSkill(SkillType.S_TECH_MECHANIC) && part.isRightTechType(SkillType.S_TECH_MECHANIC)) ||
-                         (hasSkill(SkillType.S_TECH_BA) && part.isRightTechType(SkillType.S_TECH_BA)) ||
-                         (hasSkill(SkillType.S_TECH_VESSEL) && part.isRightTechType(SkillType.S_TECH_VESSEL));
+            return (hasSkill(S_TECH_MEK) && part.isRightTechType(S_TECH_MEK)) ||
+                         (hasSkill(S_TECH_AERO) && part.isRightTechType(S_TECH_AERO)) ||
+                         (hasSkill(S_TECH_MECHANIC) && part.isRightTechType(S_TECH_MECHANIC)) ||
+                         (hasSkill(S_TECH_BA) && part.isRightTechType(S_TECH_BA)) ||
+                         (hasSkill(S_TECH_VESSEL) && part.isRightTechType(S_TECH_VESSEL));
         } else if ((unit.getEntity() instanceof Mek) || (unit.getEntity() instanceof ProtoMek)) {
-            return hasSkill(SkillType.S_TECH_MEK);
+            return hasSkill(S_TECH_MEK);
         } else if (unit.getEntity() instanceof BattleArmor) {
-            return hasSkill(SkillType.S_TECH_BA);
+            return hasSkill(S_TECH_BA);
         } else if ((unit.getEntity() instanceof Tank) || (unit.getEntity() instanceof Infantry)) {
-            return hasSkill(SkillType.S_TECH_MECHANIC);
+            return hasSkill(S_TECH_MECHANIC);
         } else if ((unit.getEntity() instanceof Dropship) || (unit.getEntity() instanceof Jumpship)) {
-            return hasSkill(SkillType.S_TECH_VESSEL);
+            return hasSkill(S_TECH_VESSEL);
         } else if (unit.getEntity() instanceof Aero) {
-            return hasSkill(SkillType.S_TECH_AERO);
+            return hasSkill(S_TECH_AERO);
         } else {
             return false;
         }
