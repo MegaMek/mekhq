@@ -3056,7 +3056,7 @@ public class Campaign implements ITechManager {
                           adjustedReputation);
                 }
 
-                if (currentSkillLevel > highest) {
+                if (bestInRole == null || currentSkillLevel > highest) {
                     bestInRole = person;
                     highest = currentSkillLevel;
                 } else if (secondary != null && currentSkillLevel == highest) {
@@ -3066,7 +3066,7 @@ public class Campaign implements ITechManager {
                         continue;
                     }
 
-                    currentSkillLevel = primarySkill.getTotalSkillLevel(person.getOptions(),
+                    currentSkillLevel = secondarySkill.getTotalSkillLevel(person.getOptions(),
                           person.getATOWAttributes(),
                           adjustedReputation);
 

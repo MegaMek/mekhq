@@ -38,8 +38,8 @@ import static java.lang.Math.floor;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.codeUtilities.MathUtility.clamp;
-import static megamek.common.Compute.d6;
 import static megamek.codeUtilities.StringUtility.isNullOrBlank;
+import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static mekhq.campaign.log.LogEntryType.ASSIGNMENT;
@@ -3304,16 +3304,14 @@ public class Person {
      *     <li>If a positive or zero custom salary has been set, it is used directly.</li>
      *     <li>If the salary is negative, the standard salary is calculated based on campaign options and the
      *     person's roles, skills, and attributes:</li>
-     *     <ul>
-     *         <li>Base salaries are taken from the campaign options, according to primary and secondary roles.</li>
-     *         <li>If the person is specialized infantry with applicable unit and specialization, a multiplier is
-     *         applied to the primary base salary.</li>
-     *         <li>An experience-level multiplier is applied to both primary and secondary salaries based on the
-     *         person's skills.</li>
-     *         <li>Additional multipliers for specializations (e.g., anti-mek skill) may also apply.</li>
-     *         <li>Secondary role salaries are halved and only applied if not disabled via campaign options.</li>
-     *         <li>The base salaries for primary and secondary roles are summed.</li>
-     *     </ul>
+     *     <li>Base salaries are taken from the campaign options, according to primary and secondary roles.</li>
+     *     <li>If the person is specialized infantry with applicable unit and specialization, a multiplier is
+     *     applied to the primary base salary.</li>
+     *     <li>An experience-level multiplier is applied to both primary and secondary salaries based on the
+     *     person's skills.</li>
+     *     <li>Additional multipliers for specializations (e.g., anti-mek skill) may also apply.</li>
+     *     <li>Secondary role salaries are halved and only applied if not disabled via campaign options.</li>
+     *     <li>The base salaries for primary and secondary roles are summed.</li>
      *     <li>If the person's rank provides a pay multiplier, the calculated total is multiplied accordingly.</li>
      * </ul>
      *

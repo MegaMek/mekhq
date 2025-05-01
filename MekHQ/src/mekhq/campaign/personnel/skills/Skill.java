@@ -282,16 +282,16 @@ public class Skill {
     /**
      * Calculates the final skill value for a character by applying progression rules, attribute modifiers,
      * SPA (Special Pilot Abilities) modifiers, and reputation, then clamps the value within the legal range for the skill type.
-     * <p>
-     * The calculation sequence is as follows:
+     *
+     * <p>The calculation sequence is as follows:</p>
      * <ul>
      *   <li>SPA modifiers are determined based on the provided character options and reputation value.</li>
      *   <li>Attribute modifiers relevant to the skill type are computed using the given attributes.</li>
      *   <li>For "count up" progression, the summed result is capped at the maximum allowed value.</li>
      *   <li>For "count down" progression, the result is floored at the minimum allowed value.</li>
      * </ul>
-     * The reputation value is included as part of the modifiers to the skill value.
-     * </p>
+     *
+     * <p>The reputation value is included as part of the modifiers to the skill value.</p>
      *
      * @param characterOptions the {@link PersonnelOptions} that define modifiers and SPA specifics for the character
      * @param attributes       the {@link Attributes} object providing attribute values for the character
