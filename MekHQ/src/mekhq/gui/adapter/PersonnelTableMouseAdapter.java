@@ -2505,19 +2505,17 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
             menu = new JMenu(resources.getString("spendXP.text"));
             if (getCampaignOptions().isUseAbilities()) {
-                JMenu abilityMenu = new JMenu(resources.getString("spendOnSpecialAbilities.text"));
-
                 JMenu combatAbilityMenu = new JMenu(resources.getString("combatAbilityMenu.text"));
-                abilityMenu.add(combatAbilityMenu);
+                menu.add(combatAbilityMenu);
 
                 JMenu maneuveringAbilityMenu = new JMenu(resources.getString("maneuveringAbilityMenu.text"));
-                abilityMenu.add(maneuveringAbilityMenu);
+                menu.add(maneuveringAbilityMenu);
 
                 JMenu utilityAbilityMenu = new JMenu(resources.getString("utilityAbilityMenu.text"));
-                abilityMenu.add(utilityAbilityMenu);
+                menu.add(utilityAbilityMenu);
 
                 JMenu characterFlawMenu = new JMenu(resources.getString("characterFlawMenu.text"));
-                abilityMenu.add(characterFlawMenu);
+                menu.add(characterFlawMenu);
 
                 int cost;
 
@@ -2920,7 +2918,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         }
                     }
                 }
-                JMenuHelpers.addMenuIfNonEmpty(menu, abilityMenu);
             }
 
             JMenu currentMenu = new JMenu(resources.getString("spendOnCurrentSkills.text"));
