@@ -3290,6 +3290,35 @@ public class Person {
         this.salary = salary;
     }
 
+    /**
+     * Calculates and returns the salary for this person based on campaign rules and status.
+     *
+     * <p>The method applies the following logic:</p>
+     * <ul>
+     *     <li>If the person is not free (e.g., a prisoner), returns a zero salary.</li>
+     *     <li>If a positive or zero custom salary has been set, it is used directly.</li>
+     *     <li>If the salary is negative, the standard salary is calculated based on campaign options and the
+     *     person's roles, skills, and attributes:</li>
+     *     <ul>
+     *         <li>Base salaries are taken from the campaign options, according to primary and secondary roles.</li>
+     *         <li>If the person is specialized infantry with applicable unit and specialization, a multiplier is
+     *         applied to the primary base salary.</li>
+     *         <li>An experience-level multiplier is applied to both primary and secondary salaries based on the
+     *         person's skills.</li>
+     *         <li>Additional multipliers for specializations (e.g., anti-mek skill) may also apply.</li>
+     *         <li>Secondary role salaries are halved and only applied if not disabled via campaign options.</li>
+     *         <li>The base salaries for primary and secondary roles are summed.</li>
+     *     </ul>
+     *     <li>If the person's rank provides a pay multiplier, the calculated total is multiplied accordingly.</li>
+     * </ul>
+     *
+     * <p>The method does not currently account for era modifiers or crew type (e.g., DropShip, JumpShip, WarShip).</p>
+     *
+     * @param campaign The current {@link Campaign} used to determine relevant options and settings.
+     *
+     * @return A {@link Money} object representing the person's salary according to current campaign rules and their
+     *       status.
+     */
     public Money getSalary(final Campaign campaign) {
         if (!getPrisonerStatus().isFree()) {
             return Money.zero();
@@ -3660,6 +3689,17 @@ public class Person {
         return Skills.SKILL_LEVELS[getExperienceLevel(campaign, secondary) + 1];
     }
 
+    /**
+     * Calculates and returns the experience level of a character based on their role, skills, and optional parameters.
+     * The computed experience level depends on the active campaign policies and the skills available to the character.
+     * It performs averaging for paired or multiple skill types when applicable and considers alternative quality averaging
+     * if enabled in the campaign options.
+     *
+     * @param campaign The current campaign containing settings and options relevant for determining the experience level.
+     * @param secondary A boolean flag indicating whether to use the secondary role or the primary role for the determination.
+     * @return The calculated experience level as an integer, based on the character's role and associated skills.
+     *         If no relevant skills are present, returns a predefined constant indicating no experience (e.g., EXP_NONE).
+     */
     public int getExperienceLevel(final Campaign campaign, final boolean secondary) {
         final PersonnelRole role = secondary ? getSecondaryRole() : getPrimaryRole();
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
@@ -4281,16 +4321,42 @@ public class Person {
         return skills.getSkill(skillName);
     }
 
+    /**
+     * @deprecated use {@link #getSkillLevel(String, boolean, boolean, LocalDate)} instead
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public int getSkillLevel(final String skillName) {
         final Skill skill = getSkill(skillName);
         return (skill == null) ? 0 : skill.getExperienceLevel(options, atowAttributes);
     }
 
     /**
-     * @param skillName The name of the skill to retrieve the level for.
+     * Retrieves the experience level for a specified skill by name, with options to account for aging effects and
+     * campaign type.
      *
-     * @return the skill level of a person for a given skill, or -1 if the person does not have the skill.
+     * <p>This method calculates the experience level for the given skill, applying adjustments based on aging effects,
+     * campaign context, and the current date. If the skill is not found, {@code 0} is returned.</p>
+     *
+     * @param skillName         the name of the skill to retrieve
+     * @param isUseAgingEffects {@code true} to include aging effects in reputation adjustment, {@code false} otherwise
+     * @param isClanCampaign    {@code true} if the context is a Clan campaign, {@code false} otherwise
+     * @param today             the current date used for age-related calculations
+     *
+     * @return the corresponding experience level for the skill, or {@code 0} if the skill does not exist
      */
+    public int getSkillLevel(final String skillName, boolean isUseAgingEffects, boolean isClanCampaign,
+          LocalDate today) {
+        final Skill skill = getSkill(skillName);
+
+        int adjustedReputation = getAdjustedReputation(isUseAgingEffects, isClanCampaign, today, rankLevel);
+
+        return (skill == null) ? 0 : skill.getExperienceLevel(options, atowAttributes, adjustedReputation);
+    }
+
+    /**
+     * @deprecated Unused
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public int getSkillLevelOrNegative(final String skillName) {
         if (hasSkill(skillName)) {
             return getSkill(skillName).getExperienceLevel(options, atowAttributes);
@@ -4668,6 +4734,18 @@ public class Person {
     }
     // endregion edge
 
+    /**
+     * Determines whether the user possesses the necessary skills to operate the given entity.
+     *
+     * <p>The required skills are based on the type of the provided entity. The method checks for specific piloting or gunnery
+     * skills relevant to the entity type, such as Mechs, VTOLs, tanks, aerospace units, battle armor, and others.</p>
+     *
+     * <p>If the appropriate skill(s) for the entity type are present, the method returns {@code true}; otherwise, it
+     * returns {@code false}.</p>
+     *
+     * @param entity the entity to be checked for driving capability
+     * @return {@code true} if the required skill(s) to drive or operate the given entity are present; {@code false} otherwise
+     */
     public boolean canDrive(final Entity entity) {
         if (entity instanceof LandAirMek) {
             return hasSkill(S_PILOT_MEK) && hasSkill(S_PILOT_AERO);
@@ -4694,6 +4772,19 @@ public class Person {
         }
     }
 
+    /**
+     * Determines whether the user possesses the necessary skills to operate weapons for the given entity.
+     *
+     * <p>The required gunnery skill is dependent on the type of entity provided. This method checks for the relevant
+     * gunnery or weapon skill associated with the entity type, such as Mechs, tanks, aerospace units, battle armor,
+     * infantry, and others.</p>
+     *
+     * <p>Returns {@code true} if the necessary skill(s) to use the entity's weapons are present; {@code false}
+     * otherwise.</p>
+     *
+     * @param entity the entity to check for gunnery capability
+     * @return {@code true} if the user is qualified to operate weapons for the given entity; {@code false} otherwise
+     */
     public boolean canGun(final Entity entity) {
         if (entity instanceof LandAirMek) {
             return hasSkill(S_GUN_MEK) && hasSkill(S_GUN_AERO);
@@ -4718,6 +4809,19 @@ public class Person {
         }
     }
 
+    /**
+     * Determines whether the user possesses the necessary technical skills to service or repair the given entity.
+     *
+     * <p>The required technical skill depends on the entity type. This method checks for the appropriate technical
+     * skill based on whether the entity is a type of Mech, vessel, aerospace unit, battle armor, tank, or other
+     * supported classes.</p>
+     *
+     * <p>Returns {@code true} if the user has the qualifying technical skill for the entity; {@code false} otherwise
+     * .</p>
+     *
+     * @param entity the entity to check for technical capability
+     * @return {@code true} if the user is qualified to service or repair the given entity; {@code false} otherwise
+     */
     public boolean canTech(final Entity entity) {
         if (entity == null) {
             return false;

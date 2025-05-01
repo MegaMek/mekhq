@@ -341,6 +341,19 @@ public class AtBConfiguration {
         };
     }
 
+    /**
+     * Calculates and returns the {@link TargetRoll} required to successfully search for a ship of the given unit type
+     * within the specified campaign.
+     *
+     * <p>The target number is based on the unit type's base search difficulty, which may be adjusted by the experience
+     * level of the best available logistics administrator and the campaign's unit rating. If no base target number is
+     * available for the provided unit type, an impossible {@code TargetRoll} is returned.</p>
+     *
+     * @param unitType the {@link Integer} constant representing the type of unit (ship) being searched for
+     * @param campaign the {@link Campaign} in which the ship search is being performed
+     *
+     * @return the {@link TargetRoll} representing the modified search difficulty for the requested ship/unit type
+     */
     public TargetRoll shipSearchTargetRoll(int unitType, Campaign campaign) {
         final Integer baseShipSearchTarget = shipSearchTargetBase(unitType);
         if (baseShipSearchTarget == null) {
@@ -357,8 +370,7 @@ public class AtBConfiguration {
         }
 
         target.addModifier(SkillType.EXP_REGULAR - experienceLevel, "Admin/Logistics");
-        target.addModifier(IUnitRating.DRAGOON_C - campaign.getAtBUnitRatingMod(),
-                "Unit Rating");
+        target.addModifier(IUnitRating.DRAGOON_C - campaign.getAtBUnitRatingMod(), "Unit Rating");
         return target;
     }
 

@@ -29,6 +29,7 @@ package mekhq.campaign.market.contractMarket;
 
 import static megamek.common.Compute.d6;
 import static megamek.common.enums.SkillLevel.REGULAR;
+import static mekhq.campaign.personnel.skills.SkillType.S_NEG;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 
 import java.time.format.DateTimeFormatter;
@@ -49,7 +50,6 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
@@ -178,11 +178,14 @@ public class CamOpsContractMarket extends AbstractContractMarket {
 
     private int findNegotiationSkill(Campaign campaign) {
         // TODO: have pirates use investigation skill instead when it is implemented per CamOps
-        Person negotiator = campaign.findBestAtSkill(SkillType.S_NEG);
+        Person negotiator = campaign.findBestAtSkill(S_NEG);
         if (negotiator == null) {
             return 0;
         }
-        return negotiator.getSkillLevel(SkillType.S_NEG);
+        return negotiator.getSkillLevel(S_NEG,
+              campaign.getCampaignOptions().isUseAgeEffects(),
+              campaign.isClanCampaign(),
+              campaign.getLocalDate());
     }
 
     private int rollNegotiation(int skill, int modifiers) {

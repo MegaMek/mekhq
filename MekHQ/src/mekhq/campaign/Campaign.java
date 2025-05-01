@@ -7325,6 +7325,23 @@ public class Campaign implements ITechManager {
         MekHQ.triggerEvent(new PersonChangedEvent(p));
     }
 
+    /**
+     * Calculates the {@link TargetRoll} required for a technician to work on a specific part task.
+     *
+     * <p>This method determines task difficulty and eligibility by evaluating the technician's skills, penalties due to
+     * work mode,
+     * unit and part constraints, time availability, helper modifiers, and campaign options. It produces
+     * context-specific messages when tasks are impossible due to skill, resource, or situation limitations.</p>
+     *
+     * <p>The result will reflect all applicable modifiers (such as overtime or era-based penalties) and communicates if
+     * a task
+     * is impossible, or has automatic success (e.g., for infantry refits).</p>
+     *
+     * @param partWork the part work task to be performed
+     * @param tech     the technician assigned to the task
+     *
+     * @return a {@link TargetRoll} capturing the total target value and reason for success or impossibility
+     */
     public TargetRoll getTargetFor(final IPartWork partWork, final Person tech) {
         final Skill skill = tech.getSkillForWorkingOn(partWork);
         int modePenalty = partWork.getMode().expReduction;

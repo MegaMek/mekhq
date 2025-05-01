@@ -356,6 +356,18 @@ public final class BatchXPDialog extends JDialog {
         }
     }
 
+    /**
+     * Improves the selected skill for all personnel currently shown in the personnel table and deducts the
+     * corresponding XP cost for each person.
+     *
+     * <p>This method retrieves the chosen skill, calculates the XP cost (with applicable multipliers and campaign
+     * options),
+     * upgrades the skill for each listed person, deducts the XP, logs the improvements, and updates campaign data.
+     * After each round of improvements, the personnel table is refreshed to reflect any updated entries, and the
+     * operation continues until there are no more eligible personnel remaining.</p>
+     *
+     * <p>At the end, a report is added to summarize the improved skill and affected personnel count.</p>
+     */
     private void spendXP() {
         String skillName = (String) choiceSkill.getSelectedItem();
         if (choiceNoSkill.equals(skillName) || (skillName == null)) {

@@ -626,6 +626,25 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         }
     }
 
+    /**
+     * Computes and applies modifiers to the clauses of a contract based on various campaign, contract, and personnel
+     * factors.
+     *
+     * <p>This method sets up and calculates the negotiation modifiers for each contract clause, such as command,
+     * salvage,
+     * transport, and support. It takes into account the experience level of the best administrators in relevant roles,
+     * campaign options (such as age effects, faction type, unit rating, and size limitations), contract specifics,
+     * enemy faction characteristics, mission type, and employer details. Clause modifiers are further adjusted for
+     * special circumstances like government or retainer contracts, high-performing units, and employer faction
+     * type.</p>
+     *
+     * <p>After all modifiers are applied for the contract, the method triggers the resolution of each contract clause
+     * (command, salvage, support, transport) using the final calculated modifiers.</p>
+     *
+     * @param contract      the {@link AtBContract} for which clauses and modifiers are being set
+     * @param unitRatingMod the current unit rating modifier to be used in clause calculations
+     * @param campaign      the {@link Campaign} in which the contract negotiation is taking place
+     */
     private void setContractClauses(AtBContract contract, int unitRatingMod, Campaign campaign) {
         ClauseMods mods = new ClauseMods();
         clauseMods.put(contract.getId(), mods);

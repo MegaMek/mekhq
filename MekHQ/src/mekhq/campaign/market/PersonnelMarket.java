@@ -548,7 +548,7 @@ public class PersonnelMarket {
     }
 
     /**
-     * @deprecated Unused. seems to be a duplicate of
+     * @deprecated Unused. Seems to be an unused alternative to
      *       {@link mekhq.campaign.againstTheBot.AtBConfiguration#shipSearchTargetRoll(int, Campaign)}
      */
     @Deprecated(since = "0.50.06", forRemoval = true)
