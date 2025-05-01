@@ -2952,12 +2952,18 @@ public class Person {
                                       "Removed from",
                                       "Added to");
 
+                                boolean shiftedLogType = false;
                                 for (String targetString : assignmentTargetStrings) {
                                     if (logEntryDescription.startsWith(targetString)) {
                                         logEntry.setType(ASSIGNMENT);
                                         person.addAssignmentLogEntry(logEntry);
+                                        shiftedLogType = true;
                                         break;
                                     }
+                                }
+
+                                if (!shiftedLogType) {
+                                    person.addPersonalLogEntry(logEntry);
                                 }
                             } else {
                                 // < 50.05 compatibility handler
