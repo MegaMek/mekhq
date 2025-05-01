@@ -167,22 +167,6 @@ public class WinterHolidayAnnouncement {
     }
 
     /**
-     * @deprecated unused
-     */
-    @Deprecated(since = "0.50.06", forRemoval = true)
-    private String getInCharacterMessageDayOne() {
-        return getInCharacterMessageDayEleven();
-    }
-
-    /**
-     * @deprecated unused
-     */
-    @Deprecated(since = "0.50.06", forRemoval = true)
-    private String getInCharacterMessageDayFiveOrEleven(boolean isDayFive) {
-        return getInCharacterMessageDayEleven();
-    }
-
-    /**
      * Builds the in-character message for either Day Five or Day Eleven of the Winter Holiday event.
      *
      * @return the message as a string for the specified day
