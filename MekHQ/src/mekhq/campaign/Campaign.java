@@ -1471,6 +1471,18 @@ public class Campaign implements ITechManager {
     }
 
     /**
+     * Checks if there is at least one active AtB (Against the Bot) contract, using the default search parameters.
+     *
+     * @return {@code true} if an active AtB contract exists; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public boolean hasActiveAtBContract() {
+        return hasActiveAtBContract(false);
+    }
+
+    /**
      * Determines whether there are any future AtB (Against the Bot) contracts. A future contract is defined as a
      * contract that has been accepted but has a start date later than the current day.
      *
