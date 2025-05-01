@@ -163,11 +163,8 @@ public class BaArmor extends Armor {
     public int getAmountAvailable() {
         return campaign.getWarehouse()
                      .streamSpareParts()
-                     .mapToInt(part -> ((part instanceof BaArmor armor) &&
-                                              armor.isPresent() &&
-                                              !armor.isReservedForRefit() &&
-                                              isClanTechBase() == part.isClanTechBase() &&
-                                              armor.getType() == getType()) ? armor.getAmount() : 0)
+                     .filter(this::isSameBAArmorPart)
+                     .mapToInt(part -> ((BaArmor) part).getAmount())
                      .sum();
     }
 
@@ -188,5 +185,18 @@ public class BaArmor extends Armor {
                   .addPart(new BaArmor(getUnitTonnage(), amount, type, -1, isClanTechBase(), campaign), 0, false);
         }
         return 0;
+    }
+
+    /**
+     * Not sure how true this title is, it was used in {@link BaArmor#getAmountAvailable}
+     * @param part is this part the same
+     * @return true if the two parts are the same, at least as far as {@link BaArmor#getAmountAvailable} is concerned
+     */
+    private boolean isSameBAArmorPart(Part part) {
+        return (part instanceof BaArmor armor) &&
+                     armor.isPresent() &&
+                     !armor.isReservedForRefit() &&
+                     isClanTechBase() == part.isClanTechBase() &&
+                     armor.getType() == getType();
     }
 }

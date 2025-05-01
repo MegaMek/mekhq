@@ -578,11 +578,8 @@ public class Armor extends Part implements IAcquisitionWork {
      */
     public int getAmountAvailable() {
         return campaign.getWarehouse()
-                     .streamSpareParts()
-                     .mapToInt(part -> ((part instanceof Armor armor) &&
-                                              armor.isPresent() &&
-                                              !armor.isReservedForRefit() &&
-                                              isSameType(armor)) ? armor.getAmount() : 0)
+                     .streamSpareParts().filter(this::isSameArmorPart)
+                     .mapToInt(part -> ((Armor) part).getAmount())
                      .sum();
     }
 
@@ -607,9 +604,9 @@ public class Armor extends Part implements IAcquisitionWork {
         }
 
         if (amountRemaining > 0) {
-            logger.error("Still trying to add armor but that shouldn't have been a problem!");
+            logger.warn("Still trying to add armor but that shouldn't have been a problem!");
         } else if (amount < 0) {
-            logger.error("Still trying to remove armor but no more armor is in the warehouse!");
+            logger.warn("Still trying to remove armor but no more armor is in the warehouse!");
         }
     }
 
@@ -740,5 +737,18 @@ public class Armor extends Part implements IAcquisitionWork {
                   .addPart(new Armor(getUnitTonnage(), type, amount, -1, false, isClanTechBase(), campaign), 0, false);
         }
         return 0;
+    }
+
+    /**
+     * Not sure how true this title is, it was used in {@link Armor#getAmountAvailable}
+     * @param part is this part the same
+     * @return true if the two parts are the same, at least as far as {@link Armor#getAmountAvailable} is
+     * concerned
+     */
+    private boolean isSameArmorPart(Part part) {
+        return (part instanceof Armor armor) &&
+                     armor.isPresent() &&
+                     !armor.isReservedForRefit() &&
+                     isSameType(armor);
     }
 }

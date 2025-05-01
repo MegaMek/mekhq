@@ -138,12 +138,8 @@ public class ProtoMekArmor extends Armor {
     @Override
     public int getAmountAvailable() {
         return campaign.getWarehouse()
-                     .streamSpareParts()
-                     .mapToInt(part -> (part instanceof ProtoMekArmor protoMekArmor) &&
-                                             protoMekArmor.isPresent() &&
-                                             !protoMekArmor.isReservedForRefit() &&
-                                             isClanTechBase() == protoMekArmor.isClanTechBase() &&
-                                             (getType() == (protoMekArmor).getType()) ? protoMekArmor.getAmount() : 0)
+                     .streamSpareParts().filter(this::isSameProtoMekArmor)
+                     .mapToInt(part -> ((ProtoMekArmor) part).getAmount())
                      .sum();
     }
 
@@ -177,5 +173,19 @@ public class ProtoMekArmor extends Armor {
                   .addPart(new ProtoMekArmor(getUnitTonnage(), type, amount, -1, isClanTechBase(), campaign), 0, false);
         }
         return 0;
+    }
+
+    /**
+     * Not sure how true this title is, it was used in {@link ProtoMekArmor#getAmountAvailable}
+     * @param part is this part the same
+     * @return true if the two parts are the same, at least as far as {@link ProtoMekArmor#getAmountAvailable} is
+     * concerned
+     */
+    private boolean isSameProtoMekArmor(Part part) {
+        return (part instanceof ProtoMekArmor protoMekArmor) &&
+                     protoMekArmor.isPresent() &&
+                     !protoMekArmor.isReservedForRefit() &&
+                     isClanTechBase() == protoMekArmor.isClanTechBase() &&
+                     (getType() == (protoMekArmor).getType());
     }
 }
