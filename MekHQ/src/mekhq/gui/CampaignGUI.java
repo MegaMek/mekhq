@@ -183,6 +183,8 @@ public class CampaignGUI extends JPanel {
 
     /* for the top button panel */
     private JPanel btnPanel;
+    private final JButton btnAdvanceMultipleDays = new JButton(resourceMap.getString("btnAdvanceMultipleDays.text"));
+    private final JButton btnMassTraining = new JButton(resourceMap.getString("btnMassTraining.text"));
     private final JToggleButton btnGMMode = new MMToggleButton(resourceMap.getString("btnGMMode.text"));
     private final JToggleButton btnOvertime = new MMToggleButton(resourceMap.getString("btnOvertime.text"));
 
@@ -970,13 +972,6 @@ public class CampaignGUI extends JPanel {
         miGMToolsDialog.addActionListener(evt -> new GMToolsDialog(getFrame(), this, null).setVisible(true));
         menuManage.add(miGMToolsDialog);
 
-        JMenuItem miAdvanceMultipleDays = new JMenuItem(resourceMap.getString("miAdvanceMultipleDays.text"));
-        miAdvanceMultipleDays.setMnemonic(KeyEvent.VK_A);
-        miAdvanceMultipleDays.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.ALT_DOWN_MASK));
-        miAdvanceMultipleDays.addActionListener(evt -> new AdvanceDaysDialog(getFrame(), this).setVisible(true));
-        miAdvanceMultipleDays.setVisible(getCampaignController().isHost());
-        menuManage.add(miAdvanceMultipleDays);
-
         JMenuItem miBloodnames = new JMenuItem(resourceMap.getString("miRandomBloodnames.text"));
         miBloodnames.setMnemonic(KeyEvent.VK_B);
         miBloodnames.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, InputEvent.ALT_DOWN_MASK));
@@ -986,14 +981,6 @@ public class CampaignGUI extends JPanel {
             }
         });
         menuManage.add(miBloodnames);
-
-        final JMenuItem miMassPersonnelTraining = new JMenuItem(resourceMap.getString("miMassPersonnelTraining.text"));
-        miMassPersonnelTraining.setToolTipText(resourceMap.getString("miMassPersonnelTraining.toolTipText"));
-        miMassPersonnelTraining.setName("miMassPersonnelTraining");
-        miMassPersonnelTraining.setMnemonic(KeyEvent.VK_M);
-        miMassPersonnelTraining.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.ALT_DOWN_MASK));
-        miMassPersonnelTraining.addActionListener(evt -> new BatchXPDialog(getFrame(), getCampaign()).setVisible(true));
-        menuManage.add(miMassPersonnelTraining);
 
         JMenuItem miScenarioEditor = new JMenuItem(resourceMap.getString("miScenarioEditor.text"));
         miScenarioEditor.setMnemonic(KeyEvent.VK_S);
@@ -1136,11 +1123,34 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.insets = new Insets(3, 10, 3, 3);
         btnPanel.add(lblLocation, gridBagConstraints);
 
+        btnAdvanceMultipleDays.addActionListener(e -> new AdvanceDaysDialog(getFrame(), this).setVisible(true));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.anchor = GridBagConstraints.EAST;
+        gridBagConstraints.insets = new Insets(3, 3, 3, 3);
+        btnPanel.add(btnAdvanceMultipleDays, gridBagConstraints);
+
+        btnMassTraining.setToolTipText(resourceMap.getString("btnMassTraining.toolTipText"));
+        btnMassTraining.addActionListener(e -> new BatchXPDialog(getFrame(), getCampaign()).setVisible(true));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.anchor = GridBagConstraints.EAST;
+        gridBagConstraints.insets = new Insets(3, 3, 3, 3);
+        btnPanel.add(btnMassTraining, gridBagConstraints);
+
         btnGMMode.setToolTipText(resourceMap.getString("btnGMMode.toolTipText"));
         btnGMMode.setSelected(getCampaign().isGM());
         btnGMMode.addActionListener(e -> getCampaign().setGMMode(btnGMMode.isSelected()));
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0;
@@ -1152,7 +1162,7 @@ public class CampaignGUI extends JPanel {
         btnOvertime.setToolTipText(resourceMap.getString("btnOvertime.toolTipText"));
         btnOvertime.addActionListener(evt -> getCampaign().setOvertime(btnOvertime.isSelected()));
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0;
@@ -1170,6 +1180,7 @@ public class CampaignGUI extends JPanel {
             // day
             // again, until after Advance Day has completed.
             btnAdvanceDay.setEnabled(false);
+            btnAdvanceMultipleDays.setEnabled(false);
 
             SwingUtilities.invokeLater(() -> {
                 try {
@@ -1177,18 +1188,20 @@ public class CampaignGUI extends JPanel {
                     getCampaignController().advanceDay();
                 } finally {
                     btnAdvanceDay.setEnabled(true);
+                    btnAdvanceMultipleDays.setEnabled(true);
                     setCursor(Cursor.getDefaultCursor());
                 }
             });
         });
         btnAdvanceDay.setMnemonic(KeyEvent.VK_A);
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = GridBagConstraints.VERTICAL;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.gridheight = 2;
+        gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
         gridBagConstraints.insets = new Insets(3, 3, 3, 15);
         btnPanel.add(btnAdvanceDay, gridBagConstraints);

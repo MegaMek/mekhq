@@ -62,7 +62,7 @@ The enemy will control the battlefield at the end of the engagement, meaning the
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
                 <allowedUnitType>-2</allowedUnitType>
-                <arrivalTurn>-3</arrivalTurn>
+                <arrivalTurn>0</arrivalTurn>
                 <canReinforceLinked>true</canReinforceLinked>
                 <contributesToBV>false</contributesToBV>
                 <contributesToMapSize>true</contributesToMapSize>

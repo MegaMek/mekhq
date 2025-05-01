@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.model;
 
@@ -286,8 +291,11 @@ public class UnitTableModel extends DataTableModel {
             case COL_TECH_CRW -> (unit.getTech() != null) ? unit.getTech().getHTMLTitle() : "-";
             case COL_MAINTAIN -> unit.getMaintenanceCost().toAmountAndSymbolString();
             case COL_MAINTAIN_CYCLE -> {
-                boolean needsMaintenance = unit.requiresMaintenance();
+                if (!campaign.getCampaignOptions().isCheckMaintenance()) {
+                    yield '-';
+                }
 
+                boolean needsMaintenance = unit.requiresMaintenance();
                 if (!needsMaintenance) {
                     yield '-';
                 }
