@@ -4330,9 +4330,9 @@ public class Campaign implements ITechManager {
             if ((getCampaignOptions().isDestroyByMargin() &&
                        (getCampaignOptions().getDestroyMargin() <= (target.getValue() - roll))) ||
                       (!getCampaignOptions().isDestroyByMargin()
-                             // if a legendary, primary tech and destroy by margin is NOT on
+                             // if an elite, primary tech and destroy by margin is NOT on
                              &&
-                             ((tech.getExperienceLevel(this, false) == SkillType.EXP_LEGENDARY) ||
+                             ((tech.getExperienceLevel(this, false) == SkillType.EXP_ELITE) ||
                                     tech.getPrimaryRole().isVehicleCrew())) // For vessel crews
                             && (roll < target.getValue())) {
                 tech.changeCurrentEdge(-1);
@@ -4373,8 +4373,8 @@ public class Campaign implements ITechManager {
                     // possible
                     effectiveSkillLvl = SkillType.EXP_ULTRA_GREEN;
                 } else {
-                    // destroyed - set the effective level to legendary
-                    effectiveSkillLvl = SkillType.EXP_LEGENDARY;
+                    // destroyed - set the effective level to elite
+                    effectiveSkillLvl = SkillType.EXP_ELITE;
                 }
             }
             report = report + partWork.fail(effectiveSkillLvl);
@@ -7186,7 +7186,7 @@ public class Campaign implements ITechManager {
         } else if (!getCampaignOptions().isDestroyByMargin() &&
                          (partWork.getSkillMin() > (skill.getExperienceLevel() - modePenalty))) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is beyond this tech's skill level");
-        } else if (partWork.getSkillMin() > SkillType.EXP_LEGENDARY) {
+        } else if (partWork.getSkillMin() > SkillType.EXP_ELITE) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is impossible.");
         } else if (!partWork.needsFixing() && !partWork.isSalvaging()) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is not needed.");

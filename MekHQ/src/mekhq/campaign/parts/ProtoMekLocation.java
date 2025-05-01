@@ -57,15 +57,11 @@ import org.w3c.dom.NodeList;
 public class ProtoMekLocation extends Part {
     private static final MMLogger logger = MMLogger.create(ProtoMekLocation.class);
 
-    static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_CLAN).setClanAdvancement(3055,
-                3060,
-                3060)
-                                                          .setClanApproximate(true, false, false)
-                                                          .setPrototypeFactions(F_CSJ)
-                                                          .setProductionFactions(F_CSJ)
-                                                          .setTechRating(RATING_D)
-                                                          .setAvailability(RATING_X, RATING_X, RATING_D, RATING_D)
-                                                          .setStaticTechLevel(SimpleTechLevel.STANDARD);
+    static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_CLAN)
+            .setClanAdvancement(3055, 3060, 3060).setClanApproximate(true, false, false)
+            .setPrototypeFactions(F_CSJ).setProductionFactions(F_CSJ)
+            .setTechRating(RATING_D).setAvailability(RATING_X, RATING_X, RATING_D, RATING_D)
+            .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     // some of these aren't used but may be later for advanced designs (i.e. WoR)
     protected int loc;
@@ -154,10 +150,8 @@ public class ProtoMekLocation extends Part {
         double totalStructureCost = 2400 * getUnitTonnage();
         if (booster) {
             if (null != unit) {
-                totalStructureCost += Math.round(unit.getEntity().getEngine().getRating() *
-                                                       1000 *
-                                                       unit.getEntity().getWeight() *
-                                                       0.025f);
+                totalStructureCost += Math
+                        .round(unit.getEntity().getEngine().getRating() * 1000 * unit.getEntity().getWeight() * 0.025f);
             } else {
                 // FIXME: uggh different costs by engine rating and weight, use a fake rating
                 totalStructureCost += Math.round(75000 * getUnitTonnage() * 0.025f);
@@ -176,11 +170,11 @@ public class ProtoMekLocation extends Part {
 
     @Override
     public boolean isSamePartType(Part part) {
-        return part instanceof ProtoMekLocation &&
-                     getLoc() == ((ProtoMekLocation) part).getLoc() &&
-                     getUnitTonnage() == part.getUnitTonnage() &&
-                     hasBooster() == ((ProtoMekLocation) part).hasBooster() &&
-                     (!isLegs() || forQuad == ((ProtoMekLocation) part).forQuad);
+        return part instanceof ProtoMekLocation
+                && getLoc() == ((ProtoMekLocation) part).getLoc()
+                && getUnitTonnage() == part.getUnitTonnage()
+                && hasBooster() == ((ProtoMekLocation) part).hasBooster()
+                && (!isLegs() || forQuad == ((ProtoMekLocation) part).forQuad);
         // && getStructureType() == ((ProtomekLocation) part).getStructureType();
     }
 
@@ -339,8 +333,8 @@ public class ProtoMekLocation extends Part {
         if (null != unit) {
             blownOff = unit.getEntity().isLocationBlownOff(loc);
             breached = unit.isLocationBreached(loc);
-            percent = ((double) unit.getEntity().getInternalForReal(loc)) /
-                            ((double) unit.getEntity().getOInternal(loc));
+            percent = ((double) unit.getEntity().getInternalForReal(loc))
+                    / ((double) unit.getEntity().getOInternal(loc));
             if (percent <= 0.0) {
                 remove(false);
             }
@@ -485,8 +479,8 @@ public class ProtoMekLocation extends Part {
         }
         if (isSalvaging()) {
             // check for armor
-            if (unit.getEntity().getArmorForReal(loc, false) > 0 ||
-                      (unit.getEntity().hasRearArmor(loc) && unit.getEntity().getArmorForReal(loc, true) > 0)) {
+            if (unit.getEntity().getArmorForReal(loc, false) > 0
+                    || (unit.getEntity().hasRearArmor(loc) && unit.getEntity().getArmorForReal(loc, true) > 0)) {
                 return "must salvage armor in this location first";
             }
             // you can only salvage a location that has nothing left on it
@@ -502,27 +496,23 @@ public class ProtoMekLocation extends Part {
                 if (slot.getType() == CriticalSlot.TYPE_SYSTEM) {
                     if (slot.isRepairable()) {
                         if (systemRepairable > 0) {
-                            return "Repairable parts in " +
-                                         unit.getEntity().getLocationName(loc) +
-                                         " must be salvaged or scrapped first.";
+                            return "Repairable parts in " + unit.getEntity().getLocationName(loc)
+                                    + " must be salvaged or scrapped first.";
                         } else {
                             systemRepairable++;
                         }
                     }
                 } else if (slot.isRepairable()) {
-                    return "Repairable parts in " +
-                                 unit.getEntity().getLocationName(loc) +
-                                 " must be salvaged or scrapped first.";
+                    return "Repairable parts in " + unit.getEntity().getLocationName(loc)
+                            + " must be salvaged or scrapped first.";
                 }
             }
             // protomeks only have system stuff in the crits, so we need to also
             // check for mounted equipment separately
             for (Mounted<?> m : unit.getEntity().getEquipment()) {
                 if (m.isRepairable() && (m.getLocation() == loc || m.getSecondLocation() == loc)) {
-                    return "Repairable parts in " +
-                                 unit.getEntity().getLocationName(loc) +
-                                 " must be salvaged or scrapped first." +
-                                 m.getName();
+                    return "Repairable parts in " + unit.getEntity().getLocationName(loc)
+                            + " must be salvaged or scrapped first." + m.getName();
                 }
             }
         }
@@ -542,8 +532,8 @@ public class ProtoMekLocation extends Part {
             return "ProtoMek Torsos cannot be scrapped";
         }
         // Check for armor
-        if (unit.getEntity().getArmor(loc, false) > 0 ||
-                  (unit.getEntity().hasRearArmor(loc) && unit.getEntity().getArmor(loc, true) > 0)) {
+        if (unit.getEntity().getArmor(loc, false) > 0
+                || (unit.getEntity().hasRearArmor(loc) && unit.getEntity().getArmor(loc, true) > 0)) {
             return "You must first remove the armor from this location before you scrap it";
         }
         // you can only salvage a location that has nothing left on it
@@ -559,17 +549,15 @@ public class ProtoMekLocation extends Part {
             if (slot.getType() == CriticalSlot.TYPE_SYSTEM) {
                 if (slot.isRepairable()) {
                     if (systemRepairable > 0) {
-                        return "Repairable parts in " +
-                                     unit.getEntity().getLocationName(loc) +
-                                     " must be salvaged or scrapped first.";
+                        return "Repairable parts in " + unit.getEntity().getLocationName(loc)
+                                + " must be salvaged or scrapped first.";
                     } else {
                         systemRepairable++;
                     }
                 }
             } else if (slot.isRepairable()) {
-                return "Repairable parts in " +
-                             unit.getEntity().getLocationName(loc) +
-                             " must be salvaged or scrapped first.";
+                return "Repairable parts in " + unit.getEntity().getLocationName(loc)
+                        + " must be salvaged or scrapped first.";
             }
         }
         // ProtoMeks only have system stuff in the crits, so we need to also check for
@@ -577,10 +565,8 @@ public class ProtoMekLocation extends Part {
         // equipment separately
         for (Mounted<?> m : unit.getEntity().getEquipment()) {
             if (m.isRepairable() && (m.getLocation() == loc || m.getSecondLocation() == loc)) {
-                return "Repairable parts in " +
-                             unit.getEntity().getLocationName(loc) +
-                             " must be salvaged or scrapped first." +
-                             m.getName();
+                return "Repairable parts in " + unit.getEntity().getLocationName(loc)
+                        + " must be salvaged or scrapped first." + m.getName();
             }
         }
         return null;
@@ -603,26 +589,37 @@ public class ProtoMekLocation extends Part {
             return super.getDesc();
         }
         StringBuilder toReturn = new StringBuilder();
-        toReturn.append("<html><b>").append(isBlownOff() ? "Re-attach " : "Seal ").append(getName());
-        if (isUnitTonnageMatters()) {
-            toReturn.append(" (").append(getUnitTonnage()).append(" ton)");
+        toReturn.append("<html><b>")
+            .append(isBlownOff() ? "Re-attach " : "Seal ")
+            .append(getName());
+        if(isUnitTonnageMatters()) {
+            toReturn.append(" (")
+                .append(getUnitTonnage())
+                .append(" ton)");
         }
         if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
             toReturn.append(" - ")
-                  .append(ReportingUtilities.messageSurroundedBySpanWithColor(SkillType.getExperienceLevelColor(
-                        getSkillMin()), SkillType.getExperienceLevelName(getSkillMin()) + "+"));
+            .append(ReportingUtilities.messageSurroundedBySpanWithColor(
+                SkillType.getExperienceLevelColor(getSkillMin()),
+                SkillType.getExperienceLevelName(getSkillMin()) + "+"));
         }
-        toReturn.append("</b><br/>").append(getDetails()).append("<br/>");
+        toReturn.append("</b><br/>")
+            .append(getDetails())
+            .append("<br/>");
 
-        if (getSkillMin() <= SkillType.EXP_LEGENDARY) {
-            toReturn.append(getTimeLeft()).append(" minutes").append(null != getTech() ? " (scheduled)" : "");
-            if (isBlownOff()) {
-                toReturn.append(" <b>TN:</b> ")
-                      .append(getAllMods(null).getValue() > -1 ? "+" : "")
-                      .append(getAllMods(null).getValueAsString());
-            }
+        if (getSkillMin() <= SkillType.EXP_ELITE) {
+            toReturn.append(getTimeLeft())
+                .append(" minutes")
+                .append(null != getTech() ? " (scheduled)" : "");
+                if(isBlownOff()) {
+                    toReturn.append(" <b>TN:</b> ")
+                        .append(getAllMods(null).getValue() > -1 ? "+" : "")
+                        .append(getAllMods(null).getValueAsString());
+                }
             if (getMode() != WorkTime.NORMAL) {
-                toReturn.append(" <i>").append(getCurrentModeName()).append("</i>");
+                toReturn.append(" <i>")
+                    .append(getCurrentModeName())
+                    .append( "</i>");
             }
         }
         toReturn.append("</html>");
