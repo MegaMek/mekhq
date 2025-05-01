@@ -200,7 +200,8 @@ public class TrainingCombatTeams {
                     Skill traineeSkill = trainee.getSkill(commanderSkill);
 
                     if (traineeSkill != null) {
-                        int traineeExperienceLevel = traineeSkill.getExperienceLevel();
+                        int skillLevel = traineeSkill.getLevel();
+                        int traineeExperienceLevel = traineeSkill.getType().getExperienceLevel(skillLevel);
 
                         if (traineeExperienceLevel > EXP_GREEN) {
                             continue;
@@ -263,10 +264,12 @@ public class TrainingCombatTeams {
             }
 
             // The lowest skill is improved first
-            skillsBeingTrained.sort(Comparator.comparingInt(Skill::getExperienceLevel));
+            skillsBeingTrained.sort(Comparator.comparingInt(Skill::getLevel));
             Skill targetSkill = skillsBeingTrained.get(0);
             // The +1 is to account for the next experience level to be gained
-            int currentExperienceLevel = targetSkill.getExperienceLevel() + 1;
+
+            int currentSkillLevel = targetSkill.getLevel();
+            int currentExperienceLevel = targetSkill.getType().getExperienceLevel(currentSkillLevel + 1);
 
             int perExperienceLevelMultiplier = EDUCATION_TIME_MULTIPLIER;
             double experienceMultiplier = campaignOptions.getXpCostMultiplier();
@@ -279,8 +282,7 @@ public class TrainingCombatTeams {
             int educationTimeReduction = currentExperienceLevel * perExperienceLevelMultiplier;
             if (newEducationTime >= educationTimeReduction) {
                 trainee.setEduEducationTime(newEducationTime - educationTimeReduction);
-                targetSkill.setLevel(targetSkill.getLevel() + 1);
-
+                targetSkill.setLevel(currentSkillLevel + 1);
 
                 campaign.addReport(String.format(resources.getString("learnedNewSkill.text"),
                       commander.getFullTitle(),
@@ -324,12 +326,12 @@ public class TrainingCombatTeams {
 
                 if (skill != null) {
                     if (!educatorSkills.containsKey(professionSkill)) {
-                        educatorSkills.put(professionSkill, skill.getExperienceLevel());
+                        educatorSkills.put(professionSkill, skill.getLevel());
                     } else {
                         int educatorSkillLevel = educatorSkills.get(professionSkill);
 
-                        if (educatorSkillLevel < skill.getExperienceLevel()) {
-                            educatorSkills.put(professionSkill, skill.getExperienceLevel());
+                        if (educatorSkillLevel < skill.getLevel()) {
+                            educatorSkills.put(professionSkill, skill.getLevel());
                         }
                     }
                 }

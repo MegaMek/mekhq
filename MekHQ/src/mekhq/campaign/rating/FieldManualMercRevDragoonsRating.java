@@ -299,29 +299,24 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
 
     private static int getSupportHours(int skillLevel) {
-        switch (skillLevel) {
-            case SkillType.EXP_ULTRA_GREEN:
-                return 20;
-            case SkillType.EXP_GREEN:
-                return 30;
-            case SkillType.EXP_REGULAR:
-                return 40;
-            case SkillType.EXP_VETERAN:
-                return 45;
-            default:
-                return 50;
-        }
+        return switch (skillLevel) {
+            case SkillType.EXP_ULTRA_GREEN -> 20;
+            case SkillType.EXP_GREEN -> 30;
+            case SkillType.EXP_REGULAR -> 40;
+            case SkillType.EXP_VETERAN -> 45;
+            default -> 50;
+        };
     }
 
-    private void updateTechSupportHours(Person p) {
-        String[] techSkills = new String[] { SkillType.S_TECH_MEK, SkillType.S_TECH_AERO, SkillType.S_TECH_BA,
+    private void updateTechSupportHours(Person tech) {
+        String[] skillNames = new String[] { SkillType.S_TECH_MEK, SkillType.S_TECH_AERO, SkillType.S_TECH_BA,
                                              SkillType.S_TECH_VESSEL, SkillType.S_TECH_MECHANIC };
 
         // Get the highest tech skill this person has.
         int highestSkill = SkillType.EXP_ULTRA_GREEN;
-        for (String s : techSkills) {
-            if (p.hasSkill(s)) {
-                int rank = p.getSkill(s).getExperienceLevel();
+        for (String skillname : skillNames) {
+            if (tech.hasSkill(skillname)) {
+                int rank = tech.getSkill(skillname).getExperienceLevel(tech.getOptions(), tech.getATOWAttributes());
                 if (rank > highestSkill) {
                     highestSkill = rank;
                 }
@@ -330,39 +325,40 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
 
         // Get the number of support hours this person contributes.
         int hours = getSupportHours(highestSkill);
-        if (p.getSecondaryRole().isTechSecondary()) {
+        if (tech.getSecondaryRole().isTechSecondary()) {
             hours = (int) Math.floor(hours / 2.0);
         }
 
-        logger.debug("Person, " + p.getFullTitle() + ", provides " + hours + " tech support hours.");
+        logger.debug("Person, {} provides {} tech support hours.", tech.getFullTitle(), hours);
         techSupportHours += hours;
     }
 
-    private void updateMedicalSupportHours(Person p) {
-        Skill doctorSkill = p.getSkill(SkillType.S_DOCTOR);
+    private void updateMedicalSupportHours(Person doctor) {
+        Skill doctorSkill = doctor.getSkill(SkillType.S_DOCTOR);
         if (doctorSkill == null) {
             return;
         }
-        int hours = getSupportHours(doctorSkill.getExperienceLevel());
-        if (p.getSecondaryRole().isDoctor()) {
+        int hours = getSupportHours(doctorSkill.getExperienceLevel(doctor.getOptions(), doctor.getATOWAttributes()));
+        if (doctor.getSecondaryRole().isDoctor()) {
             hours = (int) Math.floor(hours / 2.0);
         }
 
-        logger.debug("Person, " + p.getFullTitle() + " provides " + hours + " medical support hours.");
+        logger.debug("Person, {} provides {} medical support hours.", doctor.getFullTitle(), hours);
         medSupportHours += hours;
     }
 
-    private void updateAdministrativeSupportHours(Person p) {
-        Skill adminSkill = p.getSkill(SkillType.S_ADMIN);
+    private void updateAdministrativeSupportHours(Person administrator) {
+        Skill adminSkill = administrator.getSkill(SkillType.S_ADMIN);
         if (adminSkill == null) {
             return;
         }
-        int hours = getSupportHours(adminSkill.getExperienceLevel());
-        if (p.getSecondaryRole().isAdministrator()) {
+        int hours = getSupportHours(adminSkill.getExperienceLevel(administrator.getOptions(),
+              administrator.getATOWAttributes()));
+        if (administrator.getSecondaryRole().isAdministrator()) {
             hours = (int) Math.floor(hours / 2.0);
         }
 
-        logger.debug("Person, " + p.getFullTitle() + ", provides " + hours + " admin support hours.");
+        logger.debug("Person, {}, provides {} admin support hours.", administrator.getFullTitle(), hours);
         adminSupportHours += hours;
     }
 

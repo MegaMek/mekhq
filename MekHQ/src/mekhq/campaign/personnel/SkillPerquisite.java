@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel;
 
@@ -34,6 +39,7 @@ import java.util.Hashtable;
 
 import megamek.common.UnitType;
 import megamek.logging.MMLogger;
+import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.Skills;
 import mekhq.utilities.MHQXMLUtility;
@@ -87,10 +93,26 @@ public class SkillPerquisite {
         return qualifies(p.getSkills());
     }
 
-    public boolean qualifies(Skills s) {
+    /**
+     * Determines if the given {@link Skills} object qualifies based on the requirements in this object's skill set.
+     *
+     * <p>For each skill name in the required skill set, this method checks if the {@link Skills} object contains that
+     * skill.
+     * If it does, it retrieves the associated {@link SkillType}, calculates the experience level from the skill level,
+     * and compares it to the required minimum level for that skill. If any skill meets or exceeds the required
+     * experience level, this method returns {@code true}. If none do, it returns {@code false}.</p>
+     *
+     * @param skills the {@link Skills} object to evaluate
+     *
+     * @return {@code true} if the provided skills meet at least one required skill level; {@code false} otherwise
+     */
+    public boolean qualifies(Skills skills) {
         for (String skillName : skillSet.keySet()) {
-            if (s.hasSkill(skillName)) {
-                if (s.getSkill(skillName).getExperienceLevel() >= skillSet.get(skillName)) {
+            Skill skill = skills.getSkill(skillName);
+            if (skill != null) {
+                SkillType skillType = SkillType.getType(skillName);
+                int skillLevel = skill.getLevel();
+                if (skillType.getExperienceLevel(skillLevel) >= skillSet.get(skillName)) {
                     return true;
                 }
             }

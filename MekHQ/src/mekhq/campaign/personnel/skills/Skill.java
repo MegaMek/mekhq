@@ -529,12 +529,65 @@ public class Skill {
     }
 
     /**
-     * Calculates the total skill value by summing the level, bonus, and aging modifier.
-     *
-     * @return The total skill value.
+     * @deprecated use {@link #getTotalSkillLevel(PersonnelOptions, Attributes, int)} instead.
      */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public int getTotalSkillLevel() {
         return level + bonus + agingModifier;
+    }
+
+    /**
+     * Calculates the total skill level for a character, factoring in the level, bonuses, aging modifiers, SPA
+     * modifiers, and attribute modifiers.
+     *
+     * <p>The total skill level is determined by summing:</p>
+     * <ul>
+     *   <li>The base level of the skill, any additional bonuses, and any modifiers due to aging.</li>
+     *   <li>SPA modifiers based on the provided character options and reputation.</li>
+     *   <li>Attribute-based modifiers relevant to the skill type derived from the character's attributes.</li>
+     * </ul>
+     *
+     * @param characterOptions the {@link PersonnelOptions} defining character-specific modifiers, including SPAs
+     * @param attributes       the {@link Attributes} representing the character's current attribute values
+     * @param reputation       a numerical modifier for reputation affecting skill level (positive or negative)
+     *
+     * @return the complete skill level after all relevant modifiers have been applied
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public int getTotalSkillLevel(PersonnelOptions characterOptions, Attributes attributes, int reputation) {
+        int baseValue = level + bonus + agingModifier;
+
+        int spaModifiers = getSPAModifiers(characterOptions, reputation);
+        int attributeModifiers = getTotalAttributeModifier(new TargetRoll(), attributes, type);
+
+        return baseValue + spaModifiers + attributeModifiers;
+    }
+
+    /**
+     * Calculates the total skill level for a character using the base level, bonuses, aging modifiers, SPA modifiers,
+     * and attribute modifiers. In this version, reputation is not considered.
+     *
+     * <p>The computation sums:</p>
+     * <ul>
+     *   <li>The base skill level, any additional bonuses, and modifiers due to aging.</li>
+     *   <li>SPA modifiers, determined from the given character options (with a reputation value of zero).</li>
+     *   <li>Attribute-based modifiers for the skill type, derived from the provided attributes.</li>
+     * </ul>
+     *
+     * @param characterOptions the {@link PersonnelOptions} defining character-specific modifiers, including SPAs
+     * @param attributes       the {@link Attributes} representing the character's current attribute values
+     *
+     * @return the complete skill level after all relevant modifiers (excluding reputation) have been applied
+     */
+    public int getTotalSkillLevel(PersonnelOptions characterOptions, Attributes attributes) {
+        int baseValue = level + bonus + agingModifier;
+
+        int spaModifiers = getSPAModifiers(characterOptions, 0);
+        int attributeModifiers = getTotalAttributeModifier(new TargetRoll(), attributes, type);
+
+        return baseValue + spaModifiers + attributeModifiers;
     }
 
     public void improve() {
@@ -571,14 +624,100 @@ public class Skill {
         return cost;
     }
 
+    /**
+     * @deprecated use {@link #getSkillLevel(PersonnelOptions, Attributes, int)} instead.
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public SkillLevel getSkillLevel() {
-        // Returns the SkillLevel Enum value equivalent to the Experience Level Magic
-        // Number
-        return Skills.SKILL_LEVELS[getExperienceLevel() + 1];
+        return getSkillLevel(new PersonnelOptions(), new Attributes(), 0);
     }
 
+    /**
+     * Determines the {@link SkillLevel} of a character based on their options, attributes, and reputation.
+     *
+     * <p>This method calculates the experience level index using the provided {@code characterOptions},
+     * {@code attributes}, and {@code reputation}, and returns the corresponding {@link SkillLevel} from the
+     * {@link Skills#SKILL_LEVELS} array. The returned value represents the skill proficiency tier for the given
+     * parameters.</p>
+     *
+     * @param characterOptions the SPAs specific to the character
+     * @param attributes       the character's attributes used in skill evaluation
+     * @param reputation       the reputation value influencing skill evaluation
+     *
+     * @return the corresponding {@link SkillLevel} for the evaluated experience level
+     */
+    public SkillLevel getSkillLevel(PersonnelOptions characterOptions, Attributes attributes, int reputation) {
+        // Returns the SkillLevel Enum value equivalent to the Experience Level Magic Number
+        return Skills.SKILL_LEVELS[getExperienceLevel(characterOptions, attributes, reputation) + 1];
+    }
+
+    /**
+     * Determines the {@link SkillLevel} of a character based on their options and attributes.
+     *
+     * <p>This method calculates the experience level index using the provided {@code characterOptions} and
+     * {@code attributes},
+     * and returns the corresponding {@link SkillLevel} from the {@code Skills.SKILL_LEVELS} array. The returned value
+     * represents the skill proficiency tier for the given parameters.</p>
+     *
+     * @param characterOptions the SPAs specific to the character
+     * @param attributes       the character's attributes used in skill evaluation
+     *
+     * @return the corresponding {@link SkillLevel} for the evaluated experience level
+     */
+    public SkillLevel getSkillLevel(PersonnelOptions characterOptions, Attributes attributes) {
+        // Returns the SkillLevel Enum value equivalent to the Experience Level Magic Number
+        return getSkillLevel(characterOptions, attributes, 0);
+    }
+
+    /**
+     * @deprecated use {@link #getExperienceLevel(PersonnelOptions, Attributes, int)} or
+     *       {@link #getExperienceLevel(PersonnelOptions, Attributes)} instead.
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public int getExperienceLevel() {
-        return type.getExperienceLevel(getTotalSkillLevel());
+        return type.getExperienceLevel(getTotalSkillLevel(new PersonnelOptions(), new Attributes(), 0));
+    }
+
+    /**
+     * Calculates and returns the experience level for this skill based on the given personnel options, attributes, and
+     * reputation.
+     *
+     * <p>This method uses the specified character's options, attributes, and reputation to
+     * determine the total skill level and then delegates to the skill type to derive the corresponding experience
+     * level.</p>
+     *
+     * @param characterOptions the {@link PersonnelOptions} representing character-specific options
+     * @param attributes       the {@link Attributes} possessed by the character
+     * @param reputation       the reputation value to factor into the skill calculation
+     *
+     * @return the computed experience level as determined by the underlying skill type
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public int getExperienceLevel(PersonnelOptions characterOptions, Attributes attributes, int reputation) {
+        int totalSkillLevel = getTotalSkillLevel(characterOptions, attributes, reputation);
+        return type.getExperienceLevel(totalSkillLevel);
+    }
+
+    /**
+     * Calculates and returns the experience level for this skill based on the given personnel options and attributes,
+     * ignoring reputation.
+     *
+     * <p><b>Usage:</b> This is a convenience method that assumes a reputation value of zero. It should only be used
+     * in situations where we are 100% sure Reputation has no impact on the skill level.</p>
+     *
+     * @param characterOptions the {@link PersonnelOptions} representing character-specific options
+     * @param attributes       the {@link Attributes} possessed by the character
+     *
+     * @return the computed experience level as determined by the underlying skill type
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public int getExperienceLevel(PersonnelOptions characterOptions, Attributes attributes) {
+        int totalSkillLevel = getTotalSkillLevel(characterOptions, attributes);
+        return type.getExperienceLevel(totalSkillLevel);
     }
 
     /**
@@ -623,17 +762,17 @@ public class Skill {
         }
     }
 
-    //    /**
-//     * @deprecated use {@link #toString(PersonnelOptions, Attributes, int)} instead
-    //     */
-    //    @Deprecated(since = "0.50.06", forRemoval = true)
-    //    public String toString(PersonnelOptions options, int reputation) {
-    //        if (isCountUp()) {
-    //            return "+" + getFinalSkillValue(options, new Attributes(), reputation);
-    //        } else {
-    //            return getFinalSkillValue(options, new Attributes(), reputation) + "+";
-    //        }
-    //    }
+    /**
+     * * @deprecated use {@link #toString(PersonnelOptions, Attributes, int)} instead
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
+    public String toString(PersonnelOptions options, int reputation) {
+        if (isCountUp()) {
+            return "+" + getFinalSkillValue(options, new Attributes(), reputation);
+        } else {
+            return getFinalSkillValue(options, new Attributes(), reputation) + "+";
+        }
+    }
 
     public void writeToXML(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "skill");

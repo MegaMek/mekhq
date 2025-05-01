@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.skills;
 
@@ -705,14 +710,32 @@ public class SkillType {
                      name.equals(S_ARTILLERY);
     }
 
-    public int getExperienceLevel(int lvl) {
-        if (lvl >= eliteLvl) {
+    /**
+     * Returns the experience level constant that corresponds to the specified numeric level.
+     *
+     * <p>The provided {@code level} is compared to predefined thresholds for "elite", "veteran", "regular", and
+     * "green".
+     * The method returns the appropriate constant for the highest matching experience tier:</p>
+     * <ul>
+     *   <li>{@link #EXP_ELITE} if level is greater than or equal to {@code eliteLvl}</li>
+     *   <li>{@link #EXP_VETERAN} if level is greater than or equal to {@code vetLvl}</li>
+     *   <li>{@link #EXP_REGULAR} if level is greater than or equal to {@code regLvl}</li>
+     *   <li>{@link #EXP_GREEN} if level is greater than or equal to {@code greenLvl}</li>
+     *   <li>{@link #EXP_ULTRA_GREEN} otherwise</li>
+     * </ul>
+     *
+     * @param level the skill or experience level to evaluate
+     *
+     * @return the corresponding experience tier constant
+     */
+    public int getExperienceLevel(int level) {
+        if (level >= eliteLvl) {
             return EXP_ELITE;
-        } else if (lvl >= vetLvl) {
+        } else if (level >= vetLvl) {
             return EXP_VETERAN;
-        } else if (lvl >= regLvl) {
+        } else if (level >= regLvl) {
             return EXP_REGULAR;
-        } else if (lvl >= greenLvl) {
+        } else if (level >= greenLvl) {
             return EXP_GREEN;
         } else {
             return EXP_ULTRA_GREEN;

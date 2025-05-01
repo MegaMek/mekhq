@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.market.contractMarket;
 
@@ -41,6 +46,7 @@ import static mekhq.campaign.mission.AtBContract.getEffectiveNumUnits;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEG;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Set;
@@ -58,6 +64,8 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
@@ -633,25 +641,51 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         Person adminCommand = campaign.getSeniorAdminPerson(COMMAND);
         Person adminTransport = campaign.getSeniorAdminPerson(TRANSPORT);
         Person adminLogistics = campaign.getSeniorAdminPerson(LOGISTICS);
+
+        boolean isUseAgeEffects = campaign.getCampaignOptions().isUseAgeEffects();
+        boolean isClanCampaign = campaign.isClanCampaign();
+        LocalDate today = campaign.getLocalDate();
+
         int adminCommandExp = SkillType.EXP_NONE;
         if (adminCommand != null) {
             Skill skill = adminCommand.getSkill(S_NEG);
             if (skill != null) {
-                adminCommandExp = skill.getExperienceLevel();
+                PersonnelOptions options = adminCommand.getOptions();
+                Attributes attributes = adminCommand.getATOWAttributes();
+                int adjustedReputation = adminCommand.getAdjustedReputation(isUseAgeEffects,
+                        isClanCampaign,
+                        today,
+                        adminCommand.getRankLevel());
+
+                adminCommandExp = skill.getExperienceLevel(options, attributes, adjustedReputation);
             }
         }
         int adminTransportExp = SkillType.EXP_NONE;
         if (adminTransport != null) {
             Skill skill = adminTransport.getSkill(S_NEG);
             if (skill != null) {
-                adminTransportExp = skill.getExperienceLevel();
+                PersonnelOptions options = adminTransport.getOptions();
+                Attributes attributes = adminTransport.getATOWAttributes();
+                int adjustedReputation = adminTransport.getAdjustedReputation(isUseAgeEffects,
+                        isClanCampaign,
+                        today,
+                        adminTransport.getRankLevel());
+
+                adminTransportExp = skill.getExperienceLevel(options, attributes, adjustedReputation);
             }
         }
         int adminLogisticsExp = SkillType.EXP_NONE;
         if (adminLogistics != null) {
             Skill skill = adminLogistics.getSkill(S_NEG);
             if (skill != null) {
-                adminLogisticsExp = skill.getExperienceLevel();
+                PersonnelOptions options = adminLogistics.getOptions();
+                Attributes attributes = adminLogistics.getATOWAttributes();
+                int adjustedReputation = adminLogistics.getAdjustedReputation(isUseAgeEffects,
+                        isClanCampaign,
+                        today,
+                        adminLogistics.getRankLevel());
+
+                adminLogisticsExp = skill.getExperienceLevel(options, attributes, adjustedReputation);
             }
         }
 

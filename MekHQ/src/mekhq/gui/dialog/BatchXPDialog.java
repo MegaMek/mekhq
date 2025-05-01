@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -373,11 +378,18 @@ public final class BatchXPDialog extends JDialog {
                 // Improve the skill and deduce the cost
                 person.improveSkill(skillName);
                 person.spendXP(cost);
+
+                int adjustedReputation = person.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
+                      campaign.isClanCampaign(),
+                      campaign.getLocalDate(),
+                      person.getRankLevel());
+
                 PerformanceLogger.improvedSkill(campaign,
                       person,
                       campaign.getLocalDate(),
                       person.getSkill(skillName).getType().getName(),
-                      person.getSkill(skillName).toString());
+                      person.getSkill(skillName)
+                            .toString(person.getOptions(), person.getATOWAttributes(), adjustedReputation));
                 campaign.personUpdated(person);
             }
 
