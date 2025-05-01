@@ -1692,10 +1692,10 @@ public class Refit extends Part implements IAcquisitionWork {
             part.updateConditionFromPart();
         }
 
-        C3Util.copyC3Networks(oldEntity, oldUnit.getEntity());
         oldUnit.getEntity().setExternalIdAsString(oldUnit.getId().toString());
         getCampaign().clearGameData(oldUnit.getEntity());
         getCampaign().reloadGameEntities();
+        C3Util.copyC3Networks(oldEntity, oldUnit.getEntity());
 
         // reload any soldiers
         for (Person soldier : soldiers) {
