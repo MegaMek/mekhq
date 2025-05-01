@@ -56,7 +56,7 @@ public class ProtoMekArmor extends Armor {
 
     @Override
     public ProtoMekArmor clone() {
-        ProtoMekArmor clone = new ProtoMekArmor(0, type, 0, amount, clan, campaign);
+        ProtoMekArmor clone = new ProtoMekArmor(0, getType(), getAmount(), getLocation(), clan, campaign);
         clone.copyBaseData(this);
         return clone;
     }
