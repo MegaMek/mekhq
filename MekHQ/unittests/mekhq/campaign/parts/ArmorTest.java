@@ -71,10 +71,17 @@ public class ArmorTest {
 
     /**
      * For best results, don't use these directly, clone them first and use the clones!
+     *
      * @return
      */
     public static Stream<Armor> armorParameter() {
-        return Stream.of(new Armor(1, EquipmentType.T_ARMOR_STANDARD, ARMOR_AMOUNT, Entity.LOC_NONE, false, false, mockCampaign),
+        return Stream.of(new Armor(1,
+                    EquipmentType.T_ARMOR_STANDARD,
+                    ARMOR_AMOUNT,
+                    Entity.LOC_NONE,
+                    false,
+                    false,
+                    mockCampaign),
               new ProtoMekArmor(1, EquipmentType.T_ARMOR_STANDARD, ARMOR_AMOUNT, Entity.LOC_NONE, false, mockCampaign),
               new BaArmor(1, ARMOR_AMOUNT, EquipmentType.T_ARMOR_STANDARD, Entity.LOC_NONE, false, mockCampaign),
               new SVArmor(1, EquipmentType.T_ARMOR_STANDARD, ARMOR_AMOUNT, Entity.LOC_NONE, mockCampaign));
