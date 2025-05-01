@@ -171,7 +171,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.RandomDependents;
 import mekhq.campaign.personnel.SpecialAbility;
-import mekhq.campaign.personnel.medical.MedicalController;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.death.RandomDeath;
 import mekhq.campaign.personnel.divorce.AbstractDivorce;
@@ -196,6 +195,7 @@ import mekhq.campaign.personnel.lifeEvents.NewYearsDayAnnouncement;
 import mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.marriage.DisabledRandomMarriage;
+import mekhq.campaign.personnel.medical.MedicalController;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -8286,7 +8286,7 @@ public class Campaign implements ITechManager {
         getHangar().forEachUnit(u -> {
             Entity en = u.getEntity();
             if (null != en) {
-                game.addEntity(en);
+                game.addEntity(en, false);
             }
         });
     }
