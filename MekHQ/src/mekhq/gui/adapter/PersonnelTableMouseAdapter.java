@@ -38,12 +38,6 @@ import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.finances.enums.TransactionType.MEDICAL_EXPENSES;
-import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.REPLACEMENT_LIMB_COST_ARM_TYPE_5;
-import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.REPLACEMENT_LIMB_COST_FOOT_TYPE_5;
-import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.REPLACEMENT_LIMB_COST_HAND_TYPE_5;
-import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.REPLACEMENT_LIMB_COST_LEG_TYPE_5;
-import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.REPLACEMENT_LIMB_MINIMUM_SKILL_REQUIRED_TYPES_3_4_5;
-import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.REPLACEMENT_LIMB_RECOVERY;
 import static mekhq.campaign.personnel.DiscretionarySpending.getExpenditure;
 import static mekhq.campaign.personnel.DiscretionarySpending.getExpenditureExhaustedReportMessage;
 import static mekhq.campaign.personnel.DiscretionarySpending.performExtremeExpenditure;
@@ -53,10 +47,17 @@ import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.EducationController.makeEnrollmentCheck;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.statusValidator;
 import static mekhq.campaign.personnel.enums.education.EducationLevel.DOCTORATE;
+import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.REPLACEMENT_LIMB_COST_ARM_TYPE_5;
+import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.REPLACEMENT_LIMB_COST_FOOT_TYPE_5;
+import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.REPLACEMENT_LIMB_COST_HAND_TYPE_5;
+import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.REPLACEMENT_LIMB_COST_LEG_TYPE_5;
+import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.REPLACEMENT_LIMB_MINIMUM_SKILL_REQUIRED_TYPES_3_4_5;
+import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.REPLACEMENT_LIMB_RECOVERY;
 import static mekhq.campaign.personnel.skills.Attributes.ATTRIBUTE_IMPROVEMENT_COST;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.SkillType.S_DOCTOR;
+import static mekhq.campaign.personnel.skills.SkillType.getType;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.WILLPOWER;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.processAdHocExecution;
@@ -100,7 +101,6 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.PerformanceLogger;
-import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.AwardsFactory;
 import mekhq.campaign.personnel.BodyLocation;
@@ -128,6 +128,7 @@ import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.personnel.generator.AbstractSkillGenerator;
 import mekhq.campaign.personnel.generator.DefaultSkillGenerator;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
+import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -136,6 +137,7 @@ import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
+import mekhq.campaign.personnel.skills.enums.SkillSubType;
 import mekhq.campaign.randomEvents.personalities.PersonalityController;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
@@ -888,7 +890,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
 
                 // clear the old parents
-                List<Person> originalParents = orphanGenealogy.getParents();
+                List<Person> originalParents = new ArrayList<>(orphanGenealogy.getParents());
                 for (Person parent : originalParents) {
                     orphanGenealogy.removeFamilyMember(FamilialRelationshipType.PARENT, parent);
                 }
@@ -2856,31 +2858,115 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
 
             JMenu currentMenu = new JMenu(resources.getString("spendOnCurrentSkills.text"));
-            JMenu newMenu = new JMenu(resources.getString("spendOnNewSkills.text"));
-            for (int i = 0; i < SkillType.getSkillList().length; i++) {
-                String type = SkillType.getSkillList()[i];
 
-                int cost = person.getCostToImprove(type, isUseReasoningMultiplier);
+            JMenu combatGunnerySkillsCurrent = new JMenu(resources.getString("combatGunnerySkills.text"));
+            currentMenu.add(combatGunnerySkillsCurrent);
+
+            JMenu combatPilotingSkillsCurrent = new JMenu(resources.getString("combatPilotingSkills.text"));
+            currentMenu.add(combatPilotingSkillsCurrent);
+
+            JMenu supportSkillsCurrent = new JMenu(resources.getString("supportSkills.text"));
+            currentMenu.add(supportSkillsCurrent);
+            JMenu supportSkillsCommandCurrent = new JMenu(resources.getString("supportSkills.command"));
+            supportSkillsCurrent.add(supportSkillsCommandCurrent);
+
+            JMenu roleplaySkillsCurrent = new JMenu(resources.getString("roleplaySkills.text"));
+            currentMenu.add(roleplaySkillsCurrent);
+            JMenu roleplaySkillsArtCurrent = new JMenu(resources.getString("roleplaySkills.art"));
+            roleplaySkillsCurrent.add(roleplaySkillsArtCurrent);
+            JMenu roleplaySkillsInterestCurrent = new JMenu(resources.getString("roleplaySkills.interest"));
+            roleplaySkillsCurrent.add(roleplaySkillsInterestCurrent);
+            JMenu roleplaySkillsScienceCurrent = new JMenu(resources.getString("roleplaySkills.science"));
+            roleplaySkillsCurrent.add(roleplaySkillsScienceCurrent);
+            JMenu roleplaySkillsSecurityCurrent = new JMenu(resources.getString("roleplaySkills.security"));
+            roleplaySkillsCurrent.add(roleplaySkillsSecurityCurrent);
+
+            JMenu newSkillsMenu = new JMenu(resources.getString("spendOnNewSkills.text"));
+
+            JMenu combatGunnerySkillsNew = new JMenu(resources.getString("combatGunnerySkills.text"));
+            newSkillsMenu.add(combatGunnerySkillsNew);
+
+            JMenu combatPilotingSkillsNew = new JMenu(resources.getString("combatPilotingSkills.text"));
+            newSkillsMenu.add(combatPilotingSkillsNew);
+
+            JMenu supportSkillsNew = new JMenu(resources.getString("supportSkills.text"));
+            newSkillsMenu.add(supportSkillsNew);
+            JMenu supportSkillsCommandNew = new JMenu(resources.getString("supportSkills.command"));
+            supportSkillsNew.add(supportSkillsCommandNew);
+
+            JMenu roleplaySkillsNew = new JMenu(resources.getString("roleplaySkills.text"));
+            newSkillsMenu.add(roleplaySkillsNew);
+            JMenu roleplaySkillsArtNew = new JMenu(resources.getString("roleplaySkills.art"));
+            roleplaySkillsNew.add(roleplaySkillsArtNew);
+            JMenu roleplaySkillsInterestNew = new JMenu(resources.getString("roleplaySkills.interest"));
+            roleplaySkillsNew.add(roleplaySkillsInterestNew);
+            JMenu roleplaySkillsScienceNew = new JMenu(resources.getString("roleplaySkills.science"));
+            roleplaySkillsNew.add(roleplaySkillsScienceNew);
+            JMenu roleplaySkillsSecurityNew = new JMenu(resources.getString("roleplaySkills.security"));
+            roleplaySkillsNew.add(roleplaySkillsSecurityNew);
+
+            for (int i = 0; i < SkillType.getSkillList().length; i++) {
+                String typeName = SkillType.getSkillList()[i];
+
+                int cost = person.getCostToImprove(typeName, isUseReasoningMultiplier);
                 cost = (int) round(cost * xpCostMultiplier);
 
                 if (cost >= 0) {
-                    String desc = String.format(resources.getString("skillDesc.format"), type, cost);
+                    String desc = String.format(resources.getString("skillDesc.format"), typeName, cost);
                     menuItem = new JMenuItem(desc);
-                    menuItem.setActionCommand(makeCommand(CMD_IMPROVE, type, String.valueOf(cost)));
+                    menuItem.setActionCommand(makeCommand(CMD_IMPROVE, typeName, String.valueOf(cost)));
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(person.getXP() >= cost);
-                    if (person.hasSkill(type)) {
-                        Skill skill = person.getSkill(type);
+                    if (person.hasSkill(typeName)) {
+                        Skill skill = person.getSkill(typeName);
                         if (skill.isImprovementLegal()) {
-                            currentMenu.add(menuItem);
+                            SkillType skillType = getType(typeName);
+                            if (skillType == null) {
+                                logger.error("(Current Skills) Unknown skill type: {}", typeName);
+                                continue;
+                            }
+
+                            SkillSubType subType = skillType.getSubType();
+                            switch (subType) {
+                                case NONE -> currentMenu.add(menuItem);
+                                case COMBAT_GUNNERY -> combatGunnerySkillsCurrent.add(menuItem);
+                                case COMBAT_PILOTING -> combatPilotingSkillsCurrent.add(menuItem);
+                                case SUPPORT -> supportSkillsCurrent.add(menuItem);
+                                case SUPPORT_COMMAND -> supportSkillsCommandCurrent.add(menuItem);
+                                case ROLEPLAY_GENERAL -> roleplaySkillsCurrent.add(menuItem);
+                                case ROLEPLAY_ART -> roleplaySkillsArtCurrent.add(menuItem);
+                                case ROLEPLAY_INTEREST -> roleplaySkillsInterestCurrent.add(menuItem);
+                                case ROLEPLAY_SCIENCE -> roleplaySkillsScienceCurrent.add(menuItem);
+                                case ROLEPLAY_SECURITY -> roleplaySkillsSecurityCurrent.add(menuItem);
+                                default -> logger.error("(Current Skills) Unknown skill sub type: {}", subType);
+                            }
                         }
                     } else {
-                        newMenu.add(menuItem);
+                        SkillType skillType = getType(typeName);
+                        if (skillType == null) {
+                            logger.error("(New Skills) Unknown skill type: {}", typeName);
+                            continue;
+                        }
+
+                        SkillSubType subType = skillType.getSubType();
+                        switch (subType) {
+                            case NONE -> newSkillsMenu.add(menuItem);
+                            case COMBAT_GUNNERY -> combatGunnerySkillsNew.add(menuItem);
+                            case COMBAT_PILOTING -> combatPilotingSkillsNew.add(menuItem);
+                            case SUPPORT -> supportSkillsNew.add(menuItem);
+                            case SUPPORT_COMMAND -> supportSkillsCommandNew.add(menuItem);
+                            case ROLEPLAY_GENERAL -> roleplaySkillsNew.add(menuItem);
+                            case ROLEPLAY_ART -> roleplaySkillsArtNew.add(menuItem);
+                            case ROLEPLAY_INTEREST -> roleplaySkillsInterestNew.add(menuItem);
+                            case ROLEPLAY_SCIENCE -> roleplaySkillsScienceNew.add(menuItem);
+                            case ROLEPLAY_SECURITY -> roleplaySkillsSecurityNew.add(menuItem);
+                            default -> logger.error("(New Skills) Unknown skill sub type: {}", subType);
+                        }
                     }
                 }
             }
             JMenuHelpers.addMenuIfNonEmpty(menu, currentMenu);
-            JMenuHelpers.addMenuIfNonEmpty(menu, newMenu);
+            JMenuHelpers.addMenuIfNonEmpty(menu, newSkillsMenu);
 
             JMenu traitsMenu = new JMenu(resources.getString("spendOnTraits.text"));
             double costMultiplier = getCampaignOptions().getXpCostMultiplier();
