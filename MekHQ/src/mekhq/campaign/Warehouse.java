@@ -272,7 +272,7 @@ public class Warehouse {
      */
     public @Nullable Part checkForExistingSparePart(Part part) {
         if (part == null) {
-            logger.error("checkForExistingSparePart(Part): Part is null");
+            logger.error(new NullPointerException("Part is null"), "checkForExistingSparePart(Part): Part is null");
             return null;
         }
 
@@ -303,13 +303,14 @@ public class Warehouse {
      * @since 0.50.06
      */
     public @Nullable Part checkForExistingSparePart(Part part, boolean includeNewnessCheck) {
-        if (!includeNewnessCheck) {
-            return checkForExistingSparePart(part);
+        if (part == null) {
+            logger.error(new NullPointerException("Part is null"),
+                  "checkForExistingSparePart(Part, boolean): Part is null");
+            return null;
         }
 
-        if (part == null) {
-            logger.error("checkForExistingSparePart(Part, boolean): Part is null");
-            return null;
+        if (!includeNewnessCheck) {
+            return checkForExistingSparePart(part);
         }
 
         return findSparePart(spare -> (spare.getId() != part.getId()) &&

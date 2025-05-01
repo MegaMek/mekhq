@@ -53,6 +53,7 @@ import mekhq.campaign.parts.OmniPod;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.enums.PartQuality;
+import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 
@@ -147,6 +148,11 @@ public class Quartermaster {
 
         // don't add missing parts if they don't have units or units with not id
         if ((part instanceof MissingPart) && (null == part.getUnit())) {
+            return;
+        }
+
+        // don't keep around spare ammo bins
+        if ((part instanceof AmmoBin) && (null == part.getUnit())) {
             return;
         }
 
