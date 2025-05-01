@@ -272,7 +272,7 @@ public class Warehouse {
      */
     public @Nullable Part checkForExistingSparePart(Part part) {
         if (part == null) {
-            logger.error("checkForExistingSparePart(Part): Part is null");
+            logger.error(new NullPointerException("Part is null"), "checkForExistingSparePart(Part): Part is null");
             return null;
         }
 
@@ -308,7 +308,8 @@ public class Warehouse {
         }
 
         if (part == null) {
-            logger.error("checkForExistingSparePart(Part, boolean): Part is null");
+            logger.error(new NullPointerException("Part is null"),
+                  "checkForExistingSparePart(Part, boolean): Part is null");
             return null;
         }
 
