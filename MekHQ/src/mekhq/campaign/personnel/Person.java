@@ -91,7 +91,6 @@ import mekhq.campaign.log.LogEntryFactory;
 import mekhq.campaign.log.LogEntryType;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.log.ServiceLogger;
-import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.enums.BloodGroup;
@@ -106,6 +105,7 @@ import mekhq.campaign.personnel.enums.ROMDesignation;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.Genealogy;
+import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -2953,12 +2953,18 @@ public class Person {
                                       "Removed from",
                                       "Added to");
 
+                                boolean shiftedLogType = false;
                                 for (String targetString : assignmentTargetStrings) {
                                     if (logEntryDescription.startsWith(targetString)) {
                                         logEntry.setType(ASSIGNMENT);
                                         person.addAssignmentLogEntry(logEntry);
+                                        shiftedLogType = true;
                                         break;
                                     }
+                                }
+
+                                if (!shiftedLogType) {
+                                    person.addPersonalLogEntry(logEntry);
                                 }
                             } else {
                                 // < 50.05 compatibility handler
