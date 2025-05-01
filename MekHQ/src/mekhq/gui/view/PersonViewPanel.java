@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.view;
 
@@ -85,6 +90,8 @@ import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.FormerSpouse;
+import mekhq.campaign.personnel.skills.Attributes;
+import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.CampaignGUI;
@@ -1573,11 +1580,19 @@ public class PersonViewPanel extends JScrollablePanel {
         int addition = 0;
         double weight = 0.5;
 
+        Attributes attributes = person.getATOWAttributes();
+        PersonnelOptions options = person.getOptions();
+        int adjustedReputation = person.getAdjustedReputation(campaign.getCampaignOptions().isUseAgeEffects(),
+              campaign.isClanCampaign(),
+              campaign.getLocalDate(),
+              person.getRankLevel());
+
         int j = 0;
         for (int i = 0; i < SkillType.getSkillList().length; i++) {
             String skillName = SkillType.getSkillList()[i];
             SkillType type = SkillType.getType(skillName);
             if (person.hasSkill(skillName)) {
+                Skill skill = person.getSkill(skillName);
                 j++;
                 if (j == colBreak) {
                     addition = 2;
@@ -1590,12 +1605,9 @@ public class PersonViewPanel extends JScrollablePanel {
                 } else {
                     lblName = new JLabel(String.format(resourceMap.getString("format.itemHeader"), skillName));
                 }
-                int reputation = person.getAdjustedReputation(campaign.getCampaignOptions().isUseAgeEffects(),
-                      campaign.isClanCampaign(),
-                      campaign.getLocalDate(),
-                      person.getRankLevel());
-                lblValue = new JLabel(person.getSkill(skillName).toString(person.getOptions(), reputation));
+                lblValue = new JLabel(skill.toString(options, attributes, adjustedReputation));
                 lblName.setLabelFor(lblValue);
+                lblName.setToolTipText(wordWrap(skill.getTooltip(options, attributes, adjustedReputation)));
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = addition;
                 gridBagConstraints.gridy = firsty;

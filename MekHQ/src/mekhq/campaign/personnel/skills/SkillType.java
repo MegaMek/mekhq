@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.skills;
 
@@ -44,6 +49,7 @@ import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_SCIENC
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_SECURITY;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT_COMMAND;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColor;
 
 import java.io.PrintWriter;
@@ -85,6 +91,7 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class SkillType {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources." + SkillType.class.getSimpleName();
     private static final MMLogger logger = MMLogger.create(SkillType.class);
 
     /**
@@ -433,6 +440,44 @@ public class SkillType {
 
     public String getName() {
         return name;
+    }
+
+    /**
+     * Generates a resource bundle key derived from the {@code name} field by removing all occurrences of '/', '-', and
+     * whitespace characters.
+     *
+     * @return a normalized resource bundle key string with specific characters removed from {@code name}
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    private String getResourceBundleKey() {
+        String key = name;
+        key = key.replace(RP_ONLY_TAG, "");
+        key = key.replace("/", "");
+        key = key.replace("-", "");
+        key = key.replace(" ", "");
+        return key;
+    }
+
+    public String getFlavorText(boolean includeHtmlTags, boolean includeAttributes) {
+        String key = getResourceBundleKey();
+        String rawFlavorText = getTextAt(RESOURCE_BUNDLE, key + ".flavorText");
+
+        String htmlOpenTag = includeHtmlTags ? "<html>" : "";
+        String htmlCloseTag = includeHtmlTags ? "</html>" : "";
+
+        if (!includeAttributes) {
+            return htmlOpenTag + rawFlavorText + htmlCloseTag;
+        }
+
+        String flavorText = htmlOpenTag + rawFlavorText + "<br>(" + firstAttribute.getLabel();
+
+        if (secondAttribute != NONE) {
+            flavorText += ", " + secondAttribute.getLabel() + ')' + htmlCloseTag;
+        }
+
+        return flavorText;
     }
 
     public int getTarget() {

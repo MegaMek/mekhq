@@ -56,6 +56,7 @@ import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.REPLA
 import static mekhq.campaign.personnel.skills.Attributes.ATTRIBUTE_IMPROVEMENT_COST;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
+import static mekhq.campaign.personnel.skills.SkillType.S_ARTILLERY;
 import static mekhq.campaign.personnel.skills.SkillType.S_DOCTOR;
 import static mekhq.campaign.personnel.skills.SkillType.getType;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.WILLPOWER;
@@ -2905,6 +2906,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             JMenu roleplaySkillsSecurityNew = new JMenu(resources.getString("roleplaySkills.security"));
             roleplaySkillsNew.add(roleplaySkillsSecurityNew);
 
+            int adjustedReputation = person.getAdjustedReputation(getCampaignOptions().isUseAgeEffects(),
+                  getCampaign().isClanCampaign(),
+                  getCampaign().getLocalDate(),
+                  person.getRankLevel());
+
             for (int i = 0; i < SkillType.getSkillList().length; i++) {
                 String typeName = SkillType.getSkillList()[i];
 
@@ -2912,8 +2918,14 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 cost = (int) round(cost * xpCostMultiplier);
 
                 if (cost >= 0) {
-                    String desc = String.format(resources.getString("skillDesc.format"), typeName, cost);
-                    menuItem = new JMenuItem(desc);
+                    if (Objects.equals(typeName, S_ARTILLERY)) {
+                        if (!getCampaignOptions().isUseArtillery()) {
+                            continue;
+                        }
+                    }
+
+                    String description = String.format(resources.getString("skillDesc.format"), typeName, cost);
+                    menuItem = new JMenuItem(description);
                     menuItem.setActionCommand(makeCommand(CMD_IMPROVE, typeName, String.valueOf(cost)));
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(person.getXP() >= cost);
@@ -2925,6 +2937,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                 logger.error("(Current Skills) Unknown skill type: {}", typeName);
                                 continue;
                             }
+
+                            String tooltip = wordWrap(skill.getTooltip(person.getOptions(),
+                                  person.getATOWAttributes(),
+                                  adjustedReputation));
+                            menuItem.setToolTipText(tooltip);
 
                             SkillSubType subType = skillType.getSubType();
                             switch (subType) {
@@ -2947,6 +2964,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             logger.error("(New Skills) Unknown skill type: {}", typeName);
                             continue;
                         }
+
+                        String tooltip = wordWrap(skillType.getFlavorText(false, true));
+                        menuItem.setToolTipText(tooltip);
 
                         SkillSubType subType = skillType.getSubType();
                         switch (subType) {
