@@ -38,6 +38,7 @@ import static java.lang.Math.floor;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.codeUtilities.MathUtility.clamp;
+import static megamek.codeUtilities.StringUtility.isNullOrBlank;
 import static megamek.common.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static mekhq.campaign.log.LogEntryType.ASSIGNMENT;
@@ -66,7 +67,6 @@ import java.util.stream.Stream;
 import megamek.Version;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.codeUtilities.MathUtility;
-import megamek.codeUtilities.StringUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
@@ -544,7 +544,7 @@ public class Person {
         this.phenotype = phenotype;
     }
 
-    public String getBloodname() {
+    public @Nullable String getBloodname() {
         return bloodname;
     }
 
@@ -710,10 +710,9 @@ public class Person {
      * @return a String of the person's last name
      */
     public String getLastName() {
-        String lastName = !StringUtility.isNullOrBlank(getBloodname()) ?
-                                getBloodname() :
-                                !StringUtility.isNullOrBlank(getSurname()) ? getSurname() : "";
-        if (!StringUtility.isNullOrBlank(getPostNominal())) {
+        String lastName = !isNullOrBlank(getBloodname()) ?
+                                getBloodname() : !isNullOrBlank(getSurname()) ? getSurname() : "";
+        if (!isNullOrBlank(getPostNominal())) {
             lastName += (lastName.isBlank() ? "" : " ") + getPostNominal();
         }
         return lastName;
@@ -862,7 +861,7 @@ public class Person {
                     givenName.append(' ').append(name[i]);
                 }
 
-                if (!(!StringUtility.isNullOrBlank(getBloodname()) && getBloodname().equals(name[i]))) {
+                if (!(!isNullOrBlank(getBloodname()) && getBloodname().equals(name[i]))) {
                     givenName.append(' ').append(name[i]);
                 }
             }
@@ -2308,12 +2307,12 @@ public class Person {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "id", id.toString());
 
             // region Name
-            if (!StringUtility.isNullOrBlank(getPreNominal())) {
+            if (!isNullOrBlank(getPreNominal())) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "preNominal", getPreNominal());
             }
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "givenName", getGivenName());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "surname", getSurname());
-            if (!StringUtility.isNullOrBlank(getPostNominal())) {
+            if (!isNullOrBlank(getPostNominal())) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "postNominal", getPostNominal());
             }
 
@@ -2321,7 +2320,7 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "maidenName", getMaidenName());
             }
 
-            if (!StringUtility.isNullOrBlank(getCallsign())) {
+            if (!isNullOrBlank(getCallsign())) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "callsign", getCallsign());
             }
             // endregion Name
@@ -2359,11 +2358,11 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "phenotype", getPhenotype().name());
             }
 
-            if (!StringUtility.isNullOrBlank(bloodname)) {
+            if (!isNullOrBlank(bloodname)) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bloodname", bloodname);
             }
 
-            if (!StringUtility.isNullOrBlank(biography)) {
+            if (!isNullOrBlank(biography)) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "biography", biography);
             }
 
@@ -2687,7 +2686,7 @@ public class Person {
 
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "reasoningDescriptionIndex", reasoningDescriptionIndex);
 
-            if (!StringUtility.isNullOrBlank(personalityDescription)) {
+            if (!isNullOrBlank(personalityDescription)) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personalityDescription", personalityDescription);
             }
 
@@ -5226,7 +5225,10 @@ public class Person {
           int rankIndex) {
         return reputation +
                      (isUseAgingEffects ?
-                            getReputationAgeModifier(getAge(today), isClanCampaign, !bloodname.isBlank(), rankIndex) :
+                            getReputationAgeModifier(getAge(today),
+                                  isClanCampaign,
+                                  !isNullOrBlank(bloodname),
+                                  rankIndex) :
                             0);
     }
 
