@@ -288,36 +288,35 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             int team = botStub.getTeam();
             DefaultMutableTreeNode top = new DefaultMutableTreeNode(botStub.getName());
             List<String> allEntries = botStub.getEntityList();
-            for (String entry : allEntries) {
-                if (!scenario.getStatus().isCurrent()) {
-                    continue;
-                }
 
-                if ((team != 1) && isTrueBlindDrop) {
-                    continue;
-                }
+            if (scenario.getStatus().isCurrent()) {
+                for (String entry : allEntries) {
+                    if ((team != 1) && isTrueBlindDrop) {
+                        continue;
+                    }
 
-                if ((team != 1) && isBlindDrop) {
-                    int unitIndex = allEntries.indexOf(entry);
-                    Entity entity = scenario.getBotForce(i).getFullEntityList(campaign).get(unitIndex);
+                    if ((team != 1) && isBlindDrop) {
+                        int unitIndex = allEntries.indexOf(entry);
+                        Entity entity = scenario.getBotForce(i).getFullEntityList(campaign).get(unitIndex);
 
-                    if (entity == null) {
-                        String label = "???";
+                        if (entity == null) {
+                            String label = "???";
+                            top.add(new DefaultMutableTreeNode(label));
+                            continue;
+                        }
+
+                        String weightClass = entity.getWeightClassName();
+                        long entityType = entity.getEntityType();
+                        String unitType = getEntityMajorTypeName(entityType);
+
+                        String label = weightClass + ' ' + unitType;
                         top.add(new DefaultMutableTreeNode(label));
                         continue;
                     }
 
-                    String weightClass = entity.getWeightClassName();
-                    long entityType = entity.getEntityType();
-                    String unitType = getEntityMajorTypeName(entityType);
+                    top.add(new DefaultMutableTreeNode(entry));
 
-                    String label = weightClass + ' ' + unitType;
-                    top.add(new DefaultMutableTreeNode(label));
-                    continue;
                 }
-
-                top.add(new DefaultMutableTreeNode(entry));
-
             }
             JTree tree = new JTree(top);
             tree.collapsePath(new TreePath(top));
