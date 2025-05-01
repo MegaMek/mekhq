@@ -8469,7 +8469,7 @@ public class Campaign implements ITechManager {
         getHangar().forEachUnit(u -> {
             Entity en = u.getEntity();
             if (null != en) {
-                game.addEntity(en);
+                game.addEntity(en, false);
             }
         });
     }
