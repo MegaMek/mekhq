@@ -3728,6 +3728,11 @@ public class Campaign implements ITechManager {
             }
             return PartAcquisitionResult.PlanetSpecificFailure;
         }
+        SocioIndustrialData socioIndustrial = system.getPrimaryPlanet().getSocioIndustrial(getLocalDate());
+        CampaignOptions options = getCampaignOptions();
+        int tech = options.getPlanetTechAcquisitionBonus(socioIndustrial.tech);
+        int industry = options.getPlanetIndustryAcquisitionBonus(socioIndustrial.industry);
+        int outputs = options.getPlanetOutputAcquisitionBonus(socioIndustrial.output);
         if (d6(2) < target.getValue()) {
             // no contacts on this planet, move along
             if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
@@ -3738,7 +3743,18 @@ public class Campaign implements ITechManager {
                                 acquisition.getAcquisitionName() +
                                 " on " +
                                 system.getPrintableName(getLocalDate()) +
-                                "</b></font>");
+                                " at TN: " +
+                                target.getValue() +
+                                " - Modifiers (Tech: " +
+                                (tech > 0 ? "+" : "") +
+                                tech +
+                                ", Industry: " +
+                                (industry > 0 ? "+" : "") +
+                                industry +
+                                ", Outputs: " +
+                                (outputs > 0 ? "+" : "") +
+                                outputs +
+                                ") </font>");
             }
             return PartAcquisitionResult.PlanetSpecificFailure;
         } else {
@@ -3750,7 +3766,18 @@ public class Campaign implements ITechManager {
                                 acquisition.getAcquisitionName() +
                                 " on " +
                                 system.getPrintableName(getLocalDate()) +
-                                "</font>");
+                                " at TN: " +
+                                target.getValue() +
+                                " - Modifiers (Tech: " +
+                                (tech > 0 ? "+" : "") +
+                                tech +
+                                ", Industry: " +
+                                (industry > 0 ? "+" : "") +
+                                industry +
+                                ", Outputs: " +
+                                (outputs > 0 ? "+" : "") +
+                                outputs +
+                                ") </font>");
             }
             return PartAcquisitionResult.Success;
         }
