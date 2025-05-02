@@ -167,7 +167,7 @@ public class WinterHolidayAnnouncement {
     }
 
     /**
-     * Builds the in-character message for either Day Five or Day Eleven of the Winter Holiday event.
+     * Builds the in-character message for Day Eleven of the Winter Holiday event.
      *
      * @return the message as a string for the specified day
      */
