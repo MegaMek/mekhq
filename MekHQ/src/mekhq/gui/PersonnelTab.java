@@ -32,6 +32,8 @@
  */
 package mekhq.gui;
 
+import static megamek.client.ui.swing.util.UIUtil.scaleForGUI;
+
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -53,7 +55,6 @@ import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.JToggleButtonPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.GUIPreferences;
-import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.event.Subscribe;
 import megamek.common.preference.IPreferenceChangeListener;
 import megamek.logging.MMLogger;
@@ -76,7 +77,7 @@ import mekhq.gui.view.PersonViewPanel;
 public final class PersonnelTab extends CampaignGuiTab {
     private static final MMLogger logger = MMLogger.create(PersonnelTab.class);
 
-    public static final int PERSONNEL_VIEW_WIDTH = 490;
+    public static final int PERSONNEL_VIEW_WIDTH = scaleForGUI(525);
 
     private JSplitPane splitPersonnel;
     private JTable personnelTable;
@@ -322,7 +323,7 @@ public final class PersonnelTab extends CampaignGuiTab {
                                             PersonnelTabView.GENERAL :
                                             choicePersonView.getSelectedItem();
         final XTableColumnModel columnModel = (XTableColumnModel) getPersonnelTable().getColumnModel();
-        getPersonnelTable().setRowHeight(UIUtil.scaleForGUI(15));
+        getPersonnelTable().setRowHeight(scaleForGUI(15));
 
         // set the renderer
         for (final PersonnelTableModelColumn column : PersonnelTableModel.PERSONNEL_COLUMNS) {

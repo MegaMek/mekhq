@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.skills;
 
@@ -44,6 +49,7 @@ import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_SCIENC
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_SECURITY;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT_COMMAND;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColor;
 
 import java.io.PrintWriter;
@@ -85,6 +91,7 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class SkillType {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources." + SkillType.class.getSimpleName();
     private static final MMLogger logger = MMLogger.create(SkillType.class);
 
     /**
@@ -328,6 +335,33 @@ public class SkillType {
     }
 
     /**
+     * Retrieves a list of unique skill names that match any of the specified {@link SkillSubType}s.
+     *
+     * <p>This method iterates through all known {@link SkillType} instances and collects the names of those whose
+     * sub-type is included in the provided list of {@code skillSubTypes}. Each skill name will only appear once in the
+     * resulting list, even if multiple {@code SkillType}s with the same name are found.</p>
+     *
+     * @param skillSubTypes List of {@link SkillSubType}s for which to find matching skill names.
+     *
+     * @return A list of unique skill names that belong to one of the specified skill sub-types.
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public static List<String> getSkillsBySkillSubType(List<SkillSubType> skillSubTypes) {
+        List<String> relevantSkills = new ArrayList<>();
+        for (SkillType skillType : lookupHash.values()) {
+            SkillSubType subType = skillType.getSubType();
+            if (skillSubTypes.contains(subType)) {
+                if (!relevantSkills.contains(skillType.name)) {
+                    relevantSkills.add(skillType.name);
+                }
+            }
+        }
+        return relevantSkills;
+    }
+
+    /**
      * Default constructor for the {@code SkillType} class.
      *
      * <p>Initializes a default skill type with placeholder values, primarily for testing or fallback purposes.</p>
@@ -433,6 +467,44 @@ public class SkillType {
 
     public String getName() {
         return name;
+    }
+
+    /**
+     * Generates a resource bundle key derived from the {@code name} field by removing all occurrences of '/', '-', and
+     * whitespace characters.
+     *
+     * @return a normalized resource bundle key string with specific characters removed from {@code name}
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    private String getResourceBundleKey() {
+        String key = name;
+        key = key.replace(RP_ONLY_TAG, "");
+        key = key.replace("/", "");
+        key = key.replace("-", "");
+        key = key.replace(" ", "");
+        return key;
+    }
+
+    public String getFlavorText(boolean includeHtmlTags, boolean includeAttributes) {
+        String key = getResourceBundleKey();
+        String rawFlavorText = getTextAt(RESOURCE_BUNDLE, key + ".flavorText");
+
+        String htmlOpenTag = includeHtmlTags ? "<html>" : "";
+        String htmlCloseTag = includeHtmlTags ? "</html>" : "";
+
+        if (!includeAttributes) {
+            return htmlOpenTag + rawFlavorText + htmlCloseTag;
+        }
+
+        String flavorText = htmlOpenTag + rawFlavorText + "<br>(" + firstAttribute.getLabel();
+
+        if (secondAttribute != NONE) {
+            flavorText += ", " + secondAttribute.getLabel() + ')' + htmlCloseTag;
+        }
+
+        return flavorText;
     }
 
     public int getTarget() {
