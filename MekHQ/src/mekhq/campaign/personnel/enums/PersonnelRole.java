@@ -124,8 +124,8 @@ public enum PersonnelRole {
     ASTECH(false, KeyEvent.VK_UNDEFINED, 5, 4, 5, 3, 5, 4, 3),
 
     // ATOW: Communications Specialist Archetype (this might seem like an odd choice, but the Attributes for this Archetype
-    // work really well for this profession
-    DOCTOR(false, KeyEvent.VK_D, 3, 4, 4, 5, 6, 4, 4),
+    // work really well for this profession). However, we have switched Dexterity and Reflexes.
+    DOCTOR(false, KeyEvent.VK_D, 3, 4, 5, 4, 6, 4, 4),
 
     // ATOW: Communications Specialist Archetype (this might seem like an odd choice, but the Attributes for this Archetype
     // work really well for this profession
