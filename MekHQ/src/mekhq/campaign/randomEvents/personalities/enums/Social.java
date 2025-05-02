@@ -24,15 +24,21 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.randomEvents.personalities.enums;
+
+import static megamek.codeUtilities.MathUtility.clamp;
+import static mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType.SOCIAL;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
 import mekhq.campaign.randomEvents.personalities.PersonalityController.PronounData;
-
-import static megamek.codeUtilities.MathUtility.clamp;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
  * Represents various levels and traits of social skills in a personality.
@@ -107,6 +113,26 @@ public enum Social {
     public final static int MAJOR_TRAITS_START_INDEX = 25;
 
     /**
+     * @return the {@link PersonalityTraitType} representing social aptitude
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public PersonalityTraitType getPersonalityTraitType() {
+        return SOCIAL;
+    }
+
+    /**
+     * @return the label string for the social personality trait type
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public String getPersonalityTraitTypeLabel() {
+        return getPersonalityTraitType().getLabel();
+    }
+
+    /**
      * Retrieves the label associated with the current enumeration value.
      *
      * <p>The label is determined based on the resource bundle for the application,
@@ -174,6 +200,25 @@ public enum Social {
         final String RESOURCE_KEY = name() + ".ronin";
 
         return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY, commanderAddress);
+    }
+
+    /**
+     * Retrieves the formatted interviewer notes for a specific social description index.
+     *
+     * <p>Constructs a resource key by combining the enum name, "interviewerNote", and the provided index,
+     * then fetches the formatted text for that key from the resource bundle.</p>
+     *
+     * @param socialDescriptionIndex the index of the social description to retrieve notes for
+     *
+     * @return the formatted interviewer notes text corresponding to the specified index.
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public String getInterviewersNotes(int socialDescriptionIndex) {
+        final String RESOURCE_KEY = name() + ".interviewerNote." + socialDescriptionIndex;
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
     }
 
     /**
