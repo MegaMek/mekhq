@@ -84,17 +84,15 @@ public class LogEntry implements Cloneable {
     }
 
     public void writeToXML(PrintWriter printWriter, int indent) {
-        StringBuilder logEntryXml = new StringBuilder();
-        logEntryXml.append(MHQXMLUtility.indentStr(indent)).append("<logEntry>");
+        printWriter.println(MHQXMLUtility.indentStr(indent) + "<logEntry>");
         if (date != null) {
-            logEntryXml.append("<date>").append(date).append("</date>");
+            printWriter.println(MHQXMLUtility.indentStr(indent + 1) + "<date><![CDATA[" + date + "]]></date>");
         }
-        logEntryXml.append("<desc>").append(MHQXMLUtility.escape(desc)).append("</desc>");
+        printWriter.println(MHQXMLUtility.indentStr(indent + 1) + "<desc><![CDATA[" + desc + "]]></desc>");
         if (type != null) {
-            logEntryXml.append("<type>").append(MHQXMLUtility.escape(type.toString())).append("</type>");
+            printWriter.println(MHQXMLUtility.indentStr(indent + 1) + "<type><![CDATA[" + type + "]]></type>");
         }
-        logEntryXml.append("</logEntry>");
-        printWriter.println(logEntryXml);
+        printWriter.println(MHQXMLUtility.indentStr(indent) + "</logEntry>");
     }
 
     @Override
