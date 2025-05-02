@@ -34,6 +34,7 @@ import java.util.List;
 import megamek.common.Compute;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.module.api.PersonnelMarketMethod;
@@ -121,16 +122,14 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                      */
                     retVal.remove(p);
                     for (int i = 0; i < Compute.d6(); i++) {
-                        retVal.add(c.newPerson((Compute.d6() < 4) ?
-                                                     PersonnelRole.GROUND_VEHICLE_DRIVER :
-                                                     PersonnelRole.VEHICLE_GUNNER));
+                        retVal.add(c.newPerson((Compute.d6() < 4) ? PersonnelRole.GROUND_VEHICLE_DRIVER
+                                : PersonnelRole.VEHICLE_GUNNER));
                     }
                 }
 
                 Person adminHR = c.findBestInRole(PersonnelRole.ADMINISTRATOR_HR, SkillType.S_ADMIN);
-                int adminHRExp = (adminHR == null) ?
-                                       SkillType.EXP_ULTRA_GREEN :
-                                       adminHR.getSkill(SkillType.S_ADMIN).getExperienceLevel();
+                int adminHRExp = (adminHR == null) ? SkillType.EXP_ULTRA_GREEN
+                        : adminHR.getSkill(SkillType.S_ADMIN).getExperienceLevel();
                 int gunneryMod = 0;
                 int pilotingMod = 0;
                 switch (adminHRExp) {
@@ -152,7 +151,7 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                             pilotingMod = 1;
                         }
                         break;
-                    case SkillType.EXP_ELITE, SkillType.EXP_HEROIC, SkillType.EXP_LEGENDARY:
+                    case SkillType.EXP_ELITE:
                         gunneryMod = 1;
                         pilotingMod = 1;
                         break;

@@ -44,7 +44,7 @@ import static mekhq.campaign.mission.Scenario.T_GROUND;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_CIVILIANS;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX;
-import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
 import static mekhq.campaign.universe.IUnitGenerator.unitTypeSupportsWeightClass;
 import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
 
@@ -2876,7 +2876,7 @@ public class AtBDynamicScenarioFactory {
           Faction faction) {
         int skillLevel = 0;
         if (skill.isGreenOrGreater()) {
-            int adjustedValue = Math.min(skill.getAdjustedValue(), EXP_LEGENDARY);
+            int adjustedValue = Math.min(skill.getAdjustedValue(), EXP_ELITE);
             int commandSkillsModifier = randomSkillPreferences.getCommandSkillsModifier(adjustedValue);
 
             int skillRoll = clamp(d6(2) + commandSkillsModifier, 2, 12);

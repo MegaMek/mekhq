@@ -139,7 +139,7 @@ public class Armor extends Part implements IAcquisitionWork {
         }
         toReturn.append("</b><br/>").append(getDetails()).append("<br/>");
 
-        if (getSkillMin() <= SkillType.EXP_LEGENDARY) {
+        if (getSkillMin() <= SkillType.EXP_ELITE) {
             toReturn.append(getTimeLeft())
                   .append(" minutes")
                   .append(null != getTech() ? " (scheduled)" : "")
@@ -608,7 +608,7 @@ public class Armor extends Part implements IAcquisitionWork {
         // if we are impossible to fix now, we should scrap this amount of armor
         // from spares and start over
         String scrap = "";
-        if (skillMin > SkillType.EXP_LEGENDARY) {
+        if (skillMin > SkillType.EXP_ELITE) {
             scrap = " Armor supplies lost!";
             if (isSalvaging()) {
                 remove(false);
