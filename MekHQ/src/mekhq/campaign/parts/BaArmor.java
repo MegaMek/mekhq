@@ -161,27 +161,42 @@ public class BaArmor extends Armor {
 
     @Override
     public int getAmountAvailable() {
-        BaArmor a = (BaArmor) campaign.getWarehouse().findSparePart(part -> (part instanceof BaArmor)
-                && part.isPresent()
-                && !part.isReservedForRefit()
-                && isClanTechBase() == part.isClanTechBase()
-                && ((BaArmor) part).getType() == getType());
-
-        return a != null ? a.getAmount() : 0;
+        return campaign.getWarehouse()
+                     .streamSpareParts()
+                     .filter(this::isSameBAArmorPart)
+                     .mapToInt(part -> ((BaArmor) part).getAmount())
+                     .sum();
     }
 
     @Override
-    public void changeAmountAvailable(int amount) {
-        BaArmor a = (BaArmor) campaign.getWarehouse().findSparePart(part -> isSamePartType(part) && part.isPresent());
+    protected int changeAmountAvailableSingle(int amount) {
+        BaArmor armor = (BaArmor) campaign.getWarehouse()
+                                        .findSparePart(part -> isSamePartType(part) && part.isPresent());
 
-        if (null != a) {
-            a.setAmount(a.getAmount() + amount);
-            if (a.getAmount() <= 0) {
-                campaign.getWarehouse().removePart(a);
+        if (null != armor) {
+            int amountRemaining = armor.getAmount() + amount;
+            armor.setAmount(amountRemaining);
+            if (armor.getAmount() <= 0) {
+                campaign.getWarehouse().removePart(armor);
+                return Math.min(0, amountRemaining);
             }
         } else if (amount > 0) {
             campaign.getQuartermaster()
-                    .addPart(new BaArmor(getUnitTonnage(), amount, type, -1, isClanTechBase(), campaign), 0);
+                  .addPart(new BaArmor(getUnitTonnage(), amount, type, -1, isClanTechBase(), campaign), 0, false);
         }
+        return 0;
+    }
+
+    /**
+     * Not sure how true this title is, it was used in {@link BaArmor#getAmountAvailable}
+     * @param part is this part the same
+     * @return true if the two parts are the same, at least as far as {@link BaArmor#getAmountAvailable} is concerned
+     */
+    private boolean isSameBAArmorPart(Part part) {
+        return (part instanceof BaArmor armor) &&
+                     armor.isPresent() &&
+                     !armor.isReservedForRefit() &&
+                     isClanTechBase() == part.isClanTechBase() &&
+                     armor.getType() == getType();
     }
 }
