@@ -45,6 +45,7 @@ import static mekhq.utilities.spaUtilities.enums.AbilityCategory.MANEUVERING_ABI
 import static mekhq.utilities.spaUtilities.enums.AbilityCategory.UTILITY_ABILITY;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import mekhq.campaign.personnel.SkillPerquisite;
 import mekhq.campaign.personnel.SpecialAbility;
@@ -112,11 +113,14 @@ public class SpaUtilities {
         }
 
         boolean isManeuvering = false;
+        // Precompile regex patterns
+        final Pattern curlyBracesPattern = Pattern.compile("[{}]");
+        final Pattern orPattern = Pattern.compile("OR ");
         for (SkillPerquisite skillPerquisite : ability.getPrereqSkills()) {
             String skillPerquisiteString = skillPerquisite.toString();
             // Step 1: Remove extra information
-            skillPerquisiteString = skillPerquisiteString.replaceAll("\\{", "").replaceAll("}", "");
-            skillPerquisiteString = skillPerquisiteString.replaceAll("OR ", "");
+            skillPerquisiteString = curlyBracesPattern.matcher(skillPerquisiteString).replaceAll("");
+            skillPerquisiteString = orPattern.matcher(skillPerquisiteString).replaceAll("");
 
             // Step 2: remove experience levels
             for (int i = 0; i < EXP_ELITE; i++) {

@@ -2552,7 +2552,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                     menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
                                           name,
                                           costDesc));
-                                    menuItem.setToolTipText(wordWrap(spa.getDescription()));
+                                    menuItem.setToolTipText(wordWrap(spa.getDescription() +
+                                                                           "<br><br>" +
+                                                                           spa.getAllPrereqDesc()));
                                     menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_WEAPON_SPECIALIST,
                                           name,
                                           String.valueOf(cost)));
@@ -2589,7 +2591,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                     menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
                                           name,
                                           costDesc));
-                                    menuItem.setToolTipText(wordWrap(spa.getDescription()));
+                                    menuItem.setToolTipText(wordWrap(spa.getDescription() +
+                                                                           "<br><br>" +
+                                                                           spa.getAllPrereqDesc()));
                                     menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_SANDBLASTER,
                                           name,
                                           String.valueOf(cost)));
@@ -2621,7 +2625,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
                               resources.getString("envspec_fog.text"),
                               costDesc));
-                        menuItem.setToolTipText(wordWrap(spa.getDescription()));
+                        menuItem.setToolTipText(wordWrap(spa.getDescription() + "<br><br>" + spa.getAllPrereqDesc()));
                         if (!tros.contains(Crew.ENVSPC_FOG)) {
                             menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_ENVSPEC,
                                   Crew.ENVSPC_FOG,
@@ -2635,7 +2639,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
                                   resources.getString("envspec_light.text"),
                                   costDesc));
-                            menuItem.setToolTipText(wordWrap(spa.getDescription()));
+                            menuItem.setToolTipText(wordWrap(spa.getDescription() +
+                                                                   "<br><br>" +
+                                                                   spa.getAllPrereqDesc()));
                             menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_ENVSPEC,
                                   Crew.ENVSPC_LIGHT,
                                   String.valueOf(cost)));
@@ -2648,7 +2654,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
                                   resources.getString("envspec_rain.text"),
                                   costDesc));
-                            menuItem.setToolTipText(wordWrap(spa.getDescription()));
+                            menuItem.setToolTipText(wordWrap(spa.getDescription() +
+                                                                   "<br><br>" +
+                                                                   spa.getAllPrereqDesc()));
                             menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_ENVSPEC,
                                   Crew.ENVSPC_RAIN,
                                   String.valueOf(cost)));
@@ -2661,7 +2669,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
                                   resources.getString("envspec_snow.text"),
                                   costDesc));
-                            menuItem.setToolTipText(wordWrap(spa.getDescription()));
+                            menuItem.setToolTipText(wordWrap(spa.getDescription() +
+                                                                   "<br><br>" +
+                                                                   spa.getAllPrereqDesc()));
                             menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_ENVSPEC,
                                   Crew.ENVSPC_SNOW,
                                   String.valueOf(cost)));
@@ -2674,7 +2684,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
                                   resources.getString("envspec_wind.text"),
                                   costDesc));
-                            menuItem.setToolTipText(wordWrap(spa.getDescription()));
+                            menuItem.setToolTipText(wordWrap(spa.getDescription() +
+                                                                   "<br><br>" +
+                                                                   spa.getAllPrereqDesc()));
                             menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_ENVSPEC,
                                   Crew.ENVSPC_WIND,
                                   String.valueOf(cost)));
@@ -2705,7 +2717,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
                               resources.getString("humantro_mek.text"),
                               costDesc));
-                        menuItem.setToolTipText(wordWrap(spa.getDescription()));
+                        menuItem.setToolTipText(wordWrap(spa.getDescription() + "<br><br>" + spa.getAllPrereqDesc()));
                         if (!tros.contains(Crew.HUMANTRO_MEK)) {
                             menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_HUMANTRO,
                                   Crew.HUMANTRO_MEK,
@@ -2719,7 +2731,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
                                   resources.getString("humantro_aero.text"),
                                   costDesc));
-                            menuItem.setToolTipText(wordWrap(spa.getDescription()));
+                            menuItem.setToolTipText(wordWrap(spa.getDescription() +
+                                                                   "<br><br>" +
+                                                                   spa.getAllPrereqDesc()));
                             menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_HUMANTRO,
                                   Crew.HUMANTRO_AERO,
                                   String.valueOf(cost)));
@@ -2732,7 +2746,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
                                   resources.getString("humantro_vee.text"),
                                   costDesc));
-                            menuItem.setToolTipText(wordWrap(spa.getDescription()));
+                            menuItem.setToolTipText(wordWrap(spa.getDescription() +
+                                                                   "<br><br>" +
+                                                                   spa.getAllPrereqDesc()));
                             menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_HUMANTRO,
                                   Crew.HUMANTRO_VEE,
                                   String.valueOf(cost)));
@@ -2745,7 +2761,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
                                   resources.getString("humantro_ba.text"),
                                   costDesc));
-                            menuItem.setToolTipText(wordWrap(spa.getDescription()));
+                            menuItem.setToolTipText(wordWrap(spa.getDescription() +
+                                                                   "<br><br>" +
+                                                                   spa.getAllPrereqDesc()));
                             menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_HUMANTRO,
                                   Crew.HUMANTRO_BA,
                                   String.valueOf(cost)));
@@ -2768,7 +2786,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
                               resources.getString("laserSpecialist.text"),
                               costDesc));
-                        menuItem.setToolTipText(wordWrap(spa.getDescription()));
+                        menuItem.setToolTipText(wordWrap(spa.getDescription() + "<br><br>" + spa.getAllPrereqDesc()));
                         menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_SPECIALIST,
                               Crew.SPECIAL_ENERGY,
                               String.valueOf(cost)));
@@ -2778,7 +2796,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
                               resources.getString("missileSpecialist.text"),
                               costDesc));
-                        menuItem.setToolTipText(wordWrap(spa.getDescription()));
+                        menuItem.setToolTipText(wordWrap(spa.getDescription() + "<br><br>" + spa.getAllPrereqDesc()));
                         menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_SPECIALIST,
                               Crew.SPECIAL_MISSILE,
                               String.valueOf(cost)));
@@ -2788,7 +2806,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
                               resources.getString("ballisticSpecialist.text"),
                               costDesc));
-                        menuItem.setToolTipText(wordWrap(spa.getDescription()));
+                        menuItem.setToolTipText(wordWrap(spa.getDescription() + "<br><br>" + spa.getAllPrereqDesc()));
                         menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_SPECIALIST,
                               Crew.SPECIAL_BALLISTIC,
                               String.valueOf(cost)));
@@ -2822,7 +2840,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
                                   resources.getString("rangemaster_med.text"),
                                   costDesc));
-                            menuItem.setToolTipText(wordWrap(spa.getDescription()));
+                            menuItem.setToolTipText(wordWrap(spa.getDescription() +
+                                                                   "<br><br>" +
+                                                                   spa.getAllPrereqDesc()));
                             menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_RANGEMASTER,
                                   Crew.RANGEMASTER_MEDIUM,
                                   String.valueOf(cost)));
@@ -2835,8 +2855,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
                                   resources.getString("rangemaster_lng.text"),
                                   costDesc));
-                            menuItem.setToolTipText(wordWrap(spa.getDescription()));
-                            menuItem.setToolTipText(wordWrap(spa.getDescription()));
+                            menuItem.setToolTipText(wordWrap(spa.getDescription() +
+                                                                   "<br><br>" +
+                                                                   spa.getAllPrereqDesc()));
+                            menuItem.setToolTipText(wordWrap(spa.getDescription() +
+                                                                   "<br><br>" +
+                                                                   spa.getAllPrereqDesc()));
                             menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_RANGEMASTER,
                                   Crew.RANGEMASTER_LONG,
                                   String.valueOf(cost)));
@@ -2849,7 +2873,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
                                   resources.getString("rangemaster_xtm.text"),
                                   costDesc));
-                            menuItem.setToolTipText(wordWrap(spa.getDescription()));
+                            menuItem.setToolTipText(wordWrap(spa.getDescription() +
+                                                                   "<br><br>" +
+                                                                   spa.getAllPrereqDesc()));
                             menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_RANGEMASTER,
                                   Crew.RANGEMASTER_EXTREME,
                                   String.valueOf(cost)));
@@ -2878,7 +2904,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
                                   s,
                                   costDesc));
-                            menuItem.setToolTipText(wordWrap(spa.getDescription()));
+                            menuItem.setToolTipText(wordWrap(spa.getDescription() +
+                                                                   "<br><br>" +
+                                                                   spa.getAllPrereqDesc()));
                             menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_CUSTOM_CHOICE,
                                   s,
                                   String.valueOf(cost),
@@ -2899,7 +2927,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
                               spa.getDisplayName(),
                               costDesc));
-                        menuItem.setToolTipText(wordWrap(spa.getDescription()));
+                        menuItem.setToolTipText(wordWrap(spa.getDescription() + "<br><br>" + spa.getAllPrereqDesc()));
+
                         menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_ABILITY,
                               spa.getName(),
                               String.valueOf(cost)));
