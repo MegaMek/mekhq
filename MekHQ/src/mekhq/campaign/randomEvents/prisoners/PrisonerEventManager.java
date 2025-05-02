@@ -66,10 +66,7 @@ import mekhq.campaign.randomEvents.prisoners.enums.PrisonerEvent;
 import mekhq.campaign.randomEvents.prisoners.enums.ResponseQuality;
 import mekhq.campaign.randomEvents.prisoners.records.PrisonerEventData;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.dialog.randomEvents.prisonerDialogs.PrisonerEventDialog;
-import mekhq.gui.dialog.randomEvents.prisonerDialogs.PrisonerEventResultsDialog;
-import mekhq.gui.dialog.randomEvents.prisonerDialogs.PrisonerWarningDialog;
-import mekhq.gui.dialog.randomEvents.prisonerDialogs.PrisonerWarningResultsDialog;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
 /**
  * Manages prisoner-related events and warnings during a campaign.
@@ -326,16 +323,14 @@ public class PrisonerEventManager {
         }
         PrisonerEvent event = eventData.prisonerEvent();
 
-        PrisonerEventDialog eventDialog = new PrisonerEventDialog(campaign, speaker, event);
-
-        int choiceIndex = eventDialog.getDialogChoice();
+        int choiceIndex = getChoiceIndex(event);
 
         boolean isSuccessful = makeEventCheck(eventData, choiceIndex);
 
         EventEffectsManager effectsManager = new EventEffectsManager(campaign, eventData, choiceIndex, isSuccessful);
         String eventReport = effectsManager.getEventReport();
 
-        new PrisonerEventResultsDialog(campaign, speaker, event, choiceIndex, isSuccessful, eventReport);
+        showDialog(isSuccessful, choiceIndex, event, eventReport);
 
         Set<Person> escapees = effectsManager.getEscapees();
 
@@ -347,6 +342,67 @@ public class PrisonerEventManager {
                 new PrisonEscapeScenario(campaign, contracts.get(0), escapees);
             }
         }
+    }
+
+    /**
+     * Displays a dialog to the player presenting the outcome of their response to a prisoner event.
+     *
+     * <p>
+     * Generates an in-character message based on whether the player's action was successful or a failure, using
+     * localized resources and the specific response choice. The dialog presents this message along with an optional
+     * event report to provide context or details about the event's resolution.
+     * </p>
+     *
+     * @param isSuccessful {@code true} if the player's response to the event was successful, {@code false} otherwise
+     * @param choiceIndex  the index of the response option chosen by the player
+     * @param event        the {@link PrisonerEvent} associated with the dialog
+     * @param eventReport  additional report or commentary to display in the dialog (may be {@code null})
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    private void showDialog(boolean isSuccessful, int choiceIndex, PrisonerEvent event, String eventReport) {
+        String commanderAddress = campaign.getCommanderAddress(false);
+        String suffix = isSuccessful ? ".success" : ".failure";
+        String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
+              "response." + choiceIndex + '.' + event.name() + suffix,
+              commanderAddress);
+
+        new ImmersiveDialogSimple(campaign, speaker, null, inCharacterMessage, null, eventReport, null, false);
+    }
+
+    /**
+     * Presents an immersive dialog to the player to select a response option for the given prisoner event.
+     *
+     * <p>Constructs a message and a set of response buttons from localized resources based on the specific event.
+     * Displays a dialog to the player (using the campaign context and speaker), allowing them to choose a course of
+     * action. Returns the index of the player's selected option.</p>
+     *
+     * @param event the {@link PrisonerEvent} for which a response choice is required
+     *
+     * @return the index of the selected response option as chosen by the player in the dialog
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    private int getChoiceIndex(PrisonerEvent event) {
+        String commanderAddress = campaign.getCommanderAddress(false);
+        String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
+              "event." + event.name() + ".message",
+              commanderAddress);
+        List<String> options = List.of(getFormattedTextAt(RESOURCE_BUNDLE, "response.0." + event.name() + ".button"),
+              getFormattedTextAt(RESOURCE_BUNDLE, "response.1." + event.name() + ".button"),
+              getFormattedTextAt(RESOURCE_BUNDLE, "response.2." + event.name() + ".button"));
+        ImmersiveDialogSimple eventDialog = new ImmersiveDialogSimple(campaign,
+              speaker,
+              null,
+              inCharacterMessage,
+              options,
+              getFormattedTextAt(RESOURCE_BUNDLE, "result.ooc"),
+              null,
+              true);
+
+        return eventDialog.getDialogChoice();
     }
 
     /**
@@ -367,9 +423,12 @@ public class PrisonerEventManager {
         int executions = max(1, (int) round(prisoners.size() * 0.1));
         executions = min(executions, prisoners.size());
 
-        PrisonerWarningDialog warningDialog = new PrisonerWarningDialog(campaign, speaker, executions, setFree);
-        int choice = warningDialog.getDialogChoice();
+        String commanderAddress = campaign.getCommanderAddress(false);
+        String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "warning.message", commanderAddress);
 
+        int choice = getChoiceIndex(setFree, executions, inCharacterMessage);
+
+        String outOfCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "result.ooc");
         if (choice == CHOICE_FREE) {
             for (int i = 0; i < setFree; i++) {
                 Person prisoner = prisoners.get(i);
@@ -377,14 +436,69 @@ public class PrisonerEventManager {
                 campaign.removePerson(prisoner, false);
             }
 
-            new PrisonerWarningResultsDialog(campaign, speaker, false);
+            String resourceKey = "freeEvent" + randomInt(50) + ".message";
+            inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, resourceKey, commanderAddress);
+
+            new ImmersiveDialogSimple(campaign,
+                  speaker,
+                  null,
+                  inCharacterMessage,
+                  null,
+                  outOfCharacterMessage,  null, false);
             return;
         }
 
         if (choice == CHOICE_EXECUTE) {
             processExecutions(executions, prisoners);
-            new PrisonerWarningResultsDialog(campaign, speaker, true);
+
+            String resourceKey = "executeEvent" + randomInt(50) + ".message";
+            inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, resourceKey, commanderAddress);
+
+            new ImmersiveDialogSimple(campaign,
+                  speaker,
+                  null,
+                  inCharacterMessage,
+                  null,
+                  outOfCharacterMessage,
+                  null,
+                  false);
         }
+    }
+
+    /**
+     * Displays a warning dialog to the player for resolving prisoner overflow by freeing or executing a specified
+     * number of prisoners.
+     *
+     * <p>
+     * Presents an in-character message with options to do nothing, release, or execute prisoners. The number of
+     * prisoners to release or execute is included in the respective button labels. Returns the index of the option
+     * chosen by the player.
+     * </p>
+     *
+     * @param setFree            the number of prisoners to release if that option is selected
+     * @param executions         the number of prisoners to execute if that option is selected
+     * @param inCharacterMessage the message to display in the dialog
+     *
+     * @return the index of the selected option (e.g., 0 for do nothing, 1 for release, 2 for execute)
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    private int getChoiceIndex(int setFree, int executions, String inCharacterMessage) {
+        List<String> options = List.of(getFormattedTextAt(RESOURCE_BUNDLE, "btnDoNothing.button"),
+              getFormattedTextAt(RESOURCE_BUNDLE, "free.button", setFree),
+              getFormattedTextAt(RESOURCE_BUNDLE, "execute.button", executions));
+
+        ImmersiveDialogSimple warningDialog = new ImmersiveDialogSimple(campaign,
+              speaker,
+              null,
+              inCharacterMessage,
+              options,
+              getFormattedTextAt(RESOURCE_BUNDLE, "warning.ooc"),
+              null,
+              true);
+
+        return warningDialog.getDialogChoice();
     }
 
     /**
