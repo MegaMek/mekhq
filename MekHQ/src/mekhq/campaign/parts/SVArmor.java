@@ -162,6 +162,15 @@ public class SVArmor extends Armor {
     }
 
     @Override
+    public int getAmountAvailable() {
+        return campaign.getWarehouse()
+                     .streamSpareParts()
+                     .filter(this::isSameSVArmorPart)
+                     .mapToInt(part -> ((SVArmor) part).getAmount())
+                     .sum();
+    }
+
+    @Override
     protected int changeAmountAvailableSingle(int amount) {
         SVArmor armor = (SVArmor) campaign.getWarehouse().findSparePart(part -> {
             return isSamePartType(part) && part.isPresent() && Objects.equals(getRefitUnit(), part.getRefitUnit());
@@ -210,5 +219,18 @@ public class SVArmor extends Armor {
                 logger.error("", e);
             }
         }
+    }
+
+    /**
+     * Not sure how true this title is, it was used in {@link SVArmor#getAmountAvailable}
+     * @param part is this part the same
+     * @return true if the two parts are the same, at least as far as {@link SVArmor#getAmountAvailable} is concerned
+     */
+    private boolean isSameSVArmorPart(Part part) {
+        return (part instanceof SVArmor armor) &&
+                     armor.isPresent() &&
+                     !armor.isReservedForRefit() &&
+                     isClanTechBase() == part.isClanTechBase() &&
+                     isSamePartType(armor);
     }
 }

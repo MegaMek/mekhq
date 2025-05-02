@@ -597,7 +597,7 @@ public class Armor extends Part implements IAcquisitionWork {
         int priorAmount = 0;
 
 
-        while ((amountRemaining != 0) && priorAmount != amountRemaining) {
+        while ((amountRemaining != 0) && (priorAmount != amountRemaining)) {
             priorAmount = amountRemaining;
 
             amountRemaining = changeAmountAvailableSingle(amountRemaining);

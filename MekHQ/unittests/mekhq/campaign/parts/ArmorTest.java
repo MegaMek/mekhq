@@ -33,6 +33,7 @@
 
 package mekhq.campaign.parts;
 
+import static megamek.common.ITechnology.RATING_D;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -53,8 +54,13 @@ import org.junit.jupiter.params.provider.MethodSource;
 /**
  * Tests {@link Armor} and its children, {@link BaArmor}, {@link SVArmor}, and {@link ProtoMekArmor}.
  */
+
 public class ArmorTest {
     static final int ARMOR_AMOUNT = 5;
+    static final int ARMOR_TYPE = EquipmentType.T_ARMOR_STANDARD;
+    static final int DIFFERENT_ARMOR_TYPE = EquipmentType.T_ARMOR_FERRO_FIBROUS;
+    static final int SV_ARMOR_BAR = 5;
+    static final int DIFFERENT_SV_ARMOR_BAR = 7;
 
     static Campaign mockCampaign;
     static CampaignOptions mockCampaignOptions;
@@ -75,16 +81,10 @@ public class ArmorTest {
      * @return
      */
     public static Stream<Armor> armorParameter() {
-        return Stream.of(new Armor(1,
-                    EquipmentType.T_ARMOR_STANDARD,
-                    ARMOR_AMOUNT,
-                    Entity.LOC_NONE,
-                    false,
-                    false,
-                    mockCampaign),
-              new ProtoMekArmor(1, EquipmentType.T_ARMOR_STANDARD, ARMOR_AMOUNT, Entity.LOC_NONE, false, mockCampaign),
-              new BaArmor(1, ARMOR_AMOUNT, EquipmentType.T_ARMOR_STANDARD, Entity.LOC_NONE, false, mockCampaign),
-              new SVArmor(1, EquipmentType.T_ARMOR_STANDARD, ARMOR_AMOUNT, Entity.LOC_NONE, mockCampaign));
+        return Stream.of(new Armor(1, ARMOR_TYPE, ARMOR_AMOUNT, Entity.LOC_NONE, false, false, mockCampaign),
+              new ProtoMekArmor(1, ARMOR_TYPE, ARMOR_AMOUNT, Entity.LOC_NONE, false, mockCampaign),
+              new BaArmor(1, ARMOR_AMOUNT, ARMOR_TYPE, Entity.LOC_NONE, false, mockCampaign),
+              new SVArmor(SV_ARMOR_BAR, RATING_D, ARMOR_AMOUNT, Entity.LOC_NONE, mockCampaign));
     }
 
     @BeforeEach
@@ -101,7 +101,7 @@ public class ArmorTest {
         armorQualityD.setQuality(PartQuality.QUALITY_D);
 
         Armor armorQualityC = armor.clone();
-        armorQualityD.setQuality(PartQuality.QUALITY_C);
+        armorQualityC.setQuality(PartQuality.QUALITY_C);
 
         // Act
         warehouse.addPart(armorQualityD, false);
@@ -121,7 +121,7 @@ public class ArmorTest {
         armorQualityD.setQuality(PartQuality.QUALITY_D);
 
         Armor armorQualityC = armor.clone();
-        armorQualityD.setQuality(PartQuality.QUALITY_C);
+        armorQualityC.setQuality(PartQuality.QUALITY_C);
 
         warehouse.addPart(armorQualityD, false);
         warehouse.addPart(armorQualityC, false);
@@ -143,7 +143,7 @@ public class ArmorTest {
         armorQualityD.setQuality(PartQuality.QUALITY_D);
 
         Armor armorQualityC = armor.clone();
-        armorQualityD.setQuality(PartQuality.QUALITY_C);
+        armorQualityC.setQuality(PartQuality.QUALITY_C);
 
         warehouse.addPart(armorQualityD, false);
         warehouse.addPart(armorQualityC, false);
@@ -167,7 +167,7 @@ public class ArmorTest {
         armorQualityD.setQuality(PartQuality.QUALITY_D);
 
         Armor armorQualityC = armor.clone();
-        armorQualityD.setQuality(PartQuality.QUALITY_C);
+        armorQualityC.setQuality(PartQuality.QUALITY_C);
 
         warehouse.addPart(armorQualityD, false);
         warehouse.addPart(armorQualityC, false);
@@ -191,7 +191,7 @@ public class ArmorTest {
         armorQualityD.setQuality(PartQuality.QUALITY_D);
 
         Armor armorQualityC = armor.clone();
-        armorQualityD.setQuality(PartQuality.QUALITY_C);
+        armorQualityC.setQuality(PartQuality.QUALITY_C);
 
         warehouse.addPart(armorQualityD, false);
         warehouse.addPart(armorQualityC, false);
@@ -215,7 +215,7 @@ public class ArmorTest {
         armorQualityD.setQuality(PartQuality.QUALITY_D);
 
         Armor armorQualityC = armor.clone();
-        armorQualityD.setQuality(PartQuality.QUALITY_C);
+        armorQualityC.setQuality(PartQuality.QUALITY_C);
 
         warehouse.addPart(armorQualityD, false);
         warehouse.addPart(armorQualityC, false);
@@ -239,7 +239,7 @@ public class ArmorTest {
         armorQualityD.setQuality(PartQuality.QUALITY_D);
 
         Armor armorQualityC = armor.clone();
-        armorQualityD.setQuality(PartQuality.QUALITY_C);
+        armorQualityC.setQuality(PartQuality.QUALITY_C);
 
         warehouse.addPart(armorQualityD, false);
         warehouse.addPart(armorQualityC, false);
@@ -255,5 +255,115 @@ public class ArmorTest {
         assertEquals(0, partCount);
     }
 
+    @ParameterizedTest
+    @MethodSource(value = "armorParameter")
+    public void getAmountAvailableDoesntConsiderDifferentType(Armor armor) {
+        // Arrange
+        Armor armorSameType = armor.clone();
 
+        Armor armorDifferentType = getDifferentArmorType(armor);
+
+        warehouse.addPart(armorSameType, false);
+        warehouse.addPart(armorDifferentType, false);
+
+        // Act
+        int amountAvailable = armor.getAmountAvailable();
+        int partCount = warehouse.getSpareParts().size();
+
+        // Assert
+        assertEquals(ARMOR_AMOUNT, amountAvailable);
+        assertEquals(2, partCount);
+    }
+
+    @ParameterizedTest
+    @MethodSource(value = "armorParameter")
+    public void changeAmountAvailableDoesntConsiderDifferentTypeAdd(Armor armor) {
+        // Arrange
+        Armor armorSameType = armor.clone();
+
+        Armor armorDifferentType = getDifferentArmorType(armor);
+
+        warehouse.addPart(armorSameType, false);
+        warehouse.addPart(armorDifferentType, false);
+
+        // Act
+        armor.changeAmountAvailable((12));
+        int amountAvailable = armor.getAmountAvailable();
+        int partCount = warehouse.getSpareParts().size();
+
+        // Assert
+        assertEquals(ARMOR_AMOUNT + 12, amountAvailable);
+        assertEquals(2, partCount);
+    }
+
+    @ParameterizedTest
+    @MethodSource(value = "armorParameter")
+    public void changeAmountAvailableDoesntConsiderDifferentTypeRemove(Armor armor) {
+        // Arrange
+        Armor armorSameType = armor.clone();
+
+        Armor armorDifferentType = getDifferentArmorType(armor);
+
+        warehouse.addPart(armorSameType, false);
+        warehouse.addPart(armorDifferentType, false);
+
+        // Act
+        armor.changeAmountAvailable(-1);
+        int amountAvailable = armor.getAmountAvailable();
+        int partCount = warehouse.getSpareParts().size();
+
+        // Assert
+        assertEquals(ARMOR_AMOUNT -1, amountAvailable);
+        assertEquals(2, partCount);
+    }
+
+    @ParameterizedTest
+    @MethodSource(value = "armorParameter")
+    public void changeAmountAvailableDoesntConsiderDifferentTypeRemoveMore(Armor armor) {
+        // Arrange
+        Armor armorSameType = armor.clone();
+
+        Armor armorDifferentType = getDifferentArmorType(armor);
+
+        warehouse.addPart(armorSameType, false);
+        warehouse.addPart(armorDifferentType, false);
+
+        // Act
+        armor.changeAmountAvailable( -(ARMOR_AMOUNT+12));
+        int amountAvailable = armor.getAmountAvailable();
+        int partCount = warehouse.getSpareParts().size();
+
+        // Assert
+        assertEquals(0, amountAvailable);
+        assertEquals(1, partCount);
+    }
+
+    @ParameterizedTest
+    @MethodSource(value = "armorParameter")
+    public void changeAmountAvailableDoesntConsiderDifferentTypeRemoveNoMatch(Armor armor) {
+        // Arrange
+        Armor armorDifferentType = getDifferentArmorType(armor);
+
+        warehouse.addPart(armorDifferentType, false);
+
+        // Act
+        armor.changeAmountAvailable(-12);
+        int amountAvailable = armor.getAmountAvailable();
+        int partCount = warehouse.getSpareParts().size();
+
+        // Assert
+        assertEquals(0, amountAvailable);
+        assertEquals(1, partCount);
+    }
+
+    private Armor getDifferentArmorType(Armor armor) {
+        if (armor instanceof SVArmor) {
+            return new SVArmor(DIFFERENT_SV_ARMOR_BAR, RATING_D, ARMOR_AMOUNT, Entity.LOC_NONE, mockCampaign);
+        } else {
+            Armor differentArmor = armor.clone();
+            differentArmor.changeType(DIFFERENT_ARMOR_TYPE, false);
+            return differentArmor;
+        }
+
+    }
 }
