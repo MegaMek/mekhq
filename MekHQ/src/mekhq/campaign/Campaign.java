@@ -2530,6 +2530,38 @@ public class Campaign implements ITechManager {
     }
 
     /**
+     * Returns a list of active personnel, including students that are assigned to their home (unit) academy.
+     *
+     * <p>The returned list includes:</p>
+     * <ul>
+     *   <li>All personnel whose status is active</li>
+     *   <li>Students who are assigned to an academy that is marked as their home school</li>
+     * </ul>
+     *
+     * @return a list of {@link Person} objects who are either active or in-unit students.
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public List<Person> getActivePersonnelIncludingInUnitStudents() {
+        List<Person> activePersonnel = new ArrayList<>();
+        for (Person person : getPersonnel()) {
+            PersonnelStatus status = person.getStatus();
+            if (status.isStudent()) {
+                Academy academy = getAcademy(person.getEduAcademyName(), person.getEduAcademyNameInSet());
+                if (academy != null && academy.isHomeSchool()) {
+                    activePersonnel.add(person);
+                    continue;
+                }
+            }
+            if (status.isActive()) {
+                activePersonnel.add(person);
+            }
+        }
+        return activePersonnel;
+    }
+
+    /**
      * Retrieves a filtered list of personnel who have at least one combat profession.
      * <p>
      * This method filters the list of all personnel to include only those whose primary or secondary role is designated

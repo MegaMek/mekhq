@@ -52,6 +52,7 @@ import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.event.LoanDefaultedEvent;
 import mekhq.campaign.event.TransactionCreditEvent;
 import mekhq.campaign.event.TransactionDebitEvent;
@@ -311,8 +312,11 @@ public class Finances {
     }
 
     public void newDay(final Campaign campaign, final LocalDate yesterday, final LocalDate today) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        Accountant accountant = campaign.getAccountant();
+
         // check for a new fiscal year
-        if (campaign.getCampaignOptions().getFinancialYearDuration().isEndOfFinancialYear(campaign.getLocalDate())) {
+        if (campaignOptions.getFinancialYearDuration().isEndOfFinancialYear(campaign.getLocalDate())) {
             // calculate profits
             Money profits = getProfits();
             campaign.addReport(String.format(resourceMap.getString("Profits.finances"),
@@ -322,7 +326,7 @@ public class Finances {
             newFiscalYear(campaign);
 
             // pay taxes
-            if ((campaign.getCampaignOptions().isUseTaxes()) && (!profits.isZero())) {
+            if ((campaignOptions.isUseTaxes()) && (!profits.isZero())) {
                 payTaxes(campaign, profits);
             }
         }
@@ -347,10 +351,10 @@ public class Finances {
 
         // Handle peacetime operating expenses, payroll, and loan payments
         if (today.getDayOfMonth() == 1) {
-            if (campaign.getCampaignOptions().isUsePeacetimeCost()) {
-                if (!campaign.getCampaignOptions().isShowPeacetimeCost()) {
+            if (campaignOptions.isUsePeacetimeCost()) {
+                if (!campaignOptions.isShowPeacetimeCost()) {
                     // Do not include salaries as that will be tracked below
-                    Money peacetimeCost = campaign.getAccountant().getPeacetimeCost(false);
+                    Money peacetimeCost = accountant.getPeacetimeCost(false);
 
                     if (debit(TransactionType.MAINTENANCE,
                           today,
@@ -367,9 +371,9 @@ public class Finances {
                               "</font>"));
                     }
                 } else {
-                    Money sparePartsCost = campaign.getAccountant().getMonthlySpareParts();
-                    Money ammoCost = campaign.getAccountant().getMonthlyAmmo();
-                    Money fuelCost = campaign.getAccountant().getMonthlyFuel();
+                    Money sparePartsCost = accountant.getMonthlySpareParts();
+                    Money ammoCost = accountant.getMonthlyAmmo();
+                    Money fuelCost = accountant.getMonthlyFuel();
 
                     if (debit(TransactionType.MAINTENANCE,
                           today,
@@ -418,16 +422,16 @@ public class Finances {
                 }
             }
 
-            if (campaign.getCampaignOptions().isPayForSalaries()) {
+            if (campaignOptions.isPayForSalaries()) {
 
-                Money payRollCost = campaign.getAccountant().getPayRoll();
+                Money payRollCost = accountant.getPayRoll();
 
                 if (debit(TransactionType.SALARIES,
                       today,
                       payRollCost,
                       resourceMap.getString("Salaries.title"),
-                      campaign.getAccountant().getPayRollSummary(),
-                      campaign.getCampaignOptions().isTrackTotalEarnings())) {
+                      accountant.getPayRollSummary(),
+                      campaignOptions.isTrackTotalEarnings())) {
                     campaign.addReport(String.format(resourceMap.getString("Salaries.text"),
                           payRollCost.toAmountAndSymbolString()));
 
@@ -439,7 +443,7 @@ public class Finances {
                           resourceMap.getString("Payroll.text"),
                           "</font>"));
 
-                    if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
+                    if (campaignOptions.isUseLoyaltyModifiers()) {
                         for (Person person : campaign.getPersonnel()) {
                             if (person.getStatus().isDepartedUnit()) {
                                 continue;
@@ -463,12 +467,31 @@ public class Finances {
             }
 
             // Handle overhead expenses
-            if (campaign.getCampaignOptions().isPayForOverhead()) {
-                Money overheadCost = campaign.getAccountant().getOverheadExpenses();
+            if (campaignOptions.isPayForOverhead()) {
+                Money overheadCost = accountant.getOverheadExpenses();
 
                 if (debit(TransactionType.OVERHEAD, today, overheadCost, resourceMap.getString("Overhead.title"))) {
                     campaign.addReport(String.format(resourceMap.getString("Overhead.text"),
                           overheadCost.toAmountAndSymbolString()));
+                } else {
+                    campaign.addReport(String.format("<font color='" +
+                                                           MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                                                           "'>" +
+                                                           resourceMap.getString("InsufficientFunds.text"),
+                          resourceMap.getString("OverheadCosts.text"),
+                          "</font>"));
+                }
+            }
+
+            if (campaignOptions.isPayForFood() || campaignOptions.isPayForHousing()) {
+                Money foodAndHousingCosts = accountant.getMonthlyFoodAndHousingExpenses();
+
+                if (debit(TransactionType.OVERHEAD,
+                      today,
+                      foodAndHousingCosts,
+                      resourceMap.getString("FoodAndHousing.title"))) {
+                    campaign.addReport(String.format(resourceMap.getString("FoodAndHousing.text"),
+                          foodAndHousingCosts.toAmountAndSymbolString()));
                 } else {
                     campaign.addReport(String.format("<font color='" +
                                                            MekHQ.getMHQOptions().getFontColorNegativeHexColor() +

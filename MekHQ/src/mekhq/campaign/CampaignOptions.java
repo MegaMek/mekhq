@@ -466,6 +466,8 @@ public class CampaignOptions {
     private boolean sellUnits;
     private boolean sellParts;
     private boolean payForRecruitment;
+    private boolean payForFood;
+    private boolean payForHousing;
     private boolean useLoanLimits;
     private boolean usePercentageMaint; // Unofficial
     private boolean infantryDontCount; // Unofficial
@@ -1071,6 +1073,8 @@ public class CampaignOptions {
         sellUnits = false;
         sellParts = false;
         payForRecruitment = false;
+        payForFood = false;
+        payForHousing = false;
         useLoanLimits = false;
         usePercentageMaint = false;
         infantryDontCount = false;
@@ -3321,6 +3325,22 @@ public class CampaignOptions {
         this.payForRecruitment = payForRecruitment;
     }
 
+    public boolean isPayForFood() {
+        return payForFood;
+    }
+
+    public void setPayForFood(final boolean payForFood) {
+        this.payForFood = payForFood;
+    }
+
+    public boolean isPayForHousing() {
+        return payForHousing;
+    }
+
+    public void setPayForHousing(final boolean payForHousing) {
+        this.payForHousing = payForHousing;
+    }
+
     public boolean isUseLoanLimits() {
         return useLoanLimits;
     }
@@ -5292,6 +5312,8 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sellUnits", sellUnits);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sellParts", sellParts);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForRecruitment", payForRecruitment);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForFood", payForFood);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForHousing", payForHousing);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useLoanLimits", useLoanLimits);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePercentageMaint", usePercentageMaint);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "infantryDontCount", infantryDontCount);
@@ -6225,6 +6247,10 @@ public class CampaignOptions {
                     retVal.sellParts = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (nodeName.equalsIgnoreCase("payForRecruitment")) {
                     retVal.payForRecruitment = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("payForFood")) {
+                    retVal.payForFood = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("payForHousing")) {
+                    retVal.payForHousing = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (nodeName.equalsIgnoreCase("useLoanLimits")) {
                     retVal.useLoanLimits = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("usePercentageMaint")) {

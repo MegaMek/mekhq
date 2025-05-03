@@ -24,13 +24,20 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.finances;
 
 import static mekhq.campaign.force.Force.FORCE_NONE;
+import static mekhq.campaign.personnel.ranks.Rank.RWO_MIN;
 
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -51,6 +58,13 @@ import mekhq.campaign.unit.Unit;
  */
 public record Accountant(Campaign campaign) {
     private static final MMLogger logger = MMLogger.create(Accountant.class);
+
+    final public static int HOUSING_PRISONER_OR_DEPENDENT = 228;
+    final public static int HOUSING_ENLISTED = 312;
+    final public static int HOUSING_OFFICER = 780;
+    final public static int FOOD_PRISONER_OR_DEPENDENT = 120;
+    final public static int FOOD_ENLISTED = 240;
+    final public static int FOOD_OFFICER = 480;
 
     public CampaignOptions getCampaignOptions() {
         return campaign().getCampaignOptions();
@@ -112,6 +126,121 @@ public record Accountant(Campaign campaign) {
         } else {
             return Money.zero();
         }
+    }
+
+    /**
+     * Calculates the total monthly expenses for food and housing for all active personnel in the campaign.
+     *
+     * <p>The calculation considers both food and housing costs based on the campaign's configuration and
+     * personnel roles, including officers, enlisted members, prisoners, and dependents. Housing costs are only applied
+     * if the campaign is located on a planet. Food and housing usage is counted using fixed per-person rates according
+     * to their role/status:</p>
+     *
+     * <ul>
+     *   <li>Prisoners or dependents have specific food and housing rates.</li>
+     *   <li>Officers have higher food and housing rates than enlisted personnel.</li>
+     *   <li>Crew members of non-DropShip large vessels live aboard their vessel and are exempt from housing charges.</li>
+     * </ul>
+     *
+     * <p>If neither food nor housing expenses are enabled in the campaign options, this method returns zero.</p>
+     *
+     * @return a {@link Money} object representing the total monthly food and housing expenses for the campaign
+     */
+    public Money getMonthlyFoodAndHousingExpenses() {
+        boolean payForFood = getCampaignOptions().isPayForFood();
+        boolean payForHousing = getCampaignOptions().isPayForHousing() && campaign.getLocation().isOnPlanet();
+
+        if (!payForFood && !payForHousing) {
+            return Money.zero();
+        }
+
+        int prisonerOrDependentHousingUsage = 0;
+        int enlistedHousingUsage = 0;
+        int officerHousingUsage = 0;
+
+        int prisonerOrDependentFoodUsage = 0;
+        int enlistedFoodUsage = 0;
+        int officerFoodUsage = 0;
+
+        // Determine housing and food requirements
+        List<Person> personnel = campaign.getActivePersonnelIncludingInUnitStudents();
+        for (Person person : personnel) {
+            boolean isPrisonerOrDependent = person.getPrisonerStatus().isCurrentPrisoner() ||
+                                                  person.getPrimaryRole().isCivilian();
+            boolean isOfficer = person.getRankNumeric() >= RWO_MIN;
+
+            if (payForHousing) {
+                Unit unit = person.getUnit();
+
+                // Crew of non-DropShip vessels live on their vessel full time
+                if (!isNonDropShipLargeVessel(unit)) {
+                    if (isPrisonerOrDependent) {
+                        prisonerOrDependentHousingUsage++;
+                    } else if (isOfficer) {
+                        officerHousingUsage++;
+                    } else {
+                        enlistedHousingUsage++;
+                    }
+                }
+            }
+
+            if (payForFood) {
+                if (isPrisonerOrDependent) {
+                    prisonerOrDependentFoodUsage++;
+                } else if (isOfficer) {
+                    officerFoodUsage++;
+                } else {
+                    enlistedFoodUsage++;
+                }
+            }
+        }
+
+        // calculate total costs
+        int expenses = 0;
+        if (payForHousing) {
+            expenses += prisonerOrDependentHousingUsage * HOUSING_PRISONER_OR_DEPENDENT;
+            expenses += enlistedHousingUsage * HOUSING_ENLISTED;
+            expenses += officerHousingUsage * HOUSING_OFFICER;
+        }
+
+        if (payForFood) {
+            expenses += prisonerOrDependentFoodUsage * FOOD_PRISONER_OR_DEPENDENT;
+            expenses += enlistedFoodUsage * FOOD_ENLISTED;
+            expenses += officerFoodUsage * FOOD_OFFICER;
+        }
+
+        logger.debug("prisonerOrDependentHousingUsage: {}", prisonerOrDependentHousingUsage);
+        logger.debug("enlistedHousingUsage: {}", enlistedHousingUsage);
+        logger.debug("officerHousingUsage: {}", officerHousingUsage);
+        logger.debug("prisonerOrDependentFoodUsage: {}", prisonerOrDependentFoodUsage);
+        logger.debug("enlistedFoodUsage: {}", enlistedFoodUsage);
+        logger.debug("officerFoodUsage: {}", officerFoodUsage);
+        logger.debug("expenses: {}", expenses);
+
+        return Money.of(expenses);
+    }
+
+    /**
+     * Determines whether the specified unit is a large vessel that is not a DropShip.
+     *
+     * <p>This method checks if the given {@code unit} is non-null, retrieves its associated {@link Entity}, and
+     * evaluates whether it qualifies as a large craft but is not a DropShip.</p>
+     *
+     * @param unit the unit to be tested; may be {@code null}
+     *
+     * @return {@code true} if the unit exists, its entity is a large craft, and it is not a DropShip; {@code false}
+     *       otherwise
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public boolean isNonDropShipLargeVessel(Unit unit) {
+        if (unit == null) {
+            return false;
+        }
+
+        Entity entity = unit.getEntity();
+        return (entity != null) && entity.isLargeCraft() && !entity.isDropShip();
     }
 
     /**
