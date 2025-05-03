@@ -55,11 +55,13 @@ import org.w3c.dom.NodeList;
 public class TankLocation extends Part {
     private static final MMLogger logger = MMLogger.create(TankLocation.class);
 
-    static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_ALL)
-            .setAdvancement(2460, 2470, 2510).setApproximate(true, false, false)
-            .setPrototypeFactions(F_TH).setProductionFactions(F_TH)
-            .setTechRating(RATING_D).setAvailability(RATING_A, RATING_A, RATING_A, RATING_A)
-            .setStaticTechLevel(SimpleTechLevel.STANDARD);
+    static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_ALL).setAdvancement(2460, 2470, 2510)
+                                                          .setApproximate(true, false, false)
+                                                          .setPrototypeFactions(F_TH)
+                                                          .setProductionFactions(F_TH)
+                                                          .setTechRating(RATING_D)
+                                                          .setAvailability(RATING_A, RATING_A, RATING_A, RATING_A)
+                                                          .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     protected int loc;
     protected int damage;
@@ -112,9 +114,9 @@ public class TankLocation extends Part {
 
     @Override
     public boolean isSamePartType(Part part) {
-        return part instanceof TankLocation
-                && getLoc() == ((TankLocation) part).getLoc()
-                && getUnitTonnage() == part.getUnitTonnage();
+        return part instanceof TankLocation &&
+                     getLoc() == ((TankLocation) part).getLoc() &&
+                     getUnitTonnage() == part.getUnitTonnage();
     }
 
     @Override
@@ -257,10 +259,7 @@ public class TankLocation extends Part {
             if (isBreached()) {
                 toReturn.append(", Breached");
             } else if (damage > 0) {
-                toReturn.append(", ")
-                    .append(damage)
-                    .append(damage == 1 ? " point" : " points")
-                    .append(" of damage");
+                toReturn.append(", ").append(damage).append(damage == 1 ? " point" : " points").append(" of damage");
             }
         }
 
@@ -294,14 +293,24 @@ public class TankLocation extends Part {
 
     @Override
     public double getTonnage() {
-        // TODO Auto-generated method stub
-        return 0;
+        // Technically weight of the location structure for consistency with MekLocation
+        // Cannot have endo steel etc.
+        // Turrets are handled separately
+        double tonnage = getUnitTonnage() * 0.1 / 4;
+        return (tonnage);
     }
 
     @Override
     public Money getStickerPrice() {
-        // TODO Auto-generated method stub
-        return Money.zero();
+        // Chassis prices are returned here
+        double totalCost = 0;
+        double structureCost = 0;
+        double controlsCost = 0;
+        structureCost += 10000 * getTonnage(); // True for SVs as well?
+        controlsCost += 10000 * getTonnage() / 2;
+        //TODO: Support vehicles have chassis structure multipliers
+        totalCost = structureCost + controlsCost;
+        return Money.of(totalCost);
     }
 
     @Override
