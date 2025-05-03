@@ -33,7 +33,6 @@
  */
 package mekhq.campaign.mission;
 
-import static java.awt.Color.BLACK;
 import static java.lang.Math.ceil;
 import static java.lang.Math.floor;
 import static java.lang.Math.max;
@@ -74,6 +73,7 @@ import static mekhq.campaign.universe.fameAndInfamy.BatchallFactions.BATCHALL_FA
 import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.io.IOException;
@@ -1987,7 +1987,7 @@ public class AtBContract extends Contract {
         divider.setHorizontalAlignment(SwingConstants.CENTER);
         int fontSize = scaleForGUI(SIZE); // scaleImageIcon already includes the necessary scaling
         divider.setFont(new Font(Font.MONOSPACED, Font.PLAIN, fontSize));
-        divider.setForeground(BLACK);
+        divider.setForeground(new Color(0, 0, 0, 128));
 
         String enemy = getEnemyCode();
         ImageIcon enemyImage = getFactionLogo(gameYear, enemy);
