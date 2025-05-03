@@ -145,6 +145,8 @@ public record Accountant(Campaign campaign) {
      * <p>If neither food nor housing expenses are enabled in the campaign options, this method returns zero.</p>
      *
      * @return a {@link Money} object representing the total monthly food and housing expenses for the campaign
+     * @author Illiani
+     * @since 0.50.06
      */
     public Money getMonthlyFoodAndHousingExpenses() {
         boolean payForFood = getCampaignOptions().isPayForFood();
