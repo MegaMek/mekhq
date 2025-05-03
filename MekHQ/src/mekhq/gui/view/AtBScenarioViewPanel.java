@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.view;
 
@@ -283,32 +288,36 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             int team = botStub.getTeam();
             DefaultMutableTreeNode top = new DefaultMutableTreeNode(botStub.getName());
             List<String> allEntries = botStub.getEntityList();
-            for (String entry : allEntries) {
-                if ((team != 1) && isTrueBlindDrop) {
-                    continue;
-                }
 
-                if ((team != 1) && isBlindDrop) {
-                    int unitIndex = allEntries.indexOf(entry);
-                    Entity entity = scenario.getBotForce(i).getFullEntityList(campaign).get(unitIndex);
+            // Process entries only for current scenarios to avoid exceptions or irrelevant processing
+            if (scenario.getStatus().isCurrent()) {
+                for (String entry : allEntries) {
+                    if ((team != 1) && isTrueBlindDrop) {
+                        continue;
+                    }
 
-                    if (entity == null) {
-                        String label = "???";
+                    if ((team != 1) && isBlindDrop) {
+                        int unitIndex = allEntries.indexOf(entry);
+                        Entity entity = scenario.getBotForce(i).getFullEntityList(campaign).get(unitIndex);
+
+                        if (entity == null) {
+                            String label = "???";
+                            top.add(new DefaultMutableTreeNode(label));
+                            continue;
+                        }
+
+                        String weightClass = entity.getWeightClassName();
+                        long entityType = entity.getEntityType();
+                        String unitType = getEntityMajorTypeName(entityType);
+
+                        String label = weightClass + ' ' + unitType;
                         top.add(new DefaultMutableTreeNode(label));
                         continue;
                     }
 
-                    String weightClass = entity.getWeightClassName();
-                    long entityType = entity.getEntityType();
-                    String unitType = getEntityMajorTypeName(entityType);
+                    top.add(new DefaultMutableTreeNode(entry));
 
-                    String label = weightClass + ' ' + unitType;
-                    top.add(new DefaultMutableTreeNode(label));
-                    continue;
                 }
-
-                top.add(new DefaultMutableTreeNode(entry));
-
             }
             JTree tree = new JTree(top);
             tree.collapsePath(new TreePath(top));
