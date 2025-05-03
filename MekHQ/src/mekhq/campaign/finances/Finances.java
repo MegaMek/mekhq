@@ -497,7 +497,7 @@ public class Finances {
                                                            MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
                                                            "'>" +
                                                            resourceMap.getString("InsufficientFunds.text"),
-                          resourceMap.getString("OverheadCosts.text"),
+                          resourceMap.getString("HousingAndFoodCosts.text"),
                           "</font>"));
                 }
             }
