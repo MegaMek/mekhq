@@ -33,6 +33,7 @@
  */
 package mekhq.campaign.mission;
 
+import static java.awt.Color.BLACK;
 import static java.lang.Math.ceil;
 import static java.lang.Math.floor;
 import static java.lang.Math.max;
@@ -40,6 +41,7 @@ import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.client.ratgenerator.ModelRecord.NETWORK_NONE;
 import static megamek.client.ratgenerator.UnitTable.findTable;
+import static megamek.client.ui.swing.util.UIUtil.scaleForGUI;
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
@@ -1973,18 +1975,21 @@ public class AtBContract extends Contract {
      * @since 0.50.06
      */
     public JPanel getBelligerentsPanel(Campaign campaign) {
+        final int SIZE = 150;
+
         String employer = getEmployerCode();
         ImageIcon employerImage = getFactionLogo(campaign, employer, false);
-        employerImage = scaleImageIcon(employerImage, 150, true);
+        employerImage = scaleImageIcon(employerImage, SIZE, true);
 
         JLabel divider = new JLabel("/");
         divider.setHorizontalAlignment(SwingConstants.CENTER);
-        int fontSize = 150;
+        int fontSize = scaleForGUI(SIZE); // scaleImageIcon already includes the necessary scaling
         divider.setFont(new Font(Font.MONOSPACED, Font.PLAIN, fontSize));
+        divider.setForeground(BLACK);
 
         String enemy = getEnemyCode();
         ImageIcon enemyImage = getFactionLogo(campaign, enemy, false);
-        enemyImage = scaleImageIcon(enemyImage, 150, true);
+        enemyImage = scaleImageIcon(enemyImage, SIZE, true);
 
         JPanel panel = new JPanel(new FlowLayout());
         panel.add(new JLabel(employerImage));
