@@ -59,25 +59,6 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
-import mekhq.campaign.personnel.skills.Skills;
-import mekhq.gui.campaignOptions.components.*;
-
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import java.awt.*;
-import java.util.ResourceBundle;
-
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
-import mekhq.campaign.personnel.skills.Skills;
-import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
-import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
-import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
-import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 
 /**
  * Represents a tab in the campaign options UI for managing ruleset configurations in campaigns.
@@ -150,7 +131,6 @@ public class RulesetsTab {
     private JPanel pnlLancePanel;
     private JCheckBox chkLimitLanceWeight;
     private JCheckBox chkLimitLanceNumUnits;
-    private JCheckBox chkUseStrategy;
     private JLabel lblBaseStrategyDeployment;
     private JSpinner spnBaseStrategyDeployment;
     private JLabel lblAdditionalStrategyDeployment;
@@ -280,7 +260,6 @@ public class RulesetsTab {
         pnlLancePanel = new JPanel();
         chkLimitLanceWeight = new JCheckBox();
         chkLimitLanceNumUnits = new JCheckBox();
-        chkUseStrategy = new JCheckBox();
         lblBaseStrategyDeployment = new JLabel();
         spnBaseStrategyDeployment = new JSpinner();
         lblAdditionalStrategyDeployment = new JLabel();
@@ -668,7 +647,6 @@ public class RulesetsTab {
         // Content
         chkLimitLanceWeight = new CampaignOptionsCheckBox("LimitLanceWeight");
         chkLimitLanceNumUnits = new CampaignOptionsCheckBox("LimitLanceNumUnits");
-        chkUseStrategy = new CampaignOptionsCheckBox("UseStrategy");
         lblBaseStrategyDeployment = new CampaignOptionsLabel("BaseStrategyDeployment");
         spnBaseStrategyDeployment = new CampaignOptionsSpinner("BaseStrategyDeployment",
             0, 0, 10, 1);
@@ -688,9 +666,6 @@ public class RulesetsTab {
 
         layout.gridy++;
         panel.add(chkLimitLanceNumUnits, layout);
-
-        layout.gridy++;
-        panel.add(chkUseStrategy, layout);
 
         layout.gridx = 0;
         layout.gridy++;
@@ -1108,7 +1083,6 @@ public class RulesetsTab {
         options.setRestrictPartsByMission(chkRestrictPartsByMission.isSelected());
         options.setLimitLanceWeight(chkLimitLanceWeight.isSelected());
         options.setLimitLanceNumUnits(chkLimitLanceNumUnits.isSelected());
-        options.setUseStrategy(chkUseStrategy.isSelected());
         options.setBaseStrategyDeployment((int) spnBaseStrategyDeployment.getValue());
         options.setAdditionalStrategyDeployment((int) spnAdditionalStrategyDeployment.getValue());
         options.setAutoResolveMethod(comboAutoResolveMethod.getSelectedItem());
@@ -1183,7 +1157,6 @@ public class RulesetsTab {
         chkRestrictPartsByMission.setSelected(options.isRestrictPartsByMission());
         chkLimitLanceWeight.setSelected(options.isLimitLanceWeight());
         chkLimitLanceNumUnits.setSelected(options.isLimitLanceNumUnits());
-        chkUseStrategy.setSelected(options.isUseStrategy());
         spnBaseStrategyDeployment.setValue(options.getBaseStrategyDeployment());
         spnAdditionalStrategyDeployment.setValue(options.getAdditionalStrategyDeployment());
         comboAutoResolveMethod.setSelectedItem(options.getAutoResolveMethod());

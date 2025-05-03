@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.market.contractMarket;
 
@@ -274,21 +279,11 @@ public abstract class AbstractContractMarket {
         // Calculate base formation size and effective unit force
         Faction faction = campaign.getFaction();
         int lanceLevelFormationSize = getStandardForceSize(faction);
-
         int effectiveForces = Math.max(getEffectiveNumUnits(campaign) / lanceLevelFormationSize, 1);
-
-        // Calculate maximum deployed forces based on strategy options
-        int maxDeployableCombatTeams = effectiveForces;
-        if (campaign.getCampaignOptions().isUseStrategy()) {
-            maxDeployableCombatTeams = Math.max(calculateMaxDeployableCombatTeams(campaign), 1);
-        }
-
-        // Clamp available forces to the max deployable limit
-        int availableForces = Math.min(effectiveForces, maxDeployableCombatTeams);
 
         // If bypassing variance, apply flat reduction (reduce force by 1/3)
         if (bypassVariance) {
-            return Math.max(availableForces - calculateBypassVarianceReduction(availableForces), 1);
+            return Math.max(effectiveForces - calculateBypassVarianceReduction(effectiveForces), 1);
         }
 
         // Apply variance based on a die roll
@@ -296,14 +291,14 @@ public abstract class AbstractContractMarket {
         double varianceFactor = calculateVarianceFactor(varianceRoll);
 
         // Adjust available forces based on variance, ensuring minimum clamping
-        int adjustedForces = availableForces - (int) Math.floor((double) availableForces / varianceFactor);
+        int adjustedForces = effectiveForces - (int) Math.floor((double) effectiveForces / varianceFactor);
 
         if (adjustedForces < 1) {
             adjustedForces = 1;
         }
 
         // Return the clamped value, ensuring it does not exceed max-deployable forces
-        return Math.min(adjustedForces, maxDeployableCombatTeams);
+        return Math.min(adjustedForces, effectiveForces);
     }
 
     /**

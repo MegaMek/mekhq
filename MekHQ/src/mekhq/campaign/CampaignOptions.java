@@ -599,7 +599,6 @@ public class CampaignOptions {
     private boolean restrictPartsByMission;
     private boolean limitLanceWeight;
     private boolean limitLanceNumUnits;
-    private boolean useStrategy;
     private int baseStrategyDeployment;
     private int additionalStrategyDeployment;
     private final int[] atbBattleChance;
@@ -1222,7 +1221,6 @@ public class CampaignOptions {
         restrictPartsByMission = true;
         limitLanceWeight = true;
         limitLanceNumUnits = true;
-        useStrategy = true;
         baseStrategyDeployment = 3;
         additionalStrategyDeployment = 1;
         atbBattleChance = new int[CombatRole.values().length - 1];
@@ -4690,12 +4688,20 @@ public class CampaignOptions {
         this.usePlanetaryConditions = usePlanetaryConditions;
     }
 
+    /**
+     * @deprecated unused.
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public boolean isUseStrategy() {
-        return useStrategy;
+        return false;
     }
 
+    /**
+     * @deprecated unused.
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public void setUseStrategy(final boolean useStrategy) {
-        this.useStrategy = useStrategy;
+        return;
     }
 
     public int getBaseStrategyDeployment() {
@@ -5426,7 +5432,6 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useWeatherConditions", useWeatherConditions);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useLightConditions", useLightConditions);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePlanetaryConditions", usePlanetaryConditions);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useStrategy", useStrategy);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "baseStrategyDeployment", baseStrategyDeployment);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "additionalStrategyDeployment", additionalStrategyDeployment);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "restrictPartsByMission", restrictPartsByMission);
@@ -6445,8 +6450,6 @@ public class CampaignOptions {
                     retVal.useLightConditions = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("usePlanetaryConditions")) {
                     retVal.usePlanetaryConditions = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (nodeName.equalsIgnoreCase("useStrategy")) {
-                    retVal.useStrategy = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("baseStrategyDeployment")) {
                     retVal.baseStrategyDeployment = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("additionalStrategyDeployment")) {
