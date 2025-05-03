@@ -87,9 +87,7 @@ planet:
     event:
       - date: '2700-12-13'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         hpg: B
         population: 51629.0
         socioIndustrial: C-D-A-D-B
@@ -181,9 +179,7 @@ planet:
         population: 724696942.0
       - date: '3105-08-01'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '3110-01-01'
         population: 733885892.0
       - date: '3120-01-01'
@@ -194,9 +190,7 @@ planet:
         population: 765824902.0
       - date: '3145-08-11'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 770125552.0
   - name: Celoneo
     type: ICE_GIANT

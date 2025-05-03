@@ -106,9 +106,7 @@ planet:
     event:
       - date: '2271-11-25'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 50942.0
         socioIndustrial: C-D-B-D-C
       - date: '2280-01-01'
@@ -117,9 +115,7 @@ planet:
         population: 512609.0
       - date: '2299-03-22'
         faction:
-          source: canon
-          value:
-            - FoS
+          - FoS
       - date: '2300-01-01'
         population: 1379724.0
       - date: '2301-01-01'
@@ -132,9 +128,9 @@ planet:
         population: 12972841.0
       - date: '2340-01-01'
         population: 22585227.0
-      - date: '2341-02-18'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2350-01-01'
@@ -289,15 +285,15 @@ planet:
         population: 459406213.0
       - date: '3025-01-01'
         socioIndustrial: D-D-C-C-C
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 460931422.0
       - date: '3040-01-01'
         population: 463983630.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3047-01-01'
         socioIndustrial:
           source: canon
@@ -306,7 +302,7 @@ planet:
         population: 467429845.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -335,9 +331,7 @@ planet:
         population: 511245176.0
       - date: '3145-05-26'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 511449715.0
   - name: Uemura's Mistake
     type: GIANT_TERRESTRIAL

@@ -92,9 +92,7 @@ planet:
     event:
       - date: '2170-01-03'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 50415.0
         socioIndustrial: D-D-B-D-D
       - date: '2180-01-01'
@@ -111,9 +109,7 @@ planet:
         population: 6253209.0
       - date: '2235-09-19'
         faction:
-          source: canon
-          value:
-            - TamP
+          - TamP
       - date: '2240-01-01'
         population: 10500181.0
       - date: '2250-01-01'
@@ -136,9 +132,9 @@ planet:
         population: 144294981.0
       - date: '2340-01-01'
         population: 167897120.0
-      - date: '2341-07-16'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2350-01-01'
@@ -256,9 +252,7 @@ planet:
         population: 476027295.0
       - date: '2861-08-06'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2870-01-01'
         population: 478200529.0
       - date: '2880-01-01'
@@ -295,13 +289,11 @@ planet:
         population: 378799743.0
       - date: '3030-11-09'
         faction:
-          source: canon
-          value:
-            - LA
+          - FC
         population: 378385799.0
       - date: '3034-03-13'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FRR
       - date: '3040-01-01'
@@ -318,9 +310,7 @@ planet:
         population: 389753429.0
       - date: '3075-07-13'
         faction:
-          source: canon
-          value:
-            - CGB
+          - CGB
       - date: '3080-01-01'
         population: 393906790.0
       - date: '3088-01-01'
@@ -331,9 +321,7 @@ planet:
         population: 395881256.0
       - date: '3103-03-13'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
       - date: '3106-01-01'
         socioIndustrial: D-B-C-C-C
       - date: '3110-01-01'

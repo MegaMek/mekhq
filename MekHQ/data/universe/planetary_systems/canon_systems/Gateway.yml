@@ -76,9 +76,7 @@ planet:
     event:
       - date: '2891-09-16'
         faction:
-          source: canon
-          value:
-            - HL
+          - HL
         population: 51408.0
         socioIndustrial: C-D-A-D-F
       - date: '2892-03-31'
@@ -138,9 +136,7 @@ planet:
         population: 387264.0
       - date: '3140-12-20'
         faction:
-          source: canon
-          value:
-            - CEI
+          - CEI
       - date: '3145-01-01'
         population: 386413.0
   - name: Pugh's Planet

@@ -121,9 +121,7 @@ planet:
     event:
       - date: '2442-06-14'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 50498.0
         socioIndustrial: C-D-C-D-B
       - date: '2450-01-01'
@@ -257,15 +255,15 @@ planet:
         population: 94990325.0
       - date: '3026-01-01'
         socioIndustrial: C-C-C-C-B
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 93719299.0
       - date: '3040-01-01'
         population: 94283305.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3045-01-01'
         socioIndustrial:
           source: canon
@@ -274,27 +272,23 @@ planet:
         population: 95373821.0
       - date: '3050-06-23'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
             - FC
       - date: '3050-07-05'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
       - date: '3060-01-01'
         population: 96650766.0
       - date: '3067-09-06'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '3069-01-25'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3070-01-01'
         population: 97886058.0
       - date: '3080-01-01'
@@ -317,9 +311,7 @@ planet:
         population: 105467635.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
   - name: Cape Perkins
     type: TERRESTRIAL
     orbitalDist: 0.8

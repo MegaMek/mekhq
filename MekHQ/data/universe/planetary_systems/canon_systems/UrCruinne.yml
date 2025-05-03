@@ -32,9 +32,7 @@ planet:
     event:
       - date: '3057-06-06'
         faction:
-          source: canon
-          value:
-            - NCR
+          - NCR
         population: 50336.0
         socioIndustrial: C-D-A-C-D
       - date: '3058-03-01'
@@ -43,9 +41,7 @@ planet:
         population: 2479313.0
       - date: '3066-04-09'
         faction:
-          source: canon
-          value:
-            - FR
+          - FR
       - date: '3070-01-01'
         population: 5035842.0
       - date: '3080-01-01'
@@ -64,11 +60,6 @@ planet:
         population: 5588891.0
       - date: '3145-01-01'
         population: 5628150.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN
   - name: Molotov's Belt A
     type: ASTEROID_BELT
     orbitalDist: 0.28

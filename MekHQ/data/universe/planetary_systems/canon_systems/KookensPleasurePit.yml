@@ -114,9 +114,7 @@ planet:
     event:
       - date: '2727-11-16'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 44307.0
         socioIndustrial: C-D-D-D-C
       - date: '2730-08-02'
@@ -182,15 +180,15 @@ planet:
         population: 182831638.0
       - date: '3020-01-01'
         population: 184270242.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 185261706.0
       - date: '3040-01-01'
         population: 186754539.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3049-01-01'
         socioIndustrial:
           source: canon
@@ -199,16 +197,12 @@ planet:
         population: 188592005.0
       - date: '3057-12-01'
         faction:
-          source: canon
-          value:
-            - ARDC
+          - ARDC
       - date: '3060-01-01'
         population: 190914743.0
       - date: '3067-08-18'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population:
           source: canon
           value: 192340000.0
@@ -234,9 +228,7 @@ planet:
         population: 203988708.0
       - date: '3151-12-31'
         faction:
-          source: canon
-          value:
-            - AML
+          - AML
   - name: Walker
     type: GIANT_TERRESTRIAL
     orbitalDist: 2.52

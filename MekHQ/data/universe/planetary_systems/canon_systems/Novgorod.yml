@@ -35,9 +35,7 @@ planet:
     event:
       - date: '2891-11-17'
         faction:
-          source: canon
-          value:
-            - HL
+          - HL
         hpg: X
         population: 40566.0
         socioIndustrial: C-D-A-D-C
@@ -71,9 +69,7 @@ planet:
         population: 47519.0
       - date: '3025-11-09'
         faction:
-          source: canon
-          value:
-            - HL
+          - HL
       - date: '3030-01-01'
         population: 48019.0
       - date: '3040-01-01'
@@ -104,9 +100,7 @@ planet:
         population: 50724.0
       - date: '3140-01-15'
         faction:
-          source: canon
-          value:
-            - CEI
+          - CEI
       - date: '3145-01-01'
         population: 50979.0
   - name: Urakchiev's World

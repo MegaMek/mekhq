@@ -33,9 +33,7 @@ planet:
     event:
       - date: '2571-10-31'
         faction:
-          source: canon
-          value:
-            - OA
+          - OA
         population: 46740.0
         socioIndustrial: C-D-A-F-F
       - date: '2580-01-01'
@@ -154,9 +152,7 @@ planet:
         population: 102607278.0
       - date: '3083-08-06'
         faction:
-          source: canon
-          value:
-            - RA
+          - RA
       - date: '3090-01-01'
         population: 103970672.0
       - date: '3096-01-01'

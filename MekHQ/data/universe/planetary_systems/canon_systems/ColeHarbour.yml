@@ -52,9 +52,7 @@ planet:
     event:
       - date: '2332-02-25'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 41318.0
         socioIndustrial: D-D-C-C-B
       - date: '2340-01-01'
@@ -205,14 +203,10 @@ planet:
         population: 307669105.0
       - date: '3014-03-22'
         faction:
-          source: canon
-          value:
-            - FWLR
+          - FWLR
       - date: '3015-03-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3020-01-01'
         population: 307177418.0
       - date: '3030-01-01'
@@ -233,9 +227,7 @@ planet:
         population: 319258964.0
       - date: '3081-06-29'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 320154142.0
       - date: '3100-04-28'
@@ -255,12 +247,7 @@ planet:
         population: 322080841.0
       - date: '3148-03-01'
         faction:
-          source: canon
-          value:
-            - DA
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - DA
   - name: Hari Belt

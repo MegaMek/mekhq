@@ -184,9 +184,7 @@ planet:
     event:
       - date: '2250-04-08'
         faction:
-          source: canon
-          value:
-            - PoR
+          - PoR
         population: 47186.0
         socioIndustrial: F-D-B-D-D
       - date: '2260-01-01'
@@ -209,10 +207,8 @@ planet:
         population: 151094172.0
       - date: '2333-03-03'
         faction:
-          source: canon
-          value:
-            - PoR
-            - DC
+          - PoR
+          - DC
       - date: '2340-01-01'
         population: 249868825.0
       - date: '2349-01-01'
@@ -223,9 +219,7 @@ planet:
         population: 563826024.0
       - date: '2367-01-31'
         faction:
-          source: canon
-          value:
-            - PoR
+          - PoR
       - date: '2370-01-01'
         population: 779339137.0
       - date: '2380-01-01'
@@ -258,9 +252,7 @@ planet:
         population: 4297119346.0
       - date: '2510-12-30'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 4442951648.0
       - date: '2520-01-01'
         population: 4566789020.0
@@ -381,7 +373,7 @@ planet:
         population: 4938458023.0
       - date: '3034-03-13'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FRR
       - date: '3037-01-01'
@@ -396,22 +388,20 @@ planet:
         population: 5123549912.0
       - date: '3050-07-08'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CW
             - FRR
       - date: '3050-07-17'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CW
       - date: '3060-01-01'
         population: 5239167768.0
       - date: '3065-12-22'
         faction:
-          source: canon
-          value:
-            - CGB
+          - CGB
       - date: '3070-01-01'
         population: 5344913628.0
       - date: '3079-01-01'
@@ -428,9 +418,7 @@ planet:
         population: 5502185544.0
       - date: '3103-03-13'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
       - date: '3110-01-01'
         population: 5523133625.0
       - date: '3120-01-01'

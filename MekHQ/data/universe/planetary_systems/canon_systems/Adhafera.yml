@@ -59,9 +59,7 @@ planet:
     event:
       - date: '2662-12-06'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 51704.0
         socioIndustrial: C-D-B-D-F
       - date: '2663-09-14'
@@ -160,16 +158,12 @@ planet:
         population: 901989630.0
       - date: '3079-10-17'
         faction:
-          source: canon
-          value:
-            - SC
+          - SC
       - date: '3080-01-01'
         population: 908144060.0
       - date: '3082-03-14'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 915072249.0
       - date: '3100-01-01'
@@ -186,22 +180,16 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 979069884.0
       - date: '3145-03-01'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 984764989.0
       - date: '3151-12-01'
         faction:
-          source: canon
-          value:
-            - CP
+          - CP
   - name: Yu Huang
     type: TERRESTRIAL
     orbitalDist: 1.0
@@ -228,9 +216,7 @@ planet:
     event:
       - date: '2662-08-23'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 52918.0
         socioIndustrial: C-D-D-D-B
       - date: '2667-01-01'
@@ -329,16 +315,12 @@ planet:
         population: 675816068.0
       - date: '3079-10-31'
         faction:
-          source: canon
-          value:
-            - SC
+          - SC
       - date: '3080-01-01'
         population: 682744668.0
       - date: '3082-08-19'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 688641592.0
       - date: '3094-01-01'
@@ -353,22 +335,16 @@ planet:
         population: 707912820.0
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 714741508.0
       - date: '3145-04-24'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 718755289.0
       - date: '3151-12-01'
         faction:
-          source: canon
-          value:
-            - CP
+          - CP
   - name: Sung Chiang
     type: TERRESTRIAL
     orbitalDist: 2.8

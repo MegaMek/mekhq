@@ -68,9 +68,7 @@ planet:
     event:
       - date: '2247-06-04'
         faction:
-          source: canon
-          value:
-            - PR
+          - PR
         population: 59424.0
         socioIndustrial: D-D-A-D-B
       - date: '2250-01-01'
@@ -81,7 +79,7 @@ planet:
         population: 709600.0
       - date: '2271-06-01'
         faction:
-          source: canon
+          source: 'Handbook: House Marik'
           value:
             - FWL
       - date: '2280-01-01'
@@ -264,16 +262,12 @@ planet:
         population: 479014475.0
       - date: '3078-05-01'
         faction:
-          source: canon
-          value:
-            - PR
+          - PR
       - date: '3080-01-01'
         population: 481511837.0
       - date: '3086-02-01'
         faction:
-          source: canon
-          value:
-            - RF
+          - RF
       - date: '3090-01-01'
         population: 484506485.0
       - date: '3093-01-01'
@@ -294,12 +288,7 @@ planet:
         population: 516322110.0
       - date: '3148-07-07'
         faction:
-          source: canon
-          value:
-            - FWL
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - FWL
   - name: Yamasachinohiko

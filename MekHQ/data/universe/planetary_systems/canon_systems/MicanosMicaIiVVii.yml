@@ -74,9 +74,7 @@ planet:
     event:
       - date: '2603-05-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 46685.0
         socioIndustrial: C-D-B-D-F
       - date: '2610-01-01'
@@ -207,11 +205,6 @@ planet:
         population: 28155540.0
       - date: '3145-01-01'
         population: 28336314.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - IND
   - name: Yingarna
     type: ICE_GIANT
     orbitalDist: 0.7

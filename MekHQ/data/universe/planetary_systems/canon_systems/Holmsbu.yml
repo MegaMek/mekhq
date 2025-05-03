@@ -52,9 +52,7 @@ planet:
     event:
       - date: '2250-10-20'
         faction:
-          source: canon
-          value:
-            - PoR
+          - PoR
         population: 51506.0
         socioIndustrial: D-D-C-D-D
       - date: '2260-01-01'
@@ -75,10 +73,8 @@ planet:
         population: 43961063.0
       - date: '2333-11-24'
         faction:
-          source: canon
-          value:
-            - PoR
-            - DC
+          - PoR
+          - DC
       - date: '2340-01-01'
         population: 67131903.0
       - date: '2350-01-01'
@@ -87,9 +83,7 @@ planet:
         population: 135896349.0
       - date: '2367-07-30'
         faction:
-          source: canon
-          value:
-            - PoR
+          - PoR
       - date: '2370-01-01'
         population: 181207588.0
       - date: '2380-01-01'
@@ -122,9 +116,7 @@ planet:
         population: 839195555.0
       - date: '2510-07-08'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 868308361.0
       - date: '2520-01-01'
         population: 894094453.0
@@ -240,7 +232,7 @@ planet:
         population: 781632676.0
       - date: '3034-03-13'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FRR
       - date: '3040-03-11'
@@ -250,7 +242,7 @@ planet:
         population: 798300351.0
       - date: '3050-03-15'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CGB
       - date: '3060-01-01'
@@ -265,9 +257,7 @@ planet:
         population: 841667385.0
       - date: '3103-03-13'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
       - date: '3110-01-01'
         population: 850466401.0
       - date: '3119-01-01'
@@ -308,9 +298,7 @@ planet:
     event:
       - date: '2250-01-27'
         faction:
-          source: canon
-          value:
-            - PoR
+          - PoR
         population: 72827.0
         socioIndustrial: D-D-B-D-F
       - date: '2260-01-01'
@@ -331,10 +319,8 @@ planet:
         population: 19408032.0
       - date: '2333-08-12'
         faction:
-          source: canon
-          value:
-            - PoR
-            - DC
+          - PoR
+          - DC
       - date: '2340-01-01'
         population: 27573309.0
       - date: '2350-01-01'
@@ -343,9 +329,7 @@ planet:
         population: 48252455.0
       - date: '2367-09-28'
         faction:
-          source: canon
-          value:
-            - PoR
+          - PoR
       - date: '2370-01-01'
         population: 60443558.0
       - date: '2380-01-01'
@@ -376,9 +360,7 @@ planet:
         population: 208254714.0
       - date: '2510-03-16'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 215537995.0
       - date: '2520-01-01'
         population: 221343499.0
@@ -495,7 +477,7 @@ planet:
         population: 91399138.0
       - date: '3034-03-13'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FRR
       - date: '3040-01-01'
@@ -506,7 +488,7 @@ planet:
         population: 93497626.0
       - date: '3050-03-15'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CGB
       - date: '3060-01-01'
@@ -523,9 +505,7 @@ planet:
         population: 97449671.0
       - date: '3103-03-13'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
       - date: '3110-01-01'
         population: 98016521.0
       - date: '3120-01-01'

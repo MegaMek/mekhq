@@ -32,9 +32,7 @@ planet:
     event:
       - date: '2275-04-13'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 46941.0
         socioIndustrial: D-D-D-D-F
       - date: '2280-01-01'
@@ -53,9 +51,7 @@ planet:
         population: 14937445.0
       - date: '2350-01-26'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 24526246.0
       - date: '2360-01-01'
         population: 37736467.0
@@ -205,16 +201,16 @@ planet:
         population: 315532987.0
       - date: '3020-01-01'
         population: 301178618.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 296400387.0
       - date: '3040-09-07'
         population: 300489015.0
         socioIndustrial: C-D-D-B-F
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3049-01-01'
         socioIndustrial: C-D-C-B-D
       - date: '3050-01-01'
@@ -223,7 +219,7 @@ planet:
         population: 307911129.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -248,15 +244,8 @@ planet:
         socioIndustrial: C-C-B-B-D
       - date: '3145-02-25'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 343851954.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FS
   - name: Oceanus
     type: ICE_GIANT
     orbitalDist: 0.14

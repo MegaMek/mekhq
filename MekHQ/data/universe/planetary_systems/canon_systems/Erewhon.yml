@@ -127,9 +127,7 @@ planet:
     event:
       - date: '2722-06-14'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         hpg:
           source: canon
           value: A
@@ -147,9 +145,7 @@ planet:
         population: 4091121.0
       - date: '2775-09-27'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2780-01-01'
         population: 6446740.0
       - date: '2790-01-01'
@@ -204,19 +200,13 @@ planet:
         population: 43553168.0
       - date: '3021-08-17'
         faction:
-          source: canon
-          value:
-            - MV
+          - MV
       - date: '3025-12-27'
         faction:
-          source: canon
-          value:
-            - MV
+          - MV
       - date: '3028-05-16'
         faction:
-          source: canon
-          value:
-            - GV
+          - GV
       - date: '3030-01-01'
         population: 43603403.0
       - date: '3040-01-01'
@@ -227,7 +217,7 @@ planet:
           value: B-B-C-B-C
       - date: '3049-09-13'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
       - date: '3050-01-01'
@@ -238,14 +228,10 @@ planet:
         population: 43347801.0
       - date: '3071-06-05'
         faction:
-          source: canon
-          value:
-            - CIH
+          - CIH
       - date: '3071-09-18'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3080-01-01'
         population: 43836025.0
       - date: '3090-01-01'
@@ -266,9 +252,7 @@ planet:
         population: 45189103.0
       - date: '3151-11-15'
         faction:
-          source: canon
-          value:
-            - CHH
+          - CHH
   - name: Schmidinger
     type: ICE_GIANT
     orbitalDist: 9.36

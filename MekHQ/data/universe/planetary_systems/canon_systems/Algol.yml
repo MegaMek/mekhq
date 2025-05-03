@@ -120,9 +120,7 @@ planet:
     event:
       - date: '2243-08-24'
         faction:
-          source: canon
-          value:
-            - TGU
+          - TGU
         population: 54028.0
         socioIndustrial: D-D-C-D-B
       - date: '2250-01-01'
@@ -153,19 +151,15 @@ planet:
         population: 166657843.0
       - date: '2358-02-13'
         faction:
-          source: canon
-          value:
-            - SSUP
+          - SSUP
       - date: '2360-01-01'
         population: 226287857.0
       - date: '2366-10-10'
         faction:
-          source: canon
-          value:
-            - TGU
-      - date: '2367-05-11'
+          - TGU
+      - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -311,29 +305,18 @@ planet:
         population: 1226890296.0
       - date: '3028-08-27'
         faction:
-          source: canon
-          value:
-            - CC
-            - FS
+          - CC
+          - FC
       - date: '3028-09-04'
         faction:
-          source: canon
-          value:
-            - FS
+          - FC
       - date: '3030-01-01'
         population: 1225268715.0
       - date: '3030-02-28'
         faction:
-          source: canon
-          value:
-            - LA
+          - FC
       - date: '3040-01-01'
         population: 1238078002.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3047-01-01'
         socioIndustrial:
           source: canon
@@ -344,45 +327,37 @@ planet:
         population: 1268151310.0
       - date: '3062-12-21'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FC
             - LA
       - date: '3063-10-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FC
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
         population: 1283845895.0
       - date: '3072-02-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3077-03-10'
         faction:
-          source: canon
-          value:
-            - Stone
-            - WOB
+          - Stone
+          - WOB
       - date: '3077-03-12'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 1303509417.0
       - date: '3081-02-27'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1328247201.0
       - date: '3100-01-01'
@@ -401,16 +376,12 @@ planet:
           value: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 1354266770.0
       - date: '3145-01-15'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 1358064031.0
   - name: Inari
     type: GIANT_TERRESTRIAL

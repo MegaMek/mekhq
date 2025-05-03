@@ -44,9 +44,7 @@ planet:
     event:
       - date: '2319-04-29'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 61492.0
         socioIndustrial: F-D-C-D-D
       - date: '2320-01-01'
@@ -57,9 +55,7 @@ planet:
         population: 1018312.0
       - date: '2350-04-30'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 2857172.0
       - date: '2360-01-01'
         population: 6815055.0
@@ -189,9 +185,7 @@ planet:
         population: 308.0
       - date: '2925-02-14'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X

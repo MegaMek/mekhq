@@ -113,9 +113,7 @@ planet:
     event:
       - date: '2400-05-20'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 54988.0
         socioIndustrial: C-D-C-D-D
       - date: '2410-01-01'
@@ -152,29 +150,21 @@ planet:
         socioIndustrial: C-C-C-D-C
       - date: '2553-06-16'
         faction:
-          source: canon
-          value:
-            - MOC
+          - MOC
       - date: '2560-01-01'
         population: 175416820.0
       - date: '2570-01-01'
         population: 189260329.0
       - date: '2578-07-06'
         faction:
-          source: canon
-          value:
-            - MOC
-            - SL
+          - MOC
+          - SL
       - date: '2578-11-20'
         faction:
-          source: canon
-          value:
-            - SL
+          - SL
       - date: '2579-04-01'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2580-01-01'
         population: 202296232.0
       - date: '2590-01-01'
@@ -293,9 +283,7 @@ planet:
         population: 216066796.0
       - date: '3081-01-31'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 219727381.0
       - date: '3100-01-01'
@@ -318,12 +306,7 @@ planet:
         population: 236414732.0
       - date: '3148-09-01'
         faction:
-          source: canon
-          value:
-            - MOC
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - MOC
   - name: Akbari's Harvest

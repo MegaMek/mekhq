@@ -53,9 +53,7 @@ planet:
     event:
       - date: '2272-03-26'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 53298.0
         socioIndustrial: D-D-A-C-D
       - date: '2280-01-01'
@@ -78,9 +76,7 @@ planet:
         population: 92890456.0
       - date: '2365-10-20'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2370-01-01'
         population: 136956134.0
       - date: '2380-01-01'
@@ -182,9 +178,7 @@ planet:
         population: 1383036383.0
       - date: '2821-03-26'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2830-01-01'
         population: 1384363268.0
       - date: '2840-01-01'
@@ -205,9 +199,7 @@ planet:
         socioIndustrial: C-D-C-D-D
       - date: '2900-11-08'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 1418972490.0
       - date: '2910-01-01'
         population: 1424425781.0
@@ -291,9 +283,7 @@ planet:
     event:
       - date: '2272-08-05'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 44643.0
         socioIndustrial: D-D-A-F-D
       - date: '2280-01-01'
@@ -316,9 +306,7 @@ planet:
         population: 54430803.0
       - date: '2365-05-01'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2370-01-01'
         population: 77855605.0
       - date: '2380-01-01'
@@ -419,9 +407,7 @@ planet:
         population: 931092599.0
       - date: '2821-11-12'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2830-01-01'
         population: 927440946.0
       - date: '2840-01-01'
@@ -442,9 +428,7 @@ planet:
         socioIndustrial: C-D-C-C-B
       - date: '2900-06-03'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 887403323.0
       - date: '2910-01-01'
         population: 879868378.0

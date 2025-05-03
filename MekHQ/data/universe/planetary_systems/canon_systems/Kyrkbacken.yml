@@ -64,9 +64,7 @@ planet:
     event:
       - date: '2203-04-18'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 51526.0
         socioIndustrial: D-C-C-D-F
       - date: '2210-01-01'
@@ -93,9 +91,7 @@ planet:
         population: 417829103.0
       - date: '2315-02-28'
         faction:
-          source: canon
-          value:
-            - DoL
+          - DoL
       - date: '2320-01-01'
         population: 592259317.0
       - date: '2330-01-01'
@@ -108,7 +104,7 @@ planet:
         population: 1648528903.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -215,18 +211,14 @@ planet:
         population: 6458030951.0
       - date: '2832-02-22'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2840-01-01'
         population: 6472785786.0
       - date: '2850-01-01'
         population: 6480962513.0
       - date: '2860-06-02'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 6478760071.0
       - date: '2862-01-01'
         socioIndustrial: B-B-D-B-D
@@ -250,9 +242,7 @@ planet:
         population: 6107006930.0
       - date: '2950-08-10'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 6060628667.0
       - date: '2960-01-01'
         population: 5998852917.0
@@ -268,21 +258,15 @@ planet:
         population: 5681056774.0
       - date: '3014-08-01'
         faction:
-          source: canon
-          value:
-            - FWLR
+          - FWLR
       - date: '3015-03-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3020-01-01'
         population: 5635450052.0
       - date: '3025-02-11'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3026-01-01'
         socioIndustrial: B-B-D-B-F
       - date: '3030-01-01'
@@ -299,16 +283,12 @@ planet:
         population: 5952594726.0
       - date: '3079-07-09'
         faction:
-          source: canon
-          value:
-            - OZP
+          - OZP
       - date: '3080-01-01'
         population: 5977648199.0
       - date: '3085-01-26'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 5978843848.0
       - date: '3095-01-01'
@@ -325,16 +305,12 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 6071630668.0
       - date: '3145-06-03'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 6085002960.0
   - name: Urshult
     type: GIANT_TERRESTRIAL

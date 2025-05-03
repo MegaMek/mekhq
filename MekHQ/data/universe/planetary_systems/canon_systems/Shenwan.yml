@@ -58,9 +58,7 @@ planet:
     event:
       - date: '2349-01-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 45746.0
         socioIndustrial: D-D-A-D-B
       - date: '2350-01-01'
@@ -227,16 +225,12 @@ planet:
         population: 402549127.0
       - date: '3079-01-20'
         faction:
-          source: canon
-          value:
-            - DO
+          - DO
       - date: '3080-01-01'
         population: 408142813.0
       - date: '3086-03-17'
         faction:
-          source: canon
-          value:
-            - OP
+          - OP
       - date: '3090-01-01'
         population: 413317947.0
       - date: '3091-01-01'
@@ -255,11 +249,6 @@ planet:
         population: 418307641.0
       - date: '3145-01-01'
         population: 418140351.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Lukou
     type: GIANT_TERRESTRIAL
     orbitalDist: 0.8

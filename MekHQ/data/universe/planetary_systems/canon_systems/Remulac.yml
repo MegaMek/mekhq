@@ -67,9 +67,7 @@ planet:
     event:
       - date: '2268-02-09'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 44912.0
         socioIndustrial: D-D-C-D-F
       - date: '2270-01-01'
@@ -80,9 +78,7 @@ planet:
         population: 841823.0
       - date: '2300-01-22'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 2409733.0
       - date: '2310-01-01'
         population: 5969719.0
@@ -206,9 +202,7 @@ planet:
         population: 1684596124.0
       - date: '2864-09-26'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2870-01-01'
         population: 1660624038.0
       - date: '2880-09-01'
@@ -223,9 +217,7 @@ planet:
         population: 1574937906.0
       - date: '2920-05-29'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 1559297499.0
       - date: '2930-01-01'
         population: 1540859068.0
@@ -267,14 +259,10 @@ planet:
         population: 1531342874.0
       - date: '3081-10-13'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3082-03-24'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1555730245.0
       - date: '3100-01-01'
@@ -291,23 +279,14 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3138-05-01'
         faction:
-          source: canon
-          value:
-            - CvW
+          - CvW
       - date: '3140-01-01'
         population: 1612434334.0
       - date: '3145-01-01'
         population: 1618249559.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Claxton
     type: TERRESTRIAL
     orbitalDist: 1.92

@@ -54,9 +54,7 @@ planet:
     event:
       - date: '2170-11-18'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 63313.0
         socioIndustrial: D-D-C-D-F
       - date: '2180-01-01'
@@ -73,9 +71,7 @@ planet:
         population: 32449168.0
       - date: '2235-11-27'
         faction:
-          source: canon
-          value:
-            - TamP
+          - TamP
       - date: '2236-01-01'
         socioIndustrial: D-C-C-C-F
       - date: '2240-01-01'
@@ -100,9 +96,9 @@ planet:
         population: 1667200308.0
       - date: '2340-01-01'
         population: 1990372194.0
-      - date: '2341-04-10'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2350-01-01'
@@ -251,38 +247,36 @@ planet:
         population: 6662766144.0
       - date: '3020-01-01'
         population: 6629183056.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 6649074380.0
       - date: '3040-08-23'
         population: 6726652728.0
         socioIndustrial: B-B-D-B-D
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3048-01-01'
         socioIndustrial: A-A-C-A-D
       - date: '3050-01-01'
         population: 6793577320.0
       - date: '3051-12-05'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
             - FC
       - date: '3051-12-15'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
       - date: '3060-01-01'
         population: 6845405204.0
       - date: '3069-10-04'
         faction:
-          source: canon
-          value:
-            - CW
+          - CW
       - date: '3070-01-01'
         population: 6908673520.0
       - date: '3080-01-01'
@@ -305,15 +299,11 @@ planet:
         population: 7755309100.0
       - date: '3145-11-09'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 7784835339.0
       - date: '3151-11-15'
         faction:
-          source: canon
-          value:
-            - CHH
+          - CHH
   - name: Hayward
     type: TERRESTRIAL
     orbitalDist: 0.7

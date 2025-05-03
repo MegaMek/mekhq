@@ -73,9 +73,7 @@ planet:
     event:
       - date: '2718-03-28'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 45546.0
         socioIndustrial: D-D-B-D-F
       - date: '2720-07-17'
@@ -141,14 +139,10 @@ planet:
         population: 2219999056.0
       - date: '3014-03-22'
         faction:
-          source: canon
-          value:
-            - FWLR
+          - FWLR
       - date: '3015-03-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3020-01-01'
         population: 2245691346.0
       - date: '3030-01-01'
@@ -165,9 +159,7 @@ planet:
         population: 2388369057.0
       - date: '3079-08-03'
         faction:
-          source: canon
-          value:
-            - DTA
+          - DTA
       - date: '3080-01-01'
         population: 2421557020.0
       - date: '3090-01-01'
@@ -188,15 +180,11 @@ planet:
         population: 2651195658.0
       - date: '3145-07-31'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 2674094264.0
       - date: '3152-01-03'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
   - name: Rais
     type: GIANT_TERRESTRIAL
     orbitalDist: 4.48

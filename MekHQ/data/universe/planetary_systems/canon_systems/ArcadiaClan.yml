@@ -70,9 +70,7 @@ planet:
     event:
       - date: '2786-02-15'
         faction:
-          source: canon
-          value:
-            - SLIE
+          - SLIE
         population: 1130503.0
         socioIndustrial: C-D-F-D-D
       - date: '2787-10-06'
@@ -83,21 +81,17 @@ planet:
         population: 1130729.0
       - date: '2802-06-11'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2810-01-01'
         population: 599554.0
       - date: '2820-01-01'
         population: 425314.0
       - date: '2822-11-13'
         faction:
-          source: canon
-          value:
-            - CGB
-            - CSA
-            - CSV
-            - CBS
+          - CGB
+          - CSA
+          - CSV
+          - CBS
       - date: '2830-01-01'
         population: 1049010.0
       - date: '2840-01-01'
@@ -150,54 +144,42 @@ planet:
         population: 53242831.0
       - date: '3059-01-01'
         faction:
-          source: canon
-          value:
-            - CGB
-            - CSA
-            - CSV
+          - CGB
+          - CSA
+          - CSV
       - date: '3060-01-01'
         population: 53020324.0
       - date: '3067-09-13'
         faction:
-          source: canon
-          value:
-            - CSA
-            - CSV
-            - CGB
-            - CBS
-            - CCC
+          - CSA
+          - CSV
+          - CGB
+          - CBS
+          - CCC
       - date: '3070-01-01'
         population: 53313205.0
       - date: '3071-04-25'
         faction:
-          source: canon
-          value:
-            - CSA
-            - CSV
-            - CBS
-            - CCC
+          - CSA
+          - CSV
+          - CBS
+          - CCC
       - date: '3073-01-04'
         faction:
-          source: canon
-          value:
-            - CSA
-            - CSV
-            - CBS
-            - CCC
-            - SOC
+          - CSA
+          - CSV
+          - CBS
+          - CCC
+          - SOC
       - date: '3075-03-30'
         faction:
-          source: canon
-          value:
-            - CBS
-            - CCC
-            - CSA
+          - CBS
+          - CCC
+          - CSA
       - date: '3079-01-15'
         faction:
-          source: canon
-          value:
-            - CCC
-            - CSA
+          - CCC
+          - CSA
         population:
           source: canon
           value: 54000000.0
@@ -205,9 +187,7 @@ planet:
         population: 54054027.0
       - date: '3085-09-16'
         faction:
-          source: canon
-          value:
-            - CSA
+          - CSA
       - date: '3090-01-01'
         population: 54739417.0
       - date: '3093-01-01'

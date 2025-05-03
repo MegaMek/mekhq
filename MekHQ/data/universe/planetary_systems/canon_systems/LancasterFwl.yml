@@ -99,9 +99,7 @@ planet:
     event:
       - date: '2241-02-02'
         faction:
-          source: canon
-          value:
-            - MCM
+          - MCM
         population: 41900.0
         socioIndustrial: D-F-D-F-C
       - date: '2250-01-01'
@@ -112,7 +110,7 @@ planet:
         population: 1100544.0
       - date: '2271-06-01'
         faction:
-          source: canon
+          source: 'Handbook: House Marik'
           value:
             - FWL
       - date: '2280-01-01'
@@ -292,9 +290,7 @@ planet:
         population: 677011558.0
       - date: '3079-09-10'
         faction:
-          source: canon
-          value:
-            - MSC
+          - MSC
       - date: '3080-01-01'
         population: 682995550.0
       - date: '3090-01-01'
@@ -315,15 +311,11 @@ planet:
         population: 714432374.0
       - date: '3145-06-09'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 718300744.0
       - date: '3151-12-30'
         faction:
-          source: canon
-          value:
-            - CP
+          - CP
   - name: Andrews's Land
     type: ICE_GIANT
     orbitalDist: 3.92

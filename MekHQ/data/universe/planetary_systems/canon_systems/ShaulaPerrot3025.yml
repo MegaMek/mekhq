@@ -69,9 +69,7 @@ planet:
     event:
       - date: '2692-02-19'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 49394.0
         socioIndustrial: C-D-A-D-D
       - date: '2695-08-22'
@@ -126,9 +124,7 @@ planet:
         socioIndustrial: C-B-C-C-C
       - date: '2900-10-10'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 315141852.0
       - date: '2910-01-01'
         population: 313995287.0
@@ -156,32 +152,25 @@ planet:
         population: 302566377.0
       - date: '3030-03-15'
         faction:
-          source: canon
-          value:
-            - LA
+          - FC
         population: 301700213.0
       - date: '3034-01-01'
         socioIndustrial: C-B-B-C-C
       - date: '3040-01-01'
         population: 304245168.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3046-01-01'
         socioIndustrial: C-B-A-C-C
       - date: '3050-01-01'
         population: 307425829.0
       - date: '3051-12-04'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CW
             - FC
       - date: '3051-12-06'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CW
       - date: '3060-01-01'
@@ -208,20 +197,11 @@ planet:
         population: 340983419.0
       - date: '3145-01-21'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 343104083.0
       - date: '3151-01-15'
         faction:
-          source: canon
-          value:
-            - CHH
-      - date: '2108-12-05'
-        name: Perrot
-      - date: '3025-01-01'
-        name: Shaula
-        message: Perrot renamed to Shaula
+          - CHH
   - name: Galanov's Plains
     type: TERRESTRIAL
     orbitalDist: 1.44

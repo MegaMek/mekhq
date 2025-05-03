@@ -80,9 +80,7 @@ planet:
     event:
       - date: '2168-01-17'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 49417.0
         socioIndustrial: D-F-D-D-C
       - date: '2170-01-01'
@@ -105,9 +103,7 @@ planet:
         population: 12265999.0
       - date: '2235-03-08'
         faction:
-          source: canon
-          value:
-            - TamP
+          - TamP
       - date: '2240-01-01'
         population: 21339075.0
       - date: '2250-01-01'
@@ -130,9 +126,9 @@ planet:
         population: 382786017.0
       - date: '2340-01-01'
         population: 454186797.0
-      - date: '2341-02-09'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2350-01-01'
@@ -250,9 +246,7 @@ planet:
         population: 1342276770.0
       - date: '2864-03-23'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2870-01-01'
         population: 1325661360.0
       - date: '2880-01-01'
@@ -289,13 +283,11 @@ planet:
         population: 987973241.0
       - date: '3030-05-11'
         faction:
-          source: canon
-          value:
-            - LA
+          - FC
         population: 989200281.0
       - date: '3034-03-13'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FRR
       - date: '3040-05-01'
@@ -311,9 +303,7 @@ planet:
         population: 1040958102.0
       - date: '3075-07-05'
         faction:
-          source: canon
-          value:
-            - CGB
+          - CGB
       - date: '3080-01-01'
         population: 1060925394.0
       - date: '3090-01-01'
@@ -324,9 +314,7 @@ planet:
         socioIndustrial: A-B-C-C-B
       - date: '3103-03-13'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
       - date: '3110-01-01'
         population: 1119566482.0
       - date: '3120-01-01'

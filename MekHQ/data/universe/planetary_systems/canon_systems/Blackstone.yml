@@ -55,9 +55,7 @@ planet:
     event:
       - date: '2656-03-16'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 51848.0
         socioIndustrial: C-F-A-D-F
       - date: '2659-05-02'
@@ -92,9 +90,7 @@ planet:
         population: 97522559.0
       - date: '2779-04-10'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2780-01-01'
         population: 97239528.0
       - date: '2790-01-01'
@@ -149,16 +145,12 @@ planet:
         population: 91810512.0
       - date: '3012-11-08'
         faction:
-          source: canon
-          value:
-            - OC
+          - OC
       - date: '3020-01-01'
         population: 91131878.0
       - date: '3025-09-26'
         faction:
-          source: canon
-          value:
-            - OC
+          - OC
       - date: '3030-01-01'
         population: 91200826.0
       - date: '3040-01-01'
@@ -169,7 +161,7 @@ planet:
         socioIndustrial: C-D-A-C-D
       - date: '3049-08-08'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CW
       - date: '3050-01-01'
@@ -180,9 +172,7 @@ planet:
         population: 94884840.0
       - date: '3071-01-25'
         faction:
-          source: canon
-          value:
-            - CHH
+          - CHH
       - date: '3080-01-01'
         population: 95417686.0
       - date: '3090-01-01'
@@ -191,9 +181,7 @@ planet:
         population: 95589593.0
       - date: '3100-02-07'
         faction:
-          source: canon
-          value:
-            - TB
+          - TB
       - date: '3110-01-01'
         population: 95991913.0
       - date: '3120-01-01'
@@ -206,11 +194,6 @@ planet:
         population: 97676788.0
       - date: '3145-01-01'
         population: 97676788.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - NOC
   - name: Wyman's End
     type: TERRESTRIAL
     orbitalDist: 0.8

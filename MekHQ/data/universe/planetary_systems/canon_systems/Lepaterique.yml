@@ -70,9 +70,7 @@ planet:
     event:
       - date: '2598-09-14'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 56161.0
         socioIndustrial: C-D-C-D-C
       - date: '2600-01-01'
@@ -189,9 +187,7 @@ planet:
         population: 132669503.0
       - date: '3081-01-25'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 134110099.0
       - date: '3100-11-13'
@@ -203,9 +199,7 @@ planet:
         population: 136518631.0
       - date: '3130-06-19'
         faction:
-          source: canon
-          value:
-            - DTA
+          - DTA
         population: 138498722.0
       - date: '3132-08-07'
         hpg: X
@@ -215,19 +209,12 @@ planet:
         population: 142118483.0
       - date: '3147-04-01'
         faction:
-          source: canon
-          value:
-            - MH
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - MH
       - date: '3151-02-07'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
   - name: Nandhini Belt 1
     type: ASTEROID_BELT
     orbitalDist: 0.7

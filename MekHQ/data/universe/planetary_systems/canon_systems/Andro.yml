@@ -29,9 +29,7 @@ planet:
     event:
       - date: '2745-04-20'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 61482.0
         socioIndustrial: B-D-B-F-C
       - date: '2748-09-16'
@@ -67,9 +65,7 @@ planet:
         population: 151467541.0
       - date: '2864-08-20'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2870-01-01'
         population: 169865363.0
       - date: '2880-01-01'
@@ -102,15 +98,15 @@ planet:
         population: 249208764.0
       - date: '3020-01-01'
         population: 248836168.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 248761668.0
       - date: '3040-01-01'
         population: 246844331.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3043-01-01'
         socioIndustrial: C-C-C-B-B
       - date: '3050-01-01'
@@ -119,7 +115,7 @@ planet:
         population: 244463819.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -144,11 +140,6 @@ planet:
         population: 258103425.0
       - date: '3145-01-01'
         population: 258051810.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - CC
   - name: Pequaywan
     type: DWARF_TERRESTRIAL
     orbitalDist: 0.21

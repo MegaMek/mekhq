@@ -31,9 +31,7 @@ planet:
     event:
       - date: '2402-06-29'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 55109.0
         socioIndustrial: C-D-B-D-F
       - date: '2410-01-01'
@@ -186,9 +184,7 @@ planet:
         population: 426690782.0
       - date: '3081-09-06'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3088-01-01'
         socioIndustrial: C-D-B-C-D
       - date: '3090-01-01'
@@ -209,9 +205,7 @@ planet:
         population: 431496581.0
       - date: '3145-05-25'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 432360437.0
   - name: Gu's End
     type: DWARF_TERRESTRIAL

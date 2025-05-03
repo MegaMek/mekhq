@@ -105,9 +105,7 @@ planet:
     event:
       - date: '2161-07-15'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 49111.0
         socioIndustrial: D-D-C-D-C
       - date: '2170-01-01'
@@ -128,9 +126,7 @@ planet:
         population: 49079880.0
       - date: '2242-02-10'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 79998018.0
       - date: '2260-01-01'
@@ -149,7 +145,7 @@ planet:
         population: 551833142.0
       - date: '2317-06-26'
         faction:
-          source: canon
+          source: 'Handbook: House Davion'
           value:
             - FS
       - date: '2320-01-01'
@@ -258,14 +254,10 @@ planet:
         population: 3017162584.0
       - date: '2796-08-01'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2798-08-01'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2800-01-01'
         population: 3004285982.0
       - date: '2810-01-01'
@@ -318,15 +310,15 @@ planet:
         population: 2503092832.0
       - date: '3028-01-01'
         socioIndustrial: B-B-D-B-C
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 2510411039.0
       - date: '3040-01-01'
         population: 2533613387.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3044-01-01'
         socioIndustrial:
           source: canon
@@ -337,7 +329,7 @@ planet:
         population: 2584795773.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'

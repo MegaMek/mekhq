@@ -45,9 +45,7 @@ planet:
     event:
       - date: '2668-02-23'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 52057.0
         socioIndustrial: C-D-A-D-F
       - date: '2670-01-01'
@@ -82,9 +80,7 @@ planet:
         population: 68426439.0
       - date: '2779-12-03'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2780-01-01'
         population: 68519563.0
       - date: '2790-01-01'
@@ -99,17 +95,13 @@ planet:
         population: 1022333.0
       - date: '2836-12-04'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
       - date: '2900-06-06'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         hpg: C
         population: 44249.0
         socioIndustrial: C-D-A-D-F
@@ -155,9 +147,7 @@ planet:
         population: 51878932.0
       - date: '3087-06-01'
         faction:
-          source: canon
-          value:
-            - RT
+          - RT
       - date: '3090-01-01'
         population: 52201581.0
       - date: '3100-01-01'
@@ -174,11 +164,6 @@ planet:
         population: 52149405.0
       - date: '3145-01-01'
         population: 52055621.0
-      - date: '2108-12-05'
-        name: Dijonne
-      - date: '3050-01-01'
-        name: Pain
-        message: Dijonne renamed to Pain
   - name: Liekmar
     type: TERRESTRIAL
     orbitalDist: 0.35

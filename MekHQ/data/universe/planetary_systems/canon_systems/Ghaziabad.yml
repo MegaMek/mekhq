@@ -93,9 +93,7 @@ planet:
     event:
       - date: '2655-10-06'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 50862.0
         socioIndustrial: C-D-C-D-C
       - date: '2660-01-01'
@@ -197,9 +195,7 @@ planet:
         population: 241040663.0
       - date: '3081-07-26'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 241330085.0
       - date: '3092-01-01'
@@ -212,9 +208,7 @@ planet:
         population: 245026323.0
       - date: '3130-11-08'
         faction:
-          source: canon
-          value:
-            - RCM
+          - RCM
         population: 246599520.0
       - date: '3132-08-07'
         hpg: X
@@ -222,11 +216,6 @@ planet:
         population: 248133186.0
       - date: '3145-01-01'
         population: 248878704.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Tārakā
     type: GAS_GIANT
     orbitalDist: 5.2

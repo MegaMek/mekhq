@@ -76,9 +76,7 @@ planet:
     event:
       - date: '2450-09-16'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 50924.0
         socioIndustrial: C-F-B-D-A
       - date: '2460-01-01'
@@ -109,9 +107,7 @@ planet:
         population: 118532543.0
       - date: '2571-11-01'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2580-01-01'
         population: 133517395.0
       - date: '2590-01-01'
@@ -209,54 +205,41 @@ planet:
         population: 181570493.0
       - date: '3025-01-01'
         socioIndustrial: B-D-C-D-B
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 182909126.0
       - date: '3040-09-22'
         population: 184581195.0
         socioIndustrial: A-C-B-D-A
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3050-01-01'
         population: 185784881.0
       - date: '3050-07-03'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CW
       - date: '3060-01-01'
         population: 186622797.0
       - date: '3066-12-31'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3070-01-01'
         population: 167097.0
       - date: '3071-12-17'
         faction:
-          source: canon
-          value:
-            - CIH
-      - date: '3072-07-15'
-        faction:
-          source: canon
-          value:
-            - ABN
-        population: 0.0
-        socioIndustrial: X-X-X-X-X
+          - CIH
       - date: '3072-04-03'
         faction:
-          source: canon
-          value:
-            - CJF
-      - date: '3151-01-01'
+          - CJF
+      - date: '3072-07-15'
         faction:
-          source: sucs
-          value:
-            - ABN
+          - ABN
+        population: 0.0
+        socioIndustrial: X-X-X-X-X
   - name:
       source: canon
       value: Vantaa
@@ -286,9 +269,7 @@ planet:
     event:
       - date: '2450-03-20'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 62711.0
         socioIndustrial: D-D-C-F-B
       - date: '2460-01-01'
@@ -319,9 +300,7 @@ planet:
         population: 236574983.0
       - date: '2571-09-23'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2580-01-01'
         population: 265380227.0
       - date: '2590-04-05'
@@ -423,58 +402,45 @@ planet:
         population: 314523013.0
       - date: '3020-01-01'
         population: 311833508.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 311829624.0
       - date: '3039-01-01'
         socioIndustrial: C-D-D-C-B
       - date: '3040-01-01'
         population: 315341747.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3047-01-01'
         socioIndustrial: B-C-C-B-A
       - date: '3050-01-01'
         population: 318989109.0
       - date: '3050-07-03'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CW
       - date: '3060-01-01'
         population: 321454806.0
       - date: '3066-03-30'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3070-01-01'
         population: 453388.0
       - date: '3071-12-17'
         faction:
-          source: canon
-          value:
-            - CIH
+          - CIH
       - date: '3072-01-05'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
       - date: '3072-04-03'
         faction:
-          source: canon
-          value:
-            - CJF
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN
+          - CJF
   - name: Mextli
     type: TERRESTRIAL
     orbitalDist: 3.92

@@ -84,9 +84,7 @@ planet:
     event:
       - date: '2657-05-26'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 53502.0
         socioIndustrial: D-F-B-F-F
       - date: '2660-01-01'
@@ -173,23 +171,23 @@ planet:
         population: 131181001.0
       - date: '3020-01-01'
         population: 130104553.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 129853563.0
       - date: '3040-11-17'
         population: 131106161.0
         socioIndustrial: D-C-B-D-D
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3050-01-01'
         population: 132119575.0
       - date: '3060-01-01'
         population: 132981149.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -214,15 +212,8 @@ planet:
         population: 146981596.0
       - date: '3145-11-28'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 147895713.0
-      - date: '3152-06-01'
-        faction:
-          source: sucs
-          value:
-            - FS
   - name: Bin Ammar
     type: GIANT_TERRESTRIAL
     orbitalDist: 3.92

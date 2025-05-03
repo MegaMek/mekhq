@@ -54,9 +54,7 @@ planet:
     event:
       - date: '2716-04-18'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 43117.0
         socioIndustrial: C-D-A-D-D
       - date: '2718-10-16'
@@ -77,9 +75,7 @@ planet:
         population: 16657033.0
       - date: '2790-05-03'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 24838539.0
       - date: '2800-01-01'
         population: 34250862.0
@@ -142,9 +138,7 @@ planet:
         population: 155773743.0
       - date: '3079-09-08'
         faction:
-          source: canon
-          value:
-            - DTA
+          - DTA
       - date: '3080-01-01'
         population: 158222867.0
       - date: '3090-01-01'
@@ -164,11 +158,6 @@ planet:
         population: 166768160.0
       - date: '3145-01-01'
         population: 167503557.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Guarida de Domínguez
     type: DWARF_TERRESTRIAL
     orbitalDist: 1.6

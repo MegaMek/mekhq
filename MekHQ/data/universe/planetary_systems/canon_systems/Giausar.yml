@@ -116,9 +116,7 @@ planet:
     event:
       - date: '2269-06-11'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 58939.0
         socioIndustrial: D-C-A-D-C
       - date: '2270-01-01'
@@ -141,9 +139,7 @@ planet:
         population: 57204439.0
       - date: '2360-07-02'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 86139074.0
       - date: '2370-01-01'
         population: 122330583.0
@@ -291,17 +287,17 @@ planet:
         population: 774618407.0
       - date: '3020-01-01'
         population: 768423536.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 771732029.0
       - date: '3036-01-01'
         socioIndustrial: C-C-B-C-B
       - date: '3040-01-01'
         population: 779020512.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3042-01-01'
         socioIndustrial:
           source: canon
@@ -310,39 +306,35 @@ planet:
         population: 788425073.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
         population: 799620609.0
       - date: '3064-03-01'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FC
       - date: '3064-03-08'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FC
             - LA
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - LA
       - date: '3068-09-01'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3070-01-01'
         population: 810488682.0
       - date: '3079-12-30'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '3080-01-01'
         population: 824879551.0
       - date: '3090-10-16'
@@ -364,9 +356,7 @@ planet:
         population: 857856964.0
       - date: '3145-06-16'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 859746327.0
   - name: Kraamer
     type: ICE_GIANT

@@ -34,9 +34,7 @@ planet:
     event:
       - date: '2490-06-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 42527.0
         socioIndustrial: C-D-C-D-C
       - date: '2492-01-01'
@@ -154,14 +152,10 @@ planet:
         population: 306478893.0
       - date: '3014-03-22'
         faction:
-          source: canon
-          value:
-            - FWLR
+          - FWLR
       - date: '3015-03-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3020-01-01'
         population: 306212814.0
       - date: '3030-01-01'
@@ -180,9 +174,7 @@ planet:
         population: 326038370.0
       - date: '3081-04-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 327410611.0
       - date: '3094-01-01'
@@ -201,9 +193,7 @@ planet:
         population: 328131707.0
       - date: '3145-06-28'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 328197340.0
   - name: Knoxville
     type: GIANT_TERRESTRIAL

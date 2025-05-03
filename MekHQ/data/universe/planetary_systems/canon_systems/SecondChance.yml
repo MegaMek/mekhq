@@ -35,9 +35,7 @@ planet:
     event:
       - date: '2610-12-05'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 50121.0
         socioIndustrial: C-D-A-D-B
       - date: '2614-01-01'
@@ -93,9 +91,7 @@ planet:
         population: 1084845942.0
       - date: '2821-03-13'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2830-01-01'
         population: 1070617225.0
       - date: '2840-01-01'
@@ -116,9 +112,7 @@ planet:
         socioIndustrial: D-B-C-D-C
       - date: '2900-09-13'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 956966127.0
       - date: '2910-01-01'
         population: 948903527.0
@@ -164,9 +158,7 @@ planet:
         population: 951970098.0
       - date: '3081-03-13'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 970618624.0
       - date: '3100-01-01'
@@ -179,9 +171,7 @@ planet:
         population: 1024473012.0
       - date: '3130-03-08'
         faction:
-          source: canon
-          value:
-            - OP
+          - OP
         population: 1042246360.0
       - date: '3132-08-07'
         hpg: X
@@ -189,11 +179,6 @@ planet:
         population: 1060116010.0
       - date: '3145-01-01'
         population: 1069272323.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Marsh's Belt
     type: ASTEROID_BELT
     orbitalDist: 0.35

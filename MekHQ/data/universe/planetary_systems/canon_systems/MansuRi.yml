@@ -75,9 +75,7 @@ planet:
     event:
       - date: '2343-06-17'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 46895.0
         socioIndustrial: D-F-A-D-A
       - date: '2350-01-01'
@@ -246,9 +244,7 @@ planet:
         population: 495417645.0
       - date: '3081-09-05'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 497701816.0
       - date: '3095-01-01'
@@ -261,9 +257,7 @@ planet:
         population: 507147118.0
       - date: '3130-04-23'
         faction:
-          source: canon
-          value:
-            - OP
+          - OP
         population: 509995108.0
       - date: '3132-08-07'
         hpg: X
@@ -271,11 +265,6 @@ planet:
         population: 511834400.0
       - date: '3145-01-01'
         population: 512961675.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Son's Frontier
     type: DWARF_TERRESTRIAL
     orbitalDist: 1.44

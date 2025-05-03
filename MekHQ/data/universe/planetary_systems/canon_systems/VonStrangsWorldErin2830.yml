@@ -97,9 +97,7 @@ planet:
     event:
       - date: '2637-01-22'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 48534.0
         socioIndustrial: C-C-A-D-B
       - date: '2640-01-01'
@@ -140,9 +138,7 @@ planet:
         population: 102607052.0
       - date: '2779-05-19'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2780-01-01'
         population: 101938132.0
       - date: '2790-01-01'
@@ -207,7 +203,7 @@ planet:
         socioIndustrial: B-D-A-C-A
       - date: '3049-08-17'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
       - date: '3050-01-01'
@@ -218,14 +214,10 @@ planet:
         population: 85079483.0
       - date: '3071-09-18'
         faction:
-          source: canon
-          value:
-            - CIH
+          - CIH
       - date: '3071-11-03'
         faction:
-          source: canon
-          value:
-            - CHH
+          - CHH
       - date: '3080-01-01'
         population: 85677128.0
       - date: '3090-01-01'
@@ -236,9 +228,7 @@ planet:
         population: 86694107.0
       - date: '3100-02-07'
         faction:
-          source: canon
-          value:
-            - TB
+          - TB
       - date: '3110-01-01'
         population: 86659436.0
       - date: '3120-01-01'
@@ -249,13 +239,6 @@ planet:
         population: 86832928.0
       - date: '3145-01-01'
         population: 86832928.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - IND
-      - date: '2108-12-05'
-      - date: '2830-01-01'
   - name: Batchelor's Belt
     type: ASTEROID_BELT
     orbitalDist: 1.12

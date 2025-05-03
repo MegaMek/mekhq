@@ -36,9 +36,7 @@ planet:
     event:
       - date: '2680-11-15'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 55334.0
         socioIndustrial: C-D-A-D-B
       - date: '2681-07-13'
@@ -83,17 +81,13 @@ planet:
         population: 30433072.0
       - date: '2850-03-05'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
       - date: '3057-01-26'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
         population: 50055.0
         socioIndustrial: B-B-A-C-A
       - date: '3059-04-02'
@@ -118,16 +112,6 @@ planet:
         population: 549508663.0
       - date: '3145-01-01'
         population: 552263087.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN
-      - date: '2108-12-05'
-        name: Sharpe
-      - date: '3025-01-01'
-        name: Obeedah
-        message: Sharpe renamed to Obeedah
   - name: Pudicitia
     type: TERRESTRIAL
     orbitalDist: 0.28

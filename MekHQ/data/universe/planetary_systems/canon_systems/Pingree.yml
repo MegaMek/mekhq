@@ -86,9 +86,7 @@ planet:
     event:
       - date: '2255-03-11'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 46049.0
         socioIndustrial: D-D-B-D-F
       - date: '2260-01-01'
@@ -103,9 +101,7 @@ planet:
         population: 6336431.0
       - date: '2310-01-26'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 13006315.0
       - date: '2320-01-01'
         population: 24159326.0
@@ -271,31 +267,23 @@ planet:
         population: 984807825.0
       - date: '3068-03-30'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '3070-07-16'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 995999266.0
       - date: '3080-01-01'
         population: 996796384.0
       - date: '3081-03-08'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 1000791554.0
       - date: '3093-01-01'
         socioIndustrial: C-D-B-D-D
       - date: '3100-09-17'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 1002394103.0
       - date: '3110-01-01'
         population: 1002795140.0
@@ -309,9 +297,7 @@ planet:
         population: 1012873399.0
       - date: '3145-09-22'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 1013075994.0
   - name: Elliott's Belt
     type: ASTEROID_BELT

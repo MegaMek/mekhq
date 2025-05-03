@@ -46,9 +46,7 @@ planet:
     event:
       - date: '2248-01-06'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 52117.0
         socioIndustrial: C-D-A-C-D
       - date: '2250-01-01'
@@ -73,9 +71,7 @@ planet:
         population: 18391721.0
       - date: '2340-09-24'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 26204188.0
       - date: '2350-01-01'
         population: 35905197.0
@@ -237,16 +233,12 @@ planet:
         population: 175703580.0
       - date: '3078-05-01'
         faction:
-          source: canon
-          value:
-            - PR
+          - PR
       - date: '3080-01-01'
         population: 178680335.0
       - date: '3086-02-01'
         faction:
-          source: canon
-          value:
-            - RF
+          - RF
       - date: '3090-01-01'
         population: 181308205.0
       - date: '3098-01-01'
@@ -267,12 +259,7 @@ planet:
         population: 197117180.0
       - date: '3148-07-07'
         faction:
-          source: canon
-          value:
-            - FWL
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - FWL
   - name: Anren Chengguanzhen

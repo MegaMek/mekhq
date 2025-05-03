@@ -54,9 +54,7 @@ planet:
     event:
       - date: '2266-01-11'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 41700.0
         socioIndustrial: D-D-B-C-F
       - date: '2270-01-01'
@@ -73,14 +71,10 @@ planet:
         socioIndustrial: D-C-B-C-F
       - date: '2315-06-20'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2319-12-03'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2320-01-01'
         population: 20763859.0
       - date: '2330-01-01'
@@ -179,26 +173,20 @@ planet:
         population: 2880964032.0
       - date: '2767-11-02'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2768-01-03'
         hpg: X
       - date: '2770-01-01'
         population: 2849749404.0
       - date: '2779-03-16'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-03-01'
         hpg: B
         population: 2802553134.0
       - date: '2790-08-01'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 2763183645.0
       - date: '2800-01-01'
         population: 2713954598.0
@@ -208,9 +196,7 @@ planet:
         population: 2701282106.0
       - date: '2821-11-20'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2830-01-01'
         population: 2676968480.0
       - date: '2840-01-01'
@@ -256,55 +242,38 @@ planet:
         population: 2071620586.0
       - date: '3030-09-28'
         faction:
-          source: canon
-          value:
-            - LA
+          - FC
         population: 2080481460.0
       - date: '3032-01-01'
         socioIndustrial: C-C-C-B-F
       - date: '3040-01-01'
         population: 2099290306.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3041-01-01'
         socioIndustrial: C-B-C-A-D
       - date: '3050-01-01'
         population: 2125271031.0
       - date: '3057-10-01'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3060-01-01'
         population: 2152218861.0
       - date: '3070-01-01'
         population: 2173849020.0
       - date: '3072-02-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3078-01-12'
         faction:
-          source: canon
-          value:
-            - Stone
-            - WOB
+          - Stone
+          - WOB
       - date: '3078-01-20'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 2183435029.0
       - date: '3081-05-16'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 2198332983.0
       - date: '3100-02-23'
@@ -322,12 +291,7 @@ planet:
         population: 2230217999.0
       - date: '3150-03-25'
         faction:
-          source: canon
-          value:
-            - CWE
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - CWE
   - name: Littlechild

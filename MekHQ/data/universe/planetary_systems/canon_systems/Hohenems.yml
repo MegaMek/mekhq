@@ -66,9 +66,7 @@ planet:
     event:
       - date: '2534-05-20'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 51986.0
         socioIndustrial: C-D-C-F-B
       - date: '2540-01-01'
@@ -137,9 +135,7 @@ planet:
         population: 157996259.0
       - date: '2821-01-05'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2830-01-01'
         population: 155687829.0
       - date: '2840-01-01'
@@ -158,9 +154,7 @@ planet:
         population: 145746377.0
       - date: '2900-02-13'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 145879004.0
       - date: '2910-01-01'
         population: 146701559.0
@@ -194,7 +188,7 @@ planet:
         population: 148540780.0
       - date: '3034-03-13'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FRR
       - date: '3040-01-01'
@@ -205,13 +199,13 @@ planet:
         population: 151465751.0
       - date: '3050-08-09'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CW
             - FRR
       - date: '3050-08-12'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CW
       - date: '3060-01-01'
@@ -220,15 +214,11 @@ planet:
         population: 154278519.0
       - date: '3071-08-26'
         faction:
-          source: canon
-          value:
-            - CHH
-            - CW
+          - CHH
+          - CW
       - date: '3071-11-01'
         faction:
-          source: canon
-          value:
-            - CW
+          - CW
       - date: '3080-01-01'
         population: 155144903.0
       - date: '3090-01-01'
@@ -245,9 +235,7 @@ planet:
         hpg: X
       - date: '3140-11-23'
         faction:
-          source: canon
-          value:
-            - CHH
+          - CHH
         population: 161347357.0
       - date: '3141-01-01'
         socioIndustrial: A-C-C-C-A
