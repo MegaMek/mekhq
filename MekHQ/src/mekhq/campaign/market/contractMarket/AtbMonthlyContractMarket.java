@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.market.contractMarket;
 
@@ -392,6 +397,10 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
         contract.clanTechSalvageOverride();
 
+        contract.setDifficulty(contract.calculateContractDifficulty(contract.getStartDate().getYear(),
+              true,
+              campaign.getAllCombatEntities()));
+
         return contract;
     }
 
@@ -594,6 +603,18 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                 multiplier *= 0.8;
             } else if (unitRatingMod == IUnitRating.DRAGOON_F) {
                 multiplier *= 0.5;
+            }
+        }
+
+        // FG3 Difficulty Multiplier
+        if (campaignOptions.isUseGenericBattleValue()) {
+            int contractDifficulty = contract.getDifficulty();
+            if (contractDifficulty <= 2) {
+                multiplier /= 0.5;
+            } else if (contractDifficulty >= 8) {
+                multiplier *= 0.5;
+            } else if (contractDifficulty >= 6) {
+                multiplier *= 0.25;
             }
         }
 

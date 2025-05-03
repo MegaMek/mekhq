@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.view;
 
@@ -68,6 +73,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
     /* Basic Mission Parameters */
     private JLabel lblStatus;
+    private JPanel lblChallenge;
     private JLabel lblLocation;
     private JLabel txtLocation;
     private JLabel lblType;
@@ -169,6 +175,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
     private void fillStatsBasic() {
         lblStatus = new JLabel();
+        lblChallenge = new JPanel();
         lblLocation = new JLabel();
         txtLocation = new JLabel();
         lblType = new JLabel();
@@ -630,6 +637,18 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblStatus, gridBagConstraints);
+
+        lblChallenge = contract.getContractDifficultySkulls();
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y++;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.insets = new Insets(0, 0, 5, 0);
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlStats.add(lblChallenge, gridBagConstraints);
 
         lblLocation.setName("lblLocation");
         lblLocation.setText(resourceMap.getString("lblLocation.text"));
