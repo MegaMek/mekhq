@@ -632,7 +632,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblStatus, gridBagConstraints);
 
-        lblBelligerents = contract.getBelligerentsPanel(gui.getCampaign());
+        lblBelligerents = contract.getBelligerentsPanel(gui.getCampaign().getGameYear());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy++;

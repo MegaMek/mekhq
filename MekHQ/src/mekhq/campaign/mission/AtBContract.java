@@ -1966,19 +1966,21 @@ public class AtBContract extends Contract {
     }
 
     /**
-     * Creates and returns a {@link JPanel} displaying the belligerent factions' logos for the given campaign.
+     * Creates and returns a {@link JPanel} containing the belligerent factions' logos for the specified game year.
      *
-     * @param campaign the {@link Campaign} instance providing context and faction information
+     * <p>This panel displays the employer and enemy faction logos side by side, separated by a styled divider.
+     * The logos are determined based on the provided game year and faction codes, scaled appropriately for the GUI.</p>
      *
-     * @return a {@link JPanel} with employer and enemy faction logos side by side
+     * @param gameYear the year used to determine which faction logos to display
+     * @return a {@link JPanel} with the employer and enemy faction logos, with a divider in between
      * @author Illiani
      * @since 0.50.06
      */
-    public JPanel getBelligerentsPanel(Campaign campaign) {
-        final int SIZE = 150;
+    public JPanel getBelligerentsPanel(int gameYear) {
+        final int SIZE = 100;
 
         String employer = getEmployerCode();
-        ImageIcon employerImage = getFactionLogo(campaign, employer, false);
+        ImageIcon employerImage = getFactionLogo(gameYear, employer);
         employerImage = scaleImageIcon(employerImage, SIZE, true);
 
         JLabel divider = new JLabel("/");
@@ -1988,7 +1990,7 @@ public class AtBContract extends Contract {
         divider.setForeground(BLACK);
 
         String enemy = getEnemyCode();
-        ImageIcon enemyImage = getFactionLogo(campaign, enemy, false);
+        ImageIcon enemyImage = getFactionLogo(gameYear, enemy);
         enemyImage = scaleImageIcon(enemyImage, SIZE, true);
 
         JPanel panel = new JPanel(new FlowLayout());
