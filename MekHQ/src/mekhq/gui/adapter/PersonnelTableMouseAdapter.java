@@ -1668,7 +1668,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       suitableDoctors,
                       selectedPerson,
                       cost);
-                int choice = replacementLimbDialog.getDialogChoice();
+                int choice = replacementLimbDialog.getChoiceIndex();
 
                 // If the user chose to decline the surgery
                 if (choice == 0) {

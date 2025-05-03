@@ -24,11 +24,15 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
 import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
-import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.REPLACEMENT_LIMB_MINIMUM_SKILL_REQUIRED_TYPES_3_4_5;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.ArrayList;
@@ -37,7 +41,7 @@ import java.util.List;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Person;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
 /**
  * A dialog for managing the replacement of limbs in a campaign. This immersive dialog provides an in-character message
@@ -46,8 +50,15 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
  * <p>The dialog uses localized resources to display messages and creates responses based
  * on campaign and patient details.</p>
  */
-public class ReplacementLimbDialog extends ImmersiveDialogCore {
+public class ReplacementLimbDialog {
     final private static String RESOURCE_BUNDLE = "mekhq.resources." + ReplacementLimbDialog.class.getSimpleName();
+
+    final private Campaign campaign;
+    private int choiceIndex = 0;
+
+    public int getChoiceIndex() {
+        return choiceIndex;
+    }
 
     /**
      * Constructor to create a Replacement Limb Dialog.
@@ -59,24 +70,31 @@ public class ReplacementLimbDialog extends ImmersiveDialogCore {
      * @param cost            The {@link Money} cost of the limb replacement procedure.
      */
     public ReplacementLimbDialog(Campaign campaign, List<Person> suitableDoctors, Person patient, Money cost) {
-        super(campaign,
-              getSpeaker(campaign),
+        this.campaign = campaign;
+
+        final boolean isPlanetside = campaign.getLocation().isOnPlanet();
+        final boolean hasQualifiedDoctors = !suitableDoctors.isEmpty();
+        final boolean hasSufficientFunds = campaign.getFunds().isGreaterOrEqualThan(cost);
+
+        String inCharacterMessage = createInCharacterMessage(isPlanetside,
+              hasQualifiedDoctors,
+              campaign.getCommanderAddress(false),
               patient,
-              createInCharacterMessage(campaign.getLocation().isOnPlanet(),
-                    !suitableDoctors.isEmpty(),
-                    campaign.getCommanderAddress(false),
-                    patient,
-                    cost,
-                    campaign.getFunds().isGreaterOrEqualThan(cost)),
-              createButtons(!suitableDoctors.isEmpty(),
-                    campaign.getLocation().isOnPlanet(),
-                    campaign.getFunds().isGreaterOrEqualThan(cost)),
-              getFormattedTextAt(RESOURCE_BUNDLE, "message.ooc", REPLACEMENT_LIMB_MINIMUM_SKILL_REQUIRED_TYPES_3_4_5),
+              cost,
+              hasSufficientFunds);
+
+        List<String> buttons = createButtons(hasQualifiedDoctors, isPlanetside, hasSufficientFunds);
+
+        ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
+              getSpeaker(),
               null,
-              false,
+              inCharacterMessage,
+              buttons,
               null,
               null,
-              true);
+              false);
+        
+        choiceIndex = dialog.getDialogChoice();
     }
 
     /**
@@ -96,26 +114,19 @@ public class ReplacementLimbDialog extends ImmersiveDialogCore {
      * @param hasSufficientFunds {@code true} if the campaign has enough funds to cover the procedure, {@code false}
      *                           otherwise.
      *
-     * @return A {@link List} of {@link ButtonLabelTooltipPair} objects representing the dialog buttons.
+     * @return A {@link List} of {@link String} objects representing the dialog buttons.
      */
-    private static List<ButtonLabelTooltipPair> createButtons(boolean hasQualifiedDoctor, boolean isPlanetside,
+    private static List<String> createButtons(boolean hasQualifiedDoctor, boolean isPlanetside,
                                                               boolean hasSufficientFunds) {
-        List<ButtonLabelTooltipPair> buttons = new ArrayList<>();
+        List<String> buttons = new ArrayList<>();
 
         if (!hasSufficientFunds || (!hasQualifiedDoctor && !isPlanetside)) {
-            ButtonLabelTooltipPair btnDecline = new ButtonLabelTooltipPair(getFormattedTextAt(RESOURCE_BUNDLE,
-                  "understood.button"), null);
-            buttons.add(btnDecline);
+            buttons.add(getFormattedTextAt(RESOURCE_BUNDLE, "understood.button"));
             return buttons;
         }
 
-        ButtonLabelTooltipPair btnDecline = new ButtonLabelTooltipPair(getFormattedTextAt(RESOURCE_BUNDLE,
-              "decline.button"), null);
-        buttons.add(btnDecline);
-
-        ButtonLabelTooltipPair btnAccept = new ButtonLabelTooltipPair(getFormattedTextAt(RESOURCE_BUNDLE,
-              "accept.button"), null);
-        buttons.add(btnAccept);
+        buttons.add(getFormattedTextAt(RESOURCE_BUNDLE, "decline.button"));
+        buttons.add(getFormattedTextAt(RESOURCE_BUNDLE, "accept.button"));
 
         return buttons;
     }
@@ -163,12 +174,10 @@ public class ReplacementLimbDialog extends ImmersiveDialogCore {
      * Determines the speaker for the dialog, prioritizing the senior doctor among the active personnel. If no doctors
      * are available, the campaign's senior HR administrator is selected as the speaker.
      *
-     * @param campaign The {@link Campaign} instance containing the active personnel and administrators.
-     *
      * @return The speaker for the dialog. This is the most senior doctor, if available; otherwise, it is the campaign's
      *       senior HR administrator.
      */
-    private static Person getSpeaker(Campaign campaign) {
+    private Person getSpeaker() {
         Person seniorDoctor = null;
 
         for (Person person : campaign.getActivePersonnel(false)) {
