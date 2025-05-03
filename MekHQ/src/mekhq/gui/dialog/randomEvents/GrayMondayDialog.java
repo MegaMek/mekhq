@@ -48,6 +48,10 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 
+/**
+ * @deprecated unused
+ */
+@Deprecated(since = "0.50.06", forRemoval = true)
 public class GrayMondayDialog extends ImmersiveDialogCore {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.GrayMonday";
 
