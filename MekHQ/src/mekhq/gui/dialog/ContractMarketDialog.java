@@ -65,6 +65,7 @@ import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.FactionComboBox;
@@ -557,23 +558,28 @@ public class ContractMarketDialog extends JDialog {
         String inCharacterResourceKey = "";
         String outOfCharacterResourceKey = null;
 
-        if (difficulty == -99) {
-            inCharacterResourceKey = "messageChallengeUnknown.inCharacter";
-            outOfCharacterResourceKey = "messageChallengeUnknown.outOfCharacter";
-        } else if (difficulty <= 2) {
-            inCharacterResourceKey = "messageChallengeVeryEasy.inCharacter";
-            outOfCharacterResourceKey = "messageChallengeVeryEasy.outOfCharacter";
-        } else if (difficulty > 8) {
-            inCharacterResourceKey = "messageChallengeVeryHard.inCharacter";
-            outOfCharacterResourceKey = "messageChallengeVeryHard.outOfCharacter";
-        } else if (difficulty > 6) {
-            inCharacterResourceKey = "messageChallengeHard.inCharacter";
-            outOfCharacterResourceKey = "messageChallengeHard.outOfCharacter";
-        }
 
-        if (((AtBContract) selectedContract).getContractType().isGarrisonDuty()) {
+        AtBContractType contractType = ((AtBContract) selectedContract).getContractType();
+        if (contractType.isGarrisonDuty()) {
             inCharacterResourceKey = "messageChallengeGarrison.inCharacter";
             outOfCharacterResourceKey = "messageChallengeGarrison.outOfCharacter";
+        } else if (contractType.isGuerrillaWarfare()) {
+            inCharacterResourceKey = "messageChallengeGuerrilla.inCharacter";
+            outOfCharacterResourceKey = "messageChallengeGuerrilla.outOfCharacter";
+        } else {
+            if (difficulty == -99) {
+                inCharacterResourceKey = "messageChallengeUnknown.inCharacter";
+                outOfCharacterResourceKey = "messageChallengeUnknown.outOfCharacter";
+            } else if (difficulty <= 2) {
+                inCharacterResourceKey = "messageChallengeVeryEasy.inCharacter";
+                outOfCharacterResourceKey = "messageChallengeVeryEasy.outOfCharacter";
+            } else if (difficulty > 8) {
+                inCharacterResourceKey = "messageChallengeVeryHard.inCharacter";
+                outOfCharacterResourceKey = "messageChallengeVeryHard.outOfCharacter";
+            } else if (difficulty > 6) {
+                inCharacterResourceKey = "messageChallengeHard.inCharacter";
+                outOfCharacterResourceKey = "messageChallengeHard.outOfCharacter";
+            }
         }
 
         // If resourceKey is not found, just return true, acting as if the player had
