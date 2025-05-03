@@ -73,6 +73,7 @@ import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
@@ -94,6 +95,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
+import javax.swing.SwingConstants;
 
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ratgenerator.FactionRecord;
@@ -1957,6 +1959,37 @@ public class AtBContract extends Contract {
                 panel.add(new JLabel(skullFull));
             }
         }
+
+        return panel;
+    }
+
+    /**
+     * Creates and returns a {@link JPanel} displaying the belligerent factions' logos for the given campaign.
+     *
+     * @param campaign the {@link Campaign} instance providing context and faction information
+     *
+     * @return a {@link JPanel} with employer and enemy faction logos side by side
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public JPanel getBelligerentsPanel(Campaign campaign) {
+        String employer = getEmployerCode();
+        ImageIcon employerImage = getFactionLogo(campaign, employer, false);
+        employerImage = scaleImageIcon(employerImage, 150, true);
+
+        JLabel divider = new JLabel("/");
+        divider.setHorizontalAlignment(SwingConstants.CENTER);
+        int fontSize = 150;
+        divider.setFont(new Font(Font.MONOSPACED, Font.PLAIN, fontSize));
+
+        String enemy = getEnemyCode();
+        ImageIcon enemyImage = getFactionLogo(campaign, enemy, false);
+        enemyImage = scaleImageIcon(enemyImage, 150, true);
+
+        JPanel panel = new JPanel(new FlowLayout());
+        panel.add(new JLabel(employerImage));
+        panel.add(divider);
+        panel.add(new JLabel(enemyImage));
 
         return panel;
     }
