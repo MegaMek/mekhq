@@ -348,17 +348,9 @@ public abstract class AbstractContractMarket {
     }
 
     /**
-     * Calculates the maximum number of deployable combat teams based on the given campaign's options.
-     *
-     * <p>
-     * This method retrieves campaign options and calculates the total deployable combat teams using the base strategy
-     * deployment, additional strategy deployment, and the campaign's commander strategy.
-     * </p>
-     *
-     * @param campaign the campaign object containing the necessary data to perform the calculation
-     *
-     * @return the total number of deployable combat teams
+     * @deprecated unused.
      */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public int calculateMaxDeployableCombatTeams(Campaign campaign) {
         CampaignOptions options = campaign.getCampaignOptions();
         int baseStrategyDeployment = options.getBaseStrategyDeployment();
