@@ -753,49 +753,61 @@ public class MRMSService {
             // We really only have to check one tech of each skill level
             if (!techSkillToWorktimeMap.containsKey(skill.getType().getName() + "-" + skill.getLevel())) {
                 TargetRoll targetRoll = campaign.getTargetFor(partWork, tech);
-                WorkTime selectedWorktime = null;
+                WorkTime selectedWorktime = WorkTime.NORMAL;
 
-                // Check if we need to increase the time to meet the min BTH
-                if (targetRoll.getValue() > mrmsOptions.getBthMin()) {
-                    if (!configuredOptions.isUseExtraTime()) {
-                        debugLog("... can't increase time to reach BTH due to configuration", "repairPart");
-                        continue;
-                    } else if (!canChangeWorkTime) {
-                        debugLog("... can't increase time because this part can not have it's workMode changed",
-                                "repairPart");
-                        continue;
-                    }
-
+                if (!canChangeWorkTime) {
+                    debugLog("... can't increase the time because this part can't have its workMode changed",
+                          "repairPart");
+                }
+                else if (targetRoll.getValue() > mrmsOptions.getBthMin() && !configuredOptions.isUseExtraTime()) {
+                    debugLog("... is above min TN but can't increase time due to configuration", "repairPart");
+                }
+                // Check if we need to increase the time to meet the min TN
+                else if (targetRoll.getValue() > mrmsOptions.getBthMin() && configuredOptions.isUseExtraTime()) {
                     WorkTimeCalculation workTimeCalc = calculateNewMRMSWorktime(partWork, tech,
                             mrmsOptions, campaign, true, highestAvailableTechSkill);
 
                     if (workTimeCalc.getWorkTime() == null) {
                         if (workTimeCalc.isReachedMaxSkill()) {
-                            debugLog("... can't increase time enough to reach BTH with max available tech",
+                            debugLog("... is above min TN but can't increase time enough with max available tech",
                                     "repairPart");
 
                             return MRMSPartAction.createMaxSkillReached(partWork, highestAvailableTechSkill,
                                     mrmsOptions.getBthMin());
                         } else {
-                            debugLog("... can't increase time enough to reach BTH", "repairPart");
+                            debugLog("... is above min TN but can't increase time enough", "repairPart");
 
                             continue;
                         }
                     }
+                    else {
+                        selectedWorktime = workTimeCalc.getWorkTime();
+                    }
+                }
+                else if (targetRoll.getValue() < mrmsOptions.getBthMax() && !configuredOptions.isUseRushJob()) {
+                    debugLog("... is below max TN but can't decrease time due to configuration", "repairPart");
+                }
+                // Check if we need to decrease the time to meet the max TN
+                else if (targetRoll.getValue() < mrmsOptions.getBthMax() && configuredOptions.isUseRushJob()) {
+                    WorkTimeCalculation workTimeCalc = calculateNewMRMSWorktime(partWork, tech,
+                          mrmsOptions, campaign, false, highestAvailableTechSkill);
 
-                    selectedWorktime = workTimeCalc.getWorkTime();
-                } else if (targetRoll.getValue() < mrmsOptions.getBthMax()) {
-                    // Or decrease the time to meet the max BTH
-                    if (configuredOptions.isUseRushJob() && canChangeWorkTime) {
-                        WorkTimeCalculation workTimeCalc = calculateNewMRMSWorktime(partWork, tech, mrmsOptions,
-                                campaign,
-                                false, highestAvailableTechSkill);
+                    if (workTimeCalc.getWorkTime() == null) {
+                        if (workTimeCalc.isReachedMaxSkill()) {
+                            debugLog("... is below max TN but can't increase time within skill limits with max " +
+                                           "available tech",
+                                  "repairPart");
 
-                        if (null == workTimeCalc.getWorkTime()) {
-                            selectedWorktime = WorkTime.NORMAL;
+                            return MRMSPartAction.createMaxSkillReached(partWork, highestAvailableTechSkill,
+                                  mrmsOptions.getBthMin());
                         } else {
-                            selectedWorktime = workTimeCalc.getWorkTime();
+                            debugLog("... is below max TN but can't increase time within skill limits", "repairPart");
+
+                            continue;
                         }
+                    }
+                    else {
+                        selectedWorktime = workTimeCalc.getWorkTime();
                     }
                 }
 
