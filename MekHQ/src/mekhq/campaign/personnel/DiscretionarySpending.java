@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel;
 
@@ -130,8 +135,7 @@ public class DiscretionarySpending {
         final String fullTitle = person.getHyperlinkedFullTitle();
         if (person.isHasPerformedExtremeExpenditure()) {
             final String openingSpan = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor());
-            reportMessage = getFormattedTextAt(RESOURCE_BUNDLE,
-                  "report.format.monthly",
+            reportMessage = getFormattedTextAt(RESOURCE_BUNDLE, "report.format.exhausted",
                   fullTitle,
                   openingSpan,
                   CLOSING_SPAN_TAG);
@@ -159,17 +163,21 @@ public class DiscretionarySpending {
         // Generate the report message
         final String fullName = person.getFullName();
         final String openingSpan = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor());
-        reportMessage = getFormattedTextAt(RESOURCE_BUNDLE,
-              "report.format.monthly",
-              fullTitle,
-              openingSpan,
-              wealth,
-              CLOSING_SPAN_TAG,
-              money.toAmountString());
+        if (money.isZero()) {
+            reportMessage = getFormattedTextAt(RESOURCE_BUNDLE, "report.format.no_spending", fullTitle);
+        } else {
+            reportMessage = getFormattedTextAt(RESOURCE_BUNDLE,
+                  "report.format.monthly",
+                  fullTitle,
+                  openingSpan,
+                  wealth,
+                  CLOSING_SPAN_TAG,
+                  money.toAmountString());
 
-        // Credit finances with the calculated total spending
-        String reason = getFormattedTextAt(RESOURCE_BUNDLE, "finance.format", fullName);
-        finances.credit(WEALTH, today, money, reason);
+            // Credit finances with the calculated total spending
+            String reason = getFormattedTextAt(RESOURCE_BUNDLE, "finance.format", fullName);
+            finances.credit(WEALTH, today, money, reason);
+        }
     }
 
     /**

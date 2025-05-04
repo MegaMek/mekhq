@@ -27,6 +27,11 @@
  */
 package mekhq.campaign.parts;
 
+import static megamek.common.EquipmentType.T_ARMOR_SV_BAR_2;
+
+import java.io.PrintWriter;
+import java.util.Objects;
+
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
@@ -38,11 +43,6 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
-
-import java.io.PrintWriter;
-import java.util.Objects;
-
-import static megamek.common.EquipmentType.T_ARMOR_SV_BAR_2;
 
 /**
  * Standard support vehicle armor, which can differ by BAR and tech rating.
@@ -157,32 +157,36 @@ public class SVArmor extends Armor {
     }
 
     @Override
-    public int getAmountAvailable() {
-        SVArmor a = (SVArmor) campaign.getWarehouse().findSparePart(part -> {
-            return isSamePartType(part)
-                    && part.isPresent()
-                    && !part.isReservedForRefit();
-        });
-
-        return a != null ? a.getAmount() : 0;
+    public TechAdvancement getTechAdvancement() {
+        return ArmorType.svArmor(bar).getTechAdvancement();
     }
 
     @Override
-    public void changeAmountAvailable(int amount) {
-        SVArmor a = (SVArmor) campaign.getWarehouse().findSparePart(part -> {
-            return isSamePartType(part)
-                    && part.isPresent()
-                    && Objects.equals(getRefitUnit(), part.getRefitUnit());
+    public int getAmountAvailable() {
+        return campaign.getWarehouse()
+                     .streamSpareParts()
+                     .filter(this::isSameSVArmorPart)
+                     .mapToInt(part -> ((SVArmor) part).getAmount())
+                     .sum();
+    }
+
+    @Override
+    protected int changeAmountAvailableSingle(int amount) {
+        SVArmor armor = (SVArmor) campaign.getWarehouse().findSparePart(part -> {
+            return isSamePartType(part) && part.isPresent() && Objects.equals(getRefitUnit(), part.getRefitUnit());
         });
 
-        if (null != a) {
-            a.setAmount(a.getAmount() + amount);
-            if (a.getAmount() <= 0) {
-                campaign.getWarehouse().removePart(a);
+        if (null != armor) {
+            int amountRemaining = armor.getAmount() + amount;
+            armor.setAmount(amountRemaining);
+            if (armor.getAmount() <= 0) {
+                campaign.getWarehouse().removePart(armor);
+                return Math.min(0, amountRemaining);
             }
         } else if (amount > 0) {
-            campaign.getQuartermaster().addPart(new SVArmor(bar, techRating, amount, -1, campaign), 0);
+            campaign.getQuartermaster().addPart(new SVArmor(bar, techRating, amount, -1, campaign), 0, false);
         }
+        return 0;
     }
 
     @Override
@@ -217,8 +221,16 @@ public class SVArmor extends Armor {
         }
     }
 
-    @Override
-    public TechAdvancement getTechAdvancement() {
-        return ArmorType.svArmor(bar).getTechAdvancement();
+    /**
+     * Not sure how true this title is, it was used in {@link SVArmor#getAmountAvailable}
+     * @param part is this part the same
+     * @return true if the two parts are the same, at least as far as {@link SVArmor#getAmountAvailable} is concerned
+     */
+    private boolean isSameSVArmorPart(Part part) {
+        return (part instanceof SVArmor armor) &&
+                     armor.isPresent() &&
+                     !armor.isReservedForRefit() &&
+                     isClanTechBase() == part.isClanTechBase() &&
+                     isSamePartType(armor);
     }
 }
