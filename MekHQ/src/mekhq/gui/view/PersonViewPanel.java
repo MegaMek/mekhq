@@ -108,7 +108,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
     private final CampaignGUI gui;
 
-    private final Person person;
+    private Person person;
     private final Campaign campaign;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonViewPanel",
@@ -2338,5 +2338,13 @@ public class PersonViewPanel extends JScrollablePanel {
         pnlKills.add(killTable, gridBagConstraints);
 
         return pnlKills;
+    }
+
+    public void setPerson(Person person) {
+        this.person = person;
+        removeAll();
+        initComponents();
+        revalidate();
+        repaint();
     }
 }

@@ -320,6 +320,8 @@ public class CampaignXmlParser {
                     campaign.setLocation(CurrentLocation.generateInstanceFromXML(wn, campaign));
                 } else if (xn.equalsIgnoreCase("isAvoidingEmptySystems")) {
                     campaign.setIsAvoidingEmptySystems(Boolean.parseBoolean(wn.getTextContent().trim()));
+                } else if (xn.equalsIgnoreCase("isOfferingGoldenHello")) {
+                    campaign.setIsOfferingGoldenHello(Boolean.parseBoolean(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase("skillTypes")) {
                     processSkillTypeNodes(wn, version);
                 } else if (xn.equalsIgnoreCase("specialAbilities")) {

@@ -46,6 +46,7 @@ import static mekhq.campaign.force.Force.FORCE_NONE;
 import static mekhq.campaign.force.Force.FORCE_ORIGIN;
 import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
+import static mekhq.campaign.market.personnelMarket.NewPersonnelMarketGUI.showPersonnelTableDialog;
 import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
 import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performResupply;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.isProhibitedUnitType;
@@ -143,6 +144,7 @@ import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
+import mekhq.campaign.market.personnelMarket.NewPersonnelMarket;
 import mekhq.campaign.market.personnelMarket.PersonnelMarketEntry;
 import mekhq.campaign.market.personnelMarket.yaml.PersonnelMarketLibraries;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
@@ -359,6 +361,7 @@ public class Campaign implements ITechManager {
     private PersonnelMarket personnelMarket;
     private AbstractContractMarket contractMarket;
     private AbstractUnitMarket unitMarket;
+    private boolean isOfferingGoldenHello;
 
     private RandomDeath randomDeath;
     private transient AbstractDivorce divorce;
@@ -760,6 +763,14 @@ public class Campaign implements ITechManager {
 
     public void setUnitMarket(final AbstractUnitMarket unitMarket) {
         this.unitMarket = unitMarket;
+    }
+
+    public boolean isOfferingGoldenHello() {
+        return isOfferingGoldenHello;
+    }
+
+    public void setIsOfferingGoldenHello(final boolean isOfferingGoldenHello) {
+        this.isOfferingGoldenHello = isOfferingGoldenHello;
     }
     // endregion Markets
 
@@ -5344,7 +5355,17 @@ public class Campaign implements ITechManager {
         location.newDay(this);
 
         // Manage the Markets
-        personnelMarket.generatePersonnelForDay(this);
+        //        personnelMarket.generatePersonnelForDay(this);
+        int lengthOfMonth = currentDay.lengthOfMonth();
+        NewPersonnelMarket newPersonnelMarket = new NewPersonnelMarket(this,
+              innerSpherePersonnelMarketEntries,
+              lengthOfMonth);
+        showPersonnelTableDialog(null,
+              this,
+              newPersonnelMarket.getAvailablePersonnel(),
+              newPersonnelMarket.getRecruitmentRolls(),
+              newPersonnelMarket.systemHasNoPopulation(),
+              newPersonnelMarket.noInterestedApplicants());
 
         // TODO : AbstractContractMarket : Uncomment
         // getContractMarket().processNewDay(this);
@@ -6493,6 +6514,7 @@ public class Campaign implements ITechManager {
         finances.writeToXML(pw, indent);
         location.writeToXML(pw, indent);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "isAvoidingEmptySystems", isAvoidingEmptySystems);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "isOfferingGoldenHello", isOfferingGoldenHello);
         shoppingList.writeToXML(pw, indent);
 
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "kills");
