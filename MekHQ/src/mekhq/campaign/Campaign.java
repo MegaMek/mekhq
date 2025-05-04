@@ -143,6 +143,8 @@ import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
+import mekhq.campaign.market.personnelMarket.PersonnelMarketEntry;
+import mekhq.campaign.market.personnelMarket.yaml.PersonnelMarketLibraries;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.market.unitMarket.DisabledUnitMarket;
 import mekhq.campaign.mission.AtBContract;
@@ -397,11 +399,11 @@ public class Campaign implements ITechManager {
 
     // Libraries
     // We deliberately don't write this data to the save file as we want it rebuilt
-    // every time the
-    // campaign loads. This ensures updates can be applied and there is no risk of
-    // bugs being
-    // permanently locked into the campaign file.
+    // every time the ampaign loads. This ensures updates can be applied and there is no risk of
+    // bugs being permanently locked into the campaign file.
     RandomEventLibraries randomEventLibraries;
+    Map<PersonnelRole, PersonnelMarketEntry> clanPersonnelMarketEntries;
+    Map<PersonnelRole, PersonnelMarketEntry> innerSpherePersonnelMarketEntries;
 
     /**
      * Represents the different types of administrative specializations. Each specialization corresponds to a distinct
@@ -495,7 +497,12 @@ public class Campaign implements ITechManager {
 
         // Library initialization
         randomEventLibraries = new RandomEventLibraries();
+        PersonnelMarketLibraries personnelMarketLibraries = new PersonnelMarketLibraries();
+        clanPersonnelMarketEntries = personnelMarketLibraries.getClanMarketEntries();
+        innerSpherePersonnelMarketEntries = personnelMarketLibraries.getInnerSphereMarketEntries();
 
+        logger.info(clanPersonnelMarketEntries);
+        logger.info(innerSpherePersonnelMarketEntries);
     }
 
     /**
@@ -729,6 +736,14 @@ public class Campaign implements ITechManager {
 
     public void setPersonnelMarket(final PersonnelMarket personnelMarket) {
         this.personnelMarket = personnelMarket;
+    }
+
+    public Map<PersonnelRole, PersonnelMarketEntry> getClanPersonnelMarketEntries() {
+        return clanPersonnelMarketEntries;
+    }
+
+    public Map<PersonnelRole, PersonnelMarketEntry> getInnerSpherePersonnelMarketEntries() {
+        return innerSpherePersonnelMarketEntries;
     }
 
     public AbstractContractMarket getContractMarket() {

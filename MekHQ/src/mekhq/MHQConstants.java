@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq;
 
@@ -274,6 +279,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String STRATCON_MUL_FILES_DIRECTORY = "data/scenariotemplates/fixedmuls/";
     public static final String PLANETARY_SYSTEM_DIRECTORY_PATH = "data/universe/planetary_systems";
     public static final String FORCE_ICON_PATH = "data/images/force";
+    public static final String PERSONNEL_MARKET_DIRECTORY_PATH = "data/universe/personnelMarketEntries/";
 
     // region StratCon
     public static final String STRATCON_REQUIRED_HOSTILE_FACILITY_MODS = "./data/scenariomodifiers/requiredHostileFacilityModifiers.xml";
