@@ -33,7 +33,9 @@
 package mekhq.campaign.market.personnelMarket;
 
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
+import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
+import static mekhq.campaign.personnel.enums.PersonnelRole.DEPENDENT;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -196,6 +198,18 @@ public class NewPersonnelMarket {
             if (!hasRarePersonnel && entry.weight() <= RARE_PROFESSION_WEIGHT) {
                 hasRarePersonnel = true;
             }
+        }
+
+        int dependentsCount = d6();
+
+        for (int roll = 0; roll < dependentsCount; roll++) {
+            String applicantOriginFaction = getRandomItem(applicantOriginFactions).getShortName();
+            Person applicant = campaign.newPerson(DEPENDENT, applicantOriginFaction, Gender.RANDOMIZE);
+            if (applicant == null) {
+                continue;
+            }
+
+            availablePersonnel.add(applicant);
         }
     }
 
