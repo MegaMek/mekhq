@@ -306,6 +306,7 @@ public class TankLocation extends Part {
         double totalCost = 0;
         double structureCost = 0;
         double controlsCost = 0;
+        // Tech Manual, 1st printing, p279-280
         structureCost += 10000 * getTonnage(); // True for SVs as well?
         controlsCost += 10000 * getTonnage() / 2;
         //TODO: Support vehicles have chassis structure multipliers
