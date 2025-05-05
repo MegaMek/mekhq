@@ -403,7 +403,7 @@ public class Campaign implements ITechManager {
 
     // Libraries
     // We deliberately don't write this data to the save file as we want it rebuilt
-    // every time the ampaign loads. This ensures updates can be applied and there is no risk of
+    // every time the campaign loads. This ensures updates can be applied and there is no risk of
     // bugs being permanently locked into the campaign file.
     RandomEventLibraries randomEventLibraries;
 
