@@ -39,7 +39,10 @@ public enum ApplicantTableColumns {
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources." + ApplicantTableColumns.class.getSimpleName();
 
-    ApplicantTableColumns(int ignored) {
+    public final int columnIndex;
+
+    ApplicantTableColumns(int columnIndex) {
+        this.columnIndex = columnIndex;
     }
 
     public String getLabel() {

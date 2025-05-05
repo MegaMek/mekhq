@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.io;
 
+import static megamek.common.UnitType.DROPSHIP;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.force.Force.FORCE_NONE;
 import static mekhq.campaign.market.personnelMarket.NewPersonnelMarket.generatePersonnelMarketDataFromXML;
@@ -62,6 +63,7 @@ import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.swing.util.PlayerColour;
+import megamek.codeUtilities.MathUtility;
 import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
 import megamek.common.Jumpship;
@@ -362,7 +364,7 @@ public class CampaignXmlParser {
                 } else if (nodeName.equalsIgnoreCase("shipSearchStart")) {
                     campaign.setShipSearchStart(MHQXMLUtility.parseDate(workingNode.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("shipSearchType")) {
-                    campaign.setShipSearchType(Integer.parseInt(workingNode.getTextContent()));
+                    campaign.setShipSearchType(MathUtility.parseInt(workingNode.getTextContent(), DROPSHIP));
                 } else if (nodeName.equalsIgnoreCase("shipSearchResult")) {
                     campaign.setShipSearchResult(workingNode.getTextContent());
                 } else if (nodeName.equalsIgnoreCase("shipSearchExpiration")) {
@@ -377,7 +379,7 @@ public class CampaignXmlParser {
                 } else if (nodeName.equalsIgnoreCase("partsInUse")) {
                     processPartsInUse(campaign, workingNode);
                 } else if (nodeName.equalsIgnoreCase("temporaryPrisonerCapacity")) {
-                    campaign.setTemporaryPrisonerCapacity(Integer.parseInt(workingNode.getTextContent().trim()));
+                    campaign.setTemporaryPrisonerCapacity(MathUtility.parseInt(workingNode.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("processProcurement")) {
                     campaign.setProcessProcurement(Boolean.parseBoolean(workingNode.getTextContent().trim()));
                 }
@@ -764,7 +766,8 @@ public class CampaignXmlParser {
                         if (wn2.getNodeName().equalsIgnoreCase("faction")) {
                             RandomNameGenerator.getInstance().setChosenFaction(wn2.getTextContent().trim());
                         } else if (wn2.getNodeName().equalsIgnoreCase("percentFemale")) {
-                            RandomGenderGenerator.setPercentFemale(Integer.parseInt(wn2.getTextContent().trim()));
+                            RandomGenderGenerator.setPercentFemale(MathUtility.parseInt(wn2.getTextContent().trim(),
+                                  50));
                         }
                     }
                 } else if (nodeName.equalsIgnoreCase("currentReport")) {
@@ -796,13 +799,13 @@ public class CampaignXmlParser {
                 } else if (nodeName.equalsIgnoreCase("retainerStartDate")) {
                     campaign.setRetainerStartDate(LocalDate.parse(childNode.getTextContent()));
                 } else if (nodeName.equalsIgnoreCase("crimeRating")) {
-                    campaign.setCrimeRating(Integer.parseInt(childNode.getTextContent()));
+                    campaign.setCrimeRating(MathUtility.parseInt(childNode.getTextContent()));
                 } else if (nodeName.equalsIgnoreCase("initiativeBonus")) {
-                    campaign.setInitiativeBonus(Integer.parseInt(childNode.getTextContent()));
+                    campaign.setInitiativeBonus(MathUtility.parseInt(childNode.getTextContent()));
                 } else if (nodeName.equalsIgnoreCase("initiativeMaxBonus")) {
-                    campaign.setInitiativeMaxBonus(Integer.parseInt(childNode.getTextContent()));
+                    campaign.setInitiativeMaxBonus(MathUtility.parseInt(childNode.getTextContent(), 1));
                 } else if (nodeName.equalsIgnoreCase("crimePirateModifier")) {
-                    campaign.setCrimePirateModifier(Integer.parseInt(childNode.getTextContent()));
+                    campaign.setCrimePirateModifier(MathUtility.parseInt(childNode.getTextContent()));
                 } else if (nodeName.equalsIgnoreCase("dateOfLastCrime")) {
                     campaign.setDateOfLastCrime(LocalDate.parse(childNode.getTextContent()));
                 } else if (nodeName.equalsIgnoreCase("reputation")) {
@@ -843,13 +846,13 @@ public class CampaignXmlParser {
                 } else if (nodeName.equalsIgnoreCase("overtime")) {
                     campaign.setOvertime(Boolean.parseBoolean(childNode.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("astechPool")) {
-                    campaign.setAstechPool(Integer.parseInt(childNode.getTextContent().trim()));
+                    campaign.setAstechPool(MathUtility.parseInt(childNode.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("astechPoolMinutes")) {
-                    campaign.setAstechPoolMinutes(Integer.parseInt(childNode.getTextContent().trim()));
+                    campaign.setAstechPoolMinutes(MathUtility.parseInt(childNode.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("astechPoolOvertime")) {
-                    campaign.setAstechPoolOvertime(Integer.parseInt(childNode.getTextContent().trim()));
+                    campaign.setAstechPoolOvertime(MathUtility.parseInt(childNode.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("medicPool")) {
-                    campaign.setMedicPool(Integer.parseInt(childNode.getTextContent().trim()));
+                    campaign.setMedicPool(MathUtility.parseInt(childNode.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("id")) {
                     campaign.setId(UUID.fromString(childNode.getTextContent().trim()));
                 }

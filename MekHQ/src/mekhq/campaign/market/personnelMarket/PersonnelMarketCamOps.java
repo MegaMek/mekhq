@@ -106,7 +106,7 @@ public class PersonnelMarketCamOps extends NewPersonnelMarket {
             Person applicant = generateSingleApplicant(marketEntries);
 
             if (applicant != null) {
-                getCurrentApplicants().add(applicant);
+                addApplicant(applicant);
             }
         }
     }

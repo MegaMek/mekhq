@@ -287,6 +287,12 @@ public class NewPersonnelMarket {
         return currentApplicants;
     }
 
+    public void addApplicant(Person applicant) {
+        if (applicant != null && !currentApplicants.contains(applicant)) {
+            currentApplicants.add(applicant);
+        }
+    }
+
     public void clearCurrentApplicants() {
         setCurrentApplicants(new ArrayList<>());
     }
@@ -449,7 +455,7 @@ public class NewPersonnelMarket {
             Person applicant = Person.generateInstanceFromXML(currentChild, personnelMarket.getCampaign(), version);
 
             if (applicant != null) {
-                personnelMarket.getCurrentApplicants().add(applicant);
+                personnelMarket.addApplicant(applicant);
             }
         }
 

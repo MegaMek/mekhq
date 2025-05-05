@@ -181,7 +181,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
                 continue;
             }
 
-            getCurrentApplicants().add(applicant);
+            addApplicant(applicant);
         }
 
         int dependentsCount = d6();
@@ -193,7 +193,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
                 continue;
             }
 
-            getCurrentApplicants().add(applicant);
+            addApplicant(applicant);
         }
     }
 

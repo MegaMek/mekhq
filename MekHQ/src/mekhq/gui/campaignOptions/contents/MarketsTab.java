@@ -202,7 +202,7 @@ public class MarketsTab {
     private void initializePersonnelMarket() {
         pnlPersonnelMarketGeneralOptions = new JPanel();
         lblPersonnelMarketType = new JLabel();
-        comboPersonnelMarketType = new MMComboBox<>("comboPersonnelMarketType", getPersonnelMarketTypeOptionsOld());
+        comboPersonnelMarketType = new MMComboBox<>("comboPersonnelMarketType", getPersonnelMarketTypeOptions());
         lblPersonnelMarketStyle = new JLabel();
         comboPersonnelMarketStyle = new MMComboBox<>("comboPersonnelMarketStyle", PersonnelMarketStyle.values());
         chkPersonnelMarketReportRefresh = new JCheckBox();
@@ -224,21 +224,12 @@ public class MarketsTab {
      * @return A {@link DefaultComboBoxModel} containing the personnel market type options.
      */
     @Deprecated(since = "0.50.06", forRemoval = false)
-    private static DefaultComboBoxModel<String> getPersonnelMarketTypeOptionsOld() {
+    private static DefaultComboBoxModel<String> getPersonnelMarketTypeOptions() {
         final DefaultComboBoxModel<String> personnelMarketTypeModel = new DefaultComboBoxModel<>();
         for (final PersonnelMarketMethod method : PersonnelMarketServiceManager.getInstance().getAllServices(true)) {
             personnelMarketTypeModel.addElement(method.getModuleName());
         }
         return personnelMarketTypeModel;
-    }
-
-    private static DefaultComboBoxModel<String> getPersonnelMarketTypeOptions() {
-        PersonnelMarketStyle[] methods = PersonnelMarketStyle.values();
-        String[] options = new String[methods.length];
-        for (int i = 0; i < methods.length; i++) {
-            options[i] = methods[i].toString();
-        }
-        return new DefaultComboBoxModel<>(options);
     }
 
     /**
