@@ -34,6 +34,7 @@ package mekhq.campaign.io;
 
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.force.Force.FORCE_NONE;
+import static mekhq.campaign.market.personnelMarket.NewPersonnelMarket.generatePersonnelMarketDataFromXML;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.statusValidator;
 import static mekhq.campaign.personnel.skills.SkillDeprecationTool.DEPRECATED_SKILLS;
 import static org.apache.commons.lang3.ObjectUtils.firstNonNull;
@@ -92,7 +93,6 @@ import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
-import mekhq.campaign.market.personnelMarket.NewPersonnelMarket;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
@@ -808,9 +808,7 @@ public class CampaignXmlParser {
                 } else if (nodeName.equalsIgnoreCase("reputation")) {
                     campaign.setReputation(new ReputationController().generateInstanceFromXML(childNode));
                 } else if (nodeName.equalsIgnoreCase("newPersonnelMarket")) {
-                    campaign.setNewPersonnelMarket(new NewPersonnelMarket(campaign).generatePersonnelMarketDataFromXML(
-                          childNode,
-                          version));
+                    campaign.setNewPersonnelMarket(generatePersonnelMarketDataFromXML(campaign, childNode, version));
                 } else if (nodeName.equalsIgnoreCase("rankSystem")) {
                     if (!childNode.hasChildNodes()) { // we need there to be child nodes to parse from
                         continue;

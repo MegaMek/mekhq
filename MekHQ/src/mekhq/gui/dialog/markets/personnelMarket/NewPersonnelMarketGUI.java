@@ -30,11 +30,10 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.market.personnelMarket;
+package mekhq.gui.dialog.markets.personnelMarket;
 
 import static mekhq.campaign.finances.enums.TransactionType.RECRUITMENT;
-import static mekhq.campaign.market.personnelMarket.NewPersonnelMarket.LOW_POPULATION_RECRUITMENT_DIVIDER;
-import static mekhq.campaign.market.personnelMarket.NewPersonnelMarket.UNIT_REPUTATION_RECRUITMENT_CUTOFF;
+import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.NONE;
 import static mekhq.gui.enums.PersonnelFilter.ACTIVE;
 import static mekhq.gui.enums.PersonnelFilter.getStandardPersonnelFilters;
 
@@ -56,6 +55,8 @@ import javax.swing.table.TableRowSorter;
 
 import megamek.client.ui.baseComponents.MMComboBox;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.market.personnelMarket.NewPersonnelMarket;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.enums.PersonnelFilter;
@@ -68,6 +69,7 @@ public class NewPersonnelMarketGUI {
     private final NewPersonnelMarket market;
     private final JFrame parent;
     private final Campaign campaign;
+    private final CampaignOptions campaignOptions;
 
     private List<Person> currentApplicants;
     private MMComboBox<PersonnelFilter> roleComboBox = new MMComboBox<>("roleFilter");
@@ -79,6 +81,7 @@ public class NewPersonnelMarketGUI {
     public NewPersonnelMarketGUI(NewPersonnelMarket market) {
         this.market = market;
         this.campaign = market.getCampaign();
+        this.campaignOptions = campaign.getCampaignOptions();
         this.parent = campaign.getApp().getCampaigngui().getFrame();
         this.currentApplicants = market.getCurrentApplicants();
 
@@ -159,61 +162,48 @@ public class NewPersonnelMarketGUI {
     }
 
     private JPanel initializeButtonPanel() {
+        boolean isGM = campaign.isGM();
+
         JPanel buttonPanel = new JPanel();
         JButton hireButton = new JButton("HIRE");
-        hireButton.addActionListener(e -> {
-            List<Person> recruitedPersons = new ArrayList<>(tablePanel.getSelectedApplicants());
-
-            // Process recruitment and golden hello logic for all selected applicants
-            for (Person applicant : recruitedPersons) {
-                if (market.offeringGoldenHello) {
-                    campaign.getFinances()
-                          .debit(RECRUITMENT,
-                                campaign.getLocalDate(),
-                                applicant.getSalary(campaign).multipliedBy(12),
-                                "hiring " + applicant.getFullTitle());
-                }
-                campaign.recruitPerson(applicant);
-            }
-
-            // Remove all recruited persons from the applicants list
-            currentApplicants.removeAll(recruitedPersons);
-            if (currentApplicants.isEmpty()) {
-                personViewPanel.setVisible(false);
-            }
-
-            // Refresh table view (notify the model of data changes)
-            AbstractTableModel model = (AbstractTableModel) tablePanel.getTable().getModel();
-            model.fireTableDataChanged();
-
-            // Clear selection in the table
-            tablePanel.getTable().clearSelection();
-        });
-
+        hireButton.addActionListener(e -> hireActionListener(isGM));
         buttonPanel.add(hireButton);
-        if (campaign.isGM()) {
-            JButton addGMButton = new JButton("Add (GM)");
-            addGMButton.addActionListener(e -> {
-                List<Person> recruitedPersons = new ArrayList<>();
-                for (Person applicant : tablePanel.getSelectedApplicants()) {
-                    campaign.recruitPerson(applicant, true);
-                    recruitedPersons.add(applicant);
-                }
-                currentApplicants.removeAll(recruitedPersons);
-                if (currentApplicants.isEmpty()) {
-                    personViewPanel.setVisible(false);
-                }
 
-                // Refresh table view (notify the model of data changes)
-                AbstractTableModel model = (AbstractTableModel) tablePanel.getTable().getModel();
-                model.fireTableDataChanged();
+        JButton addGMButton = new JButton("Add (GM)");
+        addGMButton.addActionListener(e -> hireActionListener(isGM));
+        addGMButton.setEnabled(isGM);
+        buttonPanel.add(addGMButton);
 
-                // Clear selection in the table
-                tablePanel.getTable().clearSelection();
-            });
-            buttonPanel.add(addGMButton);
-        }
         return buttonPanel;
+    }
+
+    private void hireActionListener(boolean isGM) {
+        List<Person> recruitedPersons = new ArrayList<>(tablePanel.getSelectedApplicants());
+
+        // Process recruitment and golden hello logic for all selected applicants
+        for (Person applicant : recruitedPersons) {
+            if (!isGM && market.isOfferingGoldenHello()) {
+                campaign.getFinances()
+                      .debit(RECRUITMENT,
+                            campaign.getLocalDate(),
+                            applicant.getSalary(campaign).multipliedBy(12),
+                            "hiring " + applicant.getFullTitle());
+            }
+            campaign.recruitPerson(applicant, isGM);
+        }
+
+        // Remove all recruited persons from the applicant list
+        currentApplicants.removeAll(recruitedPersons);
+        if (currentApplicants.isEmpty()) {
+            personViewPanel.setVisible(false);
+        }
+
+        // Refresh the table view (notify the model of data changes)
+        AbstractTableModel model = (AbstractTableModel) tablePanel.getTable().getModel();
+        model.fireTableDataChanged();
+
+        // Clear selection in the table
+        tablePanel.getTable().clearSelection();
     }
 
     private static JPanel initializeTipPanel() {
@@ -316,7 +306,9 @@ public class NewPersonnelMarketGUI {
 
         // Slider
         rightGbc.gridy = rightRow++;
-        int recruitmentSliderMaximum = MAXIMUM_DAYS_IN_MONTH * MAXIMUM_NUMBER_OF_SYSTEM_ROLLS;
+        int recruitmentSliderMaximum = campaignOptions.getPersonnelMarketStyle() != NONE ?
+                                             MAXIMUM_DAYS_IN_MONTH * MAXIMUM_NUMBER_OF_SYSTEM_ROLLS :
+                                             MAXIMUM_DAYS_IN_MONTH;
         int recruitmentSliderCurrent = market.getRecruitmentRolls();
         JSlider personnelAvailabilitySlider = new JSlider(0, recruitmentSliderMaximum, recruitmentSliderCurrent);
         personnelAvailabilitySlider.setEnabled(false);
@@ -346,9 +338,8 @@ public class NewPersonnelMarketGUI {
     private String getAvailabilityModifierMessage() {
         String noAvailabilityMessage = market.getAvailabilityMessage();
 
-        if (noAvailabilityMessage.isBlank() &&
-                  campaign.getCampaignOptions().getUnitRatingMethod().isCampaignOperations()) {
-            if (campaign.getReputation().getReputationRating() < UNIT_REPUTATION_RECRUITMENT_CUTOFF) {
+        if (noAvailabilityMessage.isBlank() && campaignOptions.getUnitRatingMethod().isCampaignOperations()) {
+            if (campaign.getReputation().getReputationRating() < market.getUnitReputationRecruitmentCutoff()) {
                 noAvailabilityMessage = "Nobody likes you.";
             }
         }
@@ -356,7 +347,7 @@ public class NewPersonnelMarketGUI {
         LocalDate today = campaign.getLocalDate();
 
         if (noAvailabilityMessage.isBlank() &&
-                  currentSystem.getPopulation(today) < LOW_POPULATION_RECRUITMENT_DIVIDER) {
+                  currentSystem.getPopulation(today) < market.getLowPopulationRecruitmentDivider()) {
             noAvailabilityMessage = "Reduced recruitment due to low population.";
         }
         return noAvailabilityMessage;

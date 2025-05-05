@@ -46,6 +46,7 @@ import static mekhq.campaign.force.Force.FORCE_NONE;
 import static mekhq.campaign.force.Force.FORCE_ORIGIN;
 import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
+import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.NONE;
 import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
 import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performResupply;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.isProhibitedUnitType;
@@ -144,6 +145,7 @@ import mekhq.campaign.market.ShoppingList;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
 import mekhq.campaign.market.personnelMarket.NewPersonnelMarket;
+import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.market.unitMarket.DisabledUnitMarket;
 import mekhq.campaign.mission.AtBContract;
@@ -355,8 +357,9 @@ public class Campaign implements ITechManager {
 
     private ShoppingList shoppingList;
 
-    private PersonnelMarket personnelMarket;
     private NewPersonnelMarket newPersonnelMarket;
+    @Deprecated(since = "0.50.06", forRemoval = false)
+    private PersonnelMarket personnelMarket;
     private AbstractContractMarket contractMarket;
     private AbstractUnitMarket unitMarket;
 
@@ -5337,9 +5340,7 @@ public class Campaign implements ITechManager {
         location.newDay(this);
 
         // Manage the Markets
-        //        personnelMarket.generatePersonnelForDay(this);
-        newPersonnelMarket.gatherApplications();
-        newPersonnelMarket.showPersonnelMarketDialog();
+        refreshPersonnelMarkets();
 
         // TODO : AbstractContractMarket : Uncomment
         // getContractMarket().processNewDay(this);
@@ -5420,6 +5421,17 @@ public class Campaign implements ITechManager {
         // This must be the last step before returning true
         MekHQ.triggerEvent(new NewDayEvent(this));
         return true;
+    }
+
+    public void refreshPersonnelMarkets() {
+        PersonnelMarketStyle marketStyle = campaignOptions.getPersonnelMarketStyle();
+        if (marketStyle == NONE) {
+            personnelMarket.generatePersonnelForDay(this);
+        } else {
+            if (currentDay.getDayOfMonth() == 1) {
+                newPersonnelMarket.gatherApplications();
+            }
+        }
     }
 
     /**
@@ -6420,7 +6432,6 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "reputation");
         reputation.writeReputationToXML(writer, indent);
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "reputation");
-
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "newPersonnelMarket");
         newPersonnelMarket.writePersonnelMarketDataToXML(writer, indent);
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "newPersonnelMarket");

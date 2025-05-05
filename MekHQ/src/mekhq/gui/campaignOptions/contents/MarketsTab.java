@@ -54,6 +54,9 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketMethod;
+import mekhq.campaign.market.personnelMarket.NewPersonnelMarket;
+import mekhq.campaign.market.personnelMarket.PersonnelMarketCamOps;
+import mekhq.campaign.market.personnelMarket.PersonnelMarketMekHQ;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.personnel.skills.Skills;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
@@ -834,7 +837,20 @@ public class MarketsTab {
         }
 
         // Personnel Market
-        options.setPersonnelMarketStyle(comboPersonnelMarketStyle.getSelectedItem());
+        PersonnelMarketStyle selectedPersonnelMarketStyle = comboPersonnelMarketStyle.getSelectedItem();
+        if (selectedPersonnelMarketStyle != null) {
+            PersonnelMarketStyle originalPersonnelMarketStyle = options.getPersonnelMarketStyle();
+            if (selectedPersonnelMarketStyle != originalPersonnelMarketStyle) {
+                NewPersonnelMarket replacementMarket = switch (selectedPersonnelMarketStyle) {
+                    case NONE -> new NewPersonnelMarket(campaign);
+                    case MEKHQ -> new PersonnelMarketMekHQ(campaign);
+                    case CAMPAIGN_OPERATIONS -> new PersonnelMarketCamOps(campaign);
+                };
+                campaign.setNewPersonnelMarket(replacementMarket);
+            }
+            options.setPersonnelMarketStyle(comboPersonnelMarketStyle.getSelectedItem());
+        }
+
         options.setPersonnelMarketName(comboPersonnelMarketType.getSelectedItem());
         if (Objects.equals(comboPersonnelMarketType.getSelectedItem(), "Campaign Ops")) {
             campaign.getPersonnelMarket().setPaidRecruitment(false);

@@ -91,7 +91,7 @@ public class PersonnelMarketLibraries {
      * @return a {@link Map} mapping {@link PersonnelRole} to {@link PersonnelMarketEntry} for the MekHQ Market Style.
      */
     public Map<PersonnelRole, PersonnelMarketEntry> getInnerSphereMarketMekHQ() {
-        return clanMarketMekHQ;
+        return innerSphereMarketMekHQ;
     }
 
     /**
@@ -100,7 +100,7 @@ public class PersonnelMarketLibraries {
      * @return a {@link Map} mapping {@link PersonnelRole} to {@link PersonnelMarketEntry} for the CamOps Market Style.
      */
     public Map<PersonnelRole, PersonnelMarketEntry> getClanMarketCamOps() {
-        return innerSphereMarketMekHQ;
+        return clanMarketCamOps;
     }
 
     /**
@@ -109,7 +109,7 @@ public class PersonnelMarketLibraries {
      * @return a {@link Map} mapping {@link PersonnelRole} to {@link PersonnelMarketEntry} for the CamOps Market Style.
      */
     public Map<PersonnelRole, PersonnelMarketEntry> getInnerSphereMarketCamOps() {
-        return clanMarketMekHQ;
+        return innerSphereMarketCamOps;
     }
 
     /**

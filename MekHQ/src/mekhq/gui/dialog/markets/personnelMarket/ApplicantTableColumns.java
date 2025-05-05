@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.market.personnelMarket.enums;
+package mekhq.gui.dialog.markets.personnelMarket;
 
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 

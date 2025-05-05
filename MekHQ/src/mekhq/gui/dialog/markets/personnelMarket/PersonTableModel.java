@@ -30,16 +30,15 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.market.personnelMarket;
+package mekhq.gui.dialog.markets.personnelMarket;
 
-import static mekhq.campaign.market.personnelMarket.enums.ApplicantTableColumns.AGE;
 import static mekhq.campaign.personnel.enums.GenderDescriptors.MALE_FEMALE_OTHER;
+import static mekhq.gui.dialog.markets.personnelMarket.ApplicantTableColumns.AGE;
 
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.market.personnelMarket.enums.ApplicantTableColumns;
 import mekhq.campaign.personnel.Person;
 
 public class PersonTableModel extends AbstractTableModel {

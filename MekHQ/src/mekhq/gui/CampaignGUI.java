@@ -36,6 +36,7 @@ package mekhq.gui;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
+import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.NONE;
 import static mekhq.campaign.personnel.skills.SkillType.getExperienceLevelName;
 import static mekhq.gui.dialog.nagDialogs.NagController.triggerDailyNags;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -92,6 +93,7 @@ import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
+import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.Part;
@@ -1462,9 +1464,13 @@ public class CampaignGUI extends JPanel {
     }
 
     public void hirePersonMarket() {
-        getCampaign().getNewPersonnelMarket().showPersonnelMarketDialog();
-        //        PersonnelMarketDialog pmd = new PersonnelMarketDialog(getFrame(), this, getCampaign());
-        //        pmd.setVisible(true);
+        PersonnelMarketStyle marketStyle = getCampaign().getCampaignOptions().getPersonnelMarketStyle();
+        if (marketStyle == NONE) {
+            PersonnelMarketDialog pmd = new PersonnelMarketDialog(getFrame(), this, getCampaign());
+            pmd.setVisible(true);
+        } else {
+            getCampaign().getNewPersonnelMarket().showPersonnelMarketDialog();
+        }
     }
 
     private void hireBulkPersonnel() {
