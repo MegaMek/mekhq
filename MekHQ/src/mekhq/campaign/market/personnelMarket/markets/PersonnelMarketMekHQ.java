@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.market.personnelMarket;
+package mekhq.campaign.market.personnelMarket.markets;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
@@ -40,7 +40,9 @@ import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static megamek.common.Compute.d6;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
 import static mekhq.campaign.personnel.enums.PersonnelRole.DEPENDENT;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -49,8 +51,10 @@ import java.util.Set;
 
 import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
+import mekhq.campaign.market.personnelMarket.records.PersonnelMarketEntry;
 import mekhq.campaign.market.personnelMarket.yaml.PersonnelMarketLibraries;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
@@ -135,18 +139,35 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
     @Override
     public String getAvailabilityMessage() {
         CurrentLocation location = getCampaign().getLocation();
+        String color;
+        String closingBrace = CLOSING_SPAN_TAG;
 
         if (!location.isOnPlanet()) {
-            return getTextAt(RESOURCE_BUNDLE, "hint.personnelMarket.inTransit");
+            color = MekHQ.getMHQOptions().getFontColorNegativeHexColor();
+
+            return getFormattedTextAt(RESOURCE_BUNDLE,
+                  "hint.personnelMarket.inTransit",
+                  spanOpeningWithCustomColor(color),
+                  closingBrace);
         }
 
         if (getApplicantOriginFactions().isEmpty()) {
-            return getTextAt(RESOURCE_BUNDLE, "hint.personnelMarket.noInterest");
+            color = MekHQ.getMHQOptions().getFontColorNegativeHexColor();
+
+            return getFormattedTextAt(RESOURCE_BUNDLE,
+                  "hint.personnelMarket.noInterest",
+                  spanOpeningWithCustomColor(color),
+                  closingBrace);
         }
 
         for (AtBContract contract : getCampaign().getActiveAtBContracts()) {
             if (!contract.getContractType().isGarrisonType()) {
-                return getTextAt(RESOURCE_BUNDLE, "hint.personnelMarket.onContract");
+                color = MekHQ.getMHQOptions().getFontColorNegativeHexColor();
+
+                return getFormattedTextAt(RESOURCE_BUNDLE,
+                      "hint.personnelMarket.onContract",
+                      spanOpeningWithCustomColor(color),
+                      closingBrace);
             }
         }
 

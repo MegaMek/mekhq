@@ -44,7 +44,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import mekhq.campaign.market.personnelMarket.PersonnelMarketEntry;
+import mekhq.campaign.market.personnelMarket.records.PersonnelMarketEntry;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 
 /**

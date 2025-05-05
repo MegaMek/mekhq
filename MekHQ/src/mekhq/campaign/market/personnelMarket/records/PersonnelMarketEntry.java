@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.market.personnelMarket;
+package mekhq.campaign.market.personnelMarket.records;
 
 import mekhq.campaign.personnel.enums.PersonnelRole;
 

@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.market.personnelMarket;
+package mekhq.campaign.market.personnelMarket.markets;
 
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static megamek.common.Compute.randomInt;
@@ -52,6 +52,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.MarketNewPersonnelEvent;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
+import mekhq.campaign.market.personnelMarket.records.PersonnelMarketEntry;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Faction;
@@ -80,6 +81,7 @@ public class NewPersonnelMarket {
     boolean hasRarePersonnel;
     int recruitmentRolls;
     private List<Person> currentApplicants = new ArrayList<>();
+    private int lastSelectedFilter;
 
     // These values should be generated during object initialization only so that any changes to the underlying YAML
     // can be accounted for. Otherwise, we will end up with a situation where bugs or other variables get 'locked'
@@ -276,6 +278,14 @@ public class NewPersonnelMarket {
         return currentApplicants;
     }
 
+    public int getLastSelectedFilter() {
+        return lastSelectedFilter;
+    }
+
+    public void setLastSelectedFilter(int lastSelectedFilter) {
+        this.lastSelectedFilter = lastSelectedFilter;
+    }
+
     public void addApplicant(Person applicant) {
         if (applicant != null && !currentApplicants.contains(applicant)) {
             currentApplicants.add(applicant);
@@ -359,6 +369,7 @@ public class NewPersonnelMarket {
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "offeringGoldenHello", offeringGoldenHello);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "hasRarePersonnel", hasRarePersonnel);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "recruitmentRolls", recruitmentRolls);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "lastSelectedFilter", lastSelectedFilter);
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "currentApplicants");
         for (final Person person : currentApplicants) {
             person.writeToXML(writer, indent, campaign);
@@ -411,6 +422,8 @@ public class NewPersonnelMarket {
                     personnelMarket.setHasRarePersonnel(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("recruitmentRolls")) {
                     personnelMarket.setRecruitmentRolls(MathUtility.parseInt(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("lastSelectedFilter")) {
+                    personnelMarket.setLastSelectedFilter(MathUtility.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("currentApplicants")) {
                     processApplicantNodes(personnelMarket, childNode, version);
                 }

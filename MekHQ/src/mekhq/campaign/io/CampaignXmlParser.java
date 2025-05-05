@@ -35,7 +35,7 @@ package mekhq.campaign.io;
 import static megamek.common.UnitType.DROPSHIP;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.force.Force.FORCE_NONE;
-import static mekhq.campaign.market.personnelMarket.NewPersonnelMarket.generatePersonnelMarketDataFromXML;
+import static mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket.generatePersonnelMarketDataFromXML;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.statusValidator;
 import static mekhq.campaign.personnel.skills.SkillDeprecationTool.DEPRECATED_SKILLS;
 import static org.apache.commons.lang3.ObjectUtils.firstNonNull;

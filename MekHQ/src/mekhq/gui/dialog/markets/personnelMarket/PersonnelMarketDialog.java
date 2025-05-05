@@ -37,9 +37,12 @@ import static mekhq.campaign.finances.enums.TransactionType.RECRUITMENT;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.NONE;
 import static mekhq.gui.enums.PersonnelFilter.ACTIVE;
+import static mekhq.gui.enums.PersonnelFilter.ALL;
 import static mekhq.gui.enums.PersonnelFilter.getStandardPersonnelFilters;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -58,9 +61,10 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
 import megamek.client.ui.baseComponents.MMComboBox;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.market.personnelMarket.NewPersonnelMarket;
+import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -259,7 +263,9 @@ public class PersonnelMarketDialog {
             roleComboBox.addActionListener(ev -> {
                 PersonnelFilter selectedFilter = roleComboBox.getSelectedItem();
                 if (selectedFilter == null) {
-                    selectedFilter = PersonnelFilter.ALL;
+                    selectedFilter = ALL;
+                } else {
+                    market.setLastSelectedFilter(roleComboBox.getSelectedIndex());
                 }
                 PersonnelFilter finalSelectedFilter = selectedFilter;
                 sorter.setRowFilter(new RowFilter<TableModel, Integer>() {
@@ -305,21 +311,7 @@ public class PersonnelMarketDialog {
         leftGbc.gridy = leftRow++;
         leftGbc.insets = new Insets(0, 0, 0, 0);
 
-        JPanel filterPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints fbc = new GridBagConstraints();
-        fbc.gridx = 0;
-        fbc.gridy = 0;
-        fbc.anchor = GridBagConstraints.WEST;
-        filterPanel.add(new JLabel(getTextAt(RESOURCE_BUNDLE, "label.personnelMarket.filter")), fbc);
-
-        List<PersonnelFilter> filters = getStandardPersonnelFilters();
-        filters.remove(ACTIVE);
-        DefaultComboBoxModel<PersonnelFilter> filterModel = new DefaultComboBoxModel<>(filters.toArray(new PersonnelFilter[0]));
-        roleComboBox = new MMComboBox<>("roleFilter");
-        roleComboBox.setModel(filterModel);
-        fbc.gridx = 1;
-        filterPanel.add(roleComboBox, fbc);
-
+        JPanel filterPanel = initializeFilter();
         leftPanel.add(filterPanel, leftGbc);
 
         // === Right Column ===
@@ -370,12 +362,44 @@ public class PersonnelMarketDialog {
         return panel;
     }
 
+    private JPanel initializeFilter() {
+        JPanel filterPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints fbc = new GridBagConstraints();
+        fbc.gridx = 0;
+        fbc.gridy = 0;
+        fbc.anchor = GridBagConstraints.WEST;
+        filterPanel.add(new JLabel(getTextAt(RESOURCE_BUNDLE, "label.personnelMarket.filter")), fbc);
+
+        List<PersonnelFilter> filters = getStandardPersonnelFilters();
+        filters.remove(ACTIVE);
+        DefaultComboBoxModel<PersonnelFilter> filterModel = new DefaultComboBoxModel<>(filters.toArray(new PersonnelFilter[0]));
+        roleComboBox = new MMComboBox<>("roleFilter");
+        roleComboBox.setModel(filterModel);
+        try {
+            roleComboBox.setSelectedIndex(market.getLastSelectedFilter());
+        } catch (Exception e) {
+            // This will happen if we remove a filter choice from the combo, and that happens to be the filter the
+            // player last chose.
+            market.setLastSelectedFilter(0);
+        }
+        fbc.gridx = 1;
+        filterPanel.add(roleComboBox, fbc);
+        return filterPanel;
+    }
+
     private String getAvailabilityModifierMessage() {
         String noAvailabilityMessage = market.getAvailabilityMessage();
+        String color;
+        String closingBrace = CLOSING_SPAN_TAG;
 
         if (noAvailabilityMessage.isBlank() && campaignOptions.getUnitRatingMethod().isCampaignOperations()) {
             if (campaign.getReputation().getReputationRating() < market.getUnitReputationRecruitmentCutoff()) {
-                noAvailabilityMessage = getTextAt(RESOURCE_BUNDLE, "hint.personnelMarket.reputation");
+                color = MekHQ.getMHQOptions().getFontColorWarningHexColor();
+
+                noAvailabilityMessage = getFormattedTextAt(RESOURCE_BUNDLE,
+                      "hint.personnelMarket.reputation",
+                      spanOpeningWithCustomColor(color),
+                      closingBrace);
             }
         }
         PlanetarySystem currentSystem = campaign.getCurrentSystem();
@@ -383,7 +407,12 @@ public class PersonnelMarketDialog {
 
         if (noAvailabilityMessage.isBlank() &&
                   currentSystem.getPopulation(today) < market.getLowPopulationRecruitmentDivider()) {
-            noAvailabilityMessage = getTextAt(RESOURCE_BUNDLE, "hint.personnelMarket.population");
+            color = MekHQ.getMHQOptions().getFontColorWarningHexColor();
+
+            noAvailabilityMessage = getFormattedTextAt(RESOURCE_BUNDLE,
+                  "hint.personnelMarket.population",
+                  spanOpeningWithCustomColor(color),
+                  closingBrace);
         }
         return noAvailabilityMessage;
     }
