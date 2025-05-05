@@ -33,13 +33,17 @@
 package mekhq.gui.dialog.markets.personnelMarket;
 
 import static mekhq.campaign.personnel.enums.GenderDescriptors.MALE_FEMALE_OTHER;
-import static mekhq.gui.dialog.markets.personnelMarket.ApplicantTableColumns.AGE;
+import static mekhq.campaign.personnel.skills.SkillType.getColoredExperienceLevelName;
 
+import java.util.Comparator;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
 
+import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.gui.sorter.IntegerStringSorter;
+import mekhq.gui.sorter.LevelSorter;
 
 public class PersonTableModel extends AbstractTableModel {
     private final List<Person> people;
@@ -72,20 +76,22 @@ public class PersonTableModel extends AbstractTableModel {
         return switch (column) {
             case FULL_NAME -> person.getFullName();
             case PROFESSION -> person.getPrimaryRole().toString();
-            case EXPERIENCE -> person.getSkillLevel(campaign, false).toString();
-            case AGE -> person.getAge(campaign.getLocalDate());
+            case EXPERIENCE -> {
+                int experienceLevel = person.getExperienceLevel(campaign, false);
+                yield "<html>" + getColoredExperienceLevelName(experienceLevel) + "</html>";
+            }
+            case AGE -> Integer.toString(person.getAge(campaign.getLocalDate()));
             case GENDER -> MALE_FEMALE_OTHER.getDescriptorCapitalized(person.getGender());
         };
     }
 
-    @Override
-    public Class<?> getColumnClass(int columnIndex) {
-        ApplicantTableColumns col = ApplicantTableColumns.values()[columnIndex];
-        if (col == AGE) {
-            return Integer.class;
-        } else {
-            return String.class;
-        }
+    public Comparator<?> getComparator(int columnIndex) {
+        ApplicantTableColumns column = ApplicantTableColumns.values()[columnIndex];
+        return switch (column) {
+            case AGE -> new IntegerStringSorter();
+            case EXPERIENCE -> new LevelSorter();
+            default -> new NaturalOrderComparator();
+        };
     }
 
     public Person getPerson(int row) {
