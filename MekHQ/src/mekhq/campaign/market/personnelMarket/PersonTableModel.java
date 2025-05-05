@@ -33,6 +33,7 @@
 package mekhq.campaign.market.personnelMarket;
 
 import static mekhq.campaign.market.personnelMarket.enums.ApplicantTableColumns.AGE;
+import static mekhq.campaign.personnel.enums.GenderDescriptors.MALE_FEMALE_OTHER;
 
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
@@ -74,7 +75,7 @@ public class PersonTableModel extends AbstractTableModel {
             case PROFESSION -> person.getPrimaryRole().toString();
             case EXPERIENCE -> person.getSkillLevel(campaign, false).toString();
             case AGE -> person.getAge(campaign.getLocalDate());
-            case GENDER -> person.getGender().toString();
+            case GENDER -> MALE_FEMALE_OTHER.getDescriptorCapitalized(person.getGender());
         };
     }
 

@@ -50,90 +50,84 @@
   profession: VESSEL_NAVIGATOR
   count: 1
   introductionYear: 2148
-  fallbackProfession: VEHICLE_CREW
+  fallbackProfession: MECHANIC
 
-- weight: 741
-  profession: CONVENTIONAL_AIRCRAFT_PILOT
-  count: 1
-  introductionYear: 0
-  fallbackProfession: SOLDIER
-
-- weight: 185
+- weight: 500
   profession: AERO_TEK
   count: 1
   introductionYear: 2314
   fallbackProfession: MECHANIC
 
-- weight: 176
+- weight: 56
   profession: AEROSPACE_PILOT
   count: 1
   introductionYear: 2314
-  fallbackProfession: CONVENTIONAL_AIRCRAFT_PILOT
+  fallbackProfession: SOLDIER
 
-- weight: 9
-  profession: LAM_PILOT
-  count: 1
-  introductionYear: 2680
-  fallbackProfession: CONVENTIONAL_AIRCRAFT_PILOT
-
-- weight: 833
+- weight: 267
   profession: MEKWARRIOR
   count: 1
   introductionYear: 2355
-  fallbackProfession: SOLDIER
+  fallbackProfession: GROUND_VEHICLE_DRIVER
 
-- weight: 833
+- weight: 3000
   profession: MEK_TECH
   count: 1
   introductionYear: 2355
   fallbackProfession: MECHANIC
 
-- weight: 2222
+- weight: 67
+  profession: PROTOMEK_PILOT
+  count: 1
+  introductionYear: 3057
+  fallbackProfession: AEROSPACE_PILOT
+
+- weight: 1111
   profession: MECHANIC
   count: 3
   introductionYear: 0
   fallbackProfession: SOLDIER
 
-- weight: 315
+- weight: 157
   profession: GROUND_VEHICLE_DRIVER
   count: 1
   introductionYear: 0
   fallbackProfession: SOLDIER
 
-- weight: 37
+- weight: 19
   profession: VTOL_PILOT
   count: 1
   introductionYear: 0
   fallbackProfession: SOLDIER
 
-- weight: 19
+- weight: 9
   profession: NAVAL_VEHICLE_DRIVER
   count: 1
   introductionYear: 0
   fallbackProfession: SOLDIER
 
-- weight: 1852
+- weight: 926
   profession: VEHICLE_GUNNER
   count: 3
   introductionYear: 0
   fallbackProfession: SOLDIER
 
-- weight: 2315
+- weight: 1389
   profession: SOLDIER
   count: 6
   introductionYear: 0
   fallbackProfession: DEPENDENT
 
-- weight: 77
+- weight: 926
   profession: BA_TECH
   count: 1
-  introductionYear: 3050
+  introductionYear: 2868
   fallbackProfession: MECHANIC
 
-- weight: 386
+- weight: 463
   profession: BATTLE_ARMOUR
   count: 3
-  introductionYear: 3050
+  introductionYear: 2868
   fallbackProfession: SOLDIER
 
 - weight: 833

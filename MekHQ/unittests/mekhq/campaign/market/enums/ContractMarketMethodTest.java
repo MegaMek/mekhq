@@ -27,10 +27,13 @@
  */
 package mekhq.campaign.market.enums;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.ResourceBundle;
 
 import mekhq.MekHQ;
-import mekhq.campaign.market.personnelMarket.enums.ContractMarketMethod;
 import org.junit.jupiter.api.Test;
 
 public class ContractMarketMethodTest {

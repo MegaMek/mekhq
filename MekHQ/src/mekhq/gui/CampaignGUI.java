@@ -1462,8 +1462,9 @@ public class CampaignGUI extends JPanel {
     }
 
     public void hirePersonMarket() {
-        PersonnelMarketDialog pmd = new PersonnelMarketDialog(getFrame(), this, getCampaign());
-        pmd.setVisible(true);
+        getCampaign().getNewPersonnelMarket().showPersonnelMarketDialog();
+        //        PersonnelMarketDialog pmd = new PersonnelMarketDialog(getFrame(), this, getCampaign());
+        //        pmd.setVisible(true);
     }
 
     private void hireBulkPersonnel() {

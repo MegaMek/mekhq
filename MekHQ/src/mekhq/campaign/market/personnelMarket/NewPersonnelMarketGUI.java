@@ -33,97 +33,203 @@
 package mekhq.campaign.market.personnelMarket;
 
 import static mekhq.campaign.finances.enums.TransactionType.RECRUITMENT;
+import static mekhq.campaign.market.personnelMarket.NewPersonnelMarket.LOW_POPULATION_RECRUITMENT_DIVIDER;
+import static mekhq.campaign.market.personnelMarket.NewPersonnelMarket.UNIT_REPUTATION_RECRUITMENT_CUTOFF;
 import static mekhq.gui.enums.PersonnelFilter.ACTIVE;
 import static mekhq.gui.enums.PersonnelFilter.getStandardPersonnelFilters;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
 import megamek.client.ui.baseComponents.MMComboBox;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.view.PersonViewPanel;
-// ---- END ROLE FILTER ADDITION ----
 
 public class NewPersonnelMarketGUI {
     private static final int MAXIMUM_DAYS_IN_MONTH = 31;
     private static final int MAXIMUM_NUMBER_OF_SYSTEM_ROLLS = 4;
 
+    private final NewPersonnelMarket market;
+    private final JFrame parent;
+    private final Campaign campaign;
+
+    private List<Person> currentApplicants;
+    private MMComboBox<PersonnelFilter> roleComboBox = new MMComboBox<>("roleFilter");
+    private JCheckBox goldenHelloCheckbox = new JCheckBox();
+    private Person selectedPerson;
+    private PersonnelTablePanel tablePanel;
+    private PersonViewPanel personViewPanel;
+
+    public NewPersonnelMarketGUI(NewPersonnelMarket market) {
+        this.market = market;
+        this.campaign = market.getCampaign();
+        this.parent = campaign.getApp().getCampaigngui().getFrame();
+        this.currentApplicants = market.getCurrentApplicants();
+
+        initializeComponents();
+    }
+
     /**
      * Shows a modal dialog containing the personnel table.
      */
-    public static void showPersonnelTableDialog(Frame parent, Campaign campaign, List<Person> people,
-          int recruitmentRolls, boolean systemHasNoPopulation, boolean noInterestedApplicants) {
-        JDialog dialog = new JDialog(parent, "Personnel Table", true);
-        dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-
-        JPanel mainPanel = new JPanel(new BorderLayout());
-
-        JPanel topPanel = new JPanel(new BorderLayout());
-
-        JPanel leftPanel = new JPanel();
-        leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.X_AXIS));
-        leftPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        JCheckBox goldenHelloCheckbox = new JCheckBox("Offer Golden Hello");
-        goldenHelloCheckbox.setSelected(campaign.isOfferingGoldenHello());
+    public void initializeComponents() {
+        JDialog dialog = new JDialog(parent, "Personnel Market", true);
         dialog.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                campaign.setIsOfferingGoldenHello(goldenHelloCheckbox.isSelected());
+                market.setOfferingGoldenHello(goldenHelloCheckbox.isSelected());
+                market.setCurrentApplicants(currentApplicants);
                 dialog.dispose();
             }
         });
-        leftPanel.add(goldenHelloCheckbox);
 
-        JPanel availabilityPanel = new JPanel();
-        availabilityPanel.setLayout(new BoxLayout(availabilityPanel, BoxLayout.Y_AXIS));
-        availabilityPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        // This panel houses all components
+        JPanel mainPanel = new JPanel(new BorderLayout());
 
-        if (systemHasNoPopulation) {
-            availabilityPanel.add(new JLabel("System is Unpopulated"));
-        } else if (noInterestedApplicants) {
-            availabilityPanel.add(new JLabel("Nobody is Interested in Joining your Faction"));
-        } else {
-            JLabel sliderLabel = new JLabel("Personnel Availability");
-            int maxSliderValue = MAXIMUM_DAYS_IN_MONTH * MAXIMUM_NUMBER_OF_SYSTEM_ROLLS;
-            JSlider personnelAvailabilitySlider = new JSlider(0, maxSliderValue, recruitmentRolls);
-            personnelAvailabilitySlider.setEnabled(false);
-            availabilityPanel.add(sliderLabel);
-            availabilityPanel.add(personnelAvailabilitySlider);
+        // This panel houses the tips, table, and header
+        JPanel pnlLeft = new JPanel(new BorderLayout());
+        mainPanel.add(pnlLeft, BorderLayout.CENTER);
+
+        JPanel pnlHeader = initializeHeader();
+        pnlLeft.add(pnlHeader, BorderLayout.NORTH);
+
+        tablePanel = initializeTablePanel();
+        tablePanel.addListSelectionListener(e -> {
+            List<Person> applicants = tablePanel.getSelectedApplicants();
+            selectedPerson = applicants.isEmpty() ? null : applicants.get(0);
+            if (personViewPanel != null) {
+                personViewPanel.setPerson(selectedPerson);
+            }
+        });
+        pnlLeft.add(tablePanel, BorderLayout.CENTER);
+
+        JPanel pnlTips = initializeTipPanel();
+        pnlLeft.add(pnlTips, BorderLayout.SOUTH);
+
+        AtomicReference<Person> selectedPerson = new AtomicReference<>();
+        if (!currentApplicants.isEmpty()) {
+            selectedPerson.set(tablePanel.getSelectedApplicants().get(0));
         }
 
-        topPanel.add(leftPanel, BorderLayout.WEST);
-        topPanel.add(availabilityPanel, BorderLayout.EAST);
+        // This handles the initializing and display of the applicant panel
+        JSplitPane splitPane = initializePersonView(selectedPerson, mainPanel);
+        dialog.getContentPane().add(splitPane, BorderLayout.CENTER);
 
-        JPanel contentPanel = new JPanel(new BorderLayout());
-        contentPanel.add(topPanel, BorderLayout.NORTH);
+        // Finalize the dialog
+        dialog.pack();
+        dialog.setLocationRelativeTo(parent);
+        dialog.setVisible(true);
+    }
 
-        List<PersonnelFilter> filters = getStandardPersonnelFilters();
-        filters.remove(ACTIVE);
-        DefaultComboBoxModel<PersonnelFilter> filterModel = new DefaultComboBoxModel<>(filters.toArray(new PersonnelFilter[0]));
-        MMComboBox<PersonnelFilter> roleComboBox = new MMComboBox<>("roleFilter");
-        roleComboBox.setModel(filterModel);
+    private JSplitPane initializePersonView(AtomicReference<Person> selectedPerson, JPanel mainPanel) {
+        personViewPanel = new PersonViewPanel(selectedPerson.get(), campaign, campaign.getApp().getCampaigngui());
+        JScrollPane viewScrollPane = new JScrollPane(personViewPanel);
+        viewScrollPane.setPreferredSize(new Dimension(500, 500));
+        SwingUtilities.invokeLater(() -> viewScrollPane.getVerticalScrollBar().setValue(0));
 
-        JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        filterPanel.add(new JLabel("Role:"));
-        filterPanel.add(roleComboBox);
+        JPanel buttonPanel = initializeButtonPanel();
 
-        PersonnelTablePanel tablePanel = new PersonnelTablePanel(campaign, people);
+        JPanel applicantPanel = new JPanel();
+        applicantPanel.setLayout(new BorderLayout());
+        applicantPanel.add(viewScrollPane, BorderLayout.CENTER);
+        applicantPanel.add(buttonPanel, BorderLayout.SOUTH);
 
-        JPanel tableAndFilterPanel = new JPanel(new BorderLayout());
-        tableAndFilterPanel.add(filterPanel, BorderLayout.NORTH);
-        tableAndFilterPanel.add(tablePanel, BorderLayout.CENTER);
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, mainPanel, applicantPanel);
+        splitPane.setResizeWeight(1.0);
+        splitPane.setDividerLocation(0.75);
+        personViewPanel.setVisible(selectedPerson.get() != null);
 
-        contentPanel.add(tableAndFilterPanel, BorderLayout.CENTER);
+        return splitPane;
+    }
+
+    private JPanel initializeButtonPanel() {
+        JPanel buttonPanel = new JPanel();
+        JButton hireButton = new JButton("HIRE");
+        hireButton.addActionListener(e -> {
+            List<Person> recruitedPersons = new ArrayList<>(tablePanel.getSelectedApplicants());
+
+            // Process recruitment and golden hello logic for all selected applicants
+            for (Person applicant : recruitedPersons) {
+                if (market.offeringGoldenHello) {
+                    campaign.getFinances()
+                          .debit(RECRUITMENT,
+                                campaign.getLocalDate(),
+                                applicant.getSalary(campaign).multipliedBy(12),
+                                "hiring " + applicant.getFullTitle());
+                }
+                campaign.recruitPerson(applicant);
+            }
+
+            // Remove all recruited persons from the applicants list
+            currentApplicants.removeAll(recruitedPersons);
+            if (currentApplicants.isEmpty()) {
+                personViewPanel.setVisible(false);
+            }
+
+            // Refresh table view (notify the model of data changes)
+            AbstractTableModel model = (AbstractTableModel) tablePanel.getTable().getModel();
+            model.fireTableDataChanged();
+
+            // Clear selection in the table
+            tablePanel.getTable().clearSelection();
+        });
+
+        buttonPanel.add(hireButton);
+        if (campaign.isGM()) {
+            JButton addGMButton = new JButton("Add (GM)");
+            addGMButton.addActionListener(e -> {
+                List<Person> recruitedPersons = new ArrayList<>();
+                for (Person applicant : tablePanel.getSelectedApplicants()) {
+                    campaign.recruitPerson(applicant, true);
+                    recruitedPersons.add(applicant);
+                }
+                currentApplicants.removeAll(recruitedPersons);
+                if (currentApplicants.isEmpty()) {
+                    personViewPanel.setVisible(false);
+                }
+
+                // Refresh table view (notify the model of data changes)
+                AbstractTableModel model = (AbstractTableModel) tablePanel.getTable().getModel();
+                model.fireTableDataChanged();
+
+                // Clear selection in the table
+                tablePanel.getTable().clearSelection();
+            });
+            buttonPanel.add(addGMButton);
+        }
+        return buttonPanel;
+    }
+
+    private static JPanel initializeTipPanel() {
+        JLabel infoLabel = new JLabel("Paying a 12-month Golden Hello increases applicant quality.");
+        infoLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        infoLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new BorderLayout());
+        bottomPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        bottomPanel.add(infoLabel, BorderLayout.CENTER);
+        return bottomPanel;
+    }
+
+    private PersonnelTablePanel initializeTablePanel() {
+        PersonnelTablePanel tablePanel = new PersonnelTablePanel(campaign, currentApplicants);
 
         JTable personnelTable = tablePanel.getTable();
         if (personnelTable.getRowSorter() instanceof TableRowSorter<?> sorter) {
@@ -147,69 +253,112 @@ public class NewPersonnelMarketGUI {
                 });
             });
         }
+        return tablePanel;
+    }
 
-        JLabel infoLabel = new JLabel("Paying a 12-month Golden Hello increases applicant quality.");
-        infoLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        infoLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+    private JPanel initializeHeader() {
+        JPanel panel = new JPanel(new GridBagLayout());
 
-        JPanel bottomPanel = new JPanel();
-        bottomPanel.setLayout(new BorderLayout());
-        bottomPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        bottomPanel.add(infoLabel, BorderLayout.CENTER);
-        contentPanel.add(bottomPanel, BorderLayout.SOUTH);
-        mainPanel.add(contentPanel, BorderLayout.CENTER);
+        // === Left Column ===
+        JPanel leftPanel = new JPanel(new GridBagLayout());
+        leftPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        GridBagConstraints leftGbc = new GridBagConstraints();
+        leftGbc.gridx = 0;
+        leftGbc.weightx = 1.0;
+        leftGbc.fill = GridBagConstraints.NONE;
+        leftGbc.anchor = GridBagConstraints.WEST;
+        int leftRow = 0;
 
-        Person initialPerson = tablePanel.getSelectedPerson();
-        if (initialPerson != null) {
-            PersonViewPanel personViewPanel = new PersonViewPanel(initialPerson,
-                  campaign,
-                  campaign.getApp().getCampaigngui());
-            JScrollPane viewScrollPane = new JScrollPane(personViewPanel);
-            viewScrollPane.setPreferredSize(new Dimension(500, 500));
-            SwingUtilities.invokeLater(() -> viewScrollPane.getVerticalScrollBar().setValue(0));
+        // Golden Hello Checkbox
+        leftGbc.gridy = leftRow++;
+        leftGbc.insets = new Insets(0, 0, 8, 0);
+        JCheckBox goldenHelloCheckbox = new JCheckBox("Offer Golden Hello");
+        goldenHelloCheckbox.setSelected(market.isOfferingGoldenHello());
+        leftPanel.add(goldenHelloCheckbox, leftGbc);
 
-            JPanel buttonPanel = new JPanel();
-            JButton hireButton = new JButton("HIRE");
-            hireButton.addActionListener(e -> {
-                if (campaign.isOfferingGoldenHello()) {
-                    campaign.getFinances()
-                          .debit(RECRUITMENT,
-                                campaign.getLocalDate(),
-                                tablePanel.getSelectedPerson().getSalary(campaign).multipliedBy(12),
-                                "hiring " + tablePanel.getSelectedPerson().getFullTitle());
-                }
-                campaign.recruitPerson(tablePanel.getSelectedPerson());
-            });
+        // Role ComboBox (Label + ComboBox)
+        leftGbc.gridy = leftRow++;
+        leftGbc.insets = new Insets(0, 0, 0, 0);
 
-            buttonPanel.add(hireButton);
-            if (campaign.isGM()) {
-                JButton addGMButton = new JButton("Add (GM)");
-                addGMButton.addActionListener(e -> campaign.recruitPerson(tablePanel.getSelectedPerson(), true));
-                buttonPanel.add(addGMButton);
+        JPanel filterPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints fbc = new GridBagConstraints();
+        fbc.gridx = 0;
+        fbc.gridy = 0;
+        fbc.anchor = GridBagConstraints.WEST;
+        filterPanel.add(new JLabel("Role:"), fbc);
+
+        List<PersonnelFilter> filters = getStandardPersonnelFilters();
+        filters.remove(ACTIVE);
+        DefaultComboBoxModel<PersonnelFilter> filterModel = new DefaultComboBoxModel<>(filters.toArray(new PersonnelFilter[0]));
+        roleComboBox = new MMComboBox<>("roleFilter");
+        roleComboBox.setModel(filterModel);
+        fbc.gridx = 1;
+        filterPanel.add(roleComboBox, fbc);
+
+        leftPanel.add(filterPanel, leftGbc);
+
+        // === Right Column ===
+        JPanel rightPanel = new JPanel(new GridBagLayout());
+        rightPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        GridBagConstraints rightGbc = new GridBagConstraints();
+        rightGbc.gridx = 0;
+        rightGbc.weightx = 1.0;
+        rightGbc.fill = GridBagConstraints.HORIZONTAL;
+        rightGbc.anchor = GridBagConstraints.CENTER;
+        int rightRow = 0;
+
+        // Personnel Availability Label (Centered)
+        rightGbc.gridy = rightRow++;
+        rightGbc.insets = new Insets(0, 0, 8, 0);
+        JLabel availabilityLabel = new JLabel("Personnel Availability");
+        availabilityLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        rightPanel.add(availabilityLabel, rightGbc);
+
+        // Slider
+        rightGbc.gridy = rightRow++;
+        int recruitmentSliderMaximum = MAXIMUM_DAYS_IN_MONTH * MAXIMUM_NUMBER_OF_SYSTEM_ROLLS;
+        int recruitmentSliderCurrent = market.getRecruitmentRolls();
+        JSlider personnelAvailabilitySlider = new JSlider(0, recruitmentSliderMaximum, recruitmentSliderCurrent);
+        personnelAvailabilitySlider.setEnabled(false);
+        rightPanel.add(personnelAvailabilitySlider, rightGbc);
+
+        // Experience Label
+        rightGbc.gridy = rightRow++;
+        rightGbc.insets = new Insets(0, 0, 0, 0);
+        rightPanel.add(new JLabel(getAvailabilityModifierMessage()), rightGbc);
+
+        // === Place Panels ===
+        GridBagConstraints mainGbc = new GridBagConstraints();
+        mainGbc.gridx = 0;
+        mainGbc.gridy = 0;
+        mainGbc.anchor = GridBagConstraints.NORTHWEST;
+        mainGbc.fill = GridBagConstraints.BOTH;
+        mainGbc.weightx = 0.5;
+        mainGbc.weighty = 1.0;
+        panel.add(leftPanel, mainGbc);
+
+        mainGbc.gridx = 1;
+        panel.add(rightPanel, mainGbc);
+
+        return panel;
+    }
+
+    private String getAvailabilityModifierMessage() {
+        String noAvailabilityMessage = market.getAvailabilityMessage();
+
+        if (noAvailabilityMessage.isBlank() &&
+                  campaign.getCampaignOptions().getUnitRatingMethod().isCampaignOperations()) {
+            if (campaign.getReputation().getReputationRating() < UNIT_REPUTATION_RECRUITMENT_CUTOFF) {
+                noAvailabilityMessage = "Nobody likes you.";
             }
-
-            JPanel rightPanel = new JPanel();
-            rightPanel.setLayout(new BorderLayout());
-            rightPanel.add(viewScrollPane, BorderLayout.CENTER);
-            rightPanel.add(buttonPanel, BorderLayout.SOUTH);
-
-            JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, mainPanel, rightPanel);
-            splitPane.setResizeWeight(1.0);
-            splitPane.setDividerLocation(0.75);
-            dialog.getContentPane().add(splitPane, BorderLayout.CENTER);
-
-            tablePanel.addListSelectionListener(event -> {
-                if (!event.getValueIsAdjusting()) {
-                    Person selectedPerson = tablePanel.getSelectedPerson();
-                    personViewPanel.setPerson(selectedPerson);
-                }
-            });
-        } else {
-            dialog.getContentPane().add(mainPanel, BorderLayout.CENTER);
         }
+        PlanetarySystem currentSystem = campaign.getCurrentSystem();
+        LocalDate today = campaign.getLocalDate();
 
-        dialog.pack();
-        dialog.setLocationRelativeTo(parent);
-        dialog.setVisible(true);
+        if (noAvailabilityMessage.isBlank() &&
+                  currentSystem.getPopulation(today) < LOW_POPULATION_RECRUITMENT_DIVIDER) {
+            noAvailabilityMessage = "Reduced recruitment due to low population.";
+        }
+        return noAvailabilityMessage;
     }
 }

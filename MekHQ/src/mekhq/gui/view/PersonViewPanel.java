@@ -31,8 +31,10 @@ import static java.awt.Color.BLACK;
 import static java.awt.Color.RED;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.common.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
+import static megamek.common.icons.Portrait.DEFAULT_PORTRAIT_FILENAME;
 import static megamek.utilities.ImageUtilities.addTintToImageIcon;
 import static mekhq.campaign.personnel.Person.getLoyaltyName;
+import static mekhq.campaign.personnel.enums.PersonnelStatus.ACTIVE;
 import static mekhq.campaign.personnel.skills.SkillType.RP_ONLY_TAG;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
 import static org.jfree.chart.ChartColor.DARK_BLUE;
@@ -56,13 +58,16 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.function.BiConsumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.accessibility.AccessibleRelation;
 import javax.swing.*;
 import javax.swing.table.TableColumn;
 
+import megamek.client.ui.swing.tileset.MMStaticDirectoryManager;
 import megamek.codeUtilities.MathUtility;
+import megamek.common.annotations.Nullable;
 import megamek.common.icons.Portrait;
 import megamek.common.options.IOption;
 import megamek.logging.MMLogger;
@@ -114,12 +119,16 @@ public class PersonViewPanel extends JScrollablePanel {
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonViewPanel",
           MekHQ.getMHQOptions().getLocale());
 
-    public PersonViewPanel(Person p, Campaign c, CampaignGUI gui) {
+    public PersonViewPanel(@Nullable Person person, Campaign campaign, CampaignGUI gui) {
         super();
-        this.person = p;
-        this.campaign = c;
+        this.person = person;
+        this.campaign = campaign;
         this.gui = gui;
-        initComponents();
+        if (person == null) {
+            initializeEmptyPanel();
+        } else {
+            initComponents();
+        }
     }
 
     private void initComponents() {
@@ -447,6 +456,90 @@ public class PersonViewPanel extends JScrollablePanel {
         add(Box.createGlue(), gridBagConstraints);
     }
 
+    /**
+     * Initializes the panel to display empty/default content.
+     *
+     * <p>This method sets up a {@link GridBagLayout} containing:</p>
+     * <ul>
+     *   <li>A portrait section on the left, which attempts to load and display a default image.</li>
+     *   <li>An information panel on the right, produced by {@code fillInfoEmpty()}, for generic info display.</li>
+     *   <li>Box glue at the bottom to ensure components align to the top.</li>
+     * </ul>
+     * <p>If the default portrait cannot be loaded, the portrait label remains empty.</p>
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    private void initializeEmptyPanel() {
+        setLayout(new GridBagLayout());
+
+        // Portrait panel
+        Image portrait = null;
+        try {
+            portrait = (Image) MMStaticDirectoryManager.getPortraits().getItem("", DEFAULT_PORTRAIT_FILENAME);
+        } catch (Exception ex) {
+            logger.error("", ex);
+        }
+
+        JLabel lblPortrait = new JLabel();
+        if (portrait != null) {
+            lblPortrait.setIcon(new ImageIcon(portrait));
+        }
+        JPanel pnlPortrait = new JPanel();
+        pnlPortrait.add(lblPortrait,
+              new GridBagConstraints(0,
+                    0,
+                    1,
+                    1,
+                    0,
+                    0,
+                    GridBagConstraints.NORTHWEST,
+                    GridBagConstraints.NONE,
+                    new Insets(0, 0, 0, 0),
+                    0,
+                    0));
+        add(pnlPortrait,
+              new GridBagConstraints(0,
+                    0,
+                    1,
+                    1,
+                    0,
+                    0,
+                    GridBagConstraints.NORTHWEST,
+                    GridBagConstraints.NONE,
+                    new Insets(10, 10, 0, 0),
+                    0,
+                    0));
+
+        // Info panel
+        add(fillInfoEmpty(),
+              new GridBagConstraints(1,
+                    0,
+                    1,
+                    1,
+                    1.0,
+                    0,
+                    GridBagConstraints.NORTHWEST,
+                    GridBagConstraints.BOTH,
+                    new Insets(5, 5, 5, 5),
+                    0,
+                    0));
+
+        // Glue for top alignment
+        add(Box.createGlue(),
+              new GridBagConstraints(0,
+                    1,
+                    2,
+                    1,
+                    0,
+                    1.0,
+                    GridBagConstraints.NORTHWEST,
+                    GridBagConstraints.BOTH,
+                    new Insets(0, 0, 0, 0),
+                    0,
+                    0));
+    }
+
     private MouseListener getSwitchListener(JPanel current, JPanel switchTo) {
         return new MouseAdapter() {
             @Override
@@ -698,6 +791,48 @@ public class PersonViewPanel extends JScrollablePanel {
         }
 
         return portraitImageIcon;
+    }
+
+    private JPanel fillInfoEmpty() {
+        JPanel pnlInfo = new JPanel(new GridBagLayout());
+        pnlInfo.setBorder(BorderFactory.createTitledBorder("-"));
+
+        // Helper to simplify row addition (text, value, isPair, gridwidth)
+        BiConsumer<String[], Integer> addRow = (arr, gridwidth) -> {
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.anchor = GridBagConstraints.NORTHWEST;
+            gbc.fill = GridBagConstraints.NONE;
+            if (arr.length == 1) {
+                gbc.gridx = 0;
+                gbc.gridwidth = gridwidth;
+                gbc.weightx = 1.0;
+                gbc.insets = new Insets(0, 0, 5, 0);
+                pnlInfo.add(new JLabel(arr[0]), gbc);
+            } else {
+                gbc.gridx = 0;
+                gbc.gridwidth = 1;
+                pnlInfo.add(new JLabel(arr[0]), gbc);
+
+                gbc.gridx = 1;
+                gbc.gridwidth = 3;
+                gbc.weightx = 1.0;
+                gbc.insets = new Insets(0, 10, 0, 0);
+                pnlInfo.add(new JLabel(arr[1]), gbc);
+            }
+        };
+
+        addRow.accept(new String[] { String.format(resourceMap.getString("format.italic"), '-') }, 4);
+        addRow.accept(new String[] { resourceMap.getString("lblStatus1.text"), ACTIVE.toString() }, 4);
+
+        if (campaign.getCampaignOptions().isShowOriginFaction()) {
+            addRow.accept(new String[] { resourceMap.getString("lblOrigin1.text"),
+                                         "<html><a href='#'>-</a> (-)</html>" }, 4);
+        }
+        addRow.accept(new String[] { resourceMap.getString("lblAge1.text"), "-" }, 4);
+        addRow.accept(new String[] { resourceMap.getString("lblGender1.text"), "-" }, 4);
+        addRow.accept(new String[] { resourceMap.getString("lblBloodType1.text"), "-" }, 4);
+
+        return pnlInfo;
     }
 
     private JPanel fillInfo() {
@@ -2340,10 +2475,24 @@ public class PersonViewPanel extends JScrollablePanel {
         return pnlKills;
     }
 
-    public void setPerson(Person person) {
+    /**
+     * Sets the current {@link Person} object to be displayed by this panel.
+     *
+     * <p>If the provided {@code person} is {@code null}, the panel is initialized to show default (empty) content.
+     * Otherwise, it configures the panel to display the details of the specified {@link Person}.</p>
+     *
+     * <p>After updating, the panel is revalidated and repainted to reflect the changes.</p>
+     *
+     * @param person the {@link Person} to display, or {@code null} for empty content
+     */
+    public void setPerson(@Nullable Person person) {
         this.person = person;
         removeAll();
-        initComponents();
+        if (person == null) {
+            initializeEmptyPanel();
+        } else {
+            initComponents();
+        }
         revalidate();
         repaint();
     }

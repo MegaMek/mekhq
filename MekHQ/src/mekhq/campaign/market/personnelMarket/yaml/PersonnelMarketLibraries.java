@@ -33,6 +33,8 @@
 package mekhq.campaign.market.personnelMarket.yaml;
 
 import static mekhq.MHQConstants.PERSONNEL_MARKET_DIRECTORY_PATH;
+import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.CAMPAIGN_OPERATIONS;
+import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,36 +52,64 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
  * {@link PersonnelRole} for different market types.
  */
 public class PersonnelMarketLibraries {
-    private static final String CLAN_MARKET_FILE = PERSONNEL_MARKET_DIRECTORY_PATH + "clanMarket.yaml";
-    private static final String INNER_SPHERE_MARKET_FILE = PERSONNEL_MARKET_DIRECTORY_PATH + "innerSphereMarket.yaml";
+    // MekHQ
+    private final Map<PersonnelRole, PersonnelMarketEntry> clanMarketMekHQ = new EnumMap<>(PersonnelRole.class);
+    private final Map<PersonnelRole, PersonnelMarketEntry> innerSphereMarketMekHQ = new EnumMap<>(PersonnelRole.class);
 
-    private final Map<PersonnelRole, PersonnelMarketEntry> clanMarketEntries = new EnumMap<>(PersonnelRole.class);
-    private final Map<PersonnelRole, PersonnelMarketEntry> innerSphereMarketEntries = new EnumMap<>(PersonnelRole.class);
+    // Campaign Operations
+    private final Map<PersonnelRole, PersonnelMarketEntry> clanMarketCamOps = new EnumMap<>(PersonnelRole.class);
+    private final Map<PersonnelRole, PersonnelMarketEntry> innerSphereMarketCamOps = new EnumMap<>(PersonnelRole.class);
 
     /**
      * Constructs a {@code PersonnelMarketLibraries} instance and loads market entries from YAML files into maps.
      */
     public PersonnelMarketLibraries() {
-        clanMarketEntries.putAll(readEntriesAsMap(CLAN_MARKET_FILE));
-        innerSphereMarketEntries.putAll(readEntriesAsMap(INNER_SPHERE_MARKET_FILE));
+        // MekHQ
+        clanMarketMekHQ.putAll(readEntriesAsMap(PERSONNEL_MARKET_DIRECTORY_PATH + MEKHQ.getFileNameClan()));
+        innerSphereMarketMekHQ.putAll(readEntriesAsMap(PERSONNEL_MARKET_DIRECTORY_PATH +
+                                                             MEKHQ.getFileNameInnerSphere()));
+
+        // Campaign Operations
+        clanMarketCamOps.putAll(readEntriesAsMap(PERSONNEL_MARKET_DIRECTORY_PATH +
+                                                       CAMPAIGN_OPERATIONS.getFileNameClan()));
+        innerSphereMarketCamOps.putAll(readEntriesAsMap(PERSONNEL_MARKET_DIRECTORY_PATH +
+                                                              CAMPAIGN_OPERATIONS.getFileNameInnerSphere()));
     }
 
     /**
-     * Returns the map of PersonnelMarketEntry objects for the Clan market, keyed by profession.
+     * Clan market entries configured for the MekHQ Market Style.
      *
-     * @return Clan market entries as a map from PersonnelRole to PersonnelMarketEntry
+     * @return a {@link Map} mapping {@link PersonnelRole} to {@link PersonnelMarketEntry} for the MekHQ Market Style.
      */
-    public Map<PersonnelRole, PersonnelMarketEntry> getClanMarketEntries() {
-        return clanMarketEntries;
+    public Map<PersonnelRole, PersonnelMarketEntry> getClanMarketMekHQ() {
+        return clanMarketMekHQ;
     }
 
     /**
-     * Returns the map of PersonnelMarketEntry objects for the Inner Sphere market, keyed by profession.
+     * Inner Sphere market entries configured for the MekHQ Market Style.
      *
-     * @return Inner Sphere market entries as a map from PersonnelRole to PersonnelMarketEntry
+     * @return a {@link Map} mapping {@link PersonnelRole} to {@link PersonnelMarketEntry} for the MekHQ Market Style.
      */
-    public Map<PersonnelRole, PersonnelMarketEntry> getInnerSphereMarketEntries() {
-        return innerSphereMarketEntries;
+    public Map<PersonnelRole, PersonnelMarketEntry> getInnerSphereMarketMekHQ() {
+        return clanMarketMekHQ;
+    }
+
+    /**
+     * Clan market entries configured for the MekHQ Market Style.
+     *
+     * @return a {@link Map} mapping {@link PersonnelRole} to {@link PersonnelMarketEntry} for the CamOps Market Style.
+     */
+    public Map<PersonnelRole, PersonnelMarketEntry> getClanMarketCamOps() {
+        return innerSphereMarketMekHQ;
+    }
+
+    /**
+     * Inner Sphere market entries configured for the MekHQ Market Style.
+     *
+     * @return a {@link Map} mapping {@link PersonnelRole} to {@link PersonnelMarketEntry} for the CamOps Market Style.
+     */
+    public Map<PersonnelRole, PersonnelMarketEntry> getInnerSphereMarketCamOps() {
+        return clanMarketMekHQ;
     }
 
     /**

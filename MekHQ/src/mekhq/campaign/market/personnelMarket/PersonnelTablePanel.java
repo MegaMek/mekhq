@@ -32,9 +32,12 @@
  */
 package mekhq.campaign.market.personnelMarket;
 
+import static javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.text.Collator;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import javax.swing.JPanel;
@@ -51,7 +54,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 
 public class PersonnelTablePanel extends JPanel {
-    private Person selectedPerson;
+    private List<Person> selectedApplicants = new ArrayList<>();
     private int rowCount;
     private JTable table;
 
@@ -62,7 +65,7 @@ public class PersonnelTablePanel extends JPanel {
         rowCount = people.size();
 
         if (rowCount > 0) {
-            selectedPerson = people.get(0);
+            selectedApplicants.add(people.get(0));
         }
 
         // Sorters
@@ -75,9 +78,9 @@ public class PersonnelTablePanel extends JPanel {
         }
 
         // Selection
-        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.setSelectionMode(MULTIPLE_INTERVAL_SELECTION);
         ListSelectionModel selectionModel = table.getSelectionModel();
-        selectionModel.addListSelectionListener(e -> updateSelectedApplicant(people, table));
+        selectionModel.addListSelectionListener(e -> updateSelectedApplicants(people, table));
 
         // Return
         add(new JScrollPane(table), BorderLayout.CENTER);
@@ -87,8 +90,8 @@ public class PersonnelTablePanel extends JPanel {
         return table;
     }
 
-    public Person getSelectedPerson() {
-        return selectedPerson;
+    public List<Person> getSelectedApplicants() {
+        return selectedApplicants;
     }
 
     public int getRowCount() {
@@ -133,13 +136,14 @@ public class PersonnelTablePanel extends JPanel {
         column.setPreferredWidth(preferredWidth);
     }
 
-    private void updateSelectedApplicant(List<Person> people, JTable table) {
-        int viewRow = table.getSelectedRow();
-        if (viewRow >= 0) {
+    private void updateSelectedApplicants(List<Person> people, JTable table) {
+        selectedApplicants.clear();
+        int[] selectedRows = table.getSelectedRows();
+        for (int viewRow : selectedRows) {
             int modelRow = table.convertRowIndexToModel(viewRow);
-            selectedPerson = people.get(modelRow);
-        } else {
-            selectedPerson = null;
+            if (modelRow >= 0 && modelRow < people.size()) {
+                selectedApplicants.add(people.get(modelRow));
+            }
         }
     }
 

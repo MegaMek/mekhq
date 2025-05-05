@@ -32,127 +32,214 @@
  */
 package mekhq.campaign.market.personnelMarket;
 
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.personnel.enums.PersonnelRole.DEPENDENT;
 
+import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import megamek.Version;
+import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
+import mekhq.campaign.market.personnelMarket.yaml.PersonnelMarketLibraries;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.FactionHints;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.enums.HiringHallLevel;
+import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 public class NewPersonnelMarket {
     private static final MMLogger logger = MMLogger.create(NewPersonnelMarket.class);
 
     static int RARE_PROFESSION_WEIGHT = 10;
+    static int LOW_POPULATION_RECRUITMENT_DIVIDER = 10000000;
+    static int UNIT_REPUTATION_RECRUITMENT_CUTOFF = -25;
 
     final private Campaign campaign;
-    final private Map<PersonnelRole, PersonnelMarketEntry> marketEntries;
-    final private int gameYear;
+    private Faction campaignFaction;
+    private LocalDate today;
+    private int gameYear;
+    private PlanetarySystem currentSystem;
     private List<Faction> applicantOriginFactions = new ArrayList<>();
-
-    boolean systemHasNoPopulation;
-    boolean noInterestedApplicants;
+    boolean offeringGoldenHello;
     boolean hasRarePersonnel;
     int recruitmentRolls;
-    private List<Person> availablePersonnel = new ArrayList<>();
+    private List<Person> currentApplicants = new ArrayList<>();
 
-    public NewPersonnelMarket(Campaign campaign, Map<PersonnelRole, PersonnelMarketEntry> marketEntries,
-          int lengthOfMonth) {
+    // These values should be generated during object initialization only so that any changes to the underlying YAML
+    // can be accounted for. Otherwise, we will end up with a situation where bugs or other variables get 'locked'
+    // into the user's campaign save.
+    final private transient Map<PersonnelRole, PersonnelMarketEntry> clanMarketEntries;
+    final private transient Map<PersonnelRole, PersonnelMarketEntry> innerSphereMarketEntries;
+
+    public NewPersonnelMarket(Campaign campaign) {
         this.campaign = campaign;
-        this.marketEntries = marketEntries;
 
-        LocalDate today = campaign.getLocalDate();
-        this.gameYear = today.getYear();
+        PersonnelMarketLibraries personnelMarketLibraries = new PersonnelMarketLibraries();
+        clanMarketEntries = personnelMarketLibraries.getClanMarketMekHQ();
+        innerSphereMarketEntries = personnelMarketLibraries.getInnerSphereMarketMekHQ();
+    }
 
-        PlanetarySystem currentSystem = campaign.getLocation().getCurrentSystem();
-        if (currentSystem.getPopulation(today) == 0) {
-            logger.info("No population on the current system, so no applicants will be generated.");
-            systemHasNoPopulation = true;
+    public void gatherApplications() {
+        reinitializeKeyData();
+
+        currentApplicants = new ArrayList<>(); // clear old applicants
+        applicantOriginFactions = getApplicantOriginFactions();
+
+        String isZeroAvailability = getAvailabilityMessage();
+
+        if (!isZeroAvailability.isEmpty()) {
+            logger.debug("No applicants will be generated due to {}", isZeroAvailability);
             return;
         }
 
-        getApplicantOriginFactions(campaign.getFaction(), campaign.getLocation().getCurrentSystem(), today);
-        if (applicantOriginFactions.isEmpty()) {
-            logger.info("No applicants are interested from the available factions.");
-            noInterestedApplicants = true;
-            return;
-        }
+        generateApplicants();
 
-        generateApplicants(lengthOfMonth);
-        if (availablePersonnel.isEmpty()) {
-            logger.info("No applicants were generated.");
+        if (currentApplicants.isEmpty()) {
+            logger.debug("No applicants were generated.");
         } else {
-            logger.info("Generated {} applicants for the campaign.", availablePersonnel.size());
+            logger.debug("Generated {} applicants for the campaign.", currentApplicants.size());
         }
     }
 
-    public List<Person> getAvailablePersonnel() {
-        return availablePersonnel;
+    private void reinitializeKeyData() {
+        campaignFaction = campaign.getFaction();
+        today = campaign.getLocalDate();
+        gameYear = today.getYear();
+        currentSystem = campaign.getCurrentSystem();
+    }
+
+    public Campaign getCampaign() {
+        return campaign;
+    }
+
+    public List<Person> getCurrentApplicants() {
+        if (currentApplicants == null) {
+            return new ArrayList<>();
+        }
+        return currentApplicants;
+    }
+
+    public void setCurrentApplicants(List<Person> currentApplicants) {
+        this.currentApplicants = currentApplicants;
+    }
+
+    public boolean isOfferingGoldenHello() {
+        return offeringGoldenHello;
+    }
+
+    public void setOfferingGoldenHello(boolean offeringGoldenHello) {
+        this.offeringGoldenHello = offeringGoldenHello;
     }
 
     public boolean hasRarePersonnel() {
         return hasRarePersonnel;
     }
 
-    public boolean systemHasNoPopulation() {
-        return systemHasNoPopulation;
-    }
-
-    public boolean noInterestedApplicants() {
-        return noInterestedApplicants;
-    }
-
     public int getRecruitmentRolls() {
         return recruitmentRolls;
     }
 
-    private void getApplicantOriginFactions(Faction campaignFaction, PlanetarySystem currentSystem, LocalDate today) {
-        Set<Faction> systemFactions = currentSystem.getFactionSet(today);
+    public PlanetarySystem getCurrentSystem() {
+        if (currentSystem == null) {
+            currentSystem = campaign.getCurrentSystem();
+        }
+        return currentSystem;
+    }
+
+    ArrayList<Faction> getApplicantOriginFactions() {
+        Set<Faction> systemFactions = getCurrentSystem().getFactionSet(today);
+        ArrayList<Faction> interestedFactions = new ArrayList<>();
+
+        boolean filterOutLegalFactions = false;
+        if (campaign.getCampaignOptions().getUnitRatingMethod().isCampaignOperations()) {
+            if (campaign.getReputation().getReputationRating() < UNIT_REPUTATION_RECRUITMENT_CUTOFF) {
+                logger.info("Only pirates & mercenaries will be considered for applicants, as the campaign's unit " +
+                                  "rating is below the cutoff.");
+                filterOutLegalFactions = true;
+            }
+        }
 
         for (Faction faction : systemFactions) {
+            if (filterOutLegalFactions) {
+                if (!faction.isPirate() && !faction.isMercenary()) {
+                    continue;
+                }
+            }
+
             if (FactionHints.defaultFactionHints().isAtWarWith(campaignFaction, faction, today)) {
                 continue;
             }
 
             // Allies are three times as likely to join the campaign as non-allies
             if (FactionHints.defaultFactionHints().isAlliedWith(campaignFaction, faction, today)) {
-                applicantOriginFactions.add(faction);
-                applicantOriginFactions.add(faction);
+                interestedFactions.add(faction);
+                interestedFactions.add(faction);
             }
-            applicantOriginFactions.add(faction);
+            interestedFactions.add(faction);
         }
+
+        Faction mercenaryFaction = Factions.getInstance().getFaction("MERC");
+        if (mercenaryFaction != null &&
+                  !interestedFactions.isEmpty() &&
+                  !interestedFactions.contains(mercenaryFaction)) {
+            interestedFactions.add(mercenaryFaction);
+        }
+
+        return interestedFactions;
     }
 
-    private void generateApplicants(int lengthOfMonth) {
+
+    String getAvailabilityMessage() {
+        CurrentLocation location = campaign.getLocation();
+
+        if (!location.isOnPlanet()) {
+            return "Not on a planet.";
+        }
+
+        if (getApplicantOriginFactions().isEmpty()) {
+            return "Locals warring with your faction.";
+        }
+
+        return "";
+    }
+
+    private void generateApplicants() {
         ReputationController reputation = campaign.getReputation();
         int averageSkillLevel = reputation.getAverageSkillLevel().getExperienceLevel();
 
-        recruitmentRolls = lengthOfMonth * getRollsBasedOnLocation();
+        calculateNumberOfRecruitmentRolls();
 
         // Applicants will only try to join the campaign if their experience level is below the average skill level
         // of the campaign minus 2 to a minimum of 2 (Green).
-        averageSkillLevel = Math.max(averageSkillLevel - (campaign.isOfferingGoldenHello() ? 1 : 2), 2);
+        averageSkillLevel = max(averageSkillLevel - (isOfferingGoldenHello() ? 1 : 2), 2);
+
+        Map<PersonnelRole, PersonnelMarketEntry> marketEntries = campaign.isClanCampaign() ?
+                                                                       clanMarketEntries :
+                                                                       innerSphereMarketEntries;
 
         for (int roll = 0; roll < recruitmentRolls; roll++) {
-            PersonnelMarketEntry entry = pickEntry();
+            PersonnelMarketEntry entry = pickEntry(marketEntries);
             if (entry == null) {
-                logger.info("No personnel market entries found");
+                logger.error("No personnel market entries found. Check the data folder for the appropriate YAML file.");
                 return;
             }
 
@@ -170,7 +257,8 @@ public class NewPersonnelMarket {
             }
 
             if (entry == null) {
-                logger.info("Could not find a suitable fallback profession for {} game year {}",
+                logger.error("Could not find a suitable fallback profession for {} game year {}. This suggests the " +
+                                   "fallback structure of the YAML file is incorrect.",
                       originalEntry.profession(),
                       gameYear);
                 return;
@@ -180,7 +268,7 @@ public class NewPersonnelMarket {
             String applicantOriginFaction = getRandomItem(applicantOriginFactions).getShortName();
             Person applicant = campaign.newPerson(entry.profession(), applicantOriginFaction, Gender.RANDOMIZE);
             if (applicant == null) {
-                logger.info("Could not create person for {} game year {} from faction {}",
+                logger.debug("Could not create person for {} game year {} from faction {}",
                       originalEntry.profession(),
                       gameYear,
                       applicantOriginFaction);
@@ -194,7 +282,7 @@ public class NewPersonnelMarket {
                 continue;
             }
 
-            availablePersonnel.add(applicant);
+            currentApplicants.add(applicant);
             if (!hasRarePersonnel && entry.weight() <= RARE_PROFESSION_WEIGHT) {
                 hasRarePersonnel = true;
             }
@@ -209,28 +297,28 @@ public class NewPersonnelMarket {
                 continue;
             }
 
-            availablePersonnel.add(applicant);
+            currentApplicants.add(applicant);
         }
     }
 
-    private @Nullable PersonnelMarketEntry pickEntry() {
-        int totalWeight = marketEntries.values().stream().mapToInt(PersonnelMarketEntry::weight).sum();
-        if (totalWeight <= 0) {
-            return null;
-        }
+    private void calculateNumberOfRecruitmentRolls() {
+        int lengthOfMonth = today.getMonth().length(today.isLeapYear());
+        logger.debug("Base rolls: {}", lengthOfMonth);
 
-        int roll = randomInt(totalWeight) + 1; // 1-based, so every entry with positive weight has a chance
-        int cumulative = 0;
-        for (PersonnelMarketEntry entry : marketEntries.values()) {
-            cumulative += entry.weight();
-            if (roll <= cumulative) {
-                return entry;
-            }
-        }
-        return null; // Should never hit here if weights > 0
+        recruitmentRolls = lengthOfMonth * getSystemStatusRecruitmentMultiplier();
+        logger.debug("Rolls modified for location: {}", recruitmentRolls);
+
+        recruitmentRolls = max(1, (int) Math.floor(recruitmentRolls * getSystemPopulationRecruitmentMultiplier()));
+        logger.debug("Rolls modified for population: {}", recruitmentRolls);
     }
 
-    public int getRollsBasedOnLocation() {
+    private double getSystemPopulationRecruitmentMultiplier() {
+        long currentSystemPopulation = currentSystem.getPopulation(today);
+        double populationRatio = (double) currentSystemPopulation / LOW_POPULATION_RECRUITMENT_DIVIDER;
+        return min(populationRatio, 1.0);
+    }
+
+    public int getSystemStatusRecruitmentMultiplier() {
         CurrentLocation location = campaign.getLocation();
         PlanetarySystem currentSystem = location.getCurrentSystem();
 
@@ -257,5 +345,93 @@ public class NewPersonnelMarket {
         logger.debug("Rolls including capital status: {}", rolls);
 
         return rolls;
+    }
+
+    private @Nullable PersonnelMarketEntry pickEntry(Map<PersonnelRole, PersonnelMarketEntry> marketEntries) {
+        int totalWeight = marketEntries.values().stream().mapToInt(PersonnelMarketEntry::weight).sum();
+        if (totalWeight <= 0) {
+            return null;
+        }
+
+        int roll = randomInt(totalWeight) + 1; // 1-based, so every entry with positive weight has a chance
+        int cumulative = 0;
+        for (PersonnelMarketEntry entry : marketEntries.values()) {
+            cumulative += entry.weight();
+            if (roll <= cumulative) {
+                return entry;
+            }
+        }
+        return null; // Should never hit here if weights > 0
+    }
+
+    public void showPersonnelMarketDialog() {
+        new NewPersonnelMarketGUI(this);
+    }
+
+    public void writePersonnelMarketDataToXML(final PrintWriter writer, int indent) {
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "offeringGoldenHello", offeringGoldenHello);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "hasRarePersonnel", hasRarePersonnel);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "recruitmentRolls", recruitmentRolls);
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "currentApplicants");
+        for (final Person person : currentApplicants) {
+            person.writeToXML(writer, indent, campaign);
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "currentApplicants");
+    }
+
+    public NewPersonnelMarket generatePersonnelMarketDataFromXML(final Node parentNode, Version version) {
+        NodeList newLine = parentNode.getChildNodes();
+
+        logger.info("Loading Personnel Market Nodes from XML...");
+
+        try {
+            for (int i = 0; i < newLine.getLength(); i++) {
+                Node childNode = newLine.item(i);
+                String nodeName = childNode.getNodeName();
+                String nodeContents = childNode.getTextContent().trim();
+                if (nodeName.equalsIgnoreCase("offeringGoldenHello")) {
+                    this.offeringGoldenHello = Boolean.parseBoolean(nodeContents);
+                } else if (nodeName.equalsIgnoreCase("hasRarePersonnel")) {
+                    this.hasRarePersonnel = Boolean.parseBoolean(nodeContents);
+                } else if (nodeName.equalsIgnoreCase("recruitmentRolls")) {
+                    this.recruitmentRolls = MathUtility.parseInt(nodeContents);
+                } else if (nodeName.equalsIgnoreCase("currentApplicants")) {
+                    processApplicantNodes(childNode, version);
+                }
+            }
+        } catch (Exception ex) {
+            logger.error("Could not parse Personnel Market: ", ex);
+        }
+
+        return this;
+    }
+
+    private void processApplicantNodes(Node wn, Version version) {
+        logger.info("Loading Applicant Nodes from XML...");
+
+        NodeList childNodes = wn.getChildNodes();
+
+        // Okay, let's iterate through the children, eh?
+        for (int x = 0; x < childNodes.getLength(); x++) {
+            Node currentChild = childNodes.item(x);
+
+            // If it's not an element node, we ignore it.
+            if (currentChild.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            if (!currentChild.getNodeName().equalsIgnoreCase("person")) {
+                logger.error("Unknown node type not loaded in Applicant nodes: {}", currentChild.getNodeName());
+                continue;
+            }
+
+            Person applicant = Person.generateInstanceFromXML(currentChild, campaign, version);
+
+            if (applicant != null) {
+                this.currentApplicants.add(applicant);
+            }
+        }
+
+        logger.info("Load Applicant Nodes Complete!");
     }
 }
