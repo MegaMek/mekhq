@@ -43,6 +43,7 @@ import mekhq.module.api.PersonnelMarketMethod;
  *
  * @author Neoancient
  */
+@Deprecated(since = "0.50.06", forRemoval = false)
 public class PersonnelMarketFMMr implements PersonnelMarketMethod {
 
     @Override
