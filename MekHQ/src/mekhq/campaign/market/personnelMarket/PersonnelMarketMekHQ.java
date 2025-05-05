@@ -40,6 +40,7 @@ import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static megamek.common.Compute.d6;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
 import static mekhq.campaign.personnel.enums.PersonnelRole.DEPENDENT;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -51,6 +52,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.market.personnelMarket.yaml.PersonnelMarketLibraries;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
@@ -61,6 +63,7 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 
 public class PersonnelMarketMekHQ extends NewPersonnelMarket {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.PersonnelMarket";
     private static final MMLogger logger = MMLogger.create(PersonnelMarketMekHQ.class);
 
     public PersonnelMarketMekHQ(Campaign campaign) {
@@ -134,11 +137,17 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         CurrentLocation location = getCampaign().getLocation();
 
         if (!location.isOnPlanet()) {
-            return "Not on a planet.";
+            return getTextAt(RESOURCE_BUNDLE, "hint.personnelMarket.inTransit");
         }
 
         if (getApplicantOriginFactions().isEmpty()) {
-            return "Locals warring with your faction.";
+            return getTextAt(RESOURCE_BUNDLE, "hint.personnelMarket.noInterest");
+        }
+
+        for (AtBContract contract : getCampaign().getActiveAtBContracts()) {
+            if (!contract.getContractType().isGarrisonType()) {
+                return getTextAt(RESOURCE_BUNDLE, "hint.personnelMarket.onContract");
+            }
         }
 
         return "";

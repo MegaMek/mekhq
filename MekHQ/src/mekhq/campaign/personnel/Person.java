@@ -4006,6 +4006,15 @@ public class Person {
         return rank + getFullName();
     }
 
+    public String getTitleAndSurname() {
+        String rank = getRankName();
+        if (!rank.isBlank()) {
+            rank = rank + ' ';
+        }
+
+        return rank + getSurname();
+    }
+
     public String makeHTMLRank() {
         return String.format("<html><div id=\"%s\">%s</div></html>", getId(), getRankName().trim());
     }

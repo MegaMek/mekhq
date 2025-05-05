@@ -32,10 +32,14 @@
  */
 package mekhq.gui.dialog.markets.personnelMarket;
 
+import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.finances.enums.TransactionType.RECRUITMENT;
+import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.NONE;
 import static mekhq.gui.enums.PersonnelFilter.ACTIVE;
 import static mekhq.gui.enums.PersonnelFilter.getStandardPersonnelFilters;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -58,11 +62,14 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.market.personnelMarket.NewPersonnelMarket;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.view.PersonViewPanel;
 
-public class NewPersonnelMarketGUI {
+public class PersonnelMarketDialog {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.PersonnelMarket";
+
     private static final int MAXIMUM_DAYS_IN_MONTH = 31;
     private static final int MAXIMUM_NUMBER_OF_SYSTEM_ROLLS = 4;
 
@@ -78,7 +85,7 @@ public class NewPersonnelMarketGUI {
     private PersonnelTablePanel tablePanel;
     private PersonViewPanel personViewPanel;
 
-    public NewPersonnelMarketGUI(NewPersonnelMarket market) {
+    public PersonnelMarketDialog(NewPersonnelMarket market) {
         this.market = market;
         this.campaign = market.getCampaign();
         this.campaignOptions = campaign.getCampaignOptions();
@@ -92,7 +99,8 @@ public class NewPersonnelMarketGUI {
      * Shows a modal dialog containing the personnel table.
      */
     public void initializeComponents() {
-        JDialog dialog = new JDialog(parent, "Personnel Market", true);
+        JDialog dialog = new JDialog(parent);
+        setDialogTitle(dialog);
         dialog.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -135,9 +143,27 @@ public class NewPersonnelMarketGUI {
         dialog.getContentPane().add(splitPane, BorderLayout.CENTER);
 
         // Finalize the dialog
+        dialog.setModal(true);
         dialog.pack();
         dialog.setLocationRelativeTo(parent);
         dialog.setVisible(true);
+    }
+
+    private void setDialogTitle(JDialog dialog) {
+        Faction campaignFaction = campaign.getFaction();
+        if (campaignFaction.isClan()) {
+            dialog.setTitle(getTextAt(RESOURCE_BUNDLE, "title.personnelMarket.clan"));
+        } else if (campaignFaction.isComStarOrWoB()) {
+            Person commander = campaign.getFlaggedCommander();
+            String address = commander != null ? commander.getTitleAndSurname() : campaign.getCommanderAddress(false);
+            dialog.setTitle(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "title.personnelMarket.comStarOrWoB",
+                  address.toUpperCase()));
+        } else if (campaignFaction.isMercenary()) {
+            dialog.setTitle(getTextAt(RESOURCE_BUNDLE, "title.personnelMarket.mercenary"));
+        } else if (campaignFaction.isMercenary()) {
+            dialog.setTitle(getTextAt(RESOURCE_BUNDLE, "title.personnelMarket.normal"));
+        }
     }
 
     private JSplitPane initializePersonView(AtomicReference<Person> selectedPerson, JPanel mainPanel) {
@@ -165,11 +191,11 @@ public class NewPersonnelMarketGUI {
         boolean isGM = campaign.isGM();
 
         JPanel buttonPanel = new JPanel();
-        JButton hireButton = new JButton("HIRE");
+        JButton hireButton = new JButton(getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.hire.normal"));
         hireButton.addActionListener(e -> hireActionListener(isGM));
         buttonPanel.add(hireButton);
 
-        JButton addGMButton = new JButton("Add (GM)");
+        JButton addGMButton = new JButton(getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.hire.gm"));
         addGMButton.addActionListener(e -> hireActionListener(isGM));
         addGMButton.setEnabled(isGM);
         buttonPanel.add(addGMButton);
@@ -183,11 +209,10 @@ public class NewPersonnelMarketGUI {
         // Process recruitment and golden hello logic for all selected applicants
         for (Person applicant : recruitedPersons) {
             if (!isGM && market.isOfferingGoldenHello()) {
-                campaign.getFinances()
-                      .debit(RECRUITMENT,
-                            campaign.getLocalDate(),
+                campaign.getFinances().debit(RECRUITMENT,
+                      campaign.getLocalDate(),
                             applicant.getSalary(campaign).multipliedBy(12),
-                            "hiring " + applicant.getFullTitle());
+                      getFormattedTextAt(RESOURCE_BUNDLE, "finances.personnelMarket.hire", applicant.getFullTitle()));
             }
             campaign.recruitPerson(applicant, isGM);
         }
@@ -206,8 +231,8 @@ public class NewPersonnelMarketGUI {
         tablePanel.getTable().clearSelection();
     }
 
-    private static JPanel initializeTipPanel() {
-        JLabel infoLabel = new JLabel("Paying a 12-month Golden Hello increases applicant quality.");
+    private JPanel initializeTipPanel() {
+        JLabel infoLabel = new JLabel(getTipMessage());
         infoLabel.setHorizontalAlignment(SwingConstants.CENTER);
         infoLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
@@ -216,6 +241,14 @@ public class NewPersonnelMarketGUI {
         bottomPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         bottomPanel.add(infoLabel, BorderLayout.CENTER);
         return bottomPanel;
+    }
+
+    private String getTipMessage() {
+        if (market.getAssociatedPersonnelMarketStyle() == MEKHQ) {
+            return getTextAt(RESOURCE_BUNDLE, "hint.personnelMarket." + randomInt(10));
+        }
+
+        return getTextAt(RESOURCE_BUNDLE, "hint.personnelMarket.0");
     }
 
     private PersonnelTablePanel initializeTablePanel() {
@@ -262,8 +295,10 @@ public class NewPersonnelMarketGUI {
         // Golden Hello Checkbox
         leftGbc.gridy = leftRow++;
         leftGbc.insets = new Insets(0, 0, 8, 0);
-        JCheckBox goldenHelloCheckbox = new JCheckBox("Offer Golden Hello");
+        JCheckBox goldenHelloCheckbox = new JCheckBox(getTextAt(RESOURCE_BUNDLE,
+              "checkbox.personnelMarket.goldenHello"));
         goldenHelloCheckbox.setSelected(market.isOfferingGoldenHello());
+        goldenHelloCheckbox.setEnabled(market.getAssociatedPersonnelMarketStyle() == MEKHQ);
         leftPanel.add(goldenHelloCheckbox, leftGbc);
 
         // Role ComboBox (Label + ComboBox)
@@ -275,7 +310,7 @@ public class NewPersonnelMarketGUI {
         fbc.gridx = 0;
         fbc.gridy = 0;
         fbc.anchor = GridBagConstraints.WEST;
-        filterPanel.add(new JLabel("Role:"), fbc);
+        filterPanel.add(new JLabel(getTextAt(RESOURCE_BUNDLE, "label.personnelMarket.filter")), fbc);
 
         List<PersonnelFilter> filters = getStandardPersonnelFilters();
         filters.remove(ACTIVE);
@@ -300,7 +335,7 @@ public class NewPersonnelMarketGUI {
         // Personnel Availability Label (Centered)
         rightGbc.gridy = rightRow++;
         rightGbc.insets = new Insets(0, 0, 8, 0);
-        JLabel availabilityLabel = new JLabel("Personnel Availability");
+        JLabel availabilityLabel = new JLabel(getTextAt(RESOURCE_BUNDLE, "label.personnelMarket.availability"));
         availabilityLabel.setHorizontalAlignment(SwingConstants.CENTER);
         rightPanel.add(availabilityLabel, rightGbc);
 
@@ -340,7 +375,7 @@ public class NewPersonnelMarketGUI {
 
         if (noAvailabilityMessage.isBlank() && campaignOptions.getUnitRatingMethod().isCampaignOperations()) {
             if (campaign.getReputation().getReputationRating() < market.getUnitReputationRecruitmentCutoff()) {
-                noAvailabilityMessage = "Nobody likes you.";
+                noAvailabilityMessage = getTextAt(RESOURCE_BUNDLE, "hint.personnelMarket.reputation");
             }
         }
         PlanetarySystem currentSystem = campaign.getCurrentSystem();
@@ -348,7 +383,7 @@ public class NewPersonnelMarketGUI {
 
         if (noAvailabilityMessage.isBlank() &&
                   currentSystem.getPopulation(today) < market.getLowPopulationRecruitmentDivider()) {
-            noAvailabilityMessage = "Reduced recruitment due to low population.";
+            noAvailabilityMessage = getTextAt(RESOURCE_BUNDLE, "hint.personnelMarket.population");
         }
         return noAvailabilityMessage;
     }

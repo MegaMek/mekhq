@@ -56,7 +56,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.gui.dialog.markets.personnelMarket.NewPersonnelMarketGUI;
+import mekhq.gui.dialog.markets.personnelMarket.PersonnelMarketDialog;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -76,7 +76,7 @@ public class NewPersonnelMarket {
     private PlanetarySystem currentSystem;
     @SuppressWarnings(value = "unused")
     private List<Faction> applicantOriginFactions = new ArrayList<>();
-    boolean offeringGoldenHello;
+    boolean offeringGoldenHello = true;
     boolean hasRarePersonnel;
     int recruitmentRolls;
     private List<Person> currentApplicants = new ArrayList<>();
@@ -287,6 +287,10 @@ public class NewPersonnelMarket {
         return currentApplicants;
     }
 
+    public void clearCurrentApplicants() {
+        setCurrentApplicants(new ArrayList<>());
+    }
+
     public void setCurrentApplicants(List<Person> currentApplicants) {
         this.currentApplicants = currentApplicants;
     }
@@ -349,7 +353,7 @@ public class NewPersonnelMarket {
     }
 
     public void showPersonnelMarketDialog() {
-        new NewPersonnelMarketGUI(this);
+        new PersonnelMarketDialog(this);
     }
 
     public void writePersonnelMarketDataToXML(final PrintWriter writer, int indent) {
