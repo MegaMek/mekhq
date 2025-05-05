@@ -100,7 +100,7 @@ public class NewPersonnelMarket {
         reinitializeKeyData();
 
         setCurrentApplicants(new ArrayList<>()); // clear old applicants
-        setApplicantOriginFactions(getApplicantOriginFactions());
+        setApplicantOriginFactions(applicantOriginFactions);
 
         String isZeroAvailability = getAvailabilityMessage();
 
@@ -111,24 +111,24 @@ public class NewPersonnelMarket {
 
         generateApplicants();
 
-        if (getCurrentApplicants().isEmpty()) {
+        if (currentApplicants.isEmpty()) {
             logger.debug("No applicants were generated.");
         } else {
-            logger.debug("Generated {} applicants for the campaign.", getCurrentApplicants().size());
+            logger.debug("Generated {} applicants for the campaign.", currentApplicants.size());
 
-            if (getCampaign().getCampaignOptions().isPersonnelMarketReportRefresh()) {
-                generatePersonnelReport(getCampaign());
+            if (campaign.getCampaignOptions().isPersonnelMarketReportRefresh()) {
+                generatePersonnelReport(campaign);
             }
 
-            MekHQ.triggerEvent(new MarketNewPersonnelEvent(getCurrentApplicants()));
+            MekHQ.triggerEvent(new MarketNewPersonnelEvent(currentApplicants));
         }
     }
 
     void reinitializeKeyData() {
-        setCampaignFaction(getCampaign().getFaction());
-        setToday(getCampaign().getLocalDate());
-        setGameYear(getToday().getYear());
-        setCurrentSystem(getCampaign().getCurrentSystem());
+        campaignFaction = campaign.getFaction();
+        today = campaign.getLocalDate();
+        gameYear = today.getYear();
+        currentSystem = campaign.getCurrentSystem();
     }
 
     public void generateApplicants() {
@@ -146,7 +146,7 @@ public class NewPersonnelMarket {
         // Keep going until we find an entry that is before the current game year.
         int remainingIterations = 3;
         PersonnelMarketEntry originalEntry = entry;
-        while (entry != null && entry.introductionYear() > getGameYear()) {
+        while (entry != null && (entry.introductionYear() > gameYear) && (entry.extinctionYear() <= gameYear)) {
             PersonnelRole fallbackProfession = entry.fallbackProfession();
             entry = marketEntries.get(fallbackProfession);
             remainingIterations--;
@@ -158,30 +158,27 @@ public class NewPersonnelMarket {
         if (entry == null) {
             logger.error("Could not find a suitable fallback profession for {} game year {}. This suggests the " +
                                "fallback structure of the YAML file is incorrect.",
-                  originalEntry.profession(),
-                  getGameYear());
+                  originalEntry.profession(), gameYear);
             return null;
         }
 
         // If we have a valid entry, we now need to generate the applicant
-        String applicantOriginFaction = getRandomItem(getApplicantOriginFactions()).getShortName();
-        Person applicant = getCampaign().newPerson(entry.profession(), applicantOriginFaction, Gender.RANDOMIZE);
+        String applicantOriginFaction = getRandomItem(applicantOriginFactions).getShortName();
+        Person applicant = campaign.newPerson(entry.profession(), applicantOriginFaction, Gender.RANDOMIZE);
         if (applicant == null) {
             logger.debug("Could not create person for {} game year {} from faction {}",
-                  originalEntry.profession(),
-                  getGameYear(),
+                  originalEntry.profession(), gameYear,
                   applicantOriginFaction);
             return null;
         }
 
-        if (!getHasRarePersonnel() && entry.weight() <= getRareProfessionWeight()) {
-            setHasRarePersonnel(true);
+        if (!hasRarePersonnel && (entry.weight() <= RARE_PROFESSION_WEIGHT)) {
+            hasRarePersonnel = true;
         }
 
         logger.debug("Generated applicant {} ({}) game year {} from faction {}",
               applicant.getFullName(),
-              applicant.getPrimaryRole(),
-              getGameYear(),
+              applicant.getPrimaryRole(), gameYear,
               applicantOriginFaction);
 
         return applicant;
@@ -197,10 +194,6 @@ public class NewPersonnelMarket {
 
     public void setAssociatedPersonnelMarketStyle(PersonnelMarketStyle associatedPersonnelMarketStyle) {
         this.associatedPersonnelMarketStyle = associatedPersonnelMarketStyle;
-    }
-
-    public int getRareProfessionWeight() {
-        return RARE_PROFESSION_WEIGHT;
     }
 
     public int getLowPopulationRecruitmentDivider() {
@@ -266,10 +259,6 @@ public class NewPersonnelMarket {
             gameYear = today.getYear();
         }
         return gameYear;
-    }
-
-    public void setGameYear(int gameYear) {
-        this.gameYear = gameYear;
     }
 
     public ArrayList<Faction> getApplicantOriginFactions() {

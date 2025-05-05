@@ -35,6 +35,6 @@ package mekhq.campaign.market.personnelMarket;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 
 public record PersonnelMarketEntry(int weight, PersonnelRole profession, int count, int introductionYear,
-      PersonnelRole fallbackProfession) {
+      int extinctionYear, PersonnelRole fallbackProfession) {
 }
 
