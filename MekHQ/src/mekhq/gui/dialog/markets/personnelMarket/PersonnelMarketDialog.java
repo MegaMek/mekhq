@@ -35,7 +35,7 @@ package mekhq.gui.dialog.markets.personnelMarket;
 import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.finances.enums.TransactionType.RECRUITMENT;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
-import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.NONE;
+import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
 import static mekhq.gui.enums.PersonnelFilter.ACTIVE;
 import static mekhq.gui.enums.PersonnelFilter.ALL;
 import static mekhq.gui.enums.PersonnelFilter.getStandardPersonnelFilters;
@@ -99,9 +99,6 @@ public class PersonnelMarketDialog {
         initializeComponents();
     }
 
-    /**
-     * Shows a modal dialog containing the personnel table.
-     */
     public void initializeComponents() {
         JDialog dialog = new JDialog(parent);
         setDialogTitle(dialog);
@@ -153,138 +150,6 @@ public class PersonnelMarketDialog {
         dialog.setVisible(true);
     }
 
-    private void setDialogTitle(JDialog dialog) {
-        Faction campaignFaction = campaign.getFaction();
-        if (campaignFaction.isClan()) {
-            dialog.setTitle(getTextAt(RESOURCE_BUNDLE, "title.personnelMarket.clan"));
-        } else if (campaignFaction.isComStarOrWoB()) {
-            Person commander = campaign.getFlaggedCommander();
-            String address = commander != null ? commander.getTitleAndSurname() : campaign.getCommanderAddress(false);
-            dialog.setTitle(getFormattedTextAt(RESOURCE_BUNDLE,
-                  "title.personnelMarket.comStarOrWoB",
-                  address.toUpperCase()));
-        } else if (campaignFaction.isMercenary()) {
-            dialog.setTitle(getTextAt(RESOURCE_BUNDLE, "title.personnelMarket.mercenary"));
-        } else if (campaignFaction.isMercenary()) {
-            dialog.setTitle(getTextAt(RESOURCE_BUNDLE, "title.personnelMarket.normal"));
-        }
-    }
-
-    private JSplitPane initializePersonView(AtomicReference<Person> selectedPerson, JPanel mainPanel) {
-        personViewPanel = new PersonViewPanel(selectedPerson.get(), campaign, campaign.getApp().getCampaigngui());
-        JScrollPane viewScrollPane = new JScrollPane(personViewPanel);
-        viewScrollPane.setPreferredSize(new Dimension(500, 500));
-        SwingUtilities.invokeLater(() -> viewScrollPane.getVerticalScrollBar().setValue(0));
-
-        JPanel buttonPanel = initializeButtonPanel();
-
-        JPanel applicantPanel = new JPanel();
-        applicantPanel.setLayout(new BorderLayout());
-        applicantPanel.add(viewScrollPane, BorderLayout.CENTER);
-        applicantPanel.add(buttonPanel, BorderLayout.SOUTH);
-
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, mainPanel, applicantPanel);
-        splitPane.setResizeWeight(1.0);
-        splitPane.setDividerLocation(0.75);
-        personViewPanel.setVisible(selectedPerson.get() != null);
-
-        return splitPane;
-    }
-
-    private JPanel initializeButtonPanel() {
-        boolean isGM = campaign.isGM();
-
-        JPanel buttonPanel = new JPanel();
-        JButton hireButton = new JButton(getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.hire.normal"));
-        hireButton.addActionListener(e -> hireActionListener(isGM));
-        buttonPanel.add(hireButton);
-
-        JButton addGMButton = new JButton(getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.hire.gm"));
-        addGMButton.addActionListener(e -> hireActionListener(isGM));
-        addGMButton.setEnabled(isGM);
-        buttonPanel.add(addGMButton);
-
-        return buttonPanel;
-    }
-
-    private void hireActionListener(boolean isGM) {
-        List<Person> recruitedPersons = new ArrayList<>(tablePanel.getSelectedApplicants());
-
-        // Process recruitment and golden hello logic for all selected applicants
-        for (Person applicant : recruitedPersons) {
-            if (!isGM && market.isOfferingGoldenHello()) {
-                campaign.getFinances().debit(RECRUITMENT,
-                      campaign.getLocalDate(),
-                            applicant.getSalary(campaign).multipliedBy(12),
-                      getFormattedTextAt(RESOURCE_BUNDLE, "finances.personnelMarket.hire", applicant.getFullTitle()));
-            }
-            campaign.recruitPerson(applicant, isGM);
-        }
-
-        // Remove all recruited persons from the applicant list
-        currentApplicants.removeAll(recruitedPersons);
-        if (currentApplicants.isEmpty()) {
-            personViewPanel.setVisible(false);
-        }
-
-        // Refresh the table view (notify the model of data changes)
-        AbstractTableModel model = (AbstractTableModel) tablePanel.getTable().getModel();
-        model.fireTableDataChanged();
-
-        // Clear selection in the table
-        tablePanel.getTable().clearSelection();
-    }
-
-    private JPanel initializeTipPanel() {
-        JLabel infoLabel = new JLabel(getTipMessage());
-        infoLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        infoLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-
-        JPanel bottomPanel = new JPanel();
-        bottomPanel.setLayout(new BorderLayout());
-        bottomPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        bottomPanel.add(infoLabel, BorderLayout.CENTER);
-        return bottomPanel;
-    }
-
-    private String getTipMessage() {
-        if (market.getAssociatedPersonnelMarketStyle() == MEKHQ) {
-            return getTextAt(RESOURCE_BUNDLE, "hint.personnelMarket." + randomInt(10));
-        }
-
-        return getTextAt(RESOURCE_BUNDLE, "hint.personnelMarket.0");
-    }
-
-    private PersonnelTablePanel initializeTablePanel() {
-        PersonnelTablePanel tablePanel = new PersonnelTablePanel(campaign, currentApplicants);
-
-        JTable personnelTable = tablePanel.getTable();
-        if (personnelTable.getRowSorter() instanceof TableRowSorter<?> sorter) {
-            roleComboBox.addActionListener(ev -> {
-                PersonnelFilter selectedFilter = roleComboBox.getSelectedItem();
-                if (selectedFilter == null) {
-                    selectedFilter = ALL;
-                } else {
-                    market.setLastSelectedFilter(roleComboBox.getSelectedIndex());
-                }
-                PersonnelFilter finalSelectedFilter = selectedFilter;
-                sorter.setRowFilter(new RowFilter<TableModel, Integer>() {
-                    @Override
-                    public boolean include(Entry<? extends TableModel, ? extends Integer> entry) {
-                        int modelRow = entry.getIdentifier();
-                        TableModel model = entry.getModel();
-                        if (model instanceof PersonTableModel) {
-                            Person person = ((PersonTableModel) model).getPerson(modelRow);
-                            return finalSelectedFilter.getFilteredInformation(person, campaign.getLocalDate());
-                        }
-                        return true;
-                    }
-                });
-            });
-        }
-        return tablePanel;
-    }
-
     private JPanel initializeHeader() {
         JPanel panel = new JPanel(new GridBagLayout());
 
@@ -333,7 +198,7 @@ public class PersonnelMarketDialog {
 
         // Slider
         rightGbc.gridy = rightRow++;
-        int recruitmentSliderMaximum = campaignOptions.getPersonnelMarketStyle() != NONE ?
+        int recruitmentSliderMaximum = campaignOptions.getPersonnelMarketStyle() != PERSONNEL_MARKET_DISABLED ?
                                              MAXIMUM_DAYS_IN_MONTH * MAXIMUM_NUMBER_OF_SYSTEM_ROLLS :
                                              MAXIMUM_DAYS_IN_MONTH;
         int recruitmentSliderCurrent = market.getRecruitmentRolls();
@@ -385,6 +250,141 @@ public class PersonnelMarketDialog {
         fbc.gridx = 1;
         filterPanel.add(roleComboBox, fbc);
         return filterPanel;
+    }
+
+    private JPanel initializeButtonPanel() {
+        boolean isGM = campaign.isGM();
+
+        JPanel buttonPanel = new JPanel();
+        JButton hireButton = new JButton(getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.hire.normal"));
+        hireButton.addActionListener(e -> hireActionListener(isGM));
+        buttonPanel.add(hireButton);
+
+        JButton addGMButton = new JButton(getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.hire.gm"));
+        addGMButton.addActionListener(e -> hireActionListener(isGM));
+        addGMButton.setEnabled(isGM);
+        buttonPanel.add(addGMButton);
+
+        return buttonPanel;
+    }
+
+    private JPanel initializeTipPanel() {
+        JLabel infoLabel = new JLabel(getTipMessage());
+        infoLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        infoLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new BorderLayout());
+        bottomPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        bottomPanel.add(infoLabel, BorderLayout.CENTER);
+        return bottomPanel;
+    }
+
+    private PersonnelTablePanel initializeTablePanel() {
+        PersonnelTablePanel tablePanel = new PersonnelTablePanel(campaign, currentApplicants);
+
+        JTable personnelTable = tablePanel.getTable();
+        if (personnelTable.getRowSorter() instanceof TableRowSorter<?> sorter) {
+            roleComboBox.addActionListener(ev -> {
+                PersonnelFilter selectedFilter = roleComboBox.getSelectedItem();
+                if (selectedFilter == null) {
+                    selectedFilter = ALL;
+                } else {
+                    market.setLastSelectedFilter(roleComboBox.getSelectedIndex());
+                }
+                PersonnelFilter finalSelectedFilter = selectedFilter;
+                sorter.setRowFilter(new RowFilter<TableModel, Integer>() {
+                    @Override
+                    public boolean include(Entry<? extends TableModel, ? extends Integer> entry) {
+                        int modelRow = entry.getIdentifier();
+                        TableModel model = entry.getModel();
+                        if (model instanceof PersonTableModel) {
+                            Person person = ((PersonTableModel) model).getPerson(modelRow);
+                            return finalSelectedFilter.getFilteredInformation(person, campaign.getLocalDate());
+                        }
+                        return true;
+                    }
+                });
+            });
+        }
+        return tablePanel;
+    }
+
+    private JSplitPane initializePersonView(AtomicReference<Person> selectedPerson, JPanel mainPanel) {
+        personViewPanel = new PersonViewPanel(selectedPerson.get(), campaign, campaign.getApp().getCampaigngui());
+        JScrollPane viewScrollPane = new JScrollPane(personViewPanel);
+        viewScrollPane.setPreferredSize(new Dimension(500, 500));
+        SwingUtilities.invokeLater(() -> viewScrollPane.getVerticalScrollBar().setValue(0));
+
+        JPanel buttonPanel = initializeButtonPanel();
+
+        JPanel applicantPanel = new JPanel();
+        applicantPanel.setLayout(new BorderLayout());
+        applicantPanel.add(viewScrollPane, BorderLayout.CENTER);
+        applicantPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, mainPanel, applicantPanel);
+        splitPane.setResizeWeight(1.0);
+        splitPane.setDividerLocation(0.75);
+        personViewPanel.setVisible(selectedPerson.get() != null);
+
+        return splitPane;
+    }
+
+    private void hireActionListener(boolean isGM) {
+        List<Person> recruitedPersons = new ArrayList<>(tablePanel.getSelectedApplicants());
+
+        // Process recruitment and golden hello logic for all selected applicants
+        for (Person applicant : recruitedPersons) {
+            if (!isGM && market.isOfferingGoldenHello()) {
+                campaign.getFinances()
+                      .debit(RECRUITMENT,
+                            campaign.getLocalDate(),
+                            applicant.getSalary(campaign).multipliedBy(12),
+                            getFormattedTextAt(RESOURCE_BUNDLE,
+                                  "finances.personnelMarket.hire",
+                                  applicant.getFullTitle()));
+            }
+            campaign.recruitPerson(applicant, isGM);
+        }
+
+        // Remove all recruited persons from the applicant list
+        currentApplicants.removeAll(recruitedPersons);
+        if (currentApplicants.isEmpty()) {
+            personViewPanel.setVisible(false);
+        }
+
+        // Refresh the table view (notify the model of data changes)
+        AbstractTableModel model = (AbstractTableModel) tablePanel.getTable().getModel();
+        model.fireTableDataChanged();
+
+        // Clear selection in the table
+        tablePanel.getTable().clearSelection();
+    }
+
+    private void setDialogTitle(JDialog dialog) {
+        Faction campaignFaction = campaign.getFaction();
+        if (campaignFaction.isClan()) {
+            dialog.setTitle(getTextAt(RESOURCE_BUNDLE, "title.personnelMarket.clan"));
+        } else if (campaignFaction.isComStarOrWoB()) {
+            Person commander = campaign.getFlaggedCommander();
+            String address = commander != null ? commander.getTitleAndSurname() : campaign.getCommanderAddress(false);
+            dialog.setTitle(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "title.personnelMarket.comStarOrWoB",
+                  address.toUpperCase()));
+        } else if (campaignFaction.isMercenary()) {
+            dialog.setTitle(getTextAt(RESOURCE_BUNDLE, "title.personnelMarket.mercenary"));
+        } else if (campaignFaction.isMercenary()) {
+            dialog.setTitle(getTextAt(RESOURCE_BUNDLE, "title.personnelMarket.normal"));
+        }
+    }
+
+    private String getTipMessage() {
+        if (market.getAssociatedPersonnelMarketStyle() == MEKHQ) {
+            return getTextAt(RESOURCE_BUNDLE, "hint.personnelMarket." + randomInt(10));
+        }
+
+        return getTextAt(RESOURCE_BUNDLE, "hint.personnelMarket.0");
     }
 
     private String getAvailabilityModifierMessage() {

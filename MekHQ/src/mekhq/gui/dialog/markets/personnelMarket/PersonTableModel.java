@@ -46,12 +46,12 @@ import mekhq.gui.sorter.IntegerStringSorter;
 import mekhq.gui.sorter.LevelSorter;
 
 public class PersonTableModel extends AbstractTableModel {
-    private final List<Person> people;
     private final Campaign campaign;
+    private final List<Person> people;
 
-    public PersonTableModel(List<Person> people, Campaign campaign) {
-        this.people = people;
+    public PersonTableModel(Campaign campaign, List<Person> people) {
         this.campaign = campaign;
+        this.people = people;
     }
 
     @Override

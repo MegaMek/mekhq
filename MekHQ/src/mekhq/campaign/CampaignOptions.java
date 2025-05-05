@@ -35,7 +35,7 @@ package mekhq.campaign;
 
 import static megamek.common.TechConstants.getSimpleLevel;
 import static megamek.common.options.OptionsConstants.*;
-import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.NONE;
+import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
 import static mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick.ALL;
 import static mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick.SUPPORT;
 
@@ -1171,7 +1171,7 @@ public class CampaignOptions {
 
         // region Markets Tab
         // Personnel Market
-        personnelMarketStyle = NONE;
+        personnelMarketStyle = PERSONNEL_MARKET_DISABLED;
         setPersonnelMarketName(PersonnelMarket.getTypeName(PersonnelMarket.TYPE_NONE));
         setPersonnelMarketReportRefresh(true);
         setPersonnelMarketRandomRemovalTargets(new HashMap<>());

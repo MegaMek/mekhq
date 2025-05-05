@@ -36,7 +36,7 @@ package mekhq.gui;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
-import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.NONE;
+import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
 import static mekhq.campaign.personnel.skills.SkillType.getExperienceLevelName;
 import static mekhq.gui.dialog.nagDialogs.NagController.triggerDailyNags;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -1465,7 +1465,7 @@ public class CampaignGUI extends JPanel {
 
     public void hirePersonMarket() {
         PersonnelMarketStyle marketStyle = getCampaign().getCampaignOptions().getPersonnelMarketStyle();
-        if (marketStyle == NONE) {
+        if (marketStyle == PERSONNEL_MARKET_DISABLED) {
             PersonnelMarketDialog pmd = new PersonnelMarketDialog(getFrame(), this, getCampaign());
             pmd.setVisible(true);
         } else {

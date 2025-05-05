@@ -61,7 +61,8 @@ import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
-import mekhq.campaign.market.personnelMarket.markets.PersonnelMarketCamOps;
+import mekhq.campaign.market.personnelMarket.markets.PersonnelMarketCamOpsRevised;
+import mekhq.campaign.market.personnelMarket.markets.PersonnelMarketCamOpsStrict;
 import mekhq.campaign.market.personnelMarket.markets.PersonnelMarketMekHQ;
 import mekhq.campaign.personnel.skills.Skills;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
@@ -838,9 +839,10 @@ public class MarketsTab {
             PersonnelMarketStyle originalPersonnelMarketStyle = options.getPersonnelMarketStyle();
             if (selectedPersonnelMarketStyle != originalPersonnelMarketStyle) {
                 NewPersonnelMarket replacementMarket = switch (selectedPersonnelMarketStyle) {
-                    case NONE -> new NewPersonnelMarket(campaign);
+                    case PERSONNEL_MARKET_DISABLED -> new NewPersonnelMarket(campaign);
                     case MEKHQ -> new PersonnelMarketMekHQ(campaign);
-                    case CAMPAIGN_OPERATIONS -> new PersonnelMarketCamOps(campaign);
+                    case CAMPAIGN_OPERATIONS_REVISED -> new PersonnelMarketCamOpsRevised(campaign);
+                    case CAMPAIGN_OPERATIONS_STRICT -> new PersonnelMarketCamOpsStrict(campaign);
                 };
                 campaign.setNewPersonnelMarket(replacementMarket);
             }

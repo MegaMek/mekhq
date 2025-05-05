@@ -218,6 +218,12 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         }
     }
 
+    private double getSystemPopulationRecruitmentMultiplier() {
+        long currentSystemPopulation = getCurrentSystem().getPopulation(getToday());
+        double populationRatio = (double) currentSystemPopulation / getLowPopulationRecruitmentDivider();
+        return min(populationRatio, 1.0);
+    }
+
     private void calculateNumberOfRecruitmentRolls() {
         int lengthOfMonth = getToday().getMonth().length(getToday().isLeapYear());
         logger.debug("Base rolls: {}", lengthOfMonth);
@@ -229,12 +235,6 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         logger.debug("Rolls modified for population: {}", rolls);
 
         setRecruitmentRolls(rolls);
-    }
-
-    private double getSystemPopulationRecruitmentMultiplier() {
-        long currentSystemPopulation = getCurrentSystem().getPopulation(getToday());
-        double populationRatio = (double) currentSystemPopulation / getLowPopulationRecruitmentDivider();
-        return min(populationRatio, 1.0);
     }
 
     public int getSystemStatusRecruitmentMultiplier() {

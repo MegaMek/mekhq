@@ -34,7 +34,7 @@ package mekhq.campaign.market.personnelMarket.markets;
 
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static megamek.common.Compute.randomInt;
-import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.NONE;
+import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
@@ -70,7 +70,7 @@ public class NewPersonnelMarket {
     private static int UNIT_REPUTATION_RECRUITMENT_CUTOFF = Integer.MIN_VALUE;
 
     final private Campaign campaign;
-    private PersonnelMarketStyle associatedPersonnelMarketStyle = NONE;
+    private PersonnelMarketStyle associatedPersonnelMarketStyle = PERSONNEL_MARKET_DISABLED;
     private Faction campaignFaction;
     private LocalDate today;
     private int gameYear;
@@ -96,6 +96,65 @@ public class NewPersonnelMarket {
 
         clanMarketEntries = new HashMap<>();
         innerSphereMarketEntries = new HashMap<>();
+    }
+
+    public static NewPersonnelMarket generatePersonnelMarketDataFromXML(final Campaign campaign, final Node parentNode,
+          Version version) {
+        NodeList newLine = parentNode.getChildNodes();
+
+        logger.debug("Loading Personnel Market Nodes from XML...");
+
+        NewPersonnelMarket personnelMarket = null;
+        try {
+            for (int i = 0; i < newLine.getLength(); i++) {
+                Node childNode = newLine.item(i);
+                String nodeName = childNode.getNodeName();
+                String nodeContents = childNode.getTextContent().trim();
+                if (nodeName.equalsIgnoreCase("associatedPersonnelMarketStyle")) {
+                    PersonnelMarketStyle marketStyle = PersonnelMarketStyle.fromString(nodeContents);
+                    personnelMarket = switch (marketStyle) {
+                        case PERSONNEL_MARKET_DISABLED -> new NewPersonnelMarket(campaign);
+                        case MEKHQ -> new PersonnelMarketMekHQ(campaign);
+                        case CAMPAIGN_OPERATIONS_REVISED -> new PersonnelMarketCamOpsRevised(campaign);
+                        case CAMPAIGN_OPERATIONS_STRICT -> new PersonnelMarketCamOpsStrict(campaign);
+                    };
+                }
+            }
+        } catch (Exception ex) {
+            logger.error("Could not initialize Personnel Market: ", ex);
+        }
+
+        if (personnelMarket == null) {
+            logger.error("Using fallback Personnel Market. This means we've failed to load the Personnel Market data " +
+                               "from the campaign save. If this save predates 50.07 that's to be expected. Otherwise, " +
+                               "please report this as a bug.");
+            return new NewPersonnelMarket(campaign);
+        }
+
+        try {
+            for (int i = 0; i < newLine.getLength(); i++) {
+                Node childNode = newLine.item(i);
+                String nodeName = childNode.getNodeName();
+                String nodeContents = childNode.getTextContent().trim();
+                if (nodeName.equalsIgnoreCase("associatedPersonnelMarketStyle")) {
+                    personnelMarket.setAssociatedPersonnelMarketStyle(PersonnelMarketStyle.fromString(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("offeringGoldenHello")) {
+                    personnelMarket.setOfferingGoldenHello(Boolean.parseBoolean(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("hasRarePersonnel")) {
+                    personnelMarket.setHasRarePersonnel(Boolean.parseBoolean(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("recruitmentRolls")) {
+                    personnelMarket.setRecruitmentRolls(MathUtility.parseInt(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("lastSelectedFilter")) {
+                    personnelMarket.setLastSelectedFilter(MathUtility.parseInt(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("currentApplicants")) {
+                    processApplicantNodes(personnelMarket, childNode, version);
+                }
+            }
+        } catch (Exception ex) {
+            logger.error("Could not parse Personnel Market: ", ex);
+        }
+
+        return personnelMarket;
     }
 
     public void gatherApplications() {
@@ -126,68 +185,27 @@ public class NewPersonnelMarket {
         }
     }
 
-    void reinitializeKeyData() {
-        campaignFaction = campaign.getFaction();
-        today = campaign.getLocalDate();
-        gameYear = today.getYear();
-        currentSystem = campaign.getCurrentSystem();
-    }
-
     public void generateApplicants() {
     }
 
-    @Nullable
-    Person generateSingleApplicant(Map<PersonnelRole, PersonnelMarketEntry> marketEntries) {
-        PersonnelMarketEntry entry = pickEntry(marketEntries);
-        if (entry == null) {
-            logger.error("No personnel market entries found. Check the data folder for the appropriate YAML file.");
-            return null;
-        }
-
-        // If the entry's introduction year is after the current game year, pick the fallback profession
-        // Keep going until we find an entry that is before the current game year.
-        int remainingIterations = 3;
-        PersonnelMarketEntry originalEntry = entry;
-        while (entry != null && (entry.introductionYear() > gameYear) && (entry.extinctionYear() <= gameYear)) {
-            PersonnelRole fallbackProfession = entry.fallbackProfession();
-            entry = marketEntries.get(fallbackProfession);
-            remainingIterations--;
-            if (remainingIterations <= 0) {
-                entry = null;
-            }
-        }
-
-        if (entry == null) {
-            logger.error("Could not find a suitable fallback profession for {} game year {}. This suggests the " +
-                               "fallback structure of the YAML file is incorrect.",
-                  originalEntry.profession(), gameYear);
-            return null;
-        }
-
-        // If we have a valid entry, we now need to generate the applicant
-        String applicantOriginFaction = getRandomItem(applicantOriginFactions).getShortName();
-        Person applicant = campaign.newPerson(entry.profession(), applicantOriginFaction, Gender.RANDOMIZE);
-        if (applicant == null) {
-            logger.debug("Could not create person for {} game year {} from faction {}",
-                  originalEntry.profession(), gameYear,
-                  applicantOriginFaction);
-            return null;
-        }
-
-        if (!hasRarePersonnel && (entry.weight() <= RARE_PROFESSION_WEIGHT)) {
-            hasRarePersonnel = true;
-        }
-
-        logger.debug("Generated applicant {} ({}) game year {} from faction {}",
-              applicant.getFullName(),
-              applicant.getPrimaryRole(), gameYear,
-              applicantOriginFaction);
-
-        return applicant;
+    public void showPersonnelMarketDialog() {
+        new PersonnelMarketDialog(this);
     }
 
-    void generatePersonnelReport(Campaign campaign) {
-        campaign.addReport("<a href='PERSONNEL_MARKET'>Personnel Market Updated</a>");
+    public void writePersonnelMarketDataToXML(final PrintWriter writer, int indent) {
+        MHQXMLUtility.writeSimpleXMLTag(writer,
+              indent,
+              "associatedPersonnelMarketStyle",
+              associatedPersonnelMarketStyle.name()); // this node must always be first
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "offeringGoldenHello", offeringGoldenHello);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "hasRarePersonnel", hasRarePersonnel);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "recruitmentRolls", recruitmentRolls);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "lastSelectedFilter", lastSelectedFilter);
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "currentApplicants");
+        for (final Person person : currentApplicants) {
+            person.writeToXML(writer, indent, campaign);
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "currentApplicants");
     }
 
     public PersonnelMarketStyle getAssociatedPersonnelMarketStyle() {
@@ -339,6 +357,70 @@ public class NewPersonnelMarket {
         return "";
     }
 
+    void reinitializeKeyData() {
+        campaignFaction = campaign.getFaction();
+        today = campaign.getLocalDate();
+        gameYear = today.getYear();
+        currentSystem = campaign.getCurrentSystem();
+    }
+
+    @Nullable
+    Person generateSingleApplicant(Map<PersonnelRole, PersonnelMarketEntry> marketEntries) {
+        PersonnelMarketEntry entry = pickEntry(marketEntries);
+        if (entry == null) {
+            logger.error("No personnel market entries found. Check the data folder for the appropriate YAML file.");
+            return null;
+        }
+
+        // If the entry's introduction year is after the current game year, pick the fallback profession
+        // Keep going until we find an entry that is before the current game year.
+        int remainingIterations = 3;
+        PersonnelMarketEntry originalEntry = entry;
+        while (entry != null && (entry.introductionYear() > gameYear) && (entry.extinctionYear() <= gameYear)) {
+            PersonnelRole fallbackProfession = entry.fallbackProfession();
+            entry = marketEntries.get(fallbackProfession);
+            remainingIterations--;
+            if (remainingIterations <= 0) {
+                entry = null;
+            }
+        }
+
+        if (entry == null) {
+            logger.error("Could not find a suitable fallback profession for {} game year {}. This suggests the " +
+                               "fallback structure of the YAML file is incorrect.",
+                  originalEntry.profession(),
+                  gameYear);
+            return null;
+        }
+
+        // If we have a valid entry, we now need to generate the applicant
+        String applicantOriginFaction = getRandomItem(applicantOriginFactions).getShortName();
+        Person applicant = campaign.newPerson(entry.profession(), applicantOriginFaction, Gender.RANDOMIZE);
+        if (applicant == null) {
+            logger.debug("Could not create person for {} game year {} from faction {}",
+                  originalEntry.profession(),
+                  gameYear,
+                  applicantOriginFaction);
+            return null;
+        }
+
+        if (!hasRarePersonnel && (entry.weight() <= RARE_PROFESSION_WEIGHT)) {
+            hasRarePersonnel = true;
+        }
+
+        logger.debug("Generated applicant {} ({}) game year {} from faction {}",
+              applicant.getFullName(),
+              applicant.getPrimaryRole(),
+              gameYear,
+              applicantOriginFaction);
+
+        return applicant;
+    }
+
+    void generatePersonnelReport(Campaign campaign) {
+        campaign.addReport("<a href='PERSONNEL_MARKET'>Personnel Market Updated</a>");
+    }
+
     @Nullable
     PersonnelMarketEntry pickEntry(Map<PersonnelRole, PersonnelMarketEntry> marketEntries) {
         int totalWeight = marketEntries.values().stream().mapToInt(PersonnelMarketEntry::weight).sum();
@@ -355,84 +437,6 @@ public class NewPersonnelMarket {
             }
         }
         return null; // Should never hit here if weights > 0
-    }
-
-    public void showPersonnelMarketDialog() {
-        new PersonnelMarketDialog(this);
-    }
-
-    public void writePersonnelMarketDataToXML(final PrintWriter writer, int indent) {
-        MHQXMLUtility.writeSimpleXMLTag(writer,
-              indent,
-              "associatedPersonnelMarketStyle",
-              associatedPersonnelMarketStyle.name()); // this node must always be first
-        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "offeringGoldenHello", offeringGoldenHello);
-        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "hasRarePersonnel", hasRarePersonnel);
-        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "recruitmentRolls", recruitmentRolls);
-        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "lastSelectedFilter", lastSelectedFilter);
-        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "currentApplicants");
-        for (final Person person : currentApplicants) {
-            person.writeToXML(writer, indent, campaign);
-        }
-        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "currentApplicants");
-    }
-
-    public static NewPersonnelMarket generatePersonnelMarketDataFromXML(final Campaign campaign, final Node parentNode,
-          Version version) {
-        NodeList newLine = parentNode.getChildNodes();
-
-        logger.debug("Loading Personnel Market Nodes from XML...");
-
-        NewPersonnelMarket personnelMarket = null;
-        try {
-            for (int i = 0; i < newLine.getLength(); i++) {
-                Node childNode = newLine.item(i);
-                String nodeName = childNode.getNodeName();
-                String nodeContents = childNode.getTextContent().trim();
-                if (nodeName.equalsIgnoreCase("associatedPersonnelMarketStyle")) {
-                    PersonnelMarketStyle marketStyle = PersonnelMarketStyle.fromString(nodeContents);
-                    personnelMarket = switch (marketStyle) {
-                        case MEKHQ -> new PersonnelMarketMekHQ(campaign);
-                        case CAMPAIGN_OPERATIONS -> new PersonnelMarketCamOps(campaign);
-                        default -> new NewPersonnelMarket(campaign); // NONE
-                    };
-                }
-            }
-        } catch (Exception ex) {
-            logger.error("Could not initialize Personnel Market: ", ex);
-        }
-
-        if (personnelMarket == null) {
-            logger.error("Using fallback Personnel Market. This means we've failed to load the Personnel Market data " +
-                               "from the campaign save. If this save predates 50.07 that's to be expected. Otherwise, " +
-                               "please report this as a bug.");
-            return new NewPersonnelMarket(campaign);
-        }
-
-        try {
-            for (int i = 0; i < newLine.getLength(); i++) {
-                Node childNode = newLine.item(i);
-                String nodeName = childNode.getNodeName();
-                String nodeContents = childNode.getTextContent().trim();
-                if (nodeName.equalsIgnoreCase("associatedPersonnelMarketStyle")) {
-                    personnelMarket.setAssociatedPersonnelMarketStyle(PersonnelMarketStyle.fromString(nodeContents));
-                } else if (nodeName.equalsIgnoreCase("offeringGoldenHello")) {
-                    personnelMarket.setOfferingGoldenHello(Boolean.parseBoolean(nodeContents));
-                } else if (nodeName.equalsIgnoreCase("hasRarePersonnel")) {
-                    personnelMarket.setHasRarePersonnel(Boolean.parseBoolean(nodeContents));
-                } else if (nodeName.equalsIgnoreCase("recruitmentRolls")) {
-                    personnelMarket.setRecruitmentRolls(MathUtility.parseInt(nodeContents));
-                } else if (nodeName.equalsIgnoreCase("lastSelectedFilter")) {
-                    personnelMarket.setLastSelectedFilter(MathUtility.parseInt(nodeContents));
-                } else if (nodeName.equalsIgnoreCase("currentApplicants")) {
-                    processApplicantNodes(personnelMarket, childNode, version);
-                }
-            }
-        } catch (Exception ex) {
-            logger.error("Could not parse Personnel Market: ", ex);
-        }
-
-        return personnelMarket;
     }
 
     private static void processApplicantNodes(NewPersonnelMarket personnelMarket, Node wn, Version version) {

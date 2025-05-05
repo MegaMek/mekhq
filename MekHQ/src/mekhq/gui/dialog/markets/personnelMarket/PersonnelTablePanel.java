@@ -27,7 +27,7 @@ public class PersonnelTablePanel extends JPanel {
 
     public PersonnelTablePanel(Campaign campaign, List<Person> people) {
         setLayout(new BorderLayout());
-        PersonTableModel model = new PersonTableModel(people, campaign);
+        PersonTableModel model = new PersonTableModel(campaign, people);
         table = new JTable(model);
         rowCount = people.size();
 
@@ -63,6 +63,10 @@ public class PersonnelTablePanel extends JPanel {
 
     public int getRowCount() {
         return rowCount;
+    }
+
+    public void addListSelectionListener(ListSelectionListener listener) {
+        table.getSelectionModel().addListSelectionListener(listener);
     }
 
     private static void assignSorters(PersonTableModel model, JTable table) {
@@ -112,9 +116,5 @@ public class PersonnelTablePanel extends JPanel {
                 selectedApplicants.add(people.get(modelRow));
             }
         }
-    }
-
-    public void addListSelectionListener(ListSelectionListener listener) {
-        table.getSelectionModel().addListSelectionListener(listener);
     }
 }

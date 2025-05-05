@@ -44,9 +44,10 @@ import org.junit.jupiter.params.provider.NullSource;
 
 public class PersonnelMarketStyleTest {
     @ParameterizedTest
-    @CsvSource(value = { "MEKHQ,MEKHQ", "CAMPAIGN_OPERATIONS,CAMPAIGN_OPERATIONS", "mekhq,MEKHQ",
-                         "campaign_operations,CAMPAIGN_OPERATIONS", "'CAMPAIGN OPERATIONS',CAMPAIGN_OPERATIONS",
-                         "2,CAMPAIGN_OPERATIONS", "'InvalidValue',NONE", "'-1',NONE" })
+    @CsvSource(value = { "MEKHQ,MEKHQ", "CAMPAIGN_OPERATIONS_REVISED,CAMPAIGN_OPERATIONS_REVISED", "mekhq,MEKHQ",
+                         "CamOps (REviseD),CAMPAIGN_OPERATIONS_REVISED",
+                         "'CAMPAIGN OPERATIONS_REVISED',CAMPAIGN_OPERATIONS_REVISED", "2,CAMPAIGN_OPERATIONS_REVISED",
+                         "'InvalidValue',NONE", "'-1',NONE" })
     void testFromString_Parameterized(String input, PersonnelMarketStyle expected) {
         assertEquals(expected, PersonnelMarketStyle.fromString(input));
     }
@@ -55,7 +56,7 @@ public class PersonnelMarketStyleTest {
     @NullSource
     @EmptySource
     void testFromString_NullOrEmpty(String input) {
-        assertEquals(PersonnelMarketStyle.NONE, PersonnelMarketStyle.fromString(input));
+        assertEquals(PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED, PersonnelMarketStyle.fromString(input));
     }
 
     @ParameterizedTest

@@ -47,7 +47,7 @@ import static mekhq.campaign.force.Force.FORCE_ORIGIN;
 import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
-import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.NONE;
+import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
 import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
 import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performResupply;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.isProhibitedUnitType;
@@ -5426,7 +5426,7 @@ public class Campaign implements ITechManager {
 
     public void refreshPersonnelMarkets() {
         PersonnelMarketStyle marketStyle = campaignOptions.getPersonnelMarketStyle();
-        if (marketStyle == NONE) {
+        if (marketStyle == PERSONNEL_MARKET_DISABLED) {
             personnelMarket.generatePersonnelForDay(this);
         } else {
             if (currentDay.getDayOfMonth() == 1) {

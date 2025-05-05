@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.market.personnelMarket.markets;
 
-import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.CAMPAIGN_OPERATIONS;
+import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.CAMPAIGN_OPERATIONS_REVISED;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -48,19 +48,19 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.FactionHints;
 import mekhq.campaign.universe.Factions;
 
-public class PersonnelMarketCamOps extends NewPersonnelMarket {
-    private static final MMLogger logger = MMLogger.create(PersonnelMarketCamOps.class);
+public class PersonnelMarketCamOpsRevised extends NewPersonnelMarket {
+    private static final MMLogger logger = MMLogger.create(PersonnelMarketCamOpsRevised.class);
 
-    public PersonnelMarketCamOps(Campaign campaign) {
+    public PersonnelMarketCamOpsRevised(Campaign campaign) {
         super(campaign);
 
-        logger.debug("Initializing PersonnelMarketCamOps");
+        logger.debug("Initializing PersonnelMarketCamOpsRevised");
 
-        setAssociatedPersonnelMarketStyle(CAMPAIGN_OPERATIONS);
+        setAssociatedPersonnelMarketStyle(CAMPAIGN_OPERATIONS_REVISED);
 
         PersonnelMarketLibraries personnelMarketLibraries = new PersonnelMarketLibraries();
-        setClanMarketEntries(personnelMarketLibraries.getClanMarketCamOps());
-        setInnerSphereMarketEntries(personnelMarketLibraries.getInnerSphereMarketCamOps());
+        setClanMarketEntries(personnelMarketLibraries.getClanMarketCamOpsRevised());
+        setInnerSphereMarketEntries(personnelMarketLibraries.getInnerSphereMarketCamOpsRevised());
     }
 
     @Override
