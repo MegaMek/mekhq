@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.adapter;
 
@@ -33,6 +38,7 @@ import static megamek.common.enums.SkillLevel.GREEN;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.enums.SkillLevel.ULTRA_GREEN;
 import static megamek.common.enums.SkillLevel.VETERAN;
+import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
 import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
 
 import java.awt.event.ActionEvent;
@@ -1031,11 +1037,13 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             }
 
             // fill with personnel
-            if (oneAvailableUnitBelowMaxCrew) {
-                menuItem = new JMenuItem(resources.getString("hireMinimumComplement.text"));
-                menuItem.setActionCommand(COMMAND_HIRE_FULL);
-                menuItem.addActionListener(this);
-                popup.add(menuItem);
+            if (gui.getCampaign().getCampaignOptions().getPersonnelMarketStyle() != MEKHQ) {
+                if (oneAvailableUnitBelowMaxCrew) {
+                    menuItem = new JMenuItem(resources.getString("hireMinimumComplement.text"));
+                    menuItem.setActionCommand(COMMAND_HIRE_FULL);
+                    menuItem.addActionListener(this);
+                    popup.add(menuItem);
+                }
             }
 
             if (Stream.of(units).allMatch(u -> u.getCamouflage().equals(units[0].getCamouflage()))) {
