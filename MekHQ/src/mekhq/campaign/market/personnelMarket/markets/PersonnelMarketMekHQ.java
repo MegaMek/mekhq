@@ -66,10 +66,39 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 
+/**
+ * Implements MekHQ's custom personnel market system.
+ *
+ * <p>This market style provides the classic MekHQ logic for generating and selecting personnel applicants. It
+ * introduces several classic-specific behaviors, such as using resource bundles for availability messaging, population
+ * multipliers, and custom system status recruitment multipliers.</p>
+ *
+ * <ul>
+ *     <li>Uses MekHQ’s custom market logic as a selectable option.</li>
+ *     <li>Determines applicant origins and handles availability messages.</li>
+ *     <li>Recruitment roll calculations incorporate system population and system status.</li>
+ * </ul>
+ *
+ * <p><b>Extends:</b> {@link NewPersonnelMarket}</p>
+ * <p><b>Associated Market Style:</b> {@link mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle#MEKHQ}</p>
+ *
+ * @author Illiani
+ * @since 0.50.06
+ */
 public class PersonnelMarketMekHQ extends NewPersonnelMarket {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PersonnelMarket";
     private static final MMLogger logger = MMLogger.create(PersonnelMarketMekHQ.class);
 
+    /**
+     * Constructs a personnel market using the MekHQ classic ruleset.
+     *
+     * <p>Initializes data and behaviors for compatibility.</p>
+     *
+     * @param campaign the parent campaign instance
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
     public PersonnelMarketMekHQ(Campaign campaign) {
         super(campaign);
 
@@ -85,6 +114,16 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         setInnerSphereMarketEntries(personnelMarketLibraries.getInnerSphereMarketMekHQ());
     }
 
+
+    /**
+     * Determines the list of factions from which personnel applicants may originate, according to MekHQ rules and
+     * campaign context.
+     *
+     * @return a list of possible applicant origin factions
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
     @Override
     public ArrayList<Faction> getApplicantOriginFactions() {
         Set<Faction> systemFactions = getCurrentSystem().getFactionSet(getToday());
@@ -136,6 +175,15 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         return interestedFactions;
     }
 
+
+    /**
+     * Returns a localized message pertaining to market availability modifiers.
+     *
+     * @return an availability message string
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
     @Override
     public String getAvailabilityMessage() {
         CurrentLocation location = getCampaign().getLocation();
@@ -174,6 +222,14 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         return "";
     }
 
+
+    /**
+     * Generates market applicants for the current period, factoring in population multipliers and custom system
+     * status.
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
     @Override
     public void generateApplicants() {
         ReputationController reputation = getCampaign().getReputation();
@@ -218,12 +274,27 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         }
     }
 
+
+    /**
+     * Calculates a recruitment multiplier based on current system population.
+     *
+     * @return recruitment multiplier as a double
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
     private double getSystemPopulationRecruitmentMultiplier() {
         long currentSystemPopulation = getCurrentSystem().getPopulation(getToday());
         double populationRatio = (double) currentSystemPopulation / getLowPopulationRecruitmentDivider();
         return min(populationRatio, 1.0);
     }
 
+    /**
+     * Calculates the number of recruitment rolls.
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
     private void calculateNumberOfRecruitmentRolls() {
         int lengthOfMonth = getToday().getMonth().length(getToday().isLeapYear());
         logger.debug("Base rolls: {}", lengthOfMonth);
@@ -237,6 +308,15 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         setRecruitmentRolls(rolls);
     }
 
+
+    /**
+     * Calculates an additional recruitment multiplier based on system status.
+     *
+     * @return recruitment multiplier as an int
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
     public int getSystemStatusRecruitmentMultiplier() {
         CurrentLocation location = getCampaign().getLocation();
         PlanetarySystem currentSystem = location.getCurrentSystem();

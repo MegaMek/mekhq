@@ -38,7 +38,6 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 
-import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.market.personnelMarket.records.PersonnelMarketEntry;
 import mekhq.campaign.market.personnelMarket.yaml.PersonnelMarketLibraries;
@@ -48,13 +47,39 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.FactionHints;
 import mekhq.campaign.universe.Factions;
 
+/**
+ * Implements the personnel market logic using the Campaign Operations Revised ruleset.
+ *
+ * <p>Specializes the new personnel market by defining applicant pool sources, recruitment roll calculations, and
+ * market data initialization based on revised campaign operations standards.</p>
+ *
+ * <ul>
+ *     <li>Initializes market entry data using Campaign Operations Revised logic.</li>
+ *     <li>Determines applicant origin factions, taking into account alliances, wars, and mercenary access.</li>
+ *     <li>Calculates the number of recruitment rolls based on the calendar month length.</li>
+ *     <li>Generates new applicants using the configured market entries for clan or Inner Sphere campaigns.</li>
+ * </ul>
+ *
+ * <p><b>Extends:</b> {@link NewPersonnelMarket}</p>
+ * <p><b>Associated Market Style:</b>
+ * {@link mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle#CAMPAIGN_OPERATIONS_REVISED}</p>
+ *
+ * @author Illiani
+ * @since 0.50.06
+ */
 public class PersonnelMarketCamOpsRevised extends NewPersonnelMarket {
-    private static final MMLogger logger = MMLogger.create(PersonnelMarketCamOpsRevised.class);
-
+    /**
+     * Constructs a personnel market using the Campaign Operations Revised rules.
+     *
+     * <p>Initializes market styles and loads relevant personnel market libraries.</p>
+     *
+     * @param campaign the parent campaign instance
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
     public PersonnelMarketCamOpsRevised(Campaign campaign) {
         super(campaign);
-
-        logger.debug("Initializing PersonnelMarketCamOpsRevised");
 
         setAssociatedPersonnelMarketStyle(CAMPAIGN_OPERATIONS_REVISED);
 
@@ -63,6 +88,23 @@ public class PersonnelMarketCamOpsRevised extends NewPersonnelMarket {
         setInnerSphereMarketEntries(personnelMarketLibraries.getInnerSphereMarketCamOpsRevised());
     }
 
+    /**
+     * Determines the list of factions from which applicants may originate, based on the planetary system's factions,
+     * current alliances, and war states.
+     *
+     * <p>Clan campaigns only consider the campaign's faction.</p>
+     *
+     * <ul>
+     *     <li>Allies are three times as likely to join compared to non-allies.</li>
+     *     <li>Excludes factions at war with the campaign faction.</li>
+     *     <li>Ensures the mercenary faction is present if others are eligible.</li>
+     * </ul>
+     *
+     * @return a list of possible applicant origin factions
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
     @Override
     public ArrayList<Faction> getApplicantOriginFactions() {
         Set<Faction> systemFactions = getCurrentSystem().getFactionSet(getToday());
@@ -77,8 +119,7 @@ public class PersonnelMarketCamOpsRevised extends NewPersonnelMarket {
             if (FactionHints.defaultFactionHints().isAtWarWith(getCampaignFaction(), faction, getToday())) {
                 continue;
             }
-
-            // Allies are three times as likely to join the campaign as non-allies
+            // Allies have increased presence in the pool
             if (FactionHints.defaultFactionHints().isAlliedWith(getCampaignFaction(), faction, getToday())) {
                 interestedFactions.add(faction);
                 interestedFactions.add(faction);
@@ -86,6 +127,7 @@ public class PersonnelMarketCamOpsRevised extends NewPersonnelMarket {
             interestedFactions.add(faction);
         }
 
+        // Add mercenaries, if not already present and eligible
         Faction mercenaryFaction = Factions.getInstance().getFaction("MERC");
         if (mercenaryFaction != null &&
                   !interestedFactions.isEmpty() &&
@@ -96,6 +138,13 @@ public class PersonnelMarketCamOpsRevised extends NewPersonnelMarket {
         return interestedFactions;
     }
 
+    /**
+     * Generates market applicants for the current creation period, using appropriate clan or Inner Sphere entries, and
+     * performs a number of rolls determined by the calendar month length.
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
     @Override
     public void generateApplicants() {
         calculateNumberOfRecruitmentRolls();
@@ -105,17 +154,21 @@ public class PersonnelMarketCamOpsRevised extends NewPersonnelMarket {
 
         for (int roll = 0; roll < getRecruitmentRolls(); roll++) {
             Person applicant = generateSingleApplicant(marketEntries);
-
             if (applicant != null) {
                 addApplicant(applicant);
             }
         }
     }
 
+    /**
+     * Calculates the number of recruitment rolls based on the length of the current month. Sets the result as the
+     * recruitment roll count for this period.
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
     private void calculateNumberOfRecruitmentRolls() {
         int rolls = getToday().getMonth().length(getToday().isLeapYear());
-        logger.debug("Base rolls: {}", rolls);
-
         setRecruitmentRolls(rolls);
     }
 }

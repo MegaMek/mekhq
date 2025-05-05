@@ -49,8 +49,20 @@ import mekhq.campaign.market.personnelMarket.records.PersonnelMarketEntry;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 
 /**
- * Utility class for loading and managing PersonnelMarketEntry data from YAML files, storing them in maps keyed by
- * {@link PersonnelRole} for different market types.
+ * Loads and provides access to different personnel market entry configurations  for various market styles (e.g.,
+ * MekHQ, Campaign Operations Revised, Campaign Operations Strict).
+ *
+ * <p>This class initializes its data from YAML configuration files, mapping each personnel role to its corresponding
+ * market entry parameters for Clan and Inner Sphere contexts, according to the selected ruleset.</p>
+ *
+ * <p>Usage:</p>
+ * <ul>
+ *     <li>Instantiate to load all market entry data from files.</li>
+ *     <li>Retrieve Clan/Inner Sphere market maps with the appropriate getter.</li>
+ * </ul>
+ *
+ * @author Illiani
+ * @since 0.50.06
  */
 public class PersonnelMarketLibraries {
     // MekHQ
@@ -66,7 +78,8 @@ public class PersonnelMarketLibraries {
     private final Map<PersonnelRole, PersonnelMarketEntry> innerSphereMarketCamOpsStrict = new EnumMap<>(PersonnelRole.class);
 
     /**
-     * Constructs a {@code PersonnelMarketLibraries} instance and loads market entries from YAML files into maps.
+     * Initializes all personnel market maps by loading entry lists from YAML configuration files for each supported
+     * market style and theater (Clan/Inner Sphere).
      */
     public PersonnelMarketLibraries() {
         // MekHQ
@@ -142,14 +155,14 @@ public class PersonnelMarketLibraries {
     }
 
     /**
-     * Reads a YAML file containing a list of PersonnelMarketEntry objects and converts it to a map keyed by their
-     * {@code profession} field.
+     * Reads a list of personnel market entries from a YAML file and returns a mapping from personnel role to entry.
      *
-     * @param fileAddress the path to the YAML file
+     * @param fileAddress the full path to the YAML file
+     * @return a map linking each {@link PersonnelRole} to its {@link PersonnelMarketEntry}, or an empty map if unavailable
+     * @throws RuntimeException if the file could not be read or parsed
      *
-     * @return a map with PersonnelRole as the key and PersonnelMarketEntry as the value
-     *
-     * @throws RuntimeException if there is an error reading or parsing the file
+     * @author Illiani
+     * @since 0.50.06
      */
     private Map<PersonnelRole, PersonnelMarketEntry> readEntriesAsMap(String fileAddress) {
         ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());

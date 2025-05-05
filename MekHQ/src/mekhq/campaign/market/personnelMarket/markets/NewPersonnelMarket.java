@@ -62,6 +62,17 @@ import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+/**
+ * Represents the Personnel Market system for managing the recruitment, listing, and data persistence of potential
+ * recruits within a campaign.
+ *
+ * <p>Handles the generation, filtration, and display of available applicants, as well as reading and writing
+ * applicant data from/to XML. Integrates campaign state, planetary context, reputation effects, market style, and
+ * market-specific applicant pools for a flexible personnel recruitment experience.</p>
+ *
+ * @author Illiani
+ * @since 0.50.06
+ */
 public class NewPersonnelMarket {
     private static final MMLogger logger = MMLogger.create(NewPersonnelMarket.class);
 
@@ -89,6 +100,14 @@ public class NewPersonnelMarket {
     private transient Map<PersonnelRole, PersonnelMarketEntry> clanMarketEntries;
     private transient Map<PersonnelRole, PersonnelMarketEntry> innerSphereMarketEntries;
 
+    /**
+     * Creates a new Personnel Market instance bound to a campaign.
+     *
+     * @param campaign the parent {@link Campaign} instance to associate with this personnel market
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
     public NewPersonnelMarket(Campaign campaign) {
         this.campaign = campaign;
 
@@ -98,6 +117,16 @@ public class NewPersonnelMarket {
         innerSphereMarketEntries = new HashMap<>();
     }
 
+    /**
+     * Generates Personnel Market data by loading it from an XML document node.
+     *
+     * @param campaign   The relevant campaign save
+     * @param parentNode XML node parent containing market data
+     * @param version    Version the save was last made in
+     * @return Loaded Personnel Market instance
+     * @author Illiani
+     * @since 0.50.06
+     */
     public static NewPersonnelMarket generatePersonnelMarketDataFromXML(final Campaign campaign, final Node parentNode,
           Version version) {
         NodeList newLine = parentNode.getChildNodes();
@@ -157,6 +186,12 @@ public class NewPersonnelMarket {
         return personnelMarket;
     }
 
+    /**
+     * Gathers new applicant data and updates the internal applicant list based on current campaign state and settings.
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
     public void gatherApplications() {
         reinitializeKeyData();
 
@@ -185,13 +220,33 @@ public class NewPersonnelMarket {
         }
     }
 
+    /**
+     * Generates new applicants and adds them to the market's applicant pool.
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
     public void generateApplicants() {
     }
 
+    /**
+     * Launches the user interface dialog displaying the current personnel market.
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
     public void showPersonnelMarketDialog() {
         new PersonnelMarketDialog(this);
     }
 
+    /**
+     * Serializes the Personnel Market data to XML output.
+     *
+     * @param writer Output PrintWriter
+     * @param indent XML indentation level
+     * @author Illiani
+     * @since 0.50.06
+     */
     public void writePersonnelMarketDataToXML(final PrintWriter writer, int indent) {
         MHQXMLUtility.writeSimpleXMLTag(writer,
               indent,
@@ -208,50 +263,134 @@ public class NewPersonnelMarket {
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "currentApplicants");
     }
 
+    /**
+     * Gets the associated personnel market style used by this market.
+     *
+     * @return the personnel market style
+     * @author Illiani
+     * @since 0.50.06
+     */
     public PersonnelMarketStyle getAssociatedPersonnelMarketStyle() {
         return associatedPersonnelMarketStyle;
     }
 
+    /**
+     * Sets the market style for the personnel market.
+     *
+     * @param associatedPersonnelMarketStyle the personnel market style to use
+     * @author Illiani
+     * @since 0.50.06
+     */
     public void setAssociatedPersonnelMarketStyle(PersonnelMarketStyle associatedPersonnelMarketStyle) {
         this.associatedPersonnelMarketStyle = associatedPersonnelMarketStyle;
     }
 
+    /**
+     * Gets the recruitment divider value for low population systems.
+     *
+     * @return recruitment divider integer
+     * @author Illiani
+     * @since 0.50.06
+     */
     public int getLowPopulationRecruitmentDivider() {
         return LOW_POPULATION_RECRUITMENT_DIVIDER;
     }
 
+    /**
+     * Sets the recruitment divider for low population systems.
+     *
+     * @param lowPopulationRecruitmentDivider recruitment divider to set
+     * @author Illiani
+     * @since 0.50.06
+     */
     public void setLowPopulationRecruitmentDivider(int lowPopulationRecruitmentDivider) {
         LOW_POPULATION_RECRUITMENT_DIVIDER = lowPopulationRecruitmentDivider;
     }
 
+    /**
+     * Gets the unit reputation cutoff value for recruitment.
+     *
+     * @return reputation cutoff threshold
+     * @author Illiani
+     * @since 0.50.06
+     */
     public int getUnitReputationRecruitmentCutoff() {
         return UNIT_REPUTATION_RECRUITMENT_CUTOFF;
     }
 
+    /**
+     * Sets the cutoff value for unit reputation in recruitment eligibility.
+     *
+     * @param unitReputationRecruitmentCutoff reputation cutoff to set
+     * @author Illiani
+     * @since 0.50.06
+     */
     public void setUnitReputationRecruitmentCutoff(int unitReputationRecruitmentCutoff) {
         UNIT_REPUTATION_RECRUITMENT_CUTOFF = unitReputationRecruitmentCutoff;
     }
 
+    /**
+     * Returns the map of available clan market entries and their role distributions.
+     *
+     * @return map of personnel roles to market entries (Clan)
+     * @author Illiani
+     * @since 0.50.06
+     */
     public Map<PersonnelRole, PersonnelMarketEntry> getClanMarketEntries() {
         return clanMarketEntries;
     }
 
+    /**
+     * Sets the clan market entries data.
+     *
+     * @param clanMarketEntries map of personnel roles to market entries
+     * @author Illiani
+     * @since 0.50.06
+     */
     public void setClanMarketEntries(Map<PersonnelRole, PersonnelMarketEntry> clanMarketEntries) {
         this.clanMarketEntries = clanMarketEntries;
     }
 
+    /**
+     * Returns the map of available Inner Sphere market entries and their role distributions.
+     *
+     * @return map of personnel roles to market entries (Inner Sphere)
+     * @author Illiani
+     * @since 0.50.06
+     */
     public Map<PersonnelRole, PersonnelMarketEntry> getInnerSphereMarketEntries() {
         return innerSphereMarketEntries;
     }
 
+    /**
+     * Sets the Inner Sphere market entries data.
+     *
+     * @param innerSphereMarketEntries map of personnel roles to market entries
+     * @author Illiani
+     * @since 0.50.06
+     */
     public void setInnerSphereMarketEntries(Map<PersonnelRole, PersonnelMarketEntry> innerSphereMarketEntries) {
         this.innerSphereMarketEntries = innerSphereMarketEntries;
     }
 
+    /**
+     * Returns the campaign associated with this Personnel Market.
+     *
+     * @return campaign instance
+     * @author Illiani
+     * @since 0.50.06
+     */
     public Campaign getCampaign() {
         return campaign;
     }
 
+    /**
+     * Returns the faction associated with the campaign for recruitment filtering.
+     *
+     * @return campaign's faction
+     * @author Illiani
+     * @since 0.50.06
+     */
     public Faction getCampaignFaction() {
         if (campaignFaction == null) {
             campaignFaction = campaign.getFaction();
@@ -259,10 +398,24 @@ public class NewPersonnelMarket {
         return campaignFaction;
     }
 
+    /**
+     * Sets the campaign's faction, influencing applicant origins.
+     *
+     * @param campaignFaction the new campaign faction
+     * @author Illiani
+     * @since 0.50.06
+     */
     public void setCampaignFaction(Faction campaignFaction) {
         this.campaignFaction = campaignFaction;
     }
 
+    /**
+     * Returns the in-game date currently used for market evaluation.
+     *
+     * @return current date
+     * @author Illiani
+     * @since 0.50.06
+     */
     public LocalDate getToday() {
         if (today == null) {
             today = campaign.getLocalDate();
@@ -270,10 +423,24 @@ public class NewPersonnelMarket {
         return today;
     }
 
+    /**
+     * Sets the in-game date used to determine market status.
+     *
+     * @param today new current date
+     * @author Illiani
+     * @since 0.50.06
+     */
     public void setToday(LocalDate today) {
         this.today = today;
     }
 
+    /**
+     * Returns the campaign year for market behavior.
+     *
+     * @return game year
+     * @author Illiani
+     * @since 0.50.06
+     */
     public int getGameYear() {
         if (gameYear == 0) {
             gameYear = today.getYear();
@@ -281,14 +448,35 @@ public class NewPersonnelMarket {
         return gameYear;
     }
 
+    /**
+     * Returns the factions from which applicants may originate.
+     *
+     * @return list of applicant origin factions
+     * @author Illiani
+     * @since 0.50.06
+     */
     public ArrayList<Faction> getApplicantOriginFactions() {
         return new ArrayList<>();
     }
 
+    /**
+     * Sets the list of origin factions for new applicants.
+     *
+     * @param applicantOriginFactions list to set
+     * @author Illiani
+     * @since 0.50.06
+     */
     public void setApplicantOriginFactions(List<Faction> applicantOriginFactions) {
         this.applicantOriginFactions = applicantOriginFactions;
     }
 
+    /**
+     * Returns the current list of market applicants.
+     *
+     * @return list of applicants
+     * @author Illiani
+     * @since 0.50.06
+     */
     public List<Person> getCurrentApplicants() {
         if (currentApplicants == null) {
             return new ArrayList<>();
@@ -296,52 +484,135 @@ public class NewPersonnelMarket {
         return currentApplicants;
     }
 
+    /**
+     * Returns the index or filter value last used for applicant selection.
+     *
+     * @return filter index
+     * @author Illiani
+     * @since 0.50.06
+     */
     public int getLastSelectedFilter() {
         return lastSelectedFilter;
     }
 
+    /**
+     * Sets the last-used selection filter value.
+     *
+     * @param lastSelectedFilter filter index
+     * @author Illiani
+     * @since 0.50.06
+     */
     public void setLastSelectedFilter(int lastSelectedFilter) {
         this.lastSelectedFilter = lastSelectedFilter;
     }
 
+    /**
+     * Adds a new applicant to the current applicant pool.
+     *
+     * @param applicant the new Personnel applicant
+     * @author Illiani
+     * @since 0.50.06
+     */
     public void addApplicant(Person applicant) {
         if (applicant != null && !currentApplicants.contains(applicant)) {
             currentApplicants.add(applicant);
         }
     }
 
+    /**
+     * Clears all current applicants from the market.
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
     public void clearCurrentApplicants() {
         setCurrentApplicants(new ArrayList<>());
     }
 
+    /**
+     * Sets the list of current market applicants.
+     *
+     * @param currentApplicants list of applicants to set
+     * @author Illiani
+     * @since 0.50.06
+     */
     public void setCurrentApplicants(List<Person> currentApplicants) {
         this.currentApplicants = currentApplicants;
     }
 
+    /**
+     * Returns whether a golden hello (recruitment incentive) is being offered.
+     *
+     * @return {@code true} if a golden hello is offered, otherwise {@code false}
+     * @author Illiani
+     * @since 0.50.06
+     */
     public boolean isOfferingGoldenHello() {
         return offeringGoldenHello;
     }
 
+    /**
+     * Sets whether a golden hello (recruitment incentive) is being offered.
+     *
+     * @param offeringGoldenHello {@code true} to offer, {@code false} otherwise
+     * @author Illiani
+     * @since 0.50.06
+     */
     public void setOfferingGoldenHello(boolean offeringGoldenHello) {
         this.offeringGoldenHello = offeringGoldenHello;
     }
 
+    /**
+     * Returns whether rare personnel are available on the market.
+     *
+     * @return {@code true} if rare personnel are present, otherwise {@code false}
+     * @author Illiani
+     * @since 0.50.06
+     */
     public boolean getHasRarePersonnel() {
         return hasRarePersonnel;
     }
 
+    /**
+     * Sets the status of rare personnel availability.
+     *
+     * @param hasRarePersonnel {@code true} if present, {@code false} otherwise
+     * @author Illiani
+     * @since 0.50.06
+     */
     public void setHasRarePersonnel(boolean hasRarePersonnel) {
         this.hasRarePersonnel = hasRarePersonnel;
     }
 
+    /**
+     * Returns the number of recruitment rolls performed for the current market evaluation.
+     *
+     * @return recruitment rolls value
+     * @author Illiani
+     * @since 0.50.06
+     */
     public int getRecruitmentRolls() {
         return recruitmentRolls;
     }
 
+    /**
+     * Sets the number of recruitment rolls for the market.
+     *
+     * @param recruitmentRolls number of rolls to set
+     * @author Illiani
+     * @since 0.50.06
+     */
     public void setRecruitmentRolls(int recruitmentRolls) {
         this.recruitmentRolls = recruitmentRolls;
     }
 
+    /**
+     * Returns the planetary system currently used for market context.
+     *
+     * @return planetary system
+     * @author Illiani
+     * @since 0.50.06
+     */
     public PlanetarySystem getCurrentSystem() {
         if (currentSystem == null) {
             currentSystem = campaign.getCurrentSystem();
@@ -349,14 +620,34 @@ public class NewPersonnelMarket {
         return currentSystem;
     }
 
+    /**
+     * Sets the planetary system for the current personnel market.
+     *
+     * @param currentSystem planetary system to set
+     * @author Illiani
+     * @since 0.50.06
+     */
     public void setCurrentSystem(PlanetarySystem currentSystem) {
         this.currentSystem = currentSystem;
     }
 
+    /**
+     * Gets an availability message describing the market's state or conditions.
+     *
+     * @return market availability message
+     * @author Illiani
+     * @since 0.50.06
+     */
     public String getAvailabilityMessage() {
         return "";
     }
 
+    /**
+     * Reinitializes market state and key internal data.
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
     void reinitializeKeyData() {
         campaignFaction = campaign.getFaction();
         today = campaign.getLocalDate();
@@ -364,6 +655,16 @@ public class NewPersonnelMarket {
         currentSystem = campaign.getCurrentSystem();
     }
 
+    /**
+     * Generates a new single applicant using the specified market entry data.
+     *
+     * @param marketEntries market entries for role selection
+     *
+     * @return The generated Person object, or null if generation failed
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
     @Nullable
     Person generateSingleApplicant(Map<PersonnelRole, PersonnelMarketEntry> marketEntries) {
         PersonnelMarketEntry entry = pickEntry(marketEntries);
@@ -417,10 +718,27 @@ public class NewPersonnelMarket {
         return applicant;
     }
 
+    /**
+     * Generates a personnel recruitment report for the specified campaign.
+     *
+     * @param campaign the campaign to report on
+     * @author Illiani
+     * @since 0.50.06
+     */
     void generatePersonnelReport(Campaign campaign) {
         campaign.addReport("<a href='PERSONNEL_MARKET'>Personnel Market Updated</a>");
     }
 
+    /**
+     * Picks a personnel market entry from the given entry set, typically based on role and weighting.
+     *
+     * @param marketEntries map of personnel roles to entries
+     *
+     * @return selected market entry, or null if none available
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
     @Nullable
     PersonnelMarketEntry pickEntry(Map<PersonnelRole, PersonnelMarketEntry> marketEntries) {
         int totalWeight = marketEntries.values().stream().mapToInt(PersonnelMarketEntry::weight).sum();
@@ -439,6 +757,15 @@ public class NewPersonnelMarket {
         return null; // Should never hit here if weights > 0
     }
 
+    /**
+     * Processes an XML node containing applicant data and loads it into the supplied personnel market.
+     *
+     * @param personnelMarket the personnel market instance being loaded
+     * @param wn              the XML node representing applicant data
+     * @param version         serialization version
+     * @author Illiani
+     * @since 0.50.06
+     */
     private static void processApplicantNodes(NewPersonnelMarket personnelMarket, Node wn, Version version) {
         logger.debug("Loading Applicant Nodes from XML...");
 

@@ -34,17 +34,41 @@ package mekhq.campaign.market.personnelMarket.markets;
 
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.CAMPAIGN_OPERATIONS_STRICT;
 
-import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.market.personnelMarket.yaml.PersonnelMarketLibraries;
 
+/**
+ * Implements the personnel market using the Campaign Operations Strict ruleset.
+ *
+ * <p>This class specializes {@link PersonnelMarketCamOpsRevised} by supplying stricter data sets for applicant
+ * generation according to the strict interpretation of Campaign Operations. It configures market entries with data
+ * relevant to this ruleset.
+ *
+ * <ul>
+ *     <li>Initializes clan and Inner Sphere entries for the "Strict" rules variant.</li>
+ *     <li>Associates this market with the {@code CAMPAIGN_OPERATIONS_STRICT} style.</li>
+ *     <li>Inherits applicant origin and recruitment logic from its parent.</li>
+ * </ul>
+ *
+ * <p><b>Extends:</b> {@link PersonnelMarketCamOpsRevised}</p>
+ * <p><b>Associated Market Style:</b> {@link mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle#CAMPAIGN_OPERATIONS_STRICT}</p>
+ *
+ * @author Illiani
+ * @since 0.50.06
+ */
 public class PersonnelMarketCamOpsStrict extends PersonnelMarketCamOpsRevised {
-    private static final MMLogger logger = MMLogger.create(PersonnelMarketCamOpsStrict.class);
-
+    /**
+     * Constructs a personnel market instance using Campaign Operations Strict rules.
+     *
+     * <p>Initializes and loads the appropriate market entry libraries.</p>
+     *
+     * @param campaign the parent campaign instance
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
     public PersonnelMarketCamOpsStrict(Campaign campaign) {
         super(campaign);
-
-        logger.debug("Initializing PersonnelMarketCamOpsStrict");
 
         setAssociatedPersonnelMarketStyle(CAMPAIGN_OPERATIONS_STRICT);
 
