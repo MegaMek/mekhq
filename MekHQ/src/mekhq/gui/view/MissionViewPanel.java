@@ -84,6 +84,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
     /* Basic Mission Parameters */
     private JLabel lblStatus;
+    private JPanel lblBelligerents;
     private JLabel lblLocation;
     private JLabel txtLocation;
     private JLabel lblType;
@@ -185,18 +186,18 @@ public class MissionViewPanel extends JScrollablePanel {
 
     private void fillStatsBasic() {
         lblStatus = new JLabel();
+        lblBelligerents = new JPanel();
         lblLocation = new JLabel();
         txtLocation = new JLabel();
         lblType = new JLabel();
         txtType = new JLabel();
 
-        GridBagConstraints gridBagConstraints;
         pnlStats.setLayout(new GridBagLayout());
 
         lblStatus.setName("lblOwner");
         lblStatus.setText("<html><b>" + mission.getStatus() + "</b></html>");
         lblStatus.setToolTipText(mission.getStatus().getToolTipText());
-        gridBagConstraints = new GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 2;
@@ -686,6 +687,18 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         leftPanel.add(lblStatus, gridBagConstraints);
+
+        lblBelligerents = contract.getBelligerentsPanel(gui.getCampaign().getGameYear());
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy++;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.insets = new Insets(0, 0, 5, 0);
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlStats.add(lblBelligerents, gridBagConstraints);
 
         lblLocation.setName("lblLocation");
         lblLocation.setText(resourceMap.getString("lblLocation.text"));
