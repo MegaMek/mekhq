@@ -594,8 +594,9 @@ public enum PersonnelRole {
     }
 
     /**
-     * @return true if the person is an Astech or Medic, false otherwise.
+     * @deprecated Unused
      */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public boolean isAssistant() {
         return isAstech() || isMedic();
     }

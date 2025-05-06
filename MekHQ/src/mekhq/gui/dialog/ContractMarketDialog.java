@@ -559,7 +559,7 @@ public class ContractMarketDialog extends JDialog {
         String title = resourceMap.getString("incomingTransmission.title");
 
         // An ImageIcon to hold the faction icon
-        ImageIcon icon = getFactionLogo(campaign, ((AtBContract) selectedContract).getEmployerCode(), true);
+        ImageIcon icon = getFactionLogo(campaign.getGameYear(), ((AtBContract) selectedContract).getEmployerCode());
 
         // Get the resource string
         String resourceKey = "";
