@@ -789,14 +789,14 @@ public class Utilities {
      * a pre-selected portrait, provided one is to their index Additionally, any extraData parameters should be migrated
      * here
      *
-     * @param p           the person to be renamed, if applicable
+     * @param person           the person to be renamed, if applicable
      * @param oldCrew     the crew object they were a part of
      * @param crewIndex   the index of the person in the crew
      * @param crewOptions whether or not to run the populateOptionsFromCrew for this person
      */
-    private static void migrateCrewData(Person p, Crew oldCrew, int crewIndex, boolean crewOptions) {
+    private static void migrateCrewData(Person person, Crew oldCrew, int crewIndex, boolean crewOptions) {
         if (crewOptions) {
-            populateOptionsFromCrew(p, oldCrew);
+            populateOptionsFromCrew(person, oldCrew);
         }
 
         // this is a bit of a hack, but instead of tracking it elsewhere we only set
@@ -813,26 +813,27 @@ public class Utilities {
 
                 if (!(name.equalsIgnoreCase(RandomNameGenerator.UNNAMED) ||
                             name.equalsIgnoreCase(RandomNameGenerator.UNNAMED_FULL_NAME))) {
-                    p.migrateName(name);
+                    person.migrateName(name);
                 }
             } else {
-                p.setGivenName(givenName);
-                p.setSurname(oldCrew.getExtraDataValue(crewIndex, Crew.MAP_SURNAME));
-                if (p.getSurname() == null) {
-                    p.setSurname("");
+                person.setGivenName(givenName);
+                person.setSurname(oldCrew.getExtraDataValue(crewIndex, Crew.MAP_SURNAME));
+                if (person.getSurname() == null) {
+                    person.setSurname("");
                 }
 
                 String phenotype = oldCrew.getExtraDataValue(crewIndex, Crew.MAP_PHENOTYPE);
                 if (phenotype != null) {
-                    p.setPhenotype(Phenotype.parseFromString(phenotype));
+                    person.setPhenotype(Phenotype.fromString(phenotype));
                 }
 
-                p.setBloodname(oldCrew.getExtraDataValue(crewIndex, Crew.MAP_BLOODNAME));
+                String bloodname = oldCrew.getExtraDataValue(crewIndex, Crew.MAP_BLOODNAME);
+                person.setBloodname(bloodname == null ? "" : bloodname);
             }
 
             // Only created crew can be assigned a portrait, so this is safe to put in here
             if (!oldCrew.getPortrait(crewIndex).isDefault()) {
-                p.setPortrait(oldCrew.getPortrait(crewIndex).clone());
+                person.setPortrait(oldCrew.getPortrait(crewIndex).clone());
             }
         }
     }

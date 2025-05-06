@@ -24,23 +24,22 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.campaignOptions.contents;
 
-import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
-import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
-import static mekhq.campaign.personnel.skills.SkillType.S_GUN_BA;
-import static mekhq.campaign.personnel.skills.SkillType.S_GUN_PROTO;
-import static mekhq.campaign.personnel.skills.SkillType.getExperienceLevelName;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_GUNNERY;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_PILOTING;
-import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.CHARACTER_CREATION_ONLY;
-import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.CHARACTER_FLAW;
-import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.COMBAT_ABILITY;
-import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.MANEUVERING_ABILITY;
-import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.UTILITY_ABILITY;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+import static mekhq.utilities.spaUtilities.SpaUtilities.getSpaCategory;
+import static mekhq.utilities.spaUtilities.enums.AbilityCategory.CHARACTER_CREATION_ONLY;
+import static mekhq.utilities.spaUtilities.enums.AbilityCategory.CHARACTER_FLAW;
+import static mekhq.utilities.spaUtilities.enums.AbilityCategory.COMBAT_ABILITY;
+import static mekhq.utilities.spaUtilities.enums.AbilityCategory.MANEUVERING_ABILITY;
+import static mekhq.utilities.spaUtilities.enums.AbilityCategory.UTILITY_ABILITY;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -49,11 +48,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ResourceBundle;
-import java.util.regex.Pattern;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -65,22 +62,16 @@ import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
-import megamek.logging.MMLogger;
 import mekhq.CampaignPreset;
-import mekhq.MekHQ;
-import mekhq.Utilities;
 import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.SkillPerquisite;
 import mekhq.campaign.personnel.SpecialAbility;
-import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.personnel.skills.enums.SkillSubType;
 import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo;
-import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory;
 import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 import mekhq.gui.dialog.EditSpecialAbilityDialog;
+import mekhq.utilities.spaUtilities.enums.AbilityCategory;
 
 /**
  * The {@code AbilitiesTab} class represents a GUI tab for configuring and managing special abilities in a campaign.
@@ -212,7 +203,7 @@ public class AbilitiesTab {
         for (Entry<String, SpecialAbility> entry : abilities.entrySet()) {
             SpecialAbility clonedAbility = entry.getValue().clone();
             String abilityName = clonedAbility.getName();
-            AbilityCategory category = getCategory(clonedAbility);
+            AbilityCategory category = getSpaCategory(clonedAbility);
 
             if (!level3Abilities.contains(abilityName)) {
                 continue;
@@ -222,64 +213,6 @@ public class AbilitiesTab {
             allAbilityInfo.put(abilityName,
                   new CampaignOptionsAbilityInfo(abilityName, clonedAbility, isEnabled, category));
         }
-    }
-
-    /**
-     * Determines the {@code AbilityCategory} for the given special ability based on skill prerequisites such as
-     * "Gunnery", "Piloting", etc.
-     *
-     * @param ability The {@code SpecialAbility} for which the category will be identified.
-     *
-     * @return The {@code AbilityCategory} for the specified ability.
-     */
-    private AbilityCategory getCategory(SpecialAbility ability) {
-        int cost = ability.getCost();
-        // is the ability classified as Character Creation only?
-        boolean isCharacterCreationOnly = cost == -1;
-
-        if (isCharacterCreationOnly) {
-            return CHARACTER_CREATION_ONLY;
-        }
-
-        // Is the ability classified as a Flaw?
-        boolean isFlaw = cost < 0;
-
-        if (isFlaw) {
-            return CHARACTER_FLAW;
-        }
-
-        boolean isManeuvering = false;
-        for (SkillPerquisite skillPerquisite : ability.getPrereqSkills()) {
-            String skillPerquisiteString = skillPerquisite.toString();
-            // Step 1: Remove extra information
-            skillPerquisiteString = skillPerquisiteString.replaceAll("\\{", "").replaceAll("}", "");
-            skillPerquisiteString = skillPerquisiteString.replaceAll("OR ", "");
-
-            // Step 2: remove experience levels
-            for (int i = 0; i < EXP_ELITE; i++) {
-                skillPerquisiteString = skillPerquisiteString.replaceAll(getExperienceLevelName(i) + ' ', "");
-            }
-
-            // Step 3: Split the string by <br>
-            String[] parts = skillPerquisiteString.split("<br>");
-
-            // Step 4: Test each part
-            List<String> specialAbilitySkills = List.of(S_GUN_PROTO, S_GUN_BA);
-            for (String part : parts) {
-                SkillType skillType = SkillType.getType(part);
-
-                if (skillType.isSubTypeOf(COMBAT_GUNNERY) && !specialAbilitySkills.contains(part)) {
-                    return COMBAT_ABILITY;
-                }
-
-                if (skillType.isSubTypeOf(COMBAT_PILOTING) || specialAbilitySkills.contains(part)) {
-                    isManeuvering = true;
-                }
-            }
-        }
-
-        // If it isn't a Combat or Maneuvering ability, it's a utility ability
-        return isManeuvering ? MANEUVERING_ABILITY : UTILITY_ABILITY;
     }
 
     /**
