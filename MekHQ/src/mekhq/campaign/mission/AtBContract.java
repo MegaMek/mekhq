@@ -40,6 +40,7 @@ import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.client.ratgenerator.ModelRecord.NETWORK_NONE;
 import static megamek.client.ratgenerator.UnitTable.findTable;
+import static megamek.client.ui.swing.util.UIUtil.scaleForGUI;
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
@@ -72,7 +73,9 @@ import static mekhq.campaign.universe.fameAndInfamy.BatchallFactions.BATCHALL_FA
 import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
@@ -94,6 +97,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
+import javax.swing.SwingConstants;
 
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ratgenerator.FactionRecord;
@@ -1957,6 +1961,42 @@ public class AtBContract extends Contract {
                 panel.add(new JLabel(skullFull));
             }
         }
+
+        return panel;
+    }
+
+    /**
+     * Creates and returns a {@link JPanel} containing the belligerent factions' logos for the specified game year.
+     *
+     * <p>This panel displays the employer and enemy faction logos side by side, separated by a styled divider.
+     * The logos are determined based on the provided game year and faction codes, scaled appropriately for the GUI.</p>
+     *
+     * @param gameYear the year used to determine which faction logos to display
+     * @return a {@link JPanel} with the employer and enemy faction logos, with a divider in between
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public JPanel getBelligerentsPanel(int gameYear) {
+        final int SIZE = 100;
+
+        String employer = getEmployerCode();
+        ImageIcon employerImage = getFactionLogo(gameYear, employer);
+        employerImage = scaleImageIcon(employerImage, SIZE, true);
+
+        JLabel divider = new JLabel("/");
+        divider.setHorizontalAlignment(SwingConstants.CENTER);
+        int fontSize = scaleForGUI(SIZE); // scaleImageIcon already includes the necessary scaling
+        divider.setFont(new Font(Font.MONOSPACED, Font.PLAIN, fontSize));
+        divider.setForeground(new Color(0, 0, 0, 128));
+
+        String enemy = getEnemyCode();
+        ImageIcon enemyImage = getFactionLogo(gameYear, enemy);
+        enemyImage = scaleImageIcon(enemyImage, SIZE, true);
+
+        JPanel panel = new JPanel(new FlowLayout());
+        panel.add(new JLabel(employerImage));
+        panel.add(divider);
+        panel.add(new JLabel(enemyImage));
 
         return panel;
     }
