@@ -45,8 +45,7 @@ import java.io.FileNotFoundException;
 import java.io.ObjectInputFilter.Config;
 import java.lang.management.ManagementFactory;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.Objects;
 import javax.swing.InputMap;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
@@ -78,6 +77,7 @@ import megamek.common.autoresolve.acar.SimulatedClient;
 import megamek.common.autoresolve.converter.SingletonForces;
 import megamek.common.autoresolve.event.AutoResolveConcludedEvent;
 import megamek.common.event.*;
+import megamek.common.internationalization.I18n;
 import megamek.common.net.marshalling.SanityInputFilter;
 import megamek.logging.MMLogger;
 import megamek.server.Server;
@@ -821,59 +821,36 @@ public class MekHQ implements GameListener {
                   true,
                   tracker);
             resolveDialog.setVisible(true);
-            // TODO remove these safeties once the investigation is concluded -Illiani
-            if (resolveDialog == null) {
-                LOGGER.errorDialog(new IllegalStateException(),
-                      "resolveDialog is null please report this as a bug",
-                      "UNDER ACTIVE INVESTIGATION");
-            }
+            resolveDialog.dispose();
+
             if (resolveDialog.wasAborted()) {
-                // TODO remove these safeties once the investigation is concluded -Illiani
-                Map<UUID, ?> peopleStatus = tracker.getPeopleStatus();
-                if (peopleStatus == null) {
-                    LOGGER.errorDialog(new IllegalStateException(),
-                          "People status map in tracker is null please report this as a bug",
-                          "UNDER ACTIVE INVESTIGATION");
+                try {
+                    resetPersonsHits(tracker);
+                } catch (NullPointerException ex) {
+                    LOGGER.errorDialog(ex,
+                          I18n.getTextAt("AbortingResolveScenarioWizard",
+                                Sentry.isEnabled() ? "errorMessage.withSentry": "errorMessage.withoutSentry"),
+                          I18n.getTextAt("AbortingResolveScenarioWizard",
+                                "errorMessage.title"));
                 }
-
-                for (UUID personId : tracker.getPeopleStatus().keySet()) {
-                    // TODO remove these safeties once the investigation is concluded -Illiani
-                    if (getCampaign() == null) {
-                        LOGGER.errorDialog(new IllegalStateException(),
-                              "Campaign instance is null please report this as a bug",
-                              "UNDER ACTIVE INVESTIGATION");
-                    }
-
-                    Person person = getCampaign().getPerson(personId);
-
-                    if (person == null) {
-                        // TODO remove these safeties once the investigation is concluded -Illiani
-                        LOGGER.errorDialog(new IllegalStateException(),
-                              "Person with ID " +
-                                    personId +
-                                    " does not exist in the campaign please report this as a bug",
-                              "UNDER ACTIVE INVESTIGATION");
-                    }
-
-                    Integer priorHits = person.getHitsPrior();
-                    // TODO remove these safeties once the investigation is concluded -Illiani
-                    if (priorHits == null) {
-                        LOGGER.errorDialog(new IllegalStateException(),
-                              "Person's prior hits are not set for person " +
-                                    person.getFullName() +
-                                    " please report this as a bug",
-                              "UNDER ACTIVE INVESTIGATION");
-                    }
-                    person.setHits(priorHits);
-                }
-                return;
             }
+
             PostScenarioDialogHandler.handle(campaignGUI, getCampaign(), scenario, tracker);
         } catch (Exception ex) {
             LOGGER.error("Error during auto resolve concluded", ex);
         }
     }
 
+    private void resetPersonsHits(ResolveScenarioTracker tracker) {
+        var peopleStatus = tracker.getPeopleStatus();
+        Objects.requireNonNull(peopleStatus, "getPeopleStatus() returned null");
+        Objects.requireNonNull(getCampaign(), "getCampaign() returned null");
+        for (var entry : peopleStatus.entrySet()) {
+            Person person = getCampaign().getPerson(entry.getKey());
+            Objects.requireNonNull(person, "getPerson() returned null for Person ID=" + entry.getKey());
+            person.setHits(person.getHitsPrior());
+        }
+    }
     /*
      * Access methods for event bus.
      */
