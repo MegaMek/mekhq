@@ -1411,15 +1411,12 @@ public class SkillType {
     }
 
     public static SkillType createAntiMek() {
-        // Anti-Mek is the 'piloting' skill of Conventional Infantry so it has a subtype of 'COMBAT_PILOTING'.
-        // As Anti-Mek doesn't exist in ATOW so we use the linked attributes for Demolitions (and technically
-        // Climbing, though the linked attribute for Climbing is just Dexterity which is shared with Demolitions).
+        // Anti-Mek is 'Climbing' in ATOW
         return new SkillType(S_ANTI_MEK,
               8,
               false,
               COMBAT_PILOTING,
-              DEXTERITY,
-              INTELLIGENCE,
+              DEXTERITY, NONE,
               2,
               null,
               null,
