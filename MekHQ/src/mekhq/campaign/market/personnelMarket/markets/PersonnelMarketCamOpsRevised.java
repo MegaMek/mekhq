@@ -35,6 +35,7 @@ package mekhq.campaign.market.personnelMarket.markets;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.CAMPAIGN_OPERATIONS_REVISED;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -148,12 +149,15 @@ public class PersonnelMarketCamOpsRevised extends NewPersonnelMarket {
     @Override
     public void generateApplicants() {
         calculateNumberOfRecruitmentRolls();
-        Map<PersonnelRole, PersonnelMarketEntry> marketEntries = getCampaign().isClanCampaign() ?
+        Map<PersonnelRole, PersonnelMarketEntry> unorderedMarketEntries = getCampaign().isClanCampaign() ?
                                                                        getClanMarketEntries() :
                                                                        getInnerSphereMarketEntries();
+        unorderedMarketEntries = sanitizeMarketEntries(unorderedMarketEntries);
+        List<PersonnelMarketEntry> orderedMarketEntries = getMarketEntriesAsList(unorderedMarketEntries);
+
 
         for (int roll = 0; roll < getRecruitmentRolls(); roll++) {
-            Person applicant = generateSingleApplicant(marketEntries);
+            Person applicant = generateSingleApplicant(unorderedMarketEntries, orderedMarketEntries);
             if (applicant != null) {
                 addApplicant(applicant);
             }

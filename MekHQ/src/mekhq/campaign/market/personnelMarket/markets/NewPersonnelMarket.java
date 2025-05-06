@@ -40,6 +40,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -200,7 +201,7 @@ public class NewPersonnelMarket {
 
         String isZeroAvailability = getAvailabilityMessage();
 
-        if (!isZeroAvailability.isEmpty()) {
+        if (!isZeroAvailability.isBlank()) {
             logger.debug("No applicants will be generated due to {}", isZeroAvailability);
             return;
         }
@@ -463,6 +464,18 @@ public class NewPersonnelMarket {
     }
 
     /**
+     * Sets the current game year for the personnel market.
+     *
+     * @param gameYear the game year to set
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public void setGameYear(int gameYear) {
+        this.gameYear = gameYear;
+    }
+
+    /**
      * Returns the factions from which applicants may originate.
      *
      * @return list of applicant origin factions
@@ -670,36 +683,86 @@ public class NewPersonnelMarket {
     }
 
     /**
-     * Generates a new single applicant using the specified market entry data.
+     * Removes entries with non-positive weights or counts from the supplied personnel market entries map.
      *
-     * @param marketEntries market entries for role selection
+     * <p>Iterates over the existing map and removes any {@link PersonnelMarketEntry} whose {@code weight()} or
+     * {@code count()} is less than or equal to zero.</p>
      *
-     * @return The generated Person object, or null if generation failed
-     *
+     * @param marketEntries the map of personnel roles to market entries to sanitize; modified in place
+     * @return the sanitized map, containing only entries with positive weights
      * @author Illiani
      * @since 0.50.06
      */
+    public Map<PersonnelRole, PersonnelMarketEntry> sanitizeMarketEntries(
+          Map<PersonnelRole, PersonnelMarketEntry> marketEntries) {
+        List<PersonnelRole> roles = new ArrayList<>(marketEntries.keySet());
+        for (PersonnelRole role : roles) {
+            PersonnelMarketEntry entry = marketEntries.get(role);
+            // These roles can't be generated and will throw off the total weight
+            if (entry.weight() <= 0) {
+                logger.warn("Removing {} from market entries as it has a weight of < 1 ({}).",
+                      entry.profession(),
+                      entry.weight());
+                marketEntries.remove(role);
+                continue;
+            }
+
+            // These roles will throw an exception as you can't call randomInt() with a value < 1
+            if (entry.count() <= 0) {
+                logger.warn("Removing {} from market entries as it has a count of < 1 ({}).",
+                      entry.profession(),
+                      entry.count());
+                marketEntries.remove(role);
+            }
+        }
+
+        return marketEntries;
+    }
+
+    /**
+     * Returns a list of {@link PersonnelMarketEntry} objects sorted alphabetically by the string value
+     * of each entry's profession. This ensures a deterministic order for processing or testing, regardless of the
+     * original iteration order of the provided map.
+     *
+     * @param marketEntries a map containing personnel roles as keys and their corresponding market entries as values
+     * @return a list of market entries sorted alphabetically by profession
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public List<PersonnelMarketEntry> getMarketEntriesAsList(Map<PersonnelRole, PersonnelMarketEntry> marketEntries) {
+        // Maps are inherently non-deterministic in their order, however, we want to be able to both use a map (for
+        // the key:value pairs, but also we need a deterministic list to ease testing. So we create a list here and
+        // sort alphabetically based on the profession tied to each entry. This makes testing substantially easier
+        // without removing from the randomness of the pick
+        ArrayList<PersonnelMarketEntry> marketEntryList = new ArrayList<>(marketEntries.values());
+        marketEntryList.sort(Comparator.comparing(entry -> entry.profession().toString()));
+
+        return marketEntryList;
+    }
+
+    /**
+     * Generates a single applicant person based on the provided personnel market entries.
+     *
+     * <p>This method selects an entry from the ordered market entries, iterates through available fallback
+     * professions if necessary, and creates a new {@link Person}.</p>
+     *
+     * @param unorderedMarketEntries a mapping of {@link PersonnelRole} to {@link PersonnelMarketEntry} representing
+     *                              all personnel market entries.
+     * @param orderedMarketEntries a list of {@link PersonnelMarketEntry} objects, ordered by profession.
+     * @return a newly generated {@link Person} representing the applicant, or {@code null} if no suitable
+     *         applicant could be generated.
+     */
     @Nullable
-    Person generateSingleApplicant(Map<PersonnelRole, PersonnelMarketEntry> marketEntries) {
-        PersonnelMarketEntry entry = pickEntry(marketEntries);
+    Person generateSingleApplicant(Map<PersonnelRole, PersonnelMarketEntry> unorderedMarketEntries,
+          List<PersonnelMarketEntry> orderedMarketEntries) {
+        PersonnelMarketEntry entry = pickEntry(orderedMarketEntries);
         if (entry == null) {
             logger.error("No personnel market entries found. Check the data folder for the appropriate YAML file.");
             return null;
         }
 
-        // If the entry's introduction year is after the current game year, pick the fallback profession
-        // Keep going until we find an entry that is before the current game year.
-        int remainingIterations = 3;
         PersonnelMarketEntry originalEntry = entry;
-        while (entry != null && (entry.introductionYear() > gameYear) && (entry.extinctionYear() <= gameYear)) {
-            PersonnelRole fallbackProfession = entry.fallbackProfession();
-            entry = marketEntries.get(fallbackProfession);
-            remainingIterations--;
-            if (remainingIterations <= 0) {
-                entry = null;
-            }
-        }
-
+        entry = vetEntryForIntroductionAndExtinctionYears(unorderedMarketEntries, entry);
         if (entry == null) {
             logger.error("Could not find a suitable fallback profession for {} game year {}. This suggests the " +
                                "fallback structure of the YAML file is incorrect.",
@@ -733,6 +796,35 @@ public class NewPersonnelMarket {
     }
 
     /**
+     * Attempts to find a valid {@link PersonnelMarketEntry} for the current game year.
+     *
+     * <p>Starting from the provided entry, checks whether its introduction and extinction years encompass the
+     * current game year. If not, it repeatedly looks up fallback professions from the provided map, up to three
+     * attempts, until a suitable entry is found or no more attempts remain.</p>
+     *
+     * @param unorderedMarketEntries a map of personnel roles to market entries, used to look up fallbacks
+     * @param entry                  the initial {@link PersonnelMarketEntry} to validate and potentially fallback from
+     *
+     * @return a valid {@link PersonnelMarketEntry} for the current game year, or {@code null} if none can be found
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    PersonnelMarketEntry vetEntryForIntroductionAndExtinctionYears(
+          Map<PersonnelRole, PersonnelMarketEntry> unorderedMarketEntries, PersonnelMarketEntry entry) {
+        int remainingIterations = 3;
+        while (gameYear < entry.introductionYear() || gameYear >= entry.extinctionYear()) {
+            PersonnelRole fallbackProfession = entry.fallbackProfession();
+            entry = unorderedMarketEntries.get(fallbackProfession);
+            remainingIterations--;
+            if (entry == null || remainingIterations <= 0) {
+                return null;
+            }
+        }
+        return entry;
+    }
+
+    /**
      * Generates a personnel recruitment report for the specified campaign.
      *
      * @author Illiani
@@ -753,17 +845,23 @@ public class NewPersonnelMarket {
      * @since 0.50.06
      */
     @Nullable
-    PersonnelMarketEntry pickEntry(Map<PersonnelRole, PersonnelMarketEntry> marketEntries) {
-        int totalWeight = marketEntries.values().stream().mapToInt(PersonnelMarketEntry::weight).sum();
+    PersonnelMarketEntry pickEntry(List<PersonnelMarketEntry> marketEntries) {
+        int totalWeight = 0;
+        for (PersonnelMarketEntry entry : marketEntries) {
+            // These entries should have already been filtered out, but a little insurance goes a long way
+            if (entry.weight() > 0 && entry.count() > 0) {
+                totalWeight += entry.weight();
+            }
+        }
         if (totalWeight <= 0) {
             return null;
         }
 
-        int roll = randomInt(totalWeight) + 1; // 1-based, so every entry with positive weight has a chance
+        int roll = randomInt(totalWeight);
         int cumulative = 0;
-        for (PersonnelMarketEntry entry : marketEntries.values()) {
+        for (PersonnelMarketEntry entry : marketEntries) {
             cumulative += entry.weight();
-            if (roll <= cumulative) {
+            if (roll < cumulative) {
                 return entry;
             }
         }

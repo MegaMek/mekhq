@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.market.personnelMarket.enums;
 
+import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -47,7 +48,7 @@ public class PersonnelMarketStyleTest {
     @CsvSource(value = { "MEKHQ,MEKHQ", "CAMPAIGN_OPERATIONS_REVISED,CAMPAIGN_OPERATIONS_REVISED", "mekhq,MEKHQ",
                          "CamOps (REviseD),CAMPAIGN_OPERATIONS_REVISED",
                          "'CAMPAIGN OPERATIONS_REVISED',CAMPAIGN_OPERATIONS_REVISED", "2,CAMPAIGN_OPERATIONS_REVISED",
-                         "'InvalidValue',NONE", "'-1',NONE" })
+                         "'InvalidValue',PERSONNEL_MARKET_DISABLED", "'-1',PERSONNEL_MARKET_DISABLED" })
     void testFromString_Parameterized(String input, PersonnelMarketStyle expected) {
         assertEquals(expected, PersonnelMarketStyle.fromString(input));
     }
@@ -56,7 +57,7 @@ public class PersonnelMarketStyleTest {
     @NullSource
     @EmptySource
     void testFromString_NullOrEmpty(String input) {
-        assertEquals(PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED, PersonnelMarketStyle.fromString(input));
+        assertEquals(PERSONNEL_MARKET_DISABLED, PersonnelMarketStyle.fromString(input));
     }
 
     @ParameterizedTest

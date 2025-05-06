@@ -46,6 +46,7 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -236,12 +237,14 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         // of the campaign minus 2 to a minimum of 2 (Green).
         averageSkillLevel = max(averageSkillLevel - (isOfferingGoldenHello() ? 1 : 2), 2);
 
-        Map<PersonnelRole, PersonnelMarketEntry> marketEntries = getCampaign().isClanCampaign() ?
+        Map<PersonnelRole, PersonnelMarketEntry> unorderedMarketEntries = getCampaign().isClanCampaign() ?
                                                                        getClanMarketEntries() :
                                                                        getInnerSphereMarketEntries();
+        unorderedMarketEntries = sanitizeMarketEntries(unorderedMarketEntries);
+        List<PersonnelMarketEntry> orderedMarketEntries = getMarketEntriesAsList(unorderedMarketEntries);
 
         for (int roll = 0; roll < getRecruitmentRolls(); roll++) {
-            Person applicant = generateSingleApplicant(marketEntries);
+            Person applicant = generateSingleApplicant(unorderedMarketEntries, orderedMarketEntries);
             if (applicant == null) {
                 continue;
             }
