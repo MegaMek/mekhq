@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.generator;
 
@@ -157,7 +162,7 @@ public abstract class AbstractSkillGenerator {
                 addSkill(person, SkillType.S_TECH_VESSEL, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 break;
             case VESSEL_NAVIGATOR:
-                addSkill(person, SkillType.S_NAV, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
+                addSkill(person, SkillType.S_NAVIGATION, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 break;
             case MEK_TECH:
                 addSkill(person, SkillType.S_TECH_MEK, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
@@ -175,7 +180,7 @@ public abstract class AbstractSkillGenerator {
                 addSkill(person, SkillType.S_ASTECH, 0, 0);
                 break;
             case DOCTOR:
-                addSkill(person, SkillType.S_DOCTOR, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
+                addSkill(person, SkillType.S_SURGERY, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 break;
             case MEDIC:
                 addSkill(person, SkillType.S_MEDTECH, 0, 0);

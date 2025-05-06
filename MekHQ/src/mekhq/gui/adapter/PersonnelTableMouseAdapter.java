@@ -56,7 +56,7 @@ import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.REPLA
 import static mekhq.campaign.personnel.skills.Attributes.ATTRIBUTE_IMPROVEMENT_COST;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
-import static mekhq.campaign.personnel.skills.SkillType.S_DOCTOR;
+import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
 import static mekhq.campaign.personnel.skills.SkillType.getType;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.WILLPOWER;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
@@ -1633,7 +1633,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
         for (Person person : campaign.getActivePersonnel(false)) {
             if (person.isDoctor()) {
-                Skill skill = person.getSkill(S_DOCTOR);
+                Skill skill = person.getSkill(S_SURGERY);
 
                 if (skill != null &&
                           skill.getFinalSkillValue(person.getOptions()) >=

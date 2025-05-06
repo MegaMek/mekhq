@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.rating.CamOpsReputation;
 
@@ -69,7 +74,7 @@ public class CommandRating {
         commandRating.put("leadership", getSkillValue(commander, SkillType.S_LEADER));
         commandRating.put("tactics", getSkillValue(commander, SkillType.S_TACTICS));
         commandRating.put("strategy", getSkillValue(commander, SkillType.S_STRATEGY));
-        commandRating.put("negotiation", getSkillValue(commander, SkillType.S_NEG));
+        commandRating.put("negotiation", getSkillValue(commander, SkillType.S_NEGOTIATION));
 
         commandRating.put("traits",
               getATOWTraitValues(commander,
