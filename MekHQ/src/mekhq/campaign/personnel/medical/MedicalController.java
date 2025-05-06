@@ -24,11 +24,23 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.medical;
 
+import static mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil.resolveDailyHealing;
+import static mekhq.campaign.personnel.skills.SkillType.S_DOCTOR;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import megamek.common.TargetRollModifier;
-import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
@@ -36,13 +48,6 @@ import mekhq.campaign.event.PersonMedicalAssignmentEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillCheckUtility;
 import mekhq.campaign.unit.Unit;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil.resolveDailyHealing;
-import static mekhq.campaign.personnel.skills.SkillType.S_DOCTOR;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
  * The {@code MedicalController} class manages the healing process and medical-related tasks
@@ -53,6 +58,8 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
  * @since MekHQ 0.50.06
  */
 public class MedicalController {
+    private static final MMLogger logger = MMLogger.create(MedicalController.class);
+
     final String RESOURCE_BUNDLE = "mekhq.resources.MedicalController";
 
     final private Campaign campaign;
@@ -106,7 +113,8 @@ public class MedicalController {
             if (doctor != null && patient.getDaysToWaitForHealing() <= 0) {
                 healPerson(patient, doctor);
             } else if (checkNaturalHealing(patient)) {
-                campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "MedicalController.report.natural",
+                // TODO change logging level from info to debug in 50.08
+                logger.info(getFormattedTextAt(RESOURCE_BUNDLE, "MedicalController.report.natural",
                       patient.getHyperlinkedFullTitle()));
                 Unit unit = patient.getUnit();
                 if (unit != null) {
@@ -152,7 +160,8 @@ public class MedicalController {
      * @param doctor  the {@link Person} performing the treatment
      */
     private void healPerson(Person patient, Person doctor) {
-        campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "MedicalController.report.intro",
+        // TODO change logging level from info to debug in 50.08
+        logger.info(getFormattedTextAt(RESOURCE_BUNDLE, "MedicalController.report.intro",
               doctor.getHyperlinkedFullTitle(), patient.getHyperlinkedFullTitle()));
 
         SkillCheckUtility skillCheckUtility = new SkillCheckUtility(doctor,
@@ -162,7 +171,8 @@ public class MedicalController {
               isUseSupportEdge,
               false);
 
-        campaign.addReport(skillCheckUtility.getResultsText());
+        // TODO change logging level from info to debug in 50.08
+        logger.info(skillCheckUtility.getResultsText());
 
         if (skillCheckUtility.isSuccess()) {
             patient.heal();

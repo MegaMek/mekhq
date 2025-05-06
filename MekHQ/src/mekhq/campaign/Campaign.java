@@ -171,7 +171,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.RandomDependents;
 import mekhq.campaign.personnel.SpecialAbility;
-import mekhq.campaign.personnel.medical.MedicalController;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.death.RandomDeath;
 import mekhq.campaign.personnel.divorce.AbstractDivorce;
@@ -196,6 +195,7 @@ import mekhq.campaign.personnel.lifeEvents.NewYearsDayAnnouncement;
 import mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.marriage.DisabledRandomMarriage;
+import mekhq.campaign.personnel.medical.MedicalController;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -386,7 +386,7 @@ public class Campaign implements ITechManager {
     private StoryArc storyArc;
     private final FameAndInfamyController fameAndInfamy;
     private BehaviorSettings autoResolveBehaviorSettings;
-    private List<Unit> automatedMothballUnits;
+    private List<UUID> automatedMothballUnits;
     private int temporaryPrisonerCapacity;
     private boolean processProcurement;
 
@@ -1468,6 +1468,18 @@ public class Campaign implements ITechManager {
         }
 
         return false;
+    }
+
+    /**
+     * Checks if there is at least one active AtB (Against the Bot) contract, using the default search parameters.
+     *
+     * @return {@code true} if an active AtB contract exists; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public boolean hasActiveAtBContract() {
+        return hasActiveAtBContract(false);
     }
 
     /**
@@ -2778,7 +2790,7 @@ public class Campaign implements ITechManager {
             return campaignOptions.getAutoLogisticsMekLocation();
         } else if (part instanceof TankLocation) {
             return campaignOptions.getAutoLogisticsNonRepairableLocation();
-        } else if (part instanceof AmmoBin) {
+        } else if (part instanceof AmmoBin || part instanceof AmmoStorage) {
             return campaignOptions.getAutoLogisticsAmmunition();
         } else if (part instanceof Armor) {
             return campaignOptions.getAutoLogisticsArmor();
@@ -3728,6 +3740,11 @@ public class Campaign implements ITechManager {
             }
             return PartAcquisitionResult.PlanetSpecificFailure;
         }
+        SocioIndustrialData socioIndustrial = system.getPrimaryPlanet().getSocioIndustrial(getLocalDate());
+        CampaignOptions options = getCampaignOptions();
+        int tech = options.getPlanetTechAcquisitionBonus(socioIndustrial.tech);
+        int industry = options.getPlanetIndustryAcquisitionBonus(socioIndustrial.industry);
+        int outputs = options.getPlanetOutputAcquisitionBonus(socioIndustrial.output);
         if (d6(2) < target.getValue()) {
             // no contacts on this planet, move along
             if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
@@ -3738,7 +3755,18 @@ public class Campaign implements ITechManager {
                                 acquisition.getAcquisitionName() +
                                 " on " +
                                 system.getPrintableName(getLocalDate()) +
-                                "</b></font>");
+                                " at TN: " +
+                                target.getValue() +
+                                " - Modifiers (Tech: " +
+                                (tech > 0 ? "+" : "") +
+                                tech +
+                                ", Industry: " +
+                                (industry > 0 ? "+" : "") +
+                                industry +
+                                ", Outputs: " +
+                                (outputs > 0 ? "+" : "") +
+                                outputs +
+                                ") </font>");
             }
             return PartAcquisitionResult.PlanetSpecificFailure;
         } else {
@@ -3750,7 +3778,18 @@ public class Campaign implements ITechManager {
                                 acquisition.getAcquisitionName() +
                                 " on " +
                                 system.getPrintableName(getLocalDate()) +
-                                "</font>");
+                                " at TN: " +
+                                target.getValue() +
+                                " - Modifiers (Tech: " +
+                                (tech > 0 ? "+" : "") +
+                                tech +
+                                ", Industry: " +
+                                (industry > 0 ? "+" : "") +
+                                industry +
+                                ", Outputs: " +
+                                (outputs > 0 ? "+" : "") +
+                                outputs +
+                                ") </font>");
             }
             return PartAcquisitionResult.Success;
         }
@@ -5676,7 +5715,7 @@ public class Campaign implements ITechManager {
         }
 
         // remove from automatic mothballing
-        automatedMothballUnits.remove(unit);
+        automatedMothballUnits.remove(unit.getId());
 
         // finally, remove the unit
         getHangar().removeUnit(unit.getId());
@@ -6287,10 +6326,10 @@ public class Campaign implements ITechManager {
      * reducing their active maintenance costs and operational demands over time.
      * </p>
      *
-     * @return A {@link List} of {@link Unit} objects that are set for automated mothballing. Returns an empty list if
+     * @return A {@link List} of {@link UUID} objects that are set for automated mothballing. Returns an empty list if
      *       no units are configured.
      */
-    public List<Unit> getAutomatedMothballUnits() {
+    public List<UUID> getAutomatedMothballUnits() {
         return automatedMothballUnits;
     }
 
@@ -6301,9 +6340,9 @@ public class Campaign implements ITechManager {
      * Replaces the current list of units that have undergone automated mothballing.
      * </p>
      *
-     * @param automatedMothballUnits A {@link List} of {@link Unit} objects to configure for automated mothballing.
+     * @param automatedMothballUnits A {@link List} of {@link UUID} objects to configure for automated mothballing.
      */
-    public void setAutomatedMothballUnits(List<Unit> automatedMothballUnits) {
+    public void setAutomatedMothballUnits(List<UUID> automatedMothballUnits) {
         this.automatedMothballUnits = automatedMothballUnits;
     }
 
@@ -6527,13 +6566,13 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "personnelWhoAdvancedInXP");
 
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "automatedMothballUnits");
-        for (Unit unit : automatedMothballUnits) {
-            if (unit == null) {
+        for (UUID unitId : automatedMothballUnits) {
+            if (unitId == null) {
                 // <50.03 compatibility handler
                 continue;
             }
 
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mothballedUnit", unit.getId());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mothballedUnit", unitId);
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "automatedMothballUnits");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "temporaryPrisonerCapacity", temporaryPrisonerCapacity);
@@ -8286,7 +8325,7 @@ public class Campaign implements ITechManager {
         getHangar().forEachUnit(u -> {
             Entity en = u.getEntity();
             if (null != en) {
-                game.addEntity(en);
+                game.addEntity(en, false);
             }
         });
     }
