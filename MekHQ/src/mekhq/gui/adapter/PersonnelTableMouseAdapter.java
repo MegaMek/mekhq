@@ -1964,7 +1964,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         menu.add(cbMenu);
         popup.add(menu);
 
-        if (StaticChecks.areAllPrisoners(selected)) {
+        if (!StaticChecks.areAnyFree(selected)) {
             if (getCampaign().getLocation().isOnPlanet()) {
                 popup.add(newMenuItem(resources.getString("free.text"), CMD_FREE));
                 popup.add(newMenuItem(resources.getString("execute.text"), CMD_EXECUTE));
@@ -1980,7 +1980,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 popup.add(newMenuItem(resources.getString("recruit.text"), CMD_RECRUIT));
             }
 
-            if ((getCampaign().getFaction().isClan()) && (StaticChecks.areAnyBondsmen(selected))) {
+            if ((getCampaign().isClanCampaign()) && (StaticChecks.areAnyBondsmen(selected))) {
                 popup.add(newMenuItem(resources.getString("abtakha.text"), CMD_ABTAKHA));
             }
         }
