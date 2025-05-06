@@ -827,7 +827,10 @@ public class MekHQ implements GameListener {
                 try {
                     resetPersonsHits(tracker);
                 } catch (NullPointerException ex) {
-                    LOGGER.errorDialog(ex,
+                    LOGGER.error(ex,
+                          "Error during auto resolve concluded, dumping stack trace and events, " +
+                                "AtbScenario {}, AutoResolveConcludedEvent {}", scenario, autoResolveConcludedEvent);
+                    LOGGER.errorDialog(
                           I18n.getTextAt("AbortingResolveScenarioWizard",
                                 Sentry.isEnabled() ? "errorMessage.withSentry": "errorMessage.withoutSentry"),
                           I18n.getTextAt("AbortingResolveScenarioWizard",
