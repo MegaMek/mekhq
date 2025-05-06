@@ -44,8 +44,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.ObjectInputFilter.Config;
 import java.lang.management.ManagementFactory;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import javax.swing.InputMap;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
@@ -638,12 +640,11 @@ public class MekHQ implements GameListener {
                   true,
                   tracker);
             resolveDialog.setVisible(true);
+            resolveDialog.dispose();
 
-            if (resolveDialog.wasAborted()) {
-                return;
+            if (!resolveDialog.wasAborted()) {
+                PostScenarioDialogHandler.handle(campaignGUI, getCampaign(), currentScenario, tracker);
             }
-
-            PostScenarioDialogHandler.handle(campaignGUI, getCampaign(), currentScenario, tracker);
 
         } catch (Exception ex) {
             LOGGER.error(ex, "gameVictory()");
@@ -824,23 +825,29 @@ public class MekHQ implements GameListener {
             resolveDialog.dispose();
 
             if (resolveDialog.wasAborted()) {
-                try {
-                    resetPersonsHits(tracker);
-                } catch (NullPointerException ex) {
-                    LOGGER.error(ex,
-                          "Error during auto resolve concluded, dumping stack trace and events, " +
-                                "AtbScenario {}, AutoResolveConcludedEvent {}", scenario, autoResolveConcludedEvent);
-                    LOGGER.errorDialog(
-                          I18n.getTextAt("AbortingResolveScenarioWizard",
-                                Sentry.isEnabled() ? "errorMessage.withSentry": "errorMessage.withoutSentry"),
-                          I18n.getTextAt("AbortingResolveScenarioWizard",
-                                "errorMessage.title"));
-                }
+                postAbortedAutoResolve(autoResolveConcludedEvent, scenario, tracker);
+            } else {
+                // If the autoresolve is not aborted, follow with the PostScenario Handler as normal
+                PostScenarioDialogHandler.handle(campaignGUI, getCampaign(), scenario, tracker);
             }
-
-            PostScenarioDialogHandler.handle(campaignGUI, getCampaign(), scenario, tracker);
         } catch (Exception ex) {
             LOGGER.error("Error during auto resolve concluded", ex);
+        }
+    }
+
+    private void postAbortedAutoResolve(AutoResolveConcludedEvent autoResolveConcludedEvent, AtBScenario scenario,
+          ResolveScenarioTracker tracker) {
+        try {
+            resetPersonsHits(tracker);
+        } catch (NullPointerException ex) {
+            LOGGER.error(ex,
+                  "Error during auto resolve concluded, dumping stack trace and events, " +
+                        "AtbScenario {}, AutoResolveConcludedEvent {}", scenario, autoResolveConcludedEvent);
+            LOGGER.errorDialog(
+                  I18n.getTextAt("AbortingResolveScenarioWizard",
+                        Sentry.isEnabled() ? "errorMessage.withSentry": "errorMessage.withoutSentry"),
+                  I18n.getTextAt("AbortingResolveScenarioWizard",
+                        "errorMessage.title"));
         }
     }
 
@@ -848,10 +855,19 @@ public class MekHQ implements GameListener {
         var peopleStatus = tracker.getPeopleStatus();
         Objects.requireNonNull(peopleStatus, "getPeopleStatus() returned null");
         Objects.requireNonNull(getCampaign(), "getCampaign() returned null");
+        List<Throwable> errors = new ArrayList<>();
         for (var entry : peopleStatus.entrySet()) {
-            Person person = getCampaign().getPerson(entry.getKey());
-            Objects.requireNonNull(person, "getPerson() returned null for Person ID=" + entry.getKey());
-            person.setHits(person.getHitsPrior());
+            try {
+                Person person = getCampaign().getPerson(entry.getKey());
+                Objects.requireNonNull(person, "getPerson() returned null for Person ID=" + entry.getKey() + ".");
+                person.setHits(person.getHitsPrior());
+            } catch (Throwable ex) {
+                errors.add(ex);
+            }
+        }
+        if (!errors.isEmpty()) {
+            String errorMessage = errors.stream().map(Throwable::getMessage).collect(Collectors.joining("\n"));
+            throw new NullPointerException(errorMessage);
         }
     }
     /*
