@@ -7060,7 +7060,7 @@ public class Campaign implements ITechManager {
         if (noMek > 0) {
             leasedSmallMekDropships = Math.ceil(noMek / (double) smallMekDropshipMekCapacity);
             noMek -= (int) (leasedSmallMekDropships * smallMekDropshipMekCapacity);
-            mekCollars += leasedSmallMekDropships;
+            mekCollars += (int) Math.ceil(leasedSmallMekDropships);
         }
         leasedASFCapacity += (int) floor(leasedSmallMekDropships * smallMekDropshipASFCapacity);
         leasedCargoCapacity += (int) floor(leasedSmallMekDropships * smallMekDropshipCargoCapacity);
