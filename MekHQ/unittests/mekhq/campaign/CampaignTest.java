@@ -44,15 +44,25 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import megamek.common.Dropship;
 import megamek.common.EquipmentType;
+import megamek.common.Mek;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.enums.CampaignTransportType;
+import mekhq.campaign.parts.*;
+import mekhq.campaign.parts.equipment.AmmoBin;
+import mekhq.campaign.parts.equipment.HeatSink;
+import mekhq.campaign.parts.equipment.JumpJet;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -62,9 +72,13 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Systems;
 import org.apache.logging.log4j.LogManager;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 /**
  * @author Deric Page (dericdotpageatgmaildotcom)
@@ -237,5 +251,610 @@ public class CampaignTest {
         campaign.applyInitiativeBonus(2);
         assertEquals(campaign.getInitiativeBonus(), 3);
 
+    }
+
+    @Nested
+    public class TestAutoLogistics {
+        static Campaign campaign;
+
+        @BeforeAll
+        public static void beforeAll() {
+            // beforeEach MUST refresh Campaign Options!
+            // It is very time-consuming recreating Campaign for each test, let's try to reuse it
+            campaign = new Campaign();
+        }
+
+        @Nested
+        public class TestAutoLogisticsCampaignOptions {
+            final static int FIRST_DESIRED_STOCK = 100;
+            final static int SECOND_DESIRED_STOCK = 200;
+
+            @BeforeEach
+            public void beforeEach() {
+                // beforeEach MUST refresh Campaign Options!
+                campaign.setCampaignOptions(new CampaignOptions());
+            }
+
+            @Test
+            public void testGetSetStockPercentHeatSink() {
+                // Act
+                campaign.getCampaignOptions().setAutoLogisticsHeatSink(FIRST_DESIRED_STOCK);
+                int firstStockLevel = campaign.getCampaignOptions().getAutoLogisticsHeatSink();
+
+                // Let's change the stock level to something else so we can make sure it properly changes
+                campaign.getCampaignOptions().setAutoLogisticsHeatSink(SECOND_DESIRED_STOCK);
+                int secondStockLevel = campaign.getCampaignOptions().getAutoLogisticsHeatSink();
+
+                // Assert
+                assertEquals(FIRST_DESIRED_STOCK, firstStockLevel);
+                assertEquals(SECOND_DESIRED_STOCK, secondStockLevel);
+            }
+
+            @Test
+            public void testGetSetStockPercentMekHead() {
+                // Act
+                campaign.getCampaignOptions().setAutoLogisticsMekHead(FIRST_DESIRED_STOCK);
+                int firstStockLevel = campaign.getCampaignOptions().getAutoLogisticsMekHead();
+
+                // Let's change the stock level to something else so we can make sure it properly changes
+                campaign.getCampaignOptions().setAutoLogisticsMekHead(SECOND_DESIRED_STOCK);
+                int secondStockLevel = campaign.getCampaignOptions().getAutoLogisticsMekHead();
+
+                // Assert
+                assertEquals(FIRST_DESIRED_STOCK, firstStockLevel);
+                assertEquals(SECOND_DESIRED_STOCK, secondStockLevel);
+            }
+
+            @Test
+            public void testGetSetStockPercentNonRepairable() {
+                // Act
+                campaign.getCampaignOptions().setAutoLogisticsNonRepairableLocation(FIRST_DESIRED_STOCK);
+                int firstStockLevel = campaign.getCampaignOptions().getAutoLogisticsNonRepairableLocation();
+
+                // Let's change the stock level to something else so we can make sure it properly changes
+                campaign.getCampaignOptions().setAutoLogisticsNonRepairableLocation(SECOND_DESIRED_STOCK);
+                int secondStockLevel = campaign.getCampaignOptions().getAutoLogisticsNonRepairableLocation();
+
+                // Assert
+                assertEquals(FIRST_DESIRED_STOCK, firstStockLevel);
+                assertEquals(SECOND_DESIRED_STOCK, secondStockLevel);
+            }
+
+            @Test
+            public void testGetSetStockPercentMekLocation() {
+                // Act
+                campaign.getCampaignOptions().setAutoLogisticsMekLocation(FIRST_DESIRED_STOCK);
+                int firstStockLevel = campaign.getCampaignOptions().getAutoLogisticsMekLocation();
+
+                // Let's change the stock level to something else so we can make sure it properly changes
+                campaign.getCampaignOptions().setAutoLogisticsMekLocation(SECOND_DESIRED_STOCK);
+                int secondStockLevel = campaign.getCampaignOptions().getAutoLogisticsMekLocation();
+
+                // Assert
+                assertEquals(FIRST_DESIRED_STOCK, firstStockLevel);
+                assertEquals(SECOND_DESIRED_STOCK, secondStockLevel);
+            }
+
+            @Test
+            public void testGetSetStockPercentAmmunition() {
+                // Act
+                campaign.getCampaignOptions().setAutoLogisticsAmmunition(FIRST_DESIRED_STOCK);
+                int firstStockLevel = campaign.getCampaignOptions().getAutoLogisticsAmmunition();
+
+                // Let's change the stock level to something else so we can make sure it properly changes
+                campaign.getCampaignOptions().setAutoLogisticsAmmunition(SECOND_DESIRED_STOCK);
+                int secondStockLevel = campaign.getCampaignOptions().getAutoLogisticsAmmunition();
+
+                // Assert
+                assertEquals(FIRST_DESIRED_STOCK, firstStockLevel);
+                assertEquals(SECOND_DESIRED_STOCK, secondStockLevel);
+            }
+
+            @Test
+            public void testGetSetStockPercentArmor() {
+                // Act
+                campaign.getCampaignOptions().setAutoLogisticsArmor(FIRST_DESIRED_STOCK);
+                int firstStockLevel = campaign.getCampaignOptions().getAutoLogisticsArmor();
+
+                // Let's change the stock level to something else so we can make sure it properly changes
+                campaign.getCampaignOptions().setAutoLogisticsArmor(SECOND_DESIRED_STOCK);
+                int secondStockLevel = campaign.getCampaignOptions().getAutoLogisticsArmor();
+
+                // Assert
+                assertEquals(FIRST_DESIRED_STOCK, firstStockLevel);
+                assertEquals(SECOND_DESIRED_STOCK, secondStockLevel);
+            }
+
+            @Test
+            public void testGetSetStockPercentActuators() {
+                // Act
+                campaign.getCampaignOptions().setAutoLogisticsActuators(FIRST_DESIRED_STOCK);
+                int firstStockLevel = campaign.getCampaignOptions().getAutoLogisticsActuators();
+
+                // Let's change the stock level to something else so we can make sure it properly changes
+                campaign.getCampaignOptions().setAutoLogisticsActuators(SECOND_DESIRED_STOCK);
+                int secondStockLevel = campaign.getCampaignOptions().getAutoLogisticsActuators();
+
+                // Assert
+                assertEquals(FIRST_DESIRED_STOCK, firstStockLevel);
+                assertEquals(SECOND_DESIRED_STOCK, secondStockLevel);
+            }
+
+            @Test
+            public void testGetSetStockPercentJumpJet() {
+                // Act
+                campaign.getCampaignOptions().setAutoLogisticsJumpJets(FIRST_DESIRED_STOCK);
+                int firstStockLevel = campaign.getCampaignOptions().getAutoLogisticsJumpJets();
+
+                // Let's change the stock level to something else so we can make sure it properly changes
+                campaign.getCampaignOptions().setAutoLogisticsJumpJets(SECOND_DESIRED_STOCK);
+                int secondStockLevel = campaign.getCampaignOptions().getAutoLogisticsJumpJets();
+
+                // Assert
+                assertEquals(FIRST_DESIRED_STOCK, firstStockLevel);
+                assertEquals(SECOND_DESIRED_STOCK, secondStockLevel);
+            }
+
+            @Test
+            public void testGetSetStockPercentEngines() {
+                // Act
+                campaign.getCampaignOptions().setAutoLogisticsEngines(FIRST_DESIRED_STOCK);
+                int firstStockLevel = campaign.getCampaignOptions().getAutoLogisticsEngines();
+
+                // Let's change the stock level to something else so we can make sure it properly changes
+                campaign.getCampaignOptions().setAutoLogisticsEngines(SECOND_DESIRED_STOCK);
+                int secondStockLevel = campaign.getCampaignOptions().getAutoLogisticsEngines();
+
+                // Assert
+                assertEquals(FIRST_DESIRED_STOCK, firstStockLevel);
+                assertEquals(SECOND_DESIRED_STOCK, secondStockLevel);
+            }
+
+            @Test
+            public void testGetSetStockPercentOther() {
+                // Act
+                campaign.getCampaignOptions().setAutoLogisticsOther(FIRST_DESIRED_STOCK);
+                int firstStockLevel = campaign.getCampaignOptions().getAutoLogisticsOther();
+
+                // Let's change the stock level to something else so we can make sure it properly changes
+                campaign.getCampaignOptions().setAutoLogisticsOther(SECOND_DESIRED_STOCK);
+                int secondStockLevel = campaign.getCampaignOptions().getAutoLogisticsOther();
+
+                // Assert
+                assertEquals(FIRST_DESIRED_STOCK, firstStockLevel);
+                assertEquals(SECOND_DESIRED_STOCK, secondStockLevel);
+            }
+        }
+
+        /**
+         * {@link Campaign#getDefaultStockPercent} is private, so we'll need to use reflection to get the method for
+         * testing
+         */
+        @Nested
+        public class TestAutoLogisticsDefaultStockPercent {
+            final int DESIRED_STOCK_LEVEL = 100;
+            final int INCORRECT_STOCK_LEVEL = 15;
+            static Set<Part> parts;
+
+            static CampaignOptions mockCampaignOptions;
+            static Method method;
+
+            int initialStockPercent;
+            int desiredStockPercent;
+            List<Integer> initialAllPercents;
+            List<Integer> afterChangeAllPercents;
+            Part part;
+
+            @BeforeAll
+            static public void beforeAll() {
+                mockCampaignOptions = mock(CampaignOptions.class);
+                campaign.setCampaignOptions(mockCampaignOptions);
+
+                parts = new HashSet<>(Arrays.asList(new HeatSink(),
+                      new MekLocation(Mek.LOC_HEAD, 1, 0, false, false, false, false, false, campaign)));
+
+                try {
+                    method = campaign.getClass().getDeclaredMethod("getDefaultStockPercent", Part.class);
+                    method.setAccessible(true);
+                } catch (NoSuchMethodException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            /**
+             * @return parts that are not explicitly handled by {@link Campaign#getDefaultStockPercent(Part)}
+             */
+            public static Stream<Part> otherUnhandledDefaultStockPercentParts() {
+                return Stream.of(new MekGyro(), new Cubicle(), new MekSensor(), new MekLifeSupport());
+            }
+
+            @BeforeEach
+            void beforeEach() {
+                when(mockCampaignOptions.getAutoLogisticsHeatSink()).thenReturn(INCORRECT_STOCK_LEVEL);
+                when(mockCampaignOptions.getAutoLogisticsMekHead()).thenReturn(INCORRECT_STOCK_LEVEL);
+                when(mockCampaignOptions.getAutoLogisticsNonRepairableLocation()).thenReturn(INCORRECT_STOCK_LEVEL);
+                when(mockCampaignOptions.getAutoLogisticsMekLocation()).thenReturn(INCORRECT_STOCK_LEVEL);
+                when(mockCampaignOptions.getAutoLogisticsAmmunition()).thenReturn(INCORRECT_STOCK_LEVEL);
+                when(mockCampaignOptions.getAutoLogisticsArmor()).thenReturn(INCORRECT_STOCK_LEVEL);
+                when(mockCampaignOptions.getAutoLogisticsActuators()).thenReturn(INCORRECT_STOCK_LEVEL);
+                when(mockCampaignOptions.getAutoLogisticsJumpJets()).thenReturn(INCORRECT_STOCK_LEVEL);
+                when(mockCampaignOptions.getAutoLogisticsEngines()).thenReturn(INCORRECT_STOCK_LEVEL);
+                when(mockCampaignOptions.getAutoLogisticsOther()).thenReturn(INCORRECT_STOCK_LEVEL);
+            }
+
+            @Test
+            public void testGetDefaultStockPercentHeatSink() {
+                // Arrange
+                part = new HeatSink();
+
+                // Act
+                try {
+                    initialStockPercent = (int) method.invoke(campaign, part);
+                    initialAllPercents = getAllDefaultStockPercents();
+
+                    // Let's change it and make sure that it uses the new value
+                    when(mockCampaignOptions.getAutoLogisticsHeatSink()).thenReturn(DESIRED_STOCK_LEVEL);
+
+                    desiredStockPercent = (int) method.invoke(campaign, part);
+                    afterChangeAllPercents = getAllDefaultStockPercents();
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    throw new RuntimeException(e);
+                }
+
+                // Assert
+                assertEquals(INCORRECT_STOCK_LEVEL, initialStockPercent);
+                assertEquals(DESIRED_STOCK_LEVEL, desiredStockPercent);
+
+                // None of the initial defaults should contain the desired stock percent
+                assertFalse(initialAllPercents.contains(desiredStockPercent));
+
+                // Only one of these should be the desired stock percent
+                assertEquals(1, afterChangeAllPercents.stream().filter(i -> i == DESIRED_STOCK_LEVEL).toArray().length);
+            }
+
+            @Test
+            public void testGetDefaultStockPercentHead() {
+                // Arrange
+                part = new MekLocation(Mek.LOC_HEAD, 1, 0, false, false, false, false, false, campaign);
+
+                // Act
+                try {
+                    initialStockPercent = (int) method.invoke(campaign, part);
+                    initialAllPercents = getAllDefaultStockPercents();
+
+                    // Let's change it and make sure that it uses the new value
+                    when(mockCampaignOptions.getAutoLogisticsMekHead()).thenReturn(DESIRED_STOCK_LEVEL);
+
+                    desiredStockPercent = (int) method.invoke(campaign, part);
+                    afterChangeAllPercents = getAllDefaultStockPercents();
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    throw new RuntimeException(e);
+                }
+
+                // Assert
+                assertEquals(INCORRECT_STOCK_LEVEL, initialStockPercent);
+                assertEquals(DESIRED_STOCK_LEVEL, desiredStockPercent);
+
+                // None of the initial defaults should contain the desired stock percent
+                assertFalse(initialAllPercents.contains(desiredStockPercent));
+
+                // Only one of these should be the desired stock percent
+                assertEquals(1, afterChangeAllPercents.stream().filter(i -> i == DESIRED_STOCK_LEVEL).toArray().length);
+            }
+
+            @Test
+            public void testGetDefaultStockPercentCT() {
+                // Arrange
+                part = new MekLocation(Mek.LOC_CT, 1, 0, false, false, false, false, false, campaign);
+
+                // Act
+                try {
+                    initialStockPercent = (int) method.invoke(campaign, part);
+                    initialAllPercents = getAllDefaultStockPercents();
+
+                    // Let's change it and make sure that it uses the new value
+                    when(mockCampaignOptions.getAutoLogisticsNonRepairableLocation()).thenReturn(DESIRED_STOCK_LEVEL);
+
+                    desiredStockPercent = (int) method.invoke(campaign, part);
+                    afterChangeAllPercents = getAllDefaultStockPercents();
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    throw new RuntimeException(e);
+                }
+
+                // Assert
+                assertEquals(INCORRECT_STOCK_LEVEL, initialStockPercent);
+                assertEquals(DESIRED_STOCK_LEVEL, desiredStockPercent);
+
+                // None of the initial defaults should contain the desired stock percent
+                assertFalse(initialAllPercents.contains(desiredStockPercent));
+
+                // Only one of these should be the desired stock percent
+                assertEquals(1, afterChangeAllPercents.stream().filter(i -> i == DESIRED_STOCK_LEVEL).toArray().length);
+            }
+
+            @ParameterizedTest
+            @ValueSource(ints = { Mek.LOC_LARM, Mek.LOC_RARM, Mek.LOC_LT, Mek.LOC_RT })
+            public void testGetDefaultStockPercentOtherLocation(int location) {
+                // Arrange
+                part = new MekLocation(location, 1, 0, false, false, false, false, false, campaign);
+
+                // Act
+                try {
+                    initialStockPercent = (int) method.invoke(campaign, part);
+                    initialAllPercents = getAllDefaultStockPercents();
+
+                    // Let's change it and make sure that it uses the new value
+                    when(mockCampaignOptions.getAutoLogisticsMekLocation()).thenReturn(DESIRED_STOCK_LEVEL);
+
+                    desiredStockPercent = (int) method.invoke(campaign, part);
+                    afterChangeAllPercents = getAllDefaultStockPercents();
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    throw new RuntimeException(e);
+                }
+
+                // Assert
+                assertEquals(INCORRECT_STOCK_LEVEL, initialStockPercent);
+                assertEquals(DESIRED_STOCK_LEVEL, desiredStockPercent);
+
+                // None of the initial defaults should contain the desired stock percent
+                assertFalse(initialAllPercents.contains(desiredStockPercent));
+
+                // Only one of these should be the desired stock percent
+                assertEquals(1, afterChangeAllPercents.stream().filter(i -> i == DESIRED_STOCK_LEVEL).toArray().length);
+            }
+
+            @Test
+            public void testGetDefaultStockPercentTankLocation() {
+                // Arrange
+                part = new TankLocation();
+
+                // Act
+                try {
+                    initialStockPercent = (int) method.invoke(campaign, part);
+                    initialAllPercents = getAllDefaultStockPercents();
+
+                    // Let's change it and make sure that it uses the new value
+                    when(mockCampaignOptions.getAutoLogisticsNonRepairableLocation()).thenReturn(DESIRED_STOCK_LEVEL);
+
+                    desiredStockPercent = (int) method.invoke(campaign, part);
+                    afterChangeAllPercents = getAllDefaultStockPercents();
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    throw new RuntimeException(e);
+                }
+
+                // Assert
+                assertEquals(INCORRECT_STOCK_LEVEL, initialStockPercent);
+                assertEquals(DESIRED_STOCK_LEVEL, desiredStockPercent);
+
+                // None of the initial defaults should contain the desired stock percent
+                assertFalse(initialAllPercents.contains(desiredStockPercent));
+
+                // Only one of these should be the desired stock percent
+                assertEquals(1, afterChangeAllPercents.stream().filter(i -> i == DESIRED_STOCK_LEVEL).toArray().length);
+            }
+
+            @Test
+            public void testGetDefaultStockPercentAmmoBin() {
+                // Arrange
+                part = new AmmoBin();
+
+                // Act
+                try {
+                    initialStockPercent = (int) method.invoke(campaign, part);
+                    initialAllPercents = getAllDefaultStockPercents();
+
+                    // Let's change it and make sure that it uses the new value
+                    when(mockCampaignOptions.getAutoLogisticsAmmunition()).thenReturn(DESIRED_STOCK_LEVEL);
+
+                    desiredStockPercent = (int) method.invoke(campaign, part);
+                    afterChangeAllPercents = getAllDefaultStockPercents();
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    throw new RuntimeException(e);
+                }
+
+                // Assert
+                assertEquals(INCORRECT_STOCK_LEVEL, initialStockPercent);
+                assertEquals(DESIRED_STOCK_LEVEL, desiredStockPercent);
+
+                // None of the initial defaults should contain the desired stock percent
+                assertFalse(initialAllPercents.contains(desiredStockPercent));
+
+                // Only one of these should be the desired stock percent
+                assertEquals(1, afterChangeAllPercents.stream().filter(i -> i == DESIRED_STOCK_LEVEL).toArray().length);
+            }
+
+            @Test
+            public void testGetDefaultStockPercentAmmoStorage() {
+                // Arrange
+                part = new AmmoStorage();
+
+                // Act
+                try {
+                    initialStockPercent = (int) method.invoke(campaign, part);
+                    initialAllPercents = getAllDefaultStockPercents();
+
+                    // Let's change it and make sure that it uses the new value
+                    when(mockCampaignOptions.getAutoLogisticsAmmunition()).thenReturn(DESIRED_STOCK_LEVEL);
+
+                    desiredStockPercent = (int) method.invoke(campaign, part);
+                    afterChangeAllPercents = getAllDefaultStockPercents();
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    throw new RuntimeException(e);
+                }
+
+                // Assert
+                assertEquals(INCORRECT_STOCK_LEVEL, initialStockPercent);
+                assertEquals(DESIRED_STOCK_LEVEL, desiredStockPercent);
+
+                // None of the initial defaults should contain the desired stock percent
+                assertFalse(initialAllPercents.contains(desiredStockPercent));
+
+                // Only one of these should be the desired stock percent
+                assertEquals(1, afterChangeAllPercents.stream().filter(i -> i == DESIRED_STOCK_LEVEL).toArray().length);
+            }
+
+            @Test
+            public void testGetDefaultStockPercentArmor() {
+                // Arrange
+                part = new Armor();
+
+                // Act
+                try {
+                    initialStockPercent = (int) method.invoke(campaign, part);
+                    initialAllPercents = getAllDefaultStockPercents();
+
+                    // Let's change it and make sure that it uses the new value
+                    when(mockCampaignOptions.getAutoLogisticsArmor()).thenReturn(DESIRED_STOCK_LEVEL);
+
+                    desiredStockPercent = (int) method.invoke(campaign, part);
+                    afterChangeAllPercents = getAllDefaultStockPercents();
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    throw new RuntimeException(e);
+                }
+
+                // Assert
+                assertEquals(INCORRECT_STOCK_LEVEL, initialStockPercent);
+                assertEquals(DESIRED_STOCK_LEVEL, desiredStockPercent);
+
+                // None of the initial defaults should contain the desired stock percent
+                assertFalse(initialAllPercents.contains(desiredStockPercent));
+
+                // Only one of these should be the desired stock percent
+                assertEquals(1, afterChangeAllPercents.stream().filter(i -> i == DESIRED_STOCK_LEVEL).toArray().length);
+            }
+
+            @Test
+            public void testGetDefaultStockPercentActuator() {
+                // Arrange
+                part = new MekActuator();
+
+                // Act
+                try {
+                    initialStockPercent = (int) method.invoke(campaign, part);
+                    initialAllPercents = getAllDefaultStockPercents();
+
+                    // Let's change it and make sure that it uses the new value
+                    when(mockCampaignOptions.getAutoLogisticsActuators()).thenReturn(DESIRED_STOCK_LEVEL);
+
+                    desiredStockPercent = (int) method.invoke(campaign, part);
+                    afterChangeAllPercents = getAllDefaultStockPercents();
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    throw new RuntimeException(e);
+                }
+
+                // Assert
+                assertEquals(INCORRECT_STOCK_LEVEL, initialStockPercent);
+                assertEquals(DESIRED_STOCK_LEVEL, desiredStockPercent);
+
+                // None of the initial defaults should contain the desired stock percent
+                assertFalse(initialAllPercents.contains(desiredStockPercent));
+
+                // Only one of these should be the desired stock percent
+                assertEquals(1, afterChangeAllPercents.stream().filter(i -> i == DESIRED_STOCK_LEVEL).toArray().length);
+            }
+
+            @Test
+            public void testGetDefaultStockPercentJumpJets() {
+                // Arrange
+                part = new JumpJet();
+
+                // Act
+                try {
+                    initialStockPercent = (int) method.invoke(campaign, part);
+                    initialAllPercents = getAllDefaultStockPercents();
+
+                    // Let's change it and make sure that it uses the new value
+                    when(mockCampaignOptions.getAutoLogisticsJumpJets()).thenReturn(DESIRED_STOCK_LEVEL);
+
+                    desiredStockPercent = (int) method.invoke(campaign, part);
+                    afterChangeAllPercents = getAllDefaultStockPercents();
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    throw new RuntimeException(e);
+                }
+
+                // Assert
+                assertEquals(INCORRECT_STOCK_LEVEL, initialStockPercent);
+                assertEquals(DESIRED_STOCK_LEVEL, desiredStockPercent);
+
+                // None of the initial defaults should contain the desired stock percent
+                assertFalse(initialAllPercents.contains(desiredStockPercent));
+
+                // Only one of these should be the desired stock percent
+                assertEquals(1, afterChangeAllPercents.stream().filter(i -> i == DESIRED_STOCK_LEVEL).toArray().length);
+            }
+
+            @Test
+            public void testGetDefaultStockPercentEngines() {
+                // Arrange
+                part = new EnginePart();
+
+                // Act
+                try {
+                    initialStockPercent = (int) method.invoke(campaign, part);
+                    initialAllPercents = getAllDefaultStockPercents();
+
+                    // Let's change it and make sure that it uses the new value
+                    when(mockCampaignOptions.getAutoLogisticsEngines()).thenReturn(DESIRED_STOCK_LEVEL);
+
+                    desiredStockPercent = (int) method.invoke(campaign, part);
+                    afterChangeAllPercents = getAllDefaultStockPercents();
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    throw new RuntimeException(e);
+                }
+
+                // Assert
+                assertEquals(INCORRECT_STOCK_LEVEL, initialStockPercent);
+                assertEquals(DESIRED_STOCK_LEVEL, desiredStockPercent);
+
+                // None of the initial defaults should contain the desired stock percent
+                assertFalse(initialAllPercents.contains(desiredStockPercent));
+
+                // Only one of these should be the desired stock percent
+                assertEquals(1, afterChangeAllPercents.stream().filter(i -> i == DESIRED_STOCK_LEVEL).toArray().length);
+            }
+
+            @ParameterizedTest
+            @MethodSource(value = "otherUnhandledDefaultStockPercentParts")
+            public void testGetDefaultStockPercentOtherUnhandled(Part otherPart) {
+                // Arrange
+                part = otherPart;
+
+                // Act
+                try {
+                    initialStockPercent = (int) method.invoke(campaign, part);
+                    initialAllPercents = getAllDefaultStockPercents();
+
+                    // Let's change it and make sure that it uses the new value
+                    when(mockCampaignOptions.getAutoLogisticsOther()).thenReturn(DESIRED_STOCK_LEVEL);
+
+                    desiredStockPercent = (int) method.invoke(campaign, part);
+                    afterChangeAllPercents = getAllDefaultStockPercents();
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    throw new RuntimeException(e);
+                }
+
+                // Assert
+                assertEquals(INCORRECT_STOCK_LEVEL, initialStockPercent);
+                assertEquals(DESIRED_STOCK_LEVEL, desiredStockPercent);
+
+                // None of the initial defaults should contain the desired stock percent
+                assertFalse(initialAllPercents.contains(desiredStockPercent));
+
+                // Only one of these should be the desired stock percent
+                assertEquals(1, afterChangeAllPercents.stream().filter(i -> i == DESIRED_STOCK_LEVEL).toArray().length);
+            }
+
+            private List<Integer> getAllDefaultStockPercents() {
+                List<Integer> stockPercents = new ArrayList<>();
+
+                try {
+                    stockPercents.add((int) method.invoke(campaign, part));
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    throw new RuntimeException(e);
+                }
+
+                return stockPercents;
+            }
+        }
     }
 }
