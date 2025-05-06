@@ -128,7 +128,7 @@ public class SkillType {
     public static final String S_ASTECH = "Astech";
     public static final String S_SURGERY = "Surgery/Any";
     public static final String S_MEDTECH = "MedTech/Any";
-    public static final String S_NAVIGATION = "Navigation";
+    public static final String S_NAVIGATION = "Navigation/Any";
     public static final String S_ADMIN = "Administration";
     public static final String S_NEGOTIATION = "Negotiation";
     public static final String S_LEADER = "Leadership";
