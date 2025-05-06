@@ -2790,7 +2790,7 @@ public class Campaign implements ITechManager {
             return campaignOptions.getAutoLogisticsMekLocation();
         } else if (part instanceof TankLocation) {
             return campaignOptions.getAutoLogisticsNonRepairableLocation();
-        } else if (part instanceof AmmoBin) {
+        } else if (part instanceof AmmoBin || part instanceof AmmoStorage) {
             return campaignOptions.getAutoLogisticsAmmunition();
         } else if (part instanceof Armor) {
             return campaignOptions.getAutoLogisticsArmor();
