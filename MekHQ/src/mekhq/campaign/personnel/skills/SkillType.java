@@ -121,11 +121,11 @@ public class SkillType {
     public static final String S_TECH_BA = "Tech/BattleArmor";
     public static final String S_TECH_VESSEL = "Tech/Vessel";
     public static final String S_ASTECH = "Astech";
-    public static final String S_DOCTOR = "Surgery/Any";
+    public static final String S_SURGERY = "Surgery/Any";
     public static final String S_MEDTECH = "MedTech/Any";
-    public static final String S_NAV = "Hyperspace Navigation";
+    public static final String S_NAVIGATION = "Navigation";
     public static final String S_ADMIN = "Administration";
-    public static final String S_NEG = "Negotiation";
+    public static final String S_NEGOTIATION = "Negotiation";
     public static final String S_LEADER = "Leadership";
     public static final String S_SCROUNGE = "Scrounge";
     public static final String S_STRATEGY = "Strategy";
@@ -179,8 +179,9 @@ public class SkillType {
                                                S_PILOT_VTOL, S_PILOT_NVEE, S_GUN_VEE, S_PILOT_JET, S_GUN_JET,
                                                S_PILOT_SPACE, S_GUN_SPACE, S_ARTILLERY, S_GUN_BA, S_GUN_PROTO,
                                                S_SMALL_ARMS, S_ANTI_MEK, S_TECH_MEK, S_TECH_MECHANIC, S_TECH_AERO,
-                                               S_TECH_BA, S_TECH_VESSEL, S_ASTECH, S_DOCTOR, S_MEDTECH, S_NAV, S_ADMIN,
-                                               S_TACTICS, S_STRATEGY, S_NEG, S_LEADER, S_SCROUNGE, S_ACROBATICS,
+                                               S_TECH_BA, S_TECH_VESSEL, S_ASTECH, S_SURGERY, S_MEDTECH, S_NAVIGATION,
+                                               S_ADMIN, S_TACTICS, S_STRATEGY, S_NEGOTIATION, S_LEADER, S_SCROUNGE,
+                                               S_ACROBATICS,
                                                S_ACTING, S_ANIMAL_HANDLING, S_APPRAISAL, S_ARCHERY, S_ART_DANCING,
                                                S_ART_DRAWING, S_ART_PAINTING, S_ART_WRITING, S_CLIMBING,
                                                S_COMMUNICATIONS, S_COMPUTERS, S_CRYPTOGRAPHY, S_DEMOLITIONS, S_DISGUISE,
@@ -744,14 +745,14 @@ public class SkillType {
         lookupHash.put(S_TECH_BA, createTechBA());
         lookupHash.put(S_TECH_VESSEL, createTechVessel());
         lookupHash.put(S_ASTECH, createAstech());
-        lookupHash.put(S_DOCTOR, createDoctor());
+        lookupHash.put(S_SURGERY, createSurgery());
         lookupHash.put(S_MEDTECH, createMedTech());
-        lookupHash.put(S_NAV, createNav());
+        lookupHash.put(S_NAVIGATION, createNavigation());
         lookupHash.put(S_TACTICS, createTactics());
         lookupHash.put(S_STRATEGY, createStrategy());
         lookupHash.put(S_ADMIN, createAdmin());
         lookupHash.put(S_LEADER, createLeadership());
-        lookupHash.put(S_NEG, createNegotiation());
+        lookupHash.put(S_NEGOTIATION, createNegotiation());
         lookupHash.put(S_SCROUNGE, createScrounge());
         lookupHash.put(S_ACROBATICS, createAcrobatics());
         lookupHash.put(S_ACTING, createActing());
@@ -776,7 +777,7 @@ public class SkillType {
         lookupHash.put(S_INTEREST_SPORTS, createInterestSports());
         lookupHash.put(S_INTERROGATION, createInterrogation());
         lookupHash.put(S_INVESTIGATION, createInvestigation());
-        lookupHash.put(S_LANGUAGES, createLanguages());
+        lookupHash.put(S_LANGUAGES, createLanguage());
         lookupHash.put(S_MARTIAL_ARTS, createMartialArts());
         lookupHash.put(S_PERCEPTION, createPerception());
         lookupHash.put(S_SLEIGHT_OF_HAND, createSleightOfHand());
@@ -803,6 +804,20 @@ public class SkillType {
         lookupHash.put("Medtech", createMedTech());
         lookupHash.put("Gunnery/Battlesuit", createGunneryBA());
         lookupHash.put("Tech/BA", createTechBA());
+
+        // Remove below after Milestone Release post 0.49.19
+        lookupHash.put("Anti-Mek", createAntiMek());
+        lookupHash.put("MedTech", createMedTech());
+        lookupHash.put("Communications", createCommunications());
+        lookupHash.put("Sleight of Hand (RP Only)", createSleightOfHand());
+        lookupHash.put("Protocols (RP Only)", createProtocols());
+        lookupHash.put("Survival (RP Only)", createSurvival());
+        lookupHash.put("Languages (RP Only)", createLanguage());
+        lookupHash.put("Hyperspace Navigation", createNavigation());
+        lookupHash.put("Streetwise (RP Only)", createStreetwise());
+        lookupHash.put("Doctor", createSurgery());
+        lookupHash.put("Tactics", createTactics());
+        lookupHash.put("Tracking (RP Only)", createTracking());
     }
 
     public static @Nullable SkillType getType(String skillName) {
@@ -948,34 +963,34 @@ public class SkillType {
                     // skillType.name = wn2.getTextContent();
 
                     // The above code can be uncommented once these handlers have been removed
-                    String name = wn2.getTextContent();
+                    String name = wn2.getTextContent().trim().toLowerCase();
                     //Start <50.01 compatibility handler.
                     skillType.name = switch (name) {
                         case "piloting/mech" -> "Piloting/Mek";
-                        case "gunnery/mech" -> "Gunnery/Mek";
-                        case "gunnery/battlesuit" -> "Gunnery/BattleArmor";
-                        case "gunnery/protomech" -> "Gunnery/ProtoMek";
-                        case "anti-mech" -> "Anti-Mek";
-                        case "tech/mech" -> "Tech/Mek";
-                        case "tech/ba" -> "Tech/BattleArmor";
-                        case "medtech" -> "MedTech";
-                        default -> name;
+                        case "gunnery/mech" -> S_GUN_MEK;
+                        case "gunnery/battlesuit" -> S_GUN_BA;
+                        case "gunnery/protomech" -> S_GUN_PROTO;
+                        case "anti-mech" -> S_ANTI_MEK;
+                        case "tech/mech" -> S_TECH_MEK;
+                        case "tech/ba" -> S_TECH_BA;
+                        case "medtech" -> S_MEDTECH;
+                        default -> wn2.getTextContent().trim();
                     };
                     //Start <50.07 compatibility handler.
                     skillType.name = switch (name) {
-                        case "anti-mech" -> "Anti-Mek (Climbing)";
-                        case "medtech" -> "MedTech/Any";
-                        case "communications" -> "Communications/Any";
-                        case "sleight of hand" -> "Sleight of Hand/Any";
-                        case "protocols" -> "Protocols/Any";
-                        case "survival" -> "Survival/Any";
-                        case "languages" -> "Language/Any";
-                        case "hyperspace navigation" -> "Navigation/Any";
-                        case "streetwise" -> "Streetwise/Any";
-                        case "doctor" -> "Surgery/Any";
-                        case "tactics" -> "Tactics/Any";
-                        case "tracking" -> "Tracking/Any";
-                        default -> name;
+                        case "anti-mech" -> S_ANTI_MEK;
+                        case "medtech" -> S_MEDTECH;
+                        case "communications (rp only)" -> S_COMMUNICATIONS;
+                        case "sleight of hand (rp only)" -> S_SLEIGHT_OF_HAND;
+                        case "protocols (rp only)" -> S_PROTOCOLS;
+                        case "survival" -> S_SURVIVAL;
+                        case "languages (rp only)" -> S_LANGUAGES;
+                        case "hyperspace navigation" -> S_NAVIGATION;
+                        case "streetwise (rp only)" -> S_STREETWISE;
+                        case "doctor" -> S_SURGERY;
+                        case "tactics" -> S_TACTICS;
+                        case "tracking (rp only)" -> S_TRACKING;
+                        default -> wn2.getTextContent().trim();
                     };
                     //End <50.01 compatibility handler
                 } else if (wn2.getNodeName().equalsIgnoreCase("target")) {
@@ -1011,7 +1026,7 @@ public class SkillType {
             }
 
             // Skill settings from prior to this are incompatible and cannot be used, so we use the default values instead.
-            boolean preDatesSkillChanges = version.isLowerThan(new Version("0.50.07"));
+            boolean preDatesSkillChanges = version.isLowerThan(new Version("0.50.08"));
             if (preDatesSkillChanges) {
                 compatibilityHandler(skillType);
             }
@@ -1116,22 +1131,22 @@ public class SkillType {
             case S_GUN_BA, "Gunnery/Battlesuit" -> createGunneryBA();
             case S_GUN_PROTO, "Gunnery/ProtoMech" -> createGunneryProto();
             case S_SMALL_ARMS -> createSmallArms();
-            case S_ANTI_MEK, "Anti-Mech" -> createAntiMek();
+            case S_ANTI_MEK, "Anti-Mech", "Anti-Mek" -> createAntiMek();
             case S_TECH_MEK, "Tech/Mech" -> createTechMek();
             case S_TECH_MECHANIC -> createTechMechanic();
             case S_TECH_AERO -> createTechAero();
             case S_TECH_BA, "Tech/BA" -> createTechBA();
             case S_TECH_VESSEL -> createTechVessel();
             case S_ASTECH -> createAstech();
-            case S_DOCTOR -> createDoctor();
-            case S_MEDTECH, "Medtech" -> createMedTech();
-            case S_NAV -> createNav();
+            case S_SURGERY, "Doctor" -> createSurgery();
+            case S_MEDTECH, "Medtech", "MedTech" -> createMedTech();
+            case S_NAVIGATION, "Hyperspace Navigation" -> createNavigation();
             case S_ADMIN -> createAdmin();
-            case S_NEG -> createNegotiation();
+            case S_NEGOTIATION -> createNegotiation();
             case S_LEADER -> createLeadership();
             case S_SCROUNGE -> createScrounge();
             case S_STRATEGY -> createStrategy();
-            case S_TACTICS -> createTactics();
+            case S_TACTICS, "Tactics" -> createTactics();
             case S_ACROBATICS -> createAcrobatics();
             case S_ACTING -> createActing();
             case S_ANIMAL_HANDLING -> createAnimalHandling();
@@ -1142,7 +1157,7 @@ public class SkillType {
             case S_ART_PAINTING -> createArtPainting();
             case S_ART_WRITING -> createArtWriting();
             case S_CLIMBING -> createClimbing();
-            case S_COMMUNICATIONS -> createCommunications();
+            case S_COMMUNICATIONS, "Communications (RP Only)" -> createCommunications();
             case S_COMPUTERS -> createComputers();
             case S_CRYPTOGRAPHY -> createCryptography();
             case S_DEMOLITIONS -> createDemolitions();
@@ -1155,11 +1170,11 @@ public class SkillType {
             case S_INTEREST_SPORTS -> createInterestSports();
             case S_INTERROGATION -> createInterrogation();
             case S_INVESTIGATION -> createInvestigation();
-            case S_LANGUAGES -> createLanguages();
+            case S_LANGUAGES, "Languages (RP Only)" -> createLanguage();
             case S_MARTIAL_ARTS -> createMartialArts();
             case S_PERCEPTION -> createPerception();
-            case S_SLEIGHT_OF_HAND -> createSleightOfHand();
-            case S_PROTOCOLS -> createProtocols();
+            case S_SLEIGHT_OF_HAND, "Sleight of Hand (RP Only)" -> createSleightOfHand();
+            case S_PROTOCOLS, "Protocols (RP Only)" -> createProtocols();
             case S_SCIENCE_BIOLOGY -> createScienceBiology();
             case S_SCIENCE_CHEMISTRY -> createScienceChemistry();
             case S_SCIENCE_MATHEMATICS -> createScienceMathematics();
@@ -1168,9 +1183,9 @@ public class SkillType {
             case S_SCIENCE_SYSTEMS_MECHANICAL -> createSecuritySystemsMechanical();
             case S_SENSOR_OPERATIONS -> createSensorOperations();
             case S_STEALTH -> createStealth();
-            case S_STREETWISE -> createStreetwise();
-            case S_SURVIVAL -> createSurvival();
-            case S_TRACKING -> createTracking();
+            case S_STREETWISE, "Streetwise (RP Only)" -> createStreetwise();
+            case S_SURVIVAL, "Survival (RP Only)" -> createSurvival();
+            case S_TRACKING, "Tracking (RP Only)" -> createTracking();
             case S_TRAINING -> createTraining();
             default -> {
                 logger.errorDialog("REPORT TO MEGAMEK TEAM",
@@ -1541,9 +1556,9 @@ public class SkillType {
                               DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL });
     }
 
-    public static SkillType createDoctor() {
+    public static SkillType createSurgery() {
         // This corresponds to the ATOW skill 'Surgery'
-        return new SkillType(S_DOCTOR,
+        return new SkillType(S_SURGERY,
               11,
               false,
               SUPPORT,
@@ -1573,9 +1588,9 @@ public class SkillType {
                               DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL });
     }
 
-    public static SkillType createNav() {
+    public static SkillType createNavigation() {
         // This skill corresponds to the ATOW skill Navigation
-        return new SkillType(S_NAV,
+        return new SkillType(S_NAVIGATION,
               8,
               false,
               SUPPORT,
@@ -1646,7 +1661,7 @@ public class SkillType {
     }
 
     public static SkillType createNegotiation() {
-        return new SkillType(S_NEG,
+        return new SkillType(S_NEGOTIATION,
               10,
               false,
               SUPPORT,
@@ -1996,7 +2011,7 @@ public class SkillType {
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
-    public static SkillType createLanguages() {
+    public static SkillType createLanguage() {
         return new SkillType(S_LANGUAGES,
               8,
               false,

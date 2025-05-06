@@ -157,7 +157,7 @@ public abstract class AbstractSkillGenerator {
                 addSkill(person, SkillType.S_TECH_VESSEL, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 break;
             case VESSEL_NAVIGATOR:
-                addSkill(person, SkillType.S_NAV, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
+                addSkill(person, SkillType.S_NAVIGATION, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 break;
             case MEK_TECH:
                 addSkill(person, SkillType.S_TECH_MEK, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
@@ -175,7 +175,7 @@ public abstract class AbstractSkillGenerator {
                 addSkill(person, SkillType.S_ASTECH, 0, 0);
                 break;
             case DOCTOR:
-                addSkill(person, SkillType.S_DOCTOR, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
+                addSkill(person, SkillType.S_SURGERY, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 break;
             case MEDIC:
                 addSkill(person, SkillType.S_MEDTECH, 0, 0);

@@ -164,11 +164,11 @@ public class PersonUtility {
               Map.entry(VESSEL_GUNNER, List.of(S_GUN_SPACE)),
               Map.entry(VESSEL_CREW,
                     isTechsUseAdministration ? List.of(S_TECH_VESSEL, S_ADMIN) : List.of(S_TECH_VESSEL)),
-              Map.entry(VESSEL_NAVIGATOR, List.of(S_NAV)),
+              Map.entry(VESSEL_NAVIGATOR, List.of(S_NAVIGATION)),
               Map.entry(MEK_TECH, isTechsUseAdministration ? List.of(S_TECH_MEK, S_ADMIN) : List.of(S_TECH_MEK)),
               Map.entry(AERO_TEK, isTechsUseAdministration ? List.of(S_TECH_AERO, S_ADMIN) : List.of(S_TECH_AERO)),
               Map.entry(BA_TECH, isTechsUseAdministration ? List.of(S_TECH_BA, S_ADMIN) : List.of(S_TECH_BA)),
-              Map.entry(DOCTOR, isDoctorsUseAdministration ? List.of(S_DOCTOR, S_ADMIN) : List.of(S_DOCTOR)));
+              Map.entry(DOCTOR, isDoctorsUseAdministration ? List.of(S_SURGERY, S_ADMIN) : List.of(S_SURGERY)));
 
         // Add admin-specific logic
         if (primaryRole == ADMINISTRATOR_COMMAND ||
@@ -179,7 +179,7 @@ public class PersonUtility {
 
             adminSkills.add(S_ADMIN);
             if (isAdminsHaveNegotiation) {
-                adminSkills.add(S_NEG);
+                adminSkills.add(S_NEGOTIATION);
             }
             if (isAdminsHaveScrounge) {
                 adminSkills.add(S_SCROUNGE);

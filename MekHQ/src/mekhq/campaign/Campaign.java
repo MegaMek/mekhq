@@ -2375,8 +2375,8 @@ public class Campaign implements ITechManager {
                             break;
                         case VESSEL_NAVIGATOR:
                             bloodnameTarget += 2 *
-                                                     (person.hasSkill(SkillType.S_NAV) ?
-                                                            person.getSkill(SkillType.S_NAV)
+                                                     (person.hasSkill(SkillType.S_NAVIGATION) ?
+                                                            person.getSkill(SkillType.S_NAVIGATION)
                                                                   .getFinalSkillValue(options) :
                                                             TargetRoll.AUTOMATIC_FAIL);
                             break;

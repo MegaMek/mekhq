@@ -375,7 +375,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                         preparedStatement = connect.prepareStatement("INSERT INTO " +
                                                                            table +
                                                                            ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
-                        preparedStatement.setInt(1, skillHash.get(SkillType.S_NAV));
+                        preparedStatement.setInt(1, skillHash.get(SkillType.S_NAVIGATION));
                         preparedStatement.setInt(2, role.ordinal());
                         preparedStatement.executeUpdate();
                         equipment = 1;
@@ -424,7 +424,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                         preparedStatement = connect.prepareStatement("INSERT INTO " +
                                                                            table +
                                                                            ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
-                        preparedStatement.setInt(1, skillHash.get(SkillType.S_DOCTOR));
+                        preparedStatement.setInt(1, skillHash.get(SkillType.S_SURGERY));
                         preparedStatement.setInt(2, role.ordinal());
                         preparedStatement.executeUpdate();
                         break;

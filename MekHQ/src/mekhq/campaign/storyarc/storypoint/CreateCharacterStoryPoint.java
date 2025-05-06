@@ -175,7 +175,7 @@ public class CreateCharacterStoryPoint extends StoryPoint {
                     person.addSkill(SkillType.S_TECH_VESSEL, 0, 1);
                     person.addSkill(SkillType.S_GUN_SPACE, 0, 1);
                     person.addSkill(SkillType.S_PILOT_SPACE, 0, 1);
-                    person.addSkill(SkillType.S_NAV, 0, 1);
+                    person.addSkill(SkillType.S_NAVIGATION, 0, 1);
                     break;
                 default:
                     break;

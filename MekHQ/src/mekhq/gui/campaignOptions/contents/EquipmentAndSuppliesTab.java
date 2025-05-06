@@ -946,7 +946,7 @@ public class EquipmentAndSuppliesTab {
         acquireSkillModel.addElement(CampaignOptions.S_TECH);
         acquireSkillModel.addElement(SkillType.S_ADMIN);
         acquireSkillModel.addElement(SkillType.S_SCROUNGE);
-        acquireSkillModel.addElement(SkillType.S_NEG);
+        acquireSkillModel.addElement(SkillType.S_NEGOTIATION);
         acquireSkillModel.addElement(CampaignOptions.S_AUTO);
 
         return acquireSkillModel;

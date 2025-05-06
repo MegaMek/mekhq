@@ -108,11 +108,14 @@ public class ContractSummaryPanel extends JPanel {
                 tranRerolls = 1;
             } else {
                 commandNegotiator = campaign.getSeniorAdminPerson(COMMAND);
-                cmdRerolls = (commandNegotiator == null || commandNegotiator.getSkill(SkillType.S_NEG) == null) ? 0 : 1;
+                cmdRerolls = (commandNegotiator == null ||
+                                    commandNegotiator.getSkill(SkillType.S_NEGOTIATION) == null) ? 0 : 1;
                 logisticsNegotiator = campaign.getSeniorAdminPerson(LOGISTICS);
-                logRerolls = (logisticsNegotiator == null || logisticsNegotiator.getSkill(SkillType.S_NEG) == null) ? 0 : 1;
+                logRerolls = (logisticsNegotiator == null ||
+                                    logisticsNegotiator.getSkill(SkillType.S_NEGOTIATION) == null) ? 0 : 1;
                 transportNegotiator = campaign.getSeniorAdminPerson(TRANSPORT);
-                tranRerolls = (transportNegotiator == null || transportNegotiator.getSkill(SkillType.S_NEG) == null) ? 0 : 1;
+                tranRerolls = (transportNegotiator == null ||
+                                     transportNegotiator.getSkill(SkillType.S_NEGOTIATION) == null) ? 0 : 1;
             }
         }
 

@@ -265,7 +265,7 @@ public final class InjuryUtil {
     public static List<GameEffect> genMedicalTreatment(Campaign c, Person p, Person doc) {
         Objects.requireNonNull(c);
         Objects.requireNonNull(p);
-        Skill skill = doc.getSkill(SkillType.S_DOCTOR);
+        Skill skill = doc.getSkill(SkillType.S_SURGERY);
         int level = skill.getLevel();
         final int fumbleLimit = FUMBLE_LIMITS[(level >= 0) && (level <= 10) ? level : 0];
         final int critLimit = CRIT_LIMITS[(level >= 0) && (level <= 10) ? level : 0];

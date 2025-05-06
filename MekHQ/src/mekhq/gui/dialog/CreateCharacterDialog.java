@@ -1492,7 +1492,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
                         decreasePhenotypeBonus(SkillType.S_TECH_VESSEL);
                         decreasePhenotypeBonus(SkillType.S_GUN_SPACE);
                         decreasePhenotypeBonus(SkillType.S_PILOT_SPACE);
-                        decreasePhenotypeBonus(SkillType.S_NAV);
+                        decreasePhenotypeBonus(SkillType.S_NAVIGATION);
                         break;
                     default:
                         break;
@@ -1526,7 +1526,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
                         increasePhenotypeBonus(SkillType.S_TECH_VESSEL);
                         increasePhenotypeBonus(SkillType.S_GUN_SPACE);
                         increasePhenotypeBonus(SkillType.S_PILOT_SPACE);
-                        increasePhenotypeBonus(SkillType.S_NAV);
+                        increasePhenotypeBonus(SkillType.S_NAVIGATION);
                         break;
                     default:
                         break;

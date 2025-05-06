@@ -69,7 +69,7 @@ public class CommandRating {
         commandRating.put("leadership", getSkillValue(commander, SkillType.S_LEADER));
         commandRating.put("tactics", getSkillValue(commander, SkillType.S_TACTICS));
         commandRating.put("strategy", getSkillValue(commander, SkillType.S_STRATEGY));
-        commandRating.put("negotiation", getSkillValue(commander, SkillType.S_NEG));
+        commandRating.put("negotiation", getSkillValue(commander, SkillType.S_NEGOTIATION));
 
         commandRating.put("traits",
               getATOWTraitValues(commander,

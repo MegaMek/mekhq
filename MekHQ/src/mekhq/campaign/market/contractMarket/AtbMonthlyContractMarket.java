@@ -38,7 +38,7 @@ import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 import static mekhq.campaign.mission.AtBContract.getEffectiveNumUnits;
-import static mekhq.campaign.personnel.skills.SkillType.S_NEG;
+import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 
 import java.time.format.DateTimeFormatter;
@@ -635,21 +635,21 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         Person adminLogistics = campaign.getSeniorAdminPerson(LOGISTICS);
         int adminCommandExp = SkillType.EXP_NONE;
         if (adminCommand != null) {
-            Skill skill = adminCommand.getSkill(S_NEG);
+            Skill skill = adminCommand.getSkill(S_NEGOTIATION);
             if (skill != null) {
                 adminCommandExp = skill.getExperienceLevel();
             }
         }
         int adminTransportExp = SkillType.EXP_NONE;
         if (adminTransport != null) {
-            Skill skill = adminTransport.getSkill(S_NEG);
+            Skill skill = adminTransport.getSkill(S_NEGOTIATION);
             if (skill != null) {
                 adminTransportExp = skill.getExperienceLevel();
             }
         }
         int adminLogisticsExp = SkillType.EXP_NONE;
         if (adminLogistics != null) {
-            Skill skill = adminLogistics.getSkill(S_NEG);
+            Skill skill = adminLogistics.getSkill(S_NEGOTIATION);
             if (skill != null) {
                 adminLogisticsExp = skill.getExperienceLevel();
             }
