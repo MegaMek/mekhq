@@ -9498,7 +9498,7 @@ public class Campaign implements ITechManager {
         StandardForceIcon campaignIcon = getUnitIcon();
 
         if (campaignIcon.getFilename() == null) {
-            icon = getFactionLogo(this, getFaction().getShortName(), true);
+            icon = getFactionLogo(currentDay.getYear(), getFaction().getShortName());
         } else {
             icon = campaignIcon.getImageIcon();
         }
