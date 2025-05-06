@@ -798,7 +798,23 @@ public class PersonViewPanel extends JScrollablePanel {
         return portraitImageIcon;
     }
 
+    /**
+     * Constructs and returns a {@link JPanel} with empty or placeholder information fields.
+     *
+     * <p>The panel uses a {@link GridBagLayout} and is intended to display default or empty details for when no
+     * person is selected. Rows are added for various labels, including status, origin, age, gender, and blood type,
+     * with placeholder values.</p>
+     *
+     * <p>Origin information is conditionally added depending on campaign options.</p>
+     *
+     * @return a {@link JPanel} containing empty or default information fields
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
     private JPanel fillInfoEmpty() {
+        // TODO Update layout for new person view (needs that PR to be merged) - Illiani, 50.06
+
         JPanel pnlInfo = new JPanel(new GridBagLayout());
         pnlInfo.setBorder(BorderFactory.createTitledBorder("-"));
 
@@ -2489,6 +2505,8 @@ public class PersonViewPanel extends JScrollablePanel {
      * <p>After updating, the panel is revalidated and repainted to reflect the changes.</p>
      *
      * @param person the {@link Person} to display, or {@code null} for empty content
+     * @author Illiani
+     * @since 0.50.06
      */
     public void setPerson(@Nullable Person person) {
         this.person = person;

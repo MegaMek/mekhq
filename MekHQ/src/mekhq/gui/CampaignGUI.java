@@ -1463,6 +1463,14 @@ public class CampaignGUI extends JPanel {
         npd.setVisible(true);
     }
 
+    /**
+     * Opens the personnel market dialog to hire a person, using the appropriate market style based on campaign
+     * options.
+     *
+     * <p>If the personnel market is disabled in the campaign options, a deprecated {@link PersonnelMarketDialog} is
+     * displayed. Otherwise, the new personnel market dialog is shown according to the campaign's current market
+     * style.</p>
+     */
     public void hirePersonMarket() {
         PersonnelMarketStyle marketStyle = getCampaign().getCampaignOptions().getPersonnelMarketStyle();
         if (marketStyle == PERSONNEL_MARKET_DISABLED) {

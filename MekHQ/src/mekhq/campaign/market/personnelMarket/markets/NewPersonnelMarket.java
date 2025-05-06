@@ -35,6 +35,7 @@ package mekhq.campaign.market.personnelMarket.markets;
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
@@ -74,6 +75,7 @@ import org.w3c.dom.NodeList;
  * @since 0.50.06
  */
 public class NewPersonnelMarket {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.PersonnelMarket";
     private static final MMLogger logger = MMLogger.create(NewPersonnelMarket.class);
 
     private static int RARE_PROFESSION_WEIGHT = 20;
@@ -110,8 +112,6 @@ public class NewPersonnelMarket {
      */
     public NewPersonnelMarket(Campaign campaign) {
         this.campaign = campaign;
-
-        logger.debug("Initializing NewPersonnelMarket");
 
         clanMarketEntries = new HashMap<>();
         innerSphereMarketEntries = new HashMap<>();
@@ -213,7 +213,7 @@ public class NewPersonnelMarket {
             logger.debug("Generated {} applicants for the campaign.", currentApplicants.size());
 
             if (campaign.getCampaignOptions().isPersonnelMarketReportRefresh()) {
-                generatePersonnelReport(campaign);
+                campaign.addReport(generatePersonnelReport());
             }
 
             MekHQ.triggerEvent(new MarketNewPersonnelEvent(currentApplicants));
@@ -261,6 +261,20 @@ public class NewPersonnelMarket {
             person.writeToXML(writer, indent, campaign);
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "currentApplicants");
+    }
+
+    /**
+     * @return the resource bundle name as a string
+     */
+    String getResourceBundle() {
+        return RESOURCE_BUNDLE;
+    }
+
+    /**
+     * @return the {@link MMLogger} instance
+     */
+    MMLogger getLogger() {
+        return logger;
     }
 
     /**
@@ -721,12 +735,11 @@ public class NewPersonnelMarket {
     /**
      * Generates a personnel recruitment report for the specified campaign.
      *
-     * @param campaign the campaign to report on
      * @author Illiani
      * @since 0.50.06
      */
-    void generatePersonnelReport(Campaign campaign) {
-        campaign.addReport("<a href='PERSONNEL_MARKET'>Personnel Market Updated</a>");
+    private String generatePersonnelReport() {
+        return getTextAt(RESOURCE_BUNDLE, "hyperlink.personnelMarket.report");
     }
 
     /**

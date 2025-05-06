@@ -50,7 +50,6 @@ import java.util.Map;
 import java.util.Set;
 
 import megamek.common.enums.Gender;
-import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
@@ -86,9 +85,6 @@ import mekhq.campaign.universe.enums.HiringHallLevel;
  * @since 0.50.06
  */
 public class PersonnelMarketMekHQ extends NewPersonnelMarket {
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.PersonnelMarket";
-    private static final MMLogger logger = MMLogger.create(PersonnelMarketMekHQ.class);
-
     /**
      * Constructs a personnel market using the MekHQ classic ruleset.
      *
@@ -101,8 +97,6 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
      */
     public PersonnelMarketMekHQ(Campaign campaign) {
         super(campaign);
-
-        logger.debug("Initializing PersonnelMarketMekHQ");
 
         setAssociatedPersonnelMarketStyle(MEKHQ);
 
@@ -132,7 +126,8 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         boolean filterOutLegalFactions = false;
         if (getCampaign().getCampaignOptions().getUnitRatingMethod().isCampaignOperations()) {
             if (getCampaign().getReputation().getReputationRating() < getUnitReputationRecruitmentCutoff()) {
-                logger.debug("Only pirates & mercenaries will be considered for applicants, as the campaign's unit " +
+                getLogger().debug(
+                      "Only pirates & mercenaries will be considered for applicants, as the campaign's unit " +
                                    "rating is below the cutoff.");
                 filterOutLegalFactions = true;
             }
@@ -193,7 +188,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         if (!location.isOnPlanet()) {
             color = MekHQ.getMHQOptions().getFontColorNegativeHexColor();
 
-            return getFormattedTextAt(RESOURCE_BUNDLE,
+            return getFormattedTextAt(getResourceBundle(),
                   "hint.personnelMarket.inTransit",
                   spanOpeningWithCustomColor(color),
                   closingBrace);
@@ -202,7 +197,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         if (getApplicantOriginFactions().isEmpty()) {
             color = MekHQ.getMHQOptions().getFontColorNegativeHexColor();
 
-            return getFormattedTextAt(RESOURCE_BUNDLE,
+            return getFormattedTextAt(getResourceBundle(),
                   "hint.personnelMarket.noInterest",
                   spanOpeningWithCustomColor(color),
                   closingBrace);
@@ -212,7 +207,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
             if (!contract.getContractType().isGarrisonType()) {
                 color = MekHQ.getMHQOptions().getFontColorNegativeHexColor();
 
-                return getFormattedTextAt(RESOURCE_BUNDLE,
+                return getFormattedTextAt(getResourceBundle(),
                       "hint.personnelMarket.onContract",
                       spanOpeningWithCustomColor(color),
                       closingBrace);
@@ -254,7 +249,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
             int applicantSkill = applicant.getSkillLevel(getCampaign(), false).getExperienceLevel();
 
             if (applicantSkill > averageSkillLevel) {
-                logger.debug("Applicant is too experienced for the campaign, skipping.");
+                getLogger().debug("Applicant is too experienced for the campaign, skipping.");
                 continue;
             }
 
@@ -297,13 +292,13 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
      */
     private void calculateNumberOfRecruitmentRolls() {
         int lengthOfMonth = getToday().getMonth().length(getToday().isLeapYear());
-        logger.debug("Base rolls: {}", lengthOfMonth);
+        getLogger().debug("Base rolls: {}", lengthOfMonth);
 
         int rolls = lengthOfMonth * getSystemStatusRecruitmentMultiplier();
-        logger.debug("Rolls modified for location: {}", rolls);
+        getLogger().debug("Rolls modified for location: {}", rolls);
 
         rolls = clamp((int) round(rolls * getSystemPopulationRecruitmentMultiplier()), 1, rolls);
-        logger.debug("Rolls modified for population: {}", rolls);
+        getLogger().debug("Rolls modified for population: {}", rolls);
 
         setRecruitmentRolls(rolls);
     }
@@ -330,7 +325,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
             default -> 1;
         };
 
-        logger.debug("Rolls based on hiring hall status: {}", rolls);
+        getLogger().debug("Rolls based on hiring hall status: {}", rolls);
 
         for (Faction faction : currentSystem.getFactionSet(today)) {
             if (currentSystem.equals(faction.getStartingPlanet(getCampaign(), today))) {
@@ -341,7 +336,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
             }
         }
 
-        logger.debug("Rolls including capital status: {}", rolls);
+        getLogger().debug("Rolls including capital status: {}", rolls);
 
         return rolls;
     }
