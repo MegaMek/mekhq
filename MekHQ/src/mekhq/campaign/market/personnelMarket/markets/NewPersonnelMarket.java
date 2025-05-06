@@ -177,7 +177,7 @@ public class NewPersonnelMarket {
                 } else if (nodeName.equalsIgnoreCase("hasRarePersonnel")) {
                     personnelMarket.setHasRarePersonnel(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("rareProfessions")) {
-                    personnelMarket.setHasRarePersonnel(Boolean.parseBoolean(nodeContents));
+                    processRareProfessionNodes(personnelMarket, childNode);
                 } else if (nodeName.equalsIgnoreCase("recruitmentRolls")) {
                     personnelMarket.setRecruitmentRolls(MathUtility.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("lastSelectedFilter")) {
@@ -968,8 +968,24 @@ public class NewPersonnelMarket {
         logger.info("Load Applicant Nodes Complete!");
     }
 
-    private static void processRareProfessionNodes(NewPersonnelMarket personnelMarket, Node parentNode,
-          Version version) {
+    /**
+     * Processes and loads "rareProfession" nodes from the given XML parent node into the provided
+     * {@link NewPersonnelMarket}.
+     *
+     * <p>This method iterates over the child nodes of {@code parentNode}. For every child node named
+     * "rareProfession", it tries to parse the node's text content into a {@link PersonnelRole}. If successful, the role
+     * is added to the personnel market as a rare profession. </p>
+     *
+     * <p>Nodes that are not element nodes or do not have the correct name are skipped, with unknown node types
+     * logged as errors.</p>
+     *
+     * @param personnelMarket the target market to which rare professions will be added
+     * @param parentNode      the XML node whose children will be processed for rare profession entries
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    private static void processRareProfessionNodes(NewPersonnelMarket personnelMarket, Node parentNode) {
         logger.info("Loading Rare Profession Nodes from XML...");
 
         NodeList childNodes = parentNode.getChildNodes();
