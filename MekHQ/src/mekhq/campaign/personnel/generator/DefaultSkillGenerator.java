@@ -24,13 +24,17 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.generator;
 
 import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE;
-import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.SkillDeprecationTool.DEPRECATED_SKILLS;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT_COMMAND;
 
@@ -161,19 +165,21 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
     public void generateAttributes(Person person) {
         RandomSkillPreferences skillPreferences = getSkillPreferences();
 
-        if (!skillPreferences.isUseAttributes()) {
-            for (SkillAttribute attribute : SkillAttribute.values()) {
-                if (attribute.isNone()) {
-                    continue;
-                }
-
-                person.setAttributeScore(attribute, DEFAULT_ATTRIBUTE_SCORE);
+        // Reset Attribute Scores to default
+        for (SkillAttribute attribute : SkillAttribute.values()) {
+            if (attribute.isNone()) {
+                continue;
             }
 
+            person.setAttributeScore(attribute, DEFAULT_ATTRIBUTE_SCORE);
+        }
+
+        // If we're not using attributes, early exit
+        if (!skillPreferences.isUseAttributes()) {
             return;
         }
 
-        boolean extraRandomAttributes = skillPreferences.isRandomizeAttributes();
+        boolean randomizeAttributes = skillPreferences.isRandomizeAttributes();
 
         PersonnelRole profession = person.getPrimaryRole();
         Phenotype phenotype = person.getPhenotype();
@@ -189,23 +195,11 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
 
             // Attribute randomization
             int roll = d6();
-
-            if (roll == 1) {
-                person.changeAttributeScore(attribute, -1);
-
-                if (extraRandomAttributes) {
-                    while ((d6() == 1) && (person.getAttributeScore(attribute) > MINIMUM_ATTRIBUTE_SCORE)) {
-                        person.changeAttributeScore(attribute, -1);
-                    }
-                }
-            } else if (roll == 6) {
-                person.changeAttributeScore(attribute, 1);
-
-                if (extraRandomAttributes) {
-                    int attributeCap = person.getPhenotype().getAttributeCap(attribute);
-                    while ((d6() == 6) && (person.getAttributeScore(attribute) < attributeCap)) {
-                        person.changeAttributeScore(attribute, 1);
-                    }
+            if (randomizeAttributes) {
+                if (roll == 1) {
+                    person.changeAttributeScore(attribute, -1);
+                } else if (roll == 6) {
+                    person.changeAttributeScore(attribute, 1);
                 }
             }
         }
