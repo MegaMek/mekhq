@@ -109,25 +109,19 @@ public class CampaignSummary {
      * pulling out any reports
      */
     public void updateInformation() {
-
         // personnel
         totalCombatPersonnel = 0;
         totalSupportPersonnel = 0;
         totalInjuries = 0;
-        for (Person p : campaign.getActivePersonnel(true)) {
-            // Add them to the total count
-            if (!p.getPrisonerStatus().isFree()) {
-                continue;
+        for (Person person : campaign.getActivePersonnel(false)) {
+            if (person.getPrimaryRole().isCombat()) {
+                totalCombatPersonnel++;
+            } else {
+                totalSupportPersonnel++;
             }
-            {
+
+            if (person.needsFixing()) {
                 totalInjuries++;
-            }
-            if (p.getHits() > 0) {
-                if (p.getPrimaryRole().isCombat()) {
-                    totalCombatPersonnel++;
-                } else {
-                    totalSupportPersonnel++;
-                }
             }
         }
 
@@ -400,8 +394,8 @@ public class CampaignSummary {
             boolean isWithinCapacity = areFieldKitchensWithinCapacity(fieldKitchenCapacity, fieldKitchenUsage);
 
             color = isWithinCapacity ?
-                          spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor()) :
-                          "";
+                          "" :
+                          spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
             closingSpan = isWithinCapacity ? "" : CLOSING_SPAN_TAG;
             colorBlindWarning = isWithinCapacity ? "" : WARNING;
 
