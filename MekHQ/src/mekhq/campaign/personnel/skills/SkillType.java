@@ -112,7 +112,7 @@ public class SkillType {
     public static final String S_GUN_PROTO = "Gunnery/ProtoMek";
     public static final String S_ARTILLERY = "Artillery";
     public static final String S_SMALL_ARMS = "Small Arms";
-    public static final String S_ANTI_MEK = "Anti-Mek";
+    public static final String S_ANTI_MEK = "Anti-Mek (Climbing)";
 
     // support skills
     public static final String S_TECH_MEK = "Tech/Mek";
@@ -121,15 +121,15 @@ public class SkillType {
     public static final String S_TECH_BA = "Tech/BattleArmor";
     public static final String S_TECH_VESSEL = "Tech/Vessel";
     public static final String S_ASTECH = "Astech";
-    public static final String S_DOCTOR = "Doctor";
-    public static final String S_MEDTECH = "MedTech";
+    public static final String S_DOCTOR = "Surgery/Any";
+    public static final String S_MEDTECH = "MedTech/Any";
     public static final String S_NAV = "Hyperspace Navigation";
     public static final String S_ADMIN = "Administration";
     public static final String S_NEG = "Negotiation";
     public static final String S_LEADER = "Leadership";
     public static final String S_SCROUNGE = "Scrounge";
     public static final String S_STRATEGY = "Strategy";
-    public static final String S_TACTICS = "Tactics";
+    public static final String S_TACTICS = "Tactics/Any";
 
     // roleplay skills
     public static final String S_ACROBATICS = "Acrobatics" + RP_ONLY_TAG;
@@ -142,7 +142,7 @@ public class SkillType {
     public static final String S_ART_PAINTING = "Art/Painting" + RP_ONLY_TAG;
     public static final String S_ART_WRITING = "Art/Writing" + RP_ONLY_TAG;
     public static final String S_CLIMBING = "Climbing" + RP_ONLY_TAG;
-    public static final String S_COMMUNICATIONS = "Communications" + RP_ONLY_TAG;
+    public static final String S_COMMUNICATIONS = "Communications/Any" + RP_ONLY_TAG;
     public static final String S_COMPUTERS = "Computers" + RP_ONLY_TAG;
     public static final String S_CRYPTOGRAPHY = "Cryptography" + RP_ONLY_TAG;
     public static final String S_DEMOLITIONS = "Demolitions" + RP_ONLY_TAG;
@@ -155,11 +155,11 @@ public class SkillType {
     public static final String S_INTEREST_SPORTS = "Interest/Sports" + RP_ONLY_TAG;
     public static final String S_INTERROGATION = "Interrogation" + RP_ONLY_TAG;
     public static final String S_INVESTIGATION = "Investigation" + RP_ONLY_TAG;
-    public static final String S_LANGUAGES = "Languages" + RP_ONLY_TAG;
+    public static final String S_LANGUAGES = "Language/Any" + RP_ONLY_TAG;
     public static final String S_MARTIAL_ARTS = "Martial Arts" + RP_ONLY_TAG;
     public static final String S_PERCEPTION = "Perception" + RP_ONLY_TAG;
-    public static final String S_SLEIGHT_OF_HAND = "Sleight of Hand" + RP_ONLY_TAG;
-    public static final String S_PROTOCOLS = "Protocols" + RP_ONLY_TAG;
+    public static final String S_SLEIGHT_OF_HAND = "Sleight of Hand/Any" + RP_ONLY_TAG;
+    public static final String S_PROTOCOLS = "Protocols/Any" + RP_ONLY_TAG;
     public static final String S_SCIENCE_BIOLOGY = "Science/Biology" + RP_ONLY_TAG;
     public static final String S_SCIENCE_CHEMISTRY = "Science/Chemistry" + RP_ONLY_TAG;
     public static final String S_SCIENCE_MATHEMATICS = "Science/Mathematics" + RP_ONLY_TAG;
@@ -168,9 +168,9 @@ public class SkillType {
     public static final String S_SCIENCE_SYSTEMS_MECHANICAL = "Security Systems/Mechanical" + RP_ONLY_TAG;
     public static final String S_SENSOR_OPERATIONS = "Sensor Operations" + RP_ONLY_TAG;
     public static final String S_STEALTH = "Stealth" + RP_ONLY_TAG;
-    public static final String S_STREETWISE = "Streetwise" + RP_ONLY_TAG;
-    public static final String S_SURVIVAL = "Survival" + RP_ONLY_TAG;
-    public static final String S_TRACKING = "Tracking" + RP_ONLY_TAG;
+    public static final String S_STREETWISE = "Streetwise/Any" + RP_ONLY_TAG;
+    public static final String S_SURVIVAL = "Survival/Any" + RP_ONLY_TAG;
+    public static final String S_TRACKING = "Tracking/Any" + RP_ONLY_TAG;
     public static final String S_TRAINING = "Training" + RP_ONLY_TAG;
 
     public static final int NUM_LEVELS = 11;
@@ -947,9 +947,10 @@ public class SkillType {
                 if (wn2.getNodeName().equalsIgnoreCase("name")) {
                     // skillType.name = wn2.getTextContent();
 
-                    //Start <50.01 compatibility handler.
                     // The above code can be uncommented once these handlers have been removed
-                    skillType.name = switch (wn2.getTextContent().toLowerCase()) {
+                    String name = wn2.getTextContent();
+                    //Start <50.01 compatibility handler.
+                    skillType.name = switch (name) {
                         case "piloting/mech" -> "Piloting/Mek";
                         case "gunnery/mech" -> "Gunnery/Mek";
                         case "gunnery/battlesuit" -> "Gunnery/BattleArmor";
@@ -958,7 +959,23 @@ public class SkillType {
                         case "tech/mech" -> "Tech/Mek";
                         case "tech/ba" -> "Tech/BattleArmor";
                         case "medtech" -> "MedTech";
-                        default -> wn2.getTextContent();
+                        default -> name;
+                    };
+                    //Start <50.07 compatibility handler.
+                    skillType.name = switch (name) {
+                        case "anti-mech" -> "Anti-Mek (Climbing)";
+                        case "medtech" -> "MedTech/Any";
+                        case "communications" -> "Communications/Any";
+                        case "sleight of hand" -> "Sleight of Hand/Any";
+                        case "protocols" -> "Protocols/Any";
+                        case "survival" -> "Survival/Any";
+                        case "languages" -> "Language/Any";
+                        case "hyperspace navigation" -> "Navigation/Any";
+                        case "streetwise" -> "Streetwise/Any";
+                        case "doctor" -> "Surgery/Any";
+                        case "tactics" -> "Tactics/Any";
+                        case "tracking" -> "Tracking/Any";
+                        default -> name;
                     };
                     //End <50.01 compatibility handler
                 } else if (wn2.getNodeName().equalsIgnoreCase("target")) {
