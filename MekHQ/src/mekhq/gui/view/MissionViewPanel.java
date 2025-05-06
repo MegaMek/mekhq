@@ -27,6 +27,23 @@
  */
 package mekhq.gui.view;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
+import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.estimateCargoRequirements;
+
+import java.awt.Cursor;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ResourceBundle;
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextPane;
+
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
@@ -37,15 +54,6 @@ import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.MarkdownRenderer;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.ResourceBundle;
-
-import static megamek.client.ui.WrapLayout.wordWrap;
-import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.estimateCargoRequirements;
 
 /**
  * A custom panel that gets filled in with goodies from a scenario object
@@ -60,7 +68,6 @@ public class MissionViewPanel extends JScrollablePanel {
 
     /* Basic Mission Parameters */
     private JLabel lblStatus;
-    private JPanel lblChallenge;
     private JLabel lblLocation;
     private JLabel txtLocation;
     private JLabel lblType;
@@ -574,7 +581,6 @@ public class MissionViewPanel extends JScrollablePanel {
         // TODO : Switch me to use IUnitRating
         String[] ratingNames = {"F", "D", "C", "B", "A"};
         lblStatus = new JLabel();
-        lblChallenge = new JPanel();
         lblLocation = new JLabel();
         txtLocation = new JLabel();
         lblEmployer = new JLabel();
@@ -624,18 +630,6 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblStatus, gridBagConstraints);
-
-        lblChallenge = contract.getContractDifficultySkulls(campaign);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.insets = new Insets(0, 0, 5, 0);
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(lblChallenge, gridBagConstraints);
 
         lblLocation.setName("lblLocation");
         lblLocation.setText(resourceMap.getString("lblLocation.text"));

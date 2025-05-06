@@ -64,8 +64,6 @@ public class WinterHolidayAnnouncement {
     private final static int WINTER_HOLIDAY_START_YEAR = 2957;
     private final static int WINTER_HOLIDAY_MONTH = 12;
     private final static int WINTER_HOLIDAY_DAY_ZERO = 10;
-    private final static int WINTER_HOLIDAY_DAY_ONE = 17;
-    private final static int WINTER_HOLIDAY_DAY_FIVE = 22;
     private final static int WINTER_HOLIDAY_DAY_ELEVEN = 27;
 
     private final static int SUPPRESS_DIALOG_RESPONSE_INDEX = 3;
@@ -112,9 +110,7 @@ public class WinterHolidayAnnouncement {
         // Build the in character message
         return switch (currentDate.getDayOfMonth()) {
             case WINTER_HOLIDAY_DAY_ZERO -> getInCharacterMessageDayZero();
-            case WINTER_HOLIDAY_DAY_ONE -> getInCharacterMessageDayOne();
-            case WINTER_HOLIDAY_DAY_FIVE -> getInCharacterMessageDayFiveOrEleven(true);
-            case WINTER_HOLIDAY_DAY_ELEVEN -> getInCharacterMessageDayFiveOrEleven(false);
+            case WINTER_HOLIDAY_DAY_ELEVEN -> getInCharacterMessageDayEleven();
             default -> {
                 logger.error("WinterHolidayAnnouncement: getInCharacterMessage: unexpected day of month: {}",
                       currentDate.getDayOfMonth());
@@ -170,33 +166,15 @@ public class WinterHolidayAnnouncement {
         return getFormattedTextAt(RESOURCE_BUNDLE, resourceKey, commanderAddress);
     }
 
-
     /**
-     * Builds the in-character message for Day One of the Winter Holiday event.
-     *
-     * @return the Day One message as a string
-     */
-    private String getInCharacterMessageDayOne() {
-        String commanderAddress = campaign.getCommanderAddress(false);
-
-        return getFormattedTextAt(RESOURCE_BUNDLE,
-              "winterHoliday.message.dayOne." + randomInt(50) + ".ic",
-              commanderAddress);
-    }
-
-
-    /**
-     * Builds the in-character message for either Day Five or Day Eleven of the Winter Holiday event.
-     *
-     * @param isDayFive {@code true} if building the message for Day Five, {@code false} for Day Eleven
+     * Builds the in-character message for Day Eleven of the Winter Holiday event.
      *
      * @return the message as a string for the specified day
      */
-    private String getInCharacterMessageDayFiveOrEleven(boolean isDayFive) {
+    private String getInCharacterMessageDayEleven() {
         String commanderAddress = campaign.getCommanderAddress(false);
 
-        return getFormattedTextAt(RESOURCE_BUNDLE,
-              "winterHoliday.message.day" + (isDayFive ? "Five" : "Eleven") + ".ic",
+        return getFormattedTextAt(RESOURCE_BUNDLE, "winterHoliday.message.dayEleven." + randomInt(50) + ".ic",
               commanderAddress);
     }
 
@@ -250,8 +228,6 @@ public class WinterHolidayAnnouncement {
     private List<String> generateDaySpecificLabels(int dayOfMonth) {
         String dayKey = switch (dayOfMonth) {
             case WINTER_HOLIDAY_DAY_ZERO -> "dayZero";
-            case WINTER_HOLIDAY_DAY_ONE -> "dayOne";
-            case WINTER_HOLIDAY_DAY_FIVE -> "dayFive";
             case WINTER_HOLIDAY_DAY_ELEVEN -> "dayEleven";
             default -> null;
         };
@@ -287,8 +263,7 @@ public class WinterHolidayAnnouncement {
         }
 
         return switch (date.getDayOfMonth()) {
-            case WINTER_HOLIDAY_DAY_ZERO, WINTER_HOLIDAY_DAY_ONE, WINTER_HOLIDAY_DAY_FIVE, WINTER_HOLIDAY_DAY_ELEVEN ->
-                  true;
+            case WINTER_HOLIDAY_DAY_ZERO, WINTER_HOLIDAY_DAY_ELEVEN -> true;
             default -> false;
         };
     }
