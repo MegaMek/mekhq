@@ -32,6 +32,7 @@
  */
 package mekhq.gui.dialog.markets.personnelMarket;
 
+import static megamek.client.ui.swing.util.UIUtil.scaleForGUI;
 import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.finances.enums.TransactionType.RECRUITMENT;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
@@ -45,7 +46,6 @@ import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -111,6 +111,8 @@ public class PersonnelMarketDialog {
 
     private static final int MAXIMUM_DAYS_IN_MONTH = 31;
     private static final int MAXIMUM_NUMBER_OF_SYSTEM_ROLLS = 4;
+
+    private final int PADDING = scaleForGUI(5);
 
     private final NewPersonnelMarket market;
     private final JFrame parent;
@@ -215,7 +217,7 @@ public class PersonnelMarketDialog {
 
         // === Left Column ===
         JPanel leftPanel = new JPanel(new GridBagLayout());
-        leftPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        leftPanel.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
         GridBagConstraints leftGbc = new GridBagConstraints();
         leftGbc.gridx = 0;
         leftGbc.weightx = 1.0;
@@ -241,7 +243,7 @@ public class PersonnelMarketDialog {
 
         // === Right Column ===
         JPanel rightPanel = new JPanel(new GridBagLayout());
-        rightPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        rightPanel.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
         GridBagConstraints rightGbc = new GridBagConstraints();
         rightGbc.gridx = 0;
         rightGbc.weightx = 1.0;
@@ -356,11 +358,11 @@ public class PersonnelMarketDialog {
     private JPanel initializeTipPanel() {
         JLabel infoLabel = new JLabel(getTipMessage());
         infoLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        infoLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        infoLabel.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
 
         JPanel bottomPanel = new JPanel();
         bottomPanel.setLayout(new BorderLayout());
-        bottomPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        bottomPanel.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
         bottomPanel.add(infoLabel, BorderLayout.CENTER);
         return bottomPanel;
     }
@@ -417,7 +419,7 @@ public class PersonnelMarketDialog {
     private JSplitPane initializePersonView(AtomicReference<Person> selectedPerson, JPanel mainPanel) {
         personViewPanel = new PersonViewPanel(selectedPerson.get(), campaign, campaign.getApp().getCampaigngui());
         JScrollPane viewScrollPane = new JScrollPane(personViewPanel);
-        viewScrollPane.setPreferredSize(new Dimension(500, 500));
+        viewScrollPane.setPreferredSize(scaleForGUI(500, 750));
         SwingUtilities.invokeLater(() -> viewScrollPane.getVerticalScrollBar().setValue(0));
 
         JPanel buttonPanel = initializeButtonPanel();
