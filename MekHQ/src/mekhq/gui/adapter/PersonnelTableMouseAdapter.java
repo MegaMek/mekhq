@@ -1964,7 +1964,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         menu.add(cbMenu);
         popup.add(menu);
 
-        if (StaticChecks.areAllPrisoners(selected)) {
+        if (!StaticChecks.areAnyFree(selected)) {
             if (getCampaign().getLocation().isOnPlanet()) {
                 popup.add(newMenuItem(resources.getString("free.text"), CMD_FREE));
                 popup.add(newMenuItem(resources.getString("execute.text"), CMD_EXECUTE));
@@ -1972,21 +1972,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 popup.add(newMenuItem(resources.getString("jettison.text"), CMD_JETTISON));
             }
 
-            if (StaticChecks.areAllPrisoners(selected) && getCampaign().isGM()) {
-                popup.add(newMenuItem(resources.getString("ransom.text"), CMD_RANSOM));
-            }
-
             if (StaticChecks.areAnyWillingToDefect(selected)) {
                 popup.add(newMenuItem(resources.getString("recruit.text"), CMD_RECRUIT));
             }
 
-            if ((getCampaign().getFaction().isClan()) && (StaticChecks.areAnyBondsmen(selected))) {
+            if ((getCampaign().isClanCampaign()) && (StaticChecks.areAnyBondsmen(selected))) {
                 popup.add(newMenuItem(resources.getString("abtakha.text"), CMD_ABTAKHA));
             }
-        }
-
-        if (Stream.of(selected).allMatch(p -> p.getStatus().isPoW()) && getCampaign().isGM()) {
-            popup.add(newMenuItem(resources.getString("ransom.text"), CMD_RANSOM_FRIENDLY));
         }
 
         if ((oneSelected) && (!person.isChild(getCampaign().getLocalDate()))) {
@@ -3896,6 +3888,14 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                   makeCommand(CMD_CHANGE_PRISONER_STATUS, PrisonerStatus.BONDSMAN.name()),
                   (person.getPrisonerStatus() == PrisonerStatus.BONDSMAN)));
             menu.add(menuItem);
+
+            if (StaticChecks.areAllPrisoners(selected)) {
+                menu.add(newMenuItem(resources.getString("ransom.text"), CMD_RANSOM));
+            }
+
+            if (Stream.of(selected).allMatch(p -> p.getStatus().isPoW())) {
+                menu.add(newMenuItem(resources.getString("ransom.text"), CMD_RANSOM_FRIENDLY));
+            }
 
             menuItem = new JMenuItem(resources.getString("removePerson.text"));
             menuItem.setActionCommand(CMD_REMOVE);
