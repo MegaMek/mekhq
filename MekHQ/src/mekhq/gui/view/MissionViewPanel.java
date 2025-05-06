@@ -24,11 +24,6 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
- *
- * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
- * Microsoft's "Game Content Usage Rules"
- * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
- * affiliated with Microsoft.
  */
 package mekhq.gui.view;
 
@@ -39,8 +34,6 @@ import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.estimat
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -79,8 +72,8 @@ public class MissionViewPanel extends JScrollablePanel {
     protected CampaignGUI gui;
 
     protected JPanel pnlStats;
+    protected JPanel pnlTutorial;
     protected JTextPane txtDesc;
-    private JPanel pnlTutorialText;
 
     /* Basic Mission Parameters */
     private JLabel lblStatus;
@@ -145,6 +138,7 @@ public class MissionViewPanel extends JScrollablePanel {
         GridBagConstraints gridBagConstraints;
 
         pnlStats = new JPanel();
+        pnlTutorial = new JPanel();
         txtDesc = new JTextPane();
 
         setLayout(new GridBagLayout());
@@ -163,6 +157,22 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(pnlStats, gridBagConstraints);
 
+        if (mission instanceof AtBContract) {
+            pnlStats.setName("pnlTutorial");
+            pnlStats.setBorder(BorderFactory.createTitledBorder(mission.getName()));
+            fillTutorial();
+
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = 0;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 0.0;
+            gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            add(pnlTutorial, gridBagConstraints);
+        }
+
         JScrollPane scrollScenarioTable = new JScrollPaneWithSpeed(scenarioTable);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -171,6 +181,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.gridwidth = 2;
         add(scrollScenarioTable, gridBagConstraints);
     }
 
@@ -592,53 +603,11 @@ public class MissionViewPanel extends JScrollablePanel {
     }
 
     private void fillStatsAtBContract() {
-        // Main panel with BorderLayout
-        JPanel mainPanel = new JPanel(new BorderLayout());
-
-        // Tutorial panel
-        JEditorPane editorPane = new JEditorPane();
-        editorPane.setContentType("text/html");
-        editorPane.setEditable(false);
-        editorPane.setFocusable(false);
-        editorPane.setBorder(BorderFactory.createEmptyBorder());
-
-        // Use inline CSS to set font family, size, and other style properties
-        String fontStyle = "font-family: Noto Sans;";
-        editorPane.setText(String.format("<div style='width: %s; %s'>%s</div>",
-              scaleForGUI(775),
-              fontStyle,
-              resourceMap.getString("txtStratConTutorial.text")));
-        setFontScaling(editorPane, false, 1.1);
-
-        // Wrap the JEditorPane in a JScrollPane
-        JScrollPane scrollPane = new JScrollPane(editorPane);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder());
-        // This line ensures the scroll pane starts scrolled to the top, not bottom.
-        SwingUtilities.invokeLater(() -> scrollPane.getViewport().setViewPosition(new Point(0, 0)));
-
-        // Create a container with a border for the padding
-        JPanel scrollPaneContainer = new JPanel(new BorderLayout());
-        scrollPaneContainer.add(scrollPane, BorderLayout.CENTER);
-
-        JPanel rightPanel = new JPanel(new BorderLayout());
-        rightPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-        rightPanel.setPreferredSize(new Dimension(800, 0));
-        rightPanel.add(scrollPane, BorderLayout.CENTER);
-        mainPanel.add(rightPanel, BorderLayout.EAST);
-
-        // Padding
-        mainPanel.add(Box.createHorizontalStrut(20), BorderLayout.CENTER);
-
-        // Information Panel
-        JPanel leftPanel = new JPanel();
-        leftPanel.setLayout(new GridBagLayout());
-
         AtBContract contract = (AtBContract) mission;
         Campaign campaign = gui.getCampaign();
 
         // TODO : Switch me to use IUnitRating
         String[] ratingNames = {"F", "D", "C", "B", "A"};
-        pnlTutorialText = new JPanel();
         lblStatus = new JLabel();
         lblLocation = new JLabel();
         txtLocation = new JLabel();
@@ -671,13 +640,15 @@ public class MissionViewPanel extends JScrollablePanel {
         lblScore = new JLabel();
         txtScore = new JLabel();
 
+        GridBagConstraints gridBagConstraints;
+        pnlStats.setLayout(new GridBagLayout());
 
         int y = 0;
 
         lblStatus.setName("lblOwner");
         lblStatus.setText("<html><b>" + contract.getStatus() + "</b></html>");
         lblStatus.setToolTipText(contract.getStatus().getToolTipText());
-        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y++;
         gridBagConstraints.gridwidth = 2;
@@ -686,7 +657,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.insets = new Insets(0, 0, 5, 0);
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        leftPanel.add(lblStatus, gridBagConstraints);
+        pnlStats.add(lblStatus, gridBagConstraints);
 
         lblBelligerents = contract.getBelligerentsPanel(gui.getCampaign().getGameYear());
         gridBagConstraints = new GridBagConstraints();
@@ -707,7 +678,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.gridy = y;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        leftPanel.add(lblLocation, gridBagConstraints);
+        pnlStats.add(lblLocation, gridBagConstraints);
 
         txtLocation.setName("txtLocation");
         String systemName = contract.getSystemName(campaign.getLocalDate());
@@ -728,7 +699,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        leftPanel.add(txtLocation, gridBagConstraints);
+        pnlStats.add(txtLocation, gridBagConstraints);
 
         lblEmployer.setName("lblEmployer");
         lblEmployer.setText(resourceMap.getString("lblEmployer.text"));
@@ -737,7 +708,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.gridy = y;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        leftPanel.add(lblEmployer, gridBagConstraints);
+        pnlStats.add(lblEmployer, gridBagConstraints);
 
         txtEmployer.setName("txtEmployer");
         txtEmployer.setText(contract.getEmployerName(campaign.getGameYear()));
@@ -748,7 +719,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        leftPanel.add(txtEmployer, gridBagConstraints);
+        pnlStats.add(txtEmployer, gridBagConstraints);
 
         lblEnemy.setName("lblEnemy");
         lblEnemy.setText(resourceMap.getString("lblEnemy.text"));
@@ -757,7 +728,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.gridy = y;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        leftPanel.add(lblEnemy, gridBagConstraints);
+        pnlStats.add(lblEnemy, gridBagConstraints);
 
         txtEnemy.setName("txtEnemy");
         txtEnemy.setText(contract.getEnemyBotName());
@@ -768,7 +739,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        leftPanel.add(txtEnemy, gridBagConstraints);
+        pnlStats.add(txtEnemy, gridBagConstraints);
 
         lblType.setName("lblType");
         lblType.setText(resourceMap.getString("lblType.text"));
@@ -778,7 +749,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.gridy = y;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        leftPanel.add(lblType, gridBagConstraints);
+        pnlStats.add(lblType, gridBagConstraints);
 
         txtType.setName("txtType");
         txtType.setText(contract.getType());
@@ -790,7 +761,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        leftPanel.add(txtType, gridBagConstraints);
+        pnlStats.add(txtType, gridBagConstraints);
 
         lblAllyRating.setName("lblAllyRating");
         lblAllyRating.setText(resourceMap.getString("lblAllyRating.text"));
@@ -799,7 +770,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.gridy = y;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        leftPanel.add(lblAllyRating, gridBagConstraints);
+        pnlStats.add(lblAllyRating, gridBagConstraints);
 
         txtAllyRating.setName("txtAllyRating");
         txtAllyRating.setText(contract.getAllySkill() + "/" + ratingNames[contract.getAllyQuality()]);
@@ -810,7 +781,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        leftPanel.add(txtAllyRating, gridBagConstraints);
+        pnlStats.add(txtAllyRating, gridBagConstraints);
 
         lblEnemyRating.setName("lblEnemyRating");
         lblEnemyRating.setText(resourceMap.getString("lblEnemyRating.text"));
@@ -819,7 +790,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.gridy = y;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        leftPanel.add(lblEnemyRating, gridBagConstraints);
+        pnlStats.add(lblEnemyRating, gridBagConstraints);
 
         txtEnemyRating.setName("txtEnemyRating");
         txtEnemyRating.setText(contract.getEnemySkill() + "/" + ratingNames[contract.getEnemyQuality()]);
@@ -830,7 +801,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        leftPanel.add(txtEnemyRating, gridBagConstraints);
+        pnlStats.add(txtEnemyRating, gridBagConstraints);
 
         lblStartDate.setName("lblStartDate");
         lblStartDate.setText(resourceMap.getString("lblStartDate.text"));
@@ -839,7 +810,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.gridy = y;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        leftPanel.add(lblStartDate, gridBagConstraints);
+        pnlStats.add(lblStartDate, gridBagConstraints);
 
         txtStartDate.setName("txtStartDate");
         txtStartDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(contract.getStartDate()));
@@ -850,7 +821,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        leftPanel.add(txtStartDate, gridBagConstraints);
+        pnlStats.add(txtStartDate, gridBagConstraints);
 
         lblEndDate.setName("lblEndDate");
         lblEndDate.setText(resourceMap.getString("lblEndDate.text"));
@@ -859,7 +830,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.gridy = y;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        leftPanel.add(lblEndDate, gridBagConstraints);
+        pnlStats.add(lblEndDate, gridBagConstraints);
 
         txtEndDate.setName("txtEndDate");
         txtEndDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(contract.getEndingDate()));
@@ -870,7 +841,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        leftPanel.add(txtEndDate, gridBagConstraints);
+        pnlStats.add(txtEndDate, gridBagConstraints);
 
         lblPayout.setName("lblPayout");
         lblPayout.setText(resourceMap.getString("lblPayout.text"));
@@ -879,7 +850,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.gridy = y;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        leftPanel.add(lblPayout, gridBagConstraints);
+        pnlStats.add(lblPayout, gridBagConstraints);
 
         txtPayout.setName("txtPayout");
         txtPayout.setText(contract.getMonthlyPayOut().toAmountAndSymbolString());
@@ -890,7 +861,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        leftPanel.add(txtPayout, gridBagConstraints);
+        pnlStats.add(txtPayout, gridBagConstraints);
 
         lblCommand.setName("lblCommand");
         lblCommand.setText(resourceMap.getString("lblCommand.text"));
@@ -899,7 +870,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.gridy = y;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        leftPanel.add(lblCommand, gridBagConstraints);
+        pnlStats.add(lblCommand, gridBagConstraints);
 
         txtCommand.setName("txtCommand");
         txtCommand.setText(contract.getCommandRights().toString());
@@ -911,7 +882,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        leftPanel.add(txtCommand, gridBagConstraints);
+        pnlStats.add(txtCommand, gridBagConstraints);
 
         lblBLC.setName("lblBLC");
         lblBLC.setText(resourceMap.getString("lblBLC.text"));
@@ -920,7 +891,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.gridy = y;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        leftPanel.add(lblBLC, gridBagConstraints);
+        pnlStats.add(lblBLC, gridBagConstraints);
 
         txtBLC.setName("txtBLC");
         txtBLC.setText(contract.getBattleLossComp() + "%");
@@ -931,7 +902,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        leftPanel.add(txtBLC, gridBagConstraints);
+        pnlStats.add(txtBLC, gridBagConstraints);
 
         if ((contract.getSalvagePct() > 0) && !contract.isSalvageExchange()) {
             lblSalvageValueMerc = new JLabel(resourceMap.getString("lblSalvageValueMerc.text"));
@@ -940,7 +911,7 @@ public class MissionViewPanel extends JScrollablePanel {
             gridBagConstraints.gridy = y;
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            leftPanel.add(lblSalvageValueMerc, gridBagConstraints);
+            pnlStats.add(lblSalvageValueMerc, gridBagConstraints);
             txtSalvageValueMerc = new JLabel();
             txtSalvageValueMerc.setText(contract.getSalvagedByUnit().toAmountAndSymbolString());
             gridBagConstraints = new GridBagConstraints();
@@ -950,7 +921,7 @@ public class MissionViewPanel extends JScrollablePanel {
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            leftPanel.add(txtSalvageValueMerc, gridBagConstraints);
+            pnlStats.add(txtSalvageValueMerc, gridBagConstraints);
 
             lblSalvageValueEmployer = new JLabel(resourceMap.getString("lblSalvageValueEmployer.text"));
             gridBagConstraints = new GridBagConstraints();
@@ -958,7 +929,7 @@ public class MissionViewPanel extends JScrollablePanel {
             gridBagConstraints.gridy = y;
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            leftPanel.add(lblSalvageValueEmployer, gridBagConstraints);
+            pnlStats.add(lblSalvageValueEmployer, gridBagConstraints);
             txtSalvageValueEmployer = new JLabel();
             txtSalvageValueEmployer.setText(contract.getSalvagedByEmployer().toAmountAndSymbolString());
             gridBagConstraints = new GridBagConstraints();
@@ -968,7 +939,7 @@ public class MissionViewPanel extends JScrollablePanel {
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            leftPanel.add(txtSalvageValueEmployer, gridBagConstraints);
+            pnlStats.add(txtSalvageValueEmployer, gridBagConstraints);
         }
         lblSalvagePct = new JLabel(resourceMap.getString("lblSalvage.text"));
         txtSalvagePct = new JLabel();
@@ -999,7 +970,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.gridy = y;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        leftPanel.add(lblSalvagePct, gridBagConstraints);
+        pnlStats.add(lblSalvagePct, gridBagConstraints);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;
@@ -1007,7 +978,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        leftPanel.add(txtSalvagePct, gridBagConstraints);
+        pnlStats.add(txtSalvagePct, gridBagConstraints);
 
         lblMorale.setName("lblMorale");
         lblMorale.setText(resourceMap.getString("lblMorale.text"));
@@ -1017,7 +988,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.gridy = y;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        leftPanel.add(lblMorale, gridBagConstraints);
+        pnlStats.add(lblMorale, gridBagConstraints);
 
         txtMorale.setName("txtMorale");
 
@@ -1035,7 +1006,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        leftPanel.add(txtMorale, gridBagConstraints);
+        pnlStats.add(txtMorale, gridBagConstraints);
 
         if (campaign.getCampaignOptions().isUseShareSystem()) {
             lblSharePct.setName("lblSharePct");
@@ -1046,7 +1017,7 @@ public class MissionViewPanel extends JScrollablePanel {
             gridBagConstraints.gridy = y;
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            leftPanel.add(lblSharePct, gridBagConstraints);
+            pnlStats.add(lblSharePct, gridBagConstraints);
 
             txtSharePct.setName("txtSharePct");
             txtSharePct.setText(contract.getSharesPercent() + "%");
@@ -1058,7 +1029,7 @@ public class MissionViewPanel extends JScrollablePanel {
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            leftPanel.add(txtSharePct, gridBagConstraints);
+            pnlStats.add(txtSharePct, gridBagConstraints);
         }
 
         if (campaign.getCampaignOptions().isUseStratCon()) {
@@ -1069,7 +1040,7 @@ public class MissionViewPanel extends JScrollablePanel {
             gridBagConstraints.gridy = y;
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            leftPanel.add(lblCargoRequirement, gridBagConstraints);
+            pnlStats.add(lblCargoRequirement, gridBagConstraints);
 
             txtCargoRequirement.setName("txtCargoRequirement");
             txtCargoRequirement.setText("~" + estimateCargoRequirements(campaign, contract) + 't');
@@ -1080,7 +1051,7 @@ public class MissionViewPanel extends JScrollablePanel {
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            leftPanel.add(txtCargoRequirement, gridBagConstraints);
+            pnlStats.add(txtCargoRequirement, gridBagConstraints);
         }
 
         // for StratCon, contract score is irrelevant and only leads to confusion, so we
@@ -1097,7 +1068,7 @@ public class MissionViewPanel extends JScrollablePanel {
             gridBagConstraints.gridy = y;
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            leftPanel.add(lblScore, gridBagConstraints);
+            pnlStats.add(lblScore, gridBagConstraints);
 
             txtScore.setName("txtScore");
             txtScore.setText(Integer.toString(contract.getScore()));
@@ -1108,7 +1079,7 @@ public class MissionViewPanel extends JScrollablePanel {
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            leftPanel.add(txtScore, gridBagConstraints);
+            pnlStats.add(txtScore, gridBagConstraints);
         }
 
         txtDesc.setName("txtDesc");
@@ -1124,11 +1095,49 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.insets = new Insets(0, 0, 5, 0);
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        leftPanel.add(txtDesc, gridBagConstraints);
+        pnlStats.add(txtDesc, gridBagConstraints);
+    }
 
-        mainPanel.add(leftPanel, BorderLayout.WEST);
+    /**
+     * Initializes and populates the tutorial panel with formatted HTML content inside a {@link JEditorPane}, applies
+     * font scaling and styling, wraps the editor in a scroll pane with appropriate padding, and adds it to the main
+     * tutorial panel with a visual border and size constraints.
+     *
+     * <p>The content is sourced from a resource bundle and displayed using an HTML/CSS styled {@code JEditorPane}
+     * for enhanced presentation.</p>
+     *
+     * <p>The method ensures the scroll position starts at the top of the content.</p>
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    private void fillTutorial() {
+        JEditorPane editorPane = new JEditorPane();
+        editorPane.setContentType("text/html");
+        editorPane.setEditable(false);
+        editorPane.setFocusable(false);
+        editorPane.setBorder(BorderFactory.createEmptyBorder());
 
-        pnlStats = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        pnlStats.add(mainPanel, BorderLayout.WEST);
+        String fontStyle = "font-family: Noto Sans;";
+        editorPane.setText(String.format("<div style='width: %s; %s padding:%spx;'>%s</div>",
+              scaleForGUI(800),
+              fontStyle,
+              scaleForGUI(5),
+              resourceMap.getString("txtStratConTutorial.text")));
+        setFontScaling(editorPane, false, 1.1);
+
+        JScrollPane scrollPane = new JScrollPane(editorPane);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        SwingUtilities.invokeLater(() -> scrollPane.getViewport().setViewPosition(new Point(0, 0)));
+
+        JPanel scrollPaneContainer = new JPanel(new BorderLayout());
+        scrollPaneContainer.add(scrollPane, BorderLayout.CENTER);
+
+        pnlTutorial = new JPanel(new BorderLayout());
+        pnlTutorial.add(Box.createHorizontalStrut(20), BorderLayout.CENTER);
+
+        pnlTutorial.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+        pnlTutorial.setPreferredSize(scaleForGUI(800, 0));
+        pnlTutorial.add(scrollPane, BorderLayout.CENTER);
     }
 }
