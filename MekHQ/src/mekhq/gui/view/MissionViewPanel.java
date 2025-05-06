@@ -28,21 +28,30 @@
 package mekhq.gui.view;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
+import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
+import static megamek.client.ui.swing.util.UIUtil.scaleForGUI;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.estimateCargoRequirements;
 
+import java.awt.BorderLayout;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextPane;
+import javax.swing.SwingUtilities;
+import javax.swing.border.EtchedBorder;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -64,6 +73,7 @@ public class MissionViewPanel extends JScrollablePanel {
     protected CampaignGUI gui;
 
     protected JPanel pnlStats;
+    protected JPanel pnlTutorial;
     protected JTextPane txtDesc;
 
     /* Basic Mission Parameters */
@@ -129,6 +139,7 @@ public class MissionViewPanel extends JScrollablePanel {
         GridBagConstraints gridBagConstraints;
 
         pnlStats = new JPanel();
+        pnlTutorial = new JPanel();
         txtDesc = new JTextPane();
 
         setLayout(new GridBagLayout());
@@ -147,6 +158,22 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(pnlStats, gridBagConstraints);
 
+        if (mission instanceof AtBContract) {
+            pnlStats.setName("pnlTutorial");
+            pnlStats.setBorder(BorderFactory.createTitledBorder(mission.getName()));
+            fillTutorial();
+
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = 0;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 0.0;
+            gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            add(pnlTutorial, gridBagConstraints);
+        }
+
         JScrollPane scrollScenarioTable = new JScrollPaneWithSpeed(scenarioTable);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -155,6 +182,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.gridwidth = 2;
         add(scrollScenarioTable, gridBagConstraints);
     }
 
@@ -1069,5 +1097,48 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtDesc, gridBagConstraints);
+    }
+
+    /**
+     * Initializes and populates the tutorial panel with formatted HTML content inside a {@link JEditorPane}, applies
+     * font scaling and styling, wraps the editor in a scroll pane with appropriate padding, and adds it to the main
+     * tutorial panel with a visual border and size constraints.
+     *
+     * <p>The content is sourced from a resource bundle and displayed using an HTML/CSS styled {@code JEditorPane}
+     * for enhanced presentation.</p>
+     *
+     * <p>The method ensures the scroll position starts at the top of the content.</p>
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    private void fillTutorial() {
+        JEditorPane editorPane = new JEditorPane();
+        editorPane.setContentType("text/html");
+        editorPane.setEditable(false);
+        editorPane.setFocusable(false);
+        editorPane.setBorder(BorderFactory.createEmptyBorder());
+
+        String fontStyle = "font-family: Noto Sans;";
+        editorPane.setText(String.format("<div style='width: %s; %s padding:%spx;'>%s</div>",
+              scaleForGUI(800),
+              fontStyle,
+              scaleForGUI(5),
+              resourceMap.getString("txtStratConTutorial.text")));
+        setFontScaling(editorPane, false, 1.1);
+
+        JScrollPane scrollPane = new JScrollPane(editorPane);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        SwingUtilities.invokeLater(() -> scrollPane.getViewport().setViewPosition(new Point(0, 0)));
+
+        JPanel scrollPaneContainer = new JPanel(new BorderLayout());
+        scrollPaneContainer.add(scrollPane, BorderLayout.CENTER);
+
+        pnlTutorial = new JPanel(new BorderLayout());
+        pnlTutorial.add(Box.createHorizontalStrut(20), BorderLayout.CENTER);
+
+        pnlTutorial.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+        pnlTutorial.setPreferredSize(new Dimension(800, 0));
+        pnlTutorial.add(scrollPane, BorderLayout.CENTER);
     }
 }
