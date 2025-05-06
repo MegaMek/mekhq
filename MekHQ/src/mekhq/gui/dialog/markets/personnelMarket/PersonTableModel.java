@@ -41,7 +41,9 @@ import javax.swing.table.AbstractTableModel;
 
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.gui.sorter.IntegerStringSorter;
 import mekhq.gui.sorter.LevelSorter;
 
@@ -112,10 +114,20 @@ public class PersonTableModel extends AbstractTableModel {
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         Person person = people.get(rowIndex);
+        NewPersonnelMarket market = campaign.getNewPersonnelMarket();
+
         ApplicantTableColumns column = ApplicantTableColumns.values()[columnIndex];
         return switch (column) {
             case FULL_NAME -> person.getFullName();
-            case PROFESSION -> person.getPrimaryRole().toString();
+            case PROFESSION -> {
+                PersonnelRole profession = person.getPrimaryRole();
+
+                if (market.getRareProfessions().contains(profession)) {
+                    yield "<html><b>" + profession.toString() + "</b></html>";
+                } else {
+                    yield profession.toString();
+                }
+            }
             case EXPERIENCE -> {
                 int experienceLevel = person.getExperienceLevel(campaign, false);
                 yield "<html>" + getColoredExperienceLevelName(experienceLevel) + "</html>";

@@ -245,6 +245,7 @@ import mekhq.campaign.universe.selectors.planetSelectors.DefaultPlanetSelector;
 import mekhq.campaign.universe.selectors.planetSelectors.RangedPlanetSelector;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
 import mekhq.module.atb.AtBEventProcessor;
 import mekhq.service.AutosaveService;
@@ -5438,6 +5439,23 @@ public class Campaign implements ITechManager {
 
                 if (!blockRecruitment) {
                     newPersonnelMarket.gatherApplications();
+
+                    if (newPersonnelMarket.getHasRarePersonnel()) {
+                        ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(this,
+                              getSeniorAdminPerson(AdministratorSpecialization.HR),
+                              null,
+                              resources.getString("personnelMarket.rareProfession.inCharacter"),
+                              List.of(resources.getString("personnelMarket.rareProfession.button.later"),
+                                    resources.getString("personnelMarket.rareProfession.button.decline"),
+                                    resources.getString("personnelMarket.rareProfession.button.immediate")),
+                              resources.getString("personnelMarket.rareProfession.outOfCharacter"),
+                              null,
+                              true);
+
+                        if (dialog.getDialogChoice() == 2) {
+                            newPersonnelMarket.showPersonnelMarketDialog();
+                        }
+                    }
                 }
             }
         }

@@ -79,9 +79,12 @@ public class NewPersonnelMarket {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PersonnelMarket";
     private static final MMLogger logger = MMLogger.create(NewPersonnelMarket.class);
 
-    private static int RARE_PROFESSION_WEIGHT = 20;
+    @SuppressWarnings(value = "FieldCanBeLocal")
+    private static int RARE_PROFESSION_WEIGHT = 10000;
     private static int LOW_POPULATION_RECRUITMENT_DIVIDER = 1;
     private static int UNIT_REPUTATION_RECRUITMENT_CUTOFF = Integer.MIN_VALUE;
+    @SuppressWarnings(value = "FieldCanBeLocal")
+    private static int PROFESSION_EXTINCTION_IGNORE_VALUE = -1;
 
     final private Campaign campaign;
     private PersonnelMarketStyle associatedPersonnelMarketStyle = PERSONNEL_MARKET_DISABLED;
@@ -93,6 +96,7 @@ public class NewPersonnelMarket {
     private List<Faction> applicantOriginFactions = new ArrayList<>();
     boolean offeringGoldenHello = true;
     boolean hasRarePersonnel;
+    List<PersonnelRole> rareProfessions = new ArrayList<>();
     int recruitmentRolls;
     private List<Person> currentApplicants = new ArrayList<>();
     private int lastSelectedFilter;
@@ -132,7 +136,7 @@ public class NewPersonnelMarket {
           Version version) {
         NodeList newLine = parentNode.getChildNodes();
 
-        logger.debug("Loading Personnel Market Nodes from XML...");
+        logger.info("Loading Personnel Market Nodes from XML...");
 
         NewPersonnelMarket personnelMarket = null;
         try {
@@ -172,6 +176,8 @@ public class NewPersonnelMarket {
                     personnelMarket.setOfferingGoldenHello(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("hasRarePersonnel")) {
                     personnelMarket.setHasRarePersonnel(Boolean.parseBoolean(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("rareProfessions")) {
+                    personnelMarket.setHasRarePersonnel(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("recruitmentRolls")) {
                     personnelMarket.setRecruitmentRolls(MathUtility.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("lastSelectedFilter")) {
@@ -197,21 +203,21 @@ public class NewPersonnelMarket {
         reinitializeKeyData();
 
         setCurrentApplicants(new ArrayList<>()); // clear old applicants
-        setApplicantOriginFactions(applicantOriginFactions);
+        setApplicantOriginFactions(getApplicantOriginFactions());
 
         String isZeroAvailability = getAvailabilityMessage();
 
         if (!isZeroAvailability.isBlank()) {
-            logger.debug("No applicants will be generated due to {}", isZeroAvailability);
+            logger.info("No applicants will be generated due to {}", isZeroAvailability);
             return;
         }
 
         generateApplicants();
 
         if (currentApplicants.isEmpty()) {
-            logger.debug("No applicants were generated.");
+            logger.info("No applicants were generated.");
         } else {
-            logger.debug("Generated {} applicants for the campaign.", currentApplicants.size());
+            logger.info("Generated {} applicants for the campaign.", currentApplicants.size());
 
             if (campaign.getCampaignOptions().isPersonnelMarketReportRefresh()) {
                 campaign.addReport(generatePersonnelReport());
@@ -255,6 +261,11 @@ public class NewPersonnelMarket {
               associatedPersonnelMarketStyle.name()); // this node must always be first
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "offeringGoldenHello", offeringGoldenHello);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "hasRarePersonnel", hasRarePersonnel);
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "rareProfessions");
+        for (PersonnelRole profession : rareProfessions) {
+            MHQXMLUtility.writeSimpleXMLTag(writer, indent, "rareProfession", profession.name());
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "rareProfessions");
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "recruitmentRolls", recruitmentRolls);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "lastSelectedFilter", lastSelectedFilter);
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "currentApplicants");
@@ -612,6 +623,30 @@ public class NewPersonnelMarket {
     }
 
     /**
+     * Returns a list of rare professions currently stored.
+     *
+     * @return a list of {@link PersonnelRole} representing rare professions
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public List<PersonnelRole> getRareProfessions() {
+        return rareProfessions;
+    }
+
+    /**
+     * Adds a profession to the list of rare professions.
+     *
+     * @param rareProfession the {@link PersonnelRole} to mark as rare and add to the list
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public void addRareProfession(PersonnelRole rareProfession) {
+        rareProfessions.add(rareProfession);
+    }
+
+    /**
      * Returns the number of recruitment rolls performed for the current market evaluation.
      *
      * @return recruitment rolls value
@@ -680,6 +715,12 @@ public class NewPersonnelMarket {
         today = campaign.getLocalDate();
         gameYear = today.getYear();
         currentSystem = campaign.getCurrentSystem();
+
+        hasRarePersonnel = false;
+        rareProfessions = new ArrayList<>();
+        recruitmentRolls = 0;
+        applicantOriginFactions = new ArrayList<>();
+        currentApplicants = new ArrayList<>();
     }
 
     /**
@@ -772,10 +813,16 @@ public class NewPersonnelMarket {
         }
 
         // If we have a valid entry, we now need to generate the applicant
-        String applicantOriginFaction = getRandomItem(applicantOriginFactions).getShortName();
-        Person applicant = campaign.newPerson(entry.profession(), applicantOriginFaction, Gender.RANDOMIZE);
+        Faction applicantOriginFaction = getRandomItem(applicantOriginFactions);
+        if (applicantOriginFaction == null) {
+            logger.error("Could not find a valid applicant origin faction for game year {}.", gameYear);
+            return null;
+        }
+        String originFactionCode = applicantOriginFaction.getShortName();
+
+        Person applicant = campaign.newPerson(entry.profession(), originFactionCode, Gender.RANDOMIZE);
         if (applicant == null) {
-            logger.debug("Could not create person for {} game year {} from faction {}",
+            logger.info("Could not create person for {} game year {} from faction {}",
                   originalEntry.profession(),
                   gameYear,
                   applicantOriginFaction);
@@ -784,9 +831,14 @@ public class NewPersonnelMarket {
 
         if (!hasRarePersonnel && (entry.weight() <= RARE_PROFESSION_WEIGHT)) {
             hasRarePersonnel = true;
+
+            PersonnelRole profession = entry.profession();
+            if (!rareProfessions.contains(profession)) {
+                rareProfessions.add(profession);
+            }
         }
 
-        logger.debug("Generated applicant {} ({}) game year {} from faction {}",
+        logger.info("Generated applicant {} ({}) game year {} from faction {}",
               applicant.getFullName(),
               applicant.getPrimaryRole(),
               gameYear,
@@ -813,12 +865,22 @@ public class NewPersonnelMarket {
     PersonnelMarketEntry vetEntryForIntroductionAndExtinctionYears(
           Map<PersonnelRole, PersonnelMarketEntry> unorderedMarketEntries, PersonnelMarketEntry entry) {
         int remainingIterations = 3;
-        while (gameYear < entry.introductionYear() || gameYear >= entry.extinctionYear()) {
+
+        int introductionYear = entry.introductionYear();
+        int extinctionYear = entry.extinctionYear();
+        while (gameYear < introductionYear || (gameYear >= extinctionYear)) {
             PersonnelRole fallbackProfession = entry.fallbackProfession();
             entry = unorderedMarketEntries.get(fallbackProfession);
+
             remainingIterations--;
             if (entry == null || remainingIterations <= 0) {
                 return null;
+            }
+
+            introductionYear = entry.introductionYear();
+            extinctionYear = entry.extinctionYear();
+            if (extinctionYear == PROFESSION_EXTINCTION_IGNORE_VALUE) {
+                extinctionYear = Integer.MAX_VALUE;
             }
         }
         return entry;
@@ -872,15 +934,15 @@ public class NewPersonnelMarket {
      * Processes an XML node containing applicant data and loads it into the supplied personnel market.
      *
      * @param personnelMarket the personnel market instance being loaded
-     * @param wn              the XML node representing applicant data
+     * @param parentNode              the XML node representing applicant data
      * @param version         serialization version
      * @author Illiani
      * @since 0.50.06
      */
-    private static void processApplicantNodes(NewPersonnelMarket personnelMarket, Node wn, Version version) {
-        logger.debug("Loading Applicant Nodes from XML...");
+    private static void processApplicantNodes(NewPersonnelMarket personnelMarket, Node parentNode, Version version) {
+        logger.info("Loading Applicant Nodes from XML...");
 
-        NodeList childNodes = wn.getChildNodes();
+        NodeList childNodes = parentNode.getChildNodes();
 
         // Okay, let's iterate through the children, eh?
         for (int x = 0; x < childNodes.getLength(); x++) {
@@ -903,6 +965,34 @@ public class NewPersonnelMarket {
             }
         }
 
-        logger.debug("Load Applicant Nodes Complete!");
+        logger.info("Load Applicant Nodes Complete!");
+    }
+
+    private static void processRareProfessionNodes(NewPersonnelMarket personnelMarket, Node parentNode,
+          Version version) {
+        logger.info("Loading Rare Profession Nodes from XML...");
+
+        NodeList childNodes = parentNode.getChildNodes();
+
+        for (int x = 0; x < childNodes.getLength(); x++) {
+            Node currentChild = childNodes.item(x);
+
+            // If it's not an element node, we ignore it.
+            if (currentChild.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            if (!currentChild.getNodeName().equalsIgnoreCase("rareProfession")) {
+                logger.error("Unknown node type not loaded in Rare Profession nodes: {}", currentChild.getNodeName());
+                continue;
+            }
+
+            PersonnelRole primaryRole = PersonnelRole.fromString(currentChild.getTextContent().trim());
+            if (primaryRole != null) {
+                personnelMarket.addRareProfession(primaryRole);
+            }
+        }
+
+        logger.info("Load Kill Nodes Complete!");
     }
 }
