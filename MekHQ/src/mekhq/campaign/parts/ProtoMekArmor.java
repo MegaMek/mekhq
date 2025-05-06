@@ -56,7 +56,7 @@ public class ProtoMekArmor extends Armor {
 
     @Override
     public ProtoMekArmor clone() {
-        ProtoMekArmor clone = new ProtoMekArmor(0, type, 0, amount, clan, campaign);
+        ProtoMekArmor clone = new ProtoMekArmor(0, getType(), getAmount(), getLocation(), clan, campaign);
         clone.copyBaseData(this);
         return clone;
     }
@@ -137,29 +137,10 @@ public class ProtoMekArmor extends Armor {
 
     @Override
     public int getAmountAvailable() {
-        ProtoMekArmor a = (ProtoMekArmor) campaign.getWarehouse().findSparePart(part ->
-                (part instanceof ProtoMekArmor)
-                        && part.isPresent()
-                        && !part.isReservedForRefit()
-                        && isClanTechBase() == part.isClanTechBase()
-                        && (getType() == ((ProtoMekArmor) part).getType()));
-
-        return a != null ? a.getAmount() : 0;
-    }
-
-    @Override
-    public void changeAmountAvailable(int amount) {
-        ProtoMekArmor a = (ProtoMekArmor) campaign.getWarehouse().findSparePart(part ->
-                isSamePartType(part) && part.isPresent());
-
-        if (null != a) {
-            a.setAmount(a.getAmount() + amount);
-            if (a.getAmount() <= 0) {
-                campaign.getWarehouse().removePart(a);
-            }
-        } else if (amount > 0) {
-            campaign.getQuartermaster().addPart(new ProtoMekArmor(getUnitTonnage(), type, amount, -1, isClanTechBase(), campaign), 0);
-        }
+        return campaign.getWarehouse()
+                     .streamSpareParts().filter(this::isSameProtoMekArmor)
+                     .mapToInt(part -> ((ProtoMekArmor) part).getAmount())
+                     .sum();
     }
 
     @Override
@@ -173,5 +154,38 @@ public class ProtoMekArmor extends Armor {
         // Standard ProtoMek armor is not the same as Standard armor, but does not have an associated
         // type entry so we can just use the base protomek advancement
         return ProtoMek.TA_STANDARD_PROTOMEK;
+    }
+
+    @Override
+    protected int changeAmountAvailableSingle(int amount) {
+        ProtoMekArmor armor = (ProtoMekArmor) campaign.getWarehouse()
+                                                    .findSparePart(part -> isSamePartType(part) && part.isPresent());
+
+        if (null != armor) {
+            int amountRemaining = armor.getAmount() + amount;
+            armor.setAmount(amountRemaining);
+            if (armor.getAmount() <= 0) {
+                campaign.getWarehouse().removePart(armor);
+                return Math.min(0, amountRemaining);
+            }
+        } else if (amount > 0) {
+            campaign.getQuartermaster()
+                  .addPart(new ProtoMekArmor(getUnitTonnage(), type, amount, -1, isClanTechBase(), campaign), 0, false);
+        }
+        return 0;
+    }
+
+    /**
+     * Not sure how true this title is, it was used in {@link ProtoMekArmor#getAmountAvailable}
+     * @param part is this part the same
+     * @return true if the two parts are the same, at least as far as {@link ProtoMekArmor#getAmountAvailable} is
+     * concerned
+     */
+    private boolean isSameProtoMekArmor(Part part) {
+        return (part instanceof ProtoMekArmor protoMekArmor) &&
+                     protoMekArmor.isPresent() &&
+                     !protoMekArmor.isReservedForRefit() &&
+                     isClanTechBase() == protoMekArmor.isClanTechBase() &&
+                     (getType() == (protoMekArmor).getType());
     }
 }
