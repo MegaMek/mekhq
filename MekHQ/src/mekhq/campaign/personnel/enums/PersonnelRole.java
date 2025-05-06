@@ -594,7 +594,7 @@ public enum PersonnelRole {
     }
 
     /**
-     * @return Unused
+     * @deprecated Unused
      */
     @Deprecated(since = "0.50.06", forRemoval = true)
     public boolean isAssistant() {
