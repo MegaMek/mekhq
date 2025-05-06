@@ -19,6 +19,7 @@ MEKHQ VERSION HISTORY:
 + Fix #6778: Prisoners Are Now Correctly Released When Enemy Routs
 + Fix #6678, #6679, #6681, #6686: Added 7 New Unofficial SPAs for Admin Characters
 + Fix #6785: Fixed NPE on New Contract when Negotiator Lacks Negotiation Skill
++ Revert #6802: Removed 'Added Heroic and Legendary Skill Levels'
 
 0.50.05 (2025-04-25 1800 UTC)
 + PR #6284: Fixed Unique Interaction when Loading Player Campaigns with Custom Rank Systems

@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign;
 
@@ -39,6 +44,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.event.PartNewEvent;
@@ -52,6 +58,8 @@ import mekhq.utilities.MHQXMLUtility;
  * Stores parts for a Campaign.
  */
 public class Warehouse {
+    private static final MMLogger logger = MMLogger.create(Warehouse.class);
+
     private final TreeMap<Integer, Part> parts = new TreeMap<>();
 
     /**
@@ -78,7 +86,7 @@ public class Warehouse {
             Part mergedPart = mergePartWithExisting(part);
 
             // CAW: intentional reference equality
-            if (mergedPart != part) {
+            if (!mergedPart.equals(part)) {
                 // We've merged parts, so let interested parties know we've
                 // updated the merged part.
                 MekHQ.triggerEvent(new PartChangedEvent(mergedPart));
@@ -235,7 +243,7 @@ public class Warehouse {
 
         // Check if the part has no unit, no parent part, and is not reserved for replacement
         if ((null == part.getUnit()) && !part.hasParentPart() && !part.isReservedForReplacement()) {
-            Part spare = checkForExistingSparePart(part);
+            Part spare = checkForExistingSparePart(part, true);
 
             // Ensure a matching spare exists and both parts share the same isBrandNew state
             if (spare != null && part.isBrandNew() == spare.isBrandNew()) {
@@ -263,11 +271,51 @@ public class Warehouse {
      * @return The matching spare part or null if none were found.
      */
     public @Nullable Part checkForExistingSparePart(Part part) {
-        Objects.requireNonNull(part);
+        if (part == null) {
+            logger.error(new NullPointerException("Part is null"), "checkForExistingSparePart(Part): Part is null");
+            return null;
+        }
 
         return findSparePart(spare ->
                 (spare.getId() != part.getId())
                 && part.isSamePartTypeAndStatus(spare));
+    }
+
+    /**
+     * Checks for an existing spare part in inventory that matches the given {@code part}.
+     *
+     * <p>In addition to comparing type and status, this method can optionally consider whether both parts are
+     * equally brand new based on the {@code includeNewnessCheck} parameter.</p>
+     *
+     * <ul>
+     *     <li>If {@code includeNewnessCheck} is {@code true}, this method defers to
+     *     {@link #checkForExistingSparePart(Part)} for a match based on type and status.</li>
+     *     <li>If {@code part} is {@code null}, an error is logged and {@code null} is returned.</li>
+     *     <li>Otherwise, returns a matching spare part or {@code null} if none is found.</li>
+     * </ul>
+     *
+     * @param part                the part to find a match for; may not be {@code null}
+     * @param includeNewnessCheck whether to require matching "brand new" status as part of the comparison
+     *
+     * @return an existing spare part matching the given part and criteria, or {@code null} if no match is found
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public @Nullable Part checkForExistingSparePart(Part part, boolean includeNewnessCheck) {
+        if (part == null) {
+            logger.error(new NullPointerException("Part is null"),
+                  "checkForExistingSparePart(Part, boolean): Part is null");
+            return null;
+        }
+
+        if (!includeNewnessCheck) {
+            return checkForExistingSparePart(part);
+        }
+
+        return findSparePart(spare -> (spare.getId() != part.getId()) &&
+                                            part.isSamePartTypeAndStatus(spare) &&
+                                            (part.isBrandNew() == spare.isBrandNew()));
     }
 
     /**
