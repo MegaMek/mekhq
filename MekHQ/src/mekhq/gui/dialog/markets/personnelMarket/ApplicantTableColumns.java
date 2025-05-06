@@ -34,17 +34,65 @@ package mekhq.gui.dialog.markets.personnelMarket;
 
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+/**
+ * Defines the columns for the personnel market applicant table in the GUI.
+ *
+ * <p>Each column corresponds to a visible property for an applicant (e.g., full name, profession). Provides
+ * localization for column headers.</p>
+ *
+ * <p>Each constant is associated with a column index for use in table models.</p>
+ *
+ * <p>The localized label for each column is retrieved from a resource bundle.</p>
+ *
+ * @author Illiani
+ * @since 0.50.06
+ */
 public enum ApplicantTableColumns {
-    FULL_NAME(0), PROFESSION(1), EXPERIENCE(2), AGE(3), GENDER(4);
+    /**
+     * The applicant's full name
+     */
+    FULL_NAME(0),
+    /**
+     * The applicant's primary role
+     */
+    PROFESSION(1),
+    /**
+     * The applicant's experience level
+     */
+    EXPERIENCE(2),
+    /**
+     * The applicant's age
+     */
+    AGE(3),
+    /**
+     * The applicant's gender
+     */
+    GENDER(4);
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources." + ApplicantTableColumns.class.getSimpleName();
 
     public final int columnIndex;
 
+    /**
+     * Constructs a new ApplicantTableColumns value with the supplied column index.
+     *
+     * @param columnIndex the integer index for the column
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
     ApplicantTableColumns(int columnIndex) {
         this.columnIndex = columnIndex;
     }
 
+    /**
+     * Returns the localized display label for this column using the resource bundle.
+     *
+     * @return localized column header label
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
     public String getLabel() {
         return getTextAt(RESOURCE_BUNDLE, name() + ".label");
     }

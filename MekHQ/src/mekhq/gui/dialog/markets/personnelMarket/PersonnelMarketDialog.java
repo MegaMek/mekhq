@@ -71,6 +71,41 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.view.PersonViewPanel;
 
+/**
+ * Provides the main dialog window for interacting with the personnel market.
+ *
+ * <p>This class handles the GUI elements and core logic for displaying available applicants, filtering options, and
+ * handling personnel hiring activities. It integrates with campaign data and market configurations and supports a
+ * variety of customization and localization features.
+ *
+ * <p>Features:</p>
+ * <ul>
+ *     <li>Displays applicant data in a table with sorting/filtering</li>
+ *     <li>Provides detail views for each applicant</li>
+ *     <li>Integrates hiring functionality, including "Golden Hello" options</li>
+ *     <li>Shows dynamic messages and tooltips related to personnel market states</li>
+ *     <li>Supports filtering by personnel role and custom campaign-defined settings</li>
+ * </ul>
+ *
+ * <p>Usage:</p>
+ * <ol>
+ *     <li>Instantiate with the relevant market model, campaign, and parent frame.</li>
+ *     <li>Call {@code initializeComponents()} before use to construct and arrange UI elements.</li>
+ *     <li>Handles user actions for hiring or inspecting applicants directly in the GUI.</li>
+ * </ol>
+ *
+ * <p>Notable Constants:</p>
+ * <ul>
+ *     <li>{@link #MAXIMUM_DAYS_IN_MONTH}: Used for calendar-related UI logic.</li>
+ *     <li>{@link #MAXIMUM_NUMBER_OF_SYSTEM_ROLLS}: Defines maximum rolls that can be gained from system status.</li>
+ * </ul>
+ *
+ * <p>Private implementation includes utility and helper methods for constructing the dialog's layout, handling
+ * events, and providing dynamic UI feedback.</p>
+ *
+ * @author Illiani
+ * @since 0.50.06
+ */
 public class PersonnelMarketDialog {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PersonnelMarket";
 
@@ -89,6 +124,14 @@ public class PersonnelMarketDialog {
     private PersonnelTablePanel tablePanel;
     private PersonViewPanel personViewPanel;
 
+    /**
+     * Constructs a new PersonnelMarketDialog.
+     *
+     * @param market the personnel market logic backing this dialog
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
     public PersonnelMarketDialog(NewPersonnelMarket market) {
         this.market = market;
         this.campaign = market.getCampaign();
@@ -99,6 +142,14 @@ public class PersonnelMarketDialog {
         initializeComponents();
     }
 
+    /**
+     * Initializes and arranges all GUI components for the dialog.
+     *
+     * <p>Should be called before displaying the dialog.</p>
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
     public void initializeComponents() {
         JDialog dialog = new JDialog(parent);
         setDialogTitle(dialog);
@@ -150,6 +201,15 @@ public class PersonnelMarketDialog {
         dialog.setVisible(true);
     }
 
+
+    /**
+     * Creates and returns the header panel for the personnel market dialog.
+     *
+     * @return a {@link JPanel} representing the dialog header
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
     private JPanel initializeHeader() {
         JPanel panel = new JPanel(new GridBagLayout());
 
@@ -227,6 +287,15 @@ public class PersonnelMarketDialog {
         return panel;
     }
 
+
+    /**
+     * Creates and returns the filter panel containing controls for applicant filtering.
+     *
+     * @return a {@link JPanel} containing filter controls
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
     private JPanel initializeFilter() {
         JPanel filterPanel = new JPanel(new GridBagLayout());
         GridBagConstraints fbc = new GridBagConstraints();
@@ -252,6 +321,14 @@ public class PersonnelMarketDialog {
         return filterPanel;
     }
 
+    /**
+     * Creates and returns the button panel for the dialog.
+     *
+     * @return a {@link JPanel} with action buttons
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
     private JPanel initializeButtonPanel() {
         boolean isGM = campaign.isGM();
 
@@ -268,6 +345,14 @@ public class PersonnelMarketDialog {
         return buttonPanel;
     }
 
+    /**
+     * Creates and returns the tip panel, displaying context-sensitive help or advice.
+     *
+     * @return a {@link JPanel} showing dynamic tips
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
     private JPanel initializeTipPanel() {
         JLabel infoLabel = new JLabel(getTipMessage());
         infoLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -280,6 +365,14 @@ public class PersonnelMarketDialog {
         return bottomPanel;
     }
 
+    /**
+     * Initializes and returns the personnel table panel displaying market applicants.
+     *
+     * @return a configured {@link PersonnelTablePanel} instance
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
     private PersonnelTablePanel initializeTablePanel() {
         PersonnelTablePanel tablePanel = new PersonnelTablePanel(campaign, currentApplicants);
 
@@ -310,6 +403,17 @@ public class PersonnelMarketDialog {
         return tablePanel;
     }
 
+
+    /**
+     * Initializes and returns the detail view pane for the selected person.
+     *
+     * @param selectedPerson   reference to the selected person
+     * @param mainPanel        main panel where the split pane is embedded
+     * @return a configured {@link JSplitPane} for applicant details
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
     private JSplitPane initializePersonView(AtomicReference<Person> selectedPerson, JPanel mainPanel) {
         personViewPanel = new PersonViewPanel(selectedPerson.get(), campaign, campaign.getApp().getCampaigngui());
         JScrollPane viewScrollPane = new JScrollPane(personViewPanel);
@@ -331,6 +435,14 @@ public class PersonnelMarketDialog {
         return splitPane;
     }
 
+    /**
+     * Performs the hiring action for the selected applicant.
+     *
+     * @param isGM  whether the hire action is performed by a game master
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
     private void hireActionListener(boolean isGM) {
         List<Person> recruitedPersons = new ArrayList<>(tablePanel.getSelectedApplicants());
 
@@ -362,6 +474,14 @@ public class PersonnelMarketDialog {
         tablePanel.getTable().clearSelection();
     }
 
+    /**
+     * Sets the dialog's title based on market and campaign context.
+     *
+     * @param dialog the dialog window to set the title on
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
     private void setDialogTitle(JDialog dialog) {
         Faction campaignFaction = campaign.getFaction();
         if (campaignFaction.isClan()) {
@@ -379,6 +499,15 @@ public class PersonnelMarketDialog {
         }
     }
 
+
+    /**
+     * Returns a context-specific tip message for display.
+     *
+     * @return tip message as a {@link String}
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
     private String getTipMessage() {
         if (market.getAssociatedPersonnelMarketStyle() == MEKHQ) {
             return getTextAt(RESOURCE_BUNDLE, "hint.personnelMarket." + randomInt(10));
@@ -387,6 +516,14 @@ public class PersonnelMarketDialog {
         return getTextAt(RESOURCE_BUNDLE, "hint.personnelMarket.0");
     }
 
+    /**
+     * Computes and returns a message about applicant availability modifiers.
+     *
+     * @return availability modifier message as a {@link String}
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
     private String getAvailabilityModifierMessage() {
         String noAvailabilityMessage = market.getAvailabilityMessage();
         String color;
