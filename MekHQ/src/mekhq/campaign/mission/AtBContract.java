@@ -1702,7 +1702,7 @@ public class AtBContract extends Contract {
         String batchallStatement = BatchallFactions.getGreeting(campaign, enemyCode);
 
         // An ImageIcon to hold the clan's faction icon
-        ImageIcon icon = getFactionLogo(campaign, enemyCode, false);
+        ImageIcon icon = getFactionLogo(campaign.getGameYear(), enemyCode);
 
         // Set the commander's rank and use a name generator to generate the commander's
         // name
