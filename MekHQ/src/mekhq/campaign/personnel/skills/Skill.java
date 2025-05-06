@@ -39,7 +39,7 @@ import static java.lang.Math.min;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.personnel.skills.SkillType.S_ACTING;
 import static mekhq.campaign.personnel.skills.SkillType.S_ANIMAL_HANDLING;
-import static mekhq.campaign.personnel.skills.SkillType.S_NEG;
+import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.campaign.personnel.skills.SkillType.S_PERCEPTION;
 import static mekhq.campaign.personnel.skills.SkillType.S_PROTOCOLS;
 import static mekhq.campaign.personnel.skills.SkillType.S_STREETWISE;
@@ -328,7 +328,9 @@ public class Skill {
 
         String name = type.getName();
         // Reputation and Alternate ID
-        if (Objects.equals(name, S_NEG) || Objects.equals(name, S_PROTOCOLS) || Objects.equals(name, S_STREETWISE)) {
+        if (Objects.equals(name, S_NEGOTIATION) ||
+                  Objects.equals(name, S_PROTOCOLS) ||
+                  Objects.equals(name, S_STREETWISE)) {
             if (characterOptions.booleanOption(ATOW_ALTERNATE_ID) && reputation < 0) {
                 reputation = min(0, reputation + 2);
             }
@@ -394,7 +396,7 @@ public class Skill {
         }
 
         // Introvert, Gregarious
-        if (Objects.equals(name, S_ACTING) || Objects.equals(name, S_NEG)) {
+        if (Objects.equals(name, S_ACTING) || Objects.equals(name, S_NEGOTIATION)) {
             if (characterOptions.booleanOption(FLAW_INTROVERT)) {
                 modifier += 1;
             }
