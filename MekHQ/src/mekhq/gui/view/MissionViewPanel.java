@@ -34,6 +34,7 @@ import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.estimat
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -1137,7 +1138,7 @@ public class MissionViewPanel extends JScrollablePanel {
         pnlTutorial.add(Box.createHorizontalStrut(20), BorderLayout.CENTER);
 
         pnlTutorial.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-        pnlTutorial.setPreferredSize(scaleForGUI(800, 0));
+        pnlTutorial.setPreferredSize(new Dimension(800, 0));
         pnlTutorial.add(scrollPane, BorderLayout.CENTER);
     }
 }
