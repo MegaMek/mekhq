@@ -168,7 +168,9 @@ public class PersonUtility {
               Map.entry(MEK_TECH, isTechsUseAdministration ? List.of(S_TECH_MEK, S_ADMIN) : List.of(S_TECH_MEK)),
               Map.entry(AERO_TEK, isTechsUseAdministration ? List.of(S_TECH_AERO, S_ADMIN) : List.of(S_TECH_AERO)),
               Map.entry(BA_TECH, isTechsUseAdministration ? List.of(S_TECH_BA, S_ADMIN) : List.of(S_TECH_BA)),
-              Map.entry(DOCTOR, isDoctorsUseAdministration ? List.of(S_DOCTOR, S_ADMIN) : List.of(S_DOCTOR)));
+              Map.entry(ASTECH, List.of(S_ASTECH)),
+              Map.entry(DOCTOR, isDoctorsUseAdministration ? List.of(S_DOCTOR, S_ADMIN) : List.of(S_DOCTOR)),
+              Map.entry(MEDIC, List.of(S_MEDTECH)));
 
         // Add admin-specific logic
         if (primaryRole == ADMINISTRATOR_COMMAND ||
