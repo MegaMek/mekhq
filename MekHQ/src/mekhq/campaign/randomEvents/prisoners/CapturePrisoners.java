@@ -314,7 +314,7 @@ public class CapturePrisoners {
 
                     campaign.removePerson(prisoner);
                 } else {
-                    prisoner.changeStatus(campaign, today, BONDSREF);
+                    prisoner.changeStatus(campaign, today, POW);
                 }
                 return;
             }
