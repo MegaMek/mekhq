@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.randomEvents.prisoners;
 
-import static java.lang.Math.round;
 import static megamek.common.Board.T_SPACE;
 import static megamek.common.MiscType.createBeagleActiveProbe;
 import static megamek.common.MiscType.createCLImprovedSensors;
@@ -303,7 +302,7 @@ public class CapturePrisoners {
                 }
                 return;
             }
-        } else if (capturingFaction.getHonorRating(campaign) == HonorRating.NONE) {
+        } else if (capturingFaction != null && capturingFaction.getHonorRating(campaign) == HonorRating.NONE) {
             if (bondsmanRoll == 1) {
                 if (isNPC) {
                     campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
