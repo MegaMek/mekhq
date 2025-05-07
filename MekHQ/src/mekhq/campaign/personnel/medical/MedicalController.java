@@ -33,7 +33,7 @@
 package mekhq.campaign.personnel.medical;
 
 import static mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil.resolveDailyHealing;
-import static mekhq.campaign.personnel.skills.SkillType.S_DOCTOR;
+import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.ArrayList;
@@ -164,8 +164,7 @@ public class MedicalController {
         logger.info(getFormattedTextAt(RESOURCE_BUNDLE, "MedicalController.report.intro",
               doctor.getHyperlinkedFullTitle(), patient.getHyperlinkedFullTitle()));
 
-        SkillCheckUtility skillCheckUtility = new SkillCheckUtility(doctor,
-              S_DOCTOR,
+        SkillCheckUtility skillCheckUtility = new SkillCheckUtility(doctor, S_SURGERY,
               getAdditionalHealingModifiers(patient),
               0,
               isUseSupportEdge,

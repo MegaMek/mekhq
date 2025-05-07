@@ -28,6 +28,8 @@
 package mekhq.campaign.personnel.skills;
 
 import static java.lang.Math.round;
+import static mekhq.campaign.personnel.skills.SkillType.S_CLIMBING;
+import static mekhq.campaign.personnel.skills.SkillType.S_SCROUNGE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.List;
@@ -52,8 +54,11 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 public class SkillDeprecationTool {
     private final String RESOURCE_BUNDLE = "mekhq.resources." + getClass().getSimpleName();
 
+    @SuppressWarnings(value = "FieldCanBeLocal")
     private final int SKIP_ALL_DIALOG_OPTION_INDEX = 1;
+    @SuppressWarnings(value = "FieldCanBeLocal")
     private final int REFUND_DIALOG_OPTION_INDEX = 2;
+    @SuppressWarnings(value = "FieldCanBeLocal")
     private final int REFUND_ALL_DIALOG_OPTION_INDEX = 3;
     /**
      * A list of deprecated skills.
@@ -64,9 +69,10 @@ public class SkillDeprecationTool {
      * This list should be updated following each Milestone release. If there are no skills in the list an empty array
      * MUST be left; otherwise we will run into NPEs during campaign loading.</p>
      *
-     * <p><b>Last Updated:</b> 50.05</p>
+     * <p><b>Last Updated:</b> 50.06</p>
      */
-    public static final List<SkillType> DEPRECATED_SKILLS = List.of(SkillType.getType(SkillType.S_SCROUNGE));
+    public static final List<SkillType> DEPRECATED_SKILLS = List.of(SkillType.getType(S_SCROUNGE),
+          SkillType.getType(S_CLIMBING));
 
     private final Campaign campaign;
     private final Person person;

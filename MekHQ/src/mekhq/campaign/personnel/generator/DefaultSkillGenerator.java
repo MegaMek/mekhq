@@ -126,7 +126,7 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
 
         // roll Negotiation skill
         if (campaignOptions.isAdminsHaveNegotiation() && (primaryRole.isAdministrator())) {
-            addSkill(person, SkillType.S_NEG, expLvl, rskillPrefs.randomizeSkill(), 0, mod);
+            addSkill(person, SkillType.S_NEGOTIATION, expLvl, rskillPrefs.randomizeSkill(), 0, mod);
         }
 
         // roll Scrounge skill
