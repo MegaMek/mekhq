@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.personnel.generator;
 
+import static mekhq.campaign.personnel.skills.SkillDeprecationTool.DEPRECATED_SKILLS;
 import static mekhq.campaign.personnel.skills.SkillType.getRoleplaySkills;
 
 import java.util.Objects;
@@ -217,6 +218,10 @@ public abstract class AbstractSkillGenerator {
 
     public void generateRoleplaySkills(final Person person) {
         for (SkillType skillType : getRoleplaySkills()) {
+            if (DEPRECATED_SKILLS.contains(skillType)) {
+                continue;
+            }
+
             int roleplaySkillLevel = Utilities.generateExpLevel(rskillPrefs.getRoleplaySkillModifier());
             if (roleplaySkillLevel > SkillType.EXP_ULTRA_GREEN) {
                 addSkill(person, skillType.getName(), roleplaySkillLevel, rskillPrefs.randomizeSkill(), 0);
