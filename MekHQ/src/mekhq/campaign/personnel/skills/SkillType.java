@@ -146,6 +146,12 @@ public class SkillType {
     public static final String S_ART_DRAWING = "Art/Drawing" + RP_ONLY_TAG;
     public static final String S_ART_PAINTING = "Art/Painting" + RP_ONLY_TAG;
     public static final String S_ART_WRITING = "Art/Writing" + RP_ONLY_TAG;
+    public static final String S_ART_COOKING = "Art/Cooking" + RP_ONLY_TAG;
+    public static final String S_ART_POETRY = "Art/Poetry" + RP_ONLY_TAG;
+    public static final String S_ART_SCULPTURE = "Art/Sculpture" + RP_ONLY_TAG;
+    public static final String S_ART_INSTRUMENT = "Art/Instrument" + RP_ONLY_TAG;
+    public static final String S_ART_SINGING = "Art/Singing" + RP_ONLY_TAG;
+    public static final String S_ART_OTHER = "Art/Other" + RP_ONLY_TAG;
     public static final String S_CLIMBING = "Climbing" + RP_ONLY_TAG;
     public static final String S_COMMUNICATIONS = "Communications/Any" + RP_ONLY_TAG;
     public static final String S_COMPUTERS = "Computers" + RP_ONLY_TAG;
@@ -158,6 +164,24 @@ public class SkillType {
     public static final String S_INTEREST_LITERATURE = "Interest/Literature" + RP_ONLY_TAG;
     public static final String S_INTEREST_HOLO_GAMES = "Interest/Holo-Games" + RP_ONLY_TAG;
     public static final String S_INTEREST_SPORTS = "Interest/Sports" + RP_ONLY_TAG;
+    public static final String S_INTEREST_FASHION = "Interest/Fashion" + RP_ONLY_TAG;
+    public static final String S_INTEREST_MUSIC = "Interest/Music" + RP_ONLY_TAG;
+    public static final String S_INTEREST_MILITARY = "Interest/Military" + RP_ONLY_TAG;
+    public static final String S_INTEREST_ANTIQUES = "Interest/Antiques" + RP_ONLY_TAG;
+    public static final String S_INTEREST_THEOLOGY = "Interest/Theology" + RP_ONLY_TAG;
+    public static final String S_INTEREST_GAMBLING = "Interest/Gambling" + RP_ONLY_TAG;
+    public static final String S_INTEREST_POLITICS = "Interest/Politics" + RP_ONLY_TAG;
+    public static final String S_INTEREST_PHILOSOPHY = "Interest/Philosophy" + RP_ONLY_TAG;
+    public static final String S_INTEREST_ECONOMICS = "Interest/Economics" + RP_ONLY_TAG;
+    public static final String S_INTEREST_POP_CULTURE = "Interest/Pop-Culture" + RP_ONLY_TAG;
+    public static final String S_INTEREST_ASTROLOGY = "Interest/Astrology" + RP_ONLY_TAG;
+    public static final String S_INTEREST_FISHING = "Interest/Fishing" + RP_ONLY_TAG;
+    public static final String S_INTEREST_MYTHOLOGY = "Interest/Mythology" + RP_ONLY_TAG;
+    public static final String S_INTEREST_CARTOGRAPHY = "Interest/Cartography" + RP_ONLY_TAG;
+    public static final String S_INTEREST_ARCHEOLOGY = "Interest/Archeology" + RP_ONLY_TAG;
+    public static final String S_INTEREST_HOLO_CINEMA = "Interest/Holo-Cinema" + RP_ONLY_TAG;
+    public static final String S_INTEREST_EXOTIC_ANIMALS = "Interest/Exotic Animals" + RP_ONLY_TAG;
+    public static final String S_INTEREST_OTHER = "Interest/Other" + RP_ONLY_TAG;
     public static final String S_INTERROGATION = "Interrogation" + RP_ONLY_TAG;
     public static final String S_INVESTIGATION = "Investigation" + RP_ONLY_TAG;
     public static final String S_LANGUAGES = "Language/Any" + RP_ONLY_TAG;
@@ -169,6 +193,13 @@ public class SkillType {
     public static final String S_SCIENCE_CHEMISTRY = "Science/Chemistry" + RP_ONLY_TAG;
     public static final String S_SCIENCE_MATHEMATICS = "Science/Mathematics" + RP_ONLY_TAG;
     public static final String S_SCIENCE_PHYSICS = "Science/Physics" + RP_ONLY_TAG;
+    public static final String S_SCIENCE_MILITARY = "Science/Military" + RP_ONLY_TAG;
+    public static final String S_SCIENCE_GEOLOGY = "Science/Geology" + RP_ONLY_TAG;
+    public static final String S_SCIENCE_XENOBIOLOGY = "Science/Xenobiology" + RP_ONLY_TAG;
+    public static final String S_SCIENCE_PHARMACOLOGY = "Science/Pharmacology" + RP_ONLY_TAG;
+    public static final String S_SCIENCE_GENETICS = "Science/Genetics" + RP_ONLY_TAG;
+    public static final String S_SCIENCE_PSYCHOLOGY = "Science/Psychology" + RP_ONLY_TAG;
+    public static final String S_SCIENCE_OTHER = "Science/Other" + RP_ONLY_TAG;
     public static final String S_SECURITY_SYSTEMS_ELECTRONIC = "Security Systems/Electronic" + RP_ONLY_TAG;
     public static final String S_SCIENCE_SYSTEMS_MECHANICAL = "Security Systems/Mechanical" + RP_ONLY_TAG;
     public static final String S_SENSOR_OPERATIONS = "Sensor Operations" + RP_ONLY_TAG;
@@ -177,6 +208,14 @@ public class SkillType {
     public static final String S_SURVIVAL = "Survival/Any" + RP_ONLY_TAG;
     public static final String S_TRACKING = "Tracking/Any" + RP_ONLY_TAG;
     public static final String S_TRAINING = "Training" + RP_ONLY_TAG;
+    public static final String S_CAREER_ANY = "Career/Any" + RP_ONLY_TAG;
+    public static final String S_RUNNING = "Running" + RP_ONLY_TAG;
+    public static final String S_SWIMMING = "Swimming" + RP_ONLY_TAG;
+    public static final String S_ZERO_G_OPERATIONS = "Zero-G Operations" + RP_ONLY_TAG;
+    public static final String S_MELEE_WEAPONS = "Melee Weapons" + RP_ONLY_TAG;
+    public static final String S_THROWN_WEAPONS = "Thrown Weapons" + RP_ONLY_TAG;
+    public static final String S_SUPPORT_WEAPONS = "Support Weapons" + RP_ONLY_TAG;
+
 
     public static final int NUM_LEVELS = 11;
 
@@ -186,17 +225,28 @@ public class SkillType {
                                                S_SMALL_ARMS, S_ANTI_MEK, S_TECH_MEK, S_TECH_MECHANIC, S_TECH_AERO,
                                                S_TECH_BA, S_TECH_VESSEL, S_ASTECH, S_SURGERY, S_MEDTECH, S_NAVIGATION,
                                                S_ADMIN, S_TACTICS, S_STRATEGY, S_NEGOTIATION, S_LEADER, S_SCROUNGE,
-                                               S_ACROBATICS,
-                                               S_ACTING, S_ANIMAL_HANDLING, S_APPRAISAL, S_ARCHERY, S_ART_DANCING,
-                                               S_ART_DRAWING, S_ART_PAINTING, S_ART_WRITING, S_CLIMBING,
-                                               S_COMMUNICATIONS, S_COMPUTERS, S_CRYPTOGRAPHY, S_DEMOLITIONS, S_DISGUISE,
-                                               S_ESCAPE_ARTIST, S_FORGERY, S_INTEREST_HISTORY, S_INTEREST_LITERATURE,
-                                               S_INTEREST_HOLO_GAMES, S_INTEREST_SPORTS, S_INTERROGATION,
-                                               S_INVESTIGATION, S_LANGUAGES, S_MARTIAL_ARTS, S_PERCEPTION,
-                                               S_SLEIGHT_OF_HAND, S_PROTOCOLS, S_SCIENCE_BIOLOGY, S_SCIENCE_CHEMISTRY,
-                                               S_SCIENCE_MATHEMATICS, S_SCIENCE_PHYSICS, S_SECURITY_SYSTEMS_ELECTRONIC,
+                                               S_ACROBATICS, S_ACTING, S_ANIMAL_HANDLING, S_APPRAISAL, S_ARCHERY,
+                                               S_ART_COOKING, S_ART_DANCING, S_ART_DRAWING, S_ART_PAINTING,
+                                               S_ART_POETRY, S_ART_SCULPTURE, S_ART_INSTRUMENT, S_ART_SINGING,
+                                               S_ART_WRITING, S_ART_OTHER, S_CLIMBING, S_COMMUNICATIONS, S_COMPUTERS,
+                                               S_CRYPTOGRAPHY, S_DEMOLITIONS, S_DISGUISE, S_ESCAPE_ARTIST, S_FORGERY,
+                                               S_INTEREST_HISTORY, S_INTEREST_LITERATURE, S_INTEREST_HOLO_GAMES,
+                                               S_INTEREST_SPORTS, S_INTEREST_FASHION, S_INTEREST_MUSIC,
+                                               S_INTEREST_MILITARY, S_INTEREST_ANTIQUES, S_INTEREST_THEOLOGY,
+                                               S_INTEREST_GAMBLING, S_INTEREST_POLITICS, S_INTEREST_PHILOSOPHY,
+                                               S_INTEREST_ECONOMICS, S_INTEREST_POP_CULTURE, S_INTEREST_ASTROLOGY,
+                                               S_INTEREST_FISHING, S_INTEREST_MYTHOLOGY, S_INTEREST_CARTOGRAPHY,
+                                               S_INTEREST_ARCHEOLOGY, S_INTEREST_HOLO_CINEMA, S_INTEREST_EXOTIC_ANIMALS,
+                                               S_INTEREST_OTHER, S_INTERROGATION, S_INVESTIGATION, S_LANGUAGES,
+                                               S_MARTIAL_ARTS, S_PERCEPTION, S_SLEIGHT_OF_HAND, S_PROTOCOLS,
+                                               S_SCIENCE_BIOLOGY, S_SCIENCE_CHEMISTRY, S_SCIENCE_MATHEMATICS,
+                                               S_SCIENCE_PHYSICS, S_SCIENCE_MILITARY, S_SCIENCE_GEOLOGY,
+                                               S_SCIENCE_XENOBIOLOGY, S_SCIENCE_PHARMACOLOGY, S_SCIENCE_GENETICS,
+                                               S_SCIENCE_PSYCHOLOGY, S_SCIENCE_OTHER, S_SECURITY_SYSTEMS_ELECTRONIC,
                                                S_SCIENCE_SYSTEMS_MECHANICAL, S_SENSOR_OPERATIONS, S_STEALTH,
-                                               S_STREETWISE, S_SURVIVAL, S_TRACKING, S_TRAINING };
+                                               S_STREETWISE, S_SURVIVAL, S_TRACKING, S_CAREER_ANY, S_SWIMMING,
+                                               S_ZERO_G_OPERATIONS, S_RUNNING, S_TRAINING, S_MELEE_WEAPONS,
+                                               S_THROWN_WEAPONS, S_SUPPORT_WEAPONS };
 
 
     public static Map<String, SkillType> lookupHash;
@@ -768,6 +818,12 @@ public class SkillType {
         lookupHash.put(S_ART_DRAWING, createArtDrawing());
         lookupHash.put(S_ART_PAINTING, createArtPainting());
         lookupHash.put(S_ART_WRITING, createArtWriting());
+        lookupHash.put(S_ART_POETRY, createArtPoetry());
+        lookupHash.put(S_ART_SCULPTURE, createArtSculpture());
+        lookupHash.put(S_ART_INSTRUMENT, createArtInstrument());
+        lookupHash.put(S_ART_COOKING, createArtCooking());
+        lookupHash.put(S_ART_SINGING, createArtSinging());
+        lookupHash.put(S_ART_OTHER, createArtOther());
         lookupHash.put(S_CLIMBING, createClimbing());
         lookupHash.put(S_COMMUNICATIONS, createCommunications());
         lookupHash.put(S_COMPUTERS, createComputers());
@@ -779,7 +835,24 @@ public class SkillType {
         lookupHash.put(S_INTEREST_HISTORY, createInterestHistory());
         lookupHash.put(S_INTEREST_LITERATURE, createInterestLiterature());
         lookupHash.put(S_INTEREST_HOLO_GAMES, createInterestHoloGames());
-        lookupHash.put(S_INTEREST_SPORTS, createInterestSports());
+        lookupHash.put(S_INTEREST_FASHION, createInterestSports());
+        lookupHash.put(S_INTEREST_MUSIC, createInterestSports());
+        lookupHash.put(S_INTEREST_MILITARY, createInterestMilitary());
+        lookupHash.put(S_INTEREST_ANTIQUES, createInterestAntiques());
+        lookupHash.put(S_INTEREST_THEOLOGY, createInterestTheology());
+        lookupHash.put(S_INTEREST_GAMBLING, createInterestGambling());
+        lookupHash.put(S_INTEREST_POLITICS, createInterestPolitics());
+        lookupHash.put(S_INTEREST_PHILOSOPHY, createInterestPhilosophy());
+        lookupHash.put(S_INTEREST_ECONOMICS, createInterestEconomics());
+        lookupHash.put(S_INTEREST_POP_CULTURE, createInterestPopCulture());
+        lookupHash.put(S_INTEREST_ASTROLOGY, createInterestAstrology());
+        lookupHash.put(S_INTEREST_FISHING, createInterestFishing());
+        lookupHash.put(S_INTEREST_MYTHOLOGY, createInterestMythology());
+        lookupHash.put(S_INTEREST_CARTOGRAPHY, createInterestCartography());
+        lookupHash.put(S_INTEREST_ARCHEOLOGY, createInterestArcheology());
+        lookupHash.put(S_INTEREST_HOLO_CINEMA, createInterestHoloCinema());
+        lookupHash.put(S_INTEREST_EXOTIC_ANIMALS, createInterestExoticAnimals());
+        lookupHash.put(S_INTEREST_OTHER, createInterestOther());
         lookupHash.put(S_INTERROGATION, createInterrogation());
         lookupHash.put(S_INVESTIGATION, createInvestigation());
         lookupHash.put(S_LANGUAGES, createLanguage());
@@ -791,6 +864,13 @@ public class SkillType {
         lookupHash.put(S_SCIENCE_CHEMISTRY, createScienceChemistry());
         lookupHash.put(S_SCIENCE_MATHEMATICS, createScienceMathematics());
         lookupHash.put(S_SCIENCE_PHYSICS, createSciencePhysics());
+        lookupHash.put(S_SCIENCE_MILITARY, createScienceMilitary());
+        lookupHash.put(S_SCIENCE_GEOLOGY, createScienceGeology());
+        lookupHash.put(S_SCIENCE_XENOBIOLOGY, createScienceXenobiology());
+        lookupHash.put(S_SCIENCE_PHARMACOLOGY, createSciencePharmacology());
+        lookupHash.put(S_SCIENCE_GENETICS, createScienceGenetics());
+        lookupHash.put(S_SCIENCE_PSYCHOLOGY, createSciencePsychology());
+        lookupHash.put(S_SCIENCE_OTHER, createScienceOther());
         lookupHash.put(S_SECURITY_SYSTEMS_ELECTRONIC, createSecuritySystemsElectronic());
         lookupHash.put(S_SCIENCE_SYSTEMS_MECHANICAL, createSecuritySystemsMechanical());
         lookupHash.put(S_SENSOR_OPERATIONS, createSensorOperations());
@@ -798,7 +878,13 @@ public class SkillType {
         lookupHash.put(S_STREETWISE, createStreetwise());
         lookupHash.put(S_SURVIVAL, createSurvival());
         lookupHash.put(S_TRACKING, createTracking());
-        lookupHash.put(S_TRAINING, createTraining());
+        lookupHash.put(S_CAREER_ANY, createCareer());
+        lookupHash.put(S_SWIMMING, createSwimming());
+        lookupHash.put(S_RUNNING, createRunning());
+        lookupHash.put(S_ZERO_G_OPERATIONS, createZeroGOperations());
+        lookupHash.put(S_MELEE_WEAPONS, createMeleeWeapons());
+        lookupHash.put(S_THROWN_WEAPONS, createThrownWeapons());
+        lookupHash.put(S_SUPPORT_WEAPONS, createSupportWeapons());
 
         // Remove below after Milestone Release post 0.49.19
         lookupHash.put("Piloting/Mech", createPilotingMek());
@@ -1161,6 +1247,12 @@ public class SkillType {
             case S_ART_DRAWING -> createArtDrawing();
             case S_ART_PAINTING -> createArtPainting();
             case S_ART_WRITING -> createArtWriting();
+            case S_ART_COOKING -> createArtCooking();
+            case S_ART_POETRY -> createArtPoetry();
+            case S_ART_SCULPTURE -> createArtSculpture();
+            case S_ART_INSTRUMENT -> createArtInstrument();
+            case S_ART_SINGING -> createArtSinging();
+            case S_ART_OTHER -> createArtOther();
             case S_CLIMBING -> createClimbing();
             case S_COMMUNICATIONS, "Communications (RP Only)" -> createCommunications();
             case S_COMPUTERS -> createComputers();
@@ -1173,6 +1265,24 @@ public class SkillType {
             case S_INTEREST_LITERATURE -> createInterestLiterature();
             case S_INTEREST_HOLO_GAMES -> createInterestHoloGames();
             case S_INTEREST_SPORTS -> createInterestSports();
+            case S_INTEREST_FASHION -> createInterestFashion();
+            case S_INTEREST_MUSIC -> createInterestMusic();
+            case S_INTEREST_MILITARY -> createInterestMilitary();
+            case S_INTEREST_ANTIQUES -> createInterestAntiques();
+            case S_INTEREST_THEOLOGY -> createInterestTheology();
+            case S_INTEREST_GAMBLING -> createInterestGambling();
+            case S_INTEREST_POLITICS -> createInterestPolitics();
+            case S_INTEREST_PHILOSOPHY -> createInterestPhilosophy();
+            case S_INTEREST_ECONOMICS -> createInterestEconomics();
+            case S_INTEREST_POP_CULTURE -> createInterestPopCulture();
+            case S_INTEREST_ASTROLOGY -> createInterestAstrology();
+            case S_INTEREST_FISHING -> createInterestFishing();
+            case S_INTEREST_MYTHOLOGY -> createInterestMythology();
+            case S_INTEREST_CARTOGRAPHY -> createInterestCartography();
+            case S_INTEREST_ARCHEOLOGY -> createInterestArcheology();
+            case S_INTEREST_HOLO_CINEMA -> createInterestHoloCinema();
+            case S_INTEREST_EXOTIC_ANIMALS -> createInterestExoticAnimals();
+            case S_INTEREST_OTHER -> createInterestOther();
             case S_INTERROGATION -> createInterrogation();
             case S_INVESTIGATION -> createInvestigation();
             case S_LANGUAGES, "Languages (RP Only)" -> createLanguage();
@@ -1184,6 +1294,13 @@ public class SkillType {
             case S_SCIENCE_CHEMISTRY -> createScienceChemistry();
             case S_SCIENCE_MATHEMATICS -> createScienceMathematics();
             case S_SCIENCE_PHYSICS -> createSciencePhysics();
+            case S_SCIENCE_MILITARY -> createScienceMilitary();
+            case S_SCIENCE_GEOLOGY -> createScienceGeology();
+            case S_SCIENCE_XENOBIOLOGY -> createScienceXenobiology();
+            case S_SCIENCE_PHARMACOLOGY -> createSciencePharmacology();
+            case S_SCIENCE_GENETICS -> createScienceGenetics();
+            case S_SCIENCE_PSYCHOLOGY -> createSciencePsychology();
+            case S_SCIENCE_OTHER -> createScienceOther();
             case S_SECURITY_SYSTEMS_ELECTRONIC -> createSecuritySystemsElectronic();
             case S_SCIENCE_SYSTEMS_MECHANICAL -> createSecuritySystemsMechanical();
             case S_SENSOR_OPERATIONS -> createSensorOperations();
@@ -1192,6 +1309,13 @@ public class SkillType {
             case S_SURVIVAL, "Survival (RP Only)" -> createSurvival();
             case S_TRACKING, "Tracking (RP Only)" -> createTracking();
             case S_TRAINING -> createTraining();
+            case S_CAREER_ANY -> createCareer();
+            case S_SWIMMING -> createSwimming();
+            case S_ZERO_G_OPERATIONS -> createZeroGOperations();
+            case S_MELEE_WEAPONS -> createMeleeWeapons();
+            case S_THROWN_WEAPONS -> createThrownWeapons();
+            case S_SUPPORT_WEAPONS -> createSupportWeapons();
+            case S_RUNNING -> createRunning();
             default -> {
                 logger.errorDialog("REPORT TO MEGAMEK TEAM",
                       "Unexpected value in compatibilityHandler: {}",
@@ -1817,6 +1941,92 @@ public class SkillType {
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
+    public static SkillType createArtPoetry() {
+        return new SkillType(S_ART_POETRY,
+              9,
+              false,
+              ROLEPLAY_ART,
+              DEXTERITY,
+              INTELLIGENCE,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
+
+    public static SkillType createArtInstrument() {
+        return new SkillType(S_ART_INSTRUMENT,
+              9,
+              false,
+              ROLEPLAY_ART,
+              DEXTERITY,
+              INTELLIGENCE,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
+
+    public static SkillType createArtSculpture() {
+        return new SkillType(S_ART_SCULPTURE,
+              9,
+              false,
+              ROLEPLAY_ART,
+              DEXTERITY,
+              INTELLIGENCE,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
+    public static SkillType createArtCooking() {
+        return new SkillType(S_ART_COOKING,
+              9,
+              false,
+              ROLEPLAY_ART,
+              DEXTERITY,
+              INTELLIGENCE,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
+    public static SkillType createArtSinging() {
+        return new SkillType(S_ART_SINGING,
+              9,
+              false,
+              ROLEPLAY_ART,
+              DEXTERITY,
+              INTELLIGENCE,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
+    public static SkillType createArtOther() {
+        return new SkillType(S_ART_OTHER,
+              9,
+              false,
+              ROLEPLAY_ART,
+              DEXTERITY,
+              INTELLIGENCE,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
     public static SkillType createClimbing() {
         return new SkillType(S_CLIMBING,
               7,
@@ -1985,6 +2195,258 @@ public class SkillType {
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
+    public static SkillType createInterestFashion() {
+        return new SkillType(S_INTEREST_FASHION,
+              9,
+              false,
+              ROLEPLAY_INTEREST,
+              INTELLIGENCE,
+              WILLPOWER,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
+    public static SkillType createInterestMusic() {
+        return new SkillType(S_INTEREST_MUSIC,
+              9,
+              false,
+              ROLEPLAY_INTEREST,
+              INTELLIGENCE,
+              WILLPOWER,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
+    public static SkillType createInterestMilitary() {
+        return new SkillType(S_INTEREST_MILITARY,
+              9,
+              false,
+              ROLEPLAY_INTEREST,
+              INTELLIGENCE,
+              WILLPOWER,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
+    public static SkillType createInterestAntiques() {
+        return new SkillType(S_INTEREST_ANTIQUES,
+              9,
+              false,
+              ROLEPLAY_INTEREST,
+              INTELLIGENCE,
+              WILLPOWER,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
+    public static SkillType createInterestTheology() {
+        return new SkillType(S_INTEREST_THEOLOGY,
+              9,
+              false,
+              ROLEPLAY_INTEREST,
+              INTELLIGENCE,
+              WILLPOWER,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
+    public static SkillType createInterestGambling() {
+        return new SkillType(S_INTEREST_GAMBLING,
+              9,
+              false,
+              ROLEPLAY_INTEREST,
+              INTELLIGENCE,
+              WILLPOWER,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
+    public static SkillType createInterestPolitics() {
+        return new SkillType(S_INTEREST_POLITICS,
+              9,
+              false,
+              ROLEPLAY_INTEREST,
+              INTELLIGENCE,
+              WILLPOWER,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
+    public static SkillType createInterestPhilosophy() {
+        return new SkillType(S_INTEREST_PHILOSOPHY,
+              9,
+              false,
+              ROLEPLAY_INTEREST,
+              INTELLIGENCE,
+              WILLPOWER,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
+    public static SkillType createInterestEconomics() {
+        return new SkillType(S_INTEREST_ECONOMICS,
+              9,
+              false,
+              ROLEPLAY_INTEREST,
+              INTELLIGENCE,
+              WILLPOWER,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
+    public static SkillType createInterestPopCulture() {
+        return new SkillType(S_INTEREST_POP_CULTURE,
+              9,
+              false,
+              ROLEPLAY_INTEREST,
+              INTELLIGENCE,
+              WILLPOWER,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
+    public static SkillType createInterestAstrology() {
+        return new SkillType(S_INTEREST_ASTROLOGY,
+              9,
+              false,
+              ROLEPLAY_INTEREST,
+              INTELLIGENCE,
+              WILLPOWER,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
+    public static SkillType createInterestFishing() {
+        return new SkillType(S_INTEREST_FISHING,
+              9,
+              false,
+              ROLEPLAY_INTEREST,
+              INTELLIGENCE,
+              WILLPOWER,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
+    public static SkillType createInterestMythology() {
+        return new SkillType(S_INTEREST_MYTHOLOGY,
+              9,
+              false,
+              ROLEPLAY_INTEREST,
+              INTELLIGENCE,
+              WILLPOWER,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
+    public static SkillType createInterestCartography() {
+        return new SkillType(S_INTEREST_CARTOGRAPHY,
+              9,
+              false,
+              ROLEPLAY_INTEREST,
+              INTELLIGENCE,
+              WILLPOWER,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
+    public static SkillType createInterestArcheology() {
+        return new SkillType(S_INTEREST_ARCHEOLOGY,
+              9,
+              false,
+              ROLEPLAY_INTEREST,
+              INTELLIGENCE,
+              WILLPOWER,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
+    public static SkillType createInterestHoloCinema() {
+        return new SkillType(S_INTEREST_HOLO_CINEMA,
+              9,
+              false,
+              ROLEPLAY_INTEREST,
+              INTELLIGENCE,
+              WILLPOWER,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
+    public static SkillType createInterestExoticAnimals() {
+        return new SkillType(S_INTEREST_EXOTIC_ANIMALS,
+              9,
+              false,
+              ROLEPLAY_INTEREST,
+              INTELLIGENCE,
+              WILLPOWER,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
+    public static SkillType createInterestOther() {
+        return new SkillType(S_INTEREST_OTHER,
+              9,
+              false,
+              ROLEPLAY_INTEREST,
+              INTELLIGENCE,
+              WILLPOWER,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
     public static SkillType createInterrogation() {
         return new SkillType(S_INTERROGATION,
               9,
@@ -2141,6 +2603,104 @@ public class SkillType {
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
+    public static SkillType createScienceMilitary() {
+        return new SkillType(S_SCIENCE_MILITARY,
+              9,
+              false,
+              ROLEPLAY_SCIENCE,
+              INTELLIGENCE,
+              WILLPOWER,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
+    public static SkillType createScienceGeology() {
+        return new SkillType(S_SCIENCE_GEOLOGY,
+              9,
+              false,
+              ROLEPLAY_SCIENCE,
+              INTELLIGENCE,
+              WILLPOWER,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
+    public static SkillType createScienceXenobiology() {
+        return new SkillType(S_SCIENCE_XENOBIOLOGY,
+              9,
+              false,
+              ROLEPLAY_SCIENCE,
+              INTELLIGENCE,
+              WILLPOWER,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
+    public static SkillType createSciencePharmacology() {
+        return new SkillType(S_SCIENCE_PHARMACOLOGY,
+              9,
+              false,
+              ROLEPLAY_SCIENCE,
+              INTELLIGENCE,
+              WILLPOWER,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
+    public static SkillType createScienceGenetics() {
+        return new SkillType(S_SCIENCE_GENETICS,
+              9,
+              false,
+              ROLEPLAY_SCIENCE,
+              INTELLIGENCE,
+              WILLPOWER,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
+    public static SkillType createSciencePsychology() {
+        return new SkillType(S_SCIENCE_PSYCHOLOGY,
+              9,
+              false,
+              ROLEPLAY_SCIENCE,
+              INTELLIGENCE,
+              WILLPOWER,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
+    public static SkillType createScienceOther() {
+        return new SkillType(S_SCIENCE_OTHER,
+              9,
+              false,
+              ROLEPLAY_SCIENCE,
+              INTELLIGENCE,
+              WILLPOWER,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
     public static SkillType createSecuritySystemsElectronic() {
         return new SkillType(S_SECURITY_SYSTEMS_ELECTRONIC,
               9,
@@ -2246,6 +2806,104 @@ public class SkillType {
               ROLEPLAY_GENERAL,
               INTELLIGENCE,
               CHARISMA,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
+    public static SkillType createCareer() {
+        return new SkillType(S_CAREER_ANY,
+              7,
+              false,
+              ROLEPLAY_GENERAL,
+              INTELLIGENCE,
+              NONE,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
+    public static SkillType createZeroGOperations() {
+        return new SkillType(S_ZERO_G_OPERATIONS,
+              7,
+              false,
+              ROLEPLAY_GENERAL,
+              REFLEXES,
+              NONE,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
+    public static SkillType createMeleeWeapons() {
+        return new SkillType(S_MELEE_WEAPONS,
+              8,
+              false,
+              ROLEPLAY_GENERAL,
+              REFLEXES,
+              DEXTERITY,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
+    public static SkillType createThrownWeapons() {
+        return new SkillType(S_THROWN_WEAPONS,
+              7,
+              false,
+              ROLEPLAY_GENERAL,
+              DEXTERITY,
+              NONE,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
+    public static SkillType createSupportWeapons() {
+        return new SkillType(S_SUPPORT_WEAPONS,
+              7,
+              false,
+              ROLEPLAY_GENERAL,
+              DEXTERITY,
+              NONE,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
+    public static SkillType createSwimming() {
+        return new SkillType(S_SWIMMING,
+              7,
+              false,
+              ROLEPLAY_GENERAL,
+              STRENGTH,
+              NONE,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
+    public static SkillType createRunning() {
+        return new SkillType(S_RUNNING,
+              7,
+              false,
+              ROLEPLAY_GENERAL,
+              REFLEXES,
+              DEXTERITY,
               null,
               null,
               null,
