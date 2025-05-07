@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel;
 
@@ -164,11 +169,13 @@ public class PersonUtility {
               Map.entry(VESSEL_GUNNER, List.of(S_GUN_SPACE)),
               Map.entry(VESSEL_CREW,
                     isTechsUseAdministration ? List.of(S_TECH_VESSEL, S_ADMIN) : List.of(S_TECH_VESSEL)),
-              Map.entry(VESSEL_NAVIGATOR, List.of(S_NAV)),
+              Map.entry(VESSEL_NAVIGATOR, List.of(S_NAVIGATION)),
               Map.entry(MEK_TECH, isTechsUseAdministration ? List.of(S_TECH_MEK, S_ADMIN) : List.of(S_TECH_MEK)),
               Map.entry(AERO_TEK, isTechsUseAdministration ? List.of(S_TECH_AERO, S_ADMIN) : List.of(S_TECH_AERO)),
               Map.entry(BA_TECH, isTechsUseAdministration ? List.of(S_TECH_BA, S_ADMIN) : List.of(S_TECH_BA)),
-              Map.entry(DOCTOR, isDoctorsUseAdministration ? List.of(S_DOCTOR, S_ADMIN) : List.of(S_DOCTOR)));
+              Map.entry(ASTECH, List.of(S_ASTECH)),
+              Map.entry(DOCTOR, isDoctorsUseAdministration ? List.of(S_SURGERY, S_ADMIN) : List.of(S_SURGERY)),
+              Map.entry(MEDIC, List.of(S_MEDTECH)));
 
         // Add admin-specific logic
         if (primaryRole == ADMINISTRATOR_COMMAND ||
@@ -179,7 +186,7 @@ public class PersonUtility {
 
             adminSkills.add(S_ADMIN);
             if (isAdminsHaveNegotiation) {
-                adminSkills.add(S_NEG);
+                adminSkills.add(S_NEGOTIATION);
             }
             if (isAdminsHaveScrounge) {
                 adminSkills.add(S_SCROUNGE);

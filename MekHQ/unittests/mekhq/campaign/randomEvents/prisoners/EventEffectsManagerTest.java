@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.randomEvents.prisoners;
 
@@ -33,8 +38,8 @@ import static mekhq.campaign.personnel.enums.PersonnelRole.DEPENDENT;
 import static mekhq.campaign.personnel.enums.PersonnelRole.NONE;
 import static mekhq.campaign.personnel.enums.PersonnelRole.SOLDIER;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
-import static mekhq.campaign.personnel.skills.SkillType.S_DOCTOR;
 import static mekhq.campaign.personnel.skills.SkillType.S_SMALL_ARMS;
+import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
 import static mekhq.campaign.randomEvents.prisoners.enums.EventResultEffect.*;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerEvent.BARTERING;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerEvent.BREAKOUT;
@@ -698,7 +703,7 @@ class EventEffectsManagerTest {
         // Just some random skills, so we can get whether they were removed
         prisoner.addSkill(S_ADMIN, 1, 0);
         prisoner.addSkill(S_SMALL_ARMS, 1, 0);
-        prisoner.addSkill(S_DOCTOR, 1, 0);
+        prisoner.addSkill(S_SURGERY, 1, 0);
 
         prisoner.setPrimaryRole(mockCampaign, SOLDIER);
         prisoner.setSecondaryRole(ADMINISTRATOR_LOGISTICS);
@@ -709,7 +714,7 @@ class EventEffectsManagerTest {
         // Assert
         assertNull(prisoner.getSkill(S_ADMIN));
         assertNull(prisoner.getSkill(S_SMALL_ARMS));
-        assertNull(prisoner.getSkill(S_DOCTOR));
+        assertNull(prisoner.getSkill(S_SURGERY));
 
         assertSame(DEPENDENT, prisoner.getPrimaryRole());
         assertSame(NONE, prisoner.getSecondaryRole());

@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -1492,7 +1497,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
                         decreasePhenotypeBonus(SkillType.S_TECH_VESSEL);
                         decreasePhenotypeBonus(SkillType.S_GUN_SPACE);
                         decreasePhenotypeBonus(SkillType.S_PILOT_SPACE);
-                        decreasePhenotypeBonus(SkillType.S_NAV);
+                        decreasePhenotypeBonus(SkillType.S_NAVIGATION);
                         break;
                     default:
                         break;
@@ -1526,7 +1531,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
                         increasePhenotypeBonus(SkillType.S_TECH_VESSEL);
                         increasePhenotypeBonus(SkillType.S_GUN_SPACE);
                         increasePhenotypeBonus(SkillType.S_PILOT_SPACE);
-                        increasePhenotypeBonus(SkillType.S_NAV);
+                        increasePhenotypeBonus(SkillType.S_NAVIGATION);
                         break;
                     default:
                         break;

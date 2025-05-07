@@ -339,7 +339,7 @@ public class NewContractDialog extends JDialog {
         cboNegotiator.setName("cboNegotiator");
         // Add negotiators
         for (Person p : campaign.getActivePersonnel(true)) {
-            if (p.hasSkill(SkillType.S_NEG)) {
+            if (p.hasSkill(SkillType.S_NEGOTIATION)) {
                 cboNegotiator.addItem(p);
             }
         }
