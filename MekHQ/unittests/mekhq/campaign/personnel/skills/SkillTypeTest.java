@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.personnel.skills;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NONE;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
@@ -40,6 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.stream.Stream;
 
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
+import mekhq.campaign.personnel.skills.enums.SkillSubType;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -47,6 +49,119 @@ class SkillTypeTest {
 
     static Stream<String> allSkillNames() {
         return Stream.of(SkillType.getSkillList());
+    }
+
+    @ParameterizedTest
+    @MethodSource(value = "allSkillNames")
+    void testGetTarget_isValid(String skillName) {
+        SkillType.initializeTypes();
+
+        // Setup
+        SkillType skillType = SkillType.getType(skillName);
+
+        // Act
+        int target = skillType.getTarget();
+
+        // Assert
+        assertTrue(target >= 2 && target <= 12,
+              "Invalid target: " + target + " for skill: " + skillType.getName() + " must be >= 2 and <= 12");
+    }
+
+    @ParameterizedTest
+    @MethodSource(value = "allSkillNames")
+    void testGetSubType_isValid(String skillName) {
+        SkillType.initializeTypes();
+
+        // Setup
+        SkillType skillType = SkillType.getType(skillName);
+
+        // Act
+        SkillSubType subType = skillType.getSubType();
+
+        // Assert
+        assertNotSame(SkillSubType.NONE,
+              subType,
+              "Invalid subType for skill: " + skillType.getName() + " cannot be " + "NONE");
+    }
+
+    @ParameterizedTest
+    @MethodSource(value = "allSkillNames")
+    void testGetFirstAttribute_isValid(String skillName) {
+        SkillType.initializeTypes();
+
+        // Setup
+        SkillType skillType = SkillType.getType(skillName);
+
+        // Act
+        SkillAttribute attribute = skillType.getFirstAttribute();
+
+        // Assert
+        assertNotSame(SkillAttribute.NONE,
+              attribute,
+              "Invalid first attribute for skill: " + skillType.getName() + " cannot be NONE");
+        assertNotSame(null, attribute, "Invalid first attribute for skill: " + skillType.getName() + " cannot be null");
+    }
+
+    @ParameterizedTest
+    @MethodSource(value = "allSkillNames")
+    void testGetSecondAttribute_isValid(String skillName) {
+        SkillType.initializeTypes();
+
+        // Setup
+        SkillType skillType = SkillType.getType(skillName);
+
+        // Act
+        SkillAttribute attribute = skillType.getFirstAttribute();
+
+        // Assert
+        assertNotSame(null,
+              attribute,
+              "Invalid second attribute for skill: " + skillType.getName() + " cannot be null");
+    }
+
+    @ParameterizedTest
+    @MethodSource(value = "allSkillNames")
+    void testGetGreenLevel_isValid(String skillName) {
+        SkillType.initializeTypes();
+
+        // Setup
+        SkillType skillType = SkillType.getType(skillName);
+
+        // Act
+        int greenLevel = skillType.getGreenLevel();
+        int regularLevel = skillType.getRegularLevel();
+        int veteranLevel = skillType.getVeteranLevel();
+        int eliteLevel = skillType.getEliteLevel();
+
+        // Assert
+        assertTrue(greenLevel > 0, "Invalid green level for skill: " + skillType.getName() + " cannot be < 1");
+
+        assertTrue(regularLevel > greenLevel,
+              "Invalid regular level for skill: " + skillType.getName() + " cannot be < green level");
+        assertTrue(regularLevel < veteranLevel,
+              "Invalid regular level for skill: " + skillType.getName() + " cannot be >= veteran level");
+
+        assertTrue(veteranLevel < eliteLevel,
+              "Invalid veteran level for skill: " + skillType.getName() + " cannot be >= elite level");
+
+        assertTrue(eliteLevel < 11, "Invalid elite level for skill: " + skillType.getName() + " cannot be > 10");
+    }
+
+    @ParameterizedTest
+    @MethodSource(value = "allSkillNames")
+    void testGetCosts_isValid(String skillName) {
+        SkillType.initializeTypes();
+
+        // Setup
+        SkillType skillType = SkillType.getType(skillName);
+
+        // Act
+        Integer[] costs = skillType.getCosts();
+
+        // Assert
+        for (int level = 0; level < 10; level++) {
+            assertEquals(11, costs.length, "Invalid costs for skill: " + skillType.getName() + " must be 11 elements");
+        }
     }
 
     @ParameterizedTest
