@@ -60,7 +60,8 @@ class SkillTypeTest {
         int target = skillType.getTarget();
 
         // Assert
-        assertTrue(target >= 2 && target <= 12, "Invalid target: " + target + " for skill: " + skillType.getName());
+        assertTrue(target >= 2 && target <= 12,
+              "Invalid target: " + target + " for skill: " + skillType.getName() + " must be >= 2 and <= 12");
     }
 
     @ParameterizedTest
@@ -140,7 +141,7 @@ class SkillTypeTest {
         assertTrue(veteranLevel < eliteLevel,
               "Invalid veteran level for skill: " + skillType.getName() + " cannot be >= elite level");
 
-        assertTrue(eliteLevel < 11, "Invalid veteran level for skill: " + skillType.getName() + " cannot be > 10");
+        assertTrue(eliteLevel < 11, "Invalid elite level for skill: " + skillType.getName() + " cannot be > 10");
     }
 
     @ParameterizedTest
