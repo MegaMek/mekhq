@@ -178,51 +178,11 @@ public class PersonViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(pnlInfo, gridBagConstraints);
 
-        int gridy = 1;
+        int gridY = 1;
 
         PersonAwardController awardController = person.getAwardController();
         if (awardController.hasAwards()) {
-            if (awardController.hasAwardsWithRibbons()) {
-                Box boxRibbons = drawRibbons();
-
-                GridBagConstraints gbc_pnlAllRibbons = new GridBagConstraints();
-                gbc_pnlAllRibbons.gridx = 0;
-                gbc_pnlAllRibbons.gridy = 1;
-                gbc_pnlAllRibbons.fill = GridBagConstraints.NONE;
-                gbc_pnlAllRibbons.anchor = GridBagConstraints.NORTHWEST;
-                gbc_pnlAllRibbons.insets = new Insets(-10, 10, 0, 5);
-                pnlPortrait.add(boxRibbons, gbc_pnlAllRibbons);
-            }
-
-            JPanel pnlAllAwards = new JPanel();
-            pnlAllAwards.setLayout(new BoxLayout(pnlAllAwards, BoxLayout.PAGE_AXIS));
-            pnlAllAwards.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlAwards.title")));
-
-            if (awardController.hasAwardsWithMedals()) {
-                JPanel pnlMedals = drawMedals();
-                pnlMedals.setName("pnlMedals");
-                pnlMedals.setLayout(new WrapLayout(FlowLayout.LEFT));
-                pnlAllAwards.add(pnlMedals);
-            }
-
-            if (awardController.hasAwardsWithMiscs()) {
-                JPanel pnlMiscAwards = drawMiscAwards();
-                pnlMiscAwards.setName("pnlMiscAwards");
-                pnlMiscAwards.setLayout(new WrapLayout(FlowLayout.LEFT));
-                pnlAllAwards.add(pnlMiscAwards);
-            }
-
-            if (awardController.hasAwardsWithMedals() || awardController.hasAwardsWithMiscs()) {
-                gridBagConstraints = new GridBagConstraints();
-                gridBagConstraints.fill = GridBagConstraints.BOTH;
-                gridBagConstraints.gridwidth = 2;
-                gridBagConstraints.insets = new Insets(0, 0, 10, 0);
-                gridBagConstraints.gridx = 0;
-                gridBagConstraints.gridy = gridy;
-                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-                add(pnlAllAwards, gridBagConstraints);
-                gridy++;
-            }
+            gridY = applyAndDisplayAwards(awardController, pnlPortrait, gridY);
         }
 
         List<String> relevantSkills = person.getKnownSkillsBySkillSubType(List.of(COMBAT_GUNNERY, COMBAT_PILOTING));
@@ -230,14 +190,14 @@ public class PersonViewPanel extends JScrollablePanel {
             JPanel pnlCombatSkills = fillSkills(relevantSkills, "pnlSkills.combat");
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridy;
+            gridBagConstraints.gridy = gridY;
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(0, 0, 10, 0);
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             add(pnlCombatSkills, gridBagConstraints);
-            gridy++;
+            gridY++;
         }
 
         relevantSkills = person.getKnownSkillsBySkillSubType(List.of(SUPPORT, SUPPORT_COMMAND));
@@ -245,14 +205,14 @@ public class PersonViewPanel extends JScrollablePanel {
             JPanel pnlSupportSkills = fillSkills(relevantSkills, "pnlSkills.support");
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridy;
+            gridBagConstraints.gridy = gridY;
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(0, 0, 10, 0);
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             add(pnlSupportSkills, gridBagConstraints);
-            gridy++;
+            gridY++;
         }
 
         relevantSkills = person.getKnownSkillsBySkillSubType(List.of(ROLEPLAY_GENERAL,
@@ -264,14 +224,14 @@ public class PersonViewPanel extends JScrollablePanel {
             JPanel pnlRoleplaySkills = fillSkills(relevantSkills, "pnlSkills.roleplay");
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridy;
+            gridBagConstraints.gridy = gridY;
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(0, 0, 10, 0);
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             add(pnlRoleplaySkills, gridBagConstraints);
-            gridy++;
+            gridY++;
         }
 
         Map<SkillAttribute, Integer> relevantAttributes = getRelevantAttributes();
@@ -279,14 +239,14 @@ public class PersonViewPanel extends JScrollablePanel {
             JPanel pnlAttributes = fillAttributeModifiers(relevantAttributes);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridy;
+            gridBagConstraints.gridy = gridY;
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(0, 0, 10, 0);
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             add(pnlAttributes, gridBagConstraints);
-            gridy++;
+            gridY++;
         }
 
         List<SpecialAbility> relevantAbilities = getRelevantAbilities();
@@ -294,39 +254,39 @@ public class PersonViewPanel extends JScrollablePanel {
             JPanel pnlAbilities = fillAbilitiesAndImplants(relevantAbilities);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridy;
+            gridBagConstraints.gridy = gridY;
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(0, 0, 10, 0);
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             add(pnlAbilities, gridBagConstraints);
-            gridy++;
+            gridY++;
         }
 
         JPanel pnlOther = fillOther();
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.gridy = gridY;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new Insets(0, 0, 10, 0);
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(pnlOther, gridBagConstraints);
-        gridy++;
+        gridY++;
 
         if (campaignOptions.isUseAdvancedMedical() && person.needsFixing()) {
             JPanel pnlInjuries = fillInjuries();
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridy;
+            gridBagConstraints.gridy = gridY;
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.insets = new Insets(0, 0, 10, 0);
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             add(pnlInjuries, gridBagConstraints);
-            gridy++;
+            gridY++;
         }
 
         if ((!person.getPersonalityDescription().isBlank()) && (campaignOptions.isUseRandomPersonalities()) &&
@@ -340,13 +300,13 @@ public class PersonViewPanel extends JScrollablePanel {
             txtDesc.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlPersonality.title")));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridy;
+            gridBagConstraints.gridy = gridY;
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.insets = new Insets(0, 0, 10, 0);
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             add(txtDesc, gridBagConstraints);
-            gridy++;
+            gridY++;
         }
 
         if (!person.getBiography().isBlank()) {
@@ -359,13 +319,13 @@ public class PersonViewPanel extends JScrollablePanel {
                   "pnlDescription.title")), BorderFactory.createEmptyBorder(0, 2, 2, 2)));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridy;
+            gridBagConstraints.gridy = gridY;
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.insets = new Insets(0, 0, 10, 0);
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             add(txtDesc, gridBagConstraints);
-            gridy++;
+            gridY++;
         }
 
         if (!person.getPersonalLog().isEmpty()) {
@@ -384,14 +344,14 @@ public class PersonViewPanel extends JScrollablePanel {
 
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridy;
+            gridBagConstraints.gridy = gridY;
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.insets = new Insets(0, 0, 10, 0);
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             add(pnlPersonalLogHeader, gridBagConstraints);
             add(pnlPersonalLog, gridBagConstraints);
-            gridy++;
+            gridY++;
         }
 
         if (!person.getPerformanceLog().isEmpty()) {
@@ -411,14 +371,14 @@ public class PersonViewPanel extends JScrollablePanel {
 
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridy;
+            gridBagConstraints.gridy = gridY;
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.insets = new Insets(0, 0, 10, 0);
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             add(pnlPerformanceLogHeader, gridBagConstraints);
             add(pnlPerformanceLog, gridBagConstraints);
-            gridy++;
+            gridY++;
         }
 
         if (!person.getMedicalLog().isEmpty()) {
@@ -438,14 +398,14 @@ public class PersonViewPanel extends JScrollablePanel {
 
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridy;
+            gridBagConstraints.gridy = gridY;
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.insets = new Insets(0, 0, 10, 0);
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             add(pnlMedicalLogHeader, gridBagConstraints);
             add(pnlMedicalLog, gridBagConstraints);
-            gridy++;
+            gridY++;
         }
 
         if (!person.getAssignmentLog().isEmpty()) {
@@ -467,14 +427,14 @@ public class PersonViewPanel extends JScrollablePanel {
 
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridy;
+            gridBagConstraints.gridy = gridY;
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.insets = new Insets(0, 0, 10, 0);
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             add(pnlAssignmentsLogHeader, gridBagConstraints);
             add(pnlAssignmentsLog, gridBagConstraints);
-            gridy++;
+            gridY++;
         }
 
         if (!campaign.getKillsFor(person.getId()).isEmpty()) {
@@ -495,14 +455,14 @@ public class PersonViewPanel extends JScrollablePanel {
 
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridy;
+            gridBagConstraints.gridy = gridY;
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.insets = new Insets(0, 0, 10, 0);
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             add(pnlKillsHeader, gridBagConstraints);
             add(pnlKills, gridBagConstraints);
-            gridy++;
+            gridY++;
         }
 
         if (!person.getScenarioLog().isEmpty()) {
@@ -524,39 +484,102 @@ public class PersonViewPanel extends JScrollablePanel {
 
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridy;
+            gridBagConstraints.gridy = gridY;
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.insets = new Insets(0, 0, 10, 0);
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             add(pnlScenariosLogHeader, gridBagConstraints);
             add(pnlScenariosLog, gridBagConstraints);
-            gridy++;
+            gridY++;
         }
 
         if (!person.getGenealogy().isEmpty()) {
             JPanel pnlFamily = fillFamily();
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridy;
+            gridBagConstraints.gridy = gridY;
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(0, 0, 10, 0);
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             add(pnlFamily, gridBagConstraints);
-            gridy++;
+            gridY++;
         }
 
         // use glue to fill up the remaining space so everything is aligned to the top
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.gridy = gridY;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(Box.createGlue(), gridBagConstraints);
+    }
+
+    /**
+     * Initializes and lays out the award sections within a portrait panel for a person.
+     *
+     * <p>If ribbon awards are present, they are added above the awards panel. If medal or miscellaneous awards exist,
+     * they are displayed in their respective panels using a {@link WrapLayout}, all contained within a titled section.
+     * This method adds the constructed awards panel to the layout using {@link GridBagConstraints} and updates the grid
+     * Y position accordingly.</p>
+     *
+     * @param awardController the {@link PersonAwardController} providing award data and state
+     * @param pnlPortrait     the portrait {@link JPanel} to which award ribbons may be added
+     * @param gridY           the starting Y grid position for layout
+     *
+     * @return the next available grid Y position after inserting any new panels
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    private int applyAndDisplayAwards(PersonAwardController awardController, JPanel pnlPortrait, int gridY) {
+        GridBagConstraints gridBagConstraints;
+        if (awardController.hasAwardsWithRibbons()) {
+            Box boxRibbons = drawRibbons();
+
+            GridBagConstraints gbc_pnlAllRibbons = new GridBagConstraints();
+            gbc_pnlAllRibbons.gridx = 0;
+            gbc_pnlAllRibbons.gridy = 1;
+            gbc_pnlAllRibbons.fill = GridBagConstraints.NONE;
+            gbc_pnlAllRibbons.anchor = GridBagConstraints.NORTHWEST;
+            gbc_pnlAllRibbons.insets = new Insets(-10, 10, 0, 5);
+            pnlPortrait.add(boxRibbons, gbc_pnlAllRibbons);
+        }
+
+        JPanel pnlAllAwards = new JPanel();
+        pnlAllAwards.setLayout(new BoxLayout(pnlAllAwards, BoxLayout.PAGE_AXIS));
+        pnlAllAwards.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlAwards.title")));
+
+        if (awardController.hasAwardsWithMedals()) {
+            JPanel pnlMedals = drawMedals();
+            pnlMedals.setName("pnlMedals");
+            pnlMedals.setLayout(new WrapLayout(FlowLayout.LEFT));
+            pnlAllAwards.add(pnlMedals);
+        }
+
+        if (awardController.hasAwardsWithMiscs()) {
+            JPanel pnlMiscAwards = drawMiscAwards();
+            pnlMiscAwards.setName("pnlMiscAwards");
+            pnlMiscAwards.setLayout(new WrapLayout(FlowLayout.LEFT));
+            pnlAllAwards.add(pnlMiscAwards);
+        }
+
+        if (awardController.hasAwardsWithMedals() || awardController.hasAwardsWithMiscs()) {
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = gridY;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            add(pnlAllAwards, gridBagConstraints);
+            gridY++;
+        }
+        return gridY;
     }
 
     /**

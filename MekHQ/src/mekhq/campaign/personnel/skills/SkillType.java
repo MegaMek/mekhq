@@ -91,7 +91,7 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class SkillType {
-    private static final String RESOURCE_BUNDLE = "mekhq.resources." + SkillType.class.getSimpleName();
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.SkillType";
     private static final MMLogger logger = MMLogger.create(SkillType.class);
 
     /**

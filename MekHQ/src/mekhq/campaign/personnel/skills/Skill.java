@@ -44,6 +44,7 @@ import static mekhq.campaign.personnel.skills.SkillType.S_PROTOCOLS;
 import static mekhq.campaign.personnel.skills.SkillType.S_STREETWISE;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.CHARISMA;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.PrintWriter;
 import java.util.Objects;
@@ -94,7 +95,7 @@ public class Skill {
     public static int COUNT_UP_MAX_VALUE = 10;
     public static int COUNT_DOWN_MIN_VALUE = 0;
 
-    private static final String RESOURCE_BUNDLE = "mekhq.resources." + Skill.class.getSimpleName();
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Skill";
     private static final MMLogger logger = MMLogger.create(Skill.class);
 
     private SkillType type;
@@ -561,11 +562,12 @@ public class Skill {
         SkillAttribute firstLinkedAttribute = type.getFirstAttribute();
         // TODO enable once attribute modifier sare implemented
         //        int firstLinkedAttributeModifier = attributes.getAttributeModifier(firstLinkedAttribute);
+        String additionSymbol = getTextAt(RESOURCE_BUNDLE, "tooltip.format.addition");
         int firstLinkedAttributeModifier = 0;
         tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
               "tooltip.format.linkedAttribute",
               firstLinkedAttribute.getLabel(),
-              (firstLinkedAttributeModifier > 0 ? "+" : "") + firstLinkedAttributeModifier));
+              (firstLinkedAttributeModifier > 0 ? additionSymbol : "") + firstLinkedAttributeModifier));
 
         SkillAttribute secondLinkedAttribute = type.getSecondAttribute();
         if (secondLinkedAttribute != SkillAttribute.NONE) {
@@ -575,7 +577,7 @@ public class Skill {
             tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
                   "tooltip.format.linkedAttribute",
                   secondLinkedAttribute.getLabel(),
-                  (secondLinkedAttributeModifier > 0 ? "+" : "") + secondLinkedAttributeModifier));
+                  (secondLinkedAttributeModifier > 0 ? additionSymbol : "") + secondLinkedAttributeModifier));
         }
 
         return tooltip.toString();
