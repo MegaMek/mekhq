@@ -78,7 +78,7 @@ import mekhq.gui.view.PersonViewPanel;
 public final class PersonnelTab extends CampaignGuiTab {
     private static final MMLogger logger = MMLogger.create(PersonnelTab.class);
 
-    private static final int PERSONNEL_VIEW_WIDTH = UIUtil.scaleForGUI(600);
+    public static final int PERSONNEL_VIEW_WIDTH = UIUtil.scaleForGUI(600);
 
     private JSplitPane splitPersonnel;
     private JTable personnelTable;
