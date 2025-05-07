@@ -1509,8 +1509,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_REMOVE_ROLEPLAY_SKILLS: {
-                RandomSkillPreferences skillPreferences = getCampaign().getRandomSkillPreferences();
-                AbstractSkillGenerator skillGenerator = new DefaultSkillGenerator(skillPreferences);
                 for (Person person : people) {
                     // We make an iteration safe list so we can easily remove skills during the loop
                     List<Skill> allSkills = new ArrayList<>(person.getSkills().getSkills());
