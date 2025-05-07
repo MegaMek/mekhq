@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.service.mrms;
 
@@ -57,10 +62,11 @@ public class MRMSOption {
 
     // region Constructors
     public MRMSOption(PartRepairType type) {
-        this(type, false, SkillType.EXP_ULTRA_GREEN, SkillType.EXP_ELITE, DEFAULT_BTH, DEFAULT_BTH, MIN_DAILY_TIME);
+        this(type, false, SkillType.EXP_ULTRA_GREEN, SkillType.EXP_LEGENDARY, DEFAULT_BTH, DEFAULT_BTH, MIN_DAILY_TIME);
     }
 
-    public MRMSOption(PartRepairType type, boolean active, int skillMin, int skillMax, int bthMin, int bthMax, int dailyTimeMin) {
+    public MRMSOption(PartRepairType type, boolean active, int skillMin, int skillMax, int bthMin, int bthMax,
+          int dailyTimeMin) {
         this.type = type;
         this.active = active;
         this.skillMin = skillMin;
@@ -158,13 +164,12 @@ public class MRMSOption {
                 MRMSOption mrmsOption = parseFromXML(wn2);
 
                 // This fixes a migration issue from 0.47.10 to 0.47.11
-                if (version.isBetween("0.47.10", "0.47.16")
-                        && (mrmsOption.getType() == PartRepairType.HEAT_SINK)) {
+                if (version.isBetween("0.47.10", "0.47.16") && (mrmsOption.getType() == PartRepairType.HEAT_SINK)) {
                     mrmsOption.setType(PartRepairType.POD_SPACE);
                 }
 
-                if ((mrmsOption.getType() == PartRepairType.UNKNOWN_LOCATION)
-                        || !partRepairTypes.contains(mrmsOption.getType())) {
+                if ((mrmsOption.getType() == PartRepairType.UNKNOWN_LOCATION) ||
+                          !partRepairTypes.contains(mrmsOption.getType())) {
                     logger.error("Attempted to load MRMSOption with illegal type id of " + mrmsOption.getType());
                 } else {
                     mrmsOptions.add(mrmsOption);

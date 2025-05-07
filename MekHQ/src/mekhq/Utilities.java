@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq;
 
@@ -32,6 +37,8 @@ import static java.lang.Math.max;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_GREEN;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_HEROIC;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_ULTRA_GREEN;
@@ -938,8 +945,8 @@ public class Utilities {
      * @return The calculated age of the character based on the input parameters.
      */
     public static int getAgeByExpLevel(int experienceLevel, boolean isClan) {
-        if (experienceLevel > EXP_ELITE) {
-            experienceLevel = EXP_ELITE;
+        if (experienceLevel > EXP_LEGENDARY) {
+            experienceLevel = EXP_LEGENDARY;
         }
 
         int baseAge = 16;
@@ -957,6 +964,8 @@ public class Utilities {
             case EXP_REGULAR -> 2;
             case EXP_VETERAN -> 3;
             case EXP_ELITE -> 4;
+            case EXP_HEROIC -> 5;
+            case EXP_LEGENDARY -> 6;
             default -> 0;
         };
 

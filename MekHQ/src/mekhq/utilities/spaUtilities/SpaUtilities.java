@@ -32,7 +32,7 @@
  */
 package mekhq.utilities.spaUtilities;
 
-import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
 import static mekhq.campaign.personnel.skills.SkillType.S_GUN_BA;
 import static mekhq.campaign.personnel.skills.SkillType.S_GUN_PROTO;
 import static mekhq.campaign.personnel.skills.SkillType.getExperienceLevelName;
@@ -123,7 +123,7 @@ public class SpaUtilities {
             skillPerquisiteString = orPattern.matcher(skillPerquisiteString).replaceAll("");
 
             // Step 2: remove experience levels
-            for (int i = 0; i < EXP_ELITE; i++) {
+            for (int i = 0; i < EXP_LEGENDARY; i++) {
                 skillPerquisiteString = skillPerquisiteString.replaceAll(getExperienceLevelName(i) + ' ', "");
             }
 

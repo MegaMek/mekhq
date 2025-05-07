@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.service.mrms;
 
@@ -65,25 +70,27 @@ public class MRMSService {
     private static final MMLogger logger = MMLogger.create(MRMSService.class);
 
     private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.MRMS",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
 
     private MRMSService() {
 
     }
 
     public static boolean isValidMRMSUnit(Unit unit, MRMSConfiguredOptions configuredOptions) {
-        if (unit.isSelfCrewed() || (!unit.isSalvage() && !configuredOptions.useRepair())
-                || (unit.isSalvage() && !configuredOptions.useSalvage())) {
+        if (unit.isSelfCrewed() ||
+                  (!unit.isSalvage() && !configuredOptions.useRepair()) ||
+                  (unit.isSalvage() && !configuredOptions.useSalvage())) {
             return false;
         }
 
-        return (unit.getEntity() instanceof Tank) || (unit.getEntity() instanceof Aero)
-                || (unit.getEntity() instanceof Mek) || (unit.getEntity() instanceof BattleArmor);
+        return (unit.getEntity() instanceof Tank) ||
+                     (unit.getEntity() instanceof Aero) ||
+                     (unit.getEntity() instanceof Mek) ||
+                     (unit.getEntity() instanceof BattleArmor);
     }
 
     public static MRMSPartSet performWarehouseMRMS(List<IPartWork> selectedParts,
-            MRMSConfiguredOptions configuredOptions,
-            Campaign campaign) {
+          MRMSConfiguredOptions configuredOptions, Campaign campaign) {
         if (!configuredOptions.useRepair()) { // Warehouse only uses repair
             campaign.addReport(resources.getString("MRMS.CompleteDisabled.report"));
             return new MRMSPartSet();
@@ -124,8 +131,13 @@ public class MRMSService {
                     int originalQuantity = part.getQuantity();
 
                     for (int i = 0; i < originalQuantity; i++) {
-                        partSet.addPartAction(repairPart(campaign, part, null, validTechs,
-                                mrmsOptionsByType, configuredOptions, true));
+                        partSet.addPartAction(repairPart(campaign,
+                              part,
+                              null,
+                              validTechs,
+                              mrmsOptionsByType,
+                              configuredOptions,
+                              true));
                     }
                 }
             }
@@ -140,10 +152,10 @@ public class MRMSService {
             String msg = resources.getString("MRMS.CompleteDisabled.report");
             campaign.addReport(msg);
             return msg;
-        } else if ((!unit.isSalvage() && !configuredOptions.useRepair())
-                || (unit.isSalvage() && !configuredOptions.useSalvage())) {
+        } else if ((!unit.isSalvage() && !configuredOptions.useRepair()) ||
+                         (unit.isSalvage() && !configuredOptions.useSalvage())) {
             String msg = MessageFormat.format(resources.getString("MRMS.CompleteTypeDisabled.report"),
-                    unit.isSalvage() ? resources.getString("Salvage") : resources.getString("Repair"));
+                  unit.isSalvage() ? resources.getString("Salvage") : resources.getString("Repair"));
             campaign.addReport(msg);
             return msg;
         } else if (campaign.requiresAdditionalAstechs()) {
@@ -153,15 +165,16 @@ public class MRMSService {
         }
 
         List<MRMSOption> activeMRMSOptions = configuredOptions.getActiveMRMSOptions();
-        MRMSUnitAction unitAction = performUnitMRMS(campaign, unit, unit.isSalvage(),
-                activeMRMSOptions, configuredOptions);
+        MRMSUnitAction unitAction = performUnitMRMS(campaign,
+              unit,
+              unit.isSalvage(),
+              activeMRMSOptions,
+              configuredOptions);
 
         String actionDescriptor = unit.isSalvage() ? resources.getString("Salvage") : resources.getString("Repair");
-        String msg = String.format(
-                "<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor()
-                        + "'>Mass %s complete on %s.</font>",
-                actionDescriptor,
-                unit.getName());
+        String msg = String.format("<font color='" +
+                                         MekHQ.getMHQOptions().getFontColorPositiveHexColor() +
+                                         "'>Mass %s complete on %s.</font>", actionDescriptor, unit.getName());
 
         switch (unitAction.getStatus()) {
             case ACTIONS_PERFORMED:
@@ -195,13 +208,14 @@ public class MRMSService {
 
             if (!parts.isEmpty()) {
                 if (parts.size() == 1) {
-                    campaign.addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
-                            + "'>There in still 1 part that is not being worked on.</font>");
+                    campaign.addReport("<font color='" +
+                                             MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                                             "'>There in still 1 part that is not being worked on.</font>");
                 } else {
-                    campaign.addReport(String.format(
-                            "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
-                                    + "'>There are still %s parts that are not being worked on.</font>",
-                            parts.size()));
+                    campaign.addReport(String.format("<font color='" +
+                                                           MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                                                           "'>There are still %s parts that are not being worked on.</font>",
+                          parts.size()));
                 }
             }
         }
@@ -246,8 +260,7 @@ public class MRMSService {
         mrmsUnits(campaign, units, configuredOptions);
     }
 
-    public static void mrmsUnits(Campaign campaign, List<Unit> units,
-            MRMSConfiguredOptions configuredOptions) {
+    public static void mrmsUnits(Campaign campaign, List<Unit> units, MRMSConfiguredOptions configuredOptions) {
         // This shouldn't happen but is being added preventatively
         if (!configuredOptions.isEnabled()) {
             campaign.addReport(resources.getString("MRMS.CompleteDisabled.report"));
@@ -257,11 +270,14 @@ public class MRMSService {
         List<MRMSOption> activeMRMSOptions = configuredOptions.getActiveMRMSOptions();
 
         for (Unit unit : units) {
-            MRMSUnitAction unitAction = performUnitMRMS(campaign, unit,
-                    unit.isSalvage(), activeMRMSOptions, configuredOptions);
+            MRMSUnitAction unitAction = performUnitMRMS(campaign,
+                  unit,
+                  unit.isSalvage(),
+                  activeMRMSOptions,
+                  configuredOptions);
 
             List<MRMSUnitAction> list = unitActionsByStatus.computeIfAbsent(unitAction.getStatus(),
-                    k -> new ArrayList<>());
+                  k -> new ArrayList<>());
 
             list.add(unitAction);
         }
@@ -281,44 +297,56 @@ public class MRMSService {
             }
 
             if (unitActionsByStatus.containsKey(MRMSUnitAction.STATUS.ACTIONS_PERFORMED)) {
-                List<MRMSUnitAction> unitsByStatus = unitActionsByStatus
-                        .get(MRMSUnitAction.STATUS.ACTIONS_PERFORMED);
+                List<MRMSUnitAction> unitsByStatus = unitActionsByStatus.get(MRMSUnitAction.STATUS.ACTIONS_PERFORMED);
 
                 for (MRMSUnitAction mrmsUnitAction : unitsByStatus) {
                     actionsPerformed += mrmsUnitAction.getPartSet().countRepairs();
                 }
             }
 
-            StringBuilder sb = new StringBuilder(
-                    String.format("<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor()
-                            + "'>Mass Repair/Salvage complete for %s units.</font>", totalCount));
+            StringBuilder sb = new StringBuilder(String.format("<font color='" +
+                                                                     MekHQ.getMHQOptions()
+                                                                           .getFontColorPositiveHexColor() +
+                                                                     "'>Mass Repair/Salvage complete for %s units.</font>",
+                  totalCount));
 
             if (actionsPerformed > 0) {
-                sb.append(String.format(" %s repair/salvage action%s performed.", actionsPerformed,
-                        (actionsPerformed == 1 ? "" : "s")));
+                sb.append(String.format(" %s repair/salvage action%s performed.",
+                      actionsPerformed,
+                      (actionsPerformed == 1 ? "" : "s")));
             }
 
-            sb.append(generateUnitRepairSummary("<br/>- %s unit%s had repairs/parts salvaged.", unitActionsByStatus,
-                    MRMSUnitAction.STATUS.ACTIONS_PERFORMED));
+            sb.append(generateUnitRepairSummary("<br/>- %s unit%s had repairs/parts salvaged.",
+                  unitActionsByStatus,
+                  MRMSUnitAction.STATUS.ACTIONS_PERFORMED));
             sb.append(generateUnitRepairSummary(
-                    "<br/>- %s unit%s had no actions performed because there were no valid parts.", unitActionsByStatus,
-                    MRMSUnitAction.STATUS.NO_PARTS));
+                  "<br/>- %s unit%s had no actions performed because there were no valid parts.",
+                  unitActionsByStatus,
+                  MRMSUnitAction.STATUS.NO_PARTS));
             sb.append(generateUnitRepairSummary(
-                    "<br/>- %s unit%s had no actions performed because there were no valid techs.", unitActionsByStatus,
-                    MRMSUnitAction.STATUS.NO_TECHS));
+                  "<br/>- %s unit%s had no actions performed because there were no valid techs.",
+                  unitActionsByStatus,
+                  MRMSUnitAction.STATUS.NO_TECHS));
             sb.append(generateUnitRepairSummary(
-                    "<br/>- %s unit%s had no actions performed because there were unfixable limbs and configured settings do not allow location repairs.",
-                    unitActionsByStatus, MRMSUnitAction.STATUS.UNFIXABLE_LIMB));
+                  "<br/>- %s unit%s had no actions performed because there were unfixable limbs and configured settings do not allow location repairs.",
+                  unitActionsByStatus,
+                  MRMSUnitAction.STATUS.UNFIXABLE_LIMB));
 
             campaign.addReport(sb.toString());
         }
 
-        generateCampaignLogForUnitStatus(unitActionsByStatus, MRMSUnitAction.STATUS.NO_PARTS,
-                "Units with no valid parts:", campaign);
-        generateCampaignLogForUnitStatus(unitActionsByStatus, MRMSUnitAction.STATUS.NO_TECHS,
-                "Units with no valid techs:", campaign);
-        generateCampaignLogForUnitStatus(unitActionsByStatus, MRMSUnitAction.STATUS.UNFIXABLE_LIMB,
-                "Units with unfixable limbs:", campaign);
+        generateCampaignLogForUnitStatus(unitActionsByStatus,
+              MRMSUnitAction.STATUS.NO_PARTS,
+              "Units with no valid parts:",
+              campaign);
+        generateCampaignLogForUnitStatus(unitActionsByStatus,
+              MRMSUnitAction.STATUS.NO_TECHS,
+              "Units with no valid techs:",
+              campaign);
+        generateCampaignLogForUnitStatus(unitActionsByStatus,
+              MRMSUnitAction.STATUS.UNFIXABLE_LIMB,
+              "Units with unfixable limbs:",
+              campaign);
 
         if (!unitActionsByStatus.isEmpty()) {
             List<Person> techs = campaign.getTechs();
@@ -341,13 +369,16 @@ public class MRMSService {
 
                 if (count > 0) {
                     if (count == 1) {
-                        campaign.addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
-                                + "'>There in still 1 part that is not being worked on.</font>");
+                        campaign.addReport("<font color='" +
+                                                 MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                                                 "'>There in still 1 part that is not being worked on.</font>");
                     } else {
-                        campaign.addReport(String.format(
-                                "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
-                                        + "'>There are still %s parts that are not being worked on %s unit%s.</font>",
-                                count, unitCount, (unitCount == 1) ? "" : "s"));
+                        campaign.addReport(String.format("<font color='" +
+                                                               MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                                                               "'>There are still %s parts that are not being worked on %s unit%s.</font>",
+                              count,
+                              unitCount,
+                              (unitCount == 1) ? "" : "s"));
                     }
                 }
             }
@@ -362,8 +393,7 @@ public class MRMSService {
     }
 
     private static String generateUnitRepairSummary(String baseDescription,
-            Map<MRMSUnitAction.STATUS, List<MRMSUnitAction>> unitActionsByStatus,
-            MRMSUnitAction.STATUS status) {
+          Map<MRMSUnitAction.STATUS, List<MRMSUnitAction>> unitActionsByStatus, MRMSUnitAction.STATUS status) {
 
         if (!unitActionsByStatus.containsKey(status)) {
             return "";
@@ -375,8 +405,8 @@ public class MRMSService {
     }
 
     private static void generateCampaignLogForUnitStatus(
-            Map<MRMSUnitAction.STATUS, List<MRMSUnitAction>> unitActionsByStatus,
-            MRMSUnitAction.STATUS status, String statusDesc, Campaign campaign) {
+          Map<MRMSUnitAction.STATUS, List<MRMSUnitAction>> unitActionsByStatus, MRMSUnitAction.STATUS status,
+          String statusDesc, Campaign campaign) {
         if (!unitActionsByStatus.containsKey(status) || unitActionsByStatus.get(status).isEmpty()) {
             return;
         }
@@ -394,8 +424,7 @@ public class MRMSService {
     }
 
     private static MRMSUnitAction performUnitMRMS(Campaign campaign, Unit unit, boolean isSalvage,
-            List<MRMSOption> mrmsOptions,
-            MRMSConfiguredOptions configuredOptions) {
+          List<MRMSOption> mrmsOptions, MRMSConfiguredOptions configuredOptions) {
         List<Person> techs = campaign.getTechs(true);
 
         if (techs.isEmpty()) {
@@ -429,8 +458,12 @@ public class MRMSService {
         long time = System.nanoTime();
 
         while (performMoreRepairs) {
-            MRMSUnitAction currentUnitAction = performUnitMassTechAction(campaign, unit, techs,
-                    mrmsOptionsByType, isSalvage, configuredOptions);
+            MRMSUnitAction currentUnitAction = performUnitMassTechAction(campaign,
+                  unit,
+                  techs,
+                  mrmsOptionsByType,
+                  isSalvage,
+                  configuredOptions);
 
             performMoreRepairs = currentUnitAction.getPartSet().isHasRepairs();
             unitAction.merge(currentUnitAction);
@@ -445,11 +478,9 @@ public class MRMSService {
         return unitAction;
     }
 
-    private static MRMSUnitAction performUnitMassTechAction(Campaign campaign, Unit unit,
-            List<Person> techs,
-            Map<PartRepairType, MRMSOption> mrmsOptionsByType,
-            boolean salvaging,
-            MRMSConfiguredOptions configuredOptions) {
+    private static MRMSUnitAction performUnitMassTechAction(Campaign campaign, Unit unit, List<Person> techs,
+          Map<PartRepairType, MRMSOption> mrmsOptionsByType, boolean salvaging,
+          MRMSConfiguredOptions configuredOptions) {
         List<IPartWork> parts = unit.getPartsNeedingService(true);
 
         if (parts.isEmpty()) {
@@ -468,16 +499,14 @@ public class MRMSService {
             }
         }
 
-        // If we're performing an action on a unit and we allow auto-scrapping of parts
-        // that can't
-        // be fixed by an elite tech, let's first get rid of those parts and start with
-        // a cleaner
-        // slate
+        // If we're performing an action on a unit, and we allow auto-scrapping of parts
+        // that can't be fixed by an elite tech, let's first get rid of those parts and start with
+        // a cleaner slate
         if (configuredOptions.isScrapImpossible()) {
             boolean refreshParts = false;
 
             for (IPartWork partWork : parts) {
-                if ((partWork instanceof Part) && (partWork.getSkillMin() > SkillType.EXP_ELITE)) {
+                if ((partWork instanceof Part) && (partWork.getSkillMin() > SkillType.EXP_LEGENDARY)) {
                     campaign.addReport(((Part) partWork).scrap());
                     refreshParts = true;
                 }
@@ -568,8 +597,10 @@ public class MRMSService {
                 Map<Integer, Integer> countOfPartsPerLocation = new HashMap<>();
 
                 for (IPartWork partWork : partsTemp) {
-                    if (!(partWork instanceof MekLocation) && !(partWork instanceof MissingMekLocation)
-                            && locationMap.containsKey(partWork.getLocation()) && partWork.isSalvaging()) {
+                    if (!(partWork instanceof MekLocation) &&
+                              !(partWork instanceof MissingMekLocation) &&
+                              locationMap.containsKey(partWork.getLocation()) &&
+                              partWork.isSalvaging()) {
                         partsToBeRemoved.add(partWork);
 
                         int count = 0;
@@ -615,16 +646,19 @@ public class MRMSService {
                         }
 
                         if (unfixable) {
-                            campaign.addReport(String.format(
-                                    "<font color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor()
-                                            + "'>Found an unfixable limb (%s) on %s which contains %s parts. Going to remove all parts and scrap the limb before proceeding with other repairs.</font>",
-                                    loc.getName(), unit.getName(), countOfPartsPerLocation.get(locId)));
+                            campaign.addReport(String.format("<font color='" +
+                                                                   MekHQ.getMHQOptions().getFontColorWarningHexColor() +
+                                                                   "'>Found an unfixable limb (%s) on %s which contains %s parts. Going to remove all parts and scrap the limb before proceeding with other repairs.</font>",
+                                  loc.getName(),
+                                  unit.getName(),
+                                  countOfPartsPerLocation.get(locId)));
                         } else {
-                            campaign.addReport(String.format(
-                                    "<font color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor()
-                                            + "'>Found missing location (%s) on %s which contains %s parts. Going to remove all parts before proceeding with other repairs.</font>",
-                                    loc != null ? loc.getName() : Integer.toString(locId), unit.getName(),
-                                    countOfPartsPerLocation.get(locId)));
+                            campaign.addReport(String.format("<font color='" +
+                                                                   MekHQ.getMHQOptions().getFontColorWarningHexColor() +
+                                                                   "'>Found missing location (%s) on %s which contains %s parts. Going to remove all parts before proceeding with other repairs.</font>",
+                                  loc != null ? loc.getName() : Integer.toString(locId),
+                                  unit.getName(),
+                                  countOfPartsPerLocation.get(locId)));
                         }
                     }
 
@@ -660,8 +694,7 @@ public class MRMSService {
             return new MRMSUnitAction(unit, salvaging, MRMSUnitAction.STATUS.NO_PARTS);
         }
 
-        MRMSUnitAction unitAction = new MRMSUnitAction(unit, salvaging,
-                MRMSUnitAction.STATUS.ACTIONS_PERFORMED);
+        MRMSUnitAction unitAction = new MRMSUnitAction(unit, salvaging, MRMSUnitAction.STATUS.ACTIONS_PERFORMED);
 
         for (IPartWork partWork : parts) {
             if (partWork instanceof Part) {
@@ -675,8 +708,13 @@ public class MRMSService {
                 continue;
             }
 
-            unitAction.addPartAction(repairPart(campaign, partWork, unit, validTechs,
-                    mrmsOptionsByType, configuredOptions, false));
+            unitAction.addPartAction(repairPart(campaign,
+                  partWork,
+                  unit,
+                  validTechs,
+                  mrmsOptionsByType,
+                  configuredOptions,
+                  false));
         }
 
         if (scrappingLimbMode) {
@@ -692,11 +730,9 @@ public class MRMSService {
         return unitAction;
     }
 
-    private static MRMSPartAction repairPart(Campaign campaign, IPartWork partWork, Unit unit,
-            List<Person> techs,
-            Map<PartRepairType, MRMSOption> mrmsOptionsByType,
-            MRMSConfiguredOptions configuredOptions,
-            boolean warehouseMode) {
+    private static MRMSPartAction repairPart(Campaign campaign, IPartWork partWork, Unit unit, List<Person> techs,
+          Map<PartRepairType, MRMSOption> mrmsOptionsByType, MRMSConfiguredOptions configuredOptions,
+          boolean warehouseMode) {
         // We were doing this check for every tech, that's unnecessary as it
         // doesn't change from tech to tech
         MRMSOption mrmsOptions = mrmsOptionsByType.get(IPartWork.findCorrectMRMSType(partWork));
@@ -722,7 +758,7 @@ public class MRMSService {
                 highestAvailableTechSkill = skill.getExperienceLevel();
             }
 
-            if (highestAvailableTechSkill == SkillType.EXP_ELITE) {
+            if (highestAvailableTechSkill == SkillType.EXP_LEGENDARY) {
                 break;
             }
         }
@@ -762,20 +798,25 @@ public class MRMSService {
                         continue;
                     } else if (!canChangeWorkTime) {
                         debugLog("... can't increase time because this part can not have it's workMode changed",
-                                "repairPart");
+                              "repairPart");
                         continue;
                     }
 
-                    WorkTimeCalculation workTimeCalc = calculateNewMRMSWorktime(partWork, tech,
-                            mrmsOptions, campaign, true, highestAvailableTechSkill);
+                    WorkTimeCalculation workTimeCalc = calculateNewMRMSWorktime(partWork,
+                          tech,
+                          mrmsOptions,
+                          campaign,
+                          true,
+                          highestAvailableTechSkill);
 
                     if (workTimeCalc.getWorkTime() == null) {
                         if (workTimeCalc.isReachedMaxSkill()) {
                             debugLog("... can't increase time enough to reach BTH with max available tech",
-                                    "repairPart");
+                                  "repairPart");
 
-                            return MRMSPartAction.createMaxSkillReached(partWork, highestAvailableTechSkill,
-                                    mrmsOptions.getBthMin());
+                            return MRMSPartAction.createMaxSkillReached(partWork,
+                                  highestAvailableTechSkill,
+                                  mrmsOptions.getBthMin());
                         } else {
                             debugLog("... can't increase time enough to reach BTH", "repairPart");
 
@@ -787,9 +828,12 @@ public class MRMSService {
                 } else if (targetRoll.getValue() < mrmsOptions.getBthMax()) {
                     // Or decrease the time to meet the max BTH
                     if (configuredOptions.isUseRushJob() && canChangeWorkTime) {
-                        WorkTimeCalculation workTimeCalc = calculateNewMRMSWorktime(partWork, tech, mrmsOptions,
-                                campaign,
-                                false, highestAvailableTechSkill);
+                        WorkTimeCalculation workTimeCalc = calculateNewMRMSWorktime(partWork,
+                              tech,
+                              mrmsOptions,
+                              campaign,
+                              false,
+                              highestAvailableTechSkill);
 
                         if (null == workTimeCalc.getWorkTime()) {
                             selectedWorktime = WorkTime.NORMAL;
@@ -913,7 +957,7 @@ public class MRMSService {
     }
 
     private static List<IPartWork> filterParts(List<IPartWork> parts, Map<PartRepairType, MRMSOption> mrmsOptionsByType,
-            List<Person> techs, Campaign campaign) {
+          List<Person> techs, Campaign campaign) {
         List<IPartWork> newParts = new ArrayList<>();
 
         if (techs.isEmpty() || parts.isEmpty()) {
@@ -980,8 +1024,9 @@ public class MRMSService {
 
             TargetRoll roll = campaign.getTargetFor(partWork, tech);
 
-            if ((roll.getValue() == TargetRoll.IMPOSSIBLE) || (roll.getValue() == TargetRoll.AUTOMATIC_FAIL)
-                    || (roll.getValue() == TargetRoll.CHECK_FALSE)) {
+            if ((roll.getValue() == TargetRoll.IMPOSSIBLE) ||
+                      (roll.getValue() == TargetRoll.AUTOMATIC_FAIL) ||
+                      (roll.getValue() == TargetRoll.CHECK_FALSE)) {
                 continue;
             }
 
@@ -992,8 +1037,7 @@ public class MRMSService {
     }
 
     private static List<Person> filterTechs(IPartWork partWork, List<Person> techs,
-            Map<PartRepairType, MRMSOption> mrmsOptionsByType,
-            boolean warehouseMode, Campaign campaign) {
+          Map<PartRepairType, MRMSOption> mrmsOptionsByType, boolean warehouseMode, Campaign campaign) {
         List<Person> validTechs = new ArrayList<>();
 
         if (techs.isEmpty()) {
@@ -1038,9 +1082,9 @@ public class MRMSService {
             // Check if we can actually even repair this part
             TargetRoll targetRoll = campaign.getTargetFor(partWork, tech);
 
-            if ((targetRoll.getValue() == TargetRoll.IMPOSSIBLE)
-                    || (targetRoll.getValue() == TargetRoll.AUTOMATIC_FAIL)
-                    || (targetRoll.getValue() == TargetRoll.CHECK_FALSE)) {
+            if ((targetRoll.getValue() == TargetRoll.IMPOSSIBLE) ||
+                      (targetRoll.getValue() == TargetRoll.AUTOMATIC_FAIL) ||
+                      (targetRoll.getValue() == TargetRoll.CHECK_FALSE)) {
                 continue;
             }
 
@@ -1058,12 +1102,8 @@ public class MRMSService {
         return (!(part instanceof Armor)) || ((Armor) part).isInSupply();
     }
 
-    private static WorkTimeCalculation calculateNewMRMSWorktime(IPartWork partWork,
-            Person tech,
-            MRMSOption mrmsOption,
-            Campaign campaign,
-            boolean increaseTime,
-            int highestAvailableTechSkill) {
+    private static WorkTimeCalculation calculateNewMRMSWorktime(IPartWork partWork, Person tech, MRMSOption mrmsOption,
+          Campaign campaign, boolean increaseTime, int highestAvailableTechSkill) {
         long time = System.nanoTime();
 
         debugLog("...... starting calculateNewMRMSWorktime", "calculateNewMRMSWorktime");
@@ -1074,11 +1114,12 @@ public class MRMSService {
 
         TargetRoll targetRoll = campaign.getTargetFor(partWork, tech);
 
-        if ((targetRoll.getValue() == TargetRoll.IMPOSSIBLE) || (targetRoll.getValue() == TargetRoll.AUTOMATIC_FAIL)
-                || (targetRoll.getValue() == TargetRoll.CHECK_FALSE)) {
+        if ((targetRoll.getValue() == TargetRoll.IMPOSSIBLE) ||
+                  (targetRoll.getValue() == TargetRoll.AUTOMATIC_FAIL) ||
+                  (targetRoll.getValue() == TargetRoll.CHECK_FALSE)) {
             debugLog("...... ending calculateNewMRMSWorktime due to impossible role - %s ns",
-                    "calculateNewMRMSWorktime",
-                    System.nanoTime() - time);
+                  "calculateNewMRMSWorktime",
+                  System.nanoTime() - time);
 
             return new WorkTimeCalculation();
         }
@@ -1092,8 +1133,10 @@ public class MRMSService {
             previousNewWorkTime = newWorkTime;
             newWorkTime = newWorkTime.moveTimeToNextLevel(increaseTime);
 
-            debugLog("...... looping workTime check. NewWorkTime: %s, PreviousWorkTime: %s", "calculateNewMRMSWorktime",
-                    (null == newWorkTime ? "NULL" : newWorkTime.name()), previousNewWorkTime.name());
+            debugLog("...... looping workTime check. NewWorkTime: %s, PreviousWorkTime: %s",
+                  "calculateNewMRMSWorktime",
+                  (null == newWorkTime ? "NULL" : newWorkTime.name()),
+                  previousNewWorkTime.name());
 
             // If we're trying to a rush a job, our effective skill goes down
             // Let's make sure we don't put it so high that we can't fix it
@@ -1103,9 +1146,9 @@ public class MRMSService {
 
                 if (partWork.getSkillMin() > (skill.getExperienceLevel() - modePenalty)) {
                     debugLog(
-                            "...... ending calculateNewMRMSWorktime with previousWorkTime due time reduction skill mod now being less that required skill - %s ns",
-                            "calculateNewMRMSWorktime",
-                            System.nanoTime() - time);
+                          "...... ending calculateNewMRMSWorktime with previousWorkTime due time reduction skill mod now being less that required skill - %s ns",
+                          "calculateNewMRMSWorktime",
+                          System.nanoTime() - time);
 
                     return new WorkTimeCalculation(previousNewWorkTime);
                 }
@@ -1114,8 +1157,8 @@ public class MRMSService {
             // If we have a null newWorkTime, we're done. Use the previous one.
             if (null == newWorkTime) {
                 debugLog("...... ending calculateNewMRMSWorktime because newWorkTime is null - %s ns",
-                        "calculateNewMRMSWorktime",
-                        System.nanoTime() - time);
+                      "calculateNewMRMSWorktime",
+                      System.nanoTime() - time);
 
                 if (!increaseTime) {
                     return new WorkTimeCalculation(previousNewWorkTime);
@@ -1138,11 +1181,12 @@ public class MRMSService {
             targetRoll = campaign.getTargetFor(partWork, tech);
 
             // If our roll is impossible, revert to the previous one
-            if ((targetRoll.getValue() == TargetRoll.IMPOSSIBLE) || (targetRoll.getValue() == TargetRoll.AUTOMATIC_FAIL)
-                    || (targetRoll.getValue() == TargetRoll.CHECK_FALSE)) {
+            if ((targetRoll.getValue() == TargetRoll.IMPOSSIBLE) ||
+                      (targetRoll.getValue() == TargetRoll.AUTOMATIC_FAIL) ||
+                      (targetRoll.getValue() == TargetRoll.CHECK_FALSE)) {
                 debugLog("...... ending calculateNewMRMSWorktime due to impossible role - %s ns",
-                        "calculateNewMRMSWorktime",
-                        System.nanoTime() - time);
+                      "calculateNewMRMSWorktime",
+                      System.nanoTime() - time);
 
                 return new WorkTimeCalculation(previousNewWorkTime);
             }
@@ -1151,26 +1195,23 @@ public class MRMSService {
                 // If we've reached our BTH, kick out. Otherwise we'll loop
                 // around again
                 if (targetRoll.getValue() <= mrmsOption.getBthMin()) {
-                    debugLog(
-                            "...... ending calculateNewMRMSWorktime because we have reached our BTH goal - %s ns",
-                            "calculateNewMRMSWorktime",
-                            System.nanoTime() - time);
+                    debugLog("...... ending calculateNewMRMSWorktime because we have reached our BTH goal - %s ns",
+                          "calculateNewMRMSWorktime",
+                          System.nanoTime() - time);
 
                     return new WorkTimeCalculation(newWorkTime);
                 }
             } else {
                 if (targetRoll.getValue() > mrmsOption.getBthMax()) {
-                    debugLog(
-                            "...... ending calculateNewMRMSWorktime because we have reached our BTH goal - %s ns",
-                            "calculateNewMRMSWorktime",
-                            System.nanoTime() - time);
+                    debugLog("...... ending calculateNewMRMSWorktime because we have reached our BTH goal - %s ns",
+                          "calculateNewMRMSWorktime",
+                          System.nanoTime() - time);
 
                     return new WorkTimeCalculation(previousNewWorkTime);
                 } else if (targetRoll.getValue() > mrmsOption.getBthMax()) {
-                    debugLog(
-                            "...... ending calculateNewMRMSWorktime because we have reached our BTH goal - %s ns",
-                            "calculateNewMRMSWorktime",
-                            System.nanoTime() - time);
+                    debugLog("...... ending calculateNewMRMSWorktime because we have reached our BTH goal - %s ns",
+                          "calculateNewMRMSWorktime",
+                          System.nanoTime() - time);
 
                     return new WorkTimeCalculation(newWorkTime);
                 }
@@ -1233,7 +1274,7 @@ public class MRMSService {
             Skill skill2 = tech2.getSkillForWorkingOn(partWork);
 
             if (skill1.getExperienceLevel() == skill2.getExperienceLevel()) {
-                if ((tech1.getXP() == tech2.getXP()) || (skill1.getLevel() == SkillType.EXP_ELITE)) {
+                if ((tech1.getXP() == tech2.getXP()) || (skill1.getLevel() == SkillType.EXP_LEGENDARY)) {
                     return tech1.getMinutesLeft() - tech2.getMinutesLeft();
                 } else {
                     return (tech1.getXP() < tech2.getXP()) ? -1 : 1;
@@ -1316,8 +1357,8 @@ public class MRMSService {
             return new MRMSPartAction(partWork, STATUS.REPAIRED);
         }
 
-        public static MRMSPartAction createMaxSkillReached(final IPartWork partWork,
-                final int maxSkill, final int bthMin) {
+        public static MRMSPartAction createMaxSkillReached(final IPartWork partWork, final int maxSkill,
+              final int bthMin) {
             final MRMSPartAction mrmsPartAction = new MRMSPartAction(partWork, STATUS.MAX_SKILL_REACHED);
             mrmsPartAction.setMaxTechSkill(maxSkill);
             mrmsPartAction.setConfiguredBTHMin(bthMin);
@@ -1342,7 +1383,7 @@ public class MRMSService {
             }
 
             List<MRMSPartAction> list = partActionsByStatus.computeIfAbsent(partAction.getStatus(),
-                    k -> new ArrayList<>());
+                  k -> new ArrayList<>());
 
             list.add(partAction);
         }
