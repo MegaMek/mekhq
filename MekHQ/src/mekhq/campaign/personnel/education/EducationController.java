@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.education;
 
@@ -62,6 +67,7 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.Genealogy;
+import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.utilities.ReportingUtilities;
 
@@ -1622,10 +1628,21 @@ public class EducationController {
      * @param bonus       The bonus to apply when increasing the skill level.
      */
     private static void adjustSkillLevel(Person person, String skillParsed, int targetLevel, int bonus) {
-        int skillLevel = 0;
+        boolean underTarget = true;
+        while (underTarget) {
+            Skill skill = person.getSkill(skillParsed);
+            if (skill == null) {
+                logger.error("Skill {} not found for person {}", skillParsed, person.getFullTitle());
+                underTarget = false;
+                continue;
+            }
 
-        while (person.getSkill(skillParsed).getExperienceLevel() < targetLevel) {
-            person.addSkill(skillParsed, skillLevel++, bonus);
+            int skillLevel = skill.getLevel();
+            int experienceLevel = skill.getType().getExperienceLevel(skillLevel);
+
+            if (experienceLevel <= targetLevel) {
+                person.addSkill(skillParsed, skillLevel + 1, bonus);
+            }
         }
     }
 
