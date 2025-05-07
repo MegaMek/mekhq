@@ -24,8 +24,25 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission.resupplyAndCaches;
+
+import static java.lang.Math.max;
+import static megamek.common.Compute.randomInt;
+import static mekhq.campaign.force.ForceType.CONVOY;
+import static mekhq.campaign.mission.resupplyAndCaches.Resupply.CARGO_MULTIPLIER;
+import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_AMMO_TONNAGE;
+import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_ARMOR_TONNAGE;
+import static mekhq.campaign.mission.resupplyAndCaches.Resupply.calculateTargetCargoTonnage;
+import static mekhq.campaign.personnel.enums.PersonnelStatus.KIA;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
+import java.util.UUID;
 
 import megamek.common.Compute;
 import mekhq.campaign.Campaign;
@@ -35,17 +52,7 @@ import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.dialog.resupplyAndCaches.DialogAbandonedConvoy;
-
-import java.util.UUID;
-
-import static java.lang.Math.max;
-import static mekhq.campaign.force.ForceType.CONVOY;
-import static mekhq.campaign.mission.resupplyAndCaches.Resupply.CARGO_MULTIPLIER;
-import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_AMMO_TONNAGE;
-import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_ARMOR_TONNAGE;
-import static mekhq.campaign.mission.resupplyAndCaches.Resupply.calculateTargetCargoTonnage;
-import static mekhq.campaign.personnel.enums.PersonnelStatus.KIA;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
 /**
  * Utility class for managing resupply operations and events in MekHQ campaigns.
@@ -65,6 +72,8 @@ import static mekhq.campaign.personnel.enums.PersonnelStatus.KIA;
  * <p>This utility is central to the logistics and event-handling systems present in MekHQ's resupply mechanics.</p>
  */
 public class ResupplyUtilities {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Resupply";
+
     /**
      * Processes an abandoned convoy, managing the removal of units and determining the fate of the
      * convoy's crew members.
@@ -94,7 +103,22 @@ public class ResupplyUtilities {
             }
 
             if (force.isForceType(CONVOY) && force.getScenarioId() == scenarioId) {
-                new DialogAbandonedConvoy(campaign, contract, force);
+                Person speaker = campaign.getPerson(force.getForceCommanderID());
+
+                String commanderAddress = campaign.getCommanderAddress(false);
+                String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
+                      "statusUpdateAbandoned" + randomInt(20) + ".text",
+                      commanderAddress);
+                String outOfCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "outOfCharacter.abandoned");
+
+                new ImmersiveDialogSimple(campaign,
+                      speaker,
+                      null,
+                      inCharacterMessage,
+                      null,
+                      outOfCharacterMessage,
+                      null,
+                      false);
 
                 for (UUID unitID : force.getAllUnits(false)) {
                     Unit unit = campaign.getUnit(unitID);

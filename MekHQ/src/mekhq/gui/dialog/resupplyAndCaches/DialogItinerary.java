@@ -247,7 +247,7 @@ public class DialogItinerary {
               "<html><div style='width: %s; text-align:center;'>%s<br>%s</div></html>",
               DIALOG_WIDTH,
               getFormattedTextAt(RESOURCE_BUNDLE, "roleplayItems.prompt"),
-              getFormattedTextAt(RESOURCE_BUNDLE, "documentation.prompt")));
+              getFormattedTextAt(RESOURCE_BUNDLE, "outOfCharacter.itinerary")));
         infoPanel.add(lblInfo);
 
         // Create a container panel to hold both buttonPanel and infoPanel
