@@ -28,6 +28,7 @@
 package mekhq.campaign.personnel.skills;
 
 import static java.lang.Math.round;
+import static mekhq.campaign.personnel.skills.SkillType.S_ARCHERY;
 import static mekhq.campaign.personnel.skills.SkillType.S_CLIMBING;
 import static mekhq.campaign.personnel.skills.SkillType.S_SCROUNGE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -72,7 +73,8 @@ public class SkillDeprecationTool {
      * <p><b>Last Updated:</b> 50.06</p>
      */
     public static final List<SkillType> DEPRECATED_SKILLS = List.of(SkillType.getType(S_SCROUNGE),
-          SkillType.getType(S_CLIMBING));
+          SkillType.getType(S_CLIMBING),
+          SkillType.getType(S_ARCHERY));
 
     private final Campaign campaign;
     private final Person person;
