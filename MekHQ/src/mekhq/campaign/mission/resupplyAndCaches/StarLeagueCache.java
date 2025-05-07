@@ -24,8 +24,47 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission.resupplyAndCaches;
+
+import static megamek.common.EntityWeightClass.WEIGHT_ASSAULT;
+import static megamek.common.EntityWeightClass.WEIGHT_HEAVY;
+import static megamek.common.EntityWeightClass.WEIGHT_LIGHT;
+import static megamek.common.EntityWeightClass.WEIGHT_MEDIUM;
+import static megamek.common.Mek.LOC_CT;
+import static megamek.common.UnitType.AEROSPACEFIGHTER;
+import static megamek.common.UnitType.INFANTRY;
+import static megamek.common.UnitType.MEK;
+import static megamek.common.UnitType.TANK;
+import static mekhq.campaign.finances.enums.TransactionType.MISCELLANEOUS;
+import static mekhq.campaign.mission.BotForceRandomizer.UNIT_WEIGHT_UNSPECIFIED;
+import static mekhq.campaign.unit.Unit.getRandomUnitQuality;
+import static mekhq.campaign.universe.Factions.getFactionLogo;
+
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.ResourceBundle;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.Compute;
@@ -49,29 +88,6 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import org.apache.commons.math3.util.Pair;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.*;
-
-import static megamek.common.EntityWeightClass.WEIGHT_ASSAULT;
-import static megamek.common.EntityWeightClass.WEIGHT_HEAVY;
-import static megamek.common.EntityWeightClass.WEIGHT_LIGHT;
-import static megamek.common.EntityWeightClass.WEIGHT_MEDIUM;
-import static megamek.common.Mek.LOC_CT;
-import static megamek.common.UnitType.AEROSPACEFIGHTER;
-import static megamek.common.UnitType.INFANTRY;
-import static megamek.common.UnitType.MEK;
-import static megamek.common.UnitType.TANK;
-import static mekhq.campaign.finances.enums.TransactionType.MISCELLANEOUS;
-import static mekhq.campaign.mission.BotForceRandomizer.UNIT_WEIGHT_UNSPECIFIED;
-import static mekhq.campaign.unit.Unit.getRandomUnitQuality;
-import static mekhq.campaign.universe.Factions.getFactionLogo;
 
 public class StarLeagueCache {
     private final Campaign campaign;
@@ -643,7 +659,7 @@ public class StarLeagueCache {
         if (isAnon) {
             return new ImageIcon("data/images/portraits/default.gif");
         } else {
-            return getFactionLogo(campaign, campaign.getFaction().getShortName(), true);
+            return getFactionLogo(campaign.getGameYear(), campaign.getFaction().getShortName());
         }
     }
 }

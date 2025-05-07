@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.view;
 
@@ -108,11 +113,14 @@ public class ContractSummaryPanel extends JPanel {
                 tranRerolls = 1;
             } else {
                 commandNegotiator = campaign.getSeniorAdminPerson(COMMAND);
-                cmdRerolls = (commandNegotiator == null || commandNegotiator.getSkill(SkillType.S_NEG) == null) ? 0 : 1;
+                cmdRerolls = (commandNegotiator == null ||
+                                    commandNegotiator.getSkill(SkillType.S_NEGOTIATION) == null) ? 0 : 1;
                 logisticsNegotiator = campaign.getSeniorAdminPerson(LOGISTICS);
-                logRerolls = (logisticsNegotiator == null || logisticsNegotiator.getSkill(SkillType.S_NEG) == null) ? 0 : 1;
+                logRerolls = (logisticsNegotiator == null ||
+                                    logisticsNegotiator.getSkill(SkillType.S_NEGOTIATION) == null) ? 0 : 1;
                 transportNegotiator = campaign.getSeniorAdminPerson(TRANSPORT);
-                tranRerolls = (transportNegotiator == null || transportNegotiator.getSkill(SkillType.S_NEG) == null) ? 0 : 1;
+                tranRerolls = (transportNegotiator == null ||
+                                     transportNegotiator.getSkill(SkillType.S_NEGOTIATION) == null) ? 0 : 1;
             }
         }
 

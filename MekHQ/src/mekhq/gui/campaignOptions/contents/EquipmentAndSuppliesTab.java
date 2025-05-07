@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.campaignOptions.contents;
 
@@ -946,7 +951,7 @@ public class EquipmentAndSuppliesTab {
         acquireSkillModel.addElement(CampaignOptions.S_TECH);
         acquireSkillModel.addElement(SkillType.S_ADMIN);
         acquireSkillModel.addElement(SkillType.S_SCROUNGE);
-        acquireSkillModel.addElement(SkillType.S_NEG);
+        acquireSkillModel.addElement(SkillType.S_NEGOTIATION);
         acquireSkillModel.addElement(CampaignOptions.S_AUTO);
 
         return acquireSkillModel;
