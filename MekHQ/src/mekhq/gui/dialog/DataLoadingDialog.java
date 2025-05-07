@@ -27,6 +27,7 @@
  */
 package mekhq.gui.dialog;
 
+import static java.util.Arrays.sort;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP_ABRIDGED;
 import static mekhq.gui.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CANCELLED;
@@ -69,12 +70,12 @@ import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
 import mekhq.campaign.market.enums.ContractMarketMethod;
-import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
 import mekhq.campaign.personnel.Bloodname;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.backgrounds.RandomCompanyNameGenerator;
+import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.storyarc.StoryArcStub;
@@ -270,6 +271,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
             Ranks.initializeRankSystems();
             RATManager.populateCollectionNames();
             SkillType.initializeTypes();
+            sort(SkillType.getSkillList()); // sort all skills alphabetically
             SpecialAbility.initializeSPA();
             // endregion Progress 0
 

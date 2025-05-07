@@ -2375,8 +2375,8 @@ public class Campaign implements ITechManager {
                             break;
                         case VESSEL_NAVIGATOR:
                             bloodnameTarget += 2 *
-                                                     (person.hasSkill(SkillType.S_NAV) ?
-                                                            person.getSkill(SkillType.S_NAV)
+                                                     (person.hasSkill(SkillType.S_NAVIGATION) ?
+                                                            person.getSkill(SkillType.S_NAVIGATION)
                                                                   .getFinalSkillValue(options) :
                                                             TargetRoll.AUTOMATIC_FAIL);
                             break;
@@ -6940,8 +6940,7 @@ public class Campaign implements ITechManager {
         int nCollars = stats.getTotalDockingCollars();
         double nCargo = cargoStats.getTotalCargoCapacity(); // ignoring refrigerated/insulated/etc.
 
-        // get cargo tonnage including parts in transit, then get mothballed unit
-        // tonnage
+        // get cargo tonnage including parts in transit, then get mothballed unit tonnage
         double carriedCargo = cargoStats.getCargoTonnage(true, false) + cargoStats.getCargoTonnage(false, true);
 
         // calculate the number of units left not transported
@@ -6952,6 +6951,7 @@ public class Campaign implements ITechManager {
         int noASF = max(nAero - stats.getOccupiedBays(Entity.ETYPE_AEROSPACEFIGHTER), 0);
         int nolv = max(nLVee - stats.getOccupiedBays(Entity.ETYPE_TANK, true), 0);
         int nohv = max(nHVee - stats.getOccupiedBays(Entity.ETYPE_TANK), 0);
+        //TODO: Do capacity calculations for Infantry, too.
         int noinf = max(stats.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY) -
                               stats.getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
         int noBA = max(nBA - stats.getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
@@ -6983,50 +6983,57 @@ public class Campaign implements ITechManager {
         // normalized to per-jump, using 175 hours charge time as a baseline.
 
         // Roughly an Overlord
-        int largeDropshipMekCapacity = 36;
+        int largeMekDropshipMekCapacity = 36;
         int largeMekDropshipASFCapacity = 6;
         int largeMekDropshipCargoCapacity = 120;
         Money largeMekDropshipCost = Money.of(campaignOpsCosts ? (1750000.0 / 4.2) : 400000);
 
         // Roughly a Union
-        int averageDropshipMekCapacity = 12;
-        int mekDropshipASFCapacity = 2;
-        int mekDropshipCargoCapacity = 75;
-        Money mekDropshipCost = Money.of(campaignOpsCosts ? (1450000.0 / 4.2) : 150000);
+        int averageMekDropshipMekCapacity = 12;
+        int averageMekDropshipASFCapacity = 2;
+        int averageMekDropshipCargoCapacity = 75;
+        Money averageMekDropshipCost = Money.of(campaignOpsCosts ? (1450000.0 / 4.2) : 150000);
+
+        // Roughly a Leopard
+        int smallMekDropshipMekCapacity = 4;
+        int smallMekDropshipASFCapacity = 2;
+        int smallMekDropshipCargoCapacity = 5;
+        Money smallMekDropshipCost = Money.of(campaignOpsCosts ? (750000.0 / 4.2) : 60000);
 
         // Roughly a Leopard CV
-        int averageDropshipASFCapacity = 6;
-        int asfDropshipCargoCapacity = 90;
-        Money asfDropshipCost = Money.of(campaignOpsCosts ? (900000.0 / 4.2) : 80000);
+        int smallASFDropshipASFCapacity = 6;
+        int smallASFDropshipCargoCapacity = 90;
+        Money smallASFDropshipCost = Money.of(campaignOpsCosts ? (900000.0 / 4.2) : 80000);
 
         // Roughly a Triumph
-        int largeDropshipVehicleCapacity = 50;
+        int largeVehicleDropshipVehicleCapacity = 50;
         int largeVehicleDropshipCargoCapacity = 750;
         Money largeVehicleDropshipCost = Money.of(campaignOpsCosts ? (1750000.0 / 4.2) : 430000);
 
         // Roughly a Gazelle
-        int averageDropshipVehicleCapacity = 15;
-        int vehicleDropshipCargoCapacity = 65;
-        Money vehicleDropshipCost = Money.of(campaignOpsCosts ? (900000.0 / 4.2) : 40000);
+        int avgVehicleDropshipVehicleCapacity = 15;
+        int avgVehicleDropshipCargoCapacity = 65;
+        Money avgVehicleDropshipCost = Money.of(campaignOpsCosts ? (900000.0 / 4.2) : 40000);
 
         // Roughly a Mule
-        int largeDropshipCargoCapacity = 8000;
+        int largeCargoDropshipCargoCapacity = 8000;
         Money largeCargoDropshipCost = Money.of(campaignOpsCosts ? (750000.0 / 4.2) : 800000);
 
         // Roughly a Buccaneer
-        int averageDropshipCargoCapacity = 2300;
+        int avgCargoDropshipCargoCapacity = 2300;
         Money cargoDropshipCost = Money.of(campaignOpsCosts ? (550000.0 / 4.2) : 250000);
 
         int mekCollars = 0;
         double leasedLargeMekDropships = 0;
         double leasedAverageMekDropships = 0;
+        double leasedSmallMekDropships = 0;
 
         int asfCollars = 0;
-        double leasedAverageASFDropships = 0;
+        double leasedSmallASFDropships = 0;
 
         int vehicleCollars = 0;
         double leasedLargeVehicleDropships = 0;
-        double leasedAverageVehicleDropships = 0;
+        double leasedAvgVehicleDropships = 0;
 
         int cargoCollars = 0;
         double leasedLargeCargoDropships = 0;
@@ -7038,17 +7045,23 @@ public class Campaign implements ITechManager {
         // For each type we're concerned with, calculate the number of drop-ships needed to transport the force.
         // Smaller drop-ships are represented by half-dropships.
 
-        // If we're transporting more than a company, Overlord analogues are more efficient.
-        if (noMek > 12) {
-            leasedLargeMekDropships = noMek / (double) largeDropshipMekCapacity;
-            noMek -= (int) (leasedLargeMekDropships * largeDropshipMekCapacity);
+        // If we're transporting more than a company, Overlord or half-Overlord analogues are more efficient.
+        if (noMek > largeMekDropshipMekCapacity / 3) {
+            leasedLargeMekDropships = Math.round(2 * noMek / (double) largeMekDropshipMekCapacity) / 2.0;
+            noMek -= (int) (leasedLargeMekDropships * largeMekDropshipMekCapacity);
             mekCollars += (int) Math.ceil(leasedLargeMekDropships);
 
             // If there's more than a company left over, lease another Overlord. Otherwise, fall through and get a Union.
-            if (noMek > 12) {
-                leasedLargeMekDropships += 1;
-                noMek -= largeDropshipMekCapacity;
-                mekCollars += 1;
+            if (noMek > largeMekDropshipMekCapacity / 3) {
+                if (noMek > largeMekDropshipMekCapacity / 2) {
+                    leasedLargeMekDropships += 1;
+                    noMek -= largeMekDropshipMekCapacity;
+                    mekCollars += 1;
+                } else {
+                    leasedLargeMekDropships += 0.5;
+                    noMek -= (int) (largeMekDropshipMekCapacity / 0.5);
+                    mekCollars += 1;
+                }
             }
 
             leasedASFCapacity += (int) floor(leasedLargeMekDropships * largeMekDropshipASFCapacity);
@@ -7056,13 +7069,13 @@ public class Campaign implements ITechManager {
         }
 
         // Unions
-        if (noMek > 0) {
-            leasedAverageMekDropships = noMek / (double) averageDropshipMekCapacity;
-            noMek -= (int) (leasedAverageMekDropships * averageDropshipMekCapacity);
+        if (noMek > 4) {
+            leasedAverageMekDropships = Math.round(2 * noMek / (double) averageMekDropshipMekCapacity) / 2.0;
+            noMek -= (int) (leasedAverageMekDropships * averageMekDropshipMekCapacity);
             mekCollars += (int) Math.ceil(leasedAverageMekDropships);
 
             // If we can fit in a smaller DropShip, lease one of those instead.
-            if ((noMek > 0) && (noMek < (averageDropshipMekCapacity / 2))) {
+            if ((noMek > 0) && (noMek < (averageMekDropshipMekCapacity / 2))) {
                 leasedAverageMekDropships += 0.5;
                 mekCollars += 1;
             } else if (noMek > 0) {
@@ -7071,41 +7084,51 @@ public class Campaign implements ITechManager {
             }
 
             // Our Union-ish DropShip can carry some ASFs and cargo.
-            leasedASFCapacity += (int) floor(leasedAverageMekDropships * mekDropshipASFCapacity);
-            leasedCargoCapacity += (int) floor(leasedAverageMekDropships * mekDropshipCargoCapacity);
+            leasedASFCapacity += (int) floor(leasedAverageMekDropships * averageMekDropshipASFCapacity);
+            leasedCargoCapacity += (int) floor(leasedAverageMekDropships * averageMekDropshipCargoCapacity);
         }
 
-        // Leopard CVs
+        // Leopards for the rest, no halvsies here
+        if (noMek > 0) {
+            leasedSmallMekDropships = Math.ceil(noMek / (double) smallMekDropshipMekCapacity);
+            noMek -= (int) (leasedSmallMekDropships * smallMekDropshipMekCapacity);
+            mekCollars += (int) Math.ceil(leasedSmallMekDropships);
+        }
+        leasedASFCapacity += (int) floor(leasedSmallMekDropships * smallMekDropshipASFCapacity);
+        leasedCargoCapacity += (int) floor(leasedSmallMekDropships * smallMekDropshipCargoCapacity);
+
+        // Leopard CVs are (generally) the most efficient for raw wing transports even with collar fees
         if (noASF > leasedASFCapacity) {
             noASF -= leasedASFCapacity;
 
             if (noASF > 0) {
-                leasedAverageASFDropships = noASF / (double) averageDropshipASFCapacity;
-                noASF -= (int) (leasedAverageASFDropships * averageDropshipASFCapacity);
-                asfCollars += (int) Math.ceil(leasedAverageASFDropships);
+                leasedSmallASFDropships = Math.round(2 * noASF / (double) smallASFDropshipASFCapacity) / 2.0;
+                noASF -= (int) (leasedSmallASFDropships * smallASFDropshipASFCapacity);
+                asfCollars += (int) Math.ceil(leasedSmallASFDropships);
 
-                if ((noASF > 0) && (noASF < (averageDropshipASFCapacity / 2))) {
-                    leasedAverageASFDropships += 0.5;
+                if ((noASF > 0) && (noASF < (smallASFDropshipASFCapacity / 2))) {
+                    leasedSmallASFDropships += 0.5;
                     asfCollars += 1;
                 } else if (noASF > 0) {
-                    leasedAverageASFDropships += 1;
+                    leasedSmallASFDropships += 1;
                     asfCollars += 1;
                 }
             }
 
             // Our Leopard-ish DropShip can carry some cargo.
-            leasedCargoCapacity += (int) floor(asfDropshipCargoCapacity * leasedAverageASFDropships);
+            leasedCargoCapacity += (int) floor(leasedSmallASFDropships * smallASFDropshipCargoCapacity);
         }
 
         // Triumphs
-        if (noVehicles > averageDropshipVehicleCapacity) {
-            leasedLargeVehicleDropships = noVehicles / (double) largeDropshipVehicleCapacity;
-            noVehicles -= (int) (leasedLargeVehicleDropships * largeDropshipVehicleCapacity);
+        if (noVehicles > avgVehicleDropshipVehicleCapacity) {
+            leasedLargeVehicleDropships = Math.round(2 * noVehicles / (double) largeVehicleDropshipVehicleCapacity) /
+                                                2.0;
+            noVehicles -= (int) (leasedLargeVehicleDropships * largeVehicleDropshipVehicleCapacity);
             vehicleCollars += (int) Math.ceil(leasedLargeVehicleDropships);
 
-            if (noVehicles > averageDropshipVehicleCapacity) {
+            if (noVehicles > avgVehicleDropshipVehicleCapacity) {
                 leasedLargeVehicleDropships += 1;
-                noVehicles -= largeDropshipVehicleCapacity;
+                noVehicles -= largeVehicleDropshipVehicleCapacity;
                 vehicleCollars += 1;
             }
 
@@ -7113,45 +7136,45 @@ public class Campaign implements ITechManager {
         }
 
         // Gazelles
+        // Gazelles are pretty minimal, so no halfsies.
         if (noVehicles > 0) {
-            leasedAverageVehicleDropships = (nohv + newNolv) / (double) averageDropshipVehicleCapacity;
-            noVehicles = (int) ((nohv + newNolv) - leasedAverageVehicleDropships * averageDropshipVehicleCapacity);
-            vehicleCollars += (int) Math.ceil(leasedAverageVehicleDropships);
+            leasedAvgVehicleDropships = Math.ceil((nohv + newNolv) / (double) avgVehicleDropshipVehicleCapacity);
+            noVehicles = (int) ((nohv + newNolv) - leasedAvgVehicleDropships * avgVehicleDropshipVehicleCapacity);
+            vehicleCollars += (int) Math.ceil(leasedAvgVehicleDropships);
 
-            // Gazelles are pretty minimal, so no half-measures.
-            if (noVehicles > 0) {
-                leasedAverageVehicleDropships += 1;
-                noVehicles -= averageDropshipVehicleCapacity;
+            if (noVehicles > 0) { //shouldn't be necessary, but check?
+                leasedAvgVehicleDropships += 1;
+                noVehicles -= avgVehicleDropshipVehicleCapacity;
                 vehicleCollars += 1;
             }
 
             // Our Gazelle-ish DropShip can carry some cargo.
-            leasedCargoCapacity += (int) floor(vehicleDropshipCargoCapacity * leasedAverageVehicleDropships);
+            leasedCargoCapacity += (int) floor(avgVehicleDropshipCargoCapacity * leasedAvgVehicleDropships);
         }
 
         // Do we have any leftover cargo?
         noCargo -= leasedCargoCapacity;
 
         // Mules
-        if (noCargo > averageDropshipCargoCapacity) {
-            leasedLargeCargoDropships = noCargo / (double) largeDropshipCargoCapacity;
-            noCargo -= (int) (leasedLargeCargoDropships * largeDropshipCargoCapacity);
+        if (noCargo > avgCargoDropshipCargoCapacity) {
+            leasedLargeCargoDropships = Math.round(2 * noCargo / (double) largeCargoDropshipCargoCapacity) / 2.0;
+            noCargo -= (int) (leasedLargeCargoDropships * largeCargoDropshipCargoCapacity);
             cargoCollars += (int) Math.ceil(leasedLargeCargoDropships);
 
-            if (noCargo > averageDropshipCargoCapacity) {
+            if (noCargo > avgCargoDropshipCargoCapacity) {
                 leasedLargeCargoDropships += 1;
-                noCargo -= largeDropshipCargoCapacity;
+                noCargo -= largeCargoDropshipCargoCapacity;
                 cargoCollars += 1;
             }
         }
 
         // Buccaneers
         if (noCargo > 0) {
-            leasedAverageCargoDropships = noCargo / (double) averageDropshipCargoCapacity;
+            leasedAverageCargoDropships = Math.round(2 * noCargo / (double) avgCargoDropshipCargoCapacity) / 2.0;
             cargoCollars += (int) Math.ceil(leasedAverageCargoDropships);
-            noCargo -= (int) (leasedAverageCargoDropships * averageDropshipCargoCapacity);
+            noCargo -= (int) (leasedAverageCargoDropships * avgCargoDropshipCargoCapacity);
 
-            if (noCargo > 0 && noCargo < (averageDropshipCargoCapacity / 2)) {
+            if (noCargo > 0 && noCargo < (avgCargoDropshipCargoCapacity / 2)) {
                 leasedAverageCargoDropships += 0.5;
                 cargoCollars += 1;
             } else if (noCargo > 0) {
@@ -7160,12 +7183,13 @@ public class Campaign implements ITechManager {
             }
         }
 
-        dropshipCost = mekDropshipCost.multipliedBy(leasedAverageMekDropships);
-        dropshipCost = dropshipCost.plus(largeMekDropshipCost.multipliedBy(leasedLargeMekDropships));
+        dropshipCost = largeMekDropshipCost.multipliedBy(leasedLargeMekDropships);
+        dropshipCost = dropshipCost.plus(averageMekDropshipCost.multipliedBy(leasedAverageMekDropships));
+        dropshipCost = dropshipCost.plus(smallMekDropshipCost.multipliedBy(leasedSmallMekDropships));
 
-        dropshipCost = dropshipCost.plus(asfDropshipCost.multipliedBy(leasedAverageASFDropships));
+        dropshipCost = dropshipCost.plus(smallASFDropshipCost.multipliedBy(leasedSmallASFDropships));
 
-        dropshipCost = dropshipCost.plus(vehicleDropshipCost.multipliedBy(leasedAverageVehicleDropships));
+        dropshipCost = dropshipCost.plus(avgVehicleDropshipCost.multipliedBy(leasedAvgVehicleDropships));
         dropshipCost = dropshipCost.plus(largeVehicleDropshipCost.multipliedBy(leasedLargeVehicleDropships));
 
         dropshipCost = dropshipCost.plus(cargoDropshipCost.multipliedBy(leasedAverageCargoDropships));
@@ -7191,15 +7215,15 @@ public class Campaign implements ITechManager {
                 if (!u.isMothballed()) {
                     Entity e = u.getEntity();
                     if ((e.getEntityType() & Entity.ETYPE_DROPSHIP) != 0) {
-                        ownDropshipCost = ownDropshipCost.plus(mekDropshipCost.multipliedBy(u.getMekCapacity())
-                                                                     .dividedBy(averageDropshipMekCapacity));
-                        ownDropshipCost = ownDropshipCost.plus(asfDropshipCost.multipliedBy(u.getASFCapacity())
-                                                                     .dividedBy(averageDropshipASFCapacity));
-                        ownDropshipCost = ownDropshipCost.plus(vehicleDropshipCost.multipliedBy(u.getHeavyVehicleCapacity() +
-                                                                                                      u.getLightVehicleCapacity())
-                                                                     .dividedBy(averageDropshipVehicleCapacity));
+                        ownDropshipCost = ownDropshipCost.plus(averageMekDropshipCost.multipliedBy(u.getMekCapacity())
+                                                                     .dividedBy(averageMekDropshipMekCapacity));
+                        ownDropshipCost = ownDropshipCost.plus(smallASFDropshipCost.multipliedBy(u.getASFCapacity())
+                                                                     .dividedBy(smallASFDropshipASFCapacity));
+                        ownDropshipCost = ownDropshipCost.plus(avgVehicleDropshipCost.multipliedBy(u.getHeavyVehicleCapacity() +
+                                                                                                         u.getLightVehicleCapacity())
+                                                                     .dividedBy(avgVehicleDropshipVehicleCapacity));
                         ownDropshipCost = ownDropshipCost.plus(cargoDropshipCost.multipliedBy(u.getCargoCapacity())
-                                                                     .dividedBy(averageDropshipCargoCapacity));
+                                                                     .dividedBy(avgCargoDropshipCargoCapacity));
                     } else if ((e.getEntityType() & Entity.ETYPE_JUMPSHIP) != 0) {
                         ownJumpshipCost = ownDropshipCost.plus(collarCost.multipliedBy(e.getDockingCollars().size()));
                     }
@@ -9530,7 +9554,7 @@ public class Campaign implements ITechManager {
         StandardForceIcon campaignIcon = getUnitIcon();
 
         if (campaignIcon.getFilename() == null) {
-            icon = getFactionLogo(this, getFaction().getShortName(), true);
+            icon = getFactionLogo(currentDay.getYear(), getFaction().getShortName());
         } else {
             icon = campaignIcon.getImageIcon();
         }
