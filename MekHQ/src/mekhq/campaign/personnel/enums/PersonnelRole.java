@@ -54,97 +54,97 @@ public enum PersonnelRole {
      * Individual roles with corresponding name texts and mnemonics.
      */
     // I used an average of the modifiers from the MekWarrior, Hot Shot, and Grizzled Veteran ATOW Archetypes
-    MEKWARRIOR(true, KeyEvent.VK_M, 4, 5, 6, 6, 4, 4, 4),
+    MEKWARRIOR(PersonnelRoleSubType.COMBAT, KeyEvent.VK_M, 4, 5, 6, 6, 4, 4, 4),
 
     // I used an average of the modifiers from the MekWarrior, and Aerospace Pilot ATOW Archetypes
-    LAM_PILOT(true, KeyEvent.VK_UNDEFINED, 3, 4, 6, 6, 4, 4, 5),
+    LAM_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_UNDEFINED, 3, 4, 6, 6, 4, 4, 5),
 
     // ATOW: Tanker Archetype
-    GROUND_VEHICLE_DRIVER(true, KeyEvent.VK_V, 4, 5, 5, 6, 4, 4, 4),
+    GROUND_VEHICLE_DRIVER(PersonnelRoleSubType.COMBAT, KeyEvent.VK_V, 4, 5, 5, 6, 4, 4, 4),
 
     // ATOW: Tanker Archetype
-    NAVAL_VEHICLE_DRIVER(true, KeyEvent.VK_N, 4, 5, 5, 6, 4, 4, 4),
+    NAVAL_VEHICLE_DRIVER(PersonnelRoleSubType.COMBAT, KeyEvent.VK_N, 4, 5, 5, 6, 4, 4, 4),
 
     // ATOW: Companion Chopper Pilot Archetype
-    VTOL_PILOT(true, KeyEvent.VK_UNDEFINED, 4, 4, 5, 5, 4, 4, 4),
+    VTOL_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_UNDEFINED, 4, 4, 5, 5, 4, 4, 4),
 
     // ATOW: Tanker Archetype
-    VEHICLE_GUNNER(true, KeyEvent.VK_G, 4, 5, 5, 6, 4, 4, 4),
+    VEHICLE_GUNNER(PersonnelRoleSubType.COMBAT, KeyEvent.VK_G, 4, 5, 5, 6, 4, 4, 4),
 
     // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
     // Technician skill)
-    VEHICLE_CREW(true, KeyEvent.VK_UNDEFINED, 5, 4, 5, 3, 5, 4, 3),
+    VEHICLE_CREW(PersonnelRoleSubType.COMBAT, KeyEvent.VK_UNDEFINED, 5, 4, 5, 3, 5, 4, 3),
 
     // ATOW: Aerospace Pilot Archetype
-    AEROSPACE_PILOT(true, KeyEvent.VK_A, 2, 3, 5, 5, 4, 4, 5),
+    AEROSPACE_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_A, 2, 3, 5, 5, 4, 4, 5),
 
     // ATOW: Aerospace Pilot Archetype
-    CONVENTIONAL_AIRCRAFT_PILOT(true, KeyEvent.VK_C, 2, 3, 5, 5, 4, 4, 5),
+    CONVENTIONAL_AIRCRAFT_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_C, 2, 3, 5, 5, 4, 4, 5),
 
     // ATOW: Aerospace Pilot Archetype (most ProtoMek pilots are Aerospace Sibkbo washouts, so this made the most sense)
-    PROTOMEK_PILOT(true, KeyEvent.VK_P, 2, 3, 5, 5, 4, 4, 5),
+    PROTOMEK_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_P, 2, 3, 5, 5, 4, 4, 5),
 
     // ATOW: Elemental Archetype
-    BATTLE_ARMOUR(true, true, KeyEvent.VK_B, 7, 6, 4, 5, 3, 4, 3),
+    BATTLE_ARMOUR(PersonnelRoleSubType.COMBAT, true, KeyEvent.VK_B, 7, 6, 4, 5, 3, 4, 3),
 
     // ATOW: Renegade Warrior Archetype
-    SOLDIER(true, KeyEvent.VK_S, 5, 5, 4, 5, 4, 6, 3),
+    SOLDIER(PersonnelRoleSubType.COMBAT, KeyEvent.VK_S, 5, 5, 4, 5, 4, 6, 3),
 
     // ATOW: Tanker Archetype
-    VESSEL_PILOT(true, KeyEvent.VK_I, 4, 5, 5, 6, 4, 4, 4),
+    VESSEL_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_I, 4, 5, 5, 6, 4, 4, 4),
 
     // ATOW: Tanker Archetype
-    VESSEL_GUNNER(true, KeyEvent.VK_U, 4, 5, 5, 6, 4, 4, 4),
+    VESSEL_GUNNER(PersonnelRoleSubType.COMBAT, KeyEvent.VK_U, 4, 5, 5, 6, 4, 4, 4),
 
     // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
     // Technician skill)
-    VESSEL_CREW(true, KeyEvent.VK_W, 5, 4, 5, 3, 5, 4, 3),
+    VESSEL_CREW(PersonnelRoleSubType.COMBAT, KeyEvent.VK_W, 5, 4, 5, 3, 5, 4, 3),
 
     // ATOW: Battlefield Tech Archetype
-    VESSEL_NAVIGATOR(true, KeyEvent.VK_Y, 5, 4, 5, 3, 5, 4, 3),
+    VESSEL_NAVIGATOR(PersonnelRoleSubType.COMBAT, KeyEvent.VK_Y, 5, 4, 5, 3, 5, 4, 3),
 
     // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
     // Technician skill)
-    MEK_TECH(false, KeyEvent.VK_T, 5, 4, 5, 3, 5, 4, 3),
+    MEK_TECH(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_T, 5, 4, 5, 3, 5, 4, 3),
 
     // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
     // Technician skill)
-    MECHANIC(false, KeyEvent.VK_E, 5, 4, 5, 3, 5, 4, 3),
+    MECHANIC(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_E, 5, 4, 5, 3, 5, 4, 3),
 
     // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
     // Technician skill)
-    AERO_TEK(false, KeyEvent.VK_O, 5, 4, 5, 3, 5, 4, 3),
+    AERO_TEK(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_O, 5, 4, 5, 3, 5, 4, 3),
 
     // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
     // Technician skill)
-    BA_TECH(false, KeyEvent.VK_UNDEFINED, 5, 4, 5, 3, 5, 4, 3),
+    BA_TECH(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 5, 4, 5, 3, 5, 4, 3),
 
     // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
     // Technician skill)
-    ASTECH(false, KeyEvent.VK_UNDEFINED, 5, 4, 5, 3, 5, 4, 3),
+    ASTECH(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 5, 4, 5, 3, 5, 4, 3),
 
     // ATOW: Communications Specialist Archetype (this might seem like an odd choice, but the Attributes for this Archetype
     // work really well for this profession). However, we have switched Dexterity and Reflexes.
-    DOCTOR(false, KeyEvent.VK_D, 3, 4, 5, 4, 6, 4, 4),
+    DOCTOR(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_D, 3, 4, 5, 4, 6, 4, 4),
 
     // ATOW: Communications Specialist Archetype (this might seem like an odd choice, but the Attributes for this Archetype
     // work really well for this profession
-    MEDIC(false, KeyEvent.VK_UNDEFINED, 3, 4, 4, 5, 6, 4, 4),
+    MEDIC(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 3, 4, 4, 5, 6, 4, 4),
 
     // ATOW: Faceman Archetype
-    ADMINISTRATOR_COMMAND(false, KeyEvent.VK_UNDEFINED, 3, 3, 3, 4, 6, 3, 5),
+    ADMINISTRATOR_COMMAND(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 3, 3, 3, 4, 6, 3, 5),
 
     // ATOW: Faceman Archetype
-    ADMINISTRATOR_LOGISTICS(false, KeyEvent.VK_L, 3, 3, 3, 4, 6, 3, 5),
+    ADMINISTRATOR_LOGISTICS(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_L, 3, 3, 3, 4, 6, 3, 5),
 
     // ATOW: Faceman Archetype
-    ADMINISTRATOR_TRANSPORT(false, KeyEvent.VK_R, 3, 3, 3, 4, 6, 3, 5),
+    ADMINISTRATOR_TRANSPORT(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_R, 3, 3, 3, 4, 6, 3, 5),
 
     // ATOW: Faceman Archetype
-    ADMINISTRATOR_HR(false, KeyEvent.VK_H, 3, 3, 3, 4, 6, 3, 5),
+    ADMINISTRATOR_HR(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_H, 3, 3, 3, 4, 6, 3, 5),
 
     // No archetype, but ATOW pg 35 states that the Attribute scores for an average person are 4
-    DEPENDENT(false, KeyEvent.VK_UNDEFINED, 4, 4, 4, 4, 4, 4, 4),
+    DEPENDENT(PersonnelRoleSubType.CIVILIAN, KeyEvent.VK_UNDEFINED, 4, 4, 4, 4, 4, 4, 4),
 
     // If we're generating a character without a Profession, we're just going to leave them with middle of the road
     // Attribute scores (5 in everything)
@@ -155,7 +155,7 @@ public enum PersonnelRole {
     private static final MMLogger logger = MMLogger.create(PersonnelRole.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources." + PersonnelRole.class.getSimpleName();
 
-    private final boolean isCombat;
+    private final PersonnelRoleSubType subType;
     private final boolean hasClanName;
     private final int mnemonic; // Unused: J, K, Q, X, Z
     private final int strength;
@@ -169,18 +169,19 @@ public enum PersonnelRole {
 
     // region Constructors
     PersonnelRole(final int mnemonic) {
-        this(false, false, mnemonic, 5, 5, 5, 5, 5, 5, 5);
+        this(PersonnelRoleSubType.CIVILIAN, false, mnemonic, 5, 5, 5, 5, 5, 5, 5);
     }
 
-    PersonnelRole(final boolean isCombat, final int mnemonic, final int strength, final int body, final int dexterity,
+    PersonnelRole(final PersonnelRoleSubType subType, final int mnemonic, final int strength, final int body,
+          final int dexterity,
           final int reflexes, final int intelligence, final int willpower, final int charisma) {
-        this(isCombat, false, mnemonic, strength, body, dexterity, reflexes, intelligence, willpower, charisma);
+        this(subType, false, mnemonic, strength, body, dexterity, reflexes, intelligence, willpower, charisma);
     }
 
-    PersonnelRole(final boolean isCombat, final boolean hasClanName, final int mnemonic, final int strength,
+    PersonnelRole(final PersonnelRoleSubType subType, final boolean hasClanName, final int mnemonic, final int strength,
           final int body, final int dexterity, final int reflexes, final int intelligence, final int willpower,
           final int charisma) {
-        this.isCombat = isCombat;
+        this.subType = subType;
         this.hasClanName = hasClanName;
         this.mnemonic = mnemonic;
         this.strength = strength;
@@ -475,7 +476,21 @@ public enum PersonnelRole {
      * @return {@code true} if the character has a combat role, {@code true} otherwise.
      */
     public boolean isCombat() {
-        return isCombat;
+        return subType == PersonnelRoleSubType.COMBAT;
+    }
+
+    /**
+     * Checks if this object's subtype matches the specified {@link PersonnelRoleSubType}.
+     *
+     * @param subType the subtype to compare against
+     *
+     * @return {@code true} if this object's subtype is equal to the specified subtype; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public boolean isSubType(PersonnelRoleSubType subType) {
+        return this.subType == subType;
     }
 
     /**
@@ -554,7 +569,7 @@ public enum PersonnelRole {
      *       otherwise.
      */
     public boolean isSupport() {
-        return isSupport(false);
+        return isSubType(PersonnelRoleSubType.SUPPORT) || isSubType(PersonnelRoleSubType.CIVILIAN);
     }
 
     /**
@@ -563,7 +578,7 @@ public enum PersonnelRole {
      * @return {@code true} if the character is assigned to a support role, {@code false} otherwise.
      */
     public boolean isSupport(final boolean excludeCivilian) {
-        return !isCombat() && (!excludeCivilian || !isCivilian());
+        return isSubType(PersonnelRoleSubType.SUPPORT) || (!excludeCivilian && isCivilian());
     }
 
     /**
@@ -612,10 +627,10 @@ public enum PersonnelRole {
     }
 
     /**
-     * @return {@code true} if the character's assigned role is Dependent or None, {@code false} otherwise.
+     * @return {@code true} if the character's assigned role is a civilian role, {@code false} otherwise.
      */
     public boolean isCivilian() {
-        return isDependent() || isNone();
+        return isSubType(PersonnelRoleSubType.CIVILIAN);
     }
     // endregion Boolean Comparison Methods
 
