@@ -456,6 +456,8 @@ public class SkillType {
         String key = name;
         key = key.replace(RP_ONLY_TAG, "");
         key = key.replace("/", "");
+        key = key.replace("(", "");
+        key = key.replace(")", "");
         key = key.replace("-", "");
         key = key.replace(" ", "");
         return key;
@@ -472,7 +474,7 @@ public class SkillType {
             return htmlOpenTag + rawFlavorText + htmlCloseTag;
         }
 
-        String flavorText = htmlOpenTag + rawFlavorText + "<br>(" + firstAttribute.getLabel();
+        String flavorText = htmlOpenTag + rawFlavorText + "<br>(" + firstAttribute.getLabel() + htmlCloseTag;
 
         if (secondAttribute != NONE) {
             flavorText += ", " + secondAttribute.getLabel() + ')' + htmlCloseTag;
