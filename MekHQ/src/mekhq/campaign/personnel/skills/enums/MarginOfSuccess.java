@@ -63,7 +63,7 @@ public enum MarginOfSuccess {
     DISASTROUS(Integer.MIN_VALUE, -7, -4);
 
     private static final MMLogger logger = MMLogger.create(MarginOfSuccess.class);
-    private static final String RESOURCE_BUNDLE = "mekhq.resources." + MarginOfSuccess.class.getSimpleName();
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.MarginOfSuccess";
 
     private final int lowerBound;
     private final int upperBound;

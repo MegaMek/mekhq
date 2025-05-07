@@ -57,7 +57,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 public class FreedomDayAnnouncement {
     private static final MMLogger logger = MMLogger.create(FreedomDayAnnouncement.class);
 
-    private static String RESOURCE_BUNDLE = "mekhq.resources." + FreedomDayAnnouncement.class.getSimpleName();
+    private static String RESOURCE_BUNDLE = "mekhq.resources.FreedomDayAnnouncement";
 
     private final Campaign campaign;
 

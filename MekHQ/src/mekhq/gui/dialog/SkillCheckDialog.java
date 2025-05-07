@@ -63,7 +63,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
  * @since 0.50.05
  */
 public class SkillCheckDialog {
-    final String RESOURCE_BUNDLE = "mekhq.resources." + SkillCheckDialog.class.getSimpleName();
+    final String RESOURCE_BUNDLE = "mekhq.resources.SkillCheckDialog";
 
     final String DIALOG_IMAGE_FILENAME_DEFAULT = "data/images/misc/skill_check_default.png";
     final String DIALOG_IMAGE_FILENAME_PASS = "data/images/misc/skill_check_pass.png";

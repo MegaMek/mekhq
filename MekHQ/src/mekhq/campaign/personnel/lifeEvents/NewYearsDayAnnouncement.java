@@ -53,7 +53,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 public class NewYearsDayAnnouncement {
     private static final MMLogger logger = MMLogger.create(NewYearsDayAnnouncement.class);
 
-    private static String RESOURCE_BUNDLE = "mekhq.resources." + NewYearsDayAnnouncement.class.getSimpleName();
+    private static String RESOURCE_BUNDLE = "mekhq.resources.NewYearsDayAnnouncement";
 
     private final Campaign campaign;
 
