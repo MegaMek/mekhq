@@ -788,7 +788,8 @@ public class ImmersiveDialogCore extends JDialog {
 
             baseImage = portrait.getBaseImage();
         } else {
-            baseImage = Factions.getFactionLogo(campaign, speaker.getOriginFaction().getShortName(), true).getImage();
+            baseImage = Factions.getFactionLogo(campaign.getGameYear(), speaker.getOriginFaction().getShortName())
+                                .getImage();
         }
 
         // The following sorcery is due to the compressed manner in which personnel portraits are stored.
