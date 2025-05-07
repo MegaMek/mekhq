@@ -38,6 +38,7 @@ import java.util.regex.Pattern;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
+import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.TargetRoll;
 import mekhq.IconPackage;
 import mekhq.campaign.parts.MissingPart;
@@ -107,6 +108,7 @@ public class TaskTableModel extends DataTableModel {
         public Component getTableCellRendererComponent(JTable table, Object value,
                                                        boolean isSelected, boolean hasFocus,
                                                        int row, int column) {
+            table.setRowHeight(UIUtil.scaleForGUI(100));
             Component c = this;
             int actualCol = table.convertColumnIndexToModel(column);
             int actualRow = table.convertRowIndexToModel(row);
