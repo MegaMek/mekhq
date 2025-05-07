@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.view;
 
@@ -43,7 +48,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
-import javax.swing.Box;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -166,7 +170,7 @@ public class MissionViewPanel extends JScrollablePanel {
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = 0;
-            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weightx = 2.0;
             gridBagConstraints.weighty = 0.0;
             gridBagConstraints.insets = new Insets(5, 5, 5, 5);
             gridBagConstraints.fill = GridBagConstraints.BOTH;
@@ -1135,7 +1139,7 @@ public class MissionViewPanel extends JScrollablePanel {
         scrollPaneContainer.add(scrollPane, BorderLayout.CENTER);
 
         pnlTutorial = new JPanel(new BorderLayout());
-        pnlTutorial.add(Box.createHorizontalStrut(20), BorderLayout.CENTER);
+        //        pnlTutorial.add(Box.createHorizontalStrut(20), BorderLayout.CENTER);
 
         pnlTutorial.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
         pnlTutorial.setPreferredSize(new Dimension(800, 0));
