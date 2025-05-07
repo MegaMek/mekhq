@@ -238,6 +238,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_PERSONALITY = "PERSONALITY";
     private static final String CMD_ADD_RANDOM_ABILITY = "ADD_RANDOM_ABILITY";
     private static final String CMD_GENERATE_ROLEPLAY_SKILLS = "GENERATE_ROLEPLAY_SKILLS";
+    private static final String CMD_REMOVE_ROLEPLAY_SKILLS = "REMOVE_ROLEPLAY_SKILLS";
     private static final String CMD_GENERATE_ROLEPLAY_ATTRIBUTES = "GENERATE_ROLEPLAY_ATTRIBUTES";
     private static final String CMD_GENERATE_ROLEPLAY_TRAITS = "GENERATE_ROLEPLAY_TRAITS";
 
@@ -1504,6 +1505,22 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 for (Person person : people) {
                     skillGenerator.generateRoleplaySkills(person);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
+                }
+                break;
+            }
+            case CMD_REMOVE_ROLEPLAY_SKILLS: {
+                RandomSkillPreferences skillPreferences = getCampaign().getRandomSkillPreferences();
+                AbstractSkillGenerator skillGenerator = new DefaultSkillGenerator(skillPreferences);
+                for (Person person : people) {
+                    // We make an iteration safe list so we can easily remove skills during the loop
+                    List<Skill> allSkills = new ArrayList<>(person.getSkills().getSkills());
+                    for (Skill skill : allSkills) {
+                        SkillType skillType = skill.getType();
+
+                        if (skillType.isRoleplaySkill()) {
+                            person.removeSkill(skillType.getName());
+                        }
+                    }
                 }
                 break;
             }
@@ -4013,6 +4030,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
             menuItem = new JMenuItem(resources.getString("generateRoleplaySkills.text"));
             menuItem.setActionCommand(CMD_GENERATE_ROLEPLAY_SKILLS);
+            menuItem.addActionListener(this);
+            menu.add(menuItem);
+
+            menuItem = new JMenuItem(resources.getString("removeRoleplaySkills.text"));
+            menuItem.setActionCommand(CMD_REMOVE_ROLEPLAY_SKILLS);
             menuItem.addActionListener(this);
             menu.add(menuItem);
 
