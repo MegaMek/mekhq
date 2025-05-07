@@ -1063,8 +1063,7 @@ public class Person {
             case VEHICLE_CREW -> Stream.of(SkillType.S_TECH_MEK,
                   SkillType.S_TECH_AERO,
                   SkillType.S_TECH_MECHANIC,
-                  SkillType.S_TECH_BA,
-                  SkillType.S_DOCTOR,
+                  SkillType.S_TECH_BA, SkillType.S_SURGERY,
                   SkillType.S_MEDTECH,
                   SkillType.S_ASTECH).anyMatch(this::hasSkill);
             case AEROSPACE_PILOT -> hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO);
@@ -1075,12 +1074,12 @@ public class Person {
             case VESSEL_PILOT -> hasSkill(SkillType.S_PILOT_SPACE);
             case VESSEL_CREW -> hasSkill(SkillType.S_TECH_VESSEL);
             case VESSEL_GUNNER -> hasSkill(SkillType.S_GUN_SPACE);
-            case VESSEL_NAVIGATOR -> hasSkill(SkillType.S_NAV);
+            case VESSEL_NAVIGATOR -> hasSkill(SkillType.S_NAVIGATION);
             case MEK_TECH -> hasSkill(SkillType.S_TECH_MEK);
             case AERO_TEK -> hasSkill(SkillType.S_TECH_AERO);
             case BA_TECH -> hasSkill(SkillType.S_TECH_BA);
             case ASTECH -> hasSkill(SkillType.S_ASTECH);
-            case DOCTOR -> hasSkill(SkillType.S_DOCTOR);
+            case DOCTOR -> hasSkill(SkillType.S_SURGERY);
             case MEDIC -> hasSkill(SkillType.S_MEDTECH);
             case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_HR ->
                   hasSkill(S_ADMIN);
@@ -3843,7 +3842,9 @@ public class Person {
                              getSkill(SkillType.S_TECH_VESSEL).getExperienceLevel() :
                              SkillType.EXP_NONE;
             case VESSEL_NAVIGATOR:
-                return hasSkill(SkillType.S_NAV) ? getSkill(SkillType.S_NAV).getExperienceLevel() : SkillType.EXP_NONE;
+                return hasSkill(SkillType.S_NAVIGATION) ?
+                             getSkill(SkillType.S_NAVIGATION).getExperienceLevel() :
+                             SkillType.EXP_NONE;
             case MEK_TECH:
                 return hasSkill(SkillType.S_TECH_MEK) ?
                              getSkill(SkillType.S_TECH_MEK).getExperienceLevel() :
@@ -3861,8 +3862,7 @@ public class Person {
                              getSkill(SkillType.S_ASTECH).getExperienceLevel() :
                              SkillType.EXP_NONE;
             case DOCTOR:
-                return hasSkill(SkillType.S_DOCTOR) ?
-                             getSkill(SkillType.S_DOCTOR).getExperienceLevel() :
+                return hasSkill(SkillType.S_SURGERY) ? getSkill(SkillType.S_SURGERY).getExperienceLevel() :
                              SkillType.EXP_NONE;
             case MEDIC:
                 return hasSkill(SkillType.S_MEDTECH) ?
@@ -3873,7 +3873,7 @@ public class Person {
             case ADMINISTRATOR_TRANSPORT:
             case ADMINISTRATOR_HR:
                 int adminLevel = getSkillLevelOrNegative(S_ADMIN);
-                int negotiationLevel = getSkillLevelOrNegative(SkillType.S_NEG);
+                int negotiationLevel = getSkillLevelOrNegative(SkillType.S_NEGOTIATION);
                 int scroungeLevel = getSkillLevelOrNegative(SkillType.S_SCROUNGE);
 
                 int levelSum;
@@ -3969,15 +3969,15 @@ public class Person {
             case VESSEL_PILOT -> List.of(SkillType.S_PILOT_SPACE);
             case VESSEL_GUNNER -> List.of(SkillType.S_GUN_SPACE);
             case VESSEL_CREW -> List.of(SkillType.S_TECH_VESSEL);
-            case VESSEL_NAVIGATOR -> List.of(SkillType.S_NAV);
+            case VESSEL_NAVIGATOR -> List.of(SkillType.S_NAVIGATION);
             case MEK_TECH -> List.of(SkillType.S_TECH_MEK);
             case AERO_TEK -> List.of(SkillType.S_TECH_AERO);
             case BA_TECH -> List.of(SkillType.S_TECH_BA);
             case ASTECH -> List.of(SkillType.S_ASTECH);
-            case DOCTOR -> List.of(SkillType.S_DOCTOR);
+            case DOCTOR -> List.of(SkillType.S_SURGERY);
             case MEDIC -> List.of(SkillType.S_MEDTECH);
             case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_HR ->
-                  List.of(S_ADMIN, SkillType.S_NEG, SkillType.S_SCROUNGE);
+                  List.of(S_ADMIN, SkillType.S_NEGOTIATION, SkillType.S_SCROUNGE);
             case DEPENDENT, NONE -> List.of(String.valueOf(SkillType.EXP_NONE));
         };
     }
@@ -4920,7 +4920,7 @@ public class Person {
     }
 
     public boolean isDoctor() {
-        return hasSkill(SkillType.S_DOCTOR) && (getPrimaryRole().isDoctor() || getSecondaryRole().isDoctor());
+        return hasSkill(SkillType.S_SURGERY) && (getPrimaryRole().isDoctor() || getSecondaryRole().isDoctor());
     }
 
     /**
