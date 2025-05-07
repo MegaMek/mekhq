@@ -360,7 +360,7 @@ public class CapturePrisoners {
         int adjustedDefectionChance = DEFECTION_CHANCE;
 
         if (potentialDefector.getOriginFaction().isMercenary()) {
-            adjustedDefectionChance = (int) round(adjustedDefectionChance * MERCENARY_MULTIPLIER);
+            adjustedDefectionChance = (int) Math.round(adjustedDefectionChance * MERCENARY_MULTIPLIER);
         }
 
         if (potentialDefector.isClanPersonnel()) {
