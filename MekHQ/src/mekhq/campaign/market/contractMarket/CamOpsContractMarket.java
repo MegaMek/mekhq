@@ -34,7 +34,7 @@ package mekhq.campaign.market.contractMarket;
 
 import static megamek.common.Compute.d6;
 import static megamek.common.enums.SkillLevel.REGULAR;
-import static mekhq.campaign.personnel.skills.SkillType.S_NEG;
+import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 
 import java.time.format.DateTimeFormatter;
@@ -55,6 +55,7 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;

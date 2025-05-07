@@ -3832,7 +3832,7 @@ public class Person {
                 }
             }
             case VEHICLE_CREW -> {
-                Skill[] skills = { getBestTechSkill(), getSkill(S_DOCTOR), getSkill(S_MEDTECH),
+                Skill[] skills = { getBestTechSkill(), getSkill(S_SURGERY), getSkill(S_MEDTECH),
                                    getSkill(S_COMMUNICATIONS), getSkill(S_SENSOR_OPERATIONS) };
 
                 return Arrays.stream(skills)
@@ -3977,7 +3977,7 @@ public class Person {
                 }
             }
             case VESSEL_NAVIGATOR -> {
-                if (hasSkill(S_NAV)) {
+                if (hasSkill(S_NAVIGATION)) {
                     Skill firstSkill = getSkill(S_NAVIGATION);
 
                     return firstSkill.getExperienceLevel(options, atowAttributes);
@@ -4056,13 +4056,13 @@ public class Person {
                         return EXP_NONE;
                     }
                 } else if (includeNegotiation && includeScrounge) {
-                    if ((hasSkill(S_ADMIN)) && (hasSkill(S_NEG) && hasSkill(S_SCROUNGE))) {
+                    if ((hasSkill(S_ADMIN)) && (hasSkill(S_NEGOTIATION) && hasSkill(S_SCROUNGE))) {
                         Skill firstSkill = getSkill(S_ADMIN);
                         int firstSkillExperience = firstSkill.getExperienceLevel(options,
                               atowAttributes,
                               adjustedReputation);
 
-                        Skill secondSkill = getSkill(S_NEG);
+                        Skill secondSkill = getSkill(S_NEGOTIATION);
                         int secondSkillExperience = secondSkill.getExperienceLevel(options, atowAttributes);
 
                         Skill thirdSkill = getSkill(S_SCROUNGE);
@@ -4088,11 +4088,11 @@ public class Person {
                         return EXP_NONE;
                     }
                 } else if (includeNegotiation) {
-                    if ((hasSkill(S_ADMIN)) && (hasSkill(S_NEG))) {
+                    if ((hasSkill(S_ADMIN)) && (hasSkill(S_NEGOTIATION))) {
                         Skill firstSkill = getSkill(S_ADMIN);
                         int firstSkillExperience = firstSkill.getExperienceLevel(options, atowAttributes);
 
-                        Skill secondSkill = getSkill(S_NEG);
+                        Skill secondSkill = getSkill(S_NEGOTIATION);
                         int secondSkillExperience = secondSkill.getExperienceLevel(options,
                               atowAttributes,
                               adjustedReputation);
