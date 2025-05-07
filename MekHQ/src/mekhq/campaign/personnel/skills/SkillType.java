@@ -899,6 +899,7 @@ public class SkillType {
         lookupHash.put(S_DISGUISE, createDisguise());
         lookupHash.put(S_ESCAPE_ARTIST, createEscapeArtist());
         lookupHash.put(S_FORGERY, createForgery());
+        lookupHash.put(S_INTEREST_SPORTS, createInterestSports());
         lookupHash.put(S_INTEREST_HISTORY, createInterestHistory());
         lookupHash.put(S_INTEREST_LITERATURE, createInterestLiterature());
         lookupHash.put(S_INTEREST_HOLO_GAMES, createInterestHoloGames());
@@ -945,6 +946,7 @@ public class SkillType {
         lookupHash.put(S_STREETWISE, createStreetwise());
         lookupHash.put(S_SURVIVAL, createSurvival());
         lookupHash.put(S_TRACKING, createTracking());
+        lookupHash.put(S_TRAINING, createTraining());
         lookupHash.put(S_CAREER_ANY, createCareer());
         lookupHash.put(S_SWIMMING, createSwimming());
         lookupHash.put(S_RUNNING, createRunning());
