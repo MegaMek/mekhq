@@ -24,8 +24,12 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
-
 package mekhq.campaign.personnel.autoAwards;
 
 import java.util.ArrayList;
@@ -127,12 +131,15 @@ public class SkillAwards {
                 break;
 
             case "admin":
-                relevantSkills = Arrays.asList(SkillType.S_ADMIN, SkillType.S_NEG, SkillType.S_SCROUNGE);
+                relevantSkills = Arrays.asList(SkillType.S_ADMIN, SkillType.S_NEGOTIATION, SkillType.S_SCROUNGE);
                 break;
 
             case "techwithmedical":
                 relevantSkills = Arrays.asList(SkillType.S_TECH_MEK, SkillType.S_TECH_AERO, SkillType.S_TECH_MECHANIC,
-                        SkillType.S_TECH_VESSEL, SkillType.S_TECH_BA, SkillType.S_ASTECH, SkillType.S_DOCTOR,
+                      SkillType.S_TECH_VESSEL,
+                      SkillType.S_TECH_BA,
+                      SkillType.S_ASTECH,
+                      SkillType.S_SURGERY,
                         SkillType.S_MEDTECH);
                 break;
 
@@ -142,7 +149,7 @@ public class SkillAwards {
                 break;
 
             case "medical":
-                relevantSkills = Arrays.asList(SkillType.S_DOCTOR, SkillType.S_MEDTECH);
+                relevantSkills = Arrays.asList(SkillType.S_SURGERY, SkillType.S_MEDTECH);
                 break;
 
             case "assistant":
@@ -246,7 +253,7 @@ public class SkillAwards {
                 break;
 
             case "doctor":
-                relevantSkills = List.of(SkillType.S_DOCTOR);
+                relevantSkills = List.of(SkillType.S_SURGERY);
                 break;
 
             case "medtech":
@@ -254,7 +261,7 @@ public class SkillAwards {
                 break;
 
             case "hyperspacenavigation":
-                relevantSkills = List.of(SkillType.S_NAV);
+                relevantSkills = List.of(SkillType.S_NAVIGATION);
                 break;
 
             case "administration":
@@ -270,7 +277,7 @@ public class SkillAwards {
                 break;
 
             case "negotiation":
-                relevantSkills = List.of(SkillType.S_NEG);
+                relevantSkills = List.of(SkillType.S_NEGOTIATION);
                 break;
 
             case "leadership":

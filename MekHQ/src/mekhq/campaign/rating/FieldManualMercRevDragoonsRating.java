@@ -339,7 +339,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
 
     private void updateMedicalSupportHours(Person p) {
-        Skill doctorSkill = p.getSkill(SkillType.S_DOCTOR);
+        Skill doctorSkill = p.getSkill(SkillType.S_SURGERY);
         if (doctorSkill == null) {
             return;
         }
@@ -465,7 +465,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         int skillTotal = getCommanderSkillLevelWithBonus(SkillType.S_LEADER);
         skillTotal += getCommanderSkillLevelWithBonus(SkillType.S_TACTICS);
         skillTotal += getCommanderSkillLevelWithBonus(SkillType.S_STRATEGY);
-        skillTotal += getCommanderSkillLevelWithBonus(SkillType.S_NEG);
+        skillTotal += getCommanderSkillLevelWithBonus(SkillType.S_NEGOTIATION);
 
         /*
          * todo consider adding rpg traits in MekHQ (they would have no impact
@@ -635,7 +635,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         final String TEMPLATE = "    %-" + SUBHEADER_LENGTH + "s %3d";
         out.append(String.format(TEMPLATE, "Leadership:", getCommanderSkillLevelWithBonus(SkillType.S_LEADER)))
               .append("\n");
-        out.append(String.format(TEMPLATE, "Negotiation:", getCommanderSkillLevelWithBonus(SkillType.S_NEG)))
+        out.append(String.format(TEMPLATE, "Negotiation:", getCommanderSkillLevelWithBonus(SkillType.S_NEGOTIATION)))
               .append("\n");
         out.append(String.format(TEMPLATE, "Strategy:", getCommanderSkillLevelWithBonus(SkillType.S_STRATEGY)))
               .append("\n");

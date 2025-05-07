@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.resupplyAndCaches;
 
@@ -127,7 +132,7 @@ public class DialogSwindled extends JDialog {
         String smugglerTitle = getFormattedTextAt(RESOURCE_BUNDLE, "guerrillaSpeaker.text");
         String speakerName = String.format("<b>'%s'</b><br>%s", smugglerCallSign, smugglerTitle);
 
-        ImageIcon speakerIcon = getFactionLogo(campaign, "PIR", true);
+        ImageIcon speakerIcon = getFactionLogo(campaign.getGameYear(), "PIR");
         speakerIcon = scaleImageIcon(speakerIcon, 100, true);
         JLabel imageLabel = new JLabel();
         imageLabel.setIcon(speakerIcon);
