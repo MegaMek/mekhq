@@ -1012,34 +1012,40 @@ public class Person {
     public boolean canPerformRole(LocalDate today, final PersonnelRole role, final boolean primary) {
         if (primary) {
             // Primary Role:
-            // We only do a few here, as it is better on the UX-side to correct the issues when assigning the primary
-            // role
             // 1) Can always be Dependent
             // 2) Cannot be None
+            // 3) Cannot be equal to the secondary role
+            // 4) Cannot be a tech role if the secondary role is a tech role (inc. Astech)
+            // 5) Cannot be Medic if the secondary role is one of the medical staff roles
+            // 6) Cannot be Admin if the secondary role is one of the administrator roles
             if (role.isDependent()) {
                 return true;
             } else if (role.isNone()) {
+                return false;
+            } else if ((role == getSecondaryRole()) ||
+                             ((role.isTech() || role.isAstech()) &&
+                                    (getSecondaryRole().isTech() || getSecondaryRole().isAstech())) ||
+                             (role.isMedicalStaff() && getSecondaryRole().isMedicalStaff()) ||
+                             (role.isAdministrator() && getSecondaryRole().isAdministrator())) {
                 return false;
             }
         } else {
             // Secondary Role:
             // 1) Can always be None
             // 2) Cannot be Dependent
-            // 3) Can only be None if the primary role is a Dependent
-            // 4) Cannot be equal to the primary role
-            // 5) Cannot be a tech role if the primary role is an Astech
-            // 6) Cannot be Astech if the primary role is a tech role
-            // 7) Cannot be a medical staff role if the primary role is a Medic
-            // 8) Cannot be Medic if the primary role is one of the medical staff roles
+            // 3) Cannot be equal to the primary role
+            // 4) Cannot be a tech role if the primary role is a tech role (inc. Astech)
+            // 5) Cannot be Medic if the primary role is one of the medical staff roles
+            // 6) Cannot be Admin if the primary role is one of the administrator roles
             if (role.isNone()) {
                 return true;
-            } else if (role.isDependent() ||
-                             getPrimaryRole().isDependent() ||
+            } else if ((role.isDependent()) ||
+                             (getPrimaryRole().isDependent()) ||
                              (getPrimaryRole() == role) ||
-                             (role.isTechSecondary() && getPrimaryRole().isAstech()) ||
-                             (role.isAstech() && getPrimaryRole().isTech()) ||
-                             (role.isMedicalStaff() && getPrimaryRole().isMedic()) ||
-                             (role.isMedic() && getPrimaryRole().isMedicalStaff())) {
+                             ((role.isTech() || role.isAstech()) &&
+                                    (getPrimaryRole().isTech() || getPrimaryRole().isAstech())) ||
+                             (role.isMedicalStaff() && getPrimaryRole().isMedicalStaff()) ||
+                             (role.isAdministrator() && getPrimaryRole().isAdministrator())) {
                 return false;
             }
         }
