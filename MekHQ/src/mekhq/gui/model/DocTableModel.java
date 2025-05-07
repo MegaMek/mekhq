@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.model;
 
@@ -60,11 +65,11 @@ public class DocTableModel extends DataTableModel {
         StringBuilder toReturn = new StringBuilder(128);
         toReturn.append("<html><font><b>").append(doc.getFullTitle()).append("</b><br/>");
 
-        Skill skill = doc.getSkill(SkillType.S_DOCTOR);
+        Skill skill = doc.getSkill(SkillType.S_SURGERY);
         if (null != skill) {
             toReturn.append("<b>")
                     .append(SkillType.getColoredExperienceLevelName(skill.getExperienceLevel()))
-                    .append("</b> " + SkillType.S_DOCTOR);
+                  .append("</b> " + SkillType.S_SURGERY);
         }
 
         toReturn.append(String.format(" (%d XP)", doc.getXP()));
