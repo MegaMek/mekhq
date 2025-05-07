@@ -32,6 +32,7 @@
  */
 package mekhq.service.mrms;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -70,6 +71,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.work.IPartWork;
+import mekhq.campaign.work.WorkTime;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -78,16 +80,25 @@ import org.mockito.ArgumentMatcher;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
+/**
+ * JUnit Tests for {@link MRMSService}
+ */
 public class MRMSServiceTest {
     static MMLogger logger = MMLogger.create(MRMSServiceTest.class);
 
+    static int DEFAULT_TARGET_NUMBER = 6;
+
     static Faction mockFaction;
+    static List<WorkTime> timeSpent;
 
     Campaign mockCampaign;
     CampaignOptions mockCampaignOptions;
     Warehouse warehouse;
     Quartermaster mockQuartermaster;
     MRMSConfiguredOptions configuredOptions;
+
+    int targetRoll = DEFAULT_TARGET_NUMBER;
+    IPartWork lastPartWork;
 
     @BeforeAll
     public static void beforeAll() {
@@ -107,8 +118,13 @@ public class MRMSServiceTest {
 
     @BeforeEach
     public void beforeEach() {
-        TargetRoll mockTargetRoll = mock(TargetRoll.class);
-        when(mockTargetRoll.getValue()).thenReturn(3);
+        timeSpent = new ArrayList<>();
+
+        targetRoll = DEFAULT_TARGET_NUMBER;
+        lastPartWork = null;
+
+        TargetRoll mockBaseTargetRoll = mock(TargetRoll.class);
+        when(mockBaseTargetRoll.getValue()).thenReturn(targetRoll);
 
         mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaignOptions.getMRMSOptions()).thenReturn(new ArrayList<MRMSOption>());
@@ -124,7 +140,30 @@ public class MRMSServiceTest {
         when(mockCampaign.getFaction()).thenReturn(mockFaction);
         when(mockCampaign.fixPart(any(IPartWork.class), any(Person.class))).thenReturn("Part Fixed");
 
-        when(mockCampaign.getTargetFor(any(IPartWork.class), any(Person.class))).thenReturn(mockTargetRoll);
+        //Part p = mock(Part.class);
+        when(mockCampaign.getTargetFor(any(IPartWork.class), any(Person.class))).thenReturn(mockBaseTargetRoll);
+        doAnswer(inv -> {
+            Part part = inv.getArgument(0);
+            if (part.equals(lastPartWork) && part.getMode() == lastPartWork.getMode()) {
+                return mockBaseTargetRoll;
+            } else {
+                if (lastPartWork == null) {
+                    targetRoll = DEFAULT_TARGET_NUMBER;
+                } else {
+                    if (part.getMode() == WorkTime.NORMAL) {
+                        targetRoll = DEFAULT_TARGET_NUMBER;
+                    } else if (part.getMode().isRushed) {
+                        targetRoll++;
+                    } else {
+                        targetRoll--;
+
+                    }
+                }
+                lastPartWork = part.clone();
+                when(mockBaseTargetRoll.getValue()).thenReturn(targetRoll);
+            }
+            return mockBaseTargetRoll;
+        }).when(mockCampaign).getTargetFor(any(Part.class), any(Person.class));
     }
 
 
@@ -160,7 +199,7 @@ public class MRMSServiceTest {
 
         });
 
-        try(MockedStatic<Compute> compute = Mockito.mockStatic(Compute.class)) {
+        try (MockedStatic<Compute> compute = Mockito.mockStatic(Compute.class)) {
             compute.when(() -> Compute.randomInt(anyInt())).thenReturn(6);
             MRMSService.mrmsUnits(mockCampaign, List.of(unit), configuredOptions);
         }
@@ -245,6 +284,355 @@ public class MRMSServiceTest {
         }
     }
 
+
+    @Nested
+    public class testMRMSUnitsBTH {
+        int TN_IS_ABOVE = DEFAULT_TARGET_NUMBER - 1;
+        int TN_IS_BELOW = DEFAULT_TARGET_NUMBER + 1;
+
+        int TN_IS_WAY_ABOVE = DEFAULT_TARGET_NUMBER - 4;
+        int TN_IS_WAY_BELOW = DEFAULT_TARGET_NUMBER + 4;
+
+        Unit unit;
+
+        // Values not tested in this test:
+        static final int skillMin = SkillLevel.ULTRA_GREEN.getExperienceLevel();
+        static final int skillMax = SkillLevel.ELITE.getExperienceLevel();
+        static final int dailyTimeMin = 0;
+
+        @BeforeEach
+        public void beforeEach() {
+            when(mockCampaignOptions.isMRMSUseRepair()).thenReturn(true);
+
+            unit = new Unit(createEntity("UrbanMech UM-R69"), mockCampaign);
+            unit.initializeParts(true);
+        }
+
+        @Test
+        public void testControlMRMSUnitsBTH() {
+            // Arrange
+            int bthMin = DEFAULT_TARGET_NUMBER;
+            int bthMax = DEFAULT_TARGET_NUMBER;
+
+            when(mockCampaignOptions.isMRMSUseExtraTime()).thenReturn(true);
+            when(mockCampaignOptions.isMRMSUseRushJob()).thenReturn(true);
+
+            arrangeTestMRMSUnits(bthMin, bthMax);
+
+            // Act
+            MRMSService.mrmsUnits(mockCampaign, List.of(unit), configuredOptions);
+
+            // Assert
+            verify(mockCampaign, times(11)).fixPart(any(Part.class), any(Person.class));
+            assertEquals(11, timeSpent.size());
+            for (int i = 0; i < timeSpent.size(); i++) {
+                assertEquals(WorkTime.NORMAL, timeSpent.get(i), "i=" + i);
+            }
+        }
+
+        /**
+         * When "Use Extra Time" and "Use Rush Job" are deactivated, MRMS will succeed if the TN is above the "Min TN"
+         * and will not consider the "Max TN".
+         */
+        @Nested
+        public class TestNoExtraTimeNorUseRush {
+            int TN_IS_ABOVE = DEFAULT_TARGET_NUMBER - 1;
+            int TN_IS_BELOW = DEFAULT_TARGET_NUMBER + 1;
+
+            @BeforeEach
+            public void beforeEach() {
+                when(mockCampaignOptions.isMRMSUseExtraTime()).thenReturn(false);
+                when(mockCampaignOptions.isMRMSUseRushJob()).thenReturn(false);
+            }
+
+            /**
+             * Unit isn't repaired if the TN is above the minimum `bthMin` (`bthMax` not considered)
+             */
+            @Test
+            public void testMRMSUnitsBTHifTNAboveMinAboveMax() {
+                doMRMSUnitsBTHWhereTNAboveMinAboveMax();
+
+                // Assert
+                verify(mockCampaign, times(0)).fixPart(any(Part.class), any(Person.class));
+                assertEquals(0, timeSpent.size());
+            }
+
+            /**
+             * Unit isn't repaired if the TN is above the minimum `bthMin` (`bthMax` not considered)
+             */
+            @Test
+            public void testMRMSUnitsBTHifTNAboveMinBelowMax() {
+                doMRMSUnitsBTHWhereTNAboveMinBelowMax();
+
+                // Assert
+                verify(mockCampaign, times(0)).fixPart(any(Part.class), any(Person.class));
+                assertEquals(0, timeSpent.size());
+            }
+
+            /**
+             * Unit is repaired if the TN is below the minimum `bthMin` and above the maximum `bthMax`
+             */
+            @Test
+            public void testMRMSUnitsBTHifTNBelowMinAboveMax() {
+                doMRMSUnitsBTHWhereTNBelowMinAboveMax();
+
+                // Assert
+                verify(mockCampaign, times(11)).fixPart(any(Part.class), any(Person.class));
+                assertEquals(11, timeSpent.size());
+                for (int i = 0; i < timeSpent.size(); i++) {
+                    assertEquals(WorkTime.NORMAL, timeSpent.get(i), "i=" + i);
+                }
+            }
+
+            /**
+             * Unit is repaired if the TN is below the minimum `bthMin` and above the maximum `bthMax`
+             */
+            @Test
+            public void testMRMSUnitsBTHifTNBelowMinBelowMax() {
+                doMRMSUnitsBTHWhereTNBelowMinBelowMax();
+
+                // Assert
+                verify(mockCampaign, times(11)).fixPart(any(Part.class), any(Person.class));
+                assertEquals(11, timeSpent.size());
+                for (int i = 0; i < timeSpent.size(); i++) {
+                    assertEquals(WorkTime.NORMAL, timeSpent.get(i), "i=" + i);
+                }
+            }
+        }
+
+        @Nested
+        public class TestExtraTimeAndUseRush {
+
+            @BeforeEach
+            public void beforeEach() {
+                when(mockCampaignOptions.isMRMSUseExtraTime()).thenReturn(true);
+                when(mockCampaignOptions.isMRMSUseRushJob()).thenReturn(true);
+            }
+
+            /**
+             * Unit is repaired if the TN is above the minimum `bthMin` but it is able to reduce the TN to the minimum
+             * via extra time. (`bthMax` not considered)
+             */
+            @Test
+            public void testMRMSUnitsBTHifTNAboveMinAboveMax() {
+                doMRMSUnitsBTHWhereTNAboveMinAboveMax();
+
+                // Assert
+                verify(mockCampaign, times(11)).fixPart(any(Part.class), any(Person.class));
+                assertEquals(11, timeSpent.size());
+                for (int i = 0; i < timeSpent.size(); i++) {
+                    assertEquals(WorkTime.EXTRA_2, timeSpent.get(i), "i=" + i);
+                }
+            }
+
+            /**
+             * Unit is repaired if the TN is above the minimum `bthMin` but it is able to reduce the TN to the minimum
+             * via extra time. (`bthMax` not considered)
+             */
+            @Test
+            public void testMRMSUnitsBTHifTNAboveMinBelowMax() {
+                doMRMSUnitsBTHWhereTNAboveMinBelowMax();
+
+                // Assert
+                verify(mockCampaign, times(11)).fixPart(any(Part.class), any(Person.class));
+                assertEquals(11, timeSpent.size());
+                for (int i = 0; i < timeSpent.size(); i++) {
+                    assertEquals(WorkTime.EXTRA_2, timeSpent.get(i), "i=" + i);
+                }
+            }
+
+            /**
+             * Unit is repaired if the TN is below the minimum `bthMin` and above the maximum `bthMax`
+             */
+            @Test
+            public void testMRMSUnitsBTHifTNBelowMinAboveMax() {
+                doMRMSUnitsBTHWhereTNBelowMinAboveMax();
+
+                // Assert
+                verify(mockCampaign, times(11)).fixPart(any(Part.class), any(Person.class));
+                assertEquals(11, timeSpent.size());
+                for (int i = 0; i < timeSpent.size(); i++) {
+                    assertEquals(WorkTime.NORMAL, timeSpent.get(i), "i=" + i);
+                }
+            }
+
+            /**
+             * Unit is repaired if the TN is below the minimum `bthMin` and the TN will be increased to reach the
+             * maximum `bthMax` via rush time.
+             */
+            @Test
+            public void testMRMSUnitsBTHifTNBelowMinBelowMax() {
+                doMRMSUnitsBTHWhereTNBelowMinBelowMax();
+
+                // Assert
+                verify(mockCampaign, times(11)).fixPart(any(Part.class), any(Person.class));
+                assertEquals(11, timeSpent.size());
+                for (int i = 0; i < timeSpent.size(); i++) {
+                    assertEquals(WorkTime.RUSH_2, timeSpent.get(i), "i=" + i);
+                }
+            }
+
+            /**
+             * Unit isn't repaired if the TN is above the minimum `bthMin` and we can't reach it with "Use Extra Time"
+             * (`bthMax` not considered)
+             */
+            @Test
+            public void testMRMSUnitsBTHifTNWayAboveMinWayAboveMax() {
+                doMRMSUnitsBTHWhereTNWayAboveMinWayAboveMax();
+
+                // Assert
+                verify(mockCampaign, times(0)).fixPart(any(Part.class), any(Person.class));
+                assertEquals(0, timeSpent.size());
+            }
+
+            /**
+             * Unit isn't repaired if the TN is above the minimum `bthMin` and we can't reach it with "Use Extra Time"
+             * (`bthMax` not considered)
+             */
+            @Test
+            public void testMRMSUnitsBTHifTNWayAboveMinWayBelowMax() {
+                doMRMSUnitsBTHWhereTNWayAboveMinWayBelowMax();
+
+                // Assert
+                verify(mockCampaign, times(0)).fixPart(any(Part.class), any(Person.class));
+                assertEquals(0, timeSpent.size());
+            }
+
+            /**
+             * Unit is repaired if the TN is below the minimum `bthMin` and below the maximum `bthMax`.
+             */
+            @Test
+            public void testMRMSUnitsBTHifTNWayBelowMinWayAboveMax() {
+                doMRMSUnitsBTHWhereTNWayBelowMinWayAboveMax();
+
+                // Assert
+                verify(mockCampaign, times(11)).fixPart(any(Part.class), any(Person.class));
+                assertEquals(11, timeSpent.size());
+                for (int i = 0; i < timeSpent.size(); i++) {
+                    assertEquals(WorkTime.NORMAL, timeSpent.get(i), "i=" + i);
+                }
+            }
+
+            /**
+             * Unit is repaired if the TN is below the minimum `bthMin` and above the maximum `bthMax`. Rush time is
+             * used to increase the TN as close as possible, but it will still attempt to fix the part even if it's not
+             * reached.
+             */
+            @Test
+            public void testMRMSUnitsBTHifTNWayBelowMinWayBelowMax() {
+                doMRMSUnitsBTHWhereTNWayBelowMinWayBelowMax();
+
+                // Assert
+                verify(mockCampaign, times(11)).fixPart(any(Part.class), any(Person.class));
+                assertEquals(11, timeSpent.size());
+                for (int i = 0; i < timeSpent.size(); i++) {
+                    assertEquals(WorkTime.RUSH_8, timeSpent.get(i), "i=" + i);
+                }
+            }
+        }
+
+        private void arrangeTestMRMSUnits(int bthMin, int bthMax) {
+            addMRMSOption(PartRepairType.ARMOUR, skillMin, skillMax, bthMin, bthMax, dailyTimeMin);
+            configuredOptions = new MRMSConfiguredOptions(mockCampaign);
+
+            addMockTech(SkillType.S_TECH_MEK, SkillLevel.VETERAN);
+
+            unit.getParts()
+                  .stream()
+                  .filter(p -> p instanceof Armor)
+                  .map(p -> (Armor) p)
+                  .forEach(MRMSServiceTest.this::breakArmor);
+        }
+
+        private void doMRMSUnitsBTHWhereTNAboveMinAboveMax() {
+            // Arrange
+            int bthMin = TN_IS_ABOVE;
+            int bthMax = TN_IS_ABOVE;
+
+            arrangeTestMRMSUnits(bthMin, bthMax);
+
+            // Act
+            MRMSService.mrmsUnits(mockCampaign, List.of(unit), configuredOptions);
+        }
+
+        private void doMRMSUnitsBTHWhereTNAboveMinBelowMax() {
+            // Arrange
+            int bthMin = TN_IS_ABOVE;
+            int bthMax = TN_IS_BELOW;
+
+            arrangeTestMRMSUnits(bthMin, bthMax);
+
+            // Act
+            MRMSService.mrmsUnits(mockCampaign, List.of(unit), configuredOptions);
+        }
+
+        private void doMRMSUnitsBTHWhereTNBelowMinAboveMax() {
+            // Arrange
+            int bthMin = TN_IS_BELOW;
+            int bthMax = TN_IS_ABOVE;
+
+            arrangeTestMRMSUnits(bthMin, bthMax);
+
+            // Act
+            MRMSService.mrmsUnits(mockCampaign, List.of(unit), configuredOptions);
+        }
+
+        public void doMRMSUnitsBTHWhereTNBelowMinBelowMax() {
+            // Arrange
+            int bthMin = TN_IS_BELOW;
+            int bthMax = TN_IS_BELOW;
+
+            arrangeTestMRMSUnits(bthMin, bthMax);
+
+            // Act
+            MRMSService.mrmsUnits(mockCampaign, List.of(unit), configuredOptions);
+        }
+
+        private void doMRMSUnitsBTHWhereTNWayAboveMinWayAboveMax() {
+            // Arrange
+            int bthMin = TN_IS_WAY_ABOVE;
+            int bthMax = TN_IS_WAY_ABOVE;
+
+            arrangeTestMRMSUnits(bthMin, bthMax);
+
+            // Act
+            MRMSService.mrmsUnits(mockCampaign, List.of(unit), configuredOptions);
+        }
+
+        private void doMRMSUnitsBTHWhereTNWayAboveMinWayBelowMax() {
+            // Arrange
+            int bthMin = TN_IS_WAY_ABOVE;
+            int bthMax = TN_IS_WAY_BELOW;
+
+            arrangeTestMRMSUnits(bthMin, bthMax);
+
+            // Act
+            MRMSService.mrmsUnits(mockCampaign, List.of(unit), configuredOptions);
+        }
+
+        private void doMRMSUnitsBTHWhereTNWayBelowMinWayAboveMax() {
+            // Arrange
+            int bthMin = TN_IS_WAY_BELOW;
+            int bthMax = TN_IS_WAY_ABOVE;
+
+            arrangeTestMRMSUnits(bthMin, bthMax);
+
+            // Act
+            MRMSService.mrmsUnits(mockCampaign, List.of(unit), configuredOptions);
+        }
+
+        public void doMRMSUnitsBTHWhereTNWayBelowMinWayBelowMax() {
+            // Arrange
+            int bthMin = TN_IS_WAY_BELOW;
+            int bthMax = TN_IS_WAY_BELOW;
+
+            arrangeTestMRMSUnits(bthMin, bthMax);
+
+            // Act
+            MRMSService.mrmsUnits(mockCampaign, List.of(unit), configuredOptions);
+        }
+    }
+
     private void breakPart(Part part) {
         if (part instanceof Armor armor) {
             breakArmor(armor);
@@ -256,6 +644,8 @@ public class MRMSServiceTest {
         doAnswer(inv -> {
             armor.setAmountNeeded(0);
             armor.setAmount(armorAmount);
+            //when(((Person) inv.getArgument(1)).getMinutesLeft()).thenReturn()
+            timeSpent.add(((Armor) inv.getArgument(0)).getMode());
             return null;
         }).when(mockCampaign).fixPart(argThat(new IPartWorkMatch(armor)), any(Person.class));
         warehouse.addPart(armor.clone(), true);
@@ -281,7 +671,9 @@ public class MRMSServiceTest {
         when(mockCampaign.getTechs(anyBoolean())).thenReturn(List.of(mockTech));
         when(mockTech.canTech(any(Entity.class))).thenReturn(true);
         when(mockTech.getSkillLevel(any(Campaign.class), anyBoolean())).thenReturn(skillLevel);
-        when(mockTech.getSkillForWorkingOn(any(IPartWork.class))).thenReturn(new Skill(skillType, skillLevel.getExperienceLevel(), 0));
+        when(mockTech.getSkillForWorkingOn(any(IPartWork.class))).thenReturn(new Skill(skillType,
+              skillLevel.getExperienceLevel(),
+              0));
         when(mockTech.getMinutesLeft()).thenReturn(480);
 
         return mockTech;
@@ -296,14 +688,14 @@ public class MRMSServiceTest {
     }
 
     /**
-     * Creates an {@link Entity} from the given unit name by retrieving its information from the
-     * cache.
+     * Creates an {@link Entity} from the given unit name by retrieving its information from the cache.
      *
      * <p>If the unit cannot be found or loaded, appropriate error logging occurs, and {@code null}
      * is returned.
      * </p>
      *
      * @param unitName The name of the unit to retrieve and parse.
+     *
      * @return The {@link Entity} representing the unit, or {@code null} if the unit cannot be loaded.
      */
     private Entity createEntity(String unitName) {
