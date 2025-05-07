@@ -134,12 +134,12 @@ public class DialogItinerary {
         } else if (resupplyType.equals(RESUPPLY_SMUGGLER)) {
             speakerName = getFormattedTextAt(RESOURCE_BUNDLE, "guerrillaSpeaker.text");
 
-            speakerIcon = getFactionLogo(campaign, "PIR", true);
+            speakerIcon = getFactionLogo(campaign.getGameYear(), "PIR");
             speakerIcon = scaleImageIcon(speakerIcon, 200, true);
         } else {
             speakerName = contract.getEmployerName(campaign.getGameYear());
 
-            speakerIcon = getFactionLogo(campaign, contract.getEmployerCode(), true);
+            speakerIcon = getFactionLogo(campaign.getGameYear(), contract.getEmployerCode());
             speakerIcon = scaleImageIcon(speakerIcon, 200, true);
         }
 
