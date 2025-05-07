@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.randomEvents.prisoners;
 
@@ -49,6 +54,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import megamek.common.Compute;
 import megamek.common.ITechnology;
@@ -275,7 +281,7 @@ public class CapturePrisoners {
 
         int bondsmanRoll = d6(1);
         if (capturingFaction != null && capturingFaction.isClan()) {
-            if (isMekHQCaptureStyle && prisoner.isClanPersonnel() && (bondsmanRoll == 1)) {
+            if (isMekHQCaptureStyle && prisoner.isClanPersonnel() && (bondsmanRoll + d6(1) == 2)) {
                 if (isNPC) {
                     campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
                           "bondsref.report",
@@ -294,6 +300,38 @@ public class CapturePrisoners {
                     prisoner.setBecomingBondsmanEndDate(today.plusWeeks(d6(1)));
                 } else {
                     prisoner.changeStatus(campaign, today, ENEMY_BONDSMAN);
+                }
+                return;
+            }
+        } else if (capturingFaction.getHonorRating(campaign) == HonorRating.NONE) {
+            if (bondsmanRoll == 1) {
+                if (isNPC) {
+                    campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+                          "bondsref.report",
+                          prisoner.getFullName(),
+                          spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                          CLOSING_SPAN_TAG));
+
+                    campaign.removePerson(prisoner);
+                } else {
+                    prisoner.changeStatus(campaign, today, BONDSREF);
+                }
+                return;
+            }
+        }
+
+        if (Objects.equals(prisoner.getOriginFaction().getShortName(), "DC")) {
+            if (d6(2) == 2) {
+                if (isNPC) {
+                    campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+                          "seppuku.report",
+                          prisoner.getFullName(),
+                          spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                          CLOSING_SPAN_TAG));
+
+                    campaign.removePerson(prisoner);
+                } else {
+                    prisoner.changeStatus(campaign, today, BONDSREF);
                 }
                 return;
             }
