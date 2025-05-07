@@ -320,20 +320,22 @@ public class CapturePrisoners {
             }
         }
 
-        if (Objects.equals(prisoner.getOriginFaction().getShortName(), "DC")) {
-            if (d6(2) == 2) {
-                if (isNPC) {
-                    campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
-                          "seppuku.report",
-                          prisoner.getFullName(),
-                          spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
-                          CLOSING_SPAN_TAG));
+        if (isMekHQCaptureStyle) {
+            if (Objects.equals(prisoner.getOriginFaction().getShortName(), "DC")) {
+                if (d6(2) == 2) {
+                    if (isNPC) {
+                        campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+                              "seppuku.report",
+                              prisoner.getFullName(),
+                              spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                              CLOSING_SPAN_TAG));
 
-                    campaign.removePerson(prisoner);
-                } else {
-                    prisoner.changeStatus(campaign, today, SEPPUKU);
+                        campaign.removePerson(prisoner);
+                    } else {
+                        prisoner.changeStatus(campaign, today, SEPPUKU);
+                    }
+                    return;
                 }
-                return;
             }
         }
 
