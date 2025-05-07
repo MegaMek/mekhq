@@ -65,6 +65,7 @@ import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.process
 import static mekhq.utilities.spaUtilities.SpaUtilities.getSpaCategory;
 
 import java.awt.Color;
+import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.time.LocalDate;
@@ -163,6 +164,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
     // region Variable Declarations
     private static final String CMD_SKILL_CHECK = "SKILL_CHECK";
+    private static final String CMD_MEDICAL_RECORDS = "MEDICAL_RECORDS";
     private static final String CMD_RANKSYSTEM = "RANKSYSTEM";
     private static final String CMD_RANK = "RANK";
     private static final String CMD_MANEI_DOMINI_RANK = "MD_RANK";
@@ -357,6 +359,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 for (final Person person : people) {
                     new SkillCheckDialog(getCampaign(), person);
                 }
+                break;
+            }
+            case CMD_MEDICAL_RECORDS: {
+                MedicalViewDialog medDialog = new MedicalViewDialog(null, getCampaign(), selectedPerson);
+                medDialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
+                medDialog.setVisible(true);
                 break;
             }
             case CMD_RANKSYSTEM: {
@@ -1827,6 +1835,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         menuItem.setActionCommand(makeCommand(CMD_SKILL_CHECK));
         menuItem.addActionListener(this);
         popup.add(menuItem);
+
+        if (getCampaignOptions().isUseAdvancedMedical() && oneSelected) {
+            menuItem = new JMenuItem(resources.getString("viewMedicalRecords.text"));
+            menuItem.setActionCommand(makeCommand(CMD_MEDICAL_RECORDS));
+            menuItem.addActionListener(this);
+            popup.add(menuItem);
+        }
 
         if (StaticChecks.areAllEligible(true, selected)) {
             menu = new JMenu(resources.getString("changeRank.text"));

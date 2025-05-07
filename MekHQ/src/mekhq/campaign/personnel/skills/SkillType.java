@@ -91,7 +91,7 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class SkillType {
-    private static final String RESOURCE_BUNDLE = "mekhq.resources." + SkillType.class.getSimpleName();
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.SkillType";
     private static final MMLogger logger = MMLogger.create(SkillType.class);
 
     /**
@@ -386,6 +386,33 @@ public class SkillType {
     }
 
     /**
+     * Retrieves a list of unique skill names that match any of the specified {@link SkillSubType}s.
+     *
+     * <p>This method iterates through all known {@link SkillType} instances and collects the names of those whose
+     * sub-type is included in the provided list of {@code skillSubTypes}. Each skill name will only appear once in the
+     * resulting list, even if multiple {@code SkillType}s with the same name are found.</p>
+     *
+     * @param skillSubTypes List of {@link SkillSubType}s for which to find matching skill names.
+     *
+     * @return A list of unique skill names that belong to one of the specified skill sub-types.
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public static List<String> getSkillsBySkillSubType(List<SkillSubType> skillSubTypes) {
+        List<String> relevantSkills = new ArrayList<>();
+        for (SkillType skillType : lookupHash.values()) {
+            SkillSubType subType = skillType.getSubType();
+            if (skillSubTypes.contains(subType)) {
+                if (!relevantSkills.contains(skillType.name)) {
+                    relevantSkills.add(skillType.name);
+                }
+            }
+        }
+        return relevantSkills;
+    }
+
+    /**
      * Default constructor for the {@code SkillType} class.
      *
      * <p>Initializes a default skill type with placeholder values, primarily for testing or fallback purposes.</p>
@@ -524,7 +551,7 @@ public class SkillType {
             return htmlOpenTag + rawFlavorText + htmlCloseTag;
         }
 
-        String flavorText = htmlOpenTag + rawFlavorText + "<br>(" + firstAttribute.getLabel() + htmlCloseTag;
+        String flavorText = htmlOpenTag + rawFlavorText + "<br>(" + firstAttribute.getLabel();
 
         if (secondAttribute != NONE) {
             flavorText += ", " + secondAttribute.getLabel() + ')' + htmlCloseTag;
@@ -878,8 +905,8 @@ public class SkillType {
         lookupHash.put(S_INTEREST_HISTORY, createInterestHistory());
         lookupHash.put(S_INTEREST_LITERATURE, createInterestLiterature());
         lookupHash.put(S_INTEREST_HOLO_GAMES, createInterestHoloGames());
-        lookupHash.put(S_INTEREST_FASHION, createInterestSports());
-        lookupHash.put(S_INTEREST_MUSIC, createInterestSports());
+        lookupHash.put(S_INTEREST_FASHION, createInterestFashion());
+        lookupHash.put(S_INTEREST_MUSIC, createInterestMusic());
         lookupHash.put(S_INTEREST_MILITARY, createInterestMilitary());
         lookupHash.put(S_INTEREST_ANTIQUES, createInterestAntiques());
         lookupHash.put(S_INTEREST_THEOLOGY, createInterestTheology());
