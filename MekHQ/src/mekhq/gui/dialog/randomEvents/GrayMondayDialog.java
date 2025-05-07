@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.randomEvents;
 
@@ -140,7 +145,7 @@ public class GrayMondayDialog extends ImmersiveDialogCore {
         if (campaign.getLocalDate().equals(EVENT_DATE_GRAY_MONDAY.plusDays(3))) {
             if (chosenContract != null) {
                 String employerCode = chosenContract.getEmployerCode();
-                speakerIcon = Factions.getFactionLogo(campaign, employerCode, true);
+                speakerIcon = Factions.getFactionLogo(campaign.getGameYear(), employerCode);
             }
         }
 

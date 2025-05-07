@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign;
 
@@ -375,7 +380,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                         preparedStatement = connect.prepareStatement("INSERT INTO " +
                                                                            table +
                                                                            ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
-                        preparedStatement.setInt(1, skillHash.get(SkillType.S_NAV));
+                        preparedStatement.setInt(1, skillHash.get(SkillType.S_NAVIGATION));
                         preparedStatement.setInt(2, role.ordinal());
                         preparedStatement.executeUpdate();
                         equipment = 1;
@@ -424,7 +429,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                         preparedStatement = connect.prepareStatement("INSERT INTO " +
                                                                            table +
                                                                            ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
-                        preparedStatement.setInt(1, skillHash.get(SkillType.S_DOCTOR));
+                        preparedStatement.setInt(1, skillHash.get(SkillType.S_SURGERY));
                         preparedStatement.setInt(2, role.ordinal());
                         preparedStatement.executeUpdate();
                         break;
