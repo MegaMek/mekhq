@@ -385,7 +385,7 @@ public class MRMSServiceTest {
             }
 
             /**
-             * Unit is repaired if the TN is below the minimum `bthMin` and above the maximum `bthMax`
+             * Unit is repaired if the TN is below the minimum `bthMin` and below the maximum `bthMax`
              */
             @Test
             public void testMRMSUnitsBTHifTNBelowMinBelowMax() {
@@ -499,7 +499,7 @@ public class MRMSServiceTest {
             }
 
             /**
-             * Unit is repaired if the TN is below the minimum `bthMin` and below the maximum `bthMax`.
+             * Unit is repaired if the TN is below the minimum `bthMin` and above the maximum `bthMax`.
              */
             @Test
             public void testMRMSUnitsBTHifTNWayBelowMinWayAboveMax() {
