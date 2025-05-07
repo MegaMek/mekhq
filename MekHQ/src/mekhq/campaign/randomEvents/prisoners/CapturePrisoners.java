@@ -42,6 +42,7 @@ import static mekhq.campaign.personnel.enums.PersonnelStatus.ENEMY_BONDSMAN;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.KIA;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.MIA;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.POW;
+import static mekhq.campaign.personnel.enums.PersonnelStatus.SEPPUKU;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.BECOMING_BONDSMAN;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.PRISONER;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.PRISONER_DEFECTOR;
@@ -330,7 +331,7 @@ public class CapturePrisoners {
 
                     campaign.removePerson(prisoner);
                 } else {
-                    prisoner.changeStatus(campaign, today, BONDSREF);
+                    prisoner.changeStatus(campaign, today, SEPPUKU);
                 }
                 return;
             }
