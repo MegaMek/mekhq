@@ -54,6 +54,7 @@ import mekhq.gui.dialog.RetirementDefectionDialog;
  * @author Luana Coppio
  */
 public class PostScenarioDialogHandler {
+    private static final MMLogger LOGGER = MMLogger.create(PostScenarioDialogHandler.class);
 
     /**
      * Handles post-game resolution checks, dialogs, and actions after a scenario is completed.
@@ -97,11 +98,8 @@ public class PostScenarioDialogHandler {
         try {
             MekHQ.triggerEvent(new ScenarioResolvedEvent(currentScenario));
         } catch (Exception e) {
-            final MMLogger logger = MMLogger.create(PostScenarioDialogHandler.class);
-
-            logger.error("An error occurred during scenario resolution: {}", e.getMessage(), e);
-
-            logger.errorDialog(
+            LOGGER.error(e, "An error occurred during scenario resolution: {}", e.getMessage());
+            LOGGER.errorDialog(
                   e,
                   "A critical error has occurred during the scenario resolution. This issue is under investigation." +
                         "\n\nPlease open an issue report and include your MekHQ log file for further assessment.",
@@ -121,14 +119,10 @@ public class PostScenarioDialogHandler {
         final File tempImageDirectory = new File("data/images/temp");
         if (tempImageDirectory.isDirectory()) {
             var listFiles = tempImageDirectory.listFiles();
-            if (listFiles == null) {
-                // This may happen if the directory is not accessible or if someone creates a file which the name collides
-                // with the folder
-                return;
+            if (listFiles != null) {
+                Stream.of(listFiles).filter(file -> file.getName().endsWith(".png"))
+                      .forEach(File::delete);
             }
-            // This can't be null because of the above
-            Stream.of(listFiles).filter(file -> file.getName().endsWith(".png"))
-                .forEach(File::delete);
         }
     }
 
