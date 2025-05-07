@@ -1062,7 +1062,7 @@ public class Person {
                   S_TECH_MECHANIC,
                   S_TECH_BA,
                   S_TECH_VESSEL,
-                  S_DOCTOR,
+                  S_SURGERY,
                   S_MEDTECH,
                   S_ASTECH,
                   S_COMMUNICATIONS,
@@ -1075,12 +1075,12 @@ public class Person {
             case VESSEL_PILOT -> hasSkill(S_PILOT_SPACE);
             case VESSEL_CREW -> hasSkill(S_TECH_VESSEL);
             case VESSEL_GUNNER -> hasSkill(S_GUN_SPACE);
-            case VESSEL_NAVIGATOR -> hasSkill(S_NAV);
+            case VESSEL_NAVIGATOR -> hasSkill(S_NAVIGATION);
             case MEK_TECH -> hasSkill(S_TECH_MEK);
             case AERO_TEK -> hasSkill(S_TECH_AERO);
             case BA_TECH -> hasSkill(S_TECH_BA);
             case ASTECH -> hasSkill(S_ASTECH);
-            case DOCTOR -> hasSkill(S_DOCTOR);
+            case DOCTOR -> hasSkill(S_SURGERY);
             case MEDIC -> hasSkill(S_MEDTECH);
             case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_HR ->
                   hasSkill(S_ADMIN);
@@ -3978,7 +3978,7 @@ public class Person {
             }
             case VESSEL_NAVIGATOR -> {
                 if (hasSkill(S_NAV)) {
-                    Skill firstSkill = getSkill(S_NAV);
+                    Skill firstSkill = getSkill(S_NAVIGATION);
 
                     return firstSkill.getExperienceLevel(options, atowAttributes);
                 } else {
@@ -4022,8 +4022,8 @@ public class Person {
                 }
             }
             case DOCTOR -> {
-                if (hasSkill(S_DOCTOR)) {
-                    Skill firstSkill = getSkill(S_DOCTOR);
+                if (hasSkill(S_SURGERY)) {
+                    Skill firstSkill = getSkill(S_SURGERY);
 
                     return firstSkill.getExperienceLevel(options, atowAttributes);
                 } else {
@@ -4206,15 +4206,15 @@ public class Person {
             case VESSEL_PILOT -> List.of(S_PILOT_SPACE);
             case VESSEL_GUNNER -> List.of(S_GUN_SPACE);
             case VESSEL_CREW -> List.of(S_TECH_VESSEL);
-            case VESSEL_NAVIGATOR -> List.of(S_NAV);
+            case VESSEL_NAVIGATOR -> List.of(S_NAVIGATION);
             case MEK_TECH -> List.of(S_TECH_MEK);
             case AERO_TEK -> List.of(S_TECH_AERO);
             case BA_TECH -> List.of(S_TECH_BA);
             case ASTECH -> List.of(S_ASTECH);
-            case DOCTOR -> List.of(S_DOCTOR);
+            case DOCTOR -> List.of(S_SURGERY);
             case MEDIC -> List.of(S_MEDTECH);
             case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_HR ->
-                  List.of(S_ADMIN, S_NEG, S_SCROUNGE);
+                  List.of(S_ADMIN, S_NEGOTIATION, S_SCROUNGE);
             case DEPENDENT, NONE -> List.of(String.valueOf(EXP_NONE));
         };
     }
@@ -5234,7 +5234,7 @@ public class Person {
     }
 
     public boolean isDoctor() {
-        return hasSkill(S_DOCTOR) && (getPrimaryRole().isDoctor() || getSecondaryRole().isDoctor());
+        return hasSkill(SkillType.S_SURGERY) && (getPrimaryRole().isDoctor() || getSecondaryRole().isDoctor());
     }
 
     /**

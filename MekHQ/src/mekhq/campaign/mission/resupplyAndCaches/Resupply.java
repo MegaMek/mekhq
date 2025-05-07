@@ -780,7 +780,7 @@ public class Resupply {
         }
 
         if (negotiator != null) {
-            Skill skill = negotiator.getSkill(SkillType.S_NEG);
+            Skill skill = negotiator.getSkill(SkillType.S_NEGOTIATION);
 
             if (skill != null) {
                 int reputation = negotiator.getAdjustedReputation(campaign.getCampaignOptions().isUseAgeEffects(),

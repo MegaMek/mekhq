@@ -817,8 +817,8 @@ public enum PersonnelTableModelColumn {
                                                     .getFinalSkillValue(options, attributes)) :
                              "-";
             case MEDICAL:
-                return person.hasSkill(SkillType.S_DOCTOR) ?
-                             Integer.toString(person.getSkill(SkillType.S_DOCTOR)
+                return person.hasSkill(SkillType.S_SURGERY) ?
+                             Integer.toString(person.getSkill(SkillType.S_SURGERY)
                                                     .getFinalSkillValue(options, attributes)) :
                              "-";
             case ADMINISTRATION:
@@ -827,8 +827,8 @@ public enum PersonnelTableModelColumn {
                                                     .getFinalSkillValue(options, attributes)) :
                              "-";
             case NEGOTIATION:
-                return person.hasSkill(SkillType.S_NEG) ?
-                             Integer.toString(person.getSkill(SkillType.S_NEG).getFinalSkillValue(options, attributes,
+                return person.hasSkill(SkillType.S_NEGOTIATION) ?
+                             Integer.toString(person.getSkill(SkillType.S_NEGOTIATION).getFinalSkillValue(options, attributes,
                                                           person.getAdjustedReputation(isUseAgeEffects,
                                                                 isClanCampaign,
                                                                 today,

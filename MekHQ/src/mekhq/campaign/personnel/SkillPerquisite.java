@@ -145,7 +145,7 @@ public class SkillPerquisite {
                 return skillSet.containsKey(SkillType.S_PILOT_SPACE) ||
                              skillSet.containsKey(SkillType.S_GUN_SPACE) ||
                              skillSet.containsKey(SkillType.S_TECH_VESSEL) ||
-                             skillSet.containsKey(SkillType.S_NAV);
+                             skillSet.containsKey(SkillType.S_NAVIGATION);
             case UnitType.GUN_EMPLACEMENT:
             case UnitType.TANK:
                 return skillSet.containsKey(SkillType.S_PILOT_GVEE) || skillSet.containsKey(SkillType.S_GUN_VEE);

@@ -87,12 +87,12 @@ public class DocTableModel extends DataTableModel {
         StringBuilder toReturn = new StringBuilder(128);
         toReturn.append("<html><font><b>").append(doctor.getFullTitle()).append("</b><br/>");
 
-        Skill skill = doctor.getSkill(SkillType.S_DOCTOR);
+        Skill skill = doctor.getSkill(SkillType.S_SURGERY);
         if (null != skill) {
             int experienceLevel = skill.getExperienceLevel(doctor.getOptions(), doctor.getATOWAttributes());
 
             toReturn.append("<b>").append(getColoredExperienceLevelName(experienceLevel))
-                    .append("</b> " + SkillType.S_DOCTOR);
+                    .append("</b> " + SkillType.S_SURGERY);
         }
 
         toReturn.append(String.format(" (%d XP)", doctor.getXP()));

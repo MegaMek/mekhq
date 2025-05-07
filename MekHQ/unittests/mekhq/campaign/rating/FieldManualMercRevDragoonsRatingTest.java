@@ -114,8 +114,8 @@ public class FieldManualMercRevDragoonsRatingTest {
         when(mockDoctor.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockDoctor).getStatus();
         when(mockDoctor.isDeployed()).thenReturn(false);
-        when(mockDoctor.getSkill(eq(SkillType.S_DOCTOR))).thenReturn(mockDoctorSkillRegular);
-        when(mockDoctor.hasSkill(eq(SkillType.S_DOCTOR))).thenReturn(true);
+        when(mockDoctor.getSkill(eq(SkillType.S_SURGERY))).thenReturn(mockDoctorSkillRegular);
+        when(mockDoctor.hasSkill(eq(SkillType.S_SURGERY))).thenReturn(true);
         when(mockDoctor.getRankNumeric()).thenReturn(5);
 
         // Set up the tech.
@@ -367,8 +367,8 @@ public class FieldManualMercRevDragoonsRatingTest {
         when(mockMekwarrior.isDoctor()).thenReturn(true);
         doReturn(PersonnelStatus.ACTIVE).when(mockMekwarrior).getStatus();
         when(mockMekwarrior.isDeployed()).thenReturn(false);
-        when(mockMekwarrior.getSkill(eq(SkillType.S_DOCTOR))).thenReturn(mockDoctorSkillGreen);
-        when(mockMekwarrior.hasSkill(eq(SkillType.S_DOCTOR))).thenReturn(true);
+        when(mockMekwarrior.getSkill(eq(SkillType.S_SURGERY))).thenReturn(mockDoctorSkillGreen);
+        when(mockMekwarrior.hasSkill(eq(SkillType.S_SURGERY))).thenReturn(true);
         mockPersonnelList.add(mockMekwarrior);
         mockActivePersonnelList.add(mockMekwarrior);
         expectedHours += 15;
