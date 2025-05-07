@@ -129,6 +129,8 @@ class SkillTypeTest {
         int regularLevel = skillType.getRegularLevel();
         int veteranLevel = skillType.getVeteranLevel();
         int eliteLevel = skillType.getEliteLevel();
+        int heroicLevel = skillType.getHeroicLevel();
+        int legendaryLevel = skillType.getLegendaryLevel();
 
         // Assert
         assertTrue(greenLevel > 0, "Invalid green level for skill: " + skillType.getName() + " cannot be < 1");
@@ -140,6 +142,12 @@ class SkillTypeTest {
 
         assertTrue(veteranLevel < eliteLevel,
               "Invalid veteran level for skill: " + skillType.getName() + " cannot be >= elite level");
+
+        assertTrue(eliteLevel < heroicLevel,
+              "Invalid elite level for skill: " + skillType.getName() + " cannot be >= elite level");
+
+        assertTrue(heroicLevel < legendaryLevel,
+              "Invalid heroic level for skill: " + skillType.getName() + " cannot be >= elite level");
 
         assertTrue(eliteLevel < 11, "Invalid elite level for skill: " + skillType.getName() + " cannot be > 10");
     }
