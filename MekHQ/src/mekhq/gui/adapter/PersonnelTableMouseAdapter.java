@@ -1519,15 +1519,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_REMOVE_ROLEPLAY_SKILLS: {
                 for (Person person : people) {
-                    // We make an iteration safe list so we can easily remove skills during the loop
-                    List<Skill> allSkills = new ArrayList<>(person.getSkills().getSkills());
-                    for (Skill skill : allSkills) {
-                        SkillType skillType = skill.getType();
-
-                        if (skillType.isRoleplaySkill()) {
-                            person.removeSkill(skillType.getName());
-                        }
-                    }
+                    person.removeAllSkillsOfSubType(SkillSubType.ROLEPLAY_GENERAL);
+                    person.removeAllSkillsOfSubType(SkillSubType.ROLEPLAY_ART);
+                    person.removeAllSkillsOfSubType(SkillSubType.ROLEPLAY_INTEREST);
+                    person.removeAllSkillsOfSubType(SkillSubType.ROLEPLAY_SCIENCE);
+                    person.removeAllSkillsOfSubType(SkillSubType.ROLEPLAY_SECURITY);
                 }
                 break;
             }
