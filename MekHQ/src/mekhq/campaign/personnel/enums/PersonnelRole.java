@@ -153,7 +153,7 @@ public enum PersonnelRole {
 
     // region Variable Declarations
     private static final MMLogger logger = MMLogger.create(PersonnelRole.class);
-    private static final String RESOURCE_BUNDLE = "mekhq.resources." + PersonnelRole.class.getSimpleName();
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.PersonnelRole";
 
     private final boolean isCombat;
     private final boolean hasClanName;

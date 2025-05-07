@@ -63,7 +63,7 @@ import mekhq.campaign.personnel.skills.enums.SkillAttribute;
  */
 public class SkillCheckUtility {
     private static final MMLogger logger = MMLogger.create(SkillCheckUtility.class);
-    private static final String RESOURCE_BUNDLE = "mekhq.resources." + SkillCheckUtility.class.getSimpleName();
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.SkillCheckUtility";
 
     /**
      * The target number for an untrained skill check with one linked attribute.
