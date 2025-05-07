@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel;
 
@@ -123,7 +128,7 @@ public class SkillPerquisite {
                 return skillSet.containsKey(SkillType.S_PILOT_SPACE) ||
                              skillSet.containsKey(SkillType.S_GUN_SPACE) ||
                              skillSet.containsKey(SkillType.S_TECH_VESSEL) ||
-                             skillSet.containsKey(SkillType.S_NAV);
+                             skillSet.containsKey(SkillType.S_NAVIGATION);
             case UnitType.GUN_EMPLACEMENT:
             case UnitType.TANK:
                 return skillSet.containsKey(SkillType.S_PILOT_GVEE) || skillSet.containsKey(SkillType.S_GUN_VEE);
