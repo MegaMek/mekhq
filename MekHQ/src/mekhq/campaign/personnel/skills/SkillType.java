@@ -903,8 +903,8 @@ public class SkillType {
         lookupHash.put(S_INTEREST_HISTORY, createInterestHistory());
         lookupHash.put(S_INTEREST_LITERATURE, createInterestLiterature());
         lookupHash.put(S_INTEREST_HOLO_GAMES, createInterestHoloGames());
-        lookupHash.put(S_INTEREST_FASHION, createInterestSports());
-        lookupHash.put(S_INTEREST_MUSIC, createInterestSports());
+        lookupHash.put(S_INTEREST_FASHION, createInterestFashion());
+        lookupHash.put(S_INTEREST_MUSIC, createInterestMusic());
         lookupHash.put(S_INTEREST_MILITARY, createInterestMilitary());
         lookupHash.put(S_INTEREST_ANTIQUES, createInterestAntiques());
         lookupHash.put(S_INTEREST_THEOLOGY, createInterestTheology());
