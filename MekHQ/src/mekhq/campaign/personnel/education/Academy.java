@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.education;
 
@@ -43,7 +48,6 @@ import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.enums.education.AcademyType;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationLevel.Adapter;
@@ -939,13 +943,13 @@ public class Academy implements Comparable<Academy> {
             case "tech/battlearmor" -> SkillType.S_TECH_BA;
             case "tech/vessel" -> SkillType.S_TECH_VESSEL;
             case "astech" -> SkillType.S_ASTECH;
-            case "doctor" -> SkillType.S_DOCTOR;
+            case "doctor" -> SkillType.S_SURGERY;
             case "medtech" -> SkillType.S_MEDTECH;
-            case "hyperspace navigation" -> SkillType.S_NAV;
+            case "hyperspace navigation" -> SkillType.S_NAVIGATION;
             case "administration" -> SkillType.S_ADMIN;
             case "tactics" -> SkillType.S_TACTICS;
             case "strategy" -> SkillType.S_STRATEGY;
-            case "negotiation" -> SkillType.S_NEG;
+            case "negotiation" -> SkillType.S_NEGOTIATION;
             case "leadership" -> SkillType.S_LEADER;
             case "scrounge" -> SkillType.S_SCROUNGE;
 
