@@ -32,6 +32,7 @@
  */
 package mekhq.gui.dialog;
 
+import static java.util.Arrays.sort;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP_ABRIDGED;
 import static mekhq.gui.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CANCELLED;
@@ -275,6 +276,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
             Ranks.initializeRankSystems();
             RATManager.populateCollectionNames();
             SkillType.initializeTypes();
+            sort(SkillType.getSkillList()); // sort all skills alphabetically
             SpecialAbility.initializeSPA();
             // endregion Progress 0
 

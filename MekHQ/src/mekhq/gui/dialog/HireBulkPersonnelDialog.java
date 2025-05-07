@@ -355,7 +355,7 @@ public class HireBulkPersonnelDialog extends JDialog {
         while (number > 0) {
             Person person = campaign.newPerson(selectedItem.getRole());
 
-            if ((useSkill) && (!selectedItem.getRole().isCivilian()) && (!selectedItem.getRole().isAssistant())) {
+            if ((useSkill) && (!selectedItem.getRole().isCivilian())) {
                 if (skillLevel.getSelectedItem() != null) {
                     RandomSkillPreferences randomSkillPreferences = campaign.getRandomSkillPreferences();
                     boolean useExtraRandomness = randomSkillPreferences.randomizeSkill();
