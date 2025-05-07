@@ -127,7 +127,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         boolean filterOutLegalFactions = false;
         if (getCampaign().getCampaignOptions().getUnitRatingMethod().isCampaignOperations()) {
             if (getCampaign().getReputation().getReputationRating() < getUnitReputationRecruitmentCutoff()) {
-                getLogger().info(
+                getLogger().debug(
                       "Only pirates & mercenaries will be considered for applicants, as the campaign's unit " +
                                    "rating is below the cutoff.");
                 filterOutLegalFactions = true;
@@ -252,7 +252,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
             int applicantSkill = applicant.getSkillLevel(getCampaign(), false).getExperienceLevel();
 
             if (applicantSkill > averageSkillLevel) {
-                getLogger().info("Applicant is too experienced for the campaign, skipping.");
+                getLogger().debug("Applicant is too experienced for the campaign, skipping.");
                 continue;
             }
 
@@ -295,13 +295,13 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
      */
     private void calculateNumberOfRecruitmentRolls() {
         int lengthOfMonth = getToday().getMonth().length(getToday().isLeapYear());
-        getLogger().info("Base rolls: {}", lengthOfMonth);
+        getLogger().debug("Base rolls: {}", lengthOfMonth);
 
         int rolls = lengthOfMonth * getSystemStatusRecruitmentMultiplier();
-        getLogger().info("Rolls modified for location: {}", rolls);
+        getLogger().debug("Rolls modified for location: {}", rolls);
 
         rolls = clamp((int) round(rolls * getSystemPopulationRecruitmentMultiplier()), 1, rolls);
-        getLogger().info("Rolls modified for population: {}", rolls);
+        getLogger().debug("Rolls modified for population: {}", rolls);
 
         setRecruitmentRolls(rolls);
     }
@@ -328,7 +328,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
             default -> 1;
         };
 
-        getLogger().info("Rolls based on hiring hall status: {}", rolls);
+        getLogger().debug("Rolls based on hiring hall status: {}", rolls);
 
         for (Faction faction : currentSystem.getFactionSet(today)) {
             if (currentSystem.equals(faction.getStartingPlanet(getCampaign(), today))) {
@@ -339,7 +339,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
             }
         }
 
-        getLogger().info("Rolls including capital status: {}", rolls);
+        getLogger().debug("Rolls including capital status: {}", rolls);
 
         return rolls;
     }

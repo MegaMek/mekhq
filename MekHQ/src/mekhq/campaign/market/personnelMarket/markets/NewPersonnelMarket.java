@@ -208,16 +208,16 @@ public class NewPersonnelMarket {
         String isZeroAvailability = getAvailabilityMessage();
 
         if (!isZeroAvailability.isBlank()) {
-            logger.info("No applicants will be generated due to {}", isZeroAvailability);
+            logger.debug("No applicants will be generated due to {}", isZeroAvailability);
             return;
         }
 
         generateApplicants();
 
         if (currentApplicants.isEmpty()) {
-            logger.info("No applicants were generated.");
+            logger.debug("No applicants were generated.");
         } else {
-            logger.info("Generated {} applicants for the campaign.", currentApplicants.size());
+            logger.debug("Generated {} applicants for the campaign.", currentApplicants.size());
 
             if (campaign.getCampaignOptions().isPersonnelMarketReportRefresh()) {
                 campaign.addReport(generatePersonnelReport());
@@ -822,7 +822,7 @@ public class NewPersonnelMarket {
 
         Person applicant = campaign.newPerson(entry.profession(), originFactionCode, Gender.RANDOMIZE);
         if (applicant == null) {
-            logger.info("Could not create person for {} game year {} from faction {}",
+            logger.warn("Could not create person for {} game year {} from faction {}",
                   originalEntry.profession(),
                   gameYear,
                   applicantOriginFaction);
@@ -838,7 +838,7 @@ public class NewPersonnelMarket {
             }
         }
 
-        logger.info("Generated applicant {} ({}) game year {} from faction {}",
+        logger.debug("Generated applicant {} ({}) game year {} from faction {}",
               applicant.getFullName(),
               applicant.getPrimaryRole(),
               gameYear,
