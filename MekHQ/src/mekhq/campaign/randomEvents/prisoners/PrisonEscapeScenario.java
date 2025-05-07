@@ -24,14 +24,19 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.randomEvents.prisoners;
 
 import static java.io.File.separator;
 import static megamek.common.Board.START_SW;
 import static megamek.common.Compute.randomInt;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.AllGroundTerrain;
-import static mekhq.campaign.personnel.skills.SkillType.S_SMALL_ARMS;
 import static mekhq.campaign.personnel.enums.PersonnelRole.SOLDIER;
 import static mekhq.campaign.personnel.skills.SkillType.S_SMALL_ARMS;
 import static mekhq.campaign.randomEvents.prisoners.enums.MobType.HUGE;
@@ -42,6 +47,7 @@ import static mekhq.campaign.stratcon.StratconContractInitializer.getUnoccupiedC
 import static mekhq.campaign.stratcon.StratconRulesManager.generateExternalScenario;
 import static mekhq.campaign.stratcon.StratconRulesManager.getAvailableForceIDs;
 import static mekhq.campaign.stratcon.StratconRulesManager.sortForcesByMapType;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -69,7 +75,7 @@ import mekhq.campaign.stratcon.StratconCoords;
 import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.dialog.randomEvents.prisonerDialogs.PrisonerEscapeeScenarioDialog;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
 /**
  * Handles the generation and setup of a scenario involving escaped prisoners attempting to flee.
@@ -87,6 +93,7 @@ public class PrisonEscapeScenario {
     private final AtBContract contract;
     private Set<Person> escapees;
 
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
     private final MMLogger logger = MMLogger.create(PrisonEscapeScenario.class);
 
     /**
@@ -312,7 +319,20 @@ public class PrisonEscapeScenario {
             }
         }
 
-        // Trigger a dialog to inform the user an interception has taken place
-        new PrisonerEscapeeScenarioDialog(campaign, track, coords);
+        // Trigger a dialog to inform the user that an interception has taken place
+        String commanderAddress = campaign.getCommanderAddress(false);
+        String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
+              "escapeeScenario.report",
+              commanderAddress,
+              track.getDisplayableName(),
+              coords.toBTString());
+        new ImmersiveDialogSimple(campaign,
+              campaign.getSeniorAdminPerson(COMMAND),
+              null,
+              inCharacterMessage,
+              null,
+              getFormattedTextAt(RESOURCE_BUNDLE, "escapeeScenario.ooc"),
+              null,
+              false);
     }
 }

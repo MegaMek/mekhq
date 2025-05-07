@@ -40,6 +40,10 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 
+/**
+ * @deprecated Unused
+ */
+@Deprecated(since = "0.50.06", forRemoval = true)
 public class MissionEndPrisonerDialog extends ImmersiveDialogCore {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
 
@@ -53,7 +57,7 @@ public class MissionEndPrisonerDialog extends ImmersiveDialogCore {
      * @param isGoodEvent Indicates whether the event is positive.
      */
     public MissionEndPrisonerDialog(Campaign campaign, Money ransom, boolean isAllied, boolean isSuccess,
-                                    boolean isGoodEvent) {
+          boolean isGoodEvent) {
         super(campaign,
               getSpeaker(campaign),
               null,
@@ -82,7 +86,7 @@ public class MissionEndPrisonerDialog extends ImmersiveDialogCore {
      * @return A list of button-label and tooltip pairs to be displayed on the dialog.
      */
     private static List<ButtonLabelTooltipPair> createButtons(boolean isAllied, boolean isSuccess,
-                                                              boolean isGoodEvent) {
+          boolean isGoodEvent) {
         List<ButtonLabelTooltipPair> buttons = new ArrayList<>();
 
         boolean isRansom = (!isAllied && isSuccess && isGoodEvent) ||
@@ -137,7 +141,7 @@ public class MissionEndPrisonerDialog extends ImmersiveDialogCore {
      * @return A formatted string containing the in-character dialog message.
      */
     private static String createInCharacterMessage(Campaign campaign, Money ransomSum, boolean isAllied,
-                                                   boolean isSuccess, boolean isGoodEvent) {
+          boolean isSuccess, boolean isGoodEvent) {
         String key = "prisoners." +
                            (isAllied ? "player" : "enemy") +
                            '.' +
@@ -177,7 +181,7 @@ public class MissionEndPrisonerDialog extends ImmersiveDialogCore {
      * @return A formatted string containing the OOC dialog message, or {@code null} if no message is required.
      */
     private static @Nullable String createOutOfCharacterMessage(boolean isAllied, boolean isSuccess,
-                                                                boolean isGoodEvent) {
+          boolean isGoodEvent) {
         boolean showMessage = (isAllied && !isSuccess && isGoodEvent);
 
         if (showMessage) {

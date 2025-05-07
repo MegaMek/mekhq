@@ -37,15 +37,9 @@ import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 
 /**
- * Represents a dialog prompted when the player has dangerously low prisoner capacity, risking a negative event.
- *
- * <p>
- * This dialog is shown when the player's prisoner capacity is critically low, prompting them to take an action to avoid
- * potential consequences. The player may choose to ignore the issue, free prisoners to alleviate capacity issues, or
- * execute prisoners to free up space. The dialog provides in-character messaging alongside optional out-of-character
- * information for context and guidance.
- * </p>
+ * @deprecated Unused
  */
+@Deprecated(since = "0.50.06", forRemoval = true)
 public class PrisonerWarningDialog extends ImmersiveDialogCore {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
 

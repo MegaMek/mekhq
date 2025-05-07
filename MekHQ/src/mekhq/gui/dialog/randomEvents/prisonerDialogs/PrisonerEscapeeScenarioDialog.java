@@ -38,12 +38,9 @@ import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 
 /**
- * Represents a dialog triggered after prisoners have been tracked down, culminating in a special scenario.
- *
- * <p>This dialog informs the player about the results of tracking down escaped prisoners and sets
- * the stage for a special scenario. It provides an immersive, in-character message describing the situation, along with
- * optional out-of-character context to clarify the mechanics of the triggered scenario.</p>
+ * @deprecated Unused
  */
+@Deprecated(since = "0.50.06", forRemoval = true)
 public class PrisonerEscapeeScenarioDialog extends ImmersiveDialogCore {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
 

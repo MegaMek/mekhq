@@ -39,13 +39,9 @@ import mekhq.campaign.randomEvents.prisoners.enums.PrisonerEvent;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 
 /**
- * Represents a dialog triggered when a random prisoner event occurs, asking the player how they would like to resolve
- * it.
- *
- * <p>This dialog communicates the nature of a prisoner-related random event and presents the player
- * with three resolution options to choose from. The event is described with immersive, in-character messaging, and each
- * option provides a narrative justification and contextual tooltip to guide the player's decision.</p>
+ * @deprecated Unused
  */
+@Deprecated(since = "0.50.06", forRemoval = true)
 public class PrisonerEventDialog extends ImmersiveDialogCore {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
 
