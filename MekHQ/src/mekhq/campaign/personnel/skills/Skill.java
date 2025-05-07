@@ -818,60 +818,6 @@ public class Skill {
         }
 
         SkillAttribute firstLinkedAttribute = type.getFirstAttribute();
-        int firstLinkedAttributeModifier = attributes.getAttributeModifier(firstLinkedAttribute);
-        tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
-              "tooltip.format.linkedAttribute",
-              firstLinkedAttribute.getLabel(),
-              (firstLinkedAttributeModifier > 0 ? "+" : "") + firstLinkedAttributeModifier));
-
-        SkillAttribute secondLinkedAttribute = type.getSecondAttribute();
-        if (secondLinkedAttribute != SkillAttribute.NONE) {
-            int secondLinkedAttributeModifier = attributes.getAttributeModifier(secondLinkedAttribute);
-            tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
-                  "tooltip.format.linkedAttribute",
-                  secondLinkedAttribute.getLabel(),
-                  (secondLinkedAttributeModifier > 0 ? "+" : "") + secondLinkedAttributeModifier));
-        }
-
-        return tooltip.toString();
-    }
-
-    /**
-     * Creates an HTML-formatted tooltip string for the skill, incorporating flavor text, aging modifiers, SPA
-     * modifiers, and linked attribute modifiers. The content is constructed using resource bundle formatting and the
-     * provided personnel options, attribute values, and reputation adjustment.
-     *
-     * @param options            the personnel options affecting SPA calculation
-     * @param attributes         the set of attributes used to determine modifier values
-     * @param adjustedReputation the reputation value impacting the tooltip details
-     *
-     * @return an HTML-formatted string representing the generated skill tooltip
-     *
-     * @author Illiani
-     * @since 0.50.06
-     */
-    public String getTooltip(PersonnelOptions options, Attributes attributes, int adjustedReputation) {
-        StringBuilder tooltip = new StringBuilder();
-
-        String flavorText = getType().getFlavorText(false, false);
-        if (!flavorText.isBlank()) {
-            tooltip.append(flavorText).append("<br><br>");
-        }
-
-        if (agingModifier != 0) {
-            tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
-                  "tooltip.format.aging",
-                  (agingModifier > 0 ? "+" : "") + agingModifier));
-        }
-
-        int spaModifier = getSPAModifiers(options, adjustedReputation);
-        if (spaModifier != 0) {
-            tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
-                  "tooltip.format.spa",
-                  (spaModifier > 0 ? "+" : "") + spaModifier));
-        }
-
-        SkillAttribute firstLinkedAttribute = type.getFirstAttribute();
         // TODO enable once attribute modifier sare implemented
         //        int firstLinkedAttributeModifier = attributes.getAttributeModifier(firstLinkedAttribute);
         String additionSymbol = getTextAt(RESOURCE_BUNDLE, "tooltip.format.addition");

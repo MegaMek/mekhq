@@ -540,6 +540,19 @@ public class SkillType {
         return key;
     }
 
+    /**
+     * Retrieves the flavor text for this skill, optionally including HTML tags and attribute details.
+     *
+     * @param includeHtmlTags   if {@code true}, the returned string will be wrapped with {@code <html>} and
+     *                          {@code </html>} tags
+     * @param includeAttributes if {@code true}, the returned string will append the object's attributes as labels; if
+     *                          {@code false}, only the raw flavor text is returned
+     *
+     * @return the assembled flavor text, with optional HTML formatting and attribute information
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
     public String getFlavorText(boolean includeHtmlTags, boolean includeAttributes) {
         String key = getResourceBundleKey();
         String rawFlavorText = getTextAt(RESOURCE_BUNDLE, key + ".flavorText");
@@ -554,8 +567,10 @@ public class SkillType {
         String flavorText = htmlOpenTag + rawFlavorText + "<br>(" + firstAttribute.getLabel();
 
         if (secondAttribute != NONE) {
-            flavorText += ", " + secondAttribute.getLabel() + ')' + htmlCloseTag;
+            flavorText += ", " + secondAttribute.getLabel() + ')';
         }
+
+        flavorText += htmlCloseTag;
 
         return flavorText;
     }
