@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.education;
 
@@ -38,7 +43,6 @@ import java.util.List;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.enums.education.AcademyType;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -180,13 +184,13 @@ class AcademyTests {
         assertEquals(SkillType.S_TECH_BA, Academy.skillParser("tech/ba"));
         assertEquals(SkillType.S_TECH_VESSEL, Academy.skillParser("tech/vessel"));
         assertEquals(SkillType.S_ASTECH, Academy.skillParser("astech"));
-        assertEquals(SkillType.S_DOCTOR, Academy.skillParser("doctor"));
+        assertEquals(SkillType.S_SURGERY, Academy.skillParser("doctor"));
         assertEquals(SkillType.S_MEDTECH, Academy.skillParser("medtech"));
-        assertEquals(SkillType.S_NAV, Academy.skillParser("hyperspace navigation"));
+        assertEquals(SkillType.S_NAVIGATION, Academy.skillParser("hyperspace navigation"));
         assertEquals(SkillType.S_ADMIN, Academy.skillParser("administration"));
         assertEquals(SkillType.S_TACTICS, Academy.skillParser("tactics"));
         assertEquals(SkillType.S_STRATEGY, Academy.skillParser("strategy"));
-        assertEquals(SkillType.S_NEG, Academy.skillParser("negotiation"));
+        assertEquals(SkillType.S_NEGOTIATION, Academy.skillParser("negotiation"));
         assertEquals(SkillType.S_LEADER, Academy.skillParser("leadership"));
         assertEquals(SkillType.S_SCROUNGE, Academy.skillParser("scrounge"));
     }

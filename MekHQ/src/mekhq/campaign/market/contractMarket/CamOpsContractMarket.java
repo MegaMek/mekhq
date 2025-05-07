@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.market.contractMarket;
 
@@ -178,11 +183,11 @@ public class CamOpsContractMarket extends AbstractContractMarket {
 
     private int findNegotiationSkill(Campaign campaign) {
         // TODO: have pirates use investigation skill instead when it is implemented per CamOps
-        Person negotiator = campaign.findBestAtSkill(SkillType.S_NEG);
+        Person negotiator = campaign.findBestAtSkill(SkillType.S_NEGOTIATION);
         if (negotiator == null) {
             return 0;
         }
-        return negotiator.getSkillLevel(SkillType.S_NEG);
+        return negotiator.getSkillLevel(SkillType.S_NEGOTIATION);
     }
 
     private int rollNegotiation(int skill, int modifiers) {

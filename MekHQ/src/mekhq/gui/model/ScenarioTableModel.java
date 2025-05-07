@@ -27,6 +27,15 @@
  */
 package mekhq.gui.model;
 
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
+
+import java.awt.Component;
+import java.util.ArrayList;
+import java.util.ResourceBundle;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
@@ -38,14 +47,6 @@ import mekhq.campaign.stratcon.StratconCoords;
 import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.ResourceBundle;
-
-import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
-import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 /**
  * A table model for displaying scenarios
@@ -151,8 +152,7 @@ public class ScenarioTableModel extends DataTableModel {
 
                     // Wrap in HTML and include bold formatting for accessibility
                     return String.format(
-                          "<html>%s%s<b>%s</b>%s</html>",
-                          scenario.getStatus(),
+                          "<html>%s%s<b>%s</b>%s</html>", scenario.getStatus().toString(),
                           openingSpan,
                           turningPointText,
                           closingSpan
@@ -160,7 +160,7 @@ public class ScenarioTableModel extends DataTableModel {
                 }
             }
 
-            return scenario.getStatus();
+            return scenario.getStatus().toString();
         } else if (col == COL_DATE) {
             if (scenario.getDate() == null) {
                 return "-";
