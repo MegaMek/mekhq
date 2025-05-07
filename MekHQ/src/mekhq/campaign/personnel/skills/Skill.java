@@ -43,6 +43,8 @@ import static mekhq.campaign.personnel.skills.SkillType.S_PERCEPTION;
 import static mekhq.campaign.personnel.skills.SkillType.S_PROTOCOLS;
 import static mekhq.campaign.personnel.skills.SkillType.S_STREETWISE;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.CHARISMA;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.PrintWriter;
 import java.util.Objects;
@@ -53,6 +55,7 @@ import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -92,6 +95,7 @@ public class Skill {
     public static int COUNT_UP_MAX_VALUE = 10;
     public static int COUNT_DOWN_MIN_VALUE = 0;
 
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Skill";
     private static final MMLogger logger = MMLogger.create(Skill.class);
 
     private SkillType type;
@@ -225,6 +229,10 @@ public class Skill {
         this.bonus = b;
     }
 
+    public int getAgingModifier() {
+        return agingModifier;
+    }
+
     public void setAgingModifier(int agingModifier) {
         this.agingModifier = agingModifier;
     }
@@ -292,7 +300,7 @@ public class Skill {
      *
      * @return The calculated skill modifier for the current skill type.
      */
-    private int getSPAModifiers(PersonnelOptions characterOptions, int reputation) {
+    public int getSPAModifiers(PersonnelOptions characterOptions, int reputation) {
         int modifier = 0;
 
         String name = type.getName();
@@ -514,6 +522,65 @@ public class Skill {
         } else {
             return getFinalSkillValue(options, reputation) + "+";
         }
+    }
+
+    /**
+     * Creates an HTML-formatted tooltip string for the skill, incorporating flavor text, aging modifiers, SPA
+     * modifiers, and linked attribute modifiers. The content is constructed using resource bundle formatting and the
+     * provided personnel options, attribute values, and reputation adjustment.
+     *
+     * @param options            the personnel options affecting SPA calculation
+     * @param attributes         the set of attributes used to determine modifier values
+     * @param adjustedReputation the reputation value impacting the tooltip details
+     *
+     * @return an HTML-formatted string representing the generated skill tooltip
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public String getTooltip(PersonnelOptions options, Attributes attributes, int adjustedReputation) {
+        StringBuilder tooltip = new StringBuilder();
+
+        String flavorText = getType().getFlavorText(false, false);
+        if (!flavorText.isBlank()) {
+            tooltip.append(flavorText).append("<br><br>");
+        }
+
+        if (agingModifier != 0) {
+            tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "tooltip.format.aging",
+                  (agingModifier > 0 ? "+" : "") + agingModifier));
+        }
+
+        int spaModifier = getSPAModifiers(options, adjustedReputation);
+        if (spaModifier != 0) {
+            tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "tooltip.format.spa",
+                  (spaModifier > 0 ? "+" : "") + spaModifier));
+        }
+
+        SkillAttribute firstLinkedAttribute = type.getFirstAttribute();
+        // TODO enable once attribute modifier sare implemented
+        //        int firstLinkedAttributeModifier = attributes.getAttributeModifier(firstLinkedAttribute);
+        String additionSymbol = getTextAt(RESOURCE_BUNDLE, "tooltip.format.addition");
+        int firstLinkedAttributeModifier = 0;
+        tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
+              "tooltip.format.linkedAttribute",
+              firstLinkedAttribute.getLabel(),
+              (firstLinkedAttributeModifier > 0 ? additionSymbol : "") + firstLinkedAttributeModifier));
+
+        SkillAttribute secondLinkedAttribute = type.getSecondAttribute();
+        if (secondLinkedAttribute != SkillAttribute.NONE) {
+            // TODO enable once attribute modifier sare implemented
+            //            int secondLinkedAttributeModifier = attributes.getAttributeModifier(secondLinkedAttribute);
+            int secondLinkedAttributeModifier = 0;
+            tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "tooltip.format.linkedAttribute",
+                  secondLinkedAttribute.getLabel(),
+                  (secondLinkedAttributeModifier > 0 ? additionSymbol : "") + secondLinkedAttributeModifier));
+        }
+
+        return tooltip.toString();
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {
