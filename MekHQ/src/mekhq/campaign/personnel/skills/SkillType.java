@@ -212,6 +212,9 @@ public class SkillType {
     public static final String S_RUNNING = "Running" + RP_ONLY_TAG;
     public static final String S_SWIMMING = "Swimming" + RP_ONLY_TAG;
     public static final String S_ZERO_G_OPERATIONS = "Zero-G Operations" + RP_ONLY_TAG;
+    public static final String S_MELEE_WEAPONS = "Melee Weapons" + RP_ONLY_TAG;
+    public static final String S_THROWN_WEAPONS = "Thrown Weapons" + RP_ONLY_TAG;
+    public static final String S_SUPPORT_WEAPONS = "Support Weapons" + RP_ONLY_TAG;
 
 
     public static final int NUM_LEVELS = 11;
@@ -242,7 +245,8 @@ public class SkillType {
                                                S_SCIENCE_PSYCHOLOGY, S_SCIENCE_OTHER, S_SECURITY_SYSTEMS_ELECTRONIC,
                                                S_SCIENCE_SYSTEMS_MECHANICAL, S_SENSOR_OPERATIONS, S_STEALTH,
                                                S_STREETWISE, S_SURVIVAL, S_TRACKING, S_CAREER_ANY, S_SWIMMING,
-                                               S_ZERO_G_OPERATIONS, S_RUNNING, S_TRAINING };
+                                               S_ZERO_G_OPERATIONS, S_RUNNING, S_TRAINING, S_MELEE_WEAPONS,
+                                               S_THROWN_WEAPONS, S_SUPPORT_WEAPONS };
 
 
     public static Map<String, SkillType> lookupHash;
@@ -878,6 +882,9 @@ public class SkillType {
         lookupHash.put(S_SWIMMING, createSwimming());
         lookupHash.put(S_RUNNING, createRunning());
         lookupHash.put(S_ZERO_G_OPERATIONS, createZeroGOperations());
+        lookupHash.put(S_MELEE_WEAPONS, createMeleeWeapons());
+        lookupHash.put(S_THROWN_WEAPONS, createThrownWeapons());
+        lookupHash.put(S_SUPPORT_WEAPONS, createSupportWeapons());
 
         // Remove below after Milestone Release post 0.49.19
         lookupHash.put("Piloting/Mech", createPilotingMek());
@@ -1305,6 +1312,9 @@ public class SkillType {
             case S_CAREER_ANY -> createCareer();
             case S_SWIMMING -> createSwimming();
             case S_ZERO_G_OPERATIONS -> createZeroGOperations();
+            case S_MELEE_WEAPONS -> createMeleeWeapons();
+            case S_THROWN_WEAPONS -> createThrownWeapons();
+            case S_SUPPORT_WEAPONS -> createSupportWeapons();
             case S_RUNNING -> createRunning();
             default -> {
                 logger.errorDialog("REPORT TO MEGAMEK TEAM",
@@ -2823,6 +2833,48 @@ public class SkillType {
               false,
               ROLEPLAY_GENERAL,
               REFLEXES,
+              NONE,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
+    public static SkillType createMeleeWeapons() {
+        return new SkillType(S_MELEE_WEAPONS,
+              8,
+              false,
+              ROLEPLAY_GENERAL,
+              REFLEXES,
+              DEXTERITY,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
+    public static SkillType createThrownWeapons() {
+        return new SkillType(S_THROWN_WEAPONS,
+              7,
+              false,
+              ROLEPLAY_GENERAL,
+              DEXTERITY,
+              NONE,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
+    public static SkillType createSupportWeapons() {
+        return new SkillType(S_SUPPORT_WEAPONS,
+              7,
+              false,
+              ROLEPLAY_GENERAL,
+              DEXTERITY,
               NONE,
               null,
               null,
