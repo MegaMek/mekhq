@@ -569,7 +569,7 @@ public enum PersonnelRole {
      *       otherwise.
      */
     public boolean isSupport() {
-        return isSubType(PersonnelRoleSubType.SUPPORT) || isSubType(PersonnelRoleSubType.CIVILIAN);
+        return isSupport(true);
     }
 
     /**
