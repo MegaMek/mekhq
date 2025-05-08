@@ -1139,7 +1139,6 @@ public class MissionViewPanel extends JScrollablePanel {
         scrollPaneContainer.add(scrollPane, BorderLayout.CENTER);
 
         pnlTutorial = new JPanel(new BorderLayout());
-        //        pnlTutorial.add(Box.createHorizontalStrut(20), BorderLayout.CENTER);
 
         pnlTutorial.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
         pnlTutorial.setPreferredSize(new Dimension(800, 0));
