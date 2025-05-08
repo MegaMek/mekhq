@@ -116,7 +116,15 @@ import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.AcademyFactory;
 import mekhq.campaign.personnel.education.EducationController;
-import mekhq.campaign.personnel.enums.*;
+import mekhq.campaign.personnel.enums.FamilialRelationshipType;
+import mekhq.campaign.personnel.enums.ManeiDominiClass;
+import mekhq.campaign.personnel.enums.ManeiDominiRank;
+import mekhq.campaign.personnel.enums.MergingSurnameStyle;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.enums.Profession;
+import mekhq.campaign.personnel.enums.ROMDesignation;
+import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.Genealogy;
@@ -2051,9 +2059,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     cbMenuItem.setSelected(true);
                 }
 
-                if (role.isSubType(PersonnelRoleSubType.COMBAT)) {
+                if (role.isCombat()) {
                     menuCombatPrimary.add(cbMenuItem);
-                } else if (role.isSubType(PersonnelRoleSubType.SUPPORT)) {
+                } else if (role.isSupport(true)) {
                     menuSupportPrimary.add(cbMenuItem);
                 } else {
                     menuCivilianPrimary.add(cbMenuItem);
@@ -2094,9 +2102,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     cbMenuItem.setSelected(true);
                 }
 
-                if (role.isSubType(PersonnelRoleSubType.COMBAT)) {
+                if (role.isCombat()) {
                     menuCombatSecondary.add(cbMenuItem);
-                } else if (role.isSubType(PersonnelRoleSubType.SUPPORT)) {
+                } else if (role.isSupport(true)) {
                     menuSupportSecondary.add(cbMenuItem);
                 } else {
                     menuCivilianSecondary.add(cbMenuItem);
