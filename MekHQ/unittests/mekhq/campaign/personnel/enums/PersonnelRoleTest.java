@@ -557,8 +557,8 @@ class PersonnelRoleTest {
         assertTrue(PersonnelRole.MEK_TECH.isSupport());
         assertTrue(PersonnelRole.ASTECH.isSupport());
         assertTrue(PersonnelRole.ADMINISTRATOR_COMMAND.isSupport());
-        assertTrue(PersonnelRole.DEPENDENT.isSupport());
-        assertTrue(PersonnelRole.NONE.isSupport());
+        assertFalse(PersonnelRole.DEPENDENT.isSupport());
+        assertFalse(PersonnelRole.NONE.isSupport());
         assertFalse(PersonnelRole.MEKWARRIOR.isSupport(true));
         assertFalse(PersonnelRole.VESSEL_NAVIGATOR.isSupport(true));
         assertTrue(PersonnelRole.MEK_TECH.isSupport(true));

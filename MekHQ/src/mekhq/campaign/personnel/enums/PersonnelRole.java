@@ -569,7 +569,7 @@ public enum PersonnelRole {
      *       otherwise.
      */
     public boolean isSupport() {
-        return isSubType(PersonnelRoleSubType.SUPPORT) || isSubType(PersonnelRoleSubType.CIVILIAN);
+        return isSupport(true);
     }
 
     /**
@@ -627,7 +627,9 @@ public enum PersonnelRole {
     }
 
     /**
-     * @return {@code true} if the character's assigned role is a civilian role, {@code false} otherwise.
+     * @return {@code true} if the character's assigned role has a subtype of {@link PersonnelRoleSubType#CIVILIAN},
+     *         {@code false} otherwise. This method no longer considers roles such as {@code DEPENDENT} or {@code NONE}
+     *         as civilian roles, as in previous implementations.
      */
     public boolean isCivilian() {
         return isSubType(PersonnelRoleSubType.CIVILIAN);
