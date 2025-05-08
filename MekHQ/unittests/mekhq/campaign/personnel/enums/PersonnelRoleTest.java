@@ -37,14 +37,23 @@ import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 import java.awt.event.KeyEvent;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.universe.Factions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.mockito.Mockito;
 
 class PersonnelRoleTest {
     private static final PersonnelRole[] roles = PersonnelRole.values();
@@ -602,17 +611,18 @@ class PersonnelRoleTest {
         }
     }
 
-    void isSubType() {
-        for (PersonnelRole personnelRole : roles) {
-            if (personnelRole.isSubType(PersonnelRoleSubType.COMBAT)) {
-                assertTrue(personnelRole.isCombat(), "PersonnelRole " + personnelRole + " is not a combat role.");
-            } else if (personnelRole.isSubType(PersonnelRoleSubType.SUPPORT)) {
-                assertTrue(personnelRole.isSupport(), "PersonnelRole " + personnelRole + " is not a support role.");
-            } else {
-                assertFalse(personnelRole.isCivilian(), "PersonnelRole " + personnelRole + " is not a civilian role.");
-            }
+    @ParameterizedTest
+    @EnumSource(value = PersonnelRole.class)
+    void isSubType(PersonnelRole personnelRole) {
+        if (personnelRole.isSubType(PersonnelRoleSubType.COMBAT)) {
+            assertTrue(personnelRole.isCombat(), "PersonnelRole " + personnelRole + " is not a combat role.");
+        } else if (personnelRole.isSubType(PersonnelRoleSubType.SUPPORT)) {
+            assertTrue(personnelRole.isSupport(), "PersonnelRole " + personnelRole + " is not a support role.");
+        } else {
+            assertTrue(personnelRole.isCivilian(), "PersonnelRole " + personnelRole + " is not a civilian role.");
         }
     }
+
     // endregion Boolean Comparison Methods
 
     // region Static Methods
@@ -703,6 +713,30 @@ class PersonnelRoleTest {
     }
     // endregion Static Methods
 
-    // region File I/O
-    // endregion File I/O
+    @ParameterizedTest
+    @EnumSource(value = PersonnelRole.class, names = "NONE", mode = EnumSource.Mode.EXCLUDE)
+    void testRoleEligibility(PersonnelRole role) {
+        // Setup
+        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        when(mockCampaign.getFaction()).thenReturn(Factions.getInstance().getFaction("MERC"));
+
+        Person person = new Person(mockCampaign);
+
+        SkillType.initializeTypes();
+        LocalDate today = LocalDate.of(9999, 1, 1);
+
+        // Act
+        for (String skillName : role.getSkillsForProfession()) {
+            person.addSkill(skillName, 0, 0);
+        }
+
+        // Assert
+        assertTrue(person.canPerformRole(today, role, true),
+              "Person " +
+                    person +
+                    " cannot perform role " +
+                    role +
+                    " with skills " +
+                    person.getSkills().getSkillNames());
+    }
 }

@@ -416,8 +416,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                         // We don't care about admin, doctor or tech settings, as they're not going to spawn here
                         overrideSkills(false,
                               false,
-                              false,
-                              false, campaign.getCampaignOptions().isUseArtillery(),
+                              false, false, campaign.getCampaignOptions().isUseArtillery(),
                               useExtraRandomness,
                               person,
                               person.getPrimaryRole(),
