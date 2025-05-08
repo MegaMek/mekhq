@@ -47,7 +47,6 @@ import static mekhq.campaign.log.LogEntryType.PERFORMANCE;
 import static mekhq.campaign.log.LogEntryType.SERVICE;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
-import static mekhq.campaign.personnel.enums.PersonnelRole.*;
 import static mekhq.campaign.personnel.skills.Aging.getReputationAgeModifier;
 import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
@@ -3739,7 +3738,6 @@ public class Person {
         final boolean isUseArtillery = campaignOptions.isUseArtillery();
 
         final boolean isAlternativeQualityAveraging = campaignOptions.isAlternativeQualityAveraging();
-        List<String> associatedSkillNames = new ArrayList<>();
 
         // Optional skills such as Admin for Techs are not counted towards the character's experience level, except
         // in the special case of Vehicle Gunners. So we only want to fetch the base professions.
@@ -3792,7 +3790,7 @@ public class Person {
                 yield highestExperienceLevel;
             }
             case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_HR -> {
-                int adminLevel = getSkillLevelOrNegative(S_ADMIN);
+                int adminLevel = getSkillLevelOrNegative(SkillType.S_ADMIN);
                 int negotiationLevel = getSkillLevelOrNegative(SkillType.S_NEGOTIATION);
                 int scroungeLevel = getSkillLevelOrNegative(SkillType.S_SCROUNGE);
 
