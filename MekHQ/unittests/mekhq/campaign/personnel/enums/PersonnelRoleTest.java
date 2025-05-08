@@ -413,6 +413,35 @@ class PersonnelRoleTest {
     }
 
     @Test
+    void testIsCombat() {
+        for (final PersonnelRole personnelRole : roles) {
+            switch (personnelRole) {
+                case MEKWARRIOR:
+                case LAM_PILOT:
+                case GROUND_VEHICLE_DRIVER:
+                case NAVAL_VEHICLE_DRIVER:
+                case VTOL_PILOT:
+                case VEHICLE_GUNNER:
+                case VEHICLE_CREW:
+                case AEROSPACE_PILOT:
+                case CONVENTIONAL_AIRCRAFT_PILOT:
+                case PROTOMEK_PILOT:
+                case BATTLE_ARMOUR:
+                case SOLDIER:
+                case VESSEL_PILOT:
+                case VESSEL_GUNNER:
+                case VESSEL_CREW:
+                case VESSEL_NAVIGATOR:
+                    assertTrue(personnelRole.isCombat());
+                    break;
+                default:
+                    assertFalse(personnelRole.isCombat());
+                    break;
+            }
+        }
+    }
+
+    @Test
     void testIsMekWarriorGrouping() {
         for (final PersonnelRole personnelRole : roles) {
             if ((personnelRole == PersonnelRole.MEKWARRIOR) || (personnelRole == PersonnelRole.LAM_PILOT)) {
