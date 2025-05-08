@@ -482,7 +482,7 @@ public enum PersonnelRole {
                     yield List.of(SkillType.S_ADMIN);
                 }
             }
-            case DEPENDENT, NONE -> List.of(String.valueOf(SkillType.EXP_NONE));
+            case DEPENDENT, NONE -> List.of();
             case ADULT_ENTERTAINER -> List.of(SkillType.S_ART_OTHER, SkillType.S_ACTING);
             case ANTIQUARIAN -> List.of(SkillType.S_INTEREST_ANTIQUES, SkillType.S_INTEREST_HISTORY);
             case SPORTS_STAR -> List.of(SkillType.S_CAREER_ANY, SkillType.S_INTEREST_SPORTS);

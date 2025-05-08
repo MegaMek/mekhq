@@ -102,98 +102,8 @@ public abstract class AbstractSkillGenerator {
      */
     protected void generateDefaultSkills(Person person, PersonnelRole primaryRole, int expLvl, int bonus,
           int rollModifier) {
-        switch (primaryRole) {
-            case MEKWARRIOR:
-                addSkill(person, SkillType.S_PILOT_MEK, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                addSkill(person, SkillType.S_GUN_MEK, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                break;
-            case LAM_PILOT:
-                addSkill(person, SkillType.S_PILOT_MEK, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                addSkill(person, SkillType.S_GUN_MEK, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                addSkill(person, SkillType.S_PILOT_AERO, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                addSkill(person, SkillType.S_GUN_AERO, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                break;
-            case GROUND_VEHICLE_DRIVER:
-                addSkill(person, SkillType.S_PILOT_GVEE, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                addSkill(person, SkillType.S_GUN_VEE, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                break;
-            case NAVAL_VEHICLE_DRIVER:
-                addSkill(person, SkillType.S_PILOT_NVEE, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                addSkill(person, SkillType.S_GUN_VEE, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                break;
-            case VTOL_PILOT:
-                addSkill(person, SkillType.S_PILOT_VTOL, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                addSkill(person, SkillType.S_GUN_VEE, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                break;
-            case VEHICLE_GUNNER:
-                addSkill(person, SkillType.S_GUN_VEE, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                break;
-            case VEHICLE_CREW:
-                addSkill(person, SkillType.S_TECH_MECHANIC, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                break;
-            case AEROSPACE_PILOT:
-                addSkill(person, SkillType.S_PILOT_AERO, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                addSkill(person, SkillType.S_GUN_AERO, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                break;
-            case CONVENTIONAL_AIRCRAFT_PILOT:
-                addSkill(person, SkillType.S_PILOT_JET, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                addSkill(person, SkillType.S_GUN_JET, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                break;
-            case PROTOMEK_PILOT:
-                addSkill(person, SkillType.S_GUN_PROTO, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                break;
-            case BATTLE_ARMOUR:
-                addSkill(person, SkillType.S_GUN_BA, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                addSkill(person, SkillType.S_ANTI_MEK, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                addSkill(person, SkillType.S_SMALL_ARMS, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                break;
-            case SOLDIER:
-                if (Utilities.rollProbability(rskillPrefs.getAntiMekProb())) {
-                    addSkill(person, SkillType.S_ANTI_MEK, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                }
-                addSkill(person, SkillType.S_SMALL_ARMS, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                break;
-            case VESSEL_PILOT:
-                addSkill(person, SkillType.S_PILOT_SPACE, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                break;
-            case VESSEL_GUNNER:
-                addSkill(person, SkillType.S_GUN_SPACE, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                break;
-            case VESSEL_CREW:
-                addSkill(person, SkillType.S_TECH_VESSEL, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                break;
-            case VESSEL_NAVIGATOR:
-                addSkill(person, SkillType.S_NAVIGATION, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                break;
-            case MEK_TECH:
-                addSkill(person, SkillType.S_TECH_MEK, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                break;
-            case MECHANIC:
-                addSkill(person, SkillType.S_TECH_MECHANIC, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                break;
-            case AERO_TEK:
-                addSkill(person, SkillType.S_TECH_AERO, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                break;
-            case BA_TECH:
-                addSkill(person, SkillType.S_TECH_BA, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                break;
-            case ASTECH:
-                addSkill(person, SkillType.S_ASTECH, 0, 0);
-                break;
-            case DOCTOR:
-                addSkill(person, SkillType.S_SURGERY, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                break;
-            case MEDIC:
-                addSkill(person, SkillType.S_MEDTECH, 0, 0);
-                break;
-            case ADMINISTRATOR_COMMAND:
-            case ADMINISTRATOR_LOGISTICS:
-            case ADMINISTRATOR_TRANSPORT:
-            case ADMINISTRATOR_HR:
-                addSkill(person, SkillType.S_ADMIN, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                break;
-            default:
-                break;
+        for (String skillName : primaryRole.getSkillsForProfession()) {
+            addSkill(person, skillName, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
         }
     }
 
@@ -219,6 +129,11 @@ public abstract class AbstractSkillGenerator {
     public void generateRoleplaySkills(final Person person) {
         for (SkillType skillType : getRoleplaySkills()) {
             if (DEPRECATED_SKILLS.contains(skillType)) {
+                continue;
+            }
+
+            // No double-dipping
+            if (person.hasSkill(skillType.getName())) {
                 continue;
             }
 
