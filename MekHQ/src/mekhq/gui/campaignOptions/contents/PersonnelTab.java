@@ -1314,7 +1314,7 @@ public class PersonnelTab {
 
             // JSpinner
             JSpinner jSpinner = new JSpinner();
-            jSpinner.setModel(new SpinnerNumberModel(250.0, 0.0, 1000000, 10.0));
+            jSpinner.setModel(new SpinnerNumberModel(250.0, 0.0, 1000000.0, 10.0));
             jSpinner.setName("spn" + componentName);
 
             DefaultEditor editor = (DefaultEditor) jSpinner.getEditor();
@@ -1516,9 +1516,9 @@ public class PersonnelTab {
                     if (personnelRole == PersonnelRole.NONE) {
                         continue;
                     } else if (personnelRole == PersonnelRole.DEPENDENT) {
-                        spnBaseSalary[i].setValue(50);
+                        spnBaseSalary[i].setValue(50.0);
                     } else {
-                        spnBaseSalary[i].setValue(250);
+                        spnBaseSalary[i].setValue(250.0);
                     }
                 }
             }
@@ -1624,7 +1624,7 @@ public class PersonnelTab {
         options.setSalarySpecialistInfantryMultiplier((double) spnSpecialistInfantrySalary.getValue());
 
         for (final Entry<SkillLevel, JSpinner> entry : spnSalaryExperienceMultipliers.entrySet()) {
-            options.getSalaryXPMultipliers().put(entry.getKey(), (Double) entry.getValue().getValue());
+            options.getSalaryXPMultipliers().put(entry.getKey(), (double) entry.getValue().getValue());
         }
 
         for (final PersonnelRole personnelRole : PersonnelRole.values()) {

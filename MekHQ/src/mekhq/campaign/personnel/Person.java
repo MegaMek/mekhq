@@ -1074,39 +1074,13 @@ public class Person {
         }
 
         return switch (role) {
-            case MEKWARRIOR -> hasSkill(SkillType.S_GUN_MEK) && hasSkill(SkillType.S_PILOT_MEK);
-            case LAM_PILOT ->
-                  Stream.of(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK, SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO)
-                        .allMatch(this::hasSkill);
-            case GROUND_VEHICLE_DRIVER -> hasSkill(SkillType.S_PILOT_GVEE);
-            case NAVAL_VEHICLE_DRIVER -> hasSkill(SkillType.S_PILOT_NVEE);
-            case VTOL_PILOT -> hasSkill(SkillType.S_PILOT_VTOL);
-            case VEHICLE_GUNNER -> hasSkill(SkillType.S_GUN_VEE);
-            case MECHANIC -> hasSkill(SkillType.S_TECH_MECHANIC);
             case VEHICLE_CREW -> Stream.of(SkillType.S_TECH_MEK,
                   SkillType.S_TECH_AERO,
-                  SkillType.S_TECH_MECHANIC,
-                  SkillType.S_TECH_BA, SkillType.S_SURGERY,
-                  SkillType.S_MEDTECH,
-                  SkillType.S_ASTECH).anyMatch(this::hasSkill);
-            case AEROSPACE_PILOT -> hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO);
-            case CONVENTIONAL_AIRCRAFT_PILOT -> hasSkill(SkillType.S_GUN_JET) && hasSkill(SkillType.S_PILOT_JET);
-            case PROTOMEK_PILOT -> hasSkill(SkillType.S_GUN_PROTO);
-            case BATTLE_ARMOUR -> hasSkill(SkillType.S_GUN_BA);
-            case SOLDIER -> hasSkill(SkillType.S_SMALL_ARMS);
-            case VESSEL_PILOT -> hasSkill(SkillType.S_PILOT_SPACE);
-            case VESSEL_CREW -> hasSkill(SkillType.S_TECH_VESSEL);
-            case VESSEL_GUNNER -> hasSkill(SkillType.S_GUN_SPACE);
-            case VESSEL_NAVIGATOR -> hasSkill(SkillType.S_NAVIGATION);
-            case MEK_TECH -> hasSkill(SkillType.S_TECH_MEK);
-            case AERO_TEK -> hasSkill(SkillType.S_TECH_AERO);
-            case BA_TECH -> hasSkill(SkillType.S_TECH_BA);
-            case ASTECH -> hasSkill(SkillType.S_ASTECH);
-            case DOCTOR -> hasSkill(SkillType.S_SURGERY);
-            case MEDIC -> hasSkill(SkillType.S_MEDTECH);
+                  SkillType.S_TECH_MECHANIC, SkillType.S_TECH_BA, SkillType.S_SURGERY,
+                  SkillType.S_MEDTECH, SkillType.S_ASTECH, SkillType.S_COMMUNICATIONS, SkillType.S_SENSOR_OPERATIONS)
+                                       .anyMatch(this::hasSkill);
             case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_HR ->
                   hasSkill(SkillType.S_ADMIN);
-            case DEPENDENT, NONE -> true;
             case ADULT_ENTERTAINER -> {
                 // A character under the age of 18 should never have access to this profession
                 if (getAge(today) >= 18) {
@@ -1115,121 +1089,23 @@ public class Person {
                     yield false;
                 }
             }
-            case ANTIQUARIAN -> hasSkill(SkillType.S_INTEREST_ANTIQUES) && hasSkill(SkillType.S_INTEREST_HISTORY);
-            case SPORTS_STAR -> hasSkill(SkillType.S_CAREER_ANY) && hasSkill(SkillType.S_INTEREST_SPORTS);
-            case ASTROGRAPHER -> hasSkill(SkillType.S_INTEREST_CARTOGRAPHY) && hasSkill(SkillType.S_NAVIGATION);
-            case BARBER -> hasSkill(SkillType.S_ART_OTHER) && hasSkill(SkillType.S_INTEREST_FASHION);
-            case BARTENDER -> hasSkill(SkillType.S_STREETWISE) && hasSkill(SkillType.S_INTEREST_POP_CULTURE);
-            case WAR_CORRESPONDENT -> hasSkill(SkillType.S_ART_WRITING) && hasSkill(SkillType.S_INTEREST_MILITARY);
-            case BRAWLER -> hasSkill(SkillType.S_MARTIAL_ARTS) && hasSkill(SkillType.S_STREETWISE);
-            case BROKER -> hasSkill(SkillType.S_STREETWISE) && hasSkill(SkillType.S_NEGOTIATION);
-            case CHEF -> hasSkill(SkillType.S_ART_COOKING) && hasSkill(SkillType.S_LEADER);
-            case CIVILIAN_AERO_MECHANIC -> hasSkill(SkillType.S_TECH_AERO) && hasSkill(SkillType.S_TECH_MECHANIC);
-            case CIVILIAN_DROPSHIP_PILOT -> hasSkill(SkillType.S_PILOT_SPACE) && hasSkill(SkillType.S_PROTOCOLS);
-            case CIVILIAN_GUARD -> hasSkill(SkillType.S_SMALL_ARMS) && hasSkill(SkillType.S_PERCEPTION);
-            case CIVILIAN_VTOL_PILOT -> hasSkill(SkillType.S_PILOT_VTOL) && hasSkill(SkillType.S_TECH_MECHANIC);
-            case CIVIL_CLERK -> hasSkill(SkillType.S_ADMIN) && hasSkill(SkillType.S_PROTOCOLS);
-            case CLOWN -> hasSkill(SkillType.S_ACROBATICS) && hasSkill(SkillType.S_ACTING);
-            case CON_ARTIST -> hasSkill(SkillType.S_DISGUISE) && hasSkill(SkillType.S_ACTING);
-            case MILITARY_CORONER -> hasSkill(SkillType.S_SURGERY) && hasSkill(SkillType.S_SCIENCE_PHARMACOLOGY);
-            case COURIER -> hasSkill(SkillType.S_RUNNING) && hasSkill(SkillType.S_STREETWISE);
-            case CRIMINAL_MECHANIC -> hasSkill(SkillType.S_STREETWISE) && hasSkill(SkillType.S_TECH_MECHANIC);
-            case CULTURAL_CENSOR ->
-                  hasSkill(SkillType.S_INTEREST_POLITICS) && hasSkill(SkillType.S_INTEREST_LITERATURE);
-            case CULTURAL_LIAISON -> hasSkill(SkillType.S_PROTOCOLS) && hasSkill(SkillType.S_LANGUAGES);
-            case CUSTOMS_INSPECTOR -> hasSkill(SkillType.S_INVESTIGATION) && hasSkill(SkillType.S_PROTOCOLS);
-            case DATA_SMUGGLER -> hasSkill(SkillType.S_COMPUTERS) && hasSkill(SkillType.S_SECURITY_SYSTEMS_ELECTRONIC);
-            case DATA_ANALYST -> hasSkill(SkillType.S_COMPUTERS) && hasSkill(SkillType.S_SCIENCE_MATHEMATICS);
-            case SPACEPORT_WORKER -> hasSkill(SkillType.S_ASTECH) && hasSkill(SkillType.S_PILOT_GVEE);
-            case DRUG_DEALER -> hasSkill(SkillType.S_STREETWISE) && hasSkill(SkillType.S_SCIENCE_PHARMACOLOGY);
-            case FACTORY_WORKER -> hasSkill(SkillType.S_ASTECH) && hasSkill(SkillType.S_TECH_MECHANIC);
-            case LIVESTOCK_FARMER -> hasSkill(SkillType.S_ANIMAL_HANDLING) && hasSkill(SkillType.S_SCIENCE_XENOBIOLOGY);
-            case AGRI_FARMER -> hasSkill(SkillType.S_ASTECH) && hasSkill(SkillType.S_SCIENCE_BIOLOGY);
-            case FIREFIGHTER -> hasSkill(SkillType.S_PILOT_GVEE) && hasSkill(SkillType.S_ANTI_MEK);
-            case FISHER -> hasSkill(SkillType.S_INTEREST_FISHING) && hasSkill(SkillType.S_PILOT_NVEE);
-            case FORGER -> hasSkill(SkillType.S_FORGERY) && hasSkill(SkillType.S_STREETWISE);
-            case GAMBLER -> hasSkill(SkillType.S_APPRAISAL) && hasSkill(SkillType.S_INTEREST_GAMBLING);
-            case CIVILIAN_DOCTOR -> hasSkill(SkillType.S_SURGERY) && hasSkill(SkillType.S_ADMIN);
-            case HACKER -> hasSkill(SkillType.S_CRYPTOGRAPHY) && hasSkill(SkillType.S_COMPUTERS);
-            case HERALD -> hasSkill(SkillType.S_ACTING) && hasSkill(SkillType.S_PROTOCOLS);
-            case HISTORIAN -> hasSkill(SkillType.S_INTEREST_HISTORY) && hasSkill(SkillType.S_ART_WRITING);
-            case HOLO_CARTOGRAPHER ->
-                  hasSkill(SkillType.S_INTEREST_CARTOGRAPHY) && hasSkill(SkillType.S_SCIENCE_GEOLOGY);
-            case HOLO_GAMER -> hasSkill(SkillType.S_INTEREST_HOLO_GAMES) && hasSkill(SkillType.S_COMPUTERS);
-            case HOLO_JOURNALIST -> hasSkill(SkillType.S_INVESTIGATION) && hasSkill(SkillType.S_ART_WRITING);
-            case HOLO_STAR -> hasSkill(SkillType.S_ACTING) && hasSkill(SkillType.S_INTEREST_HOLO_CINEMA);
-            case INDUSTRIAL_MEK_PILOT -> hasSkill(SkillType.S_PILOT_MEK) && hasSkill(SkillType.S_TECH_MEK);
-            case INFORMATION_BROKER -> hasSkill(SkillType.S_STREETWISE) && hasSkill(SkillType.S_INVESTIGATION);
-            case MILITARY_LIAISON -> hasSkill(SkillType.S_INVESTIGATION) && hasSkill(SkillType.S_COMMUNICATIONS);
-            case JANITOR -> hasSkill(SkillType.S_ASTECH) && hasSkill(SkillType.S_CAREER_ANY);
-            case JUMPSHIP_CHEF -> hasSkill(SkillType.S_ART_COOKING) && hasSkill(SkillType.S_ZERO_G_OPERATIONS);
-            case EXOSKELETON_LABORER -> hasSkill(SkillType.S_ASTECH) && hasSkill(SkillType.S_TECH_BA);
-            case LAWYER -> hasSkill(SkillType.S_NEGOTIATION) && hasSkill(SkillType.S_INTEREST_LAW);
-            case PROPHET -> hasSkill(SkillType.S_INTEREST_ASTROLOGY) && hasSkill(SkillType.S_INTEREST_THEOLOGY);
-            case RELIC_HUNTER -> hasSkill(SkillType.S_INTEREST_ARCHEOLOGY) && hasSkill(SkillType.S_SURVIVAL);
-            case MEDIATOR -> hasSkill(SkillType.S_NEGOTIATION) && hasSkill(SkillType.S_INTEREST_POLITICS);
-            case MEDICAL_RESEARCHER ->
-                  hasSkill(SkillType.S_SCIENCE_PHARMACOLOGY) && hasSkill(SkillType.S_SCIENCE_BIOLOGY);
-            case MEK_RANGE_INSTRUCTOR -> hasSkill(SkillType.S_GUN_MEK) && hasSkill(SkillType.S_LEADER);
-            case MERCHANT -> hasSkill(SkillType.S_NEGOTIATION) && hasSkill(SkillType.S_APPRAISAL);
-            case MILITARY_ACCOUNTANT -> hasSkill(SkillType.S_INTEREST_ECONOMICS) && hasSkill(SkillType.S_ADMIN);
-            case MILITARY_ANALYST -> hasSkill(SkillType.S_STRATEGY) && hasSkill(SkillType.S_SCIENCE_MATHEMATICS);
-            case SPY -> hasSkill(SkillType.S_STEALTH) && hasSkill(SkillType.S_DISGUISE);
-            case MILITARY_THEORIST -> hasSkill(SkillType.S_TACTICS) && hasSkill(SkillType.S_INTEREST_MILITARY);
-            case MINER -> hasSkill(SkillType.S_DEMOLITIONS) && hasSkill(SkillType.S_TECH_MECHANIC);
-            case MOUNTAIN_CLIMBER -> hasSkill(SkillType.S_ANTI_MEK) && hasSkill(SkillType.S_SURVIVAL);
-            case FACTORY_FOREMAN -> hasSkill(SkillType.S_ASTECH) && hasSkill(SkillType.S_ADMIN);
-            case MUNITIONS_FACTORY_WORKER -> hasSkill(SkillType.S_DEMOLITIONS) && hasSkill(SkillType.S_ASTECH);
-            case MUSICIAN -> hasSkill(SkillType.S_ART_INSTRUMENT) && hasSkill(SkillType.S_INTEREST_MUSIC);
-            case ORBITAL_DEFENSE_GUNNER -> hasSkill(SkillType.S_GUN_VEE) && hasSkill(SkillType.S_TECH_MECHANIC);
-            case ORBITAL_SHUTTLE_PILOT -> hasSkill(SkillType.S_PILOT_AERO) && hasSkill(SkillType.S_PROTOCOLS);
-            case PARAMEDIC -> hasSkill(SkillType.S_MEDTECH) && hasSkill(SkillType.S_PILOT_GVEE);
-            case PAINTER -> hasSkill(SkillType.S_ART_PAINTING) && hasSkill(SkillType.S_INTEREST_MYTHOLOGY);
-            case PATHFINDER -> hasSkill(SkillType.S_TRACKING) && hasSkill(SkillType.S_SURVIVAL);
-            case PERFORMER -> hasSkill(SkillType.S_ART_SINGING) && hasSkill(SkillType.S_ART_DANCING);
-            case PERSONAL_VALET -> hasSkill(SkillType.S_PROTOCOLS) && hasSkill(SkillType.S_PILOT_GVEE);
-            case ESCAPED_PRISONER -> hasSkill(SkillType.S_ESCAPE_ARTIST) && hasSkill(SkillType.S_STEALTH);
-            case PROPAGANDIST -> hasSkill(SkillType.S_ART_WRITING) && hasSkill(SkillType.S_INTEREST_POLITICS);
-            case PSYCHOLOGIST -> hasSkill(SkillType.S_SCIENCE_PSYCHOLOGY) && hasSkill(SkillType.S_NEGOTIATION);
-            case FIRING_RANGE_SAFETY_OFFICER -> hasSkill(SkillType.S_SMALL_ARMS) && hasSkill(SkillType.S_LEADER);
-            case RECRUITMENT_SCREENING_OFFICER ->
-                  hasSkill(SkillType.S_INTERROGATION) && hasSkill(SkillType.S_SCIENCE_PSYCHOLOGY);
-            case RELIGIOUS_LEADER -> hasSkill(SkillType.S_INTEREST_THEOLOGY) && hasSkill(SkillType.S_LEADER);
-            case REPAIR_BAY_SUPERVISOR -> hasSkill(SkillType.S_TECH_MECHANIC) && hasSkill(SkillType.S_LEADER);
-            case REVOLUTIONIST -> hasSkill(SkillType.S_INTEREST_POLITICS) && hasSkill(SkillType.S_LEADER);
-            case RITUALIST -> hasSkill(SkillType.S_INTEREST_THEOLOGY) && hasSkill(SkillType.S_ART_DANCING);
-            case SALVAGE_RAT -> hasSkill(SkillType.S_TECH_MECHANIC) && hasSkill(SkillType.S_TECH_MEK);
-            case SCRIBE -> hasSkill(SkillType.S_ADMIN) && hasSkill(SkillType.S_ART_WRITING);
-            case SCULPTURER -> hasSkill(SkillType.S_ART_SCULPTURE) && hasSkill(SkillType.S_APPRAISAL);
-            case SENSOR_TECHNICIAN -> hasSkill(SkillType.S_SENSOR_OPERATIONS) && hasSkill(SkillType.S_COMPUTERS);
-            case CIVILIAN_PILOT -> hasSkill(SkillType.S_PILOT_JET) && hasSkill(SkillType.S_PROTOCOLS);
-            case STREET_SURGEON -> hasSkill(SkillType.S_SURGERY) && hasSkill(SkillType.S_STREETWISE);
-            case SWIMMING_INSTRUCTOR -> hasSkill(SkillType.S_SWIMMING) && hasSkill(SkillType.S_TRAINING);
-            case TACTICAL_ANALYST -> hasSkill(SkillType.S_TACTICS) && hasSkill(SkillType.S_COMPUTERS);
-            case TAILOR -> hasSkill(SkillType.S_ART_OTHER) && hasSkill(SkillType.S_INTEREST_FASHION);
-            case TEACHER -> hasSkill(SkillType.S_LEADER) && hasSkill(SkillType.S_TRAINING);
-            case TECH_COMMUNICATIONS -> hasSkill(SkillType.S_COMMUNICATIONS) && hasSkill(SkillType.S_TECH_MECHANIC);
-            case TECH_ZERO_G -> hasSkill(SkillType.S_ZERO_G_OPERATIONS) && hasSkill(SkillType.S_TECH_VESSEL);
-            case TECH_HYDROPONICS -> hasSkill(SkillType.S_ASTECH) && hasSkill(SkillType.S_SCIENCE_BIOLOGY);
-            case TECH_FUSION_PLANT -> hasSkill(SkillType.S_ASTECH) && hasSkill(SkillType.S_SCIENCE_PHYSICS);
-            case TECH_SECURITY -> hasSkill(SkillType.S_SECURITY_SYSTEMS_ELECTRONIC) &&
-                                        hasSkill(SkillType.S_SECURITY_SYSTEMS_MECHANICAL);
-            case TECH_WASTE_MANAGEMENT -> hasSkill(SkillType.S_ASTECH) && hasSkill(SkillType.S_CAREER_ANY);
-            case TECH_WATER_RECLAMATION -> hasSkill(SkillType.S_ASTECH) && hasSkill(SkillType.S_SCIENCE_CHEMISTRY);
-            case THIEF -> hasSkill(SkillType.S_SLEIGHT_OF_HAND) && hasSkill(SkillType.S_STREETWISE);
-            case TRAINING_SIM_OPERATOR -> hasSkill(SkillType.S_COMPUTERS) && hasSkill(SkillType.S_TRAINING);
-            case TRANSPORT_DRIVER -> hasSkill(SkillType.S_PILOT_GVEE) && hasSkill(SkillType.S_TECH_MECHANIC);
-            case ARTIST -> hasSkill(SkillType.S_ART_DRAWING) && hasSkill(SkillType.S_COMPUTERS);
-            case FENCE -> hasSkill(SkillType.S_APPRAISAL) && hasSkill(SkillType.S_STREETWISE);
-            case WAREHOUSE_WORKER -> hasSkill(SkillType.S_ASTECH) && hasSkill(SkillType.S_ADMIN);
-            case WARFARE_PLANNER -> hasSkill(SkillType.S_STRATEGY) && hasSkill(SkillType.S_INTEREST_MILITARY);
-            case WEATHERCASTER -> hasSkill(SkillType.S_SCIENCE_PHYSICS) && hasSkill(SkillType.S_ACTING);
-            case XENOANIMAL_TRAINER ->
-                  hasSkill(SkillType.S_INTEREST_EXOTIC_ANIMALS) && hasSkill(SkillType.S_ANIMAL_HANDLING);
-            case XENO_BIOLOGIST -> hasSkill(SkillType.S_SCIENCE_XENOBIOLOGY) && hasSkill(SkillType.S_SCIENCE_BIOLOGY);
-            case GENETICIST -> hasSkill(SkillType.S_SCIENCE_BIOLOGY) && hasSkill(SkillType.S_SCIENCE_GENETICS);
-            case BURGLAR -> hasSkill(SkillType.S_STEALTH) && hasSkill(SkillType.S_ACROBATICS);
-            case MISCELLANEOUS_JOB -> hasSkill(SkillType.S_CAREER_ANY);
+            case LUXURY_COMPANION -> {
+                // A character under the age of 18 should never have access to this profession
+                if (getAge(today) >= 18) {
+                    yield hasSkill(SkillType.S_ACTING) && hasSkill(SkillType.S_PROTOCOLS);
+                } else {
+                    yield false;
+                }
+            }
+            default -> {
+                for (String skillName : role.getSkillsForProfession()) {
+                    if (!hasSkill(skillName)) {
+                        yield false;
+                    }
+                }
+
+                yield true;
+            }
         };
     }
     // endregion Personnel Roles
@@ -4041,8 +3917,8 @@ public class Person {
                 return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
                       associatedSkillNames.get(1),
                       isAlternativeQualityAveraging);
-            case CIVILIAN_GUARD:
-                associatedSkillNames = CIVILIAN_GUARD.getSkillsForProfession();
+            case POLICE_OFFICER:
+                associatedSkillNames = POLICE_OFFICER.getSkillsForProfession();
                 return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
                       associatedSkillNames.get(1),
                       isAlternativeQualityAveraging);
@@ -4141,8 +4017,8 @@ public class Person {
                 return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
                       associatedSkillNames.get(1),
                       isAlternativeQualityAveraging);
-            case FORGER:
-                associatedSkillNames = FORGER.getSkillsForProfession();
+            case COUNTERFEITER:
+                associatedSkillNames = COUNTERFEITER.getSkillsForProfession();
                 return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
                       associatedSkillNames.get(1),
                       isAlternativeQualityAveraging);
@@ -4483,11 +4359,6 @@ public class Person {
                       isAlternativeQualityAveraging);
             case ARTIST:
                 associatedSkillNames = ARTIST.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case FENCE:
-                associatedSkillNames = FENCE.getSkillsForProfession();
                 return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
                       associatedSkillNames.get(1),
                       isAlternativeQualityAveraging);

@@ -161,7 +161,7 @@ public enum PersonnelRole {
     CHEF(KeyEvent.VK_UNDEFINED),
     CIVILIAN_AERO_MECHANIC(KeyEvent.VK_UNDEFINED),
     CIVILIAN_DROPSHIP_PILOT(KeyEvent.VK_UNDEFINED),
-    CIVILIAN_GUARD(KeyEvent.VK_UNDEFINED),
+    POLICE_OFFICER(KeyEvent.VK_UNDEFINED),
     CIVILIAN_VTOL_PILOT(KeyEvent.VK_UNDEFINED),
     CIVIL_CLERK(KeyEvent.VK_UNDEFINED),
     CLOWN(KeyEvent.VK_UNDEFINED),
@@ -180,7 +180,7 @@ public enum PersonnelRole {
     AGRI_FARMER(KeyEvent.VK_UNDEFINED),
     FIREFIGHTER(KeyEvent.VK_UNDEFINED),
     FISHER(KeyEvent.VK_UNDEFINED),
-    FORGER(KeyEvent.VK_UNDEFINED),
+    COUNTERFEITER(KeyEvent.VK_UNDEFINED),
     GAMBLER(KeyEvent.VK_UNDEFINED),
     CIVILIAN_DOCTOR(KeyEvent.VK_UNDEFINED),
     HACKER(KeyEvent.VK_UNDEFINED),
@@ -245,17 +245,102 @@ public enum PersonnelRole {
     TECH_WASTE_MANAGEMENT(KeyEvent.VK_UNDEFINED),
     TECH_WATER_RECLAMATION(KeyEvent.VK_UNDEFINED),
     THIEF(KeyEvent.VK_UNDEFINED),
+    BURGLAR(KeyEvent.VK_UNDEFINED),
     TRAINING_SIM_OPERATOR(KeyEvent.VK_UNDEFINED),
     TRANSPORT_DRIVER(KeyEvent.VK_UNDEFINED),
     ARTIST(KeyEvent.VK_UNDEFINED),
-    FENCE(KeyEvent.VK_UNDEFINED),
     WAREHOUSE_WORKER(KeyEvent.VK_UNDEFINED),
     WARFARE_PLANNER(KeyEvent.VK_UNDEFINED),
     WEATHERCASTER(KeyEvent.VK_UNDEFINED),
     XENOANIMAL_TRAINER(KeyEvent.VK_UNDEFINED),
     XENO_BIOLOGIST(KeyEvent.VK_UNDEFINED),
     GENETICIST(KeyEvent.VK_UNDEFINED),
-    BURGLAR(KeyEvent.VK_UNDEFINED),
+    MASSEUSE(KeyEvent.VK_UNDEFINED),
+    BODYGUARD(KeyEvent.VK_UNDEFINED),
+    ARTISAN_MICROBREWER(KeyEvent.VK_UNDEFINED),
+    INTERSTELLAR_TOURISM_GUIDE(KeyEvent.VK_UNDEFINED),
+    CORPORATE_CONCIERGE(KeyEvent.VK_UNDEFINED),
+    VIRTUAL_REALITY_THERAPIST(KeyEvent.VK_UNDEFINED),
+    EXOTIC_PET_CARETAKER(KeyEvent.VK_UNDEFINED),
+    CULTURAL_SENSITIVITY_ADVISOR(KeyEvent.VK_UNDEFINED),
+    PLANETARY_IMMIGRATION_ASSESSOR(KeyEvent.VK_UNDEFINED),
+    PERSONAL_ASSISTANT(KeyEvent.VK_UNDEFINED),
+    PENNILESS_NOBLE(KeyEvent.VK_UNDEFINED),
+    AIDE_DE_CAMP(KeyEvent.VK_UNDEFINED),
+    NEUROHELMET_INTERFACE_CALIBRATOR(KeyEvent.VK_UNDEFINED),
+    CIVILIAN_AEROSPACE_INSTRUCTOR(KeyEvent.VK_UNDEFINED),
+    CIVILIAN_JUMPSHIP_NAVIGATOR(KeyEvent.VK_UNDEFINED),
+    POLITICAL_AGITATOR(KeyEvent.VK_UNDEFINED),
+    NOBLE_STEWARD(KeyEvent.VK_UNDEFINED),
+    BATTLE_ROM_EDITOR(KeyEvent.VK_UNDEFINED),
+    LUXURY_COMPANION(KeyEvent.VK_UNDEFINED),
+    PLANETARY_SURVEYOR(KeyEvent.VK_UNDEFINED),
+    DISGRACED_NOBLE(KeyEvent.VK_UNDEFINED),
+    SPACEPORT_BUREAUCRAT(KeyEvent.VK_UNDEFINED),
+    VR_ENTERTAINER(KeyEvent.VK_UNDEFINED),
+    PERSONAL_ARCHIVIST(KeyEvent.VK_UNDEFINED),
+    INDUSTRIAL_INSPECTOR(KeyEvent.VK_UNDEFINED),
+    SPACEPORT_COURIER(KeyEvent.VK_UNDEFINED),
+    MEKBAY_SCHEDULER(KeyEvent.VK_UNDEFINED),
+    MILITARY_CONTRACTOR(KeyEvent.VK_UNDEFINED),
+    MILITARY_HOLO_FILMER(KeyEvent.VK_UNDEFINED),
+    WEAPONS_TESTER(KeyEvent.VK_UNDEFINED),
+    PARAMILITARY_TRAINER(KeyEvent.VK_UNDEFINED),
+    MILITIA_LEADER(KeyEvent.VK_UNDEFINED),
+    FIELD_HOSPITAL_ADMINISTRATOR(KeyEvent.VK_UNDEFINED),
+    CIVILIAN_REQUISITION_OFFICER(KeyEvent.VK_UNDEFINED),
+    TRAINING_SIM_DESIGNER(KeyEvent.VK_UNDEFINED),
+    COMMS_OPERATOR(KeyEvent.VK_UNDEFINED),
+    DECOMMISSIONING_SPECIALIST(KeyEvent.VK_UNDEFINED),
+    WAR_CRIME_INVESTIGATOR(KeyEvent.VK_UNDEFINED),
+    SECURITY_ADVISOR(KeyEvent.VK_UNDEFINED),
+    MILITARY_RECRUITER(KeyEvent.VK_UNDEFINED),
+    MILITARY_PONY_EXPRESS_COURIER(KeyEvent.VK_UNDEFINED),
+    MILITARY_PAINTER(KeyEvent.VK_UNDEFINED),
+    MORALE_OFFICER(KeyEvent.VK_UNDEFINED),
+    COMBAT_CHAPLAIN(KeyEvent.VK_UNDEFINED),
+    LOGISTICS_COORDINATOR(KeyEvent.VK_UNDEFINED),
+    FOOD_TRUCK_OPERATOR(KeyEvent.VK_UNDEFINED),
+    MESS_HALL_MANAGER(KeyEvent.VK_UNDEFINED),
+    CIVILIAN_LIAISON(KeyEvent.VK_UNDEFINED),
+    FIELD_LAUNDRY_OPERATOR(KeyEvent.VK_UNDEFINED),
+    MUNITIONS_CLERK(KeyEvent.VK_UNDEFINED),
+    SECURITY_DESK_OPERATOR(KeyEvent.VK_UNDEFINED),
+    ARMS_DEALER(KeyEvent.VK_UNDEFINED),
+    DATA_LAUNDERER(KeyEvent.VK_UNDEFINED),
+    UNLICENSED_CHEMIST(KeyEvent.VK_UNDEFINED),
+    SMUGGLER(KeyEvent.VK_UNDEFINED),
+    PROTECTION_RACKETEER(KeyEvent.VK_UNDEFINED),
+    THUG(KeyEvent.VK_UNDEFINED),
+    GANG_LEADER(KeyEvent.VK_UNDEFINED),
+    PRISON_FIXER(KeyEvent.VK_UNDEFINED),
+    TORTURER(KeyEvent.VK_UNDEFINED),
+    INTELLIGENCE_ANALYST(KeyEvent.VK_UNDEFINED),
+    CODEBREAKER(KeyEvent.VK_UNDEFINED),
+    COUNTERINTELLIGENCE_LIAISON(KeyEvent.VK_UNDEFINED),
+    DATA_INTERCEPT_OPERATOR(KeyEvent.VK_UNDEFINED),
+    SURVEILLANCE_EXPERT(KeyEvent.VK_UNDEFINED),
+    TECH_ENCRYPTION(KeyEvent.VK_UNDEFINED),
+    DEEP_COVER_OPERATIVE(KeyEvent.VK_UNDEFINED),
+    INTERROGATOR(KeyEvent.VK_UNDEFINED),
+    DATA_HARVESTER(KeyEvent.VK_UNDEFINED),
+    SIGNAL_JAMMING_SPECIALIST(KeyEvent.VK_UNDEFINED),
+    CORPORATE_ESPIONAGE_AGENT(KeyEvent.VK_UNDEFINED),
+    LOYALTY_MONITOR(KeyEvent.VK_UNDEFINED),
+    MEDIA_MANIPULATOR(KeyEvent.VK_UNDEFINED),
+    CIVILIAN_DEBRIEFER(KeyEvent.VK_UNDEFINED),
+    SPACEPORT_ENGINEER(KeyEvent.VK_UNDEFINED),
+    FRONTIER_DOCTOR(KeyEvent.VK_UNDEFINED),
+    DOOMSDAY_PREACHER(KeyEvent.VK_UNDEFINED),
+    TAX_AUDITOR(KeyEvent.VK_UNDEFINED),
+    MARKET_MANIPULATOR(KeyEvent.VK_UNDEFINED),
+    SUBVERSIVE_POET(KeyEvent.VK_UNDEFINED),
+    LEGAL_ARCHIVIST(KeyEvent.VK_UNDEFINED),
+    CONFLICT_RESOLUTION_TRAINER(KeyEvent.VK_UNDEFINED),
+    DUELIST(KeyEvent.VK_UNDEFINED),
+    SCANDAL_FIXER(KeyEvent.VK_UNDEFINED),
+    RELATIONSHIP_MATCHMAKER(KeyEvent.VK_UNDEFINED),
+    PRISON_GUARD(KeyEvent.VK_UNDEFINED),
     MISCELLANEOUS_JOB(KeyEvent.VK_UNDEFINED);
     // endregion Enum Declarations
 
@@ -495,7 +580,7 @@ public enum PersonnelRole {
             case CHEF -> List.of(SkillType.S_ART_COOKING, SkillType.S_LEADER);
             case CIVILIAN_AERO_MECHANIC -> List.of(SkillType.S_TECH_AERO, SkillType.S_TECH_MECHANIC);
             case CIVILIAN_DROPSHIP_PILOT -> List.of(SkillType.S_PILOT_SPACE, SkillType.S_PROTOCOLS);
-            case CIVILIAN_GUARD -> List.of(SkillType.S_SMALL_ARMS, SkillType.S_PERCEPTION);
+            case POLICE_OFFICER -> List.of(SkillType.S_SMALL_ARMS, SkillType.S_INVESTIGATION);
             case CIVILIAN_VTOL_PILOT -> List.of(SkillType.S_PILOT_VTOL, SkillType.S_TECH_MECHANIC);
             case CIVIL_CLERK -> List.of(SkillType.S_ADMIN, SkillType.S_PROTOCOLS);
             case CLOWN -> List.of(SkillType.S_ACROBATICS, SkillType.S_ACTING);
@@ -515,7 +600,6 @@ public enum PersonnelRole {
             case AGRI_FARMER -> List.of(SkillType.S_ASTECH, SkillType.S_SCIENCE_BIOLOGY);
             case FIREFIGHTER -> List.of(SkillType.S_PILOT_GVEE, SkillType.S_ANTI_MEK);
             case FISHER -> List.of(SkillType.S_INTEREST_FISHING, SkillType.S_PILOT_NVEE);
-            case FORGER -> List.of(SkillType.S_FORGERY, SkillType.S_STREETWISE);
             case GAMBLER -> List.of(SkillType.S_APPRAISAL, SkillType.S_INTEREST_GAMBLING);
             case CIVILIAN_DOCTOR -> List.of(SkillType.S_SURGERY, SkillType.S_ADMIN);
             case HACKER -> List.of(SkillType.S_CRYPTOGRAPHY, SkillType.S_COMPUTERS);
@@ -586,13 +670,100 @@ public enum PersonnelRole {
             case TRAINING_SIM_OPERATOR -> List.of(SkillType.S_COMPUTERS, SkillType.S_TRAINING);
             case TRANSPORT_DRIVER -> List.of(SkillType.S_PILOT_GVEE, SkillType.S_TECH_MECHANIC);
             case ARTIST -> List.of(SkillType.S_ART_DRAWING, SkillType.S_COMPUTERS);
-            case FENCE -> List.of(SkillType.S_APPRAISAL, SkillType.S_STREETWISE);
+            case COUNTERFEITER -> List.of(SkillType.S_APPRAISAL, SkillType.S_STREETWISE);
             case WAREHOUSE_WORKER -> List.of(SkillType.S_ASTECH, SkillType.S_ADMIN);
             case WARFARE_PLANNER -> List.of(SkillType.S_STRATEGY, SkillType.S_INTEREST_MILITARY);
             case WEATHERCASTER -> List.of(SkillType.S_SCIENCE_PHYSICS, SkillType.S_ACTING);
             case XENOANIMAL_TRAINER -> List.of(SkillType.S_INTEREST_EXOTIC_ANIMALS, SkillType.S_ANIMAL_HANDLING);
             case XENO_BIOLOGIST -> List.of(SkillType.S_SCIENCE_XENOBIOLOGY, SkillType.S_SCIENCE_BIOLOGY);
             case GENETICIST -> List.of(SkillType.S_SCIENCE_BIOLOGY, SkillType.S_SCIENCE_GENETICS);
+            case MASSEUSE -> List.of(SkillType.S_ART_OTHER, SkillType.S_MEDTECH);
+            case BODYGUARD -> List.of(SkillType.S_SMALL_ARMS, SkillType.S_PERCEPTION);
+            case ARTISAN_MICROBREWER -> List.of(SkillType.S_SCIENCE_CHEMISTRY, SkillType.S_ART_COOKING);
+            case INTERSTELLAR_TOURISM_GUIDE -> List.of(SkillType.S_PROTOCOLS, SkillType.S_LANGUAGES);
+            case CORPORATE_CONCIERGE -> List.of(SkillType.S_PROTOCOLS, SkillType.S_STREETWISE);
+            case VIRTUAL_REALITY_THERAPIST -> List.of(SkillType.S_COMPUTERS, SkillType.S_SCIENCE_PSYCHOLOGY);
+            case EXOTIC_PET_CARETAKER -> List.of(SkillType.S_ANIMAL_HANDLING, SkillType.S_SCIENCE_XENOBIOLOGY);
+            case CULTURAL_SENSITIVITY_ADVISOR -> List.of(SkillType.S_PROTOCOLS, SkillType.S_SCIENCE_PSYCHOLOGY);
+            case PLANETARY_IMMIGRATION_ASSESSOR -> List.of(SkillType.S_ADMIN, SkillType.S_LANGUAGES);
+            case PERSONAL_ASSISTANT -> List.of(SkillType.S_ADMIN, SkillType.S_PROTOCOLS);
+            case PENNILESS_NOBLE -> List.of(SkillType.S_INTEREST_POLITICS, SkillType.S_LEADER);
+            case AIDE_DE_CAMP -> List.of(SkillType.S_ADMIN, SkillType.S_PROTOCOLS);
+            case NEUROHELMET_INTERFACE_CALIBRATOR -> List.of(SkillType.S_COMPUTERS, SkillType.S_TECH_MEK);
+            case CIVILIAN_AEROSPACE_INSTRUCTOR -> List.of(SkillType.S_TRAINING, SkillType.S_PILOT_AERO);
+            case CIVILIAN_JUMPSHIP_NAVIGATOR -> List.of(SkillType.S_NAVIGATION, SkillType.S_SCIENCE_MATHEMATICS);
+            case POLITICAL_AGITATOR -> List.of(SkillType.S_INTEREST_POLITICS, SkillType.S_ACTING);
+            case NOBLE_STEWARD -> List.of(SkillType.S_ADMIN, SkillType.S_PROTOCOLS);
+            case BATTLE_ROM_EDITOR -> List.of(SkillType.S_INTEREST_HOLO_CINEMA, SkillType.S_INTEREST_POLITICS);
+            case LUXURY_COMPANION -> List.of(SkillType.S_ACTING, SkillType.S_PROTOCOLS);
+            case PLANETARY_SURVEYOR -> List.of(SkillType.S_SCIENCE_GEOLOGY, SkillType.S_NAVIGATION);
+            case DISGRACED_NOBLE -> List.of(SkillType.S_NEGOTIATION, SkillType.S_STREETWISE);
+            case SPACEPORT_BUREAUCRAT -> List.of(SkillType.S_ADMIN, SkillType.S_PROTOCOLS);
+            case VR_ENTERTAINER -> List.of(SkillType.S_ACTING, SkillType.S_COMPUTERS);
+            case PERSONAL_ARCHIVIST -> List.of(SkillType.S_ART_WRITING, SkillType.S_INTEREST_HISTORY);
+            case INDUSTRIAL_INSPECTOR -> List.of(SkillType.S_INVESTIGATION, SkillType.S_TECH_MECHANIC);
+            case SPACEPORT_COURIER -> List.of(SkillType.S_RUNNING, SkillType.S_PILOT_GVEE);
+            case MEKBAY_SCHEDULER -> List.of(SkillType.S_ADMIN, SkillType.S_ASTECH);
+            case MILITARY_CONTRACTOR -> List.of(SkillType.S_NEGOTIATION, SkillType.S_TECH_MECHANIC);
+            case MILITARY_HOLO_FILMER -> List.of(SkillType.S_SMALL_ARMS, SkillType.S_INTEREST_HOLO_CINEMA);
+            case WEAPONS_TESTER -> List.of(SkillType.S_SMALL_ARMS, SkillType.S_TECH_MECHANIC);
+            case PARAMILITARY_TRAINER -> List.of(SkillType.S_SMALL_ARMS, SkillType.S_TRAINING);
+            case MILITIA_LEADER -> List.of(SkillType.S_SMALL_ARMS, SkillType.S_LEADER);
+            case FIELD_HOSPITAL_ADMINISTRATOR -> List.of(SkillType.S_ADMIN, SkillType.S_MEDTECH);
+            case CIVILIAN_REQUISITION_OFFICER -> List.of(SkillType.S_NEGOTIATION, SkillType.S_ADMIN);
+            case TRAINING_SIM_DESIGNER -> List.of(SkillType.S_COMPUTERS, SkillType.S_TACTICS);
+            case COMMS_OPERATOR -> List.of(SkillType.S_COMMUNICATIONS, SkillType.S_ADMIN);
+            case DECOMMISSIONING_SPECIALIST -> List.of(SkillType.S_TECH_MEK, SkillType.S_APPRAISAL);
+            case WAR_CRIME_INVESTIGATOR -> List.of(SkillType.S_INVESTIGATION, SkillType.S_INTEREST_HISTORY);
+            case SECURITY_ADVISOR -> List.of(SkillType.S_TACTICS, SkillType.S_SECURITY_SYSTEMS_ELECTRONIC);
+            case MILITARY_PONY_EXPRESS_COURIER -> List.of(SkillType.S_PILOT_SPACE, SkillType.S_STEALTH);
+            case MILITARY_RECRUITER -> List.of(SkillType.S_NEGOTIATION, SkillType.S_LEADER);
+            case MILITARY_PAINTER -> List.of(SkillType.S_ART_PAINTING, SkillType.S_INTEREST_MILITARY);
+            case MORALE_OFFICER -> List.of(SkillType.S_ACTING, SkillType.S_LEADER);
+            case COMBAT_CHAPLAIN -> List.of(SkillType.S_INTEREST_THEOLOGY, SkillType.S_MEDTECH);
+            case LOGISTICS_COORDINATOR -> List.of(SkillType.S_ADMIN, SkillType.S_PILOT_GVEE);
+            case FOOD_TRUCK_OPERATOR -> List.of(SkillType.S_ART_COOKING, SkillType.S_PILOT_GVEE);
+            case MESS_HALL_MANAGER -> List.of(SkillType.S_ART_COOKING, SkillType.S_ADMIN);
+            case CIVILIAN_LIAISON -> List.of(SkillType.S_ACTING, SkillType.S_NEGOTIATION);
+            case FIELD_LAUNDRY_OPERATOR -> List.of(SkillType.S_ASTECH, SkillType.S_CAREER_ANY);
+            case MUNITIONS_CLERK -> List.of(SkillType.S_ADMIN, SkillType.S_DEMOLITIONS);
+            case SECURITY_DESK_OPERATOR ->
+                  List.of(SkillType.S_SENSOR_OPERATIONS, SkillType.S_SECURITY_SYSTEMS_ELECTRONIC);
+            case ARMS_DEALER -> List.of(SkillType.S_SMALL_ARMS, SkillType.S_NEGOTIATION);
+            case DATA_LAUNDERER -> List.of(SkillType.S_CRYPTOGRAPHY, SkillType.S_COMPUTERS);
+            case UNLICENSED_CHEMIST -> List.of(SkillType.S_SCIENCE_CHEMISTRY, SkillType.S_SCIENCE_PHARMACOLOGY);
+            case SMUGGLER -> List.of(SkillType.S_STEALTH, SkillType.S_PILOT_GVEE);
+            case PROTECTION_RACKETEER -> List.of(SkillType.S_SMALL_ARMS, SkillType.S_NEGOTIATION);
+            case THUG -> List.of(SkillType.S_MELEE_WEAPONS, SkillType.S_STREETWISE);
+            case GANG_LEADER -> List.of(SkillType.S_LEADER, SkillType.S_STREETWISE);
+            case PRISON_FIXER -> List.of(SkillType.S_APPRAISAL, SkillType.S_NEGOTIATION);
+            case TORTURER -> List.of(SkillType.S_INTERROGATION, SkillType.S_MEDTECH);
+            case INTELLIGENCE_ANALYST -> List.of(SkillType.S_INVESTIGATION, SkillType.S_SCIENCE_MATHEMATICS);
+            case CODEBREAKER -> List.of(SkillType.S_CRYPTOGRAPHY, SkillType.S_COMPUTERS);
+            case COUNTERINTELLIGENCE_LIAISON -> List.of(SkillType.S_INVESTIGATION, SkillType.S_INTEREST_POLITICS);
+            case DATA_INTERCEPT_OPERATOR -> List.of(SkillType.S_COMMUNICATIONS, SkillType.S_SENSOR_OPERATIONS);
+            case SURVEILLANCE_EXPERT -> List.of(SkillType.S_STEALTH, SkillType.S_SENSOR_OPERATIONS);
+            case TECH_ENCRYPTION -> List.of(SkillType.S_COMPUTERS, SkillType.S_CRYPTOGRAPHY);
+            case DEEP_COVER_OPERATIVE -> List.of(SkillType.S_DISGUISE, SkillType.S_LANGUAGES);
+            case INTERROGATOR -> List.of(SkillType.S_INTERROGATION, SkillType.S_SCIENCE_PSYCHOLOGY);
+            case DATA_HARVESTER -> List.of(SkillType.S_COMPUTERS, SkillType.S_APPRAISAL);
+            case SIGNAL_JAMMING_SPECIALIST -> List.of(SkillType.S_COMMUNICATIONS, SkillType.S_TECH_VESSEL);
+            case CORPORATE_ESPIONAGE_AGENT -> List.of(SkillType.S_STEALTH, SkillType.S_INVESTIGATION);
+            case LOYALTY_MONITOR -> List.of(SkillType.S_INVESTIGATION, SkillType.S_SCIENCE_PSYCHOLOGY);
+            case MEDIA_MANIPULATOR -> List.of(SkillType.S_ART_WRITING, SkillType.S_ACTING);
+            case CIVILIAN_DEBRIEFER -> List.of(SkillType.S_INTERROGATION, SkillType.S_LEADER);
+            case SPACEPORT_ENGINEER -> List.of(SkillType.S_TECH_VESSEL, SkillType.S_TECH_MECHANIC);
+            case FRONTIER_DOCTOR -> List.of(SkillType.S_SURGERY, SkillType.S_SURVIVAL);
+            case DOOMSDAY_PREACHER -> List.of(SkillType.S_ACTING, SkillType.S_INTEREST_ASTROLOGY);
+            case TAX_AUDITOR -> List.of(SkillType.S_INTEREST_ECONOMICS, SkillType.S_INVESTIGATION);
+            case MARKET_MANIPULATOR -> List.of(SkillType.S_INTEREST_ECONOMICS, SkillType.S_COMPUTERS);
+            case SUBVERSIVE_POET -> List.of(SkillType.S_ART_POETRY, SkillType.S_INTEREST_POLITICS);
+            case LEGAL_ARCHIVIST -> List.of(SkillType.S_ADMIN, SkillType.S_INTEREST_LAW);
+            case CONFLICT_RESOLUTION_TRAINER -> List.of(SkillType.S_NEGOTIATION, SkillType.S_TRAINING);
+            case DUELIST -> List.of(SkillType.S_MELEE_WEAPONS, SkillType.S_LEADER);
+            case SCANDAL_FIXER -> List.of(SkillType.S_INVESTIGATION, SkillType.S_PROTOCOLS);
+            case RELATIONSHIP_MATCHMAKER -> List.of(SkillType.S_PROTOCOLS, SkillType.S_NEGOTIATION);
+            case PRISON_GUARD -> List.of(SkillType.S_MELEE_WEAPONS, SkillType.S_PERCEPTION);
             case MISCELLANEOUS_JOB -> List.of(SkillType.S_CAREER_ANY);
         };
     }
