@@ -1035,7 +1035,7 @@ public class Person {
         }
 
         if (!secondaryRole.isNone()) {
-            description.append(" <b>/</b> ");
+            description.append(" / ");
             String secondaryDesc = getSecondaryRoleDesc();
             if (secondaryRole.isSubType(PersonnelRoleSubType.CIVILIAN)) {
                 description.append("<i>").append(secondaryDesc).append("</i>");
