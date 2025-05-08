@@ -113,7 +113,7 @@ public class TaskTableModel extends DataTableModel {
         public Component getTableCellRendererComponent(JTable table, Object value,
                                                        boolean isSelected, boolean hasFocus,
                                                        int row, int column) {
-            table.setRowHeight(UIUtil.scaleForGUI(100));
+            table.setRowHeight(UIUtil.scaleForGUI(DEFAULT_ROW_HEIGHT));
             Component c = this;
             int actualCol = table.convertColumnIndexToModel(column);
             int actualRow = table.convertRowIndexToModel(row);
