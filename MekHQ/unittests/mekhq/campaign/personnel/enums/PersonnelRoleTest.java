@@ -611,17 +611,18 @@ class PersonnelRoleTest {
         }
     }
 
-    void isSubType() {
-        for (PersonnelRole personnelRole : roles) {
-            if (personnelRole.isSubType(PersonnelRoleSubType.COMBAT)) {
-                assertTrue(personnelRole.isCombat(), "PersonnelRole " + personnelRole + " is not a combat role.");
-            } else if (personnelRole.isSubType(PersonnelRoleSubType.SUPPORT)) {
-                assertTrue(personnelRole.isSupport(), "PersonnelRole " + personnelRole + " is not a support role.");
-            } else {
-                assertFalse(personnelRole.isCivilian(), "PersonnelRole " + personnelRole + " is not a civilian role.");
-            }
+    @ParameterizedTest
+    @EnumSource(value = PersonnelRole.class)
+    void isSubType(PersonnelRole personnelRole) {
+        if (personnelRole.isSubType(PersonnelRoleSubType.COMBAT)) {
+            assertTrue(personnelRole.isCombat(), "PersonnelRole " + personnelRole + " is not a combat role.");
+        } else if (personnelRole.isSubType(PersonnelRoleSubType.SUPPORT)) {
+            assertTrue(personnelRole.isSupport(), "PersonnelRole " + personnelRole + " is not a support role.");
+        } else {
+            assertTrue(personnelRole.isCivilian(), "PersonnelRole " + personnelRole + " is not a civilian role.");
         }
     }
+
     // endregion Boolean Comparison Methods
 
     // region Static Methods
