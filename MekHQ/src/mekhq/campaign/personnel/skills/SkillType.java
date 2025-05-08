@@ -289,7 +289,7 @@ public class SkillType {
             case EXP_REGULAR -> "Regular";
             case EXP_VETERAN -> "Veteran";
             case EXP_ELITE -> "Elite";
-            case -1 -> "Unknown";
+            case -1 -> "None";
             default -> "Impossible";
         };
     }

@@ -102,6 +102,8 @@ public abstract class AbstractSkillGenerator {
      */
     protected void generateDefaultSkills(Person person, PersonnelRole primaryRole, int expLvl, int bonus,
           int rollModifier) {
+        // For default skills, we just want the base skills, excluding any campaign option related supplementary
+        // skills, such as artillery or admin for techs.
         for (String skillName : primaryRole.getSkillsForProfession()) {
             addSkill(person, skillName, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
         }

@@ -1079,6 +1079,21 @@ public class Person {
                   SkillType.S_TECH_MECHANIC, SkillType.S_TECH_BA, SkillType.S_SURGERY,
                   SkillType.S_MEDTECH, SkillType.S_ASTECH, SkillType.S_COMMUNICATIONS, SkillType.S_SENSOR_OPERATIONS)
                                        .anyMatch(this::hasSkill);
+            case AEROSPACE_PILOT -> hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO);
+            case CONVENTIONAL_AIRCRAFT_PILOT -> hasSkill(SkillType.S_GUN_JET) && hasSkill(SkillType.S_PILOT_JET);
+            case PROTOMEK_PILOT -> hasSkill(SkillType.S_GUN_PROTO);
+            case BATTLE_ARMOUR -> hasSkill(SkillType.S_GUN_BA);
+            case SOLDIER -> hasSkill(SkillType.S_SMALL_ARMS);
+            case VESSEL_PILOT -> hasSkill(SkillType.S_PILOT_SPACE);
+            case VESSEL_CREW -> hasSkill(SkillType.S_TECH_VESSEL);
+            case VESSEL_GUNNER -> hasSkill(SkillType.S_GUN_SPACE);
+            case VESSEL_NAVIGATOR -> hasSkill(SkillType.S_NAVIGATION);
+            case MEK_TECH -> hasSkill(SkillType.S_TECH_MEK);
+            case AERO_TEK -> hasSkill(SkillType.S_TECH_AERO);
+            case BA_TECH -> hasSkill(SkillType.S_TECH_BA);
+            case ASTECH -> hasSkill(SkillType.S_ASTECH);
+            case DOCTOR -> hasSkill(SkillType.S_SURGERY);
+            case MEDIC -> hasSkill(SkillType.S_MEDTECH);
             case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_HR ->
                   hasSkill(SkillType.S_ADMIN);
             case ADULT_ENTERTAINER -> {
@@ -3686,163 +3701,111 @@ public class Person {
         return Skills.SKILL_LEVELS[getExperienceLevel(campaign, secondary) + 1];
     }
 
+    /**
+     * Determines the experience level of a person in their current profession within the context of a campaign.
+     *
+     * <p>The calculation varies depending on the person's role and campaign options:</p>
+     * <ul>
+     *     <li>
+     *         <b>Vehicle Gunners:</b> If artillery usage is enabled in the campaign, calculates the maximum
+     *         experience level between Gunnery (Vee) and Artillery skills. Otherwise, uses the profession's
+     *         associated skills and campaign averaging option.
+     *     </li>
+     *     <li>
+     *         <b>Vehicle Crew:</b> Returns the highest experience level among a specific set of technical and support skills.
+     *     </li>
+     *     <li>
+     *         <b>Administrators:</b> Averages the Administrator skill and (optionally) Negotiation and/or Scrounge skills,
+     *         depending on campaign options. If all selected skills are untrained, returns {@link SkillType#EXP_NONE}.
+     *         Otherwise, returns the average, floored at 0.
+     *     </li>
+     *     <li>
+     *         <b>All other roles:</b> Calculates the experience level using their associated skills and campaign averaging option.
+     *     </li>
+     * </ul>
+     *
+     * @param campaign  the campaign context, providing options and relevant configuration
+     * @param secondary if {@code true}, evaluates the person's secondary role; if {@code false}, evaluates the primary
+     *                  role
+     *
+     * @return the calculated experience level for the relevant role, or {@link SkillType#EXP_NONE} if not qualified
+     */
     public int getExperienceLevel(final Campaign campaign, final boolean secondary) {
         final PersonnelRole role = secondary ? getSecondaryRole() : getPrimaryRole();
+
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        final boolean doAdminCountNegotiation = campaignOptions.isAdminExperienceLevelIncludeNegotiation();
+        final boolean doAdminCountScrounge = campaignOptions.isAdminExperienceLevelIncludeScrounge();
+        final boolean isUseArtillery = campaignOptions.isUseArtillery();
+
         final boolean isAlternativeQualityAveraging = campaignOptions.isAlternativeQualityAveraging();
         List<String> associatedSkillNames = new ArrayList<>();
 
-        switch (role) {
-            case MEKWARRIOR:
-                return CalculateExperienceLevelForProfession(SkillType.S_GUN_MEK,
-                      SkillType.S_PILOT_MEK,
-                      isAlternativeQualityAveraging);
-            case LAM_PILOT:
-                if (Stream.of(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK, SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO)
-                          .allMatch(this::hasSkill)) {
-                    /*
-                     * Attempt to use higher precision averaging, but if it doesn't provide a clear result due to
-                     * non-standard experience thresholds then fall back on lower precision averaging See Bug #140
-                     */
-                    if (isAlternativeQualityAveraging) {
-                        int rawScore = (int) floor((Stream.of(SkillType.S_GUN_MEK,
-                              SkillType.S_PILOT_MEK,
-                              SkillType.S_GUN_AERO,
-                              SkillType.S_PILOT_AERO).mapToInt(s -> getSkill(s).getLevel()).sum()) / 4.0);
+        // Optional skills such as Admin for Techs are not counted towards the character's experience level, except
+        // in the special case of Vehicle Gunners. So we only want to fetch the base professions.
+        List<String> associatedSkillNames = role.getSkillsForProfession();
 
-                        final int mekGunneryExperienceLevel = SkillType.lookupHash.get(SkillType.S_GUN_MEK)
-                                                                    .getExperienceLevel(rawScore);
-                        if ((mekGunneryExperienceLevel ==
-                                   SkillType.lookupHash.get(SkillType.S_PILOT_MEK).getExperienceLevel(rawScore) &&
-                                   (mekGunneryExperienceLevel ==
-                                          SkillType.lookupHash.get(SkillType.S_GUN_AERO)
-                                                .getExperienceLevel(rawScore)) &&
-                                   (mekGunneryExperienceLevel ==
-                                          SkillType.lookupHash.get(SkillType.S_PILOT_AERO)
-                                                .getExperienceLevel(rawScore)))) {
-                            return getSkill(SkillType.S_GUN_MEK).getType().getExperienceLevel(rawScore);
-                        }
-                    }
-
-                    return (int) floor((getSkill(SkillType.S_GUN_MEK).getExperienceLevel() +
-                                              getSkill(SkillType.S_PILOT_MEK).getExperienceLevel() +
-                                              getSkill(SkillType.S_GUN_AERO).getExperienceLevel() +
-                                              getSkill(SkillType.S_PILOT_AERO).getExperienceLevel()) / 4.0);
-                } else {
-                    return SkillType.EXP_NONE;
-                }
-            case GROUND_VEHICLE_DRIVER:
-                return hasSkill(SkillType.S_PILOT_GVEE) ?
-                             getSkill(SkillType.S_PILOT_GVEE).getExperienceLevel() :
-                             SkillType.EXP_NONE;
-            case NAVAL_VEHICLE_DRIVER:
-                return hasSkill(SkillType.S_PILOT_NVEE) ?
-                             getSkill(SkillType.S_PILOT_NVEE).getExperienceLevel() :
-                             SkillType.EXP_NONE;
-            case VTOL_PILOT:
-                return hasSkill(SkillType.S_PILOT_VTOL) ?
-                             getSkill(SkillType.S_PILOT_VTOL).getExperienceLevel() :
-                             SkillType.EXP_NONE;
-            case VEHICLE_GUNNER:
+        return switch (role) {
+            case VEHICLE_GUNNER -> {
                 if (!campaignOptions.isUseArtillery()) {
-                    return hasSkill(SkillType.S_GUN_VEE) ?
-                                 getSkill(SkillType.S_GUN_VEE).getExperienceLevel() :
-                                 SkillType.EXP_NONE;
+                    yield calculateExperienceLevelForProfession(associatedSkillNames, isAlternativeQualityAveraging);
                 } else {
                     if ((hasSkill(SkillType.S_GUN_VEE)) && (hasSkill(SkillType.S_ARTILLERY))) {
-                        return Math.max((getSkill(SkillType.S_GUN_VEE).getExperienceLevel()),
+                        yield Math.max((getSkill(SkillType.S_GUN_VEE).getExperienceLevel()),
                               (getSkill(SkillType.S_ARTILLERY).getExperienceLevel()));
                     } else if (hasSkill(SkillType.S_GUN_VEE)) {
-                        return getSkill(SkillType.S_GUN_VEE).getExperienceLevel();
+                        yield getSkill(SkillType.S_GUN_VEE).getExperienceLevel();
                     } else if (hasSkill(SkillType.S_ARTILLERY)) {
-                        return getSkill(SkillType.S_ARTILLERY).getExperienceLevel();
+                        yield getSkill(SkillType.S_ARTILLERY).getExperienceLevel();
                     } else {
-                        return SkillType.EXP_NONE;
+                        yield SkillType.EXP_NONE;
                     }
                 }
-            case VEHICLE_CREW, MECHANIC:
-                return hasSkill(SkillType.S_TECH_MECHANIC) ?
-                             getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() :
-                             SkillType.EXP_NONE;
-            case AEROSPACE_PILOT:
-                return CalculateExperienceLevelForProfession(SkillType.S_GUN_AERO,
-                      SkillType.S_PILOT_AERO,
-                      isAlternativeQualityAveraging);
-            case CONVENTIONAL_AIRCRAFT_PILOT:
-                return CalculateExperienceLevelForProfession(SkillType.S_GUN_JET,
-                      SkillType.S_PILOT_JET,
-                      isAlternativeQualityAveraging);
-            case PROTOMEK_PILOT:
-                return hasSkill(SkillType.S_GUN_PROTO) ?
-                             getSkill(SkillType.S_GUN_PROTO).getExperienceLevel() :
-                             SkillType.EXP_NONE;
-            case BATTLE_ARMOUR:
-                return CalculateExperienceLevelForProfession(SkillType.S_GUN_BA,
-                      SkillType.S_ANTI_MEK,
-                      isAlternativeQualityAveraging);
-            case SOLDIER:
-                return hasSkill(SkillType.S_SMALL_ARMS) ?
-                             getSkill(SkillType.S_SMALL_ARMS).getExperienceLevel() :
-                             SkillType.EXP_NONE;
-            case VESSEL_PILOT:
-                return hasSkill(SkillType.S_PILOT_SPACE) ?
-                             getSkill(SkillType.S_PILOT_SPACE).getExperienceLevel() :
-                             SkillType.EXP_NONE;
-            case VESSEL_GUNNER:
-                return hasSkill(SkillType.S_GUN_SPACE) ?
-                             getSkill(SkillType.S_GUN_SPACE).getExperienceLevel() :
-                             SkillType.EXP_NONE;
-            case VESSEL_CREW:
-                return hasSkill(SkillType.S_TECH_VESSEL) ?
-                             getSkill(SkillType.S_TECH_VESSEL).getExperienceLevel() :
-                             SkillType.EXP_NONE;
-            case VESSEL_NAVIGATOR:
-                return hasSkill(SkillType.S_NAVIGATION) ?
-                             getSkill(SkillType.S_NAVIGATION).getExperienceLevel() :
-                             SkillType.EXP_NONE;
-            case MEK_TECH:
-                return hasSkill(SkillType.S_TECH_MEK) ?
-                             getSkill(SkillType.S_TECH_MEK).getExperienceLevel() :
-                             SkillType.EXP_NONE;
-            case AERO_TEK:
-                return hasSkill(SkillType.S_TECH_AERO) ?
-                             getSkill(SkillType.S_TECH_AERO).getExperienceLevel() :
-                             SkillType.EXP_NONE;
-            case BA_TECH:
-                return hasSkill(SkillType.S_TECH_BA) ?
-                             getSkill(SkillType.S_TECH_BA).getExperienceLevel() :
-                             SkillType.EXP_NONE;
-            case ASTECH:
-                return hasSkill(SkillType.S_ASTECH) ?
-                             getSkill(SkillType.S_ASTECH).getExperienceLevel() :
-                             SkillType.EXP_NONE;
-            case DOCTOR:
-                return hasSkill(SkillType.S_SURGERY) ? getSkill(SkillType.S_SURGERY).getExperienceLevel() :
-                             SkillType.EXP_NONE;
-            case MEDIC:
-                return hasSkill(SkillType.S_MEDTECH) ?
-                             getSkill(SkillType.S_MEDTECH).getExperienceLevel() :
-                             SkillType.EXP_NONE;
-            case ADMINISTRATOR_COMMAND:
-            case ADMINISTRATOR_LOGISTICS:
-            case ADMINISTRATOR_TRANSPORT:
-            case ADMINISTRATOR_HR:
-                int adminLevel = getSkillLevelOrNegative(SkillType.S_ADMIN);
+            }
+            case VEHICLE_CREW -> {
+                // Vehicle crew are a special case as they just need one of any of the following skills to qualify,
+                // rather than needing all relevant skills
+                List<String> relevantSkills = List.of(SkillType.S_TECH_MEK,
+                      SkillType.S_TECH_AERO,
+                      SkillType.S_TECH_MECHANIC,
+                      SkillType.S_TECH_BA,
+                      SkillType.S_SURGERY,
+                      SkillType.S_MEDTECH,
+                      SkillType.S_ASTECH,
+                      SkillType.S_COMMUNICATIONS,
+                      SkillType.S_SENSOR_OPERATIONS);
+
+                int highestExperienceLevel = SkillType.EXP_NONE;
+                for (String relevantSkill : relevantSkills) {
+                    Skill skill = getSkill(relevantSkill);
+
+                    if (skill == null) {
+                        continue;
+                    }
+
+                    int currentExperienceLevel = skill.getExperienceLevel();
+                    if (currentExperienceLevel > highestExperienceLevel) {
+                        highestExperienceLevel = currentExperienceLevel;
+                    }
+                }
+
+                yield highestExperienceLevel;
+            }
+            case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_HR -> {
+                int adminLevel = getSkillLevelOrNegative(S_ADMIN);
                 int negotiationLevel = getSkillLevelOrNegative(SkillType.S_NEGOTIATION);
                 int scroungeLevel = getSkillLevelOrNegative(SkillType.S_SCROUNGE);
 
                 int levelSum;
-                boolean includeNegotiation = campaign.getCampaignOptions().isAdminExperienceLevelIncludeNegotiation();
-                boolean includeScrounge = campaign.getCampaignOptions().isAdminExperienceLevelIncludeScrounge();
                 int divisor;
 
-                if (includeNegotiation && includeScrounge) {
+                if (doAdminCountNegotiation && doAdminCountScrounge) {
                     levelSum = adminLevel + negotiationLevel + scroungeLevel;
                     divisor = 3;
-                } else if (includeNegotiation) {
+                } else if (doAdminCountNegotiation) {
                     levelSum = adminLevel + negotiationLevel;
                     divisor = 2;
-                } else if (includeScrounge) {
+                } else if (doAdminCountScrounge) {
                     levelSum = adminLevel + scroungeLevel;
                     divisor = 2;
                 } else {
@@ -3851,560 +3814,97 @@ public class Person {
                 }
 
                 if (levelSum == -divisor) {
-                    return SkillType.EXP_NONE;
+                    yield SkillType.EXP_NONE;
                 } else {
-                    return Math.max(0, levelSum / divisor);
+                    yield Math.max(0, levelSum / divisor);
                 }
-            case DEPENDENT:
-            case NONE:
-            case ADULT_ENTERTAINER:
-                associatedSkillNames = ADULT_ENTERTAINER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case ANTIQUARIAN:
-                associatedSkillNames = ANTIQUARIAN.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case SPORTS_STAR:
-                associatedSkillNames = SPORTS_STAR.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case ASTROGRAPHER:
-                associatedSkillNames = ASTROGRAPHER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case BARBER:
-                associatedSkillNames = BARBER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case BARTENDER:
-                associatedSkillNames = BARTENDER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case WAR_CORRESPONDENT:
-                associatedSkillNames = WAR_CORRESPONDENT.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case BRAWLER:
-                associatedSkillNames = BRAWLER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case BROKER:
-                associatedSkillNames = BROKER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case CHEF:
-                associatedSkillNames = CHEF.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case CIVILIAN_AERO_MECHANIC:
-                associatedSkillNames = CIVILIAN_AERO_MECHANIC.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case CIVILIAN_DROPSHIP_PILOT:
-                associatedSkillNames = CIVILIAN_DROPSHIP_PILOT.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case POLICE_OFFICER:
-                associatedSkillNames = POLICE_OFFICER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case CIVILIAN_VTOL_PILOT:
-                associatedSkillNames = CIVILIAN_VTOL_PILOT.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case CIVIL_CLERK:
-                associatedSkillNames = CIVIL_CLERK.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case CLOWN:
-                associatedSkillNames = CLOWN.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case CON_ARTIST:
-                associatedSkillNames = CON_ARTIST.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case MILITARY_CORONER:
-                associatedSkillNames = MILITARY_CORONER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case COURIER:
-                associatedSkillNames = COURIER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case CRIMINAL_MECHANIC:
-                associatedSkillNames = CRIMINAL_MECHANIC.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case CULTURAL_CENSOR:
-                associatedSkillNames = CULTURAL_CENSOR.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case CULTURAL_LIAISON:
-                associatedSkillNames = CULTURAL_LIAISON.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case CUSTOMS_INSPECTOR:
-                associatedSkillNames = CUSTOMS_INSPECTOR.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case DATA_SMUGGLER:
-                associatedSkillNames = DATA_SMUGGLER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case DATA_ANALYST:
-                associatedSkillNames = DATA_ANALYST.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case SPACEPORT_WORKER:
-                associatedSkillNames = SPACEPORT_WORKER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case DRUG_DEALER:
-                associatedSkillNames = DRUG_DEALER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case FACTORY_WORKER:
-                associatedSkillNames = FACTORY_WORKER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case LIVESTOCK_FARMER:
-                associatedSkillNames = LIVESTOCK_FARMER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case AGRI_FARMER:
-                associatedSkillNames = AGRI_FARMER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case FIREFIGHTER:
-                associatedSkillNames = FIREFIGHTER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case FISHER:
-                associatedSkillNames = FISHER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case COUNTERFEITER:
-                associatedSkillNames = COUNTERFEITER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case GAMBLER:
-                associatedSkillNames = GAMBLER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case CIVILIAN_DOCTOR:
-                associatedSkillNames = CIVILIAN_DOCTOR.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case HACKER:
-                associatedSkillNames = HACKER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case HERALD:
-                associatedSkillNames = HERALD.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case HISTORIAN:
-                associatedSkillNames = HISTORIAN.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case HOLO_CARTOGRAPHER:
-                associatedSkillNames = HOLO_CARTOGRAPHER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case HOLO_GAMER:
-                associatedSkillNames = HOLO_GAMER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case HOLO_JOURNALIST:
-                associatedSkillNames = HOLO_JOURNALIST.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case HOLO_STAR:
-                associatedSkillNames = HOLO_STAR.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case INDUSTRIAL_MEK_PILOT:
-                associatedSkillNames = INDUSTRIAL_MEK_PILOT.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case INFORMATION_BROKER:
-                associatedSkillNames = INFORMATION_BROKER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case MILITARY_LIAISON:
-                associatedSkillNames = MILITARY_LIAISON.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case JANITOR:
-                associatedSkillNames = JANITOR.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case JUMPSHIP_CHEF:
-                associatedSkillNames = JUMPSHIP_CHEF.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case EXOSKELETON_LABORER:
-                associatedSkillNames = EXOSKELETON_LABORER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case LAWYER:
-                associatedSkillNames = LAWYER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case PROPHET:
-                associatedSkillNames = PROPHET.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case RELIC_HUNTER:
-                associatedSkillNames = RELIC_HUNTER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case MEDIATOR:
-                associatedSkillNames = MEDIATOR.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case MEDICAL_RESEARCHER:
-                associatedSkillNames = MEDICAL_RESEARCHER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case MEK_RANGE_INSTRUCTOR:
-                associatedSkillNames = MEK_RANGE_INSTRUCTOR.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case MERCHANT:
-                associatedSkillNames = MERCHANT.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case MILITARY_ACCOUNTANT:
-                associatedSkillNames = MILITARY_ACCOUNTANT.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case MILITARY_ANALYST:
-                associatedSkillNames = MILITARY_ANALYST.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case SPY:
-                associatedSkillNames = SPY.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case MILITARY_THEORIST:
-                associatedSkillNames = MILITARY_THEORIST.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case MINER:
-                associatedSkillNames = MINER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case MOUNTAIN_CLIMBER:
-                associatedSkillNames = MOUNTAIN_CLIMBER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case FACTORY_FOREMAN:
-                associatedSkillNames = FACTORY_FOREMAN.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case MUNITIONS_FACTORY_WORKER:
-                associatedSkillNames = MUNITIONS_FACTORY_WORKER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case MUSICIAN:
-                associatedSkillNames = MUSICIAN.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case ORBITAL_DEFENSE_GUNNER:
-                associatedSkillNames = ORBITAL_DEFENSE_GUNNER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case ORBITAL_SHUTTLE_PILOT:
-                associatedSkillNames = ORBITAL_SHUTTLE_PILOT.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case PARAMEDIC:
-                associatedSkillNames = PARAMEDIC.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case PAINTER:
-                associatedSkillNames = PAINTER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case PATHFINDER:
-                associatedSkillNames = PATHFINDER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case PERFORMER:
-                associatedSkillNames = PERFORMER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case PERSONAL_VALET:
-                associatedSkillNames = PERSONAL_VALET.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case ESCAPED_PRISONER:
-                associatedSkillNames = ESCAPED_PRISONER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case PROPAGANDIST:
-                associatedSkillNames = PROPAGANDIST.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case PSYCHOLOGIST:
-                associatedSkillNames = PSYCHOLOGIST.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case FIRING_RANGE_SAFETY_OFFICER:
-                associatedSkillNames = FIRING_RANGE_SAFETY_OFFICER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case RECRUITMENT_SCREENING_OFFICER:
-                associatedSkillNames = RECRUITMENT_SCREENING_OFFICER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case RELIGIOUS_LEADER:
-                associatedSkillNames = RELIGIOUS_LEADER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case REPAIR_BAY_SUPERVISOR:
-                associatedSkillNames = REPAIR_BAY_SUPERVISOR.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case REVOLUTIONIST:
-                associatedSkillNames = REVOLUTIONIST.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case RITUALIST:
-                associatedSkillNames = RITUALIST.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case SALVAGE_RAT:
-                associatedSkillNames = SALVAGE_RAT.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case SCRIBE:
-                associatedSkillNames = SCRIBE.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case SCULPTURER:
-                associatedSkillNames = SCULPTURER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case SENSOR_TECHNICIAN:
-                associatedSkillNames = SENSOR_TECHNICIAN.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case CIVILIAN_PILOT:
-                associatedSkillNames = CIVILIAN_PILOT.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case STREET_SURGEON:
-                associatedSkillNames = STREET_SURGEON.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case SWIMMING_INSTRUCTOR:
-                associatedSkillNames = SWIMMING_INSTRUCTOR.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case TACTICAL_ANALYST:
-                associatedSkillNames = TACTICAL_ANALYST.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case TAILOR:
-                associatedSkillNames = TAILOR.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case TEACHER:
-                associatedSkillNames = TEACHER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case TECH_COMMUNICATIONS:
-                associatedSkillNames = TECH_COMMUNICATIONS.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case TECH_ZERO_G:
-                associatedSkillNames = TECH_ZERO_G.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case TECH_HYDROPONICS:
-                associatedSkillNames = TECH_HYDROPONICS.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case TECH_FUSION_PLANT:
-                associatedSkillNames = TECH_FUSION_PLANT.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case TECH_SECURITY:
-                associatedSkillNames = TECH_SECURITY.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case TECH_WASTE_MANAGEMENT:
-                associatedSkillNames = TECH_WASTE_MANAGEMENT.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case TECH_WATER_RECLAMATION:
-                associatedSkillNames = TECH_WATER_RECLAMATION.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case THIEF:
-                associatedSkillNames = THIEF.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case TRAINING_SIM_OPERATOR:
-                associatedSkillNames = TRAINING_SIM_OPERATOR.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case TRANSPORT_DRIVER:
-                associatedSkillNames = TRANSPORT_DRIVER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case ARTIST:
-                associatedSkillNames = ARTIST.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case WAREHOUSE_WORKER:
-                associatedSkillNames = WAREHOUSE_WORKER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case WARFARE_PLANNER:
-                associatedSkillNames = WARFARE_PLANNER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case WEATHERCASTER:
-                associatedSkillNames = WEATHERCASTER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case XENOANIMAL_TRAINER:
-                associatedSkillNames = XENOANIMAL_TRAINER.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case XENO_BIOLOGIST:
-                associatedSkillNames = XENO_BIOLOGIST.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case GENETICIST:
-                associatedSkillNames = GENETICIST.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case BURGLAR:
-                associatedSkillNames = BURGLAR.getSkillsForProfession();
-                return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
-                      associatedSkillNames.get(1),
-                      isAlternativeQualityAveraging);
-            case MISCELLANEOUS_JOB:
-                return hasSkill(SkillType.S_CAREER_ANY) ?
-                             getSkill(SkillType.S_CAREER_ANY).getExperienceLevel() :
-                             SkillType.EXP_NONE;
-            default:
-                return SkillType.EXP_NONE;
-        }
+            }
+            default -> calculateExperienceLevelForProfession(associatedSkillNames, isAlternativeQualityAveraging);
+        };
     }
+
+    /**
+     * Calculates the experience level for a profession based on the specified skill names and quality averaging
+     * method.
+     *
+     * <p>If the provided list of skill names is empty, this method returns {@link SkillType#EXP_REGULAR} by default.
+     * If any skill is missing or its type cannot be determined, {@link SkillType#EXP_NONE} is returned.</p>
+     *
+     * <ul>
+     *     <li>
+     *         <b>Standard Averaging:</b> If {@code isAlternativeQualityAveraging} is {@code false}, the experience
+     *         level is determined by averaging the levels of all provided skills and converting the average to an
+     *         experience level using the first skill's type.
+     *     </li>
+     *     <li>
+     *         <b>Alternative Quality Averaging:</b> If {@code isAlternativeQualityAveraging} is {@code true}, the
+     *         method checks if all experience levels for the listed skills are equal. If they are, that shared
+     *         experience level is returned. Otherwise, standard averaging is used as described above.
+     *     </li>
+     * </ul>
+     *
+     * @param skillNames                    list of skill names relevant to the profession
+     * @param isAlternativeQualityAveraging if {@code true}, uses the alternative averaging method; if {@code false},
+     *                                      uses standard averaging
+     *
+     * @return the determined experience level, or {@link SkillType#EXP_NONE} if an error occurs or prerequisite skills
+     *       are missing
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    private int calculateExperienceLevelForProfession(List<String> skillNames, boolean isAlternativeQualityAveraging) {
+        if (skillNames.isEmpty()) {
+            // If we're not tracking skills for this profession, it always counts as REGULAR
+            return SkillType.EXP_REGULAR;
+        }
+
+        int totalSkillLevel = 0;
+        boolean areAllEqual = true;
+        Integer expectedExperienceLevel = null;
+
+        for (String skillName : skillNames) {
+            Skill skill = getSkill(skillName);
+            if (skill == null) {
+                // If a character is missing a skill, it means they're unqualified for a profession. They will lose
+                // that profession the next time the campaign is loaded. We don't remove it here as that would
+                // require passing in a bunch of extra information that is largely irrelevant.
+                return SkillType.EXP_NONE;
+            }
+
+            SkillType skillType = SkillType.getType(skillName);
+            if (skillType == null) {
+                logger.warn("Unable to find skill type for {}. Experience level assessment aborted", skillName);
+                return SkillType.EXP_NONE;
+            }
+
+            int individualSkillLevel = skill.getLevel();
+            totalSkillLevel += individualSkillLevel;
+
+            if (isAlternativeQualityAveraging) {
+                int expLevel = skill.getExperienceLevel();
+                if (expectedExperienceLevel == null) {
+                    expectedExperienceLevel = expLevel;
+                } else if (!expectedExperienceLevel.equals(expLevel)) {
+                    areAllEqual = false;
+                }
+            }
+        }
+
+        if (isAlternativeQualityAveraging && areAllEqual) {
+            return expectedExperienceLevel;
+        }
+
+        int averageSkillLevel = (int) Math.floor((double) totalSkillLevel / skillNames.size());
+
+        Skill skill = getSkill(skillNames.get(0));
+        if (skill == null) {
+            return SkillType.EXP_NONE;
+        }
+
+        return skill.getType().getExperienceLevel(averageSkillLevel);
+    }
+
 
     private int CalculateExperienceLevelForProfession(String sGunBa, String sAntiMek,
           boolean isAlternativeQualityAveraging) {
