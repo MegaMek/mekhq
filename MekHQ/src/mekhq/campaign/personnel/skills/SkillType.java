@@ -49,6 +49,7 @@ import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_SCIENC
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_SECURITY;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT_COMMAND;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColor;
 
 import java.io.PrintWriter;
@@ -90,6 +91,7 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class SkillType {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.SkillType";
     private static final MMLogger logger = MMLogger.create(SkillType.class);
 
     /**
@@ -384,6 +386,33 @@ public class SkillType {
     }
 
     /**
+     * Retrieves a list of unique skill names that match any of the specified {@link SkillSubType}s.
+     *
+     * <p>This method iterates through all known {@link SkillType} instances and collects the names of those whose
+     * sub-type is included in the provided list of {@code skillSubTypes}. Each skill name will only appear once in the
+     * resulting list, even if multiple {@code SkillType}s with the same name are found.</p>
+     *
+     * @param skillSubTypes List of {@link SkillSubType}s for which to find matching skill names.
+     *
+     * @return A list of unique skill names that belong to one of the specified skill sub-types.
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public static List<String> getSkillsBySkillSubType(List<SkillSubType> skillSubTypes) {
+        List<String> relevantSkills = new ArrayList<>();
+        for (SkillType skillType : lookupHash.values()) {
+            SkillSubType subType = skillType.getSubType();
+            if (skillSubTypes.contains(subType)) {
+                if (!relevantSkills.contains(skillType.name)) {
+                    relevantSkills.add(skillType.name);
+                }
+            }
+        }
+        return relevantSkills;
+    }
+
+    /**
      * Default constructor for the {@code SkillType} class.
      *
      * <p>Initializes a default skill type with placeholder values, primarily for testing or fallback purposes.</p>
@@ -489,6 +518,61 @@ public class SkillType {
 
     public String getName() {
         return name;
+    }
+
+    /**
+     * Generates a resource bundle key derived from the {@code name} field by removing all occurrences of '/', '-', and
+     * whitespace characters.
+     *
+     * @return a normalized resource bundle key string with specific characters removed from {@code name}
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    private String getResourceBundleKey() {
+        String key = name;
+        key = key.replace(RP_ONLY_TAG, "");
+        key = key.replace("/", "");
+        key = key.replace("(", "");
+        key = key.replace(")", "");
+        key = key.replace("-", "");
+        key = key.replace(" ", "");
+        return key;
+    }
+
+    /**
+     * Retrieves the flavor text for this skill, optionally including HTML tags and attribute details.
+     *
+     * @param includeHtmlTags   if {@code true}, the returned string will be wrapped with {@code <html>} and
+     *                          {@code </html>} tags
+     * @param includeAttributes if {@code true}, the returned string will append the object's attributes as labels; if
+     *                          {@code false}, only the raw flavor text is returned
+     *
+     * @return the assembled flavor text, with optional HTML formatting and attribute information
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public String getFlavorText(boolean includeHtmlTags, boolean includeAttributes) {
+        String key = getResourceBundleKey();
+        String rawFlavorText = getTextAt(RESOURCE_BUNDLE, key + ".flavorText");
+
+        String htmlOpenTag = includeHtmlTags ? "<html>" : "";
+        String htmlCloseTag = includeHtmlTags ? "</html>" : "";
+
+        if (!includeAttributes) {
+            return htmlOpenTag + rawFlavorText + htmlCloseTag;
+        }
+
+        String flavorText = htmlOpenTag + rawFlavorText + "<br>(" + firstAttribute.getLabel();
+
+        if (secondAttribute != NONE) {
+            flavorText += ", " + secondAttribute.getLabel() + ')';
+        }
+
+        flavorText += htmlCloseTag;
+
+        return flavorText;
     }
 
     public int getTarget() {
@@ -836,8 +920,8 @@ public class SkillType {
         lookupHash.put(S_INTEREST_HISTORY, createInterestHistory());
         lookupHash.put(S_INTEREST_LITERATURE, createInterestLiterature());
         lookupHash.put(S_INTEREST_HOLO_GAMES, createInterestHoloGames());
-        lookupHash.put(S_INTEREST_FASHION, createInterestSports());
-        lookupHash.put(S_INTEREST_MUSIC, createInterestSports());
+        lookupHash.put(S_INTEREST_FASHION, createInterestFashion());
+        lookupHash.put(S_INTEREST_MUSIC, createInterestMusic());
         lookupHash.put(S_INTEREST_MILITARY, createInterestMilitary());
         lookupHash.put(S_INTEREST_ANTIQUES, createInterestAntiques());
         lookupHash.put(S_INTEREST_THEOLOGY, createInterestTheology());
