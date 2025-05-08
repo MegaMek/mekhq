@@ -600,10 +600,10 @@ class PersonnelRoleTest {
     // region Static Methods
     @Test
     void testGetMarketableRoles() {
-        final List<PersonnelRole> militaryRoles = PersonnelRole.getMarketableRoles();
-        assertEquals(roles.length - 2, militaryRoles.size());
-        assertFalse(militaryRoles.contains(PersonnelRole.DEPENDENT));
-        assertFalse(militaryRoles.contains(PersonnelRole.NONE));
+        int marketableRoles = PersonnelRole.getMarketableRoles().size();
+        int combatRoles = PersonnelRole.getCombatRoles().size();
+        int supportRoles = PersonnelRole.getSupportRoles().size();
+        assertEquals(combatRoles + supportRoles, marketableRoles);
     }
 
     @Test

@@ -155,8 +155,7 @@ public enum PersonnelRole {
     SPORTS_STAR(KeyEvent.VK_UNDEFINED),
     ASTROGRAPHER(KeyEvent.VK_UNDEFINED),
     BARBER(KeyEvent.VK_UNDEFINED),
-    BARTENDER(KeyEvent.VK_UNDEFINED),
-    WAR_CORRESPONDANT(KeyEvent.VK_UNDEFINED),
+    BARTENDER(KeyEvent.VK_UNDEFINED), WAR_CORRESPONDENT(KeyEvent.VK_UNDEFINED),
     BRAWLER(KeyEvent.VK_UNDEFINED),
     BROKER(KeyEvent.VK_UNDEFINED),
     CHEF(KeyEvent.VK_UNDEFINED),
@@ -174,8 +173,7 @@ public enum PersonnelRole {
     CULTURAL_LIAISON(KeyEvent.VK_UNDEFINED),
     CUSTOMS_INSPECTOR(KeyEvent.VK_UNDEFINED),
     DATA_SMUGGLER(KeyEvent.VK_UNDEFINED),
-    DATA_ANALYST(KeyEvent.VK_UNDEFINED),
-    SPACE_PORT_WORKER(KeyEvent.VK_UNDEFINED),
+    DATA_ANALYST(KeyEvent.VK_UNDEFINED), SPACEPORT_WORKER(KeyEvent.VK_UNDEFINED),
     DRUG_DEALER(KeyEvent.VK_UNDEFINED),
     FACTORY_WORKER(KeyEvent.VK_UNDEFINED),
     LIVESTOCK_FARMER(KeyEvent.VK_UNDEFINED),
@@ -226,8 +224,7 @@ public enum PersonnelRole {
     PSYCHOLOGIST(KeyEvent.VK_UNDEFINED),
     FIRING_RANGE_SAFETY_OFFICER(KeyEvent.VK_UNDEFINED),
     RECRUITMENT_SCREENING_OFFICER(KeyEvent.VK_UNDEFINED),
-    RELIGIOUS_LEADER(KeyEvent.VK_UNDEFINED),
-    REPAIR_BAY_FOREMAN(KeyEvent.VK_UNDEFINED),
+    RELIGIOUS_LEADER(KeyEvent.VK_UNDEFINED), REPAIR_BAY_SUPERVISOR(KeyEvent.VK_UNDEFINED),
     REVOLUTIONIST(KeyEvent.VK_UNDEFINED),
     RITUALIST(KeyEvent.VK_UNDEFINED),
     SALVAGE_RAT(KeyEvent.VK_UNDEFINED),
@@ -492,7 +489,7 @@ public enum PersonnelRole {
             case ASTROGRAPHER -> List.of(SkillType.S_INTEREST_CARTOGRAPHY, SkillType.S_NAVIGATION);
             case BARBER -> List.of(SkillType.S_ART_OTHER, SkillType.S_INTEREST_FASHION);
             case BARTENDER -> List.of(SkillType.S_STREETWISE, SkillType.S_INTEREST_POP_CULTURE);
-            case WAR_CORRESPONDANT -> List.of(SkillType.S_ART_WRITING, SkillType.S_INTEREST_MILITARY);
+            case WAR_CORRESPONDENT -> List.of(SkillType.S_ART_WRITING, SkillType.S_INTEREST_MILITARY);
             case BRAWLER -> List.of(SkillType.S_MARTIAL_ARTS, SkillType.S_STREETWISE);
             case BROKER -> List.of(SkillType.S_STREETWISE, SkillType.S_NEGOTIATION);
             case CHEF -> List.of(SkillType.S_ART_COOKING, SkillType.S_LEADER);
@@ -511,7 +508,7 @@ public enum PersonnelRole {
             case CUSTOMS_INSPECTOR -> List.of(SkillType.S_INVESTIGATION, SkillType.S_PROTOCOLS);
             case DATA_SMUGGLER -> List.of(SkillType.S_COMPUTERS, SkillType.S_SECURITY_SYSTEMS_ELECTRONIC);
             case DATA_ANALYST -> List.of(SkillType.S_COMPUTERS, SkillType.S_SCIENCE_MATHEMATICS);
-            case SPACE_PORT_WORKER -> List.of(SkillType.S_ASTECH, SkillType.S_PILOT_GVEE);
+            case SPACEPORT_WORKER -> List.of(SkillType.S_ASTECH, SkillType.S_PILOT_GVEE);
             case DRUG_DEALER -> List.of(SkillType.S_STREETWISE, SkillType.S_SCIENCE_PHARMACOLOGY);
             case FACTORY_WORKER -> List.of(SkillType.S_ASTECH, SkillType.S_TECH_MECHANIC);
             case LIVESTOCK_FARMER -> List.of(SkillType.S_ANIMAL_HANDLING, SkillType.S_SCIENCE_XENOBIOLOGY);
@@ -563,7 +560,7 @@ public enum PersonnelRole {
             case FIRING_RANGE_SAFETY_OFFICER -> List.of(SkillType.S_SMALL_ARMS, SkillType.S_LEADER);
             case RECRUITMENT_SCREENING_OFFICER -> List.of(SkillType.S_INTERROGATION, SkillType.S_SCIENCE_PSYCHOLOGY);
             case RELIGIOUS_LEADER -> List.of(SkillType.S_INTEREST_THEOLOGY, SkillType.S_LEADER);
-            case REPAIR_BAY_FOREMAN -> List.of(SkillType.S_TECH_MECHANIC, SkillType.S_LEADER);
+            case REPAIR_BAY_SUPERVISOR -> List.of(SkillType.S_TECH_MECHANIC, SkillType.S_LEADER);
             case REVOLUTIONIST -> List.of(SkillType.S_INTEREST_POLITICS, SkillType.S_LEADER);
             case RITUALIST -> List.of(SkillType.S_INTEREST_THEOLOGY, SkillType.S_ART_DANCING);
             case SALVAGE_RAT -> List.of(SkillType.S_TECH_MECHANIC, SkillType.S_TECH_MEK);
@@ -982,7 +979,10 @@ public enum PersonnelRole {
      * @return a list of roles that can be included in the personnel market
      */
     public static List<PersonnelRole> getMarketableRoles() {
-        return Stream.of(values()).filter(personnelRole -> !personnelRole.isCivilian()).collect(Collectors.toList());
+        List<PersonnelRole> marketableRoles = getCombatRoles();
+        marketableRoles.addAll(getSupportRoles());
+
+        return marketableRoles;
     }
 
     /**

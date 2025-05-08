@@ -1096,7 +1096,7 @@ public class Person {
             case ASTROGRAPHER -> hasSkill(SkillType.S_INTEREST_CARTOGRAPHY) && hasSkill(SkillType.S_NAVIGATION);
             case BARBER -> hasSkill(SkillType.S_ART_OTHER) && hasSkill(SkillType.S_INTEREST_FASHION);
             case BARTENDER -> hasSkill(SkillType.S_STREETWISE) && hasSkill(SkillType.S_INTEREST_POP_CULTURE);
-            case WAR_CORRESPONDANT -> hasSkill(SkillType.S_ART_WRITING) && hasSkill(SkillType.S_INTEREST_MILITARY);
+            case WAR_CORRESPONDENT -> hasSkill(SkillType.S_ART_WRITING) && hasSkill(SkillType.S_INTEREST_MILITARY);
             case BRAWLER -> hasSkill(SkillType.S_MARTIAL_ARTS) && hasSkill(SkillType.S_STREETWISE);
             case BROKER -> hasSkill(SkillType.S_STREETWISE) && hasSkill(SkillType.S_NEGOTIATION);
             case CHEF -> hasSkill(SkillType.S_ART_COOKING) && hasSkill(SkillType.S_LEADER);
@@ -1116,7 +1116,7 @@ public class Person {
             case CUSTOMS_INSPECTOR -> hasSkill(SkillType.S_INVESTIGATION) && hasSkill(SkillType.S_PROTOCOLS);
             case DATA_SMUGGLER -> hasSkill(SkillType.S_COMPUTERS) && hasSkill(SkillType.S_SECURITY_SYSTEMS_ELECTRONIC);
             case DATA_ANALYST -> hasSkill(SkillType.S_COMPUTERS) && hasSkill(SkillType.S_SCIENCE_MATHEMATICS);
-            case SPACE_PORT_WORKER -> hasSkill(SkillType.S_ASTECH) && hasSkill(SkillType.S_PILOT_GVEE);
+            case SPACEPORT_WORKER -> hasSkill(SkillType.S_ASTECH) && hasSkill(SkillType.S_PILOT_GVEE);
             case DRUG_DEALER -> hasSkill(SkillType.S_STREETWISE) && hasSkill(SkillType.S_SCIENCE_PHARMACOLOGY);
             case FACTORY_WORKER -> hasSkill(SkillType.S_ASTECH) && hasSkill(SkillType.S_TECH_MECHANIC);
             case LIVESTOCK_FARMER -> hasSkill(SkillType.S_ANIMAL_HANDLING) && hasSkill(SkillType.S_SCIENCE_XENOBIOLOGY);
@@ -1171,7 +1171,7 @@ public class Person {
             case RECRUITMENT_SCREENING_OFFICER ->
                   hasSkill(SkillType.S_INTERROGATION) && hasSkill(SkillType.S_SCIENCE_PSYCHOLOGY);
             case RELIGIOUS_LEADER -> hasSkill(SkillType.S_INTEREST_THEOLOGY) && hasSkill(SkillType.S_LEADER);
-            case REPAIR_BAY_FOREMAN -> hasSkill(SkillType.S_TECH_MECHANIC) && hasSkill(SkillType.S_LEADER);
+            case REPAIR_BAY_SUPERVISOR -> hasSkill(SkillType.S_TECH_MECHANIC) && hasSkill(SkillType.S_LEADER);
             case REVOLUTIONIST -> hasSkill(SkillType.S_INTEREST_POLITICS) && hasSkill(SkillType.S_LEADER);
             case RITUALIST -> hasSkill(SkillType.S_INTEREST_THEOLOGY) && hasSkill(SkillType.S_ART_DANCING);
             case SALVAGE_RAT -> hasSkill(SkillType.S_TECH_MECHANIC) && hasSkill(SkillType.S_TECH_MEK);
@@ -3987,8 +3987,8 @@ public class Person {
                 return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
                       associatedSkillNames.get(1),
                       isAlternativeQualityAveraging);
-            case WAR_CORRESPONDANT:
-                associatedSkillNames = WAR_CORRESPONDANT.getSkillsForProfession();
+            case WAR_CORRESPONDENT:
+                associatedSkillNames = WAR_CORRESPONDENT.getSkillsForProfession();
                 return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
                       associatedSkillNames.get(1),
                       isAlternativeQualityAveraging);
@@ -4082,8 +4082,8 @@ public class Person {
                 return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
                       associatedSkillNames.get(1),
                       isAlternativeQualityAveraging);
-            case SPACE_PORT_WORKER:
-                associatedSkillNames = SPACE_PORT_WORKER.getSkillsForProfession();
+            case SPACEPORT_WORKER:
+                associatedSkillNames = SPACEPORT_WORKER.getSkillsForProfession();
                 return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
                       associatedSkillNames.get(1),
                       isAlternativeQualityAveraging);
@@ -4342,8 +4342,8 @@ public class Person {
                 return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
                       associatedSkillNames.get(1),
                       isAlternativeQualityAveraging);
-            case REPAIR_BAY_FOREMAN:
-                associatedSkillNames = REPAIR_BAY_FOREMAN.getSkillsForProfession();
+            case REPAIR_BAY_SUPERVISOR:
+                associatedSkillNames = REPAIR_BAY_SUPERVISOR.getSkillsForProfession();
                 return CalculateExperienceLevelForProfession(associatedSkillNames.get(0),
                       associatedSkillNames.get(1),
                       isAlternativeQualityAveraging);

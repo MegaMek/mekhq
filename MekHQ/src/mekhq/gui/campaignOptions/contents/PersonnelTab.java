@@ -46,6 +46,7 @@ import javax.swing.GroupLayout.ParallelGroup;
 import javax.swing.GroupLayout.SequentialGroup;
 import javax.swing.JSpinner.DefaultEditor;
 
+import megamek.Version;
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.annotations.Nullable;
@@ -269,8 +270,8 @@ public class PersonnelTab {
         spnSalaryExperienceMultipliers = new HashMap<>();
 
         pnlSalaryBaseSalaryPanel = new JPanel();
-        lblBaseSalary = new JLabel[29];
-        spnBaseSalary = new JSpinner[29];
+        lblBaseSalary = new JLabel[PersonnelRole.values().length];
+        spnBaseSalary = new JSpinner[PersonnelRole.values().length];
     }
 
     /**
@@ -1308,7 +1309,7 @@ public class PersonnelTab {
 
             // JSpinner
             JSpinner jSpinner = new JSpinner();
-            jSpinner.setModel(new SpinnerNumberModel(0.0, 0.0, 1000000, 10.0));
+            jSpinner.setModel(new SpinnerNumberModel(250.0, 0.0, 1000000, 10.0));
             jSpinner.setName("spn" + componentName);
 
             DefaultEditor editor = (DefaultEditor) jSpinner.getEditor();
@@ -1375,19 +1376,39 @@ public class PersonnelTab {
     }
 
     /**
-     * Shortcut method to load default {@link CampaignOptions} values into the tab components.
+     * @deprecated use {@link #loadValuesFromCampaignOptions(Version)} instead.
      */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public void loadValuesFromCampaignOptions() {
-        loadValuesFromCampaignOptions(null);
+        loadValuesFromCampaignOptions(null, new Version());
     }
 
     /**
-     * Loads the values from the provided {@link CampaignOptions} into the Personnel Tab components. If no preset
-     * options are provided, the current {@link CampaignOptions} instance is used.
-     *
-     * @param presetCampaignOptions optional custom {@link CampaignOptions} to load into the tab.
+     * Shortcut method to load default {@link CampaignOptions} values into the tab components.
      */
+    public void loadValuesFromCampaignOptions(Version version) {
+        loadValuesFromCampaignOptions(null, version);
+    }
+
+    /**
+     * @deprecated use {@link #loadValuesFromCampaignOptions(CampaignOptions, Version)} instead.
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions) {
+        loadValuesFromCampaignOptions(presetCampaignOptions, new Version());
+    }
+
+    /**
+     * Loads and applies configuration values from the provided {@link CampaignOptions} object, or uses the default
+     * campaign options if none are provided. The configuration includes general settings, personnel logs, personnel
+     * information, awards, medical settings, prisoner and dependent settings, and salary-related options. It also
+     * adjusts certain values based on the version of the application.
+     *
+     * @param presetCampaignOptions the {@link CampaignOptions} object to load settings from. If null, default campaign
+     *                              options will be used.
+     * @param version               the version of the application, used to determine adjustments for compatibility.
+     */
+    public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions, Version version) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;
@@ -1477,8 +1498,25 @@ public class PersonnelTab {
         for (final Entry<SkillLevel, JSpinner> entry : spnSalaryExperienceMultipliers.entrySet()) {
             entry.getValue().setValue(options.getSalaryXPMultipliers().get(entry.getKey()));
         }
+
         for (int i = 0; i < spnBaseSalary.length; i++) {
             spnBaseSalary[i].setValue(options.getRoleBaseSalaries()[i].getAmount().doubleValue());
+        }
+
+        if (version.isLowerThan(new Version("0.50.07"))) {
+            for (int i = 0; i < spnBaseSalary.length; i++) {
+                PersonnelRole personnelRole = PersonnelRole.values()[i];
+
+                if ((double) spnBaseSalary[i].getValue() == 0) {
+                    if (personnelRole == PersonnelRole.NONE) {
+                        continue;
+                    } else if (personnelRole == PersonnelRole.DEPENDENT) {
+                        spnBaseSalary[i].setValue(50);
+                    } else {
+                        spnBaseSalary[i].setValue(250);
+                    }
+                }
+            }
         }
     }
 

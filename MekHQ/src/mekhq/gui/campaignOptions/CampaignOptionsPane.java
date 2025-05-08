@@ -55,6 +55,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 
+import megamek.Version;
 import megamek.common.annotations.Nullable;
 import mekhq.CampaignPreset;
 import mekhq.MekHQ;
@@ -146,7 +147,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
               round(HEADER_FONT_SIZE * uiScale),
               resources.getString("generalPanel.title")), createGeneralTab(mode));
 
-        JTabbedPane humanResourcesParentTab = createHumanResourcesParentTab();
+        JTabbedPane humanResourcesParentTab = createHumanResourcesParentTab(campaign.getVersion());
         createTab("humanResourcesParentTab", humanResourcesParentTab);
 
         JTabbedPane advancementParentTab = createAdvancementParentTab();
@@ -209,7 +210,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
      *
      * @return a {@link JTabbedPane} containing sub-tabs for the human resources category
      */
-    private JTabbedPane createHumanResourcesParentTab() {
+    private JTabbedPane createHumanResourcesParentTab(Version version) {
         // Parent Tab
         JTabbedPane humanResourcesParentTab = new JTabbedPane();
 
@@ -228,7 +229,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
               personnelTab.createMedicalTab(),
               "salariesTab",
               personnelTab.createSalariesTab()));
-        personnelTab.loadValuesFromCampaignOptions();
+        personnelTab.loadValuesFromCampaignOptions(campaign.getVersion());
 
         // Biography
         biographyTab = new BiographyTab(campaign, generalTab);
@@ -533,7 +534,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         generalTab.loadValuesFromCampaignOptions(presetCampaignOptions, presetDate, presetFaction);
 
         // Human Resources
-        personnelTab.loadValuesFromCampaignOptions(presetCampaignOptions);
+        personnelTab.loadValuesFromCampaignOptions(presetCampaignOptions, campaign.getVersion());
         biographyTab.loadValuesFromCampaignOptions(presetCampaignOptions,
               presetCampaignOptions.getRandomOriginOptions(),
               campaignPreset.getRankSystem());

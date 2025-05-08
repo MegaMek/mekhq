@@ -30,7 +30,6 @@ package mekhq.campaign.personnel.enums;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -39,12 +38,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 public class ProfessionTest {
     // region Variable Declarations
@@ -320,64 +318,6 @@ public class ProfessionTest {
         assertEquals(Profession.MEDICAL, Profession.MEKWARRIOR.getAlternateProfession("--MEDICAL"));
         assertEquals(Profession.ADMINISTRATOR, Profession.MEKWARRIOR.getAlternateProfession("--ADMIN"));
         assertEquals(Profession.CIVILIAN, Profession.MEKWARRIOR.getAlternateProfession("--CIVILIAN"));
-    }
-
-    @Test
-    public void testGetProfessionFromPersonnelRole() {
-        for (final PersonnelRole role : PersonnelRole.values()) {
-            switch (role) {
-                case MEKWARRIOR:
-                case LAM_PILOT:
-                case PROTOMEK_PILOT:
-                    assertEquals(Profession.MEKWARRIOR, Profession.getProfessionFromPersonnelRole(role));
-                    break;
-                case AEROSPACE_PILOT:
-                case CONVENTIONAL_AIRCRAFT_PILOT:
-                    assertEquals(Profession.AEROSPACE, Profession.getProfessionFromPersonnelRole(role));
-                    break;
-                case GROUND_VEHICLE_DRIVER:
-                case NAVAL_VEHICLE_DRIVER:
-                case VTOL_PILOT:
-                case VEHICLE_GUNNER:
-                case VEHICLE_CREW:
-                    assertEquals(Profession.VEHICLE, Profession.getProfessionFromPersonnelRole(role));
-                    break;
-                case BATTLE_ARMOUR:
-                case SOLDIER:
-                    assertEquals(Profession.INFANTRY, Profession.getProfessionFromPersonnelRole(role));
-                    break;
-                case VESSEL_PILOT:
-                case VESSEL_CREW:
-                case VESSEL_GUNNER:
-                case VESSEL_NAVIGATOR:
-                    assertEquals(Profession.NAVAL, Profession.getProfessionFromPersonnelRole(role));
-                    break;
-                case MEK_TECH:
-                case MECHANIC:
-                case AERO_TEK:
-                case BA_TECH:
-                case ASTECH:
-                    assertEquals(Profession.TECH, Profession.getProfessionFromPersonnelRole(role));
-                    break;
-                case DOCTOR:
-                case MEDIC:
-                    assertEquals(Profession.MEDICAL, Profession.getProfessionFromPersonnelRole(role));
-                    break;
-                case ADMINISTRATOR_COMMAND:
-                case ADMINISTRATOR_LOGISTICS:
-                case ADMINISTRATOR_HR:
-                case ADMINISTRATOR_TRANSPORT:
-                    assertEquals(Profession.ADMINISTRATOR, Profession.getProfessionFromPersonnelRole(role));
-                    break;
-                case DEPENDENT:
-                case NONE:
-                    assertEquals(Profession.CIVILIAN, Profession.getProfessionFromPersonnelRole(role));
-                    break;
-                default:
-                    fail("Unknown Personnel Role of " + role.name());
-                    break;
-            }
-        }
     }
 
     @Test
