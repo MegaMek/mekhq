@@ -2073,7 +2073,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         JMenuHelpers.addMenuIfNonEmpty(popup, menu);
 
         menu = new JMenu(resources.getString("changeSecondaryRole.text"));
-
         JMenu menuCombatSecondary = new JMenu(resources.getString("changeRole.combat"));
         JMenu menuSupportSecondary = new JMenu(resources.getString("changeRole.support"));
         JMenu menuCivilianSecondary = new JMenu(resources.getString("changeRole.civilian"));
@@ -2094,15 +2093,14 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 if (oneSelected && role == person.getSecondaryRole()) {
                     cbMenuItem.setSelected(true);
                 }
-                menu.add(cbMenuItem);
-            }
 
-            if (role.isSubType(PersonnelRoleSubType.COMBAT)) {
-                menuCombatSecondary.add(cbMenuItem);
-            } else if (role.isSubType(PersonnelRoleSubType.SUPPORT)) {
-                menuSupportSecondary.add(cbMenuItem);
-            } else {
-                menuCivilianSecondary.add(cbMenuItem);
+                if (role.isSubType(PersonnelRoleSubType.COMBAT)) {
+                    menuCombatSecondary.add(cbMenuItem);
+                } else if (role.isSubType(PersonnelRoleSubType.SUPPORT)) {
+                    menuSupportSecondary.add(cbMenuItem);
+                } else {
+                    menuCivilianSecondary.add(cbMenuItem);
+                }
             }
         }
 
