@@ -727,7 +727,7 @@ class PersonnelRoleTest {
 
         // Act
         for (String skillName : role.getSkillsForProfession()) {
-            person.addSkill(skillName, 0, 0);
+            person.addSkill(skillName, 3, 0);
         }
 
         // Assert
@@ -737,6 +737,8 @@ class PersonnelRoleTest {
                     " cannot perform role " +
                     role +
                     " with skills " +
-                    person.getSkills().getSkillNames());
+                    person.getSkills().getSkillNames() +
+                    " expected :" +
+                    role.getSkillsForProfession());
     }
 }
