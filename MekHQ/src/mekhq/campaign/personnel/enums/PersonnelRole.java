@@ -42,6 +42,7 @@ import java.util.stream.Stream;
 
 import megamek.codeUtilities.MathUtility;
 import megamek.logging.MMLogger;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 
 /**
@@ -263,6 +264,118 @@ public enum PersonnelRole {
             case INTELLIGENCE -> intelligence;
             case WILLPOWER -> willpower;
             case CHARISMA -> charisma;
+        };
+    }
+
+    /**
+     * @return a list of skill names representing the profession-appropriate skills
+     *
+     * @see #getSkillsForProfession(boolean, boolean, boolean, boolean, boolean)
+     */
+    public List<String> getSkillsForProfession() {
+        return getSkillsForProfession(false, false, false, false, false);
+    }
+
+
+    /**
+     * Retrieves the list of skill names relevant to this profession, tailored according to provided campaign or
+     * generation options.
+     *
+     * <p>The set of returned skills may vary depending on input flags that define whether certain support or
+     * specialty skills (such as Negotiation, Scrounge, Administration, or Artillery) should be included for appropriate
+     * roles.</p>
+     *
+     * <p>This method is typically used during personnel creation or skill assignment to ensure each role receives a
+     * fitting skill set based on campaign rules and user preferences.</p>
+     *
+     * @param isAdminsHaveNegotiation    if {@code true}, includes Negotiation skill for administrators
+     * @param isAdminsHaveScrounge       if {@code true}, includes Scrounge skill for administrators
+     * @param isDoctorsUseAdministration if {@code true}, includes Administration skill for medical roles
+     * @param isTechsUseAdministration   if {@code true}, includes Administration skill for technical roles
+     * @param isUseArtillery             if {@code true}, includes Artillery skills where applicable
+     *
+     * @return a list of skill names representing the profession-appropriate skills
+     */
+    public List<String> getSkillsForProfession(boolean isAdminsHaveNegotiation, boolean isAdminsHaveScrounge,
+          boolean isDoctorsUseAdministration, boolean isTechsUseAdministration, boolean isUseArtillery) {
+        return switch (this) {
+            case MEKWARRIOR -> {
+                if (isUseArtillery) {
+                    yield List.of(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK, SkillType.S_ARTILLERY);
+                } else {
+                    yield List.of(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK);
+                }
+            }
+            case LAM_PILOT ->
+                  List.of(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK, SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO);
+            case GROUND_VEHICLE_DRIVER -> List.of(SkillType.S_PILOT_GVEE);
+            case NAVAL_VEHICLE_DRIVER -> List.of(SkillType.S_PILOT_NVEE);
+            case VTOL_PILOT -> List.of(SkillType.S_PILOT_VTOL);
+            case VEHICLE_GUNNER -> {
+                if (isUseArtillery) {
+                    yield List.of(SkillType.S_GUN_VEE, SkillType.S_ARTILLERY);
+                } else {
+                    yield List.of(SkillType.S_GUN_VEE);
+                }
+            }
+            case VEHICLE_CREW, MECHANIC -> List.of(SkillType.S_TECH_MECHANIC);
+            case AEROSPACE_PILOT -> List.of(SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO);
+            case CONVENTIONAL_AIRCRAFT_PILOT -> List.of(SkillType.S_GUN_JET, SkillType.S_PILOT_JET);
+            case PROTOMEK_PILOT -> List.of(SkillType.S_GUN_PROTO, SkillType.S_GUN_PROTO);
+            case BATTLE_ARMOUR -> List.of(SkillType.S_GUN_BA, SkillType.S_ANTI_MEK);
+            case SOLDIER -> List.of(SkillType.S_SMALL_ARMS);
+            case VESSEL_PILOT -> List.of(SkillType.S_PILOT_SPACE);
+            case VESSEL_GUNNER -> List.of(SkillType.S_GUN_SPACE);
+            case VESSEL_CREW -> {
+                if (isTechsUseAdministration) {
+                    yield List.of(SkillType.S_TECH_VESSEL, SkillType.S_ADMIN);
+                } else {
+                    yield List.of(SkillType.S_TECH_VESSEL);
+                }
+            }
+            case VESSEL_NAVIGATOR -> List.of(SkillType.S_NAVIGATION);
+            case MEK_TECH -> {
+                if (isTechsUseAdministration) {
+                    yield List.of(SkillType.S_TECH_MEK, SkillType.S_ADMIN);
+                } else {
+                    yield List.of(SkillType.S_TECH_MEK);
+                }
+            }
+            case AERO_TEK -> {
+                if (isTechsUseAdministration) {
+                    yield List.of(SkillType.S_TECH_AERO, SkillType.S_ADMIN);
+                } else {
+                    yield List.of(SkillType.S_TECH_AERO);
+                }
+            }
+            case BA_TECH -> {
+                if (isTechsUseAdministration) {
+                    yield List.of(SkillType.S_TECH_BA, SkillType.S_ADMIN);
+                } else {
+                    yield List.of(SkillType.S_TECH_BA);
+                }
+            }
+            case ASTECH -> List.of(SkillType.S_ASTECH);
+            case DOCTOR -> {
+                if (isDoctorsUseAdministration) {
+                    yield List.of(SkillType.S_SURGERY, SkillType.S_ADMIN);
+                } else {
+                    yield List.of(SkillType.S_SURGERY);
+                }
+            }
+            case MEDIC -> List.of(SkillType.S_MEDTECH);
+            case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_HR -> {
+                if (isAdminsHaveNegotiation && isAdminsHaveScrounge) {
+                    yield List.of(SkillType.S_ADMIN, SkillType.S_NEGOTIATION, SkillType.S_SCROUNGE);
+                } else if (isAdminsHaveNegotiation) {
+                    yield List.of(SkillType.S_ADMIN, SkillType.S_NEGOTIATION);
+                } else if (isAdminsHaveScrounge) {
+                    yield List.of(SkillType.S_ADMIN, SkillType.S_SCROUNGE);
+                } else {
+                    yield List.of(SkillType.S_ADMIN);
+                }
+            }
+            case DEPENDENT, NONE -> List.of();
         };
     }
     // endregion Getters
