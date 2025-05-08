@@ -6541,4 +6541,27 @@ public class Person {
             return 1 - modifier;
         }
     }
+
+    /**
+     * Removes all skills from the collection that match the specified subtype.
+     *
+     * <p>Iterates safely over the current list of skills, removing each skill whose type corresponds to the given
+     * {@link SkillSubType}.</p>
+     *
+     * @param subType the {@code SkillSubType} to remove from the collection
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public void removeAllSkillsOfSubType(SkillSubType subType) {
+        // We make an iteration safe list so we can easily remove skills during the loop
+        List<Skill> allSkills = new ArrayList<>(skills.getSkills());
+        for (Skill skill : allSkills) {
+            SkillType skillType = skill.getType();
+
+            if (skillType.isSubTypeOf(subType)) {
+                removeSkill(skillType.getName());
+            }
+        }
+    }
 }

@@ -522,6 +522,24 @@ class PersonnelRoleTest {
     }
 
     @Test
+    void testIsSupport() {
+        assertFalse(PersonnelRole.MEKWARRIOR.isSupport());
+        assertFalse(PersonnelRole.VESSEL_NAVIGATOR.isSupport());
+        assertTrue(PersonnelRole.MEK_TECH.isSupport());
+        assertTrue(PersonnelRole.ASTECH.isSupport());
+        assertTrue(PersonnelRole.ADMINISTRATOR_COMMAND.isSupport());
+        assertFalse(PersonnelRole.DEPENDENT.isSupport());
+        assertFalse(PersonnelRole.NONE.isSupport());
+        assertFalse(PersonnelRole.MEKWARRIOR.isSupport(true));
+        assertFalse(PersonnelRole.VESSEL_NAVIGATOR.isSupport(true));
+        assertTrue(PersonnelRole.MEK_TECH.isSupport(true));
+        assertTrue(PersonnelRole.ASTECH.isSupport(true));
+        assertTrue(PersonnelRole.ADMINISTRATOR_COMMAND.isSupport(true));
+        assertFalse(PersonnelRole.DEPENDENT.isSupport(true));
+        assertFalse(PersonnelRole.NONE.isSupport(true));
+    }
+
+    @Test
     void testIsTech() {
         for (final PersonnelRole personnelRole : roles) {
             switch (personnelRole) {
