@@ -746,7 +746,7 @@ public class MRMSService {
 
             Skill skill = tech.getSkillForWorkingOn(partWork);
 
-            if (partWork instanceof Part) {
+            if (canChangeWorkTime) {
                 ((Part) partWork).resetModeToNormal();
             }
 
@@ -813,9 +813,29 @@ public class MRMSService {
 
                 techSkillToWorktimeMap.put(skill.getType().getName() + "-" + skill.getLevel(), selectedWorktime);
 
-                if (partWork instanceof Part) {
+                if (canChangeWorkTime) {
                     ((Part) partWork).resetModeToNormal();
                 }
+            }
+
+            // Fallback TN check to account for discrepancies between Techs
+            TargetRoll targetRoll = campaign.getTargetFor(partWork, tech);
+            if (canChangeWorkTime) {
+                WorkTime wt = techSkillToWorktimeMap.get(skill.getType().getName() + "-" + skill.getLevel());
+                if (null == wt) {
+                    debugLog("[ERROR] Null work-time from techToWorktimeMap for %s", "repairPart", tech.getFullName());
+                    wt = WorkTime.NORMAL;
+                }
+                ((Part) partWork).setMode(wt);
+                // Get updated TN with worktime in mind
+                targetRoll = campaign.getTargetFor(partWork, tech);
+                ((Part) partWork).resetModeToNormal();
+            }
+
+            if (targetRoll.getValue() > mrmsOptions.getBthMax()) {
+                debugLog("... is above max TN allowed", "repairPart");
+
+                continue;
             }
 
             boolean assigned = false;
@@ -893,7 +913,7 @@ public class MRMSService {
 
         Person tech = validTechs.get(0);
 
-        if (partWork instanceof Part) {
+        if (canChangeWorkTime) {
             Skill skill = tech.getSkillForWorkingOn(partWork);
             WorkTime wt = techSkillToWorktimeMap.get(skill.getType().getName() + "-" + skill.getLevel());
 
@@ -1080,7 +1100,9 @@ public class MRMSService {
 
         debugLog("...... starting calculateNewMRMSWorktime", "calculateNewMRMSWorktime");
 
-        if (partWork instanceof Part) {
+        boolean canChangeWorkTime = (partWork instanceof Part) && partWork.canChangeWorkMode();
+
+        if (canChangeWorkTime) {
             ((Part) partWork).resetModeToNormal();
         }
 
@@ -1123,7 +1145,7 @@ public class MRMSService {
                 }
             }
 
-            // If we have a null newWorkTime, we're done. Use the previous one if within set min/max TNs.
+            // If we have a null newWorkTime, we're done. Use the previous one unless it exceeds the set max TN.
             if (null == newWorkTime) {
                 debugLog("...... ending calculateNewMRMSWorktime because newWorkTime is null - %s ns",
                         "calculateNewMRMSWorktime",
@@ -1132,7 +1154,7 @@ public class MRMSService {
                 targetRoll = campaign.getTargetFor(partWork, tech);
 
                 WorkTimeCalculation wtc = new WorkTimeCalculation(null);
-                if (mrmsOption.getBthMin() <= targetRoll.getValue() && targetRoll.getValue() <= mrmsOption.getBthMax()) {
+                if (targetRoll.getValue() <= mrmsOption.getBthMax()) {
                     wtc.setWorkTime(previousNewWorkTime);
                 }
                 if (skill.getExperienceLevel() >= highestAvailableTechSkill) {
@@ -1143,7 +1165,7 @@ public class MRMSService {
             }
 
             // Set our new workTime and calculate the new targetRoll
-            if (partWork instanceof Part) {
+            if (canChangeWorkTime) {
                 ((Part) partWork).setMode(newWorkTime);
             }
 
