@@ -1115,7 +1115,7 @@ public class Person {
                     yield false;
                 }
             }
-            case ANTIQUARIAN -> hasSkill(SkillType.S_ART_OTHER) && hasSkill(SkillType.S_ACTING);
+            case ANTIQUARIAN -> hasSkill(SkillType.S_INTEREST_ANTIQUES) && hasSkill(SkillType.S_INTEREST_HISTORY);
             case SPORTS_STAR -> hasSkill(SkillType.S_CAREER_ANY) && hasSkill(SkillType.S_INTEREST_SPORTS);
             case ASTROGRAPHER -> hasSkill(SkillType.S_INTEREST_CARTOGRAPHY) && hasSkill(SkillType.S_NAVIGATION);
             case BARBER -> hasSkill(SkillType.S_ART_OTHER) && hasSkill(SkillType.S_INTEREST_FASHION);
