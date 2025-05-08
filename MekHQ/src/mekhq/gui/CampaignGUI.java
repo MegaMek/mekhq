@@ -757,6 +757,11 @@ public class CampaignGUI extends JPanel {
         JMenu menuHireSupport = new JMenu(resourceMap.getString("menuHire.support"));
         JMenu menuHireCivilian = new JMenu(resourceMap.getString("menuHire.civilian"));
         for (PersonnelRole role : PersonnelRole.getPrimaryRoles()) {
+            // Dependent is handled speciality so that it's always at the top of the civilian category
+            if (role.isDependent()) {
+                continue;
+            }
+
             JMenuItem miHire = new JMenuItem(role.getLabel(getCampaign().getFaction().isClan()));
             if (role.getMnemonic() != KeyEvent.VK_UNDEFINED) {
                 miHire.setMnemonic(role.getMnemonic());
