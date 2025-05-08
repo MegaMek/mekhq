@@ -116,15 +116,7 @@ import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.AcademyFactory;
 import mekhq.campaign.personnel.education.EducationController;
-import mekhq.campaign.personnel.enums.FamilialRelationshipType;
-import mekhq.campaign.personnel.enums.ManeiDominiClass;
-import mekhq.campaign.personnel.enums.ManeiDominiRank;
-import mekhq.campaign.personnel.enums.MergingSurnameStyle;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.campaign.personnel.enums.Profession;
-import mekhq.campaign.personnel.enums.ROMDesignation;
-import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
+import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.Genealogy;
@@ -241,6 +233,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_PERSONALITY = "PERSONALITY";
     private static final String CMD_ADD_RANDOM_ABILITY = "ADD_RANDOM_ABILITY";
     private static final String CMD_GENERATE_ROLEPLAY_SKILLS = "GENERATE_ROLEPLAY_SKILLS";
+    private static final String CMD_REMOVE_ROLEPLAY_SKILLS = "REMOVE_ROLEPLAY_SKILLS";
     private static final String CMD_GENERATE_ROLEPLAY_ATTRIBUTES = "GENERATE_ROLEPLAY_ATTRIBUTES";
     private static final String CMD_GENERATE_ROLEPLAY_TRAITS = "GENERATE_ROLEPLAY_TRAITS";
 
@@ -1516,6 +1509,20 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
                 break;
             }
+            case CMD_REMOVE_ROLEPLAY_SKILLS: {
+                for (Person person : people) {
+                    // We make an iteration safe list so we can easily remove skills during the loop
+                    List<Skill> allSkills = new ArrayList<>(person.getSkills().getSkills());
+                    for (Skill skill : allSkills) {
+                        SkillType skillType = skill.getType();
+
+                        if (skillType.isRoleplaySkill()) {
+                            person.removeSkill(skillType.getName());
+                        }
+                    }
+                }
+                break;
+            }
             case CMD_GENERATE_ROLEPLAY_ATTRIBUTES: {
                 RandomSkillPreferences skillPreferences = getCampaign().getRandomSkillPreferences();
                 AbstractSkillGenerator skillGenerator = new DefaultSkillGenerator(skillPreferences);
@@ -2026,6 +2033,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         final PersonnelRole[] roles = PersonnelRole.values();
 
         menu = new JMenu(resources.getString("changePrimaryRole.text"));
+        JMenu menuCombatPrimary = new JMenu(resources.getString("changeRole.combat"));
+        JMenu menuSupportPrimary = new JMenu(resources.getString("changeRole.support"));
+        JMenu menuCivilianPrimary = new JMenu(resources.getString("changeRole.civilian"));
+
         for (final PersonnelRole role : roles) {
             boolean allCanPerform = true;
 
@@ -2043,12 +2054,33 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 if (oneSelected && role == person.getPrimaryRole()) {
                     cbMenuItem.setSelected(true);
                 }
-                menu.add(cbMenuItem);
+
+                if (role.isSubType(PersonnelRoleSubType.COMBAT)) {
+                    menuCombatPrimary.add(cbMenuItem);
+                } else if (role.isSubType(PersonnelRoleSubType.SUPPORT)) {
+                    menuSupportPrimary.add(cbMenuItem);
+                } else {
+                    menuCivilianPrimary.add(cbMenuItem);
+                }
             }
         }
+        if (menuCombatPrimary.getItemCount() > 0) {
+            menu.add(menuCombatPrimary);
+        }
+        if (menuSupportPrimary.getItemCount() > 0) {
+            menu.add(menuSupportPrimary);
+        }
+        if (menuCivilianPrimary.getItemCount() > 0) {
+            menu.add(menuCivilianPrimary);
+        }
+
         JMenuHelpers.addMenuIfNonEmpty(popup, menu);
 
         menu = new JMenu(resources.getString("changeSecondaryRole.text"));
+
+        JMenu menuCombatSecondary = new JMenu(resources.getString("changeRole.combat"));
+        JMenu menuSupportSecondary = new JMenu(resources.getString("changeRole.support"));
+        JMenu menuCivilianSecondary = new JMenu(resources.getString("changeRole.civilian"));
         for (final PersonnelRole role : roles) {
             boolean allCanPerform = true;
 
@@ -2068,7 +2100,26 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
                 menu.add(cbMenuItem);
             }
+
+            if (role.isSubType(PersonnelRoleSubType.COMBAT)) {
+                menuCombatSecondary.add(cbMenuItem);
+            } else if (role.isSubType(PersonnelRoleSubType.SUPPORT)) {
+                menuSupportSecondary.add(cbMenuItem);
+            } else {
+                menuCivilianSecondary.add(cbMenuItem);
+            }
         }
+
+        if (menuCombatSecondary.getItemCount() > 0) {
+            menu.add(menuCombatSecondary);
+        }
+        if (menuSupportSecondary.getItemCount() > 0) {
+            menu.add(menuSupportSecondary);
+        }
+        if (menuCivilianSecondary.getItemCount() > 0) {
+            menu.add(menuCivilianSecondary);
+        }
+
         JMenuHelpers.addMenuIfNonEmpty(popup, menu);
 
         // change salary
@@ -4048,6 +4099,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
             menuItem = new JMenuItem(resources.getString("generateRoleplaySkills.text"));
             menuItem.setActionCommand(CMD_GENERATE_ROLEPLAY_SKILLS);
+            menuItem.addActionListener(this);
+            menu.add(menuItem);
+
+            menuItem = new JMenuItem(resources.getString("removeRoleplaySkills.text"));
+            menuItem.setActionCommand(CMD_REMOVE_ROLEPLAY_SKILLS);
             menuItem.addActionListener(this);
             menu.add(menuItem);
 
