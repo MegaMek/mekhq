@@ -101,6 +101,7 @@ import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.swing.util.PlayerColour;
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
@@ -1877,7 +1878,9 @@ public class Campaign implements ITechManager {
      * @return Return a {@link Person} object representing the new dependent.
      */
     public Person newDependent(Gender gender, @Nullable Faction originFaction, @Nullable Planet originPlanet) {
-        return newPerson(PersonnelRole.DEPENDENT,
+        List<PersonnelRole> civilianRoles = PersonnelRole.getCivilianRolesExceptNone();
+
+        return newPerson(ObjectUtility.getRandomItem(civilianRoles),
               PersonnelRole.NONE,
               new DefaultFactionSelector(getCampaignOptions().getRandomOriginOptions(), originFaction),
               new DefaultPlanetSelector(getCampaignOptions().getRandomOriginOptions(), originPlanet),

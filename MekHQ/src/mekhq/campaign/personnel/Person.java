@@ -94,15 +94,7 @@ import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
-import mekhq.campaign.personnel.enums.BloodGroup;
-import mekhq.campaign.personnel.enums.ManeiDominiClass;
-import mekhq.campaign.personnel.enums.ManeiDominiRank;
-import mekhq.campaign.personnel.enums.ModifierValue;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.campaign.personnel.enums.Phenotype;
-import mekhq.campaign.personnel.enums.Profession;
-import mekhq.campaign.personnel.enums.ROMDesignation;
+import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.Genealogy;
@@ -1004,6 +996,38 @@ public class Person {
             bgPrefix = getPhenotype().getShortName() + ' ';
         }
         return bgPrefix + getPrimaryRole().getLabel(isClanPersonnel());
+    }
+
+    /**
+     * Returns an HTML-formatted string describing the primary and, if applicable, secondary personnel roles. Civilian
+     * roles are displayed in italics. If a secondary role is present and is not {@code NONE}, it is appended to the
+     * description, separated by a slash. The description is wrapped in HTML tags.
+     *
+     * @return an HTML-formatted string describing the personnel roles, with civilian roles shown in italics
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public String getFormatedRoleDescriptions() {
+        String description = "<html>";
+        if (primaryRole.isSubType(PersonnelRoleSubType.CIVILIAN)) {
+            if (primaryRole.isNone()) {
+                description += "<b>" + getPrimaryRoleDesc() + "</b>";
+            } else {
+                description += "<i>" + getPrimaryRoleDesc() + "</i>";
+            }
+        }
+
+        if (!secondaryRole.isNone()) {
+            description += " <b>/</b> ";
+
+            if (secondaryRole.isSubType(PersonnelRoleSubType.CIVILIAN)) {
+                description += "<i>" + getSecondaryRoleDesc() + "</i>";
+            }
+        }
+
+        description += "</html>";
+        return description;
     }
 
     public String getSecondaryRoleDesc() {

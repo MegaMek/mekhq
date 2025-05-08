@@ -1503,7 +1503,7 @@ public class PersonnelTab {
             spnBaseSalary[i].setValue(options.getRoleBaseSalaries()[i].getAmount().doubleValue());
         }
 
-        if (version.isLowerThan(new Version("0.50.07"))) {
+        if (version != null && version.isLowerThan(new Version("0.50.07"))) {
             for (int i = 0; i < spnBaseSalary.length; i++) {
                 PersonnelRole personnelRole = PersonnelRole.values()[i];
 

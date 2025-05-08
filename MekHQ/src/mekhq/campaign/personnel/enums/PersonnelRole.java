@@ -1012,6 +1012,26 @@ public enum PersonnelRole {
     }
 
     /**
+     * Returns a list of {@link PersonnelRole} instances that are of the subtype {@code CIVILIAN}, excluding the
+     * {@code NONE} role.
+     *
+     * @return a {@code List<PersonnelRole>} containing all civilian personnel roles except {@code NONE}
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public static List<PersonnelRole> getCivilianRolesExceptNone() {
+        List<PersonnelRole> civilianRoles = new ArrayList<>();
+        for (PersonnelRole personnelRole : PersonnelRole.values()) {
+            if (personnelRole.isSubType(PersonnelRoleSubType.CIVILIAN)) {
+                civilianRoles.add(personnelRole);
+            }
+        }
+        civilianRoles.remove(NONE);
+        return civilianRoles;
+    }
+
+    /**
      * @return a list of roles that are potential primary roles. Currently, this is all bar NONE
      */
     public static List<PersonnelRole> getPrimaryRoles() {
