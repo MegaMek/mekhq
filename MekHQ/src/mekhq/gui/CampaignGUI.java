@@ -752,6 +752,10 @@ public class CampaignGUI extends JPanel {
 
         JMenu menuHire = new JMenu(resourceMap.getString("menuHire.text"));
         menuHire.setMnemonic(KeyEvent.VK_H);
+
+        JMenu menuHireCombat = new JMenu(resourceMap.getString("menuHire.combat"));
+        JMenu menuHireSupport = new JMenu(resourceMap.getString("menuHire.support"));
+        JMenu menuHireCivilian = new JMenu(resourceMap.getString("menuHire.civilian"));
         for (PersonnelRole role : PersonnelRole.getPrimaryRoles()) {
             JMenuItem miHire = new JMenuItem(role.getLabel(getCampaign().getFaction().isClan()));
             if (role.getMnemonic() != KeyEvent.VK_UNDEFINED) {
@@ -760,8 +764,29 @@ public class CampaignGUI extends JPanel {
             }
             miHire.setActionCommand(role.name());
             miHire.addActionListener(this::hirePerson);
-            menuHire.add(miHire);
+
+            if (role.isCombat()) {
+                menuHireCombat.add(miHire);
+            } else if (role.isSupport(true)) {
+                menuHireSupport.add(miHire);
+            } else if (!role.isDependent()) {
+                menuHireCivilian.add(miHire);
+            }
         }
+
+        JMenuItem miHire = new JMenuItem(PersonnelRole.DEPENDENT.getLabel(getCampaign().getFaction().isClan()));
+        if (PersonnelRole.DEPENDENT.getMnemonic() != KeyEvent.VK_UNDEFINED) {
+            miHire.setMnemonic(PersonnelRole.DEPENDENT.getMnemonic());
+            miHire.setAccelerator(KeyStroke.getKeyStroke(PersonnelRole.DEPENDENT.getMnemonic(),
+                  InputEvent.ALT_DOWN_MASK));
+        }
+        miHire.setActionCommand(PersonnelRole.DEPENDENT.name());
+        miHire.addActionListener(this::hirePerson);
+        menuHireCivilian.insert(miHire, 0);
+
+        menuHire.add(menuHireCombat);
+        menuHire.add(menuHireSupport);
+        menuHire.add(menuHireCivilian);
         menuMarket.add(menuHire);
 
         // region Astech Pool
