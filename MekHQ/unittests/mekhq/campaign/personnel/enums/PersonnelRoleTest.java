@@ -51,6 +51,8 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.Factions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mockito;
 
 class PersonnelRoleTest {
@@ -705,31 +707,30 @@ class PersonnelRoleTest {
     }
     // endregion Static Methods
 
-    @Test
-    void testRoleEligibility() {
-        for (PersonnelRole role : PersonnelRole.values()) {
-            if (role.equals(PersonnelRole.NONE)) {
-                continue;
-            }
+    @ParameterizedTest
+    @EnumSource(value = PersonnelRole.class, names = "NONE", mode = EnumSource.Mode.EXCLUDE)
+    void testRoleEligibility(PersonnelRole role) {
+        // Setup
+        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        when(mockCampaign.getFaction()).thenReturn(Factions.getInstance().getFaction("MERC"));
 
-            Campaign mockCampaign = Mockito.mock(Campaign.class);
-            when(mockCampaign.getFaction()).thenReturn(Factions.getInstance().getFaction("MERC"));
-            Person person = new Person(mockCampaign);
-            SkillType.initializeTypes();
+        Person person = new Person(mockCampaign);
 
+        SkillType.initializeTypes();
+        LocalDate today = LocalDate.of(9999, 1, 1);
 
-            for (String skillName : role.getSkillsForProfession()) {
-                person.addSkill(skillName, 0, 0);
-            }
-
-            LocalDate today = LocalDate.of(9999, 1, 1);
-            assertTrue(person.canPerformRole(today, role, true),
-                  "Person " +
-                        person +
-                        " cannot perform role " +
-                        role +
-                        " with skills " +
-                        person.getSkills().getSkillNames());
+        // Act
+        for (String skillName : role.getSkillsForProfession()) {
+            person.addSkill(skillName, 0, 0);
         }
+
+        // Assert
+        assertTrue(person.canPerformRole(today, role, true),
+              "Person " +
+                    person +
+                    " cannot perform role " +
+                    role +
+                    " with skills " +
+                    person.getSkills().getSkillNames());
     }
 }
