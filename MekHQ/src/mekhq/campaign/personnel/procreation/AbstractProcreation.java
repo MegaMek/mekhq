@@ -27,11 +27,11 @@
  */
 package mekhq.campaign.personnel.procreation;
 
-import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.POSTPARTUM_RECOVERY;
 import static mekhq.campaign.personnel.BodyLocation.INTERNAL;
 import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
 import static mekhq.campaign.personnel.enums.BloodGroup.getInheritedBloodGroup;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
+import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.POSTPARTUM_RECOVERY;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.time.LocalDate;
@@ -59,6 +59,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.RandomProcreationMethod;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
@@ -418,7 +419,8 @@ public abstract class AbstractProcreation {
             baby.setSurname(campaignOptions.getBabySurnameStyle()
                                   .generateBabySurname(mother, father, baby.getGender()));
             baby.setDateOfBirth(today);
-            baby.removeAllSkills();// Limit skills by age for children and adolescents
+            baby.removeAllSkills(); // Limit skills by age for children and adolescents
+            baby.setPrimaryRole(campaign, PersonnelRole.DEPENDENT);
 
             // re-roll SPAs to include in any age and skill adjustments
             Enumeration<IOption> options = new PersonnelOptions().getOptions(PersonnelOptions.LVL3_ADVANTAGES);
