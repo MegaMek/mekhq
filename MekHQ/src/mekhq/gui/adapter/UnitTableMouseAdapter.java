@@ -412,7 +412,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                         overrideSkills(false,
                               false,
                               false,
-                              false,
+                              false, campaign.getCampaignOptions().isUseArtillery(),
                               useExtraRandomness,
                               person,
                               person.getPrimaryRole(),

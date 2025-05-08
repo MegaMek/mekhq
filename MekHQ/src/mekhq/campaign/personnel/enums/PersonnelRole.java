@@ -42,6 +42,7 @@ import java.util.stream.Stream;
 
 import megamek.codeUtilities.MathUtility;
 import megamek.logging.MMLogger;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 
 /**
@@ -143,17 +144,127 @@ public enum PersonnelRole {
     // ATOW: Faceman Archetype
     ADMINISTRATOR_HR(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_H, 3, 3, 3, 4, 6, 3, 5),
 
-    // No archetype, but ATOW pg 35 states that the Attribute scores for an average person are 4
-    DEPENDENT(PersonnelRoleSubType.CIVILIAN, KeyEvent.VK_UNDEFINED, 4, 4, 4, 4, 4, 4, 4),
-
     // If we're generating a character without a Profession, we're just going to leave them with middle of the road
     // Attribute scores (5 in everything)
-    NONE(KeyEvent.VK_UNDEFINED);
+    NONE(PersonnelRoleSubType.CIVILIAN, false, KeyEvent.VK_UNDEFINED, 5, 5, 5, 5, 5, 5, 5),
+
+    // No archetype, but ATOW pg 35 states that the Attribute scores for an average person are 4
+    DEPENDENT(KeyEvent.VK_UNDEFINED),
+    ADULT_ENTERTAINER(KeyEvent.VK_UNDEFINED),
+    ANTIQUARIAN(KeyEvent.VK_UNDEFINED),
+    SPORTS_STAR(KeyEvent.VK_UNDEFINED),
+    ASTROGRAPHER(KeyEvent.VK_UNDEFINED),
+    BARBER(KeyEvent.VK_UNDEFINED),
+    BARTENDER(KeyEvent.VK_UNDEFINED),
+    WAR_CORRESPONDANT(KeyEvent.VK_UNDEFINED),
+    BRAWLER(KeyEvent.VK_UNDEFINED),
+    BROKER(KeyEvent.VK_UNDEFINED),
+    CHEF(KeyEvent.VK_UNDEFINED),
+    CIVILIAN_AERO_MECHANIC(KeyEvent.VK_UNDEFINED),
+    CIVILIAN_DROPSHIP_PILOT(KeyEvent.VK_UNDEFINED),
+    CIVILIAN_GUARD(KeyEvent.VK_UNDEFINED),
+    CIVILIAN_VTOL_PILOT(KeyEvent.VK_UNDEFINED),
+    CIVIL_CLERK(KeyEvent.VK_UNDEFINED),
+    CLOWN(KeyEvent.VK_UNDEFINED),
+    CON_ARTIST(KeyEvent.VK_UNDEFINED),
+    MILITARY_CORONER(KeyEvent.VK_UNDEFINED),
+    COURIER(KeyEvent.VK_UNDEFINED),
+    CRIMINAL_MECHANIC(KeyEvent.VK_UNDEFINED),
+    CULTURAL_CENSOR(KeyEvent.VK_UNDEFINED),
+    CULTURAL_LIAISON(KeyEvent.VK_UNDEFINED),
+    CUSTOMS_INSPECTOR(KeyEvent.VK_UNDEFINED),
+    DATA_SMUGGLER(KeyEvent.VK_UNDEFINED),
+    DATA_ANALYST(KeyEvent.VK_UNDEFINED),
+    SPACE_PORT_WORKER(KeyEvent.VK_UNDEFINED),
+    DRUG_DEALER(KeyEvent.VK_UNDEFINED),
+    FACTORY_WORKER(KeyEvent.VK_UNDEFINED),
+    LIVESTOCK_FARMER(KeyEvent.VK_UNDEFINED),
+    AGRI_FARMER(KeyEvent.VK_UNDEFINED),
+    FIREFIGHTER(KeyEvent.VK_UNDEFINED),
+    FISHER(KeyEvent.VK_UNDEFINED),
+    FORGER(KeyEvent.VK_UNDEFINED),
+    GAMBLER(KeyEvent.VK_UNDEFINED),
+    CIVILIAN_DOCTOR(KeyEvent.VK_UNDEFINED),
+    HACKER(KeyEvent.VK_UNDEFINED),
+    HERALD(KeyEvent.VK_UNDEFINED),
+    HISTORIAN(KeyEvent.VK_UNDEFINED),
+    HOLO_CARTOGRAPHER(KeyEvent.VK_UNDEFINED),
+    HOLO_GAMER(KeyEvent.VK_UNDEFINED),
+    HOLO_JOURNALIST(KeyEvent.VK_UNDEFINED),
+    HOLO_STAR(KeyEvent.VK_UNDEFINED),
+    INDUSTRIAL_MEK_PILOT(KeyEvent.VK_UNDEFINED),
+    INFORMATION_BROKER(KeyEvent.VK_UNDEFINED),
+    MILITARY_LIAISON(KeyEvent.VK_UNDEFINED),
+    JANITOR(KeyEvent.VK_UNDEFINED),
+    JUMPSHIP_CHEF(KeyEvent.VK_UNDEFINED),
+    EXOSKELETON_LABORER(KeyEvent.VK_UNDEFINED),
+    LAWYER(KeyEvent.VK_UNDEFINED),
+    PROPHET(KeyEvent.VK_UNDEFINED),
+    RELIC_HUNTER(KeyEvent.VK_UNDEFINED),
+    MEDIATOR(KeyEvent.VK_UNDEFINED),
+    MEDICAL_RESEARCHER(KeyEvent.VK_UNDEFINED),
+    MEK_RANGE_INSTRUCTOR(KeyEvent.VK_UNDEFINED),
+    MERCHANT(KeyEvent.VK_UNDEFINED),
+    MILITARY_ACCOUNTANT(KeyEvent.VK_UNDEFINED),
+    MILITARY_ANALYST(KeyEvent.VK_UNDEFINED),
+    SPY(KeyEvent.VK_UNDEFINED),
+    MILITARY_THEORIST(KeyEvent.VK_UNDEFINED),
+    MINER(KeyEvent.VK_UNDEFINED),
+    MOUNTAIN_CLIMBER(KeyEvent.VK_UNDEFINED),
+    FACTORY_FOREMAN(KeyEvent.VK_UNDEFINED),
+    MUNITIONS_FACTORY_WORKER(KeyEvent.VK_UNDEFINED),
+    MUSICIAN(KeyEvent.VK_UNDEFINED),
+    ORBITAL_DEFENSE_GUNNER(KeyEvent.VK_UNDEFINED),
+    ORBITAL_SHUTTLE_PILOT(KeyEvent.VK_UNDEFINED),
+    PARAMEDIC(KeyEvent.VK_UNDEFINED),
+    PAINTER(KeyEvent.VK_UNDEFINED),
+    PATHFINDER(KeyEvent.VK_UNDEFINED),
+    PERFORMER(KeyEvent.VK_UNDEFINED),
+    PERSONAL_VALET(KeyEvent.VK_UNDEFINED),
+    ESCAPED_PRISONER(KeyEvent.VK_UNDEFINED),
+    PROPAGANDIST(KeyEvent.VK_UNDEFINED),
+    PSYCHOLOGIST(KeyEvent.VK_UNDEFINED),
+    FIRING_RANGE_SAFETY_OFFICER(KeyEvent.VK_UNDEFINED),
+    RECRUITMENT_SCREENING_OFFICER(KeyEvent.VK_UNDEFINED),
+    RELIGIOUS_LEADER(KeyEvent.VK_UNDEFINED),
+    REPAIR_BAY_FOREMAN(KeyEvent.VK_UNDEFINED),
+    REVOLUTIONIST(KeyEvent.VK_UNDEFINED),
+    RITUALIST(KeyEvent.VK_UNDEFINED),
+    SALVAGE_RAT(KeyEvent.VK_UNDEFINED),
+    SCRIBE(KeyEvent.VK_UNDEFINED),
+    SCULPTURER(KeyEvent.VK_UNDEFINED),
+    SENSOR_TECHNICIAN(KeyEvent.VK_UNDEFINED),
+    CIVILIAN_PILOT(KeyEvent.VK_UNDEFINED),
+    STREET_SURGEON(KeyEvent.VK_UNDEFINED),
+    SWIMMING_INSTRUCTOR(KeyEvent.VK_UNDEFINED),
+    TACTICAL_ANALYST(KeyEvent.VK_UNDEFINED),
+    TAILOR(KeyEvent.VK_UNDEFINED),
+    TEACHER(KeyEvent.VK_UNDEFINED),
+    TECH_COMMUNICATIONS(KeyEvent.VK_UNDEFINED),
+    TECH_ZERO_G(KeyEvent.VK_UNDEFINED),
+    TECH_HYDROPONICS(KeyEvent.VK_UNDEFINED),
+    TECH_FUSION_PLANT(KeyEvent.VK_UNDEFINED),
+    TECH_SECURITY(KeyEvent.VK_UNDEFINED),
+    TECH_WASTE_MANAGEMENT(KeyEvent.VK_UNDEFINED),
+    TECH_WATER_RECLAMATION(KeyEvent.VK_UNDEFINED),
+    THIEF(KeyEvent.VK_UNDEFINED),
+    TRAINING_SIM_OPERATOR(KeyEvent.VK_UNDEFINED),
+    TRANSPORT_DRIVER(KeyEvent.VK_UNDEFINED),
+    ARTIST(KeyEvent.VK_UNDEFINED),
+    FENCE(KeyEvent.VK_UNDEFINED),
+    WAREHOUSE_WORKER(KeyEvent.VK_UNDEFINED),
+    WARFARE_PLANNER(KeyEvent.VK_UNDEFINED),
+    WEATHERCASTER(KeyEvent.VK_UNDEFINED),
+    XENOANIMAL_TRAINER(KeyEvent.VK_UNDEFINED),
+    XENO_BIOLOGIST(KeyEvent.VK_UNDEFINED),
+    GENETICIST(KeyEvent.VK_UNDEFINED),
+    BURGLAR(KeyEvent.VK_UNDEFINED),
+    MISCELLANEOUS_JOB(KeyEvent.VK_UNDEFINED);
     // endregion Enum Declarations
 
     // region Variable Declarations
     private static final MMLogger logger = MMLogger.create(PersonnelRole.class);
-    private static final String RESOURCE_BUNDLE = "mekhq.resources." + PersonnelRole.class.getSimpleName();
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.PersonnelRole";
 
     private final PersonnelRoleSubType subType;
     private final boolean hasClanName;
@@ -169,7 +280,7 @@ public enum PersonnelRole {
 
     // region Constructors
     PersonnelRole(final int mnemonic) {
-        this(PersonnelRoleSubType.CIVILIAN, false, mnemonic, 5, 5, 5, 5, 5, 5, 5);
+        this(PersonnelRoleSubType.CIVILIAN, false, mnemonic, 4, 4, 4, 4, 4, 4, 4);
     }
 
     PersonnelRole(final PersonnelRoleSubType subType, final int mnemonic, final int strength, final int body,
@@ -263,6 +374,229 @@ public enum PersonnelRole {
             case INTELLIGENCE -> intelligence;
             case WILLPOWER -> willpower;
             case CHARISMA -> charisma;
+        };
+    }
+
+    /**
+     * @return a list of skill names representing the profession-appropriate skills
+     *
+     * @see #getSkillsForProfession(boolean, boolean, boolean, boolean, boolean)
+     */
+    public List<String> getSkillsForProfession() {
+        return getSkillsForProfession(false, false, false, false, false);
+    }
+
+
+    /**
+     * Retrieves the list of skill names relevant to this profession, tailored according to provided campaign or
+     * generation options.
+     *
+     * <p>The set of returned skills may vary depending on input flags that define whether certain support or
+     * specialty skills (such as Negotiation, Scrounge, Administration, or Artillery) should be included for appropriate
+     * roles.</p>
+     *
+     * <p>This method is typically used during personnel creation or skill assignment to ensure each role receives a
+     * fitting skill set based on campaign rules and user preferences.</p>
+     *
+     * @param isAdminsHaveNegotiation    if {@code true}, includes Negotiation skill for administrators
+     * @param isAdminsHaveScrounge       if {@code true}, includes Scrounge skill for administrators
+     * @param isDoctorsUseAdministration if {@code true}, includes Administration skill for medical roles
+     * @param isTechsUseAdministration   if {@code true}, includes Administration skill for technical roles
+     * @param isUseArtillery             if {@code true}, includes Artillery skills where applicable
+     *
+     * @return a list of skill names representing the profession-appropriate skills
+     */
+    public List<String> getSkillsForProfession(boolean isAdminsHaveNegotiation, boolean isAdminsHaveScrounge,
+          boolean isDoctorsUseAdministration, boolean isTechsUseAdministration, boolean isUseArtillery) {
+        return switch (this) {
+            case MEKWARRIOR -> {
+                if (isUseArtillery) {
+                    yield List.of(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK, SkillType.S_ARTILLERY);
+                } else {
+                    yield List.of(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK);
+                }
+            }
+            case LAM_PILOT ->
+                  List.of(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK, SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO);
+            case GROUND_VEHICLE_DRIVER -> List.of(SkillType.S_PILOT_GVEE);
+            case NAVAL_VEHICLE_DRIVER -> List.of(SkillType.S_PILOT_NVEE);
+            case VTOL_PILOT -> List.of(SkillType.S_PILOT_VTOL);
+            case VEHICLE_GUNNER -> {
+                if (isUseArtillery) {
+                    yield List.of(SkillType.S_GUN_VEE, SkillType.S_ARTILLERY);
+                } else {
+                    yield List.of(SkillType.S_GUN_VEE);
+                }
+            }
+            case VEHICLE_CREW, MECHANIC -> List.of(SkillType.S_TECH_MECHANIC);
+            case AEROSPACE_PILOT -> List.of(SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO);
+            case CONVENTIONAL_AIRCRAFT_PILOT -> List.of(SkillType.S_GUN_JET, SkillType.S_PILOT_JET);
+            case PROTOMEK_PILOT -> List.of(SkillType.S_GUN_PROTO, SkillType.S_GUN_PROTO);
+            case BATTLE_ARMOUR -> List.of(SkillType.S_GUN_BA, SkillType.S_ANTI_MEK);
+            case SOLDIER -> List.of(SkillType.S_SMALL_ARMS);
+            case VESSEL_PILOT -> List.of(SkillType.S_PILOT_SPACE);
+            case VESSEL_GUNNER -> List.of(SkillType.S_GUN_SPACE);
+            case VESSEL_CREW -> {
+                if (isTechsUseAdministration) {
+                    yield List.of(SkillType.S_TECH_VESSEL, SkillType.S_ADMIN);
+                } else {
+                    yield List.of(SkillType.S_TECH_VESSEL);
+                }
+            }
+            case VESSEL_NAVIGATOR -> List.of(SkillType.S_NAVIGATION);
+            case MEK_TECH -> {
+                if (isTechsUseAdministration) {
+                    yield List.of(SkillType.S_TECH_MEK, SkillType.S_ADMIN);
+                } else {
+                    yield List.of(SkillType.S_TECH_MEK);
+                }
+            }
+            case AERO_TEK -> {
+                if (isTechsUseAdministration) {
+                    yield List.of(SkillType.S_TECH_AERO, SkillType.S_ADMIN);
+                } else {
+                    yield List.of(SkillType.S_TECH_AERO);
+                }
+            }
+            case BA_TECH -> {
+                if (isTechsUseAdministration) {
+                    yield List.of(SkillType.S_TECH_BA, SkillType.S_ADMIN);
+                } else {
+                    yield List.of(SkillType.S_TECH_BA);
+                }
+            }
+            case ASTECH -> List.of(SkillType.S_ASTECH);
+            case DOCTOR -> {
+                if (isDoctorsUseAdministration) {
+                    yield List.of(SkillType.S_SURGERY, SkillType.S_ADMIN);
+                } else {
+                    yield List.of(SkillType.S_SURGERY);
+                }
+            }
+            case MEDIC -> List.of(SkillType.S_MEDTECH);
+            case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_HR -> {
+                if (isAdminsHaveNegotiation && isAdminsHaveScrounge) {
+                    yield List.of(SkillType.S_ADMIN, SkillType.S_NEGOTIATION, SkillType.S_SCROUNGE);
+                } else if (isAdminsHaveNegotiation) {
+                    yield List.of(SkillType.S_ADMIN, SkillType.S_NEGOTIATION);
+                } else if (isAdminsHaveScrounge) {
+                    yield List.of(SkillType.S_ADMIN, SkillType.S_SCROUNGE);
+                } else {
+                    yield List.of(SkillType.S_ADMIN);
+                }
+            }
+            case DEPENDENT, NONE -> List.of(String.valueOf(SkillType.EXP_NONE));
+            case ADULT_ENTERTAINER -> List.of(SkillType.S_ART_OTHER, SkillType.S_ACTING);
+            case ANTIQUARIAN -> List.of(SkillType.S_INTEREST_ANTIQUES, SkillType.S_INTEREST_HISTORY);
+            case SPORTS_STAR -> List.of(SkillType.S_CAREER_ANY, SkillType.S_INTEREST_SPORTS);
+            case ASTROGRAPHER -> List.of(SkillType.S_INTEREST_CARTOGRAPHY, SkillType.S_NAVIGATION);
+            case BARBER -> List.of(SkillType.S_ART_OTHER, SkillType.S_INTEREST_FASHION);
+            case BARTENDER -> List.of(SkillType.S_STREETWISE, SkillType.S_INTEREST_POP_CULTURE);
+            case WAR_CORRESPONDANT -> List.of(SkillType.S_ART_WRITING, SkillType.S_INTEREST_MILITARY);
+            case BRAWLER -> List.of(SkillType.S_MARTIAL_ARTS, SkillType.S_STREETWISE);
+            case BROKER -> List.of(SkillType.S_STREETWISE, SkillType.S_NEGOTIATION);
+            case CHEF -> List.of(SkillType.S_ART_COOKING, SkillType.S_LEADER);
+            case CIVILIAN_AERO_MECHANIC -> List.of(SkillType.S_TECH_AERO, SkillType.S_TECH_MECHANIC);
+            case CIVILIAN_DROPSHIP_PILOT -> List.of(SkillType.S_PILOT_SPACE, SkillType.S_PROTOCOLS);
+            case CIVILIAN_GUARD -> List.of(SkillType.S_SMALL_ARMS, SkillType.S_PERCEPTION);
+            case CIVILIAN_VTOL_PILOT -> List.of(SkillType.S_PILOT_VTOL, SkillType.S_TECH_MECHANIC);
+            case CIVIL_CLERK -> List.of(SkillType.S_ADMIN, SkillType.S_PROTOCOLS);
+            case CLOWN -> List.of(SkillType.S_ACROBATICS, SkillType.S_ACTING);
+            case CON_ARTIST -> List.of(SkillType.S_DISGUISE, SkillType.S_ACTING);
+            case MILITARY_CORONER -> List.of(SkillType.S_SURGERY, SkillType.S_SCIENCE_PHARMACOLOGY);
+            case COURIER -> List.of(SkillType.S_RUNNING, SkillType.S_STREETWISE);
+            case CRIMINAL_MECHANIC -> List.of(SkillType.S_STREETWISE, SkillType.S_TECH_MECHANIC);
+            case CULTURAL_CENSOR -> List.of(SkillType.S_INTEREST_POLITICS, SkillType.S_INTEREST_LITERATURE);
+            case CULTURAL_LIAISON -> List.of(SkillType.S_PROTOCOLS, SkillType.S_LANGUAGES);
+            case CUSTOMS_INSPECTOR -> List.of(SkillType.S_INVESTIGATION, SkillType.S_PROTOCOLS);
+            case DATA_SMUGGLER -> List.of(SkillType.S_COMPUTERS, SkillType.S_SECURITY_SYSTEMS_ELECTRONIC);
+            case DATA_ANALYST -> List.of(SkillType.S_COMPUTERS, SkillType.S_SCIENCE_MATHEMATICS);
+            case SPACE_PORT_WORKER -> List.of(SkillType.S_ASTECH, SkillType.S_PILOT_GVEE);
+            case DRUG_DEALER -> List.of(SkillType.S_STREETWISE, SkillType.S_SCIENCE_PHARMACOLOGY);
+            case FACTORY_WORKER -> List.of(SkillType.S_ASTECH, SkillType.S_TECH_MECHANIC);
+            case LIVESTOCK_FARMER -> List.of(SkillType.S_ANIMAL_HANDLING, SkillType.S_SCIENCE_XENOBIOLOGY);
+            case AGRI_FARMER -> List.of(SkillType.S_ASTECH, SkillType.S_SCIENCE_BIOLOGY);
+            case FIREFIGHTER -> List.of(SkillType.S_PILOT_GVEE, SkillType.S_ANTI_MEK);
+            case FISHER -> List.of(SkillType.S_INTEREST_FISHING, SkillType.S_PILOT_NVEE);
+            case FORGER -> List.of(SkillType.S_FORGERY, SkillType.S_STREETWISE);
+            case GAMBLER -> List.of(SkillType.S_APPRAISAL, SkillType.S_INTEREST_GAMBLING);
+            case CIVILIAN_DOCTOR -> List.of(SkillType.S_SURGERY, SkillType.S_ADMIN);
+            case HACKER -> List.of(SkillType.S_CRYPTOGRAPHY, SkillType.S_COMPUTERS);
+            case HERALD -> List.of(SkillType.S_ACTING, SkillType.S_PROTOCOLS);
+            case HISTORIAN -> List.of(SkillType.S_INTEREST_HISTORY, SkillType.S_ART_WRITING);
+            case HOLO_CARTOGRAPHER -> List.of(SkillType.S_INTEREST_CARTOGRAPHY, SkillType.S_SCIENCE_GEOLOGY);
+            case HOLO_GAMER -> List.of(SkillType.S_INTEREST_HOLO_GAMES, SkillType.S_COMPUTERS);
+            case HOLO_JOURNALIST -> List.of(SkillType.S_INVESTIGATION, SkillType.S_ART_WRITING);
+            case HOLO_STAR -> List.of(SkillType.S_ACTING, SkillType.S_INTEREST_HOLO_CINEMA);
+            case INDUSTRIAL_MEK_PILOT -> List.of(SkillType.S_PILOT_MEK, SkillType.S_TECH_MEK);
+            case INFORMATION_BROKER -> List.of(SkillType.S_STREETWISE, SkillType.S_INVESTIGATION);
+            case MILITARY_LIAISON -> List.of(SkillType.S_INVESTIGATION, SkillType.S_COMMUNICATIONS);
+            case JANITOR -> List.of(SkillType.S_ASTECH, SkillType.S_CAREER_ANY);
+            case JUMPSHIP_CHEF -> List.of(SkillType.S_ART_COOKING, SkillType.S_ZERO_G_OPERATIONS);
+            case EXOSKELETON_LABORER -> List.of(SkillType.S_ASTECH, SkillType.S_TECH_BA);
+            case LAWYER -> List.of(SkillType.S_NEGOTIATION, SkillType.S_INTEREST_LAW);
+            case PROPHET -> List.of(SkillType.S_INTEREST_ASTROLOGY, SkillType.S_INTEREST_THEOLOGY);
+            case RELIC_HUNTER -> List.of(SkillType.S_INTEREST_ARCHEOLOGY, SkillType.S_SURVIVAL);
+            case MEDIATOR -> List.of(SkillType.S_NEGOTIATION, SkillType.S_INTEREST_POLITICS);
+            case MEDICAL_RESEARCHER -> List.of(SkillType.S_SCIENCE_PHARMACOLOGY, SkillType.S_SCIENCE_BIOLOGY);
+            case MEK_RANGE_INSTRUCTOR -> List.of(SkillType.S_GUN_MEK, SkillType.S_LEADER);
+            case MERCHANT -> List.of(SkillType.S_NEGOTIATION, SkillType.S_APPRAISAL);
+            case MILITARY_ACCOUNTANT -> List.of(SkillType.S_INTEREST_ECONOMICS, SkillType.S_ADMIN);
+            case MILITARY_ANALYST -> List.of(SkillType.S_STRATEGY, SkillType.S_SCIENCE_MATHEMATICS);
+            case SPY -> List.of(SkillType.S_STEALTH, SkillType.S_DISGUISE);
+            case MILITARY_THEORIST -> List.of(SkillType.S_TACTICS, SkillType.S_INTEREST_MILITARY);
+            case MINER -> List.of(SkillType.S_DEMOLITIONS, SkillType.S_TECH_MECHANIC);
+            case MOUNTAIN_CLIMBER -> List.of(SkillType.S_ANTI_MEK, SkillType.S_SURVIVAL);
+            case FACTORY_FOREMAN -> List.of(SkillType.S_ASTECH, SkillType.S_ADMIN);
+            case MUNITIONS_FACTORY_WORKER -> List.of(SkillType.S_DEMOLITIONS, SkillType.S_ASTECH);
+            case MUSICIAN -> List.of(SkillType.S_ART_INSTRUMENT, SkillType.S_INTEREST_MUSIC);
+            case ORBITAL_DEFENSE_GUNNER -> List.of(SkillType.S_GUN_VEE, SkillType.S_TECH_MECHANIC);
+            case ORBITAL_SHUTTLE_PILOT -> List.of(SkillType.S_PILOT_AERO, SkillType.S_PROTOCOLS);
+            case PARAMEDIC -> List.of(SkillType.S_MEDTECH, SkillType.S_PILOT_GVEE);
+            case PAINTER -> List.of(SkillType.S_ART_PAINTING, SkillType.S_INTEREST_MYTHOLOGY);
+            case PATHFINDER -> List.of(SkillType.S_TRACKING, SkillType.S_SURVIVAL);
+            case PERFORMER -> List.of(SkillType.S_ART_SINGING, SkillType.S_ART_DANCING);
+            case PERSONAL_VALET -> List.of(SkillType.S_PROTOCOLS, SkillType.S_PILOT_GVEE);
+            case ESCAPED_PRISONER -> List.of(SkillType.S_ESCAPE_ARTIST, SkillType.S_STEALTH);
+            case PROPAGANDIST -> List.of(SkillType.S_ART_WRITING, SkillType.S_INTEREST_POLITICS);
+            case PSYCHOLOGIST -> List.of(SkillType.S_SCIENCE_PSYCHOLOGY, SkillType.S_NEGOTIATION);
+            case FIRING_RANGE_SAFETY_OFFICER -> List.of(SkillType.S_SMALL_ARMS, SkillType.S_LEADER);
+            case RECRUITMENT_SCREENING_OFFICER -> List.of(SkillType.S_INTERROGATION, SkillType.S_SCIENCE_PSYCHOLOGY);
+            case RELIGIOUS_LEADER -> List.of(SkillType.S_INTEREST_THEOLOGY, SkillType.S_LEADER);
+            case REPAIR_BAY_FOREMAN -> List.of(SkillType.S_TECH_MECHANIC, SkillType.S_LEADER);
+            case REVOLUTIONIST -> List.of(SkillType.S_INTEREST_POLITICS, SkillType.S_LEADER);
+            case RITUALIST -> List.of(SkillType.S_INTEREST_THEOLOGY, SkillType.S_ART_DANCING);
+            case SALVAGE_RAT -> List.of(SkillType.S_TECH_MECHANIC, SkillType.S_TECH_MEK);
+            case SCRIBE -> List.of(SkillType.S_ADMIN, SkillType.S_ART_WRITING);
+            case SCULPTURER -> List.of(SkillType.S_ART_SCULPTURE, SkillType.S_APPRAISAL);
+            case SENSOR_TECHNICIAN -> List.of(SkillType.S_SENSOR_OPERATIONS, SkillType.S_COMPUTERS);
+            case CIVILIAN_PILOT -> List.of(SkillType.S_PILOT_JET, SkillType.S_PROTOCOLS);
+            case STREET_SURGEON -> List.of(SkillType.S_SURGERY, SkillType.S_STREETWISE);
+            case SWIMMING_INSTRUCTOR -> List.of(SkillType.S_SWIMMING, SkillType.S_TRAINING);
+            case TACTICAL_ANALYST -> List.of(SkillType.S_TACTICS, SkillType.S_COMPUTERS);
+            case TAILOR -> List.of(SkillType.S_ART_OTHER, SkillType.S_INTEREST_FASHION);
+            case TEACHER -> List.of(SkillType.S_LEADER, SkillType.S_TRAINING);
+            case TECH_COMMUNICATIONS -> List.of(SkillType.S_COMMUNICATIONS, SkillType.S_TECH_MECHANIC);
+            case TECH_ZERO_G -> List.of(SkillType.S_ZERO_G_OPERATIONS, SkillType.S_TECH_VESSEL);
+            case TECH_HYDROPONICS -> List.of(SkillType.S_ASTECH, SkillType.S_SCIENCE_BIOLOGY);
+            case TECH_FUSION_PLANT -> List.of(SkillType.S_ASTECH, SkillType.S_SCIENCE_PHYSICS);
+            case TECH_SECURITY ->
+                  List.of(SkillType.S_SECURITY_SYSTEMS_ELECTRONIC, SkillType.S_SECURITY_SYSTEMS_MECHANICAL);
+            case TECH_WASTE_MANAGEMENT -> List.of(SkillType.S_ASTECH, SkillType.S_CAREER_ANY);
+            case TECH_WATER_RECLAMATION -> List.of(SkillType.S_ASTECH, SkillType.S_SCIENCE_CHEMISTRY);
+            case THIEF -> List.of(SkillType.S_SLEIGHT_OF_HAND, SkillType.S_STREETWISE);
+            case BURGLAR -> List.of(SkillType.S_STEALTH, SkillType.S_ACROBATICS);
+            case TRAINING_SIM_OPERATOR -> List.of(SkillType.S_COMPUTERS, SkillType.S_TRAINING);
+            case TRANSPORT_DRIVER -> List.of(SkillType.S_PILOT_GVEE, SkillType.S_TECH_MECHANIC);
+            case ARTIST -> List.of(SkillType.S_ART_DRAWING, SkillType.S_COMPUTERS);
+            case FENCE -> List.of(SkillType.S_APPRAISAL, SkillType.S_STREETWISE);
+            case WAREHOUSE_WORKER -> List.of(SkillType.S_ASTECH, SkillType.S_ADMIN);
+            case WARFARE_PLANNER -> List.of(SkillType.S_STRATEGY, SkillType.S_INTEREST_MILITARY);
+            case WEATHERCASTER -> List.of(SkillType.S_SCIENCE_PHYSICS, SkillType.S_ACTING);
+            case XENOANIMAL_TRAINER -> List.of(SkillType.S_INTEREST_EXOTIC_ANIMALS, SkillType.S_ANIMAL_HANDLING);
+            case XENO_BIOLOGIST -> List.of(SkillType.S_SCIENCE_XENOBIOLOGY, SkillType.S_SCIENCE_BIOLOGY);
+            case GENETICIST -> List.of(SkillType.S_SCIENCE_BIOLOGY, SkillType.S_SCIENCE_GENETICS);
+            case MISCELLANEOUS_JOB -> List.of(SkillType.S_CAREER_ANY);
         };
     }
     // endregion Getters

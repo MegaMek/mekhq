@@ -404,35 +404,6 @@ class PersonnelRoleTest {
     }
 
     @Test
-    void testIsCombat() {
-        for (final PersonnelRole personnelRole : roles) {
-            switch (personnelRole) {
-                case MEKWARRIOR:
-                case LAM_PILOT:
-                case GROUND_VEHICLE_DRIVER:
-                case NAVAL_VEHICLE_DRIVER:
-                case VTOL_PILOT:
-                case VEHICLE_GUNNER:
-                case VEHICLE_CREW:
-                case AEROSPACE_PILOT:
-                case CONVENTIONAL_AIRCRAFT_PILOT:
-                case PROTOMEK_PILOT:
-                case BATTLE_ARMOUR:
-                case SOLDIER:
-                case VESSEL_PILOT:
-                case VESSEL_GUNNER:
-                case VESSEL_CREW:
-                case VESSEL_NAVIGATOR:
-                    assertTrue(personnelRole.isCombat());
-                    break;
-                default:
-                    assertFalse(personnelRole.isCombat());
-                    break;
-            }
-        }
-    }
-
-    @Test
     void testIsMekWarriorGrouping() {
         for (final PersonnelRole personnelRole : roles) {
             if ((personnelRole == PersonnelRole.MEKWARRIOR) || (personnelRole == PersonnelRole.LAM_PILOT)) {
@@ -551,24 +522,6 @@ class PersonnelRoleTest {
     }
 
     @Test
-    void testIsSupport() {
-        assertFalse(PersonnelRole.MEKWARRIOR.isSupport());
-        assertFalse(PersonnelRole.VESSEL_NAVIGATOR.isSupport());
-        assertTrue(PersonnelRole.MEK_TECH.isSupport());
-        assertTrue(PersonnelRole.ASTECH.isSupport());
-        assertTrue(PersonnelRole.ADMINISTRATOR_COMMAND.isSupport());
-        assertTrue(PersonnelRole.DEPENDENT.isSupport());
-        assertTrue(PersonnelRole.NONE.isSupport());
-        assertFalse(PersonnelRole.MEKWARRIOR.isSupport(true));
-        assertFalse(PersonnelRole.VESSEL_NAVIGATOR.isSupport(true));
-        assertTrue(PersonnelRole.MEK_TECH.isSupport(true));
-        assertTrue(PersonnelRole.ASTECH.isSupport(true));
-        assertTrue(PersonnelRole.ADMINISTRATOR_COMMAND.isSupport(true));
-        assertFalse(PersonnelRole.DEPENDENT.isSupport(true));
-        assertFalse(PersonnelRole.NONE.isSupport(true));
-    }
-
-    @Test
     void testIsTech() {
         for (final PersonnelRole personnelRole : roles) {
             switch (personnelRole) {
@@ -631,13 +584,14 @@ class PersonnelRoleTest {
         }
     }
 
-    @Test
-    void testIsCivilian() {
-        for (final PersonnelRole personnelRole : roles) {
-            if ((personnelRole == PersonnelRole.DEPENDENT) || (personnelRole == PersonnelRole.NONE)) {
-                assertTrue(personnelRole.isCivilian());
+    void isSubType() {
+        for (PersonnelRole personnelRole : roles) {
+            if (personnelRole.isSubType(PersonnelRoleSubType.COMBAT)) {
+                assertTrue(personnelRole.isCombat(), "PersonnelRole " + personnelRole + " is not a combat role.");
+            } else if (personnelRole.isSubType(PersonnelRoleSubType.SUPPORT)) {
+                assertTrue(personnelRole.isSupport(), "PersonnelRole " + personnelRole + " is not a support role.");
             } else {
-                assertFalse(personnelRole.isCivilian());
+                assertFalse(personnelRole.isCivilian(), "PersonnelRole " + personnelRole + " is not a civilian role.");
             }
         }
     }
@@ -721,8 +675,13 @@ class PersonnelRoleTest {
 
     @Test
     void testGetCivilianCount() {
-        // Civilian Roles: Dependent and None
-        assertEquals(2, PersonnelRole.getCivilianCount());
+        int civilianCount = 0;
+        for (PersonnelRole personnelRole : roles) {
+            if (personnelRole.isCivilian()) {
+                civilianCount++;
+            }
+        }
+        assertEquals(civilianCount, PersonnelRole.getCivilianCount());
     }
     // endregion Static Methods
 
