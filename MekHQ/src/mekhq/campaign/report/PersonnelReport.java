@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.report;
 
@@ -133,6 +138,7 @@ public class PersonnelReport extends AbstractReport {
         int dependentStudents = 0;
         int children = 0;
         int childrenStudents = 0;
+        Money civilianSalaries = Money.zero();
 
         for (Person person : getCampaign().getPersonnel()) {
             // Add them to the total count
@@ -180,6 +186,10 @@ public class PersonnelReport extends AbstractReport {
                     }
                     dependents++;
                 }
+
+                if (person.getStatus().isActive()) {
+                    civilianSalaries = civilianSalaries.plus(person.getSalary(getCampaign()));
+                }
             }
         }
 
@@ -222,6 +232,8 @@ public class PersonnelReport extends AbstractReport {
                             "of which " +
                             childrenStudents +
                             " are students")
+              .append("\nMonthly Salary For Civilians: ")
+              .append(civilianSalaries.toAmountAndSymbolString())
               .append(String.format("\nYou have " + prisoners + " prisoner%s", prisoners == 1 ? "" : "s"))
               .append(String.format("\nYou have " + bondsmen + " %s", (bondsmen == 1) ? "bondsman" : "bondsmen"));
 
