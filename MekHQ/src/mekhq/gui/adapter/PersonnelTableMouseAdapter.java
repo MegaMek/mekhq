@@ -704,8 +704,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_RANDOM_PROFESSION: {
                 List<PersonnelRole> possibleRoles = PersonnelRole.getCivilianRolesExceptNone();
-                RandomSkillPreferences skillPreferences = getCampaign().getRandomSkillPreferences();
-                AbstractSkillGenerator skillGenerator = new DefaultSkillGenerator(skillPreferences);
                 LocalDate today = getCampaign().getLocalDate();
 
                 for (Person person : people) {
@@ -725,7 +723,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         eligibleRoles.remove(PersonnelRole.LUXURY_COMPANION);
                     }
 
-                    PersonnelRole randomProfession = ObjectUtility.getRandomItem(possibleRoles);
+                    PersonnelRole randomProfession = ObjectUtility.getRandomItem(eligibleRoles);
                     int experienceLevel = CrewDescriptor.randomExperienceLevel();
 
                     for (String skillName : randomProfession.getSkillsForProfession()) {
