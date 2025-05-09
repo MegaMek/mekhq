@@ -755,7 +755,7 @@ public class MekHQ implements GameListener {
      *
      * @param units The list of player units involved in the scenario
      */
-    public void startAutoResolve(AtBScenario scenario, List<Unit> units) {
+    public void startAutoResolve(Scenario scenario, List<Unit> units) {
 
         this.autosaveService.requestBeforeScenarioAutosave(getCampaign());
 
