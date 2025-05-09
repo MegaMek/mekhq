@@ -1688,8 +1688,12 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         if (xpSpent > 0) {
             person.setXP(campaign, xpSpent);
         }
+
         setSkills();
         setOptions();
+
+        person.validateRoles(campaign);
+
         setVisible(false);
     }
     //endregion Listeners
