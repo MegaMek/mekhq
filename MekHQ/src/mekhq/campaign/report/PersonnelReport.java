@@ -28,6 +28,8 @@
  */
 package mekhq.campaign.report;
 
+import java.time.LocalDate;
+
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Person;
@@ -128,43 +130,57 @@ public class PersonnelReport extends AbstractReport {
         int prisoners = 0;
         int bondsmen = 0;
         int dependents = 0;
+        int dependentStudents = 0;
+        int children = 0;
+        int childrenStudents = 0;
 
-        for (Person p : getCampaign().getPersonnel()) {
+        for (Person person : getCampaign().getPersonnel()) {
             // Add them to the total count
-            final boolean primarySupport = p.getPrimaryRole().isSupport(true);
+            final boolean primarySupport = person.getPrimaryRole().isSupport(true);
 
-            if (primarySupport && p.getPrisonerStatus().isFree() && p.getStatus().isActive()) {
-                countPersonByType[p.getPrimaryRole().ordinal()]++;
+            if (primarySupport && person.getPrisonerStatus().isFree() && person.getStatus().isActive()) {
+                countPersonByType[person.getPrimaryRole().ordinal()]++;
                 countTotal++;
-                if (!p.getInjuries().isEmpty() || (p.getHits() > 0)) {
+                if (!person.getInjuries().isEmpty() || (person.getHits() > 0)) {
                     countInjured++;
                 }
-                salary = salary.plus(p.getSalary(getCampaign()));
-            } else if (p.getPrisonerStatus().isCurrentPrisoner() && p.getStatus().isActive()) {
+                salary = salary.plus(person.getSalary(getCampaign()));
+            } else if (person.getPrisonerStatus().isCurrentPrisoner() && person.getStatus().isActive()) {
                 prisoners++;
-            } else if (p.getPrisonerStatus().isBondsman() && p.getStatus().isActive()) {
+            } else if (person.getPrisonerStatus().isBondsman() && person.getStatus().isActive()) {
                 bondsmen++;
-                if (!p.getInjuries().isEmpty() || (p.getHits() > 0)) {
+                if (!person.getInjuries().isEmpty() || (person.getHits() > 0)) {
                     countInjured++;
                 }
-            } else if (primarySupport && p.getStatus().isRetired()) {
+            } else if (primarySupport && person.getStatus().isRetired()) {
                 countRetired++;
-            } else if (primarySupport && p.getStatus().isMIA()) {
+            } else if (primarySupport && person.getStatus().isMIA()) {
                 countMIA++;
-            } else if (primarySupport && p.getStatus().isKIA()) {
+            } else if (primarySupport && person.getStatus().isKIA()) {
                 countKIA++;
                 countDead++;
-            } else if (primarySupport && p.getStatus().isDead()) {
+            } else if (primarySupport && person.getStatus().isDead()) {
                 countDead++;
-            } else if (primarySupport && p.getStatus().isStudent()) {
+            } else if (primarySupport && person.getStatus().isStudent()) {
                 countStudents++;
             }
 
-            if (p.getPrimaryRole().isDependent() && p.getStatus().isActive() && p.getPrisonerStatus().isFree()) {
-                dependents++;
+            LocalDate today = getCampaign().getLocalDate();
+            if (person.getPrimaryRole().isDependent() &&
+                      !person.getStatus().isDepartedUnit() &&
+                      person.getPrisonerStatus().isFree()) {
+                if (person.isChild(today)) {
+                    if (person.getStatus().isStudent()) {
+                        childrenStudents++;
+                    }
+                    children++;
+                } else {
+                    if (person.getStatus().isStudent()) {
+                        dependentStudents++;
+                    }
+                    dependents++;
+                }
             }
-
-
         }
 
         //Add Salaries of Temp Workers
@@ -200,7 +216,12 @@ public class PersonnelReport extends AbstractReport {
               .append(String.format("%-30s        %4s\n", "Student Support Personnel", countStudents))
               .append("\nMonthly Salary For Support Personnel: ")
               .append(salary.toAmountAndSymbolString())
-              .append(String.format("\nYou have " + dependents + " %s", (dependents == 1) ? "dependent" : "dependents"))
+              .append(String.format("\nYou have " + dependents + " adult %s ",
+                    (dependents == 1) ? "civilian" : "civilians") + "of which " + dependentStudents + " are students")
+              .append(String.format("\nYou have " + children + " %s ", (children == 1) ? "child" : "children") +
+                            "of which " +
+                            childrenStudents +
+                            " are students")
               .append(String.format("\nYou have " + prisoners + " prisoner%s", prisoners == 1 ? "" : "s"))
               .append(String.format("\nYou have " + bondsmen + " %s", (bondsmen == 1) ? "bondsman" : "bondsmen"));
 
