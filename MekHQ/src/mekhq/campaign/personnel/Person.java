@@ -52,6 +52,7 @@ import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
+import static mekhq.campaign.personnel.skills.SkillType.getSkillsBySkillSubType;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
@@ -115,6 +116,7 @@ import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
+import mekhq.campaign.personnel.skills.enums.SkillSubType;
 import mekhq.campaign.randomEvents.personalities.enums.Aggression;
 import mekhq.campaign.randomEvents.personalities.enums.Ambition;
 import mekhq.campaign.randomEvents.personalities.enums.Greed;
@@ -4105,8 +4107,36 @@ public class Person {
         skills.removeSkill(skillName);
     }
 
+    /**
+     * @return the the number of skills learned by the character.
+     */
     public int getSkillNumber() {
         return skills.size();
+    }
+
+    /**
+     * Returns a list of skill names that the current object possesses, filtered by the specified skill subtypes.
+     *
+     * <p>For each skill subtype provided, this method collects all skill names associated
+     * with those subtypes, then adds to the result only those skills that the object is known to have (i.e., those for
+     * which {@code hasSkill(skillName)} returns true).</p>
+     *
+     * @param skillSubTypes the list of {@link SkillSubType} to use for filtering skills
+     *
+     * @return a {@link List} of skill names that are both of the specified subtypes and known to the object
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public List<String> getKnownSkillsBySkillSubType(List<SkillSubType> skillSubTypes) {
+        List<String> knownSkills = new ArrayList<>();
+        for (String skillName : getSkillsBySkillSubType(skillSubTypes)) {
+            if (hasSkill(skillName)) {
+                knownSkills.add(skillName);
+            }
+        }
+
+        return knownSkills;
     }
 
     /**
@@ -5223,13 +5253,13 @@ public class Person {
      */
     public int getAdjustedReputation(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today,
           int rankIndex) {
-        return reputation +
-                     (isUseAgingEffects ?
-                            getReputationAgeModifier(getAge(today),
-                                  isClanCampaign,
-                                  !isNullOrBlank(bloodname),
-                                  rankIndex) :
-                            0);
+        int modifier = isUseAgingEffects ?
+                             getReputationAgeModifier(getAge(today),
+                                   isClanCampaign,
+                                   !isNullOrBlank(bloodname),
+                                   rankIndex) :
+                             0;
+        return reputation + modifier;
     }
 
     public void setReputation(final int reputation) {
@@ -5896,6 +5926,29 @@ public class Person {
             return 1;
         } else {
             return 1 - modifier;
+        }
+    }
+
+    /**
+     * Removes all skills from the collection that match the specified subtype.
+     *
+     * <p>Iterates safely over the current list of skills, removing each skill whose type corresponds to the given
+     * {@link SkillSubType}.</p>
+     *
+     * @param subType the {@code SkillSubType} to remove from the collection
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public void removeAllSkillsOfSubType(SkillSubType subType) {
+        // We make an iteration safe list so we can easily remove skills during the loop
+        List<Skill> allSkills = new ArrayList<>(skills.getSkills());
+        for (Skill skill : allSkills) {
+            SkillType skillType = skill.getType();
+
+            if (skillType.isSubTypeOf(subType)) {
+                removeSkill(skillType.getName());
+            }
         }
     }
 }

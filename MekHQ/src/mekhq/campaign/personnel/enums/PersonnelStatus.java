@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.enums;
 
@@ -81,7 +86,8 @@ public enum PersonnelStatus {
     UNDETERMINED(NotificationSeverity.NEGATIVE, true, true),
     SUICIDE(NotificationSeverity.NEGATIVE, true, true),
     ENEMY_BONDSMAN(NotificationSeverity.NEGATIVE, false, false),
-    BONDSREF(NotificationSeverity.NEGATIVE, true, true);
+    BONDSREF(NotificationSeverity.NEGATIVE, true, true),
+    SEPPUKU(NotificationSeverity.NEGATIVE, true, true);
 
     /**
      * Represents the severity levels of a status.
@@ -491,6 +497,15 @@ public enum PersonnelStatus {
     }
 
     /**
+     * Checks if the character has the {@code SEPPUKU} personnel status.
+     *
+     * @return {@code true} if the character has the {@code SEPPUKU} personnel status {@code false} otherwise.
+     */
+    public boolean isSeppuku() {
+        return this == SEPPUKU;
+    }
+
+    /**
      * @return {@code true} if a person is currently absent from the core force, otherwise {@code false}
      */
     public boolean isAbsent() {
@@ -533,8 +548,7 @@ public enum PersonnelStatus {
                      isMedicalComplications() ||
                      isPregnancyComplications() ||
                      isUndetermined() ||
-                     isSuicide() ||
-                     isBondsref();
+                     isSuicide() || isBondsref() || isSeppuku();
     }
 
     /**
