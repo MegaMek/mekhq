@@ -108,6 +108,7 @@ import mekhq.gui.utilities.ObservableString;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
 import mekhq.utilities.MHQInternationalization;
+import mekhq.utilities.ScenarioUtils;
 
 /**
  * The main class of the application.
@@ -758,13 +759,15 @@ public class MekHQ implements GameListener {
 
         this.autosaveService.requestBeforeScenarioAutosave(getCampaign());
 
+        Board board = ScenarioUtils.getBoardFor(scenario);
         if (getCampaign().getCampaignOptions().isAutoResolveVictoryChanceEnabled()) {
+
             var proceed = AutoResolveChanceDialog.showDialog(campaignGUI.getFrame(),
                   getCampaign().getCampaignOptions().getAutoResolveNumberOfScenarios(),
                   Runtime.getRuntime().availableProcessors(),
                   1,
                   new AtBSetupForces(getCampaign(), units, scenario, new SingletonForces()),
-                  new Board(scenario.getBaseMapX(), scenario.getBaseMapY())) == JOptionPane.YES_OPTION;
+                  board) == JOptionPane.YES_OPTION;
             if (!proceed) {
                 return;
             }
@@ -772,7 +775,7 @@ public class MekHQ implements GameListener {
 
         var event = AutoResolveProgressDialog.showDialog(campaignGUI.getFrame(),
               new AtBSetupForces(getCampaign(), units, scenario, new SingletonForces()),
-              new Board(scenario.getBaseMapX(), scenario.getBaseMapY()));
+              board);
 
         var autoResolveBattleReport = new AutoResolveSimulationLogDialog(campaignGUI.getFrame(), event.getLogFile());
         autoResolveBattleReport.setModal(true);
