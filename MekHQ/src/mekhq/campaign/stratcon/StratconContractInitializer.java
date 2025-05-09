@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.stratcon;
 
@@ -49,7 +54,6 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
-import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.stratcon.StratconContractDefinition.ObjectiveParameters;
 import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
 
@@ -231,17 +235,6 @@ public class StratconContractInitializer {
                   ForceAlignment.Opposing,
                   false,
                   Collections.emptyList());
-        }
-
-        // clean up objectives for integrated command:
-        // we're still going to have all the objective facilities and scenarios
-        // but the player has no control over where they go, so they're
-        // not on the hook for actually completing objectives,
-        // just fighting where they're told to fight
-        if (contract.getCommandRights() == ContractCommandRights.INTEGRATED) {
-            for (StratconTrackState track : campaignState.getTracks()) {
-                track.getStrategicObjectives().clear();
-            }
         }
 
         // Determine starting morale
