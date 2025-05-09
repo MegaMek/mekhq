@@ -122,7 +122,7 @@ We will control the battlefield at the end of this engagement, allowing us to re
             </value>
         </entry>
         <entry>
-            <key>Resupply Convoy</key>
+            <key>Convoy</key>
             <value>
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
@@ -138,10 +138,10 @@ We will control the battlefield at the end of this engagement, allowing us to re
                 </deploymentZones>
                 <destinationZone>6</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
-                <forceAlignment>0</forceAlignment>
+                <forceAlignment>1</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
                 <forceName>Resupply Convoy</forceName>
-                <generationMethod>0</generationMethod>
+                <generationMethod>1</generationMethod>
                 <generationOrder>1</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>
@@ -188,7 +188,7 @@ We will control the battlefield at the end of this engagement, allowing us to re
         </scenarioObjective>
         <scenarioObjective>
             <associatedForceNames>
-                <associatedForceName>Resupply Convoy</associatedForceName>
+                <associatedForceName>Convoy</associatedForceName>
             </associatedForceNames>
             <associatedUnitIDs />
             <additionalDetails>
