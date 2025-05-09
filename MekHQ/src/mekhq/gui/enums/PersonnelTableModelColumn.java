@@ -613,7 +613,7 @@ public enum PersonnelTableModelColumn {
                              SkillType.getColoredExperienceLevelName(person.getExperienceLevel(campaign, false)) +
                              "</html>";
             case PERSONNEL_ROLE:
-                return person.getFormatedRoleDescriptions();
+                return person.getFormatedRoleDescriptions(today);
             case UNIT_ASSIGNMENT: {
                 if (loadAssignmentFromMarket) {
                     final Entity entity = personnelMarket.getAttachedEntity(person);

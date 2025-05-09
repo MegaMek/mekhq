@@ -1007,26 +1007,43 @@ public class Person {
      * @author Illiani
      * @since 0.50.06
      */
-    public String getFormatedRoleDescriptions() {
-        String description = "<html>";
+    public String getFormatedRoleDescriptions(LocalDate today) {
+        StringBuilder description = new StringBuilder("<html>");
+        String primaryDesc = getPrimaryRoleDesc();
+
         if (primaryRole.isSubType(PersonnelRoleSubType.CIVILIAN)) {
             if (primaryRole.isNone()) {
-                description += "<b>" + getPrimaryRoleDesc() + "</b>";
+                // Error state: emphasize the issue
+                description.append("<b><i><u>").append(primaryDesc.toUpperCase()).append("</u></i></b>");
+            } else if (primaryRole.isDependent()) {
+                String label;
+                if (status.isStudent()) {
+                    label = status.getLabel();
+                } else if (isChild(today)) {
+                    label = resources.getString("relationChild.text");
+                } else {
+                    label = primaryDesc;
+                }
+                description.append("<i>").append(label).append("</i>");
             } else {
-                description += "<i>" + getPrimaryRoleDesc() + "</i>";
+                description.append("<i>").append(primaryDesc).append("</i>");
             }
+        } else {
+            description.append(primaryDesc);
         }
 
         if (!secondaryRole.isNone()) {
-            description += " <b>/</b> ";
-
+            description.append(" / ");
+            String secondaryDesc = getSecondaryRoleDesc();
             if (secondaryRole.isSubType(PersonnelRoleSubType.CIVILIAN)) {
-                description += "<i>" + getSecondaryRoleDesc() + "</i>";
+                description.append("<i>").append(secondaryDesc).append("</i>");
+            } else {
+                description.append(secondaryDesc);
             }
         }
 
-        description += "</html>";
-        return description;
+        description.append("</html>");
+        return description.toString();
     }
 
     public String getSecondaryRoleDesc() {
