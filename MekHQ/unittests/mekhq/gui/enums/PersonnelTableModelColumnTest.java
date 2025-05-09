@@ -796,6 +796,8 @@ public class PersonnelTableModelColumnTest {
                     assertEquals(50, personnelTableModelColumn.getWidth());
                     break;
                 case PERSONNEL_ROLE:
+                    assertEquals(150, personnelTableModelColumn.getWidth());
+                    break;
                 case FORCE:
                     assertEquals(100, personnelTableModelColumn.getWidth());
                     break;
