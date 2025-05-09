@@ -38,6 +38,7 @@ import java.time.LocalDate;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 
 /**
@@ -187,7 +188,7 @@ public class PersonnelReport extends AbstractReport {
                     dependents++;
                 }
 
-                if (person.getStatus().isActive()) {
+                if (person.getStatus().isActive() || EducationController.isBeingHomeSchooled(person)) {
                     civilianSalaries = civilianSalaries.plus(person.getSalary(getCampaign()));
                 }
             }
