@@ -35,6 +35,7 @@ package mekhq.campaign.unit;
 
 import static java.lang.Math.ceil;
 import static java.lang.Math.max;
+import static java.lang.Math.round;
 import static megamek.common.MiscType.F_CARGO;
 import static mekhq.campaign.enums.CampaignTransportType.SHIP_TRANSPORT;
 import static mekhq.campaign.enums.CampaignTransportType.TACTICAL_TRANSPORT;
@@ -53,7 +54,6 @@ import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
-import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.swing.UIManager;
@@ -4488,12 +4488,12 @@ public class Unit implements ITechnology {
         if (getCampaign().getCampaignOptions().isUseAbilities() ||
                   getCampaign().getCampaignOptions().isUseEdge() ||
                   getCampaign().getCampaignOptions().isUseImplants()) {
-            PilotOptions options = new PilotOptions(); // MegaMek-style as it is sent to MegaMek
+            PilotOptions pilotOptions = new PilotOptions(); // MegaMek-style as it is sent to MegaMek
             // This double enumeration is annoying to work with for crew-served units.
             // Get the option names while we enumerate so they can be used later
             List<String> optionNames = new ArrayList<>();
             Set<String> cyberOptionNames = new HashSet<>();
-            for (Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements(); ) {
+            for (Enumeration<IOptionGroup> i = pilotOptions.getGroups(); i.hasMoreElements(); ) {
                 IOptionGroup group = i.nextElement();
                 for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements(); ) {
                     IOption option = j.nextElement();
@@ -4534,46 +4534,56 @@ public class Unit implements ITechnology {
                     crew.addAll(gunners);
                 }
                 double crewSize = crew.size();
+                double driverSize = drivers.size();
+                double gunnerSize = gunners.size();
 
-                // This does the following:
-                // 1. For each crew member, get all of their PersonnelOptions by name
-                // 2. Flatten the crew member options into one stream
-                // 3. Group these options by their name
-                // 4. For each group, group by the object value and get the counts for each
-                // value
-                // 5. Take each group which has more than crewSize/2 values, and find the
-                // maximum value
-                Map<String, Optional<Object>> bestOptions = crew.stream()
-                                                                  .flatMap(p -> optionNames.stream()
-                                                                                      .map(n -> p.getOptions()
-                                                                                                      .getOption(n)))
-                                                                  .collect(Collectors.groupingBy(IOption::getName,
-                                                                        Collectors.collectingAndThen(Collectors.groupingBy(
-                                                                                    IOption::getValue,
-                                                                                    Collectors.counting()),
-                                                                              m -> m.entrySet()
-                                                                                         .stream()
-                                                                                         .filter(e -> (cyberOptionNames.contains(
-                                                                                               e.getKey()) ?
-                                                                                                             e.getValue() >=
-                                                                                                                   crewSize :
-                                                                                                             e.getValue() >
-                                                                                                                   crewSize /
-                                                                                                                         2))
-                                                                                         .max(Entry.comparingByValue())
-                                                                                         .map(Entry::getKey))));
+                // Determine crew SPAs
+                Map<String, Optional<Object>> bestOptions = new HashMap<>();
 
-                // Go through all the options and start with the commander's value,
-                // then add any values which more than half our crew had
-                for (String optionName : optionNames) {
-                    IOption option = commander.getOptions().getOption(optionName);
-                    if (null != option) {
-                        options.getOption(optionName).setValue(option.getValue());
+                // 1. First, gather all options from all crew for each option name.
+                Map<String, List<IOption>> optionsByName = new HashMap<>();
+                for (Person crewMember : crew) {
+                    for (String optionName : optionNames) {
+                        IOption opt = crewMember.getOptions().getOption(optionName);
+                        optionsByName.computeIfAbsent(opt.getName(), k -> new ArrayList<>()).add(opt);
+                    }
+                }
+
+                // 2. For each option name, group by value and count occurrences.
+                for (Map.Entry<String, List<IOption>> entry : optionsByName.entrySet()) {
+                    String optionName = entry.getKey();
+                    List<IOption> options = entry.getValue();
+
+                    // Count values for this option name.
+                    Map<Object, Long> valueCounts = new HashMap<>();
+                    for (IOption opt : options) {
+                        Object value = opt.getValue();
+                        valueCounts.put(value, valueCounts.getOrDefault(value, 0L) + 1);
                     }
 
+                    // 3. Filter out any SPAs which don't meet the minimum 50% count either driver or gunner size
+                    Object bestKey = null;
+                    for (Map.Entry<Object, Long> valEntry : valueCounts.entrySet()) {
+                        Object key = valEntry.getKey();
+                        long count = valEntry.getValue();
+
+                        boolean cyberCheck = cyberOptionNames.contains(key) ? count >= crewSize : true;
+                        boolean driverCheck = count >= Math.ceil(driverSize / 2.0);
+                        boolean gunnerCheck = count >= Math.ceil(gunnerSize / 2.0);
+                        boolean passes = cyberCheck && (driverCheck || gunnerCheck);
+
+                        if (passes) {
+                            bestKey = key;
+                        }
+                    }
+                    bestOptions.put(optionName, Optional.ofNullable(bestKey));
+                }
+
+                // Go through all the options add any values which more than half our crew had
+                for (String optionName : optionNames) {
                     if (bestOptions.containsKey(optionName)) {
                         Optional<Object> crewOption = bestOptions.get(optionName);
-                        crewOption.ifPresent(o -> options.getOption(optionName).setValue(o));
+                        crewOption.ifPresent(o -> pilotOptions.getOption(optionName).setValue(o));
                     }
                 }
 
@@ -4586,17 +4596,17 @@ public class Unit implements ITechnology {
                 for (String implantName : cyberOptionNames) {
                     IOption option = commander.getOptions().getOption(implantName);
                     if (null != option) {
-                        options.getOption(implantName).setValue(option.getValue());
+                        pilotOptions.getOption(implantName).setValue(option.getValue());
                     }
 
                     if (bestOptions.containsKey(implantName)) {
                         Optional<Object> crewOption = bestOptions.get(implantName);
-                        crewOption.ifPresent(o -> options.getOption(implantName).setValue(o));
+                        crewOption.ifPresent(o -> pilotOptions.getOption(implantName).setValue(o));
                     }
                 }
 
                 // Assign the options to our unit
-                entity.getCrew().setOptions(options);
+                entity.getCrew().setOptions(pilotOptions);
 
                 // Assign edge points to spacecraft and vehicle crews and infantry units
                 // This overwrites the Edge value assigned above.
@@ -4615,7 +4625,7 @@ public class Unit implements ITechnology {
                     // (vessel crewmembers)
                     // handle edge solely through MHQ as noncombat personnel, so aren't considered
                     // here
-                    int edge = (int) Math.round(sumEdge / crewSize);
+                    int edge = (int) round(sumEdge / crewSize);
                     IOption edgeOption = entity.getCrew().getOptions().getOption(OptionsConstants.EDGE);
                     edgeOption.setValue((Integer) edge);
                 }
@@ -4749,10 +4759,10 @@ public class Unit implements ITechnology {
         }
 
         if (nDrivers > 0) {
-            piloting = (int) Math.round(((double) sumPiloting) / nDrivers);
+            piloting = (int) round(((double) sumPiloting) / nDrivers);
         }
         if (nGunners > 0) {
-            gunnery = (int) Math.round(((double) sumGunnery) / nGunners);
+            gunnery = (int) round(((double) sumGunnery) / nGunners);
         }
         if (entity instanceof Infantry) {
             if (entity instanceof BattleArmor) {
@@ -6089,7 +6099,7 @@ public class Unit implements ITechnology {
         if (nParts == 0) {
             return QUALITY_D;
         }
-        return PartQuality.fromNumeric((int) Math.round((1.0 * sumQuality) / nParts));
+        return PartQuality.fromNumeric((int) round((1.0 * sumQuality) / nParts));
     }
 
     public void setQuality(PartQuality q) {
