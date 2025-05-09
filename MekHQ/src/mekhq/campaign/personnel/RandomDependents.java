@@ -27,16 +27,6 @@
  */
 package mekhq.campaign.personnel;
 
-import megamek.common.Compute;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.personnel.familyTree.Genealogy;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
@@ -45,6 +35,16 @@ import static megamek.common.enums.Gender.RANDOMIZE;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.LEFT;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.FREE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import megamek.common.Compute;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.personnel.familyTree.Genealogy;
 
 /**
  * The {@link RandomDependents} class manages the random addition and removal of dependent personnel
@@ -264,7 +264,8 @@ public class RandomDependents {
                     campaign.recruitPerson(dependent, FREE, true, false);
 
                     campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "dependentJoinsForce.report",
-                        dependent.getFullName()));
+                          dependent.getFullName(),
+                          dependent.getPrimaryRole().getLabel(dependent.isClanPersonnel())));
 
                     dependentCount++;
                 }
