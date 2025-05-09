@@ -36,6 +36,8 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -809,5 +811,21 @@ public enum PersonnelRole {
     @Override
     public String toString() {
         return getLabel(false);
+    }
+
+    /**
+     * Returns an array of all {@link PersonnelRole} values sorted alphabetically by their enum name.
+     *
+     * <p>This is useful for displaying or processing personnel roles in a consistent, user-friendly order.</p>
+     *
+     * @return a {@code PersonnelRole[]} containing all enum values sorted by name in ascending order
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public static PersonnelRole[] getValuesSortedAlphabetically() {
+        return Arrays.stream(PersonnelRole.values())
+                     .sorted(Comparator.comparing(Enum::name))
+                     .toArray(PersonnelRole[]::new);
     }
 }

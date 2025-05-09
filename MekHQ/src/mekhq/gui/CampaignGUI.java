@@ -752,7 +752,9 @@ public class CampaignGUI extends JPanel {
 
         JMenu menuHire = new JMenu(resourceMap.getString("menuHire.text"));
         menuHire.setMnemonic(KeyEvent.VK_H);
-        for (PersonnelRole role : PersonnelRole.getPrimaryRoles()) {
+
+        PersonnelRole[] roles = PersonnelRole.getValuesSortedAlphabetically();
+        for (PersonnelRole role : roles) {
             JMenuItem miHire = new JMenuItem(role.getLabel(getCampaign().getFaction().isClan()));
             if (role.getMnemonic() != KeyEvent.VK_UNDEFINED) {
                 miHire.setMnemonic(role.getMnemonic());
