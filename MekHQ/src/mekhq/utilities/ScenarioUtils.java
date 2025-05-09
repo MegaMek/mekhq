@@ -1,18 +1,35 @@
 /*
- * Copyright (c) 2025 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the Free
- * Software Foundation; either version 2 of the License, or (at your option)
- * any later version.
+ * This file is part of MegaMek.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
+ * MegaMek is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
+ * MegaMek is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MegaMek was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
-
 package mekhq.utilities;
 
 import java.io.File;
@@ -37,45 +54,102 @@ public class ScenarioUtils {
 
     private ScenarioUtils() {}
 
-    public static Board getBoardFor(AtBScenario scenario) {
+    /**
+     * Creates a game board based on the settings in the provided Scenario.
+     * This method extracts map configuration from the scenario and delegates to the board creation logic.
+     *
+     * @param scenario The Scenario containing board configuration parameters
+     * @return A Board object configured according to the scenario settings, or a default board if invalid parameters
+     */
+    public static Board getBoardFor(Scenario scenario) {
+        // Check for valid dimensions and map
+        if (scenario instanceof AtBScenario atBScenario) {
+            return getStratconBoardFor(atBScenario);
+        }
+        return getNonStratconBoardFor(scenario);
+    }
+
+    private static Board getNonStratconBoardFor(Scenario scenario) {
+        if (scenario == null || scenario.getMap() == null ||
+                  scenario.getMapSizeX() <= 1 || scenario.getMapSizeY() <= 1) {
+            LOGGER.error("Invalid map settings provided for scenario {}",
+                  scenario != null ? scenario.getName() : "null");
+            return ServerBoardHelper.getPossibleGameBoard(MapSettings.getInstance(), false);
+        }
+
+        boolean isSpace = scenario.getBoardType() == Scenario.T_SPACE;
+        boolean isAtmosphere = scenario.getBoardType() == Scenario.T_ATMOSPHERE;
+
+        return createBoard(
+              scenario.getMapSizeX(),
+              scenario.getMapSizeY(),
+              scenario.getMap(),
+              scenario.isUsingFixedMap(),
+              isSpace,
+              isAtmosphere
+        );
+    }
+
+    private static Board getStratconBoardFor(AtBScenario scenario) {
+        // Check for valid dimensions and map
+        if (scenario == null || scenario.getMap() == null) {
+            LOGGER.error("Invalid AtBScenario provided");
+            return ServerBoardHelper.getPossibleGameBoard(MapSettings.getInstance(), false);
+        }
+
+        boolean isSpace = scenario.getBoardType() == Scenario.T_SPACE ||
+                                "Space".equals(scenario.getTerrainType());
+        boolean isAtmosphere = scenario.getBoardType() == Scenario.T_ATMOSPHERE;
+
+        return createBoard(
+              scenario.getMapX(),
+              scenario.getMapY(),
+              scenario.getMap(),
+              scenario.isUsingFixedMap(),
+              isSpace,
+              isAtmosphere
+        );
+    }
+
+    /**
+     * Creates a board based on the provided parameters
+     */
+    private static Board createBoard(int mapSizeX, int mapSizeY, String mapName,
+          boolean isUsingFixedMap, boolean isSpace, boolean isAtmosphere) {
         MapSettings mapSettings = MapSettings.getInstance();
-        mapSettings.setBoardSize(scenario.getMapX(), scenario.getMapY());
+        mapSettings.setBoardSize(mapSizeX, mapSizeY);
         mapSettings.setMapSize(1, 1);
         mapSettings.getBoardsSelectedVector().clear();
 
-        // if the scenario is taking place in space, do space settings instead
-        if (scenario.getBoardType() == Scenario.T_SPACE || scenario.getTerrainType().equals("Space")) {
+        if (isSpace) {
             mapSettings.setMedium(MapSettings.MEDIUM_SPACE);
             mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
-        } else if (scenario.isUsingFixedMap()) {
-            // TODO : remove inline file type
-            String board = scenario.getMap().replace(".board", "");
-            board = board.replace("\\", "/");
+        } else if (isUsingFixedMap) {
+            String board = mapName.replace(".board", "").replace("\\", "/");
             mapSettings.getBoardsSelectedVector().add(board);
 
-            if (scenario.getBoardType() == Scenario.T_ATMOSPHERE) {
+            if (isAtmosphere) {
                 mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
             }
         } else {
-            File mapgenFile = new File("data/mapgen/" + scenario.getMap() + ".xml");
+            File mapgenFile = new File("data/mapgen/" + mapName + ".xml");
             try (InputStream is = new FileInputStream(mapgenFile)) {
                 mapSettings = MapSettings.getInstance(is);
             } catch (IOException ex) {
                 Sentry.captureException(ex);
-                // TODO: Remove inline file path
-                LOGGER.error(ex, "Could not load map file data/mapgen/{}.xml", scenario.getMap());
+                LOGGER.error(ex, "Could not load map file data/mapgen/{}.xml", mapName);
             }
 
-            if (scenario.getBoardType() == Scenario.T_ATMOSPHERE) {
+            if (isAtmosphere) {
                 mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
             }
 
-            // duplicate code, but getting a new instance of map settings resets the size
-            // parameters
-            mapSettings.setBoardSize(scenario.getMapX(), scenario.getMapY());
+            // Reset size parameters after getting new instance
+            mapSettings.setBoardSize(mapSizeX, mapSizeY);
             mapSettings.setMapSize(1, 1);
             mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
         }
+
         return ServerBoardHelper.getPossibleGameBoard(mapSettings, false);
     }
 }
