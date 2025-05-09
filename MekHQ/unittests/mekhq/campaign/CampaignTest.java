@@ -55,12 +55,15 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import megamek.common.Dropship;
+import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Mek;
+import megamek.common.WeaponType;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.equipment.AmmoBin;
+import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.HeatSink;
 import mekhq.campaign.parts.equipment.JumpJet;
 import mekhq.campaign.personnel.Person;
@@ -409,6 +412,23 @@ public class CampaignTest {
                 assertEquals(FIRST_DESIRED_STOCK, firstStockLevel);
                 assertEquals(SECOND_DESIRED_STOCK, secondStockLevel);
             }
+
+            /*
+            @Test
+            public void testGetSetStockPercentWeapons() {
+                // Act
+                campaign.getCampaignOptions().setAutoLogisticsWeapons(FIRST_DESIRED_STOCK);
+                int firstStockLevel = campaign.getCampaignOptions().getAutoLogisticsWeapons();
+
+                // Let's change the stock level to something else so we can make sure it properly changes
+                campaign.getCampaignOptions().setAutoLogisticsWeapons(SECOND_DESIRED_STOCK);
+                int secondStockLevel = campaign.getCampaignOptions().getAutoLogisticsWeapons();
+
+                // Assert
+                assertEquals(FIRST_DESIRED_STOCK, firstStockLevel);
+                assertEquals(SECOND_DESIRED_STOCK, secondStockLevel);
+            }
+            */
 
             @Test
             public void testGetSetStockPercentOther() {
@@ -795,6 +815,37 @@ public class CampaignTest {
 
                     // Let's change it and make sure that it uses the new value
                     when(mockCampaignOptions.getAutoLogisticsEngines()).thenReturn(DESIRED_STOCK_LEVEL);
+
+                    desiredStockPercent = (int) method.invoke(campaign, part);
+                    afterChangeAllPercents = getAllDefaultStockPercents();
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    throw new RuntimeException(e);
+                }
+
+                // Assert
+                assertEquals(INCORRECT_STOCK_LEVEL, initialStockPercent);
+                assertEquals(DESIRED_STOCK_LEVEL, desiredStockPercent);
+
+                // None of the initial defaults should contain the desired stock percent
+                assertFalse(initialAllPercents.contains(desiredStockPercent));
+
+                // Only one of these should be the desired stock percent
+                assertEquals(1, afterChangeAllPercents.stream().filter(i -> i == DESIRED_STOCK_LEVEL).toArray().length);
+            }
+
+            @Test
+            public void testGetDefaultStockPercentWeapons() {
+                // Arrange
+                WeaponType mockWeaponType = mock(WeaponType.class);
+                part = new EquipmentPart(1, mockWeaponType, Entity.LOC_NONE, 1.0, false, campaign);
+
+                // Act
+                try {
+                    initialStockPercent = (int) method.invoke(campaign, part);
+                    initialAllPercents = getAllDefaultStockPercents();
+
+                    // Let's change it and make sure that it uses the new value
+                    when(mockCampaignOptions.getAutoLogisticsOther()).thenReturn(DESIRED_STOCK_LEVEL); //TODO
 
                     desiredStockPercent = (int) method.invoke(campaign, part);
                     afterChangeAllPercents = getAllDefaultStockPercents();
