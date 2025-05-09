@@ -50,8 +50,8 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.stream.IntStream;
 import java.util.zip.GZIPOutputStream;
 import javax.swing.*;
@@ -2415,7 +2415,7 @@ public class CampaignGUI extends JPanel {
 
     public void refreshAllTabs() {
         for (int i = 0; i < tabMain.getTabCount(); i++) {
-            ((CampaignGuiTab) tabMain.getComponentAt(i)).refreshAll();
+            ((CampaignGuiTab) tabMain.getComponentAt(i)).refreshAll(); //TODO
         }
     }
 
