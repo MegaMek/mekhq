@@ -2415,7 +2415,7 @@ public class CampaignGUI extends JPanel {
 
     public void refreshAllTabs() {
         for (int i = 0; i < tabMain.getTabCount(); i++) {
-            ((CampaignGuiTab) tabMain.getComponentAt(i)).refreshAll(); //TODO
+            ((CampaignGuiTab) tabMain.getComponentAt(i)).refreshAll();
         }
     }
 
