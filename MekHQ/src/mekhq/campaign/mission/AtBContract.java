@@ -433,7 +433,20 @@ public class AtBContract extends Contract {
      * @return The number of lances required.
      */
     public static int calculateRequiredLances(Campaign campaign) {
-        int formationSize = getStandardForceSize(campaign.getFaction());
+        int formationSize = 0;
+        for (CombatTeam combatTeam : campaign.getAllCombatTeams()) {
+            Force force = combatTeam.getForce(campaign);
+
+            if (force == null) {
+                continue;
+            }
+
+            if (force.isForceType(STANDARD)) {
+                int depth = force.getFormationLevel().getDepth();
+                formationSize += getStandardForceSize(campaign.getFaction(), depth);
+            }
+        }
+
         return max(getEffectiveNumUnits(campaign) / formationSize, 1);
     }
 
@@ -473,7 +486,11 @@ public class AtBContract extends Contract {
                 continue;
             }
 
-            for (UUID unitId : force.getAllUnits(true)) {
+            if (!force.isForceType(STANDARD)) {
+                continue;
+            }
+
+            for (UUID unitId : force.getUnits()) {
                 Entity entity = getEntityFromUnitId(campaign.getHangar(), unitId);
 
                 if (entity == null) {
