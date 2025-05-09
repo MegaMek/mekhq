@@ -844,7 +844,7 @@ public class CampaignTest {
                     initialAllPercents = getAllDefaultStockPercents();
 
                     // Let's change it and make sure that it uses the new value
-                    when(mockCampaignOptions.getAutoLogisticsOther()).thenReturn(DESIRED_STOCK_LEVEL); //TODO
+                    when(mockCampaignOptions.getAutoLogisticsWeapons()).thenReturn(DESIRED_STOCK_LEVEL); //TODO
 
                     desiredStockPercent = (int) method.invoke(campaign, part);
                     afterChangeAllPercents = getAllDefaultStockPercents();
