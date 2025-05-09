@@ -27,17 +27,28 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+
+import java.awt.Component;
+import java.awt.GridBagConstraints;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.enums.TurnoverFrequency;
-import mekhq.gui.campaignOptions.components.*;
-
-import javax.swing.*;
-import java.awt.*;
-
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
+import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
+import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
+import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 
 /**
  * The {@code TurnoverAndRetentionTab} class represents a graphical user interface (GUI)
@@ -116,8 +127,6 @@ public class TurnoverAndRetentionTab {
     private JPanel pnlAdministrativeStrain;
     private JLabel lblAdministrativeCapacity;
     private JSpinner spnAdministrativeCapacity;
-    private JLabel lblMultiCrewStrainDivider;
-    private JSpinner spnMultiCrewStrainDivider;
 
     private JPanel pnlManagementSkillWrapper;
     private JCheckBox chkUseManagementSkill;
@@ -238,8 +247,6 @@ public class TurnoverAndRetentionTab {
         pnlAdministrativeStrain = new JPanel();
         lblAdministrativeCapacity = new JLabel();
         spnAdministrativeCapacity = new JSpinner();
-        lblMultiCrewStrainDivider = new JLabel();
-        spnMultiCrewStrainDivider = new JSpinner();
 
         pnlManagementSkillWrapper = new JPanel();
         chkUseManagementSkill = new JCheckBox();
@@ -698,10 +705,6 @@ public class TurnoverAndRetentionTab {
         spnAdministrativeCapacity = new CampaignOptionsSpinner("AdministrativeCapacity",
             10, 1, 30, 1);
 
-        lblMultiCrewStrainDivider = new CampaignOptionsLabel("MultiCrewStrainDivider");
-        spnMultiCrewStrainDivider = new CampaignOptionsSpinner("MultiCrewStrainDivider",
-            5, 1, 25, 1);
-
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("AdministrativeStrain", true,
             "AdministrativeStrain");
@@ -713,12 +716,6 @@ public class TurnoverAndRetentionTab {
         panel.add(lblAdministrativeCapacity, layout);
         layout.gridx++;
         panel.add(spnAdministrativeCapacity, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblMultiCrewStrainDivider, layout);
-        layout.gridx++;
-        panel.add(spnMultiCrewStrainDivider, layout);
 
         return panel;
     }
@@ -836,7 +833,6 @@ public class TurnoverAndRetentionTab {
         spnPayoutServiceBonusRate.setValue(options.getPayoutServiceBonusRate());
         chkUseAdministrativeStrain.setSelected(options.isUseAdministrativeStrain());
         spnAdministrativeCapacity.setValue(options.getAdministrativeCapacity());
-        spnMultiCrewStrainDivider.setValue(options.getMultiCrewStrainDivider());
         chkUseManagementSkill.setSelected(options.isUseManagementSkill());
         chkUseCommanderLeadershipOnly.setSelected(options.isUseCommanderLeadershipOnly());
         spnManagementSkillPenalty.setValue(options.getManagementSkillPenalty());
@@ -895,7 +891,6 @@ public class TurnoverAndRetentionTab {
         options.setPayoutServiceBonusRate((int) spnPayoutServiceBonusRate.getValue());
         options.setUseAdministrativeStrain(chkUseAdministrativeStrain.isSelected());
         options.setAdministrativeCapacity((int) spnAdministrativeCapacity.getValue());
-        options.setMultiCrewStrainDivider((int) spnMultiCrewStrainDivider.getValue());
         options.setUseManagementSkill(chkUseManagementSkill.isSelected());
         options.setUseCommanderLeadershipOnly(chkUseCommanderLeadershipOnly.isSelected());
         options.setManagementSkillPenalty((int) spnManagementSkillPenalty.getValue());

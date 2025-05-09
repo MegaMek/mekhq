@@ -608,10 +608,12 @@ public enum PersonnelRole {
         return isDoctor() || isMedic();
     }
 
+
     /**
-     * @deprecated Unused
+     * Determines if the current entity is an assistant by checking if it is either an Astech or a Medic.
+     *
+     * @return {@code true} if the entity is an assistant (either an Astech or a Medic), {@code false} otherwise.
      */
-    @Deprecated(since = "0.50.06", forRemoval = true)
     public boolean isAssistant() {
         return isAstech() || isMedic();
     }
