@@ -183,6 +183,7 @@ public class CampaignOptions {
     private int autoLogisticsActuators;
     private int autoLogisticsJumpJets;
     private int autoLogisticsEngines;
+    private int autoLogisticsWeapons;
     private int autoLogisticsOther;
 
     // Delivery
@@ -711,6 +712,7 @@ public class CampaignOptions {
         autoLogisticsActuators = 100;
         autoLogisticsJumpJets = 50;
         autoLogisticsEngines = 0;
+        autoLogisticsWeapons = 50;
         autoLogisticsOther = 0;
 
         // Delivery
@@ -4394,6 +4396,14 @@ public class CampaignOptions {
         this.autoLogisticsEngines = autoLogisticsEngines;
     }
 
+    public int getAutoLogisticsWeapons() {
+        return autoLogisticsWeapons;
+    }
+
+    public void setAutoLogisticsWeapons(int autoLogisticsWeapons) {
+        this.autoLogisticsWeapons = autoLogisticsWeapons;
+    }
+
     public int getAutoLogisticsOther() {
         return autoLogisticsOther;
     }
@@ -4950,6 +4960,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsActuators", autoLogisticsActuators);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsJumpJets", autoLogisticsJumpJets);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsEngines", autoLogisticsEngines);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsWeapons", autoLogisticsWeapons);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsOther", autoLogisticsOther);
 
         // region Personnel Tab
@@ -5706,6 +5717,8 @@ public class CampaignOptions {
                     retVal.autoLogisticsJumpJets = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsEngines")) {
                     retVal.autoLogisticsEngines = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("autoLogisticsWeapons")) {
+                    retVal.autoLogisticsWeapons = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsOther")) {
                     retVal.autoLogisticsOther = Integer.parseInt(wn2.getTextContent().trim());
 

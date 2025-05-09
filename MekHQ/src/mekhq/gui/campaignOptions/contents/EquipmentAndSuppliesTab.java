@@ -106,6 +106,8 @@ public class EquipmentAndSuppliesTab {
     private JPanel pnlAutoLogistics;
     private JLabel lblAutoLogisticsHeatSink;
     private JSpinner spnAutoLogisticsHeatSink;
+    private JLabel lblAutoLogisticsWeapons;
+    private JSpinner spnAutoLogisticsWeapons;
     private JLabel lblAutoLogisticsMekHead;
     private JSpinner spnAutoLogisticsMekHead;
     private JLabel lblAutoLogisticsMekLocation;
@@ -297,6 +299,8 @@ public class EquipmentAndSuppliesTab {
         pnlAutoLogistics = new JPanel();
         lblAutoLogisticsHeatSink = new JLabel();
         spnAutoLogisticsHeatSink = new JSpinner();
+        lblAutoLogisticsWeapons = new JLabel();
+        spnAutoLogisticsWeapons = new JSpinner();
         lblAutoLogisticsMekHead = new JLabel();
         spnAutoLogisticsMekHead = new JSpinner();
         lblAutoLogisticsMekLocation = new JLabel();
@@ -486,6 +490,9 @@ public class EquipmentAndSuppliesTab {
         lblAutoLogisticsHeatSink = new CampaignOptionsLabel("AutoLogisticsHeatSink");
         spnAutoLogisticsHeatSink = new CampaignOptionsSpinner("AutoLogisticsHeatSink",
             250, 0, 10000, 1);
+        lblAutoLogisticsWeapons = new CampaignOptionsLabel("AutoLogisticsWeapons");
+        spnAutoLogisticsWeapons = new CampaignOptionsSpinner("AutoLogisticsWeapons",
+              50, 0, 10000, 1);
 
         lblAutoLogisticsActuators = new CampaignOptionsLabel("AutoLogisticsActuators");
         spnAutoLogisticsActuators = new CampaignOptionsSpinner("AutoLogisticsActuators",
@@ -511,65 +518,27 @@ public class EquipmentAndSuppliesTab {
         layout.gridy = 0;
         layout.gridx = 0;
         layout.gridwidth = 1;
-        panel.add(lblAutoLogisticsMekHead, layout);
-        layout.gridx++;
-        panel.add(spnAutoLogisticsMekHead, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblAutoLogisticsMekLocation, layout);
-        layout.gridx++;
-        panel.add(spnAutoLogisticsMekLocation, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblAutoLogisticsNonRepairableLocation, layout);
-        layout.gridx++;
-        panel.add(spnAutoLogisticsNonRepairableLocation, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblAutoLogisticsHeatSink, layout);
-        layout.gridx++;
-        panel.add(spnAutoLogisticsHeatSink, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblAutoLogisticsArmor, layout);
-        layout.gridx++;
-        panel.add(spnAutoLogisticsArmor, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblAutoLogisticsAmmunition, layout);
-        layout.gridx++;
-        panel.add(spnAutoLogisticsAmmunition, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblAutoLogisticsActuators, layout);
-        layout.gridx++;
-        panel.add(spnAutoLogisticsActuators, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblAutoLogisticsJumpJets, layout);
-        layout.gridx++;
-        panel.add(spnAutoLogisticsJumpJets, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblAutoLogisticsEngines, layout);
-        layout.gridx++;
-        panel.add(spnAutoLogisticsEngines, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblAutoLogisticsOther, layout);
-        layout.gridx++;
-        panel.add(spnAutoLogisticsOther, layout);
+        addSpinnerToPanel(panel, layout, lblAutoLogisticsMekHead, spnAutoLogisticsMekHead);
+        addSpinnerToPanel(panel, layout, lblAutoLogisticsMekLocation, spnAutoLogisticsMekLocation);
+        addSpinnerToPanel(panel, layout, lblAutoLogisticsNonRepairableLocation, spnAutoLogisticsNonRepairableLocation);
+        addSpinnerToPanel(panel, layout, lblAutoLogisticsHeatSink, spnAutoLogisticsHeatSink);
+        addSpinnerToPanel(panel, layout, lblAutoLogisticsArmor, spnAutoLogisticsArmor);
+        addSpinnerToPanel(panel, layout, lblAutoLogisticsAmmunition, spnAutoLogisticsAmmunition);
+        addSpinnerToPanel(panel, layout, lblAutoLogisticsActuators, spnAutoLogisticsActuators);
+        addSpinnerToPanel(panel, layout, lblAutoLogisticsJumpJets, spnAutoLogisticsJumpJets);
+        addSpinnerToPanel(panel, layout, lblAutoLogisticsEngines, spnAutoLogisticsEngines);
+        addSpinnerToPanel(panel, layout, lblAutoLogisticsWeapons, spnAutoLogisticsWeapons);
+        addSpinnerToPanel(panel, layout, lblAutoLogisticsOther, spnAutoLogisticsOther);
 
         return panel;
+    }
+
+    private void addSpinnerToPanel(JPanel panel, GridBagConstraints layout, JLabel label, JSpinner spinner) {
+        layout.gridy++;
+        panel.add(label, layout);
+        layout.gridx++;
+        panel.add(spinner, layout);
+        layout.gridx = 0;
     }
 
     /**
@@ -1113,6 +1082,7 @@ public class EquipmentAndSuppliesTab {
         options.setAutoLogisticsJumpJets((int) spnAutoLogisticsJumpJets.getValue());
         options.setAutoLogisticsEngines((int) spnAutoLogisticsEngines.getValue());
         options.setAutoLogisticsHeatSink((int) spnAutoLogisticsHeatSink.getValue());
+        options.setAutoLogisticsWeapons((int) spnAutoLogisticsWeapons.getValue());
         options.setAutoLogisticsOther((int) spnAutoLogisticsOther.getValue());
 
         // Delivery
@@ -1189,6 +1159,7 @@ public class EquipmentAndSuppliesTab {
         spnAutoLogisticsJumpJets.setValue(options.getAutoLogisticsJumpJets());
         spnAutoLogisticsEngines.setValue(options.getAutoLogisticsEngines());
         spnAutoLogisticsHeatSink.setValue(options.getAutoLogisticsHeatSink());
+        spnAutoLogisticsWeapons.setValue(options.getAutoLogisticsWeapons());
         spnAutoLogisticsOther.setValue(options.getAutoLogisticsOther());
 
         // Delivery
