@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.education;
 
@@ -163,6 +168,40 @@ public class EducationController {
         }
 
         return academy;
+    }
+
+    /**
+     * Determines whether the specified student is currently being homeschooled.
+     *
+     * <p>This method checks if the student has an associated academy set and retrieves the relevant academy using
+     * the student's academy name. If an academy is found, it returns {@code true} only if that academy indicates
+     * homeschooling.</p>
+     *
+     * <p><b>Usage:</b> the primary use of this is to ensure that homeschooled personnel are still being paid their
+     * salaries, as they will not appear in a list of active personnel.</p>
+     *
+     * @param student the {@link Person} whose schooling status is to be checked
+     *
+     * @return {@code true} if the student is being homeschooled; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public static boolean isBeingHomeSchooled(Person student) {
+        if (!student.getStatus().isStudent()) {
+            return false;
+        }
+
+        if (student.getEduAcademySet() == null) {
+            return false;
+        }
+
+        Academy academy = getAcademy(student.getEduAcademySet(), student.getEduAcademyNameInSet());
+        if (academy == null) {
+            return false;
+        }
+
+        return academy.isHomeSchool();
     }
 
     /**
