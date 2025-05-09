@@ -3920,24 +3920,6 @@ public class Person {
         return skill.getType().getExperienceLevel(averageSkillLevel);
     }
 
-
-    private int CalculateExperienceLevelForProfession(String sGunBa, String sAntiMek,
-          boolean isAlternativeQualityAveraging) {
-        if (hasSkill(sGunBa) && hasSkill(sAntiMek)) {
-            if (isAlternativeQualityAveraging) {
-                int rawScore = (int) floor((getSkill(sGunBa).getLevel() + getSkill(sAntiMek).getLevel()) / 2.0);
-                if (getSkill(sGunBa).getType().getExperienceLevel(rawScore) ==
-                          getSkill(sAntiMek).getType().getExperienceLevel(rawScore)) {
-                    return getSkill(sGunBa).getType().getExperienceLevel(rawScore);
-                }
-            }
-
-            return (int) floor((getSkill(sGunBa).getExperienceLevel() + getSkill(sAntiMek).getExperienceLevel()) / 2.0);
-        } else {
-            return SkillType.EXP_NONE;
-        }
-    }
-
     /**
      * Retrieves the skills associated with the character's profession. The skills returned depend on whether the
      * personnel's primary or secondary role is being queried and may also vary based on the campaign's configuration
