@@ -9173,7 +9173,7 @@ public class Campaign implements ITechManager {
      *       "Employee Turnover", 1 if user selected "Advance Day Regardless", 2 if user selected "Cancel Advance Day"
      */
     public int checkTurnoverPrompt() {
-        if (location.isInTransit()) {
+        if (!location.isOnPlanet()) {
             return -1;
         }
 
