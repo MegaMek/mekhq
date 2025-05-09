@@ -795,11 +795,15 @@ public class Academy implements Comparable<Academy> {
 
         if (personnel.size() == 1) {
             for (String skill : skills) {
+                String skillParsed = "";
                 if (skill.equalsIgnoreCase("none")) {
                     tooltip.append(skill).append("<br>");
                     continue;
+                } else if (skill.equalsIgnoreCase("xp")) {
+                    tooltip.append(skill).append("XP (");
                 } else {
-                    tooltip.append(skill).append(" (");
+                    skillParsed = skillParser(skill);
+                    tooltip.append(skillParsed).append(" (");
                 }
 
                 if (skill.equalsIgnoreCase("xp")) {
@@ -810,7 +814,6 @@ public class Academy implements Comparable<Academy> {
                               .append(")<br>");
                     }
                 } else {
-                    String skillParsed = skillParser(skill);
 
                     if ((person.hasSkill(skillParsed)) &&
                               (person.getSkill(skillParsed).getExperienceLevel() >= educationLevel)) {
