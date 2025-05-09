@@ -413,7 +413,6 @@ public class CampaignTest {
                 assertEquals(SECOND_DESIRED_STOCK, secondStockLevel);
             }
 
-            /*
             @Test
             public void testGetSetStockPercentWeapons() {
                 // Act
@@ -428,7 +427,6 @@ public class CampaignTest {
                 assertEquals(FIRST_DESIRED_STOCK, firstStockLevel);
                 assertEquals(SECOND_DESIRED_STOCK, secondStockLevel);
             }
-            */
 
             @Test
             public void testGetSetStockPercentOther() {
@@ -499,6 +497,7 @@ public class CampaignTest {
                 when(mockCampaignOptions.getAutoLogisticsActuators()).thenReturn(INCORRECT_STOCK_LEVEL);
                 when(mockCampaignOptions.getAutoLogisticsJumpJets()).thenReturn(INCORRECT_STOCK_LEVEL);
                 when(mockCampaignOptions.getAutoLogisticsEngines()).thenReturn(INCORRECT_STOCK_LEVEL);
+                when(mockCampaignOptions.getAutoLogisticsWeapons()).thenReturn(INCORRECT_STOCK_LEVEL);
                 when(mockCampaignOptions.getAutoLogisticsOther()).thenReturn(INCORRECT_STOCK_LEVEL);
             }
 
