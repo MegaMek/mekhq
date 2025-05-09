@@ -33,6 +33,7 @@
 package mekhq.campaign.personnel.enums;
 
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -226,6 +227,82 @@ public enum PersonnelRole {
     public String getLabel(final boolean isClan) {
         final boolean useClan = isClan && hasClanName;
         return getFormattedTextAt(RESOURCE_BUNDLE, name() + ".label" + (useClan ? ".clan" : ""));
+    }
+
+    /**
+     * Retrieves the plain text description for this personnel role from the resource bundle.
+     *
+     * @return the description string associated with the personnel role.
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    String getDescription() {
+        return getTextAt(RESOURCE_BUNDLE, name() + ".description");
+    }
+
+    /**
+     * Builds an HTML tooltip string providing a description of this personnel role and a list of related skills with
+     * their linked attributes, if available.
+     *
+     * <p>If the list of skills for this profession is not empty, the tooltip will include each skill followed by its
+     * relevant {@link SkillAttribute} types. Otherwise, a default formatted description is returned from the resource
+     * bundle.</p>
+     *
+     * @return an HTML-formatted tooltip string detailing the profession and corresponding skills.
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public String getTooltip() {
+        StringBuilder tooltip = new StringBuilder(getDescription()).append("<br>");
+
+        List<String> skills = new ArrayList<>();
+        if (this == VEHICLE_CREW) {
+            // Vehicle Crew is a bit of a special case as any of these skills makes a character eligible for
+            // experience level improvements.
+            List<String> relevantSkills = List.of(SkillType.S_TECH_MEK,
+                  SkillType.S_TECH_AERO,
+                  SkillType.S_TECH_MECHANIC,
+                  SkillType.S_TECH_BA,
+                  SkillType.S_SURGERY,
+                  SkillType.S_MEDTECH,
+                  SkillType.S_ASTECH,
+                  SkillType.S_COMMUNICATIONS,
+                  SkillType.S_SENSOR_OPERATIONS);
+            skills.addAll(relevantSkills);
+        } else {
+            skills.addAll(getSkillsForProfession());
+        }
+
+        for (String skill : skills) {
+            tooltip.append("<br>- ").append(skill);
+
+            SkillType skillType = SkillType.getType(skill);
+
+            if (skillType != null) {
+                List<SkillAttribute> linkedAttributes = new ArrayList<>(skillType.getAttributes());
+                linkedAttributes.remove(SkillAttribute.NONE);
+
+                for (SkillAttribute attribute : skillType.getAttributes()) {
+                    if (linkedAttributes.indexOf(attribute) == 0) {
+                        tooltip.append(" (");
+                    }
+
+                    tooltip.append(attribute.getLabel());
+
+                    if (linkedAttributes.indexOf(attribute) < linkedAttributes.size() - 1) {
+                        tooltip.append(", ");
+                    } else if (linkedAttributes.indexOf(attribute) == linkedAttributes.size() - 1) {
+                        tooltip.append(')');
+                    }
+                }
+            }
+
+            tooltip.append(')');
+        }
+
+        return tooltip.toString();
     }
 
     public int getMnemonic() {

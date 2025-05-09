@@ -757,6 +757,7 @@ public class CampaignGUI extends JPanel {
         for (PersonnelRole role : roles) {
             JMenuItem miHire = new JMenuItem(role.getLabel(getCampaign().getFaction().isClan()));
             if (role.getMnemonic() != KeyEvent.VK_UNDEFINED) {
+                miHire.setToolTipText(role.getTooltip());
                 miHire.setMnemonic(role.getMnemonic());
                 miHire.setAccelerator(KeyStroke.getKeyStroke(role.getMnemonic(), InputEvent.ALT_DOWN_MASK));
             }
