@@ -814,18 +814,21 @@ public enum PersonnelRole {
     }
 
     /**
-     * Returns an array of all {@link PersonnelRole} values sorted alphabetically by their enum name.
+     * Returns an array of all {@link PersonnelRole} values sorted alphabetically by their display label.
      *
-     * <p>This is useful for displaying or processing personnel roles in a consistent, user-friendly order.</p>
+     * <p>
+     * The sorting is performed based on the label returned by {@code getLabel(clanCampaign)} for each role,
+     * ensuring that the roles are ordered according to the user-facing names, which may differ depending
+     * on whether a clan campaign is in effect.
+     * </p>
      *
-     * @return a {@code PersonnelRole[]} containing all enum values sorted by name in ascending order
-     *
-     * @author Illiani
+     * @param clanCampaign {@code true} to use labels appropriate for a clan campaign;
+     *                     {@code false} to use standard labels
+     * @return a {@code PersonnelRole[]} containing all enum values sorted alphabetically by label
      * @since 0.50.06
      */
-    public static PersonnelRole[] getValuesSortedAlphabetically() {
-        return Arrays.stream(PersonnelRole.values())
-                     .sorted(Comparator.comparing(Enum::name))
+    public static PersonnelRole[] getValuesSortedAlphabetically(boolean clanCampaign) {
+        return Arrays.stream(PersonnelRole.values()).sorted(Comparator.comparing(role -> role.getLabel(clanCampaign)))
                      .toArray(PersonnelRole[]::new);
     }
 }

@@ -757,7 +757,7 @@ public class CampaignGUI extends JPanel {
         JMenu menuHireSupport = new JMenu(resourceMap.getString("menuHire.support"));
         JMenu menuHireCivilian = new JMenu(resourceMap.getString("menuHire.civilian"));
 
-        PersonnelRole[] roles = PersonnelRole.getValuesSortedAlphabetically();
+        PersonnelRole[] roles = PersonnelRole.getValuesSortedAlphabetically(getCampaign().isClanCampaign());
         for (PersonnelRole role : roles) {
             // Dependent is handled speciality so that it's always at the top of the civilian category
             if (role.isDependent()) {
