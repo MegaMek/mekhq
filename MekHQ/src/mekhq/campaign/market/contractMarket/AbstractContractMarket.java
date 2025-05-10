@@ -31,8 +31,7 @@ import static java.lang.Math.min;
 import static megamek.common.Compute.d6;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.enums.SkillLevel.VETERAN;
-import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
-import static mekhq.campaign.mission.AtBContract.getEffectiveNumUnits;
+import static mekhq.campaign.mission.AtBContract.calculateRequiredLances;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -272,10 +271,7 @@ public abstract class AbstractContractMarket {
         }
 
         // Calculate base formation size and effective unit force
-        Faction faction = campaign.getFaction();
-        int lanceLevelFormationSize = getStandardForceSize(faction);
-
-        int effectiveForces = Math.max(getEffectiveNumUnits(campaign) / lanceLevelFormationSize, 1);
+        int effectiveForces = calculateRequiredLances(campaign);
 
         // Calculate maximum deployed forces based on strategy options
         int maxDeployableCombatTeams = effectiveForces;
