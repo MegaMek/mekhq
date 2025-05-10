@@ -322,6 +322,7 @@ public class Person {
     private Reasoning reasoning;
     private int reasoningDescriptionIndex;
     private String personalityDescription;
+    private String personalityInterviewNotes;
     // endregion Personality
 
     // region Flags
@@ -508,6 +509,7 @@ public class Person {
         reasoning = Reasoning.AVERAGE;
         reasoningDescriptionIndex = randomInt(Reasoning.MAXIMUM_VARIATIONS);
         personalityDescription = "";
+        personalityInterviewNotes = "";
 
         // This assigns minutesLeft and overtimeLeft. Must be after skills to avoid an NPE.
         if (campaign != null) {
@@ -2233,6 +2235,14 @@ public class Person {
         this.personalityDescription = personalityDescription;
     }
 
+    public String getPersonalityInterviewNotes() {
+        return personalityInterviewNotes;
+    }
+
+    public void setPersonalityInterviewNotes(final String personalityInterviewNotes) {
+        this.personalityInterviewNotes = personalityInterviewNotes;
+    }
+
     // region Flags
     public boolean isClanPersonnel() {
         return clanPersonnel;
@@ -2689,6 +2699,10 @@ public class Person {
 
             if (!isNullOrBlank(personalityDescription)) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personalityDescription", personalityDescription);
+            }
+
+            if (!isNullOrBlank(personalityInterviewNotes)) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personalityInterviewNotes", personalityInterviewNotes);
             }
 
             // region Flags
@@ -3192,6 +3206,8 @@ public class Person {
                     person.reasoningDescriptionIndex = MathUtility.parseInt(wn2.getTextContent());
                 } else if (nodeName.equalsIgnoreCase("personalityDescription")) {
                     person.personalityDescription = wn2.getTextContent();
+                } else if (nodeName.equalsIgnoreCase("personalityInterviewNotes")) {
+                    person.personalityInterviewNotes = wn2.getTextContent();
                 } else if (nodeName.equalsIgnoreCase("clanPersonnel")) {
                     person.setClanPersonnel(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("commander")) {
