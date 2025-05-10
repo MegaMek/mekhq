@@ -37,14 +37,23 @@ import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 import java.awt.event.KeyEvent;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.universe.Factions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.mockito.Mockito;
 
 class PersonnelRoleTest {
     private static final PersonnelRole[] roles = PersonnelRole.values();
@@ -404,35 +413,6 @@ class PersonnelRoleTest {
     }
 
     @Test
-    void testIsCombat() {
-        for (final PersonnelRole personnelRole : roles) {
-            switch (personnelRole) {
-                case MEKWARRIOR:
-                case LAM_PILOT:
-                case GROUND_VEHICLE_DRIVER:
-                case NAVAL_VEHICLE_DRIVER:
-                case VTOL_PILOT:
-                case VEHICLE_GUNNER:
-                case VEHICLE_CREW:
-                case AEROSPACE_PILOT:
-                case CONVENTIONAL_AIRCRAFT_PILOT:
-                case PROTOMEK_PILOT:
-                case BATTLE_ARMOUR:
-                case SOLDIER:
-                case VESSEL_PILOT:
-                case VESSEL_GUNNER:
-                case VESSEL_CREW:
-                case VESSEL_NAVIGATOR:
-                    assertTrue(personnelRole.isCombat());
-                    break;
-                default:
-                    assertFalse(personnelRole.isCombat());
-                    break;
-            }
-        }
-    }
-
-    @Test
     void testIsMekWarriorGrouping() {
         for (final PersonnelRole personnelRole : roles) {
             if ((personnelRole == PersonnelRole.MEKWARRIOR) || (personnelRole == PersonnelRole.LAM_PILOT)) {
@@ -631,16 +611,18 @@ class PersonnelRoleTest {
         }
     }
 
-    @Test
-    void testIsCivilian() {
-        for (final PersonnelRole personnelRole : roles) {
-            if ((personnelRole == PersonnelRole.DEPENDENT) || (personnelRole == PersonnelRole.NONE)) {
-                assertTrue(personnelRole.isCivilian());
-            } else {
-                assertFalse(personnelRole.isCivilian());
-            }
+    @ParameterizedTest
+    @EnumSource(value = PersonnelRole.class)
+    void isSubType(PersonnelRole personnelRole) {
+        if (personnelRole.isSubType(PersonnelRoleSubType.COMBAT)) {
+            assertTrue(personnelRole.isCombat(), "PersonnelRole " + personnelRole + " is not a combat role.");
+        } else if (personnelRole.isSubType(PersonnelRoleSubType.SUPPORT)) {
+            assertTrue(personnelRole.isSupport(), "PersonnelRole " + personnelRole + " is not a support role.");
+        } else {
+            assertTrue(personnelRole.isCivilian(), "PersonnelRole " + personnelRole + " is not a civilian role.");
         }
     }
+
     // endregion Boolean Comparison Methods
 
     // region Static Methods
@@ -726,6 +708,44 @@ class PersonnelRoleTest {
     }
     // endregion Static Methods
 
-    // region File I/O
-    // endregion File I/O
+    @ParameterizedTest
+    @EnumSource(value = PersonnelRole.class, names = "NONE", mode = EnumSource.Mode.EXCLUDE)
+    void testRoleEligibility(PersonnelRole role) {
+        // Setup
+        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        when(mockCampaign.getFaction()).thenReturn(Factions.getInstance().getFaction("MERC"));
+
+        Person person = new Person(mockCampaign);
+
+        SkillType.initializeTypes();
+        LocalDate today = LocalDate.of(9999, 1, 1);
+
+        // Act
+        for (String skillName : role.getSkillsForProfession()) {
+            person.addSkill(skillName, 3, 0);
+        }
+
+        // Assert
+        assertTrue(person.canPerformRole(today, role, true),
+              "Person " +
+                    person +
+                    " cannot perform role " +
+                    role +
+                    " with skills " +
+                    person.getSkills().getSkillNames() +
+                    " expected :" +
+                    role.getSkillsForProfession());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = PersonnelRole.class, names = "NONE", mode = EnumSource.Mode.EXCLUDE)
+    void testGetDescription(PersonnelRole role) {
+        // Setup
+
+        // Act
+        String description = role.getDescription();
+
+        // Assert
+        assertTrue(isResourceKeyValid(description), "Role does not have a description: " + role.name());
+    }
 }
