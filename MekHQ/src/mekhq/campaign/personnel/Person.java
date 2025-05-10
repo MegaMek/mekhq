@@ -926,14 +926,9 @@ public class Person {
             setSecondaryRoleDirect(PersonnelRole.NONE);
         }
 
-        // Now, we can perform the time in service and last rank change tracking change
-        // for dependents
-        if (primaryRole.isDependent()) {
-            setRecruitment(null);
-            setLastRankChangeDate(null);
-        } else if (getPrimaryRole().isDependent()) {
+        // Now, we can perform the time in service and last rank change tracking change for dependents
+        if (!primaryRole.isCivilian() && recruitment != null) {
             setRecruitment(campaign.getLocalDate());
-            setLastRankChangeDate(campaign.getLocalDate());
         }
 
         // Finally, we can set the primary role
@@ -1085,6 +1080,35 @@ public class Person {
             case DEPENDENT, NONE -> true;
         };
     }
+
+    /**
+     * Validates and updates the primary and secondary roles of this person for the given campaign.
+     *
+     * <p>This method checks if the current primary and secondary roles can be performed based on the campaign's
+     * local date. If the person is not eligible for their primary role, it will be set to
+     * {@link PersonnelRole#DEPENDENT}. If they cannot perform their secondary role, it will be set to
+     * {@link PersonnelRole#NONE}.
+     *
+     * @param campaign the {@link Campaign} context used for validation, particularly the local date
+     */
+    public void validateRoles(Campaign campaign) {
+        if (!primaryRole.isNone()) {
+            boolean canPerform = canPerformRole(campaign.getLocalDate(), primaryRole, true);
+
+            if (!canPerform) {
+                setPrimaryRole(campaign, PersonnelRole.DEPENDENT);
+            }
+        }
+
+        if (!secondaryRole.isNone()) {
+            boolean canPerform = canPerformRole(campaign.getLocalDate(), secondaryRole, false);
+
+            if (!canPerform) {
+                setSecondaryRole(PersonnelRole.NONE);
+            }
+        }
+    }
+
     // endregion Personnel Roles
 
     public PersonnelStatus getStatus() {
@@ -5122,7 +5146,7 @@ public class Person {
     }
 
     public void setWealth(final int wealth) {
-        this.wealth = clamp(wealth, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
+        this.wealth = clamp(wealth, MINIMUM_WEALTH, MAXIMUM_WEALTH);
     }
 
     /**

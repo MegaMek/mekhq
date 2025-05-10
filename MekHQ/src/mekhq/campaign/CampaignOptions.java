@@ -442,7 +442,6 @@ public class CampaignOptions {
 
     private boolean useAdministrativeStrain;
     private int administrativeCapacity;
-    private int multiCrewStrainDivider;
 
     private boolean useManagementSkill;
     private boolean useCommanderLeadershipOnly;
@@ -1048,7 +1047,6 @@ public class CampaignOptions {
 
         setUseAdministrativeStrain(true);
         setAdministrativeCapacity(10);
-        setMultiCrewStrainDivider(5);
 
         setUseManagementSkill(true);
         setUseCommanderLeadershipOnly(false);
@@ -2225,12 +2223,20 @@ public class CampaignOptions {
         this.administrativeCapacity = administrativeCapacity;
     }
 
+    /**
+     * @deprecated Unused
+     */
+    @Deprecated(since = "0.50.6", forRemoval = true)
     public Integer getMultiCrewStrainDivider() {
-        return multiCrewStrainDivider;
+        return 1;
     }
 
+    /**
+     * @deprecated Unused
+     */
+    @Deprecated(since = "0.50.6", forRemoval = true)
     public void setMultiCrewStrainDivider(final Integer multiCrewStrainDivider) {
-        this.multiCrewStrainDivider = multiCrewStrainDivider;
+
     }
 
     public boolean isUseManagementSkill() {
@@ -5136,7 +5142,6 @@ public class CampaignOptions {
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAdministrativeStrain", isUseAdministrativeStrain());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "administrativeStrain", getAdministrativeCapacity());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "multiCrewStrainDivider", getMultiCrewStrainDivider());
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useManagementSkill", isUseManagementSkill());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useCommanderLeadershipOnly", isUseCommanderLeadershipOnly());
@@ -6195,8 +6200,6 @@ public class CampaignOptions {
                     retVal.setUseAdministrativeStrain(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("administrativeStrain")) {
                     retVal.setAdministrativeCapacity(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (nodeName.equalsIgnoreCase("multiCrewStrainDivider")) {
-                    retVal.setMultiCrewStrainDivider(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("useManagementSkill")) {
                     retVal.setUseManagementSkill(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("useCommanderLeadershipOnly")) {
