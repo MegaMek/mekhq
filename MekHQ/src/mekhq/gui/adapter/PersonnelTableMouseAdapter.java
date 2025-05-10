@@ -3158,7 +3158,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                   String.valueOf(traitCost),
                   String.valueOf(target)));
             menuItem.addActionListener(this);
-            menuItem.setEnabled(target <= MAXIMUM_CONNECTIONS && person.getXP() >= traitCost);
+            menuItem.setEnabled(target < MAXIMUM_CONNECTIONS && person.getXP() >= traitCost);
             traitsMenu.add(menuItem);
 
             // Reputation
@@ -3176,7 +3176,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                   String.valueOf(traitCost),
                   String.valueOf(target)));
             menuItem.addActionListener(this);
-            menuItem.setEnabled(target <= MAXIMUM_REPUTATION && person.getXP() >= traitCost);
+            menuItem.setEnabled(target < MAXIMUM_REPUTATION && person.getXP() >= traitCost);
             traitsMenu.add(menuItem);
 
             target = reputation - 1;
@@ -3189,7 +3189,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                   String.valueOf(-traitCost),
                   String.valueOf(target)));
             menuItem.addActionListener(this);
-            menuItem.setEnabled(target >= MINIMUM_REPUTATION);
+            menuItem.setEnabled(target > MINIMUM_REPUTATION);
             traitsMenu.add(menuItem);
 
             // Wealth
@@ -3202,7 +3202,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                   String.valueOf(traitCost),
                   String.valueOf(target)));
             menuItem.addActionListener(this);
-            menuItem.setEnabled(target <= MAXIMUM_WEALTH && person.getXP() >= traitCost);
+            menuItem.setEnabled(target < MAXIMUM_WEALTH && person.getXP() >= traitCost);
             traitsMenu.add(menuItem);
 
             target = wealth - 1;
@@ -3213,7 +3213,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                   String.valueOf(-traitCost),
                   String.valueOf(target)));
             menuItem.addActionListener(this);
-            menuItem.setEnabled(target >= MINIMUM_WEALTH);
+            menuItem.setEnabled(target > MINIMUM_WEALTH);
             traitsMenu.add(menuItem);
 
             // Unlucky
@@ -3226,7 +3226,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                   String.valueOf(-traitCost),
                   String.valueOf(target)));
             menuItem.addActionListener(this);
-            menuItem.setEnabled(target <= MAXIMUM_UNLUCKY);
+            menuItem.setEnabled(target < MAXIMUM_UNLUCKY);
             traitsMenu.add(menuItem);
             menu.add(traitsMenu);
 

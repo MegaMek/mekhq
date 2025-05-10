@@ -5122,7 +5122,7 @@ public class Person {
     }
 
     public void setWealth(final int wealth) {
-        this.wealth = clamp(wealth, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
+        this.wealth = clamp(wealth, MINIMUM_WEALTH, MAXIMUM_WEALTH);
     }
 
     /**
