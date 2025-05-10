@@ -1062,10 +1062,9 @@ public class Person {
             case MECHANIC -> hasSkill(SkillType.S_TECH_MECHANIC);
             case VEHICLE_CREW -> Stream.of(SkillType.S_TECH_MEK,
                   SkillType.S_TECH_AERO,
-                  SkillType.S_TECH_MECHANIC,
-                  SkillType.S_TECH_BA, SkillType.S_SURGERY,
-                  SkillType.S_MEDTECH,
-                  SkillType.S_ASTECH).anyMatch(this::hasSkill);
+                  SkillType.S_TECH_MECHANIC, SkillType.S_TECH_BA, SkillType.S_SURGERY,
+                  SkillType.S_MEDTECH, SkillType.S_ASTECH, SkillType.S_COMMUNICATIONS, SkillType.S_SENSOR_OPERATIONS)
+                                       .anyMatch(this::hasSkill);
             case AEROSPACE_PILOT -> hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO);
             case CONVENTIONAL_AIRCRAFT_PILOT -> hasSkill(SkillType.S_GUN_JET) && hasSkill(SkillType.S_PILOT_JET);
             case PROTOMEK_PILOT -> hasSkill(SkillType.S_GUN_PROTO);
@@ -3666,214 +3665,109 @@ public class Person {
         return Skills.SKILL_LEVELS[getExperienceLevel(campaign, secondary) + 1];
     }
 
+    /**
+     * Determines the experience level of a person in their current profession within the context of a campaign.
+     *
+     * <p>The calculation varies depending on the person's role and campaign options:</p>
+     * <ul>
+     *     <li>
+     *         <b>Vehicle Gunners:</b> If artillery usage is enabled in the campaign, calculates the maximum
+     *         experience level between Gunnery (Vee) and Artillery skills. Otherwise, uses the profession's
+     *         associated skills and campaign averaging option.
+     *     </li>
+     *     <li>
+     *         <b>Vehicle Crew:</b> Returns the highest experience level among a specific set of technical and support skills.
+     *     </li>
+     *     <li>
+     *         <b>Administrators:</b> Averages the Administrator skill and (optionally) Negotiation and/or Scrounge skills,
+     *         depending on campaign options. If all selected skills are untrained, returns {@link SkillType#EXP_NONE}.
+     *         Otherwise, returns the average, floored at 0.
+     *     </li>
+     *     <li>
+     *         <b>All other roles:</b> Calculates the experience level using their associated skills and campaign averaging option.
+     *     </li>
+     * </ul>
+     *
+     * @param campaign  the campaign context, providing options and relevant configuration
+     * @param secondary if {@code true}, evaluates the person's secondary role; if {@code false}, evaluates the primary
+     *                  role
+     *
+     * @return the calculated experience level for the relevant role, or {@link SkillType#EXP_NONE} if not qualified
+     */
     public int getExperienceLevel(final Campaign campaign, final boolean secondary) {
         final PersonnelRole role = secondary ? getSecondaryRole() : getPrimaryRole();
+
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        final boolean doAdminCountNegotiation = campaignOptions.isAdminExperienceLevelIncludeNegotiation();
+        final boolean doAdminCountScrounge = campaignOptions.isAdminExperienceLevelIncludeScrounge();
+        final boolean isUseArtillery = campaignOptions.isUseArtillery();
+
         final boolean isAlternativeQualityAveraging = campaignOptions.isAlternativeQualityAveraging();
 
-        switch (role) {
-            case MEKWARRIOR:
-                if (hasSkill(SkillType.S_GUN_MEK) && hasSkill(SkillType.S_PILOT_MEK)) {
-                    /*
-                     * Attempt to use higher precision averaging, but if it doesn't provide a clear result  due to
-                     * non-standard experience thresholds then fall back on lower precision averaging See Bug #140
-                     */
-                    if (isAlternativeQualityAveraging) {
-                        int rawScore = (int) floor((getSkill(SkillType.S_GUN_MEK).getLevel() +
-                                                          getSkill(SkillType.S_PILOT_MEK).getLevel()) / 2.0);
-                        if (getSkill(SkillType.S_GUN_MEK).getType().getExperienceLevel(rawScore) ==
-                                  getSkill(SkillType.S_PILOT_MEK).getType().getExperienceLevel(rawScore)) {
-                            return getSkill(SkillType.S_GUN_MEK).getType().getExperienceLevel(rawScore);
-                        }
-                    }
+        // Optional skills such as Admin for Techs are not counted towards the character's experience level, except
+        // in the special case of Vehicle Gunners. So we only want to fetch the base professions.
+        List<String> associatedSkillNames = role.getSkillsForProfession();
 
-                    return (int) floor((getSkill(SkillType.S_GUN_MEK).getExperienceLevel() +
-                                              getSkill(SkillType.S_PILOT_MEK).getExperienceLevel()) / 2.0);
-                } else {
-                    return SkillType.EXP_NONE;
-                }
-            case LAM_PILOT:
-                if (Stream.of(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK, SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO)
-                          .allMatch(this::hasSkill)) {
-                    /*
-                     * Attempt to use higher precision averaging, but if it doesn't provide a clear result due to
-                     * non-standard experience thresholds then fall back on lower precision averaging See Bug #140
-                     */
-                    if (isAlternativeQualityAveraging) {
-                        int rawScore = (int) floor((Stream.of(SkillType.S_GUN_MEK,
-                              SkillType.S_PILOT_MEK,
-                              SkillType.S_GUN_AERO,
-                              SkillType.S_PILOT_AERO).mapToInt(s -> getSkill(s).getLevel()).sum()) / 4.0);
-
-                        final int mekGunneryExperienceLevel = SkillType.lookupHash.get(SkillType.S_GUN_MEK)
-                                                                    .getExperienceLevel(rawScore);
-                        if ((mekGunneryExperienceLevel ==
-                                   SkillType.lookupHash.get(SkillType.S_PILOT_MEK).getExperienceLevel(rawScore) &&
-                                   (mekGunneryExperienceLevel ==
-                                          SkillType.lookupHash.get(SkillType.S_GUN_AERO)
-                                                .getExperienceLevel(rawScore)) &&
-                                   (mekGunneryExperienceLevel ==
-                                          SkillType.lookupHash.get(SkillType.S_PILOT_AERO)
-                                                .getExperienceLevel(rawScore)))) {
-                            return getSkill(SkillType.S_GUN_MEK).getType().getExperienceLevel(rawScore);
-                        }
-                    }
-
-                    return (int) floor((getSkill(SkillType.S_GUN_MEK).getExperienceLevel() +
-                                              getSkill(SkillType.S_PILOT_MEK).getExperienceLevel() +
-                                              getSkill(SkillType.S_GUN_AERO).getExperienceLevel() +
-                                              getSkill(SkillType.S_PILOT_AERO).getExperienceLevel()) / 4.0);
-                } else {
-                    return SkillType.EXP_NONE;
-                }
-            case GROUND_VEHICLE_DRIVER:
-                return hasSkill(SkillType.S_PILOT_GVEE) ?
-                             getSkill(SkillType.S_PILOT_GVEE).getExperienceLevel() :
-                             SkillType.EXP_NONE;
-            case NAVAL_VEHICLE_DRIVER:
-                return hasSkill(SkillType.S_PILOT_NVEE) ?
-                             getSkill(SkillType.S_PILOT_NVEE).getExperienceLevel() :
-                             SkillType.EXP_NONE;
-            case VTOL_PILOT:
-                return hasSkill(SkillType.S_PILOT_VTOL) ?
-                             getSkill(SkillType.S_PILOT_VTOL).getExperienceLevel() :
-                             SkillType.EXP_NONE;
-            case VEHICLE_GUNNER:
-                if (!campaignOptions.isUseArtillery()) {
-                    return hasSkill(SkillType.S_GUN_VEE) ?
-                                 getSkill(SkillType.S_GUN_VEE).getExperienceLevel() :
-                                 SkillType.EXP_NONE;
+        return switch (role) {
+            case VEHICLE_GUNNER -> {
+                if (!isUseArtillery) {
+                    yield calculateExperienceLevelForProfession(associatedSkillNames, isAlternativeQualityAveraging);
                 } else {
                     if ((hasSkill(SkillType.S_GUN_VEE)) && (hasSkill(SkillType.S_ARTILLERY))) {
-                        return Math.max((getSkill(SkillType.S_GUN_VEE).getExperienceLevel()),
+                        yield Math.max((getSkill(SkillType.S_GUN_VEE).getExperienceLevel()),
                               (getSkill(SkillType.S_ARTILLERY).getExperienceLevel()));
                     } else if (hasSkill(SkillType.S_GUN_VEE)) {
-                        return getSkill(SkillType.S_GUN_VEE).getExperienceLevel();
+                        yield getSkill(SkillType.S_GUN_VEE).getExperienceLevel();
                     } else if (hasSkill(SkillType.S_ARTILLERY)) {
-                        return getSkill(SkillType.S_ARTILLERY).getExperienceLevel();
+                        yield getSkill(SkillType.S_ARTILLERY).getExperienceLevel();
                     } else {
-                        return SkillType.EXP_NONE;
+                        yield SkillType.EXP_NONE;
                     }
                 }
-            case VEHICLE_CREW, MECHANIC:
-                return hasSkill(SkillType.S_TECH_MECHANIC) ?
-                             getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() :
-                             SkillType.EXP_NONE;
-            case AEROSPACE_PILOT:
-                if (hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO)) {
-                    if (isAlternativeQualityAveraging) {
-                        int rawScore = (int) floor((getSkill(SkillType.S_GUN_AERO).getLevel() +
-                                                          getSkill(SkillType.S_PILOT_AERO).getLevel()) / 2.0);
-                        if (getSkill(SkillType.S_GUN_AERO).getType().getExperienceLevel(rawScore) ==
-                                  getSkill(SkillType.S_PILOT_AERO).getType().getExperienceLevel(rawScore)) {
-                            return getSkill(SkillType.S_GUN_AERO).getType().getExperienceLevel(rawScore);
-                        }
+            }
+            case VEHICLE_CREW -> {
+                // Vehicle crew are a special case as they just need one of any of the following skills to qualify,
+                // rather than needing all relevant skills
+                List<String> relevantSkills = List.of(SkillType.S_TECH_MEK,
+                      SkillType.S_TECH_AERO,
+                      SkillType.S_TECH_MECHANIC,
+                      SkillType.S_TECH_BA,
+                      SkillType.S_SURGERY,
+                      SkillType.S_MEDTECH,
+                      SkillType.S_ASTECH,
+                      SkillType.S_COMMUNICATIONS,
+                      SkillType.S_SENSOR_OPERATIONS);
+                int highestExperienceLevel = SkillType.EXP_NONE;
+                for (String relevantSkill : relevantSkills) {
+                    Skill skill = getSkill(relevantSkill);
+
+                    if (skill == null) {
+                        continue;
                     }
 
-                    return (int) floor((getSkill(SkillType.S_GUN_AERO).getExperienceLevel() +
-                                              getSkill(SkillType.S_PILOT_AERO).getExperienceLevel()) / 2.0);
-                } else {
-                    return SkillType.EXP_NONE;
-                }
-            case CONVENTIONAL_AIRCRAFT_PILOT:
-                if (hasSkill(SkillType.S_GUN_JET) && hasSkill(SkillType.S_PILOT_JET)) {
-                    if (isAlternativeQualityAveraging) {
-                        int rawScore = (int) floor((getSkill(SkillType.S_GUN_JET).getLevel() +
-                                                          getSkill(SkillType.S_PILOT_JET).getLevel()) / 2.0);
-                        if (getSkill(SkillType.S_GUN_JET).getType().getExperienceLevel(rawScore) ==
-                                  getSkill(SkillType.S_PILOT_JET).getType().getExperienceLevel(rawScore)) {
-                            return getSkill(SkillType.S_GUN_JET).getType().getExperienceLevel(rawScore);
-                        }
+                    int currentExperienceLevel = skill.getExperienceLevel();
+                    if (currentExperienceLevel > highestExperienceLevel) {
+                        highestExperienceLevel = currentExperienceLevel;
                     }
-
-                    return (int) floor((getSkill(SkillType.S_GUN_JET).getExperienceLevel() +
-                                              getSkill(SkillType.S_PILOT_JET).getExperienceLevel()) / 2.0);
-                } else {
-                    return SkillType.EXP_NONE;
                 }
-            case PROTOMEK_PILOT:
-                return hasSkill(SkillType.S_GUN_PROTO) ?
-                             getSkill(SkillType.S_GUN_PROTO).getExperienceLevel() :
-                             SkillType.EXP_NONE;
-            case BATTLE_ARMOUR:
-                if (hasSkill(SkillType.S_GUN_BA) && hasSkill(SkillType.S_ANTI_MEK)) {
-                    if (isAlternativeQualityAveraging) {
-                        int rawScore = (int) floor((getSkill(SkillType.S_GUN_BA).getLevel() +
-                                                          getSkill(SkillType.S_ANTI_MEK).getLevel()) / 2.0);
-                        if (getSkill(SkillType.S_GUN_BA).getType().getExperienceLevel(rawScore) ==
-                                  getSkill(SkillType.S_ANTI_MEK).getType().getExperienceLevel(rawScore)) {
-                            return getSkill(SkillType.S_GUN_BA).getType().getExperienceLevel(rawScore);
-                        }
-                    }
 
-                    return (int) floor((getSkill(SkillType.S_GUN_BA).getExperienceLevel() +
-                                              getSkill(SkillType.S_ANTI_MEK).getExperienceLevel()) / 2.0);
-                } else {
-                    return SkillType.EXP_NONE;
-                }
-            case SOLDIER:
-                return hasSkill(SkillType.S_SMALL_ARMS) ?
-                             getSkill(SkillType.S_SMALL_ARMS).getExperienceLevel() :
-                             SkillType.EXP_NONE;
-            case VESSEL_PILOT:
-                return hasSkill(SkillType.S_PILOT_SPACE) ?
-                             getSkill(SkillType.S_PILOT_SPACE).getExperienceLevel() :
-                             SkillType.EXP_NONE;
-            case VESSEL_GUNNER:
-                return hasSkill(SkillType.S_GUN_SPACE) ?
-                             getSkill(SkillType.S_GUN_SPACE).getExperienceLevel() :
-                             SkillType.EXP_NONE;
-            case VESSEL_CREW:
-                return hasSkill(SkillType.S_TECH_VESSEL) ?
-                             getSkill(SkillType.S_TECH_VESSEL).getExperienceLevel() :
-                             SkillType.EXP_NONE;
-            case VESSEL_NAVIGATOR:
-                return hasSkill(SkillType.S_NAVIGATION) ?
-                             getSkill(SkillType.S_NAVIGATION).getExperienceLevel() :
-                             SkillType.EXP_NONE;
-            case MEK_TECH:
-                return hasSkill(SkillType.S_TECH_MEK) ?
-                             getSkill(SkillType.S_TECH_MEK).getExperienceLevel() :
-                             SkillType.EXP_NONE;
-            case AERO_TEK:
-                return hasSkill(SkillType.S_TECH_AERO) ?
-                             getSkill(SkillType.S_TECH_AERO).getExperienceLevel() :
-                             SkillType.EXP_NONE;
-            case BA_TECH:
-                return hasSkill(SkillType.S_TECH_BA) ?
-                             getSkill(SkillType.S_TECH_BA).getExperienceLevel() :
-                             SkillType.EXP_NONE;
-            case ASTECH:
-                return hasSkill(SkillType.S_ASTECH) ?
-                             getSkill(SkillType.S_ASTECH).getExperienceLevel() :
-                             SkillType.EXP_NONE;
-            case DOCTOR:
-                return hasSkill(SkillType.S_SURGERY) ? getSkill(SkillType.S_SURGERY).getExperienceLevel() :
-                             SkillType.EXP_NONE;
-            case MEDIC:
-                return hasSkill(SkillType.S_MEDTECH) ?
-                             getSkill(SkillType.S_MEDTECH).getExperienceLevel() :
-                             SkillType.EXP_NONE;
-            case ADMINISTRATOR_COMMAND:
-            case ADMINISTRATOR_LOGISTICS:
-            case ADMINISTRATOR_TRANSPORT:
-            case ADMINISTRATOR_HR:
+                yield highestExperienceLevel;
+            }
+            case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_HR -> {
                 int adminLevel = getSkillLevelOrNegative(S_ADMIN);
                 int negotiationLevel = getSkillLevelOrNegative(SkillType.S_NEGOTIATION);
                 int scroungeLevel = getSkillLevelOrNegative(SkillType.S_SCROUNGE);
 
                 int levelSum;
-                boolean includeNegotiation = campaign.getCampaignOptions().isAdminExperienceLevelIncludeNegotiation();
-                boolean includeScrounge = campaign.getCampaignOptions().isAdminExperienceLevelIncludeScrounge();
                 int divisor;
 
-                if (includeNegotiation && includeScrounge) {
+                if (doAdminCountNegotiation && doAdminCountScrounge) {
                     levelSum = adminLevel + negotiationLevel + scroungeLevel;
                     divisor = 3;
-                } else if (includeNegotiation) {
+                } else if (doAdminCountNegotiation) {
                     levelSum = adminLevel + negotiationLevel;
                     divisor = 2;
-                } else if (includeScrounge) {
+                } else if (doAdminCountScrounge) {
                     levelSum = adminLevel + scroungeLevel;
                     divisor = 2;
                 } else {
@@ -3882,38 +3776,102 @@ public class Person {
                 }
 
                 if (levelSum == -divisor) {
-                    return SkillType.EXP_NONE;
+                    yield SkillType.EXP_NONE;
                 } else {
-                    return Math.max(0, levelSum / divisor);
+                    yield Math.max(0, levelSum / divisor);
                 }
-            case DEPENDENT:
-            case NONE:
-            default:
-                return SkillType.EXP_NONE;
-        }
+            }
+            default -> calculateExperienceLevelForProfession(associatedSkillNames, isAlternativeQualityAveraging);
+        };
     }
+
+    /**
+     * Calculates the experience level for a profession based on the specified skill names and quality averaging
+     * method.
+     *
+     * <p>If the provided list of skill names is empty, this method returns {@link SkillType#EXP_REGULAR} by default.
+     * If any skill is missing or its type cannot be determined, {@link SkillType#EXP_NONE} is returned.</p>
+     *
+     * <ul>
+     *     <li>
+     *         <b>Standard Averaging:</b> If {@code isAlternativeQualityAveraging} is {@code false}, the experience
+     *         level is determined by averaging the levels of all provided skills and converting the average to an
+     *         experience level using the first skill's type.
+     *     </li>
+     *     <li>
+     *         <b>Alternative Quality Averaging:</b> If {@code isAlternativeQualityAveraging} is {@code true}, the
+     *         method checks if all experience levels for the listed skills are equal. If they are, that shared
+     *         experience level is returned. Otherwise, standard averaging is used as described above.
+     *     </li>
+     * </ul>
+     *
+     * @param skillNames                    list of skill names relevant to the profession
+     * @param isAlternativeQualityAveraging if {@code true}, uses the alternative averaging method; if {@code false},
+     *                                      uses standard averaging
+     *
+     * @return the determined experience level, or {@link SkillType#EXP_NONE} if an error occurs or prerequisite skills
+     *       are missing
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    private int calculateExperienceLevelForProfession(List<String> skillNames, boolean isAlternativeQualityAveraging) {
+        if (skillNames.isEmpty()) {
+            // If we're not tracking skills for this profession, it always counts as REGULAR
+            return SkillType.EXP_REGULAR;
+        }
+
+        int totalSkillLevel = 0;
+        boolean areAllEqual = true;
+        Integer expectedExperienceLevel = null;
+
+        for (String skillName : skillNames) {
+            Skill skill = getSkill(skillName);
+            if (skill == null) {
+                // If a character is missing a skill, it means they're unqualified for a profession. They will lose
+                // that profession the next time the campaign is loaded. We don't remove it here as that would
+                // require passing in a bunch of extra information that is largely irrelevant.
+                return SkillType.EXP_NONE;
+            }
+
+            SkillType skillType = SkillType.getType(skillName);
+            if (skillType == null) {
+                logger.warn("Unable to find skill type for {}. Experience level assessment aborted", skillName);
+                return SkillType.EXP_NONE;
+            }
+
+            int individualSkillLevel = skill.getLevel();
+            totalSkillLevel += individualSkillLevel;
+
+            if (isAlternativeQualityAveraging) {
+                int expLevel = skill.getExperienceLevel();
+                if (expectedExperienceLevel == null) {
+                    expectedExperienceLevel = expLevel;
+                } else if (!expectedExperienceLevel.equals(expLevel)) {
+                    areAllEqual = false;
+                }
+            }
+        }
+
+        if (isAlternativeQualityAveraging && areAllEqual) {
+            return expectedExperienceLevel;
+        }
+
+        int averageSkillLevel = (int) Math.floor((double) totalSkillLevel / skillNames.size());
+
+        Skill skill = getSkill(skillNames.get(0));
+        if (skill == null) {
+            return SkillType.EXP_NONE;
+        }
+
+        return skill.getType().getExperienceLevel(averageSkillLevel);
+    }
+
 
     /**
      * Retrieves the skills associated with the character's profession. The skills returned depend on whether the
      * personnel's primary or secondary role is being queried and may also vary based on the campaign's configuration
      * settings, such as whether artillery skills are enabled.
-     *
-     * <p>This method identifies the {@link PersonnelRole} associated with the personnel and returns
-     * a list of corresponding skills. The resulting skills depend on the profession and specific conditions, such as
-     * whether artillery is enabled in the campaign options.</p>
-     *
-     * <p>Examples of skill mappings include:
-     * <ul>
-     *     <li><strong>MEKWARRIOR:</strong> Includes gun and piloting skills for meks, with optional
-     *     artillery skills if enabled in the campaign.</li>
-     *     <li><strong>LAM_PILOT:</strong> Covers skills for both meks and aerospace combat.</li>
-     *     <li><strong>GROUND_VEHICLE_DRIVER:</strong> Includes piloting skills for ground vehicles.</li>
-     *     <li><strong>VEHICLE_GUNNER:</strong> Includes vehicle gunnery skills, with optional artillery skills
-     *         if enabled.</li>
-     *     <li><strong>AEROSPACE_PILOT:</strong> Covers skills for aerospace gunnery and piloting.</li>
-     *     <li><strong>ADMINISTRATORS:</strong> Includes administrative, negotiation, and scrounging skills.</li>
-     *     <li><strong>DEPENDENT or NONE:</strong> Returns no specific skills.</li>
-     * </ul>
      *
      * @param campaign  the current {@link Campaign}
      * @param secondary a boolean indicating whether to retrieve skills for the secondary ({@code true}) or primary
@@ -3924,48 +3882,19 @@ public class Person {
      */
     public List<String> getProfessionSkills(final Campaign campaign, final boolean secondary) {
         final PersonnelRole profession = secondary ? getSecondaryRole() : getPrimaryRole();
-        final boolean isUseArtillery = campaign.getCampaignOptions().isUseArtillery();
 
-        return switch (profession) {
-            case MEKWARRIOR -> {
-                if (isUseArtillery) {
-                    yield List.of(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK, SkillType.S_ARTILLERY);
-                } else {
-                    yield List.of(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK);
-                }
-            }
-            case LAM_PILOT ->
-                  List.of(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK, SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO);
-            case GROUND_VEHICLE_DRIVER -> List.of(SkillType.S_PILOT_GVEE);
-            case NAVAL_VEHICLE_DRIVER -> List.of(SkillType.S_PILOT_NVEE);
-            case VTOL_PILOT -> List.of(SkillType.S_PILOT_VTOL);
-            case VEHICLE_GUNNER -> {
-                if (isUseArtillery) {
-                    yield List.of(SkillType.S_GUN_VEE, SkillType.S_ARTILLERY);
-                } else {
-                    yield List.of(SkillType.S_GUN_VEE);
-                }
-            }
-            case VEHICLE_CREW, MECHANIC -> List.of(SkillType.S_TECH_MECHANIC);
-            case AEROSPACE_PILOT -> List.of(SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO);
-            case CONVENTIONAL_AIRCRAFT_PILOT -> List.of(SkillType.S_GUN_JET, SkillType.S_PILOT_JET);
-            case PROTOMEK_PILOT -> List.of(SkillType.S_GUN_PROTO, SkillType.S_GUN_PROTO);
-            case BATTLE_ARMOUR -> List.of(SkillType.S_GUN_BA, SkillType.S_ANTI_MEK);
-            case SOLDIER -> List.of(SkillType.S_SMALL_ARMS);
-            case VESSEL_PILOT -> List.of(SkillType.S_PILOT_SPACE);
-            case VESSEL_GUNNER -> List.of(SkillType.S_GUN_SPACE);
-            case VESSEL_CREW -> List.of(SkillType.S_TECH_VESSEL);
-            case VESSEL_NAVIGATOR -> List.of(SkillType.S_NAVIGATION);
-            case MEK_TECH -> List.of(SkillType.S_TECH_MEK);
-            case AERO_TEK -> List.of(SkillType.S_TECH_AERO);
-            case BA_TECH -> List.of(SkillType.S_TECH_BA);
-            case ASTECH -> List.of(SkillType.S_ASTECH);
-            case DOCTOR -> List.of(SkillType.S_SURGERY);
-            case MEDIC -> List.of(SkillType.S_MEDTECH);
-            case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_HR ->
-                  List.of(S_ADMIN, SkillType.S_NEGOTIATION, SkillType.S_SCROUNGE);
-            case DEPENDENT, NONE -> List.of(String.valueOf(SkillType.EXP_NONE));
-        };
+        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        final boolean isAdminsHaveNegotiation = campaignOptions.isAdminsHaveNegotiation();
+        final boolean isAdminsHaveScrounge = campaignOptions.isAdminsHaveScrounge();
+        final boolean isDoctorsUseAdministration = campaignOptions.isDoctorsUseAdministration();
+        final boolean isTechsUseAdministration = campaignOptions.isTechsUseAdministration();
+        final boolean isUseArtillery = campaignOptions.isUseArtillery();
+
+        return profession.getSkillsForProfession(isAdminsHaveNegotiation,
+              isAdminsHaveScrounge,
+              isDoctorsUseAdministration,
+              isTechsUseAdministration,
+              isUseArtillery);
     }
 
     /**
