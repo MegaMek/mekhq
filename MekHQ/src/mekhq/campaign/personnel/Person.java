@@ -94,15 +94,7 @@ import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
-import mekhq.campaign.personnel.enums.BloodGroup;
-import mekhq.campaign.personnel.enums.ManeiDominiClass;
-import mekhq.campaign.personnel.enums.ManeiDominiRank;
-import mekhq.campaign.personnel.enums.ModifierValue;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.campaign.personnel.enums.Phenotype;
-import mekhq.campaign.personnel.enums.Profession;
-import mekhq.campaign.personnel.enums.ROMDesignation;
+import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.Genealogy;
@@ -926,14 +918,9 @@ public class Person {
             setSecondaryRoleDirect(PersonnelRole.NONE);
         }
 
-        // Now, we can perform the time in service and last rank change tracking change
-        // for dependents
-        if (primaryRole.isDependent()) {
-            setRecruitment(null);
-            setLastRankChangeDate(null);
-        } else if (getPrimaryRole().isDependent()) {
+        // Now, we can perform the time in service and last rank change tracking change for dependents
+        if (!primaryRole.isCivilian() && recruitment != null) {
             setRecruitment(campaign.getLocalDate());
-            setLastRankChangeDate(campaign.getLocalDate());
         }
 
         // Finally, we can set the primary role
@@ -1005,6 +992,55 @@ public class Person {
             bgPrefix = getPhenotype().getShortName() + ' ';
         }
         return bgPrefix + getPrimaryRole().getLabel(isClanPersonnel());
+    }
+
+    /**
+     * Returns an HTML-formatted string describing the primary and, if applicable, secondary personnel roles. Civilian
+     * roles are displayed in italics. If a secondary role is present and is not {@code NONE}, it is appended to the
+     * description, separated by a slash. The description is wrapped in HTML tags.
+     *
+     * @return an HTML-formatted string describing the personnel roles, with civilian roles shown in italics
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public String getFormatedRoleDescriptions(LocalDate today) {
+        StringBuilder description = new StringBuilder("<html>");
+        String primaryDesc = getPrimaryRoleDesc();
+
+        if (primaryRole.isSubType(PersonnelRoleSubType.CIVILIAN)) {
+            if (primaryRole.isNone()) {
+                // Error state: emphasize the issue
+                description.append("<b><i><u>").append(primaryDesc.toUpperCase()).append("</u></i></b>");
+            } else if (primaryRole.isDependent()) {
+                String label;
+                if (status.isStudent()) {
+                    label = status.getLabel();
+                } else if (isChild(today)) {
+                    label = resources.getString("relationChild.text");
+                } else {
+                    label = primaryDesc;
+                }
+                description.append("<i>").append(label).append("</i>");
+            } else {
+                description.append("<i>").append(primaryDesc).append("</i>");
+            }
+        } else {
+            description.append(primaryDesc);
+        }
+
+        if (!secondaryRole.isNone()) {
+            description.append(" / ");
+            String secondaryDesc = getSecondaryRoleDesc();
+            if (secondaryRole.isSubType(PersonnelRoleSubType.CIVILIAN)) {
+                description.append("<i>").append(secondaryDesc).append("</i>");
+            } else {
+                description.append(secondaryDesc);
+            }
+        }
+
+        description.append("</html>");
+        return description.toString();
     }
 
     public String getSecondaryRoleDesc() {
@@ -1085,6 +1121,35 @@ public class Person {
             case DEPENDENT, NONE -> true;
         };
     }
+
+    /**
+     * Validates and updates the primary and secondary roles of this person for the given campaign.
+     *
+     * <p>This method checks if the current primary and secondary roles can be performed based on the campaign's
+     * local date. If the person is not eligible for their primary role, it will be set to
+     * {@link PersonnelRole#DEPENDENT}. If they cannot perform their secondary role, it will be set to
+     * {@link PersonnelRole#NONE}.
+     *
+     * @param campaign the {@link Campaign} context used for validation, particularly the local date
+     */
+    public void validateRoles(Campaign campaign) {
+        if (!primaryRole.isNone()) {
+            boolean canPerform = canPerformRole(campaign.getLocalDate(), primaryRole, true);
+
+            if (!canPerform) {
+                setPrimaryRole(campaign, PersonnelRole.DEPENDENT);
+            }
+        }
+
+        if (!secondaryRole.isNone()) {
+            boolean canPerform = canPerformRole(campaign.getLocalDate(), secondaryRole, false);
+
+            if (!canPerform) {
+                setSecondaryRole(PersonnelRole.NONE);
+            }
+        }
+    }
+
     // endregion Personnel Roles
 
     public PersonnelStatus getStatus() {
@@ -3710,7 +3775,7 @@ public class Person {
 
         return switch (role) {
             case VEHICLE_GUNNER -> {
-                if (!isUseArtillery) {
+                if (isUseArtillery) {
                     yield calculateExperienceLevelForProfession(associatedSkillNames, isAlternativeQualityAveraging);
                 } else {
                     if ((hasSkill(SkillType.S_GUN_VEE)) && (hasSkill(SkillType.S_ARTILLERY))) {
@@ -5122,7 +5187,7 @@ public class Person {
     }
 
     public void setWealth(final int wealth) {
-        this.wealth = clamp(wealth, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
+        this.wealth = clamp(wealth, MINIMUM_WEALTH, MAXIMUM_WEALTH);
     }
 
     /**
