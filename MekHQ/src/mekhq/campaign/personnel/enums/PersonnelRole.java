@@ -268,7 +268,7 @@ public enum PersonnelRole {
                   SkillType.S_SURGERY,
                   SkillType.S_MEDTECH,
                   SkillType.S_ASTECH,
-                  SkillType.S_COMMUNICATIONS,
+                  SkillType.S_COMMUNICATIONS, SkillType.S_ART_COOKING,
                   SkillType.S_SENSOR_OPERATIONS);
             skills.addAll(relevantSkills);
         } else {
