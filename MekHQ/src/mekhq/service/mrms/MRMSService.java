@@ -759,55 +759,54 @@ public class MRMSService {
                     debugLog("... can't increase the time because this part can't have its workMode changed",
                           "repairPart");
                 }
+
                 else if (targetRoll.getValue() > mrmsOptions.getTargetNumberPreferred() && !configuredOptions.isUseExtraTime()) {
-                    debugLog("... is above min TN but can't increase time due to configuration", "repairPart");
+                    debugLog("... is above preferred TN but can't increase time due to configuration", "repairPart");
                 }
-                // Check if we need to increase the time to meet the min TN
+
                 else if (targetRoll.getValue() > mrmsOptions.getTargetNumberPreferred() && configuredOptions.isUseExtraTime()) {
+                    debugLog("... is above preferred TN and trying to increase time", "repairPart");
                     WorkTimeCalculation workTimeCalc = calculateNewMRMSWorktime(partWork, tech,
                             mrmsOptions, campaign, true, highestAvailableTechSkill);
 
-                    if (workTimeCalc.getWorkTime() == null) {
-                        if (workTimeCalc.isReachedMaxSkill()) {
-                            debugLog("... is above min TN but can't increase time enough with max available tech",
-                                    "repairPart");
-
-                            return MRMSPartAction.createMaxSkillReached(partWork, highestAvailableTechSkill,
-                                    mrmsOptions.getTargetNumberPreferred());
-                        } else {
-                            debugLog("... is above min TN but can't increase time enough", "repairPart");
-
-                            continue;
-                        }
-                    }
-                    else {
+                    if (workTimeCalc.getWorkTime() != null) {
                         selectedWorktime = workTimeCalc.getWorkTime();
                     }
+                    else if (workTimeCalc.isReachedMaxSkill()) {
+                        debugLog("... is above preferred TN but has no suitable time settings with max available tech",
+                                "repairPart");
+
+                        return MRMSPartAction.createMaxSkillReached(partWork, highestAvailableTechSkill,
+                                mrmsOptions.getTargetNumberPreferred());
+                    } else {
+                        debugLog("... is above preferred TN but has no suitable time settings", "repairPart");
+
+                        continue;
+                    }
                 }
-                else if (targetRoll.getValue() < mrmsOptions.getTargetNumberMax() && !configuredOptions.isUseRushJob()) {
-                    debugLog("... is below max TN but can't decrease time due to configuration", "repairPart");
+
+                else if (targetRoll.getValue() < mrmsOptions.getTargetNumberPreferred() && !configuredOptions.isUseRushJob()) {
+                    debugLog("... is below preferred TN but can't decrease time due to configuration", "repairPart");
                 }
-                // Check if we need to decrease the time to meet the max TN
-                else if (targetRoll.getValue() < mrmsOptions.getTargetNumberMax() && configuredOptions.isUseRushJob()) {
+
+                else if (targetRoll.getValue() < mrmsOptions.getTargetNumberPreferred() && configuredOptions.isUseRushJob()) {
+                    debugLog("... is below preferred TN and trying to decrease time", "repairPart");
                     WorkTimeCalculation workTimeCalc = calculateNewMRMSWorktime(partWork, tech,
                           mrmsOptions, campaign, false, highestAvailableTechSkill);
 
-                    if (workTimeCalc.getWorkTime() == null) {
-                        if (workTimeCalc.isReachedMaxSkill()) {
-                            debugLog("... is below max TN but can't increase time within skill limits with max " +
-                                           "available tech",
-                                  "repairPart");
-
-                            return MRMSPartAction.createMaxSkillReached(partWork, highestAvailableTechSkill,
-                                  mrmsOptions.getTargetNumberPreferred());
-                        } else {
-                            debugLog("... is below max TN but can't increase time within skill limits", "repairPart");
-
-                            continue;
-                        }
-                    }
-                    else {
+                    if (workTimeCalc.getWorkTime() != null) {
                         selectedWorktime = workTimeCalc.getWorkTime();
+                    }
+                    else if (workTimeCalc.isReachedMaxSkill()) {
+                        debugLog("... is below preferred TN but has no suitable time settings with max available tech",
+                              "repairPart");
+
+                        return MRMSPartAction.createMaxSkillReached(partWork, highestAvailableTechSkill,
+                              mrmsOptions.getTargetNumberPreferred());
+                    } else {
+                        debugLog("... is above preferred TN but has no suitable time settings", "repairPart");
+
+                        continue;
                     }
                 }
 
