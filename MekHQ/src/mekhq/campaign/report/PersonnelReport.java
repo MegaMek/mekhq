@@ -140,6 +140,7 @@ public class PersonnelReport extends AbstractReport {
         int children = 0;
         int childrenStudents = 0;
         Money civilianSalaries = Money.zero();
+        LocalDate today = getCampaign().getLocalDate();
 
         for (Person person : getCampaign().getPersonnel()) {
             // Add them to the total count
@@ -172,7 +173,6 @@ public class PersonnelReport extends AbstractReport {
                 countStudents++;
             }
 
-            LocalDate today = getCampaign().getLocalDate();
             if (person.getPrimaryRole().isDependent() &&
                       !person.getStatus().isDepartedUnit() &&
                       person.getPrisonerStatus().isFree()) {
