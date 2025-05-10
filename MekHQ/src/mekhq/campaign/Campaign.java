@@ -2530,9 +2530,7 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Returns a list of people who are currently eligible to receive a salary.
-     *
-     * @return a list of {@link Person} objects who have active or student status
+     * @return a list of people who are currently eligible to receive a salary.
      * @author Illiani
      * @since 0.50.06
      */
