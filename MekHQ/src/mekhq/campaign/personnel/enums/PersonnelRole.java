@@ -284,7 +284,7 @@ public enum PersonnelRole {
                 List<SkillAttribute> linkedAttributes = new ArrayList<>(skillType.getAttributes());
                 linkedAttributes.remove(SkillAttribute.NONE);
 
-                for (SkillAttribute attribute : skillType.getAttributes()) {
+                for (SkillAttribute attribute : linkedAttributes) {
                     if (linkedAttributes.indexOf(attribute) == 0) {
                         tooltip.append(" (");
                     }
@@ -298,8 +298,6 @@ public enum PersonnelRole {
                     }
                 }
             }
-
-            tooltip.append(')');
         }
 
         return tooltip.toString();
