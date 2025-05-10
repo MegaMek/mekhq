@@ -682,6 +682,19 @@ public enum PersonnelRole {
     }
 
     /**
+     * @return a list of personnel roles classified as civilian roles.
+     */
+    public static List<PersonnelRole> getCivilianRoles() {
+        List<PersonnelRole> supportRoles = new ArrayList<>();
+        for (PersonnelRole personnelRole : PersonnelRole.values()) {
+            if (!personnelRole.isCivilian()) {
+                supportRoles.add(personnelRole);
+            }
+        }
+        return supportRoles;
+    }
+
+    /**
      * @return a list of roles that are potential primary roles. Currently, this is all bar NONE
      */
     public static List<PersonnelRole> getPrimaryRoles() {

@@ -24,20 +24,39 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.campaignOptions;
 
-import megamek.client.ui.swing.util.UIUtil;
-import megamek.common.annotations.Nullable;
-import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
+import static mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel.getTipPanelName;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 
-import javax.swing.*;
-import javax.swing.GroupLayout.Alignment;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
+
+import megamek.client.ui.swing.util.UIUtil;
+import megamek.common.annotations.Nullable;
+import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 
 /**
  * The {@code CampaignOptionsUtilities} class provides utility methods and constants
@@ -61,9 +80,13 @@ import java.util.ResourceBundle;
  * </ul>
  */
 public class CampaignOptionsUtilities {
-    private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
-    static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignOptionsDialog";
+
     final static String IMAGE_DIRECTORY = "data/images/universe/factions/";
+
+    public static String getCampaignOptionsResourceBundle() {
+        return RESOURCE_BUNDLE;
+    }
 
     /**
      * Retrieves the directory path for storing faction-related image resources.
@@ -170,7 +193,7 @@ public class CampaignOptionsUtilities {
             JLabel quote = new JLabel(String.format(
                 "<html><div style='width: %s; text-align:center;'>%s</div></html>",
                 UIUtil.scaleForGUI(mainPanel.getPreferredSize().width),
-                resources.getString(tabName + ".border")));
+                  getTextAt(RESOURCE_BUNDLE, tabName + ".border")));
 
             GridBagConstraints quoteConstraints = new GridBagConstraints();
             quoteConstraints.gridx = GridBagConstraints.RELATIVE;
@@ -200,7 +223,7 @@ public class CampaignOptionsUtilities {
 
             wrapperPanel.add(contentPanel, gbc);
 
-            tabbedPane.addTab(resources.getString(tabName + ".title"), wrapperPanel);
+            tabbedPane.addTab(getTextAt(RESOURCE_BUNDLE, tabName + ".title"), wrapperPanel);
         }
 
         return tabbedPane;
@@ -216,5 +239,85 @@ public class CampaignOptionsUtilities {
      */
     public static int processWrapSize(@Nullable Integer customWrapSize) {
         return customWrapSize == null ? 100 : customWrapSize;
+    }
+
+    /**
+     * Creates a {@link MouseAdapter} that updates the text of a {@link JLabel} within the specified panel to display a
+     * tip string when the mouse enters a related component.
+     *
+     * <p>
+     * When the mouse enters a component with the specified name, this adapter retrieves a localized tip string
+     * associated with that component. If the tip contains fewer than five HTML line break tags ({@code <br>}), extra
+     * line breaks are appended to ensure a minimum number of lines. The formatted tip is then set as the text of a
+     * {@link JLabel} within the provided panel, specifically targeting labels whose name matches the required pattern.
+     * </p>
+     *
+     * @param sourcePanel         the {@link JPanel} containing the label to update
+     * @param sourceComponentName the name of the component whose tip string will be shown in the label
+     *
+     * @return a {@link MouseAdapter} instance that updates the label with formatted tip text on mouse enter
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public static MouseAdapter createTipPanelUpdater(JPanel sourcePanel, String sourceComponentName) {
+        return new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent mouseEvent) {
+                String tipText = getTextAt(RESOURCE_BUNDLE, "lbl" + sourceComponentName + ".tip");
+
+                if (tipText.isBlank() || !isResourceKeyValid(tipText)) {
+                    return;
+                }
+
+                // These linebreaks are to ensure we have a relatively consistent number of lines. This stops the
+                // options from 'bouncing' around too much as the tip resizes.
+                int missingLines = 5 - tipLineCounter(tipText);
+                if (missingLines > 0) {
+                    for (int missingLine = 0; missingLine < missingLines; missingLine++) {
+                        tipText += "<br>";
+                    }
+                }
+
+                for (Component component : sourcePanel.getComponents()) {
+                    if (component instanceof JLabel label) {
+                        String labelName = label.getName();
+                        if (labelName != null && labelName.contains(getTipPanelName())) {
+                            String formatedTip = String.format("<html><div style='width: %s'>%s</div></html>",
+                                  UIUtil.scaleForGUI(750),
+                                  tipText);
+                            label.setText(formatedTip);
+                        }
+                    }
+                }
+            }
+        };
+    }
+
+    /**
+     * Counts the number of occurrences of the HTML line break tag {@code "<br>"} in the given tip string.
+     *
+     * <p>
+     * This method scans the provided string and returns the number of times the substring {@code "<br>"} appears. It is
+     * useful for determining how many HTML line breaks are present in formatted tip text.
+     * </p>
+     *
+     * @param tip the string to scan for {@code "<br>"} occurrences
+     *
+     * @return the number of {@code "<br>"} tags found in the string
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    private static int tipLineCounter(String tip) {
+        Pattern pattern = Pattern.compile("<br>");
+        Matcher matcher = pattern.matcher(tip);
+
+        int count = 0;
+        while (matcher.find()) {
+            count++;
+        }
+
+        return count;
     }
 }

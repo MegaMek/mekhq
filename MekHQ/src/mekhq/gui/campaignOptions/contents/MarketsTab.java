@@ -24,18 +24,24 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.campaignOptions.contents;
 
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.GridBagConstraints;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.ResourceBundle;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
@@ -83,9 +89,6 @@ import mekhq.module.api.PersonnelMarketMethod;
  * </p>
  */
 public class MarketsTab {
-    private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
-    private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
-
     private final Campaign campaign;
     private final CampaignOptions campaignOptions;
 
@@ -620,11 +623,15 @@ public class MarketsTab {
      */
     private JPanel createContractPayPanel() {
         // Contents
-        btnContractEquipment = new JRadioButton(resources.getString("lblContractEquipment.text"));
-        btnContractEquipment.setToolTipText(resources.getString("lblContractEquipment.tooltip"));
+        btnContractEquipment = new JRadioButton(getTextAt(getCampaignOptionsResourceBundle(),
+              "lblContractEquipment.text"));
+        btnContractEquipment.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(),
+              "lblContractEquipment.tooltip"));
 
-        btnContractPersonnel = new JRadioButton(resources.getString("lblContractPersonnel.text"));
-        btnContractPersonnel.setToolTipText(resources.getString("lblContractPersonnel.tooltip"));
+        btnContractPersonnel = new JRadioButton(getTextAt(getCampaignOptionsResourceBundle(),
+              "lblContractPersonnel.text"));
+        btnContractPersonnel.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(),
+              "lblContractPersonnel.tooltip"));
 
         // Create a ButtonGroup to link the buttons
         ButtonGroup contractGroup = new ButtonGroup();

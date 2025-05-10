@@ -33,11 +33,12 @@
 package mekhq.gui.campaignOptions.contents;
 
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
-import java.util.ResourceBundle;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -50,7 +51,6 @@ import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -79,11 +79,6 @@ import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
  * and combo boxes or formatting options and labels.
  */
 public class EquipmentAndSuppliesTab {
-    // region Variable Declarations
-    private static String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
-    private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE,
-        MekHQ.getMHQOptions().getLocale());
-
     private CampaignOptions campaignOptions;
 
     //start Acquisition Tab
@@ -931,9 +926,9 @@ public class EquipmentAndSuppliesTab {
      */
     private static String getTransitUnitName(final int unit) {
         return switch (unit) {
-            case TRANSIT_UNIT_DAY -> resources.getString("transitUnitNamesDays.text");
-            case TRANSIT_UNIT_WEEK -> resources.getString("transitUnitNamesWeeks.text");
-            case TRANSIT_UNIT_MONTH -> resources.getString("transitUnitNamesMonths.text");
+            case TRANSIT_UNIT_DAY -> getTextAt(getCampaignOptionsResourceBundle(), "transitUnitNamesDays.text");
+            case TRANSIT_UNIT_WEEK -> getTextAt(getCampaignOptionsResourceBundle(), "transitUnitNamesWeeks.text");
+            case TRANSIT_UNIT_MONTH -> getTextAt(getCampaignOptionsResourceBundle(), "transitUnitNamesMonths.text");
             default -> "ERROR";
         };
     }
@@ -1009,7 +1004,7 @@ public class EquipmentAndSuppliesTab {
         lblChoiceTechLevel = new CampaignOptionsLabel("ChoiceTechLevel");
         choiceTechLevel = new MMComboBox<>("choiceTechLevel", getMaximumTechLevelOptions());
         choiceTechLevel.setToolTipText(String.format("<html>%s</html>",
-                resources.getString("lblChoiceTechLevel.tooltip")));
+              getTextAt(getCampaignOptionsResourceBundle(), "lblChoiceTechLevel.tooltip")));
 
         // Variable Tech Level
         variableTechLevelBox = new CampaignOptionsCheckBox("VariableTechLevelBox");

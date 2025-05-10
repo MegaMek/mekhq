@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.campaignOptions.contents;
 
@@ -31,7 +36,9 @@ import static megamek.client.generator.RandomGenderGenerator.getPercentFemale;
 import static mekhq.campaign.personnel.skills.Aging.clearAllAgeModifiers;
 import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.Component;
 import java.awt.GridBagConstraints;
@@ -40,7 +47,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.ResourceBundle;
 import javax.swing.*;
 
 import megamek.client.generator.RandomGenderGenerator;
@@ -86,9 +92,6 @@ import mekhq.gui.panes.RankSystemsPane;
  * This class serves as the backbone for displaying and managing the "Biography" tab in the campaign options dialog.
  */
 public class BiographyTab {
-    private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
-    private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
-
     private Campaign campaign;
     private GeneralTab generalTab;
     private CampaignOptions campaignOptions;
@@ -1284,7 +1287,7 @@ public class BiographyTab {
         // Layout the Panel
         JPanel panel = new JPanel(new GridLayout((int) Math.ceil((personnelRoles.length + 2) / 5.0), 5));
         panel.setBorder(BorderFactory.createTitledBorder(String.format(String.format("<html>%s</html>",
-              resources.getString("lblRandomPortraitPanel.text")))));
+              getTextAt(getCampaignOptionsResourceBundle(), "lblRandomPortraitPanel.text")))));
 
         panel.add(btnEnableAllPortraits);
         panel.add(btnDisableAllPortraits);

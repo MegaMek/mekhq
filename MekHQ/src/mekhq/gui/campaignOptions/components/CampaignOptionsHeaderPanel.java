@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.campaignOptions.components;
 
@@ -31,9 +36,10 @@ import static java.awt.Color.BLACK;
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.utilities.ImageUtilities.addTintToImageIcon;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.GridBagConstraints;
-import java.util.ResourceBundle;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -49,15 +55,11 @@ import megamek.client.ui.swing.util.UIUtil;
  * layout, and font scaling is applied to the labels to ensure consistent appearance.
  */
 public class CampaignOptionsHeaderPanel extends JPanel {
-    /**
-     * The path to the resource bundle containing label text for the header panel.
-     */
-    private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
+    private static final String TIP_PANEL_NAME = "TipPanel";
 
-    /**
-     * The {@link ResourceBundle} used to load localized strings for the header and body labels.
-     */
-    static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
+    public static String getTipPanelName() {
+        return TIP_PANEL_NAME;
+    }
 
     /**
      * Constructs a new instance of {@link CampaignOptionsHeaderPanel} with a header label and an image.
@@ -96,19 +98,24 @@ public class CampaignOptionsHeaderPanel extends JPanel {
         JLabel lblImage = new JLabel(imageIcon);
 
         // Create the header label with text from the resource bundle
-        final JLabel lblHeader = new JLabel(resources.getString("lbl" + name + ".text"), SwingConstants.CENTER);
+        final JLabel lblHeader = new JLabel(getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".text"),
+              SwingConstants.CENTER);
         lblHeader.setName("lbl" + name);
         setFontScaling(lblHeader, true, 2);
 
         // Optionally create a body label with additional text, if includeBodyText is true
         JLabel lblBody = new JLabel();
         if (includeBodyText) {
-            lblBody = new JLabel(String.format("<html><div style='width: %s; text-align:justify;'>%s</div></html>",
-                  UIUtil.scaleForGUI(750),
-                  resources.getString("lbl" + name + "Body.text")), SwingConstants.CENTER);
+            lblBody = new JLabel(String.format("<html><div style='width: %s'>%s</div></html>",
+                  UIUtil.scaleForGUI(750), getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + "Body.text")),
+                  SwingConstants.CENTER);
             lblBody.setName("lbl" + name + "Body");
             setFontScaling(lblBody, false, 1);
         }
+
+        JLabel lblTip = new JLabel();
+        lblTip.setName("lbl" + name + TIP_PANEL_NAME);
+        lblTip.setText("<html><br><br><br><br><br></html>"); // This is necessary for the text updater
 
         // Initialize the panel's layout using a GridBagLayout
         new CampaignOptionsStandardPanel("pnl" + name + "HeaderPanel");
@@ -128,5 +135,8 @@ public class CampaignOptionsHeaderPanel extends JPanel {
             layout.gridwidth = 1;
             this.add(lblBody, layout);
         }
+
+        layout.gridy++;
+        this.add(lblTip, layout);
     }
 }

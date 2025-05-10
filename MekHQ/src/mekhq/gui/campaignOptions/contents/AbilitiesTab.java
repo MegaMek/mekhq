@@ -33,7 +33,9 @@
 package mekhq.gui.campaignOptions.contents;
 
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.spaUtilities.SpaUtilities.getSpaCategory;
 import static mekhq.utilities.spaUtilities.enums.AbilityCategory.CHARACTER_CREATION_ONLY;
 import static mekhq.utilities.spaUtilities.enums.AbilityCategory.CHARACTER_FLAW;
@@ -50,7 +52,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -81,9 +82,6 @@ import mekhq.utilities.spaUtilities.enums.AbilityCategory;
  * This tab is used as part of the MekHQ campaign options UI for managing personnel-related abilities.
  */
 public class AbilitiesTab {
-    private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
-    private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
-
     private ArrayList<String> level3Abilities;
     private Map<String, CampaignOptionsAbilityInfo> allAbilityInfo;
     private JPanel combatTab;
@@ -339,11 +337,12 @@ public class AbilitiesTab {
               GridBagConstraints.HORIZONTAL);
 
         // Contents
-        JCheckBox chkAbility = new JCheckBox(resources.getString("abilityEnable.text"));
+        JCheckBox chkAbility = new JCheckBox(getTextAt(getCampaignOptionsResourceBundle(), "abilityEnable.text"));
         chkAbility.setSelected(abilityInfo.isEnabled());
         chkAbility.addActionListener(e -> abilityInfo.setEnabled(chkAbility.isSelected()));
 
-        JLabel lblCost = new JLabel(String.format(resources.getString("abilityCost.text"), ability.getCost()));
+        JLabel lblCost = new JLabel(String.format(getTextAt(getCampaignOptionsResourceBundle(), "abilityCost.text"),
+              ability.getCost()));
 
         JLabel lblDescription = new JLabel();
         lblDescription.setText(String.format("<html><div style='width: %s; text-align:justify;'><i>%s</i></div></html>",
@@ -360,17 +359,21 @@ public class AbilitiesTab {
                 // This will run on the SWT thread
                 SwingUtilities.invokeLater(() -> {
                     // Update components with new values
-                    lblCost.setText(String.format(resources.getString("abilityCost.text"), ability.getCost()));
+                    lblCost.setText(String.format(getTextAt(getCampaignOptionsResourceBundle(), "abilityCost.text"),
+                          ability.getCost()));
 
-                    String prerequisitesDescription = resources.getString("prerequisites.text") +
+                    String prerequisitesDescription = getTextAt(getCampaignOptionsResourceBundle(),
+                          "prerequisites.text") +
                                                             ability.getAllPrereqDesc();
                     lblPrerequisites.setText(buildAbilityDescription(prerequisitesDescription));
 
-                    String incompatibleDescription = resources.getString("incompatible.text") +
+                    String incompatibleDescription = getTextAt(getCampaignOptionsResourceBundle(),
+                          "incompatible.text") +
                                                            ability.getInvalidDesc();
                     lblIncompatible.setText(buildAbilityDescription(incompatibleDescription));
 
-                    String removesDescription = resources.getString("removes.text") + ability.getRemovedDesc();
+                    String removesDescription = getTextAt(getCampaignOptionsResourceBundle(), "removes.text") +
+                                                      ability.getRemovedDesc();
                     lblRemoves.setText(buildAbilityDescription(removesDescription));
                 });
             }
@@ -464,7 +467,7 @@ public class AbilitiesTab {
      * @return A {@code JLabel} with the generated description.
      */
     private JLabel createAbilityLabel(String resourceKey, String descriptionFromAbility) {
-        String description = resources.getString(resourceKey) + descriptionFromAbility;
+        String description = getTextAt(getCampaignOptionsResourceBundle(), resourceKey) + descriptionFromAbility;
         return new JLabel(buildAbilityDescription(description));
     }
 

@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.campaignOptions.contents;
 
@@ -44,14 +49,15 @@ import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_SECURI
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT_COMMAND;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.GridBagConstraints;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -90,9 +96,6 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
  * </p>
  */
 public class SkillsTab {
-    private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
-    private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
-
     private final CampaignOptions campaignOptions;
 
     private Map<String, JSpinner> allTargetNumbers;
@@ -239,7 +242,7 @@ public class SkillsTab {
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         // Create a button to toggle the table
-        JButton hideAllButton = new JButton(resources.getString("btnHideAll.text"));
+        JButton hideAllButton = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "btnHideAll.text"));
         hideAllButton.addActionListener(e -> {
             setVisibleForAll(false);
 
@@ -248,7 +251,7 @@ public class SkillsTab {
         });
 
         // Create a button to toggle the table
-        JButton showAllButton = new JButton(resources.getString("btnDisplayAll.text"));
+        JButton showAllButton = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "btnDisplayAll.text"));
         showAllButton.addActionListener(e -> {
             setVisibleForAll(true);
 
@@ -411,7 +414,7 @@ public class SkillsTab {
         allSkillCosts.put(skill.getName(), skillCosts);
         allSkillMilestones.put(skill.getName(), skillMilestones);
 
-        JButton copyButton = new JButton(resources.getString("btnCopy.text"));
+        JButton copyButton = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "btnCopy.text"));
         copyButton.addActionListener(e -> {
             storedTargetNumber = (Integer) spnTargetNumber.getValue();
 
@@ -424,7 +427,7 @@ public class SkillsTab {
             }
         });
 
-        JButton pasteButton = new JButton(resources.getString("btnPaste.text"));
+        JButton pasteButton = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "btnPaste.text"));
         pasteButton.addActionListener(e -> {
             spnTargetNumber.setValue(storedTargetNumber);
 
@@ -440,7 +443,7 @@ public class SkillsTab {
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         // Create a button to toggle the table
-        JButton toggleButton = new JButton(resources.getString("btnToggle.text"));
+        JButton toggleButton = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "btnToggle.text"));
         toggleButton.addActionListener(e -> {
             for (JLabel label : labels) {
                 label.setVisible(!label.isVisible());
