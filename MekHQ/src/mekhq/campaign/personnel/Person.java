@@ -3737,7 +3737,6 @@ public class Person {
                       SkillType.S_ASTECH,
                       SkillType.S_COMMUNICATIONS,
                       SkillType.S_SENSOR_OPERATIONS);
-
                 int highestExperienceLevel = SkillType.EXP_NONE;
                 for (String relevantSkill : relevantSkills) {
                     Skill skill = getSkill(relevantSkill);

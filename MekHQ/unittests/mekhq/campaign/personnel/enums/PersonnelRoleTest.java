@@ -736,4 +736,16 @@ class PersonnelRoleTest {
                     " expected :" +
                     role.getSkillsForProfession());
     }
+
+    @ParameterizedTest
+    @EnumSource(value = PersonnelRole.class, names = "NONE", mode = EnumSource.Mode.EXCLUDE)
+    void testGetDescription(PersonnelRole role) {
+        // Setup
+
+        // Act
+        String description = role.getDescription();
+
+        // Assert
+        assertTrue(isResourceKeyValid(description), "Role does not have a description: " + role.name());
+    }
 }
