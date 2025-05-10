@@ -5718,7 +5718,7 @@ public class CampaignOptions {
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsEngines")) {
                     retVal.autoLogisticsEngines = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsWeapons")) {
-                    retVal.autoLogisticsWeapons = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.autoLogisticsWeapons = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsOther")) {
                     retVal.autoLogisticsOther = Integer.parseInt(wn2.getTextContent().trim());
 
