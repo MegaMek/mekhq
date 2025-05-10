@@ -1443,6 +1443,9 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
         setSkills();
         setOptions();
+
+        person.validateRoles(campaign);
+
         dispose();
     }
 
