@@ -3710,7 +3710,7 @@ public class Person {
 
         return switch (role) {
             case VEHICLE_GUNNER -> {
-                if (!campaignOptions.isUseArtillery()) {
+                if (isUseArtillery) {
                     yield calculateExperienceLevelForProfession(associatedSkillNames, isAlternativeQualityAveraging);
                 } else {
                     if ((hasSkill(SkillType.S_GUN_VEE)) && (hasSkill(SkillType.S_ARTILLERY))) {
