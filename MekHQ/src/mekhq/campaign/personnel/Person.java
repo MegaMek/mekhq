@@ -1097,9 +1097,15 @@ public class Person {
             case VEHICLE_GUNNER -> hasSkill(SkillType.S_GUN_VEE);
             case MECHANIC -> hasSkill(SkillType.S_TECH_MECHANIC);
             case VEHICLE_CREW -> Stream.of(SkillType.S_TECH_MEK,
-                  SkillType.S_TECH_AERO,
-                  SkillType.S_TECH_MECHANIC, SkillType.S_TECH_BA, SkillType.S_SURGERY,
-                  SkillType.S_MEDTECH, SkillType.S_ASTECH, SkillType.S_COMMUNICATIONS, SkillType.S_SENSOR_OPERATIONS)
+                        SkillType.S_TECH_AERO,
+                        SkillType.S_TECH_MECHANIC,
+                        SkillType.S_TECH_BA,
+                        SkillType.S_SURGERY,
+                        SkillType.S_MEDTECH,
+                        SkillType.S_ASTECH,
+                        SkillType.S_COMMUNICATIONS,
+                        SkillType.S_SENSOR_OPERATIONS,
+                        SkillType.S_ART_COOKING)
                                        .anyMatch(this::hasSkill);
             case AEROSPACE_PILOT -> hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO);
             case CONVENTIONAL_AIRCRAFT_PILOT -> hasSkill(SkillType.S_GUN_JET) && hasSkill(SkillType.S_PILOT_JET);
@@ -3800,7 +3806,7 @@ public class Person {
                       SkillType.S_SURGERY,
                       SkillType.S_MEDTECH,
                       SkillType.S_ASTECH,
-                      SkillType.S_COMMUNICATIONS,
+                      SkillType.S_COMMUNICATIONS, SkillType.S_ART_COOKING,
                       SkillType.S_SENSOR_OPERATIONS);
                 int highestExperienceLevel = SkillType.EXP_NONE;
                 for (String relevantSkill : relevantSkills) {
