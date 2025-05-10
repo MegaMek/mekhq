@@ -34,15 +34,11 @@ package mekhq.campaign.personnel;
 
 import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.Compute.d6;
-import static mekhq.campaign.personnel.enums.PersonnelRole.*;
 import static mekhq.campaign.personnel.generator.AbstractSkillGenerator.addSkill;
-import static mekhq.campaign.personnel.skills.SkillType.*;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Map;
 
 import megamek.common.enums.SkillLevel;
 import megamek.common.options.IOption;
@@ -106,8 +102,7 @@ public class PersonUtility {
     }
 
     /**
-     * @deprecated use
-     *       {@link #overrideSkills(boolean, boolean, boolean, boolean, boolean, Person, PersonnelRole, SkillLevel)}
+     * @deprecated use {@link #overrideSkills(boolean, boolean, boolean, boolean, boolean, boolean, Person, PersonnelRole, SkillLevel)}
      */
     @Deprecated(since = "0.50.05", forRemoval = true)
     public static void overrideSkills(boolean isAdminsHaveNegotiation, boolean isAdminsHaveScrounge,
@@ -124,81 +119,55 @@ public class PersonUtility {
     }
 
     /**
-     * Overrides the skills of a {@link Person} based on their role, experience level, and various conditions. This
-     * method applies specific skill sets to the person depending on their {@link PersonnelRole}, optionally including
-     * administrator and tech specific skills or applying randomization to skill levels.
+     * @deprecated use {@link #overrideSkills(boolean, boolean, boolean, boolean, boolean, boolean, Person, PersonnelRole, SkillLevel)}
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
+    public static void overrideSkills(boolean isAdminsHaveNegotiation, boolean isAdminsHaveScrounge,
+          boolean isDoctorsUseAdministration, boolean isTechsUseAdministration, boolean isUseExtraRandom, Person person,
+          PersonnelRole primaryRole, SkillLevel skillLevel) {
+        overrideSkills(isAdminsHaveNegotiation,
+              isAdminsHaveScrounge,
+              isDoctorsUseAdministration,
+              isTechsUseAdministration,
+              false,
+              isUseExtraRandom,
+              person,
+              primaryRole,
+              skillLevel);
+
+    }
+
+    /**
+     * Assigns and overrides the skills of a {@link Person} based on their role, experience level,
+     * and campaign-specific settings.
      *
-     * <p>Roles are mapped to corresponding skills, administrators and techs can be optionally given additional
-     * skills like Negotiation and Scrounge. Additional randomization can also be applied to skill levels.</p>
+     * <p>This method determines the appropriate skill set for the given person by consulting their primary role
+     * and campaign preferences. The chosen skills are then assigned to the person, with optional randomization of
+     * their levels if specified.</p>
      *
-     * <p>For roles not explicitly defined, no skills are applied by default.</p>
-     *
-     * @param isAdminsHaveNegotiation    Whether administrators should possess the Negotiation skill.
-     * @param isAdminsHaveScrounge       Whether administrators should possess the Scrounge skill.
-     * @param isDoctorsUseAdministration Whether doctors should possess the Administration skill in addition to medical
-     *                                   skills.
-     * @param isTechsUseAdministration   Whether techs should possess the Administration skill in addition to technical
-     *                                   skills.
-     * @param isUseExtraRandom           Whether additional randomization should be applied to adjust skill levels.
-     * @param person                     The {@link Person} whose skills are being overridden and assigned.
-     * @param primaryRole                The {@link PersonnelRole} of the person, which dictates the skill mapping.
-     * @param skillLevel                 The {@link SkillLevel} corresponding to the experience level of the person.
-     *                                   Determines specific values when adding skills to the person.
+     * @param isAdminsHaveNegotiation    if {@code true}, administrators are assigned the Negotiation skill.
+     * @param isAdminsHaveScrounge       if {@code true}, administrators are assigned the Scrounge skill.
+     * @param isDoctorsUseAdministration if {@code true}, doctors are given the Administration skill.
+     * @param isTechsUseAdministration   if {@code true}, technicians are given the Administration skill.
+     * @param isUseArtillery             if {@code true}, roles that can use it are assigned Artillery skills.
+     * @param isUseExtraRandom           if {@code true}, adds randomization to the assigned skill levels.
+     * @param person                     the {@link Person} whose skills will be overridden.
+     * @param primaryRole                the {@link PersonnelRole} used to determine which skills to assign.
+     * @param skillLevel                 the {@link SkillLevel} to use as a baseline for assigned skills.
      */
     public static void overrideSkills(boolean isAdminsHaveNegotiation, boolean isAdminsHaveScrounge,
                                       boolean isDoctorsUseAdministration, boolean isTechsUseAdministration,
-                                      boolean isUseExtraRandom, Person person, PersonnelRole primaryRole,
+          boolean isUseArtillery, boolean isUseExtraRandom, Person person, PersonnelRole primaryRole,
                                       SkillLevel skillLevel) {
-        // Role-to-Skill Mapping
-        Map<PersonnelRole, List<String>> roleSkills = Map.ofEntries(Map.entry(MEKWARRIOR,
-                    List.of(S_PILOT_MEK, S_GUN_MEK)),
-              Map.entry(LAM_PILOT, List.of(S_PILOT_MEK, S_GUN_MEK, S_PILOT_AERO, S_GUN_AERO)),
-              Map.entry(GROUND_VEHICLE_DRIVER, List.of(S_PILOT_GVEE, S_GUN_VEE)),
-              Map.entry(NAVAL_VEHICLE_DRIVER, List.of(S_PILOT_NVEE, S_GUN_VEE)),
-              Map.entry(VTOL_PILOT, List.of(S_PILOT_VTOL, S_GUN_VEE)),
-              Map.entry(VEHICLE_GUNNER, List.of(S_GUN_VEE)),
-              Map.entry(VEHICLE_CREW, List.of(S_TECH_MECHANIC)),
-              Map.entry(MECHANIC,
-                    isTechsUseAdministration ? List.of(S_TECH_MECHANIC, S_ADMIN) : List.of(S_TECH_MECHANIC)),
-              Map.entry(AEROSPACE_PILOT, List.of(S_PILOT_AERO, S_GUN_AERO)),
-              Map.entry(CONVENTIONAL_AIRCRAFT_PILOT, List.of(S_PILOT_JET, S_GUN_JET)),
-              Map.entry(PROTOMEK_PILOT, List.of(S_GUN_PROTO)),
-              Map.entry(BATTLE_ARMOUR, List.of(S_GUN_BA, S_ANTI_MEK)),
-              Map.entry(SOLDIER, List.of(S_SMALL_ARMS)),
-              Map.entry(VESSEL_PILOT, List.of(S_PILOT_SPACE)),
-              Map.entry(VESSEL_GUNNER, List.of(S_GUN_SPACE)),
-              Map.entry(VESSEL_CREW,
-                    isTechsUseAdministration ? List.of(S_TECH_VESSEL, S_ADMIN) : List.of(S_TECH_VESSEL)),
-              Map.entry(VESSEL_NAVIGATOR, List.of(S_NAVIGATION)),
-              Map.entry(MEK_TECH, isTechsUseAdministration ? List.of(S_TECH_MEK, S_ADMIN) : List.of(S_TECH_MEK)),
-              Map.entry(AERO_TEK, isTechsUseAdministration ? List.of(S_TECH_AERO, S_ADMIN) : List.of(S_TECH_AERO)),
-              Map.entry(BA_TECH, isTechsUseAdministration ? List.of(S_TECH_BA, S_ADMIN) : List.of(S_TECH_BA)),
-              Map.entry(ASTECH, List.of(S_ASTECH)),
-              Map.entry(DOCTOR, isDoctorsUseAdministration ? List.of(S_SURGERY, S_ADMIN) : List.of(S_SURGERY)),
-              Map.entry(MEDIC, List.of(S_MEDTECH)));
+        List<String> skills = primaryRole.getSkillsForProfession(isAdminsHaveNegotiation,
+              isAdminsHaveScrounge,
+              isDoctorsUseAdministration,
+              isTechsUseAdministration,
+              isUseArtillery);
 
-        // Add admin-specific logic
-        if (primaryRole == ADMINISTRATOR_COMMAND ||
-                  primaryRole == ADMINISTRATOR_LOGISTICS ||
-                  primaryRole == ADMINISTRATOR_TRANSPORT ||
-                  primaryRole == ADMINISTRATOR_HR) {
-            List<String> adminSkills = new ArrayList<>();
-
-            adminSkills.add(S_ADMIN);
-            if (isAdminsHaveNegotiation) {
-                adminSkills.add(S_NEGOTIATION);
-            }
-            if (isAdminsHaveScrounge) {
-                adminSkills.add(S_SCROUNGE);
-            }
-
-            addSkillsAndRandomize(person, adminSkills, skillLevel, isUseExtraRandom);
-            return;
+        if (!skills.isEmpty()) {
+            addSkillsAndRandomize(person, skills, skillLevel, isUseExtraRandom);
         }
-
-        // Handle Normal Role Skills
-        List<String> skills = roleSkills.getOrDefault(primaryRole, List.of());
-        addSkillsAndRandomize(person, skills, skillLevel, isUseExtraRandom);
     }
 
     /**
