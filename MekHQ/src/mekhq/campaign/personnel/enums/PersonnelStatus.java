@@ -520,6 +520,18 @@ public enum PersonnelStatus {
     }
 
     /**
+     * Determines whether a person is eligible to receive a salary.
+     *
+     * @return {@code true} if the person is eligible to receive a salary; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public boolean isSalaryEligible() {
+        return isActive() || isPoW() || isOnLeave() || isOnMaternityLeave() || isStudent();
+    }
+
+    /**
      * @return {@code true} if a person has left the unit, otherwise {@code false}
      */
     public boolean isDepartedUnit() {

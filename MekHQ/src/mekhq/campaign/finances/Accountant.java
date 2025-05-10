@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.finances;
 
@@ -74,7 +79,7 @@ public record Accountant(Campaign campaign) {
 
     private Money getTheoreticalPayroll(boolean noInfantry) {
         Money salaries = Money.zero();
-        for (Person person : campaign().getActivePersonnel(false)) {
+        for (Person person : campaign().getSalaryEligiblePersonnel()) {
             // Optionized infantry (Unofficial)
             if (!(noInfantry && person.getPrimaryRole().isSoldier())) {
                 salaries = salaries.plus(person.getSalary(campaign()));
@@ -356,7 +361,7 @@ public record Accountant(Campaign campaign) {
      */
     public Map<Person, Money> getPayRollSummary() {
         Map<Person, Money> payRollSummary = new HashMap<>();
-        for (Person person : campaign().getActivePersonnel(false)) {
+        for (Person person : campaign().getSalaryEligiblePersonnel()) {
             payRollSummary.put(person, person.getSalary(campaign()));
         }
         // And pay our pool
