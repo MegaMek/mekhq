@@ -228,7 +228,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
               personnelTab.createMedicalTab(),
               "salariesTab",
               personnelTab.createSalariesTab()));
-        personnelTab.loadValuesFromCampaignOptions();
+        personnelTab.loadValuesFromCampaignOptions(campaign.getVersion());
 
         // Biography
         biographyTab = new BiographyTab(campaign, generalTab);
@@ -533,7 +533,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         generalTab.loadValuesFromCampaignOptions(presetCampaignOptions, presetDate, presetFaction);
 
         // Human Resources
-        personnelTab.loadValuesFromCampaignOptions(presetCampaignOptions);
+        personnelTab.loadValuesFromCampaignOptions(presetCampaignOptions, campaign.getVersion());
         biographyTab.loadValuesFromCampaignOptions(presetCampaignOptions,
               presetCampaignOptions.getRandomOriginOptions(),
               campaignPreset.getRankSystem());

@@ -27,17 +27,17 @@
  */
 package mekhq.gui.enums;
 
-import mekhq.MekHQ;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
-
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import mekhq.MekHQ;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 
 public enum PersonnelFilter {
     // region Enum Declarations
@@ -500,7 +500,7 @@ public enum PersonnelFilter {
             case ADMINISTRATOR_HR ->
                     active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
                             person.getPrimaryRole().isAdministratorHR() : person.hasRole(PersonnelRole.ADMINISTRATOR_HR));
-            case DEPENDENT -> ((!dead) && (active && person.getPrimaryRole().isDependent()));
+            case DEPENDENT -> ((!dead) && (active && person.getPrimaryRole().isCivilian()));
             case FOUNDER -> ((!dead) && (person.isFounder()));
             case KIDS -> ((!dead) && (!status.isLeft()) && (person.isChild(currentDate)));
             case PRISONER -> ((!dead) && ((person.getPrisonerStatus().isCurrentPrisoner()) || (person.getPrisonerStatus().isBondsman())));
