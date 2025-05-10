@@ -33,7 +33,6 @@
  */
 package mekhq.gui;
 
-import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
@@ -767,10 +766,10 @@ public class CampaignGUI extends JPanel {
 
             JMenuItem miHire = new JMenuItem(role.getLabel(getCampaign().getFaction().isClan()));
             if (role.getMnemonic() != KeyEvent.VK_UNDEFINED) {
-                miHire.setToolTipText(wordWrap(role.getTooltip(), 50));
                 miHire.setMnemonic(role.getMnemonic());
                 miHire.setAccelerator(KeyStroke.getKeyStroke(role.getMnemonic(), InputEvent.ALT_DOWN_MASK));
             }
+            miHire.setToolTipText(role.getDescription());
             miHire.setActionCommand(role.name());
             miHire.addActionListener(this::hirePerson);
 

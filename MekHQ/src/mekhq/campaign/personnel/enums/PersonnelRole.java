@@ -237,7 +237,7 @@ public enum PersonnelRole {
      * @author Illiani
      * @since 0.50.06
      */
-    String getDescription() {
+    public String getDescription() {
         return getTextAt(RESOURCE_BUNDLE, name() + ".description");
     }
 
