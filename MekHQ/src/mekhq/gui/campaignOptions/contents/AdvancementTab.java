@@ -979,8 +979,7 @@ public class AdvancementTab {
     public JPanel recruitmentBonusesTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("RecruitmentBonusesTab",
-              getImageDirectory() + "logo_calderon_protectorate.png",
-              true);
+              getImageDirectory() + "logo_calderon_protectorate.png", true, true);
 
         // Contents
         pnlRecruitmentBonusesCombat = createRecruitmentBonusesCombatPanel();

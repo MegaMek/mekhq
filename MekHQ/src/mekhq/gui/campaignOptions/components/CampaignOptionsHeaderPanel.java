@@ -72,7 +72,12 @@ public class CampaignOptionsHeaderPanel extends JPanel {
      * @param imageAddress the file path of the image to be displayed in the panel
      */
     public CampaignOptionsHeaderPanel(String name, String imageAddress) {
-        this(name, imageAddress, false);
+        this(name, imageAddress, false, true);
+    }
+
+    @Deprecated(since = "0.50.06", forRemoval = true)
+    public CampaignOptionsHeaderPanel(String name, String imageAddress, boolean includeBodyText) {
+        this(name, imageAddress, includeBodyText, false);
     }
 
     /**
@@ -87,8 +92,10 @@ public class CampaignOptionsHeaderPanel extends JPanel {
      * @param name            the name of the header panel, used to construct the resource bundle keys
      * @param imageAddress    the file path of the image to be displayed in the panel
      * @param includeBodyText if {@code true}, includes a body label below the image
+     * @param includeTipPanel if {@code true}, includes a tip label below the body text
      */
-    public CampaignOptionsHeaderPanel(String name, String imageAddress, boolean includeBodyText) {
+    public CampaignOptionsHeaderPanel(String name, String imageAddress, boolean includeBodyText,
+          boolean includeTipPanel) {
         // Load and scale the image using the provided file path
         ImageIcon imageIcon = new ImageIcon(imageAddress);
         imageIcon = scaleImageIcon(imageIcon, 100, true);
@@ -114,8 +121,10 @@ public class CampaignOptionsHeaderPanel extends JPanel {
         }
 
         JLabel lblTip = new JLabel();
-        lblTip.setName("lbl" + name + TIP_PANEL_NAME);
-        lblTip.setText("<html><br><br><br><br><br></html>"); // This is necessary for the text updater
+        if (includeTipPanel) {
+            lblTip.setName("lbl" + name + TIP_PANEL_NAME);
+            lblTip.setText("<html><br><br><br><br><br></html>"); // This is necessary for the text updater
+        }
 
         // Initialize the panel's layout using a GridBagLayout
         new CampaignOptionsStandardPanel("pnl" + name + "HeaderPanel");
@@ -136,7 +145,9 @@ public class CampaignOptionsHeaderPanel extends JPanel {
             this.add(lblBody, layout);
         }
 
-        layout.gridy++;
-        this.add(lblTip, layout);
+        if (includeTipPanel) {
+            layout.gridy++;
+            this.add(lblTip, layout);
+        }
     }
 }

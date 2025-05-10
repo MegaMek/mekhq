@@ -225,15 +225,25 @@ public class AbilitiesTab {
         // Header
         JPanel headerPanel = switch (abilityCategory) {
             case COMBAT_ABILITY -> new CampaignOptionsHeaderPanel("CombatAbilitiesTab",
-                  getImageDirectory() + "logo_aurigan_coalition.png");
+                  getImageDirectory() + "logo_aurigan_coalition.png",
+                  false,
+                  false);
             case MANEUVERING_ABILITY -> new CampaignOptionsHeaderPanel("ManeuveringAbilitiesTab",
-                  getImageDirectory() + "logo_clan_hells_horses.png");
+                  getImageDirectory() + "logo_clan_hells_horses.png",
+                  false,
+                  false);
             case UTILITY_ABILITY -> new CampaignOptionsHeaderPanel("UtilityAbilitiesTab",
-                  getImageDirectory() + "logo_circinus_federation.png");
-            case CHARACTER_FLAW ->
-                  new CampaignOptionsHeaderPanel("CharacterFlawsTab", getImageDirectory() + "logo_word_of_blake.png");
+                  getImageDirectory() + "logo_circinus_federation.png",
+                  false,
+                  false);
+            case CHARACTER_FLAW -> new CampaignOptionsHeaderPanel("CharacterFlawsTab",
+                  getImageDirectory() + "logo_word_of_blake.png",
+                  false,
+                  false);
             case CHARACTER_CREATION_ONLY -> new CampaignOptionsHeaderPanel("CharacterCreationOnlyTab",
-                  getImageDirectory() + "logo_tortuga_dominions.png");
+                  getImageDirectory() + "logo_tortuga_dominions.png",
+                  false,
+                  false);
         };
 
         // Contents

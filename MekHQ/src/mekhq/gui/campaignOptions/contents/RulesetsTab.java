@@ -802,7 +802,9 @@ public class RulesetsTab {
     public JPanel createLegacyTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("LegacyTab",
-            getImageDirectory() + "logo_free_rasalhague_republic.png", true);
+              getImageDirectory() + "logo_free_rasalhague_republic.png",
+              true,
+              true);
 
         chkUseAtB = new CampaignOptionsCheckBox("UseAtB");
         pnlLegacyOpForGenerationPanel = createLegacyOpForGenerationPanel();
