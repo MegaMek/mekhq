@@ -549,19 +549,19 @@ public class MRMSDialog extends JDialog {
         gridBagConstraints.gridx = gridRowIdx++;
         pnlItems.add(maxSkillLabel, gridBagConstraints);
 
-        JLabel minBTHLabel = new JLabel(resources.getString("minBTHLabel.text"));
-        minBTHLabel.setToolTipText(wordWrap(resources.getString("minBTHLabel.toolTipText")));
-        minBTHLabel.setName("minBTHLabel");
-        minBTHLabel.setFont(boldFont);
+        JLabel targetNumberPreferredLabel = new JLabel(resources.getString("targetNumberPreferred.text"));
+        targetNumberPreferredLabel.setToolTipText(wordWrap(resources.getString("targetNumberPreferred.toolTipText")));
+        targetNumberPreferredLabel.setName("targetNumberPreferredLabel");
+        targetNumberPreferredLabel.setFont(boldFont);
         gridBagConstraints.gridx = gridRowIdx++;
-        pnlItems.add(minBTHLabel, gridBagConstraints);
+        pnlItems.add(targetNumberPreferredLabel, gridBagConstraints);
 
-        JLabel maxBTHLabel = new JLabel(resources.getString("maxBTHLabel.text"));
-        maxBTHLabel.setToolTipText(wordWrap(resources.getString("maxBTHLabel.toolTipText")));
-        maxBTHLabel.setName("maxBTHLabel");
-        maxBTHLabel.setFont(boldFont);
+        JLabel targetNumberMaxLabel = new JLabel(resources.getString("targetNumberMax.text"));
+        targetNumberMaxLabel.setToolTipText(wordWrap(resources.getString("targetNumberMax.toolTipText")));
+        targetNumberMaxLabel.setName("targetNumberMaxLabel");
+        targetNumberMaxLabel.setFont(boldFont);
         gridBagConstraints.gridx = gridRowIdx++;
-        pnlItems.add(maxBTHLabel, gridBagConstraints);
+        pnlItems.add(targetNumberMaxLabel, gridBagConstraints);
 
         JLabel minDailyTimeLabel = new JLabel(resources.getString("minDailyTimeLabel.text"));
         minDailyTimeLabel.setToolTipText(wordWrap(resources.getString("minDailyTimeLabel.toolTipText")));
@@ -680,12 +680,12 @@ public class MRMSDialog extends JDialog {
               pnlItems,
               rowIdx,
               columnIdx++));
-        mrmsOptionControl.setMinBTHSpn(createMRMSSkillBTHSpinner(mrmsOption.getBthMin(),
+        mrmsOptionControl.setTargetNumberPreferredSpn(createMRMSSkillBTHSpinner(mrmsOption.getTargetNumberPreferred(),
               mrmsOption.isActive(),
               pnlItems,
               rowIdx,
               columnIdx++));
-        mrmsOptionControl.setMaxBTHSpn(createMRMSSkillBTHSpinner(mrmsOption.getBthMax(),
+        mrmsOptionControl.setTargetNumberMaxSpn(createMRMSSkillBTHSpinner(mrmsOption.getTargetNumberMax(),
               mrmsOption.isActive(),
               pnlItems,
               rowIdx,
@@ -700,14 +700,14 @@ public class MRMSDialog extends JDialog {
             if (mrmsOptionControl.getActiveBox().isSelected()) {
                 mrmsOptionControl.getMinSkillCBox().setEnabled(true);
                 mrmsOptionControl.getMaxSkillCBox().setEnabled(true);
-                mrmsOptionControl.getMinBTHSpn().setEnabled(true);
-                mrmsOptionControl.getMaxBTHSpn().setEnabled(true);
+                mrmsOptionControl.getTargetNumberPreferredSpn().setEnabled(true);
+                mrmsOptionControl.getTargetNumberMaxSpn().setEnabled(true);
                 mrmsOptionControl.getMinDailyTimeSpn().setEnabled(true);
             } else {
                 mrmsOptionControl.getMinSkillCBox().setEnabled(false);
                 mrmsOptionControl.getMaxSkillCBox().setEnabled(false);
-                mrmsOptionControl.getMinBTHSpn().setEnabled(false);
-                mrmsOptionControl.getMaxBTHSpn().setEnabled(false);
+                mrmsOptionControl.getTargetNumberPreferredSpn().setEnabled(false);
+                mrmsOptionControl.getTargetNumberMaxSpn().setEnabled(false);
                 mrmsOptionControl.getMinDailyTimeSpn().setEnabled(false);
             }
         });
@@ -1158,8 +1158,8 @@ public class MRMSDialog extends JDialog {
                   mrmsOptionControl.getActiveBox().isSelected(),
                   mrmsOptionControl.getMinSkillCBox().getSelectedIndex(),
                   mrmsOptionControl.getMaxSkillCBox().getSelectedIndex(),
-                  (Integer) mrmsOptionControl.getMinBTHSpn().getValue(),
-                  (Integer) mrmsOptionControl.getMaxBTHSpn().getValue(),
+                  (Integer) mrmsOptionControl.getTargetNumberPreferredSpn().getValue(),
+                  (Integer) mrmsOptionControl.getTargetNumberMaxSpn().getValue(),
                   (Integer) mrmsOptionControl.getMinDailyTimeSpn().getValue());
 
             campaignOptions.addMRMSOption(mrmsOption);
@@ -1227,8 +1227,8 @@ public class MRMSDialog extends JDialog {
         private JCheckBox activeBox = null;
         private JComboBox<String> minSkillCBox = null;
         private JComboBox<String> maxSkillCBox = null;
-        private JSpinner minBTHSpn = null;
-        private JSpinner maxBTHSpn = null;
+        private JSpinner targetNumberPreferredSpn = null;
+        private JSpinner targetNumberMaxSpn = null;
         private JSpinner minDailyTimeSpn = null;
 
         public JCheckBox getActiveBox() {
@@ -1255,20 +1255,20 @@ public class MRMSDialog extends JDialog {
             this.maxSkillCBox = maxSkillCBox;
         }
 
-        public JSpinner getMinBTHSpn() {
-            return minBTHSpn;
+        public JSpinner getTargetNumberPreferredSpn() {
+            return targetNumberPreferredSpn;
         }
 
-        public void setMinBTHSpn(JSpinner minBTHSpn) {
-            this.minBTHSpn = minBTHSpn;
+        public void setTargetNumberPreferredSpn(JSpinner targetNumberPreferredSpn) {
+            this.targetNumberPreferredSpn = targetNumberPreferredSpn;
         }
 
-        public JSpinner getMaxBTHSpn() {
-            return maxBTHSpn;
+        public JSpinner getTargetNumberMaxSpn() {
+            return targetNumberMaxSpn;
         }
 
-        public void setMaxBTHSpn(JSpinner maxBTHSpn) {
-            this.maxBTHSpn = maxBTHSpn;
+        public void setTargetNumberMaxSpn(JSpinner targetNumberMaxSpn) {
+            this.targetNumberMaxSpn = targetNumberMaxSpn;
         }
 
         public JSpinner getMinDailyTimeSpn() {
