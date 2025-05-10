@@ -7474,7 +7474,7 @@ public class Campaign implements ITechManager {
 
         if (null == person) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE,
-                  "Your procurement personnel have used up all their " + "acquisition attempts for this period");
+                  "Your procurement personnel have used up all their acquisition attempts for this period");
         }
         final Skill skill = person.getSkillForWorkingOn(getCampaignOptions().getAcquisitionSkill());
         if (null != getShoppingList().getShoppingItem(acquisition.getNewEquipment()) && checkDaysToWait) {
