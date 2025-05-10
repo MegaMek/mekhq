@@ -5700,27 +5700,27 @@ public class CampaignOptions {
 
                     // autoLogistics
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsHeatSink")) {
-                    retVal.autoLogisticsHeatSink = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.autoLogisticsHeatSink = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsMekHead")) {
-                    retVal.autoLogisticsMekHead = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.autoLogisticsMekHead = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsMekLocation")) {
-                    retVal.autoLogisticsMekLocation = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.autoLogisticsMekLocation = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsNonRepairableLocation")) {
-                    retVal.autoLogisticsNonRepairableLocation = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.autoLogisticsNonRepairableLocation = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsArmor")) {
-                    retVal.autoLogisticsArmor = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.autoLogisticsArmor = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsAmmunition")) {
-                    retVal.autoLogisticsAmmunition = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.autoLogisticsAmmunition = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsActuators")) {
-                    retVal.autoLogisticsActuators = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.autoLogisticsActuators = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsJumpJets")) {
-                    retVal.autoLogisticsJumpJets = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.autoLogisticsJumpJets = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsEngines")) {
-                    retVal.autoLogisticsEngines = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.autoLogisticsEngines = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsWeapons")) {
                     retVal.autoLogisticsWeapons = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsOther")) {
-                    retVal.autoLogisticsOther = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.autoLogisticsOther = MathUtility.parseInt(wn2.getTextContent().trim());
 
                     // region Personnel Tab
                     // region General Personnel
