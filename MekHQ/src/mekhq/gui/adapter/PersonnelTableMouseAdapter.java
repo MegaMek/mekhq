@@ -116,7 +116,15 @@ import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.AcademyFactory;
 import mekhq.campaign.personnel.education.EducationController;
-import mekhq.campaign.personnel.enums.*;
+import mekhq.campaign.personnel.enums.FamilialRelationshipType;
+import mekhq.campaign.personnel.enums.ManeiDominiClass;
+import mekhq.campaign.personnel.enums.ManeiDominiRank;
+import mekhq.campaign.personnel.enums.MergingSurnameStyle;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.enums.Profession;
+import mekhq.campaign.personnel.enums.ROMDesignation;
+import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.Genealogy;
@@ -2033,6 +2041,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         JMenu menuSupportPrimary = new JMenu(resources.getString("changeRole.support"));
         JMenu menuCivilianPrimary = new JMenu(resources.getString("changeRole.civilian"));
 
+
         for (final PersonnelRole role : roles) {
             boolean allCanPerform = true;
 
@@ -2045,15 +2054,16 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
             if (allCanPerform) {
                 cbMenuItem = new JCheckBoxMenuItem(role.toString());
+                cbMenuItem.setToolTipText(wordWrap(role.getTooltip(), 50));
                 cbMenuItem.setActionCommand(makeCommand(CMD_PRIMARY_ROLE, role.name()));
                 cbMenuItem.addActionListener(this);
                 if (oneSelected && role == person.getPrimaryRole()) {
                     cbMenuItem.setSelected(true);
                 }
 
-                if (role.isSubType(PersonnelRoleSubType.COMBAT)) {
+                if (role.isCombat()) {
                     menuCombatPrimary.add(cbMenuItem);
-                } else if (role.isSubType(PersonnelRoleSubType.SUPPORT)) {
+                } else if (role.isSupport(true)) {
                     menuSupportPrimary.add(cbMenuItem);
                 } else {
                     menuCivilianPrimary.add(cbMenuItem);
@@ -2073,7 +2083,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         JMenuHelpers.addMenuIfNonEmpty(popup, menu);
 
         menu = new JMenu(resources.getString("changeSecondaryRole.text"));
-
         JMenu menuCombatSecondary = new JMenu(resources.getString("changeRole.combat"));
         JMenu menuSupportSecondary = new JMenu(resources.getString("changeRole.support"));
         JMenu menuCivilianSecondary = new JMenu(resources.getString("changeRole.civilian"));
@@ -2089,20 +2098,20 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
             if (allCanPerform) {
                 cbMenuItem = new JCheckBoxMenuItem(role.toString());
+                cbMenuItem.setToolTipText(wordWrap(role.getTooltip()));
                 cbMenuItem.setActionCommand(makeCommand(CMD_SECONDARY_ROLE, role.name()));
                 cbMenuItem.addActionListener(this);
                 if (oneSelected && role == person.getSecondaryRole()) {
                     cbMenuItem.setSelected(true);
                 }
-                menu.add(cbMenuItem);
-            }
 
-            if (role.isSubType(PersonnelRoleSubType.COMBAT)) {
-                menuCombatSecondary.add(cbMenuItem);
-            } else if (role.isSubType(PersonnelRoleSubType.SUPPORT)) {
-                menuSupportSecondary.add(cbMenuItem);
-            } else {
-                menuCivilianSecondary.add(cbMenuItem);
+                if (role.isCombat()) {
+                    menuCombatSecondary.add(cbMenuItem);
+                } else if (role.isSupport(true)) {
+                    menuSupportSecondary.add(cbMenuItem);
+                } else {
+                    menuCivilianSecondary.add(cbMenuItem);
+                }
             }
         }
 
