@@ -1452,7 +1452,7 @@ public class CampaignGUI extends JPanel {
     public void showNews(int id) {
         NewsItem news = getCampaign().getNews().getNewsItem(id);
         if (null != news) {
-            new NewsDialog(getCampaign(), news);
+            new NewsDialog(getCampaign(), news.getFullDescription());
         }
     }
 
