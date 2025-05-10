@@ -41,7 +41,6 @@ import static megamek.common.options.PilotOptions.LVL3_ADVANTAGES;
 import static megamek.common.options.PilotOptions.MD_ADVANTAGES;
 import static megamek.utilities.ImageUtilities.addTintToImageIcon;
 import static mekhq.campaign.personnel.Person.getLoyaltyName;
-import static mekhq.campaign.personnel.SpecialAbility.getOption;
 import static mekhq.campaign.personnel.skills.SkillType.RP_ONLY_TAG;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_GUNNERY;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_PILOTING;
@@ -76,6 +75,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -118,7 +118,6 @@ import mekhq.campaign.personnel.familyTree.FormerSpouse;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.JScrollablePanel;
@@ -250,7 +249,7 @@ public class PersonViewPanel extends JScrollablePanel {
             gridY++;
         }
 
-        List<SpecialAbility> relevantAbilities = getRelevantAbilities();
+        Map<IOption, String> relevantAbilities = getRelevantAbilities();
         if (!relevantAbilities.isEmpty()) {
             JPanel pnlAbilities = fillAbilitiesAndImplants(relevantAbilities);
             gridBagConstraints = new GridBagConstraints();
@@ -584,29 +583,31 @@ public class PersonViewPanel extends JScrollablePanel {
     }
 
     /**
-     * Retrieves a list of relevant special abilities for the person based on the current campaign options.
+     * Retrieves a map of relevant special abilities and implants for the person based on the current campaign options.
      *
-     * <p>This method checks if abilities and/or implants are enabled in the campaign options and,
-     * for each enabled category, iterates over the person's corresponding options. For each option that is selected
-     * (boolean value is true), it retrieves the corresponding {@link SpecialAbility} and adds it to the result list if
-     * it is not already present.</p>
+     * <p>This method checks whether abilities and/or implants are enabled in the campaign options.</p>
      *
-     * @return a {@link List} of unique relevant {@link SpecialAbility} instances available to the person, depending on
-     *       campaign settings and the person's selected advantages or implants
+     * <p>For each enabled category, it iterates over the person's corresponding options. If an option is selected
+     * (its boolean value is {@code true}), it retrieves the corresponding {@link IOption} instance and adds it to
+     * the result map, associating it with a string indicating its category (e.g., {@code LVL3_ADVANTAGES} for
+     * abilities or {@code MD_ADVANTAGES} for implants).</p>
+     *
+     * @return a {@link Map} where the key is a relevant {@link IOption} (representing a special ability or implant)
+     *         and the value is a {@link String} indicating the ability or implant category
      *
      * @author Illiani
      * @since 0.50.06
      */
-    private List<SpecialAbility> getRelevantAbilities() {
-        List<SpecialAbility> relevantAbilities = new ArrayList<>();
+    private Map<IOption, String> getRelevantAbilities() {
+        Map<IOption, String> relevantAbilities = new HashMap<>();
+
+        PersonnelOptions options = person.getOptions();
         if (campaignOptions.isUseAbilities() && (person.countOptions(LVL3_ADVANTAGES) > 0)) {
             for (Enumeration<IOption> i = person.getOptions(LVL3_ADVANTAGES); i.hasMoreElements(); ) {
                 IOption option = i.nextElement();
                 if (option.booleanValue()) {
-                    SpecialAbility ability = getOption(option.getName());
-                    if (!relevantAbilities.contains(ability)) {
-                        relevantAbilities.add(ability);
-                    }
+                    IOption ability = options.getOption(option.getName());
+                    relevantAbilities.put(ability, LVL3_ADVANTAGES);
                 }
             }
         }
@@ -615,10 +616,8 @@ public class PersonViewPanel extends JScrollablePanel {
             for (Enumeration<IOption> i = person.getOptions(MD_ADVANTAGES); i.hasMoreElements(); ) {
                 IOption option = i.nextElement();
                 if (option.booleanValue()) {
-                    SpecialAbility ability = getOption(option.getName());
-                    if (!relevantAbilities.contains(ability)) {
-                        relevantAbilities.add(ability);
-                    }
+                    IOption ability = options.getOption(option.getName());
+                    relevantAbilities.put(ability, MD_ADVANTAGES);
                 }
             }
         }
@@ -1869,7 +1868,23 @@ public class PersonViewPanel extends JScrollablePanel {
         return pnlAttributes;
     }
 
-    private JPanel fillAbilitiesAndImplants(List<SpecialAbility> relevantAbilities) {
+    /**
+     * Creates and returns a {@link JPanel} displaying abilities and implants in a grid layout.
+     *
+     * <p>Each ability/implant (represented by the keys of {@code relevantAbilities}) is shown as a {@link JLabel}
+     * with its name and a tooltip description. Optionally, special abilities recognized as "flaws" are highlighted
+     * using a colored icon. The items are laid out in columns to distribute them evenly based on the total number of
+     * abilities.</p>
+     *
+     * @param relevantAbilities A map where the key is an {@link IOption} representing an ability or implant, and the
+     *                          value is an associated string (such as a type or category).
+     *
+     * @return a {@link JPanel} containing the visual representation of the abilities and implants.
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    private JPanel fillAbilitiesAndImplants(Map<IOption, String> relevantAbilities) {
         JPanel pnlAbilitiesAndImplants = new JPanel(new GridBagLayout());
         pnlAbilitiesAndImplants.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlSkills.abilities")));
 
@@ -1877,14 +1892,21 @@ public class PersonViewPanel extends JScrollablePanel {
         double numColumns = 3.0;
         int skillsPerColumn = (int) ceil(relevantAbilities.size() / numColumns);
 
-        for (int i = 0; i < relevantAbilities.size(); i++) {
-            int column = i / skillsPerColumn; // 0, 1
-            int row = i % skillsPerColumn;
+        int counter = 0;
+        for (IOption option : relevantAbilities.keySet()) {
+            int column = counter / skillsPerColumn; // 0, 1
+            int row = counter % skillsPerColumn;
 
-            SpecialAbility ability = relevantAbilities.get(i);
-            String name = ability.getDisplayName();
-            String description = ability.getDescription();
-            boolean isFlaw = ability.getCost() < -1; // -1 is used to designate an origin only SPA
+            String name = option.getDisplayableName();
+            String description = option.getDescription();
+
+            boolean isFlaw = false;
+            if (Objects.equals(relevantAbilities.get(option), LVL3_ADVANTAGES)) {
+                SpecialAbility ability = SpecialAbility.getOption(option.getName());
+                if (ability != null) {
+                    isFlaw = ability.getCost() < -1; // -1 is used to designate an origin only SPA
+                }
+            }
 
             String adjustment = "";
             if (isFlaw) {
@@ -1908,6 +1930,8 @@ public class PersonViewPanel extends JScrollablePanel {
             nameConstraints.weightx = 1;
 
             pnlAbilitiesAndImplants.add(lblName, nameConstraints);
+
+            counter++;
         }
 
         return pnlAbilitiesAndImplants;
