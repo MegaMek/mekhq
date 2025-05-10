@@ -43,6 +43,7 @@ import java.awt.GridBagConstraints;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 
 import megamek.client.ui.swing.util.UIUtil;
@@ -147,7 +148,12 @@ public class CampaignOptionsHeaderPanel extends JPanel {
 
         if (includeTipPanel) {
             layout.gridy++;
+            layout.gridwidth = 5;
+            this.add(new JSeparator(SwingConstants.HORIZONTAL), layout);
+            layout.gridy++;
             this.add(lblTip, layout);
+            layout.gridy++;
+            this.add(new JSeparator(SwingConstants.HORIZONTAL), layout);
         }
     }
 }

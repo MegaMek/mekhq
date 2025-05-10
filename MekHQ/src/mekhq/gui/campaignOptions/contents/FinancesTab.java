@@ -539,7 +539,9 @@ public class FinancesTab {
     public JPanel createPriceMultipliersTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("PriceMultipliersTab",
-              getImageDirectory() + "logo_clan_stone_lion.png", true, true);
+              getImageDirectory() + "logo_clan_stone_lion.png",
+              true,
+              true);
 
         // Contents
         pnlGeneralMultipliers = createGeneralMultipliersPanel();

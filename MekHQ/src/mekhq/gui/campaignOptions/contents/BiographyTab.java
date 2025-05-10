@@ -1317,7 +1317,9 @@ public class BiographyTab {
     public JPanel createRankTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("RankTab",
-              getImageDirectory() + "logo_umayyad_caliphate.png", true, true);
+              getImageDirectory() + "logo_umayyad_caliphate.png",
+              true,
+              true);
 
         // Contents
         Component rankSystemsViewport = rankSystemsPane.getViewport().getView();

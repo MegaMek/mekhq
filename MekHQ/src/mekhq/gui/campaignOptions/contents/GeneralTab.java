@@ -501,9 +501,7 @@ public class GeneralTab {
 
         JPanel headerPanelTotalWarfare = new CampaignOptionsHeaderPanel("TotalWarfarePanel", "", true, false);
 
-        JPanel headerPanelCampaignOperations = new CampaignOptionsHeaderPanel("CampaignOperationsPanel",
-              "",
-              true,
+        JPanel headerPanelCampaignOperations = new CampaignOptionsHeaderPanel("CampaignOperationsPanel", "", true,
               false);
 
         // Layout the Panel
