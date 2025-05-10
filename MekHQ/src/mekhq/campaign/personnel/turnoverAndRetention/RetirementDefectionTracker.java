@@ -658,23 +658,20 @@ public class RetirementDefectionTracker {
      * @return the total administrative strain of the campaign
      */
     public static int getAdministrativeStrain(Campaign campaign) {
-        int personnel = 0;
-        int civilian = 0;
+        double personnel = 0;
 
         for (Person person : campaign.getActivePersonnel(false)) {
             PersonnelRole primaryRole = person.getPrimaryRole();
             if (primaryRole.isAssistant() && person.getSecondaryRole().isNone()) {
                 continue;
             } else if (primaryRole.isCivilian()) {
-                civilian++;
+                personnel += 0.1;
             } else {
                 personnel++;
             }
         }
 
-        personnel += (int) round((double) civilian / 10);
-
-        return personnel;
+        return (int) round(personnel);
     }
 
     /**
