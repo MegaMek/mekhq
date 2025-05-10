@@ -183,6 +183,7 @@ public class CampaignOptions {
     private int autoLogisticsActuators;
     private int autoLogisticsJumpJets;
     private int autoLogisticsEngines;
+    private int autoLogisticsWeapons;
     private int autoLogisticsOther;
 
     // Delivery
@@ -710,6 +711,7 @@ public class CampaignOptions {
         autoLogisticsActuators = 100;
         autoLogisticsJumpJets = 50;
         autoLogisticsEngines = 0;
+        autoLogisticsWeapons = 50;
         autoLogisticsOther = 0;
 
         // Delivery
@@ -4400,6 +4402,14 @@ public class CampaignOptions {
         this.autoLogisticsEngines = autoLogisticsEngines;
     }
 
+    public int getAutoLogisticsWeapons() {
+        return autoLogisticsWeapons;
+    }
+
+    public void setAutoLogisticsWeapons(int autoLogisticsWeapons) {
+        this.autoLogisticsWeapons = autoLogisticsWeapons;
+    }
+
     public int getAutoLogisticsOther() {
         return autoLogisticsOther;
     }
@@ -4956,6 +4966,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsActuators", autoLogisticsActuators);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsJumpJets", autoLogisticsJumpJets);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsEngines", autoLogisticsEngines);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsWeapons", autoLogisticsWeapons);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsOther", autoLogisticsOther);
 
         // region Personnel Tab
@@ -5694,25 +5705,27 @@ public class CampaignOptions {
 
                     // autoLogistics
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsHeatSink")) {
-                    retVal.autoLogisticsHeatSink = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.autoLogisticsHeatSink = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsMekHead")) {
-                    retVal.autoLogisticsMekHead = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.autoLogisticsMekHead = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsMekLocation")) {
-                    retVal.autoLogisticsMekLocation = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.autoLogisticsMekLocation = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsNonRepairableLocation")) {
-                    retVal.autoLogisticsNonRepairableLocation = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.autoLogisticsNonRepairableLocation = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsArmor")) {
-                    retVal.autoLogisticsArmor = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.autoLogisticsArmor = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsAmmunition")) {
-                    retVal.autoLogisticsAmmunition = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.autoLogisticsAmmunition = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsActuators")) {
-                    retVal.autoLogisticsActuators = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.autoLogisticsActuators = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsJumpJets")) {
-                    retVal.autoLogisticsJumpJets = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.autoLogisticsJumpJets = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsEngines")) {
-                    retVal.autoLogisticsEngines = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.autoLogisticsEngines = MathUtility.parseInt(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("autoLogisticsWeapons")) {
+                    retVal.autoLogisticsWeapons = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsOther")) {
-                    retVal.autoLogisticsOther = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.autoLogisticsOther = MathUtility.parseInt(wn2.getTextContent().trim());
 
                     // region Personnel Tab
                     // region General Personnel
