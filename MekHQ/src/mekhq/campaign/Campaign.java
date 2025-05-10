@@ -2530,31 +2530,25 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Retrieves a list of personnel who are either currently active or are being homeschooled students.
+     * Returns a list of people who are currently either active personnel or students.
+     * <p>
+     * This method iterates through all active personnel and collects those whose status
+     * indicates they are either active or students.
+     * </p>
      *
-     * <p>This method iterates over all personnel and includes those whose status is active or who are identified as
-     * being homeschooled. Personnel who have departed the unit are excluded.
-     *
-     * @return a list of {@link Person} objects who are active or being homeschooled
-     *
+     * @return a list of {@link Person} objects who have active or student status
      * @author Illiani
      * @since 0.50.06
      */
-    public List<Person> getActivePersonnelAndHomeSchooledStudents() {
-        List<Person> relevantPersonnel = new ArrayList<>();
-
-        for (Person person : getPersonnel()) {
-            if (!person.getStatus().isDepartedUnit()) {
-                continue;
-            }
-
+    public List<Person> getActiveCombatPersonnelAndStudents() {
+        List<Person> result = new ArrayList<>();
+        for (Person person : getActivePersonnel(false)) {
             PersonnelStatus status = person.getStatus();
-            if (status.isActive() || EducationController.isBeingHomeSchooled(person)) {
-                relevantPersonnel.add(person);
+            if (status.isActive() || status.isStudent()) {
+                result.add(person);
             }
         }
-
-        return relevantPersonnel;
+        return result;
     }
 
     /**
