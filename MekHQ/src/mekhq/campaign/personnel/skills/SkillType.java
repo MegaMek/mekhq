@@ -289,7 +289,7 @@ public class SkillType {
             case EXP_REGULAR -> "Regular";
             case EXP_VETERAN -> "Veteran";
             case EXP_ELITE -> "Elite";
-            case -1 -> "Unknown";
+            case -1 -> "None";
             default -> "Impossible";
         };
     }
@@ -687,6 +687,10 @@ public class SkillType {
                      Objects.equals(this.name, S_STRATEGY) ||
                      Objects.equals(this.name, S_TACTICS) ||
                      Objects.equals(this.name, S_TRAINING);
+    }
+
+    public List<SkillAttribute> getAttributes() {
+        return Arrays.asList(firstAttribute, secondAttribute);
     }
 
     public SkillAttribute getFirstAttribute() {
