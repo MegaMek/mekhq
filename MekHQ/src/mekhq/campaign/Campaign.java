@@ -2811,6 +2811,10 @@ public class Campaign implements ITechManager {
             return campaignOptions.getAutoLogisticsJumpJets();
         } else if (part instanceof EnginePart) {
             return campaignOptions.getAutoLogisticsEngines();
+        } else if (part instanceof EquipmentPart equipmentPart) {
+            if (equipmentPart.getType() instanceof WeaponType) {
+                return campaignOptions.getAutoLogisticsWeapons();
+            }
         }
 
         return campaignOptions.getAutoLogisticsOther();
