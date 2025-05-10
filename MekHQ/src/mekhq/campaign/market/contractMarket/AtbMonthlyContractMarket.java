@@ -270,16 +270,22 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         if (campaign.getFaction().isMercenary()) {
             if (null == campaign.getRetainerEmployerCode()) {
                 int retries = MAXIMUM_GENERATION_RETRIES;
-                AtBContract retVal = null;
-                while ((retries > 0) && (retVal == null)) {
+                AtBContract contract = null;
+                while ((retries > 0) && (contract == null)) {
                     // Send only 1 retry down because we're handling retries in our loop
-                    retVal = generateAtBContract(campaign,
+                    contract = generateAtBContract(campaign,
                           RandomFactionGenerator.getInstance().getEmployer(),
                           unitRatingMod,
                           1);
+
+                    if (contract != null) {
+                        contract.setDifficulty(contract.calculateContractDifficulty(contract.getStartDate().getYear(),
+                              true,
+                              campaign.getAllCombatEntities()));
+                    }
                     retries--;
                 }
-                return retVal;
+                return contract;
             } else {
                 return generateAtBContract(campaign, campaign.getRetainerEmployerCode(), unitRatingMod);
             }
@@ -599,6 +605,18 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                 multiplier *= 0.8;
             } else if (unitRatingMod == IUnitRating.DRAGOON_F) {
                 multiplier *= 0.5;
+            }
+        }
+
+        // FG3 Difficulty Multiplier
+        if (campaignOptions.isUseGenericBattleValue()) {
+            int contractDifficulty = contract.getDifficulty();
+            if (contractDifficulty != Integer.MIN_VALUE && contractDifficulty <= 2) {
+                multiplier /= 0.5;
+            } else if (contractDifficulty >= 8) {
+                multiplier *= 0.5;
+            } else if (contractDifficulty >= 6) {
+                multiplier *= 0.25;
             }
         }
 
