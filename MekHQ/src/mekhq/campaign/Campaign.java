@@ -2530,25 +2530,16 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Returns a list of people who are currently either active personnel or students.
-     * <p>
-     * This method iterates through all active personnel and collects those whose status
-     * indicates they are either active or students.
-     * </p>
+     * Returns a list of people who are currently eligible to receive a salary.
      *
      * @return a list of {@link Person} objects who have active or student status
      * @author Illiani
      * @since 0.50.06
      */
-    public List<Person> getActiveCombatPersonnelAndStudents() {
-        List<Person> result = new ArrayList<>();
-        for (Person person : getActivePersonnel(false)) {
-            PersonnelStatus status = person.getStatus();
-            if (status.isActive() || status.isStudent()) {
-                result.add(person);
-            }
-        }
-        return result;
+    public List<Person> getSalaryEligiblePersonnel() {
+        return getActivePersonnel(false).stream()
+                     .filter(person -> person.getStatus().isSalaryEligible())
+                     .collect(Collectors.toList());
     }
 
     /**
