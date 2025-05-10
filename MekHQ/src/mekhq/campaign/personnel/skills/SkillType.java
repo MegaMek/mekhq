@@ -183,6 +183,7 @@ public class SkillType {
     public static final String S_INTEREST_ARCHEOLOGY = "Interest/Archeology" + RP_ONLY_TAG;
     public static final String S_INTEREST_HOLO_CINEMA = "Interest/Holo-Cinema" + RP_ONLY_TAG;
     public static final String S_INTEREST_EXOTIC_ANIMALS = "Interest/Exotic Animals" + RP_ONLY_TAG;
+    public static final String S_INTEREST_LAW = "Interest/Law" + RP_ONLY_TAG;
     public static final String S_INTEREST_OTHER = "Interest/Other" + RP_ONLY_TAG;
     public static final String S_INTERROGATION = "Interrogation" + RP_ONLY_TAG;
     public static final String S_INVESTIGATION = "Investigation" + RP_ONLY_TAG;
@@ -203,7 +204,7 @@ public class SkillType {
     public static final String S_SCIENCE_PSYCHOLOGY = "Science/Psychology" + RP_ONLY_TAG;
     public static final String S_SCIENCE_OTHER = "Science/Other" + RP_ONLY_TAG;
     public static final String S_SECURITY_SYSTEMS_ELECTRONIC = "Security Systems/Electronic" + RP_ONLY_TAG;
-    public static final String S_SCIENCE_SYSTEMS_MECHANICAL = "Security Systems/Mechanical" + RP_ONLY_TAG;
+    public static final String S_SECURITY_SYSTEMS_MECHANICAL = "Security Systems/Mechanical" + RP_ONLY_TAG;
     public static final String S_SENSOR_OPERATIONS = "Sensor Operations" + RP_ONLY_TAG;
     public static final String S_STEALTH = "Stealth" + RP_ONLY_TAG;
     public static final String S_STREETWISE = "Streetwise/Any" + RP_ONLY_TAG;
@@ -239,13 +240,14 @@ public class SkillType {
                                                S_INTEREST_ECONOMICS, S_INTEREST_POP_CULTURE, S_INTEREST_ASTROLOGY,
                                                S_INTEREST_FISHING, S_INTEREST_MYTHOLOGY, S_INTEREST_CARTOGRAPHY,
                                                S_INTEREST_ARCHEOLOGY, S_INTEREST_HOLO_CINEMA, S_INTEREST_EXOTIC_ANIMALS,
+                                               S_INTEREST_LAW,
                                                S_INTEREST_OTHER, S_INTERROGATION, S_INVESTIGATION, S_LANGUAGES,
                                                S_MARTIAL_ARTS, S_PERCEPTION, S_SLEIGHT_OF_HAND, S_PROTOCOLS,
                                                S_SCIENCE_BIOLOGY, S_SCIENCE_CHEMISTRY, S_SCIENCE_MATHEMATICS,
                                                S_SCIENCE_PHYSICS, S_SCIENCE_MILITARY, S_SCIENCE_GEOLOGY,
                                                S_SCIENCE_XENOBIOLOGY, S_SCIENCE_PHARMACOLOGY, S_SCIENCE_GENETICS,
                                                S_SCIENCE_PSYCHOLOGY, S_SCIENCE_OTHER, S_SECURITY_SYSTEMS_ELECTRONIC,
-                                               S_SCIENCE_SYSTEMS_MECHANICAL, S_SENSOR_OPERATIONS, S_STEALTH,
+                                               S_SECURITY_SYSTEMS_MECHANICAL, S_SENSOR_OPERATIONS, S_STEALTH,
                                                S_STREETWISE, S_SURVIVAL, S_TRACKING, S_CAREER_ANY, S_SWIMMING,
                                                S_ZERO_G_OPERATIONS, S_RUNNING, S_TRAINING, S_MELEE_WEAPONS,
                                                S_THROWN_WEAPONS, S_SUPPORT_WEAPONS };
@@ -976,6 +978,7 @@ public class SkillType {
         lookupHash.put(S_INTEREST_ARCHEOLOGY, createInterestArcheology());
         lookupHash.put(S_INTEREST_HOLO_CINEMA, createInterestHoloCinema());
         lookupHash.put(S_INTEREST_EXOTIC_ANIMALS, createInterestExoticAnimals());
+        lookupHash.put(S_INTEREST_LAW, createInterestLaw());
         lookupHash.put(S_INTEREST_OTHER, createInterestOther());
         lookupHash.put(S_INTERROGATION, createInterrogation());
         lookupHash.put(S_INVESTIGATION, createInvestigation());
@@ -996,7 +999,7 @@ public class SkillType {
         lookupHash.put(S_SCIENCE_PSYCHOLOGY, createSciencePsychology());
         lookupHash.put(S_SCIENCE_OTHER, createScienceOther());
         lookupHash.put(S_SECURITY_SYSTEMS_ELECTRONIC, createSecuritySystemsElectronic());
-        lookupHash.put(S_SCIENCE_SYSTEMS_MECHANICAL, createSecuritySystemsMechanical());
+        lookupHash.put(S_SECURITY_SYSTEMS_MECHANICAL, createSecuritySystemsMechanical());
         lookupHash.put(S_SENSOR_OPERATIONS, createSensorOperations());
         lookupHash.put(S_STEALTH, createStealth());
         lookupHash.put(S_STREETWISE, createStreetwise());
@@ -1407,6 +1410,7 @@ public class SkillType {
             case S_INTEREST_ARCHEOLOGY -> createInterestArcheology();
             case S_INTEREST_HOLO_CINEMA -> createInterestHoloCinema();
             case S_INTEREST_EXOTIC_ANIMALS -> createInterestExoticAnimals();
+            case S_INTEREST_LAW -> createInterestLaw();
             case S_INTEREST_OTHER -> createInterestOther();
             case S_INTERROGATION -> createInterrogation();
             case S_INVESTIGATION -> createInvestigation();
@@ -1427,7 +1431,7 @@ public class SkillType {
             case S_SCIENCE_PSYCHOLOGY -> createSciencePsychology();
             case S_SCIENCE_OTHER -> createScienceOther();
             case S_SECURITY_SYSTEMS_ELECTRONIC -> createSecuritySystemsElectronic();
-            case S_SCIENCE_SYSTEMS_MECHANICAL -> createSecuritySystemsMechanical();
+            case S_SECURITY_SYSTEMS_MECHANICAL -> createSecuritySystemsMechanical();
             case S_SENSOR_OPERATIONS -> createSensorOperations();
             case S_STEALTH -> createStealth();
             case S_STREETWISE, "Streetwise (RP Only)" -> createStreetwise();
@@ -2558,6 +2562,20 @@ public class SkillType {
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
+    public static SkillType createInterestLaw() {
+        return new SkillType(S_INTEREST_LAW,
+              9,
+              false,
+              ROLEPLAY_INTEREST,
+              INTELLIGENCE,
+              WILLPOWER,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
     public static SkillType createInterestOther() {
         return new SkillType(S_INTEREST_OTHER,
               9,
@@ -2841,7 +2859,7 @@ public class SkillType {
     }
 
     public static SkillType createSecuritySystemsMechanical() {
-        return new SkillType(S_SCIENCE_SYSTEMS_MECHANICAL,
+        return new SkillType(S_SECURITY_SYSTEMS_MECHANICAL,
               9,
               false,
               ROLEPLAY_SECURITY,
