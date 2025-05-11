@@ -126,7 +126,6 @@ public class EquipmentAndSuppliesTab {
     //end autoLogistics Tab
 
     //start Delivery Tab
-    private JPanel pnlDeliveries;
     private JLabel lblTransitTimeUnits;
     private MMComboBox<String> choiceTransitTimeUnits;
     private static final int TRANSIT_UNIT_DAY = 0;
@@ -257,7 +256,6 @@ public class EquipmentAndSuppliesTab {
      * <li> Combo boxes for selecting unit options related to transit times and acquisitions.</li>
      */
     private void initializeDelivery() {
-        pnlDeliveries = new JPanel();
         lblTransitTimeUnits = new JLabel();
         choiceTransitTimeUnits = new MMComboBox<>("choiceTransitTimeUnits", getTransitUnitOptions());
     }
@@ -349,12 +347,10 @@ public class EquipmentAndSuppliesTab {
     public JPanel createAcquisitionTab() {
         // Header
         acquisitionHeader = new CampaignOptionsHeaderPanel("AcquisitionTab",
-              getImageDirectory() + "logo_clan_cloud_cobra.png",
-              5);
+              getImageDirectory() + "logo_clan_cloud_cobra.png", 4);
 
         pnlAcquisitions = createAcquisitionPanel();
         pnlAutoLogistics = createAutoLogisticsPanel();
-        pnlDeliveries = createDeliveryPanel();
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("acquisitionTab", true);
@@ -371,10 +367,6 @@ public class EquipmentAndSuppliesTab {
 
         layoutParent.gridx++;
         panel.add(pnlAutoLogistics, layoutParent);
-
-        layoutParent.gridx = 0;
-        layoutParent.gridy++;
-        panel.add(pnlDeliveries, layoutParent);
 
 
         // Create Parent Panel and return
@@ -422,6 +414,10 @@ public class EquipmentAndSuppliesTab {
             0,0, 100, 1);
         spnMaxAcquisitions.addMouseListener(createTipPanelUpdater(acquisitionHeader, "MaxAcquisitions"));
 
+        lblTransitTimeUnits = new CampaignOptionsLabel("TransitTimeUnits");
+        lblTransitTimeUnits.addMouseListener(createTipPanelUpdater(acquisitionHeader, "TransitTimeUnits"));
+        choiceTransitTimeUnits.addMouseListener(createTipPanelUpdater(acquisitionHeader, "TransitTimeUnits"));
+
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("AcquisitionPanel", true,
             "AcquisitionPanel");
@@ -464,6 +460,12 @@ public class EquipmentAndSuppliesTab {
         panel.add(lblMaxAcquisitions, layout);
         layout.gridx++;
         panel.add(spnMaxAcquisitions, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblTransitTimeUnits, layout);
+        layout.gridx++;
+        panel.add(choiceTransitTimeUnits, layout);
 
         return panel;
     }
@@ -582,40 +584,6 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Creates and configures a delivery panel composed of multiple sub-panels for managing transit time and delivery-related settings.
-     * The panel includes components such as labels, spinners, and choice units, and ensures proper layout and structure.
-     *
-     * @return a {@code JPanel} instance representing the delivery panel with all configured sub-panels and components.
-     */
-    private JPanel createDeliveryPanel() {
-        // Contents
-        lblTransitTimeUnits = new CampaignOptionsLabel("TransitTimeUnits");
-        lblTransitTimeUnits.addMouseListener(createTipPanelUpdater(acquisitionHeader, "TransitTimeUnits"));
-
-        // Layout the Panel
-        final JPanel panelTransit = new CampaignOptionsStandardPanel("DeliveryPanelTransit");
-        final GridBagConstraints layoutTransit = new CampaignOptionsGridBagConstraints(panelTransit);
-
-        layoutTransit.gridy = 0;
-        layoutTransit.gridx = 0;
-        layoutTransit.gridwidth = 1;
-        panelTransit.add(lblTransitTimeUnits, layoutTransit);
-        layoutTransit.gridx++;
-        panelTransit.add(choiceTransitTimeUnits, layoutTransit);
-
-        final JPanel panelParent = new CampaignOptionsStandardPanel("DeliveryPanel", true,
-            "DeliveryPanel");
-        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panelParent);
-
-        layoutParent.gridy = 0;
-        layoutParent.gridx = 0;
-        layoutParent.gridwidth = 2;
-        panelParent.add(panelTransit, layoutParent);
-
-        return panelParent;
-    }
-
-    /**
      * Creates and configures the planetary acquisition tab panel in a campaign options interface.
      * The panel includes a header, options, and modifiers section, arranged using
      * layout constraints. Once configured, it is wrapped within a parent panel and returned.
@@ -625,8 +593,7 @@ public class EquipmentAndSuppliesTab {
     public JPanel createPlanetaryAcquisitionTab() {
         // Header
         planetaryAcquisitionHeader = new CampaignOptionsHeaderPanel("PlanetaryAcquisitionTab",
-              getImageDirectory() + "logo_rim_worlds_republic.png",
-              5);
+              getImageDirectory() + "logo_rim_worlds_republic.png", 14);
 
         // Sub-Panels
         JPanel options = createOptionsPanel();
@@ -757,20 +724,32 @@ public class EquipmentAndSuppliesTab {
 
             lblPlanetAcquireTechBonus[i] = new JLabel(String.format("<html>%s</html>",
                 modifierLabel));
+            lblPlanetAcquireTechBonus[i].addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
+                  "TechLabel"));
             spnPlanetAcquireTechBonus[i] = new JSpinner(new SpinnerNumberModel(
                 0, -12, 12, 1));
+            spnPlanetAcquireTechBonus[i].addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
+                  "TechLabel"));
             setSpinnerWidth(spnPlanetAcquireTechBonus[i]);
 
             lblPlanetAcquireIndustryBonus[i] = new JLabel(String.format("<html>%s</html>",
                 modifierLabel));
+            lblPlanetAcquireIndustryBonus[i].addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
+                  "IndustryLabel"));
             spnPlanetAcquireIndustryBonus[i] = new JSpinner(new SpinnerNumberModel(
                 0, -12, 12, 1));
+            spnPlanetAcquireIndustryBonus[i].addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
+                  "IndustryLabel"));
             setSpinnerWidth(spnPlanetAcquireIndustryBonus[i]);
 
             lblPlanetAcquireOutputBonus[i] = new JLabel(String.format("<html>%s</html>",
                 modifierLabel));
+            lblPlanetAcquireOutputBonus[i].addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
+                  "OutputLabel"));
             spnPlanetAcquireOutputBonus[i] = new JSpinner(new SpinnerNumberModel(
                 0, -12, 12, 1));
+            spnPlanetAcquireOutputBonus[i].addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
+                  "OutputLabel"));
             setSpinnerWidth(spnPlanetAcquireOutputBonus[i]);
         }
 
@@ -1038,31 +1017,40 @@ public class EquipmentAndSuppliesTab {
     public JPanel createTechLimitsTab() {
         // Header
         techLimitsHeader = new CampaignOptionsHeaderPanel("TechLimitsTab",
-              getImageDirectory() + "logo_clan_ghost_bear.png",
-              5);
+              getImageDirectory() + "logo_clan_ghost_bear.png", 3);
 
         limitByYearBox = new CampaignOptionsCheckBox("LimitByYearBox");
+        limitByYearBox.addMouseListener(createTipPanelUpdater(techLimitsHeader, "LimitByYearBox"));
 
         disallowExtinctStuffBox = new CampaignOptionsCheckBox("DisallowExtinctStuffBox");
+        disallowExtinctStuffBox.addMouseListener(createTipPanelUpdater(techLimitsHeader, "DisallowExtinctStuffBox"));
 
         allowClanPurchasesBox = new CampaignOptionsCheckBox("AllowClanPurchasesBox");
+        allowClanPurchasesBox.addMouseListener(createTipPanelUpdater(techLimitsHeader, "AllowClanPurchasesBox"));
         allowISPurchasesBox = new CampaignOptionsCheckBox("AllowISPurchasesBox");
+        allowISPurchasesBox.addMouseListener(createTipPanelUpdater(techLimitsHeader, "AllowISPurchasesBox"));
 
         // Canon Purchases/Refits
         allowCanonOnlyBox = new CampaignOptionsCheckBox("AllowCanonOnlyBox");
+        allowCanonOnlyBox.addMouseListener(createTipPanelUpdater(techLimitsHeader, "AllowCanonOnlyBox"));
         allowCanonRefitOnlyBox = new CampaignOptionsCheckBox("AllowCanonRefitOnlyBox");
+        allowCanonRefitOnlyBox.addMouseListener(createTipPanelUpdater(techLimitsHeader, "AllowCanonRefitOnlyBox"));
 
         // Maximum Tech Level
         lblChoiceTechLevel = new CampaignOptionsLabel("ChoiceTechLevel");
+        lblChoiceTechLevel.addMouseListener(createTipPanelUpdater(techLimitsHeader, "ChoiceTechLevel"));
         choiceTechLevel = new MMComboBox<>("choiceTechLevel", getMaximumTechLevelOptions());
+        choiceTechLevel.addMouseListener(createTipPanelUpdater(techLimitsHeader, "ChoiceTechLevel"));
         choiceTechLevel.setToolTipText(String.format("<html>%s</html>",
               getTextAt(getCampaignOptionsResourceBundle(), "lblChoiceTechLevel.tooltip")));
 
         // Variable Tech Level
         variableTechLevelBox = new CampaignOptionsCheckBox("VariableTechLevelBox");
+        variableTechLevelBox.addMouseListener(createTipPanelUpdater(techLimitsHeader, "VariableTechLevelBox"));
 
         // Ammo by Type
         useAmmoByTypeBox = new CampaignOptionsCheckBox("UseAmmoByTypeBox");
+        useAmmoByTypeBox.addMouseListener(createTipPanelUpdater(techLimitsHeader, "UseAmmoByTypeBox"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("TechLimitsTab", true);
