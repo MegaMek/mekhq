@@ -177,26 +177,22 @@ public class SkillsTab {
         switch (category) {
             case COMBAT_GUNNERY -> {
                 headerPanel = new CampaignOptionsHeaderPanel("GunnerySkillsTab",
-                      getImageDirectory() + "logo_clan_diamond_sharks.png",
-                      5);
+                      getImageDirectory() + "logo_clan_diamond_sharks.png");
                 panelName = "GunnerySkillsTab";
             }
             case COMBAT_PILOTING -> {
                 headerPanel = new CampaignOptionsHeaderPanel("PilotingSkillsTab",
-                      getImageDirectory() + "logo_capellan_confederation.png",
-                      5);
+                      getImageDirectory() + "logo_capellan_confederation.png");
                 panelName = "PilotingSkillsTab";
             }
             case SUPPORT -> {
                 headerPanel = new CampaignOptionsHeaderPanel("SupportSkillsTab",
-                      getImageDirectory() + "logo_clan_goliath_scorpion.png",
-                      5);
+                      getImageDirectory() + "logo_clan_goliath_scorpion.png");
                 panelName = "SupportSkillsTab";
             }
             default -> { // ROLEPLAY
                 headerPanel = new CampaignOptionsHeaderPanel("RoleplaySkillsTab",
-                      getImageDirectory() + "logo_clan_jade_falcon.png",
-                      5);
+                      getImageDirectory() + "logo_clan_jade_falcon.png");
                 panelName = "RoleplaySkillsTab";
             }
         }
