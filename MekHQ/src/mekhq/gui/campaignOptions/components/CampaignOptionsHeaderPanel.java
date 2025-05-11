@@ -154,6 +154,7 @@ public class CampaignOptionsHeaderPanel extends JPanel {
 
             lblTip.setName("lbl" + name + TIP_PANEL_NAME);
             lblTip.setText("<html>" + lineBreaks + "</html>");
+            lblTip.setHorizontalAlignment(SwingConstants.CENTER);
         }
 
         // Initialize the panel's layout using a GridBagLayout

@@ -288,18 +288,21 @@ public class CampaignOptionsUtilities {
                 // the section below.
                 tipText = wordWrap(tipText, 75);
 
-                // We have to remove the closing tag so that the extra '<br>' we're adding can be factored into the
+                // We have to remove the opening tag so that the extra '<br>' we're adding can be factored into the
                 // display
-                tipText = tipText.replace("</html>", "");
+                tipText = tipText.replace("<html>", "");
 
                 // These extra linebreaks are to ensure we have a relatively consistent number of lines. This stops the
                 // options from 'bouncing' around too much as the tip resizes.
                 int panelLineCount = associatedHeaderPanel.getTipPanelHeight();
                 int missingLines = panelLineCount - tipLineCounter(tipText);
                 if (missingLines > 0) {
+                    String lineBreaks = "";
                     for (int missingLine = 0; missingLine < missingLines; missingLine++) {
-                        tipText += "<br>";
+                        lineBreaks += "<br>";
                     }
+
+                    tipText = lineBreaks + tipText;
                 } else if (missingLines < 0) {
                     logger.warn("Tip panel for {} exceeds the maximum number of lines ({}). Line count should be " +
                                       "increased by {}",
@@ -308,8 +311,8 @@ public class CampaignOptionsUtilities {
                           Math.abs(missingLines));
                 }
 
-                // That out of the way, let's add the closing tag back in
-                tipText += "</html>";
+                // That out of the way, let's add the opening tag back in
+                tipText = "<html>" + tipText;
 
                 for (Component component : associatedHeaderPanel.getComponents()) {
                     if (component instanceof JLabel label) {
