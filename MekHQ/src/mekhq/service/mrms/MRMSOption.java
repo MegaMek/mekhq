@@ -52,7 +52,7 @@ public class MRMSOption {
     private int dailyTimeMin;
 
     private static final int TARGET_NUMBER_PREFERRED = 4;
-    private static final int TARGET_NUMBER_MAX = 4;
+    private static final int TARGET_NUMBER_MAX = 6;
     private static final int DAILY_TIME_MIN = 0;
     // endregion Variable Declarations
 
