@@ -776,9 +776,6 @@ public class RelationshipsTab {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof RandomProcreationMethod) {
                     list.setToolTipText(((RandomProcreationMethod) value).getToolTipText());
-                    list.addMouseListener(createTipPanelUpdater(procreationHeader,
-                          null,
-                          ((RandomProcreationMethod) value).getToolTipText()));
                 }
                 return this;
             }

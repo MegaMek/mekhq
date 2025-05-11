@@ -437,9 +437,6 @@ public class TurnoverAndRetentionTab {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof TurnoverFrequency) {
                     list.setToolTipText(((TurnoverFrequency) value).getToolTipText());
-                    list.addMouseListener(createTipPanelUpdater(turnoverHeader,
-                          null,
-                          ((TurnoverFrequency) value).getToolTipText()));
                 }
                 return this;
             }

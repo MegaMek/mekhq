@@ -1175,9 +1175,6 @@ public class PersonnelTab {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof PrisonerCaptureStyle) {
                     list.setToolTipText(wordWrap(((PrisonerCaptureStyle) value).getTooltip()));
-                    list.addMouseListener(createTipPanelUpdater(prisonersAndDependentsHeader,
-                          null,
-                          ((PrisonerCaptureStyle) value).getTooltip()));
                 }
                 return this;
             }
