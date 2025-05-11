@@ -689,6 +689,10 @@ public class SkillType {
                      Objects.equals(this.name, S_TRAINING);
     }
 
+    public List<SkillAttribute> getAttributes() {
+        return Arrays.asList(firstAttribute, secondAttribute);
+    }
+
     public SkillAttribute getFirstAttribute() {
         return firstAttribute;
     }

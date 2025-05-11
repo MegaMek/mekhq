@@ -33,6 +33,7 @@
 package mekhq.campaign.personnel.enums;
 
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -479,6 +480,80 @@ public enum PersonnelRole {
         return getFormattedTextAt(RESOURCE_BUNDLE, name() + ".label" + (useClan ? ".clan" : ""));
     }
 
+    /**
+     * Retrieves the plain text description for this personnel role from the resource bundle.
+     *
+     * @return the description string associated with the personnel role.
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public String getDescription() {
+        return getTextAt(RESOURCE_BUNDLE, name() + ".description");
+    }
+
+    /**
+     * Builds an HTML tooltip string providing a description of this personnel role and a list of related skills with
+     * their linked attributes, if available.
+     *
+     * <p>If the list of skills for this profession is not empty, the tooltip will include each skill followed by its
+     * relevant {@link SkillAttribute} types. Otherwise, a default formatted description is returned from the resource
+     * bundle.</p>
+     *
+     * @return an HTML-formatted tooltip string detailing the profession and corresponding skills.
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public String getTooltip() {
+        StringBuilder tooltip = new StringBuilder(getDescription()).append("<br>");
+
+        List<String> skills = new ArrayList<>();
+        if (this == VEHICLE_CREW) {
+            // Vehicle Crew is a bit of a special case as any of these skills makes a character eligible for
+            // experience level improvements.
+            List<String> relevantSkills = List.of(SkillType.S_TECH_MEK,
+                  SkillType.S_TECH_AERO,
+                  SkillType.S_TECH_MECHANIC,
+                  SkillType.S_TECH_BA,
+                  SkillType.S_SURGERY,
+                  SkillType.S_MEDTECH,
+                  SkillType.S_ASTECH,
+                  SkillType.S_COMMUNICATIONS, SkillType.S_ART_COOKING,
+                  SkillType.S_SENSOR_OPERATIONS);
+            skills.addAll(relevantSkills);
+        } else {
+            skills.addAll(getSkillsForProfession());
+        }
+
+        for (String skill : skills) {
+            tooltip.append("<br>- ").append(skill);
+
+            SkillType skillType = SkillType.getType(skill);
+
+            if (skillType != null) {
+                List<SkillAttribute> linkedAttributes = new ArrayList<>(skillType.getAttributes());
+                linkedAttributes.remove(SkillAttribute.NONE);
+
+                for (SkillAttribute attribute : linkedAttributes) {
+                    if (linkedAttributes.indexOf(attribute) == 0) {
+                        tooltip.append(" (");
+                    }
+
+                    tooltip.append(attribute.getLabel());
+
+                    if (linkedAttributes.indexOf(attribute) < linkedAttributes.size() - 1) {
+                        tooltip.append(", ");
+                    } else if (linkedAttributes.indexOf(attribute) == linkedAttributes.size() - 1) {
+                        tooltip.append(')');
+                    }
+                }
+            }
+        }
+
+        return tooltip.toString();
+    }
+
     public int getMnemonic() {
         return mnemonic;
     }
@@ -574,7 +649,7 @@ public enum PersonnelRole {
             case VEHICLE_CREW, MECHANIC -> List.of(SkillType.S_TECH_MECHANIC);
             case AEROSPACE_PILOT -> List.of(SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO);
             case CONVENTIONAL_AIRCRAFT_PILOT -> List.of(SkillType.S_GUN_JET, SkillType.S_PILOT_JET);
-            case PROTOMEK_PILOT -> List.of(SkillType.S_GUN_PROTO, SkillType.S_GUN_PROTO);
+            case PROTOMEK_PILOT -> List.of(SkillType.S_GUN_PROTO);
             case BATTLE_ARMOUR -> List.of(SkillType.S_GUN_BA, SkillType.S_ANTI_MEK);
             case SOLDIER -> List.of(SkillType.S_SMALL_ARMS);
             case VESSEL_PILOT -> List.of(SkillType.S_PILOT_SPACE);
@@ -1232,10 +1307,12 @@ public enum PersonnelRole {
         return isDoctor() || isMedic();
     }
 
+
     /**
-     * @deprecated Unused
+     * Determines if the current entity is an assistant by checking if it is either an Astech or a Medic.
+     *
+     * @return {@code true} if the entity is an assistant (either an Astech or a Medic), {@code false} otherwise.
      */
-    @Deprecated(since = "0.50.06", forRemoval = true)
     public boolean isAssistant() {
         return isAstech() || isMedic();
     }
@@ -1459,18 +1536,21 @@ public enum PersonnelRole {
     }
 
     /**
-     * Returns an array of all {@link PersonnelRole} values sorted alphabetically by their enum name.
+     * Returns an array of all {@link PersonnelRole} values sorted alphabetically by their display label.
      *
-     * <p>This is useful for displaying or processing personnel roles in a consistent, user-friendly order.</p>
+     * <p>
+     * The sorting is performed based on the label returned by {@code getLabel(clanCampaign)} for each role,
+     * ensuring that the roles are ordered according to the user-facing names, which may differ depending
+     * on whether a clan campaign is in effect.
+     * </p>
      *
-     * @return a {@code PersonnelRole[]} containing all enum values sorted by name in ascending order
-     *
-     * @author Illiani
+     * @param clanCampaign {@code true} to use labels appropriate for a clan campaign;
+     *                     {@code false} to use standard labels
+     * @return a {@code PersonnelRole[]} containing all enum values sorted alphabetically by label
      * @since 0.50.06
      */
-    public static PersonnelRole[] getValuesSortedAlphabetically() {
-        return Arrays.stream(PersonnelRole.values())
-                     .sorted(Comparator.comparing(Enum::name))
+    public static PersonnelRole[] getValuesSortedAlphabetically(boolean clanCampaign) {
+        return Arrays.stream(PersonnelRole.values()).sorted(Comparator.comparing(role -> role.getLabel(clanCampaign)))
                      .toArray(PersonnelRole[]::new);
     }
 }

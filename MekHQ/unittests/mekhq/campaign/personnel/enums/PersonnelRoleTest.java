@@ -744,6 +744,18 @@ class PersonnelRoleTest {
                     role.getSkillsForProfession());
     }
 
+    @ParameterizedTest
+    @EnumSource(value = PersonnelRole.class, names = "NONE", mode = EnumSource.Mode.EXCLUDE)
+    void testGetDescription(PersonnelRole role) {
+        // Setup
+
+        // Act
+        String description = role.getDescription();
+
+        // Assert
+        assertTrue(isResourceKeyValid(description), "Role does not have a description: " + role.name());
+    }
+
     /**
      * Generates a stream of integers representing the range of days from 0 to the total number of days in 18 years,
      * accounting for leap years.

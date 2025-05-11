@@ -756,7 +756,8 @@ public class CampaignGUI extends JPanel {
         JMenu menuHireCombat = new JMenu(resourceMap.getString("menuHire.combat"));
         JMenu menuHireSupport = new JMenu(resourceMap.getString("menuHire.support"));
         JMenu menuHireCivilian = new JMenu(resourceMap.getString("menuHire.civilian"));
-        PersonnelRole[] roles = PersonnelRole.getValuesSortedAlphabetically();
+
+        PersonnelRole[] roles = PersonnelRole.getValuesSortedAlphabetically(getCampaign().isClanCampaign());
         for (PersonnelRole role : roles) {
             // Dependent is handled speciality so that it's always at the top of the civilian category
             if (role.isDependent()) {
@@ -768,6 +769,7 @@ public class CampaignGUI extends JPanel {
                 miHire.setMnemonic(role.getMnemonic());
                 miHire.setAccelerator(KeyStroke.getKeyStroke(role.getMnemonic(), InputEvent.ALT_DOWN_MASK));
             }
+            miHire.setToolTipText(role.getDescription());
             miHire.setActionCommand(role.name());
             miHire.addActionListener(this::hirePerson);
 

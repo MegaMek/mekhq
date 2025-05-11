@@ -916,14 +916,9 @@ public class Person {
             setSecondaryRoleDirect(PersonnelRole.NONE);
         }
 
-        // Now, we can perform the time in service and last rank change tracking change
-        // for dependents
-        if (primaryRole.isDependent()) {
-            setRecruitment(null);
-            setLastRankChangeDate(null);
-        } else if (getPrimaryRole().isDependent()) {
+        // Now, we can perform the time in service and last rank change tracking change for dependents
+        if (!primaryRole.isCivilian() && recruitment != null) {
             setRecruitment(campaign.getLocalDate());
-            setLastRankChangeDate(campaign.getLocalDate());
         }
 
         // Finally, we can set the primary role
@@ -1091,9 +1086,15 @@ public class Person {
 
         return switch (role) {
             case VEHICLE_CREW -> Stream.of(SkillType.S_TECH_MEK,
-                  SkillType.S_TECH_AERO,
-                  SkillType.S_TECH_MECHANIC, SkillType.S_TECH_BA, SkillType.S_SURGERY,
-                  SkillType.S_MEDTECH, SkillType.S_ASTECH, SkillType.S_COMMUNICATIONS, SkillType.S_SENSOR_OPERATIONS)
+                        SkillType.S_TECH_AERO,
+                        SkillType.S_TECH_MECHANIC,
+                        SkillType.S_TECH_BA,
+                        SkillType.S_SURGERY,
+                        SkillType.S_MEDTECH,
+                        SkillType.S_ASTECH,
+                        SkillType.S_COMMUNICATIONS,
+                        SkillType.S_SENSOR_OPERATIONS,
+                        SkillType.S_ART_COOKING)
                                        .anyMatch(this::hasSkill);
             case AEROSPACE_PILOT -> hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO);
             case CONVENTIONAL_AIRCRAFT_PILOT -> hasSkill(SkillType.S_GUN_JET) && hasSkill(SkillType.S_PILOT_JET);
@@ -1139,6 +1140,35 @@ public class Person {
             }
         };
     }
+
+    /**
+     * Validates and updates the primary and secondary roles of this person for the given campaign.
+     *
+     * <p>This method checks if the current primary and secondary roles can be performed based on the campaign's
+     * local date. If the person is not eligible for their primary role, it will be set to
+     * {@link PersonnelRole#DEPENDENT}. If they cannot perform their secondary role, it will be set to
+     * {@link PersonnelRole#NONE}.
+     *
+     * @param campaign the {@link Campaign} context used for validation, particularly the local date
+     */
+    public void validateRoles(Campaign campaign) {
+        if (!primaryRole.isNone()) {
+            boolean canPerform = canPerformRole(campaign.getLocalDate(), primaryRole, true);
+
+            if (!canPerform) {
+                setPrimaryRole(campaign, PersonnelRole.DEPENDENT);
+            }
+        }
+
+        if (!secondaryRole.isNone()) {
+            boolean canPerform = canPerformRole(campaign.getLocalDate(), secondaryRole, false);
+
+            if (!canPerform) {
+                setSecondaryRole(PersonnelRole.NONE);
+            }
+        }
+    }
+
     // endregion Personnel Roles
 
     public PersonnelStatus getStatus() {
@@ -3762,7 +3792,7 @@ public class Person {
 
         return switch (role) {
             case VEHICLE_GUNNER -> {
-                if (!campaignOptions.isUseArtillery()) {
+                if (isUseArtillery) {
                     yield calculateExperienceLevelForProfession(associatedSkillNames, isAlternativeQualityAveraging);
                 } else {
                     if ((hasSkill(SkillType.S_GUN_VEE)) && (hasSkill(SkillType.S_ARTILLERY))) {
@@ -3787,9 +3817,8 @@ public class Person {
                       SkillType.S_SURGERY,
                       SkillType.S_MEDTECH,
                       SkillType.S_ASTECH,
-                      SkillType.S_COMMUNICATIONS,
+                      SkillType.S_COMMUNICATIONS, SkillType.S_ART_COOKING,
                       SkillType.S_SENSOR_OPERATIONS);
-
                 int highestExperienceLevel = SkillType.EXP_NONE;
                 for (String relevantSkill : relevantSkills) {
                     Skill skill = getSkill(relevantSkill);
@@ -5174,7 +5203,7 @@ public class Person {
     }
 
     public void setWealth(final int wealth) {
-        this.wealth = clamp(wealth, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
+        this.wealth = clamp(wealth, MINIMUM_WEALTH, MAXIMUM_WEALTH);
     }
 
     /**
