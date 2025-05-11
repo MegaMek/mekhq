@@ -2100,8 +2100,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
 
             if (allCanPerform) {
-                cbMenuItem = new JCheckBoxMenuItem(role.toString());
-                cbMenuItem.setToolTipText(wordWrap(role.getTooltip(), 50));
+                cbMenuItem = new JCheckBoxMenuItem(role.getLabel(getCampaign().isClanCampaign()));
+                cbMenuItem.setToolTipText(wordWrap(role.getTooltip(getCampaign().isClanCampaign()), 50));
                 cbMenuItem.setActionCommand(makeCommand(CMD_PRIMARY_ROLE, role.name()));
                 cbMenuItem.addActionListener(this);
                 if (oneSelected && role == person.getPrimaryRole()) {
@@ -2144,8 +2144,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
 
             if (allCanPerform) {
-                cbMenuItem = new JCheckBoxMenuItem(role.toString());
-                cbMenuItem.setToolTipText(wordWrap(role.getTooltip()));
+                cbMenuItem = new JCheckBoxMenuItem(role.getLabel(getCampaign().isClanCampaign()));
+                cbMenuItem.setToolTipText(wordWrap(role.getTooltip(getCampaign().isClanCampaign())));
                 cbMenuItem.setActionCommand(makeCommand(CMD_SECONDARY_ROLE, role.name()));
                 cbMenuItem.addActionListener(this);
                 if (oneSelected && role == person.getSecondaryRole()) {
