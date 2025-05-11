@@ -769,7 +769,7 @@ public class CampaignGUI extends JPanel {
                 miHire.setMnemonic(role.getMnemonic());
                 miHire.setAccelerator(KeyStroke.getKeyStroke(role.getMnemonic(), InputEvent.ALT_DOWN_MASK));
             }
-            miHire.setToolTipText(role.getDescription(getCampaign().isClanCampaign()));
+            miHire.setToolTipText(role.getDescription());
             miHire.setActionCommand(role.name());
             miHire.addActionListener(this::hirePerson);
 
