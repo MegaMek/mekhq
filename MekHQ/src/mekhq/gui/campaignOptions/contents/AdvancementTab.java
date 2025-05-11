@@ -267,8 +267,7 @@ public class AdvancementTab {
     public JPanel xpAwardsTab() {
         // Header
         xpAwardsHeader = new CampaignOptionsHeaderPanel("XpAwardsTab",
-              getImageDirectory() + "logo_clan_steel_viper.png",
-              5);
+              getImageDirectory() + "logo_clan_steel_viper.png", 8);
 
         // Contents
         lblXpCostMultiplier = new CampaignOptionsLabel("XpCostMultiplier");
@@ -633,14 +632,13 @@ public class AdvancementTab {
     public JPanel skillRandomizationTab() {
         // Header
         skillRandomizationHeader = new CampaignOptionsHeaderPanel("SkillRandomizationTab",
-              getImageDirectory() + "logo_republic_of_the_sphere.png",
-              5);
+              getImageDirectory() + "logo_republic_of_the_sphere.png", 12);
 
         // Contents
         chkExtraRandomness = new CampaignOptionsCheckBox("ExtraRandomness");
-        spnContractNegotiationXP.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "ExtraRandomness"));
+        chkExtraRandomness.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "ExtraRandomness"));
         chkComingOfAgeSPAs = new CampaignOptionsCheckBox("ComingOfAgeAbilities");
-        spnContractNegotiationXP.addMouseListener(createTipPanelUpdater(skillRandomizationHeader,
+        chkComingOfAgeSPAs.addMouseListener(createTipPanelUpdater(skillRandomizationHeader,
               "ComingOfAgeAbilities"));
 
         pnlPhenotype = createPhenotypePanel();
@@ -731,7 +729,13 @@ public class AdvancementTab {
 
         for (int i = 0; i < phenotypes.size(); i++) {
             phenotypeLabels[i] = new CampaignOptionsLabel(phenotypes.get(i).getLabel());
+            phenotypeLabels[i].addMouseListener(createTipPanelUpdater(skillRandomizationHeader,
+                  null,
+                  phenotypes.get(i).getTooltip()));
             phenotypeSpinners[i] = new CampaignOptionsSpinner(phenotypes.get(i).getLabel(), 0, 0, 100, 1);
+            phenotypeSpinners[i].addMouseListener(createTipPanelUpdater(skillRandomizationHeader,
+                  null,
+                  phenotypes.get(i).getTooltip()));
 
             layout.gridx++;
             panel.add(phenotypeLabels[i], layout);
@@ -1070,8 +1074,7 @@ public class AdvancementTab {
     public JPanel recruitmentBonusesTab() {
         // Header
         recruitmentBonusesHeader = new CampaignOptionsHeaderPanel("RecruitmentBonusesTab",
-              getImageDirectory() + "logo_calderon_protectorate.png",
-              true, true, 5);
+              getImageDirectory() + "logo_calderon_protectorate.png", true, false, 0);
 
         // Contents
         pnlRecruitmentBonusesCombat = createRecruitmentBonusesCombatPanel();
