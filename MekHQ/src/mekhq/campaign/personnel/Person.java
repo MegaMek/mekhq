@@ -1115,18 +1115,18 @@ public class Person {
                   hasSkill(SkillType.S_ADMIN);
             case ADULT_ENTERTAINER -> {
                 // A character under the age of 18 should never have access to this profession
-                if (getAge(today) >= 18) {
-                    yield hasSkill(SkillType.S_ART_OTHER) && hasSkill(SkillType.S_ACTING);
-                } else {
+                if (isChild(today, true)) {
                     yield false;
+                } else {
+                    yield hasSkill(SkillType.S_ART_OTHER) && hasSkill(SkillType.S_ACTING);
                 }
             }
             case LUXURY_COMPANION -> {
                 // A character under the age of 18 should never have access to this profession
-                if (getAge(today) >= 18) {
-                    yield hasSkill(SkillType.S_ACTING) && hasSkill(SkillType.S_PROTOCOLS);
-                } else {
+                if (isChild(today, true)) {
                     yield false;
+                } else {
+                    yield hasSkill(SkillType.S_ACTING) && hasSkill(SkillType.S_PROTOCOLS);
                 }
             }
             default -> {
