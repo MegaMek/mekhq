@@ -1259,16 +1259,44 @@ public class MRMSDialog extends JDialog {
             return targetNumberPreferredSpn;
         }
 
+        /**
+         * @deprecated consider {@link #getTargetNumberPreferredSpn()}
+         */
+        public JSpinner getMinBTHSpn() {
+            return this.getTargetNumberPreferredSpn();
+        }
+
         public void setTargetNumberPreferredSpn(JSpinner targetNumberPreferredSpn) {
             this.targetNumberPreferredSpn = targetNumberPreferredSpn;
+        }
+
+        /**
+         * @deprecated consider {@link #setTargetNumberPreferredSpn(JSpinner)}
+         */
+        public void setMinBTHSpn(JSpinner minBTHSpn) {
+            this.setTargetNumberPreferredSpn(minBTHSpn);
         }
 
         public JSpinner getTargetNumberMaxSpn() {
             return targetNumberMaxSpn;
         }
 
+        /**
+         * @deprecated consider {@link #getTargetNumberMaxSpn()}
+         */
+        public JSpinner getMaxBTHSpn() {
+            return this.getTargetNumberMaxSpn();
+        }
+
         public void setTargetNumberMaxSpn(JSpinner targetNumberMaxSpn) {
             this.targetNumberMaxSpn = targetNumberMaxSpn;
+        }
+
+        /**
+         * @deprecated consider {@link #setTargetNumberMaxSpn(JSpinner)}
+         */
+        public void setMaxBTHSpn(JSpinner maxBTHSpn) {
+            this.setTargetNumberMaxSpn(maxBTHSpn);
         }
 
         public JSpinner getMinDailyTimeSpn() {

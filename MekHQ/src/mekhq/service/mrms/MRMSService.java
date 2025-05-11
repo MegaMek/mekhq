@@ -1338,8 +1338,24 @@ public class MRMSService {
             return configuredTargetNumberPreferred;
         }
 
+        /**
+         * @deprecated consider {@link #getConfiguredTargetNumberPreferred()}
+         */
+        @Deprecated(since = "0.50.07", forRemoval = true)
+        public int getConfiguredBTHMin() {
+            return this.getConfiguredTargetNumberPreferred();
+        }
+
         public void setConfiguredTargetNumberPreferred(int configuredTargetNumberPreferred) {
             this.configuredTargetNumberPreferred = configuredTargetNumberPreferred;
+        }
+
+        /**
+         * @deprecated consider {@link #setConfiguredTargetNumberPreferred(int)}
+         */
+        @Deprecated(since = "0.50.07", forRemoval = true)
+        public void setConfiguredBTHMin(int configuredBTHMin) {
+            this.setConfiguredTargetNumberPreferred(configuredBTHMin);
         }
 
         public static MRMSPartAction createRepaired(IPartWork partWork) {

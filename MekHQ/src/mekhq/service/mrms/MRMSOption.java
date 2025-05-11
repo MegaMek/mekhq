@@ -109,16 +109,44 @@ public class MRMSOption {
         return targetNumberPreferred;
     }
 
+    /**
+     * @deprecated consider {@link #getTargetNumberPreferred()}
+     */
+    public int getBthMin() {
+        return this.getTargetNumberPreferred();
+    }
+
     public void setTargetNumberPreferred(int targetNumberPreferred) {
         this.targetNumberPreferred = targetNumberPreferred;
+    }
+
+    /**
+     * @deprecated consider {@link #setTargetNumberPreferred(int)}
+     */
+    public void setBthMin(int bthMin) {
+        this.setTargetNumberPreferred(bthMin);
     }
 
     public int getTargetNumberMax() {
         return targetNumberMax;
     }
 
+    /**
+     * @deprecated consider {@link #getTargetNumberMax()}
+     */
+    public int getBthMax() {
+        return this.getTargetNumberMax();
+    }
+
     public void setTargetNumberMax(int targetNumberMax) {
         this.targetNumberMax = targetNumberMax;
+    }
+
+    /**
+     * @deprecated consider {@link #setTargetNumberMax(int)}
+     */
+    public void setBthMax(int bthMax) {
+        this.setTargetNumberMax(bthMax);
     }
 
     public int getDailyTimeMin() {
