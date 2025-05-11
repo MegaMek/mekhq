@@ -33,6 +33,7 @@
 package mekhq.gui.campaignOptions.contents;
 
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 
 import java.awt.Component;
@@ -80,6 +81,7 @@ public class TurnoverAndRetentionTab {
     private final CampaignOptions campaignOptions;
 
     //start Turnover Tab
+    private JPanel turnoverHeader;
     private JCheckBox chkUseRandomRetirement;
 
     private JPanel pnlSettings;
@@ -143,6 +145,7 @@ public class TurnoverAndRetentionTab {
     //end Turnover Tab
 
     //start Fatigue Tab
+    private JPanel fatigueHeader;
     private JCheckBox chkUseFatigue;
     private JLabel lblFatigueRate;
     private JSpinner spnFatigueRate;
@@ -271,29 +274,39 @@ public class TurnoverAndRetentionTab {
      */
     public JPanel createFatigueTab() {
         // Header
-        JPanel headerPanel = new CampaignOptionsHeaderPanel("FatigueTab",
+        fatigueHeader = new CampaignOptionsHeaderPanel("FatigueTab",
               getImageDirectory() + "logo_clan_mongoose.png",
               true,
               true);
 
         // Contents
         chkUseFatigue = new CampaignOptionsCheckBox("UseFatigue");
+        chkUseFatigue.addMouseListener(createTipPanelUpdater(fatigueHeader, "UseFatigue"));
 
         lblFatigueRate = new CampaignOptionsLabel("FatigueRate");
+        lblFatigueRate.addMouseListener(createTipPanelUpdater(fatigueHeader, "FatigueRate"));
         spnFatigueRate = new CampaignOptionsSpinner("FatigueRate",
             1, 1, 10, 1);
+        spnFatigueRate.addMouseListener(createTipPanelUpdater(fatigueHeader, "FatigueRate"));
 
         chkUseInjuryFatigue = new CampaignOptionsCheckBox("UseInjuryFatigue");
+        chkUseInjuryFatigue.addMouseListener(createTipPanelUpdater(fatigueHeader, "UseInjuryFatigue"));
 
         lblFieldKitchenCapacity = new CampaignOptionsLabel("FieldKitchenCapacity");
+        lblFieldKitchenCapacity.addMouseListener(createTipPanelUpdater(fatigueHeader, "FieldKitchenCapacity"));
         spnFieldKitchenCapacity = new CampaignOptionsSpinner("FieldKitchenCapacity",
             150, 0, 450, 1);
+        spnFieldKitchenCapacity.addMouseListener(createTipPanelUpdater(fatigueHeader, "FieldKitchenCapacity"));
 
         chkFieldKitchenIgnoreNonCombatants = new CampaignOptionsCheckBox("FieldKitchenIgnoreNonCombatants");
+        chkFieldKitchenIgnoreNonCombatants.addMouseListener(createTipPanelUpdater(fatigueHeader,
+              "FieldKitchenIgnoreNonCombatants"));
 
         lblFatigueLeaveThreshold = new CampaignOptionsLabel("FatigueLeaveThreshold");
+        lblFatigueLeaveThreshold.addMouseListener(createTipPanelUpdater(fatigueHeader, "FatigueLeaveThreshold"));
         spnFatigueLeaveThreshold = new CampaignOptionsSpinner("FatigueLeaveThreshold",
             13, 0, 17, 1);
+        spnFatigueLeaveThreshold.addMouseListener(createTipPanelUpdater(fatigueHeader, "FatigueLeaveThreshold"));
 
         // Layout the Panels
         final JPanel panelLeft = new CampaignOptionsStandardPanel("FatigueTabLeft");
@@ -338,7 +351,7 @@ public class TurnoverAndRetentionTab {
         layoutParent.gridwidth = 5;
         layoutParent.gridx = 0;
         layoutParent.gridy = 0;
-        panelParent.add(headerPanel, layoutParent);
+        panelParent.add(fatigueHeader, layoutParent);
 
         layoutParent.gridwidth = 1;
         layoutParent.gridy++;
@@ -359,53 +372,43 @@ public class TurnoverAndRetentionTab {
      */
     public JPanel createTurnoverTab() {
         // Header
-        JPanel headerPanel = new CampaignOptionsHeaderPanel("TurnoverTab",
+        turnoverHeader = new CampaignOptionsHeaderPanel("TurnoverTab",
               getImageDirectory() + "logo_duchy_of_andurien.png",
               true,
               true);
 
         // Contents
         chkUseRandomRetirement = new CampaignOptionsCheckBox("UseRandomRetirement");
+        chkUseRandomRetirement.addMouseListener(createTipPanelUpdater(turnoverHeader, "UseRandomRetirement"));
         pnlSettings = createSettingsPanel();
         pnlModifiers = createModifiersPanel();
         pnlPayout = createPayoutsPanel();
         pnlUnitCohesion = createUnitCohesionPanel();
 
         // Layout the Panel
-        final JPanel panelTop = new CampaignOptionsStandardPanel("TurnoverTabTop");
-        final GridBagConstraints layoutTop = new CampaignOptionsGridBagConstraints(panelTop);
+        final JPanel panel = new CampaignOptionsStandardPanel("TurnoverTab", true);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layoutTop.gridwidth = 1;
-        layoutTop.gridx = 0;
-        layoutTop.gridy = 0;
-        panelTop.add(chkUseRandomRetirement, layoutTop);
+        layout.gridwidth = 5;
+        layout.gridx = 0;
+        layout.gridy = 0;
+        panel.add(turnoverHeader, layout);
 
-        layoutTop.gridy++;
-        panelTop.add(pnlSettings, layoutTop);
-        layoutTop.gridx++;
-        panelTop.add(pnlModifiers, layoutTop);
-        layoutTop.gridx++;
-        panelTop.add(pnlPayout, layoutTop);
+        layout.gridy++;
+        layout.gridwidth = 1;
+        panel.add(chkUseRandomRetirement, layout);
 
-        // Layout the Panel
-        final JPanel panelParent = new CampaignOptionsStandardPanel("TurnoverTab", true);
-        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panelParent);
-
-        layoutParent.gridwidth = 5;
-        layoutParent.gridx = 0;
-        layoutParent.gridy = 0;
-        panelParent.add(headerPanel, layoutParent);
-
-        layoutParent.gridy++;
-        layoutParent.gridwidth = 1;
-        panelParent.add(panelTop, layoutParent);
-
-        layoutParent.gridy++;
-        panelParent.add(pnlUnitCohesion, layoutParent);
-
+        layout.gridy++;
+        panel.add(pnlSettings, layout);
+        layout.gridx++;
+        panel.add(pnlModifiers, layout);
+        layout.gridx++;
+        panel.add(pnlPayout, layout);
+        layout.gridx++;
+        panel.add(pnlUnitCohesion, layout);
 
         // Create Parent Panel and return
-        return createParentPanel(panelParent, "TurnoverTab");
+        return createParentPanel(panel, "TurnoverTab");
     }
 
     /**
@@ -417,10 +420,15 @@ public class TurnoverAndRetentionTab {
     private JPanel createSettingsPanel() {
         // Contents
         lblTurnoverFixedTargetNumber = new CampaignOptionsLabel("TurnoverFixedTargetNumber");
+        lblTurnoverFixedTargetNumber.addMouseListener(createTipPanelUpdater(turnoverHeader,
+              "TurnoverFixedTargetNumber"));
         spnTurnoverFixedTargetNumber = new CampaignOptionsSpinner("TurnoverFixedTargetNumber",
             3, 0, 10, 1);
+        spnTurnoverFixedTargetNumber.addMouseListener(createTipPanelUpdater(turnoverHeader,
+              "TurnoverFixedTargetNumber"));
 
         lblTurnoverFrequency = new CampaignOptionsLabel("TurnoverFrequency");
+        lblTurnoverFrequency.addMouseListener(createTipPanelUpdater(turnoverHeader, "TurnoverFrequency"));
         comboTurnoverFrequency.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
@@ -429,35 +437,52 @@ public class TurnoverAndRetentionTab {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof TurnoverFrequency) {
                     list.setToolTipText(((TurnoverFrequency) value).getToolTipText());
+                    list.addMouseListener(createTipPanelUpdater(turnoverHeader,
+                          null,
+                          ((TurnoverFrequency) value).getToolTipText()));
                 }
                 return this;
             }
         });
+        comboTurnoverFrequency.addMouseListener(createTipPanelUpdater(turnoverHeader, "TurnoverFrequency"));
 
         chkUseContractCompletionRandomRetirement = new CampaignOptionsCheckBox(
             "UseContractCompletionRandomRetirement");
+        chkUseContractCompletionRandomRetirement.addMouseListener(createTipPanelUpdater(turnoverHeader,
+              "UseContractCompletionRandomRetirement"));
 
         chkUseRandomFounderTurnover = new CampaignOptionsCheckBox("UseRandomFounderTurnover");
+        chkUseRandomFounderTurnover.addMouseListener(createTipPanelUpdater(turnoverHeader, "UseRandomFounderTurnover"));
 
         chkTrackOriginalUnit = new CampaignOptionsCheckBox("TrackOriginalUnit");
+        chkTrackOriginalUnit.addMouseListener(createTipPanelUpdater(turnoverHeader, "TrackOriginalUnit"));
 
         chkAeroRecruitsHaveUnits = new CampaignOptionsCheckBox("AeroRecruitsHaveUnits");
+        chkAeroRecruitsHaveUnits.addMouseListener(createTipPanelUpdater(turnoverHeader, "AeroRecruitsHaveUnits"));
 
         chkUseSubContractSoldiers = new CampaignOptionsCheckBox("UseSubContractSoldiers");
+        chkUseSubContractSoldiers.addMouseListener(createTipPanelUpdater(turnoverHeader, "UseSubContractSoldiers"));
 
         lblServiceContractDuration = new CampaignOptionsLabel("ServiceContractDuration");
+        lblServiceContractDuration.addMouseListener(createTipPanelUpdater(turnoverHeader, "ServiceContractDuration"));
         spnServiceContractDuration = new CampaignOptionsSpinner("ServiceContractDuration",
             36, 0, 120, 1);
+        spnServiceContractDuration.addMouseListener(createTipPanelUpdater(turnoverHeader, "ServiceContractDuration"));
 
         lblServiceContractModifier = new CampaignOptionsLabel("ServiceContractModifier");
+        lblServiceContractModifier.addMouseListener(createTipPanelUpdater(turnoverHeader, "ServiceContractModifier"));
         spnServiceContractModifier = new CampaignOptionsSpinner("ServiceContractModifier",
             3, 0, 10, 1);
+        spnServiceContractModifier.addMouseListener(createTipPanelUpdater(turnoverHeader, "ServiceContractModifier"));
 
         chkPayBonusDefault = new CampaignOptionsCheckBox("PayBonusDefault");
+        chkPayBonusDefault.addMouseListener(createTipPanelUpdater(turnoverHeader, "PayBonusDefault"));
 
         lblPayBonusDefaultThreshold = new CampaignOptionsLabel("PayBonusDefaultThreshold");
+        lblPayBonusDefaultThreshold.addMouseListener(createTipPanelUpdater(turnoverHeader, "PayBonusDefaultThreshold"));
         spnPayBonusDefaultThreshold = new CampaignOptionsSpinner("PayBonusDefaultThreshold",
             3, 0, 12, 1);
+        spnPayBonusDefaultThreshold.addMouseListener(createTipPanelUpdater(turnoverHeader, "PayBonusDefaultThreshold"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("SettingsPanel", true,
@@ -531,16 +556,30 @@ public class TurnoverAndRetentionTab {
     private JPanel createModifiersPanel() {
         // Contents
         chkUseCustomRetirementModifiers = new CampaignOptionsCheckBox("UseCustomRetirementModifiers");
+        chkUseCustomRetirementModifiers.addMouseListener(createTipPanelUpdater(turnoverHeader,
+              "UseCustomRetirementModifiers"));
         chkUseFatigueModifiers = new CampaignOptionsCheckBox("UseFatigueModifiers");
+        chkUseFatigueModifiers.addMouseListener(createTipPanelUpdater(turnoverHeader, "UseFatigueModifiers"));
         chkUseSkillModifiers = new CampaignOptionsCheckBox("UseSkillModifiers");
+        chkUseSkillModifiers.addMouseListener(createTipPanelUpdater(turnoverHeader, "UseSkillModifiers"));
         chkUseAgeModifiers = new CampaignOptionsCheckBox("UseAgeModifiers");
+        chkUseAgeModifiers.addMouseListener(createTipPanelUpdater(turnoverHeader, "UseAgeModifiers"));
         chkUseUnitRatingModifiers = new CampaignOptionsCheckBox("UseUnitRatingModifiers");
+        chkUseUnitRatingModifiers.addMouseListener(createTipPanelUpdater(turnoverHeader, "UseUnitRatingModifiers"));
         chkUseFactionModifiers = new CampaignOptionsCheckBox("UseFactionModifiers");
+        chkUseFactionModifiers.addMouseListener(createTipPanelUpdater(turnoverHeader, "UseFactionModifiers"));
         chkUseMissionStatusModifiers = new CampaignOptionsCheckBox("UseMissionStatusModifiers");
+        chkUseMissionStatusModifiers.addMouseListener(createTipPanelUpdater(turnoverHeader,
+              "UseMissionStatusModifiers"));
         chkUseHostileTerritoryModifiers = new CampaignOptionsCheckBox("UseHostileTerritoryModifiers");
+        chkUseHostileTerritoryModifiers.addMouseListener(createTipPanelUpdater(turnoverHeader,
+              "UseHostileTerritoryModifiers"));
         chkUseFamilyModifiers = new CampaignOptionsCheckBox("UseFamilyModifiers");
+        chkUseFamilyModifiers.addMouseListener(createTipPanelUpdater(turnoverHeader, "UseFamilyModifiers"));
         chkUseLoyaltyModifiers = new CampaignOptionsCheckBox("UseLoyaltyModifiers");
+        chkUseLoyaltyModifiers.addMouseListener(createTipPanelUpdater(turnoverHeader, "UseLoyaltyModifiers"));
         chkUseHideLoyalty = new CampaignOptionsCheckBox("UseHideLoyalty");
+        chkUseHideLoyalty.addMouseListener(createTipPanelUpdater(turnoverHeader, "UseHideLoyalty"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("TurnoverModifiersPanel", true,
@@ -594,22 +633,33 @@ public class TurnoverAndRetentionTab {
     private JPanel createPayoutsPanel() {
         // Contents
         lblPayoutRateOfficer = new CampaignOptionsLabel("PayoutRateOfficer");
+        lblPayoutRateOfficer.addMouseListener(createTipPanelUpdater(turnoverHeader, "PayoutRateOfficer"));
         spnPayoutRateOfficer = new CampaignOptionsSpinner("PayoutRateOfficer",
             3, 0, 12, 1);
+        spnPayoutRateOfficer.addMouseListener(createTipPanelUpdater(turnoverHeader, "PayoutRateOfficer"));
 
         lblPayoutRateEnlisted = new CampaignOptionsLabel("PayoutRateEnlisted");
+        lblPayoutRateEnlisted.addMouseListener(createTipPanelUpdater(turnoverHeader, "PayoutRateEnlisted"));
         spnPayoutRateEnlisted = new CampaignOptionsSpinner("PayoutRateEnlisted",
             3, 0, 12, 1);
+        spnPayoutRateEnlisted.addMouseListener(createTipPanelUpdater(turnoverHeader, "PayoutRateEnlisted"));
 
         lblPayoutRetirementMultiplier = new CampaignOptionsLabel("PayoutRetirementMultiplier");
+        lblPayoutRetirementMultiplier.addMouseListener(createTipPanelUpdater(turnoverHeader,
+              "PayoutRetirementMultiplier"));
         spnPayoutRetirementMultiplier = new CampaignOptionsSpinner("PayoutRetirementMultiplier",
             24, 1, 120, 1);
+        spnPayoutRetirementMultiplier.addMouseListener(createTipPanelUpdater(turnoverHeader,
+              "PayoutRetirementMultiplier"));
 
         chkUsePayoutServiceBonus = new CampaignOptionsCheckBox("UsePayoutServiceBonus");
+        chkUsePayoutServiceBonus.addMouseListener(createTipPanelUpdater(turnoverHeader, "UsePayoutServiceBonus"));
 
         lblPayoutServiceBonusRate = new CampaignOptionsLabel("PayoutServiceBonusRate");
+        lblPayoutServiceBonusRate.addMouseListener(createTipPanelUpdater(turnoverHeader, "PayoutServiceBonusRate"));
         spnPayoutServiceBonusRate = new CampaignOptionsSpinner("PayoutServiceBonusRate",
             10, 1, 100, 1);
+        spnPayoutServiceBonusRate.addMouseListener(createTipPanelUpdater(turnoverHeader, "PayoutServiceBonusRate"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PayoutsPanel", true,
@@ -670,7 +720,8 @@ public class TurnoverAndRetentionTab {
         layout.gridx = 0;
         layout.gridwidth = 1;
         panel.add(pnlAdministrativeStrainWrapper, layout);
-        layout.gridx++;
+
+        layout.gridy++;
         panel.add(pnlManagementSkillWrapper, layout);
 
         return panel;
@@ -685,6 +736,7 @@ public class TurnoverAndRetentionTab {
     private JPanel createAdministrativeStrainWrapperPanel() {
         // Contents
         chkUseAdministrativeStrain = new CampaignOptionsCheckBox("UseAdministrativeStrain");
+        chkUseAdministrativeStrain.addMouseListener(createTipPanelUpdater(turnoverHeader, "UseAdministrativeStrain"));
         pnlAdministrativeStrain = createAdministrativeStrainPanel();
 
         // Layout the Panel
@@ -711,8 +763,10 @@ public class TurnoverAndRetentionTab {
     private JPanel createAdministrativeStrainPanel() {
         // Contents
         lblAdministrativeCapacity = new CampaignOptionsLabel("AdministrativeCapacity");
+        lblAdministrativeCapacity.addMouseListener(createTipPanelUpdater(turnoverHeader, "AdministrativeCapacity"));
         spnAdministrativeCapacity = new CampaignOptionsSpinner("AdministrativeCapacity",
             10, 1, 30, 1);
+        spnAdministrativeCapacity.addMouseListener(createTipPanelUpdater(turnoverHeader, "AdministrativeCapacity"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("AdministrativeStrain", true,
@@ -738,6 +792,7 @@ public class TurnoverAndRetentionTab {
     private JPanel createManagementSkillWrapperPanel() {
         // Contents
         chkUseManagementSkill = new CampaignOptionsCheckBox("UseManagementSkill");
+        chkUseManagementSkill.addMouseListener(createTipPanelUpdater(turnoverHeader, "UseManagementSkill"));
         pnlManagementSkill = createManagementSkillPanel();
 
         // Layout the Panel
@@ -765,10 +820,14 @@ public class TurnoverAndRetentionTab {
     private JPanel createManagementSkillPanel() {
         // Contents
         chkUseCommanderLeadershipOnly = new CampaignOptionsCheckBox("UseCommanderLeadershipOnly");
+        chkUseCommanderLeadershipOnly.addMouseListener(createTipPanelUpdater(turnoverHeader,
+              "UseCommanderLeadershipOnly"));
 
         lblManagementSkillPenalty = new CampaignOptionsLabel("ManagementSkillPenalty");
+        lblManagementSkillPenalty.addMouseListener(createTipPanelUpdater(turnoverHeader, "ManagementSkillPenalty"));
         spnManagementSkillPenalty = new CampaignOptionsSpinner("ManagementSkillPenalty",
             0, -10, 10, 1);
+        spnManagementSkillPenalty.addMouseListener(createTipPanelUpdater(turnoverHeader, "ManagementSkillPenalty"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("ManagementSkill", true,
