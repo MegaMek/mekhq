@@ -172,27 +172,31 @@ public class SkillsTab {
      */
     public JPanel createSkillsTab(SkillSubType category) {
         // Header
-        JPanel headerPanel = new JPanel();
+        CampaignOptionsHeaderPanel headerPanel;
         String panelName = "";
         switch (category) {
             case COMBAT_GUNNERY -> {
                 headerPanel = new CampaignOptionsHeaderPanel("GunnerySkillsTab",
-                      getImageDirectory() + "logo_clan_diamond_sharks.png");
+                      getImageDirectory() + "logo_clan_diamond_sharks.png",
+                      5);
                 panelName = "GunnerySkillsTab";
             }
             case COMBAT_PILOTING -> {
                 headerPanel = new CampaignOptionsHeaderPanel("PilotingSkillsTab",
-                      getImageDirectory() + "logo_capellan_confederation.png");
+                      getImageDirectory() + "logo_capellan_confederation.png",
+                      5);
                 panelName = "PilotingSkillsTab";
             }
             case SUPPORT -> {
                 headerPanel = new CampaignOptionsHeaderPanel("SupportSkillsTab",
-                      getImageDirectory() + "logo_clan_goliath_scorpion.png");
+                      getImageDirectory() + "logo_clan_goliath_scorpion.png",
+                      5);
                 panelName = "SupportSkillsTab";
             }
-            case ROLEPLAY_GENERAL -> {
+            default -> { // ROLEPLAY
                 headerPanel = new CampaignOptionsHeaderPanel("RoleplaySkillsTab",
-                      getImageDirectory() + "logo_clan_jade_falcon.png");
+                      getImageDirectory() + "logo_clan_jade_falcon.png",
+                      5);
                 panelName = "RoleplaySkillsTab";
             }
         }

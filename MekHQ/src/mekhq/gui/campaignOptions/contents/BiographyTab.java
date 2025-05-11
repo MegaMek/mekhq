@@ -99,7 +99,7 @@ public class BiographyTab {
     private RandomOriginOptions randomOriginOptions;
 
     //start General Tab
-    private JPanel generalHeader;
+    private CampaignOptionsHeaderPanel generalHeader;
     private JCheckBox chkUseDylansRandomXP;
     private JLabel lblGender;
     private JSlider sldGender;
@@ -120,7 +120,7 @@ public class BiographyTab {
     //end General Tab
 
     //start Backgrounds Tab
-    private JPanel backgroundHeader;
+    private CampaignOptionsHeaderPanel backgroundHeader;
     private JPanel pnlRandomBackgrounds;
     private JCheckBox chkUseRandomPersonalities;
     private JCheckBox chkUseRandomPersonalityReputation;
@@ -144,7 +144,7 @@ public class BiographyTab {
     //end Backgrounds Tab
 
     //start Death Tab
-    private JPanel deathHeader;
+    private CampaignOptionsHeaderPanel deathHeader;
     private JCheckBox chkUseRandomDeathSuicideCause;
     private JLabel lblRandomDeathMultiplier;
     private JSpinner spnRandomDeathMultiplier;
@@ -154,7 +154,7 @@ public class BiographyTab {
     //end Death Tab
 
     //start Education Tab
-    private JPanel educationHeader;
+    private CampaignOptionsHeaderPanel educationHeader;
     private JCheckBox chkUseEducationModule;
     private JLabel lblCurriculumXpRate;
     private JSpinner spnCurriculumXpRate;
@@ -193,7 +193,7 @@ public class BiographyTab {
     private JLabel lblFactionNames;
     private MMComboBox<String> comboFactionNames;
 
-    private JPanel nameAndPortraitGenerationHeader;
+    private CampaignOptionsHeaderPanel nameAndPortraitGenerationHeader;
     private JPanel pnlRandomPortrait;
     private JCheckBox[] chkUsePortrait;
     private JButton btnEnableAllPortraits;
@@ -415,7 +415,8 @@ public class BiographyTab {
     public JPanel createGeneralTab() {
         // Header
         generalHeader = new CampaignOptionsHeaderPanel("BiographyGeneralTab",
-              getImageDirectory() + "logo_clan_blood_spirit.png");
+              getImageDirectory() + "logo_clan_blood_spirit.png",
+              7);
 
         // Contents
         chkUseDylansRandomXP = new CampaignOptionsCheckBox("UseDylansRandomXP");
@@ -582,7 +583,8 @@ public class BiographyTab {
     public JPanel createBackgroundsTab() {
         // Header
         backgroundHeader = new CampaignOptionsHeaderPanel("BackgroundsTab",
-              getImageDirectory() + "logo_nueva_castile.png");
+              getImageDirectory() + "logo_nueva_castile.png",
+              5);
 
         // Contents
         pnlRandomOriginOptions = createRandomOriginOptionsPanel();
@@ -896,7 +898,8 @@ public class BiographyTab {
     public JPanel createDeathTab() {
         // Header
         deathHeader = new CampaignOptionsHeaderPanel("DeathTab",
-              getImageDirectory() + "logo_clan_fire_mandrills.png");
+              getImageDirectory() + "logo_clan_fire_mandrills.png",
+              5);
 
         // Contents
         lblRandomDeathMultiplier = new CampaignOptionsLabel("RandomDeathMultiplier");
@@ -989,7 +992,8 @@ public class BiographyTab {
     public JPanel createEducationTab() {
         // Header
         educationHeader = new CampaignOptionsHeaderPanel("EducationTab",
-              getImageDirectory() + "logo_taurian_concordat.png");
+              getImageDirectory() + "logo_taurian_concordat.png",
+              4);
 
         // Contents
         chkUseEducationModule = new CampaignOptionsCheckBox("UseEducationModule");
@@ -1287,7 +1291,8 @@ public class BiographyTab {
     public JPanel createNameAndPortraitGenerationTab() {
         // Header
         nameAndPortraitGenerationHeader = new CampaignOptionsHeaderPanel("NameAndPortraitGenerationTab",
-              getImageDirectory() + "logo_clan_nova_cat.png");
+              getImageDirectory() + "logo_clan_nova_cat.png",
+              2);
 
         // Contents
         chkAssignPortraitOnRoleChange = new CampaignOptionsCheckBox("AssignPortraitOnRoleChange");
@@ -1418,9 +1423,8 @@ public class BiographyTab {
      */
     public JPanel createRankTab() {
         // Header
-        JPanel headerPanel = new CampaignOptionsHeaderPanel("RankTab",
-              getImageDirectory() + "logo_umayyad_caliphate.png",
-              true, false);
+        CampaignOptionsHeaderPanel headerPanel = new CampaignOptionsHeaderPanel("RankTab",
+              getImageDirectory() + "logo_umayyad_caliphate.png", true, false, 0);
 
         // Contents
         Component rankSystemsViewport = rankSystemsPane.getViewport().getView();

@@ -186,8 +186,9 @@ public class RepairAndMaintenanceTab {
      */
     public JPanel createRepairTab() {
         // Header
-        JPanel headerPanel = new CampaignOptionsHeaderPanel("RepairTab",
-            getImageDirectory() + "logo_clan_burrock.png");
+        CampaignOptionsHeaderPanel headerPanel = new CampaignOptionsHeaderPanel("RepairTab",
+              getImageDirectory() + "logo_clan_burrock.png",
+              5);
 
         chkTechsUseAdministration = new CampaignOptionsCheckBox("TechsUseAdministration");
 
@@ -286,8 +287,9 @@ public class RepairAndMaintenanceTab {
      */
     public JPanel createMaintenanceTab() {
         // Header
-        JPanel headerPanel = new CampaignOptionsHeaderPanel("MaintenanceTab",
-            getImageDirectory() + "logo_magistracy_of_canopus.png");
+        CampaignOptionsHeaderPanel headerPanel = new CampaignOptionsHeaderPanel("MaintenanceTab",
+              getImageDirectory() + "logo_magistracy_of_canopus.png",
+              5);
 
         // Contents
         checkMaintenance = new CampaignOptionsCheckBox("CheckMaintenance");

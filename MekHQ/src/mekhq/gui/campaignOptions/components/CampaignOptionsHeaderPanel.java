@@ -58,45 +58,68 @@ import megamek.client.ui.swing.util.UIUtil;
 public class CampaignOptionsHeaderPanel extends JPanel {
     private static final String TIP_PANEL_NAME = "TipPanel";
 
+    private int tipPanelHeight = 0;
+
+    public int getTipPanelHeight() {
+        return tipPanelHeight;
+    }
+
     public static String getTipPanelName() {
         return TIP_PANEL_NAME;
     }
 
-    /**
-     * Constructs a new instance of {@link CampaignOptionsHeaderPanel} with a header label and an image.
-     * <p>
-     * The panel is named {@code "pnl" + name + "HeaderPanel"}. The header label's text is fetched from a resource
-     * bundle using {@code "lbl" + name + ".text"}. The image is loaded from the specified file path and scaled
-     * appropriately.
-     *
-     * @param name         the name of the header panel, used to construct the resource bundle keys
-     * @param imageAddress the file path of the image to be displayed in the panel
-     */
-    public CampaignOptionsHeaderPanel(String name, String imageAddress) {
-        this(name, imageAddress, false, true);
-    }
-
     @Deprecated(since = "0.50.06", forRemoval = true)
     public CampaignOptionsHeaderPanel(String name, String imageAddress, boolean includeBodyText) {
-        this(name, imageAddress, includeBodyText, false);
+        this(name, imageAddress, includeBodyText, false, 0);
     }
 
     /**
-     * Constructs a new instance of {@link CampaignOptionsHeaderPanel} with a header label, an image, and optionally a
-     * body label for descriptive text.
-     * <p>
-     * The panel is named {@code "pnl" + name + "HeaderPanel"}. The header label's text is fetched from a resource
-     * bundle using {@code "lbl" + name + ".text"}. If {@code includeBodyText} is {@code true}, an additional body label
-     * is created using the resource key {@code "lbl" + name + "Body.text"}. The image is loaded from the specified file
-     * path and scaled appropriately.
+     * Constructs a {@code CampaignOptionsHeaderPanel} that displays a header label and an image.
      *
-     * @param name            the name of the header panel, used to construct the resource bundle keys
-     * @param imageAddress    the file path of the image to be displayed in the panel
-     * @param includeBodyText if {@code true}, includes a body label below the image
-     * @param includeTipPanel if {@code true}, includes a tip label below the body text
+     * <p>The panel is named {@code "pnl" + name + "HeaderPanel"}. The header label's text is fetched from a resource
+     * bundle using {@code "lbl" + name + ".text"}. The image is loaded from the specified file path and scaled
+     * appropriately.</p>
+     *
+     * @param name         a unique identifier used to fetch resource bundle entries and to form the panel's name
+     * @param imageAddress the path to the image file displayed in the panel
+     */
+    public CampaignOptionsHeaderPanel(String name, String imageAddress) {
+        this(name, imageAddress, false, false, 0);
+    }
+
+    /**
+     * Constructs a {@code CampaignOptionsHeaderPanel} that displays a header label and an image.
+     *
+     * <p>The panel is named {@code "pnl" + name + "HeaderPanel"}. The header label's text is fetched from a resource
+     * bundle using {@code "lbl" + name + ".text"}. The image is loaded from the specified file path and scaled
+     * appropriately.</p>
+     *
+     * @param name           a unique identifier used to fetch resource bundle entries and to form the panel's name
+     * @param imageAddress   the path to the image file displayed in the panel
+     * @param tipPanelHeight the number of empty line breaks to reserve vertical space for the tip panel area
+     */
+    public CampaignOptionsHeaderPanel(String name, String imageAddress, int tipPanelHeight) {
+        this(name, imageAddress, false, true, tipPanelHeight);
+    }
+
+    /**
+     * Constructs a {@code CampaignOptionsHeaderPanel} that displays a header label, an image, and optionally includes
+     * additional descriptive body text and/or a tip panel.
+     *
+     * <p>The panel is named {@code "pnl" + name + "HeaderPanel"}. The header label's text is fetched from a resource
+     * bundle using {@code "lbl" + name + ".text"}. The image is loaded from the specified file path and scaled
+     * appropriately.</p>
+     *
+     * @param name             a unique identifier used for resource bundle lookups and to form the panel's name
+     * @param imageAddress     the path to the image file to display at the top of the panel
+     * @param includeBodyText  if true, includes a body label beneath the image with descriptive text
+     * @param includeTipPanel  if true, displays a tip panel beneath the body text (or image if body text is excluded)
+     * @param tipPanelHeight   the number of empty line breaks to reserve vertical space for the tip panel area
      */
     public CampaignOptionsHeaderPanel(String name, String imageAddress, boolean includeBodyText,
-          boolean includeTipPanel) {
+          boolean includeTipPanel, int tipPanelHeight) {
+        this.tipPanelHeight = tipPanelHeight;
+
         // Load and scale the image using the provided file path
         ImageIcon imageIcon = new ImageIcon(imageAddress);
         imageIcon = scaleImageIcon(imageIcon, 100, true);
@@ -111,7 +134,7 @@ public class CampaignOptionsHeaderPanel extends JPanel {
         lblHeader.setName("lbl" + name);
         setFontScaling(lblHeader, true, 2);
 
-        // Optionally create a body label with additional text, if includeBodyText is true
+        // Optionally create a body label with additional text if includeBodyText is true
         JLabel lblBody = new JLabel();
         if (includeBodyText) {
             lblBody = new JLabel(String.format("<html><div style='width: %s'>%s</div></html>",
@@ -123,8 +146,14 @@ public class CampaignOptionsHeaderPanel extends JPanel {
 
         JLabel lblTip = new JLabel();
         if (includeTipPanel) {
+            // This stops the tip panel from bouncing around too much as new options are selected
+            StringBuilder lineBreaks = new StringBuilder();
+            for (int lineBreak = 0; lineBreak < tipPanelHeight; lineBreak++) {
+                lineBreaks.append("<br>");
+            }
+
             lblTip.setName("lbl" + name + TIP_PANEL_NAME);
-            lblTip.setText("<html><br><br><br><br><br></html>"); // This is necessary for the text updater
+            lblTip.setText("<html>" + lineBreaks + "</html>");
         }
 
         // Initialize the panel's layout using a GridBagLayout

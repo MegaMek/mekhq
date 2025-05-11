@@ -32,6 +32,7 @@
  */
 package mekhq.gui.campaignOptions;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel.getTipPanelName;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
@@ -56,6 +57,8 @@ import javax.swing.JTabbedPane;
 
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
+import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 
 /**
@@ -80,8 +83,9 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
  * </ul>
  */
 public class CampaignOptionsUtilities {
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignOptionsDialog";
+    private static final MMLogger logger = MMLogger.create(CampaignOptionsUtilities.class);
 
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignOptionsDialog";
     final static String IMAGE_DIRECTORY = "data/images/universe/factions/";
 
     public static String getCampaignOptionsResourceBundle() {
@@ -241,6 +245,11 @@ public class CampaignOptionsUtilities {
         return customWrapSize == null ? 100 : customWrapSize;
     }
 
+    public static MouseAdapter createTipPanelUpdater(CampaignOptionsHeaderPanel associatedHeaderPanel,
+          @Nullable String sourceComponentBaseName) {
+        return createTipPanelUpdater(associatedHeaderPanel, sourceComponentBaseName, null);
+    }
+
     /**
      * Creates a {@link MouseAdapter} that updates the text of a {@link JLabel} within the specified panel to display a
      * tip string when the mouse enters a related component.
@@ -252,41 +261,61 @@ public class CampaignOptionsUtilities {
      * {@link JLabel} within the provided panel, specifically targeting labels whose name matches the required pattern.
      * </p>
      *
-     * @param sourcePanel         the {@link JPanel} containing the label to update
-     * @param sourceComponentName the name of the component whose tip string will be shown in the label
+     * @param associatedHeaderPanel         the {@link JPanel} containing the label to update
+     * @param sourceComponentBaseName the name of the component whose tip string will be shown in the label
      *
      * @return a {@link MouseAdapter} instance that updates the label with formatted tip text on mouse enter
      *
      * @author Illiani
      * @since 0.50.06
      */
-    public static MouseAdapter createTipPanelUpdater(JPanel sourcePanel, String sourceComponentName) {
+    public static MouseAdapter createTipPanelUpdater(CampaignOptionsHeaderPanel associatedHeaderPanel,
+          @Nullable String sourceComponentBaseName, @Nullable String replacementText) {
         return new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent mouseEvent) {
-                String tipText = getTextAt(RESOURCE_BUNDLE, "lbl" + sourceComponentName + ".tip");
+                String tipText = replacementText;
+                if (replacementText == null) {
+                    tipText = getTextAt(RESOURCE_BUNDLE, "lbl" + sourceComponentBaseName + ".tooltip");
+                }
 
                 if (tipText.isBlank() || !isResourceKeyValid(tipText)) {
                     return;
                 }
 
-                // These linebreaks are to ensure we have a relatively consistent number of lines. This stops the
+                // This might seem really weird, and it is, but the wordWrap method uses '<br>' to create its new
+                // lines. This allows us to more easily account for line width when counting instances of '<br>' in
+                // the section below.
+                tipText = wordWrap(tipText, 75);
+
+                // We have to remove the closing tag so that the extra '<br>' we're adding can be factored into the
+                // display
+                tipText = tipText.replace("</html>", "");
+
+                // These extra linebreaks are to ensure we have a relatively consistent number of lines. This stops the
                 // options from 'bouncing' around too much as the tip resizes.
-                int missingLines = 5 - tipLineCounter(tipText);
+                int panelLineCount = associatedHeaderPanel.getTipPanelHeight();
+                int missingLines = panelLineCount - tipLineCounter(tipText);
                 if (missingLines > 0) {
                     for (int missingLine = 0; missingLine < missingLines; missingLine++) {
                         tipText += "<br>";
                     }
+                } else if (missingLines < 0) {
+                    logger.warn("Tip panel for {} exceeds the maximum number of lines ({}). Line count should be " +
+                                      "increased by {}",
+                          associatedHeaderPanel.getName(),
+                          panelLineCount,
+                          Math.abs(missingLines));
                 }
 
-                for (Component component : sourcePanel.getComponents()) {
+                // That out of the way, let's add the closing tag back in
+                tipText += "</html>";
+
+                for (Component component : associatedHeaderPanel.getComponents()) {
                     if (component instanceof JLabel label) {
                         String labelName = label.getName();
                         if (labelName != null && labelName.contains(getTipPanelName())) {
-                            String formatedTip = String.format("<html><div style='width: %s'>%s</div></html>",
-                                  UIUtil.scaleForGUI(750),
-                                  tipText);
-                            label.setText(formatedTip);
+                            label.setText(tipText);
                         }
                     }
                 }

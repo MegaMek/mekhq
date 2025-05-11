@@ -81,7 +81,7 @@ public class TurnoverAndRetentionTab {
     private final CampaignOptions campaignOptions;
 
     //start Turnover Tab
-    private JPanel turnoverHeader;
+    private CampaignOptionsHeaderPanel turnoverHeader;
     private JCheckBox chkUseRandomRetirement;
 
     private JPanel pnlSettings;
@@ -145,7 +145,7 @@ public class TurnoverAndRetentionTab {
     //end Turnover Tab
 
     //start Fatigue Tab
-    private JPanel fatigueHeader;
+    private CampaignOptionsHeaderPanel fatigueHeader;
     private JCheckBox chkUseFatigue;
     private JLabel lblFatigueRate;
     private JSpinner spnFatigueRate;
@@ -276,8 +276,7 @@ public class TurnoverAndRetentionTab {
         // Header
         fatigueHeader = new CampaignOptionsHeaderPanel("FatigueTab",
               getImageDirectory() + "logo_clan_mongoose.png",
-              true,
-              true);
+              true, true, 7);
 
         // Contents
         chkUseFatigue = new CampaignOptionsCheckBox("UseFatigue");
@@ -374,8 +373,7 @@ public class TurnoverAndRetentionTab {
         // Header
         turnoverHeader = new CampaignOptionsHeaderPanel("TurnoverTab",
               getImageDirectory() + "logo_duchy_of_andurien.png",
-              true,
-              true);
+              true, true, 4);
 
         // Contents
         chkUseRandomRetirement = new CampaignOptionsCheckBox("UseRandomRetirement");

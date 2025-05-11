@@ -76,7 +76,7 @@ public class RelationshipsTab {
     private final CampaignOptions campaignOptions;
 
     //start Marriage Tab
-    private JPanel marriageHeader;
+    private CampaignOptionsHeaderPanel marriageHeader;
     private JPanel pnlMarriageGeneralOptions;
     private JCheckBox chkUseManualMarriages;
     private JCheckBox chkUseClanPersonnelMarriages;
@@ -103,7 +103,7 @@ public class RelationshipsTab {
     //end Marriage Tab
 
     //start Divorce Tab
-    private JPanel divorceHeader;
+    private CampaignOptionsHeaderPanel divorceHeader;
     private JCheckBox chkUseManualDivorce;
     private JCheckBox chkUseClanPersonnelDivorce;
     private JCheckBox chkUsePrisonerDivorce;
@@ -136,7 +136,7 @@ public class RelationshipsTab {
     private JCheckBox chkUseMaternityLeave;
     private JCheckBox chkLogProcreation;
 
-    private JPanel procreationHeader;
+    private CampaignOptionsHeaderPanel procreationHeader;
     private JPanel pnlProcreationGeneralOptionsPanel;
     private JPanel pnlRandomProcreationPanel;
     private JLabel lblRandomProcreationMethod;
@@ -269,7 +269,8 @@ public class RelationshipsTab {
     public JPanel createMarriageTab() {
         // Header
         marriageHeader = new CampaignOptionsHeaderPanel("MarriageTab",
-            getImageDirectory() + "logo_morgrains_valkyrate.png");
+              getImageDirectory() + "logo_morgrains_valkyrate.png",
+              5);
 
         // Contents
         pnlMarriageGeneralOptions = createMarriageGeneralOptionsPanel();
@@ -480,7 +481,8 @@ public class RelationshipsTab {
     public JPanel createDivorceTab() {
         // Header
         divorceHeader = new CampaignOptionsHeaderPanel("DivorceTab",
-            getImageDirectory() + "logo_escorpion_imperio.png");
+              getImageDirectory() + "logo_escorpion_imperio.png",
+              5);
 
         // Contents
         chkUseManualDivorce = new CampaignOptionsCheckBox("UseManualDivorce");
@@ -611,7 +613,8 @@ public class RelationshipsTab {
     public JPanel createProcreationTab() {
         // Header
         procreationHeader = new CampaignOptionsHeaderPanel("ProcreationTab",
-            getImageDirectory() + "logo_hanseatic_league.png");
+              getImageDirectory() + "logo_hanseatic_league.png",
+              6);
 
         // Contents
         pnlProcreationGeneralOptionsPanel = createProcreationGeneralOptionsPanel();

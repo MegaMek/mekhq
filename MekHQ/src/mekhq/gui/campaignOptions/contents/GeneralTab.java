@@ -497,12 +497,20 @@ public class GeneralTab {
      */
     private JPanel createFurtherReadingPanel() {
         // Contents
-        JPanel headerPanelBMM = new CampaignOptionsHeaderPanel("BMMPanel", "", true, false);
+        CampaignOptionsHeaderPanel headerPanelBMM = new CampaignOptionsHeaderPanel("BMMPanel", "", true, false, 0);
 
-        JPanel headerPanelTotalWarfare = new CampaignOptionsHeaderPanel("TotalWarfarePanel", "", true, false);
+        CampaignOptionsHeaderPanel headerPanelTotalWarfare = new CampaignOptionsHeaderPanel("TotalWarfarePanel",
+              "",
+              true,
+              false,
+              0);
 
-        JPanel headerPanelCampaignOperations = new CampaignOptionsHeaderPanel("CampaignOperationsPanel", "", true,
-              false);
+        CampaignOptionsHeaderPanel headerPanelCampaignOperations = new CampaignOptionsHeaderPanel(
+              "CampaignOperationsPanel",
+              "",
+              true,
+              false,
+              0);
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("FurtherReadingPanel", true, "FurtherReadingPanel");

@@ -224,8 +224,9 @@ public class MarketsTab {
      */
     public JPanel createPersonnelMarketTab() {
         // Header
-        JPanel headerPanel = new CampaignOptionsHeaderPanel("PersonnelMarketTab",
-              getImageDirectory() + "logo_st_ives_compact.png");
+        CampaignOptionsHeaderPanel headerPanel = new CampaignOptionsHeaderPanel("PersonnelMarketTab",
+              getImageDirectory() + "logo_st_ives_compact.png",
+              5);
 
         // Contents
         pnlPersonnelMarketGeneralOptions = createPersonnelMarketGeneralOptionsPanel();
@@ -399,8 +400,9 @@ public class MarketsTab {
      */
     public JPanel createUnitMarketTab() {
         // Header
-        JPanel headerPanel = new CampaignOptionsHeaderPanel("UnitMarketTab",
-              getImageDirectory() + "logo_clan_ice_hellion.png");
+        CampaignOptionsHeaderPanel headerPanel = new CampaignOptionsHeaderPanel("UnitMarketTab",
+              getImageDirectory() + "logo_clan_ice_hellion.png",
+              5);
 
         // Contents
         lblUnitMarketMethod = new CampaignOptionsLabel("UnitMarketMethod");
@@ -515,8 +517,9 @@ public class MarketsTab {
      */
     public JPanel createContractMarketTab() {
         // Header
-        JPanel headerPanel = new CampaignOptionsHeaderPanel("ContractMarketTab",
-              getImageDirectory() + "logo_federated_suns.png");
+        CampaignOptionsHeaderPanel headerPanel = new CampaignOptionsHeaderPanel("ContractMarketTab",
+              getImageDirectory() + "logo_federated_suns.png",
+              5);
 
         // Contents
         pnlContractMarketGeneralOptions = createContractMarketGeneralOptionsPanel();

@@ -107,7 +107,7 @@ public class PersonnelTab {
     private final CampaignOptions campaignOptions;
 
     //start General Tab
-    private JPanel generalHeader;
+    private CampaignOptionsHeaderPanel generalHeader;
     private JPanel pnlPersonnelGeneralOptions;
     private JCheckBox chkUseTactics;
     private JCheckBox chkUseInitiativeBonus;
@@ -147,7 +147,7 @@ public class PersonnelTab {
     //end Personnel Logs Tab
 
     //start Personnel Information Tab
-    private JPanel personnelInformationHeader;
+    private CampaignOptionsHeaderPanel personnelInformationHeader;
     private JCheckBox chkUseTimeInService;
     private JLabel lblTimeInServiceDisplayFormat;
     private MMComboBox<TimeInDisplayFormat> comboTimeInServiceDisplayFormat;
@@ -160,7 +160,7 @@ public class PersonnelTab {
     //end Personnel Information Tab
 
     //start Awards Tab
-    private JPanel awardsHeader;
+    private CampaignOptionsHeaderPanel awardsHeader;
     private JPanel pnlAwardsGeneralOptions;
     private JLabel lblAwardBonusStyle;
     private MMComboBox<AwardBonus> comboAwardBonusStyle;
@@ -188,7 +188,7 @@ public class PersonnelTab {
     //end Awards Tab
 
     //start Medical Tab
-    private JPanel medicalHeader;
+    private CampaignOptionsHeaderPanel medicalHeader;
     private JCheckBox chkUseAdvancedMedical;
     private JLabel lblHealWaitingPeriod;
     private JSpinner spnHealWaitingPeriod;
@@ -204,7 +204,7 @@ public class PersonnelTab {
     //end Medical Tab
 
     //start Prisoners and Dependents Tab
-    private JPanel prisonersAndDependentsHeader;
+    private CampaignOptionsHeaderPanel prisonersAndDependentsHeader;
     private JPanel prisonerPanel;
     private JLabel lblPrisonerCaptureStyle;
     private MMComboBox<PrisonerCaptureStyle> comboPrisonerCaptureStyle;
@@ -216,7 +216,7 @@ public class PersonnelTab {
     //end Prisoners and Dependents Tab
 
     //start Salaries Tab
-    private JPanel salariesHeader;
+    private CampaignOptionsHeaderPanel salariesHeader;
     private JCheckBox chkDisableSecondaryRoleSalary;
 
     private JPanel pnlSalaryMultipliersPanel;
@@ -448,7 +448,8 @@ public class PersonnelTab {
     public JPanel createGeneralTab() {
         // Header
         generalHeader = new CampaignOptionsHeaderPanel("PersonnelGeneralTab",
-              getImageDirectory() + "logo_clan_wolverine.png");
+              getImageDirectory() + "logo_clan_wolverine.png",
+              5);
 
         // Contents
         pnlPersonnelGeneralOptions = createGeneralOptionsPanel();
@@ -643,7 +644,8 @@ public class PersonnelTab {
     public JPanel createAwardsTab() {
         // Header
         awardsHeader = new CampaignOptionsHeaderPanel("AwardsTab",
-              getImageDirectory() + "logo_outworld_alliance.png");
+              getImageDirectory() + "logo_outworld_alliance.png",
+              5);
 
         // Contents
         pnlAwardsGeneralOptions = createAwardsGeneralOptionsPanel();
@@ -856,7 +858,8 @@ public class PersonnelTab {
     public JPanel createMedicalTab() {
         // Header
         medicalHeader = new CampaignOptionsHeaderPanel("MedicalTab",
-              getImageDirectory() + "logo_duchy_of_tamarind_abbey.png");
+              getImageDirectory() + "logo_duchy_of_tamarind_abbey.png",
+              3);
 
         // Contents
         chkUseAdvancedMedical = new CampaignOptionsCheckBox("UseAdvancedMedical");
@@ -967,7 +970,8 @@ public class PersonnelTab {
     public JPanel createPersonnelInformationTab() {
         // Header
         personnelInformationHeader = new CampaignOptionsHeaderPanel("PersonnelInformation",
-              getImageDirectory() + "logo_rasalhague_dominion.png");
+              getImageDirectory() + "logo_rasalhague_dominion.png",
+              4);
 
         // Contents
         chkUseTimeInService = new CampaignOptionsCheckBox("UseTimeInService");
@@ -1132,7 +1136,8 @@ public class PersonnelTab {
     public JPanel createPrisonersAndDependentsTab() {
         // Header
         prisonersAndDependentsHeader = new CampaignOptionsHeaderPanel("PrisonersAndDependentsTab",
-              getImageDirectory() + "logo_illyrian_palatinate.png");
+              getImageDirectory() + "logo_illyrian_palatinate.png",
+              2);
 
         // Contents
         prisonerPanel = createPrisonersPanel();
@@ -1241,8 +1246,7 @@ public class PersonnelTab {
      */
     public JPanel createSalariesTab() {
         // Header
-        salariesHeader = new CampaignOptionsHeaderPanel("SalariesTab",
-              getImageDirectory() + "logo_clan_coyote.png");
+        salariesHeader = new CampaignOptionsHeaderPanel("SalariesTab", getImageDirectory() + "logo_clan_coyote.png", 2);
 
         // Contents
         chkDisableSecondaryRoleSalary = new CampaignOptionsCheckBox("DisableSecondaryRoleSalary");
