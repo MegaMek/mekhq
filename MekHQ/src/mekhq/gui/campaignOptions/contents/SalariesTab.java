@@ -484,14 +484,6 @@ public class SalariesTab {
     }
 
     /**
-     * @deprecated use {@link #loadValuesFromCampaignOptions(Version)} instead.
-     */
-    @Deprecated(since = "0.50.06", forRemoval = true)
-    public void loadValuesFromCampaignOptions() {
-        loadValuesFromCampaignOptions(null, new Version());
-    }
-
-    /**
      * Shortcut method to load default {@link CampaignOptions} values into the tab components.
      */
     public void loadValuesFromCampaignOptions(Version version) {
