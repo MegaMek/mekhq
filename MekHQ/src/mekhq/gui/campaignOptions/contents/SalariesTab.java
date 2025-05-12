@@ -97,7 +97,6 @@ public class SalariesTab {
     private Map<SkillLevel, JSpinner> spnSalaryExperienceMultipliers;
 
     private JPanel pnlSalaryBaseSalaryPanel;
-    private HashMap<PersonnelRole, Integer> rolesAndSalaries;
 
     private List<PersonnelRole> combatRoles;
     private JLabel[] lblBaseSalaryCombat;
@@ -143,23 +142,16 @@ public class SalariesTab {
         spnSalaryExperienceMultipliers = new HashMap<>();
 
         pnlSalaryBaseSalaryPanel = new JPanel();
-        rolesAndSalaries = new HashMap<>();
 
         combatRoles = PersonnelRole.getCombatRoles();
         combatRoles.sort(Comparator.comparing(role -> role.getLabel(false)));
         lblBaseSalaryCombat = new JLabel[combatRoles.size()];
         spnBaseSalaryCombat = new JSpinner[combatRoles.size()];
-        for (PersonnelRole role : combatRoles) {
-            rolesAndSalaries.put(role, 0);
-        }
 
         supportRoles = PersonnelRole.getSupportRoles();
         supportRoles.sort(Comparator.comparing(role -> role.getLabel(false)));
         lblBaseSalarySupport = new JLabel[supportRoles.size()];
         spnBaseSalarySupport = new JSpinner[supportRoles.size()];
-        for (PersonnelRole role : supportRoles) {
-            rolesAndSalaries.put(role, 0);
-        }
 
         civilianRoles = PersonnelRole.getCivilianRoles();
         civilianRoles.sort(Comparator.comparing(role -> role.getLabel(false)));
@@ -169,9 +161,6 @@ public class SalariesTab {
         civilianRoles.add(0, PersonnelRole.DEPENDENT);
         lblBaseSalaryCivilian = new JLabel[civilianRoles.size()];
         spnBaseSalaryCivilian = new JSpinner[civilianRoles.size()];
-        for (PersonnelRole role : civilianRoles) {
-            rolesAndSalaries.put(role, 0);
-        }
     }
 
     /**
