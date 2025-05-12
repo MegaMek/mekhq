@@ -40,6 +40,8 @@ import megamek.common.icons.Portrait;
 import megamek.logging.MMLogger;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.PersonnelRoleSubType;
 
 public class RandomPortraitGenerator {
     private static final MMLogger logger = MMLogger.create(RandomPortraitGenerator.class);
@@ -52,11 +54,11 @@ public class RandomPortraitGenerator {
      * This generates a unique Portrait based on the supplied {@link Person}
      *
      * @param personnel a list of all personnel, from which existing portraits are determined
-     * @param p         the {@link Person} to generate a unique portrait for
+     * @param person         the {@link Person} to generate a unique portrait for
      *
      * @return the generated portrait
      */
-    public static Portrait generate(Collection<Person> personnel, Person p, Boolean allowDuplicatePortraits) {
+    public static Portrait generate(Collection<Person> personnel, Person person, Boolean allowDuplicatePortraits) {
         // first create a list of existing portrait strings, so we can check for
         // duplicates - unless they are allowed in campaign options
         Set<String> existingPortraits = new HashSet<>();
@@ -68,27 +70,33 @@ public class RandomPortraitGenerator {
             }
         }
 
-        List<String> possiblePortraits;
-
         // Will search for portraits in the /gender/primaryrole folder first,
         // and if none are found then /gender/rolegroup, then /gender/combat or
         // /gender/support, then in /gender.
-        File genderFile = new File(p.getGender().isFemale() ? "Female" : "Male");
-        File searchFile = new File(genderFile, p.getPrimaryRole().getLabel(p.isClanPersonnel()));
+        File genderFile = new File(person.getGender().isFemale() ? "Female" : "Male");
 
-        possiblePortraits = getPossibleRandomPortraits(existingPortraits, searchFile);
+        PersonnelRole primaryRole = person.getPrimaryRole();
+        String primaryRoleLabel = primaryRole.getLabel(person.isClanPersonnel());
+        if (primaryRole.isSubType(PersonnelRoleSubType.CIVILIAN)) {
+            primaryRoleLabel = "Civilian";
+        } else {
+            primaryRoleLabel = primaryRole.getLabel(person.isClanPersonnel());
+        }
+        File searchFile = new File(genderFile, primaryRoleLabel);
+
+        List<String> possiblePortraits = getPossibleRandomPortraits(existingPortraits, searchFile);
 
         if (possiblePortraits.isEmpty()) {
             String searchCat_RoleGroup = "";
-            if (p.getPrimaryRole().isAdministrator()) {
+            if (person.getPrimaryRole().isAdministrator()) {
                 searchCat_RoleGroup = "Admin";
-            } else if (p.getPrimaryRole().isVesselCrew()) {
+            } else if (person.getPrimaryRole().isVesselCrew()) {
                 searchCat_RoleGroup = "Vessel Crew";
-            } else if (p.getPrimaryRole().isVehicleCrewMember()) {
+            } else if (person.getPrimaryRole().isVehicleCrewMember()) {
                 searchCat_RoleGroup = "Vehicle Crew";
-            } else if (p.getPrimaryRole().isTech()) {
+            } else if (person.getPrimaryRole().isTech()) {
                 searchCat_RoleGroup = "Tech";
-            } else if (p.getPrimaryRole().isMedicalStaff()) {
+            } else if (person.getPrimaryRole().isMedicalStaff()) {
                 searchCat_RoleGroup = "Medical";
             }
 
@@ -99,7 +107,7 @@ public class RandomPortraitGenerator {
         }
 
         if (possiblePortraits.isEmpty()) {
-            searchFile = new File(genderFile, p.getPrimaryRole().isCombat() ? "Combat" : "Support");
+            searchFile = new File(genderFile, person.getPrimaryRole().isCombat() ? "Combat" : "Support");
             possiblePortraits = getPossibleRandomPortraits(existingPortraits, searchFile);
         }
 
@@ -113,14 +121,13 @@ public class RandomPortraitGenerator {
             if (temp.length == 2) {
                 return new Portrait(temp[0], temp[1]);
             } else {
-                logger.error("Failed to generate portrait for " +
-                                   p.getFullTitle() +
+                logger.error("Failed to generate portrait for " + person.getFullTitle() +
                                    ". " +
                                    chosenPortrait +
                                    " does not split into an array of length 2.");
             }
         } else {
-            logger.warn("Failed to generate portrait for " + p.getFullTitle() + ". No possible portraits found.");
+            logger.warn("Failed to generate portrait for " + person.getFullTitle() + ". No possible portraits found.");
         }
 
         return new Portrait();
