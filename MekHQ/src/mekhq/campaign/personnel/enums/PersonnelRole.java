@@ -158,7 +158,8 @@ public enum PersonnelRole {
     SPORTS_STAR(KeyEvent.VK_UNDEFINED),
     ASTROGRAPHER(KeyEvent.VK_UNDEFINED),
     BARBER(KeyEvent.VK_UNDEFINED),
-    BARTENDER(KeyEvent.VK_UNDEFINED), WAR_CORRESPONDENT(KeyEvent.VK_UNDEFINED),
+    BARTENDER(KeyEvent.VK_UNDEFINED),
+    WAR_CORRESPONDENT(KeyEvent.VK_UNDEFINED),
     BRAWLER(KeyEvent.VK_UNDEFINED),
     BROKER(KeyEvent.VK_UNDEFINED),
     CHEF(KeyEvent.VK_UNDEFINED),
@@ -176,7 +177,8 @@ public enum PersonnelRole {
     CULTURAL_LIAISON(KeyEvent.VK_UNDEFINED),
     CUSTOMS_INSPECTOR(KeyEvent.VK_UNDEFINED),
     DATA_SMUGGLER(KeyEvent.VK_UNDEFINED),
-    DATA_ANALYST(KeyEvent.VK_UNDEFINED), SPACEPORT_WORKER(KeyEvent.VK_UNDEFINED),
+    DATA_ANALYST(KeyEvent.VK_UNDEFINED),
+    SPACEPORT_WORKER(KeyEvent.VK_UNDEFINED),
     DRUG_DEALER(KeyEvent.VK_UNDEFINED),
     FACTORY_WORKER(KeyEvent.VK_UNDEFINED),
     LIVESTOCK_FARMER(KeyEvent.VK_UNDEFINED),
@@ -227,7 +229,8 @@ public enum PersonnelRole {
     PSYCHOLOGIST(KeyEvent.VK_UNDEFINED),
     FIRING_RANGE_SAFETY_OFFICER(KeyEvent.VK_UNDEFINED),
     RECRUITMENT_SCREENING_OFFICER(KeyEvent.VK_UNDEFINED),
-    RELIGIOUS_LEADER(KeyEvent.VK_UNDEFINED), REPAIR_BAY_SUPERVISOR(KeyEvent.VK_UNDEFINED),
+    RELIGIOUS_LEADER(KeyEvent.VK_UNDEFINED),
+    REPAIR_BAY_SUPERVISOR(KeyEvent.VK_UNDEFINED),
     REVOLUTIONIST(KeyEvent.VK_UNDEFINED),
     RITUALIST(KeyEvent.VK_UNDEFINED),
     SALVAGE_RAT(KeyEvent.VK_UNDEFINED),
@@ -1388,16 +1391,34 @@ public enum PersonnelRole {
     }
 
     /**
-     * @return a list of personnel roles classified as support (non-combat) roles.
+     * @return a list of personnel roles classified as support roles.
      */
     public static List<PersonnelRole> getSupportRoles() {
         List<PersonnelRole> supportRoles = new ArrayList<>();
         for (PersonnelRole personnelRole : PersonnelRole.values()) {
-            if (!personnelRole.isCombat()) {
+            if (personnelRole.isSubType(PersonnelRoleSubType.SUPPORT)) {
                 supportRoles.add(personnelRole);
             }
         }
         return supportRoles;
+    }
+
+    /**
+     * Returns a list of {@link PersonnelRole} instances that are of the subtype {@code CIVILIAN}.
+     *
+     * @return a {@code List<PersonnelRole>} containing all civilian personnel roles.
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public static List<PersonnelRole> getCivilianRoles() {
+        List<PersonnelRole> civilianRoles = new ArrayList<>();
+        for (PersonnelRole personnelRole : PersonnelRole.values()) {
+            if (personnelRole.isSubType(PersonnelRoleSubType.CIVILIAN)) {
+                civilianRoles.add(personnelRole);
+            }
+        }
+        return civilianRoles;
     }
 
     /**
@@ -1410,12 +1431,7 @@ public enum PersonnelRole {
      * @since 0.50.06
      */
     public static List<PersonnelRole> getCivilianRolesExceptNone() {
-        List<PersonnelRole> civilianRoles = new ArrayList<>();
-        for (PersonnelRole personnelRole : PersonnelRole.values()) {
-            if (personnelRole.isSubType(PersonnelRoleSubType.CIVILIAN)) {
-                civilianRoles.add(personnelRole);
-            }
-        }
+        List<PersonnelRole> civilianRoles = getCivilianRoles();
         civilianRoles.remove(NONE);
         return civilianRoles;
     }

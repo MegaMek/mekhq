@@ -63,6 +63,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.event.OptionsChangedEvent;
+import mekhq.campaign.personnel.enums.PersonnelRoleSubType;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.Faction;
@@ -102,6 +103,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private PersonnelTab personnelTab;
     private BiographyTab biographyTab;
     private RelationshipsTab relationshipsTab;
+    private SalariesTab salariesTab;
     private TurnoverAndRetentionTab turnoverAndRetentionTab;
     private AdvancementTab advancementTab;
     private SkillsTab skillsTab;
@@ -223,10 +225,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
               personnelTab.createAwardsTab(),
               "prisonersAndDependentsTab",
               personnelTab.createPrisonersAndDependentsTab(),
-              "medicalTab",
-              personnelTab.createMedicalTab(),
-              "salariesTab",
-              personnelTab.createSalariesTab()));
+              "medicalTab", personnelTab.createMedicalTab()));
         personnelTab.loadValuesFromCampaignOptions(campaign.getVersion());
 
         // Biography
@@ -257,6 +256,17 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
               relationshipsTab.createProcreationTab()));
         relationshipsTab.loadValuesFromCampaignOptions();
 
+        // Personnel
+        salariesTab = new SalariesTab(campaignOptions);
+
+        JTabbedPane salariesContentTabs = createSubTabs(Map.of("0combatSalariesTab",
+              salariesTab.createSalariesTab(PersonnelRoleSubType.COMBAT),
+              "1supportSalariesTab",
+              salariesTab.createSalariesTab(PersonnelRoleSubType.SUPPORT),
+              "2civilianSalariesTab",
+              salariesTab.createSalariesTab(PersonnelRoleSubType.CIVILIAN)));
+        salariesTab.loadValuesFromCampaignOptions(campaign.getVersion());
+
         // Turnover and Retention
         turnoverAndRetentionTab = new TurnoverAndRetentionTab(campaignOptions);
 
@@ -277,6 +287,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         humanResourcesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
               4, getTextAt(getCampaignOptionsResourceBundle(), "turnoverAndRetentionContentTabs.title")),
               turnoverAndRetentionContentTabs);
+        humanResourcesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
+              4,
+              getTextAt(getCampaignOptionsResourceBundle(), "salariesContentTabs.title")), salariesContentTabs);
 
         addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
               4, getTextAt(getCampaignOptionsResourceBundle(), "humanResourcesParentTab.title")),
@@ -479,6 +492,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         personnelTab.applyCampaignOptionsToCampaign(campaign, options);
         biographyTab.applyCampaignOptionsToCampaign(options);
         relationshipsTab.applyCampaignOptionsToCampaign(options);
+        salariesTab.applyCampaignOptionsToCampaign(options);
         turnoverAndRetentionTab.applyCampaignOptionsToCampaign(options);
 
         // Advancement

@@ -34,7 +34,6 @@ package mekhq.gui.campaignOptions.contents;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createGroupLayout;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
@@ -42,28 +41,17 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirecto
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
 import javax.swing.*;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.GroupLayout.ParallelGroup;
-import javax.swing.GroupLayout.SequentialGroup;
-import javax.swing.JSpinner.DefaultEditor;
 
 import megamek.Version;
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.annotations.Nullable;
-import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.enums.AwardBonus;
-import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
-import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
@@ -215,24 +203,6 @@ public class PersonnelTab {
     private JCheckBox chkUseRandomDependentAddition;
     private JCheckBox chkUseRandomDependentRemoval;
     //end Prisoners and Dependents Tab
-
-    //start Salaries Tab
-    private CampaignOptionsHeaderPanel salariesHeader;
-    private JCheckBox chkDisableSecondaryRoleSalary;
-
-    private JPanel pnlSalaryMultipliersPanel;
-    private JLabel lblAntiMekSalary;
-    private JSpinner spnAntiMekSalary;
-    private JLabel lblSpecialistInfantrySalary;
-    private JSpinner spnSpecialistInfantrySalary;
-
-    private JPanel pnlSalaryExperienceMultipliersPanel;
-    private Map<SkillLevel, JLabel> lblSalaryExperienceMultipliers;
-    private Map<SkillLevel, JSpinner> spnSalaryExperienceMultipliers;
-
-    private JPanel pnlSalaryBaseSalaryPanel;
-    private JLabel[] lblBaseSalary;
-    private JSpinner[] spnBaseSalary;
     //end Salaries Tab
 
     /**
@@ -257,31 +227,6 @@ public class PersonnelTab {
         initializeAwardsTab();
         initializeMedicalTab();
         initializePrisonersAndDependentsTab();
-        initializeSalariesTab();
-    }
-
-    /**
-     * Initializes the components of the Salaries Tab. This includes settings for personnel salaries, such as
-     * multipliers and base salary rates.
-     */
-    private void initializeSalariesTab() {
-        chkDisableSecondaryRoleSalary = new JCheckBox();
-
-        pnlSalaryMultipliersPanel = new JPanel();
-
-        lblAntiMekSalary = new JLabel();
-        spnAntiMekSalary = new JSpinner();
-
-        lblSpecialistInfantrySalary = new JLabel();
-        spnSpecialistInfantrySalary = new JSpinner();
-
-        pnlSalaryExperienceMultipliersPanel = new JPanel();
-        lblSalaryExperienceMultipliers = new HashMap<>();
-        spnSalaryExperienceMultipliers = new HashMap<>();
-
-        pnlSalaryBaseSalaryPanel = new JPanel();
-        lblBaseSalary = new JLabel[PersonnelRole.values().length];
-        spnBaseSalary = new JSpinner[PersonnelRole.values().length];
     }
 
     /**
@@ -1241,256 +1186,46 @@ public class PersonnelTab {
     }
 
     /**
-     * Creates the layout for the Salaries Tab, including components for salary multipliers and base salary settings.
-     *
-     * @return a {@link JPanel} representing the Salaries Tab.
+     * @deprecated This content has been moved to its own tab
      */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public JPanel createSalariesTab() {
         // Header
-        salariesHeader = new CampaignOptionsHeaderPanel("SalariesTab", getImageDirectory() + "logo_clan_coyote.png", 2);
-
-        // Contents
-        chkDisableSecondaryRoleSalary = new CampaignOptionsCheckBox("DisableSecondaryRoleSalary");
-        chkDisableSecondaryRoleSalary.addMouseListener(createTipPanelUpdater(salariesHeader,
-              "DisableSecondaryRoleSalary"));
-        pnlSalaryMultipliersPanel = createSalaryMultipliersPanel();
-        pnlSalaryExperienceMultipliersPanel = createExperienceMultipliersPanel();
-        pnlSalaryBaseSalaryPanel = createBaseSalariesPanel();
+        //        salariesHeader = new CampaignOptionsHeaderPanel("SalariesTab", getImageDirectory() + "logo_clan_coyote.png", 2);
+        //
+        //        // Contents
+        //        chkDisableSecondaryRoleSalary = new CampaignOptionsCheckBox("DisableSecondaryRoleSalary");
+        //        chkDisableSecondaryRoleSalary.addMouseListener(createTipPanelUpdater(salariesHeader,
+        //              "DisableSecondaryRoleSalary"));
+        //        pnlSalaryMultipliersPanel = createSalaryMultipliersPanel();
+        //        pnlSalaryExperienceMultipliersPanel = createExperienceMultipliersPanel();
+        //        pnlSalaryBaseSalaryPanel = createBaseSalariesPanel();
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("SalariesTab", true);
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.gridwidth = 5;
-        layout.gridy = 0;
-        panel.add(salariesHeader, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        layout.gridwidth = 1;
-        panel.add(chkDisableSecondaryRoleSalary, layout);
-
-        layout.gridy++;
-        panel.add(pnlSalaryMultipliersPanel, layout);
-        layout.gridx++;
-        panel.add(pnlSalaryExperienceMultipliersPanel, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        layout.gridwidth = 2;
-        panel.add(pnlSalaryBaseSalaryPanel, layout);
+        //        layout.gridwidth = 5;
+        //        layout.gridy = 0;
+        //        panel.add(salariesHeader, layout);
+        //
+        //        layout.gridx = 0;
+        //        layout.gridy++;
+        //        layout.gridwidth = 1;
+        //        panel.add(chkDisableSecondaryRoleSalary, layout);
+        //
+        //        layout.gridy++;
+        //        panel.add(pnlSalaryMultipliersPanel, layout);
+        //        layout.gridx++;
+        //        panel.add(pnlSalaryExperienceMultipliersPanel, layout);
+        //
+        //        layout.gridx = 0;
+        //        layout.gridy++;
+        //        layout.gridwidth = 2;
+        //        panel.add(pnlSalaryBaseSalaryPanel, layout);
 
         // Create Parent Panel and return
         return createParentPanel(panel, "SalariesTab");
-    }
-
-    /**
-     * Creates the panel for configuring salary multipliers for specific roles in the Salaries Tab.
-     *
-     * @return a {@link JPanel} containing salary multiplier options.
-     */
-    private JPanel createSalaryMultipliersPanel() {
-        // Contents
-        lblAntiMekSalary = new CampaignOptionsLabel("AntiMekSalary");
-        lblAntiMekSalary.addMouseListener(createTipPanelUpdater(salariesHeader, "AntiMekSalary"));
-        spnAntiMekSalary = new CampaignOptionsSpinner("AntiMekSalary", 0, 0, 100, 0.01);
-        spnAntiMekSalary.addMouseListener(createTipPanelUpdater(salariesHeader, "AntiMekSalary"));
-
-        lblSpecialistInfantrySalary = new CampaignOptionsLabel("SpecialistInfantrySalary");
-        lblSpecialistInfantrySalary.addMouseListener(createTipPanelUpdater(salariesHeader, "SpecialistInfantrySalary"));
-        spnSpecialistInfantrySalary = new CampaignOptionsSpinner("SpecialistInfantrySalary", 0, 0, 100, 0.01);
-        spnSpecialistInfantrySalary.addMouseListener(createTipPanelUpdater(salariesHeader, "SpecialistInfantrySalary"));
-
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("SalaryMultipliersPanel", true, "SalaryMultipliersPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridy = 0;
-        layout.gridx = 0;
-        layout.gridwidth = 1;
-        panel.add(lblAntiMekSalary, layout);
-        layout.gridx++;
-        panel.add(spnAntiMekSalary, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblSpecialistInfantrySalary, layout);
-        layout.gridx++;
-        panel.add(spnSpecialistInfantrySalary, layout);
-
-        return panel;
-    }
-
-    /**
-     * Creates the panel for configuring experience multipliers based on skill levels in the Salaries Tab.
-     *
-     * @return a {@link JPanel} containing settings for skill-based experience multipliers.
-     */
-    private JPanel createExperienceMultipliersPanel() {
-        // Contents
-        SkillLevel[] skillLevels = Skills.SKILL_LEVELS;
-
-        for (final SkillLevel skillLevel : skillLevels) {
-            final JLabel label = new CampaignOptionsLabel("SkillLevel" + skillLevel.toString(), null, true);
-            label.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(), "lblSkillLevelMultiplier.tooltip"));
-            label.addMouseListener(createTipPanelUpdater(salariesHeader, "SkillLevelMultiplier"));
-            lblSalaryExperienceMultipliers.put(skillLevel, label);
-
-            final JSpinner spinner = new CampaignOptionsSpinner("SkillLevel" + skillLevel, null, 0, 0, 100, 0.1, true);
-            spinner.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(), "lblSkillLevelMultiplier.tooltip"));
-            spinner.addMouseListener(createTipPanelUpdater(salariesHeader, "SkillLevelMultiplier"));
-            spnSalaryExperienceMultipliers.put(skillLevel, spinner);
-        }
-
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("ExperienceMultipliersPanel",
-              true,
-              "ExperienceMultipliersPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridy = 0;
-        layout.gridx = 0;
-        layout.gridwidth = 1;
-        panel.add(lblSalaryExperienceMultipliers.get(skillLevels[0]), layout);
-        layout.gridx++;
-        panel.add(spnSalaryExperienceMultipliers.get(skillLevels[0]), layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblSalaryExperienceMultipliers.get(skillLevels[4]), layout);
-        layout.gridx++;
-        panel.add(spnSalaryExperienceMultipliers.get(skillLevels[4]), layout);
-
-        // new column
-
-        layout.gridx = 2;
-        layout.gridy = 0;
-        panel.add(lblSalaryExperienceMultipliers.get(skillLevels[1]), layout);
-        layout.gridx++;
-        panel.add(spnSalaryExperienceMultipliers.get(skillLevels[1]), layout);
-
-        layout.gridx = 2;
-        layout.gridy++;
-        panel.add(lblSalaryExperienceMultipliers.get(skillLevels[5]), layout);
-        layout.gridx++;
-        panel.add(spnSalaryExperienceMultipliers.get(skillLevels[5]), layout);
-
-        // new column
-
-        layout.gridx = 4;
-        layout.gridy = 0;
-        panel.add(lblSalaryExperienceMultipliers.get(skillLevels[2]), layout);
-        layout.gridx++;
-        panel.add(spnSalaryExperienceMultipliers.get(skillLevels[2]), layout);
-
-        layout.gridx = 4;
-        layout.gridy++;
-        panel.add(lblSalaryExperienceMultipliers.get(skillLevels[6]), layout);
-        layout.gridx++;
-        panel.add(spnSalaryExperienceMultipliers.get(skillLevels[6]), layout);
-
-        // new column
-
-        layout.gridx = 6;
-        layout.gridy = 0;
-        panel.add(lblSalaryExperienceMultipliers.get(skillLevels[3]), layout);
-        layout.gridx++;
-        panel.add(spnSalaryExperienceMultipliers.get(skillLevels[3]), layout);
-
-        layout.gridx = 6;
-        layout.gridy++;
-        panel.add(lblSalaryExperienceMultipliers.get(skillLevels[7]), layout);
-        layout.gridx++;
-        panel.add(spnSalaryExperienceMultipliers.get(skillLevels[7]), layout);
-
-        return panel;
-    }
-
-    /**
-     * Creates the panel for configuring base salaries for various personnel roles in the Salaries Tab.
-     *
-     * @return a {@link JPanel} containing settings for base salaries.
-     */
-    private JPanel createBaseSalariesPanel() {
-        // Contents
-        for (final PersonnelRole personnelRole : PersonnelRole.values()) {
-            String componentName = personnelRole.toString().replaceAll(" ", "");
-
-            // JLabel
-            JLabel jLabel = new JLabel(personnelRole.toString());
-            jLabel.addMouseListener(createTipPanelUpdater(salariesHeader, null, personnelRole.getDescription(false)));
-            jLabel.setName("lbl" + componentName);
-
-            Dimension labelSize = jLabel.getPreferredSize();
-            jLabel.setMinimumSize(UIUtil.scaleForGUI(labelSize.width, labelSize.height));
-
-            // JSpinner
-            JSpinner jSpinner = new JSpinner();
-            jSpinner.addMouseListener(createTipPanelUpdater(salariesHeader, null, personnelRole.getDescription(false)));
-            jSpinner.setModel(new SpinnerNumberModel(250.0, 0.0, 1000000, 10.0));
-            jSpinner.setName("spn" + componentName);
-
-            DefaultEditor editor = (DefaultEditor) jSpinner.getEditor();
-            editor.getTextField().setHorizontalAlignment(JTextField.LEFT);
-
-            Dimension spinnerSize = jSpinner.getPreferredSize();
-            jSpinner.setMinimumSize(UIUtil.scaleForGUI(spinnerSize.width, spinnerSize.height));
-
-            // Component Tracking Assignment
-            lblBaseSalary[personnelRole.ordinal()] = jLabel;
-            spnBaseSalary[personnelRole.ordinal()] = jSpinner;
-        }
-
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("BaseSalariesPanel", true, "BaseSalariesPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
-
-        SequentialGroup mainHorizontalGroup = layout.createSequentialGroup();
-        SequentialGroup mainVerticalGroup = layout.createSequentialGroup();
-
-        int columns = 3;
-        int rows = (int) Math.ceil((double) lblBaseSalary.length / columns);
-
-        // Create an array to store ParallelGroups for each column
-        ParallelGroup[] columnGroups = new ParallelGroup[columns];
-        for (int i = 0; i < columns; i++) {
-            columnGroups[i] = layout.createParallelGroup();
-        }
-
-        for (int j = 0; j < rows; j++) {
-            ParallelGroup verticalGroup = layout.createParallelGroup(Alignment.BASELINE);
-
-            for (int i = 0; i < columns; i++) {
-                int index = i * rows + j;
-
-                if (index < lblBaseSalary.length) {
-                    // Create a SequentialGroup for the label and spinner
-                    SequentialGroup horizontalSequentialGroup = layout.createSequentialGroup();
-
-                    horizontalSequentialGroup.addComponent(lblBaseSalary[index]);
-                    horizontalSequentialGroup.addComponent(spnBaseSalary[index]);
-                    if (i != (columns - 1)) {
-                        horizontalSequentialGroup.addGap(10);
-                    }
-
-                    // Add the SequentialGroup to the column's ParallelGroup
-                    columnGroups[i].addGroup(horizontalSequentialGroup);
-
-                    verticalGroup.addComponent(lblBaseSalary[index]);
-                    verticalGroup.addComponent(spnBaseSalary[index]);
-                }
-            }
-            mainVerticalGroup.addGroup(verticalGroup);
-        }
-        for (ParallelGroup columnGroup : columnGroups) {
-            mainHorizontalGroup.addGroup(columnGroup);
-        }
-
-        layout.setHorizontalGroup(mainHorizontalGroup);
-        layout.setVerticalGroup(mainVerticalGroup);
-
-        return panel;
     }
 
     /**
@@ -1608,34 +1343,6 @@ public class PersonnelTab {
         comboPrisonerCaptureStyle.setSelectedItem(options.getPrisonerCaptureStyle());
         chkUseRandomDependentAddition.setSelected(options.isUseRandomDependentAddition());
         chkUseRandomDependentRemoval.setSelected(options.isUseRandomDependentRemoval());
-
-        // Salaries
-        chkDisableSecondaryRoleSalary.setSelected(options.isDisableSecondaryRoleSalary());
-        spnAntiMekSalary.setValue(options.getSalaryAntiMekMultiplier());
-        spnSpecialistInfantrySalary.setValue(options.getSalarySpecialistInfantryMultiplier());
-        for (final Entry<SkillLevel, JSpinner> entry : spnSalaryExperienceMultipliers.entrySet()) {
-            entry.getValue().setValue(options.getSalaryXPMultipliers().get(entry.getKey()));
-        }
-
-        for (int i = 0; i < spnBaseSalary.length; i++) {
-            spnBaseSalary[i].setValue(options.getRoleBaseSalaries()[i].getAmount().doubleValue());
-        }
-
-        if (version != null && version.isLowerThan(new Version("0.50.07"))) {
-            for (int i = 0; i < spnBaseSalary.length; i++) {
-                PersonnelRole personnelRole = PersonnelRole.values()[i];
-
-                if ((double) spnBaseSalary[i].getValue() == 0) {
-                    if (personnelRole == PersonnelRole.NONE) {
-                        continue;
-                    } else if (personnelRole == PersonnelRole.DEPENDENT) {
-                        spnBaseSalary[i].setValue(50.0);
-                    } else {
-                        spnBaseSalary[i].setValue(250.0);
-                    }
-                }
-            }
-        }
     }
 
     /**
@@ -1730,18 +1437,5 @@ public class PersonnelTab {
         }
         options.setUseRandomDependentAddition(chkUseRandomDependentAddition.isSelected());
         options.setUseRandomDependentRemoval(chkUseRandomDependentRemoval.isSelected());
-
-        // Salaries
-        options.setDisableSecondaryRoleSalary(chkDisableSecondaryRoleSalary.isSelected());
-        options.setSalaryAntiMekMultiplier((double) spnAntiMekSalary.getValue());
-        options.setSalarySpecialistInfantryMultiplier((double) spnSpecialistInfantrySalary.getValue());
-
-        for (final Entry<SkillLevel, JSpinner> entry : spnSalaryExperienceMultipliers.entrySet()) {
-            options.getSalaryXPMultipliers().put(entry.getKey(), (double) entry.getValue().getValue());
-        }
-
-        for (final PersonnelRole personnelRole : PersonnelRole.values()) {
-            options.setRoleBaseSalary(personnelRole, (double) spnBaseSalary[personnelRole.ordinal()].getValue());
-        }
     }
 }
