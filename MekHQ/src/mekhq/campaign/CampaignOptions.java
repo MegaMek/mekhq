@@ -5868,7 +5868,15 @@ public class CampaignOptions {
                                     Double.parseDouble(wn3.getTextContent().trim()));
                     }
                 } else if (nodeName.equalsIgnoreCase("salaryTypeBase")) {
-                    retVal.setRoleBaseSalaries(Utilities.readMoneyArray(wn2, retVal.getRoleBaseSalaries().length));
+                    Money[] defaultSalaries = retVal.getRoleBaseSalaries();
+                    Money[] newSalaries = Utilities.readMoneyArray(wn2);
+
+                    Money[] mergedSalaries = new Money[PersonnelRole.values().length];
+                    for (int i = 0; i < mergedSalaries.length; i++) {
+                        mergedSalaries[i] = (newSalaries[i] != null) ? newSalaries[i] : defaultSalaries[i];
+                    }
+
+                    retVal.setRoleBaseSalaries(mergedSalaries);
                     // endregion Salary
 
                     // region Awards

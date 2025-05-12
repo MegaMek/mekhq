@@ -265,7 +265,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
               salariesTab.createSalariesTab(PersonnelRoleSubType.SUPPORT),
               "2civilianSalariesTab",
               salariesTab.createSalariesTab(PersonnelRoleSubType.CIVILIAN)));
-        salariesTab.loadValuesFromCampaignOptions(campaign.getVersion());
+        salariesTab.loadValuesFromCampaignOptions();
 
         // Turnover and Retention
         turnoverAndRetentionTab = new TurnoverAndRetentionTab(campaignOptions);

@@ -58,7 +58,6 @@ import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
-import megamek.Version;
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
@@ -475,8 +474,8 @@ public class SalariesTab {
     /**
      * Shortcut method to load default {@link CampaignOptions} values into the tab components.
      */
-    public void loadValuesFromCampaignOptions(Version version) {
-        loadValuesFromCampaignOptions(null, version);
+    public void loadValuesFromCampaignOptions() {
+        loadValuesFromCampaignOptions(null);
     }
 
     /**
@@ -487,9 +486,8 @@ public class SalariesTab {
      *
      * @param presetCampaignOptions the {@link CampaignOptions} object to load settings from. If null, default campaign
      *                              options will be used.
-     * @param version               the version of the application, used to determine adjustments for compatibility.
      */
-    public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions, Version version) {
+    public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;
