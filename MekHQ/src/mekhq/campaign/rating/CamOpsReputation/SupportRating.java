@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.rating.CamOpsReputation;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -108,9 +109,13 @@ public class SupportRating {
         // Get the total sums of personnel and administrators
         int totalPersonnelCount = getTotalPersonnelCount(campaign, technicianRequirements);
 
+        LocalDate today = campaign.getLocalDate();
+
         int administratorCount = 0;
         for (Person person : campaign.getActivePersonnel(false)) {
-            if (person.isAdministrator() || person.isDependent() || person.isDoctor()) {
+            boolean isAdult = !person.isChild(today);
+
+            if (isAdult && (person.isAdministrator() || person.isDependent() || person.isDoctor())) {
                 administratorCount++;
             }
         }
