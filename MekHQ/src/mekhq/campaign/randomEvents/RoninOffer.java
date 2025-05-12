@@ -174,7 +174,7 @@ public class RoninOffer {
             campaignState.changeSupportPoints(-requiredCombatTeams);
         }
 
-        campaign.recruitPerson(ronin, true);
+        campaign.recruitPerson(ronin, true, true);
     }
 
 

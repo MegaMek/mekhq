@@ -24,18 +24,29 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.unit.actions;
 
-import megamek.common.*;
+import static org.mockito.Mockito.*;
+
+import megamek.common.Entity;
+import megamek.common.Jumpship;
+import megamek.common.LandAirMek;
+import megamek.common.Mek;
+import megamek.common.SmallCraft;
+import megamek.common.SupportTank;
+import megamek.common.Tank;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.Test;
-
-import static org.mockito.Mockito.*;
 
 public class HirePersonnelUnitActionTest {
     @Test
@@ -59,7 +70,7 @@ public class HirePersonnelUnitActionTest {
         action.execute(mockCampaign, unit);
 
         verify(mockCampaign, times(0)).newPerson(PersonnelRole.MEKWARRIOR);
-        verify(mockCampaign, times(0)).recruitPerson(any(Person.class), eq(false));
+        verify(mockCampaign, times(0)).recruitPerson(any(Person.class), eq(false), eq(true));
     }
 
     @Test
@@ -83,13 +94,13 @@ public class HirePersonnelUnitActionTest {
         Person mockDriver = mock(Person.class);
         doNothing().when(unit).addPilotOrSoldier(eq(mockDriver));
         when(mockCampaign.newPerson(PersonnelRole.MEKWARRIOR)).thenReturn(mockDriver);
-        when(mockCampaign.recruitPerson(eq(mockDriver), eq(true))).thenReturn(true);
+        when(mockCampaign.recruitPerson(eq(mockDriver), eq(true), eq(true))).thenReturn(true);
 
         HirePersonnelUnitAction action = new HirePersonnelUnitAction(true);
         action.execute(mockCampaign, unit);
 
         verify(mockCampaign, times(1)).newPerson(PersonnelRole.MEKWARRIOR);
-        verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(true));
+        verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(true), eq(true));
         verify(unit, times(1)).addPilotOrSoldier(eq(mockDriver));
     }
 
@@ -114,13 +125,13 @@ public class HirePersonnelUnitActionTest {
         Person mockDriver = mock(Person.class);
         doNothing().when(unit).addPilotOrSoldier(eq(mockDriver));
         when(mockCampaign.newPerson(PersonnelRole.MEKWARRIOR)).thenReturn(mockDriver);
-        when(mockCampaign.recruitPerson(eq(mockDriver), anyBoolean())).thenReturn(true);
+        when(mockCampaign.recruitPerson(eq(mockDriver), anyBoolean(), eq(true))).thenReturn(true);
 
         HirePersonnelUnitAction action = new HirePersonnelUnitAction(false);
         action.execute(mockCampaign, unit);
 
         verify(mockCampaign, times(1)).newPerson(PersonnelRole.MEKWARRIOR);
-        verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(false));
+        verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(false), eq(true));
         verify(unit, times(1)).addPilotOrSoldier(eq(mockDriver));
     }
 
@@ -142,13 +153,13 @@ public class HirePersonnelUnitActionTest {
         Person mockDriver = mock(Person.class);
         doNothing().when(unit).addPilotOrSoldier(eq(mockDriver));
         when(mockCampaign.newPerson(PersonnelRole.MEKWARRIOR)).thenReturn(mockDriver);
-        when(mockCampaign.recruitPerson(eq(mockDriver), anyBoolean())).thenReturn(false);
+        when(mockCampaign.recruitPerson(eq(mockDriver), anyBoolean(), eq(true))).thenReturn(false);
 
         HirePersonnelUnitAction action = new HirePersonnelUnitAction(false);
         action.execute(mockCampaign, unit);
 
         verify(mockCampaign, times(1)).newPerson(PersonnelRole.MEKWARRIOR);
-        verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(false));
+        verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(false), eq(true));
         verify(unit, times(0)).addPilotOrSoldier(eq(mockDriver));
     }
 
@@ -173,13 +184,13 @@ public class HirePersonnelUnitActionTest {
         Person mockDriver = mock(Person.class);
         doNothing().when(unit).addPilotOrSoldier(eq(mockDriver));
         when(mockCampaign.newPerson(PersonnelRole.LAM_PILOT)).thenReturn(mockDriver);
-        when(mockCampaign.recruitPerson(eq(mockDriver), anyBoolean())).thenReturn(true);
+        when(mockCampaign.recruitPerson(eq(mockDriver), anyBoolean(), eq(true))).thenReturn(true);
 
         HirePersonnelUnitAction action = new HirePersonnelUnitAction(false);
         action.execute(mockCampaign, unit);
 
         verify(mockCampaign, times(1)).newPerson(PersonnelRole.LAM_PILOT);
-        verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(false));
+        verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(false), eq(true));
         verify(unit, times(1)).addPilotOrSoldier(eq(mockDriver));
     }
 
@@ -203,13 +214,13 @@ public class HirePersonnelUnitActionTest {
         Person mockGunner = mock(Person.class);
         doNothing().when(unit).addGunner(eq(mockGunner));
         when(mockCampaign.newPerson(PersonnelRole.MEKWARRIOR)).thenReturn(mockGunner);
-        when(mockCampaign.recruitPerson(eq(mockGunner), anyBoolean())).thenReturn(true);
+        when(mockCampaign.recruitPerson(eq(mockGunner), anyBoolean(), eq(true))).thenReturn(true);
 
         HirePersonnelUnitAction action = new HirePersonnelUnitAction(false);
         action.execute(mockCampaign, unit);
 
         verify(mockCampaign, times(1)).newPerson(PersonnelRole.MEKWARRIOR);
-        verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(false));
+        verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(false), eq(true));
         verify(unit, times(1)).addGunner(eq(mockGunner));
     }
 
@@ -233,13 +244,13 @@ public class HirePersonnelUnitActionTest {
         Person mockGunner = mock(Person.class);
         doNothing().when(unit).addGunner(eq(mockGunner));
         when(mockCampaign.newPerson(PersonnelRole.VEHICLE_GUNNER)).thenReturn(mockGunner);
-        when(mockCampaign.recruitPerson(eq(mockGunner), anyBoolean())).thenReturn(true);
+        when(mockCampaign.recruitPerson(eq(mockGunner), anyBoolean(), eq(true))).thenReturn(true);
 
         HirePersonnelUnitAction action = new HirePersonnelUnitAction(false);
         action.execute(mockCampaign, unit);
 
         verify(mockCampaign, times(1)).newPerson(PersonnelRole.VEHICLE_GUNNER);
-        verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(false));
+        verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(false), eq(true));
         verify(unit, times(1)).addGunner(eq(mockGunner));
     }
 
@@ -263,13 +274,13 @@ public class HirePersonnelUnitActionTest {
         Person mockGunner = mock(Person.class);
         doNothing().when(unit).addGunner(eq(mockGunner));
         when(mockCampaign.newPerson(PersonnelRole.VESSEL_GUNNER)).thenReturn(mockGunner);
-        when(mockCampaign.recruitPerson(eq(mockGunner), anyBoolean())).thenReturn(true);
+        when(mockCampaign.recruitPerson(eq(mockGunner), anyBoolean(), eq(true))).thenReturn(true);
 
         HirePersonnelUnitAction action = new HirePersonnelUnitAction(false);
         action.execute(mockCampaign, unit);
 
         verify(mockCampaign, times(1)).newPerson(PersonnelRole.VESSEL_GUNNER);
-        verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(false));
+        verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(false), eq(true));
         verify(unit, times(1)).addGunner(eq(mockGunner));
     }
 
@@ -293,13 +304,13 @@ public class HirePersonnelUnitActionTest {
         Person mockGunner = mock(Person.class);
         doNothing().when(unit).addGunner(eq(mockGunner));
         when(mockCampaign.newPerson(PersonnelRole.VESSEL_GUNNER)).thenReturn(mockGunner);
-        when(mockCampaign.recruitPerson(eq(mockGunner), anyBoolean())).thenReturn(true);
+        when(mockCampaign.recruitPerson(eq(mockGunner), anyBoolean(), eq(true))).thenReturn(true);
 
         HirePersonnelUnitAction action = new HirePersonnelUnitAction(false);
         action.execute(mockCampaign, unit);
 
         verify(mockCampaign, times(1)).newPerson(PersonnelRole.VESSEL_GUNNER);
-        verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(false));
+        verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(false), eq(true));
         verify(unit, times(1)).addGunner(eq(mockGunner));
     }
 
@@ -324,13 +335,13 @@ public class HirePersonnelUnitActionTest {
         Person mockCrew = mock(Person.class);
         doNothing().when(unit).addVesselCrew(eq(mockCrew));
         when(mockCampaign.newPerson(PersonnelRole.VESSEL_CREW)).thenReturn(mockCrew);
-        when(mockCampaign.recruitPerson(eq(mockCrew), anyBoolean())).thenReturn(true);
+        when(mockCampaign.recruitPerson(eq(mockCrew), anyBoolean(), eq(true))).thenReturn(true);
 
         HirePersonnelUnitAction action = new HirePersonnelUnitAction(false);
         action.execute(mockCampaign, unit);
 
         verify(mockCampaign, times(1)).newPerson(PersonnelRole.VESSEL_CREW);
-        verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(false));
+        verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(false), eq(true));
         verify(unit, times(1)).addVesselCrew(eq(mockCrew));
     }
 
@@ -355,13 +366,13 @@ public class HirePersonnelUnitActionTest {
         Person mockCrew = mock(Person.class);
         doNothing().when(unit).addVesselCrew(eq(mockCrew));
         when(mockCampaign.newPerson(PersonnelRole.VEHICLE_CREW)).thenReturn(mockCrew);
-        when(mockCampaign.recruitPerson(eq(mockCrew), anyBoolean())).thenReturn(true);
+        when(mockCampaign.recruitPerson(eq(mockCrew), anyBoolean(), eq(true))).thenReturn(true);
 
         HirePersonnelUnitAction action = new HirePersonnelUnitAction(false);
         action.execute(mockCampaign, unit);
 
         verify(mockCampaign, times(1)).newPerson(PersonnelRole.VEHICLE_CREW);
-        verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(false));
+        verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(false), eq(true));
         verify(unit, times(1)).addVesselCrew(eq(mockCrew));
     }
 
@@ -386,13 +397,13 @@ public class HirePersonnelUnitActionTest {
         Person mockNavigator = mock(Person.class);
         doNothing().when(unit).setNavigator(eq(mockNavigator));
         when(mockCampaign.newPerson(PersonnelRole.VESSEL_NAVIGATOR)).thenReturn(mockNavigator);
-        when(mockCampaign.recruitPerson(eq(mockNavigator), anyBoolean())).thenReturn(true);
+        when(mockCampaign.recruitPerson(eq(mockNavigator), anyBoolean(), eq(true))).thenReturn(true);
 
         HirePersonnelUnitAction action = new HirePersonnelUnitAction(false);
         action.execute(mockCampaign, unit);
 
         verify(mockCampaign, times(1)).newPerson(PersonnelRole.VESSEL_NAVIGATOR);
-        verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(false));
+        verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(false), eq(true));
         verify(unit, times(1)).setNavigator(eq(mockNavigator));
     }
 
@@ -416,13 +427,13 @@ public class HirePersonnelUnitActionTest {
         Person mockTechOfficer = mock(Person.class);
         doNothing().when(unit).setTechOfficer(eq(mockTechOfficer));
         when(mockCampaign.newPerson(PersonnelRole.MEKWARRIOR)).thenReturn(mockTechOfficer);
-        when(mockCampaign.recruitPerson(eq(mockTechOfficer), anyBoolean())).thenReturn(true);
+        when(mockCampaign.recruitPerson(eq(mockTechOfficer), anyBoolean(), eq(true))).thenReturn(true);
 
         HirePersonnelUnitAction action = new HirePersonnelUnitAction(false);
         action.execute(mockCampaign, unit);
 
         verify(mockCampaign, times(1)).newPerson(PersonnelRole.MEKWARRIOR);
-        verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(false));
+        verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(false), eq(true));
         verify(unit, times(1)).setTechOfficer(eq(mockTechOfficer));
     }
 
@@ -446,13 +457,13 @@ public class HirePersonnelUnitActionTest {
         Person mockTechOfficer = mock(Person.class);
         doNothing().when(unit).setTechOfficer(eq(mockTechOfficer));
         when(mockCampaign.newPerson(PersonnelRole.VEHICLE_GUNNER)).thenReturn(mockTechOfficer);
-        when(mockCampaign.recruitPerson(eq(mockTechOfficer), anyBoolean())).thenReturn(true);
+        when(mockCampaign.recruitPerson(eq(mockTechOfficer), anyBoolean(), eq(true))).thenReturn(true);
 
         HirePersonnelUnitAction action = new HirePersonnelUnitAction(false);
         action.execute(mockCampaign, unit);
 
         verify(mockCampaign, times(1)).newPerson(PersonnelRole.VEHICLE_GUNNER);
-        verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(false));
+        verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(false), eq(true));
         verify(unit, times(1)).setTechOfficer(eq(mockTechOfficer));
     }
 }

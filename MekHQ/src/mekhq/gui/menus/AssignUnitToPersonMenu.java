@@ -159,6 +159,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                                        .stream()
                                        .filter(person -> person.getStatus().isActive())
                                        .filter(person -> !person.getPrisonerStatus().isCurrentPrisoner())
+                                       .filter(person -> person.isEmployed())
                                        .filter(person -> person.getUnit() == null)
                                        .filter(person -> !Profession.getProfessionFromPersonnelRole(person.getPrimaryRole())
                                                                 .isCivilian())

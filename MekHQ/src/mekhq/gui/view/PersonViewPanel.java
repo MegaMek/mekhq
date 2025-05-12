@@ -911,6 +911,7 @@ public class PersonViewPanel extends JScrollablePanel {
         JPanel pnlInfo = new JPanel(new GridBagLayout());
         pnlInfo.setBorder(BorderFactory.createTitledBorder(person.getFullTitle()));
         JLabel lblType = new JLabel();
+        JLabel lblUnitNotResponsibleForSalary = new JLabel();
         JLabel lblStatus1 = new JLabel();
         JLabel lblStatus2 = new JLabel();
         JLabel lblOrigin1 = new JLabel();
@@ -934,9 +935,23 @@ public class PersonViewPanel extends JScrollablePanel {
 
         int y = 0;
 
+        if (!person.isEmployed()) {
+            lblUnitNotResponsibleForSalary.setName("lblNotResponsibleForSalary");
+            lblUnitNotResponsibleForSalary.setText(resourceMap.getString("lblNotEmployedByUnit.text"));
+            GridBagConstraints gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridwidth = 3;
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlInfo.add(lblUnitNotResponsibleForSalary, gridBagConstraints);
+            y++;
+        }
+
         lblStatus1.setName("lblStatus1");
         lblStatus1.setText(resourceMap.getString("lblStatus1.text"));
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridwidth = 1;
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
         gridBagConstraints.fill = GridBagConstraints.NONE;

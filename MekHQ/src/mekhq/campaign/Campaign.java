@@ -1988,89 +1988,151 @@ public class Campaign implements ITechManager {
     // region Personnel Recruitment
 
     /**
-     * @param p the person being added
+     * Recruits a person into the campaign roster using their current prisoner status, assuming recruitment is not
+     * performed by a game master that recruitment actions should be logged, and the character should be employed.
      *
-     * @return true, if the person is hired successfully, otherwise false
+     * @param person the person to recruit; must not be {@code null}
+     * @return {@code true} if recruitment was successful and the person was added or employed; {@code false} otherwise
+     * @see #recruitPerson(Person, PrisonerStatus, boolean, boolean, boolean)
      */
-    public boolean recruitPerson(Person p) {
-        return recruitPerson(p, p.getPrisonerStatus(), false, true);
+    public boolean recruitPerson(Person person) {
+        return recruitPerson(person, person.getPrisonerStatus(), false, true, true);
     }
 
     /**
-     * @param p     the person being added
-     * @param gmAdd false means that they need to pay to hire this person, provided that the campaign option to pay for
-     *              new hires is set, while true means they are added without paying
-     *
-     * @return true if the person is hired successfully, otherwise false
+     * @deprecated use {@link #recruitPerson(Person, boolean, boolean)} instead
      */
-    public boolean recruitPerson(Person p, boolean gmAdd) {
-        return recruitPerson(p, p.getPrisonerStatus(), gmAdd, true);
+    @Deprecated(since = "0.50.06", forRemoval = true)
+    public boolean recruitPerson(Person person, boolean gmAdd) {
+        return recruitPerson(person, person.getPrisonerStatus(), gmAdd, true);
     }
 
     /**
-     * @param p              the person being added
-     * @param prisonerStatus the person's prisoner status upon recruitment
+     * Recruits a person into the campaign roster using their current prisoner status,
+     * allowing specification of both game master and employment flags.
+     * <p>
+     * This is a convenience overload that enables logging and allows caller to choose
+     * whether the person is employed upon recruitment.
+     * </p>
      *
-     * @return true if the person is hired successfully, otherwise false
+     * @param person the person to recruit; must not be {@code null}
+     * @param gmAdd  if {@code true}, recruitment is performed by a game master (bypassing funds check)
+     * @param employ if {@code true}, the person is marked as employed in the campaign
+     * @return {@code true} if recruitment was successful and personnel was added or employed; {@code false} otherwise
+     * @see #recruitPerson(Person, PrisonerStatus, boolean, boolean, boolean)
      */
+    public boolean recruitPerson(Person person, boolean gmAdd, boolean employ) {
+        return recruitPerson(person, person.getPrisonerStatus(), gmAdd, true, employ);
+    }
+
+    /**
+     * @deprecated use {@link #recruitPerson(Person, PrisonerStatus, boolean)} instead
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public boolean recruitPerson(Person p, PrisonerStatus prisonerStatus) {
         return recruitPerson(p, prisonerStatus, false, true);
     }
 
     /**
-     * @param person         the person being added
-     * @param prisonerStatus the person's prisoner status upon recruitment
-     * @param gmAdd          false means that they need to pay to hire this person, true means it is added without
-     *                       paying
-     * @param log            whether to write to logs
+     * Recruits a person into the campaign roster with default parameters for game master and logging options.
+     * <p>
+     * This is a convenience overload that assumes recruitment is not performed by a game master and that recruitment
+     * actions should be logged. If successful, the person is marked as employed based on the given flag.
+     * </p>
      *
-     * @return true if the person is hired successfully, otherwise false
+     * @param person          the person to recruit; must not be {@code null}
+     * @param prisonerStatus  the prison status to assign to the person
+     * @param employ          if {@code true}, the person is marked as employed in the campaign
+     * @return {@code true} if recruitment was successful and personnel was added or employed; {@code false} otherwise
+     * @see #recruitPerson(Person, PrisonerStatus, boolean, boolean, boolean)
      */
+    public boolean recruitPerson(Person person, PrisonerStatus prisonerStatus, boolean employ) {
+        return recruitPerson(person, prisonerStatus, false, true, employ);
+    }
+
+    /**
+     * @deprecated use {@link #recruitPerson(Person, PrisonerStatus, boolean, boolean, boolean)} instead.
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public boolean recruitPerson(Person person, PrisonerStatus prisonerStatus, boolean gmAdd, boolean log) {
+        return recruitPerson(person, prisonerStatus, gmAdd, log, true);
+    }
+
+    /**
+     * Recruits a person into the campaign roster, handling employment status, prisoner status, finances, logging, and
+     * optional relationship simulation.
+     *
+     * <p>If the {@code employ} parameter is {@code true} and the person is not already employed, this method
+     * optionally
+     * deducts recruitment costs from campaign finances (unless performed by a game master). The person's status and
+     * campaign logs are updated accordingly.</p>
+     *
+     * <p>If the person is a new recruit, their joining date and personnel entry are initialized, and relationship
+     * history may be simulated based on campaign options and role.</p>
+     *
+     * <p>The method also manages staff role-specific timing pools and can log recruitment events.</p>
+     *
+     * @param person         the person to recruit; must not be {@code null}
+     * @param prisonerStatus the prison status to assign to the person
+     * @param gmAdd          if {@code true}, indicates the recruitment is being performed by a game master (bypassing
+     *                       funds check)
+     * @param log            if {@code true}, a record of the recruitment will be added to campaign logs
+     * @param employ         if {@code true}, the person is marked as employed in the campaign
+     *
+     * @return {@code true} if recruitment was successful and personnel was added or employed; {@code false} on failure
+     *       or insufficient funds
+     */
+    public boolean recruitPerson(Person person, PrisonerStatus prisonerStatus, boolean gmAdd, boolean log,
+          boolean employ) {
         if (person == null) {
+            logger.warn("A null person was passed into recruitPerson.");
             return false;
         }
 
-        // Only pay if option set, they weren't GM added, and they aren't a dependent,
-        // prisoner or bondsman
-        if (getCampaignOptions().isPayForRecruitment() &&
-                  !person.getPrimaryRole().isDependent() &&
-                  !gmAdd &&
-                  prisonerStatus.isFree()) {
-            if (!getFinances().debit(TransactionType.RECRUITMENT,
-                  getLocalDate(),
-                  person.getSalary(this).multipliedBy(2),
-                  String.format(resources.getString("personnelRecruitmentFinancesReason.text"),
-                        person.getFullName()))) {
-                addReport(String.format(resources.getString("personnelRecruitmentInsufficientFunds.text"),
-                      MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
-                      person.getFullName()));
-                return false;
+        if (employ && !person.isEmployed()) {
+            if (getCampaignOptions().isPayForRecruitment() && !gmAdd) {
+                if (!getFinances().debit(TransactionType.RECRUITMENT,
+                      getLocalDate(),
+                      person.getSalary(this).multipliedBy(2),
+                      String.format(resources.getString("personnelRecruitmentFinancesReason.text"),
+                            person.getFullName()))) {
+                    addReport(String.format(resources.getString("personnelRecruitmentInsufficientFunds.text"),
+                          MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
+                          person.getFullName()));
+                    return false;
+                }
             }
         }
-
-        personnel.put(person.getId(), person);
-        person.setJoinedCampaign(getLocalDate());
 
         String formerSurname = person.getSurname();
 
-        if (person.getPrimaryRole().isAstech()) {
-            astechPoolMinutes += Person.PRIMARY_ROLE_SUPPORT_TIME;
-            astechPoolOvertime += Person.PRIMARY_ROLE_OVERTIME_SUPPORT_TIME;
-        } else if (person.getSecondaryRole().isAstech()) {
-            astechPoolMinutes += Person.SECONDARY_ROLE_SUPPORT_TIME;
-            astechPoolOvertime += Person.SECONDARY_ROLE_OVERTIME_SUPPORT_TIME;
+        if (!personnel.containsValue(person)) {
+            person.setJoinedCampaign(currentDay);
+            personnel.put(person.getId(), person);
+
+            if (getCampaignOptions().isUseSimulatedRelationships()) {
+                if ((prisonerStatus.isFree()) &&
+                          (!person.getOriginFaction().isClan()) &&
+                          (!person.getPrimaryRole().isDependent())) {
+                    simulateRelationshipHistory(person);
+                }
+            }
+        }
+
+        if (employ) {
+            person.setEmployed(true);
+            if (person.getPrimaryRole().isAstech()) {
+                astechPoolMinutes += Person.PRIMARY_ROLE_SUPPORT_TIME;
+                astechPoolOvertime += Person.PRIMARY_ROLE_OVERTIME_SUPPORT_TIME;
+            } else if (person.getSecondaryRole().isAstech()) {
+                astechPoolMinutes += Person.SECONDARY_ROLE_SUPPORT_TIME;
+                astechPoolOvertime += Person.SECONDARY_ROLE_OVERTIME_SUPPORT_TIME;
+            }
+        } else {
+            person.setEmployed(false);
         }
 
         person.setPrisonerStatus(this, prisonerStatus, log);
-
-        if (getCampaignOptions().isUseSimulatedRelationships()) {
-            if ((prisonerStatus.isFree()) &&
-                      (!person.getOriginFaction().isClan()) &&
-                      (!person.getPrimaryRole().isDependent())) {
-                simulateRelationshipHistory(person);
-            }
-        }
 
         if (log) {
             formerSurname = person.getSurname().equals(formerSurname) ?
@@ -2187,7 +2249,7 @@ public class Campaign implements ITechManager {
         // with the simulation concluded, we add the current spouse (if any) and any
         // remaining children to the unit
         if (currentSpouse != null) {
-            recruitPerson(currentSpouse, PrisonerStatus.FREE, true, false);
+            recruitPerson(currentSpouse, PrisonerStatus.FREE, true, false, false);
 
             addReport(String.format(resources.getString("relativeJoinsForce.text"),
                   currentSpouse.getHyperlinkedFullTitle(),
@@ -2234,7 +2296,7 @@ public class Campaign implements ITechManager {
                 specialAbilityGenerator.generateSpecialAbilities(this, child, experienceLevel);
             }
 
-            recruitPerson(child, PrisonerStatus.FREE, true, false);
+            recruitPerson(child, PrisonerStatus.FREE, true, false, false);
 
             addReport(String.format(resources.getString("relativeJoinsForce.text"),
                   child.getHyperlinkedFullTitle(),
@@ -7614,20 +7676,38 @@ public class Campaign implements ITechManager {
         return getNumberPrimaryAstechs() + getNumberSecondaryAstechs();
     }
 
+    /**
+     * Returns the total number of primary astechs available.
+     * <p>
+     * This method calculates the number of astechs by adding the base astech pool to the count of active personnel
+     * whose primary role is an astech, who are not currently deployed, and are employed.
+     * </p>
+     *
+     * @return the total number of primary astechs
+     */
     public int getNumberPrimaryAstechs() {
         int astechs = getAstechPool();
-        for (Person p : getActivePersonnel(true)) {
-            if (p.getPrimaryRole().isAstech() && !p.isDeployed()) {
+        for (Person person : getActivePersonnel(false)) {
+            if (person.getPrimaryRole().isAstech() && !person.isDeployed()) {
                 astechs++;
             }
         }
         return astechs;
     }
 
+    /**
+     * Returns the total number of secondary astechs available.
+     * <p>
+     * This method calculates the number of astechs by adding the base astech pool to the count of active personnel
+     * whose secondary role is an astech, who are not currently deployed, and are employed.
+     * </p>
+     *
+     * @return the total number of secondary astechs
+     */
     public int getNumberSecondaryAstechs() {
         int astechs = 0;
-        for (Person p : getActivePersonnel(true)) {
-            if (p.getSecondaryRole().isAstech() && !p.isDeployed()) {
+        for (Person person : getActivePersonnel(false)) {
+            if (person.getSecondaryRole().isAstech() && !person.isDeployed()) {
                 astechs++;
             }
         }
@@ -7707,11 +7787,15 @@ public class Campaign implements ITechManager {
      * @return the number of medics in the campaign including any in the temporary medic pool
      */
     public int getNumberMedics() {
-        return getMedicPool() +
-                     Math.toIntExact(getActivePersonnel(true).stream()
-                                           .filter(p -> (p.getPrimaryRole().isMedic() ||
-                                                               p.getSecondaryRole().isMedic()) && !p.isDeployed())
-                                           .count());
+        int count = 0;
+        for (Person person : getActivePersonnel(false)) {
+            if ((person.getPrimaryRole().isMedic() || person.getSecondaryRole().isMedic()) &&
+                      !person.isDeployed() &&
+                      person.isEmployed()) {
+                count++;
+            }
+        }
+        return getMedicPool() + count;
     }
 
     public boolean requiresAdditionalMedics() {

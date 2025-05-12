@@ -5300,7 +5300,7 @@ public class Unit implements ITechnology {
     private void ensurePersonIsRegistered(final Person person) {
         Objects.requireNonNull(person);
         if (getCampaign().getPerson(person.getId()) == null) {
-            getCampaign().recruitPerson(person, person.getPrisonerStatus(), true, false);
+            getCampaign().recruitPerson(person, person.getPrisonerStatus(), true, false, true);
             logger.debug("The person {} added this unit {}, was not in the campaign.", person.getFullName(), getName());
         }
     }
