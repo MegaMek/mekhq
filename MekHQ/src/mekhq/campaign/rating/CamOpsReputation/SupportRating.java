@@ -110,7 +110,7 @@ public class SupportRating {
 
         int administratorCount = 0;
         for (Person person : campaign.getActivePersonnel(false)) {
-            if (person.isAdministrator() || person.isDependent()) {
+            if (person.isAdministrator() || person.isDependent() || person.isDoctor()) {
                 administratorCount++;
             }
         }
