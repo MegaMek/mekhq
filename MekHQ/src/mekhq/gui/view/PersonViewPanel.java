@@ -1897,14 +1897,14 @@ public class PersonViewPanel extends JScrollablePanel {
             int column = counter / skillsPerColumn; // 0, 1
             int row = counter % skillsPerColumn;
 
-            String name = option.getDisplayableName();
+            String name = option.getDisplayableNameWithValue();
             String description = option.getDescription();
 
             boolean isFlaw = false;
             if (Objects.equals(relevantAbilities.get(option), LVL3_ADVANTAGES)) {
                 SpecialAbility ability = SpecialAbility.getOption(option.getName());
                 if (ability != null) {
-                    isFlaw = ability.getCost() < -1; // -1 is used to designate an origin only SPA
+                    isFlaw = ability.getCost() < -1; // -1 is currently used to designate an origin only SPA
                 }
             }
 
