@@ -5254,7 +5254,16 @@ public class Campaign implements ITechManager {
             }
             if (!unit.isPresent()) {
                 unit.checkArrival();
+
+                // Has unit just been delivered?
+                if (unit.isPresent()) {
+                    addReport(String.format(resources.getString("unitArrived.text"),
+                          unit.getHyperlinkedName(),
+                          spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                          CLOSING_SPAN_TAG));
+                }
             }
+
             if (!unit.isRepairable() && !unit.hasSalvageableParts()) {
                 unitsToRemove.add(unit.getId());
             }
