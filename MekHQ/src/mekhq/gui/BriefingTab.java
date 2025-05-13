@@ -1,14 +1,14 @@
 /*
  * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
  *
- * This file is part of MekHQ.
+ * This file is part of <MekHQ.
  *
- * MekHQ is free software: you can redistribute it and/or modify
+ * <MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License (GPL),
  * version 3 or (at your option) any later version,
  * as published by the Free Software Foundation.
  *
- * MekHQ is distributed in the hope that it will be useful,
+ * <MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. <MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui;
 
@@ -90,6 +95,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.adapter.ScenarioTableMouseAdapter;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.dialog.CompleteMissionDialog;
 import mekhq.gui.dialog.CustomizeAtBContractDialog;
 import mekhq.gui.dialog.CustomizeMissionDialog;
@@ -112,6 +118,9 @@ import mekhq.utilities.MHQInternationalization;
  * Displays Mission/Contract and Scenario details.
  */
 public final class BriefingTab extends CampaignGuiTab {
+    private static ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
+          MekHQ.getMHQOptions().getLocale());
+
     private LanceAssignmentView panLanceAssignment;
     private JSplitPane splitScenario;
     private JTable scenarioTable;
@@ -158,9 +167,6 @@ public final class BriefingTab extends CampaignGuiTab {
      */
     @Override
     public void initTab() {
-        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
-              MekHQ.getMHQOptions().getLocale());
-
         JPanel panMission = new JPanel(new GridBagLayout());
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -732,8 +738,94 @@ public final class BriefingTab extends CampaignGuiTab {
         }
     }
 
+    /**
+     * Initiates the start of the selected scenario after confirming briefing acceptance.
+     *
+     * <p>This method first presents the scenario briefing dialog to the user via {@link #createBriefingDialog()}. If
+     * the user cancels or does not accept the briefing, the method returns and does not proceed further. If accepted,
+     * it calls {@link #startScenario(BehaviorSettings)} to begin the scenario.</p>
+     */
     private void startScenario() {
+        if (!createBriefingDialog()) {
+            return;
+        }
+
         startScenario(null);
+    }
+
+    /**
+     * Displays a dialog presenting the scenario briefing and allows the user to accept or cancel the scenario.
+     *
+     * <p>This method retrieves the selected scenario from the scenario table, obtains relevant mission and commander
+     * information, constructs the description with preserved line breaks, and then shows an
+     * {@code ImmersiveDialogSimple} with accept and cancel buttons.</p>
+     *
+     * @return {@code true} if the user accepts the scenario or no scenario is selected; {@code false} if the scenario
+     *       is canceled.
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    private boolean createBriefingDialog() {
+        int row = scenarioTable.getSelectedRow();
+        if (row < 0) {
+            return true;
+        }
+        Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
+        if (scenario == null) {
+            return true;
+        }
+
+        Mission mission = null;
+        if (scenario.getMissionId() != -1) {
+            mission = getCampaign().getMission(scenario.getMissionId());
+        }
+        if (mission == null) {
+            mission = comboMission.getSelectedItem();
+        }
+
+        Person speaker = null;
+        if (mission instanceof AtBContract contract) {
+            speaker = contract.getEmployerLiaison();
+        }
+
+        AtBContract contract = null;
+
+        List<Person> forceCommanders = new ArrayList<>();
+        for (Force force : getCampaign().getAllForces()) {
+            Person commander = getCampaign().getPerson(force.getForceCommanderID());
+            if (commander != null) {
+                forceCommanders.add(commander);
+            }
+        }
+
+        Person overallCommander = null;
+        for (Person commander : forceCommanders) {
+            if (overallCommander == null) {
+                overallCommander = commander;
+                continue;
+            }
+
+            if (commander.outRanksUsingSkillTiebreaker(getCampaign(), overallCommander)) {
+                overallCommander = commander;
+            }
+        }
+
+        String description = scenario.getDescription().replaceAll("(\r\n|\n)", "<br>");
+
+        List<String> buttons = List.of(resourceMap.getString("dialogScenarioAcceptance.button.accept"),
+              resourceMap.getString("dialogScenarioAcceptance.button.cancel"));
+
+        ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(getCampaign(),
+              speaker,
+              overallCommander,
+              description,
+              buttons,
+              resourceMap.getString("dialogScenarioAcceptance.outOfCharacter"),
+              null,
+              false);
+
+        return dialog.getDialogChoice() == 0;
     }
 
 

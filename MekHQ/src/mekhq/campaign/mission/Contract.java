@@ -2,14 +2,14 @@
  * Copyright (c) 2011 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
  *
- * This file is part of MekHQ.
+ * This file is part of <MekHQ.
  *
- * MekHQ is free software: you can redistribute it and/or modify
+ * <MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License (GPL),
  * version 3 or (at your option) any later version,
  * as published by the Free Software Foundation.
  *
- * MekHQ is distributed in the hope that it will be useful,
+ * <MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
@@ -25,9 +25,20 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. <MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission;
 
+import java.io.PrintWriter;
+import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+
+import megamek.Version;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -40,11 +51,6 @@ import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.text.ParseException;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 
 /**
  * Contracts - we need to track static amounts here because changes in the
@@ -720,8 +726,8 @@ public class Contract extends Mission {
     }
 
     @Override
-    protected int writeToXMLBegin(final PrintWriter pw, int indent) {
-        indent = super.writeToXMLBegin(pw, indent);
+    protected int writeToXMLBegin(Campaign campaign, final PrintWriter pw, int indent) {
+        indent = super.writeToXMLBegin(campaign, pw, indent);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "nMonths", nMonths);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "startDate", startDate);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "endDate", endDate);
@@ -751,7 +757,7 @@ public class Contract extends Mission {
     }
 
     @Override
-    public void loadFieldsFromXmlNode(Node wn) throws ParseException {
+    public void loadFieldsFromXmlNode(Campaign campaign, Version version, Node wn) throws ParseException {
         // Okay, now load mission-specific fields!
         NodeList nl = wn.getChildNodes();
 

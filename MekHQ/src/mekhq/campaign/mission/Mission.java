@@ -2,14 +2,14 @@
  * Copyright (c) 2011 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
- * This file is part of MekHQ.
+ * This file is part of <MekHQ.
  *
- * MekHQ is free software: you can redistribute it and/or modify
+ * <MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License (GPL),
  * version 3 or (at your option) any later version,
  * as published by the Free Software Foundation.
  *
- * MekHQ is distributed in the hope that it will be useful,
+ * <MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. <MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission;
 
@@ -227,12 +232,29 @@ public class Mission {
     }
 
     // region File I/O
+
+    /**
+     * @deprecated use {@link #writeToXML(Campaign, PrintWriter, int) instead}
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public void writeToXML(final PrintWriter pw, int indent) {
-        indent = writeToXMLBegin(pw, indent);
+        return;
+    }
+
+    public void writeToXML(Campaign campaign, final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(campaign, pw, indent);
         writeToXMLEnd(pw, indent);
     }
 
+    /**
+     * @deprecated use {@link #writeToXMLBegin(Campaign, PrintWriter, int)} instead;
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     protected int writeToXMLBegin(final PrintWriter pw, int indent) {
+        return indent;
+    }
+
+    protected int writeToXMLBegin(Campaign campaign, final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "mission", "id", id, "type", getClass());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", name);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "type", type);
@@ -256,13 +278,21 @@ public class Mission {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "mission");
     }
 
+    /**
+     * @deprecated use {@link #loadFieldsFromXmlNode(Campaign, Version, Node)}  instead;
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public void loadFieldsFromXmlNode(Node wn) throws ParseException {
+        return;
+    }
+
+    public void loadFieldsFromXmlNode(Campaign campaign, Version version, Node wn) throws ParseException {
         // do nothing
     }
 
-    public static Mission generateInstanceFromXML(Node wn, Campaign c, Version version) {
+    public static Mission generateInstanceFromXML(Node node, Campaign campaign, Version version) {
         Mission retVal = null;
-        NamedNodeMap attrs = wn.getAttributes();
+        NamedNodeMap attrs = node.getAttributes();
         Node classNameNode = attrs.getNamedItem("type");
         String className = classNameNode.getTextContent();
 
@@ -270,10 +300,10 @@ public class Mission {
             // Instantiate the correct child class, and call its parsing
             // function.
             retVal = (Mission) Class.forName(className).newInstance();
-            retVal.loadFieldsFromXmlNode(wn);
+            retVal.loadFieldsFromXmlNode(campaign, version, node);
 
             // Okay, now load mission-specific fields!
-            NodeList nl = wn.getChildNodes();
+            NodeList nl = node.getChildNodes();
 
             for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
@@ -284,10 +314,10 @@ public class Mission {
                                  wn2.getNodeName().equalsIgnoreCase("systemId")) {
                     retVal.systemId = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("planetName")) {
-                    PlanetarySystem system = c.getSystemByName(wn2.getTextContent());
+                    PlanetarySystem system = campaign.getSystemByName(wn2.getTextContent());
 
                     if (system != null) {
-                        retVal.systemId = c.getSystemByName(wn2.getTextContent()).getId();
+                        retVal.systemId = campaign.getSystemByName(wn2.getTextContent()).getId();
                     } else {
                         retVal.legacyPlanetName = wn2.getTextContent();
                     }
@@ -315,7 +345,7 @@ public class Mission {
 
                             continue;
                         }
-                        Scenario s = Scenario.generateInstanceFromXML(wn3, c, version);
+                        Scenario s = Scenario.generateInstanceFromXML(wn3, campaign, version);
 
                         if (null != s) {
                             retVal.addScenario(s);
