@@ -53,8 +53,8 @@
                 <active>1</active>
                 <skillMin>0</skillMin>
                 <skillMax>4</skillMax>
-                <btnMin>4</btnMin>
-                <btnMax>1</btnMax>
+                <targetNumberPreferred>4</targetNumberPreferred>
+                <targetNumberMax>6</targetNumberMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
@@ -62,8 +62,8 @@
                 <active>1</active>
                 <skillMin>0</skillMin>
                 <skillMax>4</skillMax>
-                <btnMin>4</btnMin>
-                <btnMax>1</btnMax>
+                <targetNumberPreferred>4</targetNumberPreferred>
+                <targetNumberMax>6</targetNumberMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
@@ -71,8 +71,8 @@
                 <active>1</active>
                 <skillMin>0</skillMin>
                 <skillMax>4</skillMax>
-                <btnMin>4</btnMin>
-                <btnMax>1</btnMax>
+                <targetNumberPreferred>4</targetNumberPreferred>
+                <targetNumberMax>6</targetNumberMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
@@ -80,8 +80,8 @@
                 <active>1</active>
                 <skillMin>0</skillMin>
                 <skillMax>4</skillMax>
-                <btnMin>12</btnMin>
-                <btnMax>1</btnMax>
+                <targetNumberPreferred>4</targetNumberPreferred>
+                <targetNumberMax>6</targetNumberMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
@@ -89,8 +89,8 @@
                 <active>1</active>
                 <skillMin>0</skillMin>
                 <skillMax>4</skillMax>
-                <btnMin>4</btnMin>
-                <btnMax>1</btnMax>
+                <targetNumberPreferred>4</targetNumberPreferred>
+                <targetNumberMax>6</targetNumberMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
@@ -98,8 +98,8 @@
                 <active>1</active>
                 <skillMin>0</skillMin>
                 <skillMax>4</skillMax>
-                <btnMin>4</btnMin>
-                <btnMax>1</btnMax>
+                <targetNumberPreferred>4</targetNumberPreferred>
+                <targetNumberMax>6</targetNumberMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
@@ -107,8 +107,8 @@
                 <active>1</active>
                 <skillMin>0</skillMin>
                 <skillMax>4</skillMax>
-                <btnMin>4</btnMin>
-                <btnMax>1</btnMax>
+                <targetNumberPreferred>4</targetNumberPreferred>
+                <targetNumberMax>6</targetNumberMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
@@ -116,8 +116,8 @@
                 <active>1</active>
                 <skillMin>0</skillMin>
                 <skillMax>4</skillMax>
-                <btnMin>4</btnMin>
-                <btnMax>1</btnMax>
+                <targetNumberPreferred>4</targetNumberPreferred>
+                <targetNumberMax>6</targetNumberMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
@@ -125,8 +125,8 @@
                 <active>1</active>
                 <skillMin>0</skillMin>
                 <skillMax>4</skillMax>
-                <btnMin>4</btnMin>
-                <btnMax>1</btnMax>
+                <targetNumberPreferred>4</targetNumberPreferred>
+                <targetNumberMax>6</targetNumberMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
@@ -134,8 +134,8 @@
                 <active>1</active>
                 <skillMin>0</skillMin>
                 <skillMax>4</skillMax>
-                <btnMin>4</btnMin>
-                <btnMax>1</btnMax>
+                <targetNumberPreferred>4</targetNumberPreferred>
+                <targetNumberMax>6</targetNumberMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
         </mrmsOptions>
