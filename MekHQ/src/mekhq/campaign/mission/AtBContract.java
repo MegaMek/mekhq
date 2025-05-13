@@ -432,9 +432,38 @@ public class AtBContract extends Contract {
      *
      * @return The number of lances required.
      */
-    public static int calculateRequiredLances(Campaign campaign) {
-        int formationSize = getStandardForceSize(campaign.getFaction());
-        return max(getEffectiveNumUnits(campaign) / formationSize, 1);
+    public static int calculateBaseNumberOfRequiredLances(Campaign campaign) {
+        Faction campaignFaction = campaign.getFaction();
+
+        int lanceLevelFormationSize = getStandardForceSize(campaignFaction);
+        int effectiveNumUnits = getEffectiveNumUnits(campaign);
+
+        int formationSize = 0;
+        for (CombatTeam combatTeam : campaign.getAllCombatTeams()) {
+            Force force = combatTeam.getForce(campaign);
+
+            if (force == null) {
+                continue;
+            }
+
+            if (force.isForceType(STANDARD)) {
+                int depth = force.getFormationLevel().getDepth();
+                formationSize += getStandardForceSize(campaignFaction, depth);
+            }
+        }
+
+        // getStandardForceSize returns the total number of units, so we need to get rid of that portion of the
+        // calculation
+        int caclulatedForceSize = formationSize / lanceLevelFormationSize;
+
+        // If the player has no Combat Teams assign a minimum force size of 1.
+        if (caclulatedForceSize == 0) {
+            caclulatedForceSize = 1;
+        }
+
+        int baseRequiredLances = effectiveNumUnits / caclulatedForceSize;
+
+        return max(baseRequiredLances, 1);
     }
 
     /**
@@ -470,6 +499,10 @@ public class AtBContract extends Contract {
             Force force = combatTeam.getForce(campaign);
 
             if (force == null) {
+                continue;
+            }
+
+            if (!force.isForceType(STANDARD)) {
                 continue;
             }
 
@@ -1645,7 +1678,7 @@ public class AtBContract extends Contract {
             enemyCode = "REB";
         }
 
-        requiredCombatTeams = calculateRequiredLances(campaign);
+        requiredCombatTeams = calculateBaseNumberOfRequiredLances(campaign);
 
         setPartsAvailabilityLevel(getContractType().calculatePartsAvailabilityLevel());
 
