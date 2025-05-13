@@ -5567,44 +5567,29 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Determines whether a person's records should be removed from the campaign based on their retirement date, date of
-     * death, personnel status, and genealogy activity.
+     * Determines whether a given {@link Person} should be removed from the campaign's personnel list.
      *
-     * <p>
-     * The method evaluates the following conditions in order:
+     * <p>This method checks several conditions to establish if a person is eligible for removal:</p>
      * <ul>
-     * <li>If the person has a retirement date and retirees are exempt from removal
-     * as per
-     * campaign options, the method returns {@code false}.</li>
-     * <li>If the person has a date of death, and cemeteries are exempt from removal
-     * as per
-     * campaign options, the method returns {@code false}.</li>
-     * <li>If the person has an active genealogy, the method returns
-     * {@code false}.</li>
-     * <li>If the person's retirement date is more than one month ago, the method
-     * returns {@code true}.</li>
-     * <li>If the person's date of death is more than one month ago, the method
-     * returns {@code true}.</li>
+     *     <li>Persons exempt due to retirement or death (based on campaign options) will not be removed.</li>
+     *     <li>Persons with an active genealogy will not be removed.</li>
+     *     <li>If the person retired or died more than one month ago, and does not meet earlier exemption criteria, they
+     *         will be marked for removal.</li>
      * </ul>
      *
-     * <p>
-     * If none of the above conditions are met, the method returns {@code false}.
-     *
-     * @param person The individual being checked.
-     *
-     * @return {@code true} if the person should be removed, {@code false} otherwise.
+     * @param person the {@link Person} to check for possible removal
+     * @return {@code true} if the person should be removed; {@code false} otherwise
      */
-
     private boolean shouldRemovePerson(Person person) {
         // We do these checks first, as they're cheaper than parsing the entire
         // genealogy
-        LocalDate retirementDate = person.getRetirement();
-        if (retirementDate != null && campaignOptions.isUseRemovalExemptRetirees()) {
+        PersonnelStatus status = person.getStatus();
+
+        if (status.isRetired() && campaignOptions.isUseRemovalExemptRetirees()) {
             return false;
         }
 
-        LocalDate deathDate = person.getDateOfDeath();
-        if (deathDate != null && campaignOptions.isUseRemovalExemptCemetery()) {
+        if (status.isDead() && campaignOptions.isUseRemovalExemptCemetery()) {
             return false;
         }
 
@@ -5617,9 +5602,12 @@ public class Campaign implements ITechManager {
 
         // Did the departure occur more than a month ago?
         LocalDate aMonthAgo = currentDay.minusMonths(1);
+        LocalDate retirementDate = person.getRetirement();
         if (retirementDate != null && retirementDate.isBefore(aMonthAgo)) {
             return true;
         }
+
+        LocalDate deathDate = person.getDateOfDeath();
         return deathDate != null && deathDate.isBefore(aMonthAgo);
     }
 
