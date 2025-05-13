@@ -32,6 +32,7 @@ import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.util.Objects;
 
+import megamek.common.Aero;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
@@ -39,6 +40,7 @@ import megamek.common.ITechnology;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.TechAdvancement;
+import megamek.common.Warship;
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.ArmorType;
 import megamek.logging.MMLogger;
@@ -410,19 +412,19 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     public int getBaseTimeFor(Entity entity) {
-        if (null == entity) {
+        if (entity == null) {
             return 5;
         }
         // FIXME: this mess is because switch cannot switch on longs as of Java 17.
         // Options include: Waiting for Java to support that, or changing the entire
         // way the 'ETYPE' works on Entity to implement bitset or some similar.
-        // For repair types, see StratOps, Master Repair Table, p183
+        // For repair types, see CamOps, Master Repair Table, p207
         String typeKey;
         if (entity instanceof Tank) {
             typeKey = "TANK";
-        } else if (entity.hasETypeFlag(Entity.ETYPE_WARSHIP)) {
+        } else if (entity instanceof Warship) {
             typeKey = "CAPITAL";
-        } else if (entity.hasETypeFlag(Entity.ETYPE_AERO)) {
+        } else if (entity instanceof Aero) {
             typeKey = "AEROSPACE";
         } else {
             typeKey = "DEFAULT";
