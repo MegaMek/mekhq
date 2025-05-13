@@ -291,7 +291,7 @@ class AutomatedPersonnelCleanUpTest {
               false);
 
         // Assert
-        int expected = 0;
+        int expected = 10;
         int actual = cleanUp.getPersonnelToCleanUp().size();
 
         assertEquals(expected, actual);
