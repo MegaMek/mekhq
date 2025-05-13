@@ -228,14 +228,9 @@ public class MRMSOption {
                     mrmsOption.setSkillMax(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("targetNumberPreferred")) {
                     mrmsOption.setTargetNumberPreferred(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("btnMin")) {
-                    // Kept for version upgrades
-                    mrmsOption.setTargetNumberPreferred(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("targetNumberMax")) {
                     mrmsOption.setTargetNumberMax(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("btnMax")) {
-                    // Kept for version upgrades
-                    mrmsOption.setTargetNumberMax(Integer.parseInt(wn2.getTextContent().trim()));
+
                 } else if (wn2.getNodeName().equalsIgnoreCase("dailyTimeMin")) {
                     mrmsOption.setDailyTimeMin(Integer.parseInt(wn2.getTextContent().trim()));
                 }
