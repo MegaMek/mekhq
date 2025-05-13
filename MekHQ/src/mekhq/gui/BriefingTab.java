@@ -777,6 +777,13 @@ public final class BriefingTab extends CampaignGuiTab {
             return true;
         }
 
+        String description = scenario.getDescription().replaceAll("(\r\n|\n)", "<br>");
+
+        // If there isn't a description, we have nothing to display, so just act as if the player confirmed the dialog
+        if (description.isBlank()) {
+            return true;
+        }
+
         Mission mission = null;
         if (scenario.getMissionId() != -1) {
             mission = getCampaign().getMission(scenario.getMissionId());
@@ -790,7 +797,7 @@ public final class BriefingTab extends CampaignGuiTab {
             speaker = contract.getEmployerLiaison();
         } else {
             // If we're not working with an AtBContract we have to generate the liaison each time
-            speaker = getCampaign().newPerson(PersonnelRole.ADMINISTRATOR_COMMAND, "IND", Gender.RANDOMIZE);
+            speaker = getCampaign().newPerson(PersonnelRole.ADMINISTRATOR_COMMAND, "MERC", Gender.RANDOMIZE);
         }
 
         List<Person> forceCommanders = new ArrayList<>();
@@ -812,8 +819,6 @@ public final class BriefingTab extends CampaignGuiTab {
                 overallCommander = commander;
             }
         }
-
-        String description = scenario.getDescription().replaceAll("(\r\n|\n)", "<br>");
 
         List<String> buttons = List.of(resourceMap.getString("dialogScenarioAcceptance.button.accept"),
               resourceMap.getString("dialogScenarioAcceptance.button.cancel"));
