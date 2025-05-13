@@ -1181,11 +1181,11 @@ public class MRMSService {
             }
 
             if (increaseTime) {
-                // If we've reached our BTH, kick out. Otherwise we'll loop
+                // If we've reached our TN, kick out. Otherwise we'll loop
                 // around again
                 if (targetRoll.getValue() <= mrmsOption.getTargetNumberPreferred()) {
                     debugLog(
-                            "...... ending calculateNewMRMSWorktime because we have reached our BTH goal - %s ns",
+                            "...... ending calculateNewMRMSWorktime because we have reached our TN goal - %s ns",
                             "calculateNewMRMSWorktime",
                             System.nanoTime() - time);
 
@@ -1194,7 +1194,7 @@ public class MRMSService {
             } else {
                 if (targetRoll.getValue() > mrmsOption.getTargetNumberMax()) {
                     debugLog(
-                            "...... ending calculateNewMRMSWorktime because we have reached our BTH goal - %s ns",
+                            "...... ending calculateNewMRMSWorktime because we have reached our TN goal - %s ns",
                             "calculateNewMRMSWorktime",
                             System.nanoTime() - time);
 
