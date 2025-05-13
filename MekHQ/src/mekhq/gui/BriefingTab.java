@@ -63,6 +63,7 @@ import megamek.common.Game;
 import megamek.common.GunEmplacement;
 import megamek.common.annotations.Nullable;
 import megamek.common.containers.MunitionTree;
+import megamek.common.enums.Gender;
 import megamek.common.event.Subscribe;
 import megamek.common.options.OptionsConstants;
 import megamek.common.util.sorter.NaturalOrderComparator;
@@ -787,6 +788,9 @@ public final class BriefingTab extends CampaignGuiTab {
         Person speaker = null;
         if (mission instanceof AtBContract contract) {
             speaker = contract.getEmployerLiaison();
+        } else {
+            // If we're not working with an AtBContract we have to generate the liaison each time
+            speaker = getCampaign().newPerson(PersonnelRole.ADMINISTRATOR_COMMAND, "IND", Gender.RANDOMIZE);
         }
 
         List<Person> forceCommanders = new ArrayList<>();
