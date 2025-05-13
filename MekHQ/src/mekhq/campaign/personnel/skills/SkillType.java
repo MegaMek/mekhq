@@ -49,6 +49,7 @@ import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_SCIENC
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_SECURITY;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT_COMMAND;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColor;
 
 import java.io.PrintWriter;
@@ -90,6 +91,7 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class SkillType {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.SkillType";
     private static final MMLogger logger = MMLogger.create(SkillType.class);
 
     /**
@@ -181,6 +183,7 @@ public class SkillType {
     public static final String S_INTEREST_ARCHEOLOGY = "Interest/Archeology" + RP_ONLY_TAG;
     public static final String S_INTEREST_HOLO_CINEMA = "Interest/Holo-Cinema" + RP_ONLY_TAG;
     public static final String S_INTEREST_EXOTIC_ANIMALS = "Interest/Exotic Animals" + RP_ONLY_TAG;
+    public static final String S_INTEREST_LAW = "Interest/Law" + RP_ONLY_TAG;
     public static final String S_INTEREST_OTHER = "Interest/Other" + RP_ONLY_TAG;
     public static final String S_INTERROGATION = "Interrogation" + RP_ONLY_TAG;
     public static final String S_INVESTIGATION = "Investigation" + RP_ONLY_TAG;
@@ -201,7 +204,7 @@ public class SkillType {
     public static final String S_SCIENCE_PSYCHOLOGY = "Science/Psychology" + RP_ONLY_TAG;
     public static final String S_SCIENCE_OTHER = "Science/Other" + RP_ONLY_TAG;
     public static final String S_SECURITY_SYSTEMS_ELECTRONIC = "Security Systems/Electronic" + RP_ONLY_TAG;
-    public static final String S_SCIENCE_SYSTEMS_MECHANICAL = "Security Systems/Mechanical" + RP_ONLY_TAG;
+    public static final String S_SECURITY_SYSTEMS_MECHANICAL = "Security Systems/Mechanical" + RP_ONLY_TAG;
     public static final String S_SENSOR_OPERATIONS = "Sensor Operations" + RP_ONLY_TAG;
     public static final String S_STEALTH = "Stealth" + RP_ONLY_TAG;
     public static final String S_STREETWISE = "Streetwise/Any" + RP_ONLY_TAG;
@@ -237,13 +240,14 @@ public class SkillType {
                                                S_INTEREST_ECONOMICS, S_INTEREST_POP_CULTURE, S_INTEREST_ASTROLOGY,
                                                S_INTEREST_FISHING, S_INTEREST_MYTHOLOGY, S_INTEREST_CARTOGRAPHY,
                                                S_INTEREST_ARCHEOLOGY, S_INTEREST_HOLO_CINEMA, S_INTEREST_EXOTIC_ANIMALS,
+                                               S_INTEREST_LAW,
                                                S_INTEREST_OTHER, S_INTERROGATION, S_INVESTIGATION, S_LANGUAGES,
                                                S_MARTIAL_ARTS, S_PERCEPTION, S_SLEIGHT_OF_HAND, S_PROTOCOLS,
                                                S_SCIENCE_BIOLOGY, S_SCIENCE_CHEMISTRY, S_SCIENCE_MATHEMATICS,
                                                S_SCIENCE_PHYSICS, S_SCIENCE_MILITARY, S_SCIENCE_GEOLOGY,
                                                S_SCIENCE_XENOBIOLOGY, S_SCIENCE_PHARMACOLOGY, S_SCIENCE_GENETICS,
                                                S_SCIENCE_PSYCHOLOGY, S_SCIENCE_OTHER, S_SECURITY_SYSTEMS_ELECTRONIC,
-                                               S_SCIENCE_SYSTEMS_MECHANICAL, S_SENSOR_OPERATIONS, S_STEALTH,
+                                               S_SECURITY_SYSTEMS_MECHANICAL, S_SENSOR_OPERATIONS, S_STEALTH,
                                                S_STREETWISE, S_SURVIVAL, S_TRACKING, S_CAREER_ANY, S_SWIMMING,
                                                S_ZERO_G_OPERATIONS, S_RUNNING, S_TRAINING, S_MELEE_WEAPONS,
                                                S_THROWN_WEAPONS, S_SUPPORT_WEAPONS };
@@ -285,7 +289,7 @@ public class SkillType {
             case EXP_REGULAR -> "Regular";
             case EXP_VETERAN -> "Veteran";
             case EXP_ELITE -> "Elite";
-            case -1 -> "Unknown";
+            case -1 -> "None";
             default -> "Impossible";
         };
     }
@@ -381,6 +385,33 @@ public class SkillType {
 
     public static String[] getSkillList() {
         return skillList;
+    }
+
+    /**
+     * Retrieves a list of unique skill names that match any of the specified {@link SkillSubType}s.
+     *
+     * <p>This method iterates through all known {@link SkillType} instances and collects the names of those whose
+     * sub-type is included in the provided list of {@code skillSubTypes}. Each skill name will only appear once in the
+     * resulting list, even if multiple {@code SkillType}s with the same name are found.</p>
+     *
+     * @param skillSubTypes List of {@link SkillSubType}s for which to find matching skill names.
+     *
+     * @return A list of unique skill names that belong to one of the specified skill sub-types.
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public static List<String> getSkillsBySkillSubType(List<SkillSubType> skillSubTypes) {
+        List<String> relevantSkills = new ArrayList<>();
+        for (SkillType skillType : lookupHash.values()) {
+            SkillSubType subType = skillType.getSubType();
+            if (skillSubTypes.contains(subType)) {
+                if (!relevantSkills.contains(skillType.name)) {
+                    relevantSkills.add(skillType.name);
+                }
+            }
+        }
+        return relevantSkills;
     }
 
     /**
@@ -491,6 +522,61 @@ public class SkillType {
         return name;
     }
 
+    /**
+     * Generates a resource bundle key derived from the {@code name} field by removing all occurrences of '/', '-', and
+     * whitespace characters.
+     *
+     * @return a normalized resource bundle key string with specific characters removed from {@code name}
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    private String getResourceBundleKey() {
+        String key = name;
+        key = key.replace(RP_ONLY_TAG, "");
+        key = key.replace("/", "");
+        key = key.replace("(", "");
+        key = key.replace(")", "");
+        key = key.replace("-", "");
+        key = key.replace(" ", "");
+        return key;
+    }
+
+    /**
+     * Retrieves the flavor text for this skill, optionally including HTML tags and attribute details.
+     *
+     * @param includeHtmlTags   if {@code true}, the returned string will be wrapped with {@code <html>} and
+     *                          {@code </html>} tags
+     * @param includeAttributes if {@code true}, the returned string will append the object's attributes as labels; if
+     *                          {@code false}, only the raw flavor text is returned
+     *
+     * @return the assembled flavor text, with optional HTML formatting and attribute information
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public String getFlavorText(boolean includeHtmlTags, boolean includeAttributes) {
+        String key = getResourceBundleKey();
+        String rawFlavorText = getTextAt(RESOURCE_BUNDLE, key + ".flavorText");
+
+        String htmlOpenTag = includeHtmlTags ? "<html>" : "";
+        String htmlCloseTag = includeHtmlTags ? "</html>" : "";
+
+        if (!includeAttributes) {
+            return htmlOpenTag + rawFlavorText + htmlCloseTag;
+        }
+
+        String flavorText = htmlOpenTag + rawFlavorText + "<br>(" + firstAttribute.getLabel();
+
+        if (secondAttribute != NONE) {
+            flavorText += ", " + secondAttribute.getLabel() + ')';
+        }
+
+        flavorText += htmlCloseTag;
+
+        return flavorText;
+    }
+
     public int getTarget() {
         return target;
     }
@@ -519,12 +605,47 @@ public class SkillType {
         return this.subType == subType;
     }
 
+    /**
+     * Determines if this skill is classified as a roleplay skill.
+     *
+     * <p>Roleplay skills include general, art, interest, science, and security subtypes.</p>
+     *
+     * @return {@code true} if the skill subtype is a roleplay category; {@code false} otherwise
+     */
     public boolean isRoleplaySkill() {
         return this.subType == ROLEPLAY_GENERAL ||
                      this.subType == ROLEPLAY_ART ||
                      this.subType == ROLEPLAY_INTEREST ||
                      this.subType == ROLEPLAY_SCIENCE ||
                      this.subType == ROLEPLAY_SECURITY;
+    }
+
+    /**
+     * Determines if this skill is classified as a combat skill.
+     *
+     * <p>Combat skills include gunnery and piloting subtypes.</p>
+     *
+     * @return {@code true} if the skill subtype is a combat category; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public boolean isCombatSkill() {
+        return this.subType == COMBAT_GUNNERY || this.subType == COMBAT_PILOTING;
+    }
+
+    /**
+     * Determines if this skill is classified as a support skill.
+     *
+     * <p>Support skills include support and support command subtypes.</p>
+     *
+     * @return {@code true} if the skill subtype is a support category; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public boolean isSupportSkill() {
+        return this.subType == SUPPORT || this.subType == SUPPORT_COMMAND;
     }
 
     /**
@@ -566,6 +687,10 @@ public class SkillType {
                      Objects.equals(this.name, S_STRATEGY) ||
                      Objects.equals(this.name, S_TACTICS) ||
                      Objects.equals(this.name, S_TRAINING);
+    }
+
+    public List<SkillAttribute> getAttributes() {
+        return Arrays.asList(firstAttribute, secondAttribute);
     }
 
     public SkillAttribute getFirstAttribute() {
@@ -853,6 +978,7 @@ public class SkillType {
         lookupHash.put(S_INTEREST_ARCHEOLOGY, createInterestArcheology());
         lookupHash.put(S_INTEREST_HOLO_CINEMA, createInterestHoloCinema());
         lookupHash.put(S_INTEREST_EXOTIC_ANIMALS, createInterestExoticAnimals());
+        lookupHash.put(S_INTEREST_LAW, createInterestLaw());
         lookupHash.put(S_INTEREST_OTHER, createInterestOther());
         lookupHash.put(S_INTERROGATION, createInterrogation());
         lookupHash.put(S_INVESTIGATION, createInvestigation());
@@ -873,7 +999,7 @@ public class SkillType {
         lookupHash.put(S_SCIENCE_PSYCHOLOGY, createSciencePsychology());
         lookupHash.put(S_SCIENCE_OTHER, createScienceOther());
         lookupHash.put(S_SECURITY_SYSTEMS_ELECTRONIC, createSecuritySystemsElectronic());
-        lookupHash.put(S_SCIENCE_SYSTEMS_MECHANICAL, createSecuritySystemsMechanical());
+        lookupHash.put(S_SECURITY_SYSTEMS_MECHANICAL, createSecuritySystemsMechanical());
         lookupHash.put(S_SENSOR_OPERATIONS, createSensorOperations());
         lookupHash.put(S_STEALTH, createStealth());
         lookupHash.put(S_STREETWISE, createStreetwise());
@@ -1284,6 +1410,7 @@ public class SkillType {
             case S_INTEREST_ARCHEOLOGY -> createInterestArcheology();
             case S_INTEREST_HOLO_CINEMA -> createInterestHoloCinema();
             case S_INTEREST_EXOTIC_ANIMALS -> createInterestExoticAnimals();
+            case S_INTEREST_LAW -> createInterestLaw();
             case S_INTEREST_OTHER -> createInterestOther();
             case S_INTERROGATION -> createInterrogation();
             case S_INVESTIGATION -> createInvestigation();
@@ -1304,7 +1431,7 @@ public class SkillType {
             case S_SCIENCE_PSYCHOLOGY -> createSciencePsychology();
             case S_SCIENCE_OTHER -> createScienceOther();
             case S_SECURITY_SYSTEMS_ELECTRONIC -> createSecuritySystemsElectronic();
-            case S_SCIENCE_SYSTEMS_MECHANICAL -> createSecuritySystemsMechanical();
+            case S_SECURITY_SYSTEMS_MECHANICAL -> createSecuritySystemsMechanical();
             case S_SENSOR_OPERATIONS -> createSensorOperations();
             case S_STEALTH -> createStealth();
             case S_STREETWISE, "Streetwise (RP Only)" -> createStreetwise();
@@ -2435,6 +2562,20 @@ public class SkillType {
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
+    public static SkillType createInterestLaw() {
+        return new SkillType(S_INTEREST_LAW,
+              9,
+              false,
+              ROLEPLAY_INTEREST,
+              INTELLIGENCE,
+              WILLPOWER,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
+    }
+
     public static SkillType createInterestOther() {
         return new SkillType(S_INTEREST_OTHER,
               9,
@@ -2718,7 +2859,7 @@ public class SkillType {
     }
 
     public static SkillType createSecuritySystemsMechanical() {
-        return new SkillType(S_SCIENCE_SYSTEMS_MECHANICAL,
+        return new SkillType(S_SECURITY_SYSTEMS_MECHANICAL,
               9,
               false,
               ROLEPLAY_SECURITY,
