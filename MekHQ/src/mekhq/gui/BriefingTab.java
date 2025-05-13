@@ -789,8 +789,6 @@ public final class BriefingTab extends CampaignGuiTab {
             speaker = contract.getEmployerLiaison();
         }
 
-        AtBContract contract = null;
-
         List<Person> forceCommanders = new ArrayList<>();
         for (Force force : getCampaign().getAllForces()) {
             Person commander = getCampaign().getPerson(force.getForceCommanderID());
