@@ -1132,7 +1132,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
 
             menu = new JMenu("Change Force Type");
 
-            menuItem = new JMenuItem("Make Standard Force");
+            menuItem = new JMenuItem("Make Combat Force");
             menuItem.setActionCommand(COMMAND_CHANGE_FORCE_TYPE_STANDARD + forceIds);
             menuItem.addActionListener(this);
             menu.add(menuItem);

@@ -329,6 +329,7 @@ public class Person {
     // this is a flag used in random procreation to determine whether to attempt to
     // procreate
     private boolean tryingToConceive;
+    private boolean hidePersonality;
     // endregion Flags
 
     // Generic extra data, for use with plugins and mods
@@ -2365,6 +2366,14 @@ public class Person {
     public void setTryingToConceive(final boolean tryingToConceive) {
         this.tryingToConceive = tryingToConceive;
     }
+
+    public boolean isHidePersonality() {
+        return hidePersonality;
+    }
+
+    public void setHidePersonality(final boolean hidePersonality) {
+        this.hidePersonality = hidePersonality;
+    }
     // endregion Flags
 
     public ExtraData getExtraData() {
@@ -2787,6 +2796,8 @@ public class Person {
             if (!isTryingToConceive()) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tryingToConceive", false);
             }
+
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hidePersonality", hidePersonality);
             // endregion Flags
 
             if (!extraData.isEmpty()) {
@@ -3276,6 +3287,8 @@ public class Person {
                     person.setMarriageable(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("tryingToConceive")) {
                     person.setTryingToConceive(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("hidePersonality")) {
+                    person.setHidePersonality(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("extraData")) {
                     person.extraData = ExtraData.createFromXml(wn2);
                 }
@@ -3781,7 +3794,7 @@ public class Person {
 
         return switch (role) {
             case VEHICLE_GUNNER -> {
-                if (isUseArtillery) {
+                if (!isUseArtillery) {
                     yield calculateExperienceLevelForProfession(associatedSkillNames, isAlternativeQualityAveraging);
                 } else {
                     if ((hasSkill(SkillType.S_GUN_VEE)) && (hasSkill(SkillType.S_ARTILLERY))) {

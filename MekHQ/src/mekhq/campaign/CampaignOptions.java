@@ -6777,8 +6777,8 @@ public class CampaignOptions {
      * @param gameOptions the {@link GameOptions} to update based on the current campaign options.
      */
     public void updateGameOptionsFromCampaignOptions(GameOptions gameOptions) {
-        gameOptions.getOption(RPG_COMMAND_INIT).setValue(useTactics);
         gameOptions.getOption(RPG_INDIVIDUAL_INITIATIVE).setValue(useInitiativeBonus);
+        gameOptions.getOption(RPG_COMMAND_INIT).setValue(useTactics || useInitiativeBonus);
         gameOptions.getOption(RPG_TOUGHNESS).setValue(useToughness);
         gameOptions.getOption(RPG_ARTILLERY_SKILL).setValue(useArtillery);
         gameOptions.getOption(RPG_PILOT_ADVANTAGES).setValue(useAbilities);
