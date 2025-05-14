@@ -37,7 +37,6 @@ import static java.awt.Color.RED;
 import static java.lang.Math.ceil;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.common.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
-import static megamek.common.icons.Portrait.DEFAULT_PORTRAIT_FILENAME;
 import static megamek.common.options.PilotOptions.LVL3_ADVANTAGES;
 import static megamek.common.options.PilotOptions.MD_ADVANTAGES;
 import static megamek.utilities.ImageUtilities.addTintToImageIcon;
@@ -93,7 +92,6 @@ import javax.swing.JTable;
 import javax.swing.JTextPane;
 import javax.swing.table.TableColumn;
 
-import megamek.client.ui.swing.tileset.MMStaticDirectoryManager;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Portrait;
@@ -158,7 +156,7 @@ public class PersonViewPanel extends JScrollablePanel {
         campaignOptions = campaign.getCampaignOptions();
         this.gui = gui;
         if (person == null) {
-            initializeEmptyPanel();
+            fillInfoEmpty();
         } else {
             initComponents();
         }
@@ -2562,7 +2560,7 @@ public class PersonViewPanel extends JScrollablePanel {
         this.person = person;
         removeAll();
         if (person == null) {
-            initializeEmptyPanel();
+            fillInfoEmpty();
         } else {
             initComponents();
         }
