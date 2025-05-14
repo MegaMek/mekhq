@@ -52,7 +52,6 @@ import java.util.List;
 import megamek.common.Entity;
 import megamek.common.Infantry;
 import megamek.common.UnitType;
-import mekhq.MekHQ;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
@@ -60,6 +59,7 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.HangarStatistics;
 import mekhq.campaign.unit.Unit;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * calculates and stores summary information on a campaign for use in reporting, mostly for the command center
@@ -311,7 +311,7 @@ public class CampaignSummary {
         StringBuilder report = new StringBuilder("<html>");
 
         if (comparison > 0) {
-            report.append("<font color='").append(MekHQ.getMHQOptions().getFontColorWarningHexColor()).append("'>");
+            report.append("<font color='").append(ReportingUtilities.getWarningColor()).append("'>");
         }
 
         report.append(roundedCargo).append(" tons (").append(roundedCapacity).append(" tons capacity)");
@@ -395,7 +395,7 @@ public class CampaignSummary {
 
             color = isWithinCapacity ?
                           "" :
-                          spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
+                          spanOpeningWithCustomColor(ReportingUtilities.getWarningColor());
             closingSpan = isWithinCapacity ? "" : CLOSING_SPAN_TAG;
             colorBlindWarning = isWithinCapacity ? "" : WARNING;
 
@@ -428,7 +428,7 @@ public class CampaignSummary {
             exceedsCapacity = patients > doctorCapacity;
 
             color = exceedsCapacity ?
-                          spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()) :
+                          spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()) :
                           "";
             closingSpan = exceedsCapacity ? CLOSING_SPAN_TAG : "";
             colorBlindWarning = exceedsCapacity ? WARNING : "";
@@ -452,9 +452,9 @@ public class CampaignSummary {
             exceedsCapacity = capacityUsage > prisonerCapacity;
 
             color = capacityUsage > (prisonerCapacity * 0.75) // at risk of a minor event
-                          ? spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor()) : "";
+                          ? spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()) : "";
             color = exceedsCapacity // at risk of a major event
-                          ? spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()) : color;
+                          ? spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()) : color;
             closingSpan = exceedsCapacity ? CLOSING_SPAN_TAG : "";
             colorBlindWarning = exceedsCapacity ? WARNING : "";
 

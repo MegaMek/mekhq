@@ -64,7 +64,6 @@ import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
@@ -85,6 +84,7 @@ import mekhq.gui.dialog.resupplyAndCaches.DialogPlayerConvoyOption;
 import mekhq.gui.dialog.resupplyAndCaches.DialogResupplyFocus;
 import mekhq.gui.dialog.resupplyAndCaches.DialogRoleplayEvent;
 import mekhq.gui.dialog.resupplyAndCaches.DialogSwindled;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * The {@code PerformResupply} class handles the execution and management of resupply operations within MekHQ campaigns.
@@ -272,7 +272,7 @@ public class PerformResupply {
 
             campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
                   "convoySuccessfulSmuggler.text",
-                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                  spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                   CLOSING_SPAN_TAG));
             makeDelivery(resupply, null);
         }
@@ -478,7 +478,7 @@ public class PerformResupply {
 
         campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
               "convoySuccessful.text",
-              spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+              spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
               CLOSING_SPAN_TAG));
 
         makeDelivery(resupply, convoyContents);
@@ -537,7 +537,7 @@ public class PerformResupply {
         if (template == null) {
             campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
                   "convoyErrorTemplate.text",
-                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   templateAddress,
                   CLOSING_SPAN_TAG));
 
@@ -555,7 +555,7 @@ public class PerformResupply {
         } catch (NullPointerException e) {
             campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
                   "convoyErrorTracks.text",
-                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   templateAddress,
                   CLOSING_SPAN_TAG));
 
@@ -612,7 +612,7 @@ public class PerformResupply {
             // Announce the situation to the player
             campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
                   "convoyInterceptedStratCon.text",
-                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   CLOSING_SPAN_TAG));
         } else {
             // If we failed to generate a scenario, for whatever reason, we don't
@@ -638,7 +638,7 @@ public class PerformResupply {
     private static void handleFallbackMessage(Resupply resupply, List<Part> convoyContents, Campaign campaign) {
         campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
               "convoyEscaped.text",
-              spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+              spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
               CLOSING_SPAN_TAG));
 
         makeDelivery(resupply, convoyContents);

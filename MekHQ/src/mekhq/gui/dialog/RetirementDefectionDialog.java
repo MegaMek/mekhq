@@ -86,6 +86,7 @@ import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.PersonRankStringSorter;
 import mekhq.gui.sorter.WeightClassSorter;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * @author Neoancient
@@ -471,7 +472,7 @@ public class RetirementDefectionDialog extends JDialog {
                                    resourceMap.getString("lblTotalBonus.text") +
                                    ' ' +
                                    "<font color='" +
-                                   MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                                   ReportingUtilities.getNegativeColor() +
                                    "'>" +
                                    getTotalBonus().toAmountAndSymbolString() +
                                    "</font></html>");

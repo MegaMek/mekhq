@@ -43,9 +43,9 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 import java.time.LocalDate;
 import java.util.Map;
 
-import mekhq.MekHQ;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * The {@code DiscretionarySpending} class manages the simulation of discretionary spending for a person based on their
@@ -134,7 +134,7 @@ public class DiscretionarySpending {
     public DiscretionarySpending(Person person, Finances finances, LocalDate today) {
         final String fullTitle = person.getHyperlinkedFullTitle();
         if (person.isHasPerformedExtremeExpenditure()) {
-            final String openingSpan = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor());
+            final String openingSpan = spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
             reportMessage = getFormattedTextAt(RESOURCE_BUNDLE, "report.format.exhausted",
                   fullTitle,
                   openingSpan,
@@ -162,7 +162,7 @@ public class DiscretionarySpending {
 
         // Generate the report message
         final String fullName = person.getFullName();
-        final String openingSpan = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor());
+        final String openingSpan = spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor());
         if (money.isZero()) {
             reportMessage = getFormattedTextAt(RESOURCE_BUNDLE, "report.format.no_spending", fullTitle);
         } else {
@@ -265,7 +265,7 @@ public class DiscretionarySpending {
         final String fullTitle = person.getHyperlinkedFullTitle();
         final String fullName = person.getFullName();
         final String givenName = person.getGivenName();
-        final String openingSpan = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
+        final String openingSpan = spanOpeningWithCustomColor(ReportingUtilities.getWarningColor());
         String reportMessage = getFormattedTextAt(RESOURCE_BUNDLE,
               "report.format.extreme",
               fullTitle,
@@ -312,7 +312,7 @@ public class DiscretionarySpending {
      * @return A formatted report message indicating that expenditure has been exhausted.
      */
     public static String getExpenditureExhaustedReportMessage(String hyperlinkedFullTitle) {
-        final String openingSpan = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
+        final String openingSpan = spanOpeningWithCustomColor(ReportingUtilities.getWarningColor());
         return getFormattedTextAt(RESOURCE_BUNDLE,
               "report.format.exhausted",
               hyperlinkedFullTitle,

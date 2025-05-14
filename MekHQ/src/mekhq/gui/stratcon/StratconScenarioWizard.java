@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.stratcon;
 
@@ -83,6 +88,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.gui.StratconPanel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.utilities.MHQInternationalization;
+import mekhq.utilities.ReportingUtilities;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.util.Pair;
 
@@ -614,7 +620,7 @@ public class StratconScenarioWizard extends JDialog {
 
         if (injuryCount > 0) {
             sb.append(String.format(", <span color='" +
-                                          MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                                          ReportingUtilities.getNegativeColor() +
                                           "'>%d/%d injured crew</span>", injuryCount, u.getCrew().size()));
         }
 

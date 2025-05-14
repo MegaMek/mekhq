@@ -25,11 +25,17 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.unit;
 
 import java.io.PrintWriter;
 
+import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -193,17 +199,17 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
     public String find(int transitDays) {
         // TODO: probably get a duplicate entity
         if (getCampaign().getQuartermaster().buyUnit((Entity) getNewEquipment(), transitDays)) {
-            return "<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor()
+            return "<font color='" + ReportingUtilities.getPositiveColor()
                     + "'><b> unit found</b>.</font> It will be delivered in " + transitDays + " days.";
         } else {
-            return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
+            return "<font color='" + ReportingUtilities.getNegativeColor()
                     + "'><b> You cannot afford this unit. Transaction cancelled</b>.</font>";
         }
     }
 
     @Override
     public String failToFind() {
-        return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
+        return "<font color='" + ReportingUtilities.getNegativeColor()
                 + "'><b> unit not found</b>.</font>";
     }
 

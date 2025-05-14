@@ -131,6 +131,7 @@ import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.io.FileType;
 import mekhq.utilities.MHQXMLUtility;
+import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -2499,7 +2500,7 @@ public class CampaignGUI extends JPanel {
         String inDebt = "";
         if (getCampaign().getFinances().isInDebt()) {
             // FIXME : Localize
-            inDebt = " <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>(in Debt)</font>";
+            inDebt = " <font color='" + ReportingUtilities.getNegativeColor() + "'>(in Debt)</font>";
         }
         // FIXME : Localize
         String text = "<html><b>Funds</b>: " + funds.toAmountAndSymbolString() + inDebt + "</html>";

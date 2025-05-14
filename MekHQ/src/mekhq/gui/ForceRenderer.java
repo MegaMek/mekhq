@@ -70,7 +70,7 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
 
         if (value instanceof Unit unit) {
             String name = ReportingUtilities.messageSurroundedBySpanWithColor(
-                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(), "No Crew");
+                    ReportingUtilities.getNegativeColor(), "No Crew");
             if (unit.getEntity() instanceof GunEmplacement) {
                 name = "AutoTurret";
             }
@@ -83,13 +83,13 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                         + unit.getEntity().getCrew().getPiloting() + ')';
                 if (person.needsFixing() || (unit.getEntity().getCrew().getHits() > 0)) {
                     name = ReportingUtilities.messageSurroundedBySpanWithColor(
-                            MekHQ.getMHQOptions().getFontColorNegativeHexColor(), name);
+                            ReportingUtilities.getNegativeColor(), name);
                 }
             }
             String unitName = "<i>" + unit.getName() + "</i>";
             if (unit.isDamaged()) {
                 unitName = ReportingUtilities.messageSurroundedBySpanWithColor(
-                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(), unitName);
+                    ReportingUtilities.getNegativeColor(), unitName);
             }
 
             Entity entity = unit.getEntity();

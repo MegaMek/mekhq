@@ -1371,7 +1371,7 @@ public class Person {
 
         if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
             campaign.addReport(String.format(resources.getString("loyaltyChangeGroup.text"),
-                  "<span color=" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>",
+                  "<span color=" + ReportingUtilities.getWarningColor() + "'>",
                   ReportingUtilities.CLOSING_SPAN_TAG));
         }
     }
@@ -1468,10 +1468,10 @@ public class Person {
 
         // choose the color and string based on the loyalty comparison.
         if (originalLoyalty > loyalty) {
-            color = MekHQ.getMHQOptions().getFontColorNegativeHexColor();
+            color = ReportingUtilities.getNegativeColor();
             changeString.append(resources.getString("loyaltyChangeNegative.text"));
         } else {
-            color = MekHQ.getMHQOptions().getFontColorPositiveHexColor();
+            color = ReportingUtilities.getPositiveColor();
             changeString.append(resources.getString("loyaltyChangePositive.text"));
         }
 
@@ -3353,7 +3353,7 @@ public class Person {
                 person.setPrimaryRole(campaign, PersonnelRole.NONE);
 
                 campaign.addReport(String.format(resources.getString("ineligibleForPrimaryRole"),
-                      spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                      spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                       CLOSING_SPAN_TAG,
                       person.getHyperlinkedFullTitle()));
             }
@@ -3362,7 +3362,7 @@ public class Person {
                 person.setSecondaryRole(PersonnelRole.NONE);
 
                 campaign.addReport(String.format(resources.getString("ineligibleForSecondaryRole"),
-                      spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor()),
+                      spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
                       CLOSING_SPAN_TAG,
                       person.getHyperlinkedFullTitle()));
             }
@@ -4069,7 +4069,7 @@ public class Person {
 
     public String fail() {
         return " <font color='" +
-                     MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                     ReportingUtilities.getNegativeColor() +
                      "'><b>Failed to heal.</b></font>";
     }
 
@@ -4291,7 +4291,7 @@ public class Person {
     public String succeed() {
         heal();
         return " <font color='" +
-                     MekHQ.getMHQOptions().getFontColorPositiveHexColor() +
+                     ReportingUtilities.getPositiveColor() +
                      "'><b>Successfully healed one hit.</b></font>";
     }
 

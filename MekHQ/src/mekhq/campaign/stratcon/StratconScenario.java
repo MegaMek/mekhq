@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.stratcon;
 
@@ -57,6 +62,7 @@ import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.unit.ITransportAssignment;
 import mekhq.campaign.unit.Unit;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * Class that handles scenario metadata and interaction at the StratCon level
@@ -263,7 +269,7 @@ public class StratconScenario implements IStratconDisplayable {
 
         if (isStrategicObjective()) {
             stateBuilder.append("<span color='")
-                  .append(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
+                  .append(ReportingUtilities.getNegativeColor())
                   .append("'>Contract objective located</span><br/>");
         }
 

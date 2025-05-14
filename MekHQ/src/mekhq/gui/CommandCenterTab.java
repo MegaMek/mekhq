@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui;
 
@@ -784,7 +789,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         totalCost = getCampaign().getShoppingList().getTotalBuyCost();
         funds = getCampaign().getFunds();
         if (funds.compareTo(totalCost) < 0) {
-            String warningColor = MekHQ.getMHQOptions().getFontColorWarningHexColor();
+            String warningColor = ReportingUtilities.getWarningColor();
             String formatedString = "<b>" + totalCost.toAmountAndSymbolString() + "</b>";
             totalCostString = ReportingUtilities.messageSurroundedBySpanWithColor(warningColor, formatedString);
         } else {

@@ -55,7 +55,6 @@ import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.force.Force;
@@ -70,6 +69,7 @@ import mekhq.gui.dialog.randomEvents.prisonerDialogs.PrisonerEventDialog;
 import mekhq.gui.dialog.randomEvents.prisonerDialogs.PrisonerEventResultsDialog;
 import mekhq.gui.dialog.randomEvents.prisonerDialogs.PrisonerWarningDialog;
 import mekhq.gui.dialog.randomEvents.prisonerDialogs.PrisonerWarningResultsDialog;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * Manages prisoner-related events and warnings during a campaign.
@@ -492,12 +492,12 @@ public class PrisonerEventManager {
         String key = getFormattedTextAt(RESOURCE_BUNDLE, hasBackfired ? "execute.backfired" : "execute.successful");
 
         String messageColor = hasBackfired ?
-                                    spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()) :
-                                    spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor());
+                                    spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()) :
+                                    spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor());
 
         String crimeColor = crimeNoticed ?
-                                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()) :
-                                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor());
+                                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()) :
+                                  spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor());
 
         String crimeMessage = crimeNoticed ?
                                     getFormattedTextAt(RESOURCE_BUNDLE,

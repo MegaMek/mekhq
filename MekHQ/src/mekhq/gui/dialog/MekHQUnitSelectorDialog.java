@@ -24,31 +24,48 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
+
+import static mekhq.utilities.EntityUtilities.isUnsupportedEntity;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
+
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.regex.PatternSyntaxException;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.RowFilter;
 
 import megamek.client.ui.Messages;
 import megamek.client.ui.advancedsearch.MekSearchFilter;
 import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
-import megamek.common.*;
+import megamek.common.Entity;
+import megamek.common.EntityWeightClass;
+import megamek.common.ITechnology;
+import megamek.common.MekSummary;
+import megamek.common.TargetRoll;
+import megamek.common.TechConstants;
+import megamek.common.UnitType;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.unit.UnitTechProgression;
 import mekhq.utilities.MHQInternationalization;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.regex.PatternSyntaxException;
-
-import static mekhq.utilities.EntityUtilities.isUnsupportedEntity;
-import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
-import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
+import mekhq.utilities.ReportingUtilities;
 
 public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
     //region Variable Declarations
@@ -162,7 +179,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
 
                 campaign.addReport(String.format(
                     reason,
-                    spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                    spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                     CLOSING_SPAN_TAG));
 
                 dispose();

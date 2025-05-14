@@ -80,6 +80,7 @@ import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.gui.stratcon.StratconScenarioWizard;
 import mekhq.gui.stratcon.TrackForceAssignmentUI;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * This panel handles AtB-Stratcon GUI interactions with a specific scenario track.
@@ -929,7 +930,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                                        currentTrack.getRevealedCoords().contains(boardState.getSelectedCoords());
         if (coordsRevealed) {
             infoBuilder.append("<span color='")
-                  .append(MekHQ.getMHQOptions().getFontColorPositiveHexColor())
+                  .append(ReportingUtilities.getPositiveColor())
                   .append("'><i>Recon Complete</i></span><br/>");
         }
 
@@ -956,13 +957,13 @@ public class StratconPanel extends JPanel implements ActionListener {
                 if (facility.isStrategicObjective()) {
                     infoBuilder.append(String.format("<br/><span color='%s'>Contract objective located</span>",
                           facility.getOwner() == Allied ?
-                                MekHQ.getMHQOptions().getFontColorPositiveHexColor() :
-                                MekHQ.getMHQOptions().getFontColorNegativeHexColor()));
+                                ReportingUtilities.getPositiveColor() :
+                                ReportingUtilities.getNegativeColor()));
                 }
                 infoBuilder.append("<span color='")
                       .append(facility.getOwner() == Allied ?
-                                    MekHQ.getMHQOptions().getFontColorPositiveHexColor() :
-                                    MekHQ.getMHQOptions().getFontColorNegativeHexColor())
+                                    ReportingUtilities.getPositiveColor() :
+                                    ReportingUtilities.getNegativeColor())
                       .append("'>")
                       .append("<br/>")
                       .append(facility.getFormattedDisplayableName());

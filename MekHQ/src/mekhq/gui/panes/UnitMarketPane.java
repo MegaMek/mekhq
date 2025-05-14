@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.panes;
 
@@ -53,7 +58,6 @@ import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -64,6 +68,7 @@ import mekhq.gui.model.UnitMarketTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.WeightClassSorter;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
+import mekhq.utilities.ReportingUtilities;
 
 public class UnitMarketPane extends AbstractMHQSplitPane {
     private static final MMLogger logger = MMLogger.create(UnitMarketPane.class);
@@ -438,7 +443,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
             final Money price = offer.getPrice();
             if (getCampaign().getFunds().isLessThan(price)) {
                 getCampaign().addReport(String.format("<font color='" +
-                                                            MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                                                            ReportingUtilities.getNegativeColor() +
                                                             "'>" +
                                                             resources.getString("UnitMarketPane.CannotAfford.report") +
                                                             "</font>", entity.getShortName()));
@@ -455,7 +460,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
                             String.format(resources.getString("UnitMarketPane.PurchasedUnitBlackMarketSwindled.finances"),
                                   entity.getShortName()));
                 getCampaign().addReport("<font color='" +
-                                              MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                                              ReportingUtilities.getNegativeColor() +
                                               "'>" +
                                               resources.getString("UnitMarketPane.BlackMarketSwindled.report") +
                                               "</font>");
@@ -499,7 +504,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
 
             if (!instantDelivery) {
                 getCampaign().addReport("<font color='" +
-                                              MekHQ.getMHQOptions().getFontColorPositiveHexColor() +
+                                              ReportingUtilities.getPositiveColor() +
                                               "'>" +
                                               String.format(resources.getString(
                                                           "UnitMarketPane.UnitDeliveryLength.report") + "</font>",

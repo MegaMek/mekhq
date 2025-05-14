@@ -25,11 +25,17 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.force;
 
 import java.io.PrintWriter;
 
+import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -82,18 +88,18 @@ public class UnitStub {
     // endregion Getters/Setters
 
     private String getUnitDescription(Unit u) {
-        String name = "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>No Crew</font>";
+        String name = "<font color='" + ReportingUtilities.getNegativeColor() + "'>No Crew</font>";
         Person pp = u.getCommander();
         if (null != pp) {
             name = pp.getFullTitle();
             name += " (" + u.getEntity().getCrew().getGunnery() + "/" + u.getEntity().getCrew().getPiloting() + ")";
             if (pp.needsFixing()) {
-                name = "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>" + name + "</font>";
+                name = "<font color='" + ReportingUtilities.getNegativeColor() + "'>" + name + "</font>";
             }
         }
         String uname = "<i>" + u.getName() + "</i>";
         if (u.isDamaged()) {
-            uname = "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>" + uname + "</font>";
+            uname = "<font color='" + ReportingUtilities.getNegativeColor() + "'>" + uname + "</font>";
         }
         return "<html>" + name + ", " + uname + "</html>";
     }

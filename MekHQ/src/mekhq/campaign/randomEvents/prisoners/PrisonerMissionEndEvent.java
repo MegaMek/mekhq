@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.randomEvents.prisoners;
 
@@ -42,7 +47,6 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 import java.time.LocalDate;
 import java.util.List;
 
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.Contract;
@@ -52,6 +56,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.gui.dialog.MissionEndPrisonerDefectorDialog;
 import mekhq.gui.dialog.MissionEndPrisonerDialog;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * Handles events involving prisoners at the end of a mission.
@@ -359,8 +364,8 @@ public class PrisonerMissionEndEvent {
 
         // Build the report
         String crimeColor = crimeNoticed ?
-                                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()) :
-                                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor());
+                                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()) :
+                                  spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor());
 
         String crimeMessage = crimeNoticed ?
                                     getFormattedTextAt(RESOURCE_BUNDLE,

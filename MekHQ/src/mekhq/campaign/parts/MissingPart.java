@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
@@ -129,7 +134,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
     public String succeed() {
         fix();
         return ReportingUtilities.messageSurroundedBySpanWithColor(
-                MekHQ.getMHQOptions().getFontColorPositiveHexColor(),
+                ReportingUtilities.getPositiveColor(),
                 " <b>replaced</b>.");
     }
 
@@ -234,7 +239,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
                     .append(" in stock");
             } else {
                 toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
-                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(), "None in stock"));
+                    ReportingUtilities.getNegativeColor(), "None in stock"));
             }
 
             String incoming = inventories.getTransitOrderedDetails();
@@ -246,7 +251,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
                     .append(")");
 
                 toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
-                    MekHQ.getMHQOptions().getFontColorWarningHexColor(), incomingSB.toString()));
+                    ReportingUtilities.getWarningColor(), incomingSB.toString()));
             }
         }
         return toReturn.toString();
@@ -284,11 +289,11 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
                 skillMin = SkillType.EXP_GREEN;
             }
             return ReportingUtilities.messageSurroundedBySpanWithColor(
-                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
+                    ReportingUtilities.getNegativeColor(),
                     "<b> failed and part destroyed</b>") + ".";
         } else {
             return ReportingUtilities.messageSurroundedBySpanWithColor(
-                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
+                    ReportingUtilities.getNegativeColor(),
                     "<b> failed</b>") + ".";
         }
     }
@@ -376,13 +381,13 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
         StringBuilder toReturn = new StringBuilder();
         if (campaign.getQuartermaster().buyPart(newPart, transitDays)) {
             toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
-                MekHQ.getMHQOptions().getFontColorPositiveHexColor(), "<b> part found</b>"))
+                ReportingUtilities.getPositiveColor(), "<b> part found</b>"))
                 .append(". It will be delivered in ")
                 .append(transitDays)
                 .append(" days.");
         } else {
             toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
-                MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
+                ReportingUtilities.getNegativeColor(),
                 "<b> You cannot afford this part. Transaction cancelled</b>"));
         }
         return toReturn.toString();
@@ -399,7 +404,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
     public String failToFind() {
         // TODO: Move me to live with procurment functions?
         return ReportingUtilities.messageSurroundedBySpanWithColor(
-            MekHQ.getMHQOptions().getFontColorNegativeHexColor(), "<b> part not found</b>") + ".";
+            ReportingUtilities.getNegativeColor(), "<b> part not found</b>") + ".";
     }
 
     @Override
