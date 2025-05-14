@@ -33,6 +33,7 @@
 package mekhq.gui;
 
 import static megamek.client.ratgenerator.ForceDescriptor.RATING_5;
+import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.mission.enums.MissionStatus.PARTIAL;
 import static mekhq.campaign.mission.enums.MissionStatus.SUCCESS;
 import static mekhq.campaign.mission.enums.ScenarioStatus.REFUSED_ENGAGEMENT;
@@ -509,7 +510,21 @@ public final class BriefingTab extends CampaignGuiTab {
                   Objects.equals(String.valueOf(cmd.getStatus()), "Success"));
         }
 
-        // Get rid of any remaining scenarios
+        // Undeploy forces
+        for (Force force : getCampaign().getAllForces()) {
+            int scenarioAssignment = force.getScenarioId();
+            if (scenarioAssignment != NO_ASSIGNED_SCENARIO) {
+                Scenario scenario = getCampaign().getScenario(force.getScenarioId());
+
+                // This shouldn't be necessary, but now is as good a time as any to check for null scenarios
+                if (scenario == null || scenario.getMissionId() == mission.getId()) {
+                    force.setScenarioId(NO_ASSIGNED_SCENARIO, getCampaign());
+                    continue;
+                }
+            }
+        }
+
+        // Resolve any outstanding scenarios
         for (Scenario scenario : mission.getCurrentScenarios()) {
             scenario.setStatus(REFUSED_ENGAGEMENT);
         }
@@ -598,6 +613,16 @@ public final class BriefingTab extends CampaignGuiTab {
                         JOptionPane.YES_NO_OPTION)) {
             return;
         }
+
+        // Undeploy forces
+        for (Scenario scenario : mission.getScenarios()) {
+            for (Force force : getCampaign().getAllForces()) {
+                if (force.getScenarioId() == scenario.getId()) {
+                    force.setScenarioId(NO_ASSIGNED_SCENARIO, getCampaign());
+                }
+            }
+        }
+
         getCampaign().removeMission(mission);
         final List<Mission> missions = getCampaign().getSortedMissions();
         comboMission.setSelectedItem(missions.isEmpty() ? null : missions.get(0));
