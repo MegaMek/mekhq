@@ -4477,8 +4477,7 @@ public class Unit implements ITechnology {
             // Tactics command bonus. This should actually reflect the unit's commander
             if (null != commander && commander.hasSkill(SkillType.S_TACTICS)) {
                 entity.getCrew()
-                      .setCommandBonus(commander.getSkill(SkillType.S_TACTICS)
-                                             .getFinalSkillValue(commander.getOptions()));
+                      .setCommandBonus(commander.getSkill(SkillType.S_TACTICS).getTotalSkillLevel());
             }
         }
 
