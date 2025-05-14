@@ -190,6 +190,7 @@ public final class HangarTab extends CampaignGuiTab {
         unitSorter.setComparator(UnitTableModel.COL_PILOT, new PersonTitleStringSorter(getCampaign()));
         unitSorter.setComparator(UnitTableModel.COL_TECH_CRW, new PersonTitleStringSorter(getCampaign()));
         unitSorter.setComparator(UnitTableModel.COL_MAINTAIN, new FormattedNumberSorter());
+        unitSorter.setComparator(UnitTableModel.COL_MAINTAIN_CYCLE, new NaturalOrderComparator());
         unitTable.setRowSorter(unitSorter);
         List<SortKey> sortKeys = new ArrayList<>();
         sortKeys.add(new SortKey(UnitTableModel.COL_TYPE, SortOrder.DESCENDING));
