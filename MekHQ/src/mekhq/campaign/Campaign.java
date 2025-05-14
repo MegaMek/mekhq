@@ -6481,7 +6481,7 @@ public class Campaign implements ITechManager {
 
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "missions");
         for (final Mission mission : getMissions()) {
-            mission.writeToXML(pw, indent);
+            mission.writeToXML(this, pw, indent);
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "missions");
 
@@ -6551,7 +6551,7 @@ public class Campaign implements ITechManager {
         if (getCampaignOptions().isUseAtB()) {
             // TODO : AbstractContractMarket : Remove next two lines
             // CAW: implicit DEPENDS-ON to the <missions> node, do not move this above it
-            contractMarket.writeToXML(pw, indent);
+            contractMarket.writeToXML(this, pw, indent);
 
             if (!combatTeams.isEmpty()) {
                 MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "combatTeams");
