@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.rating.CamOpsReputation;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -108,10 +109,16 @@ public class SupportRating {
         // Get the total sums of personnel and administrators
         int totalPersonnelCount = getTotalPersonnelCount(campaign, technicianRequirements);
 
-        int administratorCount = (int) campaign.getActivePersonnel(true)
-                                             .stream()
-                                             .filter(Person::isAdministrator)
-                                             .count();
+        LocalDate today = campaign.getLocalDate();
+
+        int administratorCount = 0;
+        for (Person person : campaign.getActivePersonnel(false)) {
+            boolean isAdult = !person.isChild(today);
+
+            if (isAdult && (person.isAdministrator() || person.isDependent() || person.isDoctor())) {
+                administratorCount++;
+            }
+        }
 
         // Calculate personnel count based on campaign faction
         double divisor = campaign.getFaction().isPirate() || campaign.getFaction().isMercenary() ? 10 : 20;
@@ -287,7 +294,7 @@ public class SupportRating {
         techCounts.put("techAeroCount", 0);
         techCounts.put("techBattleArmorCount", 0);
 
-        for (Person person : campaign.getActivePersonnel(true)) {
+        for (Person person : campaign.getActivePersonnel(false)) {
             updateCount(person::isTechMek, "techMekCount", techCounts);
             updateCount(person::isTechMechanic, "techMechanicCount", techCounts);
             updateCount(person::isTechAero, "techAeroCount", techCounts);

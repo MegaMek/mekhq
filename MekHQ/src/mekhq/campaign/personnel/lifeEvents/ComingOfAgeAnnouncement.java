@@ -65,7 +65,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 public class ComingOfAgeAnnouncement {
     private static final MMLogger logger = MMLogger.create(ComingOfAgeAnnouncement.class);
 
-    private static String RESOURCE_BUNDLE = "mekhq.resources." + ComingOfAgeAnnouncement.class.getSimpleName();
+    private static String RESOURCE_BUNDLE = "mekhq.resources.ComingOfAgeAnnouncement";
 
     private final Campaign campaign;
     private final Person birthdayHaver;
