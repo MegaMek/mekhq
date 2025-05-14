@@ -209,7 +209,7 @@ public class AcquisitionsDialog extends JDialog {
         if (PartsAcquisitionService.getMissingCount() > 0) {
             sbText.append(", ");
 
-            sbText.append("<font color='").append(MekHQ.getMHQOptions().getFontColorNegativeHexColor()).append("'>");
+            sbText.append("<font color='").append(ReportingUtilities.getNegativeColor()).append("'>");
             sbText.append("missing: ");
             sbText.append(PartsAcquisitionService.getMissingCount());
 
@@ -340,7 +340,7 @@ public class AcquisitionsDialog extends JDialog {
                     sbText.append(", ");
 
                     sbText.append("<font color='")
-                          .append(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
+                          .append(ReportingUtilities.getNegativeColor())
                           .append("'>");
                     sbText.append("missing: ");
                     sbText.append(partCountInfo.getMissingCount());
@@ -387,7 +387,7 @@ public class AcquisitionsDialog extends JDialog {
 
                 if (!partCountInfo.isCanBeAcquired()) {
                     sbText.append("<br/><br/><font color='")
-                          .append(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
+                          .append(ReportingUtilities.getNegativeColor())
                           .append("' size='4'>");
                     sbText.append(partCountInfo.getFailedMessage());
                     sbText.append("</font>");

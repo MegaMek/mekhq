@@ -2485,7 +2485,7 @@ public class CampaignGUI extends JPanel {
         String inDebt = "";
         if (getCampaign().getFinances().isInDebt()) {
             // FIXME : Localize
-            inDebt = " <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>(in Debt)</font>";
+            inDebt = " <font color='" + ReportingUtilities.getNegativeColor() + "'>(in Debt)</font>";
         }
         // FIXME : Localize
         String text = "<html><b>Funds</b>: " + funds.toAmountAndSymbolString() + inDebt + "</html>";

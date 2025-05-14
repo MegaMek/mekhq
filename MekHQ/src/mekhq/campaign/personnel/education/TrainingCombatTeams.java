@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.education;
 
@@ -213,7 +218,7 @@ public class TrainingCombatTeams {
                     campaign.addReport(String.format(resources.getString("notLearningAnything.text"),
                           trainee.getHyperlinkedFullTitle(),
                           commander.getFullTitle(),
-                          spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                          spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                           CLOSING_SPAN_TAG));
                     trainee.setEduAcademyName("");
                     trainee.setEduEducationTime(0);
@@ -280,7 +285,7 @@ public class TrainingCombatTeams {
                 campaign.addReport(String.format(resources.getString("learnedNewSkill.text"),
                       commander.getFullTitle(),
                       trainee.getHyperlinkedFullTitle(),
-                      spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                      spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                       CLOSING_SPAN_TAG,
                       targetSkill.getType().getName(),
                       targetSkill.getFinalSkillValue(trainee.getOptions())));

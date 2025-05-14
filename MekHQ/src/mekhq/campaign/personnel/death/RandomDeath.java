@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.death;
 
@@ -646,7 +651,7 @@ public class RandomDeath {
         if (randomlyDies(person)) {
             // We double-report here, to make sure the user definitely notices that a random death has occurred.
             // Prior to this change, it was exceptionally easy to miss these events.
-            String color = MekHQ.getMHQOptions().getFontColorNegativeHexColor();
+            String color = ReportingUtilities.getNegativeColor();
             String formatOpener = ReportingUtilities.spanOpeningWithCustomColor(color);
             campaign.addReport(String.format("%s has %s<b>died</b>%s.",
                 person.getHyperlinkedFullTitle(), formatOpener, CLOSING_SPAN_TAG));

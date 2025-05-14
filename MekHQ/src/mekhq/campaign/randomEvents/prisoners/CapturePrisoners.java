@@ -286,7 +286,7 @@ public class CapturePrisoners {
                     campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
                           "bondsref.report",
                           prisoner.getFullName(),
-                          spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                          spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                           CLOSING_SPAN_TAG));
 
                     campaign.removePerson(prisoner);
@@ -309,7 +309,7 @@ public class CapturePrisoners {
                     campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
                           "bondsref.report",
                           prisoner.getFullName(),
-                          spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                          spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                           CLOSING_SPAN_TAG));
 
                     campaign.removePerson(prisoner);
@@ -327,7 +327,7 @@ public class CapturePrisoners {
                         campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
                               "seppuku.report",
                               prisoner.getFullName(),
-                              spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                              spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                               CLOSING_SPAN_TAG));
 
                         campaign.removePerson(prisoner);

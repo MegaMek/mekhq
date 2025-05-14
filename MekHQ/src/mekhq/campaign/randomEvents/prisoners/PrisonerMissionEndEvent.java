@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.randomEvents.prisoners;
 
@@ -359,8 +364,8 @@ public class PrisonerMissionEndEvent {
 
         // Build the report
         String crimeColor = crimeNoticed ?
-                                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()) :
-                                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor());
+                                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()) :
+                                  spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor());
 
         String crimeMessage = crimeNoticed ?
                                     getFormattedTextAt(RESOURCE_BUNDLE,

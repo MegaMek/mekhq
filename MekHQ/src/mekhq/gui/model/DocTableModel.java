@@ -76,7 +76,7 @@ public class DocTableModel extends DataTableModel {
 
         if (campaign.requiresAdditionalMedics()) {
             toReturn.append("</font><font color='")
-                    .append(MekHQ.getMHQOptions().getFontColorNegativeHexColor()).append("'>, ")
+                    .append(ReportingUtilities.getNegativeColor()).append("'>, ")
                     .append(campaign.getMedicsPerDoctor())
                     .append(" medics</font><font><br/>");
         } else {

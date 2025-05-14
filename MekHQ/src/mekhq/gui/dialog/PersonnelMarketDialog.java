@@ -385,7 +385,7 @@ public class PersonnelMarketDialog extends JDialog {
                                          selectedPerson.getSalary(campaign).multipliedBy(2) :
                                          Money.zero()).plus(unitCost))) {
                 campaign.addReport("<font color='" +
-                                         MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                                         ReportingUtilities.getNegativeColor() +
                                          "'><b>Insufficient funds. Transaction cancelled</b>.</font>");
             } else {
                 /*

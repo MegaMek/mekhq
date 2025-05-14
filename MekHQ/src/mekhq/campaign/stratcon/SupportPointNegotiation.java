@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.stratcon;
 
@@ -167,7 +172,7 @@ public class SupportPointNegotiation {
 
             campaign.addReport(String.format(resources.getString("supportPoints.maximum"),
                   contract.getHyperlinkedName(),
-                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor()),
+                  spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
                   CLOSING_SPAN_TAG,
                   maxSupportPoints,
                   pluralizer));
@@ -190,8 +195,8 @@ public class SupportPointNegotiation {
 
         // Determine font color based on success or failure
         String fontColor = (negotiatedSupportPoints > 0) ?
-                                 MekHQ.getMHQOptions().getFontColorPositiveHexColor() :
-                                 MekHQ.getMHQOptions().getFontColorNegativeHexColor();
+                                 ReportingUtilities.getPositiveColor() :
+                                 ReportingUtilities.getNegativeColor();
 
         // Add points to the contract if positive
         if (negotiatedSupportPoints > 0) {
@@ -266,12 +271,12 @@ public class SupportPointNegotiation {
 
         if (contract == null) {
             campaign.addReport(String.format(resources.getString(reportKey),
-                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   CLOSING_SPAN_TAG));
         } else {
             campaign.addReport(String.format(resources.getString(reportKey),
                   contract.getHyperlinkedName(),
-                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   CLOSING_SPAN_TAG));
         }
     }

@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui;
 
@@ -65,7 +70,7 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
 
         if (value instanceof Unit unit) {
             String name = ReportingUtilities.messageSurroundedBySpanWithColor(
-                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(), "No Crew");
+                    ReportingUtilities.getNegativeColor(), "No Crew");
             if (unit.getEntity() instanceof GunEmplacement) {
                 name = "AutoTurret";
             }
@@ -78,13 +83,13 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                         + unit.getEntity().getCrew().getPiloting() + ')';
                 if (person.needsFixing() || (unit.getEntity().getCrew().getHits() > 0)) {
                     name = ReportingUtilities.messageSurroundedBySpanWithColor(
-                            MekHQ.getMHQOptions().getFontColorNegativeHexColor(), name);
+                            ReportingUtilities.getNegativeColor(), name);
                 }
             }
             String unitName = "<i>" + unit.getName() + "</i>";
             if (unit.isDamaged()) {
                 unitName = ReportingUtilities.messageSurroundedBySpanWithColor(
-                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(), unitName);
+                    ReportingUtilities.getNegativeColor(), unitName);
             }
 
             Entity entity = unit.getEntity();

@@ -222,10 +222,10 @@ public enum PersonnelStatus {
         final String RESOURCE_KEY = name() + ".report";
 
         String OPENING_SPAN_TEXT = switch (severity) {
-            case NEGATIVE -> spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor());
-            case WARNING -> spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
+            case NEGATIVE -> spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
+            case WARNING -> spanOpeningWithCustomColor(ReportingUtilities.getWarningColor());
             case NEUTRAL -> "";
-            case POSITIVE -> spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor());
+            case POSITIVE -> spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor());
         };
 
         String CLOSING_SPAN_TEXT = OPENING_SPAN_TEXT.isBlank() ? "" : CLOSING_SPAN_TAG;

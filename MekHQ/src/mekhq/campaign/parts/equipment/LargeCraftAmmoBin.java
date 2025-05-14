@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts.equipment;
 
@@ -420,10 +425,10 @@ public class LargeCraftAmmoBin extends AmmoBin {
             int shotsAvailable = getAmountAvailable();
             PartInventory inventories = campaign.getPartInventory(getNewPart());
             if (shotsAvailable == 0) {
-                availability = "<br><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
+                availability = "<br><font color='" + ReportingUtilities.getNegativeColor()
                         + "'>No ammo (" + inventories.getTransitOrderedDetails() + ")</font>";
             } else if (shotsAvailable < shotsNeeded) {
-                availability = "<br><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>Only "
+                availability = "<br><font color='" + ReportingUtilities.getNegativeColor() + "'>Only "
                         + shotsAvailable + " available (" + inventories.getTransitOrderedDetails() + ")</font>";
             }
             return getType().getDesc() + ", " + shotsNeeded + " shots needed" + availability;

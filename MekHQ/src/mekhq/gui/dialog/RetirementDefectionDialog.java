@@ -471,7 +471,7 @@ public class RetirementDefectionDialog extends JDialog {
                                    resourceMap.getString("lblTotalBonus.text") +
                                    ' ' +
                                    "<font color='" +
-                                   MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                                   ReportingUtilities.getNegativeColor() +
                                    "'>" +
                                    getTotalBonus().toAmountAndSymbolString() +
                                    "</font></html>");

@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
@@ -272,10 +277,10 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         AmmoStorage newPart = getNewPart();
         newPart.setBrandNew(true);
         if (campaign.getQuartermaster().buyPart(newPart, transitDays)) {
-            return "<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor()
+            return "<font color='" + ReportingUtilities.getPositiveColor()
                     + "'><b> part found</b>.</font> It will be delivered in " + transitDays + " days.";
         } else {
-            return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
+            return "<font color='" + ReportingUtilities.getNegativeColor()
                     + "'><b> You cannot afford this part. Transaction cancelled</b>.</font>";
         }
     }
@@ -287,7 +292,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public String failToFind() {
-        return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
+        return "<font color='" + ReportingUtilities.getNegativeColor()
                 + "'><b> part not found</b>.</font>";
     }
 

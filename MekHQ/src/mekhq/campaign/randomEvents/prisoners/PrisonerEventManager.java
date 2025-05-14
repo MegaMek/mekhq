@@ -492,12 +492,12 @@ public class PrisonerEventManager {
         String key = getFormattedTextAt(RESOURCE_BUNDLE, hasBackfired ? "execute.backfired" : "execute.successful");
 
         String messageColor = hasBackfired ?
-                                    spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()) :
-                                    spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor());
+                                    spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()) :
+                                    spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor());
 
         String crimeColor = crimeNoticed ?
-                                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()) :
-                                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor());
+                                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()) :
+                                  spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor());
 
         String crimeMessage = crimeNoticed ?
                                     getFormattedTextAt(RESOURCE_BUNDLE,

@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.skills;
 
@@ -266,11 +271,11 @@ public class SkillCheckUtility {
         String colorOpen;
         int neutralMarginValue = getMarginValue(BARELY_MADE_IT);
         if (marginOfSuccess == neutralMarginValue) {
-            colorOpen = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
+            colorOpen = spanOpeningWithCustomColor(ReportingUtilities.getWarningColor());
         } else if (marginOfSuccess < neutralMarginValue) {
-            colorOpen = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor());
+            colorOpen = spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
         } else {
-            colorOpen = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor());
+            colorOpen = spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor());
         }
         String status = getFormattedTextAt(RESOURCE_BUNDLE,
               "skillCheck.results." + (isSuccess() ? "success" : "failure"));

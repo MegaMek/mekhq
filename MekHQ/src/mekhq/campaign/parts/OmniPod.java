@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
@@ -268,13 +273,13 @@ public class OmniPod extends Part {
         timeSpent = 0;
         shorthandedMod = 0;
         if (skillMin > SkillType.EXP_ELITE) {
-            return " <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
+            return " <font color='" + ReportingUtilities.getNegativeColor()
                     + "'><b> failed and part destroyed.</b></font>";
         } else {
             // OmniPod is only added back to the warehouse if repair fails without
             // destroying part.
             campaign.getQuartermaster().addPart(this, 0);
-            return " <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b> failed.</b></font>";
+            return " <font color='" + ReportingUtilities.getNegativeColor() + "'><b> failed.</b></font>";
         }
     }
 

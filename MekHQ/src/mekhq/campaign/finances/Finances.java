@@ -360,7 +360,7 @@ public class Finances {
                               peacetimeCost.toAmountAndSymbolString()));
                     } else {
                         campaign.addReport(String.format("<font color='" +
-                                                               MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                                                               ReportingUtilities.getNegativeColor() +
                                                                "'>" +
                                                                resourceMap.getString("InsufficientFunds.text"),
                               resourceMap.getString("OperatingCosts.text"),
@@ -379,7 +379,7 @@ public class Finances {
                               sparePartsCost.toAmountAndSymbolString()));
                     } else {
                         campaign.addReport(String.format("<font color='" +
-                                                               MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                                                               ReportingUtilities.getNegativeColor() +
                                                                "'>" +
                                                                resourceMap.getString("InsufficientFunds.text"),
                               resourceMap.getString("SpareParts.text"),
@@ -394,7 +394,7 @@ public class Finances {
                               ammoCost.toAmountAndSymbolString()));
                     } else {
                         campaign.addReport(String.format("<font color='" +
-                                                               MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                                                               ReportingUtilities.getNegativeColor() +
                                                                "'>" +
                                                                resourceMap.getString("InsufficientFunds.text"),
                               resourceMap.getString("TrainingMunitions.text"),
@@ -409,7 +409,7 @@ public class Finances {
                               fuelCost.toAmountAndSymbolString()));
                     } else {
                         campaign.addReport(String.format("<font color='" +
-                                                               MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                                                               ReportingUtilities.getNegativeColor() +
                                                                "'>" +
                                                                resourceMap.getString("InsufficientFunds.text"),
                               resourceMap.getString("Fuel.text"),
@@ -433,7 +433,7 @@ public class Finances {
 
                 } else {
                     campaign.addReport(String.format("<font color='" +
-                                                           MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                                                           ReportingUtilities.getNegativeColor() +
                                                            "'>" +
                                                            resourceMap.getString("InsufficientFunds.text"),
                           resourceMap.getString("Payroll.text"),
@@ -457,7 +457,7 @@ public class Finances {
                           MekHQ.getMHQOptions().getLocale());
 
                     campaign.addReport(String.format(loyaltyChangeResources.getString("loyaltyChangeGroup.text"),
-                          "<span color=" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>",
+                          "<span color=" + ReportingUtilities.getNegativeColor() + "'>",
                           ReportingUtilities.CLOSING_SPAN_TAG));
                 }
             }
@@ -471,7 +471,7 @@ public class Finances {
                           overheadCost.toAmountAndSymbolString()));
                 } else {
                     campaign.addReport(String.format("<font color='" +
-                                                           MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                                                           ReportingUtilities.getNegativeColor() +
                                                            "'>" +
                                                            resourceMap.getString("InsufficientFunds.text"),
                           resourceMap.getString("OverheadCosts.text"),
@@ -493,7 +493,7 @@ public class Finances {
                     loan.paidLoan();
                 } else {
                     campaign.addReport("<font color='" +
-                                             MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                                             ReportingUtilities.getNegativeColor() +
                                              "'>" +
                                              resourceMap.getString("Loan.insufficient.report"),
                           loan,
@@ -572,7 +572,7 @@ public class Finances {
                      * contract payment that has just been made.
                      */
                     campaign.addReport("<font color='" +
-                                             MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                                             ReportingUtilities.getNegativeColor() +
                                              "'>" +
                                              resourceMap.getString("InsufficientFunds.text"),
                           resourceMap.getString("Shares.text"),

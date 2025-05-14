@@ -31,7 +31,6 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-
 package mekhq.gui.dialog;
 
 import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.RESUPPLY_LOOT_BOX_NAME;
@@ -267,8 +266,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
         String report = resourceMap.getString("txtInstructions.text.salvage");
         if (tracker.isEmployerEvokingSpecialClause()) {
-            String colorOpenWarning = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
-            String colorOpenNegative = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor());
+            String colorOpenWarning = spanOpeningWithCustomColor(ReportingUtilities.getWarningColor());
+            String colorOpenNegative = spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
             campaign.addReport(String.format(resourceMap.getString("txtInstructions.text.salvage.special"),
                   colorOpenWarning,
                   CLOSING_SPAN_TAG,

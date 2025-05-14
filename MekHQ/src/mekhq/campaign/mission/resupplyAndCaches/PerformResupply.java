@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission.resupplyAndCaches;
 
@@ -267,7 +272,7 @@ public class PerformResupply {
 
             campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
                   "convoySuccessfulSmuggler.text",
-                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                  spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                   CLOSING_SPAN_TAG));
             makeDelivery(resupply, null);
         }
@@ -472,7 +477,7 @@ public class PerformResupply {
 
         campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
               "convoySuccessful.text",
-              spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+              spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
               CLOSING_SPAN_TAG));
 
         makeDelivery(resupply, convoyContents);
@@ -531,7 +536,7 @@ public class PerformResupply {
         if (template == null) {
             campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
                   "convoyErrorTemplate.text",
-                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   templateAddress,
                   CLOSING_SPAN_TAG));
 
@@ -549,7 +554,7 @@ public class PerformResupply {
         } catch (NullPointerException e) {
             campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
                   "convoyErrorTracks.text",
-                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   templateAddress,
                   CLOSING_SPAN_TAG));
 
@@ -606,7 +611,7 @@ public class PerformResupply {
             // Announce the situation to the player
             campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
                   "convoyInterceptedStratCon.text",
-                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   CLOSING_SPAN_TAG));
         } else {
             // If we failed to generate a scenario, for whatever reason, we don't
@@ -632,7 +637,7 @@ public class PerformResupply {
     private static void handleFallbackMessage(Resupply resupply, List<Part> convoyContents, Campaign campaign) {
         campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
               "convoyEscaped.text",
-              spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+              spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
               CLOSING_SPAN_TAG));
 
         makeDelivery(resupply, convoyContents);

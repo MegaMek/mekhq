@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.adapter;
 
@@ -189,12 +194,12 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
         }
 
         if (success) {
-            gui.getCampaign().addReport("<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
+            gui.getCampaign().addReport("<font color='" + ReportingUtilities.getPositiveColor() + "'>"
                     + String.format(resources.getString("ProcurementTableMouseAdapter.ProcuredItem.report") + "</font>",
                             acquisition.getAcquisitionName()));
             acquisition.decrementQuantity();
         } else {
-            gui.getCampaign().addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
+            gui.getCampaign().addReport("<font color='" + ReportingUtilities.getNegativeColor() + "'>"
                     + String.format(
                             resources.getString("ProcurementTableMouseAdapter.CannotAffordToPurchaseItem.report")
                                     + "</font>",
@@ -251,7 +256,7 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
             return;
         }
 
-        gui.getCampaign().addReport("<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
+        gui.getCampaign().addReport("<font color='" + ReportingUtilities.getPositiveColor() + "'>"
                 + String.format(resources.getString("ProcurementTableMouseAdapter.GMAdded.report") + "</font>",
                         acquisition.getAcquisitionName()));
         acquisition.decrementQuantity();

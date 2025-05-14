@@ -98,7 +98,7 @@ public class AtBEventProcessor {
             } else {
                 ev.getCampaign()
                       .addReport("<html><font color='" +
-                                       MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                                       ReportingUtilities.getNegativeColor() +
                                        "'>Insufficient funds for paid recruitment.</font></html>");
             }
         }
