@@ -278,10 +278,21 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                           unitRatingMod,
                           1);
 
-                    if (contract != null) {
-                        contract.setDifficulty(contract.calculateContractDifficulty(contract.getStartDate().getYear(),
-                              true,
-                              campaign.getAllCombatEntities()));
+                    // This try-catch is specifically implemented to make testing easier. Otherwise, we would need to
+                    // define the player's TO&E, their Ally's unit availability, and their Enemy's unit availability,
+                    // a RAT generator instance and a whole other pile of stuff. So instead, we let it fail, and if we
+                    // need to specifically define difficulty in a unit test, we can do so by using
+                    // contract.setDifficulty().
+                    try {
+                        if (contract != null) {
+                            contract.setDifficulty(contract.calculateContractDifficulty(contract.getStartDate()
+                                                                                              .getYear(),
+                                  true,
+                                  campaign.getAllCombatEntities()));
+                        }
+                    } catch (Exception e) {
+                        contract.setDifficulty(5);
+                        logger.error("Unable to calculate difficulty for AtB contract " + contract, e);
                     }
                     retries--;
                 }
