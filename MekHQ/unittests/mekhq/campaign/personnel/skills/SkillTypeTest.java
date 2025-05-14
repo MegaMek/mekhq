@@ -33,6 +33,8 @@
 package mekhq.campaign.personnel.skills;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NONE;
+import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -44,6 +46,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 class SkillTypeTest {
+
     static Stream<String> allSkillNames() {
         return Stream.of(SkillType.getSkillList());
     }
@@ -158,6 +161,104 @@ class SkillTypeTest {
         // Assert
         for (int level = 0; level < 10; level++) {
             assertEquals(11, costs.length, "Invalid costs for skill: " + skillType.getName() + " must be 11 elements");
+        }
+    }
+
+    @ParameterizedTest
+    @MethodSource(value = "allSkillNames")
+    void testGetFlavorText_flavorTextExists(String skillName) {
+        SkillType.initializeTypes();
+
+        // Setup
+        SkillType skillType = SkillType.getType(skillName);
+
+        // Act
+        String flavorText = skillType.getFlavorText(false, false);
+
+        // Assert
+        assertTrue(isResourceKeyValid(flavorText), "Invalid resource key: " + skillType.getName());
+    }
+
+    @ParameterizedTest
+    @MethodSource(value = "allSkillNames")
+    void testGetFlavorText_tagsIncludedWhenRequested(String skillName) {
+        SkillType.initializeTypes();
+
+        // Setup
+        SkillType skillType = SkillType.getType(skillName);
+
+        // Act
+        String flavorText = skillType.getFlavorText(true, false);
+
+        // Assert
+        assertTrue(flavorText.contains("<html>"), "Did not include html opening tag: " + skillType.getName());
+        assertTrue(flavorText.contains("</html>"), "Did not include html closing tag: " + skillType.getName());
+    }
+
+    @ParameterizedTest
+    @MethodSource(value = "allSkillNames")
+    void testGetFlavorText_allAttributesIncluded(String skillName) {
+        SkillType.initializeTypes();
+
+        // Setup
+        SkillType skillType = SkillType.getType(skillName);
+
+        // Act
+        String flavorText = skillType.getFlavorText(false, true);
+
+        // Assert
+        SkillAttribute firstAttribute = skillType.getFirstAttribute();
+        assertNotSame(NONE, firstAttribute, "First Attribute is NONE for Skill: " + skillType.getName());
+        if (firstAttribute != NONE) {
+            assertTrue(flavorText.contains(firstAttribute.getLabel()),
+                  "Did not include first Attribute: " +
+                        firstAttribute.toString() +
+                        " for Skill: " +
+                        skillType.getName());
+        }
+
+        SkillAttribute secondAttribute = skillType.getSecondAttribute();
+        if (secondAttribute != NONE) {
+            assertTrue(flavorText.contains(secondAttribute.getLabel()),
+                  "Did not include second Attribute: " +
+                        secondAttribute.toString() +
+                        " for Skill: " +
+                        skillType.getName());
+        }
+    }
+
+    @ParameterizedTest
+    @MethodSource(value = "allSkillNames")
+    void testGetFlavorText_containsBothAttributesAndHtmlTags(String skillName) {
+        SkillType.initializeTypes();
+
+        // Setup
+        SkillType skillType = SkillType.getType(skillName);
+
+        // Act
+        String flavorText = skillType.getFlavorText(true, true);
+
+        // Assert
+        assertTrue(flavorText.contains("<html>"), "Did not include html opening tag: " + skillType.getName());
+        assertTrue(flavorText.contains("</html>"), "Did not include html closing tag: " + skillType.getName());
+
+        SkillAttribute firstAttribute = skillType.getFirstAttribute();
+        assertNotSame(NONE, firstAttribute, "First Attribute is NONE for Skill: " + skillType.getName());
+        if (firstAttribute != NONE) {
+            assertTrue(flavorText.contains(firstAttribute.getLabel()),
+                  "Did not include first Attribute: " +
+                        firstAttribute.toString() +
+                        " for Skill: " +
+                        skillType.getName());
+        }
+
+        SkillAttribute secondAttribute = skillType.getSecondAttribute();
+        if (secondAttribute != NONE) {
+            assertTrue(flavorText.contains(secondAttribute.getLabel()),
+                  "Did not include second Attribute: " +
+                        secondAttribute.toString() +
+                        " for Skill: " +
+                        skillType.getName());
         }
     }
 }

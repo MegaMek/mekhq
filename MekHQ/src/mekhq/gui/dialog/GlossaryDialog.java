@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -47,6 +52,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent.EventType;
 
 import megamek.client.ui.swing.util.UIUtil;
+import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 
@@ -84,11 +90,15 @@ public class GlossaryDialog extends JDialog {
      * @param campaign The {@link Campaign} object containing resources and glossary entries.
      * @param key      The unique identifier for the glossary term to be displayed.
      */
-    public GlossaryDialog(JDialog parent, Campaign campaign, String key) {
+    public GlossaryDialog(@Nullable JDialog parent, Campaign campaign, String key) {
         this.parent = parent;
         this.campaign = campaign;
 
-        parent.setVisible(false);
+        // Originally the dialog was designed to be called from within a JDialog, however that isn't always the case
+        // anymore, so now we hide and reveal the parent dialog (later) only if it exists.
+        if (parent != null) {
+            parent.setVisible(false);
+        }
         buildDialog(key);
     }
 
@@ -174,6 +184,9 @@ public class GlossaryDialog extends JDialog {
      */
     private void onCloseAction() {
         dispose();
-        parent.setVisible(true);
+
+        if (parent != null) {
+            parent.setVisible(true);
+        }
     }
 }
