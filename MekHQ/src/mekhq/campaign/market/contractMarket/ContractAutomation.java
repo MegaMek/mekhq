@@ -32,10 +32,13 @@
  */
 package mekhq.campaign.market.contractMarket;
 
+import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.ResourceBundle;
 import java.util.UUID;
 
 import megamek.common.Entity;
@@ -47,10 +50,11 @@ import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.Contract;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.ActivateUnitAction;
 import mekhq.campaign.unit.actions.MothballUnitAction;
-import mekhq.gui.dialog.ContractAutomationDialog;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
 /**
  * The ContractAutomation class provides a suite of methods
@@ -59,8 +63,10 @@ import mekhq.gui.dialog.ContractAutomationDialog;
  * transit to mission location and the automated activation of units when arriving in system.
  */
 public class ContractAutomation {
-    private final static ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.ContractAutomation");
+    private static final String RESOURCE_BUNDLE = "mekhq.resources." + ContractAutomation.class.getSimpleName();
     private static final MMLogger logger = MMLogger.create(ContractAutomation.class);
+
+    private static final int DIALOG_CONFIRM_OPTION = 0;
 
     /**
      * Main function to initiate a sequence of automated tasks when a contract is started.
@@ -78,12 +84,24 @@ public class ContractAutomation {
 
         // Initial setup
         final String commanderAddress = campaign.getCommanderAddress(false);
+        final List<String> buttonLabels = List.of(getTextAt(RESOURCE_BUNDLE, "generalConfirm.text"),
+              getTextAt(RESOURCE_BUNDLE, "generalDecline.text"));
+        final Person speaker = campaign.getSeniorAdminPerson(TRANSPORT);
 
         // Mothballing
-        String message = String.format(resources.getString("mothballDescription.text"), commanderAddress);
+        String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "mothballDescription.text", commanderAddress);
+        String outOfCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "mothballDescription.addendum");
 
-        ContractAutomationDialog mothballDialog = new ContractAutomationDialog(campaign, message, true);
-        if (mothballDialog.isDialogConfirmed()) {
+        ImmersiveDialogSimple mothballDialog = new ImmersiveDialogSimple(campaign,
+              speaker,
+              null,
+              inCharacterMessage,
+              buttonLabels,
+              outOfCharacterMessage,
+              null,
+              false);
+
+        if (mothballDialog.getDialogChoice() == DIALOG_CONFIRM_OPTION) {
             campaign.setAutomatedMothballUnits(performAutomatedMothballing(campaign));
         }
 
@@ -92,7 +110,7 @@ public class ContractAutomation {
         String employerName = contract.getEmployer();
 
         if (!employerName.contains("Clan")) {
-            employerName = String.format(resources.getString("generalNonClan.text"), employerName);
+            employerName = getFormattedTextAt(RESOURCE_BUNDLE, "generalNonClan.text", employerName);
         }
 
         JumpPath jumpPath = contract.getJumpPath(campaign);
@@ -100,20 +118,35 @@ public class ContractAutomation {
 
         Money costPerJump = campaign.calculateCostPerJump(true,
                 campaign.getCampaignOptions().isEquipmentContractBase());
-        String totalCost = costPerJump.multipliedBy(jumpPath.getJumps()).toAmountAndSymbolString();
+        String totalCost = costPerJump.multipliedBy(jumpPath.getJumps()).toAmountString();
 
-        message = String.format(resources.getString("transitDescription.text"),
-            targetSystem, employerName, travelDays, totalCost);
 
-        ContractAutomationDialog transitDialog = new ContractAutomationDialog(campaign, message, false);
-        if (transitDialog.isDialogConfirmed()) {
+        inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
+              "transitDescription.text",
+              targetSystem,
+              employerName,
+              travelDays,
+              totalCost);
+
+        ImmersiveDialogSimple transitDialog = new ImmersiveDialogSimple(campaign,
+              speaker,
+              null,
+              inCharacterMessage,
+              buttonLabels,
+              null,
+              null,
+              false);
+
+        if (transitDialog.getDialogChoice() == DIALOG_CONFIRM_OPTION) {
             campaign.getLocation().setJumpPath(jumpPath);
             campaign.getUnits().forEach(unit -> unit.setSite(Unit.SITE_FACILITY_BASIC));
             campaign.getApp().getCampaigngui().refreshAllTabs();
             campaign.getApp().getCampaigngui().refreshLocation();
 
-            campaign.addReport(String.format(resources.getString("transitDescription.supplemental"),
-                targetSystem, travelDays));
+            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "transitDescription.report",
+                  targetSystem,
+                  travelDays));
         }
     }
 
@@ -155,8 +188,9 @@ public class ContractAutomation {
                     mothballUnitAction.execute(campaign, unit);
                     MekHQ.triggerEvent(new UnitChangedEvent(unit));
                 } else {
-                    campaign.addReport(String.format(resources.getString("mothballingFailed.text"),
-                        unit.getName()));
+                    campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+                          "mothballingFailed.text",
+                          unit.getHyperlinkedName()));
                 }
             }
         }
@@ -180,7 +214,7 @@ public class ContractAutomation {
             Unit unit = campaign.getUnit(unitId);
 
             if (unit == null) {
-                campaign.addReport(String.format(resources.getString("activationFailed.uuid"), unitId.toString()));
+                campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "activationFailed.uuid", unitId.toString()));
                 continue;
             }
 
@@ -189,7 +223,8 @@ public class ContractAutomation {
                 MekHQ.triggerEvent(new UnitChangedEvent(unit));
 
                 if (unit.isMothballed()) {
-                    campaign.addReport(String.format(resources.getString("activationFailed.text"), unit.getName()));
+                    campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "activationFailed.text"),
+                          unit.getHyperlinkedName());
                 }
             }
         }
