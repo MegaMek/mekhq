@@ -43,11 +43,11 @@ import megamek.common.annotations.Nullable;
 import megamek.common.verifier.TestAdvancedAerospace;
 import megamek.common.verifier.TestSmallCraft;
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
+import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 

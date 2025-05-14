@@ -62,6 +62,7 @@ import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.RandomFactionGenerator;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * Main engine of the Against the Bot campaign system.

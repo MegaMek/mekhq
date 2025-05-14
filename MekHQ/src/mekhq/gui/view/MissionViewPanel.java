@@ -67,6 +67,7 @@ import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.MarkdownRenderer;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * A custom panel that gets filled in with goodies from a scenario object

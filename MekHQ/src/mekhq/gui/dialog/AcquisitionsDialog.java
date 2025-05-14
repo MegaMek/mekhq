@@ -71,6 +71,7 @@ import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.service.PartsAcquisitionService;
 import mekhq.service.PartsAcquisitionService.PartCountInfo;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * @author Kipsta

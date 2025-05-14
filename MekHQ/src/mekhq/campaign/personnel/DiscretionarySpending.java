@@ -43,9 +43,9 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 import java.time.LocalDate;
 import java.util.Map;
 
-import mekhq.MekHQ;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * The {@code DiscretionarySpending} class manages the simulation of discretionary spending for a person based on their

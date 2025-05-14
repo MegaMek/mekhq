@@ -49,6 +49,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * This class handles Support Point negotiations for StratCon.

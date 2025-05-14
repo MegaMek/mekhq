@@ -42,11 +42,11 @@ import megamek.common.Entity;
 import megamek.common.MiscType;
 import megamek.common.enums.SkillLevel;
 import megamek.common.equipment.MiscMounted;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * The {@code Fatigue} class provides utility methods for managing and processing

@@ -64,7 +64,6 @@ import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
@@ -85,6 +84,7 @@ import mekhq.gui.dialog.resupplyAndCaches.DialogPlayerConvoyOption;
 import mekhq.gui.dialog.resupplyAndCaches.DialogResupplyFocus;
 import mekhq.gui.dialog.resupplyAndCaches.DialogRoleplayEvent;
 import mekhq.gui.dialog.resupplyAndCaches.DialogSwindled;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * The {@code PerformResupply} class handles the execution and management of resupply operations within MekHQ campaigns.

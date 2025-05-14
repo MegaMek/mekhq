@@ -88,6 +88,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.gui.StratconPanel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.utilities.MHQInternationalization;
+import mekhq.utilities.ReportingUtilities;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.util.Pair;
 

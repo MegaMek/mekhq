@@ -126,6 +126,7 @@ import mekhq.gui.model.PersonnelEventLogModel;
 import mekhq.gui.model.PersonnelKillLogModel;
 import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.gui.utilities.WrapLayout;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * A custom panel that gets filled in with goodies from a Person record

@@ -115,6 +115,7 @@ import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.campaign.unit.Unit;
+import mekhq.utilities.ReportingUtilities;
 import org.apache.commons.math3.util.Pair;
 
 /**

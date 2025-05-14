@@ -37,12 +37,12 @@ import java.util.ArrayList;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.gui.BasicInfo;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * A table model for displaying doctors

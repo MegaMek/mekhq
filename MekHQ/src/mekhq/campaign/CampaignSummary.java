@@ -52,7 +52,6 @@ import java.util.List;
 import megamek.common.Entity;
 import megamek.common.Infantry;
 import megamek.common.UnitType;
-import mekhq.MekHQ;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
@@ -60,6 +59,7 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.HangarStatistics;
 import mekhq.campaign.unit.Unit;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * calculates and stores summary information on a campaign for use in reporting, mostly for the command center

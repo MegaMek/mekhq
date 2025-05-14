@@ -77,6 +77,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.AdjustLargeCraftAmmoAction;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.FileDialogs;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * This object will be the main workhorse for the scenario resolution wizard. It will keep track of information and be

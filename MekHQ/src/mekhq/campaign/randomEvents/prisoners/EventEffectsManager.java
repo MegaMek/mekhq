@@ -82,6 +82,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.selectors.factionSelectors.DefaultFactionSelector;
 import mekhq.campaign.universe.selectors.planetSelectors.DefaultPlanetSelector;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * Manages the resolution and effects of prisoner events during a campaign.

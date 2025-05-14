@@ -58,7 +58,6 @@ import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -69,6 +68,7 @@ import mekhq.gui.model.UnitMarketTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.WeightClassSorter;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
+import mekhq.utilities.ReportingUtilities;
 
 public class UnitMarketPane extends AbstractMHQSplitPane {
     private static final MMLogger logger = MMLogger.create(UnitMarketPane.class);

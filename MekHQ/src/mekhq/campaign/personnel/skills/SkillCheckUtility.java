@@ -57,6 +57,7 @@ import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * This class calculates the target number for a skill check based on the person's attributes, skills, and the

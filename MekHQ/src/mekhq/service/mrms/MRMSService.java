@@ -65,6 +65,7 @@ import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.WorkTime;
 import mekhq.gui.sorter.UnitStatusSorter;
 import mekhq.service.mrms.MRMSService.MRMSUnitAction.STATUS;
+import mekhq.utilities.ReportingUtilities;
 
 public class MRMSService {
     private static final MMLogger logger = MMLogger.create(MRMSService.class);

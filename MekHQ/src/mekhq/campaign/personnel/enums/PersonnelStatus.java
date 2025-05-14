@@ -40,9 +40,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * Represents the various statuses that a {@link Person} can have within MekHQ.
