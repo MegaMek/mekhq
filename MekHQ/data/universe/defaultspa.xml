@@ -904,7 +904,7 @@ This SPA increases that maximum by 1, but does not increase the Attribute itself
         <weight>1</weight>
         <desc><![CDATA[Unit Reputation is decreased by 1 if this character is the campaign commander.
 
-A pilot who has Combat Sense rolls three dice per initiative check, keeping the top two rolls.
+A pilot who has Combat Paralysis rolls three dice per initiative check, keeping the only the lowest two rolls.
 
 If individual initiative is enabled, this penalty applies only to the pilot's unit. Otherwise, the penalty is applied only if the pilot's unit is the force commander.]]></desc>
         <skillPrereq/>

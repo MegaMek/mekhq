@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission.resupplyAndCaches;
 
@@ -442,7 +447,8 @@ public class PerformResupply {
             String eventText;
             if (Compute.d6() <= 2) {
                 eventText = getFormattedTextAt(RESOURCE_BUNDLE,
-                      STATUS_FORWARD + Compute.randomInt(100) + STATUS_AFTERWARD);
+                      STATUS_FORWARD + Compute.randomInt(100) + STATUS_AFTERWARD,
+                      commanderAddress);
             } else {
                 int roll = Compute.randomInt(2);
 
