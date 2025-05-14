@@ -47,7 +47,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
  * on campaign and patient details.</p>
  */
 public class ReplacementLimbDialog extends ImmersiveDialogCore {
-    final private static String RESOURCE_BUNDLE = "mekhq.resources." + ReplacementLimbDialog.class.getSimpleName();
+    final private static String RESOURCE_BUNDLE = "mekhq.resources.ReplacementLimbDialog";
 
     /**
      * Constructor to create a Replacement Limb Dialog.

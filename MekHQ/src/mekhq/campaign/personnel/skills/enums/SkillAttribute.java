@@ -81,7 +81,7 @@ public enum SkillAttribute {
 
     public static int NO_SKILL_ATTRIBUTE = -1;
 
-    final private static String RESOURCE_BUNDLE = "mekhq.resources." + SkillAttribute.class.getSimpleName();
+    final private static String RESOURCE_BUNDLE = "mekhq.resources.SkillAttribute";
 
     /**
      * Checks if the current instance is {@link #NONE}.

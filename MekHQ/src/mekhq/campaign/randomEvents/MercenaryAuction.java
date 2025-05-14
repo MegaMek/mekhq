@@ -52,7 +52,7 @@ import mekhq.gui.dialog.MercenaryAuctionDialog;
 public class MercenaryAuction {
     private static final MMLogger logger = MMLogger.create(MercenaryAuction.class);
 
-    private static final String RESOURCE_BUNDLE = "mekhq.resources." + MercenaryAuctionDialog.class.getSimpleName();
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.MercenaryAuctionDialog";
 
     private static final int AUCTION_TIER_SUCCESS_PERCENT = 20;
     private static final int DECLINE_AUCTION_OPTION = 0;

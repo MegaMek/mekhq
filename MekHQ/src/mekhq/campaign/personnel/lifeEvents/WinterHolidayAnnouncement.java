@@ -56,7 +56,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 public class WinterHolidayAnnouncement {
     private static final MMLogger logger = MMLogger.create(WinterHolidayAnnouncement.class);
 
-    private static String RESOURCE_BUNDLE = "mekhq.resources." + WinterHolidayAnnouncement.class.getSimpleName();
+    private static String RESOURCE_BUNDLE = "mekhq.resources.WinterHolidayAnnouncement";
 
     private final Campaign campaign;
 

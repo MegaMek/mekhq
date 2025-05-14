@@ -47,7 +47,7 @@ import mekhq.campaign.work.IAcquisitionWork;
  * A table model for displaying parts
  */
 public class PartsTableModel extends DataTableModel {
-    private static final String RESOURCE_BUNDLE = "mekhq.resources." + PartsTableModel.class.getSimpleName();
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.PartsTableModel";
 
     public final static int COL_QUANTITY = 0;
     public final static int COL_COL_IN_USE = 1;
