@@ -47,6 +47,7 @@ import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.unit.HangarSorter;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollableMenu;
+import mekhq.gui.utilities.StaticChecks;
 
 /**
  * This is a standard menu that takes either a person or multiple people, and allows the user to assign them to a unit
@@ -65,7 +66,9 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
         // Immediate Return for Illegal Assignment
         // 1) No people to assign
         // 2) Any of the people you are trying to assign are currently deployed
-        if ((people.length == 0) || Stream.of(people).anyMatch(Person::isDeployed)) {
+        if ((people.length == 0) ||
+                  Stream.of(people).anyMatch(Person::isDeployed) ||
+                  !StaticChecks.areAllEmployed(people)) {
             return;
         }
 

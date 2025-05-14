@@ -24,19 +24,25 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.model;
 
+import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
+
 import java.awt.Component;
 import java.awt.Image;
-import java.time.temporal.ChronoUnit;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
-
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
@@ -176,32 +182,32 @@ public class RetirementTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int row, int col) {
-        Person p;
+        Person person;
         if (data.isEmpty()) {
             return "";
         } else {
-            p = campaign.getPerson(data.get(row));
+            person = campaign.getPerson(data.get(row));
         }
         switch (col) {
             case COL_PERSON:
-                return p.makeHTMLRank();
+                return person.makeHTMLRank();
             case COL_ASSIGN:
-                Unit u = p.getUnit();
+                Unit u = person.getUnit();
                 if (null != u) {
                     String name = u.getName();
                     if (u.getEntity() instanceof Tank) {
-                        if (u.isDriver(p)) {
+                        if (u.isDriver(person)) {
                             name = name + " [Driver]";
                         } else {
                             name = name + " [Gunner]";
                         }
                     }
                     if ((u.getEntity() instanceof SmallCraft) || (u.getEntity() instanceof Jumpship)) {
-                        if (u.isNavigator(p)) {
+                        if (u.isNavigator(person)) {
                             name = name + " [Navigator]";
-                        } else if (u.isDriver(p)) {
+                        } else if (u.isDriver(person)) {
                             name = name + " [Pilot]";
-                        } else if (u.isGunner(p)) {
+                        } else if (u.isGunner(person)) {
                             name = name + " [Gunner]";
                         } else {
                             name = name + " [Crew]";
@@ -210,19 +216,19 @@ public class RetirementTableModel extends AbstractTableModel {
                     return name;
                 }
                 // check for tech
-                if (!p.getTechUnits().isEmpty()) {
-                    if (p.getTechUnits().size() == 1) {
-                        u = p.getTechUnits().get(0);
+                if (!person.getTechUnits().isEmpty()) {
+                    if (person.getTechUnits().size() == 1) {
+                        u = person.getTechUnits().get(0);
                         if (null != u) {
-                            return u.getName() + " (" + p.getMaintenanceTimeUsing() + "m)";
+                            return u.getName() + " (" + person.getMaintenanceTimeUsing() + "m)";
                         }
                     } else {
-                        return p.getTechUnits().size() + " units (" + p.getMaintenanceTimeUsing() + "m)";
+                        return person.getTechUnits().size() + " units (" + person.getMaintenanceTimeUsing() + "m)";
                     }
                 }
                 return "-";
             case COL_FORCE:
-                Force force = campaign.getForceFor(p);
+                Force force = campaign.getForceFor(person);
                 if (null != force) {
                     return force.getName();
                 } else {
@@ -232,11 +238,11 @@ public class RetirementTableModel extends AbstractTableModel {
                 if (null == targets) {
                     return 0;
                 }
-                return targets.get(p.getId()).getValue() -
-                        (payBonus.get(p.getId()) ? 2 : 0) +
-                        miscMods.get(p.getId()) + generalMod;
+                return targets.get(person.getId()).getValue() - (payBonus.get(person.getId()) ? 2 : 0) +
+                             miscMods.get(person.getId()) +
+                             generalMod;
             case COL_BONUS_COST:
-                Money bonusCost = RetirementDefectionTracker.getPayoutOrBonusValue(campaign, p);
+                Money bonusCost = RetirementDefectionTracker.getPayoutOrBonusValue(campaign, person);
 
                 if (campaign.getCampaignOptions().getTurnoverFrequency().isQuarterly()) {
                     return bonusCost.dividedBy(3).toAmountAndSymbolString();
@@ -248,50 +254,55 @@ public class RetirementTableModel extends AbstractTableModel {
                     return bonusCost;
                 }
             case COL_PAY_BONUS:
-                return payBonus.getOrDefault(p.getId(), false);
+                return payBonus.getOrDefault(person.getId(), false);
             case COL_MISC_MOD:
-                return miscMods.getOrDefault(p.getId(), 0);
+                return miscMods.getOrDefault(person.getId(), 0);
             case COL_SHARES:
-                return p.getNumShares(campaign, campaign.getCampaignOptions().isSharesForAll());
+                return person.getNumShares(campaign, campaign.getCampaignOptions().isSharesForAll());
             case COL_PAYOUT:
-                if (null == campaign.getRetirementDefectionTracker().getPayout(p.getId())) {
+                if (null == campaign.getRetirementDefectionTracker().getPayout(person.getId())) {
                     return "";
                 }
-                if (altPayout.containsKey(p.getId())) {
-                    return altPayout.get(p.getId()).toAmountAndSymbolString();
+                if (altPayout.containsKey(person.getId())) {
+                    return altPayout.get(person.getId()).toAmountAndSymbolString();
                 }
-                Money payout = campaign.getRetirementDefectionTracker().getPayout(p.getId()).getPayoutAmount();
+                Money payout = campaign.getRetirementDefectionTracker().getPayout(person.getId()).getPayoutAmount();
                 /*
                  * If no unit is required as part of the payout, the unit is part or all of the
                  * final payout. If using the share system and tracking the original unit,
                  * the payout is also reduced by the value of the unit.
                  */
-                if ((campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass() == 0 &&
-                        null != unitAssignments.get(p.getId())) ||
+                if ((campaign.getRetirementDefectionTracker().getPayout(person.getId()).getWeightClass() == 0 &&
+                           null != unitAssignments.get(person.getId())) ||
                         (campaign.getCampaignOptions().isUseShareSystem() &&
-                                campaign.getCampaignOptions().isTrackOriginalUnit()
-                                && Objects.equals(p.getOriginalUnitId(), unitAssignments.get(p.getId())) &&
-                                null != campaign.getUnit(unitAssignments.get(p.getId())))) {
-                    payout = payout.minus(campaign.getUnit(unitAssignments.get(p.getId())).getBuyCost());
+                                campaign.getCampaignOptions().isTrackOriginalUnit() &&
+                               Objects.equals(person.getOriginalUnitId(), unitAssignments.get(person.getId())) &&
+                               null != campaign.getUnit(unitAssignments.get(person.getId())))) {
+                    payout = payout.minus(campaign.getUnit(unitAssignments.get(person.getId())).getBuyCost());
                 }
 
-                // if the person is under contract, we don't check whether they need a unit or
-                // are owed a shortfall
-                if (ChronoUnit.MONTHS.between(p.getRecruitment(), campaign.getLocalDate()) >= campaign
-                        .getCampaignOptions().getServiceContractDuration()) {
+                // if the person is under contract, we don't check whether they need a unit or are owed a shortfall
+                LocalDate recruitmentDate = person.getRecruitment();
+
+
+                if (isBreakingContract(person,
+                      campaign.getLocalDate(),
+                      campaign.getCampaignOptions().getServiceContractDuration())) {
                     // if the person requires a unit, check to ensure there isn't a shortfall
-                    if (null != unitAssignments.get(p.getId())) {
-                        payout = payout.plus(RetirementDefectionDialog.getShortfallAdjustment(
-                                campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass(),
-                                RetirementDefectionDialog
-                                        .weightClassIndex(campaign.getUnit(unitAssignments.get(p.getId())))));
+                    if (null != unitAssignments.get(person.getId())) {
+                        payout = payout.plus(RetirementDefectionDialog.getShortfallAdjustment(campaign.getRetirementDefectionTracker()
+                                                                                                    .getPayout(person.getId())
+                                                                                                    .getWeightClass(),
+                                RetirementDefectionDialog.weightClassIndex(campaign.getUnit(unitAssignments.get(person.getId())))));
                     }
 
                     // if the person requires a unit, but doesn't have one...
-                    if ((unitAssignments.get(p.getId()) == null)
-                            && (campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass() > 0)) {
-                        payout = payout.plus(RetirementDefectionDialog.getShortfallAdjustment(
-                                campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass(),
+                    if ((unitAssignments.get(person.getId()) == null) &&
+                              (campaign.getRetirementDefectionTracker().getPayout(person.getId()).getWeightClass() >
+                                     0)) {
+                        payout = payout.plus(RetirementDefectionDialog.getShortfallAdjustment(campaign.getRetirementDefectionTracker()
+                                                                                                    .getPayout(person.getId())
+                                                                                                    .getWeightClass(),
                                 0));
                     }
                 }
@@ -302,16 +313,17 @@ public class RetirementTableModel extends AbstractTableModel {
                 }
                 return payout.toAmountAndSymbolString();
             case COL_UNIT:
-                if (null == campaign.getRetirementDefectionTracker().getPayout(p.getId())) {
+                if (null == campaign.getRetirementDefectionTracker().getPayout(person.getId())) {
                     return "";
                 }
-                if (null != unitAssignments.get(p.getId())) {
-                    return campaign.getUnit(unitAssignments.get(p.getId())).getName();
-                } else if (campaign.getRetirementDefectionTracker().getPayout(p.getId())
+                if (null != unitAssignments.get(person.getId())) {
+                    return campaign.getUnit(unitAssignments.get(person.getId())).getName();
+                } else if (campaign.getRetirementDefectionTracker().getPayout(person.getId())
                         .getWeightClass() < EntityWeightClass.WEIGHT_LIGHT) {
                     return "";
                 } else {
-                    return "Class " + campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass();
+                    return "Class " +
+                                 campaign.getRetirementDefectionTracker().getPayout(person.getId()).getWeightClass();
                 }
             default:
                 return "?";

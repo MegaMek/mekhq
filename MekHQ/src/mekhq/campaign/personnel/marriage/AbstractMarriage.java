@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.marriage;
 
@@ -265,7 +270,7 @@ public abstract class AbstractMarriage {
 
         // recruit the spouse if they're not already in the unit
         if ((!isBackground) && (spouse.getJoinedCampaign() == null)) {
-            campaign.recruitPerson(spouse, PrisonerStatus.FREE, true, false);
+            campaign.recruitPerson(spouse, PrisonerStatus.FREE, true, false, false);
 
             ResourceBundle recruitmentResources = ResourceBundle.getBundle("mekhq.resources.Campaign",
                   MekHQ.getMHQOptions().getLocale());

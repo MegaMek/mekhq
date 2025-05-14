@@ -136,7 +136,7 @@ public enum PersonnelTableModelColumn {
     MARRIAGEABLE("PersonnelTableModelColumn.MARRIAGEABLE.text"),
     DIVORCEABLE("PersonnelTableModelColumn.DIVORCEABLE.text"),
     TRYING_TO_CONCEIVE("PersonnelTableModelColumn.TRYING_TO_CONCEIVE.text"),
-    IMMORTAL("PersonnelTableModelColumn.IMMORTAL.text"),
+    IMMORTAL("PersonnelTableModelColumn.IMMORTAL.text"), EMPLOYED("PersonnelTableModelColumn.EMPLOYED.text"),
     TOUGHNESS("PersonnelTableModelColumn.TOUGHNESS.text"),
     CONNECTIONS("PersonnelTableModelColumn.CONNECTIONS.text"),
     WEALTH("PersonnelTableModelColumn.WEALTH.text"),
@@ -416,6 +416,10 @@ public enum PersonnelTableModelColumn {
 
     public boolean isImmortal() {
         return this == IMMORTAL;
+    }
+
+    public boolean isEmployed() {
+        return this == EMPLOYED;
     }
 
     public boolean isToughness() {
@@ -865,6 +869,8 @@ public enum PersonnelTableModelColumn {
                 return resources.getString(person.getStatus().isDead() ?
                                                  "NA.text" :
                                                  (person.isImmortal() ? "Yes.text" : "No.text"));
+            case EMPLOYED:
+                return resources.getString(person.isEmployed() ? "Yes.text" : "No.text");
             case TOUGHNESS:
                 return Integer.toString(person.getToughness());
             case CONNECTIONS:

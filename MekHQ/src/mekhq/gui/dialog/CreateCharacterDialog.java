@@ -1052,8 +1052,8 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
                 // Allow factions between the person's birthday
                 // and when they were recruited, or now if we're
                 // not tracking recruitment.
-                int endYear = person.getRecruitment() != null ?
-                                    Math.min(person.getRecruitment().getYear(), year) :
+                int endYear = person.getJoinedCampaign() != null ?
+                                    Math.min(person.getJoinedCampaign().getYear(), year) :
                                     year;
                 if (faction.validBetween(person.getDateOfBirth().getYear(), endYear)) {
                     factionsModel.addElement(faction);

@@ -398,7 +398,7 @@ public class HireBulkPersonnelDialog extends JDialog {
             reRollLoyalty(person, actualSkillLevel);
             reRollAdvantages(campaign, person, actualSkillLevel);
 
-            if (!campaign.recruitPerson(person, isGmHire)) {
+            if (!campaign.recruitPerson(person, isGmHire, true)) {
                 number = 0;
             } else {
                 number--;
