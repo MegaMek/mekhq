@@ -37,14 +37,9 @@ import mekhq.campaign.Campaign;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 
 /**
- * Represents a dialog triggered at the end of a mission when the player has Prisoner Defectors they can recruit.
- *
- * <p>
- * This dialog allows the player to handle the scenario of prisoners defecting to their forces. The player is presented
- * with an immersive, narrative-driven in-character message as well as optional out-of-character context. Action
- * buttons, such as canceling or continuing the mission conclusion process, are also provided.
- * </p>
+ * @deprecated Unused
  */
+@Deprecated(since = "0.50.06", forRemoval = true)
 public class MissionEndPrisonerDefectorDialog extends ImmersiveDialogCore {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
 
