@@ -94,6 +94,8 @@ public class FinancesTab {
     private JCheckBox payForMaintainBox;
     private JCheckBox payForTransportBox;
     private JCheckBox payForRecruitmentBox;
+    private JCheckBox payForFoodBox;
+    private JCheckBox payForHousingBox;
 
 
     private JPanel pnlSales;
@@ -202,6 +204,8 @@ public class FinancesTab {
         payForMaintainBox = new JCheckBox();
         payForTransportBox = new JCheckBox();
         payForRecruitmentBox = new JCheckBox();
+        payForFoodBox = new JCheckBox();
+        payForHousingBox = new JCheckBox();
 
         // Sales
         pnlSales = new JPanel();
@@ -300,6 +304,10 @@ public class FinancesTab {
         payForTransportBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "PayForTransportBox"));
         payForRecruitmentBox = new CampaignOptionsCheckBox("PayForRecruitmentBox");
         payForRecruitmentBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "PayForRecruitmentBox"));
+        payForFoodBox = new CampaignOptionsCheckBox("PayForFoodBox");
+        payForRecruitmentBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "PayForFoodBox"));
+        payForHousingBox = new CampaignOptionsCheckBox("PayForHousingBox");
+        payForRecruitmentBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "PayForHousingBox"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PaymentsPanel", true, "PaymentsPanel");
@@ -329,6 +337,12 @@ public class FinancesTab {
         panel.add(payForTransportBox, layout);
         layout.gridx++;
         panel.add(payForRecruitmentBox, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(payForFoodBox, layout);
+        layout.gridx++;
+        panel.add(payForHousingBox, layout);
 
         return panel;
     }
@@ -859,6 +873,8 @@ public class FinancesTab {
         options.setPayForMaintain(payForMaintainBox.isSelected());
         options.setPayForTransport(payForTransportBox.isSelected());
         options.setPayForRecruitment(payForRecruitmentBox.isSelected());
+        options.setPayForFood(payForFoodBox.isSelected());
+        options.setPayForHousing(payForHousingBox.isSelected());
         options.setSellUnits(sellUnitsBox.isSelected());
         options.setSellParts(sellPartsBox.isSelected());
         options.setUseTaxes(chkUseTaxes.isSelected());
@@ -925,6 +941,8 @@ public class FinancesTab {
         payForMaintainBox.setSelected(options.isPayForMaintain());
         payForTransportBox.setSelected(options.isPayForTransport());
         payForRecruitmentBox.setSelected(options.isPayForRecruitment());
+        payForFoodBox.setSelected(options.isPayForFood());
+        payForHousingBox.setSelected(options.isPayForHousing());
         sellUnitsBox.setSelected(options.isSellUnits());
         sellPartsBox.setSelected(options.isSellParts());
         chkUseTaxes.setSelected(options.isUseTaxes());
