@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -32,12 +37,11 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.List;
 
-import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
 /**
  * A dialog that displays a notification to the commander about personnel who have advanced via vocational experience
@@ -47,64 +51,27 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
  * as part of the campaign's vocational experience system. It notifies the user, displays relevant information in
  * character, and allows quick navigation to the personnel records via hyperlinks.</p>
  */
-public class VocationalExperienceAwardDialog extends ImmersiveDialogCore {
-    private static final String PERSON_COMMAND_STRING = "PERSON";
-
+public class VocationalExperienceAwardDialog extends ImmersiveDialogSimple {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.VocationalExperienceAwardDialog";
 
     /**
      * Constructs the {@link VocationalExperienceAwardDialog}.
      *
-     * <p>This dialog leverages the superclass {@link ImmersiveDialogCore} to provide
+     * <p>This dialog leverages the superclass {@link ImmersiveDialogSimple} to provide
      * a visually immersive and interactive interface. It includes a left-side speaker and displays a message detailing
      * personnel advancements.</p>
      *
      * @param campaign the {@link Campaign} to which this dialog is tied
      */
     public VocationalExperienceAwardDialog(Campaign campaign) {
-        super(campaign,
-              getSpeaker(campaign),
+        super(campaign, campaign.getSeniorAdminPerson(HR),
               null,
-              createInCharacterMessage(campaign),
-              createButtons(),
+              createInCharacterMessage(campaign), null,
               createOutOfCharacterMessage(campaign),
-              null,
-              false,
-              null,
-              null,
-              true);
+              null, false);
 
         setModal(false);
         setAlwaysOnTop(true);
-    }
-
-    /**
-     * Creates the list of buttons to be displayed in the dialog.
-     *
-     * <p>The dialog includes only a confirmation button for this purpose, allowing
-     * the user to acknowledge the information provided.</p>
-     *
-     * @return a list of {@link ButtonLabelTooltipPair} representing the dialog's buttons
-     */
-    private static List<ButtonLabelTooltipPair> createButtons() {
-        ButtonLabelTooltipPair btnConfirm = new ButtonLabelTooltipPair(getFormattedTextAt(RESOURCE_BUNDLE,
-              "confirm.button"), null);
-
-        return List.of(btnConfirm);
-    }
-
-    /**
-     * Retrieves the left-side speaker for the dialog.
-     *
-     * <p>The speaker is determined as the senior administrator personnel with the HR
-     * specialization within the campaign. If no such person exists, this method returns {@code null}.</p>
-     *
-     * @param campaign the {@link Campaign} containing personnel data
-     *
-     * @return a {@link Person} representing the left speaker, or {@code null} if no suitable speaker is available
-     */
-    private static @Nullable Person getSpeaker(Campaign campaign) {
-        return campaign.getSeniorAdminPerson(HR);
     }
 
     /**
