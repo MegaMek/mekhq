@@ -230,6 +230,14 @@ public enum PersonnelRole {
     }
 
     /**
+     * @deprecated use {@link #getTooltip(boolean)} instead
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
+    public String getDescription() {
+        return getDescription(false);
+    }
+
+    /**
      * Retrieves the plain text description for this personnel role from the resource bundle.
      *
      * @return the description string associated with the personnel role.
@@ -237,8 +245,17 @@ public enum PersonnelRole {
      * @author Illiani
      * @since 0.50.06
      */
-    public String getDescription() {
-        return getTextAt(RESOURCE_BUNDLE, name() + ".description");
+    public String getDescription(final boolean isClan) {
+        final boolean useClan = isClan && hasClanName;
+        return getTextAt(RESOURCE_BUNDLE, name() + ".description" + (useClan ? ".clan" : ""));
+    }
+
+    /**
+     * @deprecated use {@link #getTooltip(boolean)} instead
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
+    public String getTooltip() {
+        return getTooltip(false);
     }
 
     /**
@@ -254,8 +271,8 @@ public enum PersonnelRole {
      * @author Illiani
      * @since 0.50.06
      */
-    public String getTooltip() {
-        StringBuilder tooltip = new StringBuilder(getDescription()).append("<br>");
+    public String getTooltip(final boolean isClan) {
+        StringBuilder tooltip = new StringBuilder(getDescription(isClan)).append("<br>");
 
         List<String> skills = new ArrayList<>();
         if (this == VEHICLE_CREW) {

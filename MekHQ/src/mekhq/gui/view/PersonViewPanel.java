@@ -289,7 +289,9 @@ public class PersonViewPanel extends JScrollablePanel {
             gridY++;
         }
 
-        if ((!person.getPersonalityDescription().isBlank()) && (campaignOptions.isUseRandomPersonalities()) &&
+        if ((!person.getPersonalityDescription().isBlank()) &&
+                  (campaignOptions.isUseRandomPersonalities()) &&
+                  (!person.isHidePersonality()) &&
                   (!person.isChild(campaign.getLocalDate()))) { // we don't display for children, as most of the
             // descriptions won't fit
             JTextPane txtDesc = new JTextPane();
@@ -934,9 +936,24 @@ public class PersonViewPanel extends JScrollablePanel {
 
         int y = 0;
 
+        lblType.setName("lblType");
+        lblType.setText(String.format(resourceMap.getString("format.italic"), person.getRoleDesc()));
+        lblType.getAccessibleContext().setAccessibleName("Role: " + person.getRoleDesc());
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.gridwidth = 4;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.insets = new Insets(0, 0, 5, 0);
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlInfo.add(lblType, gridBagConstraints);
+        y++;
+
         lblStatus1.setName("lblStatus1");
         lblStatus1.setText(resourceMap.getString("lblStatus1.text"));
-        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
         gridBagConstraints.fill = GridBagConstraints.NONE;
@@ -1897,14 +1914,14 @@ public class PersonViewPanel extends JScrollablePanel {
             int column = counter / skillsPerColumn; // 0, 1
             int row = counter % skillsPerColumn;
 
-            String name = option.getDisplayableName();
+            String name = option.getDisplayableNameWithValue();
             String description = option.getDescription();
 
             boolean isFlaw = false;
             if (Objects.equals(relevantAbilities.get(option), LVL3_ADVANTAGES)) {
                 SpecialAbility ability = SpecialAbility.getOption(option.getName());
                 if (ability != null) {
-                    isFlaw = ability.getCost() < -1; // -1 is used to designate an origin only SPA
+                    isFlaw = ability.getCost() < -1; // -1 is currently used to designate an origin only SPA
                 }
             }
 
