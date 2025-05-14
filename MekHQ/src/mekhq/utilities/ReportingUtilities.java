@@ -1,14 +1,14 @@
 /*
  * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
  *
- * This file is part of MekHQ.
+ * This file is part of MekHq.
  *
- * MekHQ is free software: you can redistribute it and/or modify
+ * MekHq is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License (GPL),
  * version 3 or (at your option) any later version,
  * as published by the Free Software Foundation.
  *
- * MekHQ is distributed in the hope that it will be useful,
+ * MekHq is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
@@ -24,8 +24,15 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHq was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.utilities;
+
+import mekhq.MekHQ;
 
 /**
  * This class has a collection of values and methods to make writing out various
@@ -115,5 +122,41 @@ public class ReportingUtilities {
         } else {
             return "";
         }
+    }
+
+    /**
+     * Returns the hex color code used for positive status or messages.
+     *
+     * @return the hex color string representing a positive color
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public static String getPositiveColor() {
+        return MekHQ.getMHQOptions().getFontColorPositiveHexColor();
+    }
+
+    /**
+     * Returns the hex color code used for warning status or messages.
+     *
+     * @return the hex color string representing a warning color
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public static String getWarningColor() {
+        return MekHQ.getMHQOptions().getFontColorWarningHexColor();
+    }
+
+    /**
+     * Returns the hex color code used for negative status or messages.
+     *
+     * @return the hex color string representing a negative color
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public static String getNegativeColor() {
+        return MekHQ.getMHQOptions().getFontColorNegativeHexColor();
     }
 }
