@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.randomEvents;
 
@@ -109,7 +114,15 @@ public class RoninOffer {
         boolean useExtraRandomness = randomSkillPreferences.randomizeSkill();
 
         // We don't care about admin, doctor or tech settings, as they're not going to spawn here
-        overrideSkills(false, false, false, false, useExtraRandomness, ronin, role, VETERAN);
+        overrideSkills(false,
+              false,
+              false,
+              false,
+              campaign.getCampaignOptions().isUseArtillery(),
+              useExtraRandomness,
+              ronin,
+              role,
+              VETERAN);
 
         generateBigPersonality(ronin);
 
