@@ -654,15 +654,6 @@ public class RulesetsTab {
               "AutoResolveVictoryChanceEnabled"));
         chkAutoResolveExperimentalPacarGuiEnabled.addMouseListener(createTipPanelUpdater(stratConHeader,
               "AutoResolveExperimentalPacarGuiEnabled"));
-        chkLimitLanceWeight.addMouseListener(createTipPanelUpdater(stratConHeader, "LimitLanceWeight"));
-        chkLimitLanceNumUnits.addMouseListener(createTipPanelUpdater(stratConHeader, "LimitLanceNumUnits"));
-        chkUseStrategy.addMouseListener(createTipPanelUpdater(stratConHeader, "UseStrategy"));
-        lblBaseStrategyDeployment.addMouseListener(createTipPanelUpdater(stratConHeader, "BaseStrategyDeployment"));
-        spnBaseStrategyDeployment.addMouseListener(createTipPanelUpdater(stratConHeader, "BaseStrategyDeployment"));
-        lblAdditionalStrategyDeployment.addMouseListener(createTipPanelUpdater(stratConHeader,
-              "AdditionalStrategyDeployment"));
-        spnAdditionalStrategyDeployment.addMouseListener(createTipPanelUpdater(stratConHeader,
-              "AdditionalStrategyDeployment"));
         chkRestrictPartsByMission.addMouseListener(createTipPanelUpdater(stratConHeader, "RestrictPartsByMission"));
         chkUseWeatherConditions.addMouseListener(createTipPanelUpdater(stratConHeader, "UseWeatherConditions"));
         chkUseLightConditions.addMouseListener(createTipPanelUpdater(stratConHeader, "UseLightConditions"));
