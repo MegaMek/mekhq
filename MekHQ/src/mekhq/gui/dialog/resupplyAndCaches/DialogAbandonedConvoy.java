@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.resupplyAndCaches;
 
@@ -57,10 +62,9 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 
 /**
- * This class provides a utility method to display a custom dialog related to abandoned convoys in the MekHQ game. The
- * dialog includes detailed information and visuals, like the convoy commander or speaker, a status update message, and
- * employer details.
+ * @deprecated Unused
  */
+@Deprecated(since = "0.05.06", forRemoval = true)
 public class DialogAbandonedConvoy extends JDialog {
     final int LEFT_WIDTH = UIUtil.scaleForGUI(200);
     final int RIGHT_WIDTH = UIUtil.scaleForGUI(400);
