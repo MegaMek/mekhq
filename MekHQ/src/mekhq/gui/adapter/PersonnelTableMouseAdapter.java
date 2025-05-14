@@ -3890,6 +3890,22 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menu.add(cbMenuItem);
         }
 
+        if (getCampaignOptions().isUseRandomPersonalities()) {
+            cbMenuItem = new JCheckBoxMenuItem(resources.getString("miHidePersonality.text"));
+            cbMenuItem.setToolTipText(MultiLineTooltip.splitToolTip(resources.getString("miHidePersonality.toolTipText"),
+                  100));
+            cbMenuItem.setName("miHidePersonality");
+            cbMenuItem.setSelected(person.isHidePersonality());
+            cbMenuItem.addActionListener(evt -> {
+                final boolean hidePersonality = !person.isHidePersonality();
+                Stream.of(selected).forEach(selectedPerson -> {
+                    selectedPerson.setHidePersonality(hidePersonality);
+                    MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+                });
+            });
+            menu.add(cbMenuItem);
+        }
+
         JMenuHelpers.addMenuIfNonEmpty(popup, menu);
         // endregion Flags Menu
 
