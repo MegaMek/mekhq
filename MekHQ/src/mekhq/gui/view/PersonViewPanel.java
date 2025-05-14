@@ -941,7 +941,7 @@ public class PersonViewPanel extends JScrollablePanel {
         if (!person.isEmployed()) {
             lblUnitNotResponsibleForSalary.setName("lblNotResponsibleForSalary");
             lblUnitNotResponsibleForSalary.setText(resourceMap.getString("lblNotEmployedByUnit.text"));
-            GridBagConstraints gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridwidth = 3;
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
