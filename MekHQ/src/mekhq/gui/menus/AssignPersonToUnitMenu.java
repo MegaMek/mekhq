@@ -263,6 +263,7 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                     if (singlePerson &&
                               (unit.usesSoloPilot() ||
                                      (entity instanceof VTOL) ||
+                                     (entity instanceof Mek) ||
                                      entity.isSuperHeavy() ||
                                      entity.isTripodMek() ||
                                      entity.isQuadMek())) {
@@ -358,7 +359,7 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                         valid = areAllVehicleGunners;
                     } else if ((entity instanceof SmallCraft) || (entity instanceof Jumpship)) {
                         valid = areAllVesselGunners;
-                    } else if (entity.isTripodMek() || entity.isSuperHeavy() || entity.isQuadMek()) {
+                    } else if ((entity instanceof Mek) && !unit.usesSoloPilot()) {
                         valid = areAllBattleMekPilots;
                     } else {
                         valid = false;

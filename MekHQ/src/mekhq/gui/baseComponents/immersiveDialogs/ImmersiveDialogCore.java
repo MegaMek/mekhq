@@ -58,6 +58,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkEvent.EventType;
 
@@ -183,7 +184,7 @@ public class ImmersiveDialogCore extends JDialog {
      *
      * @return The padding value as an integer.
      */
-    protected int getPADDING() {
+    protected int getPadding() {
         return PADDING;
     }
 
@@ -502,7 +503,7 @@ public class ImmersiveDialogCore extends JDialog {
      */
     protected JPanel populateButtonPanel(List<ButtonLabelTooltipPair> buttons, boolean isVerticalLayout,
           @Nullable JPanel supplementalPanel) {
-        final int padding = getPADDING();
+        final int padding = getPadding();
 
         // Main container panel to hold the spinner and button panel
         JPanel containerPanel = new JPanel();
@@ -675,6 +676,8 @@ public class ImmersiveDialogCore extends JDialog {
         speakerBox.setLayout(new BoxLayout(speakerBox, BoxLayout.Y_AXIS));
         speakerBox.setAlignmentX(Component.CENTER_ALIGNMENT);
         speakerBox.setMaximumSize(new Dimension(IMAGE_WIDTH, scaleForGUI(MAX_VALUE)));
+        speakerBox.setBorder(new EmptyBorder(0, getPadding(), 0, getPadding()));
+
 
         // Get speaker details
         String speakerName = campaign.getName();
@@ -789,7 +792,7 @@ public class ImmersiveDialogCore extends JDialog {
             baseImage = portrait.getBaseImage();
         } else {
             baseImage = Factions.getFactionLogo(campaign.getGameYear(), speaker.getOriginFaction().getShortName())
-                                .getImage();
+                              .getImage();
         }
 
         // The following sorcery is due to the compressed manner in which personnel portraits are stored.
