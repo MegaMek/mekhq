@@ -292,12 +292,12 @@ public class UnitTableModel extends DataTableModel {
             case COL_MAINTAIN -> unit.getMaintenanceCost().toAmountAndSymbolString();
             case COL_MAINTAIN_CYCLE -> {
                 if (!campaign.getCampaignOptions().isCheckMaintenance()) {
-                    yield '-';
+                    yield "-"; // Do not convert this into a character, it will break sorting
                 }
 
                 boolean needsMaintenance = unit.requiresMaintenance();
                 if (!needsMaintenance) {
-                    yield '-';
+                    yield "-"; // Do not convert this into a character, it will break sorting
                 }
 
                 double daysSinceLastMaintenance = unit.getDaysSinceMaintenance();

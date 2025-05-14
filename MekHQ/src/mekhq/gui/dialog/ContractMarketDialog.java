@@ -517,14 +517,16 @@ public class ContractMarketDialog extends JDialog {
 
     private void acceptContract(ActionEvent evt) {
         if (selectedContract != null) {
-            if (selectedContract instanceof AtBContract) {
+            if (selectedContract instanceof AtBContract contract) {
                 if (!triggerConfirmationDialog()) {
                     return;
                 }
 
                 if (campaign.getCampaignOptions().isUseStratCon()) {
-                    new DialogContractStart(campaign, (AtBContract) selectedContract);
+                    new DialogContractStart(campaign, contract);
                 }
+
+                contract.createEmployerLiaison(campaign);
             }
 
             selectedContract.setName(contractView.getContractName());

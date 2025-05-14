@@ -36,8 +36,6 @@ import static java.lang.Math.min;
 import static megamek.common.Compute.d6;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.enums.SkillLevel.VETERAN;
-import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
-import static mekhq.campaign.mission.AtBContract.getEffectiveNumUnits;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -277,9 +275,7 @@ public abstract class AbstractContractMarket {
         }
 
         // Calculate base formation size and effective unit force
-        Faction faction = campaign.getFaction();
-        int lanceLevelFormationSize = getStandardForceSize(faction);
-        int effectiveForces = Math.max(getEffectiveNumUnits(campaign) / lanceLevelFormationSize, 1);
+        int effectiveForces = AtBContract.calculateBaseNumberOfRequiredLances(campaign);
 
         // If bypassing variance, apply flat reduction (reduce force by 1/3)
         if (bypassVariance) {
@@ -833,12 +829,20 @@ public abstract class AbstractContractMarket {
         return mod;
     }
 
+    /**
+     * @deprecated use {@link #writeToXML(Campaign, PrintWriter, int)} instead
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public void writeToXML(final PrintWriter pw, int indent) {
+        return;
+    }
+
+    public void writeToXML(Campaign campaign, final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "contractMarket");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "method", method.toString());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastId", lastId);
         for (final Contract contract : contracts) {
-            contract.writeToXML(pw, indent);
+            contract.writeToXML(campaign, pw, indent);
         }
 
         for (final Integer key : clauseMods.keySet()) {
