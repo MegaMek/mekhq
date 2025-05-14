@@ -34,9 +34,6 @@ package mekhq.campaign.randomEvents.prisoners;
 
 import static java.io.File.separator;
 import static megamek.common.Board.START_SW;
-import static megamek.common.Compute.randomInt;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
-import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.AllGroundTerrain;
 import static mekhq.campaign.personnel.enums.PersonnelRole.SOLDIER;
 import static mekhq.campaign.personnel.skills.SkillType.S_SMALL_ARMS;
 import static mekhq.campaign.randomEvents.prisoners.enums.MobType.HUGE;
@@ -45,14 +42,10 @@ import static mekhq.campaign.randomEvents.prisoners.enums.MobType.MEDIUM;
 import static mekhq.campaign.randomEvents.prisoners.enums.MobType.SMALL;
 import static mekhq.campaign.stratcon.StratconContractInitializer.getUnoccupiedCoords;
 import static mekhq.campaign.stratcon.StratconRulesManager.generateExternalScenario;
-import static mekhq.campaign.stratcon.StratconRulesManager.getAvailableForceIDs;
-import static mekhq.campaign.stratcon.StratconRulesManager.sortForcesByMapType;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import megamek.codeUtilities.ObjectUtility;
@@ -67,7 +60,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
-import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.stratcon.StratconCampaignState;
@@ -270,23 +262,6 @@ public class PrisonEscapeScenario {
         if (coords == null) {
             logger.info("Failed to fetch a free set of coords");
             return;
-        }
-
-        List<Integer> availableForceIDs = getAvailableForceIDs(campaign, contract, false);
-        Map<MapLocation, List<Integer>> sortedAvailableForceIDs = sortForcesByMapType(availableForceIDs,
-              campaign.getHangar(),
-              campaign.getAllForces());
-
-        int randomForceIndex = randomInt(availableForceIDs.size());
-        int randomForceID = availableForceIDs.get(randomForceIndex);
-
-        // remove the force from the available lists, so we don't designate it as primary twice
-        boolean autoAssignLances = contract.getCommandRights().isIntegrated();
-        if (autoAssignLances) {
-            availableForceIDs.removeIf(id -> id.equals(randomForceIndex));
-
-            // we want to remove the actual int with the value, not the value at the index
-            sortedAvailableForceIDs.get(AllGroundTerrain).removeIf(id -> id.equals(randomForceID));
         }
 
         StratconScenario scenario = generateExternalScenario(campaign,

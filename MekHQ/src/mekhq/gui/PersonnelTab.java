@@ -32,6 +32,8 @@
  */
 package mekhq.gui;
 
+import static java.lang.Math.round;
+
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -76,7 +78,7 @@ import mekhq.gui.view.PersonViewPanel;
 public final class PersonnelTab extends CampaignGuiTab {
     private static final MMLogger logger = MMLogger.create(PersonnelTab.class);
 
-    public static final int PERSONNEL_VIEW_WIDTH = 490;
+    public static final int PERSONNEL_VIEW_WIDTH = UIUtil.scaleForGUI(600);
 
     private JSplitPane splitPersonnel;
     private JTable personnelTable;
@@ -223,7 +225,7 @@ public final class PersonnelTab extends CampaignGuiTab {
         personnelTable.getSelectionModel().addListSelectionListener(ev -> refreshPersonnelView());
 
         scrollPersonnelView = new JScrollPaneWithSpeed();
-        scrollPersonnelView.setMinimumSize(new Dimension(PERSONNEL_VIEW_WIDTH, 600));
+        scrollPersonnelView.setMinimumSize(new Dimension((int) round(PERSONNEL_VIEW_WIDTH * 0.9), 600));
         scrollPersonnelView.setPreferredSize(new Dimension(PERSONNEL_VIEW_WIDTH, 600));
         scrollPersonnelView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPersonnelView.setViewportView(null);
