@@ -4473,7 +4473,8 @@ public class Unit implements ITechnology {
 
         // Set Tactics-based Commander's Initiative Bonus, if applicable
         entity.getCrew().setCommandBonus(0);
-        if (getCampaign().getCampaignOptions().isUseTactics()) {
+        if (getCampaign().getCampaignOptions().isUseTactics() ||
+                  getCampaign().getCampaignOptions().isUseInitiativeBonus()) {
             // Tactics command bonus. This should actually reflect the unit's commander
             if (null != commander && commander.hasSkill(SkillType.S_TACTICS)) {
                 entity.getCrew()
