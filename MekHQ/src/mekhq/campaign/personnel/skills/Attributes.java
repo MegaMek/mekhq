@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.skills;
 
@@ -36,6 +41,7 @@ import static mekhq.campaign.personnel.PersonnelOptions.EXCEPTIONAL_ATTRIBUTE_RE
 import static mekhq.campaign.personnel.PersonnelOptions.EXCEPTIONAL_ATTRIBUTE_STRENGTH;
 import static mekhq.campaign.personnel.PersonnelOptions.EXCEPTIONAL_ATTRIBUTE_WILLPOWER;
 import static mekhq.campaign.personnel.PersonnelOptions.MUTATION_FREAKISH_STRENGTH;
+import static mekhq.campaign.personnel.skills.Skill.getIndividualAttributeModifier;
 
 import java.io.PrintWriter;
 
@@ -202,6 +208,25 @@ public class Attributes {
             case CHARISMA -> clamp(charisma, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
             default -> 0;
         };
+    }
+
+    /**
+     * Calculates and returns the modifier for the specified skill attribute.
+     *
+     * <p>This method first retrieves the score for the given {@code attribute} by calling
+     * {@code getAttribute(attribute)}, and then computes the associated modifier using
+     * {@code getIndividualAttributeModifier(int attributeScore)}.</p>
+     *
+     * @param attribute the skill attribute for which the modifier is to be calculated
+     *
+     * @return the modifier value corresponding to the specified attribute
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public int getAttributeModifier(SkillAttribute attribute) {
+        int attributeScore = getAttribute(attribute);
+        return getIndividualAttributeModifier(attributeScore);
     }
 
     /**

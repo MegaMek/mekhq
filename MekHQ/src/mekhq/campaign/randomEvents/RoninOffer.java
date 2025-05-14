@@ -114,7 +114,15 @@ public class RoninOffer {
         boolean useExtraRandomness = randomSkillPreferences.randomizeSkill();
 
         // We don't care about admin, doctor or tech settings, as they're not going to spawn here
-        overrideSkills(false, false, false, false, useExtraRandomness, ronin, role, VETERAN);
+        overrideSkills(false,
+              false,
+              false,
+              false,
+              campaign.getCampaignOptions().isUseArtillery(),
+              useExtraRandomness,
+              ronin,
+              role,
+              VETERAN);
 
         generatePersonality(ronin, true);
 
