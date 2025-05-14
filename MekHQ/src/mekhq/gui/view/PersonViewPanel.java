@@ -936,9 +936,24 @@ public class PersonViewPanel extends JScrollablePanel {
 
         int y = 0;
 
+        lblType.setName("lblType");
+        lblType.setText(String.format(resourceMap.getString("format.italic"), person.getRoleDesc()));
+        lblType.getAccessibleContext().setAccessibleName("Role: " + person.getRoleDesc());
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.gridwidth = 4;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.insets = new Insets(0, 0, 5, 0);
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlInfo.add(lblType, gridBagConstraints);
+        y++;
+
         lblStatus1.setName("lblStatus1");
         lblStatus1.setText(resourceMap.getString("lblStatus1.text"));
-        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
         gridBagConstraints.fill = GridBagConstraints.NONE;
