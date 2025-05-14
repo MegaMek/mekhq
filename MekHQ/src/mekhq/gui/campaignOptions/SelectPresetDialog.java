@@ -24,18 +24,24 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.campaignOptions;
 
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createGroupLayout;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.util.ResourceBundle;
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -43,7 +49,6 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.logging.MMLogger;
 import mekhq.CampaignPreset;
-import mekhq.MekHQ;
 import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
 
 /**
@@ -51,10 +56,6 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
  * state. Provides options to select a preset, customize a preset, or cancel the operation.
  */
 public class SelectPresetDialog extends JDialog {
-    private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
-    private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE,
-          MekHQ.getMHQOptions().getLocale());
-
     private static final MMLogger logger = MMLogger.create(SelectPresetDialog.class);
 
     private int returnState;
@@ -90,7 +91,7 @@ public class SelectPresetDialog extends JDialog {
      * @param includeCustomizePresetOption whether to include the option to customize a preset
      */
     public SelectPresetDialog(JFrame frame, boolean includePresetSelectOption, boolean includeCustomizePresetOption) {
-        super(frame, resources.getString("presetDialog.title"), true);
+        super(frame, getTextAt(getCampaignOptionsResourceBundle(), "presetDialog.title"), true);
         final int DIALOG_WIDTH = UIUtil.scaleForGUI(400);
         final int INSERT_SIZE = UIUtil.scaleForGUI(10);
         returnState = PRESET_SELECTION_CANCELLED;
@@ -109,8 +110,7 @@ public class SelectPresetDialog extends JDialog {
 
         JLabel descriptionLabel = new JLabel(String.format(
               "<html><body><div style='width:%spx;'><center>%s</center></div></body></html>",
-              DIALOG_WIDTH,
-              resources.getString("presetDialog.description")));
+              DIALOG_WIDTH, getTextAt(getCampaignOptionsResourceBundle(), "presetDialog.description")));
 
         final DefaultListModel<CampaignPreset> campaignPresets = new DefaultListModel<>();
         campaignPresets.addAll(CampaignPreset.getCampaignPresets());

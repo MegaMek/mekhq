@@ -24,24 +24,42 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.view;
 
 import static java.awt.Color.BLACK;
 import static java.awt.Color.RED;
+import static java.lang.Math.ceil;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.common.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
+import static megamek.common.options.PilotOptions.LVL3_ADVANTAGES;
+import static megamek.common.options.PilotOptions.MD_ADVANTAGES;
 import static megamek.utilities.ImageUtilities.addTintToImageIcon;
 import static mekhq.campaign.personnel.Person.getLoyaltyName;
 import static mekhq.campaign.personnel.skills.SkillType.RP_ONLY_TAG;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_GUNNERY;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_PILOTING;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_ART;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_GENERAL;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_INTEREST;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_SCIENCE;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_SECURITY;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT_COMMAND;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 import static org.jfree.chart.ChartColor.DARK_BLUE;
 import static org.jfree.chart.ChartColor.DARK_RED;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Cursor;
-import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
@@ -54,12 +72,22 @@ import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.accessibility.AccessibleRelation;
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTable;
+import javax.swing.JTextPane;
 import javax.swing.table.TableColumn;
 
 import megamek.codeUtilities.MathUtility;
@@ -69,27 +97,30 @@ import megamek.logging.MMLogger;
 import megamek.utilities.ImageUtilities;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.Kill;
-import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonAwardController;
 import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.FormerSpouse;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.Attributes;
+import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.JScrollablePanel;
-import mekhq.gui.dialog.MedicalViewDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.PersonnelEventLogModel;
 import mekhq.gui.model.PersonnelKillLogModel;
@@ -104,20 +135,22 @@ import mekhq.gui.utilities.WrapLayout;
 public class PersonViewPanel extends JScrollablePanel {
     private static final MMLogger logger = MMLogger.create(PersonViewPanel.class);
 
-    private static final int MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW = 3;
+    private static final int MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW = 5;
 
     private final CampaignGUI gui;
 
     private final Person person;
     private final Campaign campaign;
+    private final CampaignOptions campaignOptions;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonViewPanel",
           MekHQ.getMHQOptions().getLocale());
 
-    public PersonViewPanel(Person p, Campaign c, CampaignGUI gui) {
+    public PersonViewPanel(Person person, Campaign campaign, CampaignGUI gui) {
         super();
-        this.person = p;
-        this.campaign = c;
+        this.person = person;
+        this.campaign = campaign;
+        campaignOptions = campaign.getCampaignOptions();
         this.gui = gui;
         initComponents();
     }
@@ -132,7 +165,7 @@ public class PersonViewPanel extends JScrollablePanel {
         gbc_pnlPortrait.gridy = 0;
         gbc_pnlPortrait.fill = GridBagConstraints.NONE;
         gbc_pnlPortrait.anchor = GridBagConstraints.NORTHWEST;
-        gbc_pnlPortrait.insets = new Insets(10, 10, 0, 0);
+        gbc_pnlPortrait.insets = new Insets(10, 0, 0, 0);
         add(pnlPortrait, gbc_pnlPortrait);
 
         JPanel pnlInfo = fillInfo();
@@ -140,98 +173,125 @@ public class PersonViewPanel extends JScrollablePanel {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.insets = new Insets(0, 0, 10, 0);
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(pnlInfo, gridBagConstraints);
 
-        int gridy = 1;
+        int gridY = 1;
 
-        JPanel pnlSkills = fillSkills();
+        PersonAwardController awardController = person.getAwardController();
+        if (awardController.hasAwards()) {
+            gridY = applyAndDisplayAwards(awardController, pnlPortrait, gridY);
+        }
+
+        List<String> relevantSkills = person.getKnownSkillsBySkillSubType(List.of(COMBAT_GUNNERY, COMBAT_PILOTING));
+        if (!relevantSkills.isEmpty()) {
+            JPanel pnlCombatSkills = fillSkills(relevantSkills, "pnlSkills.combat");
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = gridY;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            add(pnlCombatSkills, gridBagConstraints);
+            gridY++;
+        }
+
+        relevantSkills = person.getKnownSkillsBySkillSubType(List.of(SUPPORT, SUPPORT_COMMAND));
+        if (!relevantSkills.isEmpty()) {
+            JPanel pnlSupportSkills = fillSkills(relevantSkills, "pnlSkills.support");
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = gridY;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            add(pnlSupportSkills, gridBagConstraints);
+            gridY++;
+        }
+
+        relevantSkills = person.getKnownSkillsBySkillSubType(List.of(ROLEPLAY_GENERAL,
+              ROLEPLAY_ART,
+              ROLEPLAY_INTEREST,
+              ROLEPLAY_SCIENCE,
+              ROLEPLAY_SECURITY));
+        if (!relevantSkills.isEmpty()) {
+            JPanel pnlRoleplaySkills = fillSkills(relevantSkills, "pnlSkills.roleplay");
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = gridY;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            add(pnlRoleplaySkills, gridBagConstraints);
+            gridY++;
+        }
+
+        Map<SkillAttribute, Integer> relevantAttributes = getRelevantAttributes();
+        if (!relevantAttributes.isEmpty()) {
+            JPanel pnlAttributes = fillAttributeModifiers(relevantAttributes);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = gridY;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            add(pnlAttributes, gridBagConstraints);
+            gridY++;
+        }
+
+        Map<IOption, String> relevantAbilities = getRelevantAbilities();
+        if (!relevantAbilities.isEmpty()) {
+            JPanel pnlAbilities = fillAbilitiesAndImplants(relevantAbilities);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = gridY;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            add(pnlAbilities, gridBagConstraints);
+            gridY++;
+        }
+
+        JPanel pnlOther = fillOther();
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.gridy = gridY;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.insets = new Insets(0, 0, 10, 0);
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        add(pnlSkills, gridBagConstraints);
-        gridy++;
+        add(pnlOther, gridBagConstraints);
+        gridY++;
 
-        if (campaign.getCampaignOptions().isUseAdvancedMedical()) {
+        if (campaignOptions.isUseAdvancedMedical() && person.needsFixing()) {
             JPanel pnlInjuries = fillInjuries();
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridy;
+            gridBagConstraints.gridy = gridY;
             gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             add(pnlInjuries, gridBagConstraints);
-            gridy++;
-        }
-
-        if (!person.getGenealogy().isEmpty()) {
-            JPanel pnlFamily = fillFamily();
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridy;
-            gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-            gridBagConstraints.fill = GridBagConstraints.BOTH;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            add(pnlFamily, gridBagConstraints);
-            gridy++;
-        }
-
-        if (person.getAwardController().hasAwards()) {
-            if (person.getAwardController().hasAwardsWithRibbons()) {
-                Box boxRibbons = drawRibbons();
-
-                GridBagConstraints gbc_pnlAllRibbons = new GridBagConstraints();
-                gbc_pnlAllRibbons.gridx = 0;
-                gbc_pnlAllRibbons.gridy = 1;
-                gbc_pnlAllRibbons.fill = GridBagConstraints.NONE;
-                gbc_pnlAllRibbons.anchor = GridBagConstraints.NORTHWEST;
-                gbc_pnlAllRibbons.insets = new Insets(0, 0, 0, 0);
-                pnlPortrait.add(boxRibbons, gbc_pnlAllRibbons);
-            }
-
-            JPanel pnlAllAwards = new JPanel();
-            pnlAllAwards.setLayout(new BoxLayout(pnlAllAwards, BoxLayout.PAGE_AXIS));
-            pnlAllAwards.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlAwards.title")));
-
-            if (person.getAwardController().hasAwardsWithMedals()) {
-                JPanel pnlMedals = drawMedals();
-                pnlMedals.setName("pnlMedals");
-                pnlMedals.setLayout(new WrapLayout(FlowLayout.LEFT));
-                pnlAllAwards.add(pnlMedals);
-            }
-
-            if (person.getAwardController().hasAwardsWithMiscs()) {
-                JPanel pnlMiscAwards = drawMiscAwards();
-                pnlMiscAwards.setName("pnlMiscAwards");
-                pnlMiscAwards.setLayout(new WrapLayout(FlowLayout.LEFT));
-                pnlAllAwards.add(pnlMiscAwards);
-            }
-
-            if (person.getAwardController().hasAwardsWithMedals() || person.getAwardController().hasAwardsWithMiscs()) {
-                gridBagConstraints = new GridBagConstraints();
-                gridBagConstraints.fill = GridBagConstraints.BOTH;
-                gridBagConstraints.gridwidth = 2;
-                gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-                gridBagConstraints.gridx = 0;
-                gridBagConstraints.gridy = gridy;
-                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-                add(pnlAllAwards, gridBagConstraints);
-                gridy++;
-            }
+            gridY++;
         }
 
         if ((!person.getPersonalityDescription().isBlank()) &&
-                  (campaign.getCampaignOptions().isUseRandomPersonalities()) &&
+                  (campaignOptions.isUseRandomPersonalities()) &&
+                  (!person.isHidePersonality()) &&
                   (!person.isChild(campaign.getLocalDate()))) { // we don't display for children, as most of the
             // descriptions won't fit
             JTextPane txtDesc = new JTextPane();
@@ -242,13 +302,13 @@ public class PersonViewPanel extends JScrollablePanel {
             txtDesc.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlPersonality.title")));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridy;
+            gridBagConstraints.gridy = gridY;
             gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             add(txtDesc, gridBagConstraints);
-            gridy++;
+            gridY++;
         }
 
         if (!person.getBiography().isBlank()) {
@@ -261,39 +321,39 @@ public class PersonViewPanel extends JScrollablePanel {
                   "pnlDescription.title")), BorderFactory.createEmptyBorder(0, 2, 2, 2)));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridy;
+            gridBagConstraints.gridy = gridY;
             gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             add(txtDesc, gridBagConstraints);
-            gridy++;
+            gridY++;
         }
 
         if (!person.getPersonalLog().isEmpty()) {
             JPanel pnlPersonalLogHeader = new JPanel();
             pnlPersonalLogHeader.setName("pnlLogHeader");
             pnlPersonalLogHeader.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlLogHeader.title")));
-            pnlPersonalLogHeader.setVisible(!campaign.getCampaignOptions().isDisplayPersonnelLog());
+            pnlPersonalLogHeader.setVisible(!campaignOptions.isDisplayPersonnelLog());
 
             JPanel pnlPersonalLog = fillPersonalLog();
             pnlPersonalLog.setName("pnlLog");
             pnlPersonalLog.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlLog.title")));
-            pnlPersonalLog.setVisible(campaign.getCampaignOptions().isDisplayPersonnelLog());
+            pnlPersonalLog.setVisible(campaignOptions.isDisplayPersonnelLog());
 
             pnlPersonalLogHeader.addMouseListener(getSwitchListener(pnlPersonalLogHeader, pnlPersonalLog));
             pnlPersonalLog.addMouseListener(getSwitchListener(pnlPersonalLog, pnlPersonalLogHeader));
 
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridy;
+            gridBagConstraints.gridy = gridY;
             gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             add(pnlPersonalLogHeader, gridBagConstraints);
             add(pnlPersonalLog, gridBagConstraints);
-            gridy++;
+            gridY++;
         }
 
         if (!person.getPerformanceLog().isEmpty()) {
@@ -301,26 +361,26 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlPerformanceLogHeader.setName("pnlPerformanceLogHeader");
             pnlPerformanceLogHeader.setBorder(BorderFactory.createTitledBorder(resourceMap.getString(
                   "pnlPerformanceLogHeader.title")));
-            pnlPerformanceLogHeader.setVisible(!campaign.getCampaignOptions().isDisplayPerformanceRecord());
+            pnlPerformanceLogHeader.setVisible(!campaignOptions.isDisplayPerformanceRecord());
 
             JPanel pnlPerformanceLog = fillPerformanceLog();
             pnlPerformanceLog.setName("pnlPerformanceLog");
             pnlPerformanceLog.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlPerformanceLog.title")));
-            pnlPerformanceLog.setVisible(campaign.getCampaignOptions().isDisplayPerformanceRecord());
+            pnlPerformanceLog.setVisible(campaignOptions.isDisplayPerformanceRecord());
 
             pnlPerformanceLogHeader.addMouseListener(getSwitchListener(pnlPerformanceLogHeader, pnlPerformanceLog));
             pnlPerformanceLog.addMouseListener(getSwitchListener(pnlPerformanceLog, pnlPerformanceLogHeader));
 
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridy;
+            gridBagConstraints.gridy = gridY;
             gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             add(pnlPerformanceLogHeader, gridBagConstraints);
             add(pnlPerformanceLog, gridBagConstraints);
-            gridy++;
+            gridY++;
         }
 
         if (!person.getMedicalLog().isEmpty()) {
@@ -328,26 +388,26 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlMedicalLogHeader.setName("pnlMedicalLogHeader");
             pnlMedicalLogHeader.setBorder(BorderFactory.createTitledBorder(resourceMap.getString(
                   "pnlMedicalLogHeader.title")));
-            pnlMedicalLogHeader.setVisible(!campaign.getCampaignOptions().isDisplayMedicalRecord());
+            pnlMedicalLogHeader.setVisible(!campaignOptions.isDisplayMedicalRecord());
 
             JPanel pnlMedicalLog = fillMedicalLog();
             pnlMedicalLog.setName("pnlMedicalLog");
             pnlMedicalLog.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlMedicalLog.title")));
-            pnlMedicalLog.setVisible(campaign.getCampaignOptions().isDisplayMedicalRecord());
+            pnlMedicalLog.setVisible(campaignOptions.isDisplayMedicalRecord());
 
             pnlMedicalLogHeader.addMouseListener(getSwitchListener(pnlMedicalLogHeader, pnlMedicalLog));
             pnlMedicalLog.addMouseListener(getSwitchListener(pnlMedicalLog, pnlMedicalLogHeader));
 
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridy;
+            gridBagConstraints.gridy = gridY;
             gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             add(pnlMedicalLogHeader, gridBagConstraints);
             add(pnlMedicalLog, gridBagConstraints);
-            gridy++;
+            gridY++;
         }
 
         if (!person.getAssignmentLog().isEmpty()) {
@@ -355,56 +415,56 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlAssignmentsLogHeader.setName("assignmentLogHeader");
             pnlAssignmentsLogHeader.setBorder(BorderFactory.createTitledBorder(resourceMap.getString(
                   "assignmentLogHeader.title")));
-            pnlAssignmentsLogHeader.setVisible(!campaign.getCampaignOptions().isDisplayAssignmentRecord());
+            pnlAssignmentsLogHeader.setVisible(!campaignOptions.isDisplayAssignmentRecord());
 
             JPanel pnlAssignmentsLog = fillAssignmentLog();
 
             pnlAssignmentsLog.setName("assignmentLog");
             pnlAssignmentsLog.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(resourceMap.getString(
-                  "assignmentLog.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-            pnlAssignmentsLog.setVisible(campaign.getCampaignOptions().isDisplayAssignmentRecord());
+                  "assignmentLog.title")), BorderFactory.createEmptyBorder(0, 0, 10, 0)));
+            pnlAssignmentsLog.setVisible(campaignOptions.isDisplayAssignmentRecord());
 
             pnlAssignmentsLogHeader.addMouseListener(getSwitchListener(pnlAssignmentsLogHeader, pnlAssignmentsLog));
             pnlAssignmentsLog.addMouseListener(getSwitchListener(pnlAssignmentsLog, pnlAssignmentsLogHeader));
 
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridy;
+            gridBagConstraints.gridy = gridY;
             gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             add(pnlAssignmentsLogHeader, gridBagConstraints);
             add(pnlAssignmentsLog, gridBagConstraints);
-            gridy++;
+            gridY++;
         }
 
         if (!campaign.getKillsFor(person.getId()).isEmpty()) {
             JPanel pnlKillsHeader = new JPanel();
             pnlKillsHeader.setName("killsHeader");
             pnlKillsHeader.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlKillsHeader.title")));
-            pnlKillsHeader.setVisible(!campaign.getCampaignOptions().isDisplayKillRecord());
+            pnlKillsHeader.setVisible(!campaignOptions.isDisplayKillRecord());
 
             JPanel pnlKills = fillKillRecord();
 
             pnlKills.setName("txtKills");
             pnlKills.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(resourceMap.getString(
-                  "pnlKills.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-            pnlKills.setVisible(campaign.getCampaignOptions().isDisplayKillRecord());
+                  "pnlKills.title")), BorderFactory.createEmptyBorder(0, 0, 10, 0)));
+            pnlKills.setVisible(campaignOptions.isDisplayKillRecord());
 
             pnlKillsHeader.addMouseListener(getSwitchListener(pnlKillsHeader, pnlKills));
             pnlKills.addMouseListener(getSwitchListener(pnlKills, pnlKillsHeader));
 
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridy;
+            gridBagConstraints.gridy = gridY;
             gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             add(pnlKillsHeader, gridBagConstraints);
             add(pnlKills, gridBagConstraints);
-            gridy++;
+            gridY++;
         }
 
         if (!person.getScenarioLog().isEmpty()) {
@@ -412,39 +472,189 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlScenariosLogHeader.setName("scenarioLogHeader");
             pnlScenariosLogHeader.setBorder(BorderFactory.createTitledBorder(resourceMap.getString(
                   "scenarioLogHeader.title")));
-            pnlScenariosLogHeader.setVisible(!campaign.getCampaignOptions().isDisplayScenarioLog());
+            pnlScenariosLogHeader.setVisible(!campaignOptions.isDisplayScenarioLog());
 
             JPanel pnlScenariosLog = fillScenarioLog();
 
             pnlScenariosLog.setName("scenarioLog");
             pnlScenariosLog.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(resourceMap.getString(
-                  "scenarioLog.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-            pnlScenariosLog.setVisible(campaign.getCampaignOptions().isDisplayScenarioLog());
+                  "scenarioLog.title")), BorderFactory.createEmptyBorder(0, 0, 10, 0)));
+            pnlScenariosLog.setVisible(campaignOptions.isDisplayScenarioLog());
 
             pnlScenariosLogHeader.addMouseListener(getSwitchListener(pnlScenariosLogHeader, pnlScenariosLog));
             pnlScenariosLog.addMouseListener(getSwitchListener(pnlScenariosLog, pnlScenariosLogHeader));
 
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridy;
+            gridBagConstraints.gridy = gridY;
             gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             add(pnlScenariosLogHeader, gridBagConstraints);
             add(pnlScenariosLog, gridBagConstraints);
-            gridy++;
+            gridY++;
+        }
+
+        if (!person.getGenealogy().isEmpty()) {
+            JPanel pnlFamily = fillFamily();
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = gridY;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            add(pnlFamily, gridBagConstraints);
+            gridY++;
         }
 
         // use glue to fill up the remaining space so everything is aligned to the top
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.gridy = gridY;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(Box.createGlue(), gridBagConstraints);
+    }
+
+    /**
+     * Initializes and lays out the award sections within a portrait panel for a person.
+     *
+     * <p>If ribbon awards are present, they are added above the awards panel. If medal or miscellaneous awards exist,
+     * they are displayed in their respective panels using a {@link WrapLayout}, all contained within a titled section.
+     * This method adds the constructed awards panel to the layout using {@link GridBagConstraints} and updates the grid
+     * Y position accordingly.</p>
+     *
+     * @param awardController the {@link PersonAwardController} providing award data and state
+     * @param pnlPortrait     the portrait {@link JPanel} to which award ribbons may be added
+     * @param gridY           the starting Y grid position for layout
+     *
+     * @return the next available grid Y position after inserting any new panels
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    private int applyAndDisplayAwards(PersonAwardController awardController, JPanel pnlPortrait, int gridY) {
+        GridBagConstraints gridBagConstraints;
+        if (awardController.hasAwardsWithRibbons()) {
+            Box boxRibbons = drawRibbons();
+
+            GridBagConstraints gbc_pnlAllRibbons = new GridBagConstraints();
+            gbc_pnlAllRibbons.gridx = 0;
+            gbc_pnlAllRibbons.gridy = 1;
+            gbc_pnlAllRibbons.fill = GridBagConstraints.NONE;
+            gbc_pnlAllRibbons.anchor = GridBagConstraints.NORTHWEST;
+            gbc_pnlAllRibbons.insets = new Insets(-10, 10, 0, 5);
+            pnlPortrait.add(boxRibbons, gbc_pnlAllRibbons);
+        }
+
+        JPanel pnlAllAwards = new JPanel();
+        pnlAllAwards.setLayout(new BoxLayout(pnlAllAwards, BoxLayout.PAGE_AXIS));
+        pnlAllAwards.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlAwards.title")));
+
+        if (awardController.hasAwardsWithMedals()) {
+            JPanel pnlMedals = drawMedals();
+            pnlMedals.setName("pnlMedals");
+            pnlMedals.setLayout(new WrapLayout(FlowLayout.LEFT));
+            pnlAllAwards.add(pnlMedals);
+        }
+
+        if (awardController.hasAwardsWithMiscs()) {
+            JPanel pnlMiscAwards = drawMiscAwards();
+            pnlMiscAwards.setName("pnlMiscAwards");
+            pnlMiscAwards.setLayout(new WrapLayout(FlowLayout.LEFT));
+            pnlAllAwards.add(pnlMiscAwards);
+        }
+
+        if (awardController.hasAwardsWithMedals() || awardController.hasAwardsWithMiscs()) {
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = gridY;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            add(pnlAllAwards, gridBagConstraints);
+            gridY++;
+        }
+        return gridY;
+    }
+
+    /**
+     * Retrieves a map of relevant special abilities and implants for the person based on the current campaign options.
+     *
+     * <p>This method checks whether abilities and/or implants are enabled in the campaign options.</p>
+     *
+     * <p>For each enabled category, it iterates over the person's corresponding options. If an option is selected
+     * (its boolean value is {@code true}), it retrieves the corresponding {@link IOption} instance and adds it to
+     * the result map, associating it with a string indicating its category (e.g., {@code LVL3_ADVANTAGES} for
+     * abilities or {@code MD_ADVANTAGES} for implants).</p>
+     *
+     * @return a {@link Map} where the key is a relevant {@link IOption} (representing a special ability or implant)
+     *         and the value is a {@link String} indicating the ability or implant category
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    private Map<IOption, String> getRelevantAbilities() {
+        Map<IOption, String> relevantAbilities = new HashMap<>();
+
+        PersonnelOptions options = person.getOptions();
+        if (campaignOptions.isUseAbilities() && (person.countOptions(LVL3_ADVANTAGES) > 0)) {
+            for (Enumeration<IOption> i = person.getOptions(LVL3_ADVANTAGES); i.hasMoreElements(); ) {
+                IOption option = i.nextElement();
+                if (option.booleanValue()) {
+                    IOption ability = options.getOption(option.getName());
+                    relevantAbilities.put(ability, LVL3_ADVANTAGES);
+                }
+            }
+        }
+
+        if (campaignOptions.isUseImplants() && (person.countOptions(MD_ADVANTAGES) > 0)) {
+            for (Enumeration<IOption> i = person.getOptions(MD_ADVANTAGES); i.hasMoreElements(); ) {
+                IOption option = i.nextElement();
+                if (option.booleanValue()) {
+                    IOption ability = options.getOption(option.getName());
+                    relevantAbilities.put(ability, MD_ADVANTAGES);
+                }
+            }
+        }
+        return relevantAbilities;
+    }
+
+    /**
+     * Returns a map of relevant skill attributes and their corresponding modifiers for the person.
+     *
+     * <p>This method iterates over all possible {@link SkillAttribute} values (excluding {@link SkillAttribute#NONE}),
+     * retrieves each attribute's score for the person, and computes the associated modifier using
+     * {@link Skill#getIndividualAttributeModifier(int)}. Only attributes with a non-zero modifier are included in the
+     * result map.</p>
+     *
+     * @return a {@link Map} mapping each relevant {@link SkillAttribute} to its computed modifier for the person
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    private Map<SkillAttribute, Integer> getRelevantAttributes() {
+        Map<SkillAttribute, Integer> relevantAttributes = new HashMap<>();
+        for (SkillAttribute attribute : SkillAttribute.values()) {
+            if (attribute == SkillAttribute.NONE) {
+                continue;
+            }
+
+            int attributeScore = person.getAttributeScore(attribute);
+            // TODO enable once attribute modifier sare implemented
+            //            int modifier = getIndividualAttributeModifier(attributeScore);
+            int modifier = 0;
+            if (modifier != 0) {
+                relevantAttributes.put(attribute, modifier);
+            }
+        }
+        return relevantAttributes;
     }
 
     private MouseListener getSwitchListener(JPanel current, JPanel switchTo) {
@@ -504,7 +714,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 ribbon = ribbonAsImageIcon.getImage();
 
                 ribbonLabel.setIcon(new ImageIcon(ribbon));
-                ribbonLabel.setToolTipText(award.getTooltip(campaign.getCampaignOptions(), person));
+                ribbonLabel.setToolTipText(award.getTooltip(campaignOptions, person));
                 rowRibbonsBox.add(ribbonLabel, 0);
             } catch (Exception e) {
                 logger.error("", e);
@@ -519,7 +729,6 @@ public class PersonViewPanel extends JScrollablePanel {
             rowRibbonsBoxes.add(rowRibbonsBox);
         }
 
-        Collections.reverse(rowRibbonsBoxes);
         for (Box box : rowRibbonsBoxes) {
             boxRibbons.add(box);
         }
@@ -538,7 +747,7 @@ public class PersonViewPanel extends JScrollablePanel {
      */
     private int getAwardTierCount(Award award, int maximumTiers) {
         int numAwards = person.getAwardController().getNumberOfAwards(award);
-        int tierSize = campaign.getCampaignOptions().getAwardTierSize();
+        int tierSize = campaignOptions.getAwardTierSize();
 
         int divisionResult = numAwards / tierSize;
         int addition = (tierSize == 1) ? 0 : 1;
@@ -582,7 +791,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 medal = medalAsImageIcon.getImage();
 
                 medalLabel.setIcon(new ImageIcon(medal));
-                medalLabel.setToolTipText(award.getTooltip(campaign.getCampaignOptions(), person));
+                medalLabel.setToolTipText(award.getTooltip(campaignOptions, person));
                 pnlMedals.add(medalLabel);
             } catch (Exception e) {
                 logger.error("", e);
@@ -628,7 +837,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 misc = miscAsImageIcon.getImage();
 
                 miscLabel.setIcon(new ImageIcon(misc));
-                miscLabel.setToolTipText(award.getTooltip(campaign.getCampaignOptions(), person));
+                miscLabel.setToolTipText(award.getTooltip(campaignOptions, person));
                 pnlMiscs.add(miscLabel);
             } catch (Exception e) {
                 logger.error("", e);
@@ -664,7 +873,7 @@ public class PersonViewPanel extends JScrollablePanel {
         gbc_lblPortrait.gridy = 0;
         gbc_lblPortrait.fill = GridBagConstraints.NONE;
         gbc_lblPortrait.anchor = GridBagConstraints.NORTHWEST;
-        gbc_lblPortrait.insets = new Insets(0, 0, 0, 0);
+        gbc_lblPortrait.insets = new Insets(0, 0, 10, 0);
         pnlPortrait.add(lblPortrait, gbc_lblPortrait);
 
         return pnlPortrait;
@@ -686,7 +895,7 @@ public class PersonViewPanel extends JScrollablePanel {
      */
     private ImageIcon getPortraitImageIcon() {
         Portrait portrait = person.getPortrait();
-        ImageIcon portraitImageIcon = portrait.getImageIcon(100);
+        ImageIcon portraitImageIcon = portrait.getImageIcon(175);
 
         PersonnelStatus status = person.getStatus();
         if (status.isDead()) {
@@ -765,7 +974,7 @@ public class PersonViewPanel extends JScrollablePanel {
         pnlInfo.add(lblStatus2, gridBagConstraints);
         y++;
 
-        if (campaign.getCampaignOptions().isShowOriginFaction()) {
+        if (campaignOptions.isShowOriginFaction()) {
             lblOrigin1.setName("lblOrigin1");
             lblOrigin1.setText(resourceMap.getString("lblOrigin1.text"));
             gridBagConstraints = new GridBagConstraints();
@@ -994,7 +1203,7 @@ public class PersonViewPanel extends JScrollablePanel {
         // We show the following if track total earnings is on for a free person or if
         // the
         // person has previously tracked total earnings
-        if (campaign.getCampaignOptions().isTrackTotalEarnings() &&
+        if (campaignOptions.isTrackTotalEarnings() &&
                   (person.getPrisonerStatus().isFree() || person.getTotalEarnings().isGreaterThan(Money.zero()))) {
             JLabel lblTotalEarnings1 = new JLabel(resourceMap.getString("lblTotalEarnings1.text"));
             lblTotalEarnings1.setName("lblTotalEarnings1");
@@ -1022,7 +1231,7 @@ public class PersonViewPanel extends JScrollablePanel {
         // We show the following if track total xp earnings is on for a free person or
         // if the
         // person has previously tracked total xp earnings
-        if (campaign.getCampaignOptions().isTrackTotalXPEarnings() &&
+        if (campaignOptions.isTrackTotalXPEarnings() &&
                   (person.getPrisonerStatus().isFree() || (person.getTotalXPEarnings() != 0))) {
             JLabel lblTotalXPEarnings1 = new JLabel(resourceMap.getString("lblTotalXPEarnings1.text"));
             lblTotalXPEarnings1.setName("lblTotalXPEarnings1");
@@ -1239,7 +1448,7 @@ public class PersonViewPanel extends JScrollablePanel {
             }
         }
 
-        if (campaign.getCampaignOptions().getFamilyDisplayLevel().displayParentsChildrenSiblings()) {
+        if (campaignOptions.getFamilyDisplayLevel().displayParentsChildrenSiblings()) {
             final List<Person> children = person.getGenealogy().getChildren();
             if (!children.isEmpty()) {
                 lblChildren1.setName("lblChildren1");
@@ -1279,7 +1488,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
             final List<Person> grandchildren = person.getGenealogy().getGrandchildren();
             if (!grandchildren.isEmpty() &&
-                      campaign.getCampaignOptions().getFamilyDisplayLevel().displayGrandparentsGrandchildren()) {
+                      campaignOptions.getFamilyDisplayLevel().displayGrandparentsGrandchildren()) {
                 lblGrandchildren1.setName("lblGrandchildren1");
                 lblGrandchildren1.setText(resourceMap.getString("lblGrandchildren1.text"));
                 gridBagConstraints = new GridBagConstraints();
@@ -1388,8 +1597,7 @@ public class PersonViewPanel extends JScrollablePanel {
             }
 
             final List<Person> grandparents = person.getGenealogy().getGrandparents();
-            if (!grandparents.isEmpty() &&
-                      campaign.getCampaignOptions().getFamilyDisplayLevel().displayGrandparentsGrandchildren()) {
+            if (!grandparents.isEmpty() && campaignOptions.getFamilyDisplayLevel().displayGrandparentsGrandchildren()) {
                 lblGrandparents1.setName("lblGrandparents1");
                 lblGrandparents1.setText(resourceMap.getString("lblGrandparents1.text"));
                 gridBagConstraints = new GridBagConstraints();
@@ -1428,8 +1636,7 @@ public class PersonViewPanel extends JScrollablePanel {
             }
 
             final List<Person> auntsAndUncles = person.getGenealogy().getsAuntsAndUncles();
-            if (!auntsAndUncles.isEmpty() &&
-                      campaign.getCampaignOptions().getFamilyDisplayLevel().isAuntsUnclesCousins()) {
+            if (!auntsAndUncles.isEmpty() && campaignOptions.getFamilyDisplayLevel().isAuntsUnclesCousins()) {
                 lblAuntsOrUncles1.setName("lblAuntsOrUncles1");
                 lblAuntsOrUncles1.setText(resourceMap.getString("lblAuntsOrUncles1.text"));
                 gridBagConstraints = new GridBagConstraints();
@@ -1469,7 +1676,7 @@ public class PersonViewPanel extends JScrollablePanel {
             }
 
             final List<Person> cousins = person.getGenealogy().getCousins();
-            if (!cousins.isEmpty() && campaign.getCampaignOptions().getFamilyDisplayLevel().isAuntsUnclesCousins()) {
+            if (!cousins.isEmpty() && campaignOptions.getFamilyDisplayLevel().isAuntsUnclesCousins()) {
                 lblCousins1.setName("lblCousins1");
                 lblCousins1.setText(resourceMap.getString("lblCousins1.text"));
                 gridBagConstraints = new GridBagConstraints();
@@ -1528,522 +1735,475 @@ public class PersonViewPanel extends JScrollablePanel {
         }
     }
 
-    private JPanel fillSkills() {
-        // skill panel
+    /**
+     * Creates and returns a JPanel displaying a sorted list of skills arranged in columns, with each skill's name and
+     * corresponding value shown side-by-side. The panel's title is determined by the provided resource key. Skills are
+     * distributed evenly across a fixed number of columns (default is three).
+     *
+     * @param relevantSkills the list of skill names to display; will be sorted alphabetically
+     * @param titleKey       the resource key for the panel's titled border
+     *
+     * @return a {@link JPanel} containing the skill names and values in a grid layout
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    private JPanel fillSkills(List<String> relevantSkills, String titleKey) {
+        Collections.sort(relevantSkills);
         JPanel pnlSkills = new JPanel(new GridBagLayout());
-        pnlSkills.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlSkills.title")));
+        pnlSkills.setBorder(BorderFactory.createTitledBorder(resourceMap.getString(titleKey)));
 
-        // abilities and implants
-        JLabel lblTough1 = new JLabel();
-        JLabel lblTough2 = new JLabel();
-        JLabel lblConnections1 = new JLabel();
-        JLabel lblConnections2 = new JLabel();
-        JLabel lblWealth1 = new JLabel();
-        JLabel lblWealth2 = new JLabel();
-        JLabel lblReputation1 = new JLabel();
-        JLabel lblReputation2 = new JLabel();
-        JLabel lblEdge1 = new JLabel();
-        JLabel lblEdge2 = new JLabel();
-        JLabel lblEdgeAvail1 = new JLabel();
-        JLabel lblEdgeAvail2 = new JLabel();
-
-        JLabel lblLoyalty1 = new JLabel();
-        JLabel lblLoyalty2 = new JLabel();
-
-        JLabel lblFatigue1 = new JLabel();
-        JLabel lblFatigue2 = new JLabel();
-
-        // education
-        JLabel lblEducationLevel1 = new JLabel();
-        JLabel lblEducationLevel2 = new JLabel();
-        JLabel lblEducationStage1 = new JLabel();
-        JLabel lblEducationStage2 = new JLabel();
-        JLabel lblEducationJourneyDays1 = new JLabel();
-        JLabel lblEducationJourneyDays2 = new JLabel();
-        JLabel lblEducationDays1 = new JLabel();
-        JLabel lblEducationDays2 = new JLabel();
-
-        GridBagConstraints gridBagConstraints;
-
-        JLabel lblName;
-        JLabel lblValue;
-
-        int firsty = 0;
-        int colBreak = Math.max((int) Math.ceil(person.getSkillNumber() / 2.0) + 1, 3);
-        int addition = 0;
-        double weight = 0.5;
-
-        int j = 0;
-        for (int i = 0; i < SkillType.getSkillList().length; i++) {
-            String skillName = SkillType.getSkillList()[i];
-            SkillType type = SkillType.getType(skillName);
-            if (person.hasSkill(skillName)) {
-                j++;
-                if (j == colBreak) {
-                    addition = 2;
-                    firsty = 0;
-                    weight = 1.0;
-                }
-                if (type.isRoleplaySkill()) {
-                    lblName = new JLabel(String.format(resourceMap.getString("format.itemHeader.roleplay"),
-                          skillName.replaceAll(Pattern.quote(RP_ONLY_TAG), "")));
-                } else {
-                    lblName = new JLabel(String.format(resourceMap.getString("format.itemHeader"), skillName));
-                }
-                int reputation = person.getAdjustedReputation(campaign.getCampaignOptions().isUseAgeEffects(),
-                      campaign.isClanCampaign(),
-                      campaign.getLocalDate(),
-                      person.getRankLevel());
-                lblValue = new JLabel(person.getSkill(skillName).toString(person.getOptions(), reputation));
-                lblName.setLabelFor(lblValue);
-                gridBagConstraints = new GridBagConstraints();
-                gridBagConstraints.gridx = addition;
-                gridBagConstraints.gridy = firsty;
-                gridBagConstraints.fill = GridBagConstraints.NONE;
-                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-                pnlSkills.add(lblName, gridBagConstraints);
-                gridBagConstraints = new GridBagConstraints();
-                gridBagConstraints.gridx = 1 + addition;
-                gridBagConstraints.gridy = firsty;
-                gridBagConstraints.weightx = weight;
-                gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-                gridBagConstraints.fill = GridBagConstraints.NONE;
-                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-                pnlSkills.add(lblValue, gridBagConstraints);
-                firsty++;
-            }
-        }
-
-        // reset firsty
-        firsty = colBreak;
-
-        if (campaign.getCampaignOptions().isUseAbilities() &&
-                  (person.countOptions(PersonnelOptions.LVL3_ADVANTAGES) > 0)) {
-            JLabel lblAbility1 = new JLabel(resourceMap.getString("lblAbility1.text"));
-            lblAbility1.setName("lblAbility1");
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = firsty;
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlSkills.add(lblAbility1, gridBagConstraints);
-
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridwidth = 3;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-
-            for (Enumeration<IOption> i = person.getOptions(PersonnelOptions.LVL3_ADVANTAGES); i.hasMoreElements(); ) {
-                IOption option = i.nextElement();
-                if (option.booleanValue()) {
-                    JLabel lblAbility2 = new JLabel(Utilities.getOptionDisplayName(option));
-                    lblAbility2.setToolTipText(wordWrap(option.getDescription().replaceAll("\\n", "<br>")));
-                    lblAbility2.setName("lblAbility2");
-                    lblAbility2.getAccessibleContext()
-                          .getAccessibleRelationSet()
-                          .add(new AccessibleRelation(AccessibleRelation.LABELED_BY, lblAbility1));
-                    gridBagConstraints.gridy = firsty++;
-                    pnlSkills.add(lblAbility2, gridBagConstraints);
-                }
-            }
-        }
-
-        if (campaign.getCampaignOptions().isUseImplants() &&
-                  (person.countOptions(PersonnelOptions.MD_ADVANTAGES) > 0)) {
-            JLabel lblImplants1 = new JLabel(resourceMap.getString("lblImplants1.text"));
-            lblImplants1.setName("lblImplants1");
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = firsty;
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlSkills.add(lblImplants1, gridBagConstraints);
-
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridwidth = 3;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-
-            for (Enumeration<IOption> i = person.getOptions(PersonnelOptions.MD_ADVANTAGES); i.hasMoreElements(); ) {
-                IOption option = i.nextElement();
-
-                if (option.booleanValue()) {
-                    JLabel lblImplants2 = new JLabel(Utilities.getOptionDisplayName(option));
-                    lblImplants2.setToolTipText(wordWrap(option.getDescription().replaceAll("\\n", "<br>")));
-                    lblImplants2.setName("lblImplants2");
-                    lblImplants2.getAccessibleContext()
-                          .getAccessibleRelationSet()
-                          .add(new AccessibleRelation(AccessibleRelation.LABELED_BY, lblImplants1));
-                    gridBagConstraints.gridy = firsty++;
-                    pnlSkills.add(lblImplants2, gridBagConstraints);
-                }
-            }
-        }
-
-        int edge = person.getAdjustedEdge();
-        if (campaign.getCampaignOptions().isUseEdge() && (edge != 0)) {
-            lblEdge1.setName("lblEdge1");
-            lblEdge1.setText(resourceMap.getString("lblEdge1.text"));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = firsty;
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlSkills.add(lblEdge1, gridBagConstraints);
-
-            lblEdge2.setName("lblEdge2");
-            lblEdge1.setLabelFor(lblEdge2);
-            lblEdge2.setText("" + person.getCurrentEdge() + '/' + person.getEdge());
-            lblEdge2.setToolTipText(person.getEdgeTooltip());
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = firsty;
-            gridBagConstraints.gridwidth = 1;
-            gridBagConstraints.weightx = 0.5;
-            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlSkills.add(lblEdge2, gridBagConstraints);
-            firsty++;
-        }
-
-        int totalToughness = person.getToughness();
-        if ((campaign.getCampaignOptions().isUseToughness()) && (totalToughness != 0)) {
-            lblTough1.setName("lblTough1");
-            lblTough1.setText(resourceMap.getString("lblTough1.text"));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = firsty;
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlSkills.add(lblTough1, gridBagConstraints);
-
-            lblTough2.setName("lblTough2");
-            lblTough2.setText((totalToughness >= 0 ? "+" : "") + totalToughness);
-            lblTough1.setLabelFor(lblTough2);
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = firsty;
-            gridBagConstraints.gridwidth = 3;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlSkills.add(lblTough2, gridBagConstraints);
-
-            firsty++;
-        }
-
-        if (person.getConnections() > 0) {
-            lblConnections1.setName("lblConnections1");
-            lblConnections1.setText(resourceMap.getString("lblConnections1.text"));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = firsty;
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlSkills.add(lblConnections1, gridBagConstraints);
-
-            lblConnections2.setName("lblConnections2");
-            lblConnections2.setText(person.getConnections() + "");
-            lblConnections1.setLabelFor(lblConnections2);
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = firsty;
-            gridBagConstraints.gridwidth = 3;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlSkills.add(lblConnections2, gridBagConstraints);
-
-            firsty++;
-        }
-
-        if (person.getWealth() != 0) {
-            lblWealth1.setName("lblWealth1");
-            lblWealth1.setText(resourceMap.getString("lblWealth1.text"));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = firsty;
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlSkills.add(lblWealth1, gridBagConstraints);
-
-            lblWealth2.setName("lblWealth2");
-            lblWealth2.setText(person.getWealth() + "");
-            lblWealth1.setLabelFor(lblWealth2);
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = firsty;
-            gridBagConstraints.gridwidth = 3;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlSkills.add(lblWealth2, gridBagConstraints);
-
-            firsty++;
-        }
-
-        int reputation = person.getAdjustedReputation(campaign.getCampaignOptions().isUseAgeEffects(),
+        Attributes attributes = person.getATOWAttributes();
+        PersonnelOptions options = person.getOptions();
+        int adjustedReputation = person.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
               campaign.isClanCampaign(),
               campaign.getLocalDate(),
               person.getRankLevel());
 
-        if (reputation != 0) {
-            lblReputation1.setName("lblReputation1");
-            lblReputation1.setText(resourceMap.getString("lblReputation1.text"));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = firsty;
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlSkills.add(lblReputation1, gridBagConstraints);
+        // Calculate how many rows per column for even distribution
+        double numColumns = 3.0;
+        int skillsPerColumn = (int) ceil(relevantSkills.size() / numColumns);
 
-            lblReputation2.setName("lblReputation2");
-            lblReputation2.setText(reputation + "");
-            lblReputation1.setLabelFor(lblReputation2);
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = firsty;
-            gridBagConstraints.gridwidth = 3;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlSkills.add(lblReputation2, gridBagConstraints);
+        for (int i = 0; i < relevantSkills.size(); i++) {
+            int column = i / skillsPerColumn; // 0, 1, 2
+            int row = i % skillsPerColumn;
+            int gridX = column * 2; // Each column takes 2 grid positions: name + value
 
-            firsty++;
+            String skillName = relevantSkills.get(i);
+            Skill skill = person.getSkill(skillName);
+
+            JLabel lblName = new JLabel(String.format(resourceMap.getString("format.itemHeader"),
+                  skillName.replaceAll(Pattern.quote(RP_ONLY_TAG), "")));
+
+            // TODO enable once attribute modifier sare implemented
+            //            int attributeModifier = skill.getTotalAttributeModifier(attributes, skill.getType());
+            int attributeModifier = 0;
+            int spaModifier = skill.getSPAModifiers(options, adjustedReputation);
+            int ageModifier = skill.getAgingModifier();
+            int totalModifier = attributeModifier + spaModifier + ageModifier;
+
+            String color = "";
+            String icon = "";
+            if (totalModifier != 0) {
+                color = totalModifier < 0 ?
+                              MekHQ.getMHQOptions().getFontColorNegativeHexColor() :
+                              MekHQ.getMHQOptions().getFontColorPositiveHexColor();
+                icon = totalModifier < 0 ? "&#x25BC" : "&#x25B2";
+            }
+
+            String adjustment = "";
+            if (!color.isBlank()) {
+                adjustment = String.format(" %s%s%s", spanOpeningWithCustomColor(color), icon, CLOSING_SPAN_TAG);
+            }
+
+            // TODO enable once attribute modifier sare implemented
+            //            JLabel lblValue = new JLabel(String.format("<html>%s%s</html>", skill.toString(options, attributes, adjustedReputation), adjustment));
+            JLabel lblValue = new JLabel(String.format("<html>%s%s</html>",
+                  skill.toString(options, adjustedReputation),
+                  adjustment));
+            lblName.setLabelFor(lblValue);
+            String tooltip = wordWrap(skill.getTooltip(options, attributes, adjustedReputation));
+            lblName.setToolTipText(tooltip);
+            lblValue.setToolTipText(tooltip);
+
+            // Name label constraints
+            GridBagConstraints nameConstraints = new GridBagConstraints();
+            nameConstraints.gridx = gridX;
+            nameConstraints.gridy = row;
+            nameConstraints.anchor = GridBagConstraints.NORTHWEST;
+
+            // Value label constraints
+            GridBagConstraints valueConstraints = new GridBagConstraints();
+            valueConstraints.gridx = gridX + 1;
+            valueConstraints.gridy = row;
+            valueConstraints.anchor = GridBagConstraints.NORTHWEST;
+            valueConstraints.insets = new Insets(0, 5, 0, 10);
+            valueConstraints.weightx = 1;
+
+            pnlSkills.add(lblName, nameConstraints);
+            pnlSkills.add(lblValue, valueConstraints);
         }
 
+        return pnlSkills;
+    }
+
+    /**
+     * Creates and returns a JPanel displaying attribute modifiers arranged in columns, with each attribute's name and
+     * its corresponding modifier value shown side-by-side. The attributes are distributed evenly across a fixed number
+     * of columns (default is three). The panel's title is set using a localized resource key.
+     *
+     * @param relevantAttributes a map of {@link SkillAttribute} to their integer modifier values; each entry will be
+     *                           displayed as a name/value pair
+     *
+     * @return a {@link JPanel} containing the attribute names and values in a grid layout
+     */
+    private JPanel fillAttributeModifiers(Map<SkillAttribute, Integer> relevantAttributes) {
+        JPanel pnlAttributes = new JPanel(new GridBagLayout());
+        pnlAttributes.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlSkills.attributes")));
+
+        // Calculate how many rows per column for even distribution
+        double numColumns = 3.0;
+        int skillsPerColumn = (int) ceil(relevantAttributes.size() / numColumns);
+
+        int i = 0;
+        for (SkillAttribute attribute : relevantAttributes.keySet()) {
+            int column = i / skillsPerColumn; // 0, 1, 2
+            int row = i % skillsPerColumn;
+            int gridX = column * 2; // Each column takes 2 grid positions: name + value
+
+            String attributeName = attribute.getLabel();
+            int attributeModifier = relevantAttributes.get(attribute);
+
+            JLabel lblName = new JLabel(String.format(resourceMap.getString("format.itemHeader"), attributeName));
+            JLabel lblValue = new JLabel((attributeModifier > 0 ? "+" : "") + attributeModifier);
+            lblName.setLabelFor(lblValue);
+
+            String tooltip = wordWrap(attribute.getDescription());
+            lblName.setToolTipText(tooltip);
+            lblValue.setToolTipText(tooltip);
+
+            // Name label constraints
+            GridBagConstraints nameConstraints = new GridBagConstraints();
+            nameConstraints.gridx = gridX;
+            nameConstraints.gridy = row;
+            nameConstraints.anchor = GridBagConstraints.NORTHWEST;
+
+            // Value label constraints
+            GridBagConstraints valueConstraints = new GridBagConstraints();
+            valueConstraints.gridx = gridX + 1;
+            valueConstraints.gridy = row;
+            valueConstraints.anchor = GridBagConstraints.NORTHWEST;
+            valueConstraints.insets = new Insets(0, 5, 0, 10);
+            valueConstraints.weightx = 1;
+
+            pnlAttributes.add(lblName, nameConstraints);
+            pnlAttributes.add(lblValue, valueConstraints);
+
+            i++;
+        }
+
+        return pnlAttributes;
+    }
+
+    /**
+     * Creates and returns a {@link JPanel} displaying abilities and implants in a grid layout.
+     *
+     * <p>Each ability/implant (represented by the keys of {@code relevantAbilities}) is shown as a {@link JLabel}
+     * with its name and a tooltip description. Optionally, special abilities recognized as "flaws" are highlighted
+     * using a colored icon. The items are laid out in columns to distribute them evenly based on the total number of
+     * abilities.</p>
+     *
+     * @param relevantAbilities A map where the key is an {@link IOption} representing an ability or implant, and the
+     *                          value is an associated string (such as a type or category).
+     *
+     * @return a {@link JPanel} containing the visual representation of the abilities and implants.
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    private JPanel fillAbilitiesAndImplants(Map<IOption, String> relevantAbilities) {
+        JPanel pnlAbilitiesAndImplants = new JPanel(new GridBagLayout());
+        pnlAbilitiesAndImplants.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlSkills.abilities")));
+
+        // Calculate how many rows per column for even distribution
+        double numColumns = 3.0;
+        int skillsPerColumn = (int) ceil(relevantAbilities.size() / numColumns);
+
+        int counter = 0;
+        for (IOption option : relevantAbilities.keySet()) {
+            int column = counter / skillsPerColumn; // 0, 1
+            int row = counter % skillsPerColumn;
+
+            String name = option.getDisplayableNameWithValue();
+            String description = option.getDescription();
+
+            boolean isFlaw = false;
+            if (Objects.equals(relevantAbilities.get(option), LVL3_ADVANTAGES)) {
+                SpecialAbility ability = SpecialAbility.getOption(option.getName());
+                if (ability != null) {
+                    isFlaw = ability.getCost() < -1; // -1 is currently used to designate an origin only SPA
+                }
+            }
+
+            String adjustment = "";
+            if (isFlaw) {
+                String color = MekHQ.getMHQOptions().getFontColorNegativeHexColor();
+                String icon = "&#x25BC;";
+                adjustment = String.format(" %s%s%s", spanOpeningWithCustomColor(color), icon, CLOSING_SPAN_TAG);
+            }
+
+            JLabel lblName = new JLabel(String.format("<html>%s%s</html>",
+                  name.replaceAll("\\s*\\([^)]*\\)", ""),
+                  adjustment));
+            String tooltip = wordWrap(description);
+            lblName.setToolTipText(tooltip);
+
+            // Name label constraints
+            GridBagConstraints nameConstraints = new GridBagConstraints();
+            nameConstraints.gridx = column;
+            nameConstraints.gridy = row;
+            nameConstraints.anchor = GridBagConstraints.NORTHWEST;
+            nameConstraints.insets = new Insets(0, 5, 0, 10);
+            nameConstraints.weightx = 1;
+
+            pnlAbilitiesAndImplants.add(lblName, nameConstraints);
+
+            counter++;
+        }
+
+        return pnlAbilitiesAndImplants;
+    }
+
+    private JPanel fillOther() {
+        JPanel pnlOther = new JPanel(new GridBagLayout());
+        pnlOther.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlSkills.traits")));
+
+        JLabel lblConnections = null;
+        int connections = person.getConnections();
+        if (connections != 0) {
+            String connectionsLabel = String.format(resourceMap.getString("format.traitValue"),
+                  resourceMap.getString("lblConnections.text"),
+                  connections,
+                  "");
+            lblConnections = new JLabel(connectionsLabel);
+            lblConnections.setToolTipText(wordWrap(resourceMap.getString("lblConnections.tooltip")));
+        }
+
+        JLabel lblWealth = null;
+        int wealth = person.getWealth();
+        if (wealth != 0) {
+            String wealthLabel = String.format(resourceMap.getString("format.traitValue"),
+                  resourceMap.getString("lblWealth.text"),
+                  wealth,
+                  "");
+            lblWealth = new JLabel(wealthLabel);
+            lblWealth.setToolTipText(wordWrap(resourceMap.getString("lblWealth.tooltip")));
+        }
+
+        JLabel lblReputation = null;
+        int baseReputation = person.getReputation();
+        int adjustedReputation = person.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
+              campaign.isClanCampaign(),
+              campaign.getLocalDate(),
+              person.getRankLevel());
+        if (baseReputation != 0 || adjustedReputation != 0) {
+            String adjustment = getTraitAdjustmentIcon(baseReputation, adjustedReputation);
+            String reputationLabel = String.format(resourceMap.getString("format.traitValue"),
+                  resourceMap.getString("lblReputation.text"),
+                  adjustedReputation,
+                  adjustment);
+            lblReputation = new JLabel(reputationLabel);
+            lblReputation.setToolTipText(wordWrap(String.format(resourceMap.getString("lblReputation.tooltip"),
+                  baseReputation,
+                  adjustedReputation)));
+        }
+
+        JLabel lblToughness = null;
+        int totalToughness = person.getToughness();
+        if ((campaignOptions.isUseToughness()) && (totalToughness != 0)) {
+            String toughnessLabel = String.format(resourceMap.getString("format.traitValue"),
+                  resourceMap.getString("lblToughness.text"),
+                  totalToughness,
+                  "");
+            lblToughness = new JLabel(toughnessLabel);
+            lblToughness.setToolTipText(wordWrap(resourceMap.getString("lblToughness.tooltip")));
+        }
+
+        JLabel lblEdge = null;
+        int baseEdge = person.getEdge();
+        int adjustedEdge = person.getAdjustedEdge();
+        int currentEdge = person.getCurrentEdge();
+        if (campaignOptions.isUseEdge() && (baseEdge != 0 || adjustedEdge != 0)) {
+            String adjustment = getTraitAdjustmentIcon(baseEdge, adjustedEdge);
+            String edgeLabel = String.format(resourceMap.getString("format.traitValue"),
+                  resourceMap.getString("lblEdge.text"),
+                  currentEdge + "/" + adjustedEdge,
+                  adjustment);
+            lblEdge = new JLabel(edgeLabel);
+            lblEdge.setToolTipText(wordWrap(resourceMap.getString("lblEdge.tooltip")));
+        }
+
+        JLabel lblLoyalty = null;
         int loyaltyModifier = person.getLoyaltyModifier(person.getLoyalty());
-
-        if (person.isCommander()) {
-            loyaltyModifier = person.getLoyaltyModifier(person.getLoyalty() + 2);
-        }
-
-        if ((campaign.getCampaignOptions().isUseLoyaltyModifiers()) &&
-                  (!campaign.getCampaignOptions().isUseHideLoyalty()) &&
+        if ((campaignOptions.isUseLoyaltyModifiers()) && (!campaignOptions.isUseHideLoyalty()) &&
                   (loyaltyModifier != 0)) {
-            lblLoyalty1.setName("lblLoyalty1");
-            lblLoyalty1.setText(resourceMap.getString("lblLoyalty1.text"));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = firsty;
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlSkills.add(lblLoyalty1, gridBagConstraints);
-
-            lblLoyalty2.setName("lblLoyalty2");
-
-            lblLoyalty2.setText(loyaltyModifier + " (" + getLoyaltyName(loyaltyModifier) + ')');
-            lblLoyalty2.setLabelFor(lblLoyalty2);
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = firsty;
-            gridBagConstraints.gridwidth = 3;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlSkills.add(lblLoyalty2, gridBagConstraints);
-
-            firsty++;
+            String loyaltyLabel = String.format(resourceMap.getString("format.traitValue"),
+                  resourceMap.getString("lblLoyalty.text"),
+                  loyaltyModifier + " (" + getLoyaltyName(loyaltyModifier) + ')',
+                  "");
+            lblLoyalty = new JLabel(loyaltyLabel);
+            lblLoyalty.setToolTipText(wordWrap(resourceMap.getString("lblLoyalty.tooltip")));
         }
 
-        int fatigue = person.getFatigue();
-        if (campaign.getCampaignOptions().isUseFatigue() && fatigue > 0) {
-            lblFatigue1.setName("lblFatigue1");
-            lblFatigue1.setText(resourceMap.getString("lblFatigue1.text"));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = firsty;
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlSkills.add(lblFatigue1, gridBagConstraints);
-
+        JLabel lblFatigue = null;
+        int baseFatigue = person.getFatigue();
+        int effectiveFatigue = getEffectiveFatigue(person.getFatigue(),
+              person.isClanPersonnel(),
+              person.getSkillLevel(campaign, false),
+              campaign.getFieldKitchenWithinCapacity());
+        if (campaignOptions.isUseFatigue() && (baseFatigue != 0 || effectiveFatigue != 0)) {
             StringBuilder fatigueDisplay = new StringBuilder("<html>");
-
-            int effectiveFatigue = getEffectiveFatigue(person.getFatigue(),
-                  person.isClanPersonnel(),
-                  person.getSkillLevel(campaign, false),
-                  campaign.getFieldKitchenWithinCapacity());
             int fatigueTurnoverModifier = MathUtility.clamp(((effectiveFatigue - 1) / 4) - 1, 0, 3);
-
-            if (effectiveFatigue != fatigue) {
-                fatigueDisplay.append("<s><font color='gray'>")
-                      .append(fatigue)
+            if (effectiveFatigue != baseFatigue) {
+                fatigueDisplay.append("<s><font color='gray'>").append(baseFatigue)
                       .append("</font></s> ")
                       .append(effectiveFatigue);
             } else {
                 fatigueDisplay.append("<font color='gray'>").append(effectiveFatigue).append("</font>");
             }
-
             if (fatigueTurnoverModifier > 0) {
                 fatigueDisplay.append(" (-").append(fatigueTurnoverModifier).append(')');
             }
-
             fatigueDisplay.append("</html>");
 
-            lblFatigue2.setName("lblFatigue2");
-            lblFatigue2.setText(fatigueDisplay.toString());
-            lblFatigue2.setLabelFor(lblFatigue2);
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = firsty;
-            gridBagConstraints.gridwidth = 3;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlSkills.add(lblFatigue2, gridBagConstraints);
-
-            firsty++;
+            String adjustment = getTraitAdjustmentIcon(baseFatigue, effectiveFatigue);
+            String fatigueLabel = String.format(resourceMap.getString("format.traitValue"),
+                  resourceMap.getString("lblFatigue.text"),
+                  fatigueDisplay,
+                  adjustment);
+            lblFatigue = new JLabel(fatigueLabel);
+            lblFatigue.setToolTipText(wordWrap(resourceMap.getString("lblFatigue.tooltip")));
         }
 
-        if (campaign.getCampaignOptions().isUseEducationModule()) {
-            lblEducationLevel1.setName("lblEducationLevel1");
-            lblEducationLevel1.setText(resourceMap.getString("lblEducationLevel1.text"));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = firsty;
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlSkills.add(lblEducationLevel1, gridBagConstraints);
+        JLabel lblHighestEducation = null;
+        JLabel lblEducationStage = null;
+        if (campaignOptions.isUseEducationModule()) {
+            EducationLevel highestEducation = person.getEduHighestEducation();
+            String highestEducationLabel = String.format(resourceMap.getString("format.traitValue"),
+                  resourceMap.getString("lblHighestEducation.text"),
+                  highestEducation,
+                  "");
+            lblHighestEducation = new JLabel(highestEducationLabel);
+            lblHighestEducation.setToolTipText(wordWrap(highestEducation.getToolTipText()));
 
-            lblEducationLevel2.setName("lblEducationLevel2");
-            lblEducationLevel2.setText(person.getEduHighestEducation().toString());
-            lblEducationLevel1.setLabelFor(lblEducationLevel2);
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = firsty;
-            gridBagConstraints.gridwidth = 3;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlSkills.add(lblEducationLevel2, gridBagConstraints);
+            EducationStage educationStage = person.getEduEducationStage();
+            Academy academy = EducationController.getAcademy(person.getEduAcademySet(),
+                  person.getEduAcademyNameInSet());
 
-            firsty++;
+            if (academy != null && educationStage != EducationStage.NONE) {
+                String educationLabel;
+                String educationValue;
+                switch (educationStage) {
+                    case EDUCATION -> {
+                        educationLabel = resourceMap.getString("lblEducationStage.educationTime");
 
-            if (person.getEduEducationStage() != EducationStage.NONE) {
-                lblEducationStage1.setName("lblEducationStage1");
-                lblEducationStage1.setText(resourceMap.getString("lblEducationStage1.text"));
-                gridBagConstraints = new GridBagConstraints();
-                gridBagConstraints.gridx = 0;
-                gridBagConstraints.gridy = firsty;
-                gridBagConstraints.fill = GridBagConstraints.NONE;
-                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-                pnlSkills.add(lblEducationStage1, gridBagConstraints);
-
-                lblEducationStage2.setName("lblEducationStage2");
-                lblEducationStage2.setText(person.getEduEducationStage().toString());
-                lblEducationStage2.setLabelFor(lblEducationStage2);
-                gridBagConstraints = new GridBagConstraints();
-                gridBagConstraints.gridx = 1;
-                gridBagConstraints.gridy = firsty;
-                gridBagConstraints.gridwidth = 3;
-                gridBagConstraints.weightx = 1.0;
-                gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-                gridBagConstraints.fill = GridBagConstraints.NONE;
-                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-                pnlSkills.add(lblEducationStage2, gridBagConstraints);
-
-                firsty++;
-
-                String educationText;
-
-                switch (person.getEduEducationStage()) {
-                    case EDUCATION:
-                        lblEducationDays1.setName("lblEducationDays1");
-                        lblEducationDays1.setText(resourceMap.getString("lblEducationDays1.text"));
-                        gridBagConstraints = new GridBagConstraints();
-                        gridBagConstraints.gridx = 0;
-                        gridBagConstraints.gridy = firsty;
-                        gridBagConstraints.fill = GridBagConstraints.NONE;
-                        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-                        pnlSkills.add(lblEducationDays1, gridBagConstraints);
-
-                        Academy academy = EducationController.getAcademy(person.getEduAcademySet(),
-                              person.getEduAcademyNameInSet());
-
-                        if (academy == null) {
-                            logger.debug("Found null academy for {} skipping", person.getFullTitle());
+                        if (academy.isPrepSchool()) {
+                            educationValue = String.format(resourceMap.getString("lblEducationDurationAge.text"),
+                                  academy.getAgeMax());
                         } else {
-                            lblEducationDays2.setName("lblEducationDays2");
-                            if (academy.isPrepSchool()) {
-                                educationText = String.format(resourceMap.getString("lblEducationDurationAge.text"),
-                                      academy.getAgeMax());
-                            } else {
-                                educationText = String.format(resourceMap.getString("lblEducationDurationDays.text"),
-                                      person.getEduEducationTime());
-                            }
-
-                            lblEducationDays2.setName("lblEducationDays2");
-                            lblEducationDays2.setText(educationText);
-                            lblEducationDays2.setLabelFor(lblEducationDays2);
-                            gridBagConstraints = new GridBagConstraints();
-                            gridBagConstraints.gridx = 1;
-                            gridBagConstraints.gridy = firsty;
-                            gridBagConstraints.gridwidth = 3;
-                            gridBagConstraints.weightx = 1.0;
-                            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-                            gridBagConstraints.fill = GridBagConstraints.NONE;
-                            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-                            pnlSkills.add(lblEducationDays2, gridBagConstraints);
+                            educationValue = String.format(resourceMap.getString("lblEducationDurationDays.text"),
+                                  person.getEduEducationTime());
                         }
+                    }
+                    case JOURNEY_TO_CAMPUS, JOURNEY_FROM_CAMPUS -> {
+                        educationLabel = resourceMap.getString("lblEducationStage.journeyTime");
 
-                        break;
-                    case JOURNEY_TO_CAMPUS:
-                    case JOURNEY_FROM_CAMPUS:
-                        lblEducationJourneyDays1.setName("lblEducationJourneyDays1");
-                        lblEducationJourneyDays1.setText(resourceMap.getString("lblEducationJourneyDays1.text"));
-                        gridBagConstraints = new GridBagConstraints();
-                        gridBagConstraints.gridx = 0;
-                        gridBagConstraints.gridy = firsty;
-                        gridBagConstraints.fill = GridBagConstraints.NONE;
-                        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-                        pnlSkills.add(lblEducationJourneyDays1, gridBagConstraints);
-
-                        if (person.getEduEducationStage() == EducationStage.JOURNEY_TO_CAMPUS) {
-                            educationText = String.format(resourceMap.getString("lblEducationTravelTo.text"),
+                        if (educationStage.isJourneyToCampus()) {
+                            educationValue = String.format(resourceMap.getString("lblEducationTravelTo.text"),
                                   person.getEduDaysOfTravel(),
                                   person.getEduJourneyTime(),
                                   campaign.getSystemById(person.getEduAcademySystem())
                                         .getName(campaign.getLocalDate()));
                         } else {
-                            educationText = String.format(resourceMap.getString("lblEducationTravelFrom.text"),
+                            educationValue = String.format(resourceMap.getString("lblEducationTravelFrom.text"),
                                   person.getEduDaysOfTravel(),
                                   person.getEduJourneyTime(),
                                   campaign.getSystemById(person.getEduAcademySystem())
                                         .getName(campaign.getLocalDate()));
 
                         }
-
-                        lblEducationJourneyDays2.setName("lblEducationJourneyDays2");
-                        lblEducationJourneyDays2.setText(educationText);
-                        lblEducationJourneyDays2.setLabelFor(lblEducationJourneyDays2);
-                        gridBagConstraints = new GridBagConstraints();
-                        gridBagConstraints.gridx = 1;
-                        gridBagConstraints.gridy = firsty;
-                        gridBagConstraints.gridwidth = 3;
-                        gridBagConstraints.weightx = 1.0;
-                        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-                        gridBagConstraints.fill = GridBagConstraints.NONE;
-                        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-                        pnlSkills.add(lblEducationJourneyDays2, gridBagConstraints);
-                        break;
-                    case GRADUATING:
-                    case DROPPING_OUT:
-                    case NONE:
-
-                        break;
+                    }
+                    default -> {
+                        educationLabel = educationStage.toString();
+                        educationValue = "-";
+                    }
                 }
+
+                String educationStageLabel = String.format(resourceMap.getString("format.traitValue"),
+                      educationLabel,
+                      educationValue,
+                      "");
+                lblEducationStage = new JLabel(educationStageLabel);
+                lblEducationStage.setToolTipText(wordWrap(educationStage.getToolTipText()));
             }
         }
 
-        return pnlSkills;
+        List<JLabel> components = new ArrayList<>();
+        if (lblConnections != null) {
+            components.add(lblConnections);
+        }
+        if (lblWealth != null) {
+            components.add(lblWealth);
+        }
+        if (lblReputation != null) {
+            components.add(lblReputation);
+        }
+        if (lblToughness != null) {
+            components.add(lblToughness);
+        }
+        if (lblEdge != null) {
+            components.add(lblEdge);
+        }
+        if (lblLoyalty != null) {
+            components.add(lblLoyalty);
+        }
+        if (lblFatigue != null) {
+            components.add(lblFatigue);
+        }
+        if (lblHighestEducation != null) {
+            components.add(lblHighestEducation);
+        }
+        if (lblEducationStage != null) {
+            components.add(lblEducationStage);
+        }
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
+
+        int total = components.size();
+        int numRows = (int) Math.ceil(total / 2.0);
+
+        for (int i = 0; i < total; i++) {
+            int col = i / numRows;
+            int row = i % numRows;
+
+            gbc.gridx = col;
+            gbc.gridy = row;
+            pnlOther.add(components.get(i), gbc);
+        }
+
+        return pnlOther;
+    }
+
+    /**
+     * Returns an HTML-formatted icon indicating whether the adjusted trait value is higher or lower than the base
+     * value.
+     *
+     * <p>If the adjusted value is lower than the base value, a downward arrow is returned,
+     * colored based on the configured negative color. If the adjusted value is higher, an upward arrow is returned,
+     * colored according to the configured positive color. When there is no adjustment (base and adjusted values are
+     * equal), an empty string is returned.</p>
+     *
+     * @param baseValue     the original or unmodified value of the trait
+     * @param adjustedValue the value of the trait after adjustment
+     *
+     * @return an HTML string containing a colored up or down arrow, or an empty string if there is no adjustment
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    private static String getTraitAdjustmentIcon(int baseValue, int adjustedValue) {
+        String adjustment = "";
+        if (baseValue > adjustedValue) {
+            String color = MekHQ.getMHQOptions().getFontColorNegativeHexColor();
+            adjustment = String.format(" %s%s%s", spanOpeningWithCustomColor(color), "&#x25BC", CLOSING_SPAN_TAG);
+        } else if (baseValue < adjustedValue) {
+            String color = MekHQ.getMHQOptions().getFontColorPositiveHexColor();
+            adjustment = String.format(" %s%s%s", spanOpeningWithCustomColor(color), "&#x25B2", CLOSING_SPAN_TAG);
+        }
+        return adjustment;
     }
 
     /**
@@ -2169,27 +2329,6 @@ public class PersonViewPanel extends JScrollablePanel {
     private JPanel fillInjuries() {
         JPanel pnlInjuries = new JPanel(new BorderLayout());
         pnlInjuries.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlInjuries.title")));
-
-        JButton medicalButton = new JButton(new ImageIcon("data/images/misc/medical.png"));
-        medicalButton.getAccessibleContext().setAccessibleName(resourceMap.getString("btnMedical.tooltip"));
-        medicalButton.addActionListener(event -> {
-            MedicalViewDialog medDialog = new MedicalViewDialog(SwingUtilities.getWindowAncestor(this),
-                  campaign,
-                  person);
-            medDialog.setModalityType(ModalityType.APPLICATION_MODAL);
-            medDialog.setVisible(true);
-            removeAll();
-            repaint();
-            revalidate();
-            initComponents();
-            revalidate();
-            MekHQ.triggerEvent(new PersonChangedEvent(person));
-        });
-        medicalButton.setMaximumSize(new Dimension(32, 32));
-        medicalButton.setMargin(new Insets(0, 0, 0, 0));
-        medicalButton.setToolTipText(resourceMap.getString("btnMedical.tooltip"));
-        medicalButton.setAlignmentY(Component.TOP_ALIGNMENT);
-        pnlInjuries.add(medicalButton, BorderLayout.LINE_START);
 
         JPanel pnlInjuryDetails = new JPanel(new GridBagLayout());
         pnlInjuryDetails.getAccessibleContext().setAccessibleName("Injury Details for " + person.getFullName());
