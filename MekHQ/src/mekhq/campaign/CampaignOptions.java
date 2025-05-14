@@ -185,6 +185,7 @@ public class CampaignOptions {
     private int autoLogisticsActuators;
     private int autoLogisticsJumpJets;
     private int autoLogisticsEngines;
+    private int autoLogisticsWeapons;
     private int autoLogisticsOther;
 
     // Delivery
@@ -443,7 +444,6 @@ public class CampaignOptions {
 
     private boolean useAdministrativeStrain;
     private int administrativeCapacity;
-    private int multiCrewStrainDivider;
 
     private boolean useManagementSkill;
     private boolean useCommanderLeadershipOnly;
@@ -717,6 +717,7 @@ public class CampaignOptions {
         autoLogisticsActuators = 100;
         autoLogisticsJumpJets = 50;
         autoLogisticsEngines = 0;
+        autoLogisticsWeapons = 50;
         autoLogisticsOther = 0;
 
         // Delivery
@@ -1052,7 +1053,6 @@ public class CampaignOptions {
 
         setUseAdministrativeStrain(true);
         setAdministrativeCapacity(10);
-        setMultiCrewStrainDivider(5);
 
         setUseManagementSkill(true);
         setUseCommanderLeadershipOnly(false);
@@ -2230,12 +2230,20 @@ public class CampaignOptions {
         this.administrativeCapacity = administrativeCapacity;
     }
 
+    /**
+     * @deprecated Unused
+     */
+    @Deprecated(since = "0.50.6", forRemoval = true)
     public Integer getMultiCrewStrainDivider() {
-        return multiCrewStrainDivider;
+        return 1;
     }
 
+    /**
+     * @deprecated Unused
+     */
+    @Deprecated(since = "0.50.6", forRemoval = true)
     public void setMultiCrewStrainDivider(final Integer multiCrewStrainDivider) {
-        this.multiCrewStrainDivider = multiCrewStrainDivider;
+
     }
 
     public boolean isUseManagementSkill() {
@@ -4409,6 +4417,14 @@ public class CampaignOptions {
         this.autoLogisticsEngines = autoLogisticsEngines;
     }
 
+    public int getAutoLogisticsWeapons() {
+        return autoLogisticsWeapons;
+    }
+
+    public void setAutoLogisticsWeapons(int autoLogisticsWeapons) {
+        this.autoLogisticsWeapons = autoLogisticsWeapons;
+    }
+
     public int getAutoLogisticsOther() {
         return autoLogisticsOther;
     }
@@ -4965,6 +4981,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsActuators", autoLogisticsActuators);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsJumpJets", autoLogisticsJumpJets);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsEngines", autoLogisticsEngines);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsWeapons", autoLogisticsWeapons);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsOther", autoLogisticsOther);
 
         // region Personnel Tab
@@ -5140,7 +5157,6 @@ public class CampaignOptions {
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAdministrativeStrain", isUseAdministrativeStrain());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "administrativeStrain", getAdministrativeCapacity());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "multiCrewStrainDivider", getMultiCrewStrainDivider());
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useManagementSkill", isUseManagementSkill());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useCommanderLeadershipOnly", isUseCommanderLeadershipOnly());
@@ -5705,25 +5721,27 @@ public class CampaignOptions {
 
                     // autoLogistics
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsHeatSink")) {
-                    retVal.autoLogisticsHeatSink = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.autoLogisticsHeatSink = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsMekHead")) {
-                    retVal.autoLogisticsMekHead = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.autoLogisticsMekHead = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsMekLocation")) {
-                    retVal.autoLogisticsMekLocation = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.autoLogisticsMekLocation = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsNonRepairableLocation")) {
-                    retVal.autoLogisticsNonRepairableLocation = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.autoLogisticsNonRepairableLocation = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsArmor")) {
-                    retVal.autoLogisticsArmor = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.autoLogisticsArmor = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsAmmunition")) {
-                    retVal.autoLogisticsAmmunition = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.autoLogisticsAmmunition = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsActuators")) {
-                    retVal.autoLogisticsActuators = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.autoLogisticsActuators = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsJumpJets")) {
-                    retVal.autoLogisticsJumpJets = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.autoLogisticsJumpJets = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsEngines")) {
-                    retVal.autoLogisticsEngines = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.autoLogisticsEngines = MathUtility.parseInt(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("autoLogisticsWeapons")) {
+                    retVal.autoLogisticsWeapons = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsOther")) {
-                    retVal.autoLogisticsOther = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.autoLogisticsOther = MathUtility.parseInt(wn2.getTextContent().trim());
 
                     // region Personnel Tab
                     // region General Personnel
@@ -6198,8 +6216,6 @@ public class CampaignOptions {
                     retVal.setUseAdministrativeStrain(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("administrativeStrain")) {
                     retVal.setAdministrativeCapacity(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (nodeName.equalsIgnoreCase("multiCrewStrainDivider")) {
-                    retVal.setMultiCrewStrainDivider(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("useManagementSkill")) {
                     retVal.setUseManagementSkill(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("useCommanderLeadershipOnly")) {
@@ -6779,8 +6795,8 @@ public class CampaignOptions {
      * @param gameOptions the {@link GameOptions} to update based on the current campaign options.
      */
     public void updateGameOptionsFromCampaignOptions(GameOptions gameOptions) {
-        gameOptions.getOption(RPG_COMMAND_INIT).setValue(useTactics);
         gameOptions.getOption(RPG_INDIVIDUAL_INITIATIVE).setValue(useInitiativeBonus);
+        gameOptions.getOption(RPG_COMMAND_INIT).setValue(useTactics || useInitiativeBonus);
         gameOptions.getOption(RPG_TOUGHNESS).setValue(useToughness);
         gameOptions.getOption(RPG_ARTILLERY_SKILL).setValue(useArtillery);
         gameOptions.getOption(RPG_PILOT_ADVANTAGES).setValue(useAbilities);

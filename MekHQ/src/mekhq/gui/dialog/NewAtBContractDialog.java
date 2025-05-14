@@ -565,7 +565,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         contract.setDesc(txtDesc.getText());
         contract.setCommandRights(choiceCommand.getSelectedItem());
 
-        contract.setRequiredCombatTeams(AtBContract.calculateRequiredLances(campaign));
+        contract.setRequiredCombatTeams(AtBContract.calculateBaseNumberOfRequiredLances(campaign));
 
         contract.setEnemyCode(getCurrentEnemyCode());
         contract.setAllySkill(comboAllySkill.getSelectedItem());
