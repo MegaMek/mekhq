@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.adapter;
 
@@ -411,8 +416,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                         // We don't care about admin, doctor or tech settings, as they're not going to spawn here
                         overrideSkills(false,
                               false,
-                              false,
-                              false,
+                              false, false, campaign.getCampaignOptions().isUseArtillery(),
                               useExtraRandomness,
                               person,
                               person.getPrimaryRole(),
@@ -619,7 +623,11 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 int maintenanceTime = unit.getMaintenanceTime();
 
                 if ((time - maintenanceTime) >= 0) {
-                    campaign.doMaintenance(unit);
+                    // This will increase the number of days until maintenance and then perform the maintenance. We
+                    // do it this way to ensure that everything is processed cleanly.
+                    while (unit.getDaysSinceMaintenance() != 0) {
+                        campaign.doMaintenance(unit);
+                    }
                 } else {
                     campaign.addReport(String.format(resources.getString("maintenanceAdHoc.unable"),
                           tech.getHyperlinkedFullTitle(),
@@ -943,6 +951,9 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 menuItem.setActionCommand(COMMAND_PERFORM_AD_HOC_MAINTENANCE);
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(gui.getCampaign().getCampaignOptions().isCheckMaintenance());
+                if (oneSelected && menuItem.isEnabled()) {
+                    menuItem.setEnabled(unit.getDaysSinceMaintenance() != 0);
+                }
 
                 popup.add(menuItem);
             }
