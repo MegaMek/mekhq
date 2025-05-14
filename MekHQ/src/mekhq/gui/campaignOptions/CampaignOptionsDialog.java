@@ -24,10 +24,17 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.campaignOptions;
 
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CANCELLED;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.Container;
 import java.awt.GridBagLayout;
@@ -68,9 +75,6 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
  * </ul>
  */
 public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
-    private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
-    private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
-
     private final Campaign campaign;
     private final CampaignOptionsPane campaignOptionsPane;
     private final CampaignOptionsDialogMode mode;
@@ -89,7 +93,11 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
      * @param campaign the {@link Campaign} instance representing the current campaign
      */
     public CampaignOptionsDialog(final JFrame frame, final Campaign campaign) {
-        super(frame, true, resources, "CampaignOptionsDialog", "campaignOptions.title");
+        super(frame,
+              true,
+              ResourceBundle.getBundle(getCampaignOptionsResourceBundle()),
+              "CampaignOptionsDialog",
+              "campaignOptions.title");
         this.campaign = campaign;
         this.campaignOptionsPane = new CampaignOptionsPane(frame, campaign, CampaignOptionsDialogMode.NORMAL);
         this.mode = CampaignOptionsDialogMode.NORMAL;
@@ -110,7 +118,11 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
      */
     public CampaignOptionsDialog(final JFrame frame, final Campaign campaign, @Nullable CampaignPreset preset,
                                  CampaignOptionsDialogMode mode) {
-        super(frame, true, resources, "CampaignOptionsDialog", "campaignOptions.title");
+        super(frame,
+              true,
+              ResourceBundle.getBundle(getCampaignOptionsResourceBundle()),
+              "CampaignOptionsDialog",
+              "campaignOptions.title");
         this.campaign = campaign;
         this.campaignOptionsPane = new CampaignOptionsPane(frame, campaign, mode);
         this.mode = mode;
@@ -167,7 +179,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
                 if (campaignOptions.isUseStratCon()) {
                     showStratConNotice();
                 }
-                ;
             }
         });
         pnlButtons.add(btnApplySettings);
@@ -243,8 +254,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
      * in the form of an image and a message. The notice is presented with a title, an optional image, and a descriptive
      * message, ensuring users are informed of the feature's introduction or importance. The dialog also includes a
      * single button for the user to acknowledge and dismiss the notice.</p>
-     *
-     * @return
      */
     private void showStratConNotice() {
         ImageIcon imageIcon = new ImageIcon("data/images/stratcon/stratConPromo.png");
@@ -252,9 +261,9 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         JPanel imagePanel = new JPanel(new GridBagLayout());
         imagePanel.add(imageLabel);
 
-        String title = resources.getString("stratConPromo.title");
+        String title = getTextAt(getCampaignOptionsResourceBundle(), "stratConPromo.title");
 
-        String message = resources.getString("stratConPromo.message");
+        String message = getTextAt(getCampaignOptionsResourceBundle(), "stratConPromo.message");
         JLabel messageLabel = new JLabel(message);
         JPanel messagePanel = new JPanel(new GridBagLayout());
         messagePanel.add(messageLabel);
@@ -264,7 +273,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         panel.add(imagePanel);
         panel.add(messagePanel);
 
-        Object[] options = { resources.getString("stratConPromo.button") };
+        Object[] options = { getTextAt(getCampaignOptionsResourceBundle(), "stratConPromo.button") };
 
         JOptionPane.showOptionDialog(null,
               panel,

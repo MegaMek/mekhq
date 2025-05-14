@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui;
 
@@ -176,12 +181,13 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
             ForceType forceType = force.getForceType();
             String typeKey = forceType.getSymbol();
 
-            String formattedForceName = String.format("<html>%s%s%s%s%s%s</html>",
-                force.isCombatTeam() ? "<b>" : "",
-                force.getOverrideCombatTeam() != COMBAT_TEAM_OVERRIDE_NONE ? "<u>" : "",
-                force.getName(),
-                force.isCombatTeam() ? "</b>" : "",
-                force.getOverrideCombatTeam() != COMBAT_TEAM_OVERRIDE_NONE ? "</u>" : "",
+            String formattedForceName = String.format("<html>%s%s%s%s%s%s%s</html>",
+                  force.isCombatTeam() ? "<b>" : "",
+                  force.getOverrideCombatTeam() != COMBAT_TEAM_OVERRIDE_NONE ? "<u>" : "",
+                  force.getName(),
+                  force.isCombatTeam() ? "</b>" : "",
+                  force.getOverrideCombatTeam() != COMBAT_TEAM_OVERRIDE_NONE ? "</u>" : "",
+                  force.isCombatTeam() ? " <s>c</s>" : "",
                 typeKey);
 
             setText(formattedForceName);

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<campaignPreset version="0.50.05">
+<campaignPreset version="0.50.06">
     <title>2 - Veteran Player Preset</title>
     <description><![CDATA[This preset offers the full MekHQ experience, with nearly all options enabled and balanced for a long-lasting campaign.
 <br>
@@ -28,128 +28,92 @@
         <mrmsOptions>
             <mrmsOption>
                 <type>ARMOUR</type>
-                <active>0</active>
+                <active>1</active>
                 <skillMin>0</skillMin>
                 <skillMax>4</skillMax>
                 <btnMin>4</btnMin>
-                <btnMax>4</btnMax>
+                <btnMax>1</btnMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
                 <type>AMMUNITION</type>
-                <active>0</active>
+                <active>1</active>
                 <skillMin>0</skillMin>
                 <skillMax>4</skillMax>
                 <btnMin>4</btnMin>
-                <btnMax>4</btnMax>
+                <btnMax>1</btnMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
                 <type>WEAPON</type>
-                <active>0</active>
+                <active>1</active>
                 <skillMin>0</skillMin>
                 <skillMax>4</skillMax>
                 <btnMin>4</btnMin>
-                <btnMax>4</btnMax>
+                <btnMax>1</btnMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
                 <type>GENERAL_LOCATION</type>
-                <active>0</active>
+                <active>1</active>
                 <skillMin>0</skillMin>
                 <skillMax>4</skillMax>
-                <btnMin>4</btnMin>
-                <btnMax>4</btnMax>
+                <btnMin>12</btnMin>
+                <btnMax>1</btnMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
                 <type>ENGINE</type>
-                <active>0</active>
+                <active>1</active>
                 <skillMin>0</skillMin>
                 <skillMax>4</skillMax>
                 <btnMin>4</btnMin>
-                <btnMax>4</btnMax>
+                <btnMax>1</btnMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
                 <type>GYRO</type>
-                <active>0</active>
+                <active>1</active>
                 <skillMin>0</skillMin>
                 <skillMax>4</skillMax>
                 <btnMin>4</btnMin>
-                <btnMax>4</btnMax>
+                <btnMax>1</btnMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
                 <type>ACTUATOR</type>
-                <active>0</active>
+                <active>1</active>
                 <skillMin>0</skillMin>
                 <skillMax>4</skillMax>
                 <btnMin>4</btnMin>
-                <btnMax>4</btnMax>
+                <btnMax>1</btnMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
                 <type>ELECTRONICS</type>
-                <active>0</active>
+                <active>1</active>
                 <skillMin>0</skillMin>
                 <skillMax>4</skillMax>
                 <btnMin>4</btnMin>
-                <btnMax>4</btnMax>
+                <btnMax>1</btnMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
                 <type>GENERAL</type>
-                <active>0</active>
+                <active>1</active>
                 <skillMin>0</skillMin>
                 <skillMax>4</skillMax>
                 <btnMin>4</btnMin>
-                <btnMax>4</btnMax>
-                <dailyTimeMin>0</dailyTimeMin>
-            </mrmsOption>
-            <mrmsOption>
-                <type>HEAT_SINK</type>
-                <active>0</active>
-                <skillMin>0</skillMin>
-                <skillMax>4</skillMax>
-                <btnMin>4</btnMin>
-                <btnMax>4</btnMax>
-                <dailyTimeMin>0</dailyTimeMin>
-            </mrmsOption>
-            <mrmsOption>
-                <type>MEK_LOCATION</type>
-                <active>0</active>
-                <skillMin>0</skillMin>
-                <skillMax>4</skillMax>
-                <btnMin>4</btnMin>
-                <btnMax>4</btnMax>
-                <dailyTimeMin>0</dailyTimeMin>
-            </mrmsOption>
-            <mrmsOption>
-                <type>PHYSICAL_WEAPON</type>
-                <active>0</active>
-                <skillMin>0</skillMin>
-                <skillMax>4</skillMax>
-                <btnMin>4</btnMin>
-                <btnMax>4</btnMax>
+                <btnMax>1</btnMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
                 <type>POD_SPACE</type>
-                <active>0</active>
+                <active>1</active>
                 <skillMin>0</skillMin>
                 <skillMax>4</skillMax>
                 <btnMin>4</btnMin>
-                <btnMax>4</btnMax>
-                <dailyTimeMin>0</dailyTimeMin>
-            </mrmsOption>
-            <mrmsOption>
-                <type>UNKNOWN_LOCATION</type>
-                <active>0</active>
-                <skillMin>0</skillMin>
-                <skillMax>4</skillMax>
-                <btnMin>4</btnMin>
-                <btnMax>4</btnMax>
+                <btnMax>1</btnMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
         </mrmsOptions>
@@ -188,7 +152,7 @@
         <factionIntroDate>false</factionIntroDate>
         <useAmmoByType>true</useAmmoByType>
         <waitingPeriod>1</waitingPeriod>
-        <acquisitionSkill>Negotiation</acquisitionSkill>
+        <acquisitionSkill>Administration</acquisitionSkill>
         <acquisitionPersonnelCategory>LOGISTICS</acquisitionPersonnelCategory>
         <techLevel>3</techLevel>
         <unitTransitTime>2</unitTransitTime>
@@ -285,13 +249,13 @@
         <salarySpecialistInfantryMultiplier>1.28</salarySpecialistInfantryMultiplier>
         <salaryXPMultipliers>
             <ULTRA_GREEN>0.6</ULTRA_GREEN>
-            <ELITE>3.2</ELITE>
-            <HEROIC>6.4</HEROIC>
-            <REGULAR>1.0</REGULAR>
             <NONE>0.5</NONE>
             <GREEN>0.6</GREEN>
             <VETERAN>1.6</VETERAN>
+            <REGULAR>1.0</REGULAR>
+            <ELITE>3.2</ELITE>
             <LEGENDARY>12.8</LEGENDARY>
+            <HEROIC>6.4</HEROIC>
         </salaryXPMultipliers>
         <salaryTypeBase>1500 CSB,2250 CSB,900 CSB,900 CSB,900 CSB,900 CSB,900 CSB,1500 CSB,900 CSB,960 CSB,960 CSB,750 CSB,1000 CSB,1000 CSB,1000 CSB,1000 CSB,800 CSB,800 CSB,800 CSB,800 CSB,400 CSB,1500 CSB,400 CSB,500 CSB,500 CSB,500 CSB,500 CSB,0 CSB,0 CSB</salaryTypeBase>
         <awardBonusStyle>BOTH</awardBonusStyle>
@@ -384,19 +348,19 @@
         <noInterestInMarriageDiceSize>10</noInterestInMarriageDiceSize>
         <logMarriageNameChanges>true</logMarriageNameChanges>
         <marriageSurnameWeights>
-            <BOTH_SPACE_SPOUSE>5</BOTH_SPACE_SPOUSE>
-            <HYPHEN_SPOUSE>30</HYPHEN_SPOUSE>
-            <YOURS>55</YOURS>
-            <FEMALE>160</FEMALE>
-            <SPOUSE>55</SPOUSE>
-            <BOTH_SPACE_YOURS>5</BOTH_SPACE_YOURS>
-            <MALE>500</MALE>
-            <SPACE_YOURS>10</SPACE_YOURS>
-            <HYPHEN_YOURS>30</HYPHEN_YOURS>
-            <BOTH_HYPHEN_SPOUSE>20</BOTH_HYPHEN_SPOUSE>
-            <BOTH_HYPHEN_YOURS>20</BOTH_HYPHEN_YOURS>
-            <NO_CHANGE>100</NO_CHANGE>
             <SPACE_SPOUSE>10</SPACE_SPOUSE>
+            <BOTH_HYPHEN_YOURS>20</BOTH_HYPHEN_YOURS>
+            <FEMALE>160</FEMALE>
+            <HYPHEN_YOURS>30</HYPHEN_YOURS>
+            <BOTH_SPACE_YOURS>5</BOTH_SPACE_YOURS>
+            <BOTH_SPACE_SPOUSE>5</BOTH_SPACE_SPOUSE>
+            <SPOUSE>55</SPOUSE>
+            <YOURS>55</YOURS>
+            <SPACE_YOURS>10</SPACE_YOURS>
+            <NO_CHANGE>100</NO_CHANGE>
+            <HYPHEN_SPOUSE>30</HYPHEN_SPOUSE>
+            <BOTH_HYPHEN_SPOUSE>20</BOTH_HYPHEN_SPOUSE>
+            <MALE>500</MALE>
         </marriageSurnameWeights>
         <randomMarriageMethod>DICE_ROLL</randomMarriageMethod>
         <useRandomClanPersonnelMarriages>false</useRandomClanPersonnelMarriages>
@@ -410,9 +374,9 @@
         <usePrisonerDivorce>true</usePrisonerDivorce>
         <divorceSurnameWeights>
             <SPOUSE_CHANGES_SURNAME>10</SPOUSE_CHANGES_SURNAME>
-            <BOTH_CHANGE_SURNAME>30</BOTH_CHANGE_SURNAME>
-            <BOTH_KEEP_SURNAME>50</BOTH_KEEP_SURNAME>
             <ORIGIN_CHANGES_SURNAME>10</ORIGIN_CHANGES_SURNAME>
+            <BOTH_KEEP_SURNAME>50</BOTH_KEEP_SURNAME>
+            <BOTH_CHANGE_SURNAME>30</BOTH_CHANGE_SURNAME>
         </divorceSurnameWeights>
         <randomDivorceMethod>DICE_ROLL</randomDivorceMethod>
         <useRandomOppositeSexDivorce>true</useRandomOppositeSexDivorce>
@@ -455,13 +419,13 @@
         <allAges>false</allAges>
         <militaryAcademyAccidents>10000</militaryAcademyAccidents>
         <enabledRandomDeathAgeGroups>
-            <BABY>false</BABY>
-            <ELDER>true</ELDER>
-            <TODDLER>false</TODDLER>
             <TEENAGER>false</TEENAGER>
-            <ADULT>true</ADULT>
+            <ELDER>true</ELDER>
             <CHILD>false</CHILD>
+            <ADULT>true</ADULT>
             <PRETEEN>false</PRETEEN>
+            <BABY>false</BABY>
+            <TODDLER>false</TODDLER>
         </enabledRandomDeathAgeGroups>
         <useRandomDeathSuicideCause>false</useRandomDeathSuicideCause>
         <randomDeathMultiplier>1.0</randomDeathMultiplier>
@@ -503,13 +467,13 @@
         <personnelMarketReportRefresh>true</personnelMarketReportRefresh>
         <personnelMarketRandomRemovalTargets>
             <ULTRA_GREEN>4</ULTRA_GREEN>
-            <ELITE>10</ELITE>
-            <HEROIC>11</HEROIC>
-            <REGULAR>6</REGULAR>
             <NONE>3</NONE>
             <GREEN>4</GREEN>
             <VETERAN>8</VETERAN>
+            <REGULAR>6</REGULAR>
+            <ELITE>10</ELITE>
             <LEGENDARY>11</LEGENDARY>
+            <HEROIC>11</HEROIC>
         </personnelMarketRandomRemovalTargets>
         <personnelMarketDylansWeight>0.3</personnelMarketDylansWeight>
         <usePersonnelHireHiringHallOnly>false</usePersonnelHireHiringHallOnly>
@@ -586,35 +550,35 @@
     <randomSkillPreferences>
         <overallRecruitBonus>0</overallRecruitBonus>
         <recruitmentBonuses>
+            <BA_TECH>0</BA_TECH>
+            <SOLDIER>0</SOLDIER>
             <AERO_TEK>0</AERO_TEK>
-            <LAM_PILOT>0</LAM_PILOT>
-            <ADMINISTRATOR_COMMAND>0</ADMINISTRATOR_COMMAND>
+            <VEHICLE_GUNNER>0</VEHICLE_GUNNER>
+            <DOCTOR>0</DOCTOR>
+            <VTOL_PILOT>0</VTOL_PILOT>
+            <MECHANIC>0</MECHANIC>
+            <VEHICLE_CREW>0</VEHICLE_CREW>
+            <VESSEL_CREW>0</VESSEL_CREW>
+            <ADMINISTRATOR_LOGISTICS>0</ADMINISTRATOR_LOGISTICS>
+            <GROUND_VEHICLE_DRIVER>0</GROUND_VEHICLE_DRIVER>
+            <MEK_TECH>0</MEK_TECH>
+            <VESSEL_NAVIGATOR>0</VESSEL_NAVIGATOR>
+            <PROTOMEK_PILOT>0</PROTOMEK_PILOT>
             <MEDIC>0</MEDIC>
             <AEROSPACE_PILOT>0</AEROSPACE_PILOT>
-            <MEK_TECH>0</MEK_TECH>
-            <VTOL_PILOT>0</VTOL_PILOT>
-            <GROUND_VEHICLE_DRIVER>0</GROUND_VEHICLE_DRIVER>
-            <MEKWARRIOR>0</MEKWARRIOR>
-            <VESSEL_NAVIGATOR>0</VESSEL_NAVIGATOR>
-            <ADMINISTRATOR_HR>0</ADMINISTRATOR_HR>
-            <DOCTOR>0</DOCTOR>
-            <ADMINISTRATOR_LOGISTICS>0</ADMINISTRATOR_LOGISTICS>
-            <VEHICLE_CREW>0</VEHICLE_CREW>
             <ADMINISTRATOR_TRANSPORT>0</ADMINISTRATOR_TRANSPORT>
-            <NONE>0</NONE>
-            <VESSEL_GUNNER>0</VESSEL_GUNNER>
-            <CONVENTIONAL_AIRCRAFT_PILOT>0</CONVENTIONAL_AIRCRAFT_PILOT>
-            <DEPENDENT>0</DEPENDENT>
-            <MECHANIC>0</MECHANIC>
-            <BATTLE_ARMOUR>0</BATTLE_ARMOUR>
-            <SOLDIER>0</SOLDIER>
-            <BA_TECH>0</BA_TECH>
-            <VESSEL_CREW>0</VESSEL_CREW>
-            <VEHICLE_GUNNER>0</VEHICLE_GUNNER>
-            <PROTOMEK_PILOT>0</PROTOMEK_PILOT>
             <ASTECH>0</ASTECH>
+            <DEPENDENT>0</DEPENDENT>
             <NAVAL_VEHICLE_DRIVER>0</NAVAL_VEHICLE_DRIVER>
+            <VESSEL_GUNNER>0</VESSEL_GUNNER>
+            <LAM_PILOT>0</LAM_PILOT>
+            <NONE>0</NONE>
+            <CONVENTIONAL_AIRCRAFT_PILOT>0</CONVENTIONAL_AIRCRAFT_PILOT>
+            <ADMINISTRATOR_HR>0</ADMINISTRATOR_HR>
             <VESSEL_PILOT>0</VESSEL_PILOT>
+            <ADMINISTRATOR_COMMAND>0</ADMINISTRATOR_COMMAND>
+            <BATTLE_ARMOUR>0</BATTLE_ARMOUR>
+            <MEKWARRIOR>0</MEKWARRIOR>
         </recruitmentBonuses>
         <specialAbilityBonus>-10,-10,-2,0,1</specialAbilityBonus>
         <commandSkillsModifier>-12,-11,-10,-9,-8</commandSkillsModifier>
@@ -633,422 +597,6 @@
         <secondSkillBonus>-4</secondSkillBonus>
     </randomSkillPreferences>
     <skillTypes>
-        <skillType>
-            <name>Piloting/Mek</name>
-            <target>8</target>
-            <isCountUp>false</isCountUp>
-            <subType>COMBAT_PILOTING</subType>
-            <firstAttribute>REFLEXES</firstAttribute>
-            <secondAttribute>DEXTERITY</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Gunnery/Mek</name>
-            <target>8</target>
-            <isCountUp>false</isCountUp>
-            <subType>COMBAT_GUNNERY</subType>
-            <firstAttribute>REFLEXES</firstAttribute>
-            <secondAttribute>DEXTERITY</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Piloting/Aerospace</name>
-            <target>8</target>
-            <isCountUp>false</isCountUp>
-            <subType>COMBAT_PILOTING</subType>
-            <firstAttribute>REFLEXES</firstAttribute>
-            <secondAttribute>DEXTERITY</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Gunnery/Aerospace</name>
-            <target>8</target>
-            <isCountUp>false</isCountUp>
-            <subType>COMBAT_GUNNERY</subType>
-            <firstAttribute>REFLEXES</firstAttribute>
-            <secondAttribute>DEXTERITY</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Piloting/Ground Vehicle</name>
-            <target>8</target>
-            <isCountUp>false</isCountUp>
-            <subType>COMBAT_PILOTING</subType>
-            <firstAttribute>REFLEXES</firstAttribute>
-            <secondAttribute>DEXTERITY</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Piloting/VTOL</name>
-            <target>8</target>
-            <isCountUp>false</isCountUp>
-            <subType>COMBAT_PILOTING</subType>
-            <firstAttribute>REFLEXES</firstAttribute>
-            <secondAttribute>DEXTERITY</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Piloting/Naval</name>
-            <target>8</target>
-            <isCountUp>false</isCountUp>
-            <subType>COMBAT_PILOTING</subType>
-            <firstAttribute>REFLEXES</firstAttribute>
-            <secondAttribute>DEXTERITY</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Gunnery/Vehicle</name>
-            <target>8</target>
-            <isCountUp>false</isCountUp>
-            <subType>COMBAT_GUNNERY</subType>
-            <firstAttribute>REFLEXES</firstAttribute>
-            <secondAttribute>DEXTERITY</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Piloting/Aircraft</name>
-            <target>8</target>
-            <isCountUp>false</isCountUp>
-            <subType>COMBAT_PILOTING</subType>
-            <firstAttribute>REFLEXES</firstAttribute>
-            <secondAttribute>DEXTERITY</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Gunnery/Aircraft</name>
-            <target>8</target>
-            <isCountUp>false</isCountUp>
-            <subType>COMBAT_GUNNERY</subType>
-            <firstAttribute>REFLEXES</firstAttribute>
-            <secondAttribute>DEXTERITY</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Piloting/Spacecraft</name>
-            <target>8</target>
-            <isCountUp>false</isCountUp>
-            <subType>COMBAT_PILOTING</subType>
-            <firstAttribute>REFLEXES</firstAttribute>
-            <secondAttribute>DEXTERITY</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Gunnery/Spacecraft</name>
-            <target>8</target>
-            <isCountUp>false</isCountUp>
-            <subType>COMBAT_GUNNERY</subType>
-            <firstAttribute>REFLEXES</firstAttribute>
-            <secondAttribute>DEXTERITY</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Artillery</name>
-            <target>8</target>
-            <isCountUp>false</isCountUp>
-            <subType>COMBAT_GUNNERY</subType>
-            <firstAttribute>INTELLIGENCE</firstAttribute>
-            <secondAttribute>WILLPOWER</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Gunnery/BattleArmor</name>
-            <target>8</target>
-            <isCountUp>false</isCountUp>
-            <subType>COMBAT_GUNNERY</subType>
-            <firstAttribute>REFLEXES</firstAttribute>
-            <secondAttribute>DEXTERITY</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Gunnery/ProtoMek</name>
-            <target>8</target>
-            <isCountUp>false</isCountUp>
-            <subType>COMBAT_GUNNERY</subType>
-            <firstAttribute>REFLEXES</firstAttribute>
-            <secondAttribute>DEXTERITY</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Small Arms</name>
-            <target>8</target>
-            <isCountUp>false</isCountUp>
-            <subType>COMBAT_GUNNERY</subType>
-            <firstAttribute>DEXTERITY</firstAttribute>
-            <secondAttribute>NONE</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Anti-Mek</name>
-            <target>8</target>
-            <isCountUp>false</isCountUp>
-            <subType>COMBAT_PILOTING</subType>
-            <firstAttribute>DEXTERITY</firstAttribute>
-            <secondAttribute>INTELLIGENCE</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Tech/Mek</name>
-            <target>9</target>
-            <isCountUp>false</isCountUp>
-            <subType>SUPPORT</subType>
-            <firstAttribute>DEXTERITY</firstAttribute>
-            <secondAttribute>INTELLIGENCE</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Tech/Mechanic</name>
-            <target>9</target>
-            <isCountUp>false</isCountUp>
-            <subType>SUPPORT</subType>
-            <firstAttribute>DEXTERITY</firstAttribute>
-            <secondAttribute>INTELLIGENCE</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Tech/Aero</name>
-            <target>9</target>
-            <isCountUp>false</isCountUp>
-            <subType>SUPPORT</subType>
-            <firstAttribute>DEXTERITY</firstAttribute>
-            <secondAttribute>INTELLIGENCE</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Tech/BattleArmor</name>
-            <target>9</target>
-            <isCountUp>false</isCountUp>
-            <subType>SUPPORT</subType>
-            <firstAttribute>DEXTERITY</firstAttribute>
-            <secondAttribute>INTELLIGENCE</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Tech/Vessel</name>
-            <target>9</target>
-            <isCountUp>false</isCountUp>
-            <subType>SUPPORT</subType>
-            <firstAttribute>DEXTERITY</firstAttribute>
-            <secondAttribute>INTELLIGENCE</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Astech</name>
-            <target>7</target>
-            <isCountUp>false</isCountUp>
-            <subType>SUPPORT</subType>
-            <firstAttribute>INTELLIGENCE</firstAttribute>
-            <secondAttribute>NONE</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Doctor</name>
-            <target>9</target>
-            <isCountUp>false</isCountUp>
-            <subType>SUPPORT</subType>
-            <firstAttribute>DEXTERITY</firstAttribute>
-            <secondAttribute>INTELLIGENCE</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>MedTech</name>
-            <target>7</target>
-            <isCountUp>false</isCountUp>
-            <subType>SUPPORT</subType>
-            <firstAttribute>INTELLIGENCE</firstAttribute>
-            <secondAttribute>NONE</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Hyperspace Navigation</name>
-            <target>7</target>
-            <isCountUp>false</isCountUp>
-            <subType>SUPPORT</subType>
-            <firstAttribute>INTELLIGENCE</firstAttribute>
-            <secondAttribute>NONE</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Administration</name>
-            <target>8</target>
-            <isCountUp>false</isCountUp>
-            <subType>SUPPORT</subType>
-            <firstAttribute>INTELLIGENCE</firstAttribute>
-            <secondAttribute>WILLPOWER</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Tactics</name>
-            <target>0</target>
-            <isCountUp>true</isCountUp>
-            <subType>SUPPORT_COMMAND</subType>
-            <firstAttribute>INTELLIGENCE</firstAttribute>
-            <secondAttribute>WILLPOWER</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Strategy</name>
-            <target>0</target>
-            <isCountUp>true</isCountUp>
-            <subType>SUPPORT_COMMAND</subType>
-            <firstAttribute>INTELLIGENCE</firstAttribute>
-            <secondAttribute>WILLPOWER</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Negotiation</name>
-            <target>8</target>
-            <isCountUp>false</isCountUp>
-            <subType>SUPPORT</subType>
-            <firstAttribute>CHARISMA</firstAttribute>
-            <secondAttribute>NONE</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Leadership</name>
-            <target>0</target>
-            <isCountUp>true</isCountUp>
-            <subType>SUPPORT_COMMAND</subType>
-            <firstAttribute>WILLPOWER</firstAttribute>
-            <secondAttribute>CHARISMA</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Scrounge</name>
-            <target>8</target>
-            <isCountUp>false</isCountUp>
-            <subType>SUPPORT</subType>
-            <firstAttribute>CHARISMA</firstAttribute>
-            <secondAttribute>NONE</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
         <skillType>
             <name>Acrobatics (RP Only)</name>
             <target>7</target>
@@ -1076,6 +624,19 @@
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
+            <name>Administration</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>SUPPORT</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
             <name>Animal Handling (RP Only)</name>
             <target>8</target>
             <isCountUp>false</isCountUp>
@@ -1087,6 +648,19 @@
             <vetLvl>4</vetLvl>
             <eliteLvl>5</eliteLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Anti-Mek (Climbing)</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>COMBAT_PILOTING</subType>
+            <firstAttribute>DEXTERITY</firstAttribute>
+            <secondAttribute>NONE</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>12,6,6,6,6,6,6,6,6,-1,-1</costs>
         </skillType>
         <skillType>
             <name>Appraisal (RP Only)</name>
@@ -1108,6 +682,19 @@
             <subType>ROLEPLAY_GENERAL</subType>
             <firstAttribute>DEXTERITY</firstAttribute>
             <secondAttribute>NONE</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Art/Cooking (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_ART</subType>
+            <firstAttribute>DEXTERITY</firstAttribute>
+            <secondAttribute>INTELLIGENCE</secondAttribute>
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
@@ -1141,7 +728,72 @@
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
+            <name>Art/Instrument (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_ART</subType>
+            <firstAttribute>DEXTERITY</firstAttribute>
+            <secondAttribute>INTELLIGENCE</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Art/Other (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_ART</subType>
+            <firstAttribute>DEXTERITY</firstAttribute>
+            <secondAttribute>INTELLIGENCE</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
             <name>Art/Painting (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_ART</subType>
+            <firstAttribute>DEXTERITY</firstAttribute>
+            <secondAttribute>INTELLIGENCE</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Art/Poetry (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_ART</subType>
+            <firstAttribute>DEXTERITY</firstAttribute>
+            <secondAttribute>INTELLIGENCE</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Art/Sculpture (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_ART</subType>
+            <firstAttribute>DEXTERITY</firstAttribute>
+            <secondAttribute>INTELLIGENCE</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Art/Singing (RP Only)</name>
             <target>9</target>
             <isCountUp>false</isCountUp>
             <subType>ROLEPLAY_ART</subType>
@@ -1167,6 +819,45 @@
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
+            <name>Artillery</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>COMBAT_GUNNERY</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Astech</name>
+            <target>7</target>
+            <isCountUp>false</isCountUp>
+            <subType>SUPPORT</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>NONE</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Career/Any (RP Only)</name>
+            <target>7</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_GENERAL</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>NONE</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
             <name>Climbing (RP Only)</name>
             <target>7</target>
             <isCountUp>false</isCountUp>
@@ -1180,7 +871,7 @@
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
-            <name>Communications (RP Only)</name>
+            <name>Communications/Any (RP Only)</name>
             <target>7</target>
             <isCountUp>false</isCountUp>
             <subType>ROLEPLAY_GENERAL</subType>
@@ -1271,6 +962,214 @@
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
+            <name>Gunnery/Aerospace</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>COMBAT_GUNNERY</subType>
+            <firstAttribute>REFLEXES</firstAttribute>
+            <secondAttribute>DEXTERITY</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Gunnery/Aircraft</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>COMBAT_GUNNERY</subType>
+            <firstAttribute>REFLEXES</firstAttribute>
+            <secondAttribute>DEXTERITY</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Gunnery/BattleArmor</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>COMBAT_GUNNERY</subType>
+            <firstAttribute>REFLEXES</firstAttribute>
+            <secondAttribute>DEXTERITY</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Gunnery/Mek</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>COMBAT_GUNNERY</subType>
+            <firstAttribute>REFLEXES</firstAttribute>
+            <secondAttribute>DEXTERITY</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Gunnery/ProtoMek</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>COMBAT_GUNNERY</subType>
+            <firstAttribute>REFLEXES</firstAttribute>
+            <secondAttribute>DEXTERITY</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Gunnery/Spacecraft</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>COMBAT_GUNNERY</subType>
+            <firstAttribute>REFLEXES</firstAttribute>
+            <secondAttribute>DEXTERITY</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Gunnery/Vehicle</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>COMBAT_GUNNERY</subType>
+            <firstAttribute>REFLEXES</firstAttribute>
+            <secondAttribute>DEXTERITY</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Interest/Antiques (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_INTEREST</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Interest/Archeology (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_INTEREST</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Interest/Astrology (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_INTEREST</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Interest/Cartography (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_INTEREST</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Interest/Economics (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_INTEREST</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Interest/Exotic Animals (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_INTEREST</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Interest/Fashion (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_INTEREST</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Interest/Fishing (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_INTEREST</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Interest/Gambling (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_INTEREST</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
             <name>Interest/History (RP Only)</name>
             <target>9</target>
             <isCountUp>false</isCountUp>
@@ -1284,7 +1183,7 @@
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
-            <name>Interest/Literature (RP Only)</name>
+            <name>Interest/Holo-Cinema (RP Only)</name>
             <target>9</target>
             <isCountUp>false</isCountUp>
             <subType>ROLEPLAY_INTEREST</subType>
@@ -1310,7 +1209,124 @@
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
+            <name>Interest/Literature (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_INTEREST</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Interest/Military (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_INTEREST</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Interest/Music (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_INTEREST</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Interest/Mythology (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_INTEREST</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Interest/Other (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_INTEREST</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Interest/Philosophy (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_INTEREST</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Interest/Politics (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_INTEREST</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Interest/Pop-Culture (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_INTEREST</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
             <name>Interest/Sports (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_INTEREST</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Interest/Theology (RP Only)</name>
             <target>9</target>
             <isCountUp>false</isCountUp>
             <subType>ROLEPLAY_INTEREST</subType>
@@ -1349,13 +1365,26 @@
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
-            <name>Languages (RP Only)</name>
+            <name>Language/Any (RP Only)</name>
             <target>8</target>
             <isCountUp>false</isCountUp>
             <subType>ROLEPLAY_GENERAL</subType>
             <firstAttribute>INTELLIGENCE</firstAttribute>
             <secondAttribute>CHARISMA</secondAttribute>
             <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Leadership</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>SUPPORT_COMMAND</subType>
+            <firstAttribute>WILLPOWER</firstAttribute>
+            <secondAttribute>CHARISMA</secondAttribute>
+            <greenLvl>2</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
             <eliteLvl>5</eliteLvl>
@@ -1375,6 +1404,58 @@
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
+            <name>MedTech/Any</name>
+            <target>7</target>
+            <isCountUp>false</isCountUp>
+            <subType>SUPPORT</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>NONE</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Melee Weapons (RP Only)</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_GENERAL</subType>
+            <firstAttribute>REFLEXES</firstAttribute>
+            <secondAttribute>DEXTERITY</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Navigation/Any</name>
+            <target>7</target>
+            <isCountUp>false</isCountUp>
+            <subType>SUPPORT</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>NONE</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Negotiation</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>SUPPORT</subType>
+            <firstAttribute>CHARISMA</firstAttribute>
+            <secondAttribute>NONE</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
             <name>Perception (RP Only)</name>
             <target>7</target>
             <isCountUp>false</isCountUp>
@@ -1388,12 +1469,103 @@
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
-            <name>Sleight of Hand (RP Only)</name>
+            <name>Piloting/Aerospace</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>COMBAT_PILOTING</subType>
+            <firstAttribute>REFLEXES</firstAttribute>
+            <secondAttribute>DEXTERITY</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Piloting/Aircraft</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>COMBAT_PILOTING</subType>
+            <firstAttribute>REFLEXES</firstAttribute>
+            <secondAttribute>DEXTERITY</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Piloting/Ground Vehicle</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>COMBAT_PILOTING</subType>
+            <firstAttribute>REFLEXES</firstAttribute>
+            <secondAttribute>DEXTERITY</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Piloting/Mek</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>COMBAT_PILOTING</subType>
+            <firstAttribute>REFLEXES</firstAttribute>
+            <secondAttribute>DEXTERITY</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Piloting/Naval</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>COMBAT_PILOTING</subType>
+            <firstAttribute>REFLEXES</firstAttribute>
+            <secondAttribute>DEXTERITY</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Piloting/Spacecraft</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>COMBAT_PILOTING</subType>
+            <firstAttribute>REFLEXES</firstAttribute>
+            <secondAttribute>DEXTERITY</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Piloting/VTOL</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>COMBAT_PILOTING</subType>
+            <firstAttribute>REFLEXES</firstAttribute>
+            <secondAttribute>DEXTERITY</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Protocols/Any (RP Only)</name>
             <target>8</target>
             <isCountUp>false</isCountUp>
             <subType>ROLEPLAY_GENERAL</subType>
-            <firstAttribute>REFLEXES</firstAttribute>
-            <secondAttribute>DEXTERITY</secondAttribute>
+            <firstAttribute>WILLPOWER</firstAttribute>
+            <secondAttribute>CHARISMA</secondAttribute>
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
@@ -1401,12 +1573,12 @@
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
-            <name>Protocols (RP Only)</name>
-            <target>8</target>
+            <name>Running (RP Only)</name>
+            <target>7</target>
             <isCountUp>false</isCountUp>
             <subType>ROLEPLAY_GENERAL</subType>
-            <firstAttribute>WILLPOWER</firstAttribute>
-            <secondAttribute>CHARISMA</secondAttribute>
+            <firstAttribute>REFLEXES</firstAttribute>
+            <secondAttribute>DEXTERITY</secondAttribute>
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
@@ -1440,7 +1612,72 @@
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
+            <name>Science/Genetics (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_SCIENCE</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Science/Geology (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_SCIENCE</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
             <name>Science/Mathematics (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_SCIENCE</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Science/Military (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_SCIENCE</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Science/Other (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_SCIENCE</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Science/Pharmacology (RP Only)</name>
             <target>9</target>
             <isCountUp>false</isCountUp>
             <subType>ROLEPLAY_SCIENCE</subType>
@@ -1460,6 +1697,45 @@
             <firstAttribute>INTELLIGENCE</firstAttribute>
             <secondAttribute>WILLPOWER</secondAttribute>
             <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Science/Psychology (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_SCIENCE</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Science/Xenobiology (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_SCIENCE</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Scrounge</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>SUPPORT</subType>
+            <firstAttribute>CHARISMA</firstAttribute>
+            <secondAttribute>NONE</secondAttribute>
+            <greenLvl>2</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
             <eliteLvl>5</eliteLvl>
@@ -1505,6 +1781,32 @@
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
+            <name>Sleight of Hand/Any (RP Only)</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_GENERAL</subType>
+            <firstAttribute>REFLEXES</firstAttribute>
+            <secondAttribute>DEXTERITY</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Small Arms</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>COMBAT_GUNNERY</subType>
+            <firstAttribute>DEXTERITY</firstAttribute>
+            <secondAttribute>NONE</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
             <name>Stealth (RP Only)</name>
             <target>8</target>
             <isCountUp>false</isCountUp>
@@ -1518,7 +1820,20 @@
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
-            <name>Streetwise (RP Only)</name>
+            <name>Strategy</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>SUPPORT_COMMAND</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Streetwise/Any (RP Only)</name>
             <target>8</target>
             <isCountUp>false</isCountUp>
             <subType>ROLEPLAY_GENERAL</subType>
@@ -1531,7 +1846,33 @@
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
-            <name>Survival (RP Only)</name>
+            <name>Support Weapons (RP Only)</name>
+            <target>7</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_GENERAL</subType>
+            <firstAttribute>DEXTERITY</firstAttribute>
+            <secondAttribute>NONE</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Surgery/Any</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>SUPPORT</subType>
+            <firstAttribute>DEXTERITY</firstAttribute>
+            <secondAttribute>INTELLIGENCE</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Survival/Any (RP Only)</name>
             <target>9</target>
             <isCountUp>false</isCountUp>
             <subType>ROLEPLAY_GENERAL</subType>
@@ -1544,7 +1885,111 @@
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
-            <name>Tracking (RP Only)</name>
+            <name>Swimming (RP Only)</name>
+            <target>7</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_GENERAL</subType>
+            <firstAttribute>STRENGTH</firstAttribute>
+            <secondAttribute>NONE</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Tactics/Any</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>SUPPORT_COMMAND</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Tech/Aero</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>SUPPORT</subType>
+            <firstAttribute>DEXTERITY</firstAttribute>
+            <secondAttribute>INTELLIGENCE</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Tech/BattleArmor</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>SUPPORT</subType>
+            <firstAttribute>DEXTERITY</firstAttribute>
+            <secondAttribute>INTELLIGENCE</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Tech/Mechanic</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>SUPPORT</subType>
+            <firstAttribute>DEXTERITY</firstAttribute>
+            <secondAttribute>INTELLIGENCE</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Tech/Mek</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>SUPPORT</subType>
+            <firstAttribute>DEXTERITY</firstAttribute>
+            <secondAttribute>INTELLIGENCE</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Tech/Vessel</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>SUPPORT</subType>
+            <firstAttribute>DEXTERITY</firstAttribute>
+            <secondAttribute>INTELLIGENCE</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Thrown Weapons (RP Only)</name>
+            <target>7</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_GENERAL</subType>
+            <firstAttribute>DEXTERITY</firstAttribute>
+            <secondAttribute>NONE</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Tracking/Any (RP Only)</name>
             <target>8</target>
             <isCountUp>false</isCountUp>
             <subType>ROLEPLAY_GENERAL</subType>
@@ -1569,6 +2014,19 @@
             <eliteLvl>5</eliteLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
+        <skillType>
+            <name>Zero-G Operations (RP Only)</name>
+            <target>7</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_GENERAL</subType>
+            <firstAttribute>REFLEXES</firstAttribute>
+            <secondAttribute>NONE</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
     </skillTypes>
     <specialAbilities>
         <ability>
@@ -1583,8 +2041,8 @@
             <choiceValues></choiceValues>
             <skillPrereq>
                 <skill>Anti-Mek::Veteran</skill>
-                <skill>Piloting/Ground Vehicle::Veteran</skill>
                 <skill>Gunnery/ProtoMek::Veteran</skill>
+                <skill>Piloting/Ground Vehicle::Veteran</skill>
                 <skill>Piloting/Mek::Veteran</skill>
             </skillPrereq>
         </ability>
@@ -1602,9 +2060,9 @@
                 <skill>Gunnery/Mek::Veteran</skill>
                 <skill>Gunnery/ProtoMek::Veteran</skill>
                 <skill>Gunnery/Aircraft::Veteran</skill>
-                <skill>Gunnery/BattleArmor::Veteran</skill>
-                <skill>Gunnery/Aerospace::Veteran</skill>
                 <skill>Gunnery/Spacecraft::Veteran</skill>
+                <skill>Gunnery/Aerospace::Veteran</skill>
+                <skill>Gunnery/BattleArmor::Veteran</skill>
                 <skill>Gunnery/Vehicle::Veteran</skill>
             </skillPrereq>
         </ability>
@@ -1658,43 +2116,10 @@
                 <skill>Gunnery/Mek::Regular</skill>
                 <skill>Gunnery/ProtoMek::Regular</skill>
                 <skill>Gunnery/Aircraft::Regular</skill>
-                <skill>Gunnery/BattleArmor::Regular</skill>
-                <skill>Gunnery/Aerospace::Regular</skill>
                 <skill>Gunnery/Spacecraft::Regular</skill>
+                <skill>Gunnery/Aerospace::Regular</skill>
+                <skill>Gunnery/BattleArmor::Regular</skill>
                 <skill>Gunnery/Vehicle::Regular</skill>
-            </skillPrereq>
-        </ability>
-        <ability>
-            <displayName>Jumping Jack (CamOps)</displayName>
-            <lookupName>jumping_jack</lookupName>
-            <desc>Unit only suffers a +1 to-hit penalty for jumping, rather than a +3 to-hit penalty.</desc>
-            <xpCost>150</xpCost>
-            <weight>6</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities></removeAbilities>
-            <choiceValues></choiceValues>
-            <skillPrereq>
-                <skill>Gunnery/ProtoMek::Regular</skill>
-                <skill>Piloting/Mek::Regular</skill>
-            </skillPrereq>
-        </ability>
-        <ability>
-            <displayName>Tech Specialist, Internal (Unofficial)</displayName>
-            <lookupName>tech_internal_specialist</lookupName>
-            <desc>-1 to repair and maintenance checks when working with internal systems</desc>
-            <xpCost>100</xpCost>
-            <weight>2</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities></removeAbilities>
-            <choiceValues></choiceValues>
-            <skillPrereq>
-                <skill>Tech/Vessel::Regular</skill>
-                <skill>Tech/Aero::Regular</skill>
-                <skill>Tech/Mek::Regular</skill>
-                <skill>Tech/Mechanic::Regular</skill>
-                <skill>Tech/BattleArmor::Regular</skill>
             </skillPrereq>
         </ability>
         <ability>
@@ -1724,9 +2149,9 @@
                 <skill>Gunnery/Mek::Regular</skill>
                 <skill>Gunnery/ProtoMek::Regular</skill>
                 <skill>Gunnery/Aircraft::Regular</skill>
-                <skill>Gunnery/BattleArmor::Regular</skill>
-                <skill>Gunnery/Aerospace::Regular</skill>
                 <skill>Gunnery/Spacecraft::Regular</skill>
+                <skill>Gunnery/Aerospace::Regular</skill>
+                <skill>Gunnery/BattleArmor::Regular</skill>
                 <skill>Gunnery/Vehicle::Regular</skill>
             </skillPrereq>
         </ability>
@@ -1743,56 +2168,6 @@
             <invalidAbilities></invalidAbilities>
             <removeAbilities>atow_fast_learner</removeAbilities>
             <choiceValues></choiceValues>
-        </ability>
-        <ability>
-            <displayName>Dodge (MaxTech)</displayName>
-            <lookupName>dodge_maneuver</lookupName>
-            <desc>Enables the unit to make a dodge maneuver instead of a physical attack.
-                This maneuver adds +2 to the BTH to physical attacks against the unit.
-                NOTE: The dodge maneuver is declared during the weapons phase.
-                Note: This ability is only used for BattleMeks.
-            </desc>
-            <xpCost>100</xpCost>
-            <weight>1</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities></removeAbilities>
-            <choiceValues></choiceValues>
-            <skillPrereq>
-                <skill>Gunnery/ProtoMek::Regular</skill>
-                <skill>Piloting/Mek::Regular</skill>
-            </skillPrereq>
-        </ability>
-        <ability>
-            <displayName>Good Hearing (ATOW)</displayName>
-            <lookupName>atow_good_hearing</lookupName>
-            <desc>The Target Number of all Perception checks is decreased by 1.</desc>
-            <xpCost>100</xpCost>
-            <weight>1</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities>flaw_poor_hearing</removeAbilities>
-            <choiceValues></choiceValues>
-        </ability>
-        <ability>
-            <displayName>Sniper (CamOps)</displayName>
-            <lookupName>sniper</lookupName>
-            <desc>Range penalties are halved.</desc>
-            <xpCost>150</xpCost>
-            <weight>1</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities></removeAbilities>
-            <choiceValues></choiceValues>
-            <skillPrereq>
-                <skill>Gunnery/Mek::Veteran</skill>
-                <skill>Gunnery/ProtoMek::Veteran</skill>
-                <skill>Gunnery/Aircraft::Veteran</skill>
-                <skill>Gunnery/BattleArmor::Veteran</skill>
-                <skill>Gunnery/Spacecraft::Veteran</skill>
-                <skill>Gunnery/Aerospace::Veteran</skill>
-                <skill>Gunnery/Vehicle::Veteran</skill>
-            </skillPrereq>
         </ability>
         <ability>
             <displayName>Impatient (ATOW)</displayName>
@@ -1835,8 +2210,8 @@
             <choiceValues></choiceValues>
             <skillPrereq>
                 <skill>Anti-Mek::Veteran</skill>
-                <skill>Piloting/Ground Vehicle::Veteran</skill>
                 <skill>Gunnery/ProtoMek::Veteran</skill>
+                <skill>Piloting/Ground Vehicle::Veteran</skill>
                 <skill>Piloting/Mek::Veteran</skill>
             </skillPrereq>
         </ability>
@@ -1892,20 +2267,6 @@
             <choiceValues></choiceValues>
         </ability>
         <ability>
-            <displayName>Functional Tail and Mobile Ears (Unofficial)</displayName>
-            <lookupName>mutation_cat_girl_unofficial</lookupName>
-            <desc>Increases Charisma Attribute by 1 (may not take it above 10).
-
-                The Target Number of all Perception checks decreased by 1 due to improved hearing.
-            </desc>
-            <xpCost>200</xpCost>
-            <weight>1</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities>mutation_cat_girl</invalidAbilities>
-            <removeAbilities></removeAbilities>
-            <choiceValues></choiceValues>
-        </ability>
-        <ability>
             <displayName>Fast Learner (ATOW)</displayName>
             <lookupName>atow_fast_learner</lookupName>
             <desc>Decreases the cost of purchasing and improving Skills by 20% (rounded normally).
@@ -1918,63 +2279,6 @@
             <invalidAbilities></invalidAbilities>
             <removeAbilities>flaw_slow_learner</removeAbilities>
             <choiceValues></choiceValues>
-        </ability>
-        <ability>
-            <displayName>Exceptional Attribute - Strength (ATOW)</displayName>
-            <lookupName>exceptional_attribute_strength</lookupName>
-            <desc>Characters can only increase their Attributes up to a maximum determined by their Phenotype.
-
-                This SPA increases that maximum by 1, but does not increase the Attribute itself.
-            </desc>
-            <xpCost>200</xpCost>
-            <weight>1</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities></removeAbilities>
-            <choiceValues></choiceValues>
-        </ability>
-        <ability>
-            <displayName>Gunnery/Ballistic (Unofficial)</displayName>
-            <lookupName>gunnery_ballistic</lookupName>
-            <desc>Pilot gets a -1 to-hit bonus on all ballistic weapons (MGs,
-                all ACs,
-                Gauss rifles).
-            </desc>
-            <xpCost>100</xpCost>
-            <weight>1</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities>weapon_specialist::specialist</invalidAbilities>
-            <removeAbilities></removeAbilities>
-            <choiceValues></choiceValues>
-            <skillPrereq>
-                <skill>Gunnery/Mek::Green</skill>
-                <skill>Gunnery/ProtoMek::Green</skill>
-                <skill>Gunnery/Aircraft::Green</skill>
-                <skill>Gunnery/BattleArmor::Green</skill>
-                <skill>Gunnery/Spacecraft::Green</skill>
-                <skill>Gunnery/Aerospace::Green</skill>
-                <skill>Gunnery/Vehicle::Green</skill>
-            </skillPrereq>
-        </ability>
-        <ability>
-            <displayName>Natural Aptitude, Gunnery (aToW)</displayName>
-            <lookupName>aptitude_gunnery</lookupName>
-            <desc>Roll 3d6 and take the best two for gunnery checks</desc>
-            <xpCost>500</xpCost>
-            <weight>1</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities></removeAbilities>
-            <choiceValues></choiceValues>
-            <skillPrereq>
-                <skill>Gunnery/Mek::Veteran</skill>
-                <skill>Gunnery/ProtoMek::Veteran</skill>
-                <skill>Gunnery/Aircraft::Veteran</skill>
-                <skill>Gunnery/BattleArmor::Veteran</skill>
-                <skill>Gunnery/Spacecraft::Veteran</skill>
-                <skill>Gunnery/Aerospace::Veteran</skill>
-                <skill>Gunnery/Vehicle::Veteran</skill>
-            </skillPrereq>
         </ability>
         <ability>
             <displayName>Zweihander (CamOps)</displayName>
@@ -1991,24 +2295,6 @@
             </skillPrereq>
         </ability>
         <ability>
-            <displayName>Tech Specialist, Armor (Unofficial)</displayName>
-            <lookupName>tech_armor_specialist</lookupName>
-            <desc>-1 to repair and maintenance checks when working with armor.</desc>
-            <xpCost>50</xpCost>
-            <weight>2</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities></removeAbilities>
-            <choiceValues></choiceValues>
-            <skillPrereq>
-                <skill>Tech/Vessel::Regular</skill>
-                <skill>Tech/Aero::Regular</skill>
-                <skill>Tech/Mek::Regular</skill>
-                <skill>Tech/Mechanic::Regular</skill>
-                <skill>Tech/BattleArmor::Regular</skill>
-            </skillPrereq>
-        </ability>
-        <ability>
             <displayName>Weathered (Unofficial)</displayName>
             <lookupName>weathered</lookupName>
             <desc>A pilot with this ability does not suffer the initial -1 to hit due to weather conditions.</desc>
@@ -2022,9 +2308,9 @@
                 <skill>Gunnery/Mek::Regular</skill>
                 <skill>Gunnery/ProtoMek::Regular</skill>
                 <skill>Gunnery/Aircraft::Regular</skill>
-                <skill>Gunnery/Aerospace::Regular</skill>
-                <skill>Gunnery/Spacecraft::Regular</skill>
                 <skill>Gunnery/BattleArmor::Regular</skill>
+                <skill>Gunnery/Spacecraft::Regular</skill>
+                <skill>Gunnery/Aerospace::Regular</skill>
                 <skill>Gunnery/Vehicle::Regular</skill>
             </skillPrereq>
         </ability>
@@ -2038,26 +2324,6 @@
             <invalidAbilities></invalidAbilities>
             <removeAbilities></removeAbilities>
             <choiceValues></choiceValues>
-        </ability>
-        <ability>
-            <displayName>All Weather (Unofficial)</displayName>
-            <lookupName>allweather</lookupName>
-            <desc>A pilot with this ability does not suffer the PSR penalties due to weather.</desc>
-            <xpCost>100</xpCost>
-            <weight>2</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities></removeAbilities>
-            <choiceValues></choiceValues>
-            <skillPrereq>
-                <skill>Piloting/Aerospace::Regular</skill>
-                <skill>Piloting/Naval::Regular</skill>
-                <skill>Gunnery/ProtoMek::Regular</skill>
-                <skill>Piloting/Ground Vehicle::Regular</skill>
-                <skill>Piloting/VTOL::Regular</skill>
-                <skill>Piloting/Aircraft::Regular</skill>
-                <skill>Piloting/Mek::Regular</skill>
-            </skillPrereq>
         </ability>
         <ability>
             <displayName>Animal Antipathy (ATOW)</displayName>
@@ -2113,107 +2379,10 @@
             <choiceValues></choiceValues>
             <skillPrereq>
                 <skill>Anti-Mek::Veteran</skill>
-                <skill>Piloting/Ground Vehicle::Veteran</skill>
                 <skill>Gunnery/ProtoMek::Veteran</skill>
+                <skill>Piloting/Ground Vehicle::Veteran</skill>
                 <skill>Piloting/Mek::Veteran</skill>
             </skillPrereq>
-        </ability>
-        <ability>
-            <displayName>Melee Specialist (CamOps)</displayName>
-            <lookupName>melee_specialist</lookupName>
-            <desc>Enables the unit to do 1 additional point of damage with physical attacks and applies a -1 to-hit modifier to physical attacks.
-                Note: This ability is only used for BattleMeks.
-            </desc>
-            <xpCost>100</xpCost>
-            <weight>3</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities></removeAbilities>
-            <choiceValues></choiceValues>
-            <skillPrereq>
-                <skill>Gunnery/ProtoMek::Regular</skill>
-                <skill>Piloting/Mek::Regular</skill>
-            </skillPrereq>
-        </ability>
-        <ability>
-            <displayName>Oblique Attacker (CamOps)</displayName>
-            <lookupName>oblique_attacker</lookupName>
-            <desc>The penalty for indirect fire is reduced by one and can also use indirect fire with out a spotter.</desc>
-            <xpCost>100</xpCost>
-            <weight>3</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities>oblique_attacker::sandblaster</invalidAbilities>
-            <removeAbilities></removeAbilities>
-            <choiceValues></choiceValues>
-            <skillPrereq>
-                <skill>Gunnery/Mek::Regular</skill>
-                <skill>Gunnery/ProtoMek::Regular</skill>
-                <skill>Gunnery/Aircraft::Regular</skill>
-                <skill>Gunnery/BattleArmor::Regular</skill>
-                <skill>Gunnery/Aerospace::Regular</skill>
-                <skill>Gunnery/Spacecraft::Regular</skill>
-                <skill>Gunnery/Vehicle::Regular</skill>
-            </skillPrereq>
-        </ability>
-        <ability>
-            <displayName>Gunnery Specialization (aToW)</displayName>
-            <lookupName>specialist</lookupName>
-            <desc>A pilot who specializes in a type of weapon receives a -1 to-hit modifier when using weapons of that type and a
-                +1 to-hit modifier when using other types of weapons.
-            </desc>
-            <xpCost>50</xpCost>
-            <weight>4</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities>weapon_specialist</invalidAbilities>
-            <removeAbilities></removeAbilities>
-            <choiceValues></choiceValues>
-            <skillPrereq>
-                <skill>Gunnery/Mek::Green</skill>
-                <skill>Gunnery/ProtoMek::Green</skill>
-                <skill>Gunnery/Aircraft::Green</skill>
-                <skill>Gunnery/BattleArmor::Green</skill>
-                <skill>Gunnery/Spacecraft::Green</skill>
-                <skill>Gunnery/Aerospace::Green</skill>
-                <skill>Gunnery/Vehicle::Green</skill>
-            </skillPrereq>
-        </ability>
-        <ability>
-            <displayName>Gunnery/Missile (Unofficial)</displayName>
-            <lookupName>gunnery_missile</lookupName>
-            <desc>Pilot gets a -1 to-hit bonus on all missile weapons (LRM,
-                SRM,
-                MRM,
-                RL and ATM).
-            </desc>
-            <xpCost>100</xpCost>
-            <weight>1</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities>weapon_specialist::specialist</invalidAbilities>
-            <removeAbilities></removeAbilities>
-            <choiceValues></choiceValues>
-            <skillPrereq>
-                <skill>Gunnery/Mek::Green</skill>
-                <skill>Gunnery/ProtoMek::Green</skill>
-                <skill>Gunnery/Aircraft::Green</skill>
-                <skill>Gunnery/BattleArmor::Green</skill>
-                <skill>Gunnery/Spacecraft::Green</skill>
-                <skill>Gunnery/Aerospace::Green</skill>
-                <skill>Gunnery/Vehicle::Green</skill>
-            </skillPrereq>
-        </ability>
-        <ability>
-            <displayName>Gremlins (ATOW)</displayName>
-            <lookupName>flaw_gremlins</lookupName>
-            <desc>The cost of purchasing and improving the Tech/Any, Computers, Communications, or Security Systems/Electronic skills is increased by 10% (rounded normally).
-
-                Furthermore, the Target Number of checks made with such skills is increased by 1.
-            </desc>
-            <xpCost>-300</xpCost>
-            <weight>1</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities>atow_tech_empathy</removeAbilities>
-            <choiceValues></choiceValues>
         </ability>
         <ability>
             <displayName>Exceptional Immune System (ATOW:Companion)</displayName>
@@ -2259,6 +2428,563 @@
             </skillPrereq>
         </ability>
         <ability>
+            <displayName>Functional Tail and Mobile Ears (ATOW:Companion)</displayName>
+            <lookupName>mutation_cat_girl</lookupName>
+            <desc>Decreases Charisma Attribute by 3 (may not take it below 1).
+
+                The Target Number of all Perception checks decreased by 1 due to improved hearing.
+            </desc>
+            <xpCost>-300</xpCost>
+            <weight>1</weight>
+            <prereqAbilities></prereqAbilities>
+            <invalidAbilities>mutation_cat_girl_unofficial</invalidAbilities>
+            <removeAbilities></removeAbilities>
+            <choiceValues></choiceValues>
+        </ability>
+        <ability>
+            <displayName>Sandblaster (CamOps)</displayName>
+            <lookupName>sandblaster</lookupName>
+            <desc>A pilot with this ability gets a +4, +3, or +2 to the cluster table
+                at short, medium, or long/extended range, respectively, but only with a specialized weapon.
+            </desc>
+            <xpCost>100</xpCost>
+            <weight>3</weight>
+            <prereqAbilities></prereqAbilities>
+            <invalidAbilities>cluster_hitter::cluster_master</invalidAbilities>
+            <removeAbilities></removeAbilities>
+            <choiceValues></choiceValues>
+            <skillPrereq>
+                <skill>Gunnery/Mek::Regular</skill>
+                <skill>Gunnery/ProtoMek::Regular</skill>
+                <skill>Gunnery/Aircraft::Regular</skill>
+                <skill>Gunnery/Spacecraft::Regular</skill>
+                <skill>Gunnery/Aerospace::Regular</skill>
+                <skill>Gunnery/BattleArmor::Regular</skill>
+                <skill>Gunnery/Vehicle::Regular</skill>
+            </skillPrereq>
+        </ability>
+        <ability>
+            <displayName>Poor Vision (ATOW)</displayName>
+            <lookupName>flaw_poor_vision</lookupName>
+            <desc>The Target Number of all Perception checks is increased by 1.</desc>
+            <xpCost>-100</xpCost>
+            <weight>1</weight>
+            <prereqAbilities></prereqAbilities>
+            <invalidAbilities></invalidAbilities>
+            <removeAbilities>atow_good_vision</removeAbilities>
+            <choiceValues></choiceValues>
+        </ability>
+        <ability>
+            <displayName>Pain Resistance (MaxTech)</displayName>
+            <lookupName>pain_resistance</lookupName>
+            <desc>When making consciousness rolls,
+                1 is added to all rolls.
+                Also,
+                damage received from ammo explosions is reduced to 1.
+                Note: This ability is only used for BattleMeks.
+            </desc>
+            <xpCost>50</xpCost>
+            <weight>2</weight>
+            <prereqAbilities></prereqAbilities>
+            <invalidAbilities></invalidAbilities>
+            <removeAbilities></removeAbilities>
+            <choiceValues></choiceValues>
+        </ability>
+        <ability>
+            <displayName>Blind Fighter (Unofficial)</displayName>
+            <lookupName>blind_fighter</lookupName>
+            <desc>A pilot with this ability does not suffer the initial -1 to hit due to darkness.</desc>
+            <xpCost>100</xpCost>
+            <weight>2</weight>
+            <prereqAbilities></prereqAbilities>
+            <invalidAbilities></invalidAbilities>
+            <removeAbilities></removeAbilities>
+            <choiceValues></choiceValues>
+            <skillPrereq>
+                <skill>Gunnery/Mek::Regular</skill>
+                <skill>Gunnery/ProtoMek::Regular</skill>
+                <skill>Gunnery/Aircraft::Regular</skill>
+                <skill>Gunnery/BattleArmor::Regular</skill>
+                <skill>Gunnery/Aerospace::Regular</skill>
+                <skill>Gunnery/Vehicle::Regular</skill>
+            </skillPrereq>
+        </ability>
+        <ability>
+            <displayName>Exceptional Attribute - Reflexes (ATOW)</displayName>
+            <lookupName>exceptional_attribute_reflexes</lookupName>
+            <desc>Characters can only increase their Attributes up to a maximum determined by their Phenotype.
+
+                This SPA increases that maximum by 1, but does not increase the Attribute itself.
+            </desc>
+            <xpCost>200</xpCost>
+            <weight>1</weight>
+            <prereqAbilities></prereqAbilities>
+            <invalidAbilities></invalidAbilities>
+            <removeAbilities></removeAbilities>
+            <choiceValues></choiceValues>
+        </ability>
+        <ability>
+            <displayName>Mr/Ms Fix-it (Unofficial)</displayName>
+            <lookupName>tech_fixer</lookupName>
+            <desc>Ignore the first point of penalty for repair and maintenance on low quality equipment.</desc>
+            <xpCost>50</xpCost>
+            <weight>2</weight>
+            <prereqAbilities></prereqAbilities>
+            <invalidAbilities></invalidAbilities>
+            <removeAbilities></removeAbilities>
+            <choiceValues></choiceValues>
+            <skillPrereq>
+                <skill>Tech/Vessel::Regular</skill>
+                <skill>Tech/Aero::Regular</skill>
+                <skill>Tech/Mechanic::Regular</skill>
+                <skill>Tech/Mek::Regular</skill>
+                <skill>Tech/BattleArmor::Regular</skill>
+            </skillPrereq>
+        </ability>
+        <ability>
+            <displayName>Maintainer (Unofficial)</displayName>
+            <lookupName>tech_maintainer</lookupName>
+            <desc>The tech is slow and methodical at their work. They take a +1 penalty to their repair rolls, but are better at maintaining units than most, with a -1 bonus.</desc>
+            <xpCost>100</xpCost>
+            <weight>1</weight>
+            <prereqAbilities></prereqAbilities>
+            <invalidAbilities></invalidAbilities>
+            <removeAbilities></removeAbilities>
+            <choiceValues></choiceValues>
+            <skillPrereq>
+                <skill>Tech/Vessel::Regular</skill>
+                <skill>Tech/Aero::Regular</skill>
+                <skill>Tech/Mechanic::Regular</skill>
+                <skill>Tech/Mek::Regular</skill>
+                <skill>Tech/BattleArmor::Regular</skill>
+            </skillPrereq>
+        </ability>
+        <ability>
+            <displayName>Engineer (Unofficial)</displayName>
+            <lookupName>tech_engineer</lookupName>
+            <desc>-2 on refit rolls.</desc>
+            <xpCost>100</xpCost>
+            <weight>2</weight>
+            <prereqAbilities></prereqAbilities>
+            <invalidAbilities></invalidAbilities>
+            <removeAbilities></removeAbilities>
+            <choiceValues></choiceValues>
+            <skillPrereq>
+                <skill>Tech/Vessel::Veteran</skill>
+                <skill>Tech/Aero::Veteran</skill>
+                <skill>Tech/Mechanic::Veteran</skill>
+                <skill>Tech/Mek::Veteran</skill>
+                <skill>Tech/BattleArmor::Veteran</skill>
+            </skillPrereq>
+        </ability>
+        <ability>
+            <displayName>Tactical Genius (CamOps)</displayName>
+            <lookupName>tactical_genius</lookupName>
+            <desc>A pilot who has a Tactical Genius may reroll their initiative once per turn.
+                The second roll must be accepted.
+                Note: Only one Tactical Genius may be utilized per team.
+            </desc>
+            <xpCost>150</xpCost>
+            <weight>1</weight>
+            <prereqAbilities></prereqAbilities>
+            <invalidAbilities></invalidAbilities>
+            <removeAbilities></removeAbilities>
+            <choiceValues></choiceValues>
+            <skillPrereq>
+                <skill>Piloting/Aircraft::Veteran</skill>
+                <skill>Gunnery/Mek::Veteran</skill>
+                <skill>Gunnery/Spacecraft::Veteran</skill>
+                <skill>Piloting/Spacecraft::Veteran</skill>
+                <skill>Piloting/Mek::Veteran</skill>
+                <skill>Piloting/VTOL::Veteran</skill>
+                <skill>Piloting/Naval::Veteran</skill>
+                <skill>Gunnery/BattleArmor::Veteran</skill>
+                <skill>Gunnery/Aerospace::Veteran</skill>
+                <skill>Piloting/Aerospace::Veteran</skill>
+                <skill>Gunnery/ProtoMek::Veteran</skill>
+                <skill>Anti-Mek::Veteran</skill>
+                <skill>Piloting/Ground Vehicle::Veteran</skill>
+                <skill>Gunnery/Aircraft::Veteran</skill>
+                <skill>Gunnery/Vehicle::Veteran</skill>
+            </skillPrereq>
+        </ability>
+        <ability>
+            <displayName>Sensor Geek (Unofficial)</displayName>
+            <lookupName>sensor_geek</lookupName>
+            <desc>A pilot with this ability gets a -2 bonus on sensor checks.
+                Note that this is really only a bonus, if inclusive sensor ranges are in use.
+            </desc>
+            <xpCost>100</xpCost>
+            <weight>2</weight>
+            <prereqAbilities></prereqAbilities>
+            <invalidAbilities></invalidAbilities>
+            <removeAbilities></removeAbilities>
+            <choiceValues></choiceValues>
+            <skillPrereq>
+                <skill>Piloting/Aerospace::Green</skill>
+                <skill>Piloting/Naval::Green</skill>
+                <skill>Piloting/Ground Vehicle::Green</skill>
+                <skill>Gunnery/ProtoMek::Green</skill>
+                <skill>Gunnery/BattleArmor::Green</skill>
+                <skill>Piloting/VTOL::Green</skill>
+                <skill>Piloting/Aircraft::Green</skill>
+                <skill>Piloting/Mek::Green</skill>
+            </skillPrereq>
+        </ability>
+        <ability>
+            <displayName>Exceptional Attribute - Dexterity (ATOW)</displayName>
+            <lookupName>exceptional_attribute_dexterity</lookupName>
+            <desc>Characters can only increase their Attributes up to a maximum determined by their Phenotype.
+
+                This SPA increases that maximum by 1, but does not increase the Attribute itself.
+            </desc>
+            <xpCost>200</xpCost>
+            <weight>1</weight>
+            <prereqAbilities></prereqAbilities>
+            <invalidAbilities></invalidAbilities>
+            <removeAbilities></removeAbilities>
+            <choiceValues></choiceValues>
+        </ability>
+        <ability>
+            <displayName>Unattractive (ATOW)</displayName>
+            <lookupName>flaw_unattractive</lookupName>
+            <desc>Increases the target number of all Charisma-based skills by 2.</desc>
+            <xpCost>-200</xpCost>
+            <weight>1</weight>
+            <prereqAbilities></prereqAbilities>
+            <invalidAbilities></invalidAbilities>
+            <removeAbilities>atow_attractive</removeAbilities>
+            <choiceValues></choiceValues>
+        </ability>
+        <ability>
+            <displayName>Unfit (Unofficial)</displayName>
+            <lookupName>flaw_unfit</lookupName>
+            <desc>Doubles all Fatigue gain.</desc>
+            <xpCost>-200</xpCost>
+            <weight>1</weight>
+            <prereqAbilities></prereqAbilities>
+            <invalidAbilities></invalidAbilities>
+            <removeAbilities>atow_fit</removeAbilities>
+            <choiceValues></choiceValues>
+        </ability>
+        <ability>
+            <displayName>Ambidextrous (ATOW)</displayName>
+            <lookupName>atow_ambidextrous</lookupName>
+            <desc>Removes the penalties from a single missing arm or hand (Advanced Medical only).</desc>
+            <xpCost>200</xpCost>
+            <weight>1</weight>
+            <prereqAbilities></prereqAbilities>
+            <invalidAbilities></invalidAbilities>
+            <removeAbilities></removeAbilities>
+            <choiceValues></choiceValues>
+        </ability>
+        <ability>
+            <displayName>Golden Goose (CamOps)</displayName>
+            <lookupName>golden_goose</lookupName>
+            <desc>Ground attacks are easier. Strike gives -1 BTH and Bombing is -2. Also decreases scatter distance by 2 hexes</desc>
+            <xpCost>100</xpCost>
+            <weight>3</weight>
+            <prereqAbilities></prereqAbilities>
+            <invalidAbilities></invalidAbilities>
+            <removeAbilities></removeAbilities>
+            <choiceValues></choiceValues>
+            <skillPrereq>
+                <skill>Piloting/Aerospace::Veteran</skill>
+                <skill>Piloting/Spacecraft::Veteran</skill>
+                <skill>Piloting/VTOL::Veteran</skill>
+                <skill>Piloting/Aircraft::Veteran</skill>
+            </skillPrereq>
+        </ability>
+        <ability>
+            <displayName>Jumping Jack (CamOps)</displayName>
+            <lookupName>jumping_jack</lookupName>
+            <desc>Unit only suffers a +1 to-hit penalty for jumping, rather than a +3 to-hit penalty.</desc>
+            <xpCost>150</xpCost>
+            <weight>6</weight>
+            <prereqAbilities></prereqAbilities>
+            <invalidAbilities></invalidAbilities>
+            <removeAbilities></removeAbilities>
+            <choiceValues></choiceValues>
+            <skillPrereq>
+                <skill>Gunnery/ProtoMek::Regular</skill>
+                <skill>Piloting/Mek::Regular</skill>
+            </skillPrereq>
+        </ability>
+        <ability>
+            <displayName>Tech Specialist, Internal (Unofficial)</displayName>
+            <lookupName>tech_internal_specialist</lookupName>
+            <desc>-1 to repair and maintenance checks when working with internal systems</desc>
+            <xpCost>100</xpCost>
+            <weight>2</weight>
+            <prereqAbilities></prereqAbilities>
+            <invalidAbilities></invalidAbilities>
+            <removeAbilities></removeAbilities>
+            <choiceValues></choiceValues>
+            <skillPrereq>
+                <skill>Tech/Vessel::Regular</skill>
+                <skill>Tech/Aero::Regular</skill>
+                <skill>Tech/Mechanic::Regular</skill>
+                <skill>Tech/Mek::Regular</skill>
+                <skill>Tech/BattleArmor::Regular</skill>
+            </skillPrereq>
+        </ability>
+        <ability>
+            <displayName>Dodge (MaxTech)</displayName>
+            <lookupName>dodge_maneuver</lookupName>
+            <desc>Enables the unit to make a dodge maneuver instead of a physical attack.
+                This maneuver adds +2 to the BTH to physical attacks against the unit.
+                NOTE: The dodge maneuver is declared during the weapons phase.
+                Note: This ability is only used for BattleMeks.
+            </desc>
+            <xpCost>100</xpCost>
+            <weight>1</weight>
+            <prereqAbilities></prereqAbilities>
+            <invalidAbilities></invalidAbilities>
+            <removeAbilities></removeAbilities>
+            <choiceValues></choiceValues>
+            <skillPrereq>
+                <skill>Gunnery/ProtoMek::Regular</skill>
+                <skill>Piloting/Mek::Regular</skill>
+            </skillPrereq>
+        </ability>
+        <ability>
+            <displayName>Good Hearing (ATOW)</displayName>
+            <lookupName>atow_good_hearing</lookupName>
+            <desc>The Target Number of all Perception checks is decreased by 1.</desc>
+            <xpCost>100</xpCost>
+            <weight>1</weight>
+            <prereqAbilities></prereqAbilities>
+            <invalidAbilities></invalidAbilities>
+            <removeAbilities>flaw_poor_hearing</removeAbilities>
+            <choiceValues></choiceValues>
+        </ability>
+        <ability>
+            <displayName>Sniper (CamOps)</displayName>
+            <lookupName>sniper</lookupName>
+            <desc>Range penalties are halved.</desc>
+            <xpCost>150</xpCost>
+            <weight>1</weight>
+            <prereqAbilities></prereqAbilities>
+            <invalidAbilities></invalidAbilities>
+            <removeAbilities></removeAbilities>
+            <choiceValues></choiceValues>
+            <skillPrereq>
+                <skill>Gunnery/Mek::Veteran</skill>
+                <skill>Gunnery/ProtoMek::Veteran</skill>
+                <skill>Gunnery/Aircraft::Veteran</skill>
+                <skill>Gunnery/Aerospace::Veteran</skill>
+                <skill>Gunnery/Spacecraft::Veteran</skill>
+                <skill>Gunnery/BattleArmor::Veteran</skill>
+                <skill>Gunnery/Vehicle::Veteran</skill>
+            </skillPrereq>
+        </ability>
+        <ability>
+            <displayName>Functional Tail and Mobile Ears (Unofficial)</displayName>
+            <lookupName>mutation_cat_girl_unofficial</lookupName>
+            <desc>Increases Charisma Attribute by 1 (may not take it above 10).
+
+                The Target Number of all Perception checks decreased by 1 due to improved hearing.
+            </desc>
+            <xpCost>200</xpCost>
+            <weight>1</weight>
+            <prereqAbilities></prereqAbilities>
+            <invalidAbilities>mutation_cat_girl</invalidAbilities>
+            <removeAbilities></removeAbilities>
+            <choiceValues></choiceValues>
+        </ability>
+        <ability>
+            <displayName>Exceptional Attribute - Strength (ATOW)</displayName>
+            <lookupName>exceptional_attribute_strength</lookupName>
+            <desc>Characters can only increase their Attributes up to a maximum determined by their Phenotype.
+
+                This SPA increases that maximum by 1, but does not increase the Attribute itself.
+            </desc>
+            <xpCost>200</xpCost>
+            <weight>1</weight>
+            <prereqAbilities></prereqAbilities>
+            <invalidAbilities></invalidAbilities>
+            <removeAbilities></removeAbilities>
+            <choiceValues></choiceValues>
+        </ability>
+        <ability>
+            <displayName>Gunnery/Ballistic (Unofficial)</displayName>
+            <lookupName>gunnery_ballistic</lookupName>
+            <desc>Pilot gets a -1 to-hit bonus on all ballistic weapons (MGs,
+                all ACs,
+                Gauss rifles).
+            </desc>
+            <xpCost>100</xpCost>
+            <weight>1</weight>
+            <prereqAbilities></prereqAbilities>
+            <invalidAbilities>weapon_specialist::specialist</invalidAbilities>
+            <removeAbilities></removeAbilities>
+            <choiceValues></choiceValues>
+            <skillPrereq>
+                <skill>Gunnery/Mek::Green</skill>
+                <skill>Gunnery/ProtoMek::Green</skill>
+                <skill>Gunnery/Aircraft::Green</skill>
+                <skill>Gunnery/Aerospace::Green</skill>
+                <skill>Gunnery/Spacecraft::Green</skill>
+                <skill>Gunnery/BattleArmor::Green</skill>
+                <skill>Gunnery/Vehicle::Green</skill>
+            </skillPrereq>
+        </ability>
+        <ability>
+            <displayName>Natural Aptitude, Gunnery (aToW)</displayName>
+            <lookupName>aptitude_gunnery</lookupName>
+            <desc>Roll 3d6 and take the best two for gunnery checks</desc>
+            <xpCost>500</xpCost>
+            <weight>1</weight>
+            <prereqAbilities></prereqAbilities>
+            <invalidAbilities></invalidAbilities>
+            <removeAbilities></removeAbilities>
+            <choiceValues></choiceValues>
+            <skillPrereq>
+                <skill>Gunnery/Mek::Veteran</skill>
+                <skill>Gunnery/ProtoMek::Veteran</skill>
+                <skill>Gunnery/Aircraft::Veteran</skill>
+                <skill>Gunnery/Aerospace::Veteran</skill>
+                <skill>Gunnery/Spacecraft::Veteran</skill>
+                <skill>Gunnery/BattleArmor::Veteran</skill>
+                <skill>Gunnery/Vehicle::Veteran</skill>
+            </skillPrereq>
+        </ability>
+        <ability>
+            <displayName>Tech Specialist, Armor (Unofficial)</displayName>
+            <lookupName>tech_armor_specialist</lookupName>
+            <desc>-1 to repair and maintenance checks when working with armor.</desc>
+            <xpCost>50</xpCost>
+            <weight>2</weight>
+            <prereqAbilities></prereqAbilities>
+            <invalidAbilities></invalidAbilities>
+            <removeAbilities></removeAbilities>
+            <choiceValues></choiceValues>
+            <skillPrereq>
+                <skill>Tech/Vessel::Regular</skill>
+                <skill>Tech/Aero::Regular</skill>
+                <skill>Tech/Mechanic::Regular</skill>
+                <skill>Tech/Mek::Regular</skill>
+                <skill>Tech/BattleArmor::Regular</skill>
+            </skillPrereq>
+        </ability>
+        <ability>
+            <displayName>All Weather (Unofficial)</displayName>
+            <lookupName>allweather</lookupName>
+            <desc>A pilot with this ability does not suffer the PSR penalties due to weather.</desc>
+            <xpCost>100</xpCost>
+            <weight>2</weight>
+            <prereqAbilities></prereqAbilities>
+            <invalidAbilities></invalidAbilities>
+            <removeAbilities></removeAbilities>
+            <choiceValues></choiceValues>
+            <skillPrereq>
+                <skill>Piloting/Aerospace::Regular</skill>
+                <skill>Piloting/Naval::Regular</skill>
+                <skill>Piloting/Ground Vehicle::Regular</skill>
+                <skill>Gunnery/ProtoMek::Regular</skill>
+                <skill>Piloting/VTOL::Regular</skill>
+                <skill>Piloting/Aircraft::Regular</skill>
+                <skill>Piloting/Mek::Regular</skill>
+            </skillPrereq>
+        </ability>
+        <ability>
+            <displayName>Melee Specialist (CamOps)</displayName>
+            <lookupName>melee_specialist</lookupName>
+            <desc>Enables the unit to do 1 additional point of damage with physical attacks and applies a -1 to-hit modifier to physical attacks.
+                Note: This ability is only used for BattleMeks.
+            </desc>
+            <xpCost>100</xpCost>
+            <weight>3</weight>
+            <prereqAbilities></prereqAbilities>
+            <invalidAbilities></invalidAbilities>
+            <removeAbilities></removeAbilities>
+            <choiceValues></choiceValues>
+            <skillPrereq>
+                <skill>Gunnery/ProtoMek::Regular</skill>
+                <skill>Piloting/Mek::Regular</skill>
+            </skillPrereq>
+        </ability>
+        <ability>
+            <displayName>Oblique Attacker (CamOps)</displayName>
+            <lookupName>oblique_attacker</lookupName>
+            <desc>The penalty for indirect fire is reduced by one and can also use indirect fire with out a spotter.</desc>
+            <xpCost>100</xpCost>
+            <weight>3</weight>
+            <prereqAbilities></prereqAbilities>
+            <invalidAbilities>oblique_attacker::sandblaster</invalidAbilities>
+            <removeAbilities></removeAbilities>
+            <choiceValues></choiceValues>
+            <skillPrereq>
+                <skill>Gunnery/Mek::Regular</skill>
+                <skill>Gunnery/ProtoMek::Regular</skill>
+                <skill>Gunnery/Aircraft::Regular</skill>
+                <skill>Gunnery/Spacecraft::Regular</skill>
+                <skill>Gunnery/Aerospace::Regular</skill>
+                <skill>Gunnery/BattleArmor::Regular</skill>
+                <skill>Gunnery/Vehicle::Regular</skill>
+            </skillPrereq>
+        </ability>
+        <ability>
+            <displayName>Gunnery Specialization (aToW)</displayName>
+            <lookupName>specialist</lookupName>
+            <desc>A pilot who specializes in a type of weapon receives a -1 to-hit modifier when using weapons of that type and a
+                +1 to-hit modifier when using other types of weapons.
+            </desc>
+            <xpCost>50</xpCost>
+            <weight>4</weight>
+            <prereqAbilities></prereqAbilities>
+            <invalidAbilities>weapon_specialist</invalidAbilities>
+            <removeAbilities></removeAbilities>
+            <choiceValues></choiceValues>
+            <skillPrereq>
+                <skill>Gunnery/Mek::Green</skill>
+                <skill>Gunnery/ProtoMek::Green</skill>
+                <skill>Gunnery/Aircraft::Green</skill>
+                <skill>Gunnery/Aerospace::Green</skill>
+                <skill>Gunnery/Spacecraft::Green</skill>
+                <skill>Gunnery/BattleArmor::Green</skill>
+                <skill>Gunnery/Vehicle::Green</skill>
+            </skillPrereq>
+        </ability>
+        <ability>
+            <displayName>Gunnery/Missile (Unofficial)</displayName>
+            <lookupName>gunnery_missile</lookupName>
+            <desc>Pilot gets a -1 to-hit bonus on all missile weapons (LRM,
+                SRM,
+                MRM,
+                RL and ATM).
+            </desc>
+            <xpCost>100</xpCost>
+            <weight>1</weight>
+            <prereqAbilities></prereqAbilities>
+            <invalidAbilities>weapon_specialist::specialist</invalidAbilities>
+            <removeAbilities></removeAbilities>
+            <choiceValues></choiceValues>
+            <skillPrereq>
+                <skill>Gunnery/Mek::Green</skill>
+                <skill>Gunnery/ProtoMek::Green</skill>
+                <skill>Gunnery/Aircraft::Green</skill>
+                <skill>Gunnery/Aerospace::Green</skill>
+                <skill>Gunnery/Spacecraft::Green</skill>
+                <skill>Gunnery/BattleArmor::Green</skill>
+                <skill>Gunnery/Vehicle::Green</skill>
+            </skillPrereq>
+        </ability>
+        <ability>
+            <displayName>Gremlins (ATOW)</displayName>
+            <lookupName>flaw_gremlins</lookupName>
+            <desc>The cost of purchasing and improving the Tech/Any, Computers, Communications, or Security Systems/Electronic skills is increased by 10% (rounded normally).
+
+                Furthermore, the Target Number of checks made with such skills is increased by 1.
+            </desc>
+            <xpCost>-300</xpCost>
+            <weight>1</weight>
+            <prereqAbilities></prereqAbilities>
+            <invalidAbilities></invalidAbilities>
+            <removeAbilities>atow_tech_empathy</removeAbilities>
+            <choiceValues></choiceValues>
+        </ability>
+        <ability>
             <displayName>Hopping Jack (Unofficial)</displayName>
             <lookupName>hopping_jack</lookupName>
             <desc>Unit only suffers a +2 to-hit penalty for jumping, rather than a +3 to-hit penalty.</desc>
@@ -2302,20 +3028,6 @@
                 <skill>Gunnery/ProtoMek::Regular</skill>
                 <skill>Piloting/Mek::Regular</skill>
             </skillPrereq>
-        </ability>
-        <ability>
-            <displayName>Functional Tail and Mobile Ears (ATOW:Companion)</displayName>
-            <lookupName>mutation_cat_girl</lookupName>
-            <desc>Decreases Charisma Attribute by 3 (may not take it below 1).
-
-                The Target Number of all Perception checks decreased by 1 due to improved hearing.
-            </desc>
-            <xpCost>-300</xpCost>
-            <weight>1</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities>mutation_cat_girl_unofficial</invalidAbilities>
-            <removeAbilities></removeAbilities>
-            <choiceValues></choiceValues>
         </ability>
         <ability>
             <displayName>Cross-Country (CamOps)</displayName>
@@ -2369,9 +3081,9 @@
                 <skill>Gunnery/Mek::Green</skill>
                 <skill>Gunnery/ProtoMek::Green</skill>
                 <skill>Gunnery/Aircraft::Green</skill>
-                <skill>Gunnery/BattleArmor::Green</skill>
-                <skill>Gunnery/Spacecraft::Green</skill>
                 <skill>Gunnery/Aerospace::Green</skill>
+                <skill>Gunnery/Spacecraft::Green</skill>
+                <skill>Gunnery/BattleArmor::Green</skill>
                 <skill>Gunnery/Vehicle::Green</skill>
             </skillPrereq>
         </ability>
@@ -2389,32 +3101,10 @@
                 <skill>Gunnery/Mek::Veteran</skill>
                 <skill>Gunnery/ProtoMek::Veteran</skill>
                 <skill>Gunnery/Aircraft::Veteran</skill>
-                <skill>Gunnery/Aerospace::Veteran</skill>
-                <skill>Gunnery/Spacecraft::Veteran</skill>
                 <skill>Gunnery/BattleArmor::Veteran</skill>
+                <skill>Gunnery/Spacecraft::Veteran</skill>
+                <skill>Gunnery/Aerospace::Veteran</skill>
                 <skill>Gunnery/Vehicle::Veteran</skill>
-            </skillPrereq>
-        </ability>
-        <ability>
-            <displayName>Sandblaster (CamOps)</displayName>
-            <lookupName>sandblaster</lookupName>
-            <desc>A pilot with this ability gets a +4, +3, or +2 to the cluster table
-                at short, medium, or long/extended range, respectively, but only with a specialized weapon.
-            </desc>
-            <xpCost>100</xpCost>
-            <weight>3</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities>cluster_hitter::cluster_master</invalidAbilities>
-            <removeAbilities></removeAbilities>
-            <choiceValues></choiceValues>
-            <skillPrereq>
-                <skill>Gunnery/Mek::Regular</skill>
-                <skill>Gunnery/ProtoMek::Regular</skill>
-                <skill>Gunnery/Aircraft::Regular</skill>
-                <skill>Gunnery/BattleArmor::Regular</skill>
-                <skill>Gunnery/Aerospace::Regular</skill>
-                <skill>Gunnery/Spacecraft::Regular</skill>
-                <skill>Gunnery/Vehicle::Regular</skill>
             </skillPrereq>
         </ability>
         <ability>
@@ -2431,9 +3121,9 @@
                 <skill>Gunnery/Mek::Regular</skill>
                 <skill>Gunnery/ProtoMek::Regular</skill>
                 <skill>Gunnery/Aircraft::Regular</skill>
-                <skill>Gunnery/BattleArmor::Regular</skill>
-                <skill>Gunnery/Aerospace::Regular</skill>
                 <skill>Gunnery/Spacecraft::Regular</skill>
+                <skill>Gunnery/Aerospace::Regular</skill>
+                <skill>Gunnery/BattleArmor::Regular</skill>
                 <skill>Gunnery/Vehicle::Regular</skill>
             </skillPrereq>
         </ability>
@@ -2467,17 +3157,6 @@
             </skillPrereq>
         </ability>
         <ability>
-            <displayName>Poor Vision (ATOW)</displayName>
-            <lookupName>flaw_poor_vision</lookupName>
-            <desc>The Target Number of all Perception checks is increased by 1.</desc>
-            <xpCost>-100</xpCost>
-            <weight>1</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities>atow_good_vision</removeAbilities>
-            <choiceValues></choiceValues>
-        </ability>
-        <ability>
             <displayName>Environmental Specialist (CamOps)</displayName>
             <lookupName>env_specialist</lookupName>
             <desc>Environmental specialists are adept in certain planetary conditions.
@@ -2497,31 +3176,15 @@
                 <skill>Piloting/Mek::Regular</skill>
                 <skill>Piloting/VTOL::Regular</skill>
                 <skill>Piloting/Naval::Regular</skill>
-                <skill>Piloting/Aerospace::Regular</skill>
-                <skill>Gunnery/Aerospace::Regular</skill>
                 <skill>Gunnery/BattleArmor::Regular</skill>
-                <skill>Anti-Mek::Regular</skill>
+                <skill>Gunnery/Aerospace::Regular</skill>
+                <skill>Piloting/Aerospace::Regular</skill>
                 <skill>Gunnery/ProtoMek::Regular</skill>
+                <skill>Anti-Mek::Regular</skill>
                 <skill>Piloting/Ground Vehicle::Regular</skill>
                 <skill>Gunnery/Aircraft::Regular</skill>
                 <skill>Gunnery/Vehicle::Regular</skill>
             </skillPrereq>
-        </ability>
-        <ability>
-            <displayName>Pain Resistance (MaxTech)</displayName>
-            <lookupName>pain_resistance</lookupName>
-            <desc>When making consciousness rolls,
-                1 is added to all rolls.
-                Also,
-                damage received from ammo explosions is reduced to 1.
-                Note: This ability is only used for BattleMeks.
-            </desc>
-            <xpCost>50</xpCost>
-            <weight>2</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities></removeAbilities>
-            <choiceValues></choiceValues>
         </ability>
         <ability>
             <displayName>Serious Disfigurement (ATOW:Companion)</displayName>
@@ -2551,63 +3214,12 @@
             <skillPrereq>
                 <skill>Piloting/Aerospace::Regular</skill>
                 <skill>Piloting/Naval::Regular</skill>
-                <skill>Piloting/Ground Vehicle::Regular</skill>
                 <skill>Gunnery/ProtoMek::Regular</skill>
+                <skill>Piloting/Ground Vehicle::Regular</skill>
                 <skill>Piloting/Spacecraft::Regular</skill>
                 <skill>Piloting/VTOL::Regular</skill>
                 <skill>Piloting/Aircraft::Regular</skill>
                 <skill>Piloting/Mek::Regular</skill>
-            </skillPrereq>
-        </ability>
-        <ability>
-            <displayName>Blind Fighter (Unofficial)</displayName>
-            <lookupName>blind_fighter</lookupName>
-            <desc>A pilot with this ability does not suffer the initial -1 to hit due to darkness.</desc>
-            <xpCost>100</xpCost>
-            <weight>2</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities></removeAbilities>
-            <choiceValues></choiceValues>
-            <skillPrereq>
-                <skill>Gunnery/Mek::Regular</skill>
-                <skill>Gunnery/ProtoMek::Regular</skill>
-                <skill>Gunnery/Aircraft::Regular</skill>
-                <skill>Gunnery/Aerospace::Regular</skill>
-                <skill>Gunnery/BattleArmor::Regular</skill>
-                <skill>Gunnery/Vehicle::Regular</skill>
-            </skillPrereq>
-        </ability>
-        <ability>
-            <displayName>Exceptional Attribute - Reflexes (ATOW)</displayName>
-            <lookupName>exceptional_attribute_reflexes</lookupName>
-            <desc>Characters can only increase their Attributes up to a maximum determined by their Phenotype.
-
-                This SPA increases that maximum by 1, but does not increase the Attribute itself.
-            </desc>
-            <xpCost>200</xpCost>
-            <weight>1</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities></removeAbilities>
-            <choiceValues></choiceValues>
-        </ability>
-        <ability>
-            <displayName>Mr/Ms Fix-it (Unofficial)</displayName>
-            <lookupName>tech_fixer</lookupName>
-            <desc>Ignore the first point of penalty for repair and maintenance on low quality equipment.</desc>
-            <xpCost>50</xpCost>
-            <weight>2</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities></removeAbilities>
-            <choiceValues></choiceValues>
-            <skillPrereq>
-                <skill>Tech/Vessel::Regular</skill>
-                <skill>Tech/Aero::Regular</skill>
-                <skill>Tech/Mek::Regular</skill>
-                <skill>Tech/Mechanic::Regular</skill>
-                <skill>Tech/BattleArmor::Regular</skill>
             </skillPrereq>
         </ability>
         <ability>
@@ -2624,9 +3236,9 @@
                 <skill>Gunnery/Mek::Regular</skill>
                 <skill>Gunnery/ProtoMek::Regular</skill>
                 <skill>Gunnery/Aircraft::Regular</skill>
-                <skill>Gunnery/BattleArmor::Regular</skill>
-                <skill>Gunnery/Spacecraft::Regular</skill>
                 <skill>Gunnery/Aerospace::Regular</skill>
+                <skill>Gunnery/Spacecraft::Regular</skill>
+                <skill>Gunnery/BattleArmor::Regular</skill>
                 <skill>Gunnery/Vehicle::Regular</skill>
                 <skill>Artillery::Regular</skill>
             </skillPrereq>
@@ -2660,32 +3272,14 @@
                 <skill>Piloting/Mek::Regular</skill>
                 <skill>Piloting/VTOL::Regular</skill>
                 <skill>Piloting/Naval::Regular</skill>
-                <skill>Piloting/Aerospace::Regular</skill>
-                <skill>Gunnery/Aerospace::Regular</skill>
                 <skill>Gunnery/BattleArmor::Regular</skill>
-                <skill>Anti-Mek::Regular</skill>
+                <skill>Gunnery/Aerospace::Regular</skill>
+                <skill>Piloting/Aerospace::Regular</skill>
                 <skill>Gunnery/ProtoMek::Regular</skill>
+                <skill>Anti-Mek::Regular</skill>
                 <skill>Piloting/Ground Vehicle::Regular</skill>
                 <skill>Gunnery/Aircraft::Regular</skill>
                 <skill>Gunnery/Vehicle::Regular</skill>
-            </skillPrereq>
-        </ability>
-        <ability>
-            <displayName>Maintainer (Unofficial)</displayName>
-            <lookupName>tech_maintainer</lookupName>
-            <desc>The tech is slow and methodical at their work. They take a +1 penalty to their repair rolls, but are better at maintaining units than most, with a -1 bonus.</desc>
-            <xpCost>100</xpCost>
-            <weight>1</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities></removeAbilities>
-            <choiceValues></choiceValues>
-            <skillPrereq>
-                <skill>Tech/Vessel::Regular</skill>
-                <skill>Tech/Aero::Regular</skill>
-                <skill>Tech/Mek::Regular</skill>
-                <skill>Tech/Mechanic::Regular</skill>
-                <skill>Tech/BattleArmor::Regular</skill>
             </skillPrereq>
         </ability>
         <ability>
@@ -2703,8 +3297,8 @@
             <choiceValues></choiceValues>
             <skillPrereq>
                 <skill>Anti-Mek::Veteran</skill>
-                <skill>Piloting/Ground Vehicle::Veteran</skill>
                 <skill>Gunnery/ProtoMek::Veteran</skill>
+                <skill>Piloting/Ground Vehicle::Veteran</skill>
                 <skill>Piloting/Mek::Veteran</skill>
             </skillPrereq>
         </ability>
@@ -2720,24 +3314,6 @@
             <choiceValues></choiceValues>
         </ability>
         <ability>
-            <displayName>Engineer (Unofficial)</displayName>
-            <lookupName>tech_engineer</lookupName>
-            <desc>-2 on refit rolls.</desc>
-            <xpCost>100</xpCost>
-            <weight>2</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities></removeAbilities>
-            <choiceValues></choiceValues>
-            <skillPrereq>
-                <skill>Tech/Vessel::Veteran</skill>
-                <skill>Tech/Aero::Veteran</skill>
-                <skill>Tech/Mek::Veteran</skill>
-                <skill>Tech/Mechanic::Veteran</skill>
-                <skill>Tech/BattleArmor::Veteran</skill>
-            </skillPrereq>
-        </ability>
-        <ability>
             <displayName>Tech Specialist, Weapon (Unofficial)</displayName>
             <lookupName>tech_weapon_specialist</lookupName>
             <desc>-1 to repair and maintenance checks when working with weapons.</desc>
@@ -2750,8 +3326,8 @@
             <skillPrereq>
                 <skill>Tech/Vessel::Regular</skill>
                 <skill>Tech/Aero::Regular</skill>
-                <skill>Tech/Mek::Regular</skill>
                 <skill>Tech/Mechanic::Regular</skill>
+                <skill>Tech/Mek::Regular</skill>
                 <skill>Tech/BattleArmor::Regular</skill>
             </skillPrereq>
         </ability>
@@ -2798,11 +3374,11 @@
                 <skill>Piloting/Mek::Regular</skill>
                 <skill>Piloting/VTOL::Regular</skill>
                 <skill>Piloting/Naval::Regular</skill>
-                <skill>Piloting/Aerospace::Regular</skill>
-                <skill>Gunnery/Aerospace::Regular</skill>
                 <skill>Gunnery/BattleArmor::Regular</skill>
-                <skill>Anti-Mek::Regular</skill>
+                <skill>Gunnery/Aerospace::Regular</skill>
+                <skill>Piloting/Aerospace::Regular</skill>
                 <skill>Gunnery/ProtoMek::Regular</skill>
+                <skill>Anti-Mek::Regular</skill>
                 <skill>Piloting/Ground Vehicle::Regular</skill>
                 <skill>Gunnery/Aircraft::Regular</skill>
                 <skill>Gunnery/Vehicle::Regular</skill>
@@ -2826,11 +3402,11 @@
                 <skill>Piloting/Mek::Regular</skill>
                 <skill>Piloting/VTOL::Regular</skill>
                 <skill>Piloting/Naval::Regular</skill>
-                <skill>Piloting/Aerospace::Regular</skill>
-                <skill>Gunnery/Aerospace::Regular</skill>
                 <skill>Gunnery/BattleArmor::Regular</skill>
-                <skill>Anti-Mek::Regular</skill>
+                <skill>Gunnery/Aerospace::Regular</skill>
+                <skill>Piloting/Aerospace::Regular</skill>
                 <skill>Gunnery/ProtoMek::Regular</skill>
+                <skill>Anti-Mek::Regular</skill>
                 <skill>Piloting/Ground Vehicle::Regular</skill>
                 <skill>Gunnery/Aircraft::Regular</skill>
                 <skill>Gunnery/Vehicle::Regular</skill>
@@ -2859,60 +3435,6 @@
             <choiceValues></choiceValues>
         </ability>
         <ability>
-            <displayName>Tactical Genius (CamOps)</displayName>
-            <lookupName>tactical_genius</lookupName>
-            <desc>A pilot who has a Tactical Genius may reroll their initiative once per turn.
-                The second roll must be accepted.
-                Note: Only one Tactical Genius may be utilized per team.
-            </desc>
-            <xpCost>150</xpCost>
-            <weight>1</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities></removeAbilities>
-            <choiceValues></choiceValues>
-            <skillPrereq>
-                <skill>Piloting/Aircraft::Veteran</skill>
-                <skill>Gunnery/Mek::Veteran</skill>
-                <skill>Gunnery/Spacecraft::Veteran</skill>
-                <skill>Piloting/Spacecraft::Veteran</skill>
-                <skill>Piloting/Mek::Veteran</skill>
-                <skill>Piloting/VTOL::Veteran</skill>
-                <skill>Piloting/Naval::Veteran</skill>
-                <skill>Piloting/Aerospace::Veteran</skill>
-                <skill>Gunnery/Aerospace::Veteran</skill>
-                <skill>Gunnery/BattleArmor::Veteran</skill>
-                <skill>Anti-Mek::Veteran</skill>
-                <skill>Gunnery/ProtoMek::Veteran</skill>
-                <skill>Piloting/Ground Vehicle::Veteran</skill>
-                <skill>Gunnery/Aircraft::Veteran</skill>
-                <skill>Gunnery/Vehicle::Veteran</skill>
-            </skillPrereq>
-        </ability>
-        <ability>
-            <displayName>Sensor Geek (Unofficial)</displayName>
-            <lookupName>sensor_geek</lookupName>
-            <desc>A pilot with this ability gets a -2 bonus on sensor checks.
-                Note that this is really only a bonus, if inclusive sensor ranges are in use.
-            </desc>
-            <xpCost>100</xpCost>
-            <weight>2</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities></removeAbilities>
-            <choiceValues></choiceValues>
-            <skillPrereq>
-                <skill>Piloting/Aerospace::Green</skill>
-                <skill>Piloting/Naval::Green</skill>
-                <skill>Gunnery/ProtoMek::Green</skill>
-                <skill>Piloting/Ground Vehicle::Green</skill>
-                <skill>Piloting/VTOL::Green</skill>
-                <skill>Gunnery/BattleArmor::Green</skill>
-                <skill>Piloting/Aircraft::Green</skill>
-                <skill>Piloting/Mek::Green</skill>
-            </skillPrereq>
-        </ability>
-        <ability>
             <displayName>Fit (ATOW)</displayName>
             <lookupName>atow_fit</lookupName>
             <desc>Half all Fatigue gained (rounding down).</desc>
@@ -2928,20 +3450,6 @@
             <lookupName>iron_man</lookupName>
             <desc>A pilot with this skill receives only 1 pilot hit from ammunition explosions.</desc>
             <xpCost>100</xpCost>
-            <weight>1</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities></removeAbilities>
-            <choiceValues></choiceValues>
-        </ability>
-        <ability>
-            <displayName>Exceptional Attribute - Dexterity (ATOW)</displayName>
-            <lookupName>exceptional_attribute_dexterity</lookupName>
-            <desc>Characters can only increase their Attributes up to a maximum determined by their Phenotype.
-
-                This SPA increases that maximum by 1, but does not increase the Attribute itself.
-            </desc>
-            <xpCost>200</xpCost>
             <weight>1</weight>
             <prereqAbilities></prereqAbilities>
             <invalidAbilities></invalidAbilities>
@@ -2971,54 +3479,21 @@
                 <skill>Piloting/Mek::Veteran</skill>
                 <skill>Piloting/VTOL::Veteran</skill>
                 <skill>Piloting/Naval::Veteran</skill>
-                <skill>Piloting/Aerospace::Veteran</skill>
-                <skill>Gunnery/Aerospace::Veteran</skill>
                 <skill>Gunnery/BattleArmor::Veteran</skill>
-                <skill>Anti-Mek::Veteran</skill>
+                <skill>Gunnery/Aerospace::Veteran</skill>
+                <skill>Piloting/Aerospace::Veteran</skill>
                 <skill>Gunnery/ProtoMek::Veteran</skill>
+                <skill>Anti-Mek::Veteran</skill>
                 <skill>Piloting/Ground Vehicle::Veteran</skill>
                 <skill>Gunnery/Aircraft::Veteran</skill>
                 <skill>Gunnery/Vehicle::Veteran</skill>
             </skillPrereq>
         </ability>
         <ability>
-            <displayName>Unattractive (ATOW)</displayName>
-            <lookupName>flaw_unattractive</lookupName>
-            <desc>Increases the target number of all Charisma-based skills by 2.</desc>
-            <xpCost>-200</xpCost>
-            <weight>1</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities>atow_attractive</removeAbilities>
-            <choiceValues></choiceValues>
-        </ability>
-        <ability>
-            <displayName>Unfit (Unofficial)</displayName>
-            <lookupName>flaw_unfit</lookupName>
-            <desc>Doubles all Fatigue gain.</desc>
-            <xpCost>-200</xpCost>
-            <weight>1</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities>atow_fit</removeAbilities>
-            <choiceValues></choiceValues>
-        </ability>
-        <ability>
             <displayName>Sixth Sense (ATOW)</displayName>
             <lookupName>atow_sixth_sense</lookupName>
             <desc>The Target Number of all Perception checks are decreased by 3.</desc>
             <xpCost>400</xpCost>
-            <weight>1</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities></removeAbilities>
-            <choiceValues></choiceValues>
-        </ability>
-        <ability>
-            <displayName>Ambidextrous (ATOW)</displayName>
-            <lookupName>atow_ambidextrous</lookupName>
-            <desc>Removes the penalties from a single missing arm or hand (Advanced Medical only).</desc>
-            <xpCost>200</xpCost>
             <weight>1</weight>
             <prereqAbilities></prereqAbilities>
             <invalidAbilities></invalidAbilities>
@@ -3039,9 +3514,9 @@
                 <skill>Gunnery/Mek::Regular</skill>
                 <skill>Gunnery/ProtoMek::Regular</skill>
                 <skill>Gunnery/Aircraft::Regular</skill>
-                <skill>Gunnery/BattleArmor::Regular</skill>
-                <skill>Gunnery/Aerospace::Regular</skill>
                 <skill>Gunnery/Spacecraft::Regular</skill>
+                <skill>Gunnery/Aerospace::Regular</skill>
+                <skill>Gunnery/BattleArmor::Regular</skill>
                 <skill>Gunnery/Vehicle::Regular</skill>
             </skillPrereq>
         </ability>
@@ -3058,23 +3533,6 @@
             <skillPrereq>
                 <skill>Gunnery/Mek::Regular</skill>
                 <skill>Gunnery/Aerospace::Regular</skill>
-            </skillPrereq>
-        </ability>
-        <ability>
-            <displayName>Golden Goose (CamOps)</displayName>
-            <lookupName>golden_goose</lookupName>
-            <desc>Ground attacks are easier. Strike gives -1 BTH and Bombing is -2. Also decreases scatter distance by 2 hexes</desc>
-            <xpCost>100</xpCost>
-            <weight>3</weight>
-            <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
-            <removeAbilities></removeAbilities>
-            <choiceValues></choiceValues>
-            <skillPrereq>
-                <skill>Piloting/Aerospace::Veteran</skill>
-                <skill>Piloting/Spacecraft::Veteran</skill>
-                <skill>Piloting/VTOL::Veteran</skill>
-                <skill>Piloting/Aircraft::Veteran</skill>
             </skillPrereq>
         </ability>
         <ability>

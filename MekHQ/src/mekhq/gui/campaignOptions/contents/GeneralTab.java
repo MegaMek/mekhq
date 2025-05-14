@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.campaignOptions.contents;
 
@@ -31,6 +36,8 @@ import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.common.options.OptionsConstants.ALLOWED_YEAR;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createGroupLayout;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -38,7 +45,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.time.LocalDate;
-import java.util.ResourceBundle;
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 
@@ -85,9 +91,6 @@ import mekhq.gui.displayWrappers.FactionDisplay;
  * This class extends the user interface features provided by {@link AbstractMHQTabbedPane}.
  */
 public class GeneralTab {
-    private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
-    private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
-
     private final JFrame frame;
     private final Campaign campaign;
     private final CampaignOptions campaignOptions;
@@ -191,12 +194,13 @@ public class GeneralTab {
         // Campaign faction
         lblFaction = new CampaignOptionsLabel("Faction");
         comboFaction.setSelectedItem(new FactionDisplay(campaign.getFaction(), campaign.getLocalDate()));
-        comboFaction.setToolTipText(String.format("<html>%s</html>", resources.getString("lblFaction.tooltip")));
+        comboFaction.setToolTipText(String.format("<html>%s</html>",
+              getTextAt(getCampaignOptionsResourceBundle(), "lblFaction.tooltip")));
 
         // Reputation
         lblReputation = new CampaignOptionsLabel("Reputation");
         unitRatingMethodCombo.setToolTipText(String.format("<html>%s</html>",
-              resources.getString("lblReputation.tooltip")));
+              getTextAt(getCampaignOptionsResourceBundle(), "lblReputation.tooltip")));
         lblManualUnitRatingModifier = new CampaignOptionsLabel("ManualUnitRatingModifier");
         manualUnitRatingModifier = new CampaignOptionsSpinner("ManualUnitRatingModifier", 0, -1000, 1000, 1);
         chkResetCriminalRecord = new CampaignOptionsCheckBox("ResetCriminalRecord");
@@ -320,11 +324,13 @@ public class GeneralTab {
         imageIcon = scaleImageIcon(imageIcon, 200, true);
         JLabel imageLabel = new JLabel(imageIcon);
 
-        final JLabel lblHeader = new JLabel(resources.getString("lblGeneral.text"), SwingConstants.CENTER);
+        final JLabel lblHeader = new JLabel(getTextAt(getCampaignOptionsResourceBundle(), "lblGeneral.text"),
+              SwingConstants.CENTER);
         setFontScaling(lblHeader, true, 2);
         lblHeader.setName("lblGeneral");
 
-        JLabel lblBody = new JLabel(String.format("<html>%s</html>", resources.getString("lblGeneralBody.text")),
+        JLabel lblBody = new JLabel(String.format("<html>%s</html>",
+              getTextAt(getCampaignOptionsResourceBundle(), "lblGeneralBody.text")),
               SwingConstants.CENTER);
         lblBody.setName("lblGeneralHeaderBody");
 
@@ -491,11 +497,20 @@ public class GeneralTab {
      */
     private JPanel createFurtherReadingPanel() {
         // Contents
-        JPanel headerPanelBMM = new CampaignOptionsHeaderPanel("BMMPanel", "", true);
+        CampaignOptionsHeaderPanel headerPanelBMM = new CampaignOptionsHeaderPanel("BMMPanel", "", true, false, 0);
 
-        JPanel headerPanelTotalWarfare = new CampaignOptionsHeaderPanel("TotalWarfarePanel", "", true);
+        CampaignOptionsHeaderPanel headerPanelTotalWarfare = new CampaignOptionsHeaderPanel("TotalWarfarePanel",
+              "",
+              true,
+              false,
+              0);
 
-        JPanel headerPanelCampaignOperations = new CampaignOptionsHeaderPanel("CampaignOperationsPanel", "", true);
+        CampaignOptionsHeaderPanel headerPanelCampaignOperations = new CampaignOptionsHeaderPanel(
+              "CampaignOperationsPanel",
+              "",
+              true,
+              false,
+              0);
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("FurtherReadingPanel", true, "FurtherReadingPanel");

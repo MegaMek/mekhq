@@ -24,10 +24,14 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.randomEvents.prisoners;
 
-import static java.lang.Math.round;
 import static megamek.common.Board.T_SPACE;
 import static megamek.common.MiscType.createBeagleActiveProbe;
 import static megamek.common.MiscType.createCLImprovedSensors;
@@ -38,6 +42,7 @@ import static mekhq.campaign.personnel.enums.PersonnelStatus.ENEMY_BONDSMAN;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.KIA;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.MIA;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.POW;
+import static mekhq.campaign.personnel.enums.PersonnelStatus.SEPPUKU;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.BECOMING_BONDSMAN;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.PRISONER;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.PRISONER_DEFECTOR;
@@ -49,6 +54,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import megamek.common.Compute;
 import megamek.common.ITechnology;
@@ -275,7 +281,7 @@ public class CapturePrisoners {
 
         int bondsmanRoll = d6(1);
         if (capturingFaction != null && capturingFaction.isClan()) {
-            if (isMekHQCaptureStyle && prisoner.isClanPersonnel() && (bondsmanRoll == 1)) {
+            if (isMekHQCaptureStyle && prisoner.isClanPersonnel() && (bondsmanRoll + d6(1) == 2)) {
                 if (isNPC) {
                     campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
                           "bondsref.report",
@@ -296,6 +302,40 @@ public class CapturePrisoners {
                     prisoner.changeStatus(campaign, today, ENEMY_BONDSMAN);
                 }
                 return;
+            }
+        } else if (capturingFaction != null && capturingFaction.getHonorRating(campaign) == HonorRating.NONE) {
+            if (bondsmanRoll == 1) {
+                if (isNPC) {
+                    campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+                          "bondsref.report",
+                          prisoner.getFullName(),
+                          spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                          CLOSING_SPAN_TAG));
+
+                    campaign.removePerson(prisoner);
+                } else {
+                    prisoner.changeStatus(campaign, today, POW);
+                }
+                return;
+            }
+        }
+
+        if (isMekHQCaptureStyle) {
+            if (Objects.equals(prisoner.getOriginFaction().getShortName(), "DC")) {
+                if (d6(2) == 2) {
+                    if (isNPC) {
+                        campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+                              "seppuku.report",
+                              prisoner.getFullName(),
+                              spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                              CLOSING_SPAN_TAG));
+
+                        campaign.removePerson(prisoner);
+                    } else {
+                        prisoner.changeStatus(campaign, today, SEPPUKU);
+                    }
+                    return;
+                }
             }
         }
 
@@ -323,7 +363,7 @@ public class CapturePrisoners {
         int adjustedDefectionChance = DEFECTION_CHANCE;
 
         if (potentialDefector.getOriginFaction().isMercenary()) {
-            adjustedDefectionChance = (int) round(adjustedDefectionChance * MERCENARY_MULTIPLIER);
+            adjustedDefectionChance = (int) Math.round(adjustedDefectionChance * MERCENARY_MULTIPLIER);
         }
 
         if (potentialDefector.isClanPersonnel()) {

@@ -2530,6 +2530,17 @@ public class Campaign implements ITechManager {
     }
 
     /**
+     * @return a list of people who are currently eligible to receive a salary.
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public List<Person> getSalaryEligiblePersonnel() {
+        return getActivePersonnel(false).stream()
+                     .filter(person -> person.getStatus().isSalaryEligible())
+                     .collect(Collectors.toList());
+    }
+
+    /**
      * Retrieves a filtered list of personnel who have at least one combat profession.
      * <p>
      * This method filters the list of all personnel to include only those whose primary or secondary role is designated
@@ -2800,6 +2811,10 @@ public class Campaign implements ITechManager {
             return campaignOptions.getAutoLogisticsJumpJets();
         } else if (part instanceof EnginePart) {
             return campaignOptions.getAutoLogisticsEngines();
+        } else if (part instanceof EquipmentPart equipmentPart) {
+            if (equipmentPart.getType() instanceof WeaponType) {
+                return campaignOptions.getAutoLogisticsWeapons();
+            }
         }
 
         return campaignOptions.getAutoLogisticsOther();
@@ -5238,7 +5253,16 @@ public class Campaign implements ITechManager {
             }
             if (!unit.isPresent()) {
                 unit.checkArrival();
+
+                // Has unit just been delivered?
+                if (unit.isPresent()) {
+                    addReport(String.format(resources.getString("unitArrived.text"),
+                          unit.getHyperlinkedName(),
+                          spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                          CLOSING_SPAN_TAG));
+                }
             }
+
             if (!unit.isRepairable() && !unit.hasSalvageableParts()) {
                 unitsToRemove.add(unit.getId());
             }
@@ -6465,7 +6489,7 @@ public class Campaign implements ITechManager {
 
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "missions");
         for (final Mission mission : getMissions()) {
-            mission.writeToXML(pw, indent);
+            mission.writeToXML(this, pw, indent);
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "missions");
 
@@ -6535,7 +6559,7 @@ public class Campaign implements ITechManager {
         if (getCampaignOptions().isUseAtB()) {
             // TODO : AbstractContractMarket : Remove next two lines
             // CAW: implicit DEPENDS-ON to the <missions> node, do not move this above it
-            contractMarket.writeToXML(pw, indent);
+            contractMarket.writeToXML(this, pw, indent);
 
             if (!combatTeams.isEmpty()) {
                 MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "combatTeams");
@@ -7457,7 +7481,8 @@ public class Campaign implements ITechManager {
         }
 
         if (null == person) {
-            return new TargetRoll(TargetRoll.IMPOSSIBLE, "No one on your force is capable of acquiring parts");
+            return new TargetRoll(TargetRoll.IMPOSSIBLE,
+                  "Your procurement personnel have used up all their acquisition attempts for this period");
         }
         final Skill skill = person.getSkillForWorkingOn(getCampaignOptions().getAcquisitionSkill());
         if (null != getShoppingList().getShoppingItem(acquisition.getNewEquipment()) && checkDaysToWait) {
@@ -9172,7 +9197,7 @@ public class Campaign implements ITechManager {
      *       "Employee Turnover", 1 if user selected "Advance Day Regardless", 2 if user selected "Cancel Advance Day"
      */
     public int checkTurnoverPrompt() {
-        if (location.isInTransit()) {
+        if (!location.isOnPlanet()) {
             return -1;
         }
 
