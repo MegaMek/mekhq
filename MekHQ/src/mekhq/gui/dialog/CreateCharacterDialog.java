@@ -86,6 +86,7 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.Option;
 import megamek.common.options.OptionsConstants;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Bloodname;
@@ -116,6 +117,7 @@ import mekhq.gui.utilities.MarkdownRenderer;
  * This dialog is used to create a character in story arcs from a pool of XP
  */
 public class CreateCharacterDialog extends JDialog implements DialogOptionListener {
+    private static final MMLogger logger = MMLogger.create(CreateCharacterDialog.class);
 
     public enum NameRestrictions {
         ALL, FIRST_NAME, NONE
@@ -1148,11 +1150,13 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         c.insets = new Insets(0, 10, 0, 0);
         c.gridx = 0;
 
+        List<String> sortedSkillNames = getSortedSkillNames();
+
         SkillType stype;
-        for (int i = 0; i < SkillType.getSkillList().length; i++) {
-            c.gridy = i;
+        for (int index = 0; index < sortedSkillNames.size(); index++) {
+            c.gridy = index;
             c.gridx = 0;
-            final String type = SkillType.getSkillList()[i];
+            final String type = sortedSkillNames.get(index);
             stype = SkillType.getType(type);
             chkSkill = new JCheckBox();
             chkSkill.setSelected(person.hasSkill(type));
@@ -1219,6 +1223,57 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             c.weightx = 1.0;
             panSkills.add(spnBonus, c);
         }
+    }
+
+    /**
+     * Returns a list of skill names sorted by category.
+     *
+     * <p>The sorting order is:</p>
+     * <ol>
+     *     <li>Combat skills</li>
+     *     <li>Support skills</li>
+     *     <li>Roleplay skills</li>
+     * </ol>
+     *
+     * <p>Skill names are categorized by querying their {@code SkillType}. Any unknown skill types are ignored and a
+     * warning is logged.</p>
+     *
+     * @return a {@code List} of skill names sorted by skill category
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    private static List<String> getSortedSkillNames() {
+        String[] unsortedSkillNames = SkillType.getSkillList();
+        List<String> sortedSkillNames = new ArrayList<>();
+        List<String> combatSkills = new ArrayList<>();
+        List<String> supportSkills = new ArrayList<>();
+        List<String> roleplaySkills = new ArrayList<>();
+        for (String skillName : unsortedSkillNames) {
+            SkillType skillType = SkillType.getType(skillName);
+
+            if (skillType == null) {
+                logger.warn("Unknown skill type: {}", skillName);
+                continue;
+            }
+
+            if (skillType.isRoleplaySkill()) {
+                roleplaySkills.add(skillName);
+                continue;
+            }
+
+            if (skillType.isSupportSkill()) {
+                supportSkills.add(skillName);
+                continue;
+            }
+
+            combatSkills.add(skillName);
+        }
+
+        sortedSkillNames.addAll(combatSkills);
+        sortedSkillNames.addAll(supportSkills);
+        sortedSkillNames.addAll(roleplaySkills);
+        return sortedSkillNames;
     }
 
     private void setSkills() {
@@ -1633,8 +1688,12 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         if (xpSpent > 0) {
             person.setXP(campaign, xpSpent);
         }
+
         setSkills();
         setOptions();
+
+        person.validateRoles(campaign);
+
         setVisible(false);
     }
     //endregion Listeners
