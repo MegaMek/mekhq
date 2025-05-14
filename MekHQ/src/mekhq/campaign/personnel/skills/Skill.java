@@ -327,6 +327,12 @@ public class Skill {
     public int getSPAModifiers(PersonnelOptions characterOptions, int reputation) {
         int modifier = 0;
 
+        if (characterOptions == null) {
+            logger.warn("Character options are null. Cannot calculate SPA Modifiers.", new Exception());
+            return modifier;
+        }
+
+
         String name = type.getName();
         // Reputation and Alternate ID
         if (Objects.equals(name, S_NEGOTIATION) ||

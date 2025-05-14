@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.model;
 
@@ -40,6 +45,7 @@ import megamek.common.Tank;
 import megamek.common.VTOL;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
@@ -142,6 +148,7 @@ public class CrewListModel extends AbstractListModel<Person> {
             String gunSkill = SkillType.getGunnerySkillFor(unit.getEntity());
             String driveSkill = SkillType.getDrivingSkillFor(unit.getEntity());
             PersonnelOptions options = person.getOptions();
+            Attributes attributes = person.getATOWAttributes();
             String sb = "<html><font><b>" +
                               person.getFullTitle() +
                               "</b><br/>" +
@@ -150,11 +157,11 @@ public class CrewListModel extends AbstractListModel<Person> {
                               // Shooting and driving don't benefit from Reputation, so no need to pass that in.
                               +
                               (person.hasSkill(gunSkill) ?
-                                     person.getSkill(gunSkill).getFinalSkillValue(options, 0) :
+                                     person.getSkill(gunSkill).getFinalSkillValue(options, attributes, 0) :
                                      "-") +
                               '/' +
                               (person.hasSkill(driveSkill) ?
-                                     person.getSkill(driveSkill).getFinalSkillValue(options, 0) :
+                                     person.getSkill(driveSkill).getFinalSkillValue(options, attributes, 0) :
                                      "-") +
                               ")</font></html>";
             setHtmlText(sb);

@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.service.mrms;
 
@@ -53,6 +58,8 @@ import mekhq.campaign.parts.PodSpace;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -717,9 +724,10 @@ public class MRMSService {
 
         for (Person tech : techs) {
             Skill skill = tech.getSkillForWorkingOn(partWork);
+            int experienceLevel = skill.getExperienceLevel(tech.getOptions(), tech.getATOWAttributes());
 
-            if (skill.getExperienceLevel() > highestAvailableTechSkill) {
-                highestAvailableTechSkill = skill.getExperienceLevel();
+            if (experienceLevel > highestAvailableTechSkill) {
+                highestAvailableTechSkill = experienceLevel;
             }
 
             if (highestAvailableTechSkill == SkillType.EXP_ELITE) {
@@ -1023,15 +1031,18 @@ public class MRMSService {
                 continue;
             }
 
-            if (mrmsOption.getSkillMin() > skill.getExperienceLevel()) {
+            PersonnelOptions options = tech.getOptions();
+            Attributes attributes = tech.getATOWAttributes();
+
+            if (mrmsOption.getSkillMin() > skill.getExperienceLevel(options, attributes)) {
                 continue;
             }
 
-            if (mrmsOption.getSkillMax() < skill.getExperienceLevel()) {
+            if (mrmsOption.getSkillMax() < skill.getExperienceLevel(options, attributes)) {
                 continue;
             }
 
-            if (partWork.getSkillMin() > skill.getExperienceLevel()) {
+            if (partWork.getSkillMin() > skill.getExperienceLevel(options, attributes)) {
                 continue;
             }
 
@@ -1101,7 +1112,8 @@ public class MRMSService {
             if (!increaseTime) {
                 int modePenalty = partWork.getMode().expReduction;
 
-                if (partWork.getSkillMin() > (skill.getExperienceLevel() - modePenalty)) {
+                if (partWork.getSkillMin() >
+                          (skill.getExperienceLevel(tech.getOptions(), tech.getATOWAttributes()) - modePenalty)) {
                     debugLog(
                             "...... ending calculateNewMRMSWorktime with previousWorkTime due time reduction skill mod now being less that required skill - %s ns",
                             "calculateNewMRMSWorktime",
@@ -1123,7 +1135,8 @@ public class MRMSService {
 
                 WorkTimeCalculation wtc = new WorkTimeCalculation(null);
 
-                if (skill.getExperienceLevel() >= highestAvailableTechSkill) {
+                if (skill.getExperienceLevel(tech.getOptions(), tech.getATOWAttributes()) >=
+                          highestAvailableTechSkill) {
                     wtc.setReachedMaxSkill(true);
                 }
 
@@ -1230,9 +1243,12 @@ public class MRMSService {
             // tech
             // with the same XP, put the one with the more time ahead.
             Skill skill1 = tech1.getSkillForWorkingOn(partWork);
-            Skill skill2 = tech2.getSkillForWorkingOn(partWork);
+            int skill1ExperienceLevel = skill1.getExperienceLevel(tech1.getOptions(), tech1.getATOWAttributes());
 
-            if (skill1.getExperienceLevel() == skill2.getExperienceLevel()) {
+            Skill skill2 = tech2.getSkillForWorkingOn(partWork);
+            int skill2ExperienceLevel = skill2.getExperienceLevel(tech2.getOptions(), tech2.getATOWAttributes());
+
+            if (skill1ExperienceLevel == skill2ExperienceLevel) {
                 if ((tech1.getXP() == tech2.getXP()) || (skill1.getLevel() == SkillType.EXP_ELITE)) {
                     return tech1.getMinutesLeft() - tech2.getMinutesLeft();
                 } else {
@@ -1240,7 +1256,7 @@ public class MRMSService {
                 }
             }
 
-            return skill1.getExperienceLevel() < skill2.getExperienceLevel() ? -1 : 1;
+            return skill1ExperienceLevel < skill2ExperienceLevel ? -1 : 1;
         }
     }
 
