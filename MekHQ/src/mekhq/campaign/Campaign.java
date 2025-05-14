@@ -52,6 +52,9 @@ import static mekhq.campaign.mission.resupplyAndCaches.Resupply.isProhibitedUnit
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.processAbandonedConvoy;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
 import static mekhq.campaign.personnel.DiscretionarySpending.performDiscretionarySpending;
+import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_INTERSTELLAR_NEGOTIATOR;
+import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_LOGISTICIAN;
+import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_SCROUNGE;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.TrainingCombatTeams.processTrainingCombatTeams;
@@ -3245,7 +3248,7 @@ public class Campaign implements ITechManager {
     public @Nullable Person getLogisticsPerson() {
         final String skill = campaignOptions.getAcquisitionSkill();
         final ProcurementPersonnelPick acquisitionCategory = campaignOptions.getAcquisitionPersonnelCategory();
-        final int maxAcquisitions = campaignOptions.getMaxAcquisitions();
+        final int defaultMaxAcquisitions = campaignOptions.getMaxAcquisitions();
 
         int bestSkill = -1;
         Person procurementCharacter = null;
@@ -3253,11 +3256,18 @@ public class Campaign implements ITechManager {
             return null;
         } else if (skill.equals(S_TECH)) {
             for (Person person : getActivePersonnel(false)) {
+                int effectiveMaxAcquisitions = defaultMaxAcquisitions;
+
+                PersonnelOptions options = person.getOptions();
+                if (options.booleanOption(ADMIN_SCROUNGE)) {
+                    effectiveMaxAcquisitions++;
+                }
+
                 if (isIneligibleToPerformProcurement(person, acquisitionCategory)) {
                     continue;
                 }
 
-                if (maxAcquisitions > 0 && (person.getAcquisitions() >= maxAcquisitions)) {
+                if (defaultMaxAcquisitions > 0 && (person.getAcquisitions() >= effectiveMaxAcquisitions)) {
                     continue;
                 }
 
@@ -3268,11 +3278,18 @@ public class Campaign implements ITechManager {
             }
         } else {
             for (Person person : getActivePersonnel(false)) {
+                int effectiveMaxAcquisitions = defaultMaxAcquisitions;
+
+                PersonnelOptions options = person.getOptions();
+                if (options.booleanOption(ADMIN_SCROUNGE)) {
+                    effectiveMaxAcquisitions++;
+                }
+
                 if (isIneligibleToPerformProcurement(person, acquisitionCategory)) {
                     continue;
                 }
 
-                if (maxAcquisitions > 0 && (person.getAcquisitions() >= maxAcquisitions)) {
+                if (defaultMaxAcquisitions > 0 && (person.getAcquisitions() >= effectiveMaxAcquisitions)) {
                     continue;
                 }
 
@@ -3589,6 +3606,11 @@ public class Campaign implements ITechManager {
                         PartAcquisitionResult result = findContactForAcquisition(shoppingItem, person, system);
                         if (result == PartAcquisitionResult.Success) {
                             int transitTime = calculatePartTransitTime(system);
+
+                            PersonnelOptions options = person.getOptions();
+                            double logisticianModifier = options.booleanOption(ADMIN_LOGISTICIAN) ? 0.9 : 1.0;
+                            transitTime = (int) Math.round(transitTime * logisticianModifier);
+
                             int totalQuantity = 0;
                             while (shoppingItem.getQuantity() > 0 &&
                                          canAcquireParts(person) &&
@@ -7223,6 +7245,14 @@ public class Campaign implements ITechManager {
             }
 
             totalCost = totalCost.plus(ownDropshipCost).plus(ownJumpshipCost);
+        }
+
+        Person negotiator = getSeniorAdminPerson(AdministratorSpecialization.TRANSPORT);
+        if (negotiator != null) {
+            PersonnelOptions options = negotiator.getOptions();
+            if (options.booleanOption(ADMIN_INTERSTELLAR_NEGOTIATOR) && totalCost.isPositive()) {
+                totalCost = totalCost.multipliedBy(0.85);
+            }
         }
 
         return totalCost;
