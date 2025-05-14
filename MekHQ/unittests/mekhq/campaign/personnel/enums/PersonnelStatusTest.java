@@ -24,17 +24,22 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.enums;
-
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 import static mekhq.campaign.personnel.enums.PersonnelStatus.*;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
 
 public class PersonnelStatusTest {
     @Test
@@ -119,7 +124,9 @@ public class PersonnelStatusTest {
     public void testIsDepartedUnit() {
         List<PersonnelStatus> deadStatuses = List.of(KIA, HOMICIDE, WOUNDS, DISEASE, ACCIDENTAL,
             NATURAL_CAUSES, OLD_AGE, MEDICAL_COMPLICATIONS, PREGNANCY_COMPLICATIONS, UNDETERMINED,
-            SUICIDE, BONDSREF);
+              SUICIDE,
+              BONDSREF,
+              SEPPUKU);
         List<PersonnelStatus> validStatuses = List.of(RETIRED, RESIGNED, SACKED, DESERTED,
             DEFECTED, MISSING, LEFT, ENEMY_BONDSMAN);
 
@@ -134,7 +141,9 @@ public class PersonnelStatusTest {
     public void testIsDead() {
         List<PersonnelStatus> validStatuses = List.of(KIA, HOMICIDE, WOUNDS, DISEASE, ACCIDENTAL,
             NATURAL_CAUSES, OLD_AGE, MEDICAL_COMPLICATIONS, PREGNANCY_COMPLICATIONS, UNDETERMINED,
-            SUICIDE, BONDSREF);
+              SUICIDE,
+              BONDSREF,
+              SEPPUKU);
 
         for (PersonnelStatus status : PersonnelStatus.values()) {
             boolean isDead = validStatuses.contains(status);
@@ -147,7 +156,10 @@ public class PersonnelStatusTest {
     public void testIsDeadOrMIA() {
         List<PersonnelStatus> validStatuses = List.of(KIA, HOMICIDE, WOUNDS, DISEASE, ACCIDENTAL,
             NATURAL_CAUSES, OLD_AGE, MEDICAL_COMPLICATIONS, PREGNANCY_COMPLICATIONS, UNDETERMINED,
-            SUICIDE, BONDSREF, MIA);
+              SUICIDE,
+              BONDSREF,
+              MIA,
+              SEPPUKU);
 
         for (PersonnelStatus status : PersonnelStatus.values()) {
             boolean isDeadOrMIA = validStatuses.contains(status);

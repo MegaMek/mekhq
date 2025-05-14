@@ -24,17 +24,23 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.campaignOptions.components;
 
-import megamek.common.annotations.Nullable;
-
-import javax.swing.*;
-import java.util.ResourceBundle;
-
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.processWrapSize;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
+import javax.swing.JLabel;
+
+import megamek.common.annotations.Nullable;
 
 /**
  * A specialized {@link JLabel} component designed for use in campaign options dialogs.
@@ -44,17 +50,6 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.processWrapSize
  * and an option exists to create the label without a tooltip.
  */
 public class CampaignOptionsLabel extends JLabel {
-
-    /**
-     * The path to the resource bundle containing text and tooltip data for the label.
-     */
-    private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
-
-    /**
-     * The {@link ResourceBundle} used to retrieve text and tooltips for the label.
-     */
-    static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
-
     /**
      * Constructs a {@link CampaignOptionsLabel} with the specified name.
      * <p>
@@ -89,12 +84,11 @@ public class CampaignOptionsLabel extends JLabel {
      */
     public CampaignOptionsLabel(String name, @Nullable Integer customWrapSize, boolean noTooltip) {
         // Set the label's text using the resource bundle with HTML formatting for better rendering
-        super(String.format("<html>%s</html>",
-                resources.getString("lbl" + name + ".text")));
+        super(String.format("<html>%s</html>", getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".text")));
 
         // Configure the tooltip if not excluded
         if (!noTooltip) {
-            setToolTipText(wordWrap(resources.getString("lbl" + name + ".tooltip"),
+            setToolTipText(wordWrap(getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".tooltip"),
                     processWrapSize(customWrapSize)));
         }
 

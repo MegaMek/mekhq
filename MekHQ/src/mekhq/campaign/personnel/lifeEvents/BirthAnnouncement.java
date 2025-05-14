@@ -57,7 +57,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
  * event, incorporating campaign context and personalized pronoun and title handling for both parent and child.</p>
  */
 public class BirthAnnouncement {
-    private static String RESOURCE_BUNDLE = "mekhq.resources." + BirthAnnouncement.class.getSimpleName();
+    private static String RESOURCE_BUNDLE = "mekhq.resources.BirthAnnouncement";
 
     private final Campaign campaign;
     private final Person parent;
