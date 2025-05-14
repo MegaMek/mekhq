@@ -187,6 +187,7 @@ public class CampaignGUI extends JPanel {
     private final JButton btnMassTraining = new JButton(resourceMap.getString("btnMassTraining.text"));
     private final JToggleButton btnGMMode = new MMToggleButton(resourceMap.getString("btnGMMode.text"));
     private final JToggleButton btnOvertime = new MMToggleButton(resourceMap.getString("btnOvertime.text"));
+    private final JButton btnGlossary = new JButton(resourceMap.getString("btnGlossary.text"));
 
     ReportHyperlinkListener reportHLL;
 
@@ -753,17 +754,48 @@ public class CampaignGUI extends JPanel {
         JMenu menuHire = new JMenu(resourceMap.getString("menuHire.text"));
         menuHire.setMnemonic(KeyEvent.VK_H);
 
-        PersonnelRole[] roles = PersonnelRole.getValuesSortedAlphabetically();
+        JMenu menuHireCombat = new JMenu(resourceMap.getString("menuHire.combat"));
+        JMenu menuHireSupport = new JMenu(resourceMap.getString("menuHire.support"));
+        JMenu menuHireCivilian = new JMenu(resourceMap.getString("menuHire.civilian"));
+
+        PersonnelRole[] roles = PersonnelRole.getValuesSortedAlphabetically(getCampaign().isClanCampaign());
         for (PersonnelRole role : roles) {
+            // Dependent is handled speciality so that it's always at the top of the civilian category
+            if (role.isDependent()) {
+                continue;
+            }
+
             JMenuItem miHire = new JMenuItem(role.getLabel(getCampaign().getFaction().isClan()));
             if (role.getMnemonic() != KeyEvent.VK_UNDEFINED) {
                 miHire.setMnemonic(role.getMnemonic());
                 miHire.setAccelerator(KeyStroke.getKeyStroke(role.getMnemonic(), InputEvent.ALT_DOWN_MASK));
             }
+            miHire.setToolTipText(role.getDescription(getCampaign().isClanCampaign()));
             miHire.setActionCommand(role.name());
             miHire.addActionListener(this::hirePerson);
-            menuHire.add(miHire);
+
+            if (role.isCombat()) {
+                menuHireCombat.add(miHire);
+            } else if (role.isSupport(true)) {
+                menuHireSupport.add(miHire);
+            } else if (!role.isDependent()) {
+                menuHireCivilian.add(miHire);
+            }
         }
+
+        JMenuItem miHire = new JMenuItem(PersonnelRole.DEPENDENT.getLabel(getCampaign().getFaction().isClan()));
+        if (PersonnelRole.DEPENDENT.getMnemonic() != KeyEvent.VK_UNDEFINED) {
+            miHire.setMnemonic(PersonnelRole.DEPENDENT.getMnemonic());
+            miHire.setAccelerator(KeyStroke.getKeyStroke(PersonnelRole.DEPENDENT.getMnemonic(),
+                  InputEvent.ALT_DOWN_MASK));
+        }
+        miHire.setActionCommand(PersonnelRole.DEPENDENT.name());
+        miHire.addActionListener(this::hirePerson);
+        menuHireCivilian.insert(miHire, 0);
+
+        menuHire.add(menuHireCombat);
+        menuHire.add(menuHireSupport);
+        menuHire.add(menuHireCivilian);
         menuMarket.add(menuHire);
 
         // region Astech Pool
@@ -1125,9 +1157,22 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.insets = new Insets(3, 10, 3, 3);
         btnPanel.add(lblLocation, gridBagConstraints);
 
-        btnAdvanceMultipleDays.addActionListener(e -> new AdvanceDaysDialog(getFrame(), this).setVisible(true));
+        btnGlossary.addActionListener(evt -> new FullGlossaryDialog(getCampaign()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.VERTICAL;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.gridheight = 2;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
+        gridBagConstraints.insets = new Insets(3, 3, 3, 15);
+        btnPanel.add(btnGlossary, gridBagConstraints);
+
+        btnAdvanceMultipleDays.addActionListener(e -> new AdvanceDaysDialog(getFrame(), this).setVisible(true));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0;
@@ -1139,7 +1184,7 @@ public class CampaignGUI extends JPanel {
         btnMassTraining.setToolTipText(resourceMap.getString("btnMassTraining.toolTipText"));
         btnMassTraining.addActionListener(e -> new BatchXPDialog(getFrame(), getCampaign()).setVisible(true));
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0;
@@ -1152,7 +1197,7 @@ public class CampaignGUI extends JPanel {
         btnGMMode.setSelected(getCampaign().isGM());
         btnGMMode.addActionListener(e -> getCampaign().setGMMode(btnGMMode.isSelected()));
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0;
@@ -1164,7 +1209,7 @@ public class CampaignGUI extends JPanel {
         btnOvertime.setToolTipText(resourceMap.getString("btnOvertime.toolTipText"));
         btnOvertime.addActionListener(evt -> getCampaign().setOvertime(btnOvertime.isSelected()));
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0;
@@ -1197,7 +1242,7 @@ public class CampaignGUI extends JPanel {
         });
         btnAdvanceDay.setMnemonic(KeyEvent.VK_A);
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = GridBagConstraints.VERTICAL;
         gridBagConstraints.weightx = 0.0;

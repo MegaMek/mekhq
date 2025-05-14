@@ -152,7 +152,7 @@
         <factionIntroDate>false</factionIntroDate>
         <useAmmoByType>true</useAmmoByType>
         <waitingPeriod>1</waitingPeriod>
-        <acquisitionSkill>Negotiation</acquisitionSkill>
+        <acquisitionSkill>Administration</acquisitionSkill>
         <acquisitionPersonnelCategory>LOGISTICS</acquisitionPersonnelCategory>
         <techLevel>3</techLevel>
         <unitTransitTime>2</unitTransitTime>
