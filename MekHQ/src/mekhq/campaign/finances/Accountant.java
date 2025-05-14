@@ -36,6 +36,7 @@ import static mekhq.campaign.force.Force.FORCE_NONE;
 import static mekhq.campaign.personnel.ranks.Rank.RWO_MIN;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +51,7 @@ import mekhq.campaign.Hangar;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 
@@ -165,8 +167,18 @@ public record Accountant(Campaign campaign) {
         int officerFoodUsage = 0;
 
         // Determine housing and food requirements
-        List<Person> personnel = campaign.getActivePersonnelIncludingInUnitStudents();
+        List<Person> personnel = new ArrayList<>(campaign().getPersonnel());
         for (Person person : personnel) {
+            if (person.getStatus().isDepartedUnit()) {
+                // No paying for dead people or folks who left the campaign unit
+                continue;
+            }
+
+            if (person.getStatus().isStudent() && !EducationController.isBeingHomeSchooled(person)) {
+                // Tuition includes room and board
+                continue;
+            }
+
             boolean isPrisonerOrDependent = person.getPrisonerStatus().isCurrentPrisoner() ||
                                                   person.getPrimaryRole().isCivilian();
             boolean isOfficer = person.getRankNumeric() >= RWO_MIN;

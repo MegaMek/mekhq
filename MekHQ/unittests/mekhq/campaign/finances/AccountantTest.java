@@ -99,7 +99,7 @@ public class AccountantTest {
         CurrentLocation location = new CurrentLocation();
         when(mockCampaign.getLocation()).thenReturn(location);
 
-        when(mockCampaign.getActivePersonnelIncludingInUnitStudents()).thenReturn(new ArrayList<>());
+        when(mockCampaign.getPersonnel()).thenReturn(new ArrayList<>());
 
         // Act
         Money expected = Money.zero();
@@ -131,7 +131,7 @@ public class AccountantTest {
         prisoner.setPrisonerStatus(mockCampaign, PRISONER, false);
         List<Person> prisoners = List.of(prisoner, prisoner, prisoner);
 
-        when(mockCampaign.getActivePersonnelIncludingInUnitStudents()).thenReturn(prisoners);
+        when(mockCampaign.getPersonnel()).thenReturn(prisoners);
 
         // Act
         int expensesFood = FOOD_PRISONER_OR_DEPENDENT * prisoners.size();
@@ -165,7 +165,7 @@ public class AccountantTest {
         prisoner.setPrisonerStatus(mockCampaign, PRISONER, false);
         List<Person> prisoners = List.of(prisoner, prisoner, prisoner);
 
-        when(mockCampaign.getActivePersonnelIncludingInUnitStudents()).thenReturn(prisoners);
+        when(mockCampaign.getPersonnel()).thenReturn(prisoners);
 
         // Act
         int expensesHousing = HOUSING_PRISONER_OR_DEPENDENT * prisoners.size();
@@ -198,7 +198,7 @@ public class AccountantTest {
         prisoner.setPrisonerStatus(mockCampaign, PRISONER, false);
         List<Person> prisoners = List.of(prisoner, prisoner, prisoner);
 
-        when(mockCampaign.getActivePersonnelIncludingInUnitStudents()).thenReturn(prisoners);
+        when(mockCampaign.getPersonnel()).thenReturn(prisoners);
 
         // Act
         int expensesFood = FOOD_PRISONER_OR_DEPENDENT * prisoners.size();
@@ -231,7 +231,7 @@ public class AccountantTest {
         dependent.setPrimaryRole(mockCampaign, DEPENDENT);
         List<Person> dependents = List.of(dependent, dependent, dependent);
 
-        when(mockCampaign.getActivePersonnelIncludingInUnitStudents()).thenReturn(dependents);
+        when(mockCampaign.getPersonnel()).thenReturn(dependents);
 
         // Act
         int expensesFood = FOOD_PRISONER_OR_DEPENDENT * dependents.size();
@@ -265,7 +265,7 @@ public class AccountantTest {
         dependent.setPrimaryRole(mockCampaign, DEPENDENT);
         List<Person> dependents = List.of(dependent, dependent, dependent);
 
-        when(mockCampaign.getActivePersonnelIncludingInUnitStudents()).thenReturn(dependents);
+        when(mockCampaign.getPersonnel()).thenReturn(dependents);
 
         // Act
         int expensesHousing = HOUSING_PRISONER_OR_DEPENDENT * dependents.size();
@@ -298,7 +298,7 @@ public class AccountantTest {
         dependent.setPrimaryRole(mockCampaign, DEPENDENT);
         List<Person> dependents = List.of(dependent, dependent, dependent);
 
-        when(mockCampaign.getActivePersonnelIncludingInUnitStudents()).thenReturn(dependents);
+        when(mockCampaign.getPersonnel()).thenReturn(dependents);
 
         // Act
         int expensesFood = FOOD_PRISONER_OR_DEPENDENT * dependents.size();
@@ -332,7 +332,7 @@ public class AccountantTest {
         enlisted.setRank(RWO_MIN - 1);
         List<Person> enlistedPersonnel = List.of(enlisted, enlisted, enlisted);
 
-        when(mockCampaign.getActivePersonnelIncludingInUnitStudents()).thenReturn(enlistedPersonnel);
+        when(mockCampaign.getPersonnel()).thenReturn(enlistedPersonnel);
 
         // Act
         int expensesFood = FOOD_ENLISTED * enlistedPersonnel.size();
@@ -367,7 +367,7 @@ public class AccountantTest {
         enlisted.setRank(RWO_MIN - 1);
         List<Person> enlistedPersonnel = List.of(enlisted, enlisted, enlisted);
 
-        when(mockCampaign.getActivePersonnelIncludingInUnitStudents()).thenReturn(enlistedPersonnel);
+        when(mockCampaign.getPersonnel()).thenReturn(enlistedPersonnel);
 
         // Act
         int expensesHousing = HOUSING_ENLISTED * enlistedPersonnel.size();
@@ -401,7 +401,7 @@ public class AccountantTest {
         enlisted.setRank(RWO_MIN - 1);
         List<Person> enlistedPersonnel = List.of(enlisted, enlisted, enlisted);
 
-        when(mockCampaign.getActivePersonnelIncludingInUnitStudents()).thenReturn(enlistedPersonnel);
+        when(mockCampaign.getPersonnel()).thenReturn(enlistedPersonnel);
 
         // Act
         int expensesFood = FOOD_ENLISTED * enlistedPersonnel.size();
@@ -435,7 +435,7 @@ public class AccountantTest {
         officer.setRank(RWO_MIN + 1);
         List<Person> officerPersonnel = List.of(officer, officer, officer);
 
-        when(mockCampaign.getActivePersonnelIncludingInUnitStudents()).thenReturn(officerPersonnel);
+        when(mockCampaign.getPersonnel()).thenReturn(officerPersonnel);
 
         // Act
         int expensesFood = FOOD_OFFICER * officerPersonnel.size();
@@ -470,7 +470,7 @@ public class AccountantTest {
         officer.setRank(RWO_MIN + 1);
         List<Person> officerPersonnel = List.of(officer, officer, officer);
 
-        when(mockCampaign.getActivePersonnelIncludingInUnitStudents()).thenReturn(officerPersonnel);
+        when(mockCampaign.getPersonnel()).thenReturn(officerPersonnel);
 
         // Act
         int expensesHousing = HOUSING_OFFICER * officerPersonnel.size();
@@ -504,7 +504,7 @@ public class AccountantTest {
         officer.setRank(RWO_MIN + 1);
         List<Person> officerPersonnel = List.of(officer, officer, officer);
 
-        when(mockCampaign.getActivePersonnelIncludingInUnitStudents()).thenReturn(officerPersonnel);
+        when(mockCampaign.getPersonnel()).thenReturn(officerPersonnel);
 
         // Act
         int expensesFood = FOOD_OFFICER * officerPersonnel.size();
@@ -557,7 +557,7 @@ public class AccountantTest {
         allPersonnel.addAll(enlistedPersonnel);
         allPersonnel.addAll(officerPersonnel);
 
-        when(mockCampaign.getActivePersonnelIncludingInUnitStudents()).thenReturn(allPersonnel);
+        when(mockCampaign.getPersonnel()).thenReturn(allPersonnel);
 
         // Act
         int expensesFood = FOOD_PRISONER_OR_DEPENDENT * (prisoners.size() + dependents.size());
@@ -617,7 +617,7 @@ public class AccountantTest {
         allPersonnel.addAll(enlistedPersonnel);
         allPersonnel.addAll(officerPersonnel);
 
-        when(mockCampaign.getActivePersonnelIncludingInUnitStudents()).thenReturn(allPersonnel);
+        when(mockCampaign.getPersonnel()).thenReturn(allPersonnel);
 
         // Act
         int expensesHousing = HOUSING_PRISONER_OR_DEPENDENT * (prisoners.size() + dependents.size());
@@ -673,7 +673,7 @@ public class AccountantTest {
         allPersonnel.addAll(enlistedPersonnel);
         allPersonnel.addAll(officerPersonnel);
 
-        when(mockCampaign.getActivePersonnelIncludingInUnitStudents()).thenReturn(allPersonnel);
+        when(mockCampaign.getPersonnel()).thenReturn(allPersonnel);
 
         // Act
         int expensesFood = FOOD_PRISONER_OR_DEPENDENT * (prisoners.size() + dependents.size());
@@ -730,7 +730,7 @@ public class AccountantTest {
         allPersonnel.addAll(enlistedPersonnel);
         allPersonnel.addAll(officerPersonnel);
 
-        when(mockCampaign.getActivePersonnelIncludingInUnitStudents()).thenReturn(allPersonnel);
+        when(mockCampaign.getPersonnel()).thenReturn(allPersonnel);
 
         // Act
         int expensesFood = FOOD_PRISONER_OR_DEPENDENT * (prisoners.size() + dependents.size());
@@ -801,7 +801,7 @@ public class AccountantTest {
         allPersonnel.addAll(officerPersonnel);
         allPersonnel.addAll(warShipPersonnel);
 
-        when(mockCampaign.getActivePersonnelIncludingInUnitStudents()).thenReturn(allPersonnel);
+        when(mockCampaign.getPersonnel()).thenReturn(allPersonnel);
 
         // Act
         int expensesFood = FOOD_PRISONER_OR_DEPENDENT * (prisoners.size() + dependents.size());
