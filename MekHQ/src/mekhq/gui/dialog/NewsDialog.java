@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -38,12 +43,10 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.universe.NewsItem;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
 /**
  * NewsDialog is a dialog window for displaying news items within the context of a campaign. It includes information
@@ -52,7 +55,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
  * This dialog is a part of MekHQ and displays immersive content in the game GUI.
  * </p>
  */
-public class NewsDialog extends ImmersiveDialogCore {
+public class NewsDialog extends ImmersiveDialogSimple {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.NewsDialog";
 
     private static final int OPERATION_KLONDIKE = 2822;
@@ -62,35 +65,22 @@ public class NewsDialog extends ImmersiveDialogCore {
     private static final String AFFILIATE_NETWORK_NAME = "affiliateNewsNetworks";
 
     /**
-     * Constructs a new NewsDialog to display a given {@link NewsItem}.
+     * Constructs a {@code NewsDialog} that displays a central message to the player within the campaign context.
      *
-     * @param campaign The campaign instance containing relevant game details.
-     * @param news     The {@link NewsItem} to be displayed in the dialog.
-     */
-    public NewsDialog(Campaign campaign, NewsItem news) {
-        super(campaign,
-              new Person(campaign),
-              null,
-              news.getFullDescription(),
-              createButtons(),
-              null,
-              UIUtil.scaleForGUI(400),
-              false,
-              null,
-              null,
-              true);
-    }
-
-    /**
-     * Creates the buttons for the dialog.
+     * <p>
+     * The dialog uses a placeholder speaker to ensure that the immersive dialog interface displays the speaker panel,
+     * even though no specific person is associated with the message. Only the provided central message is shown.
+     * </p>
      *
-     * @return A list of {@link ButtonLabelTooltipPair} containing buttons for the dialog.
+     * @param campaign the current {@link Campaign} context
+     * @param centerMessage the main message to display in the dialog
      */
-    private static List<ButtonLabelTooltipPair> createButtons() {
-        ButtonLabelTooltipPair btnClose = new ButtonLabelTooltipPair(getFormattedTextAt(RESOURCE_BUNDLE,
-              "newsReport.button"), null);
-
-        return List.of(btnClose);
+    public NewsDialog(Campaign campaign, String centerMessage) {
+        super(campaign, new Person(campaign), // empty person to trick immersive dialog into showing the speaker panel
+              null, centerMessage,
+              null,
+              null,
+              null, false);
     }
 
     @Override
