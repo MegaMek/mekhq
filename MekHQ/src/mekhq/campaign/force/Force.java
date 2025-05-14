@@ -1086,6 +1086,8 @@ public class Force {
         for (Force subforce : force.getSubForces()) {
             if (currentFormationLevel - 1 < lowerBoundary) {
                 subforce.setFormationLevel(FormationLevel.INVALID);
+            } else if (subforce.getSubForces().isEmpty()) {
+                subforce.setFormationLevel(FormationLevel.parseFromInt(lowerBoundary));
             } else {
                 subforce.setFormationLevel(FormationLevel.parseFromInt(currentFormationLevel - 1));
             }
