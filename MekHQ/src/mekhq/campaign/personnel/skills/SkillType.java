@@ -570,6 +570,8 @@ public class SkillType {
 
         if (secondAttribute != NONE) {
             flavorText += ", " + secondAttribute.getLabel() + ')';
+        } else {
+            flavorText += ")";
         }
 
         flavorText += htmlCloseTag;

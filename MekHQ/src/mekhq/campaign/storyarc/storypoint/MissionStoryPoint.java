@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.storyarc.storypoint;
 
@@ -33,9 +38,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.Version;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -43,6 +45,8 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.storyarc.StoryPoint;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * A StoryPoint class to start a new mission. A MissionStoryPoint will not
@@ -170,7 +174,7 @@ public class MissionStoryPoint extends StoryPoint {
             if (mission.getId() > 0) {
                 MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "missionId", mission.getId());
             } else {
-                mission.writeToXML(pw1, indent);
+                mission.writeToXML(getCampaign(), pw1, indent);
             }
         }
         writeToXmlEnd(pw1, --indent);
