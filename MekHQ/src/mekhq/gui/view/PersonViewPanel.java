@@ -289,7 +289,9 @@ public class PersonViewPanel extends JScrollablePanel {
             gridY++;
         }
 
-        if ((!person.getPersonalityDescription().isBlank()) && (campaignOptions.isUseRandomPersonalities()) &&
+        if ((!person.getPersonalityDescription().isBlank()) &&
+                  (campaignOptions.isUseRandomPersonalities()) &&
+                  (!person.isHidePersonality()) &&
                   (!person.isChild(campaign.getLocalDate()))) { // we don't display for children, as most of the
             // descriptions won't fit
             JTextPane txtDesc = new JTextPane();
