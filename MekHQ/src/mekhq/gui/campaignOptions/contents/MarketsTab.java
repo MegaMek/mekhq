@@ -24,18 +24,25 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.campaignOptions.contents;
 
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.GridBagConstraints;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.ResourceBundle;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
@@ -83,13 +90,11 @@ import mekhq.module.api.PersonnelMarketMethod;
  * </p>
  */
 public class MarketsTab {
-    private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
-    private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
-
     private final Campaign campaign;
     private final CampaignOptions campaignOptions;
 
     //start Personnel Market
+    private CampaignOptionsHeaderPanel personnelMarketHeader;
     private JPanel pnlPersonnelMarketGeneralOptions;
     private JLabel lblPersonnelMarketType;
     private MMComboBox<String> comboPersonnelMarketType;
@@ -104,6 +109,7 @@ public class MarketsTab {
     //end Personnel Market
 
     //start Unit Market
+    private CampaignOptionsHeaderPanel unitMarketHeader;
     private JLabel lblUnitMarketMethod;
     private MMComboBox<UnitMarketMethod> comboUnitMarketMethod;
     private JCheckBox chkUnitMarketRegionalMekVariations;
@@ -117,6 +123,7 @@ public class MarketsTab {
     //end Unit Market
 
     //start Contract Market
+    private CampaignOptionsHeaderPanel contractMarketHeader;
     private JPanel pnlContractMarketGeneralOptions;
     private JLabel lblContractMarketMethod;
     private MMComboBox<ContractMarketMethod> comboContractMarketMethod;
@@ -221,8 +228,8 @@ public class MarketsTab {
      */
     public JPanel createPersonnelMarketTab() {
         // Header
-        JPanel headerPanel = new CampaignOptionsHeaderPanel("PersonnelMarketTab",
-              getImageDirectory() + "logo_st_ives_compact.png");
+        personnelMarketHeader = new CampaignOptionsHeaderPanel("PersonnelMarketTab",
+              getImageDirectory() + "logo_st_ives_compact.png", 3);
 
         // Contents
         pnlPersonnelMarketGeneralOptions = createPersonnelMarketGeneralOptionsPanel();
@@ -235,7 +242,7 @@ public class MarketsTab {
         layout.gridwidth = 5;
         layout.gridx = 0;
         layout.gridy = 0;
-        panel.add(headerPanel, layout);
+        panel.add(personnelMarketHeader, layout);
 
         layout.gridy++;
         layout.gridwidth = 1;
@@ -259,14 +266,24 @@ public class MarketsTab {
     private JPanel createPersonnelMarketGeneralOptionsPanel() {
         // Contents
         lblPersonnelMarketType = new CampaignOptionsLabel("PersonnelMarketType");
+        lblPersonnelMarketType.addMouseListener(createTipPanelUpdater(personnelMarketHeader, "PersonnelMarketType"));
         comboPersonnelMarketType = new MMComboBox<>("comboPersonnelMarketType", getPersonnelMarketTypeOptions());
+        comboPersonnelMarketType.addMouseListener(createTipPanelUpdater(personnelMarketHeader, "PersonnelMarketType"));
 
         lblPersonnelMarketDylansWeight = new CampaignOptionsLabel("PersonnelMarketDylansWeight");
+        lblPersonnelMarketDylansWeight.addMouseListener(createTipPanelUpdater(personnelMarketHeader,
+              "PersonnelMarketDylansWeight"));
         spnPersonnelMarketDylansWeight = new CampaignOptionsSpinner("PersonnelMarketDylansWeight", 0.3, 0, 1, 0.1);
+        spnPersonnelMarketDylansWeight.addMouseListener(createTipPanelUpdater(personnelMarketHeader,
+              "PersonnelMarketDylansWeight"));
 
         chkPersonnelMarketReportRefresh = new CampaignOptionsCheckBox("PersonnelMarketReportRefresh");
+        chkPersonnelMarketReportRefresh.addMouseListener(createTipPanelUpdater(personnelMarketHeader,
+              "PersonnelMarketReportRefresh"));
 
         chkUsePersonnelHireHiringHallOnly = new CampaignOptionsCheckBox("UsePersonnelHireHiringHallOnly");
+        chkUsePersonnelHireHiringHallOnly.addMouseListener(createTipPanelUpdater(personnelMarketHeader,
+              "UsePersonnelHireHiringHallOnly"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PersonnelMarketGeneralOptionsPanel", false, "");
@@ -396,26 +413,44 @@ public class MarketsTab {
      */
     public JPanel createUnitMarketTab() {
         // Header
-        JPanel headerPanel = new CampaignOptionsHeaderPanel("UnitMarketTab",
-              getImageDirectory() + "logo_clan_ice_hellion.png");
+        unitMarketHeader = new CampaignOptionsHeaderPanel("UnitMarketTab",
+              getImageDirectory() + "logo_clan_ice_hellion.png",
+              5);
 
         // Contents
         lblUnitMarketMethod = new CampaignOptionsLabel("UnitMarketMethod");
+        lblUnitMarketMethod.addMouseListener(createTipPanelUpdater(unitMarketHeader, "UnitMarketMethod"));
         comboUnitMarketMethod = new MMComboBox<>("comboUnitMarketMethod", UnitMarketMethod.values());
+        comboUnitMarketMethod.addMouseListener(createTipPanelUpdater(unitMarketHeader, "UnitMarketMethod"));
 
         chkUnitMarketRegionalMekVariations = new CampaignOptionsCheckBox("UnitMarketRegionalMekVariations");
+        chkUnitMarketRegionalMekVariations.addMouseListener(createTipPanelUpdater(unitMarketHeader,
+              "UnitMarketRegionalMekVariations"));
 
         lblUnitMarketSpecialUnitChance = new CampaignOptionsLabel("UnitMarketSpecialUnitChance");
+        lblUnitMarketSpecialUnitChance.addMouseListener(createTipPanelUpdater(unitMarketHeader,
+              "UnitMarketSpecialUnitChance"));
         spnUnitMarketSpecialUnitChance = new CampaignOptionsSpinner("UnitMarketSpecialUnitChance", 30, 0, 100, 1);
+        spnUnitMarketSpecialUnitChance.addMouseListener(createTipPanelUpdater(unitMarketHeader,
+              "UnitMarketSpecialUnitChance"));
 
         lblUnitMarketRarityModifier = new CampaignOptionsLabel("UnitMarketRarityModifier");
+        lblUnitMarketRarityModifier.addMouseListener(createTipPanelUpdater(unitMarketHeader,
+              "UnitMarketRarityModifier"));
         spnUnitMarketRarityModifier = new CampaignOptionsSpinner("UnitMarketRarityModifier", 0, -10, 10, 1);
+        spnUnitMarketRarityModifier.addMouseListener(createTipPanelUpdater(unitMarketHeader,
+              "UnitMarketRarityModifier"));
 
         chkInstantUnitMarketDelivery = new CampaignOptionsCheckBox("InstantUnitMarketDelivery");
+        chkInstantUnitMarketDelivery.addMouseListener(createTipPanelUpdater(unitMarketHeader,
+              "InstantUnitMarketDelivery"));
 
         chkMothballUnitMarketDeliveries = new CampaignOptionsCheckBox("MothballUnitMarketDeliveries");
+        chkMothballUnitMarketDeliveries.addMouseListener(createTipPanelUpdater(unitMarketHeader,
+              "MothballUnitMarketDeliveries"));
 
         chkUnitMarketReportRefresh = new CampaignOptionsCheckBox("UnitMarketReportRefresh");
+        chkUnitMarketReportRefresh.addMouseListener(createTipPanelUpdater(unitMarketHeader, "UnitMarketReportRefresh"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("UnitMarketTab", true, "");
@@ -423,7 +458,7 @@ public class MarketsTab {
 
         layout.gridwidth = 5;
         layout.gridy = 0;
-        panel.add(headerPanel, layout);
+        panel.add(unitMarketHeader, layout);
 
         layout.gridwidth = 1;
         layout.gridx = 0;
@@ -512,9 +547,9 @@ public class MarketsTab {
      */
     public JPanel createContractMarketTab() {
         // Header
-        JPanel headerPanel = new CampaignOptionsHeaderPanel("ContractMarketTab",
-              getImageDirectory() + "logo_federated_suns.png");
-
+        contractMarketHeader = new CampaignOptionsHeaderPanel("ContractMarketTab",
+              getImageDirectory() + "logo_federated_suns.png",
+              5);
         // Contents
         pnlContractMarketGeneralOptions = createContractMarketGeneralOptionsPanel();
         pnlContractPay = createContractPayPanel();
@@ -526,7 +561,7 @@ public class MarketsTab {
         layout.gridwidth = 5;
         layout.gridx = 0;
         layout.gridy = 0;
-        panel.add(headerPanel, layout);
+        panel.add(contractMarketHeader, layout);
 
         layout.gridy++;
         layout.gridwidth = 1;
@@ -547,25 +582,42 @@ public class MarketsTab {
     private JPanel createContractMarketGeneralOptionsPanel() {
         // Contents
         lblContractMarketMethod = new CampaignOptionsLabel("ContractMarketMethod");
+        lblContractMarketMethod.addMouseListener(createTipPanelUpdater(contractMarketHeader, "ContractMarketMethod"));
         comboContractMarketMethod = new MMComboBox<>("comboContractMarketMethod");
         DefaultComboBoxModel<ContractMarketMethod> model = new DefaultComboBoxModel<>(ContractMarketMethod.values());
         model.removeElement(ContractMarketMethod.CAM_OPS);
         comboContractMarketMethod.setModel(model);
+        comboContractMarketMethod.addMouseListener(createTipPanelUpdater(contractMarketHeader, "ContractMarketMethod"));
 
         lblContractSearchRadius = new CampaignOptionsLabel("ContractSearchRadius");
+        lblContractSearchRadius.addMouseListener(createTipPanelUpdater(contractMarketHeader, "ContractSearchRadius"));
         spnContractSearchRadius = new CampaignOptionsSpinner("ContractSearchRadius", 300, 100, 2500, 100);
+        spnContractSearchRadius.addMouseListener(createTipPanelUpdater(contractMarketHeader, "ContractSearchRadius"));
 
         chkVariableContractLength = new CampaignOptionsCheckBox("VariableContractLength");
+        chkVariableContractLength.addMouseListener(createTipPanelUpdater(contractMarketHeader,
+              "VariableContractLength"));
 
         chkUseDynamicDifficulty = new CampaignOptionsCheckBox("UseDynamicDifficulty");
+        chkUseDynamicDifficulty.addMouseListener(createTipPanelUpdater(contractMarketHeader, "UseDynamicDifficulty"));
 
         chkContractMarketReportRefresh = new CampaignOptionsCheckBox("ContractMarketReportRefresh");
+        chkContractMarketReportRefresh.addMouseListener(createTipPanelUpdater(contractMarketHeader,
+              "ContractMarketReportRefresh"));
 
         lblCoontractMaxSalvagePercentage = new CampaignOptionsLabel("CoontractMaxSalvagePercentage");
+        lblCoontractMaxSalvagePercentage.addMouseListener(createTipPanelUpdater(contractMarketHeader,
+              "CoontractMaxSalvagePercentage"));
         spnContractMaxSalvagePercentage = new CampaignOptionsSpinner("CoontractMaxSalvagePercentage", 100, 0, 100, 10);
+        spnContractMaxSalvagePercentage.addMouseListener(createTipPanelUpdater(contractMarketHeader,
+              "CoontractMaxSalvagePercentage"));
 
         lblDropShipBonusPercentage = new CampaignOptionsLabel("DropShipBonusPercentage");
+        lblDropShipBonusPercentage.addMouseListener(createTipPanelUpdater(contractMarketHeader,
+              "DropShipBonusPercentage"));
         spnDropShipBonusPercentage = new CampaignOptionsSpinner("DropShipBonusPercentage", 0, 0, 20, 5);
+        spnDropShipBonusPercentage.addMouseListener(createTipPanelUpdater(contractMarketHeader,
+              "DropShipBonusPercentage"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("ContractMarketGeneralOptionsPanel");
@@ -620,11 +672,19 @@ public class MarketsTab {
      */
     private JPanel createContractPayPanel() {
         // Contents
-        btnContractEquipment = new JRadioButton(resources.getString("lblContractEquipment.text"));
-        btnContractEquipment.setToolTipText(resources.getString("lblContractEquipment.tooltip"));
+        btnContractEquipment = new JRadioButton(getTextAt(getCampaignOptionsResourceBundle(),
+              "lblContractEquipment.text"));
+        spnDropShipBonusPercentage.addMouseListener(createTipPanelUpdater(contractMarketHeader, "ContractEquipment"));
+        btnContractEquipment.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(),
+              "lblContractEquipment.tooltip"));
+        spnDropShipBonusPercentage.addMouseListener(createTipPanelUpdater(contractMarketHeader, "ContractEquipment"));
 
-        btnContractPersonnel = new JRadioButton(resources.getString("lblContractPersonnel.text"));
-        btnContractPersonnel.setToolTipText(resources.getString("lblContractPersonnel.tooltip"));
+        btnContractPersonnel = new JRadioButton(getTextAt(getCampaignOptionsResourceBundle(),
+              "lblContractPersonnel.text"));
+        spnDropShipBonusPercentage.addMouseListener(createTipPanelUpdater(contractMarketHeader, "ContractPersonnel"));
+        btnContractPersonnel.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(),
+              "lblContractPersonnel.tooltip"));
+        spnDropShipBonusPercentage.addMouseListener(createTipPanelUpdater(contractMarketHeader, "ContractPersonnel"));
 
         // Create a ButtonGroup to link the buttons
         ButtonGroup contractGroup = new ButtonGroup();
@@ -633,42 +693,58 @@ public class MarketsTab {
 
         // Add other components here...
         chkEquipContractSaleValue = new CampaignOptionsCheckBox("EquipContractSaleValue");
+        chkEquipContractSaleValue.addMouseListener(createTipPanelUpdater(contractMarketHeader,
+              "EquipContractSaleValue"));
 
         lblEquipPercent = new CampaignOptionsLabel("EquipPercent");
+        lblEquipPercent.addMouseListener(createTipPanelUpdater(contractMarketHeader, "EquipPercent"));
         spnEquipPercent = new CampaignOptionsSpinner("EquipPercent",
               0.1,
               0,
               CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT,
               0.1);
+        spnEquipPercent.addMouseListener(createTipPanelUpdater(contractMarketHeader, "EquipPercent"));
 
         lblDropShipPercent = new CampaignOptionsLabel("DropShipPercent");
+        lblDropShipPercent.addMouseListener(createTipPanelUpdater(contractMarketHeader, "DropShipPercent"));
         spnDropShipPercent = new CampaignOptionsSpinner("DropShipPercent",
               0.1,
               0,
               CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT,
               0.1);
+        spnDropShipPercent.addMouseListener(createTipPanelUpdater(contractMarketHeader, "DropShipPercent"));
 
         lblJumpShipPercent = new CampaignOptionsLabel("JumpShipPercent");
+        lblJumpShipPercent.addMouseListener(createTipPanelUpdater(contractMarketHeader, "JumpShipPercent"));
         spnJumpShipPercent = new CampaignOptionsSpinner("JumpShipPercent",
               0.1,
               0,
               CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT,
               0.1);
+        spnJumpShipPercent.addMouseListener(createTipPanelUpdater(contractMarketHeader, "JumpShipPercent"));
 
         lblWarShipPercent = new CampaignOptionsLabel("WarShipPercent");
+        lblWarShipPercent.addMouseListener(createTipPanelUpdater(contractMarketHeader, "WarShipPercent"));
         spnWarShipPercent = new CampaignOptionsSpinner("WarShipPercent",
               0.1,
               0,
               CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT,
               0.1);
+        spnWarShipPercent.addMouseListener(createTipPanelUpdater(contractMarketHeader, "WarShipPercent"));
 
         chkBLCSaleValue = new CampaignOptionsCheckBox("BLCSaleValue");
+        chkBLCSaleValue.addMouseListener(createTipPanelUpdater(contractMarketHeader, "BLCSaleValue"));
 
         useInfantryDoseNotCountBox = new CampaignOptionsCheckBox("UseInfantryDoseNotCountBox");
+        useInfantryDoseNotCountBox.addMouseListener(createTipPanelUpdater(contractMarketHeader,
+              "UseInfantryDoseNotCountBox"));
 
         chkMercSizeLimited = new CampaignOptionsCheckBox("MercSizeLimited");
+        chkMercSizeLimited.addMouseListener(createTipPanelUpdater(contractMarketHeader, "MercSizeLimited"));
 
         chkOverageRepaymentInFinalPayment = new CampaignOptionsCheckBox("OverageRepaymentInFinalPayment");
+        chkOverageRepaymentInFinalPayment.addMouseListener(createTipPanelUpdater(contractMarketHeader,
+              "OverageRepaymentInFinalPayment"));
 
         // Layout the Panel
         final JPanel panelValuePercent = new CampaignOptionsStandardPanel("ContractPayPanelValuePercent", false);

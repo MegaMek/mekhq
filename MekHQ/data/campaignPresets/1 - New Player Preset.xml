@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<campaignPreset version="0.50.05">
+<campaignPreset version="0.50.06">
     <title>1 - New Player Preset</title>
     <description><![CDATA[This preset is a simplified version of the "Veteran Experience" preset, designed for newer players or those seeking an easier game.
 <br>
@@ -50,128 +50,92 @@
         <mrmsOptions>
             <mrmsOption>
                 <type>ARMOUR</type>
-                <active>0</active>
+                <active>1</active>
                 <skillMin>0</skillMin>
                 <skillMax>4</skillMax>
                 <btnMin>4</btnMin>
-                <btnMax>4</btnMax>
+                <btnMax>1</btnMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
                 <type>AMMUNITION</type>
-                <active>0</active>
+                <active>1</active>
                 <skillMin>0</skillMin>
                 <skillMax>4</skillMax>
                 <btnMin>4</btnMin>
-                <btnMax>4</btnMax>
+                <btnMax>1</btnMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
                 <type>WEAPON</type>
-                <active>0</active>
+                <active>1</active>
                 <skillMin>0</skillMin>
                 <skillMax>4</skillMax>
                 <btnMin>4</btnMin>
-                <btnMax>4</btnMax>
+                <btnMax>1</btnMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
                 <type>GENERAL_LOCATION</type>
-                <active>0</active>
+                <active>1</active>
                 <skillMin>0</skillMin>
                 <skillMax>4</skillMax>
-                <btnMin>4</btnMin>
-                <btnMax>4</btnMax>
+                <btnMin>12</btnMin>
+                <btnMax>1</btnMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
                 <type>ENGINE</type>
-                <active>0</active>
+                <active>1</active>
                 <skillMin>0</skillMin>
                 <skillMax>4</skillMax>
                 <btnMin>4</btnMin>
-                <btnMax>4</btnMax>
+                <btnMax>1</btnMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
                 <type>GYRO</type>
-                <active>0</active>
+                <active>1</active>
                 <skillMin>0</skillMin>
                 <skillMax>4</skillMax>
                 <btnMin>4</btnMin>
-                <btnMax>4</btnMax>
+                <btnMax>1</btnMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
                 <type>ACTUATOR</type>
-                <active>0</active>
+                <active>1</active>
                 <skillMin>0</skillMin>
                 <skillMax>4</skillMax>
                 <btnMin>4</btnMin>
-                <btnMax>4</btnMax>
+                <btnMax>1</btnMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
                 <type>ELECTRONICS</type>
-                <active>0</active>
+                <active>1</active>
                 <skillMin>0</skillMin>
                 <skillMax>4</skillMax>
                 <btnMin>4</btnMin>
-                <btnMax>4</btnMax>
+                <btnMax>1</btnMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
                 <type>GENERAL</type>
-                <active>0</active>
+                <active>1</active>
                 <skillMin>0</skillMin>
                 <skillMax>4</skillMax>
                 <btnMin>4</btnMin>
-                <btnMax>4</btnMax>
-                <dailyTimeMin>0</dailyTimeMin>
-            </mrmsOption>
-            <mrmsOption>
-                <type>HEAT_SINK</type>
-                <active>0</active>
-                <skillMin>0</skillMin>
-                <skillMax>4</skillMax>
-                <btnMin>4</btnMin>
-                <btnMax>4</btnMax>
-                <dailyTimeMin>0</dailyTimeMin>
-            </mrmsOption>
-            <mrmsOption>
-                <type>MEK_LOCATION</type>
-                <active>0</active>
-                <skillMin>0</skillMin>
-                <skillMax>4</skillMax>
-                <btnMin>4</btnMin>
-                <btnMax>4</btnMax>
-                <dailyTimeMin>0</dailyTimeMin>
-            </mrmsOption>
-            <mrmsOption>
-                <type>PHYSICAL_WEAPON</type>
-                <active>0</active>
-                <skillMin>0</skillMin>
-                <skillMax>4</skillMax>
-                <btnMin>4</btnMin>
-                <btnMax>4</btnMax>
+                <btnMax>1</btnMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
             <mrmsOption>
                 <type>POD_SPACE</type>
-                <active>0</active>
+                <active>1</active>
                 <skillMin>0</skillMin>
                 <skillMax>4</skillMax>
                 <btnMin>4</btnMin>
-                <btnMax>4</btnMax>
-                <dailyTimeMin>0</dailyTimeMin>
-            </mrmsOption>
-            <mrmsOption>
-                <type>UNKNOWN_LOCATION</type>
-                <active>0</active>
-                <skillMin>0</skillMin>
-                <skillMax>4</skillMax>
-                <btnMin>4</btnMin>
-                <btnMax>4</btnMax>
+                <btnMax>1</btnMax>
                 <dailyTimeMin>0</dailyTimeMin>
             </mrmsOption>
         </mrmsOptions>
@@ -210,7 +174,7 @@
         <factionIntroDate>false</factionIntroDate>
         <useAmmoByType>true</useAmmoByType>
         <waitingPeriod>1</waitingPeriod>
-        <acquisitionSkill>Negotiation</acquisitionSkill>
+        <acquisitionSkill>Administration</acquisitionSkill>
         <acquisitionPersonnelCategory>LOGISTICS</acquisitionPersonnelCategory>
         <techLevel>2</techLevel>
         <unitTransitTime>1</unitTransitTime>
@@ -306,14 +270,14 @@
         <salaryAntiMekMultiplier>1.5</salaryAntiMekMultiplier>
         <salarySpecialistInfantryMultiplier>1.28</salarySpecialistInfantryMultiplier>
         <salaryXPMultipliers>
+            <ULTRA_GREEN>0.6</ULTRA_GREEN>
             <NONE>0.5</NONE>
             <GREEN>0.6</GREEN>
-            <HEROIC>6.4</HEROIC>
-            <LEGENDARY>12.8</LEGENDARY>
-            <ULTRA_GREEN>0.6</ULTRA_GREEN>
-            <ELITE>3.2</ELITE>
             <VETERAN>1.6</VETERAN>
             <REGULAR>1.0</REGULAR>
+            <ELITE>3.2</ELITE>
+            <LEGENDARY>12.8</LEGENDARY>
+            <HEROIC>6.4</HEROIC>
         </salaryXPMultipliers>
         <salaryTypeBase>1500 CSB,2250 CSB,900 CSB,900 CSB,900 CSB,900 CSB,900 CSB,1500 CSB,900 CSB,960 CSB,960 CSB,750 CSB,1000 CSB,1000 CSB,1000 CSB,1000 CSB,800 CSB,800 CSB,800 CSB,800 CSB,400 CSB,1500 CSB,400 CSB,500 CSB,500 CSB,500 CSB,500 CSB,0 CSB,0 CSB</salaryTypeBase>
         <awardBonusStyle>BOTH</awardBonusStyle>
@@ -407,17 +371,17 @@
         <logMarriageNameChanges>true</logMarriageNameChanges>
         <marriageSurnameWeights>
             <SPACE_SPOUSE>10</SPACE_SPOUSE>
-            <NO_CHANGE>100</NO_CHANGE>
-            <BOTH_SPACE_YOURS>5</BOTH_SPACE_YOURS>
-            <FEMALE>160</FEMALE>
-            <SPACE_YOURS>10</SPACE_YOURS>
             <BOTH_HYPHEN_YOURS>20</BOTH_HYPHEN_YOURS>
-            <HYPHEN_SPOUSE>30</HYPHEN_SPOUSE>
-            <BOTH_HYPHEN_SPOUSE>20</BOTH_HYPHEN_SPOUSE>
-            <YOURS>55</YOURS>
+            <FEMALE>160</FEMALE>
+            <HYPHEN_YOURS>30</HYPHEN_YOURS>
+            <BOTH_SPACE_YOURS>5</BOTH_SPACE_YOURS>
             <BOTH_SPACE_SPOUSE>5</BOTH_SPACE_SPOUSE>
             <SPOUSE>55</SPOUSE>
-            <HYPHEN_YOURS>30</HYPHEN_YOURS>
+            <YOURS>55</YOURS>
+            <SPACE_YOURS>10</SPACE_YOURS>
+            <NO_CHANGE>100</NO_CHANGE>
+            <HYPHEN_SPOUSE>30</HYPHEN_SPOUSE>
+            <BOTH_HYPHEN_SPOUSE>20</BOTH_HYPHEN_SPOUSE>
             <MALE>500</MALE>
         </marriageSurnameWeights>
         <randomMarriageMethod>DICE_ROLL</randomMarriageMethod>
@@ -431,10 +395,10 @@
         <useClanPersonnelDivorce>true</useClanPersonnelDivorce>
         <usePrisonerDivorce>true</usePrisonerDivorce>
         <divorceSurnameWeights>
-            <BOTH_CHANGE_SURNAME>30</BOTH_CHANGE_SURNAME>
-            <ORIGIN_CHANGES_SURNAME>10</ORIGIN_CHANGES_SURNAME>
             <SPOUSE_CHANGES_SURNAME>10</SPOUSE_CHANGES_SURNAME>
+            <ORIGIN_CHANGES_SURNAME>10</ORIGIN_CHANGES_SURNAME>
             <BOTH_KEEP_SURNAME>50</BOTH_KEEP_SURNAME>
+            <BOTH_CHANGE_SURNAME>30</BOTH_CHANGE_SURNAME>
         </divorceSurnameWeights>
         <randomDivorceMethod>DICE_ROLL</randomDivorceMethod>
         <useRandomOppositeSexDivorce>true</useRandomOppositeSexDivorce>
@@ -477,13 +441,13 @@
         <allAges>false</allAges>
         <militaryAcademyAccidents>10000</militaryAcademyAccidents>
         <enabledRandomDeathAgeGroups>
-            <TODDLER>false</TODDLER>
-            <CHILD>false</CHILD>
-            <BABY>false</BABY>
             <TEENAGER>false</TEENAGER>
             <ELDER>true</ELDER>
+            <CHILD>false</CHILD>
             <ADULT>true</ADULT>
             <PRETEEN>false</PRETEEN>
+            <BABY>false</BABY>
+            <TODDLER>false</TODDLER>
         </enabledRandomDeathAgeGroups>
         <useRandomDeathSuicideCause>false</useRandomDeathSuicideCause>
         <randomDeathMultiplier>1.0</randomDeathMultiplier>
@@ -524,14 +488,14 @@
         <personnelMarketName>Dylan&apos;s Method</personnelMarketName>
         <personnelMarketReportRefresh>true</personnelMarketReportRefresh>
         <personnelMarketRandomRemovalTargets>
+            <ULTRA_GREEN>4</ULTRA_GREEN>
             <NONE>3</NONE>
             <GREEN>4</GREEN>
-            <HEROIC>11</HEROIC>
-            <LEGENDARY>11</LEGENDARY>
-            <ULTRA_GREEN>4</ULTRA_GREEN>
-            <ELITE>10</ELITE>
             <VETERAN>8</VETERAN>
             <REGULAR>6</REGULAR>
+            <ELITE>10</ELITE>
+            <LEGENDARY>11</LEGENDARY>
+            <HEROIC>11</HEROIC>
         </personnelMarketRandomRemovalTargets>
         <personnelMarketDylansWeight>0.3</personnelMarketDylansWeight>
         <usePersonnelHireHiringHallOnly>false</usePersonnelHireHiringHallOnly>
@@ -608,35 +572,35 @@
     <randomSkillPreferences>
         <overallRecruitBonus>0</overallRecruitBonus>
         <recruitmentBonuses>
-            <MEDIC>0</MEDIC>
-            <AERO_TEK>0</AERO_TEK>
-            <ADMINISTRATOR_TRANSPORT>0</ADMINISTRATOR_TRANSPORT>
-            <ADMINISTRATOR_COMMAND>0</ADMINISTRATOR_COMMAND>
-            <ASTECH>0</ASTECH>
-            <CONVENTIONAL_AIRCRAFT_PILOT>0</CONVENTIONAL_AIRCRAFT_PILOT>
-            <GROUND_VEHICLE_DRIVER>0</GROUND_VEHICLE_DRIVER>
-            <PROTOMEK_PILOT>0</PROTOMEK_PILOT>
-            <NONE>0</NONE>
-            <VTOL_PILOT>0</VTOL_PILOT>
-            <ADMINISTRATOR_HR>0</ADMINISTRATOR_HR>
-            <MEKWARRIOR>0</MEKWARRIOR>
-            <DEPENDENT>0</DEPENDENT>
-            <BATTLE_ARMOUR>0</BATTLE_ARMOUR>
-            <VESSEL_CREW>0</VESSEL_CREW>
-            <VESSEL_GUNNER>0</VESSEL_GUNNER>
-            <LAM_PILOT>0</LAM_PILOT>
             <BA_TECH>0</BA_TECH>
             <SOLDIER>0</SOLDIER>
-            <VESSEL_NAVIGATOR>0</VESSEL_NAVIGATOR>
-            <MECHANIC>0</MECHANIC>
+            <AERO_TEK>0</AERO_TEK>
             <VEHICLE_GUNNER>0</VEHICLE_GUNNER>
-            <VESSEL_PILOT>0</VESSEL_PILOT>
-            <MEK_TECH>0</MEK_TECH>
-            <VEHICLE_CREW>0</VEHICLE_CREW>
-            <ADMINISTRATOR_LOGISTICS>0</ADMINISTRATOR_LOGISTICS>
-            <NAVAL_VEHICLE_DRIVER>0</NAVAL_VEHICLE_DRIVER>
             <DOCTOR>0</DOCTOR>
+            <VTOL_PILOT>0</VTOL_PILOT>
+            <MECHANIC>0</MECHANIC>
+            <VEHICLE_CREW>0</VEHICLE_CREW>
+            <VESSEL_CREW>0</VESSEL_CREW>
+            <ADMINISTRATOR_LOGISTICS>0</ADMINISTRATOR_LOGISTICS>
+            <GROUND_VEHICLE_DRIVER>0</GROUND_VEHICLE_DRIVER>
+            <MEK_TECH>0</MEK_TECH>
+            <VESSEL_NAVIGATOR>0</VESSEL_NAVIGATOR>
+            <PROTOMEK_PILOT>0</PROTOMEK_PILOT>
+            <MEDIC>0</MEDIC>
             <AEROSPACE_PILOT>0</AEROSPACE_PILOT>
+            <ADMINISTRATOR_TRANSPORT>0</ADMINISTRATOR_TRANSPORT>
+            <ASTECH>0</ASTECH>
+            <DEPENDENT>0</DEPENDENT>
+            <NAVAL_VEHICLE_DRIVER>0</NAVAL_VEHICLE_DRIVER>
+            <VESSEL_GUNNER>0</VESSEL_GUNNER>
+            <LAM_PILOT>0</LAM_PILOT>
+            <NONE>0</NONE>
+            <CONVENTIONAL_AIRCRAFT_PILOT>0</CONVENTIONAL_AIRCRAFT_PILOT>
+            <ADMINISTRATOR_HR>0</ADMINISTRATOR_HR>
+            <VESSEL_PILOT>0</VESSEL_PILOT>
+            <ADMINISTRATOR_COMMAND>0</ADMINISTRATOR_COMMAND>
+            <BATTLE_ARMOUR>0</BATTLE_ARMOUR>
+            <MEKWARRIOR>0</MEKWARRIOR>
         </recruitmentBonuses>
         <specialAbilityBonus>-10,-10,-2,0,1</specialAbilityBonus>
         <commandSkillsModifier>-12,-11,-10,-9,-8</commandSkillsModifier>
@@ -655,422 +619,6 @@
         <secondSkillBonus>-4</secondSkillBonus>
     </randomSkillPreferences>
     <skillTypes>
-        <skillType>
-            <name>Piloting/Mek</name>
-            <target>8</target>
-            <isCountUp>false</isCountUp>
-            <subType>COMBAT_PILOTING</subType>
-            <firstAttribute>REFLEXES</firstAttribute>
-            <secondAttribute>DEXTERITY</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Gunnery/Mek</name>
-            <target>8</target>
-            <isCountUp>false</isCountUp>
-            <subType>COMBAT_GUNNERY</subType>
-            <firstAttribute>REFLEXES</firstAttribute>
-            <secondAttribute>DEXTERITY</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Piloting/Aerospace</name>
-            <target>8</target>
-            <isCountUp>false</isCountUp>
-            <subType>COMBAT_PILOTING</subType>
-            <firstAttribute>REFLEXES</firstAttribute>
-            <secondAttribute>DEXTERITY</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Gunnery/Aerospace</name>
-            <target>8</target>
-            <isCountUp>false</isCountUp>
-            <subType>COMBAT_GUNNERY</subType>
-            <firstAttribute>REFLEXES</firstAttribute>
-            <secondAttribute>DEXTERITY</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Piloting/Ground Vehicle</name>
-            <target>8</target>
-            <isCountUp>false</isCountUp>
-            <subType>COMBAT_PILOTING</subType>
-            <firstAttribute>REFLEXES</firstAttribute>
-            <secondAttribute>DEXTERITY</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Piloting/VTOL</name>
-            <target>8</target>
-            <isCountUp>false</isCountUp>
-            <subType>COMBAT_PILOTING</subType>
-            <firstAttribute>REFLEXES</firstAttribute>
-            <secondAttribute>DEXTERITY</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Piloting/Naval</name>
-            <target>8</target>
-            <isCountUp>false</isCountUp>
-            <subType>COMBAT_PILOTING</subType>
-            <firstAttribute>REFLEXES</firstAttribute>
-            <secondAttribute>DEXTERITY</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Gunnery/Vehicle</name>
-            <target>8</target>
-            <isCountUp>false</isCountUp>
-            <subType>COMBAT_GUNNERY</subType>
-            <firstAttribute>REFLEXES</firstAttribute>
-            <secondAttribute>DEXTERITY</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Piloting/Aircraft</name>
-            <target>8</target>
-            <isCountUp>false</isCountUp>
-            <subType>COMBAT_PILOTING</subType>
-            <firstAttribute>REFLEXES</firstAttribute>
-            <secondAttribute>DEXTERITY</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Gunnery/Aircraft</name>
-            <target>8</target>
-            <isCountUp>false</isCountUp>
-            <subType>COMBAT_GUNNERY</subType>
-            <firstAttribute>REFLEXES</firstAttribute>
-            <secondAttribute>DEXTERITY</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Piloting/Spacecraft</name>
-            <target>8</target>
-            <isCountUp>false</isCountUp>
-            <subType>COMBAT_PILOTING</subType>
-            <firstAttribute>REFLEXES</firstAttribute>
-            <secondAttribute>DEXTERITY</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Gunnery/Spacecraft</name>
-            <target>8</target>
-            <isCountUp>false</isCountUp>
-            <subType>COMBAT_GUNNERY</subType>
-            <firstAttribute>REFLEXES</firstAttribute>
-            <secondAttribute>DEXTERITY</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Artillery</name>
-            <target>8</target>
-            <isCountUp>false</isCountUp>
-            <subType>COMBAT_GUNNERY</subType>
-            <firstAttribute>INTELLIGENCE</firstAttribute>
-            <secondAttribute>WILLPOWER</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Gunnery/BattleArmor</name>
-            <target>8</target>
-            <isCountUp>false</isCountUp>
-            <subType>COMBAT_GUNNERY</subType>
-            <firstAttribute>REFLEXES</firstAttribute>
-            <secondAttribute>DEXTERITY</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Gunnery/ProtoMek</name>
-            <target>8</target>
-            <isCountUp>false</isCountUp>
-            <subType>COMBAT_GUNNERY</subType>
-            <firstAttribute>REFLEXES</firstAttribute>
-            <secondAttribute>DEXTERITY</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Small Arms</name>
-            <target>8</target>
-            <isCountUp>false</isCountUp>
-            <subType>COMBAT_GUNNERY</subType>
-            <firstAttribute>DEXTERITY</firstAttribute>
-            <secondAttribute>NONE</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Anti-Mek</name>
-            <target>8</target>
-            <isCountUp>false</isCountUp>
-            <subType>COMBAT_PILOTING</subType>
-            <firstAttribute>DEXTERITY</firstAttribute>
-            <secondAttribute>INTELLIGENCE</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Tech/Mek</name>
-            <target>9</target>
-            <isCountUp>false</isCountUp>
-            <subType>SUPPORT</subType>
-            <firstAttribute>DEXTERITY</firstAttribute>
-            <secondAttribute>INTELLIGENCE</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Tech/Mechanic</name>
-            <target>9</target>
-            <isCountUp>false</isCountUp>
-            <subType>SUPPORT</subType>
-            <firstAttribute>DEXTERITY</firstAttribute>
-            <secondAttribute>INTELLIGENCE</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Tech/Aero</name>
-            <target>9</target>
-            <isCountUp>false</isCountUp>
-            <subType>SUPPORT</subType>
-            <firstAttribute>DEXTERITY</firstAttribute>
-            <secondAttribute>INTELLIGENCE</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Tech/BattleArmor</name>
-            <target>9</target>
-            <isCountUp>false</isCountUp>
-            <subType>SUPPORT</subType>
-            <firstAttribute>DEXTERITY</firstAttribute>
-            <secondAttribute>INTELLIGENCE</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Tech/Vessel</name>
-            <target>9</target>
-            <isCountUp>false</isCountUp>
-            <subType>SUPPORT</subType>
-            <firstAttribute>DEXTERITY</firstAttribute>
-            <secondAttribute>INTELLIGENCE</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Astech</name>
-            <target>7</target>
-            <isCountUp>false</isCountUp>
-            <subType>SUPPORT</subType>
-            <firstAttribute>INTELLIGENCE</firstAttribute>
-            <secondAttribute>NONE</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Doctor</name>
-            <target>9</target>
-            <isCountUp>false</isCountUp>
-            <subType>SUPPORT</subType>
-            <firstAttribute>DEXTERITY</firstAttribute>
-            <secondAttribute>INTELLIGENCE</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>MedTech</name>
-            <target>7</target>
-            <isCountUp>false</isCountUp>
-            <subType>SUPPORT</subType>
-            <firstAttribute>INTELLIGENCE</firstAttribute>
-            <secondAttribute>NONE</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Hyperspace Navigation</name>
-            <target>7</target>
-            <isCountUp>false</isCountUp>
-            <subType>SUPPORT</subType>
-            <firstAttribute>INTELLIGENCE</firstAttribute>
-            <secondAttribute>NONE</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Administration</name>
-            <target>8</target>
-            <isCountUp>false</isCountUp>
-            <subType>SUPPORT</subType>
-            <firstAttribute>INTELLIGENCE</firstAttribute>
-            <secondAttribute>WILLPOWER</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Tactics</name>
-            <target>0</target>
-            <isCountUp>true</isCountUp>
-            <subType>SUPPORT_COMMAND</subType>
-            <firstAttribute>INTELLIGENCE</firstAttribute>
-            <secondAttribute>WILLPOWER</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Strategy</name>
-            <target>0</target>
-            <isCountUp>true</isCountUp>
-            <subType>SUPPORT_COMMAND</subType>
-            <firstAttribute>INTELLIGENCE</firstAttribute>
-            <secondAttribute>WILLPOWER</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Negotiation</name>
-            <target>8</target>
-            <isCountUp>false</isCountUp>
-            <subType>SUPPORT</subType>
-            <firstAttribute>CHARISMA</firstAttribute>
-            <secondAttribute>NONE</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Leadership</name>
-            <target>0</target>
-            <isCountUp>true</isCountUp>
-            <subType>SUPPORT_COMMAND</subType>
-            <firstAttribute>WILLPOWER</firstAttribute>
-            <secondAttribute>CHARISMA</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
-        <skillType>
-            <name>Scrounge</name>
-            <target>8</target>
-            <isCountUp>false</isCountUp>
-            <subType>SUPPORT</subType>
-            <firstAttribute>CHARISMA</firstAttribute>
-            <secondAttribute>NONE</secondAttribute>
-            <greenLvl>2</greenLvl>
-            <regLvl>3</regLvl>
-            <vetLvl>4</vetLvl>
-            <eliteLvl>5</eliteLvl>
-            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
-        </skillType>
         <skillType>
             <name>Acrobatics (RP Only)</name>
             <target>7</target>
@@ -1098,6 +646,19 @@
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
+            <name>Administration</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>SUPPORT</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
             <name>Animal Handling (RP Only)</name>
             <target>8</target>
             <isCountUp>false</isCountUp>
@@ -1109,6 +670,19 @@
             <vetLvl>4</vetLvl>
             <eliteLvl>5</eliteLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Anti-Mek (Climbing)</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>COMBAT_PILOTING</subType>
+            <firstAttribute>DEXTERITY</firstAttribute>
+            <secondAttribute>NONE</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>12,6,6,6,6,6,6,6,6,-1,-1</costs>
         </skillType>
         <skillType>
             <name>Appraisal (RP Only)</name>
@@ -1130,6 +704,19 @@
             <subType>ROLEPLAY_GENERAL</subType>
             <firstAttribute>DEXTERITY</firstAttribute>
             <secondAttribute>NONE</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Art/Cooking (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_ART</subType>
+            <firstAttribute>DEXTERITY</firstAttribute>
+            <secondAttribute>INTELLIGENCE</secondAttribute>
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
@@ -1163,7 +750,72 @@
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
+            <name>Art/Instrument (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_ART</subType>
+            <firstAttribute>DEXTERITY</firstAttribute>
+            <secondAttribute>INTELLIGENCE</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Art/Other (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_ART</subType>
+            <firstAttribute>DEXTERITY</firstAttribute>
+            <secondAttribute>INTELLIGENCE</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
             <name>Art/Painting (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_ART</subType>
+            <firstAttribute>DEXTERITY</firstAttribute>
+            <secondAttribute>INTELLIGENCE</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Art/Poetry (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_ART</subType>
+            <firstAttribute>DEXTERITY</firstAttribute>
+            <secondAttribute>INTELLIGENCE</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Art/Sculpture (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_ART</subType>
+            <firstAttribute>DEXTERITY</firstAttribute>
+            <secondAttribute>INTELLIGENCE</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Art/Singing (RP Only)</name>
             <target>9</target>
             <isCountUp>false</isCountUp>
             <subType>ROLEPLAY_ART</subType>
@@ -1189,6 +841,45 @@
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
+            <name>Artillery</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>COMBAT_GUNNERY</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Astech</name>
+            <target>7</target>
+            <isCountUp>false</isCountUp>
+            <subType>SUPPORT</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>NONE</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Career/Any (RP Only)</name>
+            <target>7</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_GENERAL</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>NONE</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
             <name>Climbing (RP Only)</name>
             <target>7</target>
             <isCountUp>false</isCountUp>
@@ -1202,7 +893,7 @@
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
-            <name>Communications (RP Only)</name>
+            <name>Communications/Any (RP Only)</name>
             <target>7</target>
             <isCountUp>false</isCountUp>
             <subType>ROLEPLAY_GENERAL</subType>
@@ -1293,6 +984,214 @@
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
+            <name>Gunnery/Aerospace</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>COMBAT_GUNNERY</subType>
+            <firstAttribute>REFLEXES</firstAttribute>
+            <secondAttribute>DEXTERITY</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Gunnery/Aircraft</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>COMBAT_GUNNERY</subType>
+            <firstAttribute>REFLEXES</firstAttribute>
+            <secondAttribute>DEXTERITY</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Gunnery/BattleArmor</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>COMBAT_GUNNERY</subType>
+            <firstAttribute>REFLEXES</firstAttribute>
+            <secondAttribute>DEXTERITY</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Gunnery/Mek</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>COMBAT_GUNNERY</subType>
+            <firstAttribute>REFLEXES</firstAttribute>
+            <secondAttribute>DEXTERITY</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Gunnery/ProtoMek</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>COMBAT_GUNNERY</subType>
+            <firstAttribute>REFLEXES</firstAttribute>
+            <secondAttribute>DEXTERITY</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Gunnery/Spacecraft</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>COMBAT_GUNNERY</subType>
+            <firstAttribute>REFLEXES</firstAttribute>
+            <secondAttribute>DEXTERITY</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Gunnery/Vehicle</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>COMBAT_GUNNERY</subType>
+            <firstAttribute>REFLEXES</firstAttribute>
+            <secondAttribute>DEXTERITY</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Interest/Antiques (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_INTEREST</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Interest/Archeology (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_INTEREST</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Interest/Astrology (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_INTEREST</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Interest/Cartography (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_INTEREST</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Interest/Economics (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_INTEREST</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Interest/Exotic Animals (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_INTEREST</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Interest/Fashion (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_INTEREST</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Interest/Fishing (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_INTEREST</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Interest/Gambling (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_INTEREST</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
             <name>Interest/History (RP Only)</name>
             <target>9</target>
             <isCountUp>false</isCountUp>
@@ -1306,7 +1205,7 @@
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
-            <name>Interest/Literature (RP Only)</name>
+            <name>Interest/Holo-Cinema (RP Only)</name>
             <target>9</target>
             <isCountUp>false</isCountUp>
             <subType>ROLEPLAY_INTEREST</subType>
@@ -1332,7 +1231,124 @@
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
+            <name>Interest/Literature (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_INTEREST</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Interest/Military (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_INTEREST</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Interest/Music (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_INTEREST</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Interest/Mythology (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_INTEREST</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Interest/Other (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_INTEREST</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Interest/Philosophy (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_INTEREST</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Interest/Politics (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_INTEREST</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Interest/Pop-Culture (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_INTEREST</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
             <name>Interest/Sports (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_INTEREST</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Interest/Theology (RP Only)</name>
             <target>9</target>
             <isCountUp>false</isCountUp>
             <subType>ROLEPLAY_INTEREST</subType>
@@ -1371,13 +1387,26 @@
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
-            <name>Languages (RP Only)</name>
+            <name>Language/Any (RP Only)</name>
             <target>8</target>
             <isCountUp>false</isCountUp>
             <subType>ROLEPLAY_GENERAL</subType>
             <firstAttribute>INTELLIGENCE</firstAttribute>
             <secondAttribute>CHARISMA</secondAttribute>
             <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Leadership</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>SUPPORT_COMMAND</subType>
+            <firstAttribute>WILLPOWER</firstAttribute>
+            <secondAttribute>CHARISMA</secondAttribute>
+            <greenLvl>2</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
             <eliteLvl>5</eliteLvl>
@@ -1397,6 +1426,58 @@
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
+            <name>MedTech/Any</name>
+            <target>7</target>
+            <isCountUp>false</isCountUp>
+            <subType>SUPPORT</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>NONE</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Melee Weapons (RP Only)</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_GENERAL</subType>
+            <firstAttribute>REFLEXES</firstAttribute>
+            <secondAttribute>DEXTERITY</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Navigation/Any</name>
+            <target>7</target>
+            <isCountUp>false</isCountUp>
+            <subType>SUPPORT</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>NONE</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Negotiation</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>SUPPORT</subType>
+            <firstAttribute>CHARISMA</firstAttribute>
+            <secondAttribute>NONE</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
             <name>Perception (RP Only)</name>
             <target>7</target>
             <isCountUp>false</isCountUp>
@@ -1410,12 +1491,103 @@
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
-            <name>Sleight of Hand (RP Only)</name>
+            <name>Piloting/Aerospace</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>COMBAT_PILOTING</subType>
+            <firstAttribute>REFLEXES</firstAttribute>
+            <secondAttribute>DEXTERITY</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Piloting/Aircraft</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>COMBAT_PILOTING</subType>
+            <firstAttribute>REFLEXES</firstAttribute>
+            <secondAttribute>DEXTERITY</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Piloting/Ground Vehicle</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>COMBAT_PILOTING</subType>
+            <firstAttribute>REFLEXES</firstAttribute>
+            <secondAttribute>DEXTERITY</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Piloting/Mek</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>COMBAT_PILOTING</subType>
+            <firstAttribute>REFLEXES</firstAttribute>
+            <secondAttribute>DEXTERITY</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Piloting/Naval</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>COMBAT_PILOTING</subType>
+            <firstAttribute>REFLEXES</firstAttribute>
+            <secondAttribute>DEXTERITY</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Piloting/Spacecraft</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>COMBAT_PILOTING</subType>
+            <firstAttribute>REFLEXES</firstAttribute>
+            <secondAttribute>DEXTERITY</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Piloting/VTOL</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>COMBAT_PILOTING</subType>
+            <firstAttribute>REFLEXES</firstAttribute>
+            <secondAttribute>DEXTERITY</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Protocols/Any (RP Only)</name>
             <target>8</target>
             <isCountUp>false</isCountUp>
             <subType>ROLEPLAY_GENERAL</subType>
-            <firstAttribute>REFLEXES</firstAttribute>
-            <secondAttribute>DEXTERITY</secondAttribute>
+            <firstAttribute>WILLPOWER</firstAttribute>
+            <secondAttribute>CHARISMA</secondAttribute>
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
@@ -1423,12 +1595,12 @@
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
-            <name>Protocols (RP Only)</name>
-            <target>8</target>
+            <name>Running (RP Only)</name>
+            <target>7</target>
             <isCountUp>false</isCountUp>
             <subType>ROLEPLAY_GENERAL</subType>
-            <firstAttribute>WILLPOWER</firstAttribute>
-            <secondAttribute>CHARISMA</secondAttribute>
+            <firstAttribute>REFLEXES</firstAttribute>
+            <secondAttribute>DEXTERITY</secondAttribute>
             <greenLvl>1</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
@@ -1462,7 +1634,72 @@
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
+            <name>Science/Genetics (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_SCIENCE</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Science/Geology (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_SCIENCE</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
             <name>Science/Mathematics (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_SCIENCE</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Science/Military (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_SCIENCE</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Science/Other (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_SCIENCE</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Science/Pharmacology (RP Only)</name>
             <target>9</target>
             <isCountUp>false</isCountUp>
             <subType>ROLEPLAY_SCIENCE</subType>
@@ -1482,6 +1719,45 @@
             <firstAttribute>INTELLIGENCE</firstAttribute>
             <secondAttribute>WILLPOWER</secondAttribute>
             <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Science/Psychology (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_SCIENCE</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Science/Xenobiology (RP Only)</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_SCIENCE</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Scrounge</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>SUPPORT</subType>
+            <firstAttribute>CHARISMA</firstAttribute>
+            <secondAttribute>NONE</secondAttribute>
+            <greenLvl>2</greenLvl>
             <regLvl>3</regLvl>
             <vetLvl>4</vetLvl>
             <eliteLvl>5</eliteLvl>
@@ -1527,6 +1803,32 @@
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
+            <name>Sleight of Hand/Any (RP Only)</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_GENERAL</subType>
+            <firstAttribute>REFLEXES</firstAttribute>
+            <secondAttribute>DEXTERITY</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Small Arms</name>
+            <target>8</target>
+            <isCountUp>false</isCountUp>
+            <subType>COMBAT_GUNNERY</subType>
+            <firstAttribute>DEXTERITY</firstAttribute>
+            <secondAttribute>NONE</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
             <name>Stealth (RP Only)</name>
             <target>8</target>
             <isCountUp>false</isCountUp>
@@ -1540,7 +1842,20 @@
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
-            <name>Streetwise (RP Only)</name>
+            <name>Strategy</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>SUPPORT_COMMAND</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Streetwise/Any (RP Only)</name>
             <target>8</target>
             <isCountUp>false</isCountUp>
             <subType>ROLEPLAY_GENERAL</subType>
@@ -1553,7 +1868,33 @@
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
-            <name>Survival (RP Only)</name>
+            <name>Support Weapons (RP Only)</name>
+            <target>7</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_GENERAL</subType>
+            <firstAttribute>DEXTERITY</firstAttribute>
+            <secondAttribute>NONE</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Surgery/Any</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>SUPPORT</subType>
+            <firstAttribute>DEXTERITY</firstAttribute>
+            <secondAttribute>INTELLIGENCE</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Survival/Any (RP Only)</name>
             <target>9</target>
             <isCountUp>false</isCountUp>
             <subType>ROLEPLAY_GENERAL</subType>
@@ -1566,7 +1907,111 @@
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
         <skillType>
-            <name>Tracking (RP Only)</name>
+            <name>Swimming (RP Only)</name>
+            <target>7</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_GENERAL</subType>
+            <firstAttribute>STRENGTH</firstAttribute>
+            <secondAttribute>NONE</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Tactics/Any</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>SUPPORT_COMMAND</subType>
+            <firstAttribute>INTELLIGENCE</firstAttribute>
+            <secondAttribute>WILLPOWER</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Tech/Aero</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>SUPPORT</subType>
+            <firstAttribute>DEXTERITY</firstAttribute>
+            <secondAttribute>INTELLIGENCE</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Tech/BattleArmor</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>SUPPORT</subType>
+            <firstAttribute>DEXTERITY</firstAttribute>
+            <secondAttribute>INTELLIGENCE</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Tech/Mechanic</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>SUPPORT</subType>
+            <firstAttribute>DEXTERITY</firstAttribute>
+            <secondAttribute>INTELLIGENCE</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Tech/Mek</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>SUPPORT</subType>
+            <firstAttribute>DEXTERITY</firstAttribute>
+            <secondAttribute>INTELLIGENCE</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Tech/Vessel</name>
+            <target>9</target>
+            <isCountUp>false</isCountUp>
+            <subType>SUPPORT</subType>
+            <firstAttribute>DEXTERITY</firstAttribute>
+            <secondAttribute>INTELLIGENCE</secondAttribute>
+            <greenLvl>2</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Thrown Weapons (RP Only)</name>
+            <target>7</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_GENERAL</subType>
+            <firstAttribute>DEXTERITY</firstAttribute>
+            <secondAttribute>NONE</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
+        <skillType>
+            <name>Tracking/Any (RP Only)</name>
             <target>8</target>
             <isCountUp>false</isCountUp>
             <subType>ROLEPLAY_GENERAL</subType>
@@ -1591,6 +2036,19 @@
             <eliteLvl>5</eliteLvl>
             <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
         </skillType>
+        <skillType>
+            <name>Zero-G Operations (RP Only)</name>
+            <target>7</target>
+            <isCountUp>false</isCountUp>
+            <subType>ROLEPLAY_GENERAL</subType>
+            <firstAttribute>REFLEXES</firstAttribute>
+            <secondAttribute>NONE</secondAttribute>
+            <greenLvl>1</greenLvl>
+            <regLvl>3</regLvl>
+            <vetLvl>4</vetLvl>
+            <eliteLvl>5</eliteLvl>
+            <costs>20,10,20,30,40,50,60,70,80,90,100</costs>
+        </skillType>
     </skillTypes>
     <specialAbilities>
         <ability>
@@ -1605,8 +2063,8 @@
             <choiceValues></choiceValues>
             <skillPrereq>
                 <skill>Anti-Mek::Veteran</skill>
-                <skill>Gunnery/ProtoMek::Veteran</skill>
                 <skill>Piloting/Ground Vehicle::Veteran</skill>
+                <skill>Gunnery/ProtoMek::Veteran</skill>
                 <skill>Piloting/Mek::Veteran</skill>
             </skillPrereq>
         </ability>
@@ -1624,9 +2082,9 @@
                 <skill>Gunnery/Mek::Veteran</skill>
                 <skill>Gunnery/ProtoMek::Veteran</skill>
                 <skill>Gunnery/Aircraft::Veteran</skill>
-                <skill>Gunnery/Spacecraft::Veteran</skill>
-                <skill>Gunnery/Aerospace::Veteran</skill>
                 <skill>Gunnery/BattleArmor::Veteran</skill>
+                <skill>Gunnery/Aerospace::Veteran</skill>
+                <skill>Gunnery/Spacecraft::Veteran</skill>
                 <skill>Gunnery/Vehicle::Veteran</skill>
             </skillPrereq>
         </ability>
@@ -1680,9 +2138,9 @@
                 <skill>Gunnery/Mek::Regular</skill>
                 <skill>Gunnery/ProtoMek::Regular</skill>
                 <skill>Gunnery/Aircraft::Regular</skill>
-                <skill>Gunnery/Spacecraft::Regular</skill>
-                <skill>Gunnery/Aerospace::Regular</skill>
                 <skill>Gunnery/BattleArmor::Regular</skill>
+                <skill>Gunnery/Aerospace::Regular</skill>
+                <skill>Gunnery/Spacecraft::Regular</skill>
                 <skill>Gunnery/Vehicle::Regular</skill>
             </skillPrereq>
         </ability>
@@ -1713,9 +2171,9 @@
                 <skill>Gunnery/Mek::Regular</skill>
                 <skill>Gunnery/ProtoMek::Regular</skill>
                 <skill>Gunnery/Aircraft::Regular</skill>
-                <skill>Gunnery/Spacecraft::Regular</skill>
-                <skill>Gunnery/Aerospace::Regular</skill>
                 <skill>Gunnery/BattleArmor::Regular</skill>
+                <skill>Gunnery/Aerospace::Regular</skill>
+                <skill>Gunnery/Spacecraft::Regular</skill>
                 <skill>Gunnery/Vehicle::Regular</skill>
             </skillPrereq>
         </ability>
@@ -1774,8 +2232,8 @@
             <choiceValues></choiceValues>
             <skillPrereq>
                 <skill>Anti-Mek::Veteran</skill>
-                <skill>Gunnery/ProtoMek::Veteran</skill>
                 <skill>Piloting/Ground Vehicle::Veteran</skill>
+                <skill>Gunnery/ProtoMek::Veteran</skill>
                 <skill>Piloting/Mek::Veteran</skill>
             </skillPrereq>
         </ability>
@@ -1872,9 +2330,9 @@
                 <skill>Gunnery/Mek::Regular</skill>
                 <skill>Gunnery/ProtoMek::Regular</skill>
                 <skill>Gunnery/Aircraft::Regular</skill>
-                <skill>Gunnery/BattleArmor::Regular</skill>
-                <skill>Gunnery/Spacecraft::Regular</skill>
                 <skill>Gunnery/Aerospace::Regular</skill>
+                <skill>Gunnery/Spacecraft::Regular</skill>
+                <skill>Gunnery/BattleArmor::Regular</skill>
                 <skill>Gunnery/Vehicle::Regular</skill>
             </skillPrereq>
         </ability>
@@ -1943,8 +2401,8 @@
             <choiceValues></choiceValues>
             <skillPrereq>
                 <skill>Anti-Mek::Veteran</skill>
-                <skill>Gunnery/ProtoMek::Veteran</skill>
                 <skill>Piloting/Ground Vehicle::Veteran</skill>
+                <skill>Gunnery/ProtoMek::Veteran</skill>
                 <skill>Piloting/Mek::Veteran</skill>
             </skillPrereq>
         </ability>
@@ -2021,9 +2479,9 @@
                 <skill>Gunnery/Mek::Regular</skill>
                 <skill>Gunnery/ProtoMek::Regular</skill>
                 <skill>Gunnery/Aircraft::Regular</skill>
-                <skill>Gunnery/Spacecraft::Regular</skill>
-                <skill>Gunnery/Aerospace::Regular</skill>
                 <skill>Gunnery/BattleArmor::Regular</skill>
+                <skill>Gunnery/Aerospace::Regular</skill>
+                <skill>Gunnery/Spacecraft::Regular</skill>
                 <skill>Gunnery/Vehicle::Regular</skill>
             </skillPrereq>
         </ability>
@@ -2068,8 +2526,8 @@
                 <skill>Gunnery/Mek::Regular</skill>
                 <skill>Gunnery/ProtoMek::Regular</skill>
                 <skill>Gunnery/Aircraft::Regular</skill>
-                <skill>Gunnery/BattleArmor::Regular</skill>
                 <skill>Gunnery/Aerospace::Regular</skill>
+                <skill>Gunnery/BattleArmor::Regular</skill>
                 <skill>Gunnery/Vehicle::Regular</skill>
             </skillPrereq>
         </ability>
@@ -2100,8 +2558,8 @@
             <skillPrereq>
                 <skill>Tech/Vessel::Regular</skill>
                 <skill>Tech/Aero::Regular</skill>
-                <skill>Tech/Mechanic::Regular</skill>
                 <skill>Tech/Mek::Regular</skill>
+                <skill>Tech/Mechanic::Regular</skill>
                 <skill>Tech/BattleArmor::Regular</skill>
             </skillPrereq>
         </ability>
@@ -2118,8 +2576,8 @@
             <skillPrereq>
                 <skill>Tech/Vessel::Regular</skill>
                 <skill>Tech/Aero::Regular</skill>
-                <skill>Tech/Mechanic::Regular</skill>
                 <skill>Tech/Mek::Regular</skill>
+                <skill>Tech/Mechanic::Regular</skill>
                 <skill>Tech/BattleArmor::Regular</skill>
             </skillPrereq>
         </ability>
@@ -2136,8 +2594,8 @@
             <skillPrereq>
                 <skill>Tech/Vessel::Veteran</skill>
                 <skill>Tech/Aero::Veteran</skill>
-                <skill>Tech/Mek::Veteran</skill>
                 <skill>Tech/Mechanic::Veteran</skill>
+                <skill>Tech/Mek::Veteran</skill>
                 <skill>Tech/BattleArmor::Veteran</skill>
             </skillPrereq>
         </ability>
@@ -2162,11 +2620,11 @@
                 <skill>Piloting/Mek::Veteran</skill>
                 <skill>Piloting/VTOL::Veteran</skill>
                 <skill>Piloting/Naval::Veteran</skill>
-                <skill>Gunnery/BattleArmor::Veteran</skill>
-                <skill>Gunnery/Aerospace::Veteran</skill>
                 <skill>Piloting/Aerospace::Veteran</skill>
-                <skill>Gunnery/ProtoMek::Veteran</skill>
+                <skill>Gunnery/Aerospace::Veteran</skill>
+                <skill>Gunnery/BattleArmor::Veteran</skill>
                 <skill>Anti-Mek::Veteran</skill>
+                <skill>Gunnery/ProtoMek::Veteran</skill>
                 <skill>Piloting/Ground Vehicle::Veteran</skill>
                 <skill>Gunnery/Aircraft::Veteran</skill>
                 <skill>Gunnery/Vehicle::Veteran</skill>
@@ -2187,10 +2645,10 @@
             <skillPrereq>
                 <skill>Piloting/Aerospace::Green</skill>
                 <skill>Piloting/Naval::Green</skill>
-                <skill>Piloting/Ground Vehicle::Green</skill>
                 <skill>Gunnery/ProtoMek::Green</skill>
-                <skill>Gunnery/BattleArmor::Green</skill>
+                <skill>Piloting/Ground Vehicle::Green</skill>
                 <skill>Piloting/VTOL::Green</skill>
+                <skill>Gunnery/BattleArmor::Green</skill>
                 <skill>Piloting/Aircraft::Green</skill>
                 <skill>Piloting/Mek::Green</skill>
             </skillPrereq>
@@ -2302,8 +2760,8 @@
             <skillPrereq>
                 <skill>Tech/Vessel::Veteran</skill>
                 <skill>Tech/Aero::Veteran</skill>
-                <skill>Tech/Mechanic::Veteran</skill>
                 <skill>Tech/Mek::Veteran</skill>
+                <skill>Tech/Mechanic::Veteran</skill>
                 <skill>Tech/BattleArmor::Veteran</skill>
             </skillPrereq>
         </ability>
@@ -2351,9 +2809,9 @@
                 <skill>Gunnery/Mek::Veteran</skill>
                 <skill>Gunnery/ProtoMek::Veteran</skill>
                 <skill>Gunnery/Aircraft::Veteran</skill>
-                <skill>Gunnery/Aerospace::Veteran</skill>
-                <skill>Gunnery/Spacecraft::Veteran</skill>
                 <skill>Gunnery/BattleArmor::Veteran</skill>
+                <skill>Gunnery/Spacecraft::Veteran</skill>
+                <skill>Gunnery/Aerospace::Veteran</skill>
                 <skill>Gunnery/Vehicle::Veteran</skill>
             </skillPrereq>
         </ability>
@@ -2402,9 +2860,9 @@
                 <skill>Gunnery/Mek::Green</skill>
                 <skill>Gunnery/ProtoMek::Green</skill>
                 <skill>Gunnery/Aircraft::Green</skill>
-                <skill>Gunnery/Aerospace::Green</skill>
-                <skill>Gunnery/Spacecraft::Green</skill>
                 <skill>Gunnery/BattleArmor::Green</skill>
+                <skill>Gunnery/Spacecraft::Green</skill>
+                <skill>Gunnery/Aerospace::Green</skill>
                 <skill>Gunnery/Vehicle::Green</skill>
             </skillPrereq>
         </ability>
@@ -2422,9 +2880,9 @@
                 <skill>Gunnery/Mek::Veteran</skill>
                 <skill>Gunnery/ProtoMek::Veteran</skill>
                 <skill>Gunnery/Aircraft::Veteran</skill>
-                <skill>Gunnery/Aerospace::Veteran</skill>
-                <skill>Gunnery/Spacecraft::Veteran</skill>
                 <skill>Gunnery/BattleArmor::Veteran</skill>
+                <skill>Gunnery/Spacecraft::Veteran</skill>
+                <skill>Gunnery/Aerospace::Veteran</skill>
                 <skill>Gunnery/Vehicle::Veteran</skill>
             </skillPrereq>
         </ability>
@@ -2441,8 +2899,8 @@
             <skillPrereq>
                 <skill>Tech/Vessel::Regular</skill>
                 <skill>Tech/Aero::Regular</skill>
-                <skill>Tech/Mechanic::Regular</skill>
                 <skill>Tech/Mek::Regular</skill>
+                <skill>Tech/Mechanic::Regular</skill>
                 <skill>Tech/BattleArmor::Regular</skill>
             </skillPrereq>
         </ability>
@@ -2459,8 +2917,8 @@
             <skillPrereq>
                 <skill>Piloting/Aerospace::Regular</skill>
                 <skill>Piloting/Naval::Regular</skill>
-                <skill>Piloting/Ground Vehicle::Regular</skill>
                 <skill>Gunnery/ProtoMek::Regular</skill>
+                <skill>Piloting/Ground Vehicle::Regular</skill>
                 <skill>Piloting/VTOL::Regular</skill>
                 <skill>Piloting/Aircraft::Regular</skill>
                 <skill>Piloting/Mek::Regular</skill>
@@ -2497,9 +2955,9 @@
                 <skill>Gunnery/Mek::Regular</skill>
                 <skill>Gunnery/ProtoMek::Regular</skill>
                 <skill>Gunnery/Aircraft::Regular</skill>
-                <skill>Gunnery/Spacecraft::Regular</skill>
-                <skill>Gunnery/Aerospace::Regular</skill>
                 <skill>Gunnery/BattleArmor::Regular</skill>
+                <skill>Gunnery/Aerospace::Regular</skill>
+                <skill>Gunnery/Spacecraft::Regular</skill>
                 <skill>Gunnery/Vehicle::Regular</skill>
             </skillPrereq>
         </ability>
@@ -2519,9 +2977,9 @@
                 <skill>Gunnery/Mek::Green</skill>
                 <skill>Gunnery/ProtoMek::Green</skill>
                 <skill>Gunnery/Aircraft::Green</skill>
-                <skill>Gunnery/Aerospace::Green</skill>
-                <skill>Gunnery/Spacecraft::Green</skill>
                 <skill>Gunnery/BattleArmor::Green</skill>
+                <skill>Gunnery/Spacecraft::Green</skill>
+                <skill>Gunnery/Aerospace::Green</skill>
                 <skill>Gunnery/Vehicle::Green</skill>
             </skillPrereq>
         </ability>
@@ -2543,9 +3001,9 @@
                 <skill>Gunnery/Mek::Green</skill>
                 <skill>Gunnery/ProtoMek::Green</skill>
                 <skill>Gunnery/Aircraft::Green</skill>
-                <skill>Gunnery/Aerospace::Green</skill>
-                <skill>Gunnery/Spacecraft::Green</skill>
                 <skill>Gunnery/BattleArmor::Green</skill>
+                <skill>Gunnery/Spacecraft::Green</skill>
+                <skill>Gunnery/Aerospace::Green</skill>
                 <skill>Gunnery/Vehicle::Green</skill>
             </skillPrereq>
         </ability>
@@ -2660,9 +3118,9 @@
                 <skill>Gunnery/Mek::Green</skill>
                 <skill>Gunnery/ProtoMek::Green</skill>
                 <skill>Gunnery/Aircraft::Green</skill>
-                <skill>Gunnery/Aerospace::Green</skill>
-                <skill>Gunnery/Spacecraft::Green</skill>
                 <skill>Gunnery/BattleArmor::Green</skill>
+                <skill>Gunnery/Spacecraft::Green</skill>
+                <skill>Gunnery/Aerospace::Green</skill>
                 <skill>Gunnery/Vehicle::Green</skill>
             </skillPrereq>
         </ability>
@@ -2680,9 +3138,9 @@
                 <skill>Gunnery/Mek::Veteran</skill>
                 <skill>Gunnery/ProtoMek::Veteran</skill>
                 <skill>Gunnery/Aircraft::Veteran</skill>
-                <skill>Gunnery/BattleArmor::Veteran</skill>
-                <skill>Gunnery/Spacecraft::Veteran</skill>
                 <skill>Gunnery/Aerospace::Veteran</skill>
+                <skill>Gunnery/Spacecraft::Veteran</skill>
+                <skill>Gunnery/BattleArmor::Veteran</skill>
                 <skill>Gunnery/Vehicle::Veteran</skill>
             </skillPrereq>
         </ability>
@@ -2700,9 +3158,9 @@
                 <skill>Gunnery/Mek::Regular</skill>
                 <skill>Gunnery/ProtoMek::Regular</skill>
                 <skill>Gunnery/Aircraft::Regular</skill>
-                <skill>Gunnery/Spacecraft::Regular</skill>
-                <skill>Gunnery/Aerospace::Regular</skill>
                 <skill>Gunnery/BattleArmor::Regular</skill>
+                <skill>Gunnery/Aerospace::Regular</skill>
+                <skill>Gunnery/Spacecraft::Regular</skill>
                 <skill>Gunnery/Vehicle::Regular</skill>
             </skillPrereq>
         </ability>
@@ -2755,11 +3213,11 @@
                 <skill>Piloting/Mek::Regular</skill>
                 <skill>Piloting/VTOL::Regular</skill>
                 <skill>Piloting/Naval::Regular</skill>
-                <skill>Gunnery/BattleArmor::Regular</skill>
-                <skill>Gunnery/Aerospace::Regular</skill>
                 <skill>Piloting/Aerospace::Regular</skill>
-                <skill>Gunnery/ProtoMek::Regular</skill>
+                <skill>Gunnery/Aerospace::Regular</skill>
+                <skill>Gunnery/BattleArmor::Regular</skill>
                 <skill>Anti-Mek::Regular</skill>
+                <skill>Gunnery/ProtoMek::Regular</skill>
                 <skill>Piloting/Ground Vehicle::Regular</skill>
                 <skill>Gunnery/Aircraft::Regular</skill>
                 <skill>Gunnery/Vehicle::Regular</skill>
@@ -2793,8 +3251,8 @@
             <skillPrereq>
                 <skill>Piloting/Aerospace::Regular</skill>
                 <skill>Piloting/Naval::Regular</skill>
-                <skill>Gunnery/ProtoMek::Regular</skill>
                 <skill>Piloting/Ground Vehicle::Regular</skill>
+                <skill>Gunnery/ProtoMek::Regular</skill>
                 <skill>Piloting/Spacecraft::Regular</skill>
                 <skill>Piloting/VTOL::Regular</skill>
                 <skill>Piloting/Aircraft::Regular</skill>
@@ -2815,9 +3273,9 @@
                 <skill>Gunnery/Mek::Regular</skill>
                 <skill>Gunnery/ProtoMek::Regular</skill>
                 <skill>Gunnery/Aircraft::Regular</skill>
-                <skill>Gunnery/Aerospace::Regular</skill>
-                <skill>Gunnery/Spacecraft::Regular</skill>
                 <skill>Gunnery/BattleArmor::Regular</skill>
+                <skill>Gunnery/Spacecraft::Regular</skill>
+                <skill>Gunnery/Aerospace::Regular</skill>
                 <skill>Gunnery/Vehicle::Regular</skill>
                 <skill>Artillery::Regular</skill>
             </skillPrereq>
@@ -2851,11 +3309,11 @@
                 <skill>Piloting/Mek::Regular</skill>
                 <skill>Piloting/VTOL::Regular</skill>
                 <skill>Piloting/Naval::Regular</skill>
-                <skill>Gunnery/BattleArmor::Regular</skill>
-                <skill>Gunnery/Aerospace::Regular</skill>
                 <skill>Piloting/Aerospace::Regular</skill>
-                <skill>Gunnery/ProtoMek::Regular</skill>
+                <skill>Gunnery/Aerospace::Regular</skill>
+                <skill>Gunnery/BattleArmor::Regular</skill>
                 <skill>Anti-Mek::Regular</skill>
+                <skill>Gunnery/ProtoMek::Regular</skill>
                 <skill>Piloting/Ground Vehicle::Regular</skill>
                 <skill>Gunnery/Aircraft::Regular</skill>
                 <skill>Gunnery/Vehicle::Regular</skill>
@@ -2876,8 +3334,8 @@
             <choiceValues></choiceValues>
             <skillPrereq>
                 <skill>Anti-Mek::Veteran</skill>
-                <skill>Gunnery/ProtoMek::Veteran</skill>
                 <skill>Piloting/Ground Vehicle::Veteran</skill>
+                <skill>Gunnery/ProtoMek::Veteran</skill>
                 <skill>Piloting/Mek::Veteran</skill>
             </skillPrereq>
         </ability>
@@ -2905,8 +3363,8 @@
             <skillPrereq>
                 <skill>Tech/Vessel::Regular</skill>
                 <skill>Tech/Aero::Regular</skill>
-                <skill>Tech/Mechanic::Regular</skill>
                 <skill>Tech/Mek::Regular</skill>
+                <skill>Tech/Mechanic::Regular</skill>
                 <skill>Tech/BattleArmor::Regular</skill>
             </skillPrereq>
         </ability>
@@ -2953,11 +3411,11 @@
                 <skill>Piloting/Mek::Regular</skill>
                 <skill>Piloting/VTOL::Regular</skill>
                 <skill>Piloting/Naval::Regular</skill>
-                <skill>Gunnery/BattleArmor::Regular</skill>
-                <skill>Gunnery/Aerospace::Regular</skill>
                 <skill>Piloting/Aerospace::Regular</skill>
-                <skill>Gunnery/ProtoMek::Regular</skill>
+                <skill>Gunnery/Aerospace::Regular</skill>
+                <skill>Gunnery/BattleArmor::Regular</skill>
                 <skill>Anti-Mek::Regular</skill>
+                <skill>Gunnery/ProtoMek::Regular</skill>
                 <skill>Piloting/Ground Vehicle::Regular</skill>
                 <skill>Gunnery/Aircraft::Regular</skill>
                 <skill>Gunnery/Vehicle::Regular</skill>
@@ -2981,11 +3439,11 @@
                 <skill>Piloting/Mek::Regular</skill>
                 <skill>Piloting/VTOL::Regular</skill>
                 <skill>Piloting/Naval::Regular</skill>
-                <skill>Gunnery/BattleArmor::Regular</skill>
-                <skill>Gunnery/Aerospace::Regular</skill>
                 <skill>Piloting/Aerospace::Regular</skill>
-                <skill>Gunnery/ProtoMek::Regular</skill>
+                <skill>Gunnery/Aerospace::Regular</skill>
+                <skill>Gunnery/BattleArmor::Regular</skill>
                 <skill>Anti-Mek::Regular</skill>
+                <skill>Gunnery/ProtoMek::Regular</skill>
                 <skill>Piloting/Ground Vehicle::Regular</skill>
                 <skill>Gunnery/Aircraft::Regular</skill>
                 <skill>Gunnery/Vehicle::Regular</skill>
@@ -3058,11 +3516,11 @@
                 <skill>Piloting/Mek::Veteran</skill>
                 <skill>Piloting/VTOL::Veteran</skill>
                 <skill>Piloting/Naval::Veteran</skill>
-                <skill>Gunnery/BattleArmor::Veteran</skill>
-                <skill>Gunnery/Aerospace::Veteran</skill>
                 <skill>Piloting/Aerospace::Veteran</skill>
-                <skill>Gunnery/ProtoMek::Veteran</skill>
+                <skill>Gunnery/Aerospace::Veteran</skill>
+                <skill>Gunnery/BattleArmor::Veteran</skill>
                 <skill>Anti-Mek::Veteran</skill>
+                <skill>Gunnery/ProtoMek::Veteran</skill>
                 <skill>Piloting/Ground Vehicle::Veteran</skill>
                 <skill>Gunnery/Aircraft::Veteran</skill>
                 <skill>Gunnery/Vehicle::Veteran</skill>
@@ -3093,9 +3551,9 @@
                 <skill>Gunnery/Mek::Regular</skill>
                 <skill>Gunnery/ProtoMek::Regular</skill>
                 <skill>Gunnery/Aircraft::Regular</skill>
-                <skill>Gunnery/Spacecraft::Regular</skill>
-                <skill>Gunnery/Aerospace::Regular</skill>
                 <skill>Gunnery/BattleArmor::Regular</skill>
+                <skill>Gunnery/Aerospace::Regular</skill>
+                <skill>Gunnery/Spacecraft::Regular</skill>
                 <skill>Gunnery/Vehicle::Regular</skill>
             </skillPrereq>
         </ability>

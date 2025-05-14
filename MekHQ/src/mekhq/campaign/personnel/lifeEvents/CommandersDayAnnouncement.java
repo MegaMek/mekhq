@@ -56,7 +56,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
  * @since 0.50.05
  */
 public class CommandersDayAnnouncement {
-    private static String RESOURCE_BUNDLE = "mekhq.resources." + CommandersDayAnnouncement.class.getSimpleName();
+    private static String RESOURCE_BUNDLE = "mekhq.resources.CommandersDayAnnouncement";
 
     private final Campaign campaign;
 
