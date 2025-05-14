@@ -5254,7 +5254,16 @@ public class Campaign implements ITechManager {
             }
             if (!unit.isPresent()) {
                 unit.checkArrival();
+
+                // Has unit just been delivered?
+                if (unit.isPresent()) {
+                    addReport(String.format(resources.getString("unitArrived.text"),
+                          unit.getHyperlinkedName(),
+                          spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                          CLOSING_SPAN_TAG));
+                }
             }
+
             if (!unit.isRepairable() && !unit.hasSalvageableParts()) {
                 unitsToRemove.add(unit.getId());
             }
@@ -6424,7 +6433,7 @@ public class Campaign implements ITechManager {
 
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "missions");
         for (final Mission mission : getMissions()) {
-            mission.writeToXML(pw, indent);
+            mission.writeToXML(this, pw, indent);
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "missions");
 
@@ -6494,7 +6503,7 @@ public class Campaign implements ITechManager {
         if (getCampaignOptions().isUseAtB()) {
             // TODO : AbstractContractMarket : Remove next two lines
             // CAW: implicit DEPENDS-ON to the <missions> node, do not move this above it
-            contractMarket.writeToXML(pw, indent);
+            contractMarket.writeToXML(this, pw, indent);
 
             if (!combatTeams.isEmpty()) {
                 MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "combatTeams");
@@ -7416,7 +7425,8 @@ public class Campaign implements ITechManager {
         }
 
         if (null == person) {
-            return new TargetRoll(TargetRoll.IMPOSSIBLE, "No one on your force is capable of acquiring parts");
+            return new TargetRoll(TargetRoll.IMPOSSIBLE,
+                  "Your procurement personnel have used up all their acquisition attempts for this period");
         }
         final Skill skill = person.getSkillForWorkingOn(getCampaignOptions().getAcquisitionSkill());
         if (null != getShoppingList().getShoppingItem(acquisition.getNewEquipment()) && checkDaysToWait) {
