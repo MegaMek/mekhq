@@ -33,6 +33,7 @@
  */
 package mekhq.campaign.personnel.turnoverAndRetention;
 
+import static java.lang.Math.round;
 import static mekhq.campaign.personnel.Person.getLoyaltyName;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
 
@@ -659,44 +660,20 @@ public class RetirementDefectionTracker {
      * @return the total administrative strain of the campaign
      */
     public static int getAdministrativeStrain(Campaign campaign) {
-        int personnel = 0;
-        int proto = 0;
-        int multiCrew = 0;
-        int other = 0;
+        double personnel = 0;
 
-        for (Person person : campaign.getActivePersonnel(true)) {
-            if ((person.getPrimaryRole().isCivilian()) ||
-                      (person.getPrisonerStatus().isPrisoner()) ||
-                      (person.getPrisonerStatus().isPrisonerDefector())) {
-                other++;
-            } else if (person.getUnit() != null) {
-                if (person.getUnit().isCommander(person)) {
-                    if (person.getUnit().getEntity().isProtoMek()) {
-                        proto++;
-                    } else {
-                        multiCrew++;
-                    }
-                }
+        for (Person person : campaign.getActivePersonnel(false)) {
+            PersonnelRole primaryRole = person.getPrimaryRole();
+            if (primaryRole.isAssistant() && person.getSecondaryRole().isNone()) {
+                continue;
+            } else if (primaryRole.isCivilian()) {
+                personnel += 0.1;
             } else {
-                if ((person.getPrimaryRole().isAstech()) && person.getSecondaryRole().isNone()) {
-                    continue;
-                } else if ((person.getPrimaryRole().isMedic()) && person.getSecondaryRole().isNone()) {
-                    continue;
-                } else if ((person.getPrimaryRole().isMedic()) && person.getSecondaryRole().isAstech()) {
-                    continue;
-                } else if ((person.getPrimaryRole().isAstech()) && person.getSecondaryRole().isMedic()) {
-                    continue;
-                }
-
                 personnel++;
             }
         }
 
-        personnel += proto / 5;
-        personnel += multiCrew / campaign.getCampaignOptions().getMultiCrewStrainDivider();
-        personnel += other / (campaign.getCampaignOptions().getMultiCrewStrainDivider() * 2);
-
-        return personnel;
+        return (int) round(personnel);
     }
 
     /**

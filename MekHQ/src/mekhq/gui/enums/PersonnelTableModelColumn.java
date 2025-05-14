@@ -615,7 +615,7 @@ public enum PersonnelTableModelColumn {
                              SkillType.getColoredExperienceLevelName(person.getExperienceLevel(campaign, false)) +
                              "</html>";
             case PERSONNEL_ROLE:
-                return person.getRoleDesc();
+                return person.getFormatedRoleDescriptions(today);
             case UNIT_ASSIGNMENT: {
                 if (loadAssignmentFromMarket) {
                     final Entity entity = personnelMarket.getAttachedEntity(person);
@@ -1008,7 +1008,8 @@ public enum PersonnelTableModelColumn {
             case PERSON, UNIT_ASSIGNMENT -> 125;
             case RANK, FIRST_NAME, GIVEN_NAME, DEPLOYED -> 70;
             case LAST_NAME, SURNAME, BLOODNAME, CALLSIGN, SKILL_LEVEL, SALARY -> 50;
-            case PERSONNEL_ROLE, FORCE -> 100;
+            case PERSONNEL_ROLE -> 150;
+            case FORCE -> 100;
             default -> 20;
         };
     }
@@ -1056,7 +1057,6 @@ public enum PersonnelTableModelColumn {
                      DEPLOYED,
                      INJURIES,
                      XP -> true;
-                case SALARY -> campaign.getCampaignOptions().isPayForSalaries();
                 default -> false;
             };
             case PILOT_GUNNERY_SKILLS -> switch (this) {
@@ -1102,6 +1102,7 @@ public enum PersonnelTableModelColumn {
             case BIOGRAPHICAL -> switch (this) {
                 case RANK, FIRST_NAME, LAST_NAME, AGE, PERSONNEL_STATUS, PERSONNEL_ROLE, EDUCATION -> true;
                 case ORIGIN_FACTION, ORIGIN_PLANET -> campaign.getCampaignOptions().isShowOriginFaction();
+                case SALARY -> campaign.getCampaignOptions().isPayForSalaries();
                 default -> false;
             };
             case FLUFF -> switch (this) {

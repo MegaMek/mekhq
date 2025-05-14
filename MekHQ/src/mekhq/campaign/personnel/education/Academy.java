@@ -796,11 +796,15 @@ public class Academy implements Comparable<Academy> {
 
         if (personnel.size() == 1) {
             for (String skillName : skillNames) {
+                String skillParsed = "";
                 if (skillName.equalsIgnoreCase("none")) {
                     tooltip.append(skillName).append("<br>");
                     continue;
+                } else if (skill.equalsIgnoreCase("xp")) {
+                    tooltip.append(skill).append("XP (");
                 } else {
-                    tooltip.append(skillName).append(" (");
+                    skillParsed = skillParser(skill);
+                    tooltip.append(skillParsed).append(" (");
                 }
 
                 if (skillName.equalsIgnoreCase("xp")) {

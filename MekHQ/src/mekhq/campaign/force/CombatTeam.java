@@ -129,15 +129,10 @@ public class CombatTeam {
             return formationSize;
         }
 
-        formationLevelDepth++; // Lance is depth 0, so we need to add +1 to get the number of iterations
-
-        for (int i = 0; i < formationLevelDepth; i++) {
-
-            if (faction.isComStarOrWoB()) {
-                formationSize *= 6;
-            } else {
-                formationSize *= 3;
-            }
+        if (faction.isComStarOrWoB()) {
+            formationSize *= (int) Math.pow(6, formationLevelDepth);
+        } else {
+            formationSize *= (int) Math.pow(3, formationLevelDepth);
         }
 
         return formationSize;

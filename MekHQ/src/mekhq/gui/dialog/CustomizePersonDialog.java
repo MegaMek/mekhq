@@ -1443,6 +1443,9 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
         setSkills();
         setOptions();
+
+        person.validateRoles(campaign);
+
         dispose();
     }
 
@@ -1483,19 +1486,22 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         JSpinner spnBonus;
 
         GridBagLayout gridBag = new GridBagLayout();
-        GridBagConstraints c = new GridBagConstraints();
+        GridBagConstraints constraints = new GridBagConstraints();
         skillsPanel.setLayout(gridBag);
 
-        c.gridwidth = 1;
-        c.fill = GridBagConstraints.NONE;
-        c.insets = new Insets(0, 10, 0, 0);
-        c.gridx = 0;
+        constraints.gridwidth = 1;
+        constraints.fill = GridBagConstraints.NONE;
+        constraints.insets = new Insets(0, 10, 0, 0);
+        constraints.gridx = 0;
 
         AgingMilestone milestone = getMilestone(person.getAge(campaign.getLocalDate()));
-        for (int i = 0; i < SkillType.getSkillList().length; i++) {
-            c.gridy = i;
-            c.gridx = 0;
-            final String type = SkillType.getSkillList()[i];
+
+        List<String> sortedSkillNames = getSortedSkillNames();
+
+        for (int index = 0; index < sortedSkillNames.size(); index++) {
+            constraints.gridy = index;
+            constraints.gridx = 0;
+            final String type = sortedSkillNames.get(index);
             chkSkill = new JCheckBox();
             chkSkill.setSelected(person.hasSkill(type));
             skillChecks.put(type, chkSkill);
@@ -1540,46 +1546,97 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             int ageModifier = getAgeModifier(milestone, skillType.getFirstAttribute(), skillType.getSecondAttribute());
             skillAgeModifiers.put(type, new JLabel(ageModifier + ""));
 
-            c.anchor = GridBagConstraints.WEST;
-            c.weightx = 0;
-            skillsPanel.add(chkSkill, c);
+            constraints.anchor = GridBagConstraints.WEST;
+            constraints.weightx = 0;
+            skillsPanel.add(chkSkill, constraints);
 
-            c.gridx = 1;
-            c.anchor = GridBagConstraints.WEST;
-            skillsPanel.add(lblName, c);
+            constraints.gridx = 1;
+            constraints.anchor = GridBagConstraints.WEST;
+            skillsPanel.add(lblName, constraints);
 
-            c.gridx = 2;
-            c.anchor = GridBagConstraints.CENTER;
-            skillsPanel.add(lblValue, c);
+            constraints.gridx = 2;
+            constraints.anchor = GridBagConstraints.CENTER;
+            skillsPanel.add(lblValue, constraints);
 
-            c.gridx = 3;
-            c.anchor = GridBagConstraints.WEST;
-            skillsPanel.add(lblLevel, c);
+            constraints.gridx = 3;
+            constraints.anchor = GridBagConstraints.WEST;
+            skillsPanel.add(lblLevel, constraints);
 
-            c.gridx = 4;
-            c.anchor = GridBagConstraints.WEST;
-            skillsPanel.add(spnLevel, c);
+            constraints.gridx = 4;
+            constraints.anchor = GridBagConstraints.WEST;
+            skillsPanel.add(spnLevel, constraints);
 
-            c.gridx = 5;
-            c.anchor = GridBagConstraints.WEST;
-            skillsPanel.add(lblBonus, c);
+            constraints.gridx = 5;
+            constraints.anchor = GridBagConstraints.WEST;
+            skillsPanel.add(lblBonus, constraints);
 
-            c.gridx = 6;
-            c.anchor = GridBagConstraints.WEST;
-            c.weightx = 1.0;
-            skillsPanel.add(spnBonus, c);
+            constraints.gridx = 6;
+            constraints.anchor = GridBagConstraints.WEST;
+            constraints.weightx = 1.0;
+            skillsPanel.add(spnBonus, constraints);
 
             if (campaign.getCampaignOptions().isUseAgeEffects()) {
-                c.gridx = 7;
-                c.anchor = GridBagConstraints.WEST;
-                skillsPanel.add(lblAging, c);
+                constraints.gridx = 7;
+                constraints.anchor = GridBagConstraints.WEST;
+                skillsPanel.add(lblAging, constraints);
 
-                c.gridx = 8;
-                c.anchor = GridBagConstraints.WEST;
-                c.weightx = 1.0;
-                skillsPanel.add(skillAgeModifiers.get(type), c);
+                constraints.gridx = 8;
+                constraints.anchor = GridBagConstraints.WEST;
+                constraints.weightx = 1.0;
+                skillsPanel.add(skillAgeModifiers.get(type), constraints);
             }
         }
+    }
+
+    /**
+     * Returns a list of skill names sorted by category.
+     *
+     * <p>The sorting order is:</p>
+     * <ol>
+     *     <li>Combat skills</li>
+     *     <li>Support skills</li>
+     *     <li>Roleplay skills</li>
+     * </ol>
+     *
+     * <p>Skill names are categorized by querying their {@code SkillType}. Any unknown skill types are ignored and a
+     * warning is logged.</p>
+     *
+     * @return a {@code List} of skill names sorted by skill category
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    private static List<String> getSortedSkillNames() {
+        String[] unsortedSkillNames = SkillType.getSkillList();
+        List<String> sortedSkillNames = new ArrayList<>();
+        List<String> combatSkills = new ArrayList<>();
+        List<String> supportSkills = new ArrayList<>();
+        List<String> roleplaySkills = new ArrayList<>();
+        for (String skillName : unsortedSkillNames) {
+            SkillType skillType = SkillType.getType(skillName);
+
+            if (skillType == null) {
+                logger.warn("Unknown skill type: {}", skillName);
+                continue;
+            }
+
+            if (skillType.isRoleplaySkill()) {
+                roleplaySkills.add(skillName);
+                continue;
+            }
+
+            if (skillType.isSupportSkill()) {
+                supportSkills.add(skillName);
+                continue;
+            }
+
+            combatSkills.add(skillName);
+        }
+
+        sortedSkillNames.addAll(combatSkills);
+        sortedSkillNames.addAll(supportSkills);
+        sortedSkillNames.addAll(roleplaySkills);
+        return sortedSkillNames;
     }
 
     private void setSkills() {
