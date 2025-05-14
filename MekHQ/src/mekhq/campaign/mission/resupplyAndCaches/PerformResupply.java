@@ -447,7 +447,8 @@ public class PerformResupply {
             String eventText;
             if (Compute.d6() <= 2) {
                 eventText = getFormattedTextAt(RESOURCE_BUNDLE,
-                      STATUS_FORWARD + Compute.randomInt(100) + STATUS_AFTERWARD);
+                      STATUS_FORWARD + Compute.randomInt(100) + STATUS_AFTERWARD,
+                      commanderAddress);
             } else {
                 int roll = Compute.randomInt(2);
 

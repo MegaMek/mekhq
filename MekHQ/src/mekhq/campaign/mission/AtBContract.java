@@ -99,6 +99,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 
+import megamek.Version;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ratgenerator.FactionRecord;
 import megamek.client.ratgenerator.RATGenerator;
@@ -127,6 +128,7 @@ import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.randomEvents.MercenaryAuction;
 import mekhq.campaign.randomEvents.RoninOffer;
@@ -159,6 +161,7 @@ public class AtBContract extends Contract {
     protected AtBContract parentContract;
     /* hired by another mercenary unit on contract to a third-party employer */ boolean mercSubcontract;
 
+    protected Person employerLiaison;
     protected String employerCode;
     protected String enemyCode;
     protected String enemyName;
@@ -230,6 +233,7 @@ public class AtBContract extends Contract {
 
     public AtBContract(String name) {
         super(name, "Independent");
+        employerLiaison = null;
         employerCode = "IND";
         enemyCode = "IND";
         enemyName = "Independent";
@@ -1177,8 +1181,8 @@ public class AtBContract extends Contract {
     }
 
     @Override
-    protected int writeToXMLBegin(final PrintWriter pw, int indent) {
-        indent = super.writeToXMLBegin(pw, indent);
+    protected int writeToXMLBegin(Campaign campaign, final PrintWriter pw, int indent) {
+        indent = super.writeToXMLBegin(campaign, pw, indent);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "employerCode", getEmployerCode());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enemyCode", getEnemyCode());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractType", getContractType().name());
@@ -1247,98 +1251,108 @@ public class AtBContract extends Contract {
             stratconCampaignState.Serialize(pw);
         }
 
+        if (employerLiaison != null) {
+            employerLiaison.writeToXML(pw, indent, campaign);
+        }
+
         return indent;
     }
 
     @Override
-    public void loadFieldsFromXmlNode(Node wn) throws ParseException {
-        super.loadFieldsFromXmlNode(wn);
-        NodeList nl = wn.getChildNodes();
+    public void loadFieldsFromXmlNode(Campaign campaign, Version version, Node node) throws ParseException {
+        super.loadFieldsFromXmlNode(campaign, version, node);
+        NodeList childNodes = node.getChildNodes();
 
-        for (int x = 0; x < nl.getLength(); x++) {
-            Node wn2 = nl.item(x);
+        for (int x = 0; x < childNodes.getLength(); x++) {
+            Node item = childNodes.item(x);
 
             try {
-                if (wn2.getNodeName().equalsIgnoreCase("employerCode")) {
-                    employerCode = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("enemyCode")) {
-                    enemyCode = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("contractType")) {
-                    setContractType(AtBContractType.parseFromString(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("allySkill")) {
-                    setAllySkill(parseFromString(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("allyQuality")) {
-                    allyQuality = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("enemySkill")) {
-                    setEnemySkill(parseFromString(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("enemyQuality")) {
-                    enemyQuality = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("allyBotName")) {
-                    allyBotName = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("enemyBotName")) {
-                    enemyBotName = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("allyCamoCategory")) {
-                    getAllyCamouflage().setCategory(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("allyCamoFileName")) {
-                    getAllyCamouflage().setFilename(wn2.getTextContent().trim());
-                } else if (wn2.getTextContent().equalsIgnoreCase("allyColour")) {
-                    setAllyColour(PlayerColour.parseFromString(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("enemyCamoCategory")) {
-                    getEnemyCamouflage().setCategory(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("enemyCamoFileName")) {
-                    getEnemyCamouflage().setFilename(wn2.getTextContent().trim());
-                } else if (wn2.getTextContent().equalsIgnoreCase("enemyColour")) {
-                    setEnemyColour(PlayerColour.parseFromString(wn2.getTextContent().trim()));
+                if (item.getNodeName().equalsIgnoreCase("employerCode")) {
+                    employerCode = item.getTextContent();
+                } else if (item.getNodeName().equalsIgnoreCase("enemyCode")) {
+                    enemyCode = item.getTextContent();
+                } else if (item.getNodeName().equalsIgnoreCase("contractType")) {
+                    setContractType(AtBContractType.parseFromString(item.getTextContent().trim()));
+                } else if (item.getNodeName().equalsIgnoreCase("allySkill")) {
+                    setAllySkill(parseFromString(item.getTextContent().trim()));
+                } else if (item.getNodeName().equalsIgnoreCase("allyQuality")) {
+                    allyQuality = Integer.parseInt(item.getTextContent());
+                } else if (item.getNodeName().equalsIgnoreCase("enemySkill")) {
+                    setEnemySkill(parseFromString(item.getTextContent().trim()));
+                } else if (item.getNodeName().equalsIgnoreCase("enemyQuality")) {
+                    enemyQuality = Integer.parseInt(item.getTextContent());
+                } else if (item.getNodeName().equalsIgnoreCase("allyBotName")) {
+                    allyBotName = item.getTextContent();
+                } else if (item.getNodeName().equalsIgnoreCase("enemyBotName")) {
+                    enemyBotName = item.getTextContent();
+                } else if (item.getNodeName().equalsIgnoreCase("allyCamoCategory")) {
+                    getAllyCamouflage().setCategory(item.getTextContent().trim());
+                } else if (item.getNodeName().equalsIgnoreCase("allyCamoFileName")) {
+                    getAllyCamouflage().setFilename(item.getTextContent().trim());
+                } else if (item.getTextContent().equalsIgnoreCase("allyColour")) {
+                    setAllyColour(PlayerColour.parseFromString(item.getTextContent().trim()));
+                } else if (item.getNodeName().equalsIgnoreCase("enemyCamoCategory")) {
+                    getEnemyCamouflage().setCategory(item.getTextContent().trim());
+                } else if (item.getNodeName().equalsIgnoreCase("enemyCamoFileName")) {
+                    getEnemyCamouflage().setFilename(item.getTextContent().trim());
+                } else if (item.getTextContent().equalsIgnoreCase("enemyColour")) {
+                    setEnemyColour(PlayerColour.parseFromString(item.getTextContent().trim()));
                     // <50.03 compatibility handler
-                } else if (wn2.getNodeName().equalsIgnoreCase("requiredLances") ||
-                                 wn2.getNodeName().equalsIgnoreCase("requiredCombatTeams")) {
-                    requiredCombatTeams = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("moraleLevel")) {
-                    setMoraleLevel(AtBMoraleLevel.parseFromString(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("routEnd")) {
-                    routEnd = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("routedPayout")) {
-                    String cleanValue = wn2.getTextContent().trim().replaceAll("[^0-9.]", "");
+                } else if (item.getNodeName().equalsIgnoreCase("requiredLances") ||
+                                 item.getNodeName().equalsIgnoreCase("requiredCombatTeams")) {
+                    requiredCombatTeams = Integer.parseInt(item.getTextContent());
+                } else if (item.getNodeName().equalsIgnoreCase("moraleLevel")) {
+                    setMoraleLevel(AtBMoraleLevel.parseFromString(item.getTextContent().trim()));
+                } else if (item.getNodeName().equalsIgnoreCase("routEnd")) {
+                    routEnd = MHQXMLUtility.parseDate(item.getTextContent().trim());
+                } else if (item.getNodeName().equalsIgnoreCase("routedPayout")) {
+                    String cleanValue = item.getTextContent().trim().replaceAll("[^0-9.]", "");
                     double value = Double.parseDouble(cleanValue);
                     routedPayout = Money.of(value);
-                } else if (wn2.getNodeName().equalsIgnoreCase("partsAvailabilityLevel")) {
-                    partsAvailabilityLevel = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("extensionLength")) {
-                    extensionLength = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("sharesPct")) {
-                    sharesPct = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("batchallAccepted")) {
-                    batchallAccepted = Boolean.parseBoolean(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("playerMinorBreaches")) {
-                    playerMinorBreaches = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("employerMinorBreaches")) {
-                    employerMinorBreaches = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("contractScoreArbitraryModifier")) {
-                    contractScoreArbitraryModifier = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("priorLogisticsFailure")) {
-                    priorLogisticsFailure = Boolean.parseBoolean(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("battleTypeMod")) {
-                    battleTypeMod = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("nextWeekBattleTypeMod")) {
-                    nextWeekBattleTypeMod = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("commandRoll")) {
-                    commandRoll = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("salvageRoll")) {
-                    salvageRoll = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("supportRoll")) {
-                    supportRoll = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("transportRoll")) {
-                    transportRoll = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("specialEventScenarioDate")) {
-                    specialEventScenarioDate = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("specialEventScenarioType")) {
-                    specialEventScenarioType = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase(StratconCampaignState.ROOT_XML_ELEMENT_NAME)) {
-                    stratconCampaignState = StratconCampaignState.Deserialize(wn2);
+                } else if (item.getNodeName().equalsIgnoreCase("partsAvailabilityLevel")) {
+                    partsAvailabilityLevel = Integer.parseInt(item.getTextContent());
+                } else if (item.getNodeName().equalsIgnoreCase("extensionLength")) {
+                    extensionLength = Integer.parseInt(item.getTextContent());
+                } else if (item.getNodeName().equalsIgnoreCase("sharesPct")) {
+                    sharesPct = Integer.parseInt(item.getTextContent());
+                } else if (item.getNodeName().equalsIgnoreCase("batchallAccepted")) {
+                    batchallAccepted = Boolean.parseBoolean(item.getTextContent());
+                } else if (item.getNodeName().equalsIgnoreCase("playerMinorBreaches")) {
+                    playerMinorBreaches = Integer.parseInt(item.getTextContent());
+                } else if (item.getNodeName().equalsIgnoreCase("employerMinorBreaches")) {
+                    employerMinorBreaches = Integer.parseInt(item.getTextContent());
+                } else if (item.getNodeName().equalsIgnoreCase("contractScoreArbitraryModifier")) {
+                    contractScoreArbitraryModifier = Integer.parseInt(item.getTextContent());
+                } else if (item.getNodeName().equalsIgnoreCase("priorLogisticsFailure")) {
+                    priorLogisticsFailure = Boolean.parseBoolean(item.getTextContent());
+                } else if (item.getNodeName().equalsIgnoreCase("battleTypeMod")) {
+                    battleTypeMod = Integer.parseInt(item.getTextContent());
+                } else if (item.getNodeName().equalsIgnoreCase("nextWeekBattleTypeMod")) {
+                    nextWeekBattleTypeMod = Integer.parseInt(item.getTextContent());
+                } else if (item.getNodeName().equalsIgnoreCase("commandRoll")) {
+                    commandRoll = Integer.parseInt(item.getTextContent());
+                } else if (item.getNodeName().equalsIgnoreCase("salvageRoll")) {
+                    salvageRoll = Integer.parseInt(item.getTextContent());
+                } else if (item.getNodeName().equalsIgnoreCase("supportRoll")) {
+                    supportRoll = Integer.parseInt(item.getTextContent());
+                } else if (item.getNodeName().equalsIgnoreCase("transportRoll")) {
+                    transportRoll = Integer.parseInt(item.getTextContent());
+                } else if (item.getNodeName().equalsIgnoreCase("specialEventScenarioDate")) {
+                    specialEventScenarioDate = MHQXMLUtility.parseDate(item.getTextContent().trim());
+                } else if (item.getNodeName().equalsIgnoreCase("specialEventScenarioType")) {
+                    specialEventScenarioType = Integer.parseInt(item.getTextContent());
+                } else if (item.getNodeName().equalsIgnoreCase(StratconCampaignState.ROOT_XML_ELEMENT_NAME)) {
+                    stratconCampaignState = StratconCampaignState.Deserialize(item);
                     stratconCampaignState.setContract(this);
                     this.setStratconCampaignState(stratconCampaignState);
-                } else if (wn2.getNodeName().equalsIgnoreCase("parentContractId")) {
-                    parentContract = new AtBContractRef(Integer.parseInt(wn2.getTextContent()));
+                } else if (item.getNodeName().equalsIgnoreCase("parentContractId")) {
+                    parentContract = new AtBContractRef(Integer.parseInt(item.getTextContent()));
+                } else if (item.getNodeName().equalsIgnoreCase("person")) {
+                    employerLiaison = Person.generateInstanceFromXML(item, campaign, version);
+
+                    if (employerLiaison == null) {
+                        createEmployerLiaison(campaign);
+                    }
                 }
             } catch (Exception e) {
                 logger.error("", e);
@@ -1374,6 +1388,18 @@ public class AtBContract extends Contract {
 
     public Faction getEmployerFaction() {
         return Factions.getInstance().getFaction(getEmployerCode());
+    }
+
+    public Person getEmployerLiaison() {
+        return employerLiaison;
+    }
+
+    public void setEmployerLiaison(Person employerLiaison) {
+        this.employerLiaison = employerLiaison;
+    }
+
+    public void createEmployerLiaison(Campaign campaign) {
+        employerLiaison = campaign.newPerson(PersonnelRole.ADMINISTRATOR_COMMAND, getEmployerCode(), Gender.RANDOMIZE);
     }
 
     public String getEmployerCode() {

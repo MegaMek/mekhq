@@ -739,13 +739,25 @@ class PersonnelRoleTest {
 
     @ParameterizedTest
     @EnumSource(value = PersonnelRole.class, names = "NONE", mode = EnumSource.Mode.EXCLUDE)
-    void testGetDescription(PersonnelRole role) {
+    void testGetDescription_notClan(PersonnelRole role) {
         // Setup
 
         // Act
-        String description = role.getDescription();
+        String description = role.getDescription(false);
 
         // Assert
         assertTrue(isResourceKeyValid(description), "Role does not have a description: " + role.name());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = PersonnelRole.class, names = "NONE", mode = EnumSource.Mode.EXCLUDE)
+    void testGetDescription_Clan(PersonnelRole role) {
+        // Setup
+
+        // Act
+        String description = role.getDescription(true);
+
+        // Assert
+        assertTrue(isResourceKeyValid(description), "Role does not have a Clan description: " + role.name());
     }
 }

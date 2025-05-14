@@ -181,12 +181,13 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
             ForceType forceType = force.getForceType();
             String typeKey = forceType.getSymbol();
 
-            String formattedForceName = String.format("<html>%s%s%s%s%s%s</html>",
-                force.isCombatTeam() ? "<b>" : "",
-                force.getOverrideCombatTeam() != COMBAT_TEAM_OVERRIDE_NONE ? "<u>" : "",
-                force.getName(),
-                force.isCombatTeam() ? "</b>" : "",
-                force.getOverrideCombatTeam() != COMBAT_TEAM_OVERRIDE_NONE ? "</u>" : "",
+            String formattedForceName = String.format("<html>%s%s%s%s%s%s%s</html>",
+                  force.isCombatTeam() ? "<b>" : "",
+                  force.getOverrideCombatTeam() != COMBAT_TEAM_OVERRIDE_NONE ? "<u>" : "",
+                  force.getName(),
+                  force.isCombatTeam() ? "</b>" : "",
+                  force.getOverrideCombatTeam() != COMBAT_TEAM_OVERRIDE_NONE ? "</u>" : "",
+                  force.isCombatTeam() ? " <s>c</s>" : "",
                 typeKey);
 
             setText(formattedForceName);
