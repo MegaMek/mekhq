@@ -479,7 +479,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
         txtCommand.setName("txtCommand");
         txtCommand.setText(contract.getCommandRights().toString());
-        txtCommand.setToolTipText(contract.getCommandRights().getToolTipText());
+        txtCommand.setToolTipText(wordWrap(contract.getCommandRights().getToolTipText()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 7;
@@ -879,7 +879,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
         txtCommand.setName("txtCommand");
         txtCommand.setText(contract.getCommandRights().toString());
-        txtCommand.setToolTipText(contract.getCommandRights().getToolTipText());
+        txtCommand.setToolTipText(wordWrap(contract.getCommandRights().getToolTipText()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;
