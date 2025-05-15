@@ -52,9 +52,9 @@ import static megamek.common.SimpleTechLevel.STANDARD;
 public class Procurement {
     private final int negotiatorSkillRating;
     private final int gameYear;
-    private final int techEra;
+    private final Era techEra;
     private final Faction originFaction;
-    private final int factionTechCode;
+    private final ITechnology.Faction factionTechCode;
     private static final MMLogger logger = MMLogger.create(Procurement.class);
 
     /**
@@ -80,7 +80,7 @@ public class Procurement {
      * @param faction Faction instance
      * @return returns corresponding faction code.
      */
-    public static int getFactionTechCode(Faction faction) {
+    public static ITechnology.Faction getFactionTechCode(Faction faction) {
         int allCodesCount = MM_FACTION_CODES.length;
         for (int i = 0; i < allCodesCount; i++) {
             if (MM_FACTION_CODES[i].equals(faction.getShortName())) {
@@ -92,13 +92,13 @@ public class Procurement {
 
         if (faction.isClan()) {
             logger.info("Returning: Clan");
-            return Faction.CLAN;
+            return ITechnology.Faction.CLAN;
         } else if (faction.isPeriphery()) {
             logger.info("Returning: Periphery");
-            return Faction.PER;
+            return ITechnology.Faction.PER;
         } else {
             logger.info("Returning: Inner Sphere");
-            return Faction.IS;
+            return ITechnology.Faction.IS;
         }
     }
 
@@ -276,7 +276,7 @@ public class Procurement {
      * @param useHardExtinction a boolean flag that indicates whether to enforce hard extinctions.
      * @return The revised availability rate based on the performed extinction check.
      */
-    private int performTrulyExtinctCheck(Part part, int availability, boolean useHardExtinction) {
+    private TechRating performTrulyExtinctCheck(Part part, TechRating availability, boolean useHardExtinction) {
         if (part.isExtinct(gameYear, originFaction.isClan(), factionTechCode)) {
             int extinctionYear = part.getExtinctionDate(originFaction.isClan(), factionTechCode);
 
