@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.market.contractMarket;
 
@@ -841,12 +846,20 @@ public abstract class AbstractContractMarket {
         return mod;
     }
 
+    /**
+     * @deprecated use {@link #writeToXML(Campaign, PrintWriter, int)} instead
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public void writeToXML(final PrintWriter pw, int indent) {
+        return;
+    }
+
+    public void writeToXML(Campaign campaign, final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "contractMarket");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "method", method.toString());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastId", lastId);
         for (final Contract contract : contracts) {
-            contract.writeToXML(pw, indent);
+            contract.writeToXML(campaign, pw, indent);
         }
 
         for (final Integer key : clauseMods.keySet()) {
