@@ -33,22 +33,13 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
-import megamek.common.ITechnology.TechRating;;
+import megamek.common.ITechnology.TechRating;
 
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
 public class SocioIndustrialData {
-
-    private final static Map<String, TechRating> stringToEquipmentTypeMap = new HashMap<String, TechRating>() {{
-        put("A", EquipmentType.TechRating.A);
-        put("B", EquipmentType.TechRating.B);
-        put("C", EquipmentType.TechRating.C);
-        put("D", EquipmentType.TechRating.D);
-        put("F", EquipmentType.TechRating.F);
-        put("X", EquipmentType.TechRating.X);
-    }};
 
     private final static String SEPARATOR = "-";
 
@@ -90,7 +81,7 @@ public class SocioIndustrialData {
                 + "-" + ITechnology.getRatingName(rawMaterials)
                 + "-" + ITechnology.getRatingName(output)
                 + "-" + ITechnology.getRatingName(agriculture);
-         }
+        }
 
     /** @return the USILR rating as a HTML description */
     public String getHTMLDescription() {
@@ -243,9 +234,14 @@ public class SocioIndustrialData {
         }
 
         private TechRating convertRatingToCode(String rating) {
-            Integer result = stringToEquipmentTypeMap.get(rating.toUpperCase(Locale.ROOT));
-            return (null != result) ? result : EquipmentType.TechRating.C;
+            try {
+                return TechRating.fromName(rating.toUpperCase(Locale.ROOT));
+            } catch (IllegalArgumentException e) {
+                // If the rating is not valid, return a default value
+                return EquipmentType.TechRating.C;
+            }
         }
+
         @Override
         public SocioIndustrialData deserialize(final JsonParser jsonParser, final DeserializationContext context) {
             try {
