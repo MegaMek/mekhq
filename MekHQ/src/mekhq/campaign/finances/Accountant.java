@@ -107,6 +107,16 @@ public record Accountant(Campaign campaign) {
         return Money.zero();
     }
 
+    public Money getLeaseCosts() {
+        if (getCampaignOptions().isTrackLeases()) {
+            return getHangar().getUnitsStream()
+                         .filter(u -> u.hasLease() && (null != u.getTech()))
+                         .map(u -> u.getUnitLease().getLeaseCost(campaign.getLocalDate()))
+                         .reduce(Money.zero(), Money::plus);
+        }
+        return Money.zero();
+    }
+
     public Money getWeeklyMaintenanceCosts() {
         return getHangar().getUnitsStream().map(Unit::getWeeklyMaintenanceCost).reduce(Money.zero(), Money::plus);
     }
