@@ -87,11 +87,18 @@ public class CampaignTransporterMap {
             return;
         }
         AbstractTransportedUnitsSummary transportedUnitsSummary = transport.getTransportedUnitsSummary(campaignTransportType);
-        for (TransporterType transporterType : transportedUnitsSummary.getTransportCapabilities()) {
+
+        // Let's make a list of all the transportTypes in the map, and all the transportTypes the unit has
+        Set<TransporterType> transporterTypes = new HashSet<>();
+        transporterTypes.addAll(transportedUnitsSummary.getTransportCapabilities());
+        transporterTypes.addAll(transportersMap.keySet());
+
+        // Now let's update the current transporterTypes
+        for (TransporterType transporterType : transporterTypes) {
             if (transportersMap.containsKey(transporterType)) {
                 Set<Double> oldCapacities = transportersMap.get(transporterType).keySet();
                 Double newCapacity = transportedUnitsSummary.getCurrentTransportCapacity(transporterType);
-                //First, if this is a new capacity for the map, let's manually add it
+                // First, if this is a new capacity for the map, let's manually add it
                 if (!oldCapacities.contains(newCapacity)) {
                     addTransporterToCapacityMap(transport, transporterType);
                 }
@@ -105,9 +112,14 @@ public class CampaignTransporterMap {
                         addTransporterToCapacityMap(transport, transporterType);
                     }
                 }
+
+                // Finally, let's remove this from the map & get out if the transport doesn't have this transporterType
+                if (!transportedUnitsSummary.getTransportCapabilities().contains(transporterType)) {
+                    removeTransportFromCapacityMap(transport, transporterType, 0);
+                }
             }
             else {
-                logger.error(String.format("Invalid transporter type %s", transporterType));
+                addTransporterToCapacityMap (transport, transporterType);
             }
         }
     }
@@ -183,14 +195,18 @@ public class CampaignTransporterMap {
 
         for (TransporterType transporterTypeToRemove : toRemoveMap.keySet()) {
             double capacity = toRemoveMap.get(transporterTypeToRemove);
+            removeTransportFromCapacityMap(transport, transporterTypeToRemove, capacity);
+        }
+    }
 
-            transportersMap.get(transporterTypeToRemove).get(capacity).remove(transport.getId());
-            if (transportersMap.get(transporterTypeToRemove).get(capacity).isEmpty()) {
-                transportersMap.get(transporterTypeToRemove).remove(capacity);
-            }
-            if (transportersMap.get(transporterTypeToRemove).isEmpty()) {
-                transportersMap.remove(transporterTypeToRemove);
-            }
+    private void removeTransportFromCapacityMap(Unit transport, TransporterType transporterTypeToRemove, double capacity) {
+
+        transportersMap.get(transporterTypeToRemove).get(capacity).remove(transport.getId());
+        if (transportersMap.get(transporterTypeToRemove).get(capacity).isEmpty()) {
+            transportersMap.get(transporterTypeToRemove).remove(capacity);
+        }
+        if (transportersMap.get(transporterTypeToRemove).isEmpty()) {
+            transportersMap.remove(transporterTypeToRemove);
         }
     }
 }
