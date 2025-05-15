@@ -56,7 +56,9 @@ import megamek.common.TechConstants;
 import megamek.common.UnitType;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Lease;
 import mekhq.campaign.parts.enums.PartQuality;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.unit.UnitTechProgression;
 import mekhq.utilities.MHQInternationalization;
@@ -66,6 +68,8 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
     private Campaign campaign;
     private boolean addToCampaign;
     private UnitOrder selectedUnit = null;
+    protected JButton buttonLease;
+    protected JButton buttonLeaseGM;
 
     private static final String TARGET_UNKNOWN = "--";
     //endregion Variable Declarations
@@ -100,6 +104,30 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         }
     }
 
+    public void leaseButtonHandler(boolean isGM) {
+        // Block acquisition if the unit type is unsupported
+        if (getSelectedEntity() == null) {
+            return;
+        }
+        Entity entity = selectedUnit.getEntity();
+        // Remove this check if we ever allow other units to be leased.
+        if (!(Lease.isLeasable(entity))) {
+            return; //TODO: Add a dialog box for why it doesn't work
+        }
+
+        if (isGM) {
+            PartQuality quality = PartQuality.QUALITY_D;
+            if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
+                quality = UnitOrder.getRandomUnitQuality(0);
+            }
+            Unit unit = campaign.addNewUnit(selectedUnit.getEntity(), false, 0, quality);
+            unit.addLease(new Lease(campaign.getLocalDate(), unit));
+        } else {
+            Lease thisLease = new Lease(entity, campaign);
+            campaign.getShoppingList().addShoppingItem(thisLease, 1, campaign);
+        }
+    }
+
     //region Button Methods
     @Override
     protected JPanel createButtonsPanel() {
@@ -113,6 +141,14 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
             buttonSelect.setEnabled(false);
             panelButtons.add(buttonSelect, new GridBagConstraints());
 
+            if (campaign.getCampaignOptions().isTrackLeases()) {
+                buttonLease = new JButton(Messages.getString("MekSelectorDialog.Lease", TARGET_UNKNOWN));
+                buttonLease.setName("buttonLease");
+                buttonLease.addActionListener(e -> leaseButtonHandler(false));
+                panelButtons.add(buttonLease, new GridBagConstraints());
+                buttonLease.setEnabled(false);
+            }
+
             if (campaign.isGM()) {
                 // This is used as a GM add, the name is because of how it is used in MegaMek and MegaMekLab
                 buttonSelectClose = new JButton(Messages.getString("MekSelectorDialog.AddGM"));
@@ -120,6 +156,14 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
                 buttonSelectClose.addActionListener(this);
                 buttonSelectClose.setEnabled(false);
                 panelButtons.add(buttonSelectClose, new GridBagConstraints());
+                if (campaign.getCampaignOptions().isTrackLeases()) {
+                    buttonLeaseGM = new JButton(Messages.getString("MekSelectorDialog.LeaseGM", TARGET_UNKNOWN));
+                    buttonLeaseGM.setName("buttonLeaseGM");
+                    buttonLeaseGM.addActionListener(e -> leaseButtonHandler(true));
+                    panelButtons.add(buttonLeaseGM, new GridBagConstraints());
+                    buttonLeaseGM.setEnabled(false);
+                }
+
             }
 
             // This closes the dialog
@@ -213,6 +257,14 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
                 buttonSelect.setText(Messages.getString("MekSelectorDialog.Buy", TARGET_UNKNOWN));
                 buttonSelect.setToolTipText(null);
                 buttonSelectClose.setEnabled(false);
+                if (campaign.getCampaignOptions().isTrackLeases()) {
+                    buttonLease.setEnabled(false);
+                    buttonLease.setText(Messages.getString("MekSelectorDialog.Lease", TARGET_UNKNOWN));
+                    buttonLease.setToolTipText(null);
+                    buttonLeaseGM.setEnabled(false);
+                    buttonLeaseGM.setText(Messages.getString("MekSelectorDialog.LeaseGM", TARGET_UNKNOWN));
+                    buttonLeaseGM.setToolTipText(null);
+                }
             }
         } else {
             selectedUnit = new UnitOrder(entity, campaign);
@@ -222,6 +274,14 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
                 buttonSelect.setText(Messages.getString("MekSelectorDialog.Buy", target.getValueAsString()));
                 buttonSelect.setToolTipText(target.getDesc());
                 buttonSelectClose.setEnabled(true);
+                if (campaign.getCampaignOptions().isTrackLeases() && (Lease.isLeasable(entity))) {
+                    buttonLease.setEnabled(true);
+                    buttonLeaseGM.setEnabled(true);
+                    buttonLease.setText(Messages.getString("MekSelectorDialog.Lease", target.getValueAsString()));
+                    buttonLeaseGM.setText(Messages.getString("MekSelectorDialog.LeaseGM", target.getValueAsString()));
+                    buttonLease.setToolTipText(target.getDesc());
+                    buttonLeaseGM.setToolTipText(target.getDesc());
+                }
             }
         }
 

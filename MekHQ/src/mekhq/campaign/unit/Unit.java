@@ -84,6 +84,7 @@ import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.event.PersonCrewAssignmentEvent;
 import mekhq.campaign.event.PersonTechAssignmentEvent;
 import mekhq.campaign.event.UnitArrivedEvent;
+import mekhq.campaign.finances.Lease;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.log.AssignmentLogger;
@@ -1383,8 +1384,11 @@ public class Unit implements ITechnology {
     }
 
     public Money getSellValue() {
-        Money partsValue = Money.zero();
+        if (this.unitLease != null) {
+            return Money.zero();
+        } // don't count leased vehicles
 
+        Money partsValue = Money.zero();
         partsValue = partsValue.plus(parts.stream()
                                            .map(x -> x.getActualValue().multipliedBy(x.getQuantity()))
                                            .collect(Collectors.toList()));
@@ -6804,4 +6808,29 @@ public class Unit implements ITechnology {
                   "Unexpected value in mekhq/campaign/unit/Unit.java/getRandomUnitQuality: " + roll);
         };
     }
+
+    private Lease unitLease;
+
+    public void addLease(Lease lease) {
+        unitLease = lease;
+    }
+
+    public void removeLease() {
+        unitLease = null;
+    }
+
+    public boolean hasLease() {
+        if (unitLease != null) {
+            return true;
+        }
+        return false;
+    }
+
+    public Lease getUnitLease() {
+        if (hasLease()) {
+            return unitLease;
+        }
+        return null;
+    }
+
 }

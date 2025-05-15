@@ -75,6 +75,7 @@ public class FinancesTab {
     private CampaignOptionsHeaderPanel financesGeneralOptions;
     private JPanel pnlGeneralOptions;
     private JCheckBox useLoanLimitsBox;
+    private JCheckBox trackLeasesBox;
     private JCheckBox usePercentageMaintenanceBox;
     private JCheckBox useExtendedPartsModifierBox;
     private JCheckBox usePeacetimeCostBox;
@@ -179,6 +180,7 @@ public class FinancesTab {
         // General Options
         pnlGeneralOptions = new JPanel();
         useLoanLimitsBox = new JCheckBox();
+        trackLeasesBox = new JCheckBox();
         usePercentageMaintenanceBox = new JCheckBox();
         useExtendedPartsModifierBox = new JCheckBox();
         usePeacetimeCostBox = new JCheckBox();
@@ -370,6 +372,7 @@ public class FinancesTab {
     private JPanel createGeneralOptionsPanel() {
         // Contents
         useLoanLimitsBox = new CampaignOptionsCheckBox("UseLoanLimitsBox");
+        trackLeasesBox = new CampaignOptionsCheckBox("TrackLeasesBox");
         useLoanLimitsBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "UseLoanLimitsBox"));
         usePercentageMaintenanceBox = new CampaignOptionsCheckBox("UsePercentageMaintenanceBox");
         usePercentageMaintenanceBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
@@ -406,6 +409,9 @@ public class FinancesTab {
         layout.gridy = 0;
         layout.gridwidth = 2;
         panel.add(useLoanLimitsBox, layout);
+
+        layout.gridy++;
+        panel.add(trackLeasesBox, layout);
 
         layout.gridy++;
         panel.add(usePercentageMaintenanceBox, layout);
@@ -843,6 +849,7 @@ public class FinancesTab {
 
         // General Options
         options.setLoanLimits(useLoanLimitsBox.isSelected());
+        options.setTrackLeases(trackLeasesBox.isSelected());
         options.setUsePercentageMaint(usePercentageMaintenanceBox.isSelected());
         options.setUseExtendedPartsModifier(useExtendedPartsModifierBox.isSelected());
         options.setUsePeacetimeCost(usePeacetimeCostBox.isSelected());
@@ -909,6 +916,7 @@ public class FinancesTab {
 
         // General Options
         useLoanLimitsBox.setSelected(options.isUseLoanLimits());
+        trackLeasesBox.setSelected(options.isTrackLeases());
         usePercentageMaintenanceBox.setSelected(options.isUsePercentageMaint());
         useExtendedPartsModifierBox.setSelected(options.isUseExtendedPartsModifier());
         usePeacetimeCostBox.setSelected(options.isUsePeacetimeCost());
