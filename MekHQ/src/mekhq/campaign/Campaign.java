@@ -249,6 +249,8 @@ import mekhq.service.IAutosaveService;
 import mekhq.service.mrms.MRMSService;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
+import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
+import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 
 /**
  * The main campaign class, keeps track of teams and units
@@ -3758,9 +3760,9 @@ public class Campaign implements ITechManager {
         }
         SocioIndustrialData socioIndustrial = system.getPrimaryPlanet().getSocioIndustrial(getLocalDate());
         CampaignOptions options = getCampaignOptions();
-        int tech = options.getPlanetTechAcquisitionBonus(socioIndustrial.tech);
-        int industry = options.getPlanetIndustryAcquisitionBonus(socioIndustrial.industry);
-        int outputs = options.getPlanetOutputAcquisitionBonus(socioIndustrial.output);
+        int techBonus = options.getPlanetTechAcquisitionBonus(socioIndustrial.tech);
+        int industryBonus = options.getPlanetIndustryAcquisitionBonus(socioIndustrial.industry);
+        int outputsBonus = options.getPlanetOutputAcquisitionBonus(socioIndustrial.output);
         if (d6(2) < target.getValue()) {
             // no contacts on this planet, move along
             if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
@@ -3774,14 +3776,14 @@ public class Campaign implements ITechManager {
                                 " at TN: " +
                                 target.getValue() +
                                 " - Modifiers (Tech: " +
-                                (tech > 0 ? "+" : "") +
-                                tech +
+                                (techBonus > 0 ? "+" : "") +
+                                techBonus +
                                 ", Industry: " +
-                                (industry > 0 ? "+" : "") +
-                                industry +
+                                (industryBonus > 0 ? "+" : "") +
+                                industryBonus +
                                 ", Outputs: " +
-                                (outputs > 0 ? "+" : "") +
-                                outputs +
+                                (outputsBonus > 0 ? "+" : "") +
+                                outputsBonus +
                                 ") </font>");
             }
             return PartAcquisitionResult.PlanetSpecificFailure;

@@ -63,7 +63,7 @@ public class PlanetarySystem {
 
     
     // --- Sophistication Rating Enum ---
-    enum PlanetarySophistication {
+    public enum PlanetarySophistication {
         ADVANCED(-1, "Advanced"),
         A(0, "A"),
         B(1, "B"),
@@ -98,7 +98,7 @@ public class PlanetarySystem {
     }
 
     // --- Planetary Rating Enum ---
-    enum PlanetaryRating {
+    public enum PlanetaryRating {
         A(0, "A"),
         B(1, "B"),
         C(2, "C"),
