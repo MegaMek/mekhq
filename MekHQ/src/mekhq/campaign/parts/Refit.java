@@ -3050,7 +3050,7 @@ public class Refit extends Part implements IAcquisitionWork {
      * @return should probably always be true
      */
     @Override
-    public boolean isIntroducedBy(int year, boolean clan, int techFaction) {
+    public boolean isIntroducedBy(int year, boolean clan, ITechnology.Faction techFaction) {
         return getIntroductionDate(clan, techFaction) <= year;
     }
 
@@ -3060,7 +3060,7 @@ public class Refit extends Part implements IAcquisitionWork {
      * @return should probably always be false
      */
     @Override
-    public boolean isExtinctIn(int year, boolean clan, int techFaction) {
+    public boolean isExtinctIn(int year, boolean clan, ITechnology.Faction techFaction) {
         return isExtinct(year, clan, techFaction);
     }
 

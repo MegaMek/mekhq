@@ -28,6 +28,7 @@
  */
 package mekhq.campaign.work;
 
+import megamek.common.ITechnology;
 import megamek.common.TargetRoll;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
@@ -80,9 +81,9 @@ public interface IAcquisitionWork extends IWork {
         return getBuyCost().multipliedBy(getQuantity());
     }
 
-    public boolean isIntroducedBy(int year, boolean clan, int techFaction);
+    public boolean isIntroducedBy(int year, boolean clan, ITechnology.Faction techFaction);
 
-    public boolean isExtinctIn(int year, boolean clan, int techFaction);
+    public boolean isExtinctIn(int year, boolean clan, ITechnology.Faction techFaction);
 
     public int getAvailability();
 

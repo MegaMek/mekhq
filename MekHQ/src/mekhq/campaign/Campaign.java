@@ -116,6 +116,7 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
 import megamek.common.util.BuildingBlock;
+import megamek.common.ITechnology.TechRating;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
@@ -313,7 +314,7 @@ public class Campaign implements ITechManager {
     private Hashtable<Integer, CombatTeam> combatTeams; // AtB
 
     private Faction faction;
-    private int techFactionCode;
+    private ITechnology.Faction techFactionCode;
     private String retainerEmployerCode; // AtB
     private LocalDate retainerStartDate; // AtB
     private RankSystem rankSystem;
@@ -8529,12 +8530,12 @@ public class Campaign implements ITechManager {
      *
      * @return the number of days required for the parts or units to arrive based on the calculated transit time.
      */
-    public int calculatePartTransitTime(int availability) {
+    public int calculatePartTransitTime(TechRating availability) {
         // This is accurate as of the latest rules. It was (BASE_MODIFIER - (roll + availability) / 4) months in the
         // older version.
         final int BASE_MODIFIER = 7; // CamOps p51
         final int roll = d6(1);
-        final int total = max(1, (BASE_MODIFIER + roll + availability) / 4); // CamOps p51
+        final int total = max(1, (BASE_MODIFIER + roll + availability.getIndex()) / 4); // CamOps p51
 
         // now step forward through the calendar
         LocalDate arrivalDate = currentDay;
@@ -9311,7 +9312,7 @@ public class Campaign implements ITechManager {
     }
 
     @Override
-    public int getTechFaction() {
+    public ITechnology.Faction getTechFaction() {
         return techFactionCode;
     }
 
@@ -9327,14 +9328,14 @@ public class Campaign implements ITechManager {
             // If the tech progression data does not include the current faction,
             // use a generic.
             if (getFaction().isClan()) {
-                techFactionCode = Faction.CLAN;
+                techFactionCode = ITechnology.Faction.CLAN;
             } else if (getFaction().isPeriphery()) {
-                techFactionCode = Faction.PER;
+                techFactionCode = ITechnology.Faction.PER;
             } else {
-                techFactionCode = Faction.IS;
+                techFactionCode = ITechnology.Faction.IS;
             }
         } else {
-            techFactionCode = Faction.NONE;
+            techFactionCode = ITechnology.Faction.NONE;
         }
         // Unit tech level will be calculated if the code has changed.
         UnitTechProgression.loadFaction(techFactionCode);

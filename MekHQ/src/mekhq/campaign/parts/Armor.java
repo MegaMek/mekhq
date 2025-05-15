@@ -566,7 +566,7 @@ public class Armor extends Part implements IAcquisitionWork {
             target.addModifier(campaign.getCampaignOptions().getIsAcquisitionPenalty(), "Inner Sphere tech");
         }
         // availability mod
-        int avail = getAvailability();
+        TechRating avail = getAvailability();
         int availabilityMod = Availability.getAvailabilityModifier(avail);
         target.addModifier(availabilityMod, "availability (" + ITechnology.getRatingName(avail) + ')');
         return target;
@@ -724,12 +724,12 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     @Override
-    public boolean isIntroducedBy(int year, boolean clan, int techFaction) {
+    public boolean isIntroducedBy(int year, boolean clan, ITechnology.Faction techFaction) {
         return getIntroductionDate(clan, techFaction) <= year;
     }
 
     @Override
-    public boolean isExtinctIn(int year, boolean clan, int techFaction) {
+    public boolean isExtinctIn(int year, boolean clan, ITechnology.Faction techFaction) {
         return isExtinct(year, clan, techFaction);
     }
 

@@ -92,11 +92,6 @@ import org.w3c.dom.NodeList;
 public abstract class Part implements IPartWork, ITechnology {
     private static final MMLogger logger = MMLogger.create(Part.class);
 
-    public static final int T_UNKNOWN = -1;
-    public static final int T_BOTH = 0;
-    public static final int T_IS = 1;
-    public static final int T_CLAN = 2;
-
     protected static final TechAdvancement TA_POD = Entity.getOmniAdvancement();
     // Generic TechAdvancement for a number of basic components.
     protected static final TechAdvancement TA_GENERIC = new TechAdvancement(ITechnology.TechBase.ALL).setAdvancement(DATE_ES,
@@ -288,13 +283,13 @@ public abstract class Part implements IPartWork, ITechnology {
         }
 
         switch (getTechBase()) {
-            case T_IS:
+            case IS:
                 cost = cost.multipliedBy(campaign.getCampaignOptions().getInnerSphereUnitPriceMultiplier());
                 break;
-            case T_CLAN:
+            case CLAN:
                 cost = cost.multipliedBy(campaign.getCampaignOptions().getClanUnitPriceMultiplier());
                 break;
-            case T_BOTH:
+            case ALL:
             default:
                 cost = cost.multipliedBy(campaign.getCampaignOptions().getCommonPartPriceMultiplier());
                 break;
@@ -507,15 +502,15 @@ public abstract class Part implements IPartWork, ITechnology {
         return getTechBaseName(getTechBase());
     }
 
-    public static String getTechBaseName(int base) {
+    public static String getTechBaseName(TechBase base) {
         switch (base) {
-            case T_BOTH:
+            case ALL:
                 return "IS/Clan";
-            case T_CLAN:
+            case CLAN:
                 return "Clan";
-            case T_IS:
+            case IS:
                 return "IS";
-            case T_UNKNOWN:
+            case UNKNOWN:
                 return "UNKNOWN";
             default:
                 return "??";
@@ -545,7 +540,7 @@ public abstract class Part implements IPartWork, ITechnology {
         }
     }
 
-    public SimpleTechLevel getSimpleTechLevel(int year, boolean clan, int faction) {
+    public SimpleTechLevel getSimpleTechLevel(int year, boolean clan, Faction faction) {
         if (campaign.useVariableTechLevel()) {
             return getSimpleLevel(year, clan, faction);
         } else {
@@ -1613,12 +1608,12 @@ public abstract class Part implements IPartWork, ITechnology {
     }
 
     @Override
-    public int getTechBase() {
+    public TechBase getTechBase() {
         return getTechAdvancement().getTechBase();
     }
 
     @Override
-    public int getTechRating() {
+    public TechRating getTechRating() {
         return getTechAdvancement().getTechRating();
     }
 
@@ -1707,28 +1702,35 @@ public abstract class Part implements IPartWork, ITechnology {
     }
 
     @Override
-    public int getBaseAvailability(int era) {
+    public TechRating getBaseAvailability(Era era) {
+        TechRating advRating = getTechAdvancement() != null
+            ? getTechAdvancement().getBaseAvailability(era)
+            : TA_GENERIC.getBaseAvailability(era);
         if (omniPodded) {
-            return Math.max(getTechAdvancement().getBaseAvailability(era), TA_POD.getBaseAvailability(era));
+            TechRating podRating = TA_POD.getBaseAvailability(era);
+            return advRating.getIndex() > podRating.getIndex() ? advRating : podRating;
         }
-        return getTechAdvancement().getBaseAvailability(era);
+        return advRating;
     }
 
-    public int getAvailability() {
+    public TechRating getAvailability() {
         return calcYearAvailability(campaign.getGameYear(), campaign.useClanTechBase(), campaign.getTechFaction());
     }
 
     @Override
-    public int calcYearAvailability(int year, boolean clan) {
-        int av = getTechAdvancement().calcYearAvailability(campaign.getGameYear(), campaign.getFaction().isClan());
+    public TechRating calcYearAvailability(int year, boolean clan) {
+        TechRating av = getTechAdvancement() != null
+            ? getTechAdvancement().calcYearAvailability(year, clan)
+            : TA_GENERIC.calcYearAvailability(year, clan);
         if (omniPodded) {
-            av = Math.max(av, TA_POD.calcYearAvailability(campaign.getGameYear(), campaign.getFaction().isClan()));
+            TechRating podRating = TA_POD.calcYearAvailability(year, clan);
+            av = av.getIndex() > podRating.getIndex() ? av : podRating;
         }
         return av;
     }
 
     @Override
-    public int getIntroductionDate(boolean clan, int faction) {
+    public int getIntroductionDate(boolean clan, Faction faction) {
         if (omniPodded) {
             return Math.max(getTechAdvancement().getIntroductionDate(clan, faction),
                   TA_POD.getIntroductionDate(clan, faction));
@@ -1737,7 +1739,7 @@ public abstract class Part implements IPartWork, ITechnology {
     }
 
     @Override
-    public int getPrototypeDate(boolean clan, int faction) {
+    public int getPrototypeDate(boolean clan, Faction faction) {
         if (omniPodded) {
             return Math.max(getTechAdvancement().getPrototypeDate(clan, faction),
                   TA_POD.getPrototypeDate(clan, faction));
@@ -1746,7 +1748,7 @@ public abstract class Part implements IPartWork, ITechnology {
     }
 
     @Override
-    public int getProductionDate(boolean clan, int faction) {
+    public int getProductionDate(boolean clan, Faction faction) {
         if (omniPodded) {
             return Math.max(getTechAdvancement().getProductionDate(clan, faction),
                   TA_POD.getProductionDate(clan, faction));
@@ -1755,12 +1757,12 @@ public abstract class Part implements IPartWork, ITechnology {
     }
 
     @Override
-    public int getExtinctionDate(boolean clan, int faction) {
+    public int getExtinctionDate(boolean clan, Faction faction) {
         return getTechAdvancement().getExtinctionDate(clan, faction);
     }
 
     @Override
-    public int getReintroductionDate(boolean clan, int faction) {
+    public int getReintroductionDate(boolean clan, Faction faction) {
         return getTechAdvancement().getReintroductionDate(clan, faction);
     }
 

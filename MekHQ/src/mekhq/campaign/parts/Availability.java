@@ -31,6 +31,7 @@ package mekhq.campaign.parts;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.logging.MMLogger;
+import megamek.common.ITechnology.TechRating;
 
 /**
  * Helper functions for determining part availability and tech base
@@ -42,22 +43,22 @@ import megamek.logging.MMLogger;
 public class Availability {
     private static final MMLogger logger = MMLogger.create(Availability.class);
 
-    public static int getAvailabilityModifier(int availability) {
+    public static int getAvailabilityModifier(TechRating availability) {
         switch (availability) {
-            case ITechnology.TechRating.A:
+            case A:
                 return -4;
-            case ITechnology.TechRating.B:
+            case B:
                 return -3;
-            case ITechnology.TechRating.C:
+            case C:
                 return -2;
-            case ITechnology.TechRating.D:
+            case D:
                 return -1;
-            case ITechnology.TechRating.E:
+            case E:
                 return 0;
-            case ITechnology.TechRating.F:
+            case F:
                 return 2;
-            case ITechnology.TechRating.FSTAR:
-            case ITechnology.TechRating.X:
+            case FSTAR:
+            case X:
                 // FIXME : Per IO, any IS equipment with a base SW availability of E-F that goes
                 // FIXME : extinct during the SW has it increased by 1 with F+1 meaning that
                 // there
@@ -73,19 +74,19 @@ public class Availability {
         }
     }
 
-    public static int getTechModifier(int tech) {
+    public static int getTechModifier(TechRating tech) {
         switch (tech) {
-            case EquipmentType.TechRating.A:
+            case A:
                 return -4;
-            case EquipmentType.TechRating.B:
+            case B:
                 return -2;
-            case EquipmentType.TechRating.C:
+            case C:
                 return 0;
-            case EquipmentType.TechRating.D:
+            case D:
                 return 1;
-            case EquipmentType.TechRating.E:
+            case E:
                 return 2;
-            case EquipmentType.TechRating.F:
+            case F:
                 return 3;
             default:
                 logger.error("Attempting to get tech modifier for unknown rating of " + tech);

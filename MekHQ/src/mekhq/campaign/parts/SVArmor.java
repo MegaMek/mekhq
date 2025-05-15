@@ -35,6 +35,7 @@ import java.util.Objects;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
+import megamek.common.ITechnology.TechRating;
 import megamek.common.TechAdvancement;
 import megamek.common.equipment.ArmorType;
 import megamek.logging.MMLogger;
@@ -51,7 +52,7 @@ public class SVArmor extends Armor {
     private static final MMLogger logger = MMLogger.create(SVArmor.class);
 
     private int bar;
-    private int techRating;
+    private TechRating techRating;
 
     /**
      * Constructor used during campaign deserialization
@@ -70,7 +71,7 @@ public class SVArmor extends Armor {
      * @param loc        The location on the unit
      * @param campaign   The campaign instance
      */
-    public SVArmor(int bar, int techRating, int points, int loc, Campaign campaign) {
+    public SVArmor(int bar, TechRating techRating, int points, int loc, Campaign campaign) {
         super(0, EquipmentType.T_ARMOR_STANDARD, points, loc, false, false, campaign);
         this.bar = bar;
         this.techRating = techRating;
@@ -82,7 +83,7 @@ public class SVArmor extends Armor {
     }
 
     @Override
-    public int getTechRating() {
+    public TechRating getTechRating() {
         return techRating;
     }
 

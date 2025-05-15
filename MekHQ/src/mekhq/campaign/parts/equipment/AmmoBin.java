@@ -703,12 +703,12 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
 
     @Override
-    public boolean isIntroducedBy(int year, boolean clan, int techFaction) {
+    public boolean isIntroducedBy(int year, boolean clan, ITechnology.Faction techFaction) {
         return getIntroductionDate(clan, techFaction) <= year;
     }
 
     @Override
-    public boolean isExtinctIn(int year, boolean clan, int techFaction) {
+    public boolean isExtinctIn(int year, boolean clan, ITechnology.Faction techFaction) {
         return isExtinct(year, clan, techFaction);
     }
 }
