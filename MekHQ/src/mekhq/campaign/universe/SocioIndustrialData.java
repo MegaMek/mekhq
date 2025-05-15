@@ -32,8 +32,9 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import megamek.common.EquipmentType;
-import megamek.common.ITechnology;
-import megamek.common.ITechnology.TechRating;
+import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
+import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
+
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -45,28 +46,28 @@ public class SocioIndustrialData {
 
     public static final SocioIndustrialData NONE = new SocioIndustrialData();
     static {
-        NONE.tech = TechRating.X;
-        NONE.industry = TechRating.X;
-        NONE.rawMaterials = TechRating.X;
-        NONE.output = TechRating.X;
-        NONE.agriculture = TechRating.X;
+        NONE.tech = PlanetarySophistication.REGRESSED;
+        NONE.industry = PlanetaryRating.F;
+        NONE.rawMaterials = PlanetaryRating.F;
+        NONE.output = PlanetaryRating.F;
+        NONE.agriculture = PlanetaryRating.F;
     }
 
-    public TechRating tech;
-    public TechRating industry;
-    public TechRating rawMaterials;
-    public TechRating output;
-    public TechRating agriculture;
+    public PlanetarySophistication tech;
+    public PlanetaryRating industry;
+    public PlanetaryRating rawMaterials;
+    public PlanetaryRating output;
+    public PlanetaryRating agriculture;
 
     public SocioIndustrialData() {
-        this.tech = TechRating.X;
-        this.industry = TechRating.X;
-        this.rawMaterials = TechRating.X;
-        this.output = TechRating.X;
-        this.agriculture = TechRating.X;
+        this.tech = PlanetarySophistication.REGRESSED;
+        this.industry = PlanetaryRating.F;
+        this.rawMaterials = PlanetaryRating.F;
+        this.output = PlanetaryRating.F;
+        this.agriculture = PlanetaryRating.F;
     }
 
-    public SocioIndustrialData(TechRating t, TechRating i, TechRating r, TechRating o, TechRating a) {
+    public SocioIndustrialData(PlanetarySophistication t, PlanetaryRating i, PlanetaryRating r, PlanetaryRating o, PlanetaryRating a) {
         this.tech = t;
         this.industry = i;
         this.rawMaterials = r;
@@ -76,11 +77,11 @@ public class SocioIndustrialData {
 
     @Override
     public String toString() {
-        return ITechnology.getRatingName(tech)
-                + "-" + ITechnology.getRatingName(industry)
-                + "-" + ITechnology.getRatingName(rawMaterials)
-                + "-" + ITechnology.getRatingName(output)
-                + "-" + ITechnology.getRatingName(agriculture);
+        return tech.getName()
+                + "-" + industry.getName()
+                + "-" + rawMaterials.getName()
+                + "-" + output.getName()
+                + "-" + agriculture.getName();
         }
 
     /** @return the USILR rating as a HTML description */
@@ -91,7 +92,7 @@ public class SocioIndustrialData {
         // Note that rating "E" isn't used in official USILR codes, but we add them for completeness
         StringBuilder sb = new StringBuilder("<html>");
         switch (tech) {
-            case -1:
+            case ADVANCED:
                 sb.append("Advanced: Ultra high-tech world<br>");
                 break;
             case A:
@@ -112,7 +113,7 @@ public class SocioIndustrialData {
             case F:
                 sb.append("F: Primitive world<br>");
                 break;
-            case X:
+            case REGRESSED:
                 sb.append("Regressed: Pre-industrial world<br>");
                 break;
             default:
@@ -233,12 +234,21 @@ public class SocioIndustrialData {
             super(vc);
         }
 
-        private TechRating convertRatingToCode(String rating) {
+        private PlanetarySophistication getSophisticationFromString(String sophistication) {
             try {
-                return TechRating.fromName(rating.toUpperCase(Locale.ROOT));
+                return PlanetarySophistication.fromName(sophistication.toUpperCase(Locale.ROOT));
             } catch (IllegalArgumentException e) {
                 // If the rating is not valid, return a default value
-                return EquipmentType.TechRating.C;
+                return PlanetarySophistication.C;
+            }
+        }
+
+        private PlanetaryRating getRatingFromString(String rating) {
+            try {
+                return PlanetaryRating.fromName(rating.toUpperCase(Locale.ROOT));
+            } catch (IllegalArgumentException e) {
+                // If the rating is not valid, return a default value
+                return PlanetaryRating.C;
             }
         }
 
@@ -248,20 +258,20 @@ public class SocioIndustrialData {
                 String[] socio = jsonParser.getText().split(SEPARATOR);
                 SocioIndustrialData result = new SocioIndustrialData();
                 if (socio.length >= 5) {
-                    result.tech = convertRatingToCode(socio[0]);
-                    if (result.tech == EquipmentType.TechRating.C) {
+                    result.tech = getSophisticationFromString(socio[0]);
+                    if (result.tech == PlanetarySophistication.C) {
                         // Could be ADV or R too
                         String techRating = socio[0].toUpperCase(Locale.ROOT);
                         if (techRating.equals("ADV")) {
-                            result.tech = -1;
+                            result.tech = PlanetarySophistication.ADVANCED;
                         } else if (techRating.equals("R")) {
-                            result.tech = EquipmentType.TechRating.X;
+                            result.tech = PlanetarySophistication.REGRESSED;
                         }
                     }
-                    result.industry = convertRatingToCode(socio[1]);
-                    result.rawMaterials = convertRatingToCode(socio[2]);
-                    result.output = convertRatingToCode(socio[3]);
-                    result.agriculture = convertRatingToCode(socio[4]);
+                    result.industry = getRatingFromString(socio[1]);
+                    result.rawMaterials = getRatingFromString(socio[2]);
+                    result.output = getRatingFromString(socio[3]);
+                    result.agriculture = getRatingFromString(socio[4]);
                 }
                 return result;
             } catch (Exception e) {
