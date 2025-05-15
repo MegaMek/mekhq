@@ -50,19 +50,19 @@ import org.w3c.dom.NodeList;
 public class DropshipDockingCollar extends Part {
     private static final MMLogger logger = MMLogger.create(DropshipDockingCollar.class);
 
-    static final TechAdvancement TA_BOOM = new TechAdvancement(TECH_BASE_ALL)
+    static final TechAdvancement TA_BOOM = new TechAdvancement(ITechnology.TechBase.ALL)
             .setAdvancement(2458, 2470, 2500)
-            .setPrototypeFactions(F_TH)
-            .setProductionFactions(F_TH)
-            .setTechRating(RATING_C)
-            .setAvailability(RATING_C, RATING_C, RATING_C, RATING_C)
+            .setPrototypeFactions(Faction.TH)
+            .setProductionFactions(Faction.TH)
+            .setTechRating(TechRating.C)
+            .setAvailability(TechRating.C, TechRating.C, TechRating.C, TechRating.C)
             .setStaticTechLevel(SimpleTechLevel.STANDARD);
-    static final TechAdvancement TA_NO_BOOM = new TechAdvancement(TECH_BASE_ALL)
+    static final TechAdvancement TA_NO_BOOM = new TechAdvancement(ITechnology.TechBase.ALL)
             .setAdvancement(2304, 2350, 2364, 2520)
-            .setPrototypeFactions(F_TA)
-            .setProductionFactions(F_TH)
-            .setTechRating(RATING_B)
-            .setAvailability(RATING_C, RATING_X, RATING_X, RATING_X)
+            .setPrototypeFactions(Faction.TA)
+            .setProductionFactions(Faction.TH)
+            .setTechRating(TechRating.B)
+            .setAvailability(TechRating.C, TechRating.X, TechRating.X, TechRating.X)
             .setStaticTechLevel(SimpleTechLevel.ADVANCED);
 
     private int collarType;

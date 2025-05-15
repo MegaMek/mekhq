@@ -49,10 +49,10 @@ import org.w3c.dom.NodeList;
 public class KFChargingSystem extends Part {
     private static final MMLogger logger = MMLogger.create(KFChargingSystem.class);
 
-    public static final TechAdvancement TA_CHARGING_SYSTEM = new TechAdvancement(TECH_BASE_ALL)
-            .setAdvancement(2107, 2120, 2300).setPrototypeFactions(F_TA)
-            .setProductionFactions(F_TA).setTechRating(RATING_D)
-            .setAvailability(RATING_D, RATING_E, RATING_D, RATING_D)
+    public static final TechAdvancement TA_CHARGING_SYSTEM = new TechAdvancement(ITechnology.TechBase.ALL)
+            .setAdvancement(2107, 2120, 2300).setPrototypeFactions(Faction.TA)
+            .setProductionFactions(Faction.TA).setTechRating(TechRating.D)
+            .setAvailability(TechRating.D, TechRating.E, TechRating.D, TechRating.D)
             .setStaticTechLevel(SimpleTechLevel.ADVANCED);
 
     // Standard, primitive, compact, subcompact...

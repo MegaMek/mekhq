@@ -40,10 +40,10 @@ import mekhq.campaign.finances.Money;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Rotor extends TankLocation {
-    static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_ALL)
+    static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(ITechnology.TechBase.ALL)
             .setAdvancement(2460, 2470, 2510).setApproximate(true, false, false)
-            .setPrototypeFactions(F_TH).setProductionFactions(F_TH)
-            .setTechRating(RATING_D).setAvailability(RATING_C, RATING_D, RATING_C, RATING_C)
+            .setPrototypeFactions(Faction.TH).setProductionFactions(Faction.TH)
+            .setTechRating(TechRating.D).setAvailability(TechRating.C, TechRating.D, TechRating.C, TechRating.C)
             .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     public Rotor() {

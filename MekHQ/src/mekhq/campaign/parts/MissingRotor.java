@@ -69,7 +69,7 @@ public class MissingRotor extends MissingPart {
 
     @Override
     public int getTechRating() {
-        return EquipmentType.RATING_B;
+        return EquipmentType.TechRating.B;
     }
 
     @Override

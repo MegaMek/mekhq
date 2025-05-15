@@ -125,9 +125,9 @@ public class MissingMekGyro extends MissingPart {
             case Mek.GYRO_COMPACT:
             case Mek.GYRO_HEAVY_DUTY:
             case Mek.GYRO_XL:
-                return EquipmentType.RATING_E;
+                return EquipmentType.TechRating.E;
             default:
-                return EquipmentType.RATING_D;
+                return EquipmentType.TechRating.D;
         }
     }
 

@@ -99,11 +99,11 @@ public abstract class Part implements IPartWork, ITechnology {
 
     protected static final TechAdvancement TA_POD = Entity.getOmniAdvancement();
     // Generic TechAdvancement for a number of basic components.
-    protected static final TechAdvancement TA_GENERIC = new TechAdvancement(TECH_BASE_ALL).setAdvancement(DATE_ES,
+    protected static final TechAdvancement TA_GENERIC = new TechAdvancement(ITechnology.TechBase.ALL).setAdvancement(DATE_ES,
                 DATE_ES,
                 DATE_ES)
-                                                              .setTechRating(RATING_C)
-                                                              .setAvailability(RATING_C, RATING_C, RATING_C, RATING_C)
+                                                              .setTechRating(TechRating.C)
+                                                              .setAvailability(TechRating.C, TechRating.C, TechRating.C, TechRating.C)
                                                               .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     protected String name;
@@ -593,7 +593,7 @@ public abstract class Part implements IPartWork, ITechnology {
     }
 
     protected boolean isClanTechBase() {
-        return getTechBase() == TECH_BASE_CLAN;
+        return getTechBase() == ITechnology.TechBase.CLAN;
     }
 
     public abstract void writeToXML(PrintWriter pw, int indent);

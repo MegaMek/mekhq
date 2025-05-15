@@ -2624,7 +2624,7 @@ public class Refit extends Part implements IAcquisitionWork {
     @Override
     public TargetRoll getAllAcquisitionMods() {
         TargetRoll roll = new TargetRoll();
-        int avail = EquipmentType.RATING_A;
+        int avail = EquipmentType.TechRating.A;
         int techBaseMod = 0;
         for (Part part : shoppingList) {
             if (getTechBase() == T_CLAN && campaign.getCampaignOptions().getClanAcquisitionPenalty() > techBaseMod) {

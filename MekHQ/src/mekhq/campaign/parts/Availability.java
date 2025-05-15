@@ -44,20 +44,20 @@ public class Availability {
 
     public static int getAvailabilityModifier(int availability) {
         switch (availability) {
-            case ITechnology.RATING_A:
+            case ITechnology.TechRating.A:
                 return -4;
-            case ITechnology.RATING_B:
+            case ITechnology.TechRating.B:
                 return -3;
-            case ITechnology.RATING_C:
+            case ITechnology.TechRating.C:
                 return -2;
-            case ITechnology.RATING_D:
+            case ITechnology.TechRating.D:
                 return -1;
-            case ITechnology.RATING_E:
+            case ITechnology.TechRating.E:
                 return 0;
-            case ITechnology.RATING_F:
+            case ITechnology.TechRating.F:
                 return 2;
-            case ITechnology.RATING_FSTAR:
-            case ITechnology.RATING_X:
+            case ITechnology.TechRating.FSTAR:
+            case ITechnology.TechRating.X:
                 // FIXME : Per IO, any IS equipment with a base SW availability of E-F that goes
                 // FIXME : extinct during the SW has it increased by 1 with F+1 meaning that
                 // there
@@ -75,17 +75,17 @@ public class Availability {
 
     public static int getTechModifier(int tech) {
         switch (tech) {
-            case EquipmentType.RATING_A:
+            case EquipmentType.TechRating.A:
                 return -4;
-            case EquipmentType.RATING_B:
+            case EquipmentType.TechRating.B:
                 return -2;
-            case EquipmentType.RATING_C:
+            case EquipmentType.TechRating.C:
                 return 0;
-            case EquipmentType.RATING_D:
+            case EquipmentType.TechRating.D:
                 return 1;
-            case EquipmentType.RATING_E:
+            case EquipmentType.TechRating.E:
                 return 2;
-            case EquipmentType.RATING_F:
+            case EquipmentType.TechRating.F:
                 return 3;
             default:
                 logger.error("Attempting to get tech modifier for unknown rating of " + tech);

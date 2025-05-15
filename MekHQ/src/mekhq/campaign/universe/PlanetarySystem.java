@@ -170,11 +170,11 @@ public class PlanetarySystem {
 
     /** highest socio-industrial ratings among all planets in-system for the map **/
     public SocioIndustrialData getSocioIndustrial(LocalDate when) {
-        int tech = EquipmentType.RATING_X;
-        int industry = EquipmentType.RATING_X;
-        int rawMaterials = EquipmentType.RATING_X;
-        int output = EquipmentType.RATING_X;
-        int agriculture = EquipmentType.RATING_X;
+        int tech = EquipmentType.TechRating.X;
+        int industry = EquipmentType.TechRating.X;
+        int rawMaterials = EquipmentType.TechRating.X;
+        int output = EquipmentType.TechRating.X;
+        int agriculture = EquipmentType.TechRating.X;
 
         for (Planet planet : planets.values()) {
             SocioIndustrialData sic = planet.getSocioIndustrial(when);

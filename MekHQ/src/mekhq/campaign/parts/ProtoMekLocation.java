@@ -57,10 +57,10 @@ import org.w3c.dom.NodeList;
 public class ProtoMekLocation extends Part {
     private static final MMLogger logger = MMLogger.create(ProtoMekLocation.class);
 
-    static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_CLAN)
+    static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(ITechnology.TechBase.CLAN)
             .setClanAdvancement(3055, 3060, 3060).setClanApproximate(true, false, false)
-            .setPrototypeFactions(F_CSJ).setProductionFactions(F_CSJ)
-            .setTechRating(RATING_D).setAvailability(RATING_X, RATING_X, RATING_D, RATING_D)
+            .setPrototypeFactions(Faction.CSJ).setProductionFactions(Faction.CSJ)
+            .setTechRating(TechRating.D).setAvailability(TechRating.X, TechRating.X, TechRating.D, TechRating.D)
             .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     // some of these aren't used but may be later for advanced designs (i.e. WoR)

@@ -127,7 +127,7 @@ public class MissingAvionics extends MissingPart {
     @Override
     public int getTechRating() {
         // go with conventional fighter avionics
-        return EquipmentType.RATING_B;
+        return EquipmentType.TechRating.B;
     }
 
     @Override

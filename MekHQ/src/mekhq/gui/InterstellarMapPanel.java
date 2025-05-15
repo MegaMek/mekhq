@@ -56,7 +56,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.*;
 
-import static megamek.common.ITechnology.RATING_A;
+import static megamek.common.ITechnology.TechRating.A;
 
 /**
  * This is not functional yet. Just testing things out.
@@ -1106,51 +1106,51 @@ public class InterstellarMapPanel extends JPanel {
 
         if (null != socio && optTech.isSelected()) {
             return switch (socio.tech) {
-                case EquipmentType.RATING_F, EquipmentType.RATING_E -> new Color(68, 1, 84);
-                case EquipmentType.RATING_D -> new Color(59, 82, 139);
-                case EquipmentType.RATING_C -> new Color(33, 144, 140);
-                case EquipmentType.RATING_B -> new Color(93, 200, 99);
-                case RATING_A -> new Color(253, 231, 37);
+                case EquipmentType.TechRating.F, EquipmentType.TechRating.E -> new Color(68, 1, 84);
+                case EquipmentType.TechRating.D -> new Color(59, 82, 139);
+                case EquipmentType.TechRating.C -> new Color(33, 144, 140);
+                case EquipmentType.TechRating.B -> new Color(93, 200, 99);
+                case TechRating.A -> new Color(253, 231, 37);
                 default -> Color.BLACK;
             };
         }
         if (null != socio && optIndustry.isSelected()) {
             return switch (socio.industry) {
-                case EquipmentType.RATING_F, EquipmentType.RATING_E -> new Color(0, 0, 4);
-                case EquipmentType.RATING_D -> new Color(81, 18, 124);
-                case EquipmentType.RATING_C -> new Color(182, 54, 121);
-                case EquipmentType.RATING_B -> new Color(251, 136, 97);
-                case RATING_A -> new Color(252, 253, 191);
+                case EquipmentType.TechRating.F, EquipmentType.TechRating.E -> new Color(0, 0, 4);
+                case EquipmentType.TechRating.D -> new Color(81, 18, 124);
+                case EquipmentType.TechRating.C -> new Color(182, 54, 121);
+                case EquipmentType.TechRating.B -> new Color(251, 136, 97);
+                case TechRating.A -> new Color(252, 253, 191);
                 default -> Color.BLACK;
             };
         }
         if (null != socio && optRawMaterials.isSelected()) {
             return switch (socio.rawMaterials) {
-                case EquipmentType.RATING_F, EquipmentType.RATING_E -> new Color(13, 8, 135);
-                case EquipmentType.RATING_D -> new Color(126, 3, 168);
-                case EquipmentType.RATING_C -> new Color(204, 70, 120);
-                case EquipmentType.RATING_B -> new Color(248, 148, 65);
-                case RATING_A -> new Color(240, 249, 33);
+                case EquipmentType.TechRating.F, EquipmentType.TechRating.E -> new Color(13, 8, 135);
+                case EquipmentType.TechRating.D -> new Color(126, 3, 168);
+                case EquipmentType.TechRating.C -> new Color(204, 70, 120);
+                case EquipmentType.TechRating.B -> new Color(248, 148, 65);
+                case TechRating.A -> new Color(240, 249, 33);
                 default -> Color.BLACK;
             };
         }
         if (null != socio && optOutput.isSelected()) {
             return switch (socio.output) {
-                case EquipmentType.RATING_F, EquipmentType.RATING_E -> new Color(0, 0, 4);
-                case EquipmentType.RATING_D -> new Color(86, 15, 110);
-                case EquipmentType.RATING_C -> new Color(187, 55, 84);
-                case EquipmentType.RATING_B -> new Color(249, 140, 10);
-                case RATING_A -> new Color(252, 255, 164);
+                case EquipmentType.TechRating.F, EquipmentType.TechRating.E -> new Color(0, 0, 4);
+                case EquipmentType.TechRating.D -> new Color(86, 15, 110);
+                case EquipmentType.TechRating.C -> new Color(187, 55, 84);
+                case EquipmentType.TechRating.B -> new Color(249, 140, 10);
+                case TechRating.A -> new Color(252, 255, 164);
                 default -> Color.BLACK;
             };
         }
         if (null != socio && optAgriculture.isSelected()) {
             return switch (socio.agriculture) {
-                case EquipmentType.RATING_F, EquipmentType.RATING_E -> new Color(0, 32, 77);
-                case EquipmentType.RATING_D -> new Color(66, 77, 107);
-                case EquipmentType.RATING_C -> new Color(124, 123, 120);
-                case EquipmentType.RATING_B -> new Color(188, 175, 111);
-                case RATING_A -> new Color(255, 234, 70);
+                case EquipmentType.TechRating.F, EquipmentType.TechRating.E -> new Color(0, 32, 77);
+                case EquipmentType.TechRating.D -> new Color(66, 77, 107);
+                case EquipmentType.TechRating.C -> new Color(124, 123, 120);
+                case EquipmentType.TechRating.B -> new Color(188, 175, 111);
+                case TechRating.A -> new Color(255, 234, 70);
                 default -> Color.BLACK;
             };
         }

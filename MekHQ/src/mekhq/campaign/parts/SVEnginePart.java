@@ -69,7 +69,7 @@ public class SVEnginePart extends Part {
      */
 
     public SVEnginePart() {
-        this(0, 0.0, Engine.COMBUSTION_ENGINE, RATING_D, FuelType.PETROCHEMICALS, null);
+        this(0, 0.0, Engine.COMBUSTION_ENGINE, TechRating.D, FuelType.PETROCHEMICALS, null);
     }
 
     /**
@@ -79,8 +79,8 @@ public class SVEnginePart extends Part {
      *                      tons.
      * @param engineTonnage The mass of the engine
      * @param etype         An {@link Engine} type constant
-     * @param techRating    The engine's tech rating, {@code RATING_A} through
-     *                      {@code RATING_F}
+     * @param techRating    The engine's tech rating, {@code TechRating.A} through
+     *                      {@code TechRating.F}
      * @param fuelType      Needed to distinguish different types of internal
      *                      combustion engines.
      * @param campaign      The campaign instance

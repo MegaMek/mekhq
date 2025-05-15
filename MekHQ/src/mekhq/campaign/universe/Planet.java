@@ -580,8 +580,8 @@ public class Planet {
         }
         return switch (getSocioIndustrial(when).tech) {
             case -1 -> 5; // Ultra-Advanced; not accounted for in the EquipmentType.RATING constants
-            case EquipmentType.RATING_A, EquipmentType.RATING_B -> 3;
-            case EquipmentType.RATING_C, EquipmentType.RATING_D -> 1;
+            case EquipmentType.TechRating.A, EquipmentType.TechRating.B -> 3;
+            case EquipmentType.TechRating.C, EquipmentType.TechRating.D -> 1;
             default -> 0;
         };
     }
@@ -708,17 +708,17 @@ public class Planet {
         if (null == socioIndustrial) {
             // nothing has been coded for this planet, so we will assume C across the board
             socioIndustrial = new SocioIndustrialData();
-            socioIndustrial.tech = ITechnology.RATING_C;
-            socioIndustrial.industry = ITechnology.RATING_C;
-            socioIndustrial.output = ITechnology.RATING_C;
-            socioIndustrial.rawMaterials = ITechnology.RATING_C;
-            socioIndustrial.agriculture = ITechnology.RATING_C;
+            socioIndustrial.tech = ITechnology.TechRating.C;
+            socioIndustrial.industry = ITechnology.TechRating.C;
+            socioIndustrial.output = ITechnology.TechRating.C;
+            socioIndustrial.rawMaterials = ITechnology.TechRating.C;
+            socioIndustrial.agriculture = ITechnology.TechRating.C;
         }
 
         // don't allow acquisitions from caveman planets
-        if ((socioIndustrial.tech == ITechnology.RATING_X) ||
-                  (socioIndustrial.industry == ITechnology.RATING_X) ||
-                  (socioIndustrial.output == ITechnology.RATING_X)) {
+        if ((socioIndustrial.tech == ITechnology.TechRating.X) ||
+                  (socioIndustrial.industry == ITechnology.TechRating.X) ||
+                  (socioIndustrial.output == ITechnology.TechRating.X)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Regressed: Pre-industrial world");
         }
 

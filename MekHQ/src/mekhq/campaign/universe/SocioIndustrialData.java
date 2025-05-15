@@ -41,23 +41,23 @@ import java.util.Map;
 public class SocioIndustrialData {
 
     private final static Map<String, Integer> stringToEquipmentTypeMap = new HashMap<String, Integer>() {{
-        put("A", EquipmentType.RATING_A);
-        put("B", EquipmentType.RATING_B);
-        put("C", EquipmentType.RATING_C);
-        put("D", EquipmentType.RATING_D);
-        put("F", EquipmentType.RATING_F);
-        put("X", EquipmentType.RATING_X);
+        put("A", EquipmentType.TechRating.A);
+        put("B", EquipmentType.TechRating.B);
+        put("C", EquipmentType.TechRating.C);
+        put("D", EquipmentType.TechRating.D);
+        put("F", EquipmentType.TechRating.F);
+        put("X", EquipmentType.TechRating.X);
     }};
 
     private final static String SEPARATOR = "-";
 
     public static final SocioIndustrialData NONE = new SocioIndustrialData();
     static {
-        NONE.tech = EquipmentType.RATING_X;
-        NONE.industry = EquipmentType.RATING_X;
-        NONE.rawMaterials = EquipmentType.RATING_X;
-        NONE.output = EquipmentType.RATING_X;
-        NONE.agriculture = EquipmentType.RATING_X;
+        NONE.tech = EquipmentType.TechRating.X;
+        NONE.industry = EquipmentType.TechRating.X;
+        NONE.rawMaterials = EquipmentType.TechRating.X;
+        NONE.output = EquipmentType.TechRating.X;
+        NONE.agriculture = EquipmentType.TechRating.X;
     }
 
     public int tech;
@@ -67,11 +67,11 @@ public class SocioIndustrialData {
     public int agriculture;
 
     public SocioIndustrialData() {
-        this.tech = EquipmentType.RATING_X;
-        this.industry = EquipmentType.RATING_X;
-        this.rawMaterials = EquipmentType.RATING_X;
-        this.output = EquipmentType.RATING_X;
-        this.agriculture = EquipmentType.RATING_X;
+        this.tech = EquipmentType.TechRating.X;
+        this.industry = EquipmentType.TechRating.X;
+        this.rawMaterials = EquipmentType.TechRating.X;
+        this.output = EquipmentType.TechRating.X;
+        this.agriculture = EquipmentType.TechRating.X;
     }
 
     public SocioIndustrialData(int t, int i, int r, int o, int a) {
@@ -102,25 +102,25 @@ public class SocioIndustrialData {
             case -1:
                 sb.append("Advanced: Ultra high-tech world<br>");
                 break;
-            case EquipmentType.RATING_A:
+            case EquipmentType.TechRating.A:
                 sb.append("A: High-tech world<br>");
                 break;
-            case EquipmentType.RATING_B:
+            case EquipmentType.TechRating.B:
                 sb.append("B: Advanced world<br>");
                 break;
-            case EquipmentType.RATING_C:
+            case EquipmentType.TechRating.C:
                 sb.append("C: Moderately advanced world<br>");
                 break;
-            case EquipmentType.RATING_D:
+            case EquipmentType.TechRating.D:
                 sb.append("D: Lower-tech world; about 21st- to 22nd-century level<br>");
                 break;
-            case EquipmentType.RATING_E:
+            case EquipmentType.TechRating.E:
                 sb.append("E: Lower-tech world; about 20th century level<br>");
                 break;
-            case EquipmentType.RATING_F:
+            case EquipmentType.TechRating.F:
                 sb.append("F: Primitive world<br>");
                 break;
-            case EquipmentType.RATING_X:
+            case EquipmentType.TechRating.X:
                 sb.append("Regressed: Pre-industrial world<br>");
                 break;
             default:
@@ -129,22 +129,22 @@ public class SocioIndustrialData {
         }
 
         switch (industry) {
-            case EquipmentType.RATING_A:
+            case EquipmentType.TechRating.A:
                 sb.append("A: Heavily industrialized<br>");
                 break;
-            case EquipmentType.RATING_B:
+            case EquipmentType.TechRating.B:
                 sb.append("B: Moderately industrialized<br>");
                 break;
-            case EquipmentType.RATING_C:
+            case EquipmentType.TechRating.C:
                 sb.append("C: Basic heavy industry; about 22nd century level<br>");
                 break;
-            case EquipmentType.RATING_D:
+            case EquipmentType.TechRating.D:
                 sb.append("D: Low industrialization; about 20th century level<br>");
                 break;
-            case EquipmentType.RATING_E:
+            case EquipmentType.TechRating.E:
                 sb.append("E: Very low industrialization; about 19th century level<br>");
                 break;
-            case EquipmentType.RATING_F:
+            case EquipmentType.TechRating.F:
                 sb.append("F: No industrialization<br>");
                 break;
             default:
@@ -153,22 +153,22 @@ public class SocioIndustrialData {
         }
 
         switch (rawMaterials) {
-            case EquipmentType.RATING_A:
+            case EquipmentType.TechRating.A:
                 sb.append("A: Fully self-sufficient raw material production<br>");
                 break;
-            case EquipmentType.RATING_B:
+            case EquipmentType.TechRating.B:
                 sb.append("B: Mostly self-sufficient raw material production<br>");
                 break;
-            case EquipmentType.RATING_C:
+            case EquipmentType.TechRating.C:
                 sb.append("C: Limited raw material production<br>");
                 break;
-            case EquipmentType.RATING_D:
+            case EquipmentType.TechRating.D:
                 sb.append("D: Production dependent on imports of raw materials<br>");
                 break;
-            case EquipmentType.RATING_E:
+            case EquipmentType.TechRating.E:
                 sb.append("E: Production highly dependent on imports of raw materials<br>");
                 break;
-            case EquipmentType.RATING_F:
+            case EquipmentType.TechRating.F:
                 sb.append("F: No economically viable local raw material production<br>");
                 break;
             default:
@@ -177,22 +177,22 @@ public class SocioIndustrialData {
         }
 
         switch (output) {
-            case EquipmentType.RATING_A:
+            case EquipmentType.TechRating.A:
                 sb.append("A: High industrial output<br>");
                 break;
-            case EquipmentType.RATING_B:
+            case EquipmentType.TechRating.B:
                 sb.append("B: Good industrial output<br>");
                 break;
-            case EquipmentType.RATING_C:
+            case EquipmentType.TechRating.C:
                 sb.append("C: Limited industrial output<br>"); // Bad for Ferengi
                 break;
-            case EquipmentType.RATING_D:
+            case EquipmentType.TechRating.D:
                 sb.append("D: Negligible industrial output<br>");
                 break;
-            case EquipmentType.RATING_E:
+            case EquipmentType.TechRating.E:
                 sb.append("E: Negligible industrial output<br>");
                 break;
-            case EquipmentType.RATING_F:
+            case EquipmentType.TechRating.F:
                 sb.append("F: None<br>"); // Good for Ferengi
                 break;
             default:
@@ -201,22 +201,22 @@ public class SocioIndustrialData {
         }
 
         switch (agriculture) {
-            case EquipmentType.RATING_A:
+            case EquipmentType.TechRating.A:
                 sb.append("A: Breadbasket<br>");
                 break;
-            case EquipmentType.RATING_B:
+            case EquipmentType.TechRating.B:
                 sb.append("B: Agriculturally abundant world<br>");
                 break;
-            case EquipmentType.RATING_C:
+            case EquipmentType.TechRating.C:
                 sb.append("C: Modest agriculture<br>");
                 break;
-            case EquipmentType.RATING_D:
+            case EquipmentType.TechRating.D:
                 sb.append("D: Poor agriculture<br>");
                 break;
-            case EquipmentType.RATING_E:
+            case EquipmentType.TechRating.E:
                 sb.append("E: Very poor agriculture<br>");
                 break;
-            case EquipmentType.RATING_F:
+            case EquipmentType.TechRating.F:
                 sb.append("F: Barren world<br>");
                 break;
             default:
@@ -243,7 +243,7 @@ public class SocioIndustrialData {
 
         private int convertRatingToCode(String rating) {
             Integer result = stringToEquipmentTypeMap.get(rating.toUpperCase(Locale.ROOT));
-            return (null != result) ? result : EquipmentType.RATING_C;
+            return (null != result) ? result : EquipmentType.TechRating.C;
         }
         @Override
         public SocioIndustrialData deserialize(final JsonParser jsonParser, final DeserializationContext context) {
@@ -252,13 +252,13 @@ public class SocioIndustrialData {
                 SocioIndustrialData result = new SocioIndustrialData();
                 if (socio.length >= 5) {
                     result.tech = convertRatingToCode(socio[0]);
-                    if (result.tech == EquipmentType.RATING_C) {
+                    if (result.tech == EquipmentType.TechRating.C) {
                         // Could be ADV or R too
                         String techRating = socio[0].toUpperCase(Locale.ROOT);
                         if (techRating.equals("ADV")) {
                             result.tech = -1;
                         } else if (techRating.equals("R")) {
-                            result.tech = EquipmentType.RATING_X;
+                            result.tech = EquipmentType.TechRating.X;
                         }
                     }
                     result.industry = convertRatingToCode(socio[1]);

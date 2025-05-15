@@ -719,7 +719,7 @@ public class EquipmentAndSuppliesTab {
      */
     private JPanel createModifiersPanel() {
         // Modifier Spinners
-        for (int i = EquipmentType.RATING_A; i <= EquipmentType.RATING_F; i++) {
+        for (int i = EquipmentType.TechRating.A; i <= EquipmentType.TechRating.F; i++) {
             String modifierLabel = getModifierLabel(i);
 
             lblPlanetAcquireTechBonus[i] = new JLabel(String.format("<html>%s</html>",
@@ -919,17 +919,17 @@ public class EquipmentAndSuppliesTab {
      *
      * @param quality the integer representing the quality rating, corresponding to predefined
      *               constants in EquipmentType.
-     * @return the string label associated with the provided quality rating. Returns "A" for RATING_A,
-     * "B" for RATING_B, etc., or "ERROR" if the quality does not match any predefined ratings.
+     * @return the string label associated with the provided quality rating. Returns "A" for TechRating.A,
+     * "B" for TechRating.B, etc., or "ERROR" if the quality does not match any predefined ratings.
      */
     private String getModifierLabel(int quality) {
         return switch (quality) {
-            case EquipmentType.RATING_A -> "A";
-            case EquipmentType.RATING_B -> "B";
-            case EquipmentType.RATING_C -> "C";
-            case EquipmentType.RATING_D -> "D";
-            case EquipmentType.RATING_E -> "E";
-            case EquipmentType.RATING_F -> "F";
+            case EquipmentType.TechRating.A -> "A";
+            case EquipmentType.TechRating.B -> "B";
+            case EquipmentType.TechRating.C -> "C";
+            case EquipmentType.TechRating.D -> "D";
+            case EquipmentType.TechRating.E -> "E";
+            case EquipmentType.TechRating.F -> "F";
             default -> "ERROR";
         };
     }
@@ -1162,7 +1162,7 @@ public class EquipmentAndSuppliesTab {
         options.setDisallowClanPartsFromIS(disallowClanPartsFromIS.isSelected());
         options.setPenaltyClanPartsFromIS((int) spnPenaltyClanPartsFromIS.getValue());
         options.setPlanetAcquisitionVerboseReporting(usePlanetaryAcquisitionsVerbose.isSelected());
-        for (int i = ITechnology.RATING_A; i <= ITechnology.RATING_F; i++) {
+        for (int i = ITechnology.TechRating.A; i <= ITechnology.TechRating.F; i++) {
             options.setPlanetTechAcquisitionBonus((int) spnPlanetAcquireTechBonus[i].getValue(), i);
             options.setPlanetIndustryAcquisitionBonus(
                 (int) spnPlanetAcquireIndustryBonus[i].getValue(), i);
@@ -1239,7 +1239,7 @@ public class EquipmentAndSuppliesTab {
         disallowClanPartsFromIS.setSelected(options.isNoClanPartsFromIS());
         spnPenaltyClanPartsFromIS.setValue(options.getPenaltyClanPartsFromIS());
         usePlanetaryAcquisitionsVerbose.setSelected(options.isPlanetAcquisitionVerbose());
-        for (int i = EquipmentType.RATING_A; i <= EquipmentType.RATING_F; i++) {
+        for (int i = EquipmentType.TechRating.A; i <= EquipmentType.TechRating.F; i++) {
             spnPlanetAcquireTechBonus[i].setValue(options.getPlanetTechAcquisitionBonus(i));
             spnPlanetAcquireIndustryBonus[i].setValue(options.getPlanetIndustryAcquisitionBonus(i));
             spnPlanetAcquireOutputBonus[i].setValue(options.getPlanetOutputAcquisitionBonus(i));

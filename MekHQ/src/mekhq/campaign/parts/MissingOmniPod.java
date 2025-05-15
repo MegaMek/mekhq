@@ -94,7 +94,7 @@ public class MissingOmniPod extends MissingPart {
         if (null != partType) {
             return partType.getTechBase();
         } else {
-            return TechAdvancement.TECH_BASE_ALL;
+            return TechAdvancement.TechBase.ALL;
         }
     }
 
@@ -191,7 +191,7 @@ public class MissingOmniPod extends MissingPart {
     // Using tech rating for Omni construction option from IOps.
     @Override
     public int getTechRating() {
-        return EquipmentType.RATING_E;
+        return EquipmentType.TechRating.E;
     }
 
     @Override

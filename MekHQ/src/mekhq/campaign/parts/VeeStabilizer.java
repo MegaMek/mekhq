@@ -100,7 +100,7 @@ public class VeeStabilizer extends Part {
 
     @Override
     public int getBaseAvailability(int era) {
-        return EquipmentType.RATING_B;
+        return EquipmentType.TechRating.B;
     }
 
     @Override

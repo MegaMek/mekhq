@@ -5920,7 +5920,7 @@ public class Unit implements ITechnology {
 
     public int getAvailability(int era) {
         // take the highest availability of all parts
-        int availability = EquipmentType.RATING_A;
+        int availability = EquipmentType.TechRating.A;
         for (Part p : parts) {
             int newAvailability = p.getAvailability();
             // Taharqa: it's not clear whether a unit should really be considered extinct when its parts are extinct
@@ -5928,7 +5928,7 @@ public class Unit implements ITechnology {
             // date itself, but given that there are no canon extinction/re-intro dates for units, we will use this
             // instead
             if (p.isExtinct(getCampaign().getGameYear(), getCampaign().getFaction().isClan())) {
-                newAvailability = EquipmentType.RATING_X;
+                newAvailability = EquipmentType.TechRating.X;
             }
             if (newAvailability > availability) {
                 availability = newAvailability;
@@ -6324,14 +6324,14 @@ public class Unit implements ITechnology {
             int rating = getTechRating();
             if (((currentYear > 2859) && (currentYear < 3040)) &&
                       (!getCampaign().getFaction().isClan() && !getCampaign().getFaction().isComStar())) {
-                if (rating > EquipmentType.RATING_D) {
+                if (rating > EquipmentType.TechRating.D) {
                     partsCost = partsCost.multipliedBy(5.0);
                 }
             }
 
-            if (rating == EquipmentType.RATING_E) {
+            if (rating == EquipmentType.TechRating.E) {
                 partsCost = partsCost.multipliedBy(1.1);
-            } else if (rating == EquipmentType.RATING_F) {
+            } else if (rating == EquipmentType.TechRating.F) {
                 partsCost = partsCost.multipliedBy(1.25);
             }
 

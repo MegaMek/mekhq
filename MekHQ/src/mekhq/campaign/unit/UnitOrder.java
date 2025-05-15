@@ -306,7 +306,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
         // parts need to be initialized for this to work
         int avail = getAvailability();
         if (this.isExtinctIn(getCampaign().getGameYear())) {
-            avail = EquipmentType.RATING_X;
+            avail = EquipmentType.TechRating.X;
         }
         int availabilityMod = Availability.getAvailabilityModifier(avail);
         target.addModifier(availabilityMod, "availability (" + ITechnology.getRatingName(avail) + ")");

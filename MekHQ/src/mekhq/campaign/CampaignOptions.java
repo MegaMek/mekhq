@@ -727,26 +727,26 @@ public class CampaignOptions {
         planetAcquisitionVerbose = false;
         // Planet Socio-Industrial Modifiers
         planetTechAcquisitionBonus = new int[6];
-        planetTechAcquisitionBonus[EquipmentType.RATING_A] = -1;
-        planetTechAcquisitionBonus[EquipmentType.RATING_B] = 0;
-        planetTechAcquisitionBonus[EquipmentType.RATING_C] = 1;
-        planetTechAcquisitionBonus[EquipmentType.RATING_D] = 2;
-        planetTechAcquisitionBonus[EquipmentType.RATING_E] = 4;
-        planetTechAcquisitionBonus[EquipmentType.RATING_F] = 8;
+        planetTechAcquisitionBonus[EquipmentType.TechRating.A] = -1;
+        planetTechAcquisitionBonus[EquipmentType.TechRating.B] = 0;
+        planetTechAcquisitionBonus[EquipmentType.TechRating.C] = 1;
+        planetTechAcquisitionBonus[EquipmentType.TechRating.D] = 2;
+        planetTechAcquisitionBonus[EquipmentType.TechRating.E] = 4;
+        planetTechAcquisitionBonus[EquipmentType.TechRating.F] = 8;
         planetIndustryAcquisitionBonus = new int[6];
-        planetIndustryAcquisitionBonus[EquipmentType.RATING_A] = 0;
-        planetIndustryAcquisitionBonus[EquipmentType.RATING_B] = 0;
-        planetIndustryAcquisitionBonus[EquipmentType.RATING_C] = 0;
-        planetIndustryAcquisitionBonus[EquipmentType.RATING_D] = 0;
-        planetIndustryAcquisitionBonus[EquipmentType.RATING_E] = 0;
-        planetIndustryAcquisitionBonus[EquipmentType.RATING_F] = 0;
+        planetIndustryAcquisitionBonus[EquipmentType.TechRating.A] = 0;
+        planetIndustryAcquisitionBonus[EquipmentType.TechRating.B] = 0;
+        planetIndustryAcquisitionBonus[EquipmentType.TechRating.C] = 0;
+        planetIndustryAcquisitionBonus[EquipmentType.TechRating.D] = 0;
+        planetIndustryAcquisitionBonus[EquipmentType.TechRating.E] = 0;
+        planetIndustryAcquisitionBonus[EquipmentType.TechRating.F] = 0;
         planetOutputAcquisitionBonus = new int[6];
-        planetOutputAcquisitionBonus[EquipmentType.RATING_A] = -1;
-        planetOutputAcquisitionBonus[EquipmentType.RATING_B] = 0;
-        planetOutputAcquisitionBonus[EquipmentType.RATING_C] = 1;
-        planetOutputAcquisitionBonus[EquipmentType.RATING_D] = 2;
-        planetOutputAcquisitionBonus[EquipmentType.RATING_E] = 4;
-        planetOutputAcquisitionBonus[EquipmentType.RATING_F] = 8;
+        planetOutputAcquisitionBonus[EquipmentType.TechRating.A] = -1;
+        planetOutputAcquisitionBonus[EquipmentType.TechRating.B] = 0;
+        planetOutputAcquisitionBonus[EquipmentType.TechRating.C] = 1;
+        planetOutputAcquisitionBonus[EquipmentType.TechRating.D] = 2;
+        planetOutputAcquisitionBonus[EquipmentType.TechRating.E] = 4;
+        planetOutputAcquisitionBonus[EquipmentType.TechRating.F] = 8;
         // endregion Supplies and Acquisitions Tab
 
         // region Tech Limits Tab

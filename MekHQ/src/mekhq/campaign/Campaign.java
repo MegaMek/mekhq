@@ -435,7 +435,7 @@ public class Campaign implements ITechManager {
         campaignStartDate = null;
         campaignOptions = new CampaignOptions();
         setFaction(Factions.getInstance().getDefaultFaction());
-        techFactionCode = ITechnology.F_MERC;
+        techFactionCode = ITechnology.Faction.MERC;
         CurrencyManager.getInstance().setCampaign(this);
         location = new CurrentLocation(Systems.getInstance().getSystems().get("Galatea"), 0);
         isAvoidingEmptySystems = true;
@@ -7506,7 +7506,7 @@ public class Campaign implements ITechManager {
         }
         if (getCampaignOptions().isDisallowExtinctStuff() &&
                   (acquisition.isExtinctIn(getGameYear(), useClanTechBase(), getTechFaction()) ||
-                         acquisition.getAvailability() == EquipmentType.RATING_X)) {
+                         acquisition.getAvailability() == EquipmentType.TechRating.X)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "It is extinct!");
         }
 
@@ -9327,14 +9327,14 @@ public class Campaign implements ITechManager {
             // If the tech progression data does not include the current faction,
             // use a generic.
             if (getFaction().isClan()) {
-                techFactionCode = ITechnology.F_CLAN;
+                techFactionCode = Faction.CLAN;
             } else if (getFaction().isPeriphery()) {
-                techFactionCode = ITechnology.F_PER;
+                techFactionCode = Faction.PER;
             } else {
-                techFactionCode = ITechnology.F_IS;
+                techFactionCode = Faction.IS;
             }
         } else {
-            techFactionCode = ITechnology.F_NONE;
+            techFactionCode = Faction.NONE;
         }
         // Unit tech level will be calculated if the code has changed.
         UnitTechProgression.loadFaction(techFactionCode);

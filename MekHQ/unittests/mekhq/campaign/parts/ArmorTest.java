@@ -33,7 +33,7 @@
 
 package mekhq.campaign.parts;
 
-import static megamek.common.ITechnology.RATING_D;
+import static megamek.common.ITechnology.TechRating.D;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -84,7 +84,7 @@ public class ArmorTest {
         return Stream.of(new Armor(1, ARMOR_TYPE, ARMOR_AMOUNT, Entity.LOC_NONE, false, false, mockCampaign),
               new ProtoMekArmor(1, ARMOR_TYPE, ARMOR_AMOUNT, Entity.LOC_NONE, false, mockCampaign),
               new BaArmor(1, ARMOR_AMOUNT, ARMOR_TYPE, Entity.LOC_NONE, false, mockCampaign),
-              new SVArmor(SV_ARMOR_BAR, RATING_D, ARMOR_AMOUNT, Entity.LOC_NONE, mockCampaign));
+              new SVArmor(SV_ARMOR_BAR, TechRating.D, ARMOR_AMOUNT, Entity.LOC_NONE, mockCampaign));
     }
 
     @BeforeEach
@@ -358,7 +358,7 @@ public class ArmorTest {
 
     private Armor getDifferentArmorType(Armor armor) {
         if (armor instanceof SVArmor) {
-            return new SVArmor(DIFFERENT_SV_ARMOR_BAR, RATING_D, ARMOR_AMOUNT, Entity.LOC_NONE, mockCampaign);
+            return new SVArmor(DIFFERENT_SV_ARMOR_BAR, TechRating.D, ARMOR_AMOUNT, Entity.LOC_NONE, mockCampaign);
         } else {
             Armor differentArmor = armor.clone();
             differentArmor.changeType(DIFFERENT_ARMOR_TYPE, false);

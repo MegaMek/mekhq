@@ -81,7 +81,7 @@ public class MotiveSystem extends Part {
 
     @Override
     public int getBaseAvailability(int era) {
-        return RATING_B;
+        return TechRating.B;
     }
 
     @Override

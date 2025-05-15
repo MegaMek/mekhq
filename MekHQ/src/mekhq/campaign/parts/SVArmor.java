@@ -58,7 +58,7 @@ public class SVArmor extends Armor {
      */
 
     public SVArmor() {
-        this(2, RATING_D, 0, Entity.LOC_NONE, null);
+        this(2, TechRating.D, 0, Entity.LOC_NONE, null);
     }
 
     /**
