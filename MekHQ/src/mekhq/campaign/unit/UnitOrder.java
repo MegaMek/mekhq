@@ -52,8 +52,8 @@ import org.w3c.dom.NodeList;
 public class UnitOrder extends Unit implements IAcquisitionWork {
     private static final MMLogger logger = MMLogger.create(UnitOrder.class);
 
-    int quantity;
-    int daysToWait;
+    protected int quantity;
+    protected int daysToWait;
 
     public UnitOrder() {
         super(null, null);

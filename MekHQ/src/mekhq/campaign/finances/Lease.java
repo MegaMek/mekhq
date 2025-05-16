@@ -64,6 +64,7 @@ public class Lease extends UnitOrder {
      * If a lease is in the shopping list, it doesn't have a unit yet to attach to.
      */
     public Lease(Entity entity, Campaign campaign) {
+        super(entity, campaign);
         this.entity = entity;
         this.leasedUnit = new Unit(entity, campaign);
         this.campaign = campaign;
@@ -168,8 +169,8 @@ public class Lease extends UnitOrder {
     public void writeToXML(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "unitLease");
         pw.println(MHQXMLUtility.writeEntityToXmlString(getEntity(), indent, getCampaign().getEntities()));
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "quantity", quantity);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "daysToWait", daysToWait);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "quantity", super.quantity);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "daysToWait", super.daysToArrival);
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "unitOrder");
     }
 
@@ -198,6 +199,16 @@ public class Lease extends UnitOrder {
         retVal.initializeParts(false);
 
         return retVal;
+    }
+
+    @Override
+    public Money getTotalBuyCost() {
+        return Money.zero();
+    }
+
+    @Override
+    public Money getBuyCost() {
+        return Money.zero();
     }
 }
 
