@@ -84,7 +84,7 @@ public class Lease extends UnitOrder {
      * yesterday was the first month. Should only be called on the 1st. It's also possible we get a lease object before
      * the lease actually starts, if it takes a while to deliver the unit. Cost will be zero in this case.
      *
-     * @params time The current campaign LocalDate
+     * @param time The current campaign LocalDate
      */
     public Money getLeaseCost(LocalDate time) {
         if (getLeaseStart().isAfter(campaign.getLocalDate())) {
@@ -201,6 +201,7 @@ public class Lease extends UnitOrder {
         return retVal;
     }
 
+    // Leases don't actually COST anything...
     @Override
     public Money getTotalBuyCost() {
         return Money.zero();
