@@ -370,7 +370,7 @@ public class Factions {
             case "MSC" -> "logo_marik_stewart_commonwealth";
             case "OP" -> "logo_oriente_protectorate";
             case "RA" -> "logo_raven_alliance";
-            case "RCM" -> "logo_raven_alliance";
+            case "RCM" -> "logo_rim_commonality";
             case "NIOPS" -> "logo_niops_association";
             case "AXP" -> "logo_axumite_providence";
             case "NDC" -> "logo_new_delphi_compact";
