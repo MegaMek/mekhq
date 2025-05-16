@@ -265,72 +265,72 @@
 				<active>0</active>
 				<skillMin>0</skillMin>
 				<skillMax>4</skillMax>
-				<btnMin>4</btnMin>
-				<btnMax>4</btnMax>
+				<targetNumberPreferred>4</targetNumberPreferred>
+				<targetNumberMax>6</targetNumberMax>
 			</massRepairOption>
 			<massRepairOption>
 				<type>1</type>
 				<active>0</active>
 				<skillMin>0</skillMin>
 				<skillMax>4</skillMax>
-				<btnMin>4</btnMin>
-				<btnMax>4</btnMax>
+				<targetNumberPreferred>4</targetNumberPreferred>
+				<targetNumberMax>6</targetNumberMax>
 			</massRepairOption>
 			<massRepairOption>
 				<type>2</type>
 				<active>0</active>
 				<skillMin>0</skillMin>
 				<skillMax>4</skillMax>
-				<btnMin>4</btnMin>
-				<btnMax>4</btnMax>
+				<targetNumberPreferred>4</targetNumberPreferred>
+				<targetNumberMax>6</targetNumberMax>
 			</massRepairOption>
 			<massRepairOption>
 				<type>3</type>
 				<active>0</active>
 				<skillMin>0</skillMin>
 				<skillMax>4</skillMax>
-				<btnMin>4</btnMin>
-				<btnMax>4</btnMax>
+				<targetNumberPreferred>4</targetNumberPreferred>
+				<targetNumberMax>6</targetNumberMax>
 			</massRepairOption>
 			<massRepairOption>
 				<type>4</type>
 				<active>0</active>
 				<skillMin>0</skillMin>
 				<skillMax>4</skillMax>
-				<btnMin>4</btnMin>
-				<btnMax>4</btnMax>
+				<targetNumberPreferred>4</targetNumberPreferred>
+				<targetNumberMax>6</targetNumberMax>
 			</massRepairOption>
 			<massRepairOption>
 				<type>5</type>
 				<active>0</active>
 				<skillMin>0</skillMin>
 				<skillMax>4</skillMax>
-				<btnMin>4</btnMin>
-				<btnMax>4</btnMax>
+				<targetNumberPreferred>4</targetNumberPreferred>
+				<targetNumberMax>6</targetNumberMax>
 			</massRepairOption>
 			<massRepairOption>
 				<type>6</type>
 				<active>0</active>
 				<skillMin>0</skillMin>
 				<skillMax>4</skillMax>
-				<btnMin>4</btnMin>
-				<btnMax>4</btnMax>
+				<targetNumberPreferred>4</targetNumberPreferred>
+				<targetNumberMax>6</targetNumberMax>
 			</massRepairOption>
 			<massRepairOption>
 				<type>7</type>
 				<active>0</active>
 				<skillMin>0</skillMin>
 				<skillMax>4</skillMax>
-				<btnMin>4</btnMin>
-				<btnMax>4</btnMax>
+				<targetNumberPreferred>4</targetNumberPreferred>
+				<targetNumberMax>6</targetNumberMax>
 			</massRepairOption>
 			<massRepairOption>
 				<type>8</type>
 				<active>0</active>
 				<skillMin>0</skillMin>
 				<skillMax>4</skillMax>
-				<btnMin>4</btnMin>
-				<btnMax>4</btnMax>
+				<targetNumberPreferred>4</targetNumberPreferred>
+				<targetNumberMax>6</targetNumberMax>
 			</massRepairOption>
 		</massRepairOptions>
 		<planetTechAcquisitionBonus>-1,0,1,2,4,8</planetTechAcquisitionBonus>

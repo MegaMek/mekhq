@@ -108,7 +108,7 @@ public class MRMSConfiguredOptions {
 
             MRMSOption mrmsOption = new MRMSOption(partRepairType, mrmsOptionControl.getActiveBox().isSelected(),
                     mrmsOptionControl.getMinSkillCBox().getSelectedIndex(), mrmsOptionControl.getMaxSkillCBox().getSelectedIndex(),
-                    (Integer) mrmsOptionControl.getMinBTHSpn().getValue(), (Integer) mrmsOptionControl.getMaxBTHSpn().getValue(),
+                    (Integer) mrmsOptionControl.getTargetNumberPreferredSpn().getValue(), (Integer) mrmsOptionControl.getTargetNumberMaxSpn().getValue(),
                     (Integer) mrmsOptionControl.getMinDailyTimeSpn().getValue());
 
             if (mrmsOption.isActive()) {

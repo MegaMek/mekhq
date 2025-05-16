@@ -171,13 +171,13 @@ public class MRMSServiceTest {
     public void testMRMS() {
         int skillMin = SkillLevel.ULTRA_GREEN.getExperienceLevel();
         int skillMax = SkillLevel.HEROIC.getExperienceLevel();
-        int bthMin = 6;
-        int bthMax = 6;
+        int targetNumberPreferred = 6;
+        int targetNumberMax = 6;
         int dailyTimeMin = 0;
 
         Unit unit = new Unit(createEntity("UrbanMech UM-R69"), mockCampaign);
 
-        addMRMSOption(PartRepairType.ARMOUR, skillMin, skillMax, bthMin, bthMax, dailyTimeMin);
+        addMRMSOption(PartRepairType.ARMOUR, skillMin, skillMax, targetNumberPreferred, targetNumberMax, dailyTimeMin);
 
         when(mockCampaignOptions.isMRMSUseRepair()).thenReturn(true);
 
@@ -213,8 +213,8 @@ public class MRMSServiceTest {
         Unit unit;
 
         // Values not tested in this test:
-        static final int bthMin = 6;
-        static final int bthMax = 6;
+        static final int targetNumberPreferred = 6;
+        static final int targetNumberMax = 6;
         static final int dailyTimeMin = 0;
 
         @BeforeEach
@@ -241,7 +241,7 @@ public class MRMSServiceTest {
         }
 
         @Test
-        public void testMRMSUnitsBelowMinSkill() {
+        public void testMRMSUnitsBelowPreferredSkill() {
             // Arrange
             int skillMin = SkillLevel.ELITE.getExperienceLevel();
             int skillMax = SkillLevel.LEGENDARY.getExperienceLevel();
@@ -271,7 +271,8 @@ public class MRMSServiceTest {
         }
 
         private void arrangeTestMRMSUnits(int skillMin, int skillMax) {
-            addMRMSOption(PartRepairType.ARMOUR, skillMin, skillMax, bthMin, bthMax, dailyTimeMin);
+            addMRMSOption(PartRepairType.ARMOUR, skillMin, skillMax, targetNumberPreferred,
+                  targetNumberMax, dailyTimeMin);
             configuredOptions = new MRMSConfiguredOptions(mockCampaign);
 
             addMockTech(SkillType.S_TECH_MEK, SkillLevel.VETERAN);
@@ -286,7 +287,7 @@ public class MRMSServiceTest {
 
 
     @Nested
-    public class testMRMSUnitsBTH {
+    public class testMRMSUnitsTargetNumbers {
         int TN_IS_ABOVE = DEFAULT_TARGET_NUMBER - 1;
         int TN_IS_BELOW = DEFAULT_TARGET_NUMBER + 1;
 
@@ -309,15 +310,15 @@ public class MRMSServiceTest {
         }
 
         @Test
-        public void testControlMRMSUnitsBTH() {
+        public void testControlMRMSUnitsTargetNumbers() {
             // Arrange
-            int bthMin = DEFAULT_TARGET_NUMBER;
-            int bthMax = DEFAULT_TARGET_NUMBER;
+            int targetNumberPreferred = DEFAULT_TARGET_NUMBER;
+            int targetNumberMax = DEFAULT_TARGET_NUMBER;
 
             when(mockCampaignOptions.isMRMSUseExtraTime()).thenReturn(true);
             when(mockCampaignOptions.isMRMSUseRushJob()).thenReturn(true);
 
-            arrangeTestMRMSUnits(bthMin, bthMax);
+            arrangeTestMRMSUnits(targetNumberPreferred, targetNumberMax);
 
             // Act
             MRMSService.mrmsUnits(mockCampaign, List.of(unit), configuredOptions);
@@ -331,13 +332,11 @@ public class MRMSServiceTest {
         }
 
         /**
-         * When "Use Extra Time" and "Use Rush Job" are deactivated, MRMS will succeed if the TN is above the "Min TN"
-         * and will not consider the "Max TN".
+         * When "Use Extra Time" and "Use Rush Job" options are deactivated, MRMS will succeed unless the part's TN is 
+         * higher than the "Max TN" setting ("Preferred TN" not considered).
          */
         @Nested
         public class TestNoExtraTimeNorUseRush {
-            int TN_IS_ABOVE = DEFAULT_TARGET_NUMBER - 1;
-            int TN_IS_BELOW = DEFAULT_TARGET_NUMBER + 1;
 
             @BeforeEach
             public void beforeEach() {
@@ -346,11 +345,11 @@ public class MRMSServiceTest {
             }
 
             /**
-             * Unit isn't repaired if the TN is above the minimum `bthMin` (`bthMax` not considered)
+             * Unit isn't repaired if the TN is above the "max TN" setting
              */
             @Test
-            public void testMRMSUnitsBTHifTNAboveMinAboveMax() {
-                doMRMSUnitsBTHWhereTNAboveMinAboveMax();
+            public void testMRMSUnitsTargetNumbersifTNAbovePreferredAboveMax() {
+                doMRMSUnitsTargetNumbersWhereTNAbovePreferredAboveMax();
 
                 // Assert
                 verify(mockCampaign, times(0)).fixPart(any(Part.class), any(Person.class));
@@ -358,23 +357,11 @@ public class MRMSServiceTest {
             }
 
             /**
-             * Unit isn't repaired if the TN is above the minimum `bthMin` (`bthMax` not considered)
+             * Unit is repaired if the TN is equal or lower than the "max TN" setting
              */
             @Test
-            public void testMRMSUnitsBTHifTNAboveMinBelowMax() {
-                doMRMSUnitsBTHWhereTNAboveMinBelowMax();
-
-                // Assert
-                verify(mockCampaign, times(0)).fixPart(any(Part.class), any(Person.class));
-                assertEquals(0, timeSpent.size());
-            }
-
-            /**
-             * Unit is repaired if the TN is below the minimum `bthMin` and above the maximum `bthMax`
-             */
-            @Test
-            public void testMRMSUnitsBTHifTNBelowMinAboveMax() {
-                doMRMSUnitsBTHWhereTNBelowMinAboveMax();
+            public void testMRMSUnitsTargetNumbersifTNAbovePreferredBelowMax() {
+                doMRMSUnitsTargetNumbersWhereTNAbovePreferredBelowMax();
 
                 // Assert
                 verify(mockCampaign, times(11)).fixPart(any(Part.class), any(Person.class));
@@ -385,11 +372,23 @@ public class MRMSServiceTest {
             }
 
             /**
-             * Unit is repaired if the TN is below the minimum `bthMin` and below the maximum `bthMax`
+             * Unit isn't repaired if the TN is above the "max TN" setting
              */
             @Test
-            public void testMRMSUnitsBTHifTNBelowMinBelowMax() {
-                doMRMSUnitsBTHWhereTNBelowMinBelowMax();
+            public void testMRMSUnitsTargetNumbersifTNBelowPreferredAboveMax() {
+                doMRMSUnitsTargetNumbersWhereTNBelowPreferredAboveMax();
+
+                // Assert
+                verify(mockCampaign, times(0)).fixPart(any(Part.class), any(Person.class));
+                assertEquals(0, timeSpent.size());
+            }
+
+            /**
+             * Unit is repaired if the TN is equal or lower than the "max TN" setting
+             */
+            @Test
+            public void testMRMSUnitsTargetNumbersifTNBelowPreferredBelowMax() {
+                doMRMSUnitsTargetNumbersWhereTNBelowPreferredBelowMax();
 
                 // Assert
                 verify(mockCampaign, times(11)).fixPart(any(Part.class), any(Person.class));
@@ -410,12 +409,13 @@ public class MRMSServiceTest {
             }
 
             /**
-             * Unit is repaired if the TN is above the minimum `bthMin` but it is able to reduce the TN to the minimum
-             * via extra time. (`bthMax` not considered)
+             * Unit is repaired even if the TN is above the "max TN" setting when it is able to reduce the TN to
+             * equal or lower than the "max TN" setting via extra time. The MRMS will try to get the adjusted TN as
+             * close as possible to the "Preferred TN" setting.
              */
             @Test
-            public void testMRMSUnitsBTHifTNAboveMinAboveMax() {
-                doMRMSUnitsBTHWhereTNAboveMinAboveMax();
+            public void testMRMSUnitsTargetNumbersifTNAbovePreferredAboveMax() {
+                doMRMSUnitsTargetNumbersWhereTNAbovePreferredAboveMax();
 
                 // Assert
                 verify(mockCampaign, times(11)).fixPart(any(Part.class), any(Person.class));
@@ -426,12 +426,13 @@ public class MRMSServiceTest {
             }
 
             /**
-             * Unit is repaired if the TN is above the minimum `bthMin` but it is able to reduce the TN to the minimum
-             * via extra time. (`bthMax` not considered)
+             * Unit is repaired even if the TN is above the "Max TN" setting when it is able to reduce the TN to
+             * equal or lower than the "max TN" setting via extra time. The MRMS will try to get the adjusted TN as
+             * close as possible to the "Preferred TN" setting, using extra time if it currently above it.
              */
             @Test
-            public void testMRMSUnitsBTHifTNAboveMinBelowMax() {
-                doMRMSUnitsBTHWhereTNAboveMinBelowMax();
+            public void testMRMSUnitsTargetNumbersifTNAbovePreferredBelowMax() {
+                doMRMSUnitsTargetNumbersWhereTNAbovePreferredBelowMax();
 
                 // Assert
                 verify(mockCampaign, times(11)).fixPart(any(Part.class), any(Person.class));
@@ -442,27 +443,25 @@ public class MRMSServiceTest {
             }
 
             /**
-             * Unit is repaired if the TN is below the minimum `bthMin` and above the maximum `bthMax`
+             * Unit isn't repaired if the TN is below the "Preferred TN" setting and above the "Max TN" setting - the
+             * "Preferred TN" setting must be equal or lower than the "Max TN" setting.
              */
             @Test
-            public void testMRMSUnitsBTHifTNBelowMinAboveMax() {
-                doMRMSUnitsBTHWhereTNBelowMinAboveMax();
+            public void testMRMSUnitsTargetNumbersifTNBelowPreferredAboveMax() {
+                doMRMSUnitsTargetNumbersWhereTNBelowPreferredAboveMax();
 
                 // Assert
-                verify(mockCampaign, times(11)).fixPart(any(Part.class), any(Person.class));
-                assertEquals(11, timeSpent.size());
-                for (int i = 0; i < timeSpent.size(); i++) {
-                    assertEquals(WorkTime.NORMAL, timeSpent.get(i), "i=" + i);
-                }
+                verify(mockCampaign, times(0)).fixPart(any(Part.class), any(Person.class));
+                assertEquals(0, timeSpent.size());
             }
 
             /**
-             * Unit is repaired if the TN is below the minimum `bthMin` and the TN will be increased to reach the
-             * maximum `bthMax` via rush time.
+             * Unit is always repaired if the TN is below the "Max TN" setting. The MRMS will try to get the adjusted TN
+             * as close as possible to the "Preferred TN" setting, using rush job if it currently below it.
              */
             @Test
-            public void testMRMSUnitsBTHifTNBelowMinBelowMax() {
-                doMRMSUnitsBTHWhereTNBelowMinBelowMax();
+            public void testMRMSUnitsTargetNumbersifTNBelowPreferredBelowMax() {
+                doMRMSUnitsTargetNumbersWhereTNBelowPreferredBelowMax();
 
                 // Assert
                 verify(mockCampaign, times(11)).fixPart(any(Part.class), any(Person.class));
@@ -473,12 +472,11 @@ public class MRMSServiceTest {
             }
 
             /**
-             * Unit isn't repaired if the TN is above the minimum `bthMin` and we can't reach it with "Use Extra Time"
-             * (`bthMax` not considered)
+             * Unit isn't repaired if the TN is above the "Max TN" setting and we can't reach it even with extra time
              */
             @Test
-            public void testMRMSUnitsBTHifTNWayAboveMinWayAboveMax() {
-                doMRMSUnitsBTHWhereTNWayAboveMinWayAboveMax();
+            public void testMRMSUnitsTargetNumbersifTNWayAbovePreferredWayAboveMax() {
+                doMRMSUnitsTargetNumbersWhereTNWayAbovePreferredWayAboveMax();
 
                 // Assert
                 verify(mockCampaign, times(0)).fixPart(any(Part.class), any(Person.class));
@@ -486,41 +484,41 @@ public class MRMSServiceTest {
             }
 
             /**
-             * Unit isn't repaired if the TN is above the minimum `bthMin` and we can't reach it with "Use Extra Time"
-             * (`bthMax` not considered)
+             * Unit is always repaired if the TN is below the "Max TN" setting. The MRMS will try to get the adjusted TN
+             * as close as possible to the "Preferred TN" setting, using extra time if it currently above it.
              */
             @Test
-            public void testMRMSUnitsBTHifTNWayAboveMinWayBelowMax() {
-                doMRMSUnitsBTHWhereTNWayAboveMinWayBelowMax();
-
-                // Assert
-                verify(mockCampaign, times(0)).fixPart(any(Part.class), any(Person.class));
-                assertEquals(0, timeSpent.size());
-            }
-
-            /**
-             * Unit is repaired if the TN is below the minimum `bthMin` and above the maximum `bthMax`.
-             */
-            @Test
-            public void testMRMSUnitsBTHifTNWayBelowMinWayAboveMax() {
-                doMRMSUnitsBTHWhereTNWayBelowMinWayAboveMax();
+            public void testMRMSUnitsTargetNumbersifTNWayAbovePreferredWayBelowMax() {
+                doMRMSUnitsTargetNumbersWhereTNWayAbovePreferredWayBelowMax();
 
                 // Assert
                 verify(mockCampaign, times(11)).fixPart(any(Part.class), any(Person.class));
                 assertEquals(11, timeSpent.size());
                 for (int i = 0; i < timeSpent.size(); i++) {
-                    assertEquals(WorkTime.NORMAL, timeSpent.get(i), "i=" + i);
+                    assertEquals(WorkTime.EXTRA_4, timeSpent.get(i), "i=" + i);
                 }
             }
 
             /**
-             * Unit is repaired if the TN is below the minimum `bthMin` and above the maximum `bthMax`. Rush time is
-             * used to increase the TN as close as possible, but it will still attempt to fix the part even if it's not
-             * reached.
+             * Unit isn't repaired if the TN is below the "Preferred TN" setting and above the "Max TN" setting - the
+             * "Preferred TN" setting must be equal or lower than the "Max TN" setting.
              */
             @Test
-            public void testMRMSUnitsBTHifTNWayBelowMinWayBelowMax() {
-                doMRMSUnitsBTHWhereTNWayBelowMinWayBelowMax();
+            public void testMRMSUnitsTargetNumbersifTNWayBelowPreferredWayAboveMax() {
+                doMRMSUnitsTargetNumbersWhereTNWayBelowPreferredWayAboveMax();
+
+                // Assert
+                verify(mockCampaign, times(0)).fixPart(any(Part.class), any(Person.class));
+                assertEquals(0, timeSpent.size());
+            }
+
+            /**
+             * Unit is always repaired if the TN is below the "Max TN" setting. The MRMS will try to get the adjusted TN
+             * as close as possible to the "Preferred TN" setting, using rush job if it currently below it.
+             */
+            @Test
+            public void testMRMSUnitsTargetNumbersifTNWayBelowPreferredWayBelowMax() {
+                doMRMSUnitsTargetNumbersWhereTNWayBelowPreferredWayBelowMax();
 
                 // Assert
                 verify(mockCampaign, times(11)).fixPart(any(Part.class), any(Person.class));
@@ -531,8 +529,9 @@ public class MRMSServiceTest {
             }
         }
 
-        private void arrangeTestMRMSUnits(int bthMin, int bthMax) {
-            addMRMSOption(PartRepairType.ARMOUR, skillMin, skillMax, bthMin, bthMax, dailyTimeMin);
+        private void arrangeTestMRMSUnits(int targetNumberPreferred, int targetNumberMax) {
+            addMRMSOption(PartRepairType.ARMOUR, skillMin, skillMax, targetNumberPreferred, targetNumberMax,
+                  dailyTimeMin);
             configuredOptions = new MRMSConfiguredOptions(mockCampaign);
 
             addMockTech(SkillType.S_TECH_MEK, SkillLevel.VETERAN);
@@ -544,89 +543,89 @@ public class MRMSServiceTest {
                   .forEach(MRMSServiceTest.this::breakArmor);
         }
 
-        private void doMRMSUnitsBTHWhereTNAboveMinAboveMax() {
+        private void doMRMSUnitsTargetNumbersWhereTNAbovePreferredAboveMax() {
             // Arrange
-            int bthMin = TN_IS_ABOVE;
-            int bthMax = TN_IS_ABOVE;
+            int targetNumberPreferred = TN_IS_ABOVE;
+            int targetNumberMax = TN_IS_ABOVE;
 
-            arrangeTestMRMSUnits(bthMin, bthMax);
+            arrangeTestMRMSUnits(targetNumberPreferred, targetNumberMax);
 
             // Act
             MRMSService.mrmsUnits(mockCampaign, List.of(unit), configuredOptions);
         }
 
-        private void doMRMSUnitsBTHWhereTNAboveMinBelowMax() {
+        private void doMRMSUnitsTargetNumbersWhereTNAbovePreferredBelowMax() {
             // Arrange
-            int bthMin = TN_IS_ABOVE;
-            int bthMax = TN_IS_BELOW;
+            int targetNumberPreferred = TN_IS_ABOVE;
+            int targetNumberMax = TN_IS_BELOW;
 
-            arrangeTestMRMSUnits(bthMin, bthMax);
+            arrangeTestMRMSUnits(targetNumberPreferred, targetNumberMax);
 
             // Act
             MRMSService.mrmsUnits(mockCampaign, List.of(unit), configuredOptions);
         }
 
-        private void doMRMSUnitsBTHWhereTNBelowMinAboveMax() {
+        private void doMRMSUnitsTargetNumbersWhereTNBelowPreferredAboveMax() {
             // Arrange
-            int bthMin = TN_IS_BELOW;
-            int bthMax = TN_IS_ABOVE;
+            int targetNumberPreferred = TN_IS_BELOW;
+            int targetNumberMax = TN_IS_ABOVE;
 
-            arrangeTestMRMSUnits(bthMin, bthMax);
+            arrangeTestMRMSUnits(targetNumberPreferred, targetNumberMax);
 
             // Act
             MRMSService.mrmsUnits(mockCampaign, List.of(unit), configuredOptions);
         }
 
-        public void doMRMSUnitsBTHWhereTNBelowMinBelowMax() {
+        public void doMRMSUnitsTargetNumbersWhereTNBelowPreferredBelowMax() {
             // Arrange
-            int bthMin = TN_IS_BELOW;
-            int bthMax = TN_IS_BELOW;
+            int targetNumberPreferred = TN_IS_BELOW;
+            int targetNumberMax = TN_IS_BELOW;
 
-            arrangeTestMRMSUnits(bthMin, bthMax);
+            arrangeTestMRMSUnits(targetNumberPreferred, targetNumberMax);
 
             // Act
             MRMSService.mrmsUnits(mockCampaign, List.of(unit), configuredOptions);
         }
 
-        private void doMRMSUnitsBTHWhereTNWayAboveMinWayAboveMax() {
+        private void doMRMSUnitsTargetNumbersWhereTNWayAbovePreferredWayAboveMax() {
             // Arrange
-            int bthMin = TN_IS_WAY_ABOVE;
-            int bthMax = TN_IS_WAY_ABOVE;
+            int targetNumberPreferred = TN_IS_WAY_ABOVE;
+            int targetNumberMax = TN_IS_WAY_ABOVE;
 
-            arrangeTestMRMSUnits(bthMin, bthMax);
+            arrangeTestMRMSUnits(targetNumberPreferred, targetNumberMax);
 
             // Act
             MRMSService.mrmsUnits(mockCampaign, List.of(unit), configuredOptions);
         }
 
-        private void doMRMSUnitsBTHWhereTNWayAboveMinWayBelowMax() {
+        private void doMRMSUnitsTargetNumbersWhereTNWayAbovePreferredWayBelowMax() {
             // Arrange
-            int bthMin = TN_IS_WAY_ABOVE;
-            int bthMax = TN_IS_WAY_BELOW;
+            int targetNumberPreferred = TN_IS_WAY_ABOVE;
+            int targetNumberMax = TN_IS_WAY_BELOW;
 
-            arrangeTestMRMSUnits(bthMin, bthMax);
+            arrangeTestMRMSUnits(targetNumberPreferred, targetNumberMax);
 
             // Act
             MRMSService.mrmsUnits(mockCampaign, List.of(unit), configuredOptions);
         }
 
-        private void doMRMSUnitsBTHWhereTNWayBelowMinWayAboveMax() {
+        private void doMRMSUnitsTargetNumbersWhereTNWayBelowPreferredWayAboveMax() {
             // Arrange
-            int bthMin = TN_IS_WAY_BELOW;
-            int bthMax = TN_IS_WAY_ABOVE;
+            int targetNumberPreferred = TN_IS_WAY_BELOW;
+            int targetNumberMax = TN_IS_WAY_ABOVE;
 
-            arrangeTestMRMSUnits(bthMin, bthMax);
+            arrangeTestMRMSUnits(targetNumberPreferred, targetNumberMax);
 
             // Act
             MRMSService.mrmsUnits(mockCampaign, List.of(unit), configuredOptions);
         }
 
-        public void doMRMSUnitsBTHWhereTNWayBelowMinWayBelowMax() {
+        public void doMRMSUnitsTargetNumbersWhereTNWayBelowPreferredWayBelowMax() {
             // Arrange
-            int bthMin = TN_IS_WAY_BELOW;
-            int bthMax = TN_IS_WAY_BELOW;
+            int targetNumberPreferred = TN_IS_WAY_BELOW;
+            int targetNumberMax = TN_IS_WAY_BELOW;
 
-            arrangeTestMRMSUnits(bthMin, bthMax);
+            arrangeTestMRMSUnits(targetNumberPreferred, targetNumberMax);
 
             // Act
             MRMSService.mrmsUnits(mockCampaign, List.of(unit), configuredOptions);
@@ -679,10 +678,11 @@ public class MRMSServiceTest {
         return mockTech;
     }
 
-    private void addMRMSOption(PartRepairType partRepairType, int skillMin, int skillMax, int bthMin, int bthMax,
-          int dailyTimeMin) {
+    private void addMRMSOption(PartRepairType partRepairType, int skillMin, int skillMax, int targetNumberPreferred,
+          int targetNumberMax, int dailyTimeMin) {
         List<MRMSOption> mrmsOptions = mockCampaignOptions.getMRMSOptions();
-        MRMSOption mrm = new MRMSOption(partRepairType, true, skillMin, skillMax, bthMin, bthMax, dailyTimeMin);
+        MRMSOption mrm = new MRMSOption(partRepairType, true, skillMin, skillMax, targetNumberPreferred,
+              targetNumberMax, dailyTimeMin);
         mrmsOptions.add(mrm);
         when(mockCampaignOptions.getMRMSOptions()).thenReturn(mrmsOptions);
     }

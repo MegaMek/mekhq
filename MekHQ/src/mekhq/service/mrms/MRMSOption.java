@@ -47,26 +47,27 @@ public class MRMSOption {
     private boolean active;
     private int skillMin;
     private int skillMax;
-    private int bthMin;
-    private int bthMax;
+    private int targetNumberPreferred;
+    private int targetNumberMax;
     private int dailyTimeMin;
 
-    private static final int DEFAULT_BTH = 4;
-    private static final int MIN_DAILY_TIME = 0;
+    private static final int TARGET_NUMBER_PREFERRED = 4;
+    private static final int TARGET_NUMBER_MAX = 6;
+    private static final int DAILY_TIME_MIN = 0;
     // endregion Variable Declarations
 
     // region Constructors
     public MRMSOption(PartRepairType type) {
-        this(type, false, SkillType.EXP_ULTRA_GREEN, SkillType.EXP_ELITE, DEFAULT_BTH, DEFAULT_BTH, MIN_DAILY_TIME);
+        this(type, false, SkillType.EXP_ULTRA_GREEN, SkillType.EXP_ELITE, TARGET_NUMBER_PREFERRED, TARGET_NUMBER_MAX, DAILY_TIME_MIN);
     }
 
-    public MRMSOption(PartRepairType type, boolean active, int skillMin, int skillMax, int bthMin, int bthMax, int dailyTimeMin) {
+    public MRMSOption(PartRepairType type, boolean active, int skillMin, int skillMax, int targetNumberPreferred, int targetNumberMax, int dailyTimeMin) {
         this.type = type;
         this.active = active;
         this.skillMin = skillMin;
         this.skillMax = skillMax;
-        this.bthMin = bthMin;
-        this.bthMax = bthMax;
+        this.targetNumberPreferred = targetNumberPreferred;
+        this.targetNumberMax = targetNumberMax;
         this.dailyTimeMin = dailyTimeMin;
     }
     // endregion Constructors
@@ -104,20 +105,48 @@ public class MRMSOption {
         this.skillMax = skillMax;
     }
 
+    public int getTargetNumberPreferred() {
+        return targetNumberPreferred;
+    }
+
+    /**
+     * @deprecated consider {@link #getTargetNumberPreferred()}
+     */
     public int getBthMin() {
-        return bthMin;
+        return this.getTargetNumberPreferred();
     }
 
+    public void setTargetNumberPreferred(int targetNumberPreferred) {
+        this.targetNumberPreferred = targetNumberPreferred;
+    }
+
+    /**
+     * @deprecated consider {@link #setTargetNumberPreferred(int)}
+     */
     public void setBthMin(int bthMin) {
-        this.bthMin = bthMin;
+        this.setTargetNumberPreferred(bthMin);
     }
 
+    public int getTargetNumberMax() {
+        return targetNumberMax;
+    }
+
+    /**
+     * @deprecated consider {@link #getTargetNumberMax()}
+     */
     public int getBthMax() {
-        return bthMax;
+        return this.getTargetNumberMax();
     }
 
+    public void setTargetNumberMax(int targetNumberMax) {
+        this.targetNumberMax = targetNumberMax;
+    }
+
+    /**
+     * @deprecated consider {@link #setTargetNumberMax(int)}
+     */
     public void setBthMax(int bthMax) {
-        this.bthMax = bthMax;
+        this.setTargetNumberMax(bthMax);
     }
 
     public int getDailyTimeMin() {
@@ -136,8 +165,8 @@ public class MRMSOption {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "active", isActive() ? 1 : 0);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "skillMin", getSkillMin());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "skillMax", getSkillMax());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "btnMin", getBthMin());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "btnMax", getBthMax());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "targetNumberPreferred", getTargetNumberPreferred());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "targetNumberMax", getTargetNumberMax());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "dailyTimeMin", getDailyTimeMin());
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "mrmsOption");
     }
@@ -197,10 +226,11 @@ public class MRMSOption {
                     mrmsOption.setSkillMin(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("skillMax")) {
                     mrmsOption.setSkillMax(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("btnMin")) {
-                    mrmsOption.setBthMin(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("btnMax")) {
-                    mrmsOption.setBthMax(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("targetNumberPreferred")) {
+                    mrmsOption.setTargetNumberPreferred(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("targetNumberMax")) {
+                    mrmsOption.setTargetNumberMax(Integer.parseInt(wn2.getTextContent().trim()));
+
                 } else if (wn2.getNodeName().equalsIgnoreCase("dailyTimeMin")) {
                     mrmsOption.setDailyTimeMin(Integer.parseInt(wn2.getTextContent().trim()));
                 }
