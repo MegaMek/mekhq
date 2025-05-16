@@ -37,6 +37,7 @@ import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.utilities.ImageUtilities.addTintToImageIcon;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.GridBagConstraints;
@@ -129,7 +130,10 @@ public class CampaignOptionsHeaderPanel extends JPanel {
         JLabel lblImage = new JLabel(imageIcon);
 
         // Create the header label with text from the resource bundle
-        final JLabel lblHeader = new JLabel(getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".text"),
+        final JLabel lblHeader = new JLabel("<html>" +
+                                                  getFormattedTextAt(getCampaignOptionsResourceBundle(),
+                                                        "lbl" + name + ".text") +
+                                                  "</html>",
               SwingConstants.CENTER);
         lblHeader.setName("lbl" + name);
         setFontScaling(lblHeader, true, 2);
