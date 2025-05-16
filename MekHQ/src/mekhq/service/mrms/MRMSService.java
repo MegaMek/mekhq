@@ -1235,7 +1235,7 @@ public class MRMSService {
 
             // Nulls at the end
             if (skill1 == null && skill2 == null) {
-                return 0;
+                return Integer.compare(tech1.getMinutesLeft(), tech2.getMinutesLeft());
             }
             if (skill1 == null) {
                 return 1;
