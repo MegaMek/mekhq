@@ -740,7 +740,6 @@ public class CampaignOptions {
         planetIndustryAcquisitionBonus.put(PlanetaryRating.B, 0);
         planetIndustryAcquisitionBonus.put(PlanetaryRating.C, 0);
         planetIndustryAcquisitionBonus.put(PlanetaryRating.D, 0);
-        planetIndustryAcquisitionBonus.put(PlanetaryRating.E, 0);
         planetIndustryAcquisitionBonus.put(PlanetaryRating.F, 0);
         planetOutputAcquisitionBonus.put(PlanetaryRating.A, -1);
         planetOutputAcquisitionBonus.put(PlanetaryRating.B, 0);

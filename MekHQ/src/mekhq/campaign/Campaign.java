@@ -316,7 +316,7 @@ public class Campaign implements ITechManager {
     private Hashtable<Integer, CombatTeam> combatTeams; // AtB
 
     private Faction faction;
-    private ITechnology.Faction techFactionCode;
+    private ITechnology.Faction techFaction;
     private String retainerEmployerCode; // AtB
     private LocalDate retainerStartDate; // AtB
     private RankSystem rankSystem;
@@ -438,7 +438,7 @@ public class Campaign implements ITechManager {
         campaignStartDate = null;
         campaignOptions = new CampaignOptions();
         setFaction(Factions.getInstance().getDefaultFaction());
-        techFactionCode = ITechnology.Faction.MERC;
+        techFaction = ITechnology.Faction.MERC;
         CurrencyManager.getInstance().setCampaign(this);
         location = new CurrentLocation(Systems.getInstance().getSystems().get("Galatea"), 0);
         isAvoidingEmptySystems = true;
@@ -9315,32 +9315,32 @@ public class Campaign implements ITechManager {
 
     @Override
     public ITechnology.Faction getTechFaction() {
-        return techFactionCode;
+        return techFaction;
     }
 
     public void updateTechFactionCode() {
         if (campaignOptions.isFactionIntroDate()) {
             for (int i = 0; i < ITechnology.MM_FACTION_CODES.length; i++) {
                 if (ITechnology.MM_FACTION_CODES[i].equals(getFaction().getShortName())) {
-                    techFactionCode = i;
-                    UnitTechProgression.loadFaction(techFactionCode);
+                    techFaction = i;
+                    UnitTechProgression.loadFaction(techFaction);
                     return;
                 }
             }
             // If the tech progression data does not include the current faction,
             // use a generic.
             if (getFaction().isClan()) {
-                techFactionCode = ITechnology.Faction.CLAN;
+                techFaction = ITechnology.Faction.CLAN;
             } else if (getFaction().isPeriphery()) {
-                techFactionCode = ITechnology.Faction.PER;
+                techFaction = ITechnology.Faction.PER;
             } else {
-                techFactionCode = ITechnology.Faction.IS;
+                techFaction = ITechnology.Faction.IS;
             }
         } else {
-            techFactionCode = ITechnology.Faction.NONE;
+            techFaction = ITechnology.Faction.NONE;
         }
         // Unit tech level will be calculated if the code has changed.
-        UnitTechProgression.loadFaction(techFactionCode);
+        UnitTechProgression.loadFaction(techFaction);
     }
 
     @Override

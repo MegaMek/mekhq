@@ -60,11 +60,11 @@ public class SocioIndustrialData {
     public PlanetaryRating agriculture;
 
     public SocioIndustrialData() {
-        this.tech = PlanetarySophistication.REGRESSED;
-        this.industry = PlanetaryRating.F;
-        this.rawMaterials = PlanetaryRating.F;
-        this.output = PlanetaryRating.F;
-        this.agriculture = PlanetaryRating.F;
+        this.tech = PlanetarySophistication.C;
+        this.industry = PlanetaryRating.D;
+        this.rawMaterials = PlanetaryRating.B;
+        this.output = PlanetaryRating.C;
+        this.agriculture = PlanetaryRating.C;
     }
 
     public SocioIndustrialData(PlanetarySophistication t, PlanetaryRating i, PlanetaryRating r, PlanetaryRating o, PlanetaryRating a) {
@@ -107,9 +107,6 @@ public class SocioIndustrialData {
             case D:
                 sb.append("D: Lower-tech world; about 21st- to 22nd-century level<br>");
                 break;
-            case E:
-                sb.append("E: Lower-tech world; about 20th century level<br>");
-                break;
             case F:
                 sb.append("F: Primitive world<br>");
                 break;
@@ -134,9 +131,6 @@ public class SocioIndustrialData {
             case D:
                 sb.append("D: Low industrialization; about 20th century level<br>");
                 break;
-            case E:
-                sb.append("E: Very low industrialization; about 19th century level<br>");
-                break;
             case F:
                 sb.append("F: No industrialization<br>");
                 break;
@@ -157,9 +151,6 @@ public class SocioIndustrialData {
                 break;
             case D:
                 sb.append("D: Production dependent on imports of raw materials<br>");
-                break;
-            case E:
-                sb.append("E: Production highly dependent on imports of raw materials<br>");
                 break;
             case F:
                 sb.append("F: No economically viable local raw material production<br>");
@@ -182,9 +173,6 @@ public class SocioIndustrialData {
             case D:
                 sb.append("D: Negligible industrial output<br>");
                 break;
-            case E:
-                sb.append("E: Negligible industrial output<br>");
-                break;
             case F:
                 sb.append("F: None<br>"); // Good for Ferengi
                 break;
@@ -205,9 +193,6 @@ public class SocioIndustrialData {
                 break;
             case D:
                 sb.append("D: Poor agriculture<br>");
-                break;
-            case E:
-                sb.append("E: Very poor agriculture<br>");
                 break;
             case F:
                 sb.append("F: Barren world<br>");
@@ -260,11 +245,13 @@ public class SocioIndustrialData {
                 if (socio.length >= 5) {
                     result.tech = getSophisticationFromString(socio[0]);
                     if (result.tech == PlanetarySophistication.C) {
-                        // Could be ADV or R too
+                        // Could be ADV or R or X too
                         String techRating = socio[0].toUpperCase(Locale.ROOT);
                         if (techRating.equals("ADV")) {
                             result.tech = PlanetarySophistication.ADVANCED;
                         } else if (techRating.equals("R")) {
+                            result.tech = PlanetarySophistication.REGRESSED;
+                        } else if (techRating.equals("X")) {
                             result.tech = PlanetarySophistication.REGRESSED;
                         }
                     }

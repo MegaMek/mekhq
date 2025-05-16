@@ -53,16 +53,16 @@ public class StructuralIntegrity extends Part {
     private static final MMLogger logger = MMLogger.create(StructuralIntegrity.class);
 
     // Slight variations for ASFs, CFs, and SC/DS
-    static final TechAdvancement TA_ASF = new TechAdvancement(ITechnology.TechBase.ALL)
+    static final TechAdvancement TA_ASF = new TechAdvancement(TechBase.ALL)
             .setAdvancement(2200, 2470, 2490).setApproximate(true, false, false)
             .setPrototypeFactions(Faction.TA).setProductionFactions(Faction.TH)
             .setTechRating(TechRating.C).setAvailability(TechRating.C, TechRating.D, TechRating.D, TechRating.C)
             .setStaticTechLevel(SimpleTechLevel.STANDARD);
-    static final TechAdvancement TA_CF = new TechAdvancement(ITechnology.TechBase.ALL)
+    static final TechAdvancement TA_CF = new TechAdvancement(TechBase.ALL)
             .setAdvancement(DATE_PS, 2470, 2490).setProductionFactions(Faction.TH)
             .setTechRating(TechRating.C).setAvailability(TechRating.C, TechRating.C, TechRating.C, TechRating.C)
             .setStaticTechLevel(SimpleTechLevel.STANDARD);
-    static final TechAdvancement TA_DS = new TechAdvancement(ITechnology.TechBase.ALL)
+    static final TechAdvancement TA_DS = new TechAdvancement(TechBase.ALL)
             .setAdvancement(2200, 2470, 2490).setApproximate(true, false, false)
             .setPrototypeFactions(Faction.TA).setProductionFactions(Faction.TH)
             .setTechRating(TechRating.C).setAvailability(TechRating.D, TechRating.D, TechRating.D, TechRating.D)

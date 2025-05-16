@@ -808,7 +808,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        void setTechFaction(int techFaction) {
+        void setTechFaction(ITechnology.Faction techFaction) {
             structureTab.setTechFaction(techFaction);
         }
 
@@ -933,7 +933,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        void setTechFaction(int techFaction) {
+        void setTechFaction(ITechnology.Faction techFaction) {
             structureTab.setTechFaction(techFaction);
         }
     }
@@ -1057,7 +1057,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        void setTechFaction(int techFaction) {
+        void setTechFaction(ITechnology.Faction techFaction) {
             structureTab.setTechFaction(techFaction);
         }
     }
@@ -1193,7 +1193,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        void setTechFaction(int techFaction) {
+        void setTechFaction(ITechnology.Faction techFaction) {
             structureTab.setTechFaction(techFaction);
         }
     }
@@ -1313,7 +1313,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        void setTechFaction(int techFaction) {
+        void setTechFaction(ITechnology.Faction techFaction) {
             structureTab.setTechFaction(techFaction);
         }
     }
@@ -1425,7 +1425,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        void setTechFaction(int techFaction) {
+        void setTechFaction(ITechnology.Faction techFaction) {
             structureTab.setTechFaction(techFaction);
         }
     }
@@ -1552,7 +1552,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        void setTechFaction(int techFaction) {
+        void setTechFaction(ITechnology.Faction techFaction) {
             structureTab.setTechFaction(techFaction);
         }
     }
@@ -1682,7 +1682,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        void setTechFaction(int techFaction) {
+        void setTechFaction(ITechnology.Faction techFaction) {
             structureTab.setTechFaction(techFaction);
         }
     }
