@@ -80,8 +80,8 @@ public class MotiveSystem extends Part {
     }
 
     @Override
-    public TechRating getBaseAvailability(Era era) {
-        return TechRating.B;
+    public AvailabilityValue getBaseAvailability(Era era) {
+        return AvailabilityValue.B;
     }
 
     @Override
