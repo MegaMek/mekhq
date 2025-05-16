@@ -98,7 +98,7 @@ public abstract class Part implements IPartWork, ITechnology {
                 DATE_ES,
                 DATE_ES)
                                                               .setTechRating(TechRating.C)
-                                                              .setAvailability(TechRating.C, TechRating.C, TechRating.C, TechRating.C)
+                                                              .setAvailability(AvailabilityValue.C, AvailabilityValue.C, AvailabilityValue.C, AvailabilityValue.C)
                                                               .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     protected String name;
