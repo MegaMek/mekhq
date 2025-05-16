@@ -1244,7 +1244,7 @@ public class MRMSService {
                 return -1;
             }
 
-            int experienceCompare = Integer.compare(skill1.getExperienceLevel(), skill2.getExperienceLevel());
+            int experienceCompare = Integer.compare(skill1.getTotalSkillLevel(), skill2.getTotalSkillLevel());
             if (experienceCompare != 0) {
                 return experienceCompare;
             }
