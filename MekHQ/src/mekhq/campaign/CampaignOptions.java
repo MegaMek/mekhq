@@ -47,6 +47,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import megamek.Version;
 import megamek.codeUtilities.MathUtility;
@@ -78,6 +79,7 @@ import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
+import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 
 /**
@@ -5449,10 +5451,19 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioModChance", scenarioModChance);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioModBV", scenarioModBV);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoConfigMunitions", autoConfigMunitions);
-
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetTechAcquisitionBonus", planetTechAcquisitionBonus);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetIndustryAcquisitionBonus", planetIndustryAcquisitionBonus);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetOutputAcquisitionBonus", planetOutputAcquisitionBonus);
+        
+        String planetTechAcquisitionBonusString = Arrays.stream(PlanetarySophistication.values())
+                        .map(sophistication -> planetTechAcquisitionBonus.getOrDefault(sophistication, 0).toString())
+                        .collect(Collectors.joining(","));
+        String planetIndustryAcquisitionBonusString = Arrays.stream(PlanetaryRating.values())
+                        .map(rating -> planetIndustryAcquisitionBonus.getOrDefault(rating, 0).toString())
+                        .collect(Collectors.joining(","));
+        String planetOutputAcquisitionBonusString = Arrays.stream(PlanetaryRating.values())
+                        .map(rating -> planetOutputAcquisitionBonus.getOrDefault(rating, 0).toString())
+                        .collect(Collectors.joining(","));
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetTechAcquisitionBonus", planetTechAcquisitionBonusString);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetIndustryAcquisitionBonus", planetIndustryAcquisitionBonusString);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetOutputAcquisitionBonus", planetOutputAcquisitionBonusString);
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePortraitForType", isUsePortraitForRoles());
 
@@ -5605,18 +5616,57 @@ public class CampaignOptions {
                     retVal.maxJumpsPlanetaryAcquisition = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("planetTechAcquisitionBonus")) {
                     String[] values = wn2.getTextContent().split(",");
-                    for (int i = 0; i < values.length; i++) {
-                        retVal.planetTechAcquisitionBonus.put(PlanetarySophistication.fromIndex(i), Integer.parseInt(values[i]));
+                    if (values.length == 6) {
+                        // < 0.50.07 compatibility handler
+                        retVal.planetTechAcquisitionBonus.put(PlanetarySophistication.A, Integer.parseInt(values[0]));
+                        retVal.planetTechAcquisitionBonus.put(PlanetarySophistication.B, Integer.parseInt(values[1]));
+                        retVal.planetTechAcquisitionBonus.put(PlanetarySophistication.C, Integer.parseInt(values[2]));
+                        retVal.planetTechAcquisitionBonus.put(PlanetarySophistication.D, Integer.parseInt(values[3]));
+                        retVal.planetTechAcquisitionBonus.put(PlanetarySophistication.F, Integer.parseInt(values[5]));
+                    } else
+                    if (values.length == PlanetarySophistication.values().length) {
+                        // >= 0.50.07 compatibility handler
+                        for (int i = 0; i < values.length; i++) {
+                            retVal.planetTechAcquisitionBonus.put(PlanetarySophistication.fromIndex(i), Integer.parseInt(values[i]));
+                        }
+                    } else {
+                        logger.error("Invalid number of values for planetTechAcquisitionBonus: {}", values.length);
                     }
                 } else if (nodeName.equalsIgnoreCase("planetIndustryAcquisitionBonus")) {
                     String[] values = wn2.getTextContent().split(",");
-                    for (int i = 0; i < values.length; i++) {
-                        retVal.planetIndustryAcquisitionBonus.put(PlanetaryRating.fromIndex(i), Integer.parseInt(values[i]));
+                    if (values.length == 6) {
+                        // < 0.50.07 compatibility handler
+                        retVal.planetIndustryAcquisitionBonus.put(PlanetaryRating.A, Integer.parseInt(values[0]));
+                        retVal.planetIndustryAcquisitionBonus.put(PlanetaryRating.B, Integer.parseInt(values[1]));
+                        retVal.planetIndustryAcquisitionBonus.put(PlanetaryRating.C, Integer.parseInt(values[2]));
+                        retVal.planetIndustryAcquisitionBonus.put(PlanetaryRating.D, Integer.parseInt(values[3]));
+                        retVal.planetIndustryAcquisitionBonus.put(PlanetaryRating.F, Integer.parseInt(values[5]));
+                    } else 
+                        // >= 0.50.07 compatibility handler
+                    if (values.length == PlanetaryRating.values().length) {
+                        for (int i = 0; i < values.length; i++) {
+                            retVal.planetIndustryAcquisitionBonus.put(PlanetaryRating.fromIndex(i), Integer.parseInt(values[i]));
+                        }
+                    } else {
+                        logger.error("Invalid number of values for planetIndustryAcquisitionBonus: {}", values.length);
                     }
                 } else if (nodeName.equalsIgnoreCase("planetOutputAcquisitionBonus")) {
                     String[] values = wn2.getTextContent().split(",");
-                    for (int i = 0; i < values.length; i++) {
-                        retVal.planetOutputAcquisitionBonus.put(PlanetaryRating.fromIndex(i), Integer.parseInt(values[i]));
+                    if (values.length == 6) {
+                        // < 0.50.07 compatibility handler
+                        retVal.planetOutputAcquisitionBonus.put(PlanetaryRating.A, Integer.parseInt(values[0]));
+                        retVal.planetOutputAcquisitionBonus.put(PlanetaryRating.B, Integer.parseInt(values[1]));
+                        retVal.planetOutputAcquisitionBonus.put(PlanetaryRating.C, Integer.parseInt(values[2]));
+                        retVal.planetOutputAcquisitionBonus.put(PlanetaryRating.D, Integer.parseInt(values[3]));
+                        retVal.planetOutputAcquisitionBonus.put(PlanetaryRating.F, Integer.parseInt(values[5]));
+                    } else
+                        // >= 0.50.07 compatibility handler
+                    if (values.length == PlanetaryRating.values().length) {
+                        for (int i = 0; i < values.length; i++) {
+                            retVal.planetOutputAcquisitionBonus.put(PlanetaryRating.fromIndex(i), Integer.parseInt(values[i]));
+                        }
+                    } else {
+                        logger.error("Invalid number of values for planetOutputAcquisitionBonus: {}", values.length);
                     }
                 } else if (nodeName.equalsIgnoreCase("equipmentContractPercent")) {
                     retVal.setEquipmentContractPercent(Double.parseDouble(wn2.getTextContent().trim()));
