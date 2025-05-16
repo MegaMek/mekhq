@@ -1228,8 +1228,8 @@ public class MRMSService {
         @Override
         public int compare(Person tech1, Person tech2) {
             // Sort the valid techs by applicable skill. Let's start with the least experienced and work our way up
-            // until we find someone who can perform the work. If we have two techs with the same skill, put the one
-            // with the lesser XP in the front. If we have tech with the same XP, put the one with the more time ahead.
+            // until we find someone who can perform the work. If we have two techs with the same XP, put the one with
+            // the more time ahead.
             Skill skill1 = tech1.getSkillForWorkingOn(partWork);
             Skill skill2 = tech2.getSkillForWorkingOn(partWork);
 
@@ -1249,22 +1249,6 @@ public class MRMSService {
                 return experienceCompare;
             }
 
-            // At this point, the same experience level
-            int xp1 = tech1.getXP();
-            int xp2 = tech2.getXP();
-
-            // Only treat ELITE as a special case, otherwise compare XP
-            if (skill1.getLevel() == SkillType.EXP_ELITE && skill2.getLevel() == SkillType.EXP_ELITE) {
-                // Both ELITE, compare by minutes left
-                return Integer.compare(tech1.getMinutesLeft(), tech2.getMinutesLeft());
-            }
-
-            int xpCompare = Integer.compare(xp1, xp2);
-            if (xpCompare != 0) {
-                return xpCompare;
-            }
-
-            // Finally, compare by minutes left
             return Integer.compare(tech1.getMinutesLeft(), tech2.getMinutesLeft());
         }
     }
