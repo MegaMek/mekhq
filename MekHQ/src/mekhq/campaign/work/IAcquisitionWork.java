@@ -87,7 +87,7 @@ public interface IAcquisitionWork extends IWork {
 
     public boolean isExtinctIn(int year, boolean clan, ITechnology.Faction techFaction);
 
-    public TechRating getAvailability();
+    public int getAvailability();
 
     public String getShoppingListReport(int quantity);
 

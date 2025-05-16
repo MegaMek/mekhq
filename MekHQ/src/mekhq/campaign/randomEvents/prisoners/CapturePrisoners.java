@@ -58,7 +58,7 @@ import java.util.Objects;
 
 import megamek.common.Compute;
 import megamek.common.ITechnology;
-import megamek.common.ITechnology.TechRating;
+import megamek.common.ITechnology.AvailabilityValue;
 import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
@@ -162,22 +162,22 @@ public class CapturePrisoners {
             sarTargetNumber.addModifier(GOING_TO_GROUND, "Potential Prisoner Going to Ground");
             sarTargetNumber.addModifier(SAR_CONTAINS_VTOL_OR_WIGE, "SAR Contains VTOL or WIGE");
 
-            final TechRating isImprovedSensorsAvailability = createISImprovedSensors().calcYearAvailability(today,
+            final AvailabilityValue isImprovedSensorsAvailability = createISImprovedSensors().calcYearAvailability(today,
                   searchingFactionIsClan,
                   techFaction);
-            final TechRating clanImprovedSensorsAvailability = createCLImprovedSensors().calcYearAvailability(today,
+            final AvailabilityValue clanImprovedSensorsAvailability = createCLImprovedSensors().calcYearAvailability(today,
                   searchingFactionIsClan,
                   techFaction);
 
-            final TechRating improvedSensorsAvailability = searchingFactionIsClan ?
+            final AvailabilityValue improvedSensorsAvailability = searchingFactionIsClan ?
                                                           clanImprovedSensorsAvailability :
                                                           isImprovedSensorsAvailability;
 
-            final TechRating activeProbeAvailability = createBeagleActiveProbe().calcYearAvailability(today,
+            final AvailabilityValue activeProbeAvailability = createBeagleActiveProbe().calcYearAvailability(today,
                   searchingFactionIsClan,
                   techFaction);
 
-            // TODO: sarQuality is evaluated against the index of a TechRating. doesn't seems very nice. Refactor the whole constructor.
+            // TODO: sarQuality is evaluated against the index of a AvailabilityValue. doesn't seems very nice. Refactor the whole constructor.
             if (sarQuality >= improvedSensorsAvailability.getIndex()) {
                 sarTargetNumber.addModifier(SAR_HAS_IMPROVED_SENSORS, "SAR has Improved Sensors");
             } else if (sarQuality >= activeProbeAvailability.getIndex()) {

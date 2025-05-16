@@ -8532,12 +8532,12 @@ public class Campaign implements ITechManager {
      *
      * @return the number of days required for the parts or units to arrive based on the calculated transit time.
      */
-    public int calculatePartTransitTime(TechRating availability) {
+    public int calculatePartTransitTime(int availability) {
         // This is accurate as of the latest rules. It was (BASE_MODIFIER - (roll + availability) / 4) months in the
         // older version.
         final int BASE_MODIFIER = 7; // CamOps p51
         final int roll = d6(1);
-        final int total = max(1, (BASE_MODIFIER + roll + availability.getIndex()) / 4); // CamOps p51
+        final int total = max(1, (BASE_MODIFIER + roll + availability) / 4); // CamOps p51
 
         // now step forward through the calendar
         LocalDate arrivalDate = currentDay;
@@ -8548,6 +8548,32 @@ public class Campaign implements ITechManager {
         };
 
         return Math.toIntExact(ChronoUnit.DAYS.between(getLocalDate(), arrivalDate));
+    }
+    /**
+     * Calculates the transit time for the arrival of parts or supplies based on the availability of the item, a random
+     * roll, and campaign-specific transit time settings.
+     *
+     * <p>
+     * The transit time is calculated using the following factors:
+     * <ul>
+     * <li>A fixed base modifier value defined by campaign rules.</li>
+     * <li>A random roll of 1d6 to add variability to the calculation.</li>
+     * <li>The availability value of the requested parts or supplies from the
+     * acquisition details.</li>
+     * </ul>
+     *
+     * <p>
+     * The calculated duration is applied in units (days, weeks, or months) based on
+     * the campaign's
+     * configuration for transit time.
+     * </p>
+     *
+     * @param techRating the TechRating of the part
+     *
+     * @return the number of days required for the parts or units to arrive based on the calculated transit time.
+     */
+    public int calculatePartTransitTime(AvailabilityRating techRating) {
+        return calculatePartTransitTime(AvailabilityRating.getIndex());
     }
 
     /**

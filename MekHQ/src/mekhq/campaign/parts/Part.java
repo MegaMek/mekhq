@@ -1702,28 +1702,28 @@ public abstract class Part implements IPartWork, ITechnology {
     }
 
     @Override
-    public TechRating getBaseAvailability(Era era) {
-        TechRating advRating = getTechAdvancement() != null
+    public AvailabilityValue getBaseAvailability(Era era) {
+        AvailabilityValue advRating = getTechAdvancement() != null
             ? getTechAdvancement().getBaseAvailability(era)
             : TA_GENERIC.getBaseAvailability(era);
         if (omniPodded) {
-            TechRating podRating = TA_POD.getBaseAvailability(era);
+            AvailabilityValue podRating = TA_POD.getBaseAvailability(era);
             return advRating.isBetterThan(podRating) ? advRating : podRating;
         }
         return advRating;
     }
 
-    public TechRating getAvailability() {
+    public AvailabilityValue getAvailability() {
         return calcYearAvailability(campaign.getGameYear(), campaign.useClanTechBase(), campaign.getTechFaction());
     }
 
     @Override
-    public TechRating calcYearAvailability(int year, boolean clan) {
-        TechRating av = getTechAdvancement() != null
+    public AvailabilityValue calcYearAvailability(int year, boolean clan) {
+        AvailabilityValue av = getTechAdvancement() != null
             ? getTechAdvancement().calcYearAvailability(year, clan)
             : TA_GENERIC.calcYearAvailability(year, clan);
         if (omniPodded) {
-            TechRating podRating = TA_POD.calcYearAvailability(year, clan);
+            AvailabilityValue podRating = TA_POD.calcYearAvailability(year, clan);
             av = av.isBetterThan(podRating) ? av : podRating;
         }
         return av;

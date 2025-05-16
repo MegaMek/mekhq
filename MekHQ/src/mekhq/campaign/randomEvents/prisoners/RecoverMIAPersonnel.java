@@ -28,7 +28,7 @@
 package mekhq.campaign.randomEvents.prisoners;
 
 import megamek.common.ITechnology;
-import megamek.common.ITechnology.TechRating;
+import megamek.common.ITechnology.AvailabilityValue;
 import megamek.common.TargetRoll;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
@@ -75,7 +75,7 @@ public class RecoverMIAPersonnel {
      * @param sarQuality     The quality of the SAR team's equipment (null defaults to average
      *                      quality).
      */
-    public RecoverMIAPersonnel(Campaign campaign, Faction searchingFaction, TechRating sarQuality) {
+    public RecoverMIAPersonnel(Campaign campaign, Faction searchingFaction, Integer sarQuality) {
         this.campaign = campaign;
 
         int today = campaign.getLocalDate().getYear();
@@ -91,23 +91,24 @@ public class RecoverMIAPersonnel {
 
         sarTargetNumber.addModifier(SAR_CONTAINS_VTOL_OR_WIGE, "SAR Contains VTOL or WIGE");
 
-        final TechRating isImprovedSensorsAvailability = createISImprovedSensors().calcYearAvailability(
+        final AvailabilityValue isImprovedSensorsAvailability = createISImprovedSensors().calcYearAvailability(
             today, isClan, techFaction);
-        final TechRating clanImprovedSensorsAvailability = createCLImprovedSensors().calcYearAvailability(
+        final AvailabilityValue clanImprovedSensorsAvailability = createCLImprovedSensors().calcYearAvailability(
             today, isClan, techFaction);
 
-        final TechRating improvedSensorsAvailability = isClan ? clanImprovedSensorsAvailability : isImprovedSensorsAvailability;
+        final AvailabilityValue improvedSensorsAvailability = isClan ? clanImprovedSensorsAvailability : isImprovedSensorsAvailability;
 
-        final TechRating activeProbeAvailability = createBeagleActiveProbe().calcYearAvailability(
+        final AvailabilityValue activeProbeAvailability = createBeagleActiveProbe().calcYearAvailability(
             today, isClan, techFaction);
 
         if (sarQuality == null) {
             sarQuality = QUALITY_D.ordinal();
         }
 
-        if (sarQuality >= improvedSensorsAvailability) {
+        // TODO: sarQuality is evaluated against the index of a AvailabilityValue. doesn't seems very nice. Refactor the whole constructor.
+        if (sarQuality >= improvedSensorsAvailability.getIndex()) {
             sarTargetNumber.addModifier(SAR_HAS_IMPROVED_SENSORS, "SAR has Improved Sensors");
-        } else if (sarQuality >= activeProbeAvailability) {
+        } else if (sarQuality >= activeProbeAvailability.getIndex()) {
             sarTargetNumber.addModifier(SAR_HAS_ACTIVE_PROBE, "SAR has Active Probe");
         }
     }
