@@ -55,14 +55,14 @@ public class DropshipDockingCollar extends Part {
             .setPrototypeFactions(Faction.TH)
             .setProductionFactions(Faction.TH)
             .setTechRating(TechRating.C)
-            .setAvailability(TechRating.C, TechRating.C, TechRating.C, TechRating.C)
+            .setAvailability(AvailabilityValue.C, AvailabilityValue.C, AvailabilityValue.C, AvailabilityValue.C)
             .setStaticTechLevel(SimpleTechLevel.STANDARD);
     static final TechAdvancement TA_NO_BOOM = new TechAdvancement(TechBase.ALL)
             .setAdvancement(2304, 2350, 2364, 2520)
             .setPrototypeFactions(Faction.TA)
             .setProductionFactions(Faction.TH)
             .setTechRating(TechRating.B)
-            .setAvailability(TechRating.C, TechRating.X, TechRating.X, TechRating.X)
+            .setAvailability(AvailabilityValue.C, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X)
             .setStaticTechLevel(SimpleTechLevel.ADVANCED);
 
     private int collarType;

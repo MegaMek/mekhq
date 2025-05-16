@@ -6596,7 +6596,7 @@ public class Unit implements ITechnology {
     }
 
     @Override
-    public TechRating getBaseAvailability(Era era) {
+    public AvailabilityValue getBaseAvailability(Era era) {
         return getTechProgression().getBaseAvailability(era);
     }
 
@@ -6655,7 +6655,7 @@ public class Unit implements ITechnology {
     }
 
     @Override
-    public TechRating calcYearAvailability(int year, boolean clan, ITechnology.Faction faction) {
+    public AvailabilityValue calcYearAvailability(int year, boolean clan, ITechnology.Faction faction) {
         return getTechProgression(faction).calcYearAvailability(year, clan);
     }
 

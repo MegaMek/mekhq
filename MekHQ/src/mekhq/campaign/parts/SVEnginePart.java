@@ -95,7 +95,7 @@ public class SVEnginePart extends Part {
 
         Engine engine = new Engine(10, etype, Engine.SUPPORT_VEE_ENGINE);
         techAdvancement = engine.getTechAdvancement();
-        name = String.format("%s (%s) Engine", engine.getEngineName(), ITechnology.getRatingName(techRating));
+        name = String.format("%s (%s) Engine", engine.getEngineName(), techRating.getName());
     }
 
     /**
@@ -168,7 +168,7 @@ public class SVEnginePart extends Part {
         indent = writeToXMLBegin(pw, indent);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, NODE_ENGINE_TONNAGE, engineTonnage);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, NODE_ETYPE, etype);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, NODE_TECH_RATING, ITechnology.getRatingName(techRating));
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, NODE_TECH_RATING, techRating.getName());
         if (etype == Engine.COMBUSTION_ENGINE) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, NODE_FUEL_TYPE, fuelType.name());
         }

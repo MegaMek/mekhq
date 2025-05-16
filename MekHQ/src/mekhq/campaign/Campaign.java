@@ -100,6 +100,7 @@ import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
+import megamek.client.ratgenerator.AvailabilityRating;
 import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
@@ -116,6 +117,7 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
 import megamek.common.util.BuildingBlock;
+import megamek.common.ITechnology.AvailabilityValue;
 import megamek.common.ITechnology.TechRating;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
@@ -8572,8 +8574,8 @@ public class Campaign implements ITechManager {
      *
      * @return the number of days required for the parts or units to arrive based on the calculated transit time.
      */
-    public int calculatePartTransitTime(AvailabilityRating techRating) {
-        return calculatePartTransitTime(AvailabilityRating.getIndex());
+    public int calculatePartTransitTime(AvailabilityValue availability) {
+        return calculatePartTransitTime(availability.getIndex());
     }
 
     /**

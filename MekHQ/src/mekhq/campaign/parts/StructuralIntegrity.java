@@ -60,12 +60,12 @@ public class StructuralIntegrity extends Part {
             .setStaticTechLevel(SimpleTechLevel.STANDARD);
     static final TechAdvancement TA_CF = new TechAdvancement(TechBase.ALL)
             .setAdvancement(DATE_PS, 2470, 2490).setProductionFactions(Faction.TH)
-            .setTechRating(TechRating.C).setAvailability(TechRating.C, TechRating.C, TechRating.C, TechRating.C)
+            .setTechRating(TechRating.C).setAvailability(AvailabilityValue.C, AvailabilityValue.C, AvailabilityValue.C, AvailabilityValue.C)
             .setStaticTechLevel(SimpleTechLevel.STANDARD);
     static final TechAdvancement TA_DS = new TechAdvancement(TechBase.ALL)
             .setAdvancement(2200, 2470, 2490).setApproximate(true, false, false)
             .setPrototypeFactions(Faction.TA).setProductionFactions(Faction.TH)
-            .setTechRating(TechRating.C).setAvailability(TechRating.D, TechRating.D, TechRating.D, TechRating.D)
+            .setTechRating(TechRating.C).setAvailability(AvailabilityValue.D, AvailabilityValue.D, AvailabilityValue.D, AvailabilityValue.D)
             .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     private int pointsNeeded;

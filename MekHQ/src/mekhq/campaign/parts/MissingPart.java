@@ -312,9 +312,9 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
             }
         }
         //availability mod
-        TechRating avail = getAvailability();
+        AvailabilityValue avail = getAvailability();
         int availabilityMod = Availability.getAvailabilityModifier(avail);
-        target.addModifier(availabilityMod, "availability (" + ITechnology.getRatingName(avail) + ')');
+        target.addModifier(availabilityMod, "availability (" + avail.getName() + ')');
 
         return target;
     }

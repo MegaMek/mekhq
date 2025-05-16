@@ -48,6 +48,7 @@ import megamek.common.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.universe.Faction.Tag;
+import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
 import mekhq.campaign.universe.enums.HPGRating;
 import mekhq.campaign.universe.enums.HiringHallLevel;
@@ -721,8 +722,8 @@ public class Planet {
 
         // don't allow acquisitions from caveman planets
         if ((socioIndustrial.tech == PlanetarySophistication.REGRESSED) ||
-                  (socioIndustrial.industry == TechRating.X) ||
-                  (socioIndustrial.output == TechRating.X)) {
+                  (socioIndustrial.industry == PlanetaryRating.F) ||
+                  (socioIndustrial.output == PlanetaryRating.F)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Regressed: Pre-industrial world");
         }
 

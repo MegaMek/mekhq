@@ -75,7 +75,7 @@ public class SVArmor extends Armor {
         super(0, EquipmentType.T_ARMOR_STANDARD, points, loc, false, false, campaign);
         this.bar = bar;
         this.techRating = techRating;
-        this.name = String.format("BAR %d armor (%s)", bar, ITechnology.getRatingName(techRating));
+        this.name = String.format("BAR %d armor (%s)", bar, techRating.getName());
     }
 
     public int getBAR() {
@@ -193,7 +193,7 @@ public class SVArmor extends Armor {
     @Override
     protected void writeToXMLEnd(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bar", bar);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techRating", ITechnology.getRatingName(techRating));
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techRating", techRating.getName());
         super.writeToXMLEnd(pw, indent);
     }
 

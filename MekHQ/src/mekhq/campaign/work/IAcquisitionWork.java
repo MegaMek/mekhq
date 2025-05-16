@@ -30,7 +30,7 @@ package mekhq.campaign.work;
 
 import megamek.common.ITechnology;
 import megamek.common.ITechnology.TechBase;
-import megamek.common.ITechnology.TechRating;
+import megamek.common.ITechnology.AvailabilityValue;
 import megamek.common.TargetRoll;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
@@ -87,7 +87,7 @@ public interface IAcquisitionWork extends IWork {
 
     public boolean isExtinctIn(int year, boolean clan, ITechnology.Faction techFaction);
 
-    public int getAvailability();
+    public AvailabilityValue getAvailability();
 
     public String getShoppingListReport(int quantity);
 

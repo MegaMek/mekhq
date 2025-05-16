@@ -57,7 +57,7 @@ public class KfBoom extends Part {
     static final TechAdvancement TA_PROTOTYPE_KF_BOOM = new TechAdvancement(TechBase.ALL)
             .setAdvancement(2458, 2470, 2500).setPrototypeFactions(Faction.TH)
             .setProductionFactions(Faction.TH).setTechRating(TechRating.C)
-            .setAvailability(TechRating.F, TechRating.X, TechRating.X, TechRating.X)
+            .setAvailability(AvailabilityValue.F, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X)
             .setStaticTechLevel(SimpleTechLevel.ADVANCED);
 
     private int boomType = Dropship.BOOM_STANDARD;

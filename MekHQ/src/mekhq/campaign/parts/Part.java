@@ -927,7 +927,7 @@ public abstract class Part implements IPartWork, ITechnology {
         // but we will make this user customizable
         final TargetRoll mods = new TargetRoll(campaign.getCampaignOptions().getMaintenanceBonus(), "maintenance");
         mods.addModifier(Availability.getTechModifier(getTechRating()),
-              "tech rating " + ITechnology.getRatingName(getTechRating()));
+              "tech rating " + getTechRating().getName());
 
         if (getUnit() == null) {
             return mods;

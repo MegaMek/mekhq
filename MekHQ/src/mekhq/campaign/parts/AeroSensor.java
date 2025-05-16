@@ -52,7 +52,7 @@ import org.w3c.dom.NodeList;
 public class AeroSensor extends Part {
     final static TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TechBase.ALL)
             .setISAdvancement(DATE_ES, DATE_ES, DATE_ES)
-            .setTechRating(TechRating.C).setAvailability(TechRating.C, TechRating.C, TechRating.C, TechRating.C)
+            .setTechRating(TechRating.C).setAvailability(AvailabilityValue.C, AvailabilityValue.C, AvailabilityValue.C, AvailabilityValue.C)
             .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     private boolean largeCraft;

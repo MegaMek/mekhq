@@ -304,17 +304,17 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
             target.addModifier(+1, "ProtoMek");
         }
         // parts need to be initialized for this to work
-        TechRating avail = getAvailability();
+        AvailabilityValue avail = getAvailability();
         if (this.isExtinctIn(getCampaign().getGameYear())) {
-            avail = EquipmentType.TechRating.X;
+            avail = AvailabilityValue.X;
         }
         int availabilityMod = Availability.getAvailabilityModifier(avail);
-        target.addModifier(availabilityMod, "availability (" + ITechnology.getRatingName(avail) + ")");
+        target.addModifier(availabilityMod, "availability (" + avail.getName() + ")");
         return target;
     }
 
     @Override
-    public TechRating getAvailability() {
+    public AvailabilityValue getAvailability() {
         return calcYearAvailability(getCampaign().getGameYear(), getCampaign().useClanTechBase(),
                 getCampaign().getTechFaction());
     }

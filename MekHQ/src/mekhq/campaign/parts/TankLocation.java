@@ -60,7 +60,7 @@ public class TankLocation extends Part {
                                                           .setPrototypeFactions(Faction.TH)
                                                           .setProductionFactions(Faction.TH)
                                                           .setTechRating(TechRating.D)
-                                                          .setAvailability(TechRating.A, TechRating.A, TechRating.A, TechRating.A)
+                                                          .setAvailability(AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A)
                                                           .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     protected int loc;

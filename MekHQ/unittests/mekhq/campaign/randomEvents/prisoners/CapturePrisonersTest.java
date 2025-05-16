@@ -28,6 +28,7 @@
 package mekhq.campaign.randomEvents.prisoners;
 
 import megamek.common.ITechnology;
+import megamek.common.ITechnology.AvailabilityValue;
 import megamek.common.ITechnology.TechRating;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Scenario;
@@ -76,8 +77,8 @@ class CapturePrisonersTest {
         LocalDate today = LocalDate.of(3151, 1, 1);
         when(mockCampaign.getLocalDate()).thenReturn(today);
 
-        TechRating activeProbeAvailability = getPartAvailability(today, true);
-        TechRating improvedSensorsAvailability = getPartAvailability(today, false);
+        AvailabilityValue activeProbeAvailability = getPartAvailability(today, true);
+        AvailabilityValue improvedSensorsAvailability = getPartAvailability(today, false);
 
         // Act
         int quality = -1;
@@ -105,8 +106,8 @@ class CapturePrisonersTest {
         LocalDate today = LocalDate.of(3151, 1, 1);
         when(mockCampaign.getLocalDate()).thenReturn(today);
 
-        TechRating activeProbeAvailability = getPartAvailability(today, true);
-        TechRating improvedSensorsAvailability = getPartAvailability(today, false);
+        AvailabilityValue activeProbeAvailability = getPartAvailability(today, true);
+        AvailabilityValue improvedSensorsAvailability = getPartAvailability(today, false);
 
         // Act
         CapturePrisoners capturePrisoners = new CapturePrisoners(mockCampaign, mockFaction, scenario, activeProbeAvailability.getIndex());
@@ -132,8 +133,8 @@ class CapturePrisonersTest {
         LocalDate today = LocalDate.of(3151, 1, 1);
         when(mockCampaign.getLocalDate()).thenReturn(today);
 
-        TechRating activeProbeAvailability = getPartAvailability(today, true);
-        TechRating improvedSensorsAvailability = getPartAvailability(today, false);
+        AvailabilityValue activeProbeAvailability = getPartAvailability(today, true);
+        AvailabilityValue improvedSensorsAvailability = getPartAvailability(today, false);
 
         // Act
         CapturePrisoners capturePrisoners = new CapturePrisoners(mockCampaign, mockFaction, scenario, improvedSensorsAvailability.getIndex());
@@ -576,7 +577,7 @@ class CapturePrisonersTest {
      * @return An integer representing the availability of the part for the given year
      *         and technology type.
      */
-    private TechRating getPartAvailability(LocalDate today, boolean isActiveProbe) {
+    private AvailabilityValue getPartAvailability(LocalDate today, boolean isActiveProbe) {
         int year = today.getYear();
         ITechnology.Faction techFaction = ITechnology.getFactionFromMMAbbr("IS");
 

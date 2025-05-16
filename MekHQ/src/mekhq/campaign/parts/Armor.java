@@ -566,9 +566,9 @@ public class Armor extends Part implements IAcquisitionWork {
             target.addModifier(campaign.getCampaignOptions().getIsAcquisitionPenalty(), "Inner Sphere tech");
         }
         // availability mod
-        TechRating avail = getAvailability();
+        AvailabilityValue avail = getAvailability();
         int availabilityMod = Availability.getAvailabilityModifier(avail);
-        target.addModifier(availabilityMod, "availability (" + ITechnology.getRatingName(avail) + ')');
+        target.addModifier(availabilityMod, "availability (" + avail.getName() + ')');
         return target;
     }
 

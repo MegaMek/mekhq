@@ -52,7 +52,7 @@ public class GravDeck extends Part {
     static final TechAdvancement TA_GRAV_DECK = new TechAdvancement(TechBase.ALL)
             .setAdvancement(DATE_ES, DATE_ES, DATE_ES)
             .setTechRating(TechRating.B)
-            .setAvailability(TechRating.C, TechRating.C, TechRating.C, TechRating.C)
+            .setAvailability(AvailabilityValue.C, AvailabilityValue.C, AvailabilityValue.C, AvailabilityValue.C)
             .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     private int deckType;

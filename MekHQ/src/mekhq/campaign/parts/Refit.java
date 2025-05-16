@@ -2624,7 +2624,7 @@ public class Refit extends Part implements IAcquisitionWork {
     @Override
     public TargetRoll getAllAcquisitionMods() {
         TargetRoll roll = new TargetRoll();
-        TechRating avail = TechRating.A;
+        AvailabilityValue avail = AvailabilityValue.A;
         int techBaseMod = 0;
         for (Part part : shoppingList) {
             if (getTechBase() == TechBase.CLAN && campaign.getCampaignOptions().getClanAcquisitionPenalty() > techBaseMod) {
@@ -2638,13 +2638,13 @@ public class Refit extends Part implements IAcquisitionWork {
                     techBaseMod = penalty;
                 }
             }
-            avail = TechRating.fromIndex(Math.max(avail.getIndex(), part.getAvailability().getIndex()));
+            avail = AvailabilityValue.fromIndex(Math.max(avail.getIndex(), part.getAvailability().getIndex()));
         }
         if (techBaseMod > 0) {
             roll.addModifier(techBaseMod, "tech limit");
         }
         int availabilityMod = Availability.getAvailabilityModifier(avail);
-        roll.addModifier(availabilityMod, "availability (" + ITechnology.getRatingName(avail) + ")");
+        roll.addModifier(availabilityMod, "availability (" + avail.getName() + ")");
         return roll;
     }
 

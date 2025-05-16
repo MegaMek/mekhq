@@ -183,7 +183,7 @@ public class BayDoor extends Part {
     public TechAdvancement getTechAdvancement() {
         return new TechAdvancement(TechBase.ALL).setAdvancement(DATE_PS, DATE_PS, DATE_PS)
                 .setTechRating(TechRating.A)
-                .setAvailability(TechRating.A, TechRating.A, TechRating.A, TechRating.A)
+                .setAvailability(AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A)
                 .setStaticTechLevel(SimpleTechLevel.STANDARD);
     }
 }

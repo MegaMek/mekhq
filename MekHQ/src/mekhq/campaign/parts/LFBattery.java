@@ -53,7 +53,7 @@ public class LFBattery extends Part {
     public static final TechAdvancement TA_LF_BATTERY = new TechAdvancement(TechBase.ALL)
             .setAdvancement(2519, 2529, 2600).setPrototypeFactions(Faction.TH)
             .setProductionFactions(Faction.TH).setTechRating(TechRating.D)
-            .setAvailability(TechRating.E, TechRating.F, TechRating.E, TechRating.E)
+            .setAvailability(AvailabilityValue.E, AvailabilityValue.F, AvailabilityValue.E, AvailabilityValue.E)
             .setStaticTechLevel(SimpleTechLevel.ADVANCED);
 
     // Standard, primitive, compact, subcompact...

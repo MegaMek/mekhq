@@ -28,9 +28,12 @@
  */
 package mekhq.campaign.parts;
 
+import static java.lang.Math.*;
+
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.logging.MMLogger;
+import megamek.common.ITechnology.AvailabilityValue;
 import megamek.common.ITechnology.TechRating;
 
 /**
@@ -43,7 +46,7 @@ import megamek.common.ITechnology.TechRating;
 public class Availability {
     private static final MMLogger logger = MMLogger.create(Availability.class);
 
-    public static int getAvailabilityModifier(TechRating availability) {
+    public static int getAvailabilityModifier(AvailabilityValue availability) {
         switch (availability) {
             case A:
                 return -4;
@@ -57,7 +60,6 @@ public class Availability {
                 return 0;
             case F:
                 return 2;
-            case FSTAR:
             case X:
                 // FIXME : Per IO, any IS equipment with a base SW availability of E-F that goes
                 // FIXME : extinct during the SW has it increased by 1 with F+1 meaning that
