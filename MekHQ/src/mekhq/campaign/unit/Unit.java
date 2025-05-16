@@ -5918,17 +5918,17 @@ public class Unit implements ITechnology {
         return null;
     }
 
-    public TechRating getAvailability(int era) {
+    public AvailabilityValue getAvailability(int era) {
         // take the highest availability of all parts
-        TechRating availability = EquipmentType.TechRating.A;
+        AvailabilityValue availability = AvailabilityValue.A;
         for (Part p : parts) {
-            TechRating newAvailability = p.getAvailability();
+            AvailabilityValue newAvailability = p.getAvailability();
             // Taharqa: it's not clear whether a unit should really be considered extinct when its parts are extinct
             // as many probably outlive the production of parts it would be better to just use the unit extinction
             // date itself, but given that there are no canon extinction/re-intro dates for units, we will use this
             // instead
             if (p.isExtinct(getCampaign().getGameYear(), getCampaign().getFaction().isClan())) {
-                newAvailability = TechRating.X;
+                newAvailability = AvailabilityValue.X;
             }
             if (newAvailability.isBetterThan(availability)) {
                 availability = newAvailability;

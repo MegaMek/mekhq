@@ -7511,7 +7511,7 @@ public class Campaign implements ITechManager {
         }
         if (getCampaignOptions().isDisallowExtinctStuff() &&
                   (acquisition.isExtinctIn(getGameYear(), useClanTechBase(), getTechFaction()) ||
-                         acquisition.getAvailability() == TechRating.X)) {
+                         acquisition.getAvailability().equals(AvailabilityValue.X))) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "It is extinct!");
         }
 

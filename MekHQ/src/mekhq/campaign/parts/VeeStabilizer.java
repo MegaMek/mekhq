@@ -99,8 +99,8 @@ public class VeeStabilizer extends Part {
     }
 
     @Override
-    public TechRating getBaseAvailability(Era era) {
-        return EquipmentType.TechRating.B;
+    public AvailabilityValue getBaseAvailability(Era era) {
+        return AvailabilityValue.B;
     }
 
     @Override
