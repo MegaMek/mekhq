@@ -673,7 +673,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.insets = new Insets(0, 0, 5, 0);
         gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.anchor = GridBagConstraints.CENTER;
         pnlStats.add(lblBelligerents, gridBagConstraints);
 
         lblLocation.setName("lblLocation");
