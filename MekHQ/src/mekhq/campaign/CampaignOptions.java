@@ -597,11 +597,6 @@ public class CampaignOptions {
     // Contract Operations
     private boolean mercSizeLimited;
     private boolean restrictPartsByMission;
-    private boolean limitLanceWeight;
-    private boolean limitLanceNumUnits;
-    private boolean useStrategy;
-    private int baseStrategyDeployment;
-    private int additionalStrategyDeployment;
     private final int[] atbBattleChance;
     private boolean generateChases;
 
@@ -1220,11 +1215,6 @@ public class CampaignOptions {
         // Contract Operations
         mercSizeLimited = false;
         restrictPartsByMission = true;
-        limitLanceWeight = true;
-        limitLanceNumUnits = true;
-        useStrategy = true;
-        baseStrategyDeployment = 3;
-        additionalStrategyDeployment = 1;
         atbBattleChance = new int[CombatRole.values().length - 1];
         atbBattleChance[CombatRole.MANEUVER.ordinal()] = 40;
         atbBattleChance[CombatRole.FRONTLINE.ordinal()] = 20;
@@ -4706,28 +4696,49 @@ public class CampaignOptions {
         this.usePlanetaryConditions = usePlanetaryConditions;
     }
 
+    /**
+     * @deprecated unused.
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public boolean isUseStrategy() {
-        return useStrategy;
+        return false;
     }
 
+    /**
+     * @deprecated unused.
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public void setUseStrategy(final boolean useStrategy) {
-        this.useStrategy = useStrategy;
     }
 
+    /**
+     * @deprecated unused except in deprecated methods
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public int getBaseStrategyDeployment() {
-        return baseStrategyDeployment;
+        return 0;
     }
 
+    /**
+     * @deprecated unused.
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public void setBaseStrategyDeployment(final int baseStrategyDeployment) {
-        this.baseStrategyDeployment = baseStrategyDeployment;
     }
 
+    /**
+     * @deprecated unused except in deprecated methods
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public int getAdditionalStrategyDeployment() {
-        return additionalStrategyDeployment;
+        return 0;
     }
 
+    /**
+     * @deprecated unused.
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public void setAdditionalStrategyDeployment(final int additionalStrategyDeployment) {
-        this.additionalStrategyDeployment = additionalStrategyDeployment;
     }
 
     public boolean isRestrictPartsByMission() {
@@ -4738,20 +4749,34 @@ public class CampaignOptions {
         this.restrictPartsByMission = restrictPartsByMission;
     }
 
+    /**
+     * @deprecated unused.
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public boolean isLimitLanceWeight() {
-        return limitLanceWeight;
+        return false;
     }
 
+    /**
+     * @deprecated unused.
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public void setLimitLanceWeight(final boolean limitLanceWeight) {
-        this.limitLanceWeight = limitLanceWeight;
     }
 
+    /**
+     * @deprecated unused.
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public boolean isLimitLanceNumUnits() {
-        return limitLanceNumUnits;
+        return false;
     }
 
+    /**
+     * @deprecated unused.
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public void setLimitLanceNumUnits(final boolean limitLanceNumUnits) {
-        this.limitLanceNumUnits = limitLanceNumUnits;
     }
 
     public boolean isAllowOpForAeros() {
@@ -5442,12 +5467,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useWeatherConditions", useWeatherConditions);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useLightConditions", useLightConditions);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePlanetaryConditions", usePlanetaryConditions);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useStrategy", useStrategy);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "baseStrategyDeployment", baseStrategyDeployment);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "additionalStrategyDeployment", additionalStrategyDeployment);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "restrictPartsByMission", restrictPartsByMission);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "limitLanceWeight", limitLanceWeight);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "limitLanceNumUnits", limitLanceNumUnits);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignPortraitOnRoleChange", assignPortraitOnRoleChange);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowDuplicatePortraits", allowDuplicatePortraits);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowOpForAeros", isAllowOpForAeros());
@@ -6461,18 +6481,8 @@ public class CampaignOptions {
                     retVal.useLightConditions = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("usePlanetaryConditions")) {
                     retVal.usePlanetaryConditions = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (nodeName.equalsIgnoreCase("useStrategy")) {
-                    retVal.useStrategy = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (nodeName.equalsIgnoreCase("baseStrategyDeployment")) {
-                    retVal.baseStrategyDeployment = Integer.parseInt(wn2.getTextContent().trim());
-                } else if (nodeName.equalsIgnoreCase("additionalStrategyDeployment")) {
-                    retVal.additionalStrategyDeployment = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("restrictPartsByMission")) {
                     retVal.restrictPartsByMission = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (nodeName.equalsIgnoreCase("limitLanceWeight")) {
-                    retVal.limitLanceWeight = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (nodeName.equalsIgnoreCase("limitLanceNumUnits")) {
-                    retVal.limitLanceNumUnits = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("allowOpForLocalUnits")) {
                     retVal.setAllowOpForLocalUnits(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("allowOpForAeros")) {
