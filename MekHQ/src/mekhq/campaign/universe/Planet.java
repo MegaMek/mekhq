@@ -43,10 +43,12 @@ import com.fasterxml.jackson.databind.util.StdConverter;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
+import megamek.common.ITechnology.TechRating;
 import megamek.common.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.universe.Faction.Tag;
+import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
 import mekhq.campaign.universe.enums.HPGRating;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.universe.enums.PlanetaryType;
@@ -579,11 +581,18 @@ public class Planet {
             return 0;
         }
         return switch (getSocioIndustrial(when).tech) {
-            case -1 -> 5; // Ultra-Advanced; not accounted for in the EquipmentType.RATING constants
-            case EquipmentType.TechRating.A, EquipmentType.TechRating.B -> 3;
-            case EquipmentType.TechRating.C, EquipmentType.TechRating.D -> 1;
+            case ADVANCED -> 5; // Ultra-Advanced; not accounted for in the EquipmentType.RATING constants
+            case A, B -> 3;
+            case C, D -> 1;
             default -> 0;
         };
+    }
+
+    /**
+     * Returns the equipment technology rating of the planet based on its sophistication.
+     */
+    public TechRating getTechRating(LocalDate when) {
+        return getSocioIndustrial(when).getEquipmentTechRating();
     }
 
     // Astronavigation
@@ -706,28 +715,23 @@ public class Planet {
 
         SocioIndustrialData socioIndustrial = getSocioIndustrial(when);
         if (null == socioIndustrial) {
-            // nothing has been coded for this planet, so we will assume C across the board
+            // nothing has been coded for this planet, so we will use the default values (CampaignOps)
             socioIndustrial = new SocioIndustrialData();
-            socioIndustrial.tech = ITechnology.TechRating.C;
-            socioIndustrial.industry = ITechnology.TechRating.C;
-            socioIndustrial.output = ITechnology.TechRating.C;
-            socioIndustrial.rawMaterials = ITechnology.TechRating.C;
-            socioIndustrial.agriculture = ITechnology.TechRating.C;
         }
 
         // don't allow acquisitions from caveman planets
-        if ((socioIndustrial.tech == ITechnology.TechRating.X) ||
+        if ((socioIndustrial.tech == PlanetarySophistication.REGRESSED) ||
                   (socioIndustrial.industry == ITechnology.TechRating.X) ||
                   (socioIndustrial.output == ITechnology.TechRating.X)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Regressed: Pre-industrial world");
         }
 
         target.addModifier(options.getPlanetTechAcquisitionBonus(socioIndustrial.tech),
-              "planet tech: " + ITechnology.getRatingName(socioIndustrial.tech));
+              "planet tech: " + socioIndustrial.tech.getName());
         target.addModifier(options.getPlanetIndustryAcquisitionBonus(socioIndustrial.industry),
-              "planet industry: " + ITechnology.getRatingName(socioIndustrial.industry));
+              "planet industry: " + socioIndustrial.industry.getName());
         target.addModifier(options.getPlanetOutputAcquisitionBonus(socioIndustrial.output),
-              "planet output: " + ITechnology.getRatingName(socioIndustrial.output));
+              "planet output: " + socioIndustrial.output.getName());
 
         return target;
 
