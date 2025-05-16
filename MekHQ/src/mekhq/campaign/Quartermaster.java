@@ -32,6 +32,7 @@
  */
 package mekhq.campaign;
 
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -574,6 +575,25 @@ public class Quartermaster {
             getCampaign().addNewUnit(en, false, days, quality);
             return true;
         }
+    }
+
+    /**
+     * Leases a Unit.
+     *
+     * @param
+     */
+    public boolean leaseUnit(Entity en, int days) {
+        Objects.requireNonNull(en);
+
+        PartQuality quality = PartQuality.QUALITY_D;
+
+        if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
+            quality = Unit.getRandomUnitQuality(0);
+        }
+        //We don't want to start the new lease until the unit arrives.
+        Unit newUnit = getCampaign().addNewUnit(en, false, days, quality);
+        newUnit.addLease(new Lease(campaign.getLocalDate().plus((long) days, ChronoUnit.DAYS), newUnit));
+        return true;
     }
 
     /**
