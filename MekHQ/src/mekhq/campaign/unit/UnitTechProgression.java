@@ -59,12 +59,12 @@ public class UnitTechProgression {
 
     private static final UnitTechProgression instance = new UnitTechProgression();
 
-    private Map<Integer, FutureTask<Map<MekSummary, ITechnology>>> techMap = new HashMap<>();
+    private Map<ITechnology.Faction, FutureTask<Map<MekSummary, ITechnology>>> techMap = new HashMap<>();
 
     /**
      * Initializes the data for a particular faction
      */
-    public static void loadFaction(int techFaction) {
+    public static void loadFaction(ITechnology.Faction techFaction) {
         instance.getTask(techFaction);
     }
 
@@ -76,7 +76,7 @@ public class UnitTechProgression {
      * @param techFaction The faction for which to calculate progression data.
      * @return The task responsible for calculating the data for the faction.
      */
-    private FutureTask<Map<MekSummary, ITechnology>> getTask(int techFaction) {
+    private FutureTask<Map<MekSummary, ITechnology>> getTask(ITechnology.Faction techFaction) {
         FutureTask<Map<MekSummary, ITechnology>> task = instance.techMap.get(techFaction);
         if (null == task) {
             task = new FutureTask<>(new BuildMapTask(techFaction));
@@ -106,7 +106,7 @@ public class UnitTechProgression {
      *         is returned.
      */
     public static ITechnology getProgression(final Unit unit,
-            final int techFaction, final boolean block) {
+            final ITechnology.Faction techFaction, final boolean block) {
         MekSummary ms = MekSummaryCache.getInstance().getMek(unit.getEntity().getShortName());
         if (null != ms) {
             return getProgression(ms, techFaction, block);
@@ -134,7 +134,7 @@ public class UnitTechProgression {
      *         block is false, or there was an exception processing the task, null
      *         is returned.
      */
-    public static ITechnology getProgression(final MekSummary ms, final int techFaction, final boolean block) {
+    public static ITechnology getProgression(final MekSummary ms, final ITechnology.Faction techFaction, final boolean block) {
         FutureTask<Map<MekSummary, ITechnology>> task = instance.getTask(techFaction);
         if (!block && !task.isDone()) {
             return null;
@@ -153,7 +153,7 @@ public class UnitTechProgression {
         return null;
     }
 
-    private static ITechnology calcTechProgression(MekSummary ms, int techFaction) {
+    private static ITechnology calcTechProgression(MekSummary ms, ITechnology.Faction techFaction) {
         try {
             Entity en = new MekFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
             if (null == en) {
@@ -174,9 +174,9 @@ public class UnitTechProgression {
      * faction.
      */
     private static class BuildMapTask implements Callable<Map<MekSummary, ITechnology>> {
-        private int techFaction;
+        private ITechnology.Faction techFaction;
 
-        BuildMapTask(int techFaction) {
+        BuildMapTask(ITechnology.Faction techFaction) {
             this.techFaction = techFaction;
         }
 

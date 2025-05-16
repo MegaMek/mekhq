@@ -59,7 +59,7 @@ public class SVEnginePart extends Part {
 
     private double engineTonnage;
     private int etype;
-    private int techRating;
+    private TechRating techRating;
     private FuelType fuelType;
 
     private TechAdvancement techAdvancement;
@@ -85,7 +85,7 @@ public class SVEnginePart extends Part {
      *                      combustion engines.
      * @param campaign      The campaign instance
      */
-    public SVEnginePart(int unitTonnage, double engineTonnage, int etype, int techRating,
+    public SVEnginePart(int unitTonnage, double engineTonnage, int etype, TechRating techRating,
             FuelType fuelType, Campaign campaign) {
         super(unitTonnage, campaign);
         this.engineTonnage = unitTonnage;
@@ -113,7 +113,7 @@ public class SVEnginePart extends Part {
     }
 
     @Override
-    public int getTechRating() {
+    public TechRating getTechRating() {
         return techRating;
     }
 

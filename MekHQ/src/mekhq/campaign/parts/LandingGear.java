@@ -193,9 +193,9 @@ public class LandingGear extends Part {
     }
 
     @Override
-    public int getTechRating() {
+    public TechRating getTechRating() {
         //go with conventional fighter avionics
-        return EquipmentType.TechRating.B;
+        return TechRating.B;
     }
 
     @Override

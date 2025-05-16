@@ -51,7 +51,7 @@ import mekhq.utilities.MHQXMLUtility;
 public class MissingSVEngine extends MissingPart {
     private double engineTonnage;
     private int etype;
-    private int techRating;
+    private TechRating techRating;
     private FuelType fuelType;
 
     private TechAdvancement techAdvancement;
@@ -77,7 +77,7 @@ public class MissingSVEngine extends MissingPart {
      *                      combustion engines.
      * @param campaign      The campaign instance
      */
-    public MissingSVEngine(int unitTonnage, double engineTonnage, int etype, int techRating,
+    public MissingSVEngine(int unitTonnage, double engineTonnage, int etype, TechRating techRating,
             FuelType fuelType, Campaign campaign) {
         super(unitTonnage, campaign);
         this.engineTonnage = engineTonnage;
@@ -105,7 +105,7 @@ public class MissingSVEngine extends MissingPart {
     }
 
     @Override
-    public int getTechRating() {
+    public TechRating getTechRating() {
         return techRating;
     }
 

@@ -6531,9 +6531,9 @@ public class Unit implements ITechnology {
         return getTechProgression(getCampaign().getTechFaction());
     }
 
-    private ITechnology getTechProgression(int techFaction) {
+    private ITechnology getTechProgression(ITechnology.Faction techFaction) {
         // If useFactionIntroDate is false, use the base data that was calculated for the Entity when it was loaded.
-        if (techFaction < 0) {
+        if (techFaction.equals(ITechnology.Faction.NONE)) {
             return getEntity();
         }
         // First check whether it has already been calculated for this faction, but don't wait if it hasn't.
@@ -6591,17 +6591,17 @@ public class Unit implements ITechnology {
     }
 
     @Override
-    public int getTechRating() {
+    public TechRating getTechRating() {
         return getTechProgression().getTechRating();
     }
 
     @Override
-    public int getBaseAvailability(int era) {
+    public TechRating getBaseAvailability(int era) {
         return getTechProgression().getBaseAvailability(era);
     }
 
     @Override
-    public int getIntroductionDate(boolean clan, int faction) {
+    public int getIntroductionDate(boolean clan, ITechnology.Faction faction) {
         return getTechProgression(faction).getIntroductionDate(clan, faction);
     }
 

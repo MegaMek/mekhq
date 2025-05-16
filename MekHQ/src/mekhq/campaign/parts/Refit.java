@@ -2958,8 +2958,8 @@ public class Refit extends Part implements IAcquisitionWork {
      * @return 0
      */
     @Override
-    public int getTechRating() {
-        return 0;
+    public TechRating getTechRating() {
+        return TechRating.A; // Was 0 pre-conversion to ENUM, so this is the same
     }
 
     /**

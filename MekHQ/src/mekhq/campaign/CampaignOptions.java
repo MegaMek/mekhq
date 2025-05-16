@@ -730,12 +730,14 @@ public class CampaignOptions {
         penaltyClanPartsFromIS = 4;
         planetAcquisitionVerbose = false;
         // Planet Socio-Industrial Modifiers
+        planetTechAcquisitionBonus.put(PlanetarySophistication.ADVANCED, -1);
         planetTechAcquisitionBonus.put(PlanetarySophistication.A, -1);
         planetTechAcquisitionBonus.put(PlanetarySophistication.B, 0);
         planetTechAcquisitionBonus.put(PlanetarySophistication.C, 1);
         planetTechAcquisitionBonus.put(PlanetarySophistication.D, 2);
         planetTechAcquisitionBonus.put(PlanetarySophistication.E, 4);
         planetTechAcquisitionBonus.put(PlanetarySophistication.F, 8);
+        planetTechAcquisitionBonus.put(PlanetarySophistication.REGRESSED, 8);
         planetIndustryAcquisitionBonus.put(PlanetaryRating.A, 0);
         planetIndustryAcquisitionBonus.put(PlanetaryRating.B, 0);
         planetIndustryAcquisitionBonus.put(PlanetaryRating.C, 0);

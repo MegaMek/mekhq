@@ -80,11 +80,11 @@ public class OmniPod extends Part {
      * @return The tech base of the part the omnipod is meant to contain.
      */
     @Override
-    public int getTechBase() {
+    public TechBase getTechBase() {
         if (null != partType) {
             return partType.getTechBase();
         } else {
-            return TechAdvancement.TechBase.ALL;
+            return TechBase.ALL;
         }
     }
 
@@ -157,8 +157,8 @@ public class OmniPod extends Part {
 
     // Using tech rating for Omni construction option from IOps.
     @Override
-    public int getTechRating() {
-        return EquipmentType.TechRating.E;
+    public TechRating getTechRating() {
+        return TechRating.E;
     }
 
     @Override

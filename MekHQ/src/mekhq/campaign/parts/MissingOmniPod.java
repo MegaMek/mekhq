@@ -190,8 +190,8 @@ public class MissingOmniPod extends MissingPart {
 
     // Using tech rating for Omni construction option from IOps.
     @Override
-    public int getTechRating() {
-        return EquipmentType.TechRating.E;
+    public TechRating getTechRating() {
+        return TechRating.E;
     }
 
     @Override
