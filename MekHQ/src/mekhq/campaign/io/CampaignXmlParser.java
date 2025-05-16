@@ -1608,7 +1608,7 @@ public class CampaignXmlParser {
             }
 
             // clan flag might not have been properly set in early versions
-            if ((prt instanceof EnginePart) && prt.getName().contains("(Clan") && (prt.getTechBase() != Part.T_CLAN)) {
+            if ((prt instanceof EnginePart) && prt.getName().contains("(Clan") && (prt.getTechBase() != Part.TechBase.CLAN)) {
                 ((EnginePart) prt).fixClanFlag();
             }
             if ((prt instanceof MissingEnginePart) && (null != u) && (u.getEntity() instanceof Tank)) {
@@ -1617,7 +1617,7 @@ public class CampaignXmlParser {
             }
             if ((prt instanceof MissingEnginePart) &&
                       prt.getName().contains("(Clan") &&
-                      (prt.getTechBase() != Part.T_CLAN)) {
+                      (prt.getTechBase() != Part.TechBase.CLAN)) {
                 ((MissingEnginePart) prt).fixClanFlag();
             }
 

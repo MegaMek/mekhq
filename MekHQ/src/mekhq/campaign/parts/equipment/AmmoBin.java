@@ -643,7 +643,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
             target.addModifier(campaign.getCampaignOptions().getIsAcquisitionPenalty(), "Inner Sphere tech");
         }
         // availability mod
-        int avail = getAvailability();
+        TechRating avail = getAvailability();
         int availabilityMod = Availability.getAvailabilityModifier(avail);
         target.addModifier(availabilityMod, "availability (" + ITechnology.getRatingName(avail) + ")");
         return target;

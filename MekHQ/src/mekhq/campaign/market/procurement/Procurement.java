@@ -73,17 +73,30 @@ public class Procurement {
         this.gameYear = gameYear;
         this.originFaction = originFaction;
 
-        factionTechCode = getFactionTechCode(originFaction);
+        factionTechCode = getTechFaction(originFaction);
         techEra = getTechEra(gameYear);
     }
 
     /**
-     * Given a faction, returns the corresponding faction code.
+     * Given a faction, returns the corresponding tech faction code.
      *
      * @param faction Faction instance
-     * @return returns corresponding faction code.
+     * @return returns corresponding faction.
+     * 
+     * @deprecated Use {@link #getTechFaction(Faction)} instead.
      */
+    @Deprecated
     public static ITechnology.Faction getFactionTechCode(Faction faction) {
+        return getTechFaction(faction);
+    }
+
+    /**
+     * Given a faction, returns the corresponding tech faction code.
+     *
+     * @param faction Faction instance
+     * @return returns corresponding faction.
+     */
+    public static ITechnology.Faction getTechFaction(Faction faction) {
         ITechnology.Faction result = ITechnology.Faction.fromMMAbbr(faction.getShortName());
         if (result != ITechnology.Faction.NONE) {
             return result;

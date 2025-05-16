@@ -1106,51 +1106,52 @@ public class InterstellarMapPanel extends JPanel {
 
         if (null != socio && optTech.isSelected()) {
             return switch (socio.tech) {
-                case EquipmentType.TechRating.F, EquipmentType.TechRating.E -> new Color(68, 1, 84);
-                case EquipmentType.TechRating.D -> new Color(59, 82, 139);
-                case EquipmentType.TechRating.C -> new Color(33, 144, 140);
-                case EquipmentType.TechRating.B -> new Color(93, 200, 99);
-                case TechRating.A -> new Color(253, 231, 37);
+                case REGRESSED -> new Color(51, 51, 51);
+                case F -> new Color(68, 1, 84);
+                case D -> new Color(59, 82, 139);
+                case C -> new Color(33, 144, 140);
+                case B -> new Color(93, 200, 99);
+                case A, ADVANCED -> new Color(253, 231, 37);
                 default -> Color.BLACK;
             };
         }
         if (null != socio && optIndustry.isSelected()) {
             return switch (socio.industry) {
-                case EquipmentType.TechRating.F, EquipmentType.TechRating.E -> new Color(0, 0, 4);
-                case EquipmentType.TechRating.D -> new Color(81, 18, 124);
-                case EquipmentType.TechRating.C -> new Color(182, 54, 121);
-                case EquipmentType.TechRating.B -> new Color(251, 136, 97);
-                case TechRating.A -> new Color(252, 253, 191);
+                case F -> new Color(0, 0, 4);
+                case D -> new Color(81, 18, 124);
+                case C -> new Color(182, 54, 121);
+                case B -> new Color(251, 136, 97);
+                case A -> new Color(252, 253, 191);
                 default -> Color.BLACK;
             };
         }
         if (null != socio && optRawMaterials.isSelected()) {
             return switch (socio.rawMaterials) {
-                case EquipmentType.TechRating.F, EquipmentType.TechRating.E -> new Color(13, 8, 135);
-                case EquipmentType.TechRating.D -> new Color(126, 3, 168);
-                case EquipmentType.TechRating.C -> new Color(204, 70, 120);
-                case EquipmentType.TechRating.B -> new Color(248, 148, 65);
-                case TechRating.A -> new Color(240, 249, 33);
+                case F -> new Color(13, 8, 135);
+                case D -> new Color(126, 3, 168);
+                case C -> new Color(204, 70, 120);
+                case B -> new Color(248, 148, 65);
+                case A -> new Color(240, 249, 33);
                 default -> Color.BLACK;
             };
         }
         if (null != socio && optOutput.isSelected()) {
             return switch (socio.output) {
-                case EquipmentType.TechRating.F, EquipmentType.TechRating.E -> new Color(0, 0, 4);
-                case EquipmentType.TechRating.D -> new Color(86, 15, 110);
-                case EquipmentType.TechRating.C -> new Color(187, 55, 84);
-                case EquipmentType.TechRating.B -> new Color(249, 140, 10);
-                case TechRating.A -> new Color(252, 255, 164);
+                case F -> new Color(0, 0, 4);
+                case D -> new Color(86, 15, 110);
+                case C -> new Color(187, 55, 84);
+                case B -> new Color(249, 140, 10);
+                case A -> new Color(252, 255, 164);
                 default -> Color.BLACK;
             };
         }
         if (null != socio && optAgriculture.isSelected()) {
             return switch (socio.agriculture) {
-                case EquipmentType.TechRating.F, EquipmentType.TechRating.E -> new Color(0, 32, 77);
-                case EquipmentType.TechRating.D -> new Color(66, 77, 107);
-                case EquipmentType.TechRating.C -> new Color(124, 123, 120);
-                case EquipmentType.TechRating.B -> new Color(188, 175, 111);
-                case TechRating.A -> new Color(255, 234, 70);
+                case F -> new Color(0, 32, 77);
+                case D -> new Color(66, 77, 107);
+                case C -> new Color(124, 123, 120);
+                case B -> new Color(188, 175, 111);
+                case A -> new Color(255, 234, 70);
                 default -> Color.BLACK;
             };
         }

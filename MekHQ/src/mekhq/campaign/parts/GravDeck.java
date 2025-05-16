@@ -49,7 +49,7 @@ import org.w3c.dom.NodeList;
 public class GravDeck extends Part {
     private static final MMLogger logger = MMLogger.create(GravDeck.class);
 
-    static final TechAdvancement TA_GRAV_DECK = new TechAdvancement(ITechnology.TechBase.ALL)
+    static final TechAdvancement TA_GRAV_DECK = new TechAdvancement(TechBase.ALL)
             .setAdvancement(DATE_ES, DATE_ES, DATE_ES)
             .setTechRating(TechRating.B)
             .setAvailability(TechRating.C, TechRating.C, TechRating.C, TechRating.C)

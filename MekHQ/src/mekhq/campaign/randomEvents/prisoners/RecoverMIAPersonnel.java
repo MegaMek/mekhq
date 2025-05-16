@@ -28,6 +28,7 @@
 package mekhq.campaign.randomEvents.prisoners;
 
 import megamek.common.ITechnology;
+import megamek.common.ITechnology.TechRating;
 import megamek.common.TargetRoll;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
@@ -74,30 +75,30 @@ public class RecoverMIAPersonnel {
      * @param sarQuality     The quality of the SAR team's equipment (null defaults to average
      *                      quality).
      */
-    public RecoverMIAPersonnel(Campaign campaign, Faction searchingFaction, Integer sarQuality) {
+    public RecoverMIAPersonnel(Campaign campaign, Faction searchingFaction, TechRating sarQuality) {
         this.campaign = campaign;
 
         int today = campaign.getLocalDate().getYear();
         boolean isClan = searchingFaction != null && searchingFaction.isClan();
 
-        int techFaction = isClan ? ITechnology.getCodeFromMMAbbr("CLAN") : ITechnology.getCodeFromMMAbbr("IS");
+        ITechnology.Faction techFaction = isClan ? ITechnology.getFactionFromMMAbbr("CLAN") : ITechnology.getFactionFromMMAbbr("IS");
         try {
             // searchingFaction being null is fine because we're just ignoring any exceptions
-            techFaction = ITechnology.getCodeFromMMAbbr(searchingFaction.getShortName());
+            techFaction = ITechnology.getFactionFromMMAbbr(searchingFaction.getShortName());
         } catch (Exception ignored) {
             // if we can't get the tech faction, we just use the fallbacks already assigned.
         }
 
         sarTargetNumber.addModifier(SAR_CONTAINS_VTOL_OR_WIGE, "SAR Contains VTOL or WIGE");
 
-        final int isImprovedSensorsAvailability = createISImprovedSensors().calcYearAvailability(
+        final TechRating isImprovedSensorsAvailability = createISImprovedSensors().calcYearAvailability(
             today, isClan, techFaction);
-        final int clanImprovedSensorsAvailability = createCLImprovedSensors().calcYearAvailability(
+        final TechRating clanImprovedSensorsAvailability = createCLImprovedSensors().calcYearAvailability(
             today, isClan, techFaction);
 
-        final int improvedSensorsAvailability = isClan ? clanImprovedSensorsAvailability : isImprovedSensorsAvailability;
+        final TechRating improvedSensorsAvailability = isClan ? clanImprovedSensorsAvailability : isImprovedSensorsAvailability;
 
-        final int activeProbeAvailability = createBeagleActiveProbe().calcYearAvailability(
+        final TechRating activeProbeAvailability = createBeagleActiveProbe().calcYearAvailability(
             today, isClan, techFaction);
 
         if (sarQuality == null) {

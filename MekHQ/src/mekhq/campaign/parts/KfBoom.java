@@ -49,12 +49,12 @@ import org.w3c.dom.NodeList;
 public class KfBoom extends Part {
     private static final MMLogger logger = MMLogger.create(KfBoom.class);
 
-    static final TechAdvancement TA_KFBOOM = new TechAdvancement(ITechnology.TechBase.ALL)
+    static final TechAdvancement TA_KFBOOM = new TechAdvancement(TechBase.ALL)
             .setAdvancement(2458, 2470, 2500).setPrototypeFactions(Faction.TH)
             .setProductionFactions(Faction.TH).setTechRating(TechRating.C)
             .setAvailability(TechRating.D, TechRating.C, TechRating.C, TechRating.C)
             .setStaticTechLevel(SimpleTechLevel.STANDARD);
-    static final TechAdvancement TA_PROTOTYPE_KF_BOOM = new TechAdvancement(ITechnology.TechBase.ALL)
+    static final TechAdvancement TA_PROTOTYPE_KF_BOOM = new TechAdvancement(TechBase.ALL)
             .setAdvancement(2458, 2470, 2500).setPrototypeFactions(Faction.TH)
             .setProductionFactions(Faction.TH).setTechRating(TechRating.C)
             .setAvailability(TechRating.F, TechRating.X, TechRating.X, TechRating.X)

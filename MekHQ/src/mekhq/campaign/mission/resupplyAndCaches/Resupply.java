@@ -42,7 +42,7 @@ import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 import static mekhq.campaign.force.ForceType.CONVOY;
 import static mekhq.campaign.force.ForceType.STANDARD;
-import static mekhq.campaign.market.procurement.Procurement.getFactionTechCode;
+import static mekhq.campaign.market.procurement.Procurement.getTechFaction;
 import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
 
 import java.time.LocalDate;
@@ -56,6 +56,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import megamek.common.Entity;
+import megamek.common.ITechnology;
 import megamek.common.Mek;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -93,7 +94,7 @@ public class Resupply {
     private final ResupplyType resupplyType;
     private final Faction employerFaction;
     private final int currentYear;
-    private final int employerTechCode;
+    private final ITechnology.Faction employerTechCode;
     private final boolean employerIsClan;
     private List<Part> ammoBinPool;
     private double focusAmmo;
@@ -147,7 +148,7 @@ public class Resupply {
         Faction enemyFaction = contract.getEnemy();
         employerIsClan = enemyFaction.isClan();
 
-        employerTechCode = getFactionTechCode(employerFaction);
+        employerTechCode = getTechFaction(employerFaction);
 
         focusAmmo = 0.25;
         focusArmor = 0.25;

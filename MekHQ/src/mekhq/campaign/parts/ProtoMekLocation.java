@@ -38,6 +38,7 @@ import megamek.common.ProtoMek;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TargetRoll;
 import megamek.common.TechAdvancement;
+import megamek.common.TechAdvancement.AdvancementPhase;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -57,8 +58,9 @@ import org.w3c.dom.NodeList;
 public class ProtoMekLocation extends Part {
     private static final MMLogger logger = MMLogger.create(ProtoMekLocation.class);
 
-    static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(ITechnology.TechBase.CLAN)
-            .setClanAdvancement(3055, 3060, 3060).setClanApproximate(true, false, false)
+    static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TechBase.CLAN)
+            .setClanAdvancement(3055, 3060, 3060)
+            .setClanApproximate(AdvancementPhase.PROTOTYPE)
             .setPrototypeFactions(Faction.CSJ).setProductionFactions(Faction.CSJ)
             .setTechRating(TechRating.D).setAvailability(TechRating.X, TechRating.X, TechRating.D, TechRating.D)
             .setStaticTechLevel(SimpleTechLevel.STANDARD);

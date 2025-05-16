@@ -51,7 +51,7 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MekActuator extends Part {
-    static final TechAdvancement TA_STANDARD = new TechAdvancement(ITechnology.TechBase.ALL).setAdvancement(2300, 2350, 2505)
+    static final TechAdvancement TA_STANDARD = new TechAdvancement(TechBase.ALL).setAdvancement(2300, 2350, 2505)
             .setApproximate(true, false, false).setPrototypeFactions(Faction.TA).setProductionFactions(Faction.TH)
             .setStaticTechLevel(SimpleTechLevel.INTRO);
     static final TechAdvancement TA_SUPERHEAVY = new TechAdvancement(TechBase.IS).setAdvancement(2905, 2940, 3076)

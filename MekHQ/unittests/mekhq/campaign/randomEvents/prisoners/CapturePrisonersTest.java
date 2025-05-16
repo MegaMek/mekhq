@@ -28,6 +28,7 @@
 package mekhq.campaign.randomEvents.prisoners;
 
 import megamek.common.ITechnology;
+import megamek.common.ITechnology.TechRating;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
@@ -75,8 +76,8 @@ class CapturePrisonersTest {
         LocalDate today = LocalDate.of(3151, 1, 1);
         when(mockCampaign.getLocalDate()).thenReturn(today);
 
-        int activeProbeAvailability = getPartAvailability(today, true);
-        int improvedSensorsAvailability = getPartAvailability(today, false);
+        TechRating activeProbeAvailability = getPartAvailability(today, true);
+        TechRating improvedSensorsAvailability = getPartAvailability(today, false);
 
         // Act
         int quality = -1;
@@ -90,8 +91,9 @@ class CapturePrisonersTest {
 
         int actualTargetNumber = capturePrisoners.getSarTargetNumber().getValue();
         assertEquals(expectedTargetNumber, actualTargetNumber);
-        assertTrue(quality < activeProbeAvailability);
-        assertTrue(quality < improvedSensorsAvailability);
+        // TODO: sarQuality is evaluated against the index of a TechRating. doesn't seems very nice. See constructor of CapturePrisoners.
+        assertTrue(quality < activeProbeAvailability.getIndex());
+        assertTrue(quality < improvedSensorsAvailability.getIndex());
     }
 
     @Test
@@ -103,11 +105,11 @@ class CapturePrisonersTest {
         LocalDate today = LocalDate.of(3151, 1, 1);
         when(mockCampaign.getLocalDate()).thenReturn(today);
 
-        int activeProbeAvailability = getPartAvailability(today, true);
-        int improvedSensorsAvailability = getPartAvailability(today, false);
+        TechRating activeProbeAvailability = getPartAvailability(today, true);
+        TechRating improvedSensorsAvailability = getPartAvailability(today, false);
 
         // Act
-        CapturePrisoners capturePrisoners = new CapturePrisoners(mockCampaign, mockFaction, scenario, activeProbeAvailability);
+        CapturePrisoners capturePrisoners = new CapturePrisoners(mockCampaign, mockFaction, scenario, activeProbeAvailability.getIndex());
 
         // Assert
         int expectedTargetNumber = BASE_TARGET_NUMBER
@@ -118,7 +120,7 @@ class CapturePrisonersTest {
 
         int actualTargetNumber = capturePrisoners.getSarTargetNumber().getValue();
         assertEquals(expectedTargetNumber, actualTargetNumber);
-        assertTrue(activeProbeAvailability < improvedSensorsAvailability);
+        assertTrue(improvedSensorsAvailability.isBetterThan(activeProbeAvailability));
     }
 
     @Test
@@ -130,11 +132,11 @@ class CapturePrisonersTest {
         LocalDate today = LocalDate.of(3151, 1, 1);
         when(mockCampaign.getLocalDate()).thenReturn(today);
 
-        int activeProbeAvailability = getPartAvailability(today, true);
-        int improvedSensorsAvailability = getPartAvailability(today, false);
+        TechRating activeProbeAvailability = getPartAvailability(today, true);
+        TechRating improvedSensorsAvailability = getPartAvailability(today, false);
 
         // Act
-        CapturePrisoners capturePrisoners = new CapturePrisoners(mockCampaign, mockFaction, scenario, improvedSensorsAvailability);
+        CapturePrisoners capturePrisoners = new CapturePrisoners(mockCampaign, mockFaction, scenario, improvedSensorsAvailability.getIndex());
 
         // Assert
         int expectedTargetNumber = BASE_TARGET_NUMBER
@@ -145,7 +147,7 @@ class CapturePrisonersTest {
 
         int actualTargetNumber = capturePrisoners.getSarTargetNumber().getValue();
         assertEquals(expectedTargetNumber, actualTargetNumber);
-        assertTrue(improvedSensorsAvailability > activeProbeAvailability);
+        assertTrue(activeProbeAvailability.isBetterThan(improvedSensorsAvailability));
     }
 
     @Test
@@ -574,14 +576,14 @@ class CapturePrisonersTest {
      * @return An integer representing the availability of the part for the given year
      *         and technology type.
      */
-    private int getPartAvailability(LocalDate today, boolean isActiveProbe) {
+    private TechRating getPartAvailability(LocalDate today, boolean isActiveProbe) {
         int year = today.getYear();
-        int technology = ITechnology.getCodeFromMMAbbr("IS");
+        ITechnology.Faction techFaction = ITechnology.getFactionFromMMAbbr("IS");
 
         if (isActiveProbe) {
-            return createBeagleActiveProbe().calcYearAvailability(year, false, technology);
+            return createBeagleActiveProbe().calcYearAvailability(year, false, techFaction);
         } else {
-            return createISImprovedSensors().calcYearAvailability(year, false, technology);
+            return createISImprovedSensors().calcYearAvailability(year, false, techFaction);
         }
     }
 }

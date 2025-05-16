@@ -90,7 +90,7 @@ public class MissingOmniPod extends MissingPart {
      * @return The tech base of the part the omnipod is meant to contain.
      */
     @Override
-    public int getTechBase() {
+    public TechBase getTechBase() {
         if (null != partType) {
             return partType.getTechBase();
         } else {

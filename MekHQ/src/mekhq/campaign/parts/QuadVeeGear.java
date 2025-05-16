@@ -47,7 +47,7 @@ import mekhq.campaign.finances.Money;
  * @author Neoancient
  */
 public class QuadVeeGear extends Part {
-    static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(ITechnology.TechBase.CLAN)
+    static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TechBase.CLAN)
             .setTechRating(TechRating.F)
             .setAvailability(TechRating.X, TechRating.X, TechRating.X, TechRating.F)
             .setClanAdvancement(3130, 3135, DATE_NONE, DATE_NONE, DATE_NONE)

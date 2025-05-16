@@ -49,7 +49,7 @@ import org.w3c.dom.NodeList;
 public class KFDriveCoil extends Part {
     private static final MMLogger logger = MMLogger.create(KFDriveCoil.class);
 
-    public static final TechAdvancement TA_DRIVE_COIL = new TechAdvancement(ITechnology.TechBase.ALL)
+    public static final TechAdvancement TA_DRIVE_COIL = new TechAdvancement(TechBase.ALL)
             .setAdvancement(2107, 2120, 2300).setPrototypeFactions(Faction.TA)
             .setProductionFactions(Faction.TA).setTechRating(TechRating.D)
             .setAvailability(TechRating.D, TechRating.E, TechRating.D, TechRating.D)

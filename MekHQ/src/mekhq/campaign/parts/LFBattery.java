@@ -50,7 +50,7 @@ public class LFBattery extends Part {
     private static final MMLogger logger = MMLogger.create(LFBattery.class);
 
     // Not specified in IO - use SO p158
-    public static final TechAdvancement TA_LF_BATTERY = new TechAdvancement(ITechnology.TechBase.ALL)
+    public static final TechAdvancement TA_LF_BATTERY = new TechAdvancement(TechBase.ALL)
             .setAdvancement(2519, 2529, 2600).setPrototypeFactions(Faction.TH)
             .setProductionFactions(Faction.TH).setTechRating(TechRating.D)
             .setAvailability(TechRating.E, TechRating.F, TechRating.E, TechRating.E)

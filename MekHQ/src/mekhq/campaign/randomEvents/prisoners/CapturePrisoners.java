@@ -58,6 +58,7 @@ import java.util.Objects;
 
 import megamek.common.Compute;
 import megamek.common.ITechnology;
+import megamek.common.ITechnology.TechRating;
 import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
@@ -142,12 +143,12 @@ public class CapturePrisoners {
         int today = campaign.getLocalDate().getYear();
         searchingFactionIsClan = searchingFaction != null && searchingFaction.isClan();
 
-        int techFaction = searchingFactionIsClan ?
-                                ITechnology.getCodeFromMMAbbr("CLAN") :
-                                ITechnology.getCodeFromMMAbbr("IS");
+        ITechnology.Faction techFaction = searchingFactionIsClan ?
+                                ITechnology.getFactionFromMMAbbr("CLAN") :
+                                ITechnology.getFactionFromMMAbbr("IS");
         try {
             // searchingFaction being null is fine because we're just ignoring any exceptions
-            techFaction = ITechnology.getCodeFromMMAbbr(searchingFaction.getShortName());
+            techFaction = ITechnology.getFactionFromMMAbbr(searchingFaction.getShortName());
         } catch (Exception ignored) {
             // if we can't get the tech faction, we just use the fallbacks already assigned.
         }
@@ -161,24 +162,25 @@ public class CapturePrisoners {
             sarTargetNumber.addModifier(GOING_TO_GROUND, "Potential Prisoner Going to Ground");
             sarTargetNumber.addModifier(SAR_CONTAINS_VTOL_OR_WIGE, "SAR Contains VTOL or WIGE");
 
-            final int isImprovedSensorsAvailability = createISImprovedSensors().calcYearAvailability(today,
+            final TechRating isImprovedSensorsAvailability = createISImprovedSensors().calcYearAvailability(today,
                   searchingFactionIsClan,
                   techFaction);
-            final int clanImprovedSensorsAvailability = createCLImprovedSensors().calcYearAvailability(today,
+            final TechRating clanImprovedSensorsAvailability = createCLImprovedSensors().calcYearAvailability(today,
                   searchingFactionIsClan,
                   techFaction);
 
-            final int improvedSensorsAvailability = searchingFactionIsClan ?
+            final TechRating improvedSensorsAvailability = searchingFactionIsClan ?
                                                           clanImprovedSensorsAvailability :
                                                           isImprovedSensorsAvailability;
 
-            final int activeProbeAvailability = createBeagleActiveProbe().calcYearAvailability(today,
+            final TechRating activeProbeAvailability = createBeagleActiveProbe().calcYearAvailability(today,
                   searchingFactionIsClan,
                   techFaction);
 
-            if (sarQuality >= improvedSensorsAvailability) {
+            // TODO: sarQuality is evaluated against the index of a TechRating. doesn't seems very nice. Refactor the whole constructor.
+            if (sarQuality >= improvedSensorsAvailability.getIndex()) {
                 sarTargetNumber.addModifier(SAR_HAS_IMPROVED_SENSORS, "SAR has Improved Sensors");
-            } else if (sarQuality >= activeProbeAvailability) {
+            } else if (sarQuality >= activeProbeAvailability.getIndex()) {
                 sarTargetNumber.addModifier(SAR_HAS_ACTIVE_PROBE, "SAR has Active Probe");
             }
         }

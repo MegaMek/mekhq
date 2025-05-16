@@ -301,11 +301,11 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
     @Override
     public TargetRoll getAllAcquisitionMods() {
         TargetRoll target = new TargetRoll();
-        if (getTechBase() == T_CLAN && campaign.getCampaignOptions().getClanAcquisitionPenalty() > 0) {
+        if (getTechBase() == TechBase.CLAN && campaign.getCampaignOptions().getClanAcquisitionPenalty() > 0) {
             target.addModifier(campaign.getCampaignOptions().getClanAcquisitionPenalty(), "clan-tech");
-        } else if (getTechBase() == T_IS && campaign.getCampaignOptions().getIsAcquisitionPenalty() > 0) {
+        } else if (getTechBase() == TechBase.IS && campaign.getCampaignOptions().getIsAcquisitionPenalty() > 0) {
             target.addModifier(campaign.getCampaignOptions().getIsAcquisitionPenalty(), "Inner Sphere tech");
-        } else if (getTechBase() == T_BOTH) {
+        } else if (getTechBase() == TechBase.ALL) {
             int penalty = Math.min(campaign.getCampaignOptions().getClanAcquisitionPenalty(), campaign.getCampaignOptions().getIsAcquisitionPenalty());
             if (penalty > 0) {
                 target.addModifier(penalty, "tech limit");

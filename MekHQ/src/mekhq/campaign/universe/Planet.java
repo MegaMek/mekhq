@@ -721,8 +721,8 @@ public class Planet {
 
         // don't allow acquisitions from caveman planets
         if ((socioIndustrial.tech == PlanetarySophistication.REGRESSED) ||
-                  (socioIndustrial.industry == ITechnology.TechRating.X) ||
-                  (socioIndustrial.output == ITechnology.TechRating.X)) {
+                  (socioIndustrial.industry == TechRating.X) ||
+                  (socioIndustrial.output == TechRating.X)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Regressed: Pre-industrial world");
         }
 

@@ -735,7 +735,6 @@ public class CampaignOptions {
         planetTechAcquisitionBonus.put(PlanetarySophistication.B, 0);
         planetTechAcquisitionBonus.put(PlanetarySophistication.C, 1);
         planetTechAcquisitionBonus.put(PlanetarySophistication.D, 2);
-        planetTechAcquisitionBonus.put(PlanetarySophistication.E, 4);
         planetTechAcquisitionBonus.put(PlanetarySophistication.F, 8);
         planetTechAcquisitionBonus.put(PlanetarySophistication.REGRESSED, 8);
         planetIndustryAcquisitionBonus.put(PlanetaryRating.A, 0);
@@ -747,7 +746,6 @@ public class CampaignOptions {
         planetOutputAcquisitionBonus.put(PlanetaryRating.B, 0);
         planetOutputAcquisitionBonus.put(PlanetaryRating.C, 1);
         planetOutputAcquisitionBonus.put(PlanetaryRating.D, 2);
-        planetOutputAcquisitionBonus.put(PlanetaryRating.E, 4);
         planetOutputAcquisitionBonus.put(PlanetaryRating.F, 8);
         // endregion Supplies and Acquisitions Tab
 
@@ -5594,7 +5592,7 @@ public class CampaignOptions {
                     retVal.usePlanetaryAcquisition = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("planetAcquisitionFactionLimit")) {
                     retVal.setPlanetAcquisitionFactionLimit(PlanetaryAcquisitionFactionLimit.parseFromString(wn2.getTextContent()
-                                                                                                                   .trim()));
+                                                                                                                .trim()));
                 } else if (nodeName.equalsIgnoreCase("planetAcquisitionNoClanCrossover")) {
                     retVal.planetAcquisitionNoClanCrossover = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("noClanPartsFromIS")) {
@@ -5608,17 +5606,17 @@ public class CampaignOptions {
                 } else if (nodeName.equalsIgnoreCase("planetTechAcquisitionBonus")) {
                     String[] values = wn2.getTextContent().split(",");
                     for (int i = 0; i < values.length; i++) {
-                        retVal.planetTechAcquisitionBonus[i] = Integer.parseInt(values[i]);
+                        retVal.planetTechAcquisitionBonus.put(PlanetarySophistication.fromIndex(i), Integer.parseInt(values[i]));
                     }
                 } else if (nodeName.equalsIgnoreCase("planetIndustryAcquisitionBonus")) {
                     String[] values = wn2.getTextContent().split(",");
                     for (int i = 0; i < values.length; i++) {
-                        retVal.planetIndustryAcquisitionBonus[i] = Integer.parseInt(values[i]);
+                        retVal.planetIndustryAcquisitionBonus.put(PlanetaryRating.fromIndex(i), Integer.parseInt(values[i]));
                     }
                 } else if (nodeName.equalsIgnoreCase("planetOutputAcquisitionBonus")) {
                     String[] values = wn2.getTextContent().split(",");
                     for (int i = 0; i < values.length; i++) {
-                        retVal.planetOutputAcquisitionBonus[i] = Integer.parseInt(values[i]);
+                        retVal.planetOutputAcquisitionBonus.put(PlanetaryRating.fromIndex(i), Integer.parseInt(values[i]));
                     }
                 } else if (nodeName.equalsIgnoreCase("equipmentContractPercent")) {
                     retVal.setEquipmentContractPercent(Double.parseDouble(wn2.getTextContent().trim()));

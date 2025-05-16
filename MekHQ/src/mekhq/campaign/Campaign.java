@@ -3742,7 +3742,7 @@ public class Campaign implements ITechManager {
                              getLocalDate(),
                              getCampaignOptions(),
                              getFaction(),
-                             acquisition.getTechBase() == Part.T_CLAN);
+                             acquisition.getTechBase() == Part.TechBase.CLAN);
 
         if (target.getValue() == TargetRoll.IMPOSSIBLE) {
             if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
@@ -3799,14 +3799,14 @@ public class Campaign implements ITechManager {
                                 " at TN: " +
                                 target.getValue() +
                                 " - Modifiers (Tech: " +
-                                (tech > 0 ? "+" : "") +
-                                tech +
+                                (techBonus > 0 ? "+" : "") +
+                                techBonus +
                                 ", Industry: " +
-                                (industry > 0 ? "+" : "") +
-                                industry +
+                                (industryBonus > 0 ? "+" : "") +
+                                industryBonus +
                                 ", Outputs: " +
-                                (outputs > 0 ? "+" : "") +
-                                outputs +
+                                (outputsBonus > 0 ? "+" : "") +
+                                outputsBonus +
                                 ") </font>");
             }
             return PartAcquisitionResult.Success;
@@ -3867,7 +3867,7 @@ public class Campaign implements ITechManager {
                                  getLocalDate(),
                                  getCampaignOptions(),
                                  getFaction(),
-                                 acquisition.getTechBase() == Part.T_CLAN);
+                                 acquisition.getTechBase() == Part.TechBase.CLAN);
         }
         report += "attempts to find " + acquisition.getAcquisitionName();
 
@@ -7494,10 +7494,10 @@ public class Campaign implements ITechManager {
                   "You must wait until the new cycle to check for this part. Further" +
                         " attempts will be added to the shopping list.");
         }
-        if (acquisition.getTechBase() == Part.T_CLAN && !getCampaignOptions().isAllowClanPurchases()) {
+        if (acquisition.getTechBase() == Part.TechBase.CLAN && !getCampaignOptions().isAllowClanPurchases()) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "You cannot acquire clan parts");
         }
-        if (acquisition.getTechBase() == Part.T_IS && !getCampaignOptions().isAllowISPurchases()) {
+        if (acquisition.getTechBase() == Part.TechBase.IS && !getCampaignOptions().isAllowISPurchases()) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "You cannot acquire inner sphere parts");
         }
         if (getCampaignOptions().getTechLevel() < Utilities.getSimpleTechLevel(acquisition.getTechLevel())) {
@@ -7509,7 +7509,7 @@ public class Campaign implements ITechManager {
         }
         if (getCampaignOptions().isDisallowExtinctStuff() &&
                   (acquisition.isExtinctIn(getGameYear(), useClanTechBase(), getTechFaction()) ||
-                         acquisition.getAvailability() == EquipmentType.TechRating.X)) {
+                         acquisition.getAvailability() == TechRating.X)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "It is extinct!");
         }
 
@@ -9320,9 +9320,12 @@ public class Campaign implements ITechManager {
 
     public void updateTechFactionCode() {
         if (campaignOptions.isFactionIntroDate()) {
-            for (int i = 0; i < ITechnology.MM_FACTION_CODES.length; i++) {
-                if (ITechnology.MM_FACTION_CODES[i].equals(getFaction().getShortName())) {
-                    techFaction = i;
+            for (ITechnology.Faction f : ITechnology.Faction.values()) {
+                if (f.equals(ITechnology.Faction.NONE)) {
+                    continue;
+                }
+                if (f.getCodeMM().equals(getFaction().getShortName())) {
+                    techFaction = f;
                     UnitTechProgression.loadFaction(techFaction);
                     return;
                 }

@@ -128,7 +128,7 @@ public class MissingBayDoor extends MissingPart {
 
     @Override
     public TechAdvancement getTechAdvancement() {
-        return new TechAdvancement(ITechnology.TechBase.ALL).setAdvancement(DATE_PS, DATE_PS, DATE_PS)
+        return new TechAdvancement(TechBase.ALL).setAdvancement(DATE_PS, DATE_PS, DATE_PS)
                 .setTechRating(TechRating.A)
                 .setAvailability(TechRating.A, TechRating.A, TechRating.A, TechRating.A)
                 .setStaticTechLevel(SimpleTechLevel.STANDARD);

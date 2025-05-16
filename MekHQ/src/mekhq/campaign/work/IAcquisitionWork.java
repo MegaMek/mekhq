@@ -29,6 +29,8 @@
 package mekhq.campaign.work;
 
 import megamek.common.ITechnology;
+import megamek.common.ITechnology.TechBase;
+import megamek.common.ITechnology.TechRating;
 import megamek.common.TargetRoll;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
@@ -63,7 +65,7 @@ public interface IAcquisitionWork extends IWork {
 
     public TargetRoll getAllAcquisitionMods();
 
-    public int getTechBase();
+    public TechBase getTechBase();
 
     public int getTechLevel();
 
@@ -85,7 +87,7 @@ public interface IAcquisitionWork extends IWork {
 
     public boolean isExtinctIn(int year, boolean clan, ITechnology.Faction techFaction);
 
-    public int getAvailability();
+    public TechRating getAvailability();
 
     public String getShoppingListReport(int quantity);
 

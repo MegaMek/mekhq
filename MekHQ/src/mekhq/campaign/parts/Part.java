@@ -94,7 +94,7 @@ public abstract class Part implements IPartWork, ITechnology {
 
     protected static final TechAdvancement TA_POD = Entity.getOmniAdvancement();
     // Generic TechAdvancement for a number of basic components.
-    protected static final TechAdvancement TA_GENERIC = new TechAdvancement(ITechnology.TechBase.ALL).setAdvancement(DATE_ES,
+    protected static final TechAdvancement TA_GENERIC = new TechAdvancement(TechBase.ALL).setAdvancement(DATE_ES,
                 DATE_ES,
                 DATE_ES)
                                                               .setTechRating(TechRating.C)
@@ -1708,7 +1708,7 @@ public abstract class Part implements IPartWork, ITechnology {
             : TA_GENERIC.getBaseAvailability(era);
         if (omniPodded) {
             TechRating podRating = TA_POD.getBaseAvailability(era);
-            return advRating.getIndex() > podRating.getIndex() ? advRating : podRating;
+            return advRating.isBetterThan(podRating) ? advRating : podRating;
         }
         return advRating;
     }
@@ -1724,7 +1724,7 @@ public abstract class Part implements IPartWork, ITechnology {
             : TA_GENERIC.calcYearAvailability(year, clan);
         if (omniPodded) {
             TechRating podRating = TA_POD.calcYearAvailability(year, clan);
-            av = av.getIndex() > podRating.getIndex() ? av : podRating;
+            av = av.isBetterThan(podRating) ? av : podRating;
         }
         return av;
     }
