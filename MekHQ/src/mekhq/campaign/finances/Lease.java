@@ -201,6 +201,15 @@ public class Lease extends UnitOrder {
         return retVal;
     }
 
+    @Override
+    public String getAcquisitionName() {
+        // This cannot be hyperlinked name due to the fact that we have a null unit ID
+        // Also, the field this goes into does not currently support html, and would
+        // need our listener attached
+        // - Dylan
+        return "Lease for " + getName();
+    }
+
     // Leases don't actually COST anything...
     @Override
     public Money getTotalBuyCost() {
