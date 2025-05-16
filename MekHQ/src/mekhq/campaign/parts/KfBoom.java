@@ -52,7 +52,7 @@ public class KfBoom extends Part {
     static final TechAdvancement TA_KFBOOM = new TechAdvancement(TechBase.ALL)
             .setAdvancement(2458, 2470, 2500).setPrototypeFactions(Faction.TH)
             .setProductionFactions(Faction.TH).setTechRating(TechRating.C)
-            .setAvailability(TechRating.D, TechRating.C, TechRating.C, TechRating.C)
+            .setAvailability(AvailabilityValue.D, AvailabilityValue.C, AvailabilityValue.C, AvailabilityValue.C)
             .setStaticTechLevel(SimpleTechLevel.STANDARD);
     static final TechAdvancement TA_PROTOTYPE_KF_BOOM = new TechAdvancement(TechBase.ALL)
             .setAdvancement(2458, 2470, 2500).setPrototypeFactions(Faction.TH)

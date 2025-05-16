@@ -56,7 +56,7 @@ public class StructuralIntegrity extends Part {
     static final TechAdvancement TA_ASF = new TechAdvancement(TechBase.ALL)
             .setAdvancement(2200, 2470, 2490).setApproximate(true, false, false)
             .setPrototypeFactions(Faction.TA).setProductionFactions(Faction.TH)
-            .setTechRating(TechRating.C).setAvailability(TechRating.C, TechRating.D, TechRating.D, TechRating.C)
+            .setTechRating(TechRating.C).setAvailability(AvailabilityValue.C, AvailabilityValue.D, AvailabilityValue.D, AvailabilityValue.C)
             .setStaticTechLevel(SimpleTechLevel.STANDARD);
     static final TechAdvancement TA_CF = new TechAdvancement(TechBase.ALL)
             .setAdvancement(DATE_PS, 2470, 2490).setProductionFactions(Faction.TH)

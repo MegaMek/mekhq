@@ -52,7 +52,7 @@ public class KFHeliumTank extends Part {
     public static final TechAdvancement TA_HELIUM_TANK = new TechAdvancement(TechBase.ALL)
             .setAdvancement(2107, 2120, 2300).setPrototypeFactions(Faction.TA)
             .setProductionFactions(Faction.TA).setTechRating(TechRating.D)
-            .setAvailability(TechRating.D, TechRating.E, TechRating.D, TechRating.D)
+            .setAvailability(AvailabilityValue.D, AvailabilityValue.E, AvailabilityValue.D, AvailabilityValue.D)
             .setStaticTechLevel(SimpleTechLevel.ADVANCED);
 
     // Standard, primitive, compact, subcompact...

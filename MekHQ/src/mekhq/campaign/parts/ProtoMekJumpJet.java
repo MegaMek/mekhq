@@ -54,7 +54,7 @@ public class ProtoMekJumpJet extends Part {
     static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TechBase.CLAN)
             .setClanAdvancement(3055,3060,3060).setClanApproximate(true, false, false)
             .setPrototypeFactions(Faction.CSJ).setProductionFactions(Faction.CSJ)
-            .setTechRating(TechRating.D).setAvailability(TechRating.X, TechRating.X, TechRating.C, TechRating.C)
+            .setTechRating(TechRating.D).setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.C, AvailabilityValue.C)
             .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     public ProtoMekJumpJet() {

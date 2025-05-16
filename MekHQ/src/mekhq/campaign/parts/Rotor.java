@@ -43,7 +43,7 @@ public class Rotor extends TankLocation {
     static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TechBase.ALL)
             .setAdvancement(2460, 2470, 2510).setApproximate(true, false, false)
             .setPrototypeFactions(Faction.TH).setProductionFactions(Faction.TH)
-            .setTechRating(TechRating.D).setAvailability(TechRating.C, TechRating.D, TechRating.C, TechRating.C)
+            .setTechRating(TechRating.D).setAvailability(AvailabilityValue.C, AvailabilityValue.D, AvailabilityValue.C, AvailabilityValue.C)
             .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     public Rotor() {

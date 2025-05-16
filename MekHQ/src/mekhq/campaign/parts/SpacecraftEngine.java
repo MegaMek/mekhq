@@ -61,7 +61,7 @@ import mekhq.campaign.personnel.skills.SkillType;
 public class SpacecraftEngine extends Part {
     static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TechBase.ALL)
             .setAdvancement(DATE_ES, DATE_ES, DATE_ES).setTechRating(TechRating.D)
-            .setAvailability(TechRating.C, TechRating.D, TechRating.C, TechRating.C)
+            .setAvailability(AvailabilityValue.C, AvailabilityValue.D, AvailabilityValue.C, AvailabilityValue.C)
             .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     double engineTonnage;
