@@ -31,21 +31,28 @@ package mekhq.campaign.universe;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import megamek.common.EquipmentType;
+
+import megamek.common.ITechnology;
+import megamek.common.ITechnology.TechRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 
-
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Locale;
-import java.util.Map;
 
 public class SocioIndustrialData {
 
     private final static String SEPARATOR = "-";
-
+    private static final EnumMap<PlanetarySophistication, TechRating> sophisticationToTechRating = new EnumMap<>(PlanetarySophistication.class);
     public static final SocioIndustrialData NONE = new SocioIndustrialData();
     static {
+        sophisticationToTechRating.put(PlanetarySophistication.ADVANCED, TechRating.F);
+        sophisticationToTechRating.put(PlanetarySophistication.A, TechRating.E);
+        sophisticationToTechRating.put(PlanetarySophistication.B, TechRating.D);
+        sophisticationToTechRating.put(PlanetarySophistication.C, TechRating.C);
+        sophisticationToTechRating.put(PlanetarySophistication.D, TechRating.B);
+        sophisticationToTechRating.put(PlanetarySophistication.F, TechRating.A);
+        sophisticationToTechRating.put(PlanetarySophistication.REGRESSED, TechRating.X);
         NONE.tech = PlanetarySophistication.REGRESSED;
         NONE.industry = PlanetaryRating.F;
         NONE.rawMaterials = PlanetaryRating.F;
@@ -87,123 +94,116 @@ public class SocioIndustrialData {
 
     /** @return the USILR rating as a HTML description */
     public String getHTMLDescription() {
-        // TODO: MHQInternationalization
-        // TODO: Some way to encode "advanced" ultra-tech worlds (rating "AA" for technological sophistication)
-        // TODO: Some way to encode "regressed" worlds
-        // Note that rating "E" isn't used in official USILR codes, but we add them for completeness
         StringBuilder sb = new StringBuilder("<html>");
         switch (tech) {
             case ADVANCED:
-                sb.append("Advanced: Ultra high-tech world<br>");
+                sb.append("Advanced: Ultra-Tech world. Hosts the most advanced research centers and universities in human space, equivalent to New Avalon or Strana Mechty.<br>");
                 break;
             case A:
-                sb.append("A: High-tech world<br>");
+                sb.append("A: High-tech world. Advanced research centers and universities; best medical care; cutting-edge microelectronics industry.<br>");
                 break;
             case B:
-                sb.append("B: Advanced world<br>");
+                sb.append("B: Advanced world. Access to many new technologies; hosts universities; good medical care available (though lacking in most cutting-edge medical tech); basic microelectronics industry.<br>");
                 break;
             case C:
-                sb.append("C: Moderately advanced world<br>");
+                sb.append("C: Moderately advanced world. Average local education and medical care; minimal microelectronics industry.<br>");
                 break;
             case D:
-                sb.append("D: Lower-tech world; about 21st- to 22nd-century level<br>");
+                sb.append("D: Lower-tech world. Poor educational system; medical care equivalent to 21st- to 22nd-century levels; nonexistent microelectronics industry (excepting possible isolated regions run by private concerns).<br>");
                 break;
             case F:
-                sb.append("F: Primitive world<br>");
+                sb.append("F: Primitive world. Inhabitants live without dependence on technology; no advanced education; medical care equivalent to twentieth-century level (at best).<br>");
                 break;
             case REGRESSED:
-                sb.append("Regressed: Pre-industrial world<br>");
-                break;
-            default:
-                sb.append("X: Technological sophistication unknown<br>");
+                sb.append("Regressed: Pre-twentieth century technology, maybe Stone Age<br>");
                 break;
         }
 
         switch (industry) {
             case A:
-                sb.append("A: Heavily industrialized<br>");
+                sb.append("A: Heavily industrialized. Capable of manufacturing any and all complex products.<br>");
                 break;
             case B:
-                sb.append("B: Moderately industrialized<br>");
+                sb.append("B: Moderately industrialized. May produce a limited quantity and range of complex products.<br>");
                 break;
             case C:
-                sb.append("C: Basic heavy industry; about 22nd century level<br>");
+                sb.append("C: Basic heavy industry. Equivalent to roughly 22nd-century tech; fusion technology possible, but no complex products (including BattleMechs).<br>");
                 break;
             case D:
-                sb.append("D: Low industrialization; about 20th century level<br>");
+                sb.append("D: Low industrialization. Roughly equivalent to mid-twentieth century level; fusion technology must be imported.<br>");
                 break;
             case F:
                 sb.append("F: No industrialization<br>");
-                break;
-            default:
-                sb.append("X: None<br>");
                 break;
         }
 
         switch (rawMaterials) {
             case A:
-                sb.append("A: Fully self-sufficient raw material production<br>");
+                sb.append("A: Fully self-sufficient. System produces all needed raw materials and may export in large quantities.<br>");
                 break;
             case B:
-                sb.append("B: Mostly self-sufficient raw material production<br>");
+                sb.append("B: Mostly self-sufficient. System produces all needed raw materials and may export a small surplus.<br>");
                 break;
             case C:
-                sb.append("C: Limited raw material production<br>");
+                sb.append("C: Self-sustaining. System produces some of its needed raw materials and imports the rest.<br>");
                 break;
             case D:
-                sb.append("D: Production dependent on imports of raw materials<br>");
+                sb.append("D: Dependent. System is poor in raw materials and must import most of its material needs.<br>");
                 break;
             case F:
-                sb.append("F: No economically viable local raw material production<br>");
-                break;
-            default:
-                sb.append("X: None<br>");
+                sb.append("F: Heavy dependent. System utterly reliant on imported materials to maintain industry and population.<br>");
                 break;
         }
 
         switch (output) {
             case A:
-                sb.append("A: High industrial output<br>");
+                sb.append("A: High output. World has wide industrial and commercial base capable of exporting most of its excess output, if sufficient space transport is available.<br>");
                 break;
             case B:
-                sb.append("B: Good industrial output<br>");
+                sb.append("B: Good output. World's industrial and commercial base sufficient for modest product export.<br>");
                 break;
             case C:
-                sb.append("C: Limited industrial output<br>"); // Bad for Ferengi
+                sb.append("C: Limited output. World has a small industrial base which limits exports; imported goods common.<br>"); // Bad for Ferengi
                 break;
             case D:
-                sb.append("D: Negligible industrial output<br>");
+                sb.append("D: Negligible output. World's industrial base insufficient for major exports; reliant on imported goods.<br>");
                 break;
             case F:
-                sb.append("F: None<br>"); // Good for Ferengi
-                break;
-            default:
-                sb.append("X: None<br>");
+                sb.append("F: No output. World must import most—if not all—of its heavy industrial and high-tech needs.<br>"); // Good for Ferengi
                 break;
         }
 
         switch (agriculture) {
             case A:
-                sb.append("A: Breadbasket<br>");
+                sb.append("A: Breadbasket. Planetary agro industries meet all local needs and sustain a thriving export trade, as allowed by available space transport.<br>");
                 break;
             case B:
-                sb.append("B: Agriculturally abundant world<br>");
+                sb.append("B: Abundant world. Rich agricultural environment sustains local needs and permits limited exports.<br>");
                 break;
             case C:
-                sb.append("C: Modest agriculture<br>");
+                sb.append("C: Modest agriculture. Most food locally produced, though some agricultural needs rely on imports.<br>");
                 break;
             case D:
-                sb.append("D: Poor agriculture<br>");
+                sb.append("D: Poor agriculture. Minimal agricultural output forces heavy reliance on off-world imports to sustain the local population.<br>");
                 break;
             case F:
-                sb.append("F: Barren world<br>");
-                break;
-            default:
-                sb.append("X: None<br>");
+                sb.append("F: Barren world. World's agricultural output cannot sustain the local population without continuous off-world imports.<br>");
                 break;
         }
 
         return sb.append("</html>").toString();
+    }
+
+    /**
+     * Returns the equipment technology rating of the planet based on its sophistication.
+     * Using the USILR rating conversion explained in the CampaignOps p.123
+     * A USILR score of A corresponds to Tech Rating E,
+     * USILR B to Tech Rating D, USILR C to Tech Rating C,
+     * USILR D to Tech Rating B, and USILR F to Tech Rating A.
+     * A Regressed world remains regressed by any scale, while Advanced corresponds to Tech Rating F.
+     */
+    public TechRating getEquipmentTechRating() {
+        return sophisticationToTechRating.get(tech);
     }
 
     /**
@@ -224,7 +224,18 @@ public class SocioIndustrialData {
             try {
                 return PlanetarySophistication.fromName(sophistication.toUpperCase(Locale.ROOT));
             } catch (IllegalArgumentException e) {
-                // If the rating is not valid, return a default value
+                // If the rating is not valid, return a default value but first let's evaluate 
+                // some special cases to be retrocompatible with the old codes
+                if (sophistication != null) {
+                    sophistication = sophistication.toUpperCase(Locale.ROOT);
+                    if (sophistication.equals("ADV")) {
+                        return PlanetarySophistication.ADVANCED;
+                    } else if (sophistication.equals("R")) {
+                        return PlanetarySophistication.REGRESSED;
+                    } else if (sophistication.equals("X")) {
+                        return PlanetarySophistication.REGRESSED;
+                    }
+                }
                 return PlanetarySophistication.C;
             }
         }
@@ -233,7 +244,14 @@ public class SocioIndustrialData {
             try {
                 return PlanetaryRating.fromName(rating.toUpperCase(Locale.ROOT));
             } catch (IllegalArgumentException e) {
-                // If the rating is not valid, return a default value
+                // If the rating is not valid, return a default value but first let's evaluate 
+                // some special cases to be retrocompatible with the old codes
+                if (rating != null) {
+                    rating = rating.toUpperCase(Locale.ROOT);
+                    if (rating.equals("X")) {
+                        return PlanetaryRating.F;
+                    }
+                }
                 return PlanetaryRating.C;
             }
         }
@@ -245,17 +263,6 @@ public class SocioIndustrialData {
                 SocioIndustrialData result = new SocioIndustrialData();
                 if (socio.length >= 5) {
                     result.tech = getSophisticationFromString(socio[0]);
-                    if (result.tech == PlanetarySophistication.C) {
-                        // Could be ADV or R or X too
-                        String techRating = socio[0].toUpperCase(Locale.ROOT);
-                        if (techRating.equals("ADV")) {
-                            result.tech = PlanetarySophistication.ADVANCED;
-                        } else if (techRating.equals("R")) {
-                            result.tech = PlanetarySophistication.REGRESSED;
-                        } else if (techRating.equals("X")) {
-                            result.tech = PlanetarySophistication.REGRESSED;
-                        }
-                    }
                     result.industry = getRatingFromString(socio[1]);
                     result.rawMaterials = getRatingFromString(socio[2]);
                     result.output = getRatingFromString(socio[3]);
