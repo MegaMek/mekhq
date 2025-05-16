@@ -2889,11 +2889,6 @@ public class AtBDynamicScenarioFactory {
             };
         }
 
-        // Are they a formation leader? If so, increase their 'tactics' by 2
-        if (randomInt(getStandardForceSize(faction)) == 0) {
-            skillLevel = Math.min(skillLevel + 2, 10);
-        }
-
         if (randomSkillPreferences.randomizeSkill()) {
             int randomnessRoll = d6();
 

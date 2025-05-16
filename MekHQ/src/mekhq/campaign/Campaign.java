@@ -1661,6 +1661,20 @@ public class Campaign implements ITechManager {
 
     /**
      * This will update the transport in the transports list with current capacities. When a unit is added or removed
+     * from a transport, that information needs updated in the campaign transport map. This method will update the
+     * map for every {@code CampaignTransportType} for the given transport.
+     *
+     * @see Campaign#updateTransportInTransports(CampaignTransportType, Unit)
+     * @param transport             Unit
+     */
+    public void updateTransportInTransports(Unit transport) {
+        for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
+            updateTransportInTransports (campaignTransportType, transport);
+        }
+    }
+
+    /**
+     * This will update the transport in the transports list with current capacities. When a unit is added or removed
      * from a transport, that information needs updated in the campaign transport map. This method takes the
      * CampaignTransportType and transport as inputs and updates the map with the current capacities of the transport.
      *
