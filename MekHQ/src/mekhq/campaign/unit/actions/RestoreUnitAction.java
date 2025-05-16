@@ -121,6 +121,7 @@ public class RestoreUnitAction implements IUnitAction {
         unit.removeParts();
 
         unit.initializeAllTransportSpace();
+        campaign.updateTransportInTransports(unit);
 
         unit.initializeParts(true);
         unit.runDiagnostic(false);
