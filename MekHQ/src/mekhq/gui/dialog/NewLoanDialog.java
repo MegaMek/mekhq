@@ -122,9 +122,7 @@ public class NewLoanDialog extends JDialog implements ActionListener, ChangeList
         this.numberFormatter = new NumberFormatter(NumberFormat.getInstance());
 
         rating = campaign.getAtBUnitRatingMod();
-        loan = Loan.getBaseLoan(rating,
-              this.campaign.getCampaignOptions().isSimulateGrayMonday(),
-              this.campaign.getLocalDate());
+        loan = Loan.getBaseLoan(rating, this.campaign.getCampaignOptions().isSimulateGrayMonday(), campaign);
         maxCollateralValue = this.campaign.getFinances().getMaxCollateral(this.campaign);
         initComponents();
         setLocationRelativeTo(frame);
@@ -628,7 +626,7 @@ public class NewLoanDialog extends JDialog implements ActionListener, ChangeList
             sldCollateral.setPaintLabels(true);
             sldCollateral.setEnabled(!isGrayMonday);
 
-            sldLength = new JSlider(1, Loan.getMaxYears(rating), loan.getYears());
+            sldLength = new JSlider(1, Loan.getMaxYears(rating, campaign), loan.getYears());
         } else {
             sldInterest = new JSlider(0, 100, loan.getRate());
             sldInterest.setMajorTickSpacing(10);
