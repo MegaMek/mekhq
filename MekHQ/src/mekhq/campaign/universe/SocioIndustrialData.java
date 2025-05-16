@@ -60,6 +60,7 @@ public class SocioIndustrialData {
     public PlanetaryRating agriculture;
 
     public SocioIndustrialData() {
+        // These are the default USILR values from CampaignOps p.126
         this.tech = PlanetarySophistication.C;
         this.industry = PlanetaryRating.D;
         this.rawMaterials = PlanetaryRating.B;
