@@ -110,7 +110,7 @@ public record Accountant(Campaign campaign) {
     public Money getLeaseCosts() {
         if (getCampaignOptions().isTrackLeases()) {
             return getHangar().getUnitsStream()
-                         .filter(u -> u.hasLease() && (null != u.getTech()))
+                         .filter(u -> u.hasLease())
                          .map(u -> u.getUnitLease().getLeaseCost(campaign.getLocalDate()))
                          .reduce(Money.zero(), Money::plus);
         }

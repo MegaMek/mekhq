@@ -28,54 +28,21 @@
  */
 package mekhq.campaign.finances;
 
-import java.io.PrintWriter;
 import java.time.LocalDate;
 
 import megamek.common.Entity;
-import megamek.logging.MMLogger;
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.unit.UnitOrder;
-import mekhq.utilities.MHQXMLUtility;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
-public class Lease extends UnitOrder {
-    private static final MMLogger logger = MMLogger.create(Lease.class);
-    private Money leaseCost;
-    private LocalDate acquisitionDate;
-    private Unit leasedUnit;
-    private int daysToWait;
-    private Campaign campaign;
-    private int quantity;
+public class Lease {
+    private final Money leaseCost;
+    private final LocalDate acquisitionDate;
 
-    /*
+    /**
      * Leases are nominally attached to units while they are in the hanger.
      */
     public Lease(LocalDate currentDay, Unit unit) {
         acquisitionDate = currentDay;
         // Campaign Operations 4th., p43
-        leaseCost = unit.getSellValue().multipliedBy(0.005);
-    }
-
-    /*
-     * If a lease is in the shopping list, it doesn't have a unit yet to attach to.
-     */
-    public Lease(Entity entity, Campaign campaign) {
-        super(entity, campaign);
-        this.entity = entity;
-        this.leasedUnit = new Unit(entity, campaign);
-        this.campaign = campaign;
-    }
-
-    public Lease() {
-        super(null, null);
-    }
-
-    public void realizeLease(LocalDate currentDay, Unit unit) {
-        acquisitionDate = currentDay;
         leaseCost = unit.getSellValue().multipliedBy(0.005);
     }
 
@@ -87,7 +54,7 @@ public class Lease extends UnitOrder {
      * @param time The current campaign LocalDate
      */
     public Money getLeaseCost(LocalDate time) {
-        if (getLeaseStart().isAfter(campaign.getLocalDate())) {
+        if (getLeaseStart().isBefore(time)) {
             if (isLeaseFirstMonth(time.minusDays(1))) {
                 return getFirstLeaseCost(time);
             }
@@ -150,75 +117,5 @@ public class Lease extends UnitOrder {
         return check instanceof megamek.common.Dropship || check instanceof megamek.common.Jumpship;
     }
 
-    @Override
-    public void decrementDaysToWait() {
-        daysToWait = daysToWait > 0 ? daysToWait-- : 0;
-    }
-
-    @Override
-    public String find(int transitDays) {
-        campaign.getQuartermaster().leaseUnit((Entity) getNewEquipment(), transitDays);
-        return "<font color='" +
-                     MekHQ.getMHQOptions().getFontColorPositiveHexColor() +
-                     "'><b> unit found</b>.</font> It will be delivered in " +
-                     transitDays +
-                     " days.";
-    }
-
-    @Override
-    public void writeToXML(final PrintWriter pw, int indent) {
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "unitLease");
-        pw.println(MHQXMLUtility.writeEntityToXmlString(getEntity(), indent, getCampaign().getEntities()));
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "quantity", super.quantity);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "daysToWait", super.daysToArrival);
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "unitOrder");
-    }
-
-    public static Lease generateInstanceFromXML(Node wn, Campaign c) {
-        Lease retVal = new Lease();
-        retVal.setCampaign(c);
-
-        NodeList nl = wn.getChildNodes();
-
-        try {
-            for (int x = 0; x < nl.getLength(); x++) {
-                Node wn2 = nl.item(x);
-
-                if (wn2.getNodeName().equalsIgnoreCase("quantity")) {
-                    retVal.quantity = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("daysToWait")) {
-                    retVal.daysToWait = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("entity")) {
-                    retVal.entity = MHQXMLUtility.parseSingleEntityMul((Element) wn2, c);
-                }
-            }
-        } catch (Exception ex) {
-            logger.error("", ex);
-        }
-
-        retVal.initializeParts(false);
-
-        return retVal;
-    }
-
-    @Override
-    public String getAcquisitionName() {
-        // This cannot be hyperlinked name due to the fact that we have a null unit ID
-        // Also, the field this goes into does not currently support html, and would
-        // need our listener attached
-        // - Dylan
-        return "Lease for " + getName();
-    }
-
-    // Leases don't actually COST anything...
-    @Override
-    public Money getTotalBuyCost() {
-        return Money.zero();
-    }
-
-    @Override
-    public Money getBuyCost() {
-        return Money.zero();
-    }
 }
 
