@@ -190,6 +190,8 @@ public class GlossaryDialog extends JDialog {
      * @param key The resource key used to retrieve the glossary term's title and definition.
      */
     private void buildDialog(String key) {
+        key = key.toUpperCase(); // We're always dealing in uppercase in the Glossary
+
         String title = getFormattedTextAt(GLOSSARY_BUNDLE, key + ".title");
         if (!isResourceKeyValid(title)) {
             logger.error("No valid title for {}", key);

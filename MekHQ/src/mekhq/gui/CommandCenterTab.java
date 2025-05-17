@@ -27,6 +27,8 @@
  */
 package mekhq.gui;
 
+import static mekhq.utilities.MHQInternationalization.getText;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -228,8 +230,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
         JEditorPane infoPane = new JEditorPane();
         infoPane.setContentType("text/html");
-        infoPane.setText("<html><div style='text-align:center'>" +
-                               resourceMap.getString("commandCenterTab.keyText") +
+        infoPane.setText("<html><div style='text-align:center'>" + getText("commandCenterTab.keyText") +
                                "</div></html>");
         infoPane.setEditable(false);
         infoPane.setBorder(null);

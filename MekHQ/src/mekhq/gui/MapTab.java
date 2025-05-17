@@ -29,6 +29,7 @@ package mekhq.gui;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.campaign.randomEvents.prisoners.RecoverMIAPersonnel.abandonMissingPersonnel;
+import static mekhq.utilities.MHQInternationalization.getText;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -166,8 +167,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
 
         JEditorPane infoPane = new JEditorPane();
         infoPane.setContentType("text/html");
-        infoPane.setText("<html><div style='text-align:center'>" +
-                               resourceMap.getString("mapTab.keyText") +
+        infoPane.setText("<html><div style='text-align:center'>" + getText("mapTab.keyText") +
                                "</div></html>");
         infoPane.setEditable(false);
         infoPane.setBorder(null);
