@@ -57,6 +57,7 @@ import megamek.common.UnitType;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Lease;
+import mekhq.campaign.finances.LeaseOrder;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitOrder;
@@ -123,7 +124,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
             Unit unit = campaign.addNewUnit(selectedUnit.getEntity(), false, 0, quality);
             unit.addLease(new Lease(campaign.getLocalDate(), unit));
         } else {
-            Lease thisLease = new Lease(entity, campaign);
+            LeaseOrder thisLease = new LeaseOrder(entity, campaign);
             campaign.getShoppingList().addShoppingItem(thisLease, 1, campaign);
         }
     }
