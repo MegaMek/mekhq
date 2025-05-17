@@ -28,24 +28,23 @@
  */
 package mekhq.campaign.finances;
 
+import static megamek.codeUtilities.MathUtility.clamp;
+import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
+
+import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.util.Objects;
+
 import megamek.common.Compute;
 import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.enums.FinancialTerm;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.PrintWriter;
-import java.time.LocalDate;
-import java.util.Objects;
-
-import static megamek.codeUtilities.MathUtility.clamp;
-import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
-
 /**
- * TODO : Update loan baseline based on latest Campaign Operations Rules
- *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Loan {
@@ -70,20 +69,25 @@ public class Loan {
         // don't do anything, this is for loading
     }
 
-    public Loan(final int principal, final int rate, final int years,
-            final FinancialTerm financialTerm, final int collateral, final LocalDate today) {
+    public Loan(final int principal, final int rate, final int years, final FinancialTerm financialTerm,
+          final int collateral, final LocalDate today) {
         this(Money.of(principal), rate, years, financialTerm, collateral, today);
     }
 
-    public Loan(final Money principal, final int rate, final int years,
-            final FinancialTerm financialTerm, final int collateral, final LocalDate today) {
-        this(FinancialInstitutions.randomFinancialInstitution(today).toString(), randomReferenceNumber(),
-                principal, rate, years, financialTerm, collateral, today);
+    public Loan(final Money principal, final int rate, final int years, final FinancialTerm financialTerm,
+          final int collateral, final LocalDate today) {
+        this(FinancialInstitutions.randomFinancialInstitution(today).toString(),
+              randomReferenceNumber(),
+              principal,
+              rate,
+              years,
+              financialTerm,
+              collateral,
+              today);
     }
 
-    public Loan(final String institution, final String referenceNumber, final Money principal,
-            final int rate, final int years, final FinancialTerm financialTerm,
-            final int collateral, final LocalDate today) {
+    public Loan(final String institution, final String referenceNumber, final Money principal, final int rate,
+          final int years, final FinancialTerm financialTerm, final int collateral, final LocalDate today) {
         setInstitution(institution);
         setReferenceNumber(referenceNumber);
         setPrincipal(principal);
@@ -194,8 +198,7 @@ public class Loan {
     }
 
     public Money determineRemainingValue() {
-        return getPaymentAmount()
-                .multipliedBy(getRemainingPayments());
+        return getPaymentAmount().multipliedBy(getRemainingPayments());
     }
     // endregion Determination Methods
 
@@ -207,9 +210,8 @@ public class Loan {
 
         setRemainingPayments(numberOfPayments);
         if (periodicRate > 0) {
-            setPaymentAmount(getPrincipal()
-                .multipliedBy(periodicRate * Math.pow(1 + periodicRate, numberOfPayments))
-                .dividedBy(Math.pow(1 + periodicRate, numberOfPayments) - 1));
+            setPaymentAmount(getPrincipal().multipliedBy(periodicRate * Math.pow(1 + periodicRate, numberOfPayments))
+                                   .dividedBy(Math.pow(1 + periodicRate, numberOfPayments) - 1));
         } else {
             setPaymentAmount(getPrincipal().dividedBy(numberOfPayments));
         }
@@ -222,43 +224,44 @@ public class Loan {
     }
 
     public boolean checkLoanPayment(final LocalDate today) {
-        return today.equals(getNextPayment())
-                || (today.isAfter(getNextPayment())) && (getRemainingPayments() > 0);
+        return today.equals(getNextPayment()) || (today.isAfter(getNextPayment())) && (getRemainingPayments() > 0);
     }
 
     /**
-     * Computes and returns a base loan object based on the player's rating, the current date,
-     * and campaign-specific conditions such as the Gray Monday event.
+     * Computes and returns a base loan object based on the player's rating, the current date, and campaign-specific
+     * conditions such as the Gray Monday event.
      *
      * <p>This method determines the loan terms that the player is eligible for based on their
-     * performance rating and whether the game is simulating the Gray Monday event. If the
-     * Gray Monday event is active, a special predatory loan with significantly higher interest
-     * rates and penalties is offered. Otherwise, the loan terms are progressively better
-     * as the player's rating improves.</p>
+     * performance rating and whether the game is simulating the Gray Monday event. If the Gray Monday event is active,
+     * a special predatory loan with significantly higher interest rates and penalties is offered. Otherwise, the loan
+     * terms are progressively better as the player's rating improves.</p>
      *
      * <p>The returned {@link Loan} object contains all relevant terms such as the principal,
      * interest rate, repayment duration, financial term, and associated penalty.</p>
      *
-     * @param rating             The player's performance rating as an integer. Defaults to higher
-     *                           loan penalties and stricter terms for lower ratings.
-     * @param simulateGrayMonday A {@code boolean} flag that indicates whether the Gray Monday
-     *                           event is active, which impacts loan terms significantly.
-     * @param date               The current in-game date as a {@link LocalDate} object, used
-     *                           to determine if Gray Monday conditions apply.
+     * @param rating             The player's performance rating as an integer. Defaults to higher loan penalties and
+     *                           stricter terms for lower ratings.
+     * @param simulateGrayMonday A {@code boolean} flag that indicates whether the Gray Monday event is active, which
+     *                           impacts loan terms significantly.
+     * @param campaign           The current campaign object, used for LocalDate to determine if Gray Monday conditions
+     *                           apply and for fetching faction.
      *
-     * @return A {@link Loan} object representing the player's base loan terms based on
-     *         their rating and event conditions.
+     * @return A {@link Loan} object representing the player's base loan terms based on their rating and event
+     *       conditions.
      */
-    public static Loan getBaseLoan(final int rating, boolean simulateGrayMonday, final LocalDate date) {
+    public static Loan getBaseLoan(final int rating, boolean simulateGrayMonday, final Campaign campaign) {
         // we are going to treat the score from StellarOps the same as dragoons score
-        // TODO: pirates and government forces
 
+        LocalDate date = campaign.getLocalDate();
         if (isGrayMonday(date, simulateGrayMonday)) {
             // This simulates the player taking out a predatory loan
             return new Loan(10000000, 60, 1, FinancialTerm.MONTHLY, 100, date);
         }
-
-        if (rating <= 0) {
+        if (campaign.getFaction().isGovernment()) {
+            return new Loan(10000000, 5, 1, FinancialTerm.MONTHLY, 0, date);
+        } else if (campaign.getFaction().isPirate()) {
+            return new Loan(10000000, 50, 1, FinancialTerm.MONTHLY, 100, date);
+        } else if (rating <= 0) {
             return new Loan(10000000, 35, 1, FinancialTerm.MONTHLY, 80, date);
         } else if (rating < 5) {
             return new Loan(10000000, 20, 1, FinancialTerm.MONTHLY, 60, date);
@@ -310,17 +313,35 @@ public class Loan {
      * Determines the maximum number of years by clamping the given rating to a valid range.
      *
      * <p>This method returns a value that ensures the input {@code rating} falls within the specified
-     * range of 1 to 7. Ratings below 1 are clamped to 1, and ratings above 7 are clamped to 7. The
-     * clamped value is directly returned.</p>
+     * range from the loan table. Ratings below 1 are clamped to 1, and ratings above 7 are clamped to 7. The clamped
+     * value is directly returned. The '6 months' period is currently rounded up to 1 year. See CO 4th p50, Loan
+     * Table</p>
+     * <p>TODO: Change slider and results to months to allow for 6 month periods</p>
+     * <br>
      *
-     * <p>The clamped values coincide with the Experience Level ordinals (Ultra-Green, Green, etc).
-     * This means a Veteran-rated campaign (ordinal 4) could take up to a 4-year loan.</p>
+     * @param rating   the input rating value to be clamped.
+     * @param campaign the campaign object for faction type
      *
-     * @param rating the input rating value to be clamped.
      * @return the clamped rating, guaranteed to be a value between 1 and 7 (inclusive).
      */
-    public static int getMaxYears(int rating) {
-        return clamp(rating, 1, 7);
+    public static int getMaxYears(int rating, Campaign campaign) {
+        int paybackPeriod = 1;
+        if (campaign.getFaction().isGovernment()) {
+            paybackPeriod = 10;
+        } else if (campaign.getFaction().isPirate()) {
+            paybackPeriod = 1;
+        } else if (rating <= 0) {
+            paybackPeriod = 1;
+        } else if (rating < 5) {
+            paybackPeriod = 1;
+        } else if (rating < 10) {
+            paybackPeriod = 2;
+        } else if (rating < 14) {
+            paybackPeriod = 3;
+        } else {
+            paybackPeriod = 5;
+        }
+        return clamp(rating, 1, paybackPeriod);
     }
 
     public static int getCollateralIncrement(final int rating, final boolean interestPositive) {
@@ -436,17 +457,17 @@ public class Loan {
         } else if (this == other) {
             return true;
         } else if (other instanceof Loan loan) {
-            return getInstitution().equals(loan.getInstitution())
-                    && getReferenceNumber().equals(loan.getReferenceNumber())
-                    && getPrincipal().equals(loan.getPrincipal())
-                    && (getRate() == loan.getRate())
-                    && (getYears() == loan.getYears())
-                    && (getFinancialTerm() == loan.getFinancialTerm())
-                    && (getCollateral() == loan.getCollateral())
-                    && (getRemainingPayments() == loan.getRemainingPayments())
-                    && getPaymentAmount().equals(loan.getPaymentAmount())
-                    && getNextPayment().isEqual(loan.getNextPayment())
-                    && (isOverdue() == loan.isOverdue());
+            return getInstitution().equals(loan.getInstitution()) &&
+                         getReferenceNumber().equals(loan.getReferenceNumber()) &&
+                         getPrincipal().equals(loan.getPrincipal()) &&
+                         (getRate() == loan.getRate()) &&
+                         (getYears() == loan.getYears()) &&
+                         (getFinancialTerm() == loan.getFinancialTerm()) &&
+                         (getCollateral() == loan.getCollateral()) &&
+                         (getRemainingPayments() == loan.getRemainingPayments()) &&
+                         getPaymentAmount().equals(loan.getPaymentAmount()) &&
+                         getNextPayment().isEqual(loan.getNextPayment()) &&
+                         (isOverdue() == loan.isOverdue());
         } else {
             return false;
         }
@@ -454,8 +475,16 @@ public class Loan {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getInstitution(), getReferenceNumber(), getPrincipal(), getRate(),
-                getYears(), getFinancialTerm(), getCollateral(), getRemainingPayments(),
-                getPaymentAmount(), getNextPayment(), isOverdue());
+        return Objects.hash(getInstitution(),
+              getReferenceNumber(),
+              getPrincipal(),
+              getRate(),
+              getYears(),
+              getFinancialTerm(),
+              getCollateral(),
+              getRemainingPayments(),
+              getPaymentAmount(),
+              getNextPayment(),
+              isOverdue());
     }
 }

@@ -28,7 +28,18 @@
  */
 package mekhq.campaign.finances;
 
+import java.io.FileInputStream;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import javax.xml.parsers.DocumentBuilder;
+
 import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
@@ -44,15 +55,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.xml.parsers.DocumentBuilder;
-import java.io.FileInputStream;
-import java.time.LocalDate;
-import java.util.*;
-
 /**
- * Main class used to handle all money and currency information.
- * Currency information is loaded when this class is first constructed.
- *
+ * Main class used to handle all money and currency information. Currency information is loaded when this class is first
+ * constructed.
+ * <p>
  * There should be only one instance of this class.
  *
  * @author Vicente Cartas Espinel (vicente.cartas at outlook.com)
@@ -66,15 +72,12 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
     private LocalDate lastChecked;
 
     /**
-     * The last planetary system the campaign was on
-     * when the default currency was checked.
+     * The last planetary system the campaign was on when the default currency was checked.
      */
     private PlanetarySystem lastSystem;
 
     /**
-     * A cached default currency. This should be refreshed
-     * any time the date changes or the current location
-     * changes.
+     * A cached default currency. This should be refreshed any time the date changes or the current location changes.
      */
     private Currency defaultCurrency;
 
@@ -95,16 +98,7 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
         this.currencyCodeToNameMap = new HashMap<>();
         this.currencyCodeToSymbolMap = new HashMap<>();
 
-        this.backupCurrency = new Currency(
-                "CSB",
-                -1,
-                0,
-                "ComStar bill",
-                "C-Bill",
-                2835,
-                999999,
-                true,
-                true);
+        this.backupCurrency = new Currency("CSB", -1, 0, "ComStar bill", "C-Bill", 2835, 999999, true, true);
 
         this.createFormatters();
     }
@@ -147,9 +141,9 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
         // planetary system against our cached date and systems
         LocalDate date = campaign.getLocalDate();
         PlanetarySystem currentSystem = this.campaign.getCurrentSystem();
-        if ((lastChecked == null)
-                || this.lastChecked.isBefore(date)
-                || !Objects.equals(this.lastSystem, currentSystem)) {
+        if ((lastChecked == null) ||
+                  this.lastChecked.isBefore(date) ||
+                  !Objects.equals(this.lastSystem, currentSystem)) {
             this.lastChecked = date;
             this.lastSystem = currentSystem;
             this.defaultCurrency = this.backupCurrency;
@@ -172,10 +166,9 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
             // Use the currency of the Faction in any of our contracts, if it exists
             for (Contract contract : this.campaign.getActiveContracts()) {
                 if (contract instanceof AtBContract) {
-                    Currency currency = possibleCurrencies.getOrDefault(
-                            Factions.getInstance().getFaction(((AtBContract) contract).getEmployerCode())
-                                    .getCurrencyCode(),
-                            null);
+                    Currency currency = possibleCurrencies.getOrDefault(Factions.getInstance()
+                                                                              .getFaction(((AtBContract) contract).getEmployerCode())
+                                                                              .getCurrencyCode(), null);
 
                     if (currency != null) {
                         return defaultCurrency = currency;
@@ -208,8 +201,7 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
             DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
 
             // Parse using builder to get DOM representation of the XML file
-            try (FileInputStream xmlFile = new FileInputStream("data/universe/currencies.xml")) { // TODO : Remove
-                                                                                                  // inline file path
+            try (FileInputStream xmlFile = new FileInputStream(MHQConstants.FINANCIAL_CURRENCIES_FILE_PATH)) {
                 Document xmlDoc = db.parse(xmlFile);
 
                 Element root = xmlDoc.getDocumentElement();
@@ -218,8 +210,7 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
 
                 for (int i = 0; i < currencies.getLength(); i++) {
                     String name = "", code = "", symbol = "";
-                    int numericCurrencyCode = -1, decimalPlaces = 0, startYear = Integer.MAX_VALUE,
-                            endYear = Integer.MIN_VALUE;
+                    int numericCurrencyCode = -1, decimalPlaces = 0, startYear = Integer.MAX_VALUE, endYear = Integer.MIN_VALUE;
                     boolean isDefault = false, isBackup = false;
 
                     NodeList currencyData = currencies.item(i).getChildNodes();
@@ -277,16 +268,15 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
                         startYear = endYear;
                     }
 
-                    Currency currency = new Currency(
-                            code,
-                            numericCurrencyCode,
-                            decimalPlaces,
-                            name,
-                            symbol,
-                            startYear,
-                            endYear,
-                            isDefault,
-                            isBackup);
+                    Currency currency = new Currency(code,
+                          numericCurrencyCode,
+                          decimalPlaces,
+                          name,
+                          symbol,
+                          startYear,
+                          endYear,
+                          isDefault,
+                          isBackup);
                     this.currencies.add(currency);
                     this.currencyCodeToNameMap.put(code, name);
                     this.currencyCodeToSymbolMap.put(code, symbol);
@@ -304,24 +294,19 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
     }
 
     private void createFormatters() {
-        this.uiAmountPrinter = new MoneyFormatterBuilder()
-                .appendAmountLocalized()
-                .toFormatter();
+        this.uiAmountPrinter = new MoneyFormatterBuilder().appendAmountLocalized().toFormatter();
 
-        this.xmlMoneyFormatter = new MoneyFormatterBuilder()
-                .append(new XmlMoneyWriter(), new XmlMoneyParser())
-                .toFormatter();
+        this.xmlMoneyFormatter = new MoneyFormatterBuilder().append(new XmlMoneyWriter(), new XmlMoneyParser())
+                                       .toFormatter();
 
-        this.uiAmountAndSymbolPrinter = new MoneyFormatterBuilder()
-                .appendAmountLocalized()
-                .appendLiteral(" ")
-                .append(new CurrencyDataLookupWriter(this.currencyCodeToSymbolMap), null)
-                .toFormatter();
+        this.uiAmountAndSymbolPrinter = new MoneyFormatterBuilder().appendAmountLocalized()
+                                              .appendLiteral(" ")
+                                              .append(new CurrencyDataLookupWriter(this.currencyCodeToSymbolMap), null)
+                                              .toFormatter();
 
-        this.uiAmountAndNamePrinter = new MoneyFormatterBuilder()
-                .appendAmountLocalized()
-                .appendLiteral(" ")
-                .append(new CurrencyDataLookupWriter(this.currencyCodeToNameMap), null)
-                .toFormatter();
+        this.uiAmountAndNamePrinter = new MoneyFormatterBuilder().appendAmountLocalized()
+                                            .appendLiteral(" ")
+                                            .append(new CurrencyDataLookupWriter(this.currencyCodeToNameMap), null)
+                                            .toFormatter();
     }
 }
