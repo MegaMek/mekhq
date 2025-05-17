@@ -53,7 +53,7 @@ public class Lease {
      *
      * @param time The current campaign LocalDate
      */
-    public Money getLeaseCost(LocalDate time) {
+    public Money getLeaseCostNow(LocalDate time) {
         if (getLeaseStart().isBefore(time)) {
             if (isLeaseFirstMonth(time.minusDays(1))) {
                 return getFirstLeaseCost(time);
