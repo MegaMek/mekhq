@@ -46,6 +46,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
 
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.swing.util.UIUtil;
@@ -152,11 +153,9 @@ public class EquipmentAndSuppliesTab {
     private JSpinner[] spnPlanetAcquireTechBonus;
 
     private JPanel pnlIndustryModifiers;
-    private JLabel[] lblPlanetAcquireIndustryBonus;
     private JSpinner[] spnPlanetAcquireIndustryBonus;
 
     private JPanel pnlOutputModifiers;
-    private JLabel[] lblPlanetAcquireOutputBonus;
     private JSpinner[] spnPlanetAcquireOutputBonus;
     //end Planetary Acquisition Tab
 
@@ -236,11 +235,9 @@ public class EquipmentAndSuppliesTab {
         spnPlanetAcquireTechBonus = new JSpinner[PlanetarySophistication.values().length];
 
         pnlIndustryModifiers = new JPanel();
-        lblPlanetAcquireIndustryBonus = new JLabel[PlanetaryRating.values().length];
         spnPlanetAcquireIndustryBonus = new JSpinner[PlanetaryRating.values().length];
 
         pnlOutputModifiers = new JPanel();
-        lblPlanetAcquireOutputBonus = new JLabel[PlanetaryRating.values().length];
         spnPlanetAcquireOutputBonus = new JSpinner[PlanetaryRating.values().length];
     }
 
@@ -724,6 +721,7 @@ public class EquipmentAndSuppliesTab {
             String techModifierLabel = sophistication.getName();
             lblPlanetAcquireTechBonus[i] = new JLabel(String.format("<html>%s</html>",
                 techModifierLabel));
+            lblPlanetAcquireTechBonus[i].setHorizontalAlignment(SwingConstants.RIGHT);
             lblPlanetAcquireTechBonus[i].addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
                   "TechLabel"));
             spnPlanetAcquireTechBonus[i] = new JSpinner(new SpinnerNumberModel(
@@ -736,19 +734,11 @@ public class EquipmentAndSuppliesTab {
         i = 0;
         for (PlanetaryRating rating : PlanetaryRating.values()) {
             String modifierLabel = rating.getName();
-            lblPlanetAcquireIndustryBonus[i] = new JLabel(String.format("<html>%s</html>",
-                modifierLabel));
-            lblPlanetAcquireIndustryBonus[i].addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
-                  "IndustryLabel"));
             spnPlanetAcquireIndustryBonus[i] = new JSpinner(new SpinnerNumberModel(
                 0, -12, 12, 1));
             spnPlanetAcquireIndustryBonus[i].addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
                   "IndustryLabel"));
             setSpinnerWidth(spnPlanetAcquireIndustryBonus[i]);
-            lblPlanetAcquireOutputBonus[i] = new JLabel(String.format("<html>%s</html>",
-                modifierLabel));
-            lblPlanetAcquireOutputBonus[i].addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
-                  "OutputLabel"));
             spnPlanetAcquireOutputBonus[i] = new JSpinner(new SpinnerNumberModel(
                 0, -12, 12, 1));
             spnPlanetAcquireOutputBonus[i].addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
@@ -765,6 +755,7 @@ public class EquipmentAndSuppliesTab {
         final JPanel panel = new CampaignOptionsStandardPanel("PlanetaryAcquisitionTabModifiers",
             true, "ModifiersPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+
         layout.anchor = GridBagConstraints.NORTH;
         layout.gridx = 0;
         layout.gridy = 0;
@@ -787,6 +778,7 @@ public class EquipmentAndSuppliesTab {
      */
     private JPanel createTechModifiersPanel() {
         JLabel techLabel = new CampaignOptionsLabel("TechLabel");
+        techLabel.setHorizontalAlignment(SwingConstants.CENTER);
         techLabel.addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader, "TechLabel"));
 
 
@@ -818,6 +810,17 @@ public class EquipmentAndSuppliesTab {
         return panel;
     }
 
+    private int getSpinnerHeight() {
+        int spinnerHeight = 0;
+        if (spnPlanetAcquireIndustryBonus != null && spnPlanetAcquireIndustryBonus.length > 0 && spnPlanetAcquireIndustryBonus[0] != null) {
+            spinnerHeight = spnPlanetAcquireIndustryBonus[0].getPreferredSize().height;
+        } else {
+            //fallback
+            spinnerHeight = new JSpinner().getPreferredSize().height; 
+        }
+        return spinnerHeight;
+    }
+
     /**
      * Creates and configures a {@code JPanel} that serves as the Industry Modifiers Panel.
      * The panel contains labels and spinners arranged in a grid layout to display
@@ -828,6 +831,7 @@ public class EquipmentAndSuppliesTab {
      */
     private JPanel createIndustryModifiersPanel() {
         JLabel industryLabel = new CampaignOptionsLabel("IndustryLabel");
+        industryLabel.setHorizontalAlignment(SwingConstants.CENTER);
         industryLabel.addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader, "IndustryLabel"));
 
         // Layout the Panel
@@ -837,15 +841,17 @@ public class EquipmentAndSuppliesTab {
         // Add the label
         layout.gridx = 0;
         layout.gridy = 0;
-        layout.gridwidth = 2;
+        layout.gridwidth = 1;
         layout.weightx = 1.0;
         panel.add(industryLabel, layout);
         layout.gridx = 0;
         layout.gridy = 1;
-        layout.gridwidth = 2;
+        layout.gridwidth = 1;
         layout.weightx = 0;
         layout.anchor = GridBagConstraints.WEST;
-        panel.add(new JLabel(""), layout);
+        JPanel spacer = new JPanel();
+        spacer.setPreferredSize(new Dimension(1, getSpinnerHeight()));
+        panel.add(spacer, layout);
         // Add the other elements
         for (int i = 0; i < PlanetaryRating.values().length; i++) {
             layout.gridx = 0;
@@ -853,11 +859,16 @@ public class EquipmentAndSuppliesTab {
             layout.gridwidth = 1;
             layout.weightx = 0;
             layout.anchor = GridBagConstraints.WEST;
-            panel.add(lblPlanetAcquireIndustryBonus[i], layout);
-
-            layout.gridx++;
             panel.add(spnPlanetAcquireIndustryBonus[i], layout);
         }
+
+        // Filler
+        layout.gridx = 0;
+        layout.gridy = PlanetaryRating.values().length + 2;
+        layout.gridwidth = 1;
+        JPanel bottomSpacer = new JPanel();
+        bottomSpacer.setPreferredSize(new Dimension(1, getSpinnerHeight()));
+        panel.add(bottomSpacer, layout);
 
         return panel;
     }
@@ -871,25 +882,28 @@ public class EquipmentAndSuppliesTab {
      */
     private JPanel createOutputModifiersPanel() {
         JLabel outputLabel = new CampaignOptionsLabel("OutputLabel");
+        outputLabel.setHorizontalAlignment(SwingConstants.CENTER);
         outputLabel.addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader, "OutputLabel"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("OutputModifiersPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
         // Add the label
         layout.gridx = 0;
         layout.gridy = 0;
-        layout.gridwidth = 2;
+        layout.gridwidth = 1;
         layout.weightx = 1.0;
         panel.add(outputLabel, layout);
 
         layout.gridx = 0;
         layout.gridy = 1;
-        layout.gridwidth = 2;
+        layout.gridwidth = 1;
         layout.weightx = 0;
         layout.anchor = GridBagConstraints.WEST;
-        panel.add(new JLabel(""), layout);
+        JPanel spacer = new JPanel();
+        spacer.setPreferredSize(new Dimension(1, getSpinnerHeight()));
+        panel.add(spacer, layout);
+
         // Add the other elements
         for (int i = 0; i < PlanetaryRating.values().length; i++) {
             layout.gridx = 0;
@@ -897,11 +911,16 @@ public class EquipmentAndSuppliesTab {
             layout.gridwidth = 1;
             layout.weightx = 0;
             layout.anchor = GridBagConstraints.WEST;
-            panel.add(lblPlanetAcquireOutputBonus[i], layout);
-
-            layout.gridx++;
             panel.add(spnPlanetAcquireOutputBonus[i], layout);
         }
+
+        // Filler
+        layout.gridx = 0;
+        layout.gridy = PlanetaryRating.values().length + 2;
+        layout.gridwidth = 1;
+        JPanel bottomSpacer = new JPanel();
+        bottomSpacer.setPreferredSize(new Dimension(1, getSpinnerHeight()));
+        panel.add(bottomSpacer, layout);
 
         return panel;
     }
