@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.HyperlinkEvent;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
@@ -69,6 +70,7 @@ import mekhq.campaign.report.PersonnelReport;
 import mekhq.campaign.report.TransportReport;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.adapter.ProcurementTableMouseAdapter;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 import mekhq.gui.dialog.AcquisitionsDialog;
 import mekhq.gui.dialog.MRMSDialog;
 import mekhq.gui.dialog.MekHQUnitSelectorDialog;
@@ -224,9 +226,26 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.weighty = 0.0;
         panCommand.add(panIcon, gridBagConstraints);
 
+        JEditorPane infoPane = new JEditorPane();
+        infoPane.setContentType("text/html");
+        infoPane.setText("<html><div style='text-align:center'>" +
+                               resourceMap.getString("commandCenterTab.keyText") +
+                               "</div></html>");
+        infoPane.setEditable(false);
+        infoPane.setBorder(null);
+        infoPane.setOpaque(false);
+        infoPane.addHyperlinkListener(evt -> {
+            if (evt.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                ImmersiveDialogCore.handleImmersiveHyperlinkClick(null, getCampaign(), evt.getDescription());
+            }
+        });
+
+        JPanel southPanel = new JPanel(new BorderLayout());
+        southPanel.add(infoPane, BorderLayout.CENTER);
+
         setLayout(new BorderLayout());
         add(panCommand, BorderLayout.CENTER);
-
+        add(southPanel, BorderLayout.SOUTH);
     }
 
     private void initInfoPanel() {
