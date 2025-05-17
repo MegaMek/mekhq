@@ -32,6 +32,8 @@
  */
 package mekhq.gui;
 
+import static mekhq.utilities.MHQInternationalization.getText;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -48,6 +50,7 @@ import java.util.UUID;
 import javax.swing.*;
 import javax.swing.RowSorter.SortKey;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
@@ -75,6 +78,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
 import mekhq.gui.adapter.ServicedUnitsTableMouseAdapter;
 import mekhq.gui.adapter.TaskTableMouseAdapter;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 import mekhq.gui.dialog.AcquisitionsDialog;
 import mekhq.gui.dialog.MRMSDialog;
 import mekhq.gui.enums.MHQTabType;
@@ -148,7 +152,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
               MekHQ.getMHQOptions().getLocale());
         GridBagConstraints gridBagConstraints;
 
-        setLayout(new GridLayout());
+        setLayout(new BorderLayout());
 
         JPanel panServicedUnits = new JPanel(new GridBagLayout());
 
@@ -463,6 +467,31 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         add(panServicedUnits);
         add(panTasks);
         add(panTechs);
+
+        JPanel centerPanel = new JPanel(new GridLayout(1, 3));
+        centerPanel.add(panServicedUnits);
+        centerPanel.add(panTasks);
+        centerPanel.add(panTechs);
+
+        JEditorPane infoPanelEditorPane = new JEditorPane();
+        infoPanelEditorPane.setContentType("text/html");
+        infoPanelEditorPane.setText("<html><div style='text-align:center'>" +
+                                          getText("repairTab.keyText") +
+                                          "</div></html>");
+        infoPanelEditorPane.setEditable(false);
+        infoPanelEditorPane.setBorder(null);
+        infoPanelEditorPane.setOpaque(false);
+        infoPanelEditorPane.addHyperlinkListener(evt -> {
+            if (evt.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                ImmersiveDialogCore.handleImmersiveHyperlinkClick(null, getCampaign(), evt.getDescription());
+            }
+        });
+
+        JPanel southPanel = new JPanel(new BorderLayout());
+        southPanel.add(infoPanelEditorPane, BorderLayout.CENTER);
+
+        add(centerPanel, BorderLayout.CENTER);
+        add(southPanel, BorderLayout.SOUTH);
 
         filterTechs();
     }
