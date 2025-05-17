@@ -44,6 +44,7 @@ import megamek.codeUtilities.ObjectUtility;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.common.ITechnology.TechRating;
+import megamek.common.annotations.Nullable;
 import megamek.common.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.campaign.CampaignOptions;
@@ -592,7 +593,7 @@ public class Planet {
     /**
      * Returns the equipment technology rating of the planet based on its sophistication.
      */
-    public TechRating getTechRating(LocalDate when) {
+    public @Nullable TechRating getTechRating(LocalDate when) {
         return getSocioIndustrial(when).getEquipmentTechRating();
     }
 

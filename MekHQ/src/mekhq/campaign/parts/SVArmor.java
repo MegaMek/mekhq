@@ -208,12 +208,7 @@ public class SVArmor extends Armor {
                         bar = Integer.parseInt(wn.getTextContent());
                         break;
                     case "techRating":
-                        for (int r = 0; r < ratingNames.length; r++) {
-                            if (ratingNames[r].equals(wn.getTextContent())) {
-                                techRating = r;
-                                break;
-                            }
-                        }
+                        techRating = TechRating.fromName(wn.getTextContent());
                         break;
                 }
             } catch (Exception e) {

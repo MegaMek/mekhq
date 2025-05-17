@@ -64,13 +64,13 @@ public class PlanetarySystem {
     
     // --- Sophistication Rating Enum ---
     public enum PlanetarySophistication {
-        ADVANCED(-1, "Advanced"),
-        A(0, "A"),
-        B(1, "B"),
-        C(2, "C"),
-        D(3, "D"),
-        F(4, "F"),
-        REGRESSED(5, "Regressed");
+        ADVANCED(0, "Advanced"),
+        A(1, "A"),
+        B(2, "B"),
+        C(3, "C"),
+        D(4, "D"),
+        F(5, "F"),
+        REGRESSED(6, "Regressed");
 
         private final int index;
         private final String name;

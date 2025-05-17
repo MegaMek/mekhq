@@ -189,12 +189,7 @@ public class SVEnginePart extends Part {
                         etype = Integer.parseInt(wn.getTextContent());
                         break;
                     case NODE_TECH_RATING:
-                        for (int i = 0; i < ratingNames.length; i++) {
-                            if (ratingNames[i].equals(wn.getTextContent())) {
-                                techRating = i;
-                                break;
-                            }
-                        }
+                        techRating = TechRating.fromName(wn.getTextContent());
                         break;
                     case NODE_FUEL_TYPE:
                         fuelType = FuelType.valueOf(wn.getTextContent());

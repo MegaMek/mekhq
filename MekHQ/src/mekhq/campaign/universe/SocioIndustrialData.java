@@ -34,6 +34,7 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
 import megamek.common.ITechnology;
 import megamek.common.ITechnology.TechRating;
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 
@@ -52,7 +53,7 @@ public class SocioIndustrialData {
         sophisticationToTechRating.put(PlanetarySophistication.C, TechRating.C);
         sophisticationToTechRating.put(PlanetarySophistication.D, TechRating.B);
         sophisticationToTechRating.put(PlanetarySophistication.F, TechRating.A);
-        sophisticationToTechRating.put(PlanetarySophistication.REGRESSED, TechRating.X);
+        sophisticationToTechRating.put(PlanetarySophistication.REGRESSED, null); // Regressed worlds are regressed by any scale (CampaignOps p.51)
         NONE.tech = PlanetarySophistication.REGRESSED;
         NONE.industry = PlanetaryRating.F;
         NONE.rawMaterials = PlanetaryRating.F;
@@ -202,7 +203,7 @@ public class SocioIndustrialData {
      * USILR D to Tech Rating B, and USILR F to Tech Rating A.
      * A Regressed world remains regressed by any scale, while Advanced corresponds to Tech Rating F.
      */
-    public TechRating getEquipmentTechRating() {
+    public @Nullable TechRating getEquipmentTechRating() {
         return sophisticationToTechRating.get(tech);
     }
 
