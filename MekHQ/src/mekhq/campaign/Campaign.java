@@ -8584,7 +8584,7 @@ public class Campaign implements ITechManager {
      * configuration for transit time.
      * </p>
      *
-     * @param techRating the TechRating of the part
+     * @param availability the Availability of the part
      *
      * @return the number of days required for the parts or units to arrive based on the calculated transit time.
      */
