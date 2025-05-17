@@ -49,10 +49,7 @@ import javax.swing.SpinnerNumberModel;
 
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.swing.util.UIUtil;
-import megamek.common.EquipmentType;
-import megamek.common.ITechnology;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
-import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.CampaignOptions;
@@ -760,20 +757,20 @@ public class EquipmentAndSuppliesTab {
             i++;
         }
         // Panels
-        pnlIndustryModifiers = createIndustryModifiersPanel();
         pnlTechModifiers = createTechModifiersPanel();
+        pnlIndustryModifiers = createIndustryModifiersPanel();
         pnlOutputModifiers = createOutputModifiersPanel();
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PlanetaryAcquisitionTabModifiers",
             true, "ModifiersPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
+        layout.anchor = GridBagConstraints.NORTH;
         layout.gridx = 0;
         layout.gridy = 0;
-        panel.add(pnlIndustryModifiers, layout);
-        layout.gridx++;
         panel.add(pnlTechModifiers, layout);
+        layout.gridx++;
+        panel.add(pnlIndustryModifiers, layout);
         layout.gridx++;
         panel.add(pnlOutputModifiers, layout);
 
@@ -843,11 +840,16 @@ public class EquipmentAndSuppliesTab {
         layout.gridwidth = 2;
         layout.weightx = 1.0;
         panel.add(industryLabel, layout);
-
+        layout.gridx = 0;
+        layout.gridy = 1;
+        layout.gridwidth = 2;
+        layout.weightx = 0;
+        layout.anchor = GridBagConstraints.WEST;
+        panel.add(new JLabel(""), layout);
         // Add the other elements
         for (int i = 0; i < PlanetaryRating.values().length; i++) {
             layout.gridx = 0;
-            layout.gridy = i + 1;
+            layout.gridy = i + 2;
             layout.gridwidth = 1;
             layout.weightx = 0;
             layout.anchor = GridBagConstraints.WEST;
@@ -882,10 +884,16 @@ public class EquipmentAndSuppliesTab {
         layout.weightx = 1.0;
         panel.add(outputLabel, layout);
 
+        layout.gridx = 0;
+        layout.gridy = 1;
+        layout.gridwidth = 2;
+        layout.weightx = 0;
+        layout.anchor = GridBagConstraints.WEST;
+        panel.add(new JLabel(""), layout);
         // Add the other elements
         for (int i = 0; i < PlanetaryRating.values().length; i++) {
             layout.gridx = 0;
-            layout.gridy = i + 1;
+            layout.gridy = i + 2;
             layout.gridwidth = 1;
             layout.weightx = 0;
             layout.anchor = GridBagConstraints.WEST;
