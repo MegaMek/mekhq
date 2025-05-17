@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -30,31 +30,29 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.market;
+package mekhq.campaign.market.personnelMarket.records;
 
-import java.util.ArrayList;
-import java.util.List;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 
-import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Person;
-import mekhq.module.api.PersonnelMarketMethod;
-
-@Deprecated(since = "0.50.06", forRemoval = false)
-public class PersonnelMarketDisabled implements PersonnelMarketMethod {
-
-
-    @Override
-    public String getModuleName() {
-        return "Disabled";
-    }
-
-    @Override
-    public List<Person> generatePersonnelForDay(Campaign c) {
-        return new ArrayList<Person>();
-    }
-
-    @Override
-    public List<Person> removePersonnelForDay(Campaign c, List<Person> current) {
-        return new ArrayList<Person>();
-    }
+/**
+ * Represents an entry in the personnel market configuration.
+ *
+ * <p>Each entry defines the parameters for generating personnel of a specific role/profession, along with its
+ * frequency, availability period, and possible fallback category.</p>
+ *
+ * <p>Immutable data container for use in generating market applicants.</p>
+ *
+ * @param weight             The selection weight for random applicant generation.
+ * @param profession         The personnel role this entry produces.
+ * @param count              Maximum number of applicants generated per batch for this entry.
+ * @param introductionYear   Year this profession becomes available.
+ * @param extinctionYear     Last year this profession remains available.
+ * @param fallbackProfession Alternate role to use if this one is unavailable.
+ *
+ * @author Illiani
+ * @since 0.50.06
+ */
+public record PersonnelMarketEntry(int weight, PersonnelRole profession, int count, int introductionYear,
+      int extinctionYear, PersonnelRole fallbackProfession) {
 }
+

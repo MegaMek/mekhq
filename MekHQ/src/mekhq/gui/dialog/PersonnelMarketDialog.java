@@ -89,6 +89,7 @@ import mekhq.gui.view.PersonViewPanel;
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com) (code borrowed heavily from MegaMekLab UnitSelectorDialog
  */
+@Deprecated(since = "0.50.06", forRemoval = false)
 public class PersonnelMarketDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(PersonnelMarketDialog.class);
 
