@@ -49,6 +49,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 import javax.swing.*;
+import javax.swing.event.HyperlinkEvent;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
@@ -97,6 +98,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.adapter.ScenarioTableMouseAdapter;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.dialog.CompleteMissionDialog;
 import mekhq.gui.dialog.CustomizeAtBContractDialog;
@@ -350,8 +352,26 @@ public final class BriefingTab extends CampaignGuiTab {
         splitBrief.setResizeWeight(0.5);
         splitBrief.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, ev -> refreshScenarioView());
 
+        // === Add info panel at the bottom (center aligned) ===
+        JEditorPane infoPane = new JEditorPane();
+        infoPane.setContentType("text/html");
+        infoPane.setText("<html><div style='text-align:center'>" +
+                               resourceMap.getString("missionTab.keyText") +
+                               "</div></html>");
+        infoPane.setEditable(false);
+        infoPane.setBorder(null);
+        infoPane.setOpaque(false);
+        infoPane.addHyperlinkListener(evt -> {
+            if (evt.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                ImmersiveDialogCore.handleImmersiveHyperlinkClick(null, getCampaign(), evt.getDescription());
+            }
+        });
+        JPanel southPanel = new JPanel(new BorderLayout());
+        southPanel.add(infoPane, BorderLayout.CENTER);
+
         setLayout(new BorderLayout());
         add(splitBrief, BorderLayout.CENTER);
+        add(southPanel, BorderLayout.SOUTH); // Add bottom info panel
     }
 
     private void addMission() {
