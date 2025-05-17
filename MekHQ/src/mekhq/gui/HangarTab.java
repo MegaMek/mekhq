@@ -32,6 +32,9 @@
  */
 package mekhq.gui;
 
+import static mekhq.utilities.MHQInternationalization.getText;
+
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -42,6 +45,7 @@ import java.util.ResourceBundle;
 import java.util.UUID;
 import javax.swing.*;
 import javax.swing.RowSorter.SortKey;
+import javax.swing.event.HyperlinkEvent;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
@@ -62,6 +66,7 @@ import mekhq.campaign.event.*;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.gui.adapter.UnitTableMouseAdapter;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
@@ -210,13 +215,36 @@ public final class HangarTab extends CampaignGuiTab {
 
         JScrollPane scrollUnitTable = new JScrollPaneWithSpeed(unitTable);
 
+        JEditorPane infoPanelEditorPane = new JEditorPane();
+        infoPanelEditorPane.setContentType("text/html");
+        infoPanelEditorPane.setText("<html><div style='text-align:center'>" +
+                                          getText("hangarTab.keyText") +
+                                          "</div></html>");
+        infoPanelEditorPane.setEditable(false);
+        infoPanelEditorPane.setBorder(null);
+        infoPanelEditorPane.setOpaque(false);
+        infoPanelEditorPane.addHyperlinkListener(evt -> {
+            if (evt.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                ImmersiveDialogCore.handleImmersiveHyperlinkClick(null, getCampaign(), evt.getDescription());
+            }
+        });
+        JPanel southPanel = new JPanel(new BorderLayout());
+        southPanel.add(infoPanelEditorPane, BorderLayout.CENTER);
+
+        JPanel infoPanelWrapper = new JPanel(new BorderLayout());
+        infoPanelWrapper.add(infoPanelEditorPane, BorderLayout.CENTER);
+
+        JPanel tableAndInfoPanel = new JPanel(new BorderLayout());
+        tableAndInfoPanel.add(scrollUnitTable, BorderLayout.CENTER);
+        tableAndInfoPanel.add(infoPanelWrapper, BorderLayout.SOUTH);
+
         scrollUnitView = new JScrollPaneWithSpeed();
         scrollUnitView.setMinimumSize(new Dimension(UNIT_VIEW_WIDTH, 600));
         scrollUnitView.setPreferredSize(new Dimension(UNIT_VIEW_WIDTH, 600));
         scrollUnitView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollUnitView.setViewportView(null);
 
-        splitUnit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollUnitTable, scrollUnitView);
+        splitUnit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, tableAndInfoPanel, scrollUnitView);
         splitUnit.setOneTouchExpandable(true);
         splitUnit.setResizeWeight(1.0);
         splitUnit.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, pce -> refreshUnitView());
