@@ -30,10 +30,6 @@ package mekhq.campaign.unit;
 
 import java.io.PrintWriter;
 
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.*;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.logging.MMLogger;
@@ -44,6 +40,9 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * We use an extension of unit to create a unit order acquisition work
@@ -114,6 +113,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
 
     /**
      * @param quantity - the number of parts of this type
+     *
      * @return a string that gives a grammatical correct name based on the quantity
      */
     @Override
@@ -193,18 +193,23 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
     public String find(int transitDays) {
         // TODO: probably get a duplicate entity
         if (getCampaign().getQuartermaster().buyUnit((Entity) getNewEquipment(), transitDays)) {
-            return "<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor()
-                    + "'><b> unit found</b>.</font> It will be delivered in " + transitDays + " days.";
+            return "<font color='" +
+                         MekHQ.getMHQOptions().getFontColorPositiveHexColor() +
+                         "'><b> unit found</b>.</font> It will be delivered in " +
+                         transitDays +
+                         " days.";
         } else {
-            return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
-                    + "'><b> You cannot afford this unit. Transaction cancelled</b>.</font>";
+            return "<font color='" +
+                         MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                         "'><b> You cannot afford this unit. Transaction cancelled</b>.</font>";
         }
     }
 
     @Override
     public String failToFind() {
-        return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
-                + "'><b> unit not found</b>.</font>";
+        return "<font color='" +
+                     MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                     "'><b> unit not found</b>.</font>";
     }
 
     @Override
@@ -219,7 +224,88 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
             target.addModifier(getCampaign().getCampaignOptions().getIsAcquisitionPenalty(), "Inner Sphere tech");
         }
         // TODO: Fix weight classes
-        // TODO: aero large craft
+        if (entity instanceof Dropship || entity instanceof Jumpship) {
+            //FIXME ?
+            /* In theory, these should be the base target numbers of these vehicles. The base TNs in the book are
+             * static and don't adjust for Admin skill or anything. This doesn't match our usage of skills such as
+             * Administration to find vehicles. Instead, we're going to just kind of assume they 'intended'
+             * a base TN of 7 and adjust for windage.
+             *
+             */
+            if (entity instanceof SpaceStation) {
+                target.addModifier((int) Math.ceil(entity.getCost(false) / 50000000) + 5 - 7, "Spacestation Base");
+            } else if (entity instanceof Warship) {
+                double collars = ((Warship) entity).getDockingCollars().size();
+                target.addModifier((int) (Math.ceil(Math.sqrt(entity.getWeight() / 5000)) +
+                                                Math.ceil(Math.sqrt(collars))) - 7, "Warship Base");
+            } else if (entity instanceof Dropship) {
+                target.addModifier((int) Math.ceil(entity.getCost(false) / 50000000) + 5 - 7, "Dropship Base");
+            } else {
+                int collars = ((Jumpship) entity).getDockingCollars().size();
+                target.addModifier((int) Math.ceil(entity.getCost(false) / 100000000) + collars - 7, "Jumpship Base");
+            }
+
+            // Since the actual rules are ambiguous, I'm using the tech level as a stand-in for 'uniqueness'
+            // 1 is 'common' and 5 is 'experimental' according to enums
+            // However, almost all Dropships are 'D' techlevel, so... a better solution could be found.
+
+            int techLevel = entity.getTechLevel(getCampaign().getGameYear());
+            switch (techLevel) {
+                case 1:
+                    target.addModifier(-1, "Common");
+                    break;
+                case 2:
+                    target.addModifier(0, "Average");
+                    break;
+                case 3:
+                    target.addModifier(3, "Rare");
+                    break;
+                case 4:
+                    target.addModifier(6, "Very Rare");
+                    break;
+                case 5:
+                default:
+                    target.addModifier(10, "Unique");
+
+            }
+            // Other Misc Mods
+            if (getCampaign().isClanCampaign()) {
+                target.addModifier(-4, "Clan Force");
+            } else if (getCampaign().getFaction().isGovernment()) {
+                target.addModifier(-2, "Government");
+            }
+            if (entity.isMilitary()) {
+                target.addModifier(1, "Military Vessel");
+            }
+            // Couldn't find any field which faction manufacturers which dropship/jumpship, so we can't compare
+            // the 'is this a different faction' part. We're already penalizing Clan purchases so that would be
+            // double-dipping.
+
+            //Eras
+            int year = getCampaign().getGameYear();
+            if (year > 3084) {
+                target.addModifier(0, "Era");
+            } else if (year > 3068) {
+                target.addModifier(-2, "Era");
+            } else if (year > 3050) {
+                target.addModifier(-1, "Era");
+            } else if (year > 2901) {
+                target.addModifier(+0, "Era");
+            } else if (year > 2821) {
+                target.addModifier(-2, "Era");
+            } else if (year > 2751) {
+                target.addModifier(-6, "Era");
+            } else if (year > 2651) {
+                target.addModifier(-6, "Era");
+            } else if (year > 2571) {
+                target.addModifier(-5, "Era");
+            } else if (year > 2412) {
+                target.addModifier(-4, "Era");
+            } else {
+                target.addModifier(-3, "Era");
+            }
+            return target;
+        }
         // TODO: support vehicles
         // see EntityWeightClass.java in megamek for weight classes
         if (entity instanceof Mek) {
@@ -315,8 +401,9 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
 
     @Override
     public int getAvailability() {
-        return calcYearAvailability(getCampaign().getGameYear(), getCampaign().useClanTechBase(),
-                getCampaign().getTechFaction());
+        return calcYearAvailability(getCampaign().getGameYear(),
+              getCampaign().useClanTechBase(),
+              getCampaign().getTechFaction());
     }
 
     @Override
