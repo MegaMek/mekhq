@@ -352,7 +352,6 @@ public final class BriefingTab extends CampaignGuiTab {
         splitBrief.setResizeWeight(0.5);
         splitBrief.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, ev -> refreshScenarioView());
 
-        // === Add info panel at the bottom (center aligned) ===
         JEditorPane infoPane = new JEditorPane();
         infoPane.setContentType("text/html");
         infoPane.setText("<html><div style='text-align:center'>" +

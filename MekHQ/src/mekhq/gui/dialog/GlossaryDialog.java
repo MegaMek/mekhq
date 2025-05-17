@@ -33,7 +33,6 @@
 package mekhq.gui.dialog;
 
 import static java.lang.Math.round;
-import static javax.swing.BorderFactory.createEmptyBorder;
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
 import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.handleImmersiveHyperlinkClick;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -41,20 +40,20 @@ import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Point;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import javax.swing.JDialog;
-import javax.swing.JEditorPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
+import java.util.List;
+import javax.swing.*;
 import javax.swing.event.HyperlinkEvent.EventType;
 
 import megamek.client.ui.swing.util.UIUtil;
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.universe.Factions;
 
 /**
  * The {@code GlossaryDialog} class represents a dialog window for displaying glossary entries. It displays detailed
@@ -76,6 +75,84 @@ public class GlossaryDialog extends JDialog {
     private int PADDING = UIUtil.scaleForGUI(10);
 
     private final String GLOSSARY_BUNDLE = "mekhq.resources.Glossary";
+
+    private final List<String> FACTION_CODES_FOR_IMAGE = List.of("ARC",
+          "ARD",
+          "CDP",
+          "CC",
+          "CIR",
+          "CBS",
+          "CB",
+          "CCC",
+          "CCO",
+          "CFM",
+          "CGB",
+          "CGS",
+          "CHH",
+          "CIH",
+          "CJF",
+          "CMG",
+          "CNC",
+          "CDS",
+          "CSJ",
+          "CSR",
+          "CSA",
+          "CSV",
+          "CSL",
+          "CW",
+          "CWE",
+          "CWIE",
+          "CWOV",
+          "CS",
+          "DC",
+          "DA",
+          "DTA",
+          "CEI",
+          "FC",
+          "FS",
+          "FOR",
+          "FVC",
+          "FRR",
+          "FWL",
+          "FR",
+          "HL",
+          "IP",
+          "LL",
+          "LA",
+          "MOC",
+          "MH",
+          "MERC",
+          "MV",
+          "NC",
+          "OC",
+          "OA",
+          "PIR",
+          "RD",
+          "RF",
+          "ROS",
+          "RWR",
+          "IND",
+          "SIC",
+          "SL",
+          "TC",
+          "TD",
+          "UC",
+          "WOB",
+          "TH",
+          "CI",
+          "SOC",
+          "CWI",
+          "EF",
+          "GV",
+          "JF",
+          "MSC",
+          "OP",
+          "RA",
+          "RCM",
+          "NIOPS",
+          "AXP",
+          "NDC",
+          "REB");
 
     /**
      * Creates a new {@code GlossaryDialog} instance to display information about a glossary term.
@@ -132,6 +209,7 @@ public class GlossaryDialog extends JDialog {
         editorPane.setContentType("text/html");
         editorPane.setEditable(false);
         editorPane.setFocusable(false);
+        editorPane.setBorder(BorderFactory.createEmptyBorder());
 
         // Use inline CSS to set font family, size, and other style properties
         String fontStyle = "font-family: Noto Sans;";
@@ -150,14 +228,32 @@ public class GlossaryDialog extends JDialog {
         // Wrap the JEditorPane in a JScrollPane
         JScrollPane scrollPane = new JScrollPane(editorPane);
         scrollPane.setMinimumSize(new Dimension(CENTER_WIDTH, scrollPane.getHeight()));
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
         // This line ensures the scroll pane starts scrolled to the top, not bottom.
         SwingUtilities.invokeLater(() -> scrollPane.getViewport().setViewPosition(new Point(0, 0)));
 
-        // Create a JPanel with padding
-        JPanel paddedPanel = new JPanel(new BorderLayout());
-        paddedPanel.setBorder(createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
-        paddedPanel.add(scrollPane, BorderLayout.CENTER);
-        add(paddedPanel);
+        // Create a container with a border for the padding
+        JPanel scrollPaneContainer = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        scrollPaneContainer.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
+        scrollPaneContainer.add(scrollPane);
+
+        // Create a JLabel for the image above the JEditorPane
+        String randomFactionCode = ObjectUtility.getRandomItem(FACTION_CODES_FOR_IMAGE);
+        ImageIcon imageIcon = Factions.getFactionLogo(campaign.getGameYear(), randomFactionCode);
+        JLabel imageLabel = new JLabel();
+        imageLabel.setIcon(imageIcon);
+        imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        imageLabel.setBorder(BorderFactory.createEmptyBorder(PADDING, 0, 0, 0));
+
+        // Create a panel for the image and editorPane
+        JPanel contentPanel = new JPanel();
+        contentPanel.setLayout(new BorderLayout());
+        if (imageIcon != null) {
+            contentPanel.add(imageLabel, BorderLayout.NORTH);
+        }
+        contentPanel.add(scrollPaneContainer, BorderLayout.CENTER);
+
+        add(contentPanel, BorderLayout.NORTH);
 
         // Assign close action
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -168,8 +264,14 @@ public class GlossaryDialog extends JDialog {
             }
         });
 
+        // Close on ESC
+        getRootPane().registerKeyboardAction(e -> onCloseAction(),
+              KeyStroke.getKeyStroke("ESCAPE"),
+              JComponent.WHEN_IN_FOCUSED_WINDOW);
+
         // Set dialog properties
         setSize((int) round((CENTER_WIDTH + (PADDING * 2)) * 1.1), CENTER_HEIGHT);
+        pack();
         setLocationRelativeTo(null);
         setModal(true);
         setVisible(true);
