@@ -94,12 +94,11 @@ public abstract class Part implements IPartWork, ITechnology {
 
     protected static final TechAdvancement TA_POD = Entity.getOmniAdvancement();
     // Generic TechAdvancement for a number of basic components.
-    protected static final TechAdvancement TA_GENERIC = new TechAdvancement(TechBase.ALL).setAdvancement(DATE_ES,
-                DATE_ES,
-                DATE_ES)
-                                                              .setTechRating(TechRating.C)
-                                                              .setAvailability(AvailabilityValue.C, AvailabilityValue.C, AvailabilityValue.C, AvailabilityValue.C)
-                                                              .setStaticTechLevel(SimpleTechLevel.STANDARD);
+    protected static final TechAdvancement TA_GENERIC = new TechAdvancement(TechBase.ALL)
+        .setAdvancement(DATE_ES, DATE_ES, DATE_ES)
+        .setTechRating(TechRating.C)
+        .setAvailability(AvailabilityValue.C, AvailabilityValue.C, AvailabilityValue.C, AvailabilityValue.C)
+        .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     protected String name;
     protected int id;
