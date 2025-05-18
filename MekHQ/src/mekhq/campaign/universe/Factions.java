@@ -360,23 +360,31 @@ public class Factions {
             case "TD" -> "logo_tortuga_dominions";
             case "UC" -> "logo_umayyad_caliphate";
             case "WOB" -> "logo_word_of_blake";
-            // The following are missing icons
-            case "TH" -> "logo_mercenaries"; // Terran Hegemony
-            case "CI" -> "logo_mercenaries"; // Chainelane Isles
-            case "SOC" -> "logo_mercenaries"; // The Society
-            case "CWI" -> "logo_mercenaries"; // Clan Widowmaker
-            case "EF" -> "logo_mercenaries"; // Elysian Fields
-            case "GV" -> "logo_mercenaries"; // Greater Valkyrate
-            case "JF" -> "logo_mercenaries"; // JarnFolk
-            case "MSC" -> "logo_mercenaries"; // Marik-Stewart Commonwealth
-            case "OP" -> "logo_mercenaries"; // Oriente Protectorate
-            case "RA" -> "logo_mercenaries"; // Raven Alliance
-            case "RCM" -> "logo_mercenaries"; // Rim Commonality
-            case "NIOPS" -> "logo_mercenaries"; // Niops Association
-            case "AXP" -> "logo_mercenaries"; // Axumite Providence
-            case "NDC" -> "logo_mercenaries"; // New Delphi Compact
-            // Fallback
-            default -> "logo_mercenaries";
+            case "TH" -> "logo_terran_hegemony";
+            case "CI" -> "logo_chainelane_isles";
+            case "SOC" -> "logo_the_society";
+            case "CWI" -> "logo_clan_widowmaker";
+            case "EF" -> "logo_elysian_fields";
+            case "GV" -> "logo_greater_valkyrate";
+            case "JF" -> "logo_jarnfolk";
+            case "MSC" -> "logo_marik_stewart_commonwealth";
+            case "OP" -> "logo_oriente_protectorate";
+            case "RA" -> "logo_raven_alliance";
+            case "RCM" -> "logo_rim_commonality";
+            case "NIOPS" -> "logo_niops_association";
+            case "AXP" -> "logo_axumite_providence";
+            case "NDC" -> "logo_new_delphi_compact";
+            case "REB" -> "logo_rebels";
+            // Fallbacks
+            default -> {
+                Faction faction = Factions.getInstance().getFaction(factionCode);
+
+                if (faction != null && faction.isClan()) {
+                    yield "logo_clan_generic";
+                } else {
+                    yield "logo_mercenaries";
+                }
+            }
         };
 
         ImageIcon icon = new ImageIcon(IMAGE_DIRECTORY + key + FILE_TYPE);
