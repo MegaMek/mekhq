@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -25,21 +24,26 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
+
 package mekhq.campaign.finances;
 
 import java.io.PrintWriter;
 
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.unit.UnitOrder;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class LeaseOrder extends mekhq.campaign.unit.UnitOrder {
-    private static final MMLogger logger = MMLogger.create(UnitOrder.class);
+    private static final MMLogger LOGGER = MMLogger.create(LeaseOrder.class);
 
     /*
      * LeaseOrders is in the shopping list, it doesn't have a unit yet to attach to.
@@ -127,7 +131,7 @@ public class LeaseOrder extends mekhq.campaign.unit.UnitOrder {
                 }
             }
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
         }
 
         retVal.initializeParts(false);

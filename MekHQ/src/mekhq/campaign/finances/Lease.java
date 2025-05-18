@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -25,7 +24,13 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
+
 package mekhq.campaign.finances;
 
 import java.io.PrintWriter;
@@ -40,7 +45,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class Lease {
-    private static final MMLogger logger = MMLogger.create(UnitOrder.class);
+    private static final MMLogger LOGGER = MMLogger.create(UnitOrder.class);
 
     private Money leaseCost;
     private LocalDate acquisitionDate;
@@ -163,7 +168,7 @@ public class Lease {
             }
             return retVal;
         } catch (Exception ex) {
-            logger.error("Could not parse lease for unit {}", u.getId(), ex);
+            LOGGER.error("Could not parse lease for unit {}", u.getId(), ex);
         }
         return null;
     }

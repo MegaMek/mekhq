@@ -612,32 +612,6 @@ public class Quartermaster {
         getCampaign().removeUnit(unit.getId());
     }
 
-    /**
-     * Leases a unit.
-     *
-     * @param en   An entity representing the unit to be leased.
-     * @param days How many days it will take to arrive.
-     **/
-    public boolean LeaseUnit(Entity en, int days) {
-        Objects.requireNonNull(en);
-
-        PartQuality quality = PartQuality.QUALITY_D;
-
-        if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
-            quality = Unit.getRandomUnitQuality(0);
-        }
-
-        if (getCampaignOptions().isTrackLeases()) {
-            Unit unit = new Unit(en, getCampaign());
-            unit.addLease(new Lease(getCampaign().getLocalDate(), unit));
-            getCampaign().addNewUnit(en, false, days, quality);
-            return true;
-        } else {
-            getCampaign().addNewUnit(en, false, days, quality);
-            return true;
-        }
-    }
-
     public void cancelUnitLease(Unit unit) {
         Objects.requireNonNull(unit);
         Money lastMonthLease = unit.getUnitLease().getFinalLeaseCost(getCampaign().getLocalDate());
