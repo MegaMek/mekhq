@@ -28,13 +28,18 @@
  */
 package mekhq.campaign.finances;
 
-import megamek.common.Entity;
+import java.io.PrintWriter;
+
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.unit.UnitOrder;
+import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 public class LeaseOrder extends mekhq.campaign.unit.UnitOrder {
-    private int daysToWait;
-    private Campaign campaign;
-    private Entity entity;
+    private static final MMLogger logger = MMLogger.create(UnitOrder.class);
 
     /*
      * LeaseOrders is in the shopping list, it doesn't have a unit yet to attach to.
@@ -42,17 +47,25 @@ public class LeaseOrder extends mekhq.campaign.unit.UnitOrder {
     public LeaseOrder(megamek.common.Entity entity, mekhq.campaign.Campaign campaign) {
         super(entity, campaign);
         this.entity = entity;
-        this.campaign = campaign;
+    }
+
+    // For the XML reader.
+    private LeaseOrder() {
     }
 
     @Override
     public void decrementDaysToWait() {
-        daysToWait = daysToWait > 0 ? daysToWait-- : 0;
+        super.decrementDaysToWait();
+    }
+
+    @Override
+    public int getDaysToWait() {
+        return super.getDaysToWait();
     }
 
     @Override
     public String find(int transitDays) {
-        campaign.getQuartermaster().leaseUnit((megamek.common.Entity) getNewEquipment(), transitDays);
+        super.getCampaign().getQuartermaster().leaseUnit((megamek.common.Entity) getNewEquipment(), transitDays);
         return "<font color='" +
                      mekhq.MekHQ.getMHQOptions().getFontColorPositiveHexColor() +
                      "'><b> unit found for leasing</b>.</font> It will be delivered in " +
@@ -78,6 +91,42 @@ public class LeaseOrder extends mekhq.campaign.unit.UnitOrder {
     @Override
     public Money getBuyCost() {
         return Money.zero();
+    }
+
+    @Override
+    public void writeToXML(final PrintWriter pw, int indent) {
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "leaseOrder");
+        pw.println(MHQXMLUtility.writeEntityToXmlString(getEntity(), indent, getCampaign().getEntities()));
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "quantity", quantity);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "daysToWait", daysToWait);
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "leaseOrder");
+    }
+
+    public static LeaseOrder generateInstanceFromXML(Node wn, Campaign c) {
+        LeaseOrder retVal = new LeaseOrder();
+        retVal.setCampaign(c);
+
+        NodeList nl = wn.getChildNodes();
+
+        try {
+            for (int x = 0; x < nl.getLength(); x++) {
+                Node wn2 = nl.item(x);
+
+                if (wn2.getNodeName().equalsIgnoreCase("quantity")) {
+                    retVal.quantity = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("daysToWait")) {
+                    retVal.daysToWait = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("entity")) {
+                    retVal.entity = MHQXMLUtility.parseSingleEntityMul((Element) wn2, c);
+                }
+            }
+        } catch (Exception ex) {
+            logger.error("", ex);
+        }
+
+        retVal.initializeParts(false);
+
+        return retVal;
     }
 }
 

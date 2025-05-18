@@ -28,14 +28,22 @@
  */
 package mekhq.campaign.finances;
 
+import java.io.PrintWriter;
 import java.time.LocalDate;
 
 import megamek.common.Entity;
+import megamek.logging.MMLogger;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.UnitOrder;
+import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 public class Lease {
-    private final Money leaseCost;
-    private final LocalDate acquisitionDate;
+    private static final MMLogger logger = MMLogger.create(UnitOrder.class);
+
+    private Money leaseCost;
+    private LocalDate acquisitionDate;
 
     /**
      * Leases are nominally attached to units while they are in the hanger.
@@ -44,6 +52,12 @@ public class Lease {
         acquisitionDate = currentDay;
         // Campaign Operations 4th., p43
         leaseCost = unit.getSellValue().multipliedBy(0.005);
+    }
+
+    /**
+     * This constructor is only use for reloading leases from the XML.
+     */
+    private Lease() {
     }
 
     /**
@@ -117,5 +131,32 @@ public class Lease {
         return check instanceof megamek.common.Dropship || check instanceof megamek.common.Jumpship;
     }
 
+    public void writeToXML(final PrintWriter pw, int indent) {
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "lease");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "leaseCost", leaseCost);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "acquisitionDate", acquisitionDate);
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "lease");
+    }
+
+    public static Lease generateInstanceFromXML(Node wn, Unit u) {
+        Lease retVal = new Lease();
+        NodeList nl = wn.getChildNodes();
+
+        try {
+            for (int x = 0; x < nl.getLength(); x++) {
+                Node wn2 = nl.item(x);
+
+                if (wn2.getNodeName().equalsIgnoreCase("leaseCost")) {
+                    retVal.leaseCost = Money.fromXmlString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("acquisitionDate")) {
+                    retVal.acquisitionDate = LocalDate.parse(wn2.getTextContent());
+                }
+            }
+            return retVal;
+        } catch (Exception ex) {
+            logger.error("Could not parse lease for unit {}", u.getId(), ex);
+        }
+        return null;
+    }
 }
 

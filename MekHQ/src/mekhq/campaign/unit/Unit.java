@@ -459,7 +459,8 @@ public class Unit implements ITechnology {
      *
      * @return transported units summary of that type, or null
      */
-    public @Nullable AbstractTransportedUnitsSummary getTransportedUnitsSummary(CampaignTransportType campaignTransportType) {
+    public @Nullable AbstractTransportedUnitsSummary getTransportedUnitsSummary(
+          CampaignTransportType campaignTransportType) {
         for (AbstractTransportedUnitsSummary transportedUnitSummary : transportedUnitsSummaries) {
             if (transportedUnitSummary.getClass() == campaignTransportType.getTransportedUnitsSummaryType()) {
                 return transportedUnitSummary;
@@ -2511,6 +2512,11 @@ public class Unit implements ITechnology {
         }
 
         // END new transports
+        //Leases
+        if (hasLease()) {
+            unitLease.writeToXML(pw, indent);
+        }
+
         // Salvage status
         if (salvaged) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvaged", true);
@@ -2730,6 +2736,9 @@ public class Unit implements ITechnology {
                     retVal.lastMaintenanceReport = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("mothballInfo")) {
                     retVal.mothballInfo = MothballInfo.generateInstanceFromXML(wn2, version);
+                } else if (wn2.getNodeName().equalsIgnoreCase("lease")) {
+                    // Leases
+                    retVal.unitLease = Lease.generateInstanceFromXML(wn2, retVal);
                 }
                 // Set up bay space values after we've loaded everything from the unit record
                 // Used for older campaign
@@ -4494,8 +4503,7 @@ public class Unit implements ITechnology {
                   getCampaign().getCampaignOptions().isUseInitiativeBonus()) {
             // Tactics command bonus. This should actually reflect the unit's commander
             if (null != commander && commander.hasSkill(SkillType.S_TACTICS)) {
-                entity.getCrew()
-                      .setCommandBonus(commander.getSkill(SkillType.S_TACTICS).getTotalSkillLevel());
+                entity.getCrew().setCommandBonus(commander.getSkill(SkillType.S_TACTICS).getTotalSkillLevel());
             }
         }
 
