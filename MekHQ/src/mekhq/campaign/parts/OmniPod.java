@@ -81,10 +81,6 @@ public class OmniPod extends Part {
      */
     @Override
     public TechBase getTechBase() {
-        System.out.println("OmniPod.getTechBase() called");
-        System.out.println("name: " + this.getName());
-        System.out.println("partname: " + this.getPartName());
-        System.out.println("getTechLevel: " + getTechLevel());
         if (null != partType) {
             return partType.getTechBase();
         } else {
