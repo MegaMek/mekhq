@@ -181,10 +181,10 @@ public class ShoppingList {
             // when we parse units and find refit kits that have not been found
             if ((shoppingItem instanceof Part) && !(shoppingItem instanceof Refit)) {
                 ((Part) shoppingItem).writeToXML(pw, indent);
-            } else if (shoppingItem instanceof UnitOrder) {
-                ((UnitOrder) shoppingItem).writeToXML(pw, indent);
             } else if (shoppingItem instanceof LeaseOrder) {
                 ((LeaseOrder) shoppingItem).writeToXML(pw, indent);
+            } else if (shoppingItem instanceof UnitOrder) {
+                ((UnitOrder) shoppingItem).writeToXML(pw, indent);
             }
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "shoppingList");

@@ -55,7 +55,7 @@ public class Lease {
     }
 
     /**
-     * This constructor is only use for reloading leases from the XML.
+     * This constructor is only used for reloading leases from the XML.
      */
     private Lease() {
     }
@@ -78,12 +78,15 @@ public class Lease {
     }
 
     /**
-     * Utility function for the raw lease cost.
+     * This is the total monthly cost for the entire lease.
      */
     public Money getLeaseCost() {
         return leaseCost;
     }
 
+    /**
+     * Leases can start at any time of the month, but they are only processed on the 1st by the accountant.
+     */
     public LocalDate getLeaseStart() {
         return acquisitionDate;
     }
@@ -123,10 +126,16 @@ public class Lease {
     public Money getFirstLeaseCost(LocalDate today) {
         int startDay = acquisitionDate.getDayOfMonth();
         int yesterday = today.minusDays(1).getDayOfMonth();
-        float fractionOfMonth = (float) (yesterday - startDay) / (float) yesterday;
+        float fractionOfMonth = (float) (yesterday - startDay) + 1 / (float) yesterday;
         return leaseCost.multipliedBy(fractionOfMonth);
     }
 
+    /**
+     * This function checks to see if the Entity is of a leasable type. This is currently hardcoded to restrict it to
+     * Dropships and Jumpships only.
+     *
+     * @return True if unit is leasable
+     */
     public static boolean isLeasable(Entity check) {
         return check instanceof megamek.common.Dropship || check instanceof megamek.common.Jumpship;
     }

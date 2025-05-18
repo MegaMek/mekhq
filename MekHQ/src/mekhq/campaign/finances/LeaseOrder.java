@@ -73,21 +73,27 @@ public class LeaseOrder extends mekhq.campaign.unit.UnitOrder {
                      " days.";
     }
 
+    /**
+     * Displays the correct name for the Procurement List, so they're not confused with standard orders.
+     *
+     * @return {String} Lease for UnitName
+     */
     @Override
     public String getAcquisitionName() {
-        // This cannot be hyperlinked name due to the fact that we have a null unit ID
-        // Also, the field this goes into does not currently support html, and would
-        // need our listener attached
-        // - Dylan
         return "Lease for " + getName();
     }
 
-    // Leases don't actually COST anything...
+    /**
+     * Leases don't actually COST anything when a unit is obtained, so this returns zero.
+     */
     @Override
     public Money getTotalBuyCost() {
         return Money.zero();
     }
 
+    /**
+     * Leases don't actually COST anything when a unit is obtained, so this returns zero.
+     */
     @Override
     public Money getBuyCost() {
         return Money.zero();
