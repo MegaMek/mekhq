@@ -395,6 +395,7 @@ public class MRMSDialog extends JDialog {
               "PartsPanel.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
         partsTableModel = new PartsTableModel();
+        partsTableModel.setData(new ArrayList<>());
         partsTable = new JTable(partsTableModel);
         partsTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         partsTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
