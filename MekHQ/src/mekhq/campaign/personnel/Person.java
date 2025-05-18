@@ -1344,7 +1344,10 @@ public class Person {
 
         for (UUID tagAlongId : eduTagAlongs) {
             Person tagAlong = campaign.getPerson(tagAlongId);
-            tagAlong.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
+
+            if (tagAlong != null) {
+                tagAlong.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
+            }
         }
         this.setEduTagAlongs(new ArrayList<>());
 

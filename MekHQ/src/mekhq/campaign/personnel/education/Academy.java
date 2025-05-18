@@ -800,7 +800,7 @@ public class Academy implements Comparable<Academy> {
                     tooltip.append(skill).append("<br>");
                     continue;
                 } else if (skill.equalsIgnoreCase("xp")) {
-                    tooltip.append(skill).append("XP (");
+                    tooltip.append(skill).append(" (");
                 } else {
                     skillParsed = skillParser(skill);
                     tooltip.append(skillParsed).append(" (");
