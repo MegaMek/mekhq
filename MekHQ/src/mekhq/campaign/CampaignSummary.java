@@ -399,7 +399,7 @@ public class CampaignSummary {
             closingSpan = isWithinCapacity ? "" : CLOSING_SPAN_TAG;
             colorBlindWarning = isWithinCapacity ? "" : WARNING;
 
-            report.append(String.format("Kitchens %s(%s/%s)%s%s",
+            report.append(String.format("Field Kitchens %s(%s/%s)%s%s",
                   color,
                   fieldKitchenUsage,
                   fieldKitchenCapacity,
@@ -458,7 +458,7 @@ public class CampaignSummary {
             closingSpan = exceedsCapacity ? CLOSING_SPAN_TAG : "";
             colorBlindWarning = exceedsCapacity ? WARNING : "";
 
-            report.append(String.format("Prisoners %s(%s/%s)%s%s",
+            report.append(String.format("Prisoner Capacity %s(%s/%s)%s%s",
                   color,
                   capacityUsage,
                   prisonerCapacity,

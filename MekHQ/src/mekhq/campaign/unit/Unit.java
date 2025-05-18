@@ -390,6 +390,19 @@ public class Unit implements ITechnology {
         }
     }
 
+    public void clearAllTransportSpace() {
+        for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
+            clearTransportSpace(campaignTransportType);
+        }
+    }
+
+    private void clearTransportSpace(CampaignTransportType campaignTransportType) {
+        AbstractTransportedUnitsSummary summary = getTransportedUnitsSummary(campaignTransportType);
+        if (summary != null) {
+            summary.clearTransportCapacityMap();
+        }
+    }
+
     private ShipTransportedUnitsSummary getShipTransportedUnitsSummary() {
         return (ShipTransportedUnitsSummary) getTransportedUnitsSummary(SHIP_TRANSPORT);
     }
@@ -451,7 +464,7 @@ public class Unit implements ITechnology {
      *
      * @return transported units summary of that type, or null
      */
-    public AbstractTransportedUnitsSummary getTransportedUnitsSummary(CampaignTransportType campaignTransportType) {
+    public @Nullable AbstractTransportedUnitsSummary getTransportedUnitsSummary(CampaignTransportType campaignTransportType) {
         for (AbstractTransportedUnitsSummary transportedUnitSummary : transportedUnitsSummaries) {
             if (transportedUnitSummary.getClass() == campaignTransportType.getTransportedUnitsSummaryType()) {
                 return transportedUnitSummary;
