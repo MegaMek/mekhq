@@ -749,6 +749,10 @@ public class Campaign implements ITechManager {
     // endregion Markets
 
     // region Personnel Modules
+    public void resetRandomDeath() {
+        this.randomDeath = new RandomDeath(this);
+    }
+
     public AbstractDivorce getDivorce() {
         return divorce;
     }
