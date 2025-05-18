@@ -33,7 +33,6 @@
 package mekhq.gui;
 
 import static java.lang.Math.round;
-import static mekhq.utilities.MHQInternationalization.getText;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -47,7 +46,6 @@ import java.util.ResourceBundle;
 import java.util.UUID;
 import javax.swing.*;
 import javax.swing.RowSorter.SortKey;
-import javax.swing.event.HyperlinkEvent;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
@@ -67,12 +65,12 @@ import mekhq.MekHQ;
 import mekhq.campaign.event.*;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.adapter.PersonnelTableMouseAdapter;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.enums.PersonnelTabView;
 import mekhq.gui.enums.PersonnelTableModelColumn;
 import mekhq.gui.model.PersonnelTableModel;
+import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.view.PersonViewPanel;
 
@@ -236,28 +234,12 @@ public final class PersonnelTab extends CampaignGuiTab {
 
         JScrollPane scrollPersonnelTable = new JScrollPaneWithSpeed(personnelTable);
 
-        JEditorPane infoPanelEditorPane = new JEditorPane();
-        infoPanelEditorPane.setContentType("text/html");
-        infoPanelEditorPane.setText("<html><div style='text-align:center'>" +
-                                          getText("personnelTab.keyText") +
-                                          "</div></html>");
-        infoPanelEditorPane.setEditable(false);
-        infoPanelEditorPane.setBorder(null);
-        infoPanelEditorPane.setOpaque(false);
-        infoPanelEditorPane.addHyperlinkListener(evt -> {
-            if (evt.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                ImmersiveDialogCore.handleImmersiveHyperlinkClick(null, getCampaign(), evt.getDescription());
-            }
-        });
-        JPanel southPanel = new JPanel(new BorderLayout());
-        southPanel.add(infoPanelEditorPane, BorderLayout.CENTER);
-
-        JPanel infoPanelWrapper = new JPanel(new BorderLayout());
-        infoPanelWrapper.add(infoPanelEditorPane, BorderLayout.CENTER);
 
         JPanel tableAndInfoPanel = new JPanel(new BorderLayout());
         tableAndInfoPanel.add(scrollPersonnelTable, BorderLayout.CENTER);
-        tableAndInfoPanel.add(infoPanelWrapper, BorderLayout.SOUTH);
+
+        JPanel pnlTutorial = new TutorialHyperlinkPanel("personnelTab");
+        tableAndInfoPanel.add(pnlTutorial, BorderLayout.SOUTH);
 
         splitPersonnel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, tableAndInfoPanel, scrollPersonnelView);
         splitPersonnel.setOneTouchExpandable(true);

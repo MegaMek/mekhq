@@ -34,7 +34,6 @@ package mekhq.gui;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.campaign.randomEvents.prisoners.RecoverMIAPersonnel.abandonMissingPersonnel;
-import static mekhq.utilities.MHQInternationalization.getText;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -44,8 +43,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Objects;
 import java.util.ResourceBundle;
-import javax.swing.*;
-import javax.swing.event.HyperlinkEvent;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JViewport;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
 
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
@@ -55,8 +61,8 @@ import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 import mekhq.gui.enums.MHQTabType;
+import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.view.JumpPathViewPanel;
@@ -170,23 +176,8 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         panMap.setSelectedSystem(getCampaign().getLocation().getCurrentSystem());
         panMapView.add(panMap, BorderLayout.CENTER);
 
-        JEditorPane infoPane = new JEditorPane();
-        infoPane.setContentType("text/html");
-        infoPane.setText("<html><div style='text-align:center'>" + getText("mapTab.keyText") +
-                               "</div></html>");
-        infoPane.setEditable(false);
-        infoPane.setBorder(null);
-        infoPane.setOpaque(false);
-        infoPane.addHyperlinkListener(evt -> {
-            if (evt.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                ImmersiveDialogCore.handleImmersiveHyperlinkClick(null, getCampaign(), evt.getDescription());
-            }
-        });
-
-        JPanel southPanel = new JPanel(new BorderLayout());
-        southPanel.add(infoPane, BorderLayout.CENTER);
-
-        panMapView.add(southPanel, BorderLayout.SOUTH);
+        JPanel pnlTutorial = new TutorialHyperlinkPanel("mapTab");
+        panMapView.add(pnlTutorial, BorderLayout.SOUTH);
 
         mapView = new JViewport();
         mapView.setMinimumSize(new Dimension(600, 600));

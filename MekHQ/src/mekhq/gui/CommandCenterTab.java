@@ -32,8 +32,6 @@
  */
 package mekhq.gui;
 
-import static mekhq.utilities.MHQInternationalization.getText;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -50,7 +48,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.HyperlinkEvent;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
@@ -77,7 +74,6 @@ import mekhq.campaign.report.PersonnelReport;
 import mekhq.campaign.report.TransportReport;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.adapter.ProcurementTableMouseAdapter;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 import mekhq.gui.dialog.AcquisitionsDialog;
 import mekhq.gui.dialog.MRMSDialog;
 import mekhq.gui.dialog.MekHQUnitSelectorDialog;
@@ -92,6 +88,7 @@ import mekhq.gui.dialog.reportDialogs.TransportReportDialog;
 import mekhq.gui.dialog.reportDialogs.UnitRatingReportDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.ProcurementTableModel;
+import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.TargetSorter;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
@@ -233,25 +230,11 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.weighty = 0.0;
         panCommand.add(panIcon, gridBagConstraints);
 
-        JEditorPane infoPane = new JEditorPane();
-        infoPane.setContentType("text/html");
-        infoPane.setText("<html><div style='text-align:center'>" + getText("commandCenterTab.keyText") +
-                               "</div></html>");
-        infoPane.setEditable(false);
-        infoPane.setBorder(null);
-        infoPane.setOpaque(false);
-        infoPane.addHyperlinkListener(evt -> {
-            if (evt.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                ImmersiveDialogCore.handleImmersiveHyperlinkClick(null, getCampaign(), evt.getDescription());
-            }
-        });
-
-        JPanel southPanel = new JPanel(new BorderLayout());
-        southPanel.add(infoPane, BorderLayout.CENTER);
+        JPanel pnlTutorial = new TutorialHyperlinkPanel("commandCenterTab");
 
         setLayout(new BorderLayout());
         add(panCommand, BorderLayout.CENTER);
-        add(southPanel, BorderLayout.SOUTH);
+        add(pnlTutorial, BorderLayout.SOUTH);
     }
 
     private void initInfoPanel() {

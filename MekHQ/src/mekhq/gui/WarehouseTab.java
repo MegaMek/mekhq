@@ -33,7 +33,6 @@
 package mekhq.gui;
 
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
-import static mekhq.utilities.MHQInternationalization.getText;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -45,7 +44,6 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import javax.swing.*;
 import javax.swing.RowSorter.SortKey;
-import javax.swing.event.HyperlinkEvent;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
@@ -67,11 +65,11 @@ import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.PartsTableMouseAdapter;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 import mekhq.gui.dialog.PartsReportDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.gui.model.TechTableModel;
+import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.PartsDetailSorter;
 import mekhq.gui.sorter.TechSorter;
@@ -357,26 +355,11 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         splitWarehouse.setOneTouchExpandable(true);
         splitWarehouse.setResizeWeight(1.0);
 
-        JEditorPane infoPanelEditorPane = new JEditorPane();
-        infoPanelEditorPane.setContentType("text/html");
-        infoPanelEditorPane.setText("<html><div style='text-align:center'>" +
-                                          getText("warehouseTab.keyText") +
-                                          "</div></html>");
-        infoPanelEditorPane.setEditable(false);
-        infoPanelEditorPane.setBorder(null);
-        infoPanelEditorPane.setOpaque(false);
-        infoPanelEditorPane.addHyperlinkListener(evt -> {
-            if (evt.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                ImmersiveDialogCore.handleImmersiveHyperlinkClick(null, getCampaign(), evt.getDescription());
-            }
-        });
-
-        JPanel southPanel = new JPanel(new BorderLayout());
-        southPanel.add(infoPanelEditorPane, BorderLayout.CENTER);
+        JPanel pnlTutorial = new TutorialHyperlinkPanel("warehouseTab");
 
         setLayout(new BorderLayout());
         add(splitWarehouse, BorderLayout.CENTER);
-        add(southPanel, BorderLayout.SOUTH);
+        add(pnlTutorial, BorderLayout.SOUTH);
     }
 
     /**

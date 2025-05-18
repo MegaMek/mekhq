@@ -32,8 +32,6 @@
  */
 package mekhq.gui;
 
-import static mekhq.utilities.MHQInternationalization.getText;
-
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
@@ -52,13 +50,11 @@ import java.util.List;
 import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JEditorPane;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
-import javax.swing.event.HyperlinkEvent;
 
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.event.Subscribe;
@@ -70,11 +66,11 @@ import mekhq.campaign.event.PersonEvent;
 import mekhq.campaign.event.PersonMedicalAssignmentEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.personnel.Person;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 import mekhq.gui.dialog.MedicalViewDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.DocTableModel;
 import mekhq.gui.model.PatientTableModel;
+import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.sorter.PersonTitleSorter;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
@@ -284,20 +280,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
         gridBagConstraints.weighty = 1.0;
         add(scrollUnassignedPatient, gridBagConstraints);
 
-        JEditorPane infoPanelEditorPane = new JEditorPane();
-        infoPanelEditorPane.setContentType("text/html");
-        infoPanelEditorPane.setText("<html><div style='text-align:center'>" +
-                                          getText("infirmary.keyText") +
-                                          "</div></html>");
-        infoPanelEditorPane.setEditable(false);
-        infoPanelEditorPane.setBorder(null);
-        infoPanelEditorPane.setOpaque(false);
-        infoPanelEditorPane.addHyperlinkListener(evt -> {
-            if (evt.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                ImmersiveDialogCore.handleImmersiveHyperlinkClick(null, getCampaign(), evt.getDescription());
-            }
-        });
-
+        JPanel pnlTutorial = new TutorialHyperlinkPanel("infirmary");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
@@ -307,8 +290,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.insets = new Insets(10, 5, 5, 5);
-
-        add(infoPanelEditorPane, gridBagConstraints);
+        add(pnlTutorial, gridBagConstraints);
 
     }
 

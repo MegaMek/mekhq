@@ -50,7 +50,6 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 import javax.swing.*;
-import javax.swing.event.HyperlinkEvent;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
@@ -99,7 +98,6 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.adapter.ScenarioTableMouseAdapter;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.dialog.CompleteMissionDialog;
 import mekhq.gui.dialog.CustomizeAtBContractDialog;
@@ -111,6 +109,7 @@ import mekhq.gui.dialog.NewContractDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.ScenarioTableModel;
+import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.sorter.DateStringComparator;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.view.AtBScenarioViewPanel;
@@ -352,24 +351,11 @@ public final class BriefingTab extends CampaignGuiTab {
         splitBrief.setResizeWeight(0.5);
         splitBrief.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, ev -> refreshScenarioView());
 
-        JEditorPane infoPane = new JEditorPane();
-        infoPane.setContentType("text/html");
-        infoPane.setText("<html><div style='text-align:center'>" + getText("missionTab.keyText") +
-                               "</div></html>");
-        infoPane.setEditable(false);
-        infoPane.setBorder(null);
-        infoPane.setOpaque(false);
-        infoPane.addHyperlinkListener(evt -> {
-            if (evt.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                ImmersiveDialogCore.handleImmersiveHyperlinkClick(null, getCampaign(), evt.getDescription());
-            }
-        });
-        JPanel southPanel = new JPanel(new BorderLayout());
-        southPanel.add(infoPane, BorderLayout.CENTER);
+        JPanel pnlTutorial = new TutorialHyperlinkPanel("missionTab");
 
         setLayout(new BorderLayout());
         add(splitBrief, BorderLayout.CENTER);
-        add(southPanel, BorderLayout.SOUTH);
+        add(pnlTutorial, BorderLayout.SOUTH);
     }
 
     private void addMission() {

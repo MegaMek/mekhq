@@ -32,8 +32,6 @@
  */
 package mekhq.gui;
 
-import static mekhq.utilities.MHQInternationalization.getText;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -50,7 +48,6 @@ import java.util.UUID;
 import javax.swing.*;
 import javax.swing.RowSorter.SortKey;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
@@ -78,13 +75,13 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
 import mekhq.gui.adapter.ServicedUnitsTableMouseAdapter;
 import mekhq.gui.adapter.TaskTableMouseAdapter;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 import mekhq.gui.dialog.AcquisitionsDialog;
 import mekhq.gui.dialog.MRMSDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.TaskTableModel;
 import mekhq.gui.model.TechTableModel;
 import mekhq.gui.model.UnitTableModel;
+import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.sorter.TaskSorter;
 import mekhq.gui.sorter.TechSorter;
 import mekhq.gui.sorter.UnitStatusSorter;
@@ -472,26 +469,10 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         centerPanel.add(panServicedUnits);
         centerPanel.add(panTasks);
         centerPanel.add(panTechs);
-
-        JEditorPane infoPanelEditorPane = new JEditorPane();
-        infoPanelEditorPane.setContentType("text/html");
-        infoPanelEditorPane.setText("<html><div style='text-align:center'>" +
-                                          getText("repairTab.keyText") +
-                                          "</div></html>");
-        infoPanelEditorPane.setEditable(false);
-        infoPanelEditorPane.setBorder(null);
-        infoPanelEditorPane.setOpaque(false);
-        infoPanelEditorPane.addHyperlinkListener(evt -> {
-            if (evt.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                ImmersiveDialogCore.handleImmersiveHyperlinkClick(null, getCampaign(), evt.getDescription());
-            }
-        });
-
-        JPanel southPanel = new JPanel(new BorderLayout());
-        southPanel.add(infoPanelEditorPane, BorderLayout.CENTER);
-
         add(centerPanel, BorderLayout.CENTER);
-        add(southPanel, BorderLayout.SOUTH);
+
+        JPanel pnlTutorial = new TutorialHyperlinkPanel("repairTab");
+        add(pnlTutorial, BorderLayout.SOUTH);
 
         filterTechs();
     }

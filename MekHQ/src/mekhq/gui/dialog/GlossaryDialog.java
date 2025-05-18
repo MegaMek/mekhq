@@ -33,7 +33,6 @@
 package mekhq.gui.dialog;
 
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
-import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.handleImmersiveHyperlinkClick;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 
@@ -51,8 +50,8 @@ import megamek.client.ui.swing.util.UIUtil;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Factions;
+import mekhq.gui.panels.TutorialHyperlinkPanel;
 
 /**
  * The {@code GlossaryDialog} class represents a dialog window for displaying glossary entries. It displays detailed
@@ -67,7 +66,6 @@ public class GlossaryDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(GlossaryDialog.class);
 
     private final JDialog parent;
-    private final Campaign campaign;
 
     private int CENTER_WIDTH = UIUtil.scaleForGUI(800);
     private int CENTER_HEIGHT = UIUtil.scaleForGUI(400);
@@ -163,12 +161,10 @@ public class GlossaryDialog extends JDialog {
      * </p>
      *
      * @param parent   The parent {@link JDialog} that is temporarily hidden while this dialog is displayed.
-     * @param campaign The {@link Campaign} object containing resources and glossary entries.
      * @param key      The unique identifier for the glossary term to be displayed.
      */
-    public GlossaryDialog(@Nullable JDialog parent, Campaign campaign, String key) {
+    public GlossaryDialog(@Nullable JDialog parent, String key) {
         this.parent = parent;
-        this.campaign = campaign;
 
         // Originally the dialog was designed to be called from within a JDialog, however that isn't always the case
         // anymore, so now we hide and reveal the parent dialog (later) only if it exists.
@@ -222,7 +218,7 @@ public class GlossaryDialog extends JDialog {
         // Add a HyperlinkListener to capture hyperlink clicks
         editorPane.addHyperlinkListener(evt -> {
             if (evt.getEventType() == EventType.ACTIVATED) {
-                handleImmersiveHyperlinkClick(this, campaign, evt.getDescription());
+                TutorialHyperlinkPanel.handleTutorialHyperlinkClick(this, evt.getDescription());
             }
         });
 
@@ -240,7 +236,8 @@ public class GlossaryDialog extends JDialog {
 
         // Create a JLabel for the image above the JEditorPane
         String randomFactionCode = ObjectUtility.getRandomItem(FACTION_CODES_FOR_IMAGE);
-        ImageIcon imageIcon = Factions.getFactionLogo(campaign.getGameYear(), randomFactionCode);
+        // game year is largely irrelevant for the glossary dialog
+        ImageIcon imageIcon = Factions.getFactionLogo(3025, randomFactionCode);
         JLabel imageLabel = new JLabel();
         imageLabel.setIcon(imageIcon);
         imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
