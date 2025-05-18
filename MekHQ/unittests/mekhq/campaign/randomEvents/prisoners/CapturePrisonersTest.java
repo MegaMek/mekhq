@@ -148,7 +148,7 @@ class CapturePrisonersTest {
 
         int actualTargetNumber = capturePrisoners.getSarTargetNumber().getValue();
         assertEquals(expectedTargetNumber, actualTargetNumber);
-        assertTrue(activeProbeAvailability.isBetterThan(improvedSensorsAvailability));
+        assertTrue(improvedSensorsAvailability.isBetterThan(activeProbeAvailability));
     }
 
     @Test

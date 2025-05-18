@@ -1703,14 +1703,12 @@ public abstract class Part implements IPartWork, ITechnology {
 
     @Override
     public AvailabilityValue getBaseAvailability(Era era) {
-        AvailabilityValue advRating = getTechAdvancement() != null
-            ? getTechAdvancement().getBaseAvailability(era)
-            : TA_GENERIC.getBaseAvailability(era);
         if (omniPodded) {
+            AvailabilityValue av = getTechAdvancement().getBaseAvailability(era);
             AvailabilityValue podRating = TA_POD.getBaseAvailability(era);
-            return advRating.isBetterThan(podRating) ? advRating : podRating;
+            return podRating.isBetterThan(av) ? podRating : av;
         }
-        return advRating;
+        return getTechAdvancement().getBaseAvailability(era);
     }
 
     public AvailabilityValue getAvailability() {
@@ -1719,12 +1717,12 @@ public abstract class Part implements IPartWork, ITechnology {
 
     @Override
     public AvailabilityValue calcYearAvailability(int year, boolean clan) {
-        AvailabilityValue av = getTechAdvancement() != null
-            ? getTechAdvancement().calcYearAvailability(year, clan)
-            : TA_GENERIC.calcYearAvailability(year, clan);
+        AvailabilityValue av = getTechAdvancement().calcYearAvailability(campaign.getGameYear(), campaign.getFaction().isClan());
         if (omniPodded) {
-            AvailabilityValue podRating = TA_POD.calcYearAvailability(year, clan);
-            av = av.isBetterThan(podRating) ? av : podRating;
+            AvailabilityValue podRating = TA_POD.calcYearAvailability(campaign.getGameYear(), campaign.getFaction().isClan());
+            if (podRating.isBetterThan(av)) {
+                av = podRating;
+            }
         }
         return av;
     }
