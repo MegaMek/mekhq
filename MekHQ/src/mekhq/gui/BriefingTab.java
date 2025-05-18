@@ -369,7 +369,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
         setLayout(new BorderLayout());
         add(splitBrief, BorderLayout.CENTER);
-        add(southPanel, BorderLayout.SOUTH); // Add bottom info panel
+        add(southPanel, BorderLayout.SOUTH);
     }
 
     private void addMission() {
