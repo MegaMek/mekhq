@@ -154,8 +154,6 @@ public class StratconTab extends CampaignGuiTab {
                 ImmersiveDialogCore.handleImmersiveHyperlinkClick(null, getCampaign(), evt.getDescription());
             }
         });
-        JPanel southPanel = new JPanel(new BorderLayout());
-        southPanel.add(infoPanelEditorPane, BorderLayout.CENTER);
 
         JPanel infoPanelWrapper = new JPanel(new BorderLayout());
         infoPanelWrapper.add(infoPanelEditorPane, BorderLayout.CENTER);

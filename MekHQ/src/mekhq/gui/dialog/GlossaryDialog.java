@@ -32,7 +32,6 @@
  */
 package mekhq.gui.dialog;
 
-import static java.lang.Math.round;
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
 import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.handleImmersiveHyperlinkClick;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -272,7 +271,6 @@ public class GlossaryDialog extends JDialog {
               JComponent.WHEN_IN_FOCUSED_WINDOW);
 
         // Set dialog properties
-        setSize((int) round((CENTER_WIDTH + (PADDING * 2)) * 1.1), CENTER_HEIGHT);
         pack();
         setLocationRelativeTo(null);
         setModal(true);
