@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.skills;
 
@@ -56,7 +61,7 @@ public class Aging {
      * This is because modifying the experience a character has spent on {@code x} skill would get complicated quickly,
      * so we use this workaround.</p>
      */
-    private static final int AGING_SKILL_MODIFIER_DIVIDER = 100;
+    public static final int AGING_SKILL_MODIFIER_DIVIDER = 100;
 
     /**
      * Updates the aging modifiers for all skills of a given {@link Person} based on their current age and attributes.

@@ -58,6 +58,7 @@ import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
@@ -695,21 +696,24 @@ public class CombatTeam {
             try {
                 Unit unit = campaign.getUnit(id);
                 Entity entity = unit.getEntity();
-
-                boolean isClan = campaign.getFaction().isClan();
                 long entityType = entity.getEntityType();
 
-                if (entityType == ETYPE_TANK) {
-                    if (isClan || campaign.getCampaignOptions().isAdjustPlayerVehicles()) {
-                        weight += entity.getWeight() * 0.5;
-                    } else {
-                        weight += entity.getWeight();
-                    }
-                } else if (entityType == ETYPE_AEROSPACEFIGHTER) {
-                    if (isClan) {
-                        weight += entity.getWeight() * 0.5;
-                    } else {
-                        weight += entity.getWeight();
+                boolean isClan = campaign.isClanCampaign();
+
+                CampaignOptions campaignOptions = campaign.getCampaignOptions();
+                if (campaignOptions.isUseAtB() && !campaignOptions.isUseStratCon()) {
+                    if (entityType == ETYPE_TANK) {
+                        if (isClan || campaignOptions.isAdjustPlayerVehicles()) {
+                            weight += entity.getWeight() * 0.5;
+                        } else {
+                            weight += entity.getWeight();
+                        }
+                    } else if (entityType == ETYPE_AEROSPACEFIGHTER) {
+                        if (isClan) {
+                            weight += entity.getWeight() * 0.5;
+                        } else {
+                            weight += entity.getWeight();
+                        }
                     }
                 } else {
                     weight += entity.getWeight();
