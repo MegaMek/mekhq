@@ -68,7 +68,7 @@ public enum FactionStandingLevel {
     STANDING_LEVEL_7(7, 80, 99, 3, 1.75, true, false, true, 10, 1, 0.80, 2, 1.15, 1, 2),
     STANDING_LEVEL_8(8, 100, Integer.MAX_VALUE, 4, 2.0, true, false, true, 15, 2, 0.75, 3, 1.2, 2, 3);
 
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionStanding";
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionStandings";
     private static final MMLogger LOGGER = MMLogger.create(FactionStandingLevel.class);
 
     private final static String LABEL_SUFFIX_INNER_SPHERE = "innerSphere";
@@ -79,8 +79,8 @@ public enum FactionStandingLevel {
     private final static int MAXIMUM_STANDING_LEVEL = 8;
 
     private final int standingLevel;
-    private final int minimumFame;
-    private final int maximumFame;
+    private final double minimumFame;
+    private final double maximumFame;
     private final int negotiationModifier;
     private final double resupplyWeightModifier;
     private final boolean hasCommandCircuitAccess;
@@ -163,24 +163,24 @@ public enum FactionStandingLevel {
     /**
      * Retrieves the minimum fame value associated with this faction standing.
      *
-     * @return the minimum fame as an integer.
+     * @return the minimum fame as a double.
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public int getMinimumFame() {
+    public double getMinimumFame() {
         return minimumFame;
     }
 
     /**
      * Retrieves the maximum fame value associated with the faction standing.
      *
-     * @return An integer representing the maximum fame value.
+     * @return A double representing the maximum fame value.
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public int getMaximumFame() {
+    public double getMaximumFame() {
         return maximumFame;
     }
 

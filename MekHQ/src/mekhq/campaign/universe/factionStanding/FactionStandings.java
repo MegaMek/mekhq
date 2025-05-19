@@ -32,16 +32,24 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
+import static java.lang.Math.abs;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
+
 import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import megamek.codeUtilities.MathUtility;
 import megamek.logging.MMLogger;
+import mekhq.MekHQ;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.FactionHints;
 import mekhq.campaign.universe.Factions;
@@ -63,6 +71,7 @@ import org.w3c.dom.NodeList;
  */
 public class FactionStandings {
     private static final MMLogger LOGGER = MMLogger.create(FactionStandings.class);
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionStandings";
 
     private static final double DEFAULT_FAME = 0.0;
     private static final double DEFAULT_FAME_DEGRADATION = 0.25;
@@ -112,6 +121,10 @@ public class FactionStandings {
      * @since 0.50.07
      */
     public void initializeStartingFameValues(Faction campaignFaction, LocalDate today) {
+        List<String> fameChangeReports = new java.util.ArrayList<>();
+
+        int gameYear = today.getYear();
+
         Collection<Faction> allFactions = Factions.getInstance().getFactions();
         FactionHints factionHints = FactionHints.defaultFactionHints();
 
@@ -124,22 +137,35 @@ public class FactionStandings {
         Set<Faction> allies = new HashSet<>();
         Set<Faction> enemies = new HashSet<>();
 
+        String report = "";
         for (Faction otherFaction : allFactions) {
+            String otherFactionCode = otherFaction.getShortName();
             if (otherFaction.equals(campaignFaction)) {
-                setFameForFaction(otherFaction.getShortName(), fameSameFaction);
+                report = changeFameForFaction(otherFactionCode, fameSameFaction, gameYear);
+                if (!report.isBlank()) {
+                    fameChangeReports.add(report);
+                }
                 continue;
             }
 
             if (factionHints.isAlliedWith(campaignFaction, otherFaction, today)) {
-                setFameForFaction(otherFaction.getShortName(), fameAlly);
+                report = changeFameForFaction(otherFactionCode, fameAlly, gameYear);
+                if (!report.isBlank()) {
+                    fameChangeReports.add(report);
+                }
+
                 allies.add(otherFaction);
             } else if (factionHints.isAtWarWith(campaignFaction, otherFaction, today)) {
-                setFameForFaction(otherFaction.getShortName(), fameEnemy);
+                report = changeFameForFaction(otherFactionCode, fameEnemy, gameYear);
+                if (!report.isBlank()) {
+                    fameChangeReports.add(report);
+                }
+
                 enemies.add(otherFaction);
             }
         }
 
-        // Pass 2: Friends of enemies
+        // Pass 2: Friends of Enemies
         for (Faction otherFaction : allFactions) {
             if (otherFaction.equals(campaignFaction) ||
                       allies.contains(otherFaction) ||
@@ -147,13 +173,18 @@ public class FactionStandings {
                 continue;
             }
 
-            // Check if ally of enemy
+            String otherFactionCode = otherFaction.getShortName();
+
+            // Check if ally of an enemy
             boolean isAllyOfEnemy = enemies.stream()
                                           .anyMatch(enemy -> factionHints.isAlliedWith(enemy, otherFaction, today));
 
-            // set fame
+            // Set Fame
             if (isAllyOfEnemy) {
-                setFameForFaction(otherFaction.getShortName(), fameEnemyOfAEnemy);
+                report = changeFameForFaction(otherFactionCode, fameEnemyOfAEnemy, gameYear);
+                if (!report.isBlank()) {
+                    fameChangeReports.add(report);
+                }
             }
         }
     }
@@ -210,26 +241,92 @@ public class FactionStandings {
      * @since 0.50.07
      */
     public void setFameForFaction(final String factionCode, final double fame) {
-        changeFameForFaction(factionCode, fame);
+        factionStandings.put(factionCode, fame);
     }
 
     /**
-     * Adjusts the fame value for a specific faction by a given amount.
+     * Adjusts the Fame value for a specific faction by a given delta, potentially changing its standing milestone,
+     * and generates a report describing the change.
      *
-     * <p>The current fame value for the faction is retrieved and incremented by {@code delta}. If the faction code
-     * does not already exist, it is created with the value {@code delta}.</p>
+     * <p>The current fame value for the specified faction is retrieved and incremented by {@code delta}. If the
+     * faction does not yet exist in the Standings, it will be added with the value {@code delta}. If the change
+     * results in a milestone crossing (a change to a different {@link FactionStandingLevel}), an extra message
+     * reporting the milestone change is included.</p>
      *
-     * @param factionCode a unique code identifying the faction
-     * @param delta       the amount to add to the faction's current standing
+     * <p>The report is formatted with colored text to indicate whether Fame increased or decreased, and includes the
+     * new milestone label if a milestone boundary was crossed. The faction's full name for the current game year is
+     * used in the report.</p>
+     *
+     * <p>A delta of zero has no effect on Fame or milestones and returns an empty string.</p>
+     *
+     * @param factionCode a unique code identifying the faction whose Fame is being changed
+     * @param delta the amount to add to the faction's current Standing (can be positive or negative)
+     * @param gameYear the current in-game year, used for proper display of faction names
+     * @return a formatted {@link String} reporting the fame change and milestone transition (if any); returns an empty
+     * string if {@code delta} is zero
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public void changeFameForFaction(final String factionCode, final double delta) {
+    public String changeFameForFaction(final String factionCode, final double delta, final int gameYear) {
+        if (delta == 0) {
+            LOGGER.debug("A change of 0 Fame requested for {}. Shortcutting the method.", factionCode);
+            return "";
+        }
+
         double originalFame = getFameForFaction(factionCode);
+        FactionStandingLevel originalMilestone = FactionStandingUtilities.calculateFactionStandingLevel(originalFame);
+
         double newFame = originalFame + delta;
+        FactionStandingLevel newMilestone = FactionStandingUtilities.calculateFactionStandingLevel(newFame);
 
         factionStandings.put(factionCode, newFame);
+
+        Faction relevantFaction = Factions.getInstance().getFaction(factionCode);
+
+        // Build 'milestone changed' report
+        String reportingColor = "";
+        String milestoneChangeReport = "";
+        if (originalMilestone != newMilestone) {
+            if (relevantFaction == null) {
+                relevantFaction = Factions.getInstance().getDefaultFaction();
+            }
+
+            if (newMilestone.getStandingLevel() > originalMilestone.getStandingLevel()) {
+                reportingColor = MekHQ.getMHQOptions().getFontColorPositiveHexColor();
+            } else {
+                reportingColor = MekHQ.getMHQOptions().getFontColorNegativeHexColor();
+            }
+
+            milestoneChangeReport = getFormattedTextAt(RESOURCE_BUNDLE,
+                  "factionStandings.change.report.milestone",
+                  spanOpeningWithCustomColor(reportingColor),
+                  newMilestone.getLabel(relevantFaction),
+                  CLOSING_SPAN_TAG);
+        }
+
+        // Build final report
+        String deltaDirection = "";
+        if (originalFame > newFame) {
+            reportingColor = MekHQ.getMHQOptions().getFontColorPositiveHexColor();
+            deltaDirection = getTextAt(RESOURCE_BUNDLE, "factionStandings.change.increased");
+        } else {
+            reportingColor = MekHQ.getMHQOptions().getFontColorNegativeHexColor();
+            deltaDirection = getTextAt(RESOURCE_BUNDLE, "factionStandings.change.decreased");
+        }
+
+        String factionName = relevantFaction == null ?
+                                   getTextAt(RESOURCE_BUNDLE, "factionStandings.change.report.unknownFaction") :
+                                   relevantFaction.getFullName(gameYear);
+
+        return getFormattedTextAt(RESOURCE_BUNDLE,
+              "factionStandings.change.report",
+              factionName,
+              reportingColor,
+              deltaDirection,
+              CLOSING_SPAN_TAG,
+              abs(delta),
+              milestoneChangeReport);
     }
 
     /**

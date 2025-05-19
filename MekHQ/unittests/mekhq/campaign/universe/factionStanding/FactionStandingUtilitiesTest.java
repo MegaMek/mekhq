@@ -32,19 +32,19 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
-import static mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel.STANDING_LEVEL_0;
-import static mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel.STANDING_LEVEL_8;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.util.Arrays;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-
 import mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+
+import java.util.Arrays;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
+import static mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel.STANDING_LEVEL_0;
+import static mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel.STANDING_LEVEL_8;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class FactionStandingUtilitiesTest {
     @Test
@@ -83,17 +83,19 @@ class FactionStandingUtilitiesTest {
 
     private static Stream<Arguments> fameAndExpectedStandingLevel() {
         return Arrays.stream(FactionStandingLevel.values()).flatMap(standing -> {
-            int min = standing.getMinimumFame();
-            int max = standing.getMaximumFame();
+            // We're casting to an int as we don't need to check every possible decimal value.
+            // If all ints pass the test, then all doubles will too.
+            int minimumFame = (int) standing.getMinimumFame();
+            int maximumFame = (int) standing.getMaximumFame();
             // These special handlers stop us iterating for all values between Integer#MIN_VALUE and
             // Integer#MAX_VALUE.
             if (standing == STANDING_LEVEL_0) {
-                min = -100;
+                minimumFame = -100;
             }
             if (standing == STANDING_LEVEL_8) {
-                max = 110;
+                maximumFame = 110;
             }
-            return IntStream.rangeClosed(min, max).mapToObj(fame -> Arguments.of(fame, standing));
+            return IntStream.rangeClosed(minimumFame, maximumFame).mapToObj(fame -> Arguments.of(fame, standing));
         });
     }
 }

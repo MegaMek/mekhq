@@ -56,7 +56,7 @@ public class FactionStandingUtilities {
      * @author Illiani
      * @since 0.50.07
      */
-    public static FactionStandingLevel calculateFactionStandingLevel(int fame) {
+    public static FactionStandingLevel calculateFactionStandingLevel(double fame) {
         for (FactionStandingLevel standingLevel : FactionStandingLevel.values()) {
             if (fame >= standingLevel.getMinimumFame() && fame <= standingLevel.getMaximumFame()) {
                 return standingLevel;
@@ -82,7 +82,7 @@ public class FactionStandingUtilities {
      * @see FactionStandingLevel#getStandingLevel()
      * @since 0.50.07
      */
-    public static int getStandingLevel(final int fame) {
+    public static int getStandingLevel(final double fame) {
         final FactionStandingLevel standing = calculateFactionStandingLevel(fame);
 
         return standing.getStandingLevel();
@@ -99,7 +99,7 @@ public class FactionStandingUtilities {
      * @see FactionStandingLevel#getNegotiationModifier()
      * @since 0.50.07
      */
-    public static int getNegotiationModifier(final int fame) {
+    public static int getNegotiationModifier(final double fame) {
         final FactionStandingLevel standing = calculateFactionStandingLevel(fame);
 
         return standing.getNegotiationModifier();
@@ -116,7 +116,7 @@ public class FactionStandingUtilities {
      * @see FactionStandingLevel#getResupplyWeightModifier()
      * @since 0.50.07
      */
-    public static double getResupplyWeightModifier(final int fame) {
+    public static double getResupplyWeightModifier(final double fame) {
         final FactionStandingLevel standing = calculateFactionStandingLevel(fame);
 
         return standing.getResupplyWeightModifier();
@@ -133,7 +133,7 @@ public class FactionStandingUtilities {
      * @see FactionStandingLevel#hasCommandCircuitAccess()
      * @since 0.50.07
      */
-    public static boolean hasCommandCircuitAccess(final int fame) {
+    public static boolean hasCommandCircuitAccess(final double fame) {
         final FactionStandingLevel standing = calculateFactionStandingLevel(fame);
 
         return standing.hasCommandCircuitAccess();
@@ -150,7 +150,7 @@ public class FactionStandingUtilities {
      * @see FactionStandingLevel#isOutlawed()
      * @since 0.50.07
      */
-    public static boolean isOutlawed(final int fame) {
+    public static boolean isOutlawed(final double fame) {
         final FactionStandingLevel standing = calculateFactionStandingLevel(fame);
 
         return standing.isOutlawed();
@@ -167,7 +167,7 @@ public class FactionStandingUtilities {
      * @see FactionStandingLevel#isBatchallAllowed()
      * @since 0.50.07
      */
-    public static boolean isBatchallAllowed(final int fame) {
+    public static boolean isBatchallAllowed(final double fame) {
         final FactionStandingLevel standing = calculateFactionStandingLevel(fame);
 
         return standing.isBatchallAllowed();
@@ -184,7 +184,7 @@ public class FactionStandingUtilities {
      * @see FactionStandingLevel#getRecruitmentTickets()
      * @since 0.50.07
      */
-    public static int getRecruitmentTickets(final int fame) {
+    public static int getRecruitmentTickets(final double fame) {
         final FactionStandingLevel standing = calculateFactionStandingLevel(fame);
 
         return standing.getRecruitmentTickets();
@@ -201,7 +201,7 @@ public class FactionStandingUtilities {
      * @see FactionStandingLevel#getRecruitmentRollsModifier()
      * @since 0.50.07
      */
-    public static int getRecruitmentRollsModifier(final int fame) {
+    public static int getRecruitmentRollsModifier(final double fame) {
         final FactionStandingLevel standing = calculateFactionStandingLevel(fame);
 
         return standing.getRecruitmentRollsModifier();
@@ -218,7 +218,7 @@ public class FactionStandingUtilities {
      * @see FactionStandingLevel#getBarrackCostsMultiplier()
      * @since 0.50.07
      */
-    public static double getBarrackCostsMultiplier(final int fame) {
+    public static double getBarrackCostsMultiplier(final double fame) {
         final FactionStandingLevel standing = calculateFactionStandingLevel(fame);
 
         return standing.getBarrackCostsMultiplier();
@@ -235,7 +235,7 @@ public class FactionStandingUtilities {
      * @see FactionStandingLevel#getUnitMarketRarityModifier()
      * @since 0.50.07
      */
-    public static int getUnitMarketRarityModifier(final int fame) {
+    public static int getUnitMarketRarityModifier(final double fame) {
         final FactionStandingLevel standing = calculateFactionStandingLevel(fame);
 
         return standing.getUnitMarketRarityModifier();
@@ -252,7 +252,7 @@ public class FactionStandingUtilities {
      * @see FactionStandingLevel#getContractPayMultiplier()
      * @since 0.50.07
      */
-    public static double getContractPayMultiplier(final int fame) {
+    public static double getContractPayMultiplier(final double fame) {
         final FactionStandingLevel standing = calculateFactionStandingLevel(fame);
 
         return standing.getContractPayMultiplier();
@@ -269,7 +269,7 @@ public class FactionStandingUtilities {
      * @see FactionStandingLevel#getSupportPointModifierContractStart()
      * @since 0.50.07
      */
-    public static int getSupportPointModifierContractStart(final int fame) {
+    public static int getSupportPointModifierContractStart(final double fame) {
         final FactionStandingLevel standing = calculateFactionStandingLevel(fame);
 
         return standing.getSupportPointModifierContractStart();
@@ -286,7 +286,7 @@ public class FactionStandingUtilities {
      * @see FactionStandingLevel#getSupportPointModifierPeriodic()
      * @since 0.50.07
      */
-    public static int getSupportPointModifierPeriodic(final int fame) {
+    public static int getSupportPointModifierPeriodic(final double fame) {
         final FactionStandingLevel standing = calculateFactionStandingLevel(fame);
 
         return standing.getSupportPointModifierPeriodic();
