@@ -33,6 +33,8 @@
  */
 package mekhq.campaign.finances;
 
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.PrintWriter;
@@ -345,7 +347,7 @@ public class Finances {
         // Handle assets
         getAssets().forEach(asset -> asset.processNewDay(campaign, yesterday, today, this));
 
-        // Handle peacetime operating expenses, payroll, and loan payments
+        // Handle peacetime operating expenses, payroll, loan payments, and leases
         if (today.getDayOfMonth() == 1) {
             if (campaign.getCampaignOptions().isUsePeacetimeCost()) {
                 if (!campaign.getCampaignOptions().isShowPeacetimeCost()) {
@@ -507,6 +509,22 @@ public class Finances {
                 newLoans.add(loan);
             } else {
                 campaign.addReport(resourceMap.getString("Loan.paid.report"), loan);
+            }
+        }
+
+        // Leases - on the 1st, go get the cost of units in the hanger looking for leases. Charge money if possible.
+        if (today.getDayOfMonth() == 1 && (campaign.getCampaignOptions().isTrackLeases())) {
+            Money leaseCosts = campaign.getAccountant().getLeaseCosts();
+            if (debit(TransactionType.LEASE_PAYMENT, today, leaseCosts, resourceMap.getString("LeaseCosts.title"))) {
+                campaign.addReport(String.format(resourceMap.getString("LeaseCosts.text"),
+                      leaseCosts.toAmountAndSymbolString()));
+            } else {
+                String color = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor());
+                String msg = String.format(color +
+                                                 resourceMap.getString("LeaseCosts.insufficient.report") +
+                                                 leaseCosts +
+                                                 "</span>");
+                campaign.addReport(msg);
             }
         }
 

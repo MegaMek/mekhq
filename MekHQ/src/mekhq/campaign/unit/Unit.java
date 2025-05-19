@@ -84,6 +84,7 @@ import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.event.PersonCrewAssignmentEvent;
 import mekhq.campaign.event.PersonTechAssignmentEvent;
 import mekhq.campaign.event.UnitArrivedEvent;
+import mekhq.campaign.finances.Lease;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.log.AssignmentLogger;
@@ -458,7 +459,8 @@ public class Unit implements ITechnology {
      *
      * @return transported units summary of that type, or null
      */
-    public @Nullable AbstractTransportedUnitsSummary getTransportedUnitsSummary(CampaignTransportType campaignTransportType) {
+    public @Nullable AbstractTransportedUnitsSummary getTransportedUnitsSummary(
+          CampaignTransportType campaignTransportType) {
         for (AbstractTransportedUnitsSummary transportedUnitSummary : transportedUnitsSummaries) {
             if (transportedUnitSummary.getClass() == campaignTransportType.getTransportedUnitsSummaryType()) {
                 return transportedUnitSummary;
@@ -1383,8 +1385,11 @@ public class Unit implements ITechnology {
     }
 
     public Money getSellValue() {
-        Money partsValue = Money.zero();
+        if (this.unitLease != null) {
+            return Money.zero();
+        } // don't count leased vehicles
 
+        Money partsValue = Money.zero();
         partsValue = partsValue.plus(parts.stream()
                                            .map(x -> x.getActualValue().multipliedBy(x.getQuantity()))
                                            .collect(Collectors.toList()));
@@ -2507,6 +2512,11 @@ public class Unit implements ITechnology {
         }
 
         // END new transports
+        //Leases
+        if (hasLease()) {
+            unitLease.writeToXML(pw, indent);
+        }
+
         // Salvage status
         if (salvaged) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvaged", true);
@@ -2726,6 +2736,9 @@ public class Unit implements ITechnology {
                     retVal.lastMaintenanceReport = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("mothballInfo")) {
                     retVal.mothballInfo = MothballInfo.generateInstanceFromXML(wn2, version);
+                } else if (wn2.getNodeName().equalsIgnoreCase("lease")) {
+                    // Leases
+                    retVal.unitLease = Lease.generateInstanceFromXML(wn2, retVal);
                 }
                 // Set up bay space values after we've loaded everything from the unit record
                 // Used for older campaign
@@ -4490,8 +4503,7 @@ public class Unit implements ITechnology {
                   getCampaign().getCampaignOptions().isUseInitiativeBonus()) {
             // Tactics command bonus. This should actually reflect the unit's commander
             if (null != commander && commander.hasSkill(SkillType.S_TACTICS)) {
-                entity.getCrew()
-                      .setCommandBonus(commander.getSkill(SkillType.S_TACTICS).getTotalSkillLevel());
+                entity.getCrew().setCommandBonus(commander.getSkill(SkillType.S_TACTICS).getTotalSkillLevel());
             }
         }
 
@@ -6804,4 +6816,23 @@ public class Unit implements ITechnology {
                   "Unexpected value in mekhq/campaign/unit/Unit.java/getRandomUnitQuality: " + roll);
         };
     }
+
+    private Lease unitLease;
+
+    public void addLease(Lease lease) {
+        unitLease = lease;
+    }
+
+    public void removeLease() {
+        unitLease = null;
+    }
+
+    public boolean hasLease() {
+        return (unitLease != null);
+    }
+
+    public Lease getUnitLease() {
+        return unitLease;
+    }
+
 }

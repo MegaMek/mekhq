@@ -44,6 +44,7 @@ public enum TransactionType {
     FINANCIAL_TERM_END_CARRYOVER("TransactionType.FINANCIAL_TERM_END_CARRYOVER.text",
           "TransactionType.FINANCIAL_TERM_END_CARRYOVER.toolTipText"),
     FINE("TransactionType.FINE.text", "TransactionType.FINE.toolTipText"),
+    LEASE_PAYMENT("TransactionType.LEASE_PAYMENT.text", "TransactionType.LEASE_PAYMENT.toolTipText"),
     LOAN_PAYMENT("TransactionType.LOAN_PAYMENT.text", "TransactionType.LOAN_PAYMENT.toolTipText"),
     LOAN_PRINCIPAL("TransactionType.LOAN_PRINCIPAL.text", "TransactionType.LOAN_PRINCIPAL.toolTipText"),
     MAINTENANCE("TransactionType.MAINTENANCE.text", "TransactionType.MAINTENANCE.toolTipText"),
@@ -64,6 +65,7 @@ public enum TransactionType {
     TRANSPORTATION("TransactionType.TRANSPORTATION.text", "TransactionType.TRANSPORTATION.toolTipText"),
     UNIT_PURCHASE("TransactionType.UNIT_PURCHASE.text", "TransactionType.UNIT_PURCHASE.toolTipText"),
     UNIT_SALE("TransactionType.UNIT_SALE.text", "TransactionType.UNIT_SALE.toolTipText"),
+    UNIT_CANCEL_LEASE("TransactionType.UNIT_CANCEL_LEASE.text", "TransactionType.UNIT_CANCEL_LEASE.toolTipText"),
     BONUS_EXCHANGE("TransactionType.BONUS_EXCHANGE.text", "TransactionType.BONUS_EXCHANGE.toolTipText"),
     WEALTH("TransactionType.WEALTH.text", "TransactionType.WEALTH.toolTipText");
     // endregion Enum Declarations
@@ -119,6 +121,10 @@ public enum TransactionType {
 
     public boolean isFine() {
         return this == FINE;
+    }
+
+    public boolean isLeasePayment() {
+        return this == LEASE_PAYMENT;
     }
 
     public boolean isLoanPayment() {

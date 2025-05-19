@@ -39,6 +39,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.ProcurementEvent;
+import mekhq.campaign.finances.LeaseOrder;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
@@ -180,6 +181,8 @@ public class ShoppingList {
             // when we parse units and find refit kits that have not been found
             if ((shoppingItem instanceof Part) && !(shoppingItem instanceof Refit)) {
                 ((Part) shoppingItem).writeToXML(pw, indent);
+            } else if (shoppingItem instanceof LeaseOrder) {
+                ((LeaseOrder) shoppingItem).writeToXML(pw, indent);
             } else if (shoppingItem instanceof UnitOrder) {
                 ((UnitOrder) shoppingItem).writeToXML(pw, indent);
             }
@@ -203,6 +206,12 @@ public class ShoppingList {
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("unitOrder")) {
                     UnitOrder u = UnitOrder.generateInstanceFromXML(wn2, c);
+                    u.setCampaign(c);
+                    if (u.getEntity() != null) {
+                        retVal.getShoppingList().add(u);
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("leaseOrder")) {
+                    LeaseOrder u = LeaseOrder.generateInstanceFromXML(wn2, c);
                     u.setCampaign(c);
                     if (u.getEntity() != null) {
                         retVal.getShoppingList().add(u);
