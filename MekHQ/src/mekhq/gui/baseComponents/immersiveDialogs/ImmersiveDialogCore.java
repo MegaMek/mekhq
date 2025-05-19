@@ -237,6 +237,7 @@ public class ImmersiveDialogCore extends JDialog {
         // Left box for speaker details
         if (leftSpeaker != null) {
             JPanel pnlLeftSpeaker = buildSpeakerPanel(leftSpeaker, campaign);
+            pnlLeftSpeaker.setBorder(new EmptyBorder(0, getPadding(), 0, 0));
 
             // Add pnlLeftSpeaker to mainPanel
             constraints.gridx = gridx;
@@ -259,6 +260,7 @@ public class ImmersiveDialogCore extends JDialog {
         // Right box for speaker details
         if (rightSpeaker != null) {
             JPanel pnlRightSpeaker = buildSpeakerPanel(rightSpeaker, campaign);
+            pnlRightSpeaker.setBorder(new EmptyBorder(0, 0, 0, getPadding()));
 
             // Add pnlRightSpeaker to mainPanel
             constraints.gridx = gridx;
@@ -332,6 +334,7 @@ public class ImmersiveDialogCore extends JDialog {
         editorPane.setEditable(false);
         editorPane.setFocusable(false);
         editorPane.setBorder(BorderFactory.createEmptyBorder());
+        editorPane.setBorder(new EmptyBorder(0, getPadding(), 0, getPadding()));
 
         // Use inline CSS to set font family, size, and other style properties
         String fontStyle = "font-family: Noto Sans;";
@@ -676,8 +679,6 @@ public class ImmersiveDialogCore extends JDialog {
         speakerBox.setLayout(new BoxLayout(speakerBox, BoxLayout.Y_AXIS));
         speakerBox.setAlignmentX(Component.CENTER_ALIGNMENT);
         speakerBox.setMaximumSize(new Dimension(IMAGE_WIDTH, scaleForGUI(MAX_VALUE)));
-        speakerBox.setBorder(new EmptyBorder(0, getPadding(), 0, getPadding()));
-
 
         // Get speaker details
         String speakerName = campaign.getName();
