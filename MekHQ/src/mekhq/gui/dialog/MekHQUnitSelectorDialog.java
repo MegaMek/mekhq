@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -60,6 +65,7 @@ import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.unit.UnitTechProgression;
 import mekhq.utilities.MHQInternationalization;
+import mekhq.utilities.ReportingUtilities;
 
 public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
     //region Variable Declarations
@@ -174,9 +180,10 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
                           "mekSelectorDialog.unsupported.droneOs");
                 }
 
-                campaign.addReport(String.format(reason,
-                      spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
-                      CLOSING_SPAN_TAG));
+                campaign.addReport(String.format(
+                    reason,
+                    spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
+                    CLOSING_SPAN_TAG));
 
                 dispose();
                 return;

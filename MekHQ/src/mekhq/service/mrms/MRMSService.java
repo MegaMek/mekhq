@@ -65,6 +65,7 @@ import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.WorkTime;
 import mekhq.gui.sorter.UnitStatusSorter;
 import mekhq.service.mrms.MRMSService.MRMSUnitAction.STATUS;
+import mekhq.utilities.ReportingUtilities;
 
 public class MRMSService {
     private static final MMLogger logger = MMLogger.create(MRMSService.class);
@@ -163,7 +164,7 @@ public class MRMSService {
 
         String actionDescriptor = unit.isSalvage() ? resources.getString("Salvage") : resources.getString("Repair");
         String msg = String.format(
-                "<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor()
+                "<font color='" + ReportingUtilities.getPositiveColor()
                         + "'>Mass %s complete on %s.</font>",
                 actionDescriptor,
                 unit.getName());
@@ -200,11 +201,11 @@ public class MRMSService {
 
             if (!parts.isEmpty()) {
                 if (parts.size() == 1) {
-                    campaign.addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
+                    campaign.addReport("<font color='" + ReportingUtilities.getNegativeColor()
                             + "'>There in still 1 part that is not being worked on.</font>");
                 } else {
                     campaign.addReport(String.format(
-                            "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
+                            "<font color='" + ReportingUtilities.getNegativeColor()
                                     + "'>There are still %s parts that are not being worked on.</font>",
                             parts.size()));
                 }
@@ -295,7 +296,7 @@ public class MRMSService {
             }
 
             StringBuilder sb = new StringBuilder(
-                    String.format("<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor()
+                    String.format("<font color='" + ReportingUtilities.getPositiveColor()
                             + "'>Mass Repair/Salvage complete for %s units.</font>", totalCount));
 
             if (actionsPerformed > 0) {
@@ -346,11 +347,11 @@ public class MRMSService {
 
                 if (count > 0) {
                     if (count == 1) {
-                        campaign.addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
+                        campaign.addReport("<font color='" + ReportingUtilities.getNegativeColor()
                                 + "'>There in still 1 part that is not being worked on.</font>");
                     } else {
                         campaign.addReport(String.format(
-                                "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
+                                "<font color='" + ReportingUtilities.getNegativeColor()
                                         + "'>There are still %s parts that are not being worked on %s unit%s.</font>",
                                 count, unitCount, (unitCount == 1) ? "" : "s"));
                     }
@@ -621,12 +622,12 @@ public class MRMSService {
 
                         if (unfixable) {
                             campaign.addReport(String.format(
-                                    "<font color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor()
+                                    "<font color='" + ReportingUtilities.getWarningColor()
                                             + "'>Found an unfixable limb (%s) on %s which contains %s parts. Going to remove all parts and scrap the limb before proceeding with other repairs.</font>",
                                     loc.getName(), unit.getName(), countOfPartsPerLocation.get(locId)));
                         } else {
                             campaign.addReport(String.format(
-                                    "<font color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor()
+                                    "<font color='" + ReportingUtilities.getWarningColor()
                                             + "'>Found missing location (%s) on %s which contains %s parts. Going to remove all parts before proceeding with other repairs.</font>",
                                     loc != null ? loc.getName() : Integer.toString(locId), unit.getName(),
                                     countOfPartsPerLocation.get(locId)));

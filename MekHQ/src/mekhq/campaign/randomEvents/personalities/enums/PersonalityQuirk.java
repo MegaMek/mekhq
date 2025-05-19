@@ -24,12 +24,18 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.randomEvents.personalities.enums;
 
 import static megamek.codeUtilities.MathUtility.clamp;
 import static mekhq.campaign.personnel.enums.PersonnelRole.BATTLE_ARMOUR;
 import static mekhq.campaign.personnel.enums.PersonnelRole.SOLDIER;
+import static mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType.PERSONALITY_QUIRK;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.ArrayList;
@@ -316,6 +322,26 @@ public enum PersonalityQuirk {
      * and three for Support, this should equal 3 and not 6.</p>
      */
     public final static int MAXIMUM_VARIATIONS = 3;
+
+    /**
+     * @return the {@link PersonalityTraitType} representing personality quirks
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public PersonalityTraitType getPersonalityTraitType() {
+        return PERSONALITY_QUIRK;
+    }
+
+    /**
+     * @return the label string for the personality quirk trait type
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public String getPersonalityTraitTypeLabel() {
+        return getPersonalityTraitType().getLabel();
+    }
 
     /**
      * Retrieves the label associated with the current enumeration value.

@@ -50,7 +50,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.Contract;
@@ -59,6 +58,7 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * Handles events involving prisoners at the end of a mission.
@@ -443,8 +443,8 @@ public class PrisonerMissionEndEvent {
 
         // Build the report
         String crimeColor = crimeNoticed ?
-                                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()) :
-                                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor());
+                                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()) :
+                                  spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor());
 
         String crimeMessage = crimeNoticed ?
                                     getFormattedTextAt(RESOURCE_BUNDLE,

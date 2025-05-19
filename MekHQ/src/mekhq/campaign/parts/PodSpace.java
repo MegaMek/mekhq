@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
@@ -254,11 +259,11 @@ public class PodSpace implements IPartWork {
         if (isSalvaging()) {
             remove(true);
             return ReportingUtilities.messageSurroundedBySpanWithColor(
-                    MekHQ.getMHQOptions().getFontColorPositiveHexColor(), "<b> removed</b>") + ".";
+                    ReportingUtilities.getPositiveColor(), "<b> removed</b>") + ".";
         } else {
             fix();
             return ReportingUtilities.messageSurroundedBySpanWithColor(
-                    MekHQ.getMHQOptions().getFontColorPositiveHexColor(), "<b> fixed</b>") + ".";
+                    ReportingUtilities.getPositiveColor(), "<b> fixed</b>") + ".";
         }
     }
 
@@ -277,11 +282,11 @@ public class PodSpace implements IPartWork {
         }
         if (rating >= SkillType.EXP_ELITE && replacing) {
                 return ReportingUtilities.messageSurroundedBySpanWithColor(
-                        MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
+                        ReportingUtilities.getNegativeColor(),
                         "<b> failed and part(s) destroyed</b>") + ".";
         } else {
             return ReportingUtilities.messageSurroundedBySpanWithColor(
-                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(),"<b> failed</b>") + ".";
+                    ReportingUtilities.getNegativeColor(),"<b> failed</b>") + ".";
         }
     }
 

@@ -87,6 +87,7 @@ public class PersonnelOptions extends PilotOptions {
     public static final String FLAW_GREMLINS = "flaw_gremlins";
     public static final String ATOW_TECH_EMPATHY = "atow_tech_empathy";
     public static final String FLAW_TRANSIT_DISORIENTATION_SYNDROME = "flaw_transit_disorientation_syndrome";
+
     public static final String MUTATION_FREAKISH_STRENGTH = "mutation_freakish_strength";
     public static final String MUTATION_EXCEPTIONAL_IMMUNE_SYSTEM = "mutation_exceptional_immune_system";
     public static final String MUTATION_EXOTIC_APPEARANCE = "mutation_exotic_appearance";
@@ -102,6 +103,14 @@ public class PersonnelOptions extends PilotOptions {
     public static final String EXCEPTIONAL_ATTRIBUTE_INTELLIGENCE = "exceptional_attribute_intelligence";
     public static final String EXCEPTIONAL_ATTRIBUTE_WILLPOWER = "exceptional_attribute_willpower";
     public static final String EXCEPTIONAL_ATTRIBUTE_CHARISMA = "exceptional_attribute_charisma";
+
+    public static final String ADMIN_SCROUNGE = "admin_scrounge";
+    public static final String ADMIN_MEDIATOR = "admin_mediator";
+    public static final String ADMIN_LOGISTICIAN = "admin_logistician";
+    public static final String ADMIN_COORDINATOR = "admin_coordinator";
+    public static final String ADMIN_TETRIS_MASTER = "admin_tetris_master";
+    public static final String ADMIN_NETWORKER = "admin_networker";
+    public static final String ADMIN_INTERSTELLAR_NEGOTIATOR = "admin_interstellar_negotiator";
 
     @Override
     public void initialize() {
@@ -185,6 +194,14 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, EXCEPTIONAL_ATTRIBUTE_INTELLIGENCE, false);
         addOption(l3a, EXCEPTIONAL_ATTRIBUTE_WILLPOWER, false);
         addOption(l3a, EXCEPTIONAL_ATTRIBUTE_CHARISMA, false);
+
+        addOption(l3a, ADMIN_SCROUNGE, false);
+        addOption(l3a, ADMIN_MEDIATOR, false);
+        addOption(l3a, ADMIN_LOGISTICIAN, false);
+        addOption(l3a, ADMIN_COORDINATOR, false);
+        addOption(l3a, ADMIN_TETRIS_MASTER, false);
+        addOption(l3a, ADMIN_NETWORKER, false);
+        addOption(l3a, ADMIN_INTERSTELLAR_NEGOTIATOR, false);
 
         addOption(edge, EDGE_MEDICAL, true);
         addOption(edge, EDGE_REPAIR_BREAK_PART, true);
