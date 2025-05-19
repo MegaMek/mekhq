@@ -161,7 +161,7 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
      * @return The current capacity of the transporter, or 0
      */
     @Override
-    public double getCurrentTransportCapacity(TransporterType transporterType) {
+    public double getCurrentTransportCapacity(@Nullable TransporterType transporterType) {
         return transportCapacity.getOrDefault(transporterType, 0.0);
     }
 
@@ -226,6 +226,14 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
         }
 
         clearTransportedEntities();
+    }
+
+    /**
+     * Completely clears the capacity map. Helpful if the transportCapacity has a TransporterType for a Transporter
+     * the unit no longer has - such as after a refit.
+     */
+    public void clearTransportCapacityMap() {
+        transportCapacity = new HashMap<>();
     }
 
     protected Set<Entity> clearTransportedEntities() {
