@@ -35,22 +35,23 @@ package mekhq.campaign.finances;
 
 import java.io.PrintWriter;
 
+import megamek.common.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.unit.UnitOrder;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class LeaseOrder extends mekhq.campaign.unit.UnitOrder {
+public class LeaseOrder extends UnitOrder {
     private static final MMLogger LOGGER = MMLogger.create(LeaseOrder.class);
 
     /*
      * LeaseOrders is in the shopping list, it doesn't have a unit yet to attach to.
      */
-    public LeaseOrder(megamek.common.Entity entity, mekhq.campaign.Campaign campaign) {
+    public LeaseOrder(Entity entity, Campaign campaign) {
         super(entity, campaign);
-        this.entity = entity;
     }
 
     // For the XML reader.
@@ -58,18 +59,8 @@ public class LeaseOrder extends mekhq.campaign.unit.UnitOrder {
     }
 
     @Override
-    public void decrementDaysToWait() {
-        super.decrementDaysToWait();
-    }
-
-    @Override
-    public int getDaysToWait() {
-        return super.getDaysToWait();
-    }
-
-    @Override
     public String find(int transitDays) {
-        super.getCampaign().getQuartermaster().leaseUnit((megamek.common.Entity) getNewEquipment(), transitDays);
+        super.getCampaign().getQuartermaster().createLeasedUnit((megamek.common.Entity) getNewEquipment(), transitDays);
         return "<font color='" +
                      mekhq.MekHQ.getMHQOptions().getFontColorPositiveHexColor() +
                      "'><b> unit found for leasing</b>.</font> It will be delivered in " +
@@ -131,7 +122,7 @@ public class LeaseOrder extends mekhq.campaign.unit.UnitOrder {
                 }
             }
         } catch (Exception ex) {
-            LOGGER.error("", ex);
+            LOGGER.error("Exception while parsing lease order from {}", nl);
         }
 
         retVal.initializeParts(false);

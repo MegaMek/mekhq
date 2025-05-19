@@ -32,7 +32,7 @@
  */
 package mekhq.campaign;
 
-import java.time.temporal.ChronoUnit;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -41,6 +41,7 @@ import megamek.common.AmmoType;
 import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
 import megamek.common.weapons.infantry.InfantryWeapon;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.event.PartArrivedEvent;
 import mekhq.campaign.event.PartChangedEvent;
@@ -63,6 +64,8 @@ import mekhq.campaign.unit.Unit;
  * Manages machines and materiel for a campaign.
  */
 public class Quartermaster {
+    private static final MMLogger LOGGER = MMLogger.create(Quartermaster.class);
+
     public enum PartAcquisitionResult {
         PartInherentFailure, PlanetSpecificFailure, Success
     }
@@ -578,22 +581,25 @@ public class Quartermaster {
     }
 
     /**
-     * Leases a Unit.
+     * Leases a Unit by creating a new Unit from the entity specified and adding it to the hangar with attached lease.
      *
-     * @param
+     * @param leaseEntity The unit to lease
+     * @param days        The number of days before the lease starts (typically days to arrival)
      */
-    public boolean leaseUnit(Entity en, int days) {
-        Objects.requireNonNull(en);
-
+    public void createLeasedUnit(Entity leaseEntity, int days) {
+        if (leaseEntity == null) {
+            LOGGER.error(new NullPointerException(), "null unit passed into createLeasedUnit");
+            return;
+        }
         PartQuality quality = PartQuality.QUALITY_D;
 
         if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
             quality = Unit.getRandomUnitQuality(0);
         }
         //We don't want to start the new lease until the unit arrives.
-        Unit newUnit = getCampaign().addNewUnit(en, false, days, quality);
-        newUnit.addLease(new Lease(campaign.getLocalDate().plus((long) days, ChronoUnit.DAYS), newUnit));
-        return true;
+        LocalDate leaseStart = campaign.getLocalDate().plusDays(days);
+        Unit newUnit = getCampaign().addNewUnit(leaseEntity, false, days, quality);
+        newUnit.addLease(new Lease(leaseStart, newUnit));
     }
 
     /**
@@ -612,8 +618,24 @@ public class Quartermaster {
         getCampaign().removeUnit(unit.getId());
     }
 
+    /**
+     * Disposes of a leased unit. Checks first that the unit exists, and has an attached lease - otherwise throws an
+     * exception.
+     *
+     * @param unit Unit to be removed
+     */
     public void cancelUnitLease(Unit unit) {
-        Objects.requireNonNull(unit);
+        if (unit == null) {
+            LOGGER.error(new NullPointerException(), "null unit passed into cancelUnitLease");
+            return;
+        }
+        if (unit.getUnitLease() == null) {
+            LOGGER.error(new NullPointerException(),
+                  "Unit {} with no lease passed into cancelUnitLease",
+                  unit.getName());
+            return;
+        }
+
         Money lastMonthLease = unit.getUnitLease().getFinalLeaseCost(getCampaign().getLocalDate());
 
         getCampaign().getFinances()

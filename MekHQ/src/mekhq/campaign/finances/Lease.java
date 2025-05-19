@@ -73,13 +73,18 @@ public class Lease {
      * @param time The current campaign LocalDate
      */
     public Money getLeaseCostNow(LocalDate time) {
-        if (getLeaseStart().isBefore(time)) {
-            if (isLeaseFirstMonth(time.minusDays(1))) {
-                return getFirstLeaseCost(time);
+        if (time.getDayOfMonth() == 1) {
+            if (getLeaseStart().isBefore(time)) {
+                if (isLeaseFirstMonth(time.minusDays(1))) {
+                    return getFirstLeaseCost(time);
+                }
+                return leaseCost;
             }
-            return leaseCost;
+            return Money.zero();
+        } else {
+            LOGGER.error("getLeaseCostNow(time) cannot be called on other days of the month then the 1st.");
+            return null;
         }
-        return Money.zero();
     }
 
     /**
@@ -113,12 +118,13 @@ public class Lease {
      * @return Money Prorated last payment of lease
      */
     public Money getFinalLeaseCost(LocalDate today) {
-        int startDay = 0;
+        int startDay = 1;
         int currentDay = today.getDayOfMonth();
         if (isLeaseFirstMonth(today)) {
             startDay = acquisitionDate.getDayOfMonth();
         }
-        float fractionOfMonth = (float) (currentDay - startDay) / (float) today.lengthOfMonth();
+        int daysElapsed = currentDay - startDay + 1;
+        float fractionOfMonth = (float) daysElapsed / today.lengthOfMonth();
         return leaseCost.multipliedBy(fractionOfMonth);
     }
 
@@ -129,10 +135,17 @@ public class Lease {
      * @return Money Prorated first payment of lease
      */
     public Money getFirstLeaseCost(LocalDate today) {
-        int startDay = acquisitionDate.getDayOfMonth();
-        int yesterday = today.minusDays(1).getDayOfMonth();
-        float fractionOfMonth = (float) (yesterday - startDay) + 1 / (float) yesterday;
-        return leaseCost.multipliedBy(fractionOfMonth);
+        if (today.getDayOfMonth() == 1) {
+            int startDay = acquisitionDate.getDayOfMonth();
+            LocalDate yesterday = today.minusDays(1);
+            int daysInMonth = yesterday.lengthOfMonth();
+            int daysElapsed = yesterday.getDayOfMonth() - startDay + 1;
+            float fractionOfMonth = (float) daysElapsed / daysInMonth;
+            return leaseCost.multipliedBy(fractionOfMonth);
+        } else {
+            LOGGER.error("getFirstLeaseCost(today) cannot be called on other days of the month than the 1st.");
+            return null;
+        }
     }
 
     /**
@@ -142,7 +155,7 @@ public class Lease {
      * @return True if unit is leasable
      */
     public static boolean isLeasable(Entity check) {
-        return check instanceof megamek.common.Dropship || check instanceof megamek.common.Jumpship;
+        return check.isDropShip() || check.isJumpShip();
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {

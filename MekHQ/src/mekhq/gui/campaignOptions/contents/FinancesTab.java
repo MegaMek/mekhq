@@ -234,7 +234,8 @@ public class FinancesTab {
     public JPanel createFinancesGeneralOptionsTab() {
         // Header
         financesGeneralOptions = new CampaignOptionsHeaderPanel("FinancesGeneralTab",
-              getImageDirectory() + "logo_star_league.png", 6);
+              getImageDirectory() + "logo_star_league.png",
+              6);
 
         // Contents
         pnlGeneralOptions = createGeneralOptionsPanel();
@@ -372,8 +373,9 @@ public class FinancesTab {
     private JPanel createGeneralOptionsPanel() {
         // Contents
         useLoanLimitsBox = new CampaignOptionsCheckBox("UseLoanLimitsBox");
-        trackLeasesBox = new CampaignOptionsCheckBox("TrackLeasesBox");
         useLoanLimitsBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "UseLoanLimitsBox"));
+        trackLeasesBox = new CampaignOptionsCheckBox("TrackLeasesBox");
+        trackLeasesBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "UseTrackLeasesBox"));
         usePercentageMaintenanceBox = new CampaignOptionsCheckBox("UsePercentageMaintenanceBox");
         usePercentageMaintenanceBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
               "UsePercentageMaintenanceBox"));
@@ -584,7 +586,10 @@ public class FinancesTab {
     public JPanel createPriceMultipliersTab() {
         // Header
         priceMultipliersHeader = new CampaignOptionsHeaderPanel("PriceMultipliersTab",
-              getImageDirectory() + "logo_clan_stone_lion.png", true, true, 2);
+              getImageDirectory() + "logo_clan_stone_lion.png",
+              true,
+              true,
+              2);
 
         // Contents
         pnlGeneralMultipliers = createGeneralMultipliersPanel();

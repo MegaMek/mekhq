@@ -150,7 +150,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     public static final String COMMAND_HIRE_FULL = "HIRE_FULL";
     public static final String COMMAND_DISBAND = "DISBAND";
     public static final String COMMAND_SELL = "SELL";
-    public static final String COMMAND_UNLEASE = "CANCEL LEASE";
+    public static final String COMMAND_UNLEASE = "CANCEL_LEASE";
     public static final String COMMAND_LOSS = "LOSS";
     public static final String COMMAND_MAINTENANCE_REPORT = "MAINTENANCE_REPORT";
     public static final String COMMAND_QUIRKS = "QUIRKS";

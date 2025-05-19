@@ -6828,17 +6828,11 @@ public class Unit implements ITechnology {
     }
 
     public boolean hasLease() {
-        if (unitLease != null) {
-            return true;
-        }
-        return false;
+        return (unitLease != null);
     }
 
     public Lease getUnitLease() {
-        if (hasLease()) {
-            return unitLease;
-        }
-        return null;
+        return unitLease;
     }
 
 }
