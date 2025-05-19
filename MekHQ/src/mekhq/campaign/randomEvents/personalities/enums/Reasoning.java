@@ -24,10 +24,18 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.randomEvents.personalities.enums;
 
+import static java.lang.Math.round;
 import static megamek.codeUtilities.MathUtility.clamp;
+import static megamek.common.Compute.randomInt;
+import static mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType.REASONING;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import megamek.codeUtilities.MathUtility;
@@ -194,6 +202,27 @@ public enum Reasoning {
               pronounData.pluralizer());
     }
 
+    /**
+     * Retrieves the formatted exam results text.
+     *
+     * <p>Calculates the results percentage based on the current {@code level} relative to {@code GENIUS.level},
+     * and uses this value to format the exam results text from the resource bundle.</p>
+     *
+     * @return the formatted exam results string with the calculated percentage inserted.
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public String getExamResults() {
+        final String RESOURCE_KEY = "examResults.text";
+
+        int results = (int) round(((double) this.level / GENIUS.level) * 100) - 5;
+        results += randomInt(11);
+        results = clamp(results, 0, 100);
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY, results);
+    }
+
     // region Boolean Comparison Methods
 
     /**
@@ -221,6 +250,26 @@ public enum Reasoning {
      */
     public int getReasoningScore() {
         return this.level - (Reasoning.values().length / 2);
+    }
+
+    /**
+     * @return the {@link PersonalityTraitType} representing reasoning
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public PersonalityTraitType getPersonalityTraitType() {
+        return REASONING;
+    }
+
+    /**
+     * @return the label string for the reasoning personality trait type
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public String getPersonalityTraitTypeLabel() {
+        return getPersonalityTraitType().getLabel();
     }
 
     /**

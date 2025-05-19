@@ -53,6 +53,9 @@ import static mekhq.campaign.mission.resupplyAndCaches.Resupply.isProhibitedUnit
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.processAbandonedConvoy;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
 import static mekhq.campaign.personnel.DiscretionarySpending.performDiscretionarySpending;
+import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_INTERSTELLAR_NEGOTIATOR;
+import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_LOGISTICIAN;
+import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_SCROUNGE;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.TrainingCombatTeams.processTrainingCombatTeams;
@@ -68,8 +71,8 @@ import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKi
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenUsage;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.processFatigueRecovery;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
-import static mekhq.campaign.randomEvents.GrayMonday.EVENT_DATE_CLARION_NOTE;
-import static mekhq.campaign.randomEvents.GrayMonday.EVENT_DATE_GRAY_MONDAY;
+import static mekhq.campaign.randomEvents.GrayMonday.GRAY_MONDAY_EVENTS_BEGIN;
+import static mekhq.campaign.randomEvents.GrayMonday.GRAY_MONDAY_EVENTS_END;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.MINIMUM_TEMPORARY_CAPACITY;
@@ -183,7 +186,6 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
-import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.generator.AbstractSpecialAbilityGenerator;
 import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
@@ -241,6 +243,7 @@ import mekhq.campaign.universe.selectors.factionSelectors.RangedFactionSelector;
 import mekhq.campaign.universe.selectors.planetSelectors.AbstractPlanetSelector;
 import mekhq.campaign.universe.selectors.planetSelectors.DefaultPlanetSelector;
 import mekhq.campaign.universe.selectors.planetSelectors.RangedPlanetSelector;
+import mekhq.campaign.utilities.AutomatedPersonnelCleanUp;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
@@ -924,7 +927,7 @@ public class Campaign implements ITechManager {
                   .append(" deducted for ship search.");
         } else {
             addReport("<font color=" +
-                            MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                            ReportingUtilities.getNegativeColor() +
                             ">Insufficient funds for ship search.</font>");
             setShipSearchStart(null);
             return;
@@ -960,7 +963,7 @@ public class Campaign implements ITechManager {
                           .append(MekHQ.getMHQOptions().getDisplayFormattedDate(getShipSearchExpiration()));
                 } else {
                     report.append(" <font color=")
-                          .append(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
+                          .append(ReportingUtilities.getNegativeColor())
                           .append(">Could not determine ship type.</font>");
                 }
             } else {
@@ -981,7 +984,7 @@ public class Campaign implements ITechManager {
 
         if (getFunds().isLessThan(cost)) {
             addReport("<font color='" +
-                            MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                            ReportingUtilities.getNegativeColor() +
                             "'><b> You cannot afford this unit. Transaction cancelled</b>.</font>");
             return;
         }
@@ -1014,7 +1017,7 @@ public class Campaign implements ITechManager {
 
         if (!getCampaignOptions().isInstantUnitMarketDelivery()) {
             addReport("<font color='" +
-                            MekHQ.getMHQOptions().getFontColorPositiveHexColor() +
+                            ReportingUtilities.getPositiveColor() +
                             "'>Unit will be delivered in " +
                             transitDays +
                             " days.</font>");
@@ -1163,7 +1166,7 @@ public class Campaign implements ITechManager {
             }
         } else {
             addReport("<font color='" +
-                            MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                            ReportingUtilities.getNegativeColor() +
                             "'>You cannot afford to make the final payments.</font>");
             return false;
         }
@@ -2070,7 +2073,7 @@ public class Campaign implements ITechManager {
                   String.format(resources.getString("personnelRecruitmentFinancesReason.text"),
                         person.getFullName()))) {
                 addReport(String.format(resources.getString("personnelRecruitmentInsufficientFunds.text"),
-                      MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
+                      ReportingUtilities.getNegativeColor(),
                       person.getFullName()));
                 return false;
             }
@@ -3272,7 +3275,7 @@ public class Campaign implements ITechManager {
     public @Nullable Person getLogisticsPerson() {
         final String skill = campaignOptions.getAcquisitionSkill();
         final ProcurementPersonnelPick acquisitionCategory = campaignOptions.getAcquisitionPersonnelCategory();
-        final int maxAcquisitions = campaignOptions.getMaxAcquisitions();
+        final int defaultMaxAcquisitions = campaignOptions.getMaxAcquisitions();
 
         int bestSkill = -1;
         Person procurementCharacter = null;
@@ -3280,11 +3283,18 @@ public class Campaign implements ITechManager {
             return null;
         } else if (skill.equals(S_TECH)) {
             for (Person person : getActivePersonnel(false)) {
+                int effectiveMaxAcquisitions = defaultMaxAcquisitions;
+
+                PersonnelOptions options = person.getOptions();
+                if (options.booleanOption(ADMIN_SCROUNGE)) {
+                    effectiveMaxAcquisitions++;
+                }
+
                 if (isIneligibleToPerformProcurement(person, acquisitionCategory)) {
                     continue;
                 }
 
-                if (maxAcquisitions > 0 && (person.getAcquisitions() >= maxAcquisitions)) {
+                if (defaultMaxAcquisitions > 0 && (person.getAcquisitions() >= effectiveMaxAcquisitions)) {
                     continue;
                 }
 
@@ -3295,11 +3305,18 @@ public class Campaign implements ITechManager {
             }
         } else {
             for (Person person : getActivePersonnel(false)) {
+                int effectiveMaxAcquisitions = defaultMaxAcquisitions;
+
+                PersonnelOptions options = person.getOptions();
+                if (options.booleanOption(ADMIN_SCROUNGE)) {
+                    effectiveMaxAcquisitions++;
+                }
+
                 if (isIneligibleToPerformProcurement(person, acquisitionCategory)) {
                     continue;
                 }
 
-                if (maxAcquisitions > 0 && (person.getAcquisitions() >= maxAcquisitions)) {
+                if (defaultMaxAcquisitions > 0 && (person.getAcquisitions() >= effectiveMaxAcquisitions)) {
                     continue;
                 }
 
@@ -3616,6 +3633,11 @@ public class Campaign implements ITechManager {
                         PartAcquisitionResult result = findContactForAcquisition(shoppingItem, person, system);
                         if (result == PartAcquisitionResult.Success) {
                             int transitTime = calculatePartTransitTime(system);
+
+                            PersonnelOptions options = person.getOptions();
+                            double logisticianModifier = options.booleanOption(ADMIN_LOGISTICIAN) ? 0.9 : 1.0;
+                            transitTime = (int) Math.round(transitTime * logisticianModifier);
+
                             int totalQuantity = 0;
                             while (shoppingItem.getQuantity() > 0 &&
                                          canAcquireParts(person) &&
@@ -3625,7 +3647,7 @@ public class Campaign implements ITechManager {
                             if (totalQuantity > 0) {
                                 addReport(personTitle +
                                                 "<font color='" +
-                                                MekHQ.getMHQOptions().getFontColorPositiveHexColor() +
+                                                ReportingUtilities.getPositiveColor() +
                                                 "'><b> found " +
                                                 shoppingItem.getQuantityName(totalQuantity) +
                                                 " on " +
@@ -3646,7 +3668,7 @@ public class Campaign implements ITechManager {
                         if (!canPayFor(shoppingItem)) {
                             if (!getCampaignOptions().isPlanetAcquisitionVerbose()) {
                                 addReport("<font color='" +
-                                                MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                                                ReportingUtilities.getNegativeColor() +
                                                 "'><b>You cannot afford to purchase another " +
                                                 shoppingItem.getAcquisitionName() +
                                                 "</b></font>");
@@ -3749,7 +3771,7 @@ public class Campaign implements ITechManager {
         if (target.getValue() == TargetRoll.IMPOSSIBLE) {
             if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
                 addReport("<font color='" +
-                                MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                                ReportingUtilities.getNegativeColor() +
                                 "'><b>" +
                                 impossibleSentencePrefix +
                                 acquisition.getAcquisitionName() +
@@ -3771,7 +3793,7 @@ public class Campaign implements ITechManager {
         if (target.getValue() == TargetRoll.IMPOSSIBLE) {
             if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
                 addReport("<font color='" +
-                                MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                                ReportingUtilities.getNegativeColor() +
                                 "'><b>" +
                                 impossibleSentencePrefix +
                                 acquisition.getAcquisitionName() +
@@ -3791,7 +3813,7 @@ public class Campaign implements ITechManager {
             // no contacts on this planet, move along
             if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
                 addReport("<font color='" +
-                                MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                                ReportingUtilities.getNegativeColor() +
                                 "'><b>" +
                                 failedSentencePrefix +
                                 acquisition.getAcquisitionName() +
@@ -3814,7 +3836,7 @@ public class Campaign implements ITechManager {
         } else {
             if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
                 addReport("<font color='" +
-                                MekHQ.getMHQOptions().getFontColorPositiveHexColor() +
+                                ReportingUtilities.getPositiveColor() +
                                 "'>" +
                                 succeededSentencePrefix +
                                 acquisition.getAcquisitionName() +
@@ -3898,7 +3920,7 @@ public class Campaign implements ITechManager {
         // if impossible, then return
         if (target.getValue() == TargetRoll.IMPOSSIBLE) {
             report += ":<font color='" +
-                            MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                            ReportingUtilities.getNegativeColor() +
                             "'><b> " +
                             target.getDesc() +
                             "</b></font>";
@@ -4564,7 +4586,7 @@ public class Campaign implements ITechManager {
             if (reportUnderStrength) {
                 addReport(String.format(resources.getString("understrength.text"),
                       force.getName(),
-                      spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor()),
+                      spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
                       CLOSING_SPAN_TAG,
                       minimumUnitCount));
             }
@@ -4617,7 +4639,7 @@ public class Campaign implements ITechManager {
                 if (campaignState != null && deficit > 0) {
                     addReport(String.format(resources.getString("contractBreach.text"),
                           contract.getHyperlinkedName(),
-                          spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                          spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                           CLOSING_SPAN_TAG));
 
                     campaignState.updateVictoryPoints(-1);
@@ -4921,7 +4943,7 @@ public class Campaign implements ITechManager {
                     person.setPrisonerStatus(this, BONDSMAN, true);
                     addReport(String.format(resources.getString("becomeBondsman.text"),
                           person.getHyperlinkedName(),
-                          spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                          spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                           CLOSING_SPAN_TAG));
                 }
             }
@@ -4981,7 +5003,7 @@ public class Campaign implements ITechManager {
 
         if (!personnelWhoAdvancedInXP.isEmpty()) {
             addReport(String.format(resources.getString("gainedExperience.text"),
-                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                  spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                   personnelWhoAdvancedInXP.size(),
                   CLOSING_SPAN_TAG));
         }
@@ -5089,7 +5111,7 @@ public class Campaign implements ITechManager {
             if (isBirthday && campaignOptions.isAnnounceBirthdays()) {
                 addReport(String.format(resources.getString("anniversaryBirthday.text"),
                       person.getHyperlinkedFullTitle(),
-                      spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                      spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                       person.getAge(getLocalDate()),
                       CLOSING_SPAN_TAG));
             }
@@ -5103,7 +5125,7 @@ public class Campaign implements ITechManager {
                           (campaignOptions.isAnnounceRecruitmentAnniversaries())) {
                     addReport(String.format(resources.getString("anniversaryRecruitment.text"),
                           person.getHyperlinkedFullTitle(),
-                          spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                          spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                           yearsOfEmployment,
                           CLOSING_SPAN_TAG,
                           name));
@@ -5113,7 +5135,7 @@ public class Campaign implements ITechManager {
             if (isBirthday) {
                 addReport(String.format(resources.getString("anniversaryBirthday.text"),
                       person.getHyperlinkedFullTitle(),
-                      spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                      spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                       person.getAge(getLocalDate()),
                       CLOSING_SPAN_TAG));
             }
@@ -5439,7 +5461,7 @@ public class Campaign implements ITechManager {
 
         // process removal of old personnel data on the first day of each month
         if ((campaignOptions.isUsePersonnelRemoval()) && (currentDay.getDayOfMonth() == 1)) {
-            processPersonnelRemoval();
+            performPersonnelCleanUp();
         }
 
         // this duplicates any turnover information so that it is still available on the
@@ -5456,13 +5478,39 @@ public class Campaign implements ITechManager {
         }
 
         // Random Events
-        if (currentDay.equals(EVENT_DATE_CLARION_NOTE) || (currentDay.isBefore(EVENT_DATE_GRAY_MONDAY.plusDays(5)))) {
+        if (currentDay.isAfter(GRAY_MONDAY_EVENTS_BEGIN) && currentDay.isBefore(GRAY_MONDAY_EVENTS_END)) {
             new GrayMonday(this, currentDay);
         }
 
         // This must be the last step before returning true
         MekHQ.triggerEvent(new NewDayEvent(this));
         return true;
+    }
+
+    /**
+     * Performs cleanup of departed personnel by identifying and removing eligible personnel records.
+     *
+     * <p>This method uses the {@link AutomatedPersonnelCleanUp} utility to determine which {@link Person}
+     * objects should be removed from the campaign based on current date and campaign configuration options. Identified
+     * personnel are then removed, and a report entry is generated if any removals occur.</p>
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    private void performPersonnelCleanUp() {
+        AutomatedPersonnelCleanUp removal = new AutomatedPersonnelCleanUp(currentDay,
+              getPersonnel(),
+              campaignOptions.isUseRemovalExemptRetirees(),
+              campaignOptions.isUseRemovalExemptCemetery());
+
+        List<Person> personnelToRemove = removal.getPersonnelToCleanUp();
+        for (Person person : personnelToRemove) {
+            removePerson(person, false);
+        }
+
+        if (!personnelToRemove.isEmpty()) {
+            addReport(resources.getString("personnelRemoval.text"));
+        }
     }
 
     /**
@@ -5576,89 +5624,6 @@ public class Campaign implements ITechManager {
 
     public void setInitiativeMaxBonus(int bonus) {
         initiativeMaxBonus = bonus;
-    }
-
-    /**
-     * This method iterates through the list of personnel and deletes the records of those who have left the unit and
-     * who match additional checks.
-     */
-    public void processPersonnelRemoval() {
-        List<Person> personnelToRemove = new ArrayList<>();
-
-        for (Person person : getPersonnel()) {
-            PersonnelStatus status = person.getStatus();
-
-            if (status.isDepartedUnit()) {
-                if (shouldRemovePerson(person)) {
-                    personnelToRemove.add(person);
-                }
-            }
-        }
-
-        for (Person person : personnelToRemove) {
-            removePerson(person, false);
-        }
-
-        if (!personnelToRemove.isEmpty()) {
-            addReport(resources.getString("personnelRemoval.text"));
-        }
-    }
-
-    /**
-     * Determines whether a person's records should be removed from the campaign based on their retirement date, date of
-     * death, personnel status, and genealogy activity.
-     *
-     * <p>
-     * The method evaluates the following conditions in order:
-     * <ul>
-     * <li>If the person has a retirement date and retirees are exempt from removal
-     * as per
-     * campaign options, the method returns {@code false}.</li>
-     * <li>If the person has a date of death, and cemeteries are exempt from removal
-     * as per
-     * campaign options, the method returns {@code false}.</li>
-     * <li>If the person has an active genealogy, the method returns
-     * {@code false}.</li>
-     * <li>If the person's retirement date is more than one month ago, the method
-     * returns {@code true}.</li>
-     * <li>If the person's date of death is more than one month ago, the method
-     * returns {@code true}.</li>
-     * </ul>
-     *
-     * <p>
-     * If none of the above conditions are met, the method returns {@code false}.
-     *
-     * @param person The individual being checked.
-     *
-     * @return {@code true} if the person should be removed, {@code false} otherwise.
-     */
-
-    private boolean shouldRemovePerson(Person person) {
-        // We do these checks first, as they're cheaper than parsing the entire
-        // genealogy
-        LocalDate retirementDate = person.getRetirement();
-        if (retirementDate != null && campaignOptions.isUseRemovalExemptRetirees()) {
-            return false;
-        }
-
-        LocalDate deathDate = person.getDateOfDeath();
-        if (deathDate != null && campaignOptions.isUseRemovalExemptCemetery()) {
-            return false;
-        }
-
-        // Do not remove if the character has an active genealogy
-        Genealogy genealogy = person.getGenealogy();
-
-        if (genealogy.isActive()) {
-            return false;
-        }
-
-        // Did the departure occur more than a month ago?
-        LocalDate aMonthAgo = currentDay.minusMonths(1);
-        if (retirementDate != null && retirementDate.isBefore(aMonthAgo)) {
-            return true;
-        }
-        return deathDate != null && deathDate.isBefore(aMonthAgo);
     }
 
     /**
@@ -7254,6 +7219,14 @@ public class Campaign implements ITechManager {
             totalCost = totalCost.plus(ownDropshipCost).plus(ownJumpshipCost);
         }
 
+        Person negotiator = getSeniorAdminPerson(AdministratorSpecialization.TRANSPORT);
+        if (negotiator != null) {
+            PersonnelOptions options = negotiator.getOptions();
+            if (options.booleanOption(ADMIN_INTERSTELLAR_NEGOTIATOR) && totalCost.isPositive()) {
+                totalCost = totalCost.multipliedBy(0.85);
+            }
+        }
+
         return totalCost;
     }
 
@@ -8671,7 +8644,7 @@ public class Campaign implements ITechManager {
             MekHQ.triggerEvent(new LoanPaidEvent(loan));
         } else {
             addReport("<font color='" +
-                            MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                            ReportingUtilities.getNegativeColor() +
                             "'>You do not have enough funds to pay off " +
                             loan +
                             "</font>");
@@ -8810,7 +8783,7 @@ public class Campaign implements ITechManager {
                       unit.getMaintenanceCost(),
                       "Maintenance for " + unit.getName()))) {
                     addReport("<font color='" +
-                                    MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                                    ReportingUtilities.getNegativeColor() +
                                     "'><b>You cannot afford to pay maintenance costs for " +
                                     unit.getHyperlinkedName() +
                                     "!</b></font>");
@@ -8904,7 +8877,7 @@ public class Campaign implements ITechManager {
             }
             if (!damageString.isEmpty()) {
                 damageString = "<b><font color='" +
-                                     MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                                     ReportingUtilities.getNegativeColor() +
                                      "'>" +
                                      damageString +
                                      "</b></font> [<a href='REPAIR|" +
@@ -8914,7 +8887,7 @@ public class Campaign implements ITechManager {
             String paidString = "";
             if (!paidMaintenance) {
                 paidString = "<font color='" +
-                                   MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                                   ReportingUtilities.getNegativeColor() +
                                    "'>Could not afford maintenance costs, so check is at a penalty.</font>";
             }
             addReport(techNameLinked +

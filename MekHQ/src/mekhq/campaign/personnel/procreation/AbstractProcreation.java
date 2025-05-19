@@ -85,7 +85,7 @@ public abstract class AbstractProcreation {
     public static final IntKey PREGNANCY_CHILDREN_DATA = new IntKey("procreation:children");
     public static final StringKey PREGNANCY_FATHER_DATA = new StringKey("procreation:father");
 
-    private static final String RESOURCE_BUNDLE = "mekhq.resources." + AbstractProcreation.class.getSimpleName();
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.AbstractProcreation";
     //endregion Variable Declarations
 
     //region Constructors

@@ -37,12 +37,12 @@ import java.util.ArrayList;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.gui.BasicInfo;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * A table model for displaying doctors
@@ -76,7 +76,7 @@ public class DocTableModel extends DataTableModel {
 
         if (campaign.requiresAdditionalMedics()) {
             toReturn.append("</font><font color='")
-                    .append(MekHQ.getMHQOptions().getFontColorNegativeHexColor()).append("'>, ")
+                    .append(ReportingUtilities.getNegativeColor()).append("'>, ")
                     .append(campaign.getMedicsPerDoctor())
                     .append(" medics</font><font><br/>");
         } else {

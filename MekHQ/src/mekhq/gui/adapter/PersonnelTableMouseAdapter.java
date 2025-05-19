@@ -60,6 +60,7 @@ import static mekhq.campaign.personnel.skills.SkillType.S_ARTILLERY;
 import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
 import static mekhq.campaign.personnel.skills.SkillType.getType;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.WILLPOWER;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeInterviewersNotes;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.processAdHocExecution;
 import static mekhq.utilities.spaUtilities.SpaUtilities.getSpaCategory;
@@ -445,6 +446,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 for (final Person person : people) {
                     person.setPrimaryRole(getCampaign(), role);
                     writePersonalityDescription(person);
+                    writeInterviewersNotes(person);
                     getCampaign().personUpdated(person);
                     if (getCampaignOptions().isUsePortraitForRole(role) &&
                               getCampaignOptions().isAssignPortraitOnRoleChange() &&
@@ -1550,7 +1552,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_PERSONALITY: {
                 for (Person person : people) {
-                    PersonalityController.generatePersonality(person);
+                    PersonalityController.generatePersonality(person, false);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
@@ -1611,6 +1613,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     person.setGivenName(name[0]);
                     person.setSurname(name[1]);
                     writePersonalityDescription(person);
+                    writeInterviewersNotes(person);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
