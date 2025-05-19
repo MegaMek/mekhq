@@ -126,6 +126,7 @@ import mekhq.gui.model.PersonnelEventLogModel;
 import mekhq.gui.model.PersonnelKillLogModel;
 import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.gui.utilities.WrapLayout;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * A custom panel that gets filled in with goodies from a Person record
@@ -298,8 +299,15 @@ public class PersonViewPanel extends JScrollablePanel {
             txtDesc.setName("personalityDescription");
             txtDesc.setEditable(false);
             txtDesc.setContentType("text/html");
-            txtDesc.setText(person.getPersonalityDescription());
-            txtDesc.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlPersonality.title")));
+
+            String borderTitleKey = "pnlPersonality.normal";
+            if (person.getJoinedCampaign() == null) {
+                borderTitleKey = "pnlPersonality.interview";
+                txtDesc.setText(person.getPersonalityInterviewNotes());
+            } else {
+                txtDesc.setText(person.getPersonalityDescription());
+            }
+            txtDesc.setBorder(BorderFactory.createTitledBorder(resourceMap.getString(borderTitleKey)));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridY;
@@ -1802,8 +1810,8 @@ public class PersonViewPanel extends JScrollablePanel {
             String icon = "";
             if (totalModifier != 0) {
                 color = totalModifier < 0 ?
-                              MekHQ.getMHQOptions().getFontColorNegativeHexColor() :
-                              MekHQ.getMHQOptions().getFontColorPositiveHexColor();
+                              ReportingUtilities.getNegativeColor() :
+                              ReportingUtilities.getPositiveColor();
                 icon = totalModifier < 0 ? "&#x25BC" : "&#x25B2";
             }
 
@@ -1943,7 +1951,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
             String adjustment = "";
             if (isFlaw) {
-                String color = MekHQ.getMHQOptions().getFontColorNegativeHexColor();
+                String color = ReportingUtilities.getNegativeColor();
                 String icon = "&#x25BC;";
                 adjustment = String.format(" %s%s%s", spanOpeningWithCustomColor(color), icon, CLOSING_SPAN_TAG);
             }
@@ -2213,10 +2221,10 @@ public class PersonViewPanel extends JScrollablePanel {
     private static String getTraitAdjustmentIcon(int baseValue, int adjustedValue) {
         String adjustment = "";
         if (baseValue > adjustedValue) {
-            String color = MekHQ.getMHQOptions().getFontColorNegativeHexColor();
+            String color = ReportingUtilities.getNegativeColor();
             adjustment = String.format(" %s%s%s", spanOpeningWithCustomColor(color), "&#x25BC", CLOSING_SPAN_TAG);
         } else if (baseValue < adjustedValue) {
-            String color = MekHQ.getMHQOptions().getFontColorPositiveHexColor();
+            String color = ReportingUtilities.getPositiveColor();
             adjustment = String.format(" %s%s%s", spanOpeningWithCustomColor(color), "&#x25B2", CLOSING_SPAN_TAG);
         }
         return adjustment;

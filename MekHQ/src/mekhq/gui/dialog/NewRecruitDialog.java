@@ -33,6 +33,8 @@
 package mekhq.gui.dialog;
 
 import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeInterviewersNotes;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -61,7 +63,6 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.Profession;
-import mekhq.campaign.randomEvents.personalities.PersonalityController;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.displayWrappers.RankDisplay;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
@@ -256,7 +257,8 @@ public class NewRecruitDialog extends JDialog {
                               .generateGivenNameSurnameSplit(person.getGender(), person.isClanPersonnel(), factionCode);
         person.setGivenName(name[0]);
         person.setSurname(name[1]);
-        PersonalityController.writePersonalityDescription(person);
+        writePersonalityDescription(person);
+        writeInterviewersNotes(person);
         refreshView();
     }
 

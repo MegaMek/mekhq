@@ -24,12 +24,15 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
-
 package mekhq.campaign.randomEvents.personalities;
 
 import static java.lang.Math.max;
-import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.personnel.enums.GenderDescriptors.HE_SHE_THEY;
 import static mekhq.campaign.personnel.enums.GenderDescriptors.HIM_HER_THEM;
@@ -47,6 +50,7 @@ import mekhq.campaign.randomEvents.personalities.enums.Aggression;
 import mekhq.campaign.randomEvents.personalities.enums.Ambition;
 import mekhq.campaign.randomEvents.personalities.enums.Greed;
 import mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk;
+import mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType;
 import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.campaign.randomEvents.personalities.enums.Social;
 
@@ -62,21 +66,11 @@ public class PersonalityController {
     public final static int PERSONALITY_QUIRK_CHANCE = 10;
 
     /**
-     * Represents the four primary types of personality characteristics a character can possess.
-     *
-     * <p>This enum is used to categorize and manage the key personality traits
-     * of a character, which include:</p>
-     * <ul>
-     *     <li>{@link #AGGRESSION} - Reflecting the character's tendency toward hostility or
-     *     assertiveness.</li>
-     *     <li>{@link #AMBITION} - Representing the character's drive to achieve goals or power.</li>
-     *     <li>{@link #GREED} - Indicating the character's desire for wealth or material possessions.</li>
-     *     <li>{@link #SOCIAL} - Showcasing the character's inclination towards sociability and
-     *     interpersonal relationships.</li>
-     * </ul>
+     * @deprecated use {@link #generatePersonality(Person, boolean)} instead
      */
-    public enum PersonalityTraitType {
-        AGGRESSION, AMBITION, GREED, SOCIAL, REASONING, PERSONALITY_QUIRK;
+    @Deprecated(since = "0.50.06", forRemoval = true)
+    public static void generatePersonality(Person person) {
+        generatePersonality(person, false);
     }
 
     /**
@@ -84,86 +78,91 @@ public class PersonalityController {
      * ambition, greed, social behavior, reasoning, and optional quirks.
      *
      * <p>The method ensures that each personality characteristic is generated with a specified
-     * probability (1 in 6 by default). If no characteristic is assigned, a fallback mechanism generates at least one
+     * probability (1 in 4 by default). If no characteristic is assigned, a fallback mechanism generates at least one
      * characteristic to ensure a meaningful personality.
      *
      * @param person the person for whom the personality will be generated; this person's attributes will be updated
      *               based on generated traits
      */
-    public static void generatePersonality(Person person) {
-        // AGGRESSION
-        // we only want a 1 in 6 chance of getting a personality trait, per characteristic, this
-        // prevents trait bloat and helps reduce repetitiveness
-        if (d6() == 1) {
-            String traitIndex = getTraitIndex(Aggression.MAJOR_TRAITS_START_INDEX);
-            person.setAggression(Aggression.fromString(traitIndex));
-        } else {
-            person.setAggression(Aggression.NONE);
+    public static void generatePersonality(Person person, boolean isBigPersonality) {
+        // As this method can be applied over an existing personality profile, we first reset the character's
+        // personality to default.
+        person.setAggression(Aggression.NONE);
+        person.setAmbition(Ambition.NONE);
+        person.setGreed(Greed.NONE);
+        person.setSocial(Social.NONE);
+
+        // Then we generate a new personality
+        List<PersonalityTraitType> possibleTraits = new ArrayList<>(Arrays.asList(PersonalityTraitType.AGGRESSION,
+              PersonalityTraitType.AMBITION,
+              PersonalityTraitType.GREED,
+              PersonalityTraitType.SOCIAL));
+
+        Collections.shuffle(possibleTraits);
+
+        List<PersonalityTraitType> chosenTraits = new ArrayList<>();
+
+        PersonalityTraitType firstTrait = possibleTraits.get(0);
+        possibleTraits.remove(firstTrait);
+        chosenTraits.add(firstTrait);
+
+        if (isBigPersonality || (randomInt(4) == 0)) {
+            PersonalityTraitType secondTrait = possibleTraits.get(0);
+            possibleTraits.remove(secondTrait);
+            chosenTraits.add(secondTrait);
         }
 
-        // AMBITION
-        if (d6() == 1) {
-            String traitIndex = getTraitIndex(Ambition.MAJOR_TRAITS_START_INDEX);
-            person.setAmbition(Ambition.fromString(traitIndex));
-        } else {
-            person.setAmbition(Ambition.NONE);
+        if (randomInt(4) == 0) {
+            PersonalityTraitType thirdTrait = possibleTraits.get(0);
+            possibleTraits.remove(thirdTrait);
+            chosenTraits.add(thirdTrait);
         }
 
-        // GREED
-        if (d6() == 1) {
-            String traitIndex = getTraitIndex(Greed.MAJOR_TRAITS_START_INDEX);
-            person.setGreed(Greed.fromString(traitIndex));
-        } else {
-            person.setGreed(Greed.NONE);
+        if (randomInt(4) == 0) {
+            PersonalityTraitType forthTrait = possibleTraits.get(0);
+            chosenTraits.add(forthTrait);
         }
 
-        // SOCIAL
-        if (d6() == 1) {
-            String traitIndex = getTraitIndex(Social.MAJOR_TRAITS_START_INDEX);
-            person.setSocial(Social.fromString(traitIndex));
-        } else {
-            person.setSocial(Social.NONE);
+        for (PersonalityTraitType traitType : chosenTraits) {
+            switch (traitType) {
+                case AGGRESSION -> {
+                    String traitIndex = getTraitIndex(Aggression.MAJOR_TRAITS_START_INDEX);
+                    person.setAggression(Aggression.fromString(traitIndex));
+                }
+                case AMBITION -> {
+                    String traitIndex = getTraitIndex(Ambition.MAJOR_TRAITS_START_INDEX);
+                    person.setAmbition(Ambition.fromString(traitIndex));
+                }
+                case GREED -> {
+                    String traitIndex = getTraitIndex(Greed.MAJOR_TRAITS_START_INDEX);
+                    person.setGreed(Greed.fromString(traitIndex));
+                }
+                case SOCIAL -> {
+                    String traitIndex = getTraitIndex(Social.MAJOR_TRAITS_START_INDEX);
+                    person.setSocial(Social.fromString(traitIndex));
+                }
+                default -> {
+                }
+            }
         }
 
         // PERSONALITY QUIRK
-        if (d6() == 1) {
-            generateAndApplyPersonalityQuirk(person);
-        } else {
-            person.setPersonalityQuirk(PersonalityQuirk.NONE);
-        }
+        generateAndApplyPersonalityQuirk(person);
 
         // REASONING
-        person.setReasoning(generateReasoning(randomInt(8346)));
+        int firstReasoning = randomInt(8346);
+        int secondReasoning = isBigPersonality ? randomInt(8346) : 0;
+        person.setReasoning(generateReasoning(max(firstReasoning, secondReasoning)));
 
         // finally, write the description
         writePersonalityDescription(person);
-
-        // check at least one characteristic has been generated, if not, then pick a characteristic
-        // at random
-        if (person.getPersonalityDescription().isBlank()) {
-            performPersonalityGenerationFallback(person);
-            writePersonalityDescription(person);
-        }
+        writeInterviewersNotes(person);
     }
 
     /**
-     * Generates an expansive "big" personality for a major character, Ronin, or hero.
-     *
-     * <p>This method creates a detailed set of personality traits for the given person,
-     * selecting and assigning a combination of major traits, a quirk, and reasoning. It ensures the generated
-     * personality reflects a high degree of uniqueness and depth.</p>
-     *
-     * <p>The method proceeds as follows:
-     * <ul>
-     *     <li>Randomly selects up to four major traits (Aggression, Ambition, Greed, Social).</li>
-     *     <li>Assigns the selected traits to the person's corresponding personality attributes.</li>
-     *     <li>Generates and applies a unique personality quirk to the person.</li>
-     *     <li>Generates a reasoning score using the maximum of two random values.</li>
-     *     <li>Writes a personality description based on the generated traits and attributes.</li>
-     * </ul>
-     *
-     * @param person the {@link Person} object to which the full personality will be applied
+     * @deprecated use {@link #generatePersonality(Person, boolean)} instead
      */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public static void generateBigPersonality(Person person) {
         // As this method is likely going to be be applied over an existing personality profile, we
         // wipe the old to ensure a clean slate.
@@ -219,6 +218,8 @@ public class PersonalityController {
                     String traitIndex = getTraitIndex(Social.MAJOR_TRAITS_START_INDEX);
                     person.setSocial(Social.fromString(traitIndex));
                 }
+                default -> {
+                }
             }
         }
 
@@ -232,6 +233,7 @@ public class PersonalityController {
 
         // finally, write the description
         writePersonalityDescription(person);
+        writeInterviewersNotes(person);
     }
 
     /**
@@ -250,40 +252,9 @@ public class PersonalityController {
     }
 
     /**
-     * Fallback mechanism to ensure the person has at least one personality characteristic. If no characteristics were
-     * generated during the initial roll in {@link #generatePersonality}, this method assigns one characteristic at
-     * random.
-     *
-     * @param person the person whose personality will be updated with a fallback characteristic
-     */
-    private static void performPersonalityGenerationFallback(Person person) {
-        int roll = randomInt(5);
-
-        switch (roll) {
-            case 0 -> {
-                String traitIndex = getTraitIndex(Aggression.MAJOR_TRAITS_START_INDEX);
-                person.setAggression(Aggression.fromString(traitIndex));
-            }
-            case 1 -> {
-                String traitIndex = getTraitIndex(Ambition.MAJOR_TRAITS_START_INDEX);
-                person.setAmbition(Ambition.fromString(traitIndex));
-            }
-            case 2 -> {
-                String traitIndex = getTraitIndex(Greed.MAJOR_TRAITS_START_INDEX);
-                person.setGreed(Greed.fromString(traitIndex));
-            }
-            case 3 -> {
-                String traitIndex = getTraitIndex(Social.MAJOR_TRAITS_START_INDEX);
-                person.setSocial(Social.fromString(traitIndex));
-            }
-            default -> generateAndApplyPersonalityQuirk(person);
-        }
-    }
-
-    /**
      * Generates a trait index based on the provided starting index for major traits.
      *
-     * <p>The method rolls a random integer between 0 and the provided index, and if the
+     * <p>The method rolls a random integer between 1 and the provided index, and if the
      * major traits index is rolled, it further rolls a value between 0 and 5 to cover the extended major traits range.
      *
      * @param majorTraitsStartIndex the starting index for major traits in the enum
@@ -386,6 +357,35 @@ public class PersonalityController {
         person.setPersonalityDescription(personalityDescription.toString());
     }
 
+    public static void writeInterviewersNotes(Person person) {
+        List<String> notes = getTraitInterviewerNotes(person.getAggression(),
+              person.getAggressionDescriptionIndex(),
+              person.getAmbition(),
+              person.getAmbitionDescriptionIndex(),
+              person.getGreed(),
+              person.getGreedDescriptionIndex(),
+              person.getSocial(),
+              person.getSocialDescriptionIndex());
+
+        // Reasoning and personality quirk are handled differently to general personality traits.
+        // REASONING
+        Reasoning reasoning = person.getReasoning();
+        String examResults = reasoning.getExamResults();
+
+        // Build the description proper
+        StringBuilder interviewersNotes = new StringBuilder("<html>");
+
+        interviewersNotes.append(examResults);
+
+        for (String note : notes) {
+            interviewersNotes.append("<br>- ").append(note);
+        }
+
+        interviewersNotes.append("</html>");
+
+        person.setPersonalityInterviewNotes(interviewersNotes.toString());
+    }
+
     /**
      * Retrieves the descriptions of all personality traits (other than Reasoning and Quirks) for the given person. This
      * method processes various personality traits such as aggression, ambition, greed, and social behavior, generating
@@ -457,11 +457,49 @@ public class PersonalityController {
         return traitDescriptions;
     }
 
+    private static List<String> getTraitInterviewerNotes(Aggression aggression, int aggressionDescriptionIndex,
+          Ambition ambition, int ambitionDescriptionIndex, Greed greed, int greedDescriptionIndex, Social social,
+          int socialDescriptionIndex) {
+        List<String> interviewersNotes = new ArrayList<>();
 
-    /**
-     * @deprecated replaced by {@link #getReasoning()}
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
+        // AGGRESSION
+        if (!aggression.isNone()) {
+            String traitDescription = aggression.getInterviewersNotes(aggressionDescriptionIndex);
+
+            if (!traitDescription.isBlank()) {
+                interviewersNotes.add(traitDescription);
+            }
+        }
+
+        // AMBITION
+        if (!ambition.isNone()) {
+            String traitDescription = ambition.getInterviewersNotes(ambitionDescriptionIndex);
+
+            if (!traitDescription.isBlank()) {
+                interviewersNotes.add(traitDescription);
+            }
+        }
+
+        // GREED
+        if (!greed.isNone()) {
+            String traitDescription = greed.getInterviewersNotes(greedDescriptionIndex);
+
+            if (!traitDescription.isBlank()) {
+                interviewersNotes.add(traitDescription);
+            }
+        }
+
+        // SOCIAL
+        if (!social.isNone()) {
+            String traitDescription = social.getInterviewersNotes(socialDescriptionIndex);
+
+            if (!traitDescription.isBlank()) {
+                interviewersNotes.add(traitDescription);
+            }
+        }
+
+        return interviewersNotes;
+    }
 
 
     /**

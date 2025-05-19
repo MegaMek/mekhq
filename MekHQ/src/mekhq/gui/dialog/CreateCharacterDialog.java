@@ -46,6 +46,8 @@ import static mekhq.campaign.personnel.Person.MINIMUM_WEALTH;
 import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
 import static mekhq.campaign.personnel.skills.Skill.getCountDownMaxValue;
 import static mekhq.campaign.personnel.skills.Skill.getCountUpMaxValue;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeInterviewersNotes;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
 import static mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk.personalityQuirksSortedAlphabetically;
 
 import java.awt.BorderLayout;
@@ -97,7 +99,6 @@ import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.randomEvents.personalities.PersonalityController;
 import mekhq.campaign.randomEvents.personalities.enums.Aggression;
 import mekhq.campaign.randomEvents.personalities.enums.Ambition;
 import mekhq.campaign.randomEvents.personalities.enums.Greed;
@@ -1680,7 +1681,8 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             person.setSocial(comboSocial.getSelectedItem());
             person.setPersonalityQuirk(comboPersonalityQuirk.getSelectedItem());
             person.setReasoning(comboReasoning.getSelectedItem());
-            PersonalityController.writePersonalityDescription(person);
+            writePersonalityDescription(person);
+            writeInterviewersNotes(person);
         }
 
         person.setPortrait(portrait);

@@ -82,6 +82,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.selectors.factionSelectors.DefaultFactionSelector;
 import mekhq.campaign.universe.selectors.planetSelectors.DefaultPlanetSelector;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * Manages the resolution and effects of prisoner events during a campaign.
@@ -248,8 +249,8 @@ public class EventEffectsManager {
         campaign.changeTemporaryPrisonerCapacity(magnitude);
 
         String colorOpen = magnitude > 0 ?
-                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()) :
-                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor());
+                                 spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()) :
+                                 spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
 
         String direction = getFormattedTextAt(RESOURCE_BUNDLE, magnitude > 0 ? "change.increased" : "change.decreased");
 
@@ -301,8 +302,8 @@ public class EventEffectsManager {
         MekHQ.triggerEvent(new PersonChangedEvent(target));
 
         String colorOpen = isGuard ?
-                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()) :
-                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
+                                 spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()) :
+                                 spanOpeningWithCustomColor(ReportingUtilities.getWarningColor());
 
         String context = getFormattedTextAt(RESOURCE_BUNDLE,
               magnitude > 0 ? "context.guard.singular" : "context.prisoner.singular");
@@ -357,8 +358,8 @@ public class EventEffectsManager {
         }
 
         String colorOpen = isGuard ?
-                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()) :
-                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
+                                 spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()) :
+                                 spanOpeningWithCustomColor(ReportingUtilities.getWarningColor());
 
         String context;
         if (isGuard) {
@@ -419,8 +420,8 @@ public class EventEffectsManager {
         }
 
         String colorOpen = isGuard ?
-                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()) :
-                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
+                                 spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()) :
+                                 spanOpeningWithCustomColor(ReportingUtilities.getWarningColor());
 
         String context;
         if (isGuard) {
@@ -485,8 +486,8 @@ public class EventEffectsManager {
         }
 
         String colorOpen = isGuard ?
-                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()) :
-                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
+                                 spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()) :
+                                 spanOpeningWithCustomColor(ReportingUtilities.getWarningColor());
 
         String context;
         if (isGuard) {
@@ -566,7 +567,7 @@ public class EventEffectsManager {
 
         MekHQ.triggerEvent(new PersonChangedEvent(target));
 
-        String colorOpen = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor());
+        String colorOpen = spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor());
 
         String context = getFormattedTextAt(RESOURCE_BUNDLE,
               isGuard ? "context.guard.singular" : "context.prisoner.singular");
@@ -615,8 +616,8 @@ public class EventEffectsManager {
               magnitude > 0 ? "context.guard.singular" : "context.prisoner.singular");
 
         String colorOpen = magnitude > 0 ?
-                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()) :
-                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
+                                 spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()) :
+                                 spanOpeningWithCustomColor(ReportingUtilities.getWarningColor());
 
         String direction = getFormattedTextAt(RESOURCE_BUNDLE, magnitude > 0 ? "change.increased" : "change.decreased");
 
@@ -672,8 +673,8 @@ public class EventEffectsManager {
         }
 
         String colorOpen = magnitude > 0 ?
-                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()) :
-                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
+                                 spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()) :
+                                 spanOpeningWithCustomColor(ReportingUtilities.getWarningColor());
 
         String direction = getFormattedTextAt(RESOURCE_BUNDLE, magnitude > 0 ? "change.increased" : "change.decreased");
 
@@ -719,7 +720,7 @@ public class EventEffectsManager {
 
         logger.info(escapees.toString());
 
-        String colorOpen = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor());
+        String colorOpen = spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
 
         String context = getFormattedTextAt(RESOURCE_BUNDLE,
               magnitude != 1 ? "context.prisoner.plural" : "context.prisoner.singular");
@@ -769,7 +770,7 @@ public class EventEffectsManager {
         MMLogger logger = MMLogger.create(EventEffectsManager.class);
         logger.info(escapees.toString());
 
-        String colorOpen = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor());
+        String colorOpen = spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
 
         String context = getFormattedTextAt(RESOURCE_BUNDLE,
               targetCount != 1 ? "context.prisoner.plural" : "context.prisoner.singular");
@@ -824,8 +825,8 @@ public class EventEffectsManager {
               magnitude > 0 ? "context.guard.singular" : "context.prisoner.singular");
 
         String colorOpen = magnitude > 0 ?
-                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()) :
-                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
+                                 spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()) :
+                                 spanOpeningWithCustomColor(ReportingUtilities.getWarningColor());
 
         String direction = getFormattedTextAt(RESOURCE_BUNDLE, magnitude > 0 ? "change.increased" : "change.decreased");
 
@@ -884,8 +885,8 @@ public class EventEffectsManager {
         }
 
         String colorOpen = magnitude > 0 ?
-                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()) :
-                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
+                                 spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()) :
+                                 spanOpeningWithCustomColor(ReportingUtilities.getWarningColor());
 
         String direction = getFormattedTextAt(RESOURCE_BUNDLE, magnitude > 0 ? "change.increased" : "change.decreased");
 
@@ -938,8 +939,8 @@ public class EventEffectsManager {
               magnitude != 0 ? "SUPPORT_POINT.plural" : "SUPPORT_POINT.singular");
 
         String colorOpen = magnitude > 0 ?
-                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()) :
-                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
+                                 spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()) :
+                                 spanOpeningWithCustomColor(ReportingUtilities.getWarningColor());
 
         String direction = getFormattedTextAt(RESOURCE_BUNDLE, magnitude > 0 ? "change.increased" : "change.decreased");
 
@@ -1011,7 +1012,7 @@ public class EventEffectsManager {
         int moraleOrdinal = target.getMoraleLevel().ordinal();
         target.setMoraleLevel(AtBMoraleLevel.values()[moraleOrdinal + 1]);
 
-        String colorOpen = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor());
+        String colorOpen = spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
 
         return getFormattedTextAt(RESOURCE_BUNDLE, "BARTERING.report", colorOpen, CLOSING_SPAN_TAG);
     }
@@ -1116,8 +1117,8 @@ public class EventEffectsManager {
         }
 
         String colorOpen = magnitude > 1 ?
-                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()) :
-                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
+                                 spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()) :
+                                 spanOpeningWithCustomColor(ReportingUtilities.getWarningColor());
 
         return getFormattedTextAt(RESOURCE_BUNDLE, "POISON.report", colorOpen, CLOSING_SPAN_TAG);
     }
@@ -1167,7 +1168,7 @@ public class EventEffectsManager {
             campaign.recruitPerson(newPerson, PrisonerStatus.PRISONER, true, false, false);
         }
 
-        String colorOpen = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor());
+        String colorOpen = spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
 
         String context = getFormattedTextAt(RESOURCE_BUNDLE,
               prisonerCount != 1 ? "context.prisoner.plural" : "context.prisoner.singular");

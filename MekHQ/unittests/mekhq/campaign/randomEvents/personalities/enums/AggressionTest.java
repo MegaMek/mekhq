@@ -27,95 +27,71 @@
  */
 package mekhq.campaign.randomEvents.personalities.enums;
 
-import static mekhq.campaign.randomEvents.personalities.enums.Aggression.ASSERTIVE;
-import static mekhq.campaign.randomEvents.personalities.enums.Aggression.DECISIVE;
 import static mekhq.campaign.randomEvents.personalities.enums.Aggression.MAXIMUM_VARIATIONS;
 import static mekhq.campaign.randomEvents.personalities.enums.Aggression.NONE;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+
+import java.util.Arrays;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import megamek.common.enums.Gender;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.universe.Faction;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
 public class AggressionTest {
-    @Test
-    public void testFromString_ValidStatus() {
-        Aggression status = Aggression.fromString(DECISIVE.name());
-        assertEquals(DECISIVE, status);
-    }
-
-    @Test
-    public void testFromString_InvalidStatus() {
-        Aggression status = Aggression.fromString("INVALID_STATUS");
-
-        assertEquals(NONE, status);
-    }
-
-    @Test
-    public void testFromString_NullStatus() {
-        Aggression status = Aggression.fromString(null);
-
-        assertEquals(NONE, status);
-    }
-
-    @Test
-    public void testFromString_EmptyString() {
-        Aggression status = Aggression.fromString("");
-
-        assertEquals(NONE, status);
-    }
-
-    @Test
-    public void testFromString_FromOrdinal() {
-        Aggression status = Aggression.fromString(ASSERTIVE.ordinal() + "");
-
-        assertEquals(ASSERTIVE, status);
-    }
-
-    @Test
-    public void testGetLabel_notInvalid() {
-        for (Aggression status : Aggression.values()) {
-            String label = status.getLabel();
-            assertTrue(isResourceKeyValid(label));
+    @ParameterizedTest
+    @CsvSource(value = { "AGGRESSIVE,AGGRESSIVE", "INVALID_STATUS,NONE", "'',NONE", "'null',NONE", "1,AGGRESSIVE" })
+    void testFromStringVariousInputs(String input, Aggression expected) {
+        if ("null".equals(input)) {
+            input = null;
         }
+        Aggression result = Aggression.fromString(input);
+        assertEquals(expected, result);
     }
 
-    @Test
-    public void testGetDescription_notInvalid() {
-        Campaign campaign = mock(Campaign.class);
-        Faction campaignFaction = mock(Faction.class);
-        when(campaign.getFaction()).thenReturn(campaignFaction);
-        when(campaignFaction.getShortName()).thenReturn("MERC");
-        Person person = new Person(campaign);
-
-        for (Aggression trait : Aggression.values()) {
-            for (int i = 0; i < MAXIMUM_VARIATIONS; i++) {
-                person.setAggressionDescriptionIndex(i);
-                String description = trait.getDescription(i, Gender.MALE, "Barry");
-                assertTrue(isResourceKeyValid(description));
-            }
-        }
+    @ParameterizedTest
+    @EnumSource(value = Aggression.class)
+    void testFromString_Ordinal_All(Aggression value) {
+        Aggression result = Aggression.fromString(String.valueOf(value.ordinal()));
+        assertEquals(value, result);
     }
 
-    @Test
-    public void testGetDescription_InvalidDescriptionIndex() {
-        String description = NONE.getDescription(MAXIMUM_VARIATIONS, Gender.MALE, "Barry");
+    @ParameterizedTest
+    @EnumSource(value = Aggression.class)
+    void testGetLabel_notInvalid(Aggression status) {
+        String label = status.getLabel();
+        assertTrue(isResourceKeyValid(label));
+    }
+
+    static Stream<Arguments> provideAggressionsAndIndices() {
+        return Arrays.stream(Aggression.values())
+                     .flatMap(trait -> IntStream.range(0, MAXIMUM_VARIATIONS).mapToObj(i -> Arguments.of(trait, i)));
+    }
+
+    @ParameterizedTest
+    @MethodSource(value = "provideAggressionsAndIndices")
+    void testGetDescription_notInvalid(Aggression trait, int i) {
+        String description = trait.getDescription(i, Gender.MALE, "Barry");
         assertTrue(isResourceKeyValid(description));
     }
 
-    @Test
-    public void testGetRoninMessage_notInvalid() {
-        for (Aggression trait : Aggression.values()) {
-            for (int i = 0; i < MAXIMUM_VARIATIONS; i++) {
-                String description = trait.getRoninMessage("Commander");
-                assertTrue(isResourceKeyValid(description));
-            }
-        }
+    @ParameterizedTest
+    @CsvSource(value = { "99", "1000", "-1" })
+    void testGetDescription_InvalidDescriptionIndex(int invalidIndex) {
+        String description = NONE.getDescription(invalidIndex, Gender.MALE, "Barry");
+        assertTrue(isResourceKeyValid(description));
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = Aggression.class)
+    void testGetRoninMessage_notInvalid(Aggression trait) {
+        String description = trait.getRoninMessage("Commander");
+        assertTrue(isResourceKeyValid(description));
     }
 }

@@ -24,106 +24,166 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.randomEvents;
 
-import static java.time.temporal.ChronoUnit.DAYS;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.finances.enums.TransactionType.STARTING_CAPITAL;
+import static mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR_COMMAND;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.time.LocalDate;
 
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
-import mekhq.gui.dialog.randomEvents.GrayMondayDialog;
+import mekhq.campaign.universe.Factions;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
 public class GrayMonday {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.GrayMonday";
 
+    public final static LocalDate GRAY_MONDAY_EVENTS_BEGIN = LocalDate.of(3132, 8, 3);
+    public final static LocalDate BANKRUPTCY = LocalDate.of(3132, 8, 9);
+    public final static LocalDate EMPLOYER_BEGGING = LocalDate.of(3132, 8, 10);
+    public final static LocalDate GRAY_MONDAY_EVENTS_END = LocalDate.of(3132, 8, 12);
+
+    /**
+     * @deprecated unused
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public final static LocalDate EVENT_DATE_CLARION_NOTE = LocalDate.of(3132, 8,4);
+
+    /**
+     * @deprecated unused except in deprecated classes
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public final static LocalDate EVENT_DATE_GRAY_MONDAY = LocalDate.of(3132, 8,7);
 
     private final Campaign campaign;
 
     public GrayMonday(Campaign campaign, LocalDate today) {
         this.campaign = campaign;
-        Person speaker = getSpeaker();
 
-        int daysAfterClarionNote = (int) DAYS.between(EVENT_DATE_CLARION_NOTE, today);
-        if (daysAfterClarionNote >= 0 && daysAfterClarionNote <= 3) {
-            new GrayMondayDialog(campaign, speaker, true, daysAfterClarionNote);
-        }
+        boolean isEmployerBegging = today.equals(EMPLOYER_BEGGING);
+        if (campaign.getCampaignOptions().isSimulateGrayMonday()) {
+            if (today.equals(BANKRUPTCY)) {
+                Finances finances = campaign.getFinances();
+                Money balance = finances.getBalance();
+                Money adjustedBalance = balance.multipliedBy(0.99);
 
-        int daysAfterGrayMonday = (int) DAYS.between(EVENT_DATE_GRAY_MONDAY, today);
-        if (daysAfterGrayMonday > 0 && daysAfterGrayMonday <= 4) {
-            boolean shouldShowDialog = daysAfterGrayMonday != 3;
+                finances.debit(STARTING_CAPITAL,
+                      today,
+                      adjustedBalance,
+                      getFormattedTextAt(RESOURCE_BUNDLE, "transaction.message"));
 
-            if (daysAfterGrayMonday == 3) {
+                finances.getLoans().clear();
+            }
+
+            if (isEmployerBegging) {
                 for (AtBContract contract : campaign.getAtBContracts()) {
                     LocalDate startDate = contract.getStartDate();
                     if (!startDate.isBefore(today)) {
-                        shouldShowDialog = true;
-                        break;
+                        contract.setBaseAmount(Money.of(0));
+                        contract.setOverheadComp(0);
+                        contract.setBattleLossComp(0);
+                        contract.setStraightSupport(0);
+                        contract.setTransportComp(0);
+                        contract.setTransitAmount(Money.of(0));
+                        contract.calculateContract(campaign);
+
+                        contract.setSalvagePct(100);
                     }
                 }
-            }
 
-            if (shouldShowDialog) {
-                new GrayMondayDialog(campaign, speaker, false, daysAfterGrayMonday);
+                campaign.getContractMarket().getContracts().clear();
+
+                getFormattedTextAt(RESOURCE_BUNDLE, "employer.report");
             }
         }
 
-        if (daysAfterGrayMonday == 2) {
-            Finances finances = campaign.getFinances();
-            Money balance = finances.getBalance();
-            Money adjustedBalance = balance.multipliedBy(0.01);
-
-            finances.getTransactions().clear();
-
-            finances.getLoans().clear();
-
-            finances.credit(STARTING_CAPITAL, today, adjustedBalance,
-                getFormattedTextAt(RESOURCE_BUNDLE, "transaction.message"));
-
+        String resourceKey;
+        if (today.isAfter(GRAY_MONDAY_EVENTS_BEGIN) && today.isBefore(GRAY_MONDAY_EVENTS_END)) {
+            resourceKey = "event." + today.getDayOfMonth() + ".message";
+        } else {
+            return;
         }
 
-        if (daysAfterGrayMonday == 3) {
+        Person speaker = null;
+
+        if (isEmployerBegging) {
             for (AtBContract contract : campaign.getAtBContracts()) {
                 LocalDate startDate = contract.getStartDate();
                 if (!startDate.isBefore(today)) {
-                    contract.setBaseAmount(Money.of(0));
-                    contract.setOverheadComp(0);
-                    contract.setBattleLossComp(0);
-                    contract.setStraightSupport(0);
-                    contract.setTransportComp(0);
-                    contract.setTransitAmount(Money.of(0));
-                    contract.calculateContract(campaign);
-
-                    contract.setSalvagePct(100);
+                    speaker = getEmployerSpeaker(contract);
+                    break;
                 }
             }
-
-            campaign.getContractMarket().getContracts().clear();
-
-            getFormattedTextAt(RESOURCE_BUNDLE, "employer.report");
+        } else {
+            speaker = getSpeaker();
         }
+
+        // This means there is no active contract
+        if (isEmployerBegging && speaker == null) {
+            return;
+        }
+
+        String commanderAddress = campaign.getCommanderAddress(false);
+        String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, resourceKey, commanderAddress);
+        String outOfCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "dialog.ooc");
+
+        new ImmersiveDialogSimple(campaign,
+              speaker,
+              null,
+              inCharacterMessage,
+              null,
+              outOfCharacterMessage,
+              null,
+              false);
     }
 
     /**
      * Retrieves the speaker for the dialogs.
      *
-     * <p>The speaker is determined as the senior administrator personnel with the Logistics
+     * <p>The speaker is determined as the senior administrator personnel with the Command
      * specialization within the campaign. If no such person exists, this method returns {@code null}.</p>
      *
      * @return a {@link Person} representing the left speaker, or {@code null} if no suitable speaker is available
      */
     private @Nullable Person getSpeaker() {
-        return campaign.getSeniorAdminPerson(LOGISTICS);
+        return campaign.getSeniorAdminPerson(COMMAND);
+    }
+
+    /**
+     * Creates and returns a {@link Person} object representing the employer for a given contract.
+     *
+     * <p>
+     * The employer speaker is initialized with the contract's employer faction, assigned a randomized gender, and its
+     * origin faction is set accordingly.
+     * </p>
+     *
+     * @param contract the {@link AtBContract} whose employer faction is used to create the speaker
+     *
+     * @return a {@link Person} representing the employer, with appropriate faction and origin set
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    private Person getEmployerSpeaker(AtBContract contract) {
+        String employer = contract.getEmployerFaction().getShortName();
+        Person speaker = campaign.newPerson(ADMINISTRATOR_COMMAND, employer, Gender.RANDOMIZE);
+        speaker.setOriginFaction(Factions.getInstance().getFaction(employer));
+
+        return speaker;
     }
 
     /**
@@ -139,8 +199,8 @@ public class GrayMonday {
      * {@code false} otherwise.
      */
     public static boolean isGrayMonday(LocalDate today, boolean isUseGrayMonday) {
-        return isUseGrayMonday
-            && today.isAfter(EVENT_DATE_GRAY_MONDAY.minusDays(1)) &&
-                     today.isBefore(EVENT_DATE_GRAY_MONDAY.plusMonths(12));
+        return isUseGrayMonday &&
+                     today.isAfter(GRAY_MONDAY_EVENTS_BEGIN) &&
+                     today.isBefore(GRAY_MONDAY_EVENTS_BEGIN.plusMonths(12));
     }
 }

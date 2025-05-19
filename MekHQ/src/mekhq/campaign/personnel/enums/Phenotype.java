@@ -69,7 +69,7 @@ public enum Phenotype {
 
     // region Variable Declarations
     private static final MMLogger logger = MMLogger.create(Phenotype.class);
-    private static final String RESOURCE_BUNDLE = "mekhq.resources." + Phenotype.class.getSimpleName();
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Phenotype";
 
     private final boolean isTrueborn;
     private final boolean external;
