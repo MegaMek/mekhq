@@ -670,6 +670,9 @@ public class CampaignXmlParser {
             }
         });
 
+        // Reset Random Death to match current campaign options
+        campaign.resetRandomDeath();
+
         logger.info("Load of campaign file complete!");
 
         return campaign;
