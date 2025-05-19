@@ -1,12 +1,13 @@
 MEKHQ VERSION HISTORY:
 ---------------
-0.50.06 (2025-05-19 1830 UTC)
+0.50.07
+
+0.50.06 (2025-05-19 1830 UTC) (MILESTONE RELEASE) - DEV NOTE - Starting with this release the History file is built on release rather than on going.
 DEV NOTE - Starting with this release the History file is built on release rather than on going.
 * Updated Rank System XML Version to 0.50.06 by @IllianiBird in https://github.com/MegaMek/mekhq/pull/6767
 * 0.50.06 Deprecation Removal and Clean up by @rjhancock in https://github.com/MegaMek/mekhq/pull/6768
 * Restored Event Handlers for Campaign State Management by @IllianiBird in https://github.com/MegaMek/mekhq/pull/6772
 * Fix #3111: Added Heroic and Legendary Skill Levels by @IllianiBird in https://github.com/MegaMek/mekhq/pull/6623
-* Added Support for Mission and Scenario Hyperlinking by @IllianiBird in https://github.com/MegaMek/mekhq/pull/6643
 * Fix #4551: Added Double-Click Functionality to the Infirmary Tab to Jump to Patients in Personnel Tab by @IllianiBird in https://github.com/MegaMek/mekhq/pull/6644
 * Made Injuries Appear More Serious By Changing Terms by @IllianiBird in https://github.com/MegaMek/mekhq/pull/6670
 * Implement RFE #6058 display cost of orderd parts by @goron111 in https://github.com/MegaMek/mekhq/pull/6674
@@ -168,8 +169,7 @@ DEV NOTE - Starting with this release the History file is built on release rathe
 * Fix: Final Grammar Pass on Glossary by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7052
 * Fix: Stopped Higher Administration Skill Making Reinforcement Attempts Harder by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7053
 * Fix: Updated Reinforcement Documentation by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7054
-* Improvement: Improved Spacing of Immersive Dialogs to Better Display Text When Missing 1+ Speakers by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7055
-
+* Improvement: Improved Spacing of Immersive Dialogs to Better Display Text When Missing 1+ Speakers by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7055nearly 1
 ## New Contributors
 * @savanik made their first contribution in https://github.com/MegaMek/mekhq/pull/6840
 
