@@ -61,6 +61,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.UnitTableMouseAdapter;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * This class handles the display of the Mass Mothball/Reactivate dialog
@@ -358,7 +359,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
             return String.format("Completion Time: %d minutes", completionTime);
         } else {
             return "<html>Completion Time: <span color='" +
-                         MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                         ReportingUtilities.getNegativeColor() +
                          "'>Never</span></html>";
         }
     }

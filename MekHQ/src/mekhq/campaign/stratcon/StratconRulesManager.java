@@ -114,6 +114,7 @@ import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.campaign.unit.Unit;
+import mekhq.utilities.ReportingUtilities;
 import org.apache.commons.math3.util.Pair;
 
 /**
@@ -1578,7 +1579,7 @@ public class StratconRulesManager {
                   scenario.getHyperlinkedName()));
             reportStatus.append(' ');
             reportStatus.append(String.format(resources.getString("reinforcementsAutomaticSuccess.text"),
-                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                  spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                   CLOSING_SPAN_TAG));
             campaign.addReport(reportStatus.toString());
             return SUCCESS;
@@ -1594,7 +1595,7 @@ public class StratconRulesManager {
         if (roll == 2) {
             reportStatus.append(' ');
             reportStatus.append(String.format(resources.getString("reinforcementsCriticalFailure.text"),
-                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   CLOSING_SPAN_TAG));
             campaign.addReport(reportStatus.toString());
             return FAILED;
@@ -1604,7 +1605,7 @@ public class StratconRulesManager {
         if (roll >= reinforcementTargetNumber) {
             reportStatus.append(' ');
             reportStatus.append(String.format(resources.getString("reinforcementsSuccess.text"),
-                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                  spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                   CLOSING_SPAN_TAG));
             campaign.addReport(reportStatus.toString());
             return SUCCESS;
@@ -1618,7 +1619,7 @@ public class StratconRulesManager {
         if (interceptionRoll >= interceptionOdds || contract.getMoraleLevel().isRouted()) {
             reportStatus.append(' ');
             reportStatus.append(String.format(resources.getString("reinforcementsCommandFailure.text"),
-                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor()),
+                  spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
                   CLOSING_SPAN_TAG));
             campaign.addReport(reportStatus.toString());
             return DELAYED;
@@ -1627,7 +1628,7 @@ public class StratconRulesManager {
         // Check failed, enemy attempt interception
         reportStatus.append(' ');
         reportStatus.append(String.format(resources.getString("reinforcementsInterceptionAttempt.text"),
-              spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor()),
+              spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
               CLOSING_SPAN_TAG));
 
         UUID commanderId = force.getForceCommanderID();
@@ -1637,7 +1638,7 @@ public class StratconRulesManager {
 
             reportStatus.append(' ');
             reportStatus.append(String.format(resources.getString("reinforcementsErrorNoCommander.text"),
-                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   CLOSING_SPAN_TAG));
             campaign.addReport(reportStatus.toString());
             return FAILED;
@@ -1650,7 +1651,7 @@ public class StratconRulesManager {
 
             reportStatus.append(' ');
             reportStatus.append(String.format(resources.getString("reinforcementsErrorUnableToFetchCommander.text"),
-                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   CLOSING_SPAN_TAG));
             campaign.addReport(reportStatus.toString());
             return FAILED;
@@ -1671,7 +1672,7 @@ public class StratconRulesManager {
                                         resources.getString("reinforcementEvasionSuccessful.text") :
                                         resources.getString("reinforcementEvasionSuccessful.noSkill");
             campaign.addReport(String.format(reportString,
-                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                  spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                   CLOSING_SPAN_TAG));
 
             if (campaign.getCampaignOptions().isUseFatigue()) {
@@ -1682,7 +1683,7 @@ public class StratconRulesManager {
         }
 
         campaign.addReport(String.format(resources.getString("reinforcementEvasionUnsuccessful.text"),
-              spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+              spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
               CLOSING_SPAN_TAG,
               roll,
               targetNumber));

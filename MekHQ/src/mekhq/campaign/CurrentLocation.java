@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign;
 
@@ -54,6 +59,7 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.utilities.MHQXMLUtility;
+import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -277,7 +283,7 @@ public class CurrentLocation {
                                            " to " +
                                            jumpPath.get(1).getName(campaign.getLocalDate()))) {
                         campaign.addReport("<font color='" +
-                                                 MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                                                 ReportingUtilities.getNegativeColor() +
                                                  "'><b>You cannot afford to make the jump!</b></font>");
                         return;
                     }
