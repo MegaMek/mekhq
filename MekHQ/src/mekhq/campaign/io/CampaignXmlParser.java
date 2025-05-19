@@ -129,6 +129,7 @@ import mekhq.campaign.unit.cleanup.EquipmentUnscrambler;
 import mekhq.campaign.unit.cleanup.EquipmentUnscramblerResult;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.campaign.universe.fameAndInfamy.FameAndInfamyController;
 import mekhq.io.idReferenceClasses.PersonIdReference;
 import mekhq.module.atb.AtBEventProcessor;
@@ -804,6 +805,8 @@ public class CampaignXmlParser {
                     retVal.setDateOfLastCrime(LocalDate.parse(wn.getTextContent()));
                 } else if (xn.equalsIgnoreCase("reputation")) {
                     retVal.setReputation(new ReputationController().generateInstanceFromXML(wn));
+                } else if (xn.equalsIgnoreCase("factionStandings")) {
+                    retVal.setFactionStandings(FactionStandings.generateInstanceFromXML(wn));
                 } else if (xn.equalsIgnoreCase("rankSystem")) {
                     if (!wn.hasChildNodes()) { // we need there to be child nodes to parse from
                         continue;

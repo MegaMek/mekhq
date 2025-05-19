@@ -232,6 +232,7 @@ import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.universe.eras.Era;
 import mekhq.campaign.universe.eras.Eras;
 import mekhq.campaign.universe.factionStanding.BatchallFactions;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.campaign.universe.fameAndInfamy.FameAndInfamyController;
 import mekhq.campaign.universe.selectors.factionSelectors.AbstractFactionSelector;
 import mekhq.campaign.universe.selectors.factionSelectors.DefaultFactionSelector;
@@ -379,6 +380,7 @@ public class Campaign implements ITechManager {
     private int crimeRating;
     private int crimePirateModifier;
     private LocalDate dateOfLastCrime;
+    private FactionStandings factionStandings;
     private int initiativeBonus;
     private int initiativeMaxBonus;
     private final CampaignSummary campaignSummary;
@@ -448,6 +450,7 @@ public class Campaign implements ITechManager {
         retainerEmployerCode = null;
         retainerStartDate = null;
         reputation = null;
+        factionStandings = new FactionStandings();
         crimeRating = 0;
         crimePirateModifier = 0;
         dateOfLastCrime = null;
@@ -6200,6 +6203,14 @@ public class Campaign implements ITechManager {
         this.reputation = reputation;
     }
 
+    public FactionStandings getFactionStandings() {
+        return factionStandings;
+    }
+
+    public void setFactionStandings(FactionStandings factionStandings) {
+        this.factionStandings = factionStandings;
+    }
+
     private void addInMemoryLogHistory(LogEntry le) {
         if (!inMemoryLogHistory.isEmpty()) {
             while (ChronoUnit.DAYS.between(inMemoryLogHistory.get(0).getDate(), le.getDate()) >
@@ -6454,6 +6465,10 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "reputation");
         reputation.writeReputationToXML(pw, indent);
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "reputation");
+
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "factionStandings");
+        factionStandings.writeFactionStandingsToXML(pw, indent);
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "factionStandings");
 
         // this handles campaigns that predate 49.20
         if (campaignStartDate == null) {

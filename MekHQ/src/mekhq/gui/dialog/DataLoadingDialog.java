@@ -84,6 +84,7 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RATManager;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.eras.Eras;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.baseComponents.AbstractMHQDialogBasic;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
@@ -364,6 +365,10 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 ReputationController reputationController = new ReputationController();
                 reputationController.initializeReputation(campaign);
                 campaign.setReputation(reputationController);
+
+                // initialize starting faction standings
+                FactionStandings factionStandings = campaign.getFactionStandings();
+                factionStandings.initializeStartingFameValues(campaign.getFaction(), campaign.getLocalDate());
                 // endregion Progress 6
 
                 // region Progress 7
