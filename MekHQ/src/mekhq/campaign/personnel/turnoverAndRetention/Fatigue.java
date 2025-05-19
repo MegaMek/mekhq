@@ -59,7 +59,7 @@ import mekhq.utilities.ReportingUtilities;
  * based on campaign settings and personnel conditions.</p>
  */
 public class Fatigue {
-    final private static String RESOURCE_BUNDLE = "mekhq.resources." + Fatigue.class.getSimpleName();
+    final private static String RESOURCE_BUNDLE = "mekhq.resources.Fatigue";
 
     static final private int FATIGUE_RECOVERY_RATE = 1;
 

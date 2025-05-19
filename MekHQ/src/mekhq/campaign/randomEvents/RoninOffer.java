@@ -84,7 +84,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
  * process based on the player’s choices.</p>
  */
 public class RoninOffer {
-    private static final String RESOURCE_BUNDLE = "mekhq.resources." + RoninOffer.class.getSimpleName();
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.RoninOffer";
 
     private final Campaign campaign;
 

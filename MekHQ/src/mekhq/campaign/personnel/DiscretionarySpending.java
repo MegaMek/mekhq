@@ -61,7 +61,7 @@ import mekhq.utilities.ReportingUtilities;
  * campaign commander uses their Wealth in this manner.</p>
  */
 public class DiscretionarySpending {
-    final private static String RESOURCE_BUNDLE = "mekhq.resources." + DiscretionarySpending.class.getSimpleName();
+    final private static String RESOURCE_BUNDLE = "mekhq.resources.DiscretionarySpending";
 
     /**
      * The maximum number of major purchases a person can make in a single discretionary spending calculation.
