@@ -2241,7 +2241,7 @@ class MekLocationTest {
         assertTrue(mekLocation.getDesc().contains(mekLocation.getCurrentModeName()));
 
         // Breached, but too hard to handle
-        mekLocation.setSkillMin(SkillType.EXP_ELITE + 1);
+        mekLocation.setSkillMin(SkillType.EXP_LEGENDARY + 1);
         assertTrue(mekLocation.getDesc().contains("Impossible"));
     }
 }
