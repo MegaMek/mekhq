@@ -231,7 +231,7 @@ import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.universe.eras.Era;
 import mekhq.campaign.universe.eras.Eras;
-import mekhq.campaign.universe.fameAndInfamy.BatchallFactions;
+import mekhq.campaign.universe.factionStanding.BatchallFactions;
 import mekhq.campaign.universe.fameAndInfamy.FameAndInfamyController;
 import mekhq.campaign.universe.selectors.factionSelectors.AbstractFactionSelector;
 import mekhq.campaign.universe.selectors.factionSelectors.DefaultFactionSelector;

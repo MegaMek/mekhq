@@ -121,7 +121,7 @@ import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.UnitGeneratorParameters;
 import mekhq.campaign.universe.enums.EraFlag;
 import mekhq.campaign.universe.enums.HonorRating;
-import mekhq.campaign.universe.fameAndInfamy.BatchallFactions;
+import mekhq.campaign.universe.factionStanding.BatchallFactions;
 
 /**
  * This class handles the creation and substantive manipulation of AtBDynamicScenarios

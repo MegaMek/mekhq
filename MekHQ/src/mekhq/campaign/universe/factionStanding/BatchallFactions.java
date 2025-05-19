@@ -25,15 +25,15 @@
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
  */
-package mekhq.campaign.universe.fameAndInfamy;
+package mekhq.campaign.universe.factionStanding;
+
+import java.util.List;
+import java.util.ResourceBundle;
 
 import megamek.codeUtilities.MathUtility;
 import megamek.common.Compute;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-
-import java.util.List;
-import java.util.ResourceBundle;
 
 /**
  * Provides utility methods for working with clan factions within the Fame and Infamy module:
