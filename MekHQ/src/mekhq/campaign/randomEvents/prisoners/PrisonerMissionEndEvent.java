@@ -35,6 +35,8 @@ package mekhq.campaign.randomEvents.prisoners;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static megamek.common.Compute.randomInt;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
 import static mekhq.campaign.finances.enums.TransactionType.RANSOM;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.ACTIVE;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.HOMICIDE;
@@ -45,6 +47,7 @@ import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import mekhq.campaign.Campaign;
@@ -54,8 +57,7 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.gui.dialog.MissionEndPrisonerDefectorDialog;
-import mekhq.gui.dialog.MissionEndPrisonerDialog;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.utilities.ReportingUtilities;
 
 /**
@@ -99,7 +101,22 @@ public class PrisonerMissionEndEvent {
      * @return An integer representing the player's choice in the defector-handling dialog.
      */
     public int handlePrisonerDefectors() {
-        MissionEndPrisonerDefectorDialog dialog = new MissionEndPrisonerDefectorDialog(campaign);
+        String commanderAddress = campaign.getCommanderAddress(false);
+        String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "prisonerDefectors.message", commanderAddress);
+
+        List<String> dialogOptions = List.of(getFormattedTextAt(RESOURCE_BUNDLE, "cancel.button"),
+              getFormattedTextAt(RESOURCE_BUNDLE, "continue.button"));
+
+        String outOfCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "prisonerDefectors.ooc");
+        ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
+              campaign.getSeniorAdminPerson(HR),
+              null,
+              inCharacterMessage,
+              dialogOptions,
+              outOfCharacterMessage,
+              null,
+              false);
+
         return dialog.getDialogChoice();
     }
 
@@ -124,13 +141,75 @@ public class PrisonerMissionEndEvent {
         int goodEventChance = determineGoodEventChance(isAllied);
         boolean isGoodEvent = randomInt(goodEventChance) > 0;
 
-        MissionEndPrisonerDialog dialog = new MissionEndPrisonerDialog(campaign,
-              ransom,
-              isAllied,
-              isSuccess,
-              isGoodEvent);
+        String key = "prisoners." +
+                           (isAllied ? "player" : "enemy") +
+                           '.' +
+                           (isSuccess ? "victory" : "defeat") +
+                           '.' +
+                           (isGoodEvent ? "good" : "bad") +
+                           '.' +
+                           randomInt(50);
+
+        String commanderAddress = campaign.getCommanderAddress(false);
+        String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, key, commanderAddress, ransom.toAmountString());
+
+        String outOfCharacterMessage = null;
+        if (isAllied && !isSuccess && isGoodEvent) {
+            outOfCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "prisoners.ransom.ooc");
+        }
+
+        ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
+              campaign.getSeniorAdminPerson(COMMAND),
+              null,
+              inCharacterMessage,
+              getEndOfContractDialogButtons(isAllied, isSuccess, isGoodEvent),
+              outOfCharacterMessage,
+              null,
+              true);
 
         processPlayerResponse(ransom, isGoodEvent, dialog.getDialogChoice(), prisoners);
+    }
+
+    /**
+     * Builds the list of buttons to be displayed in the dialog based on the parameters.
+     *
+     * <p>
+     * The available buttons depend on the ownership (allied/enemy), mission outcome, and the type of event. Buttons may
+     * include options such as "Accept Ransom", "Decline Ransom", "Release Prisoners", and "Execute Prisoners".
+     * </p>
+     *
+     * @param isAllied    Indicates whether the prisoners are allied.
+     * @param isSuccess   Indicates whether the mission was successful.
+     * @param isGoodEvent Indicates whether the event is positive.
+     *
+     * @return A list of buttons to be displayed on the dialog.
+     */
+    private static List<String> getEndOfContractDialogButtons(boolean isAllied, boolean isSuccess,
+          boolean isGoodEvent) {
+        List<String> buttons = new ArrayList<>();
+
+        boolean isRansom = (!isAllied && isSuccess && isGoodEvent) ||
+                                 (!isAllied && !isSuccess && isGoodEvent) ||
+                                 (isAllied && !isSuccess && isGoodEvent);
+
+        if (isRansom) {
+            if (isAllied) {
+                buttons.add(getFormattedTextAt(RESOURCE_BUNDLE, "decline.button"));
+            }
+
+            buttons.add(getFormattedTextAt(RESOURCE_BUNDLE, "accept.button"));
+        }
+
+        if (!isAllied) {
+            buttons.add(getFormattedTextAt(RESOURCE_BUNDLE, "releaseThem.button"));
+            buttons.add(getFormattedTextAt(RESOURCE_BUNDLE, "executeThem.button"));
+        }
+
+        if (isAllied && !isRansom) {
+            buttons.add(getFormattedTextAt(RESOURCE_BUNDLE, "successful.button"));
+        }
+
+        return buttons;
     }
 
     /**

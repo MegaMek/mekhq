@@ -36,6 +36,7 @@ import static megamek.common.Board.T_SPACE;
 import static megamek.common.MiscType.createBeagleActiveProbe;
 import static megamek.common.MiscType.createCLImprovedSensors;
 import static megamek.common.MiscType.createISImprovedSensors;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.BONDSREF;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.DEFECTED;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.ENEMY_BONDSMAN;
@@ -69,8 +70,8 @@ import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.enums.HonorRating;
-import mekhq.gui.dialog.DefectionOffer;
 import mekhq.utilities.ReportingUtilities;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
 /**
  * Handles events and processes related to capturing prisoners.
@@ -255,11 +256,57 @@ public class CapturePrisoners {
                     prisoner.setPrisonerStatus(campaign, PRISONER_DEFECTOR, false);
                 }
 
-                new DefectionOffer(campaign, prisoner, prisoner.isClanPersonnel());
+                boolean isBondsman = prisoner.isClanPersonnel();
+                new ImmersiveDialogSimple(campaign,
+                      campaign.getSeniorAdminPerson(HR),
+                      null,
+                      createInCharacterMessage(prisoner, isBondsman),
+                      null,
+                      getFormattedTextAt(RESOURCE_BUNDLE, (isBondsman ? "bondsman" : "defector") + ".ooc"),
+                      null,
+                      false);
             }
         }
 
         handlePostCapture(prisoner, prisoner.getPrisonerStatus());
+    }
+
+
+    /**
+     * Generates the in-character message for the dialog based on the defection offer.
+     *
+     * <p>This message customizes its narrative based on the type of defector
+     * (standard or bondsman). It provides details about the prisoner, their origin faction, and their offer to defect,
+     * addressing the player by their in-game title.</p>
+     *
+     * @param defector   The prisoner making the defection offer.
+     * @param isBondsman {@code true} if the defector is a bondsman, {@code false} otherwise.
+     *
+     * @return A formatted string containing the immersive in-character message for the player.
+     */
+    private String createInCharacterMessage(Person defector, boolean isBondsman) {
+        String typeKey = isBondsman ? "bondsman" : "defector";
+        String commanderAddress = campaign.getCommanderAddress(false);
+
+        if (isBondsman) {
+            String originFaction = defector.getOriginFaction().getFullName(campaign.getGameYear());
+
+            if (!originFaction.contains("Clan")) {
+                originFaction = "The " + originFaction;
+            }
+            return getFormattedTextAt(RESOURCE_BUNDLE,
+                  typeKey + ".message",
+                  commanderAddress,
+                  defector.getFullName(),
+                  originFaction,
+                  defector.getFirstName());
+        }
+
+        return getFormattedTextAt(RESOURCE_BUNDLE,
+              typeKey + ".message",
+              commanderAddress,
+              defector.getFullName(),
+              defector.getOriginFaction().getFullName(campaign.getGameYear()));
     }
 
     /**
