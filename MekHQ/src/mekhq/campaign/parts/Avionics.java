@@ -198,7 +198,7 @@ public class Avionics extends Part {
     @Override
     public Money getStickerPrice() {
         // Tech Manual p283 - cost is only valid for Conventional Fighters
-        if (unit.getEntity() instanceof ConvFighter) {
+        if (unit != null && unit.getEntity() instanceof ConvFighter) {
             return Money.of(4000 * this.unitTonnage * 0.1);
         } else {
             return Money.zero();
