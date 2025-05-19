@@ -749,6 +749,10 @@ public class Campaign implements ITechManager {
     // endregion Markets
 
     // region Personnel Modules
+    public void resetRandomDeath() {
+        this.randomDeath = new RandomDeath(this);
+    }
+
     public AbstractDivorce getDivorce() {
         return divorce;
     }
@@ -1651,6 +1655,20 @@ public class Campaign implements ITechManager {
             tacticalTransporters.addTransporter(unit);
         } else if (campaignTransportType.isTowTransport()) {
             towTransporters.addTransporter(unit);
+        }
+    }
+
+    /**
+     * This will update the transport in the transports list with current capacities. When a unit is added or removed
+     * from a transport, that information needs updated in the campaign transport map. This method will update the
+     * map for every {@code CampaignTransportType} for the given transport.
+     *
+     * @see Campaign#updateTransportInTransports(CampaignTransportType, Unit)
+     * @param transport             Unit
+     */
+    public void updateTransportInTransports(Unit transport) {
+        for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
+            updateTransportInTransports (campaignTransportType, transport);
         }
     }
 
@@ -4873,7 +4891,9 @@ public class Campaign implements ITechManager {
         // Process personnel
         int peopleWhoCelebrateCommandersDay = 0;
         int commanderDayTargetNumber = 5;
-        boolean isCommandersDay = isCommandersDay(currentDay) && getFlaggedCommander() != null;
+        boolean isCommandersDay = isCommandersDay(currentDay) &&
+                                        getFlaggedCommander() != null &&
+                                        campaignOptions.isShowLifeEventDialogCelebrations();
         for (Person person : personnel) {
             if (person.getStatus().isDepartedUnit()) {
                 continue;
