@@ -299,8 +299,15 @@ public class PersonViewPanel extends JScrollablePanel {
             txtDesc.setName("personalityDescription");
             txtDesc.setEditable(false);
             txtDesc.setContentType("text/html");
-            txtDesc.setText(person.getPersonalityDescription());
-            txtDesc.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlPersonality.title")));
+
+            String borderTitleKey = "pnlPersonality.normal";
+            if (person.getJoinedCampaign() == null) {
+                borderTitleKey = "pnlPersonality.interview";
+                txtDesc.setText(person.getPersonalityInterviewNotes());
+            } else {
+                txtDesc.setText(person.getPersonalityDescription());
+            }
+            txtDesc.setBorder(BorderFactory.createTitledBorder(resourceMap.getString(borderTitleKey)));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridY;
