@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.force;
 
@@ -1086,6 +1091,8 @@ public class Force {
         for (Force subforce : force.getSubForces()) {
             if (currentFormationLevel - 1 < lowerBoundary) {
                 subforce.setFormationLevel(FormationLevel.INVALID);
+            } else if (subforce.getSubForces().isEmpty()) {
+                subforce.setFormationLevel(FormationLevel.parseFromInt(lowerBoundary));
             } else {
                 subforce.setFormationLevel(FormationLevel.parseFromInt(currentFormationLevel - 1));
             }
