@@ -60,6 +60,7 @@ import static mekhq.campaign.personnel.skills.SkillType.S_ARTILLERY;
 import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
 import static mekhq.campaign.personnel.skills.SkillType.getType;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.WILLPOWER;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeInterviewersNotes;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.processAdHocExecution;
 import static mekhq.utilities.spaUtilities.SpaUtilities.getSpaCategory;
@@ -83,8 +84,10 @@ import javax.swing.JTable;
 
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
+import megamek.client.ratgenerator.CrewDescriptor;
 import megamek.client.ui.dialogs.PortraitChooserDialog;
 import megamek.codeUtilities.MathUtility;
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Crew;
 import megamek.common.EntityWeightClass;
 import megamek.common.Mounted;
@@ -136,6 +139,7 @@ import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.personnel.skills.Aging;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -216,6 +220,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_EDIT_HITS = "EDIT_HITS";
     private static final String CMD_EDIT = "EDIT";
     private static final String CMD_SACK = "SACK";
+    private static final String CMD_EMPLOY = "EMPLOY";
     private static final String CMD_SPENDING_SPREE = "SPENDING_SPREE";
     private static final String CMD_REMOVE = "REMOVE";
     private static final String CMD_EDGE_TRIGGER = "EDGE";
@@ -233,6 +238,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_BUY_TRAIT = "BUY_TRAIT";
     private static final String CMD_CHANGE_ATTRIBUTE = "CHANGE_ATTRIBUTE";
     private static final String CMD_SET_ATTRIBUTE = "SET_ATTRIBUTE";
+    private static final String CMD_RANDOM_PROFESSION = "RANDOM_PROFESSION";
     private static final String CMD_ADD_SPOUSE = "SPOUSE";
     private static final String CMD_REMOVE_SPOUSE = "REMOVE_SPOUSE";
     private static final String CMD_ADD_PREGNANCY = "ADD_PREGNANCY";
@@ -441,6 +447,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 for (final Person person : people) {
                     person.setPrimaryRole(getCampaign(), role);
                     writePersonalityDescription(person);
+                    writeInterviewersNotes(person);
                     getCampaign().personUpdated(person);
                     if (getCampaignOptions().isUsePortraitForRole(role) &&
                               getCampaignOptions().isAssignPortraitOnRoleChange() &&
@@ -702,6 +709,49 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                 for (Person person : people) {
                     person.setAttributeScore(attribute, choice);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                    getCampaign().personUpdated(person);
+                }
+
+                break;
+            }
+            case CMD_RANDOM_PROFESSION: {
+                List<PersonnelRole> possibleRoles = PersonnelRole.getCivilianRolesExceptNone();
+                LocalDate today = getCampaign().getLocalDate();
+
+                for (Person person : people) {
+                    // Under 16s are considered children and unable to be assigned a profession
+                    if (person.isChild(today)) {
+                        continue;
+                    }
+
+                    List<PersonnelRole> eligibleRoles = new ArrayList<>(possibleRoles);
+
+                    int personAge = person.getAge(today);
+
+                    if (personAge < 18) {
+                        // Characters under 18 years old are strictly unable to be assigned these roles.
+                        // This is project policy.
+                        eligibleRoles.remove(PersonnelRole.ADULT_ENTERTAINER);
+                        eligibleRoles.remove(PersonnelRole.LUXURY_COMPANION);
+                    }
+
+                    PersonnelRole randomProfession = ObjectUtility.getRandomItem(eligibleRoles);
+                    int experienceLevel = CrewDescriptor.randomExperienceLevel();
+
+                    for (String skillName : randomProfession.getSkillsForProfession()) {
+                        if (person.getSkill(skillName) != null) { // They already have this skill
+                            continue;
+                        }
+
+                        SkillType skillType = SkillType.getType(skillName);
+                        int targetLevel = skillType.getExperienceLevel(experienceLevel);
+                        person.addSkill(skillName, targetLevel, 0);
+                    }
+
+                    Aging.updateAllSkillAgeModifiers(today, person);
+                    person.setPrimaryRole(getCampaign(), randomProfession);
+
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                     getCampaign().personUpdated(person);
                 }
@@ -1036,18 +1086,21 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_SACK: {
                 boolean showDialog = false;
                 List<Person> toRemove = new ArrayList<>();
-                for (Person person : people) {
-                    if (!person.getPrimaryRole().isCivilian()) {
-                        if (getCampaign().getRetirementDefectionTracker()
-                                  .removeFromCampaign(person, false, true, getCampaign(), null)) {
-                            showDialog = true;
+                if (getCampaignOptions().isUseAtB()) {
+                    for (Person person : people) {
+                        if (!person.getPrimaryRole().isCivilian()) {
+                            if (getCampaign().getRetirementDefectionTracker()
+                                      .removeFromCampaign(person, false, true, getCampaign(), null)) {
+                                showDialog = true;
+                            } else {
+                                toRemove.add(person);
+                            }
                         } else {
                             toRemove.add(person);
                         }
-                    } else {
-                        toRemove.add(person);
                     }
                 }
+
                 if (showDialog) {
                     RetirementDefectionDialog rdd = new RetirementDefectionDialog(gui, null, false);
 
@@ -1078,6 +1131,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         }
                     }
                 }
+                break;
+            }
+            case CMD_EMPLOY: {
+                for (Person person : people) {
+                    getCampaign().recruitPerson(person);
+                }
+
                 break;
             }
             case CMD_SPENDING_SPREE: {
@@ -1513,7 +1573,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_PERSONALITY: {
                 for (Person person : people) {
-                    PersonalityController.generatePersonality(person);
+                    PersonalityController.generatePersonality(person, false);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
@@ -1574,6 +1634,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     person.setGivenName(name[0]);
                     person.setSurname(name[1]);
                     writePersonalityDescription(person);
+                    writeInterviewersNotes(person);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
@@ -1705,7 +1766,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       suitableDoctors,
                       selectedPerson,
                       cost);
-                int choice = replacementLimbDialog.getDialogChoice();
+                int choice = replacementLimbDialog.getChoiceIndex();
 
                 // If the user chose to decline the surgery
                 if (choice == 0) {
@@ -3779,9 +3840,16 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         menuItem.setEnabled(true);
         popup.add(menuItem);
 
-        if (getCampaignOptions().isUseAtB() && StaticChecks.areAllActive(selected)) {
+        if (StaticChecks.areAllEmployed(selected)) {
             menuItem = new JMenuItem(resources.getString("sack.text"));
             menuItem.setActionCommand(CMD_SACK);
+            menuItem.addActionListener(this);
+            popup.add(menuItem);
+        }
+
+        if (!StaticChecks.areAllEmployed(selected)) {
+            menuItem = new JMenuItem(resources.getString("employ.text"));
+            menuItem.setActionCommand(CMD_EMPLOY);
             menuItem.addActionListener(this);
             popup.add(menuItem);
         }
@@ -4219,6 +4287,14 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 attributesMenu.add(menuItem);
             }
             menu.add(attributesMenu);
+
+            menuItem = new JMenuItem(resources.getString("generateRandomCivilianProfession.text"));
+            menuItem.setToolTipText(wordWrap(String.format(resources.getString(
+                  "generateRandomCivilianProfession.tooltip"))));
+            menuItem.setActionCommand(makeCommand(CMD_RANDOM_PROFESSION));
+            menuItem.addActionListener(this);
+            menuItem.setEnabled(getCampaign().isGM());
+            menu.add(menuItem);
 
             JMenuHelpers.addMenuIfNonEmpty(popup, menu);
         }

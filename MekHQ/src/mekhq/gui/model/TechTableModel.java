@@ -47,6 +47,7 @@ import mekhq.campaign.work.IPartWork;
 import mekhq.gui.BasicInfo;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.ITechWorkPanel;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * A table model for displaying work items
@@ -141,7 +142,7 @@ public class TechTableModel extends DataTableModel {
         StringBuilder toReturn = new StringBuilder(128);
         toReturn.append("<html><font");
         if ((null != part) && (null != part.getUnit()) && tech.getTechUnits().contains(part.getUnit())) {
-            toReturn.append(" color='").append(MekHQ.getMHQOptions().getFontColorPositiveHexColor()).append("'><b>@");
+            toReturn.append(" color='" + ReportingUtilities.getPositiveColor() + "'><b>@");
         } else {
             toReturn.append("><b>");
         }

@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe.generators.companyGenerators;
 
@@ -680,7 +685,7 @@ public abstract class AbstractCompanyGenerator {
         // Recruit all the personnel, GM-style so that the initial hiring cost is
         // calculated as part
         // of the financial model
-        trackers.forEach(t -> campaign.recruitPerson(t.getPerson(), true));
+        trackers.forEach(t -> campaign.recruitPerson(t.getPerson(), true, true));
 
         // Now that they are recruited, we can simulate backwards a few years and
         // generate marriages and children

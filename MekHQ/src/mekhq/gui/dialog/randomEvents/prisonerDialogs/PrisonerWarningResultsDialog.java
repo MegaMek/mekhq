@@ -38,13 +38,9 @@ import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 
 /**
- * Represents a dialog triggered as a result of the player responding to a warning about exceeding Prisoner Capacity.
- *
- * <p>This dialog is shown after the player has chosen to resolve the high Prisoner Capacity
- * situation by either releasing or executing prisoners. It provides an immersive, narrative-driven in-character message
- * that reflects the consequences of the player's decision and an optional out-of-character (OOC) message for additional
- * context.</p>
+ * @deprecated Unused
  */
+@Deprecated(since = "0.50.06", forRemoval = true)
 public class PrisonerWarningResultsDialog extends ImmersiveDialogCore {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
 

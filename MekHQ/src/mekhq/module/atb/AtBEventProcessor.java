@@ -67,6 +67,7 @@ import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.RandomFactionGenerator;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * Main engine of the Against the Bot campaign system.
@@ -103,7 +104,7 @@ public class AtBEventProcessor {
             } else {
                 ev.getCampaign()
                       .addReport("<html><font color='" +
-                                       MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                                       ReportingUtilities.getNegativeColor() +
                                        "'>Insufficient funds for paid recruitment.</font></html>");
             }
         }

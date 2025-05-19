@@ -158,7 +158,7 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                             pilotingMod = 1;
                         }
                         break;
-                    case SkillType.EXP_ELITE:
+                    case SkillType.EXP_ELITE, SkillType.EXP_HEROIC, SkillType.EXP_LEGENDARY:
                         gunneryMod = 1;
                         pilotingMod = 1;
                         break;

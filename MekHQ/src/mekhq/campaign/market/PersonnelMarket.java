@@ -71,6 +71,7 @@ import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+@Deprecated(since = "0.50.06", forRemoval = false)
 public class PersonnelMarket {
     private static final MMLogger logger = MMLogger.create(PersonnelMarket.class);
 

@@ -50,6 +50,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * This class handles Support Point negotiations for StratCon.
@@ -173,7 +174,7 @@ public class SupportPointNegotiation {
 
             campaign.addReport(String.format(resources.getString("supportPoints.maximum"),
                   contract.getHyperlinkedName(),
-                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor()),
+                  spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
                   CLOSING_SPAN_TAG,
                   maxSupportPoints,
                   pluralizer));
@@ -196,8 +197,8 @@ public class SupportPointNegotiation {
 
         // Determine font color based on success or failure
         String fontColor = (negotiatedSupportPoints > 0) ?
-                                 MekHQ.getMHQOptions().getFontColorPositiveHexColor() :
-                                 MekHQ.getMHQOptions().getFontColorNegativeHexColor();
+                                 ReportingUtilities.getPositiveColor() :
+                                 ReportingUtilities.getNegativeColor();
 
         // Add points to the contract if positive
         if (negotiatedSupportPoints > 0) {
@@ -279,12 +280,12 @@ public class SupportPointNegotiation {
 
         if (contract == null) {
             campaign.addReport(String.format(resources.getString(reportKey),
-                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   CLOSING_SPAN_TAG));
         } else {
             campaign.addReport(String.format(resources.getString(reportKey),
                   contract.getHyperlinkedName(),
-                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   CLOSING_SPAN_TAG));
         }
     }

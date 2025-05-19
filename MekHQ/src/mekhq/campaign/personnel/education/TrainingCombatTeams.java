@@ -52,6 +52,7 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.unit.Unit;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * Handles the training of combat teams within the campaign.
@@ -219,7 +220,7 @@ public class TrainingCombatTeams {
                     campaign.addReport(String.format(resources.getString("notLearningAnything.text"),
                           trainee.getHyperlinkedFullTitle(),
                           commander.getFullTitle(),
-                          spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                          spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                           CLOSING_SPAN_TAG));
                     trainee.setEduAcademyName("");
                     trainee.setEduEducationTime(0);
@@ -287,7 +288,7 @@ public class TrainingCombatTeams {
                 campaign.addReport(String.format(resources.getString("learnedNewSkill.text"),
                       commander.getFullTitle(),
                       trainee.getHyperlinkedFullTitle(),
-                      spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                      spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                       CLOSING_SPAN_TAG,
                       targetSkill.getType().getName(),
                       targetSkill.getFinalSkillValue(trainee.getOptions(), trainee.getATOWAttributes())));

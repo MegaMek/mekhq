@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.skills;
 
@@ -77,8 +82,8 @@ public class RandomSkillPreferences {
         antiMekProb = 10;
         combatSmallArmsBonus = -3;
         supportSmallArmsBonus = -10;
-        specialAbilityBonus = new int[] { -10, -10, -2, 0, 1 };
-        commandSkillsModifier = new int[] { -10, -10, -7, -4, -1 };
+        specialAbilityBonus = new int[] { -10, -10, -2, 0, 1, 1, 1 };
+        commandSkillsModifier = new int[] { -10, -10, -7, -4, -1, -1, -1 };
         roleplaySkillModifier = -12;
         artilleryProb = 10;
         artilleryBonus = -2;

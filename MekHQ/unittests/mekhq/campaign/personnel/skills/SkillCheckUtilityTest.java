@@ -88,7 +88,7 @@ class SkillCheckUtilityTest {
         int expectedMarginOfSuccess = getMarginValue(DISASTROUS);
         assertEquals(expectedMarginOfSuccess, checkUtility.getMarginOfSuccess());
 
-        String RESOURCE_BUNDLE = "mekhq.resources." + SkillCheckUtility.class.getSimpleName();
+        String RESOURCE_BUNDLE = "mekhq.resources.SkillCheckUtility";
         String expectedResultsText = getFormattedTextAt(RESOURCE_BUNDLE, "skillCheck.nullPerson");
         assertEquals(expectedResultsText, checkUtility.getResultsText());
 
@@ -106,7 +106,7 @@ class SkillCheckUtilityTest {
         int expectedMarginOfSuccess = getMarginValue(DISASTROUS);
         assertEquals(expectedMarginOfSuccess, checkUtility.getMarginOfSuccess());
 
-        String RESOURCE_BUNDLE = "mekhq.resources." + SkillCheckUtility.class.getSimpleName();
+        String RESOURCE_BUNDLE = "mekhq.resources.SkillCheckUtility";
         String expectedResultsText = getFormattedTextAt(RESOURCE_BUNDLE, "skillCheck.nullPerson");
         assertEquals(expectedResultsText, checkUtility.getResultsText());
 

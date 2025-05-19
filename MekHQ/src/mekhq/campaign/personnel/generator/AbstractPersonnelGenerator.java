@@ -125,8 +125,6 @@ public abstract class AbstractPersonnelGenerator {
      * @return An integer value between {@link SkillType#EXP_ULTRA_GREEN} and {@link SkillType#EXP_ELITE}.
      */
     public int generateExperienceLevel(Person person) {
-
-
         int bonus = rSkillPrefs.getOverallRecruitBonus() + rSkillPrefs.getRecruitmentBonus(person.getPrimaryRole());
 
         // LAM pilots get +3 to random experience roll
