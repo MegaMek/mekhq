@@ -64,6 +64,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.enums.MHQTabType;
+import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.view.JumpPathViewPanel;
@@ -176,6 +177,9 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         // let's go ahead and zoom in on the current location
         panMap.setSelectedSystem(getCampaign().getLocation().getCurrentSystem());
         panMapView.add(panMap, BorderLayout.CENTER);
+
+        JPanel pnlTutorial = new TutorialHyperlinkPanel("mapTab");
+        panMapView.add(pnlTutorial, BorderLayout.SOUTH);
 
         mapView = new JViewport();
         mapView.setMinimumSize(new Dimension(600, 600));

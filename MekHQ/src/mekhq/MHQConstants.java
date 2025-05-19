@@ -269,6 +269,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String ERAS_FILE_PATH = "data/universe/eras.xml";
     public static final String FACTION_HINTS_FILE = "data/universe/factionhints.xml";
     public static final String FINANCIAL_INSTITUTIONS_FILE_PATH = "data/universe/financialInstitutions.xml";
+    public static final String FINANCIAL_CURRENCIES_FILE_PATH = "data/universe/currencies.xml";
     public static final String RANDOM_DEATH_CAUSES_FILE_PATH = "data/universe/randomDeathCauses.xml";
     public static final String RANKS_FILE_PATH = "data/universe/ranks.xml";
     public static final String CAMPAIGN_PRESET_DIRECTORY = "data/campaignPresets/";
