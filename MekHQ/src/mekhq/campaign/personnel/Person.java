@@ -1357,7 +1357,10 @@ public class Person {
 
         for (UUID tagAlongId : eduTagAlongs) {
             Person tagAlong = campaign.getPerson(tagAlongId);
-            tagAlong.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
+
+            if (tagAlong != null) {
+                tagAlong.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
+            }
         }
         this.setEduTagAlongs(new ArrayList<>());
 
@@ -3935,7 +3938,7 @@ public class Person {
                 return SkillType.EXP_NONE;
             }
 
-            int individualSkillLevel = skill.getLevel();
+            int individualSkillLevel = skill.getTotalSkillLevel();
             totalSkillLevel += individualSkillLevel;
 
             if (isAlternativeQualityAveraging) {
