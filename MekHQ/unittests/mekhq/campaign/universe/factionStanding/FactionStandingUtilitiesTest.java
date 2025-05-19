@@ -50,7 +50,7 @@ class FactionStandingUtilitiesTest {
     @Test
     void test_calculateFactionStandingLevel_veryLowFame() {
         // Setup
-        int fame = Integer.MIN_VALUE;
+        int fame = Integer.MIN_VALUE + 1; // values must be above Integer#MIN_VALUE
 
         // Act
         FactionStandingLevel result = FactionStandingUtilities.calculateFactionStandingLevel(fame);
@@ -85,12 +85,12 @@ class FactionStandingUtilitiesTest {
         return Arrays.stream(FactionStandingLevel.values()).flatMap(standing -> {
             // We're casting to an int as we don't need to check every possible decimal value.
             // If all ints pass the test, then all doubles will too.
-            int minimumFame = (int) standing.getMinimumFame();
+            int minimumFame = (int) standing.getMinimumFame() + 1;
             int maximumFame = (int) standing.getMaximumFame();
             // These special handlers stop us iterating for all values between Integer#MIN_VALUE and
             // Integer#MAX_VALUE.
             if (standing == STANDING_LEVEL_0) {
-                minimumFame = -100;
+                minimumFame = -110;
             }
             if (standing == STANDING_LEVEL_8) {
                 maximumFame = 110;

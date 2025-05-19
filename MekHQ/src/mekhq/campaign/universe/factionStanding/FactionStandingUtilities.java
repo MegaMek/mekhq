@@ -58,7 +58,7 @@ public class FactionStandingUtilities {
      */
     public static FactionStandingLevel calculateFactionStandingLevel(double fame) {
         for (FactionStandingLevel standingLevel : FactionStandingLevel.values()) {
-            if (fame >= standingLevel.getMinimumFame() && fame <= standingLevel.getMaximumFame()) {
+            if (fame > standingLevel.getMinimumFame() && fame <= standingLevel.getMaximumFame()) {
                 return standingLevel;
             }
         }

@@ -5343,6 +5343,8 @@ public class Campaign implements ITechManager {
         // Advance the day by one
         final LocalDate yesterday = currentDay;
         currentDay = currentDay.plusDays(1);
+        boolean isFirstOfMonth = currentDay.getDayOfMonth() == 1;
+        boolean isNewYear = currentDay.getDayOfYear() == 1;
 
         // Check for important dates
         if (campaignOptions.isShowLifeEventDialogCelebrations()) {
@@ -5363,12 +5365,18 @@ public class Campaign implements ITechManager {
         beginReport("<b>" + MekHQ.getMHQOptions().getLongDisplayFormattedDate(getLocalDate()) + "</b>");
 
         // New Year Changes
-        if (currentDay.getDayOfYear() == 1) {
+        if (isNewYear) {
             // News is reloaded
             reloadNews();
 
             // Change Year Game Option
             getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(getGameYear());
+
+            // Degrade Fame
+            List<String> degradedFameReports = factionStandings.processFameDegradation(currentDay.getYear());
+            for (String report : degradedFameReports) {
+                addReport(report);
+            }
         }
 
         readNews();
@@ -5389,7 +5397,7 @@ public class Campaign implements ITechManager {
         // Needs to be before 'processNewDayATB' so that Dependents can't leave the
         // moment they
         // arrive via AtB Bonus Events
-        if ((location.isOnPlanet()) && (currentDay.getDayOfMonth() == 1)) {
+        if (location.isOnPlanet() && isFirstOfMonth) {
             RandomDependents randomDependents = new RandomDependents(this);
             randomDependents.processMonthlyRemovalAndAddition();
         }
@@ -5407,14 +5415,14 @@ public class Campaign implements ITechManager {
             processEducationNewDay();
         }
 
-        if ((campaignOptions.isEnableAutoAwards()) && (currentDay.getDayOfMonth() == 1)) {
+        if (campaignOptions.isEnableAutoAwards() && isFirstOfMonth) {
             AutoAwardsController autoAwardsController = new AutoAwardsController();
             autoAwardsController.ManualController(this, false);
         }
 
         // Prisoner events can occur on Monday or the 1st of the month depending on the
         // type of event
-        if (currentDay.getDayOfWeek() == DayOfWeek.MONDAY || currentDay.getDayOfMonth() == 1) {
+        if (currentDay.getDayOfWeek() == DayOfWeek.MONDAY || isFirstOfMonth) {
             new PrisonerEventManager(this);
         }
 
@@ -5432,7 +5440,7 @@ public class Campaign implements ITechManager {
         finances.newDay(this, yesterday, getLocalDate());
 
         // process removal of old personnel data on the first day of each month
-        if ((campaignOptions.isUsePersonnelRemoval()) && (currentDay.getDayOfMonth() == 1)) {
+        if (campaignOptions.isUsePersonnelRemoval() && isFirstOfMonth) {
             processPersonnelRemoval();
         }
 

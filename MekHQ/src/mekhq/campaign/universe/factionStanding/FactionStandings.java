@@ -32,9 +32,6 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
-import static java.lang.Math.abs;
-import static mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel.STANDING_LEVEL_3;
-import static mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel.STANDING_LEVEL_5;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -77,9 +74,9 @@ public class FactionStandings {
 
     static final double DEFAULT_FAME = 0.0;
     static final double DEFAULT_FAME_DEGRADATION = 0.25;
-    static final double STARTING_FAME_SAME_FACTION = STANDING_LEVEL_5.getMinimumFame();
+    static final double STARTING_FAME_SAME_FACTION = DEFAULT_FAME + 25;
     static final double STARTING_FAME_ALLIED_FACTION = STARTING_FAME_SAME_FACTION / 2;
-    static final double STARTING_FAME_ENEMY_FACTION = STANDING_LEVEL_3.getMaximumFame();
+    static final double STARTING_FAME_ENEMY_FACTION = DEFAULT_FAME - 25;
 
     private Map<String, Double> factionStandings;
 
@@ -127,7 +124,7 @@ public class FactionStandings {
      * @since 0.50.07
      */
     public List<String> initializeStartingFameValues(Faction campaignFaction, LocalDate today) {
-        List<String> fameChangeReports = new java.util.ArrayList<>();
+        List<String> fameChangeReports = new ArrayList<>();
 
         int gameYear = today.getYear();
 
@@ -351,8 +348,7 @@ public class FactionStandings {
         return getFormattedTextAt(RESOURCE_BUNDLE,
               "factionStandings.change.report", factionName, spanOpeningWithCustomColor(reportingColor),
               deltaDirection,
-              CLOSING_SPAN_TAG,
-              abs(delta),
+              CLOSING_SPAN_TAG, delta,
               milestoneChangeReport);
     }
 
@@ -400,6 +396,7 @@ public class FactionStandings {
      */
     public List<String> processFameDegradation(int gameYear) {
         List<String> fameChangeReports = new ArrayList<>();
+        LOGGER.info("Processing fame decay for {} factions.", factionStandings.size());
         for (String factionCode : new HashSet<>(factionStandings.keySet())) {
             double currentFame = factionStandings.get(factionCode);
 
