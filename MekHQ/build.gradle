@@ -57,6 +57,15 @@ ext {
     mmlDir = "${rootDir}/../megameklab"
 }
 
+applicationDefaultJvmArgs = [
+            '-Xmx4096m',
+            '--add-opens',
+            'java.base/java.util=ALL-UNNAMED',
+            '--add-opens',
+            'java.base/java.util.concurrent=ALL-UNNAMED',
+            '-Dsun.awt.disablegrab=true'
+]
+
 dependencies {
     implementation "org.megamek:megamek:${version}"
     implementation("org.megamek:megameklab:${version}") {
@@ -119,6 +128,7 @@ jar {
                 .collect { "${lib}/${it.name}" }.join(' '))
         attributes "Add-Opens": 'java.base/java.util java.base/java.util.concurrent'
         attributes "Build-Date": LocalDateTime.now()
+        attributes "Sealed": true
     }
 }
 
@@ -225,7 +235,6 @@ tasks.register('createStartScripts', CreateStartScripts) {
     outputDir = startScripts.outputDir
     classpath = jar.outputs.files + files(project.sourceSets.main.runtimeClasspath.files)
             .filter { it.name.endsWith(".jar") }
-    defaultJvmOpts = project.ext.mhqJvmOptions
 }
 
 distributions {
