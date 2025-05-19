@@ -202,7 +202,7 @@ public class ContractSummaryPanel extends JPanel {
                 gridBagConstraintsLabels.gridy = ++y;
                 mainPanel.add(lblChallenge, gridBagConstraintsLabels);
 
-                JPanel txtChallenge = ((AtBContract) contract).getContractDifficultySkulls(campaign);
+                JPanel txtChallenge = ((AtBContract) contract).getContractDifficultySkulls();
                 txtChallenge.setToolTipText(wordWrap(resourceMap.getString("lblChallenge.tooltip")));
                 txtChallenge.setName("txtChallenge");
                 gridBagConstraintsText.gridy = y;

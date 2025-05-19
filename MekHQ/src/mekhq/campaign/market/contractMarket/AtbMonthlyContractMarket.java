@@ -270,16 +270,33 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         if (campaign.getFaction().isMercenary()) {
             if (null == campaign.getRetainerEmployerCode()) {
                 int retries = MAXIMUM_GENERATION_RETRIES;
-                AtBContract retVal = null;
-                while ((retries > 0) && (retVal == null)) {
+                AtBContract contract = null;
+                while ((retries > 0) && (contract == null)) {
                     // Send only 1 retry down because we're handling retries in our loop
-                    retVal = generateAtBContract(campaign,
+                    contract = generateAtBContract(campaign,
                           RandomFactionGenerator.getInstance().getEmployer(),
                           unitRatingMod,
                           1);
+
+                    // This try-catch is specifically implemented to make testing easier. Otherwise, we would need to
+                    // define the player's TO&E, their Ally's unit availability, and their Enemy's unit availability,
+                    // a RAT generator instance and a whole other pile of stuff. So instead, we let it fail, and if we
+                    // need to specifically define difficulty in a unit test, we can do so by using
+                    // contract.setDifficulty().
+                    try {
+                        if (contract != null) {
+                            contract.setDifficulty(contract.calculateContractDifficulty(contract.getStartDate()
+                                                                                              .getYear(),
+                                  true,
+                                  campaign.getAllCombatEntities()));
+                        }
+                    } catch (Exception e) {
+                        contract.setDifficulty(5);
+                        logger.error("Unable to calculate difficulty for AtB contract " + contract, e);
+                    }
                     retries--;
                 }
-                return retVal;
+                return contract;
             } else {
                 return generateAtBContract(campaign, campaign.getRetainerEmployerCode(), unitRatingMod);
             }
@@ -599,6 +616,18 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                 multiplier *= 0.8;
             } else if (unitRatingMod == IUnitRating.DRAGOON_F) {
                 multiplier *= 0.5;
+            }
+        }
+
+        // FG3 Difficulty Multiplier
+        if (campaignOptions.isUseGenericBattleValue()) {
+            int contractDifficulty = contract.getDifficulty();
+            if (contractDifficulty != Integer.MIN_VALUE && contractDifficulty <= 2) {
+                multiplier /= 0.5;
+            } else if (contractDifficulty >= 8) {
+                multiplier *= 0.5;
+            } else if (contractDifficulty >= 6) {
+                multiplier *= 0.25;
             }
         }
 
