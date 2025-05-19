@@ -33,6 +33,8 @@
 package mekhq.campaign.universe.factionStanding;
 
 import static java.lang.Math.abs;
+import static mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel.STANDING_LEVEL_3;
+import static mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel.STANDING_LEVEL_5;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -40,12 +42,12 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import megamek.codeUtilities.MathUtility;
 import megamek.logging.MMLogger;
@@ -73,8 +75,11 @@ public class FactionStandings {
     private static final MMLogger LOGGER = MMLogger.create(FactionStandings.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionStandings";
 
-    private static final double DEFAULT_FAME = 0.0;
-    private static final double DEFAULT_FAME_DEGRADATION = 0.25;
+    static final double DEFAULT_FAME = 0.0;
+    static final double DEFAULT_FAME_DEGRADATION = 0.25;
+    static final double STARTING_FAME_SAME_FACTION = STANDING_LEVEL_5.getMinimumFame();
+    static final double STARTING_FAME_ALLIED_FACTION = STARTING_FAME_SAME_FACTION / 2;
+    static final double STARTING_FAME_ENEMY_FACTION = STANDING_LEVEL_3.getMaximumFame();
 
     private Map<String, Double> factionStandings;
 
@@ -95,32 +100,33 @@ public class FactionStandings {
     }
 
     /**
-     * Initializes the 'standings' map based on the campaign faction and the specific date.
+     * Initializes faction fame standings at the start of a campaign or when performing a full reset.
      *
-     * <p>Factions are assigned fame values based on whether they are direct allies, direct enemies, or have
-     * secondary relationships (e.g., friends of allies/enemies of enemies).</p>
+     * <p>This method sets up initial Fame values for all factions relative to the given campaign faction on a
+     * specified date. Direct allies, direct enemies, and secondary relationships (such as allies of enemies) are
+     * each assigned distinct starting fame values, determined by the configuration in {@link FactionStandingLevel}.</p>
      *
-     * <p>The initialization is performed in two passes:</p>
+     * <p>The process is performed in two passes:</p>
      * <ul>
-     *     <li><b>Pass 1:</b> Sets high fame for direct allies and low fame for direct enemies, collecting these
-     *     groups.</li>
-     *     <li><b>Pass 2:</b> Assigns intermediate fame to factions indirectly related to the campaign faction (e.g.,
-     *     friends of enemies), avoiding those already processed.</li>
+     *     <li><b>First pass:</b> Identifies and assigns Fame to the campaign faction itself, direct allies, and
+     *     direct enemies. Allies receive a positive Fame boost, enemies receive a negative one, and the campaign
+     *     faction starts with a high positive Fame.</li>
+     *     <li><b>Second pass:</b> Assigns intermediate fame values to factions indirectly related to the campaign
+     *     faction (such as allies of enemies), while skipping those already processed in the first pass.</li>
      * </ul>
      *
-     * <p>Fame values assigned are based on the {@link FactionStandingLevel} configuration.</p>
+     * <p>This method is intended primarily for initializing a new campaign or completely resetting the standings.
+     * To maintain player progress, it should not be used for incremental changes during an active campaign.</p>
      *
-     * <p><b>Usage:</b> generally we should only be using this when a campaign is first created or when we're wholly
-     * resetting standings mid-campaign. For all other use cases, we should be manually populating the 'standings' map
-     * to ensure we're not wiping progress.</p>
-     *
-     * @param campaignFaction the main faction whose perspective is used for all relationships
-     * @param today           the current campaign date used for determining relationships
+     * @param campaignFaction the main faction from which all relationships are evaluated
+     * @param today the current campaign date, used to determine relationships between factions
+     * @return a list of formatted report strings describing each fame value that was set during initialization;
+     *         one entry per modified faction
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public void initializeStartingFameValues(Faction campaignFaction, LocalDate today) {
+    public List<String> initializeStartingFameValues(Faction campaignFaction, LocalDate today) {
         List<String> fameChangeReports = new java.util.ArrayList<>();
 
         int gameYear = today.getYear();
@@ -128,20 +134,15 @@ public class FactionStandings {
         Collection<Faction> allFactions = Factions.getInstance().getFactions();
         FactionHints factionHints = FactionHints.defaultFactionHints();
 
-        double fameSameFaction = FactionStandingLevel.STANDING_LEVEL_1.getMinimumFame();
-        double fameAlly = fameSameFaction / 2;
-        double fameEnemy = FactionStandingLevel.STANDING_LEVEL_3.getMaximumFame();
-        double fameEnemyOfAEnemy = fameEnemy / 2;
-
-        // Pass 1: Determine primary allies/enemies and set immediate fame
-        Set<Faction> allies = new HashSet<>();
-        Set<Faction> enemies = new HashSet<>();
-
-        String report = "";
+        String report;
         for (Faction otherFaction : allFactions) {
+            if (isUntrackedFaction(otherFaction)) {
+                continue;
+            }
+
             String otherFactionCode = otherFaction.getShortName();
             if (otherFaction.equals(campaignFaction)) {
-                report = changeFameForFaction(otherFactionCode, fameSameFaction, gameYear);
+                report = changeFameForFaction(otherFactionCode, STARTING_FAME_SAME_FACTION, gameYear);
                 if (!report.isBlank()) {
                     fameChangeReports.add(report);
                 }
@@ -149,44 +150,39 @@ public class FactionStandings {
             }
 
             if (factionHints.isAlliedWith(campaignFaction, otherFaction, today)) {
-                report = changeFameForFaction(otherFactionCode, fameAlly, gameYear);
+                report = changeFameForFaction(otherFactionCode, STARTING_FAME_ALLIED_FACTION, gameYear);
                 if (!report.isBlank()) {
                     fameChangeReports.add(report);
+                    continue;
                 }
-
-                allies.add(otherFaction);
-            } else if (factionHints.isAtWarWith(campaignFaction, otherFaction, today)) {
-                report = changeFameForFaction(otherFactionCode, fameEnemy, gameYear);
-                if (!report.isBlank()) {
-                    fameChangeReports.add(report);
-                }
-
-                enemies.add(otherFaction);
-            }
-        }
-
-        // Pass 2: Friends of Enemies
-        for (Faction otherFaction : allFactions) {
-            if (otherFaction.equals(campaignFaction) ||
-                      allies.contains(otherFaction) ||
-                      enemies.contains(otherFaction)) {
-                continue;
             }
 
-            String otherFactionCode = otherFaction.getShortName();
-
-            // Check if ally of an enemy
-            boolean isAllyOfEnemy = enemies.stream()
-                                          .anyMatch(enemy -> factionHints.isAlliedWith(enemy, otherFaction, today));
-
-            // Set Fame
-            if (isAllyOfEnemy) {
-                report = changeFameForFaction(otherFactionCode, fameEnemyOfAEnemy, gameYear);
+            if (factionHints.isAtWarWith(campaignFaction, otherFaction, today)) {
+                report = changeFameForFaction(otherFactionCode, STARTING_FAME_ENEMY_FACTION, gameYear);
                 if (!report.isBlank()) {
                     fameChangeReports.add(report);
                 }
             }
         }
+
+        return fameChangeReports;
+    }
+
+    /**
+     * Determines if the specified faction is considered "untracked."
+     *
+     * <p>A faction is untracked if it is classified as a mercenary, rebel or pirate, corporation, or independent.</p>
+     *
+     * @param otherFaction the {@link Faction} to check
+     *
+     * @return {@code true} if the faction is mercenary, rebel or pirate, corporation, or independent; {@code false}
+     *       otherwise
+     */
+    public static boolean isUntrackedFaction(Faction otherFaction) {
+        return otherFaction.isMercenary() ||
+                     otherFaction.isRebelOrPirate() ||
+                     otherFaction.isCorporation() ||
+                     otherFaction.isIndependent();
     }
 
     /**
@@ -245,25 +241,22 @@ public class FactionStandings {
     }
 
     /**
-     * Adjusts the Fame value for a specific faction by a given delta, potentially changing its standing milestone,
-     * and generates a report describing the change.
+     * Adjusts the fame value for a specified faction by a given amount and generates a detailed report of any change.
      *
-     * <p>The current fame value for the specified faction is retrieved and incremented by {@code delta}. If the
-     * faction does not yet exist in the Standings, it will be added with the value {@code delta}. If the change
-     * results in a milestone crossing (a change to a different {@link FactionStandingLevel}), an extra message
-     * reporting the milestone change is included.</p>
+     * <p>Retrieves the current fame of the specified faction and alters it by {@code delta}. If the faction does not
+     * exist in the standings, it is initialized with the specified delta value. The method determines if this
+     * adjustment causes the faction to cross a standing milestone, as defined in {@link FactionStandingLevel}. If a
+     * milestone transition occurs, the report includes a message highlighting this change. The generated report uses
+     * color formatting to indicate the direction of change (increase or decrease) and displays the faction’s full
+     * name for the current game year.</p>
      *
-     * <p>The report is formatted with colored text to indicate whether Fame increased or decreased, and includes the
-     * new milestone label if a milestone boundary was crossed. The faction's full name for the current game year is
-     * used in the report.</p>
+     * <p>If {@code delta} is zero, the method leaves fame and milestones unchanged and returns an empty string.</p>
      *
-     * <p>A delta of zero has no effect on Fame or milestones and returns an empty string.</p>
-     *
-     * @param factionCode a unique code identifying the faction whose Fame is being changed
-     * @param delta the amount to add to the faction's current Standing (can be positive or negative)
-     * @param gameYear the current in-game year, used for proper display of faction names
-     * @return a formatted {@link String} reporting the fame change and milestone transition (if any); returns an empty
-     * string if {@code delta} is zero
+     * @param factionCode unique identifier for the faction whose fame should be adjusted
+     * @param delta the amount to increment or decrement the faction's fame (can be positive or negative)
+     * @param gameYear the current in-game year, affecting how faction names are displayed in reports
+     * @return a formatted {@link String} describing the fame change and any milestone transition, or an empty string
+     * if {@code delta} is zero
      *
      * @author Illiani
      * @since 0.50.07
@@ -275,18 +268,44 @@ public class FactionStandings {
         }
 
         double originalFame = getFameForFaction(factionCode);
-        FactionStandingLevel originalMilestone = FactionStandingUtilities.calculateFactionStandingLevel(originalFame);
-
         double newFame = originalFame + delta;
-        FactionStandingLevel newMilestone = FactionStandingUtilities.calculateFactionStandingLevel(newFame);
 
         factionStandings.put(factionCode, newFame);
 
-        Faction relevantFaction = Factions.getInstance().getFaction(factionCode);
+        return getFameChangedReport(delta, gameYear, factionCode, newFame, originalFame);
+    }
 
-        // Build 'milestone changed' report
-        String reportingColor = "";
-        String milestoneChangeReport = "";
+    /**
+     * Builds a formatted report string describing changes to a faction's fame and any milestone transitions.
+     *
+     * <p>This method generates detailed feedback about a Fame value adjustment for a faction, including whether a
+     * milestone ({@link FactionStandingLevel}) has changed as a result. The report text uses color formatting to
+     * visually indicate the change's nature (positive, negative, or neutral); includes the faction's name for the
+     * current game year; the direction and magnitude of the fame change; and a message about the milestone
+     * status—whether a new milestone was reached or the faction remains within the same milestone.</p>
+     *
+     * <p>If the relevant faction is not present, a default faction is used for milestone reporting.</p>
+     *
+     * <p>An additional prefix may be applied to the faction name.</p>
+     *
+     * @param delta        the amount of Fame gained or lost
+     * @param gameYear     the current in-game year, used to render the appropriate faction name
+     * @param factionCode  unique identifier for the faction whose Fame should be adjusted
+     * @param newFame      the Fame value after the delta is applied
+     * @param originalFame the Fame value before the delta is applied
+     *
+     * @return a formatted {@link String} describing the fame change, direction, and any milestone transition
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private String getFameChangedReport(double delta, int gameYear, String factionCode, double newFame, double originalFame) {
+        Faction relevantFaction = Factions.getInstance().getFaction(factionCode);
+        FactionStandingLevel originalMilestone = FactionStandingUtilities.calculateFactionStandingLevel(originalFame);
+        FactionStandingLevel newMilestone = FactionStandingUtilities.calculateFactionStandingLevel(newFame);
+
+        String reportingColor;
+        String milestoneChangeReport;
         if (originalMilestone != newMilestone) {
             if (relevantFaction == null) {
                 relevantFaction = Factions.getInstance().getDefaultFaction();
@@ -299,15 +318,22 @@ public class FactionStandings {
             }
 
             milestoneChangeReport = getFormattedTextAt(RESOURCE_BUNDLE,
-                  "factionStandings.change.report.milestone",
+                  "factionStandings.change.report.milestone.new",
+                  spanOpeningWithCustomColor(reportingColor),
+                  newMilestone.getLabel(relevantFaction),
+                  CLOSING_SPAN_TAG);
+        } else {
+            reportingColor = MekHQ.getMHQOptions().getFontColorWarningHexColor();
+
+            milestoneChangeReport = getFormattedTextAt(RESOURCE_BUNDLE, "factionStandings.change.report.milestone.same",
                   spanOpeningWithCustomColor(reportingColor),
                   newMilestone.getLabel(relevantFaction),
                   CLOSING_SPAN_TAG);
         }
 
         // Build final report
-        String deltaDirection = "";
-        if (originalFame > newFame) {
+        String deltaDirection;
+        if (newFame > originalFame) {
             reportingColor = MekHQ.getMHQOptions().getFontColorPositiveHexColor();
             deltaDirection = getTextAt(RESOURCE_BUNDLE, "factionStandings.change.increased");
         } else {
@@ -318,11 +344,12 @@ public class FactionStandings {
         String factionName = relevantFaction == null ?
                                    getTextAt(RESOURCE_BUNDLE, "factionStandings.change.report.unknownFaction") :
                                    relevantFaction.getFullName(gameYear);
+        if (!factionName.contains(getTextAt(RESOURCE_BUNDLE, "factionStandings.change.report.clan.check"))) {
+            factionName = getTextAt(RESOURCE_BUNDLE, "factionStandings.change.report.clan.prefix") + ' ' + factionName;
+        }
 
         return getFormattedTextAt(RESOURCE_BUNDLE,
-              "factionStandings.change.report",
-              factionName,
-              reportingColor,
+              "factionStandings.change.report", factionName, spanOpeningWithCustomColor(reportingColor),
               deltaDirection,
               CLOSING_SPAN_TAG,
               abs(delta),
@@ -353,33 +380,46 @@ public class FactionStandings {
         factionStandings.remove(factionCode);
     }
 
-
     /**
-     * Gradually shifts all non-zero faction standings toward zero by a fixed increment per call.
+     * Gradually reduces all non-zero faction fame values toward zero by a fixed increment, simulating fame decay over time.
      *
-     * <p>Fame values are adjusted by {@code -0.25} if positive and by {@code +0.25} if negative. If the new value
-     * crosses zero, it is clamped to exactly zero, preventing fame "overshooting."</p>
+     * <p>For each faction with a non-zero fame value, the method decrements positive values and increments negative
+     * values by a fixed amount. This step-wise adjustment continues fame's progression toward zero, with fame being
+     * set to exactly zero if it otherwise crosses zero, thus preventing overshooting. For each adjustment, a report
+     * string is generated if an actual change occurs.</p>
      *
-     * <p>This method simulates the natural decay of fame over time.</p>
+     * <p>This method is typically called annually to model the natural decline of relationships or reputation over
+     * time.</p>
+     *
+     * @param gameYear the current in-game year, used for proper display of faction names in reports
+     * @return a list of formatted report strings describing each fame change made during this process; one entry per
+     * modified faction, or an empty list if no changes occurred
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public void processFameDegradation() {
+    public List<String> processFameDegradation(int gameYear) {
+        List<String> fameChangeReports = new ArrayList<>();
         for (String factionCode : new HashSet<>(factionStandings.keySet())) {
             double currentFame = factionStandings.get(factionCode);
 
             if (currentFame != DEFAULT_FAME) {
                 double delta = currentFame > DEFAULT_FAME ? -DEFAULT_FAME_DEGRADATION : DEFAULT_FAME_DEGRADATION;
-                changeFameForFaction(factionCode, delta);
+                String report = changeFameForFaction(factionCode, delta, gameYear);
                 double newFame = getFameForFaction(factionCode);
 
                 if ((currentFame > DEFAULT_FAME && newFame < DEFAULT_FAME) ||
                           (currentFame < DEFAULT_FAME && newFame > DEFAULT_FAME)) {
                     setFameForFaction(factionCode, DEFAULT_FAME);
                 }
+
+                if (!report.isBlank()) {
+                    fameChangeReports.add(report);
+                }
             }
         }
+
+        return fameChangeReports;
     }
 
     /**

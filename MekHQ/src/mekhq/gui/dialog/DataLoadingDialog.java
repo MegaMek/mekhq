@@ -43,6 +43,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import javax.swing.JDialog;
@@ -368,7 +369,11 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
 
                 // initialize starting faction standings
                 FactionStandings factionStandings = campaign.getFactionStandings();
-                factionStandings.initializeStartingFameValues(campaign.getFaction(), campaign.getLocalDate());
+                List<String> standingReports = factionStandings.initializeStartingFameValues(campaign.getFaction(),
+                      campaign.getLocalDate());
+                for (String report : standingReports) {
+                    campaign.addReport(report);
+                }
                 // endregion Progress 6
 
                 // region Progress 7
