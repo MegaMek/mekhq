@@ -1106,6 +1106,13 @@ public class RetirementDefectionTracker {
         }
 
         public static boolean isBreakingContract(Person person, LocalDate localDate, int ContractDuration) {
+            LocalDate recruitmentDate = person.getRecruitment();
+
+            // There is no contract to break
+            if (recruitmentDate == null) {
+                return false;
+            }
+
             return ChronoUnit.MONTHS.between(person.getRecruitment(), localDate) < ContractDuration;
         }
     }

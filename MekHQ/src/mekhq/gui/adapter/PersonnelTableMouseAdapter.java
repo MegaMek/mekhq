@@ -217,6 +217,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_EDIT_HITS = "EDIT_HITS";
     private static final String CMD_EDIT = "EDIT";
     private static final String CMD_SACK = "SACK";
+    private static final String CMD_EMPLOY = "EMPLOY";
     private static final String CMD_SPENDING_SPREE = "SPENDING_SPREE";
     private static final String CMD_REMOVE = "REMOVE";
     private static final String CMD_EDGE_TRIGGER = "EDGE";
@@ -1028,18 +1029,21 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_SACK: {
                 boolean showDialog = false;
                 List<Person> toRemove = new ArrayList<>();
-                for (Person person : people) {
-                    if (!person.getPrimaryRole().isCivilian()) {
-                        if (getCampaign().getRetirementDefectionTracker()
-                                  .removeFromCampaign(person, false, true, getCampaign(), null)) {
-                            showDialog = true;
+                if (getCampaignOptions().isUseAtB()) {
+                    for (Person person : people) {
+                        if (!person.getPrimaryRole().isCivilian()) {
+                            if (getCampaign().getRetirementDefectionTracker()
+                                      .removeFromCampaign(person, false, true, getCampaign(), null)) {
+                                showDialog = true;
+                            } else {
+                                toRemove.add(person);
+                            }
                         } else {
                             toRemove.add(person);
                         }
-                    } else {
-                        toRemove.add(person);
                     }
                 }
+
                 if (showDialog) {
                     RetirementDefectionDialog rdd = new RetirementDefectionDialog(gui, null, false);
 
@@ -1070,6 +1074,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         }
                     }
                 }
+                break;
+            }
+            case CMD_EMPLOY: {
+                for (Person person : people) {
+                    getCampaign().recruitPerson(person);
+                }
+
                 break;
             }
             case CMD_SPENDING_SPREE: {
@@ -3767,9 +3778,16 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         menuItem.setEnabled(true);
         popup.add(menuItem);
 
-        if (getCampaignOptions().isUseAtB() && StaticChecks.areAllActive(selected)) {
+        if (StaticChecks.areAllEmployed(selected)) {
             menuItem = new JMenuItem(resources.getString("sack.text"));
             menuItem.setActionCommand(CMD_SACK);
+            menuItem.addActionListener(this);
+            popup.add(menuItem);
+        }
+
+        if (!StaticChecks.areAllEmployed(selected)) {
+            menuItem = new JMenuItem(resources.getString("employ.text"));
+            menuItem.setActionCommand(CMD_EMPLOY);
             menuItem.addActionListener(this);
             popup.add(menuItem);
         }

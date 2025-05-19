@@ -1165,7 +1165,7 @@ public class EventEffectsManager {
                   new DefaultFactionSelector(originOptions, targetFaction),
                   new DefaultPlanetSelector(originOptions, targetContract.getSystem().getPrimaryPlanet()),
                   Gender.RANDOMIZE);
-            campaign.recruitPerson(newPerson, PrisonerStatus.PRISONER, true, false);
+            campaign.recruitPerson(newPerson, PrisonerStatus.PRISONER, true, false, false);
         }
 
         String colorOpen = spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());

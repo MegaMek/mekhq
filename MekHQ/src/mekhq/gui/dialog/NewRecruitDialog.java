@@ -229,14 +229,14 @@ public class NewRecruitDialog extends JDialog {
     }
 
     private void hire() {
-        if (getCampaign().recruitPerson(person, false)) {
+        if (getCampaign().recruitPerson(person, false, true)) {
             createNewRecruit();
         }
         refreshView();
     }
 
     private void addGM() {
-        if (getCampaign().recruitPerson(person, true)) {
+        if (getCampaign().recruitPerson(person, true, true)) {
             createNewRecruit();
         }
         refreshView();

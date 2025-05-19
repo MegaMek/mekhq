@@ -323,6 +323,7 @@ public class Person {
     private boolean divorceable;
     private boolean founder; // +1 share if using shares system
     private boolean immortal;
+    private boolean employed;
     // this is a flag used in determine whether a person is a potential marriage
     // candidate provided
     // that they are not married, are old enough, etc.
@@ -522,6 +523,7 @@ public class Person {
         setDivorceable(true);
         setFounder(false);
         setImmortal(false);
+        setEmployed(true);
         setMarriageable(true);
         setTryingToConceive(true);
         // endregion Flags
@@ -1009,6 +1011,11 @@ public class Person {
      */
     public String getFormatedRoleDescriptions(LocalDate today) {
         StringBuilder description = new StringBuilder("<html>");
+
+        if (!employed) {
+            description.append("\u25CF ");
+        }
+
         String primaryDesc = getPrimaryRoleDesc();
 
         if (primaryRole.isSubType(PersonnelRoleSubType.CIVILIAN)) {
@@ -1606,14 +1613,24 @@ public class Person {
         return recruitment;
     }
 
+    /**
+     * Sets the recruitment (join) date for this entity.
+     * <p>
+     * If the provided date is not {@code null}, the entity is marked as employed.
+     * </p>
+     *
+     * @param recruitment the date the entity was recruited, or {@code null} to unset
+     */
     public void setRecruitment(final @Nullable LocalDate recruitment) {
+        employed = recruitment != null;
+
         this.recruitment = recruitment;
     }
 
     public String getTimeInService(final Campaign campaign) {
         // Get time in service based on year
         if (getRecruitment() == null) {
-            // use "" they haven't been recruited or are dependents
+            // use "" they haven't been recruited
             return "";
         }
 
@@ -2370,6 +2387,14 @@ public class Person {
         this.immortal = immortal;
     }
 
+    public boolean isEmployed() {
+        return employed;
+    }
+
+    public void setEmployed(final boolean employed) {
+        this.employed = employed;
+    }
+
     public boolean isMarriageable() {
         return marriageable;
     }
@@ -2794,32 +2819,14 @@ public class Person {
             }
 
             // region Flags
-            // Always save whether they are clan personnel or not
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clanPersonnel", isClanPersonnel());
-            if (isCommander()) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commander", true);
-            }
-
-            if (!isDivorceable()) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "divorceable", false);
-            }
-
-            if (isFounder()) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "founder", true);
-            }
-
-            if (isImmortal()) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "immortal", true);
-            }
-
-            if (!isMarriageable()) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "marriageable", false);
-            }
-
-            if (!isTryingToConceive()) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tryingToConceive", false);
-            }
-
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commander", commander);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "divorceable", divorceable);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "founder", founder);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "immortal", immortal);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "employed", employed);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "marriageable", marriageable);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tryingToConceive", tryingToConceive);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hidePersonality", hidePersonality);
             // endregion Flags
 
@@ -3308,6 +3315,8 @@ public class Person {
                     person.setFounder(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("immortal")) {
                     person.setImmortal(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("employed")) {
+                    person.setEmployed(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("marriageable")) {
                     person.setMarriageable(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("tryingToConceive")) {
@@ -3366,10 +3375,8 @@ public class Person {
                 person.setRank(0);
             }
 
-            // Fixing recruitment dates
-            // I don't know when this metric was added, so we check all versions
-            if (person.getRecruitment() == null) {
-                person.setRecruitment(campaign.getLocalDate());
+            if (person.getJoinedCampaign() == null) {
+                person.setJoinedCampaign(campaign.getLocalDate());
             }
 
             // This resolves a bug squashed in 2025 (50.03) but lurked in our codebase
@@ -3406,6 +3413,10 @@ public class Person {
 
     public Money getSalary(final Campaign campaign) {
         if (!getPrisonerStatus().isFree()) {
+            return Money.zero();
+        }
+
+        if (!employed) {
             return Money.zero();
         }
 

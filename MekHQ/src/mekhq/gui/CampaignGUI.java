@@ -2177,22 +2177,22 @@ public class CampaignGUI extends JPanel {
                     continue;
                 }
 
-                Person p = Person.generateInstanceFromXML(wn2, getCampaign(), version);
-                if ((p != null) && (getCampaign().getPerson(p.getId()) != null)) {
+                Person person = Person.generateInstanceFromXML(wn2, getCampaign(), version);
+                if ((person != null) && (getCampaign().getPerson(person.getId()) != null)) {
                     logger.error("ERROR: Cannot load person who exists, ignoring. (Name: {}, Id {})",
-                          p.getFullName(),
-                          p.getId());
-                    p = null;
+                          person.getFullName(),
+                          person.getId());
+                    person = null;
                 }
 
-                if (p != null) {
-                    getCampaign().recruitPerson(p, true);
+                if (person != null) {
+                    getCampaign().recruitPerson(person, true, person.isEmployed());
 
                     // Clear some values we no longer should have set in case this
                     // has transferred campaigns or things in the campaign have
                     // changed...
-                    p.setUnit(null);
-                    p.clearTechUnits();
+                    person.setUnit(null);
+                    person.clearTechUnits();
                 }
             }
 

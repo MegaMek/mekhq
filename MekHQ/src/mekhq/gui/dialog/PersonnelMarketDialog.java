@@ -413,7 +413,7 @@ public class PersonnelMarketDialog extends JDialog {
             Entity en = personnelMarket.getAttachedEntity(selectedPerson);
             UUID pid = selectedPerson.getId();
 
-            if (campaign.recruitPerson(selectedPerson, true)) {
+            if (campaign.recruitPerson(selectedPerson, true, true)) {
                 addUnit(en, false);
                 personnelMarket.removePerson(selectedPerson);
                 personnelModel.setData(personnelMarket.getPersonnel());
