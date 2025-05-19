@@ -64,6 +64,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.RandomProcreationMethod;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
@@ -423,7 +424,8 @@ public abstract class AbstractProcreation {
             baby.setSurname(campaignOptions.getBabySurnameStyle()
                                   .generateBabySurname(mother, father, baby.getGender()));
             baby.setDateOfBirth(today);
-            baby.removeAllSkills();// Limit skills by age for children and adolescents
+            baby.removeAllSkills(); // Limit skills by age for children and adolescents
+            baby.setPrimaryRole(campaign, PersonnelRole.DEPENDENT);
 
             // re-roll SPAs to include in any age and skill adjustments
             Enumeration<IOption> options = new PersonnelOptions().getOptions(PersonnelOptions.LVL3_ADVANTAGES);

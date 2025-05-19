@@ -62,7 +62,7 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
     public void generateSkills(final Campaign campaign, final Person person, final int expLvl) {
         PersonnelRole primaryRole = person.getPrimaryRole();
         PersonnelRole secondaryRole = person.getSecondaryRole();
-        RandomSkillPreferences rskillPrefs = getSkillPreferences();
+        RandomSkillPreferences skillPreferences = getSkillPreferences();
 
         int bonus = getPhenotypeBonus(person);
         int mod = 0;
@@ -72,10 +72,7 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
         }
 
         generateDefaultSkills(person, primaryRole, expLvl, bonus, mod);
-
-        if (!secondaryRole.isCivilian()) {
-            generateDefaultSkills(person, secondaryRole, expLvl, bonus, mod);
-        }
+        generateDefaultSkills(person, secondaryRole, expLvl, bonus, mod);
 
         // apply phenotype bonus only to primary skills
         bonus = 0;
@@ -83,33 +80,33 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
         // roll small arms skill
         if (!person.getSkills().hasSkill(SkillType.S_SMALL_ARMS)) {
             int sarmsLvl = Utilities.generateExpLevel((primaryRole.isSupport(true) || secondaryRole.isSupport(true)) ?
-                                                            rskillPrefs.getSupportSmallArmsBonus() :
-                                                            rskillPrefs.getCombatSmallArmsBonus());
+                                                            skillPreferences.getSupportSmallArmsBonus() :
+                                                            skillPreferences.getCombatSmallArmsBonus());
 
             if (primaryRole.isCivilian()) {
                 sarmsLvl = 0;
             }
 
             if (sarmsLvl > SkillType.EXP_ULTRA_GREEN) {
-                addSkill(person, SkillType.S_SMALL_ARMS, sarmsLvl, rskillPrefs.randomizeSkill(), bonus);
+                addSkill(person, SkillType.S_SMALL_ARMS, sarmsLvl, skillPreferences.randomizeSkill(), bonus);
             }
         }
 
-        // roll lesdership skills
+        // roll command skills
         if (primaryRole.isCombat()) {
-            int leadershipSkillLevel = Utilities.generateExpLevel(rskillPrefs.getCommandSkillsModifier(expLvl));
+            int leadershipSkillLevel = Utilities.generateExpLevel(skillPreferences.getCommandSkillsModifier(expLvl));
             if (leadershipSkillLevel > SkillType.EXP_ULTRA_GREEN) {
-                addSkill(person, SkillType.S_TACTICS, leadershipSkillLevel, rskillPrefs.randomizeSkill(), 0);
+                addSkill(person, SkillType.S_TACTICS, leadershipSkillLevel, skillPreferences.randomizeSkill(), 0);
             }
 
-            leadershipSkillLevel = Utilities.generateExpLevel(rskillPrefs.getCommandSkillsModifier(expLvl));
+            leadershipSkillLevel = Utilities.generateExpLevel(skillPreferences.getCommandSkillsModifier(expLvl));
             if (leadershipSkillLevel > SkillType.EXP_ULTRA_GREEN) {
-                addSkill(person, SkillType.S_STRATEGY, leadershipSkillLevel, rskillPrefs.randomizeSkill(), 0);
+                addSkill(person, SkillType.S_STRATEGY, leadershipSkillLevel, skillPreferences.randomizeSkill(), 0);
             }
 
-            leadershipSkillLevel = Utilities.generateExpLevel(rskillPrefs.getCommandSkillsModifier(expLvl));
+            leadershipSkillLevel = Utilities.generateExpLevel(skillPreferences.getCommandSkillsModifier(expLvl));
             if (leadershipSkillLevel > SkillType.EXP_ULTRA_GREEN) {
-                addSkill(person, SkillType.S_LEADER, leadershipSkillLevel, rskillPrefs.randomizeSkill(), 0);
+                addSkill(person, SkillType.S_LEADER, leadershipSkillLevel, skillPreferences.randomizeSkill(), 0);
             }
         }
 
@@ -120,31 +117,31 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
         // roll artillery skill
         if (campaignOptions.isUseArtillery() &&
                   (primaryRole.isMekWarrior() || primaryRole.isVehicleGunner() || primaryRole.isSoldier()) &&
-                  Utilities.rollProbability(rskillPrefs.getArtilleryProb())) {
+                  Utilities.rollProbability(skillPreferences.getArtilleryProb())) {
             generateArtillerySkill(person, bonus);
         }
 
         // roll Negotiation skill
         if (campaignOptions.isAdminsHaveNegotiation() && (primaryRole.isAdministrator())) {
-            addSkill(person, SkillType.S_NEGOTIATION, expLvl, rskillPrefs.randomizeSkill(), 0, mod);
+            addSkill(person, SkillType.S_NEGOTIATION, expLvl, skillPreferences.randomizeSkill(), 0, mod);
         }
 
         // roll Scrounge skill
         if (campaignOptions.isAdminsHaveScrounge() && (primaryRole.isAdministrator())) {
-            addSkill(person, SkillType.S_SCROUNGE, expLvl, rskillPrefs.randomizeSkill(), 0, mod);
+            addSkill(person, SkillType.S_SCROUNGE, expLvl, skillPreferences.randomizeSkill(), 0, mod);
         }
 
         // roll Administration skill
         if (campaignOptions.isTechsUseAdministration() && (person.isTech() || primaryRole.isVesselCrew())) {
-            addSkill(person, SkillType.S_ADMIN, expLvl, rskillPrefs.randomizeSkill(), 0, mod);
+            addSkill(person, SkillType.S_ADMIN, expLvl, skillPreferences.randomizeSkill(), 0, mod);
         }
 
         if (campaignOptions.isDoctorsUseAdministration() && (primaryRole.isDoctor())) {
-            addSkill(person, SkillType.S_ADMIN, expLvl, rskillPrefs.randomizeSkill(), 0, mod);
+            addSkill(person, SkillType.S_ADMIN, expLvl, skillPreferences.randomizeSkill(), 0, mod);
         }
 
         // roll random secondary skill
-        if (Utilities.rollProbability(rskillPrefs.getSecondSkillProb())) {
+        if (Utilities.rollProbability(skillPreferences.getSecondSkillProb())) {
             List<String> possibleSkills = new ArrayList<>();
             for (String skillType : SkillType.skillList) {
                 SkillType type = SkillType.getType(skillType);
@@ -156,8 +153,8 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
             }
 
             String selSkill = possibleSkills.get(randomInt(possibleSkills.size()));
-            int secondLvl = Utilities.generateExpLevel(rskillPrefs.getSecondSkillBonus());
-            addSkill(person, selSkill, secondLvl, rskillPrefs.randomizeSkill(), 0);
+            int secondLvl = Utilities.generateExpLevel(skillPreferences.getSecondSkillBonus());
+            addSkill(person, selSkill, secondLvl, skillPreferences.randomizeSkill(), 0);
         }
     }
 

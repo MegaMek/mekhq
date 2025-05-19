@@ -84,8 +84,10 @@ import javax.swing.JTable;
 
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
+import megamek.client.ratgenerator.CrewDescriptor;
 import megamek.client.ui.dialogs.PortraitChooserDialog;
 import megamek.codeUtilities.MathUtility;
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Crew;
 import megamek.common.EntityWeightClass;
 import megamek.common.Mounted;
@@ -137,6 +139,7 @@ import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.personnel.skills.Aging;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -235,6 +238,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_BUY_TRAIT = "BUY_TRAIT";
     private static final String CMD_CHANGE_ATTRIBUTE = "CHANGE_ATTRIBUTE";
     private static final String CMD_SET_ATTRIBUTE = "SET_ATTRIBUTE";
+    private static final String CMD_RANDOM_PROFESSION = "RANDOM_PROFESSION";
     private static final String CMD_ADD_SPOUSE = "SPOUSE";
     private static final String CMD_REMOVE_SPOUSE = "REMOVE_SPOUSE";
     private static final String CMD_ADD_PREGNANCY = "ADD_PREGNANCY";
@@ -695,6 +699,49 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                 for (Person person : people) {
                     person.setAttributeScore(attribute, choice);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                    getCampaign().personUpdated(person);
+                }
+
+                break;
+            }
+            case CMD_RANDOM_PROFESSION: {
+                List<PersonnelRole> possibleRoles = PersonnelRole.getCivilianRolesExceptNone();
+                LocalDate today = getCampaign().getLocalDate();
+
+                for (Person person : people) {
+                    // Under 16s are considered children and unable to be assigned a profession
+                    if (person.isChild(today)) {
+                        continue;
+                    }
+
+                    List<PersonnelRole> eligibleRoles = new ArrayList<>(possibleRoles);
+
+                    int personAge = person.getAge(today);
+
+                    if (personAge < 18) {
+                        // Characters under 18 years old are strictly unable to be assigned these roles.
+                        // This is project policy.
+                        eligibleRoles.remove(PersonnelRole.ADULT_ENTERTAINER);
+                        eligibleRoles.remove(PersonnelRole.LUXURY_COMPANION);
+                    }
+
+                    PersonnelRole randomProfession = ObjectUtility.getRandomItem(eligibleRoles);
+                    int experienceLevel = CrewDescriptor.randomExperienceLevel();
+
+                    for (String skillName : randomProfession.getSkillsForProfession()) {
+                        if (person.getSkill(skillName) != null) { // They already have this skill
+                            continue;
+                        }
+
+                        SkillType skillType = SkillType.getType(skillName);
+                        int targetLevel = skillType.getExperienceLevel(experienceLevel);
+                        person.addSkill(skillName, targetLevel, 0);
+                    }
+
+                    Aging.updateAllSkillAgeModifiers(today, person);
+                    person.setPrimaryRole(getCampaign(), randomProfession);
+
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                     getCampaign().personUpdated(person);
                 }
@@ -4225,6 +4272,14 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 attributesMenu.add(menuItem);
             }
             menu.add(attributesMenu);
+
+            menuItem = new JMenuItem(resources.getString("generateRandomCivilianProfession.text"));
+            menuItem.setToolTipText(wordWrap(String.format(resources.getString(
+                  "generateRandomCivilianProfession.tooltip"))));
+            menuItem.setActionCommand(makeCommand(CMD_RANDOM_PROFESSION));
+            menuItem.addActionListener(this);
+            menuItem.setEnabled(getCampaign().isGM());
+            menu.add(menuItem);
 
             JMenuHelpers.addMenuIfNonEmpty(popup, menu);
         }

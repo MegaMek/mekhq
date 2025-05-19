@@ -51,7 +51,6 @@ import static mekhq.campaign.personnel.skills.Aging.getReputationAgeModifier;
 import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
-import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.getSkillsBySkillSubType;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
@@ -1107,15 +1106,6 @@ public class Person {
         }
 
         return switch (role) {
-            case MEKWARRIOR -> hasSkill(SkillType.S_GUN_MEK) && hasSkill(SkillType.S_PILOT_MEK);
-            case LAM_PILOT ->
-                  Stream.of(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK, SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO)
-                        .allMatch(this::hasSkill);
-            case GROUND_VEHICLE_DRIVER -> hasSkill(SkillType.S_PILOT_GVEE);
-            case NAVAL_VEHICLE_DRIVER -> hasSkill(SkillType.S_PILOT_NVEE);
-            case VTOL_PILOT -> hasSkill(SkillType.S_PILOT_VTOL);
-            case VEHICLE_GUNNER -> hasSkill(SkillType.S_GUN_VEE);
-            case MECHANIC -> hasSkill(SkillType.S_TECH_MECHANIC);
             case VEHICLE_CREW -> Stream.of(SkillType.S_TECH_MEK,
                         SkillType.S_TECH_AERO,
                         SkillType.S_TECH_MECHANIC,
@@ -1143,8 +1133,32 @@ public class Person {
             case DOCTOR -> hasSkill(SkillType.S_SURGERY);
             case MEDIC -> hasSkill(SkillType.S_MEDTECH);
             case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_HR ->
-                  hasSkill(S_ADMIN);
-            case DEPENDENT, NONE -> true;
+                  hasSkill(SkillType.S_ADMIN);
+            case ADULT_ENTERTAINER -> {
+                // A character under the age of 18 should never have access to this profession
+                if (isChild(today, true)) {
+                    yield false;
+                } else {
+                    yield hasSkill(SkillType.S_ART_OTHER) && hasSkill(SkillType.S_ACTING);
+                }
+            }
+            case LUXURY_COMPANION -> {
+                // A character under the age of 18 should never have access to this profession
+                if (isChild(today, true)) {
+                    yield false;
+                } else {
+                    yield hasSkill(SkillType.S_ACTING) && hasSkill(SkillType.S_PROTOCOLS);
+                }
+            }
+            default -> {
+                for (String skillName : role.getSkillsForProfession()) {
+                    if (!hasSkill(skillName)) {
+                        yield false;
+                    }
+                }
+
+                yield true;
+            }
         };
     }
 
@@ -1500,8 +1514,7 @@ public class Person {
         String report = String.format(resources.getString("loyaltyChangeReport.text"),
               getHyperlinkedFullTitle(),
               "<span color=" + color + "'>",
-              changeString,
-              ReportingUtilities.CLOSING_SPAN_TAG);
+              changeString, CLOSING_SPAN_TAG);
 
         campaign.addReport(report);
     }
@@ -3878,7 +3891,7 @@ public class Person {
                 yield highestExperienceLevel;
             }
             case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_HR -> {
-                int adminLevel = getSkillLevelOrNegative(S_ADMIN);
+                int adminLevel = getSkillLevelOrNegative(SkillType.S_ADMIN);
                 int negotiationLevel = getSkillLevelOrNegative(SkillType.S_NEGOTIATION);
                 int scroungeLevel = getSkillLevelOrNegative(SkillType.S_SCROUNGE);
 
@@ -3990,7 +4003,6 @@ public class Person {
 
         return skill.getType().getExperienceLevel(averageSkillLevel);
     }
-
 
     /**
      * Retrieves the skills associated with the character's profession. The skills returned depend on whether the
@@ -4970,7 +4982,7 @@ public class Person {
 
         double administrationMultiplier = 1.0 - (TECH_ADMINISTRATION_MULTIPLIER * REGULAR_EXPERIENCE_LEVEL);
 
-        Skill administration = skills.getSkill(S_ADMIN);
+        Skill administration = skills.getSkill(SkillType.S_ADMIN);
         int experienceLevel = SkillLevel.NONE.getExperienceLevel();
 
         if (administration != null) {
@@ -5018,7 +5030,7 @@ public class Person {
 
         double administrationMultiplier = 1.0 - (DOCTOR_ADMINISTRATION_MULTIPLIER * REGULAR_EXPERIENCE_LEVEL);
 
-        Skill administration = skills.getSkill(S_ADMIN);
+        Skill administration = skills.getSkill(SkillType.S_ADMIN);
         int experienceLevel = SkillLevel.NONE.getExperienceLevel();
 
         if (administration != null) {

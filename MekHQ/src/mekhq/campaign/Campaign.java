@@ -36,6 +36,7 @@ package mekhq.campaign;
 import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static megamek.common.Compute.d6;
+import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.CampaignOptions.S_AUTO;
 import static mekhq.campaign.CampaignOptions.S_TECH;
 import static mekhq.campaign.CampaignOptions.TRANSIT_UNIT_MONTH;
@@ -104,6 +105,7 @@ import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.swing.util.PlayerColour;
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
@@ -1051,7 +1053,7 @@ public class Campaign implements ITechManager {
                               getLocalDate(),
                               getCampaignOptions().getServiceContractDuration())) {
                             if (!getActiveContracts().isEmpty()) {
-                                int roll = Compute.randomInt(20);
+                                int roll = randomInt(20);
 
                                 if (roll == 0) {
                                     person.changeStatus(this, getLocalDate(), PersonnelStatus.DEFECTED);
@@ -1096,7 +1098,7 @@ public class Campaign implements ITechManager {
                     // non-civilian spouses may divorce the remaining partner
                     if ((person.getAge(getLocalDate()) >= 50) && (!campaignOptions.getRandomDivorceMethod().isNone())) {
                         if ((spouse != null) && (spouse.isDivorceable()) && (!spouse.getPrimaryRole().isCivilian())) {
-                            if ((person.getStatus().isDefected()) || (Compute.randomInt(6) == 0)) {
+                            if ((person.getStatus().isDefected()) || (randomInt(6) == 0)) {
                                 getDivorce().divorce(this, getLocalDate(), person, SplittingSurnameStyle.WEIGHTED);
 
                                 turnoverRetirementInformation.add(String.format(resources.getString("divorce.text"),
@@ -1120,7 +1122,7 @@ public class Campaign implements ITechManager {
                                                                                                  .isAbsent()));
 
                             // if there is a remaining parent, there is a 50/50 chance the child departs
-                            if ((hasRemainingParent) && (Compute.randomInt(2) == 0)) {
+                            if ((hasRemainingParent) && (randomInt(2) == 0)) {
                                 addReport(child.getHyperlinkedFullTitle() +
                                                 ' ' +
                                                 resources.getString("turnoverJointDepartureChild.text"));
@@ -1898,7 +1900,14 @@ public class Campaign implements ITechManager {
      * @return Return a {@link Person} object representing the new dependent.
      */
     public Person newDependent(Gender gender, @Nullable Faction originFaction, @Nullable Planet originPlanet) {
-        return newPerson(PersonnelRole.DEPENDENT,
+        PersonnelRole civilianProfession = PersonnelRole.MISCELLANEOUS_JOB;
+
+        if (randomInt(20) == 0) {
+            List<PersonnelRole> civilianRoles = PersonnelRole.getCivilianRolesExceptNone();
+            civilianProfession = ObjectUtility.getRandomItem(civilianRoles);
+        }
+
+        return newPerson(civilianProfession,
               PersonnelRole.NONE,
               new DefaultFactionSelector(getCampaignOptions().getRandomOriginOptions(), originFaction),
               new DefaultPlanetSelector(getCampaignOptions().getRandomOriginOptions(), originPlanet),
@@ -2207,7 +2216,7 @@ public class Campaign implements ITechManager {
                     // them
                     for (Person child : children) {
                         if (child.getGenealogy().getParents().contains(currentSpouse)) {
-                            if (Compute.randomInt(2) == 0) {
+                            if (randomInt(2) == 0) {
                                 toRemove.add(child);
                             }
                         }

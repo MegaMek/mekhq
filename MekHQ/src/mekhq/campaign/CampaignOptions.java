@@ -834,6 +834,9 @@ public class CampaignOptions {
         getSalaryXPMultipliers().put(SkillLevel.HEROIC, 6.4);
         getSalaryXPMultipliers().put(SkillLevel.LEGENDARY, 12.8);
         setRoleBaseSalaries(new Money[personnelRoles.length]);
+        for (PersonnelRole role : personnelRoles) {
+            setRoleBaseSalary(role, 250);
+        }
         setRoleBaseSalary(PersonnelRole.MEKWARRIOR, 1500);
         setRoleBaseSalary(PersonnelRole.LAM_PILOT, 2250);
         setRoleBaseSalary(PersonnelRole.GROUND_VEHICLE_DRIVER, 900);
@@ -861,8 +864,9 @@ public class CampaignOptions {
         setRoleBaseSalary(PersonnelRole.ADMINISTRATOR_LOGISTICS, 500);
         setRoleBaseSalary(PersonnelRole.ADMINISTRATOR_TRANSPORT, 500);
         setRoleBaseSalary(PersonnelRole.ADMINISTRATOR_HR, 500);
-        setRoleBaseSalary(PersonnelRole.DEPENDENT, 0);
+        setRoleBaseSalary(PersonnelRole.DEPENDENT, 50);
         setRoleBaseSalary(PersonnelRole.NONE, 0);
+
 
         // Awards
         setAwardBonusStyle(AwardBonus.BOTH);
@@ -5906,7 +5910,15 @@ public class CampaignOptions {
                                     Double.parseDouble(wn3.getTextContent().trim()));
                     }
                 } else if (nodeName.equalsIgnoreCase("salaryTypeBase")) {
-                    retVal.setRoleBaseSalaries(Utilities.readMoneyArray(wn2, retVal.getRoleBaseSalaries().length));
+                    Money[] defaultSalaries = retVal.getRoleBaseSalaries();
+                    Money[] newSalaries = Utilities.readMoneyArray(wn2);
+
+                    Money[] mergedSalaries = new Money[PersonnelRole.values().length];
+                    for (int i = 0; i < mergedSalaries.length; i++) {
+                        mergedSalaries[i] = (newSalaries[i] != null) ? newSalaries[i] : defaultSalaries[i];
+                    }
+
+                    retVal.setRoleBaseSalaries(mergedSalaries);
                     // endregion Salary
 
                     // region Awards
