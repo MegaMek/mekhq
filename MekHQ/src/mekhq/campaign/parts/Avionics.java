@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
@@ -198,7 +203,13 @@ public class Avionics extends Part {
     @Override
     public Money getStickerPrice() {
         // Tech Manual p283 - cost is only valid for Conventional Fighters
-        if (unit.getEntity() instanceof ConvFighter) {
+        if (unit == null) {
+            return Money.zero();
+        }
+
+        Entity entity = unit.getEntity();
+
+        if (entity != null && entity.isConventionalFighter()) {
             return Money.of(4000 * this.unitTonnage * 0.1);
         } else {
             return Money.zero();
