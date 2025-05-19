@@ -181,7 +181,6 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
-import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.generator.AbstractSpecialAbilityGenerator;
 import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
@@ -239,6 +238,7 @@ import mekhq.campaign.universe.selectors.factionSelectors.RangedFactionSelector;
 import mekhq.campaign.universe.selectors.planetSelectors.AbstractPlanetSelector;
 import mekhq.campaign.universe.selectors.planetSelectors.DefaultPlanetSelector;
 import mekhq.campaign.universe.selectors.planetSelectors.RangedPlanetSelector;
+import mekhq.campaign.utilities.AutomatedPersonnelCleanUp;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
@@ -5430,7 +5430,7 @@ public class Campaign implements ITechManager {
 
         // process removal of old personnel data on the first day of each month
         if ((campaignOptions.isUsePersonnelRemoval()) && (currentDay.getDayOfMonth() == 1)) {
-            processPersonnelRemoval();
+            performPersonnelCleanUp();
         }
 
         // this duplicates any turnover information so that it is still available on the
@@ -5454,6 +5454,32 @@ public class Campaign implements ITechManager {
         // This must be the last step before returning true
         MekHQ.triggerEvent(new NewDayEvent(this));
         return true;
+    }
+
+    /**
+     * Performs cleanup of departed personnel by identifying and removing eligible personnel records.
+     *
+     * <p>This method uses the {@link AutomatedPersonnelCleanUp} utility to determine which {@link Person}
+     * objects should be removed from the campaign based on current date and campaign configuration options. Identified
+     * personnel are then removed, and a report entry is generated if any removals occur.</p>
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    private void performPersonnelCleanUp() {
+        AutomatedPersonnelCleanUp removal = new AutomatedPersonnelCleanUp(currentDay,
+              getPersonnel(),
+              campaignOptions.isUseRemovalExemptRetirees(),
+              campaignOptions.isUseRemovalExemptCemetery());
+
+        List<Person> personnelToRemove = removal.getPersonnelToCleanUp();
+        for (Person person : personnelToRemove) {
+            removePerson(person, false);
+        }
+
+        if (!personnelToRemove.isEmpty()) {
+            addReport(resources.getString("personnelRemoval.text"));
+        }
     }
 
     /**
@@ -5567,89 +5593,6 @@ public class Campaign implements ITechManager {
 
     public void setInitiativeMaxBonus(int bonus) {
         initiativeMaxBonus = bonus;
-    }
-
-    /**
-     * This method iterates through the list of personnel and deletes the records of those who have left the unit and
-     * who match additional checks.
-     */
-    public void processPersonnelRemoval() {
-        List<Person> personnelToRemove = new ArrayList<>();
-
-        for (Person person : getPersonnel()) {
-            PersonnelStatus status = person.getStatus();
-
-            if (status.isDepartedUnit()) {
-                if (shouldRemovePerson(person)) {
-                    personnelToRemove.add(person);
-                }
-            }
-        }
-
-        for (Person person : personnelToRemove) {
-            removePerson(person, false);
-        }
-
-        if (!personnelToRemove.isEmpty()) {
-            addReport(resources.getString("personnelRemoval.text"));
-        }
-    }
-
-    /**
-     * Determines whether a person's records should be removed from the campaign based on their retirement date, date of
-     * death, personnel status, and genealogy activity.
-     *
-     * <p>
-     * The method evaluates the following conditions in order:
-     * <ul>
-     * <li>If the person has a retirement date and retirees are exempt from removal
-     * as per
-     * campaign options, the method returns {@code false}.</li>
-     * <li>If the person has a date of death, and cemeteries are exempt from removal
-     * as per
-     * campaign options, the method returns {@code false}.</li>
-     * <li>If the person has an active genealogy, the method returns
-     * {@code false}.</li>
-     * <li>If the person's retirement date is more than one month ago, the method
-     * returns {@code true}.</li>
-     * <li>If the person's date of death is more than one month ago, the method
-     * returns {@code true}.</li>
-     * </ul>
-     *
-     * <p>
-     * If none of the above conditions are met, the method returns {@code false}.
-     *
-     * @param person The individual being checked.
-     *
-     * @return {@code true} if the person should be removed, {@code false} otherwise.
-     */
-
-    private boolean shouldRemovePerson(Person person) {
-        // We do these checks first, as they're cheaper than parsing the entire
-        // genealogy
-        LocalDate retirementDate = person.getRetirement();
-        if (retirementDate != null && campaignOptions.isUseRemovalExemptRetirees()) {
-            return false;
-        }
-
-        LocalDate deathDate = person.getDateOfDeath();
-        if (deathDate != null && campaignOptions.isUseRemovalExemptCemetery()) {
-            return false;
-        }
-
-        // Do not remove if the character has an active genealogy
-        Genealogy genealogy = person.getGenealogy();
-
-        if (genealogy.isActive()) {
-            return false;
-        }
-
-        // Did the departure occur more than a month ago?
-        LocalDate aMonthAgo = currentDay.minusMonths(1);
-        if (retirementDate != null && retirementDate.isBefore(aMonthAgo)) {
-            return true;
-        }
-        return deathDate != null && deathDate.isBefore(aMonthAgo);
     }
 
     /**
