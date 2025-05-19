@@ -81,6 +81,7 @@ import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.TaskTableModel;
 import mekhq.gui.model.TechTableModel;
 import mekhq.gui.model.UnitTableModel;
+import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.sorter.TaskSorter;
 import mekhq.gui.sorter.TechSorter;
 import mekhq.gui.sorter.UnitStatusSorter;
@@ -148,7 +149,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
               MekHQ.getMHQOptions().getLocale());
         GridBagConstraints gridBagConstraints;
 
-        setLayout(new GridLayout());
+        setLayout(new BorderLayout());
 
         JPanel panServicedUnits = new JPanel(new GridBagLayout());
 
@@ -463,6 +464,15 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         add(panServicedUnits);
         add(panTasks);
         add(panTechs);
+
+        JPanel centerPanel = new JPanel(new GridLayout(1, 3));
+        centerPanel.add(panServicedUnits);
+        centerPanel.add(panTasks);
+        centerPanel.add(panTechs);
+        add(centerPanel, BorderLayout.CENTER);
+
+        JPanel pnlTutorial = new TutorialHyperlinkPanel("repairTab");
+        add(pnlTutorial, BorderLayout.SOUTH);
 
         filterTechs();
     }

@@ -33,6 +33,8 @@
  */
 package mekhq.gui.dialog;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
+
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -419,8 +421,8 @@ public class NewContractDialog extends JDialog {
             public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
                   final boolean isSelected, final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof ContractCommandRights) {
-                    list.setToolTipText(((ContractCommandRights) value).getToolTipText());
+                if (value instanceof ContractCommandRights commandRights) {
+                    list.setToolTipText(wordWrap(commandRights.getToolTipText()));
                 }
                 return this;
             }
