@@ -34,6 +34,7 @@ package mekhq.gui;
 
 import static java.lang.Math.round;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -69,6 +70,7 @@ import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.enums.PersonnelTabView;
 import mekhq.gui.enums.PersonnelTableModelColumn;
 import mekhq.gui.model.PersonnelTableModel;
+import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.view.PersonViewPanel;
 
@@ -231,7 +233,15 @@ public final class PersonnelTab extends CampaignGuiTab {
         scrollPersonnelView.setViewportView(null);
 
         JScrollPane scrollPersonnelTable = new JScrollPaneWithSpeed(personnelTable);
-        splitPersonnel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollPersonnelTable, scrollPersonnelView);
+
+
+        JPanel tableAndInfoPanel = new JPanel(new BorderLayout());
+        tableAndInfoPanel.add(scrollPersonnelTable, BorderLayout.CENTER);
+
+        JPanel pnlTutorial = new TutorialHyperlinkPanel("personnelTab");
+        tableAndInfoPanel.add(pnlTutorial, BorderLayout.SOUTH);
+
+        splitPersonnel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, tableAndInfoPanel, scrollPersonnelView);
         splitPersonnel.setOneTouchExpandable(true);
         splitPersonnel.setResizeWeight(1.0);
         splitPersonnel.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, ev -> refreshPersonnelView());
