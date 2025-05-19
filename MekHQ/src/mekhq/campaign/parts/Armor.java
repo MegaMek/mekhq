@@ -368,13 +368,13 @@ public class Armor extends Part implements IAcquisitionWork {
         newPart.setDaysToArrival(transitDays);
         if (campaign.getQuartermaster().buyPart(newPart, transitDays)) {
             return "<font color='" +
-                         MekHQ.getMHQOptions().getFontColorPositiveHexColor() +
+                         ReportingUtilities.getPositiveColor() +
                          "'><b> part found</b>.</font> It will be delivered in " +
                          transitDays +
                          " days.";
         } else {
             return "<font color='" +
-                         MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                         ReportingUtilities.getNegativeColor() +
                          "'><b> You cannot afford this part. Transaction cancelled</b>.</font>";
         }
     }
@@ -387,7 +387,7 @@ public class Armor extends Part implements IAcquisitionWork {
     @Override
     public String failToFind() {
         return "<font color='" +
-                     MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                     ReportingUtilities.getNegativeColor() +
                      "'><b> part not found</b>.</font>";
     }
 
@@ -657,7 +657,7 @@ public class Armor extends Part implements IAcquisitionWork {
             }
         }
         return " <font color='" +
-                     MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                     ReportingUtilities.getNegativeColor() +
                      "'><b> failed." +
                      scrap +
                      "</b></font>";

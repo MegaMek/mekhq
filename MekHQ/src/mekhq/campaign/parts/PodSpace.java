@@ -263,14 +263,12 @@ public class PodSpace implements IPartWork {
     public String succeed() {
         if (isSalvaging()) {
             remove(true);
-            return ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
-                                                                             .getFontColorPositiveHexColor(),
-                  "<b> removed</b>") + ".";
+            return ReportingUtilities.messageSurroundedBySpanWithColor(
+                    ReportingUtilities.getPositiveColor(), "<b> removed</b>") + ".";
         } else {
             fix();
-            return ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
-                                                                             .getFontColorPositiveHexColor(),
-                  "<b> fixed</b>") + ".";
+            return ReportingUtilities.messageSurroundedBySpanWithColor(
+                    ReportingUtilities.getPositiveColor(), "<b> fixed</b>") + ".";
         }
     }
 
@@ -287,13 +285,12 @@ public class PodSpace implements IPartWork {
             }
         }
         if (rating >= SkillType.EXP_LEGENDARY && replacing) {
-            return ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
-                                                                             .getFontColorNegativeHexColor(),
-                  "<b> failed and part(s) destroyed</b>") + ".";
+                return ReportingUtilities.messageSurroundedBySpanWithColor(
+                        ReportingUtilities.getNegativeColor(),
+                        "<b> failed and part(s) destroyed</b>") + ".";
         } else {
-            return ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
-                                                                             .getFontColorNegativeHexColor(),
-                  "<b> failed</b>") + ".";
+            return ReportingUtilities.messageSurroundedBySpanWithColor(
+                    ReportingUtilities.getNegativeColor(),"<b> failed</b>") + ".";
         }
     }
 

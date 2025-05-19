@@ -86,6 +86,7 @@ import mekhq.campaign.unit.ITransportAssignment;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTechProgression;
 import mekhq.campaign.universe.Faction;
+import mekhq.utilities.ReportingUtilities;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.w3c.dom.Node;
@@ -1597,7 +1598,7 @@ public class Utilities {
         for (Entity en : entities) {
             if (null == en) {
                 stub.add("<html><font color='" +
-                               MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                               ReportingUtilities.getNegativeColor() +
                                "'>No random assignment table found for faction</font></html>");
             } else {
                 stub.add("<html>" +

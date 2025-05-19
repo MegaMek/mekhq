@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.mission.resupplyAndCaches;
 
+import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.CRITICAL;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.DOMINATING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
@@ -44,6 +45,7 @@ import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_AMMO_TO
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_ARMOR_TONNAGE;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RESUPPLY_CONTRACT_END;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RESUPPLY_LOOT;
+import static mekhq.campaign.personnel.enums.PersonnelRole.GROUND_VEHICLE_DRIVER;
 import static mekhq.campaign.stratcon.StratconContractInitializer.getUnoccupiedCoords;
 import static mekhq.campaign.stratcon.StratconRulesManager.generateExternalScenario;
 import static mekhq.gui.dialog.resupplyAndCaches.DialogItinerary.itineraryDialog;
@@ -63,9 +65,10 @@ import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.Hangar;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
@@ -76,15 +79,16 @@ import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.AmmoBin;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconCoords;
 import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconTrackState;
-import mekhq.gui.dialog.resupplyAndCaches.DialogInterception;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.dialog.resupplyAndCaches.DialogPlayerConvoyOption;
 import mekhq.gui.dialog.resupplyAndCaches.DialogResupplyFocus;
-import mekhq.gui.dialog.resupplyAndCaches.DialogRoleplayEvent;
 import mekhq.gui.dialog.resupplyAndCaches.DialogSwindled;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * The {@code PerformResupply} class handles the execution and management of resupply operations within MekHQ campaigns.
@@ -153,7 +157,6 @@ public class PerformResupply {
             return;
         }
 
-        final Campaign campaign = resupply.getCampaign();
         final boolean isIndependent = contract.getCommandRights().isIndependent();
         final boolean isGuerrilla = contract.getContractType().isGuerrillaWarfare();
         final ResupplyType resupplyType = resupply.getResupplyType();
@@ -265,14 +268,14 @@ public class PerformResupply {
         final AtBContract contract = resupply.getContract();
         int swindleChance = contract.getMoraleLevel().ordinal();
 
-        if (Compute.randomInt(10) < swindleChance) {
+        if (randomInt(10) < swindleChance) {
             new DialogSwindled(resupply);
         } else {
             final Campaign campaign = resupply.getCampaign();
 
             campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
                   "convoySuccessfulSmuggler.text",
-                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                  spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                   CLOSING_SPAN_TAG));
             makeDelivery(resupply, null);
         }
@@ -392,7 +395,7 @@ public class PerformResupply {
         interceptionChance = Math.max(1, interceptionChance);
 
         // With interception chance calculated, we check to see whether an interception or event has occurred.
-        if (Compute.randomInt(10) < interceptionChance) {
+        if (randomInt(10) < interceptionChance) {
             generateInterceptionOrConvoyEvent(resupply, playerConvoy, convoyContents, interceptionChance);
         } else {
             completeSuccessfulDelivery(resupply, convoyContents);
@@ -421,7 +424,7 @@ public class PerformResupply {
         final Campaign campaign = resupply.getCampaign();
         final AtBContract contract = resupply.getContract();
 
-        if (Compute.randomInt(10) < interceptionChance) {
+        if (randomInt(10) < interceptionChance) {
             processConvoyInterception(resupply, convoy, convoyContents);
         } else {
             // If it is an NPC convoy, we skip roleplay events
@@ -450,18 +453,21 @@ public class PerformResupply {
                       STATUS_FORWARD + Compute.randomInt(100) + STATUS_AFTERWARD,
                       commanderAddress);
             } else {
-                int roll = Compute.randomInt(2);
+                int roll = randomInt(2);
 
                 if (morale.isAdvancing() || morale.isWeakened()) {
                     morale = roll == 0 ? (morale.isAdvancing() ? DOMINATING : CRITICAL) : STALEMATE;
                 }
 
                 eventText = getFormattedTextAt(RESOURCE_BUNDLE,
-                      STATUS_FORWARD + "Enemy" + morale + Compute.randomInt(50) + STATUS_AFTERWARD,
+                      STATUS_FORWARD + "Enemy" + morale + randomInt(50) + STATUS_AFTERWARD,
                       commanderAddress);
             }
 
-            new DialogRoleplayEvent(campaign, convoy, eventText);
+            Person speaker = campaign.getPerson(convoy.getForceCommanderID());
+            String outOfCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "outOfCharacter.roleplay");
+            new ImmersiveDialogSimple(campaign, speaker, null, eventText, null, outOfCharacterMessage, null, false);
+
             completeSuccessfulDelivery(resupply, convoyContents);
         }
     }
@@ -478,7 +484,7 @@ public class PerformResupply {
 
         campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
               "convoySuccessful.text",
-              spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+              spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
               CLOSING_SPAN_TAG));
 
         makeDelivery(resupply, convoyContents);
@@ -509,8 +515,8 @@ public class PerformResupply {
         final Campaign campaign = resupply.getCampaign();
         final AtBContract contract = resupply.getContract();
 
-        // Trigger a dialog to inform the user an interception has taken place
-        new DialogInterception(resupply, targetConvoy);
+        // Trigger a dialog to inform the user that an interception has taken place
+        displayDialog(targetConvoy, campaign, contract);
 
         // Determine which scenario template to use based on convoy state
         String templateAddress = GENERIC;
@@ -537,7 +543,7 @@ public class PerformResupply {
         if (template == null) {
             campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
                   "convoyErrorTemplate.text",
-                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   templateAddress,
                   CLOSING_SPAN_TAG));
 
@@ -555,7 +561,7 @@ public class PerformResupply {
         } catch (NullPointerException e) {
             campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
                   "convoyErrorTracks.text",
-                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   templateAddress,
                   CLOSING_SPAN_TAG));
 
@@ -612,7 +618,7 @@ public class PerformResupply {
             // Announce the situation to the player
             campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
                   "convoyInterceptedStratCon.text",
-                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   CLOSING_SPAN_TAG));
         } else {
             // If we failed to generate a scenario, for whatever reason, we don't
@@ -620,6 +626,43 @@ public class PerformResupply {
             // this fluffy response.
             handleFallbackMessage(resupply, convoyContents, campaign);
         }
+    }
+
+    private static void displayDialog(Force targetConvoy, Campaign campaign, AtBContract contract) {
+        Person speaker;
+        String inCharacterMessage = "";
+        String commanderAddress = campaign.getCommanderAddress(false);
+        if (targetConvoy != null) {
+            speaker = campaign.getPerson(targetConvoy.getForceCommanderID());
+
+            Hangar hangar = campaign.getHangar();
+            if (targetConvoy.forceContainsOnlyVTOLForces(hangar, false) ||
+                      targetConvoy.forceContainsOnlyAerialForces(hangar, false, false)) {
+                inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
+                      "statusUpdateIntercepted.boilerplate",
+                      commanderAddress);
+            }
+        } else {
+            // We invent an NPC driver for NPC convoys
+            speaker = campaign.newPerson(GROUND_VEHICLE_DRIVER, contract.getEmployerCode(), Gender.RANDOMIZE);
+        }
+
+        if (inCharacterMessage.isBlank()) {
+            inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
+                  "statusUpdateIntercepted" + randomInt(20) + ".text",
+                  campaign.getCommanderAddress(false));
+        }
+
+        String outOfCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "outOfCharacter.intercepted");
+
+        new ImmersiveDialogSimple(campaign,
+              speaker,
+              null,
+              inCharacterMessage,
+              null,
+              outOfCharacterMessage,
+              null,
+              false);
     }
 
     /**
@@ -638,7 +681,7 @@ public class PerformResupply {
     private static void handleFallbackMessage(Resupply resupply, List<Part> convoyContents, Campaign campaign) {
         campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
               "convoyEscaped.text",
-              spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+              spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
               CLOSING_SPAN_TAG));
 
         makeDelivery(resupply, convoyContents);

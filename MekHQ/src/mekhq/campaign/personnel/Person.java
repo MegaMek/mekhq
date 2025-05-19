@@ -314,6 +314,7 @@ public class Person {
     private Reasoning reasoning;
     private int reasoningDescriptionIndex;
     private String personalityDescription;
+    private String personalityInterviewNotes;
     // endregion Personality
 
     // region Flags
@@ -505,6 +506,7 @@ public class Person {
         reasoning = Reasoning.AVERAGE;
         reasoningDescriptionIndex = randomInt(Reasoning.MAXIMUM_VARIATIONS);
         personalityDescription = "";
+        personalityInterviewNotes = "";
 
         // This assigns minutesLeft and overtimeLeft. Must be after skills to avoid an NPE.
         if (campaign != null) {
@@ -1055,34 +1057,40 @@ public class Person {
     public boolean canPerformRole(LocalDate today, final PersonnelRole role, final boolean primary) {
         if (primary) {
             // Primary Role:
-            // We only do a few here, as it is better on the UX-side to correct the issues when assigning the primary
-            // role
             // 1) Can always be Dependent
             // 2) Cannot be None
+            // 3) Cannot be equal to the secondary role
+            // 4) Cannot be a tech role if the secondary role is a tech role (inc. Astech)
+            // 5) Cannot be Medic if the secondary role is one of the medical staff roles
+            // 6) Cannot be Admin if the secondary role is one of the administrator roles
             if (role.isDependent()) {
                 return true;
             } else if (role.isNone()) {
+                return false;
+            } else if ((role == getSecondaryRole()) ||
+                             ((role.isTech() || role.isAstech()) &&
+                                    (getSecondaryRole().isTech() || getSecondaryRole().isAstech())) ||
+                             (role.isMedicalStaff() && getSecondaryRole().isMedicalStaff()) ||
+                             (role.isAdministrator() && getSecondaryRole().isAdministrator())) {
                 return false;
             }
         } else {
             // Secondary Role:
             // 1) Can always be None
             // 2) Cannot be Dependent
-            // 3) Can only be None if the primary role is a Dependent
-            // 4) Cannot be equal to the primary role
-            // 5) Cannot be a tech role if the primary role is an Astech
-            // 6) Cannot be Astech if the primary role is a tech role
-            // 7) Cannot be a medical staff role if the primary role is a Medic
-            // 8) Cannot be Medic if the primary role is one of the medical staff roles
+            // 3) Cannot be equal to the primary role
+            // 4) Cannot be a tech role if the primary role is a tech role (inc. Astech)
+            // 5) Cannot be Medic if the primary role is one of the medical staff roles
+            // 6) Cannot be Admin if the primary role is one of the administrator roles
             if (role.isNone()) {
                 return true;
-            } else if (role.isDependent() ||
-                             getPrimaryRole().isDependent() ||
+            } else if ((role.isDependent()) ||
+                             (getPrimaryRole().isDependent()) ||
                              (getPrimaryRole() == role) ||
-                             (role.isTechSecondary() && getPrimaryRole().isAstech()) ||
-                             (role.isAstech() && getPrimaryRole().isTech()) ||
-                             (role.isMedicalStaff() && getPrimaryRole().isMedic()) ||
-                             (role.isMedic() && getPrimaryRole().isMedicalStaff())) {
+                             ((role.isTech() || role.isAstech()) &&
+                                    (getPrimaryRole().isTech() || getPrimaryRole().isAstech())) ||
+                             (role.isMedicalStaff() && getPrimaryRole().isMedicalStaff()) ||
+                             (role.isAdministrator() && getPrimaryRole().isAdministrator())) {
                 return false;
             }
         }
@@ -1378,7 +1386,7 @@ public class Person {
 
         if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
             campaign.addReport(String.format(resources.getString("loyaltyChangeGroup.text"),
-                  "<span color=" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>",
+                  "<span color=" + ReportingUtilities.getWarningColor() + "'>",
                   ReportingUtilities.CLOSING_SPAN_TAG));
         }
     }
@@ -1475,10 +1483,10 @@ public class Person {
 
         // choose the color and string based on the loyalty comparison.
         if (originalLoyalty > loyalty) {
-            color = MekHQ.getMHQOptions().getFontColorNegativeHexColor();
+            color = ReportingUtilities.getNegativeColor();
             changeString.append(resources.getString("loyaltyChangeNegative.text"));
         } else {
-            color = MekHQ.getMHQOptions().getFontColorPositiveHexColor();
+            color = ReportingUtilities.getPositiveColor();
             changeString.append(resources.getString("loyaltyChangePositive.text"));
         }
 
@@ -2311,6 +2319,14 @@ public class Person {
         this.personalityDescription = personalityDescription;
     }
 
+    public String getPersonalityInterviewNotes() {
+        return personalityInterviewNotes;
+    }
+
+    public void setPersonalityInterviewNotes(final String personalityInterviewNotes) {
+        this.personalityInterviewNotes = personalityInterviewNotes;
+    }
+
     // region Flags
     public boolean isClanPersonnel() {
         return clanPersonnel;
@@ -2775,6 +2791,10 @@ public class Person {
 
             if (!isNullOrBlank(personalityDescription)) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personalityDescription", personalityDescription);
+            }
+
+            if (!isNullOrBlank(personalityInterviewNotes)) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personalityInterviewNotes", personalityInterviewNotes);
             }
 
             // region Flags
@@ -3280,6 +3300,8 @@ public class Person {
                     person.reasoningDescriptionIndex = MathUtility.parseInt(wn2.getTextContent());
                 } else if (nodeName.equalsIgnoreCase("personalityDescription")) {
                     person.personalityDescription = wn2.getTextContent();
+                } else if (nodeName.equalsIgnoreCase("personalityInterviewNotes")) {
+                    person.personalityInterviewNotes = wn2.getTextContent();
                 } else if (nodeName.equalsIgnoreCase("clanPersonnel")) {
                     person.setClanPersonnel(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("commander")) {
@@ -3360,7 +3382,7 @@ public class Person {
                 person.setPrimaryRole(campaign, PersonnelRole.NONE);
 
                 campaign.addReport(String.format(resources.getString("ineligibleForPrimaryRole"),
-                      spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                      spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                       CLOSING_SPAN_TAG,
                       person.getHyperlinkedFullTitle()));
             }
@@ -3369,7 +3391,7 @@ public class Person {
                 person.setSecondaryRole(PersonnelRole.NONE);
 
                 campaign.addReport(String.format(resources.getString("ineligibleForSecondaryRole"),
-                      spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor()),
+                      spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
                       CLOSING_SPAN_TAG,
                       person.getHyperlinkedFullTitle()));
             }
@@ -4076,7 +4098,7 @@ public class Person {
 
     public String fail() {
         return " <font color='" +
-                     MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                     ReportingUtilities.getNegativeColor() +
                      "'><b>Failed to heal.</b></font>";
     }
 
@@ -4298,7 +4320,7 @@ public class Person {
     public String succeed() {
         heal();
         return " <font color='" +
-                     MekHQ.getMHQOptions().getFontColorPositiveHexColor() +
+                     ReportingUtilities.getPositiveColor() +
                      "'><b>Successfully healed one hit.</b></font>";
     }
 
