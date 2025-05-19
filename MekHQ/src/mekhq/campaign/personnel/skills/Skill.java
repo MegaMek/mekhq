@@ -342,90 +342,90 @@ public class Skill {
         // Animal Empathy and Animal Antipathy
         if (Objects.equals(name, S_ANIMAL_HANDLING)) {
             if (characterOptions.booleanOption(FLAW_ANIMAL_ANTIPATHY)) {
-                modifier += 2;
+                modifier -= 2;
             }
 
             if (characterOptions.booleanOption(ATOW_ANIMAL_EMPATHY)) {
-                modifier -= 2;
+                modifier += 2;
             }
         }
 
         // Attractive, Unattractive, Freakish Strength
         if (type.hasAttribute(CHARISMA)) {
             if (characterOptions.booleanOption(FLAW_UNATTRACTIVE)) {
-                modifier += 2;
+                modifier -= 2;
             }
 
             if (characterOptions.booleanOption(MUTATION_FREAKISH_STRENGTH)) {
-                modifier += 2;
+                modifier -= 2;
             }
 
             if (characterOptions.booleanOption(ATOW_ATTRACTIVE)) {
-                modifier -= 2;
+                modifier += 2;
             }
         }
 
         // Poor Hearing, Good Hearing, Poor Vision, Good Vision, Sixth Sense, Cat Girl
         if (Objects.equals(name, S_PERCEPTION)) {
             if (characterOptions.booleanOption(FLAW_POOR_HEARING)) {
-                modifier += 1;
+                modifier -= 1;
             }
 
             if (characterOptions.booleanOption(ATOW_GOOD_HEARING)) {
-                modifier -= 1;
-            }
-
-            if (characterOptions.booleanOption(MUTATION_CAT_GIRL)) {
-                modifier -= 1;
-            }
-
-            if (characterOptions.booleanOption(MUTATION_CAT_GIRL_UNOFFICIAL)) {
-                modifier -= 1;
-            }
-
-            if (characterOptions.booleanOption(FLAW_POOR_VISION)) {
                 modifier += 1;
             }
 
-            if (characterOptions.booleanOption(ATOW_GOOD_VISION)) {
+            if (characterOptions.booleanOption(MUTATION_CAT_GIRL)) {
+                modifier += 1;
+            }
+
+            if (characterOptions.booleanOption(MUTATION_CAT_GIRL_UNOFFICIAL)) {
+                modifier += 1;
+            }
+
+            if (characterOptions.booleanOption(FLAW_POOR_VISION)) {
                 modifier -= 1;
             }
 
+            if (characterOptions.booleanOption(ATOW_GOOD_VISION)) {
+                modifier += 1;
+            }
+
             if (characterOptions.booleanOption(ATOW_SIXTH_SENSE)) {
-                modifier -= 3;
+                modifier += 3;
             }
         }
 
         // Introvert, Gregarious
         if (Objects.equals(name, S_ACTING) || Objects.equals(name, S_NEGOTIATION)) {
             if (characterOptions.booleanOption(FLAW_INTROVERT)) {
-                modifier += 1;
+                modifier -= 1;
             }
 
             if (characterOptions.booleanOption(ATOW_GREGARIOUS)) {
-                modifier -= 1;
+                modifier += 1;
             }
         }
 
         // Impatient, Patient
         if (type.isAffectedByImpatientOrPatient()) {
             if (characterOptions.booleanOption(FLAW_IMPATIENT)) {
-                modifier += 1;
+                modifier -= 1;
             }
 
             if (characterOptions.booleanOption(ATOW_PATIENT)) {
-                modifier -= 1;
+                modifier += 1;
             }
         }
 
         // Gremlins, Tech Empathy
         if (type.isAffectedByGremlinsOrTechEmpathy()) {
             if (characterOptions.booleanOption(FLAW_IMPATIENT)) {
-                modifier += 1;
+                modifier -= 1;
             }
 
             if (characterOptions.booleanOption(ATOW_PATIENT)) {
-                modifier -= 1;
+                modifier += 1;
             }
         }
 
