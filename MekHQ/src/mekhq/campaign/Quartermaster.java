@@ -586,10 +586,10 @@ public class Quartermaster {
      * @param leaseEntity The unit to lease
      * @param days        The number of days before the lease starts (typically days to arrival)
      */
-    public void createLeasedUnit(Entity leaseEntity, int days) {
+    public boolean createLeasedUnit(Entity leaseEntity, int days) {
         if (leaseEntity == null) {
             LOGGER.error(new NullPointerException(), "null unit passed into createLeasedUnit");
-            return;
+            return false;
         }
         PartQuality quality = PartQuality.QUALITY_D;
 
@@ -600,6 +600,7 @@ public class Quartermaster {
         LocalDate leaseStart = campaign.getLocalDate().plusDays(days);
         Unit newUnit = getCampaign().addNewUnit(leaseEntity, false, days, quality);
         newUnit.addLease(new Lease(leaseStart, newUnit));
+        return true;
     }
 
     /**

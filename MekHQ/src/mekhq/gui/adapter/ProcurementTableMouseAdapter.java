@@ -27,23 +27,28 @@
  */
 package mekhq.gui.adapter;
 
-import megamek.common.Entity;
-import megamek.logging.MMLogger;
-import mekhq.MekHQ;
-import mekhq.campaign.event.ProcurementEvent;
-import mekhq.campaign.parts.Part;
-import mekhq.campaign.parts.enums.PartQuality;
-import mekhq.campaign.unit.Unit;
-import mekhq.campaign.work.IAcquisitionWork;
-import mekhq.gui.CampaignGUI;
-import mekhq.gui.model.ProcurementTableModel;
-import mekhq.gui.utilities.JMenuHelpers;
-
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.JTable;
+
+import megamek.common.Entity;
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+import mekhq.campaign.event.ProcurementEvent;
+import mekhq.campaign.finances.LeaseOrder;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.enums.PartQuality;
+import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.UnitOrder;
+import mekhq.campaign.work.IAcquisitionWork;
+import mekhq.gui.CampaignGUI;
+import mekhq.gui.model.ProcurementTableModel;
+import mekhq.gui.utilities.JMenuHelpers;
 
 public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
     private static final MMLogger logger = MMLogger.create(ProcurementTableMouseAdapter.class);
@@ -54,12 +59,12 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
     private final ProcurementTableModel model;
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
     // endregion Variable Declarations
 
     // region Constructors
     protected ProcurementTableMouseAdapter(final CampaignGUI gui, final JTable table,
-            final ProcurementTableModel model) {
+          final ProcurementTableModel model) {
         this.gui = gui;
         this.table = table;
         this.model = model;
@@ -167,8 +172,20 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
         return Optional.of(popup);
     }
 
+    private boolean tryProcureEntity(IAcquisitionWork acquisition, int transitTime) {
+        boolean success;
+        final Object equipment = acquisition.getNewEquipment();
+        if (acquisition instanceof LeaseOrder) {
+            success = gui.getCampaign().getQuartermaster().createLeasedUnit((Entity) equipment, transitTime);
+        } else {
+            success = gui.getCampaign().getQuartermaster().buyUnit((Entity) equipment, transitTime);
+        }
+        return success;
+    }
+
     /**
      * @param acquisition the
+     *
      * @return whether the procurement attempt succeeded or not
      */
     private boolean tryProcureOneItem(final IAcquisitionWork acquisition) {
@@ -181,31 +198,36 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
         final boolean success;
         if (equipment instanceof Part) {
             success = gui.getCampaign().getQuartermaster().buyPart((Part) equipment, transitTime);
-        } else if (equipment instanceof Entity) {
-            success = gui.getCampaign().getQuartermaster().buyUnit((Entity) equipment, transitTime);
+        } else if (acquisition instanceof UnitOrder) {
+            success = tryProcureEntity((UnitOrder) acquisition, transitTime);
         } else {
             logger.error("Attempted to acquire unknown equipment of {}", acquisition.getAcquisitionName());
             return false;
         }
 
         if (success) {
-            gui.getCampaign().addReport("<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
-                    + String.format(resources.getString("ProcurementTableMouseAdapter.ProcuredItem.report") + "</font>",
-                            acquisition.getAcquisitionName()));
+            gui.getCampaign()
+                  .addReport("<font color='" +
+                                   MekHQ.getMHQOptions().getFontColorPositiveHexColor() +
+                                   "'>" +
+                                   String.format(resources.getString("ProcurementTableMouseAdapter.ProcuredItem.report") +
+                                                       "</font>", acquisition.getAcquisitionName()));
             acquisition.decrementQuantity();
         } else {
-            gui.getCampaign().addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
-                    + String.format(
-                            resources.getString("ProcurementTableMouseAdapter.CannotAffordToPurchaseItem.report")
-                                    + "</font>",
-                            acquisition.getAcquisitionName()));
+            gui.getCampaign()
+                  .addReport("<font color='" +
+                                   MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                                   "'>" +
+                                   String.format(resources.getString(
+                                               "ProcurementTableMouseAdapter.CannotAffordToPurchaseItem.report") + "</font>",
+                                         acquisition.getAcquisitionName()));
         }
         return success;
     }
 
     /**
-     * Processes the acquisition of a single item, adding it to the campaign as either a part or a unit,
-     * or logging an error if the acquisition type is unrecognized.
+     * Processes the acquisition of a single item, adding it to the campaign as either a part or a unit, or logging an
+     * error if the acquisition type is unrecognized.
      *
      * <p>The method performs the following steps:</p>
      * <ul>
@@ -225,6 +247,7 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
      * </ul>
      *
      * @param acquisition The acquisition work containing the item and metadata to process. Must not be {@code null}.
+     *
      * @throws NullPointerException If {@code acquisition} is {@code null}.
      */
     private void addOneItem(final IAcquisitionWork acquisition) {
@@ -251,9 +274,12 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
             return;
         }
 
-        gui.getCampaign().addReport("<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
-                + String.format(resources.getString("ProcurementTableMouseAdapter.GMAdded.report") + "</font>",
-                        acquisition.getAcquisitionName()));
+        gui.getCampaign()
+              .addReport("<font color='" +
+                               MekHQ.getMHQOptions().getFontColorPositiveHexColor() +
+                               "'>" +
+                               String.format(resources.getString("ProcurementTableMouseAdapter.GMAdded.report") +
+                                                   "</font>", acquisition.getAcquisitionName()));
         acquisition.decrementQuantity();
     }
 }
