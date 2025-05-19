@@ -41,6 +41,7 @@ import static megamek.common.options.PilotOptions.LVL3_ADVANTAGES;
 import static megamek.common.options.PilotOptions.MD_ADVANTAGES;
 import static megamek.utilities.ImageUtilities.addTintToImageIcon;
 import static mekhq.campaign.personnel.Person.getLoyaltyName;
+import static mekhq.campaign.personnel.enums.PersonnelStatus.ACTIVE;
 import static mekhq.campaign.personnel.skills.SkillType.RP_ONLY_TAG;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_GUNNERY;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_PILOTING;
@@ -77,6 +78,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.function.BiConsumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.accessibility.AccessibleRelation;
@@ -91,6 +93,7 @@ import javax.swing.JTextPane;
 import javax.swing.table.TableColumn;
 
 import megamek.codeUtilities.MathUtility;
+import megamek.common.annotations.Nullable;
 import megamek.common.icons.Portrait;
 import megamek.common.options.IOption;
 import megamek.logging.MMLogger;
@@ -140,20 +143,24 @@ public class PersonViewPanel extends JScrollablePanel {
 
     private final CampaignGUI gui;
 
-    private final Person person;
+    private Person person;
     private final Campaign campaign;
     private final CampaignOptions campaignOptions;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonViewPanel",
           MekHQ.getMHQOptions().getLocale());
 
-    public PersonViewPanel(Person person, Campaign campaign, CampaignGUI gui) {
+    public PersonViewPanel(@Nullable Person person, Campaign campaign, CampaignGUI gui) {
         super();
         this.person = person;
         this.campaign = campaign;
         campaignOptions = campaign.getCampaignOptions();
         this.gui = gui;
-        initComponents();
+        if (person == null) {
+            fillInfoEmpty();
+        } else {
+            initComponents();
+        }
     }
 
     private void initComponents() {
@@ -915,6 +922,64 @@ public class PersonViewPanel extends JScrollablePanel {
         }
 
         return portraitImageIcon;
+    }
+
+    /**
+     * Constructs and returns a {@link JPanel} with empty or placeholder information fields.
+     *
+     * <p>The panel uses a {@link GridBagLayout} and is intended to display default or empty details for when no
+     * person is selected. Rows are added for various labels, including status, origin, age, gender, and blood type,
+     * with placeholder values.</p>
+     *
+     * <p>Origin information is conditionally added depending on campaign options.</p>
+     *
+     * @return a {@link JPanel} containing empty or default information fields
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    private JPanel fillInfoEmpty() {
+        // TODO Update layout for new person view (needs that PR to be merged) - Illiani, 50.06
+
+        JPanel pnlInfo = new JPanel(new GridBagLayout());
+        pnlInfo.setBorder(BorderFactory.createTitledBorder("-"));
+
+        // Helper to simplify row addition (text, value, isPair, gridwidth)
+        BiConsumer<String[], Integer> addRow = (arr, gridwidth) -> {
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.anchor = GridBagConstraints.NORTHWEST;
+            gbc.fill = GridBagConstraints.NONE;
+            if (arr.length == 1) {
+                gbc.gridx = 0;
+                gbc.gridwidth = gridwidth;
+                gbc.weightx = 1.0;
+                gbc.insets = new Insets(0, 0, 5, 0);
+                pnlInfo.add(new JLabel(arr[0]), gbc);
+            } else {
+                gbc.gridx = 0;
+                gbc.gridwidth = 1;
+                pnlInfo.add(new JLabel(arr[0]), gbc);
+
+                gbc.gridx = 1;
+                gbc.gridwidth = 3;
+                gbc.weightx = 1.0;
+                gbc.insets = new Insets(0, 10, 0, 0);
+                pnlInfo.add(new JLabel(arr[1]), gbc);
+            }
+        };
+
+        addRow.accept(new String[] { String.format(resourceMap.getString("format.italic"), '-') }, 4);
+        addRow.accept(new String[] { resourceMap.getString("lblStatus1.text"), ACTIVE.toString() }, 4);
+
+        if (campaign.getCampaignOptions().isShowOriginFaction()) {
+            addRow.accept(new String[] { resourceMap.getString("lblOrigin1.text"),
+                                         "<html><a href='#'>-</a> (-)</html>" }, 4);
+        }
+        addRow.accept(new String[] { resourceMap.getString("lblAge1.text"), "-" }, 4);
+        addRow.accept(new String[] { resourceMap.getString("lblGender1.text"), "-" }, 4);
+        addRow.accept(new String[] { resourceMap.getString("lblBloodType1.text"), "-" }, 4);
+
+        return pnlInfo;
     }
 
     private JPanel fillInfo() {
@@ -2501,5 +2566,29 @@ public class PersonViewPanel extends JScrollablePanel {
         pnlKills.add(killTable, gridBagConstraints);
 
         return pnlKills;
+    }
+
+    /**
+     * Sets the current {@link Person} object to be displayed by this panel.
+     *
+     * <p>If the provided {@code person} is {@code null}, the panel is initialized to show default (empty) content.
+     * Otherwise, it configures the panel to display the details of the specified {@link Person}.</p>
+     *
+     * <p>After updating, the panel is revalidated and repainted to reflect the changes.</p>
+     *
+     * @param person the {@link Person} to display, or {@code null} for empty content
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public void setPerson(@Nullable Person person) {
+        this.person = person;
+        removeAll();
+        if (person == null) {
+            fillInfoEmpty();
+        } else {
+            initComponents();
+        }
+        revalidate();
+        repaint();
     }
 }

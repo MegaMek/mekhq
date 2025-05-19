@@ -4073,6 +4073,40 @@ public class Person {
         return rank + getFullName();
     }
 
+    /**
+     * Returns the person's title (rank) and surname as a single string.
+     *
+     * <p>If the person has an assigned rank, the rank (followed by a space) will precede the surname. If no rank is
+     * available, only the surname is returned. If an exception occurs while retrieving the rank (for example, if the
+     * person has not been assigned a rank system), the method will ignore the exception and return only the
+     * surname.</p>
+     *
+     * <p>This design ensures robust behavior for test cases and scenarios where the person may not have a rank
+     * assignment.</p>
+     *
+     * @return a string containing the person's rank (if any) and surname
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public String getTitleAndSurname() {
+        String rank = "";
+
+        try {
+            rank = getRankName();
+
+            if (!rank.isBlank()) {
+                rank = rank + ' ';
+            }
+        } catch (Exception ignored) {
+            // This try-catch exists to allow us to more easily test Person objects. Previously, if
+            // a method included 'getTitleAndSurname' it would break if the Person object hadn't been
+            // assigned a Rank System.
+        }
+
+        return rank + getSurname();
+    }
+
     public String makeHTMLRank() {
         return String.format("<html><div id=\"%s\">%s</div></html>", getId(), getRankName().trim());
     }

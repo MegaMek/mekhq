@@ -36,6 +36,7 @@ package mekhq.gui;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
+import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
 import static mekhq.campaign.personnel.skills.SkillType.getExperienceLevelName;
 import static mekhq.gui.dialog.nagDialogs.NagController.triggerDailyNags;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -92,6 +93,7 @@ import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
+import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.Part;
@@ -1509,9 +1511,22 @@ public class CampaignGUI extends JPanel {
         npd.setVisible(true);
     }
 
+    /**
+     * Opens the personnel market dialog to hire a person, using the appropriate market style based on campaign
+     * options.
+     *
+     * <p>If the personnel market is disabled in the campaign options, a deprecated {@link PersonnelMarketDialog} is
+     * displayed. Otherwise, the new personnel market dialog is shown according to the campaign's current market
+     * style.</p>
+     */
     public void hirePersonMarket() {
-        PersonnelMarketDialog pmd = new PersonnelMarketDialog(getFrame(), this, getCampaign());
-        pmd.setVisible(true);
+        PersonnelMarketStyle marketStyle = getCampaign().getCampaignOptions().getPersonnelMarketStyle();
+        if (marketStyle == PERSONNEL_MARKET_DISABLED) {
+            PersonnelMarketDialog pmd = new PersonnelMarketDialog(getFrame(), this, getCampaign());
+            pmd.setVisible(true);
+        } else {
+            getCampaign().getNewPersonnelMarket().showPersonnelMarketDialog();
+        }
     }
 
     private void hireBulkPersonnel() {

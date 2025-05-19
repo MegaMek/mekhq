@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -380,7 +385,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                         .getMethod(campaign.getCampaignOptions()));
 
                 // Setup Markets
-                campaign.getPersonnelMarket().generatePersonnelForDay(campaign);
+                campaign.refreshPersonnelMarkets();
                 ContractMarketMethod contractMarketMethod = campaign.getCampaignOptions().getContractMarketMethod();
                 campaign.setContractMarket(contractMarketMethod.getContractMarket());
                 if (!contractMarketMethod.isNone()) {

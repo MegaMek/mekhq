@@ -35,6 +35,7 @@ package mekhq.campaign;
 
 import static megamek.common.TechConstants.getSimpleLevel;
 import static megamek.common.options.OptionsConstants.*;
+import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
 import static mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick.ALL;
 import static mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick.SUPPORT;
 
@@ -65,6 +66,7 @@ import mekhq.campaign.finances.enums.FinancialYearDuration;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketMethod;
+import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.enums.*;
@@ -555,11 +557,15 @@ public class CampaignOptions {
 
     // region Markets Tab
     // Personnel Market
-    private String personnelMarketName;
-    private boolean personnelMarketReportRefresh;
-    private Map<SkillLevel, Integer> personnelMarketRandomRemovalTargets;
-    private double personnelMarketDylansWeight;
+    private PersonnelMarketStyle personnelMarketStyle;
     private boolean usePersonnelHireHiringHallOnly;
+    private boolean personnelMarketReportRefresh;
+    @Deprecated(since = "0.50.06", forRemoval = false)
+    private String personnelMarketName;
+    @Deprecated(since = "0.50.06", forRemoval = false)
+    private Map<SkillLevel, Integer> personnelMarketRandomRemovalTargets;
+    @Deprecated(since = "0.50.06", forRemoval = false)
+    private double personnelMarketDylansWeight;
 
     // Unit Market
     private UnitMarketMethod unitMarketMethod;
@@ -1168,6 +1174,7 @@ public class CampaignOptions {
 
         // region Markets Tab
         // Personnel Market
+        personnelMarketStyle = PERSONNEL_MARKET_DISABLED;
         setPersonnelMarketName(PersonnelMarket.getTypeName(PersonnelMarket.TYPE_NONE));
         setPersonnelMarketReportRefresh(true);
         setPersonnelMarketRandomRemovalTargets(new HashMap<>());
@@ -3538,6 +3545,14 @@ public class CampaignOptions {
 
     // region Markets Tab
     // region Personnel Market
+    public PersonnelMarketStyle getPersonnelMarketStyle() {
+        return personnelMarketStyle;
+    }
+
+    public void setPersonnelMarketStyle(final PersonnelMarketStyle personnelMarketStyle) {
+        this.personnelMarketStyle = personnelMarketStyle;
+    }
+
     public String getPersonnelMarketName() {
         return personnelMarketName;
     }
@@ -5410,6 +5425,7 @@ public class CampaignOptions {
 
         // region Markets Tab
         // region Personnel Market
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelMarketStyle", getPersonnelMarketStyle().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelMarketName", getPersonnelMarketName());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelMarketReportRefresh", isPersonnelMarketReportRefresh());
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "personnelMarketRandomRemovalTargets");
@@ -6368,6 +6384,8 @@ public class CampaignOptions {
 
                     // region Markets Tab
                     // region Personnel Market
+                } else if (nodeName.equalsIgnoreCase("personnelMarketStyle")) {
+                    retVal.setPersonnelMarketStyle(PersonnelMarketStyle.fromString(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("personnelMarketName")) {
                     String marketName = wn2.getTextContent().trim();
                     // Backwards compatibility with saves from before these rules moved to Camops

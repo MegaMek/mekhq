@@ -47,6 +47,8 @@ import static mekhq.campaign.force.Force.FORCE_NONE;
 import static mekhq.campaign.force.Force.FORCE_ORIGIN;
 import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
+import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
+import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
 import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
 import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performResupply;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.isProhibitedUnitType;
@@ -148,6 +150,8 @@ import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
+import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
+import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.market.unitMarket.DisabledUnitMarket;
 import mekhq.campaign.mission.AtBContract;
@@ -246,6 +250,7 @@ import mekhq.campaign.universe.selectors.planetSelectors.RangedPlanetSelector;
 import mekhq.campaign.utilities.AutomatedPersonnelCleanUp;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
 import mekhq.module.atb.AtBEventProcessor;
 import mekhq.service.AutosaveService;
@@ -359,6 +364,8 @@ public class Campaign implements ITechManager {
 
     private ShoppingList shoppingList;
 
+    private NewPersonnelMarket newPersonnelMarket;
+    @Deprecated(since = "0.50.06", forRemoval = false)
     private PersonnelMarket personnelMarket;
     private AbstractContractMarket contractMarket;
     private AbstractUnitMarket unitMarket;
@@ -402,10 +409,8 @@ public class Campaign implements ITechManager {
 
     // Libraries
     // We deliberately don't write this data to the save file as we want it rebuilt
-    // every time the
-    // campaign loads. This ensures updates can be applied and there is no risk of
-    // bugs being
-    // permanently locked into the campaign file.
+    // every time the campaign loads. This ensures updates can be applied and there is no risk of
+    // bugs being permanently locked into the campaign file.
     RandomEventLibraries randomEventLibraries;
 
     /**
@@ -472,6 +477,7 @@ public class Campaign implements ITechManager {
         game.setOptions(gameOptions);
         customs = new ArrayList<>();
         shoppingList = new ShoppingList();
+        newPersonnelMarket = new NewPersonnelMarket(this);
         news = new News(getGameYear(), id.getLeastSignificantBits());
         setPersonnelMarket(new PersonnelMarket());
         setContractMarket(new AtbMonthlyContractMarket());
@@ -500,7 +506,6 @@ public class Campaign implements ITechManager {
 
         // Library initialization
         randomEventLibraries = new RandomEventLibraries();
-
     }
 
     /**
@@ -750,6 +755,14 @@ public class Campaign implements ITechManager {
 
     public void setUnitMarket(final AbstractUnitMarket unitMarket) {
         this.unitMarket = unitMarket;
+    }
+
+    public NewPersonnelMarket getNewPersonnelMarket() {
+        return newPersonnelMarket;
+    }
+
+    public void setNewPersonnelMarket(final NewPersonnelMarket newPersonnelMarket) {
+        this.newPersonnelMarket = newPersonnelMarket;
     }
     // endregion Markets
 
@@ -5465,7 +5478,7 @@ public class Campaign implements ITechManager {
         location.newDay(this);
 
         // Manage the Markets
-        personnelMarket.generatePersonnelForDay(this);
+        refreshPersonnelMarkets();
 
         // TODO : AbstractContractMarket : Uncomment
         // getContractMarket().processNewDay(this);
@@ -5546,6 +5559,42 @@ public class Campaign implements ITechManager {
         // This must be the last step before returning true
         MekHQ.triggerEvent(new NewDayEvent(this));
         return true;
+    }
+
+    public void refreshPersonnelMarkets() {
+        PersonnelMarketStyle marketStyle = campaignOptions.getPersonnelMarketStyle();
+        if (marketStyle == PERSONNEL_MARKET_DISABLED) {
+            personnelMarket.generatePersonnelForDay(this);
+        } else {
+            if (currentDay.getDayOfMonth() == 1) {
+                boolean blockRecruitment = false;
+
+                if (newPersonnelMarket.getAssociatedPersonnelMarketStyle() == MEKHQ) {
+                    blockRecruitment = !location.isOnPlanet();
+                }
+
+                if (!blockRecruitment) {
+                    newPersonnelMarket.gatherApplications();
+
+                    if (newPersonnelMarket.getHasRarePersonnel()) {
+                        ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(this,
+                              getSeniorAdminPerson(AdministratorSpecialization.HR),
+                              null,
+                              resources.getString("personnelMarket.rareProfession.inCharacter"),
+                              List.of(resources.getString("personnelMarket.rareProfession.button.later"),
+                                    resources.getString("personnelMarket.rareProfession.button.decline"),
+                                    resources.getString("personnelMarket.rareProfession.button.immediate")),
+                              resources.getString("personnelMarket.rareProfession.outOfCharacter"),
+                              null,
+                              true);
+
+                        if (dialog.getDialogChoice() == 2) {
+                            newPersonnelMarket.showPersonnelMarketDialog();
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -6451,156 +6500,161 @@ public class Campaign implements ITechManager {
         return randomEventLibraries;
     }
 
-    public void writeToXML(final PrintWriter pw) {
+    public void writeToXML(final PrintWriter writer) {
         int indent = 0;
 
         // File header
-        pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+        writer.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 
         // Start the XML root.
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "campaign", "version", MHQConstants.VERSION);
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "campaign", "version", MHQConstants.VERSION);
 
         // region Basic Campaign Info
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "info");
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "info");
 
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "id", id.toString());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", name);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "faction", getFaction().getShortName());
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "id", id.toString());
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "name", name);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "faction", getFaction().getShortName());
         if (retainerEmployerCode != null) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "retainerEmployerCode", retainerEmployerCode);
+            MHQXMLUtility.writeSimpleXMLTag(writer, indent, "retainerEmployerCode", retainerEmployerCode);
 
             if (retainerStartDate == null) {
                 // this handles <50.0 campaigns
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "retainerStartDate", currentDay);
+                MHQXMLUtility.writeSimpleXMLTag(writer, indent, "retainerStartDate", currentDay);
             } else {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "retainerStartDate", retainerStartDate);
+                MHQXMLUtility.writeSimpleXMLTag(writer, indent, "retainerStartDate", retainerStartDate);
             }
         }
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "crimeRating", crimeRating);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "crimePirateModifier", crimePirateModifier);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "crimeRating", crimeRating);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "crimePirateModifier", crimePirateModifier);
 
         // this handles <50.0 campaigns
         if (dateOfLastCrime != null) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "dateOfLastCrime", dateOfLastCrime);
+            MHQXMLUtility.writeSimpleXMLTag(writer, indent, "dateOfLastCrime", dateOfLastCrime);
         } else if (getAdjustedCrimeRating() < 0) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "dateOfLastCrime", currentDay);
+            MHQXMLUtility.writeSimpleXMLTag(writer, indent, "dateOfLastCrime", currentDay);
         }
 
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "reputation");
-        reputation.writeReputationToXML(pw, indent);
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "reputation");
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "reputation");
+        reputation.writeReputationToXML(writer, indent);
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "reputation");
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "newPersonnelMarket");
+        newPersonnelMarket.writePersonnelMarketDataToXML(writer, indent);
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "newPersonnelMarket");
 
         // this handles campaigns that predate 49.20
         if (campaignStartDate == null) {
             setCampaignStartDate(getLocalDate());
         }
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "campaignStartDate", getCampaignStartDate());
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "campaignStartDate", getCampaignStartDate());
 
-        getRankSystem().writeToXML(pw, indent, false);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "overtime", overtime);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "gmMode", gmMode);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "astechPool", astechPool);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "astechPoolMinutes", astechPoolMinutes);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "astechPoolOvertime", astechPoolOvertime);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "medicPool", medicPool);
-        getCamouflage().writeToXML(pw, indent);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "colour", getColour().name());
-        getUnitIcon().writeToXML(pw, indent);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastForceId", lastForceId);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastMissionId", lastMissionId);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastScenarioId", lastScenarioId);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "calendar", getLocalDate());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "initiativeBonus", initiativeBonus);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "initiativeMaxBonus", initiativeMaxBonus);
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "nameGen");
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "faction", RandomNameGenerator.getInstance().getChosenFaction());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "percentFemale", RandomGenderGenerator.getPercentFemale());
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "nameGen");
+        getRankSystem().writeToXML(writer, indent, false);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "overtime", overtime);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "gmMode", gmMode);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "astechPool", astechPool);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "astechPoolMinutes", astechPoolMinutes);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "astechPoolOvertime", astechPoolOvertime);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "medicPool", medicPool);
+        getCamouflage().writeToXML(writer, indent);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "colour", getColour().name());
+        getUnitIcon().writeToXML(writer, indent);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "lastForceId", lastForceId);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "lastMissionId", lastMissionId);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "lastScenarioId", lastScenarioId);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "calendar", getLocalDate());
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "initiativeBonus", initiativeBonus);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "initiativeMaxBonus", initiativeMaxBonus);
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "nameGen");
+        MHQXMLUtility.writeSimpleXMLTag(writer,
+              indent,
+              "faction",
+              RandomNameGenerator.getInstance().getChosenFaction());
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "percentFemale", RandomGenderGenerator.getPercentFemale());
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "nameGen");
 
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "currentReport");
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "currentReport");
         for (String s : currentReport) {
             // This cannot use the MHQXMLUtility as it cannot be escaped
-            pw.println(MHQXMLUtility.indentStr(indent) + "<reportLine><![CDATA[" + s + "]]></reportLine>");
+            writer.println(MHQXMLUtility.indentStr(indent) + "<reportLine><![CDATA[" + s + "]]></reportLine>");
         }
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "currentReport");
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "currentReport");
 
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "info");
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "info");
         // endregion Basic Campaign Info
 
         // region Options
         if (getCampaignOptions() != null) {
-            getCampaignOptions().writeToXml(pw, indent);
+            getCampaignOptions().writeToXml(writer, indent);
         }
-        getGameOptions().writeToXML(pw, indent);
+        getGameOptions().writeToXML(writer, indent);
         // endregion Options
 
         // Lists of objects:
-        units.writeToXML(pw, indent, "units"); // Units
+        units.writeToXML(writer, indent, "units"); // Units
 
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "personnel");
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "personnel");
         for (final Person person : getPersonnel()) {
-            person.writeToXML(pw, indent, this);
+            person.writeToXML(writer, indent, this);
         }
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "personnel");
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "personnel");
 
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "missions");
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "missions");
         for (final Mission mission : getMissions()) {
-            mission.writeToXML(this, pw, indent);
+            mission.writeToXML(this, writer, indent);
         }
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "missions");
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "missions");
 
         // the forces structure is hierarchical, but that should be handled
         // internally from with writeToXML function for Force
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "forces");
-        forces.writeToXML(pw, indent);
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "forces");
-        finances.writeToXML(pw, indent);
-        location.writeToXML(pw, indent);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "isAvoidingEmptySystems", isAvoidingEmptySystems);
-        shoppingList.writeToXML(pw, indent);
-
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "kills");
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "forces");
+        forces.writeToXML(writer, indent);
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "forces");
+        finances.writeToXML(writer, indent);
+        location.writeToXML(writer, indent);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "isAvoidingEmptySystems", isAvoidingEmptySystems);
+        shoppingList.writeToXML(writer, indent);
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "kills");
         for (List<Kill> kills : kills.values()) {
             for (Kill k : kills) {
-                k.writeToXML(pw, indent);
+                k.writeToXML(writer, indent);
             }
         }
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "kills");
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "skillTypes");
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "kills");
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "skillTypes");
         for (final String skillName : SkillType.skillList) {
             final SkillType type = getType(skillName);
             if (type != null) {
-                type.writeToXML(pw, indent);
+                type.writeToXML(writer, indent);
             }
         }
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "skillTypes");
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "specialAbilities");
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "skillTypes");
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "specialAbilities");
         for (String key : SpecialAbility.getSpecialAbilities().keySet()) {
             // <50.01 compatibility handler
             if (Objects.equals(key, "clan_tech_knowledge")) {
                 continue;
             }
 
-            SpecialAbility.getAbility(key).writeToXML(pw, indent);
+            SpecialAbility.getAbility(key).writeToXML(writer, indent);
         }
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "specialAbilities");
-        rskillPrefs.writeToXML(pw, indent);
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "specialAbilities");
+        rskillPrefs.writeToXML(writer, indent);
 
         // parts is the biggest so it goes last
-        parts.writeToXML(pw, indent, "parts"); // Parts
+        parts.writeToXML(writer, indent, "parts"); // Parts
 
         // current story arc
         if (null != storyArc) {
-            storyArc.writeToXml(pw, indent);
+            storyArc.writeToXml(writer, indent);
         }
 
         // Fame and Infamy
         if (fameAndInfamy != null) {
-            fameAndInfamy.writeToXml(pw, indent);
+            fameAndInfamy.writeToXml(writer, indent);
         }
 
         // Markets
-        getPersonnelMarket().writeToXML(pw, indent, this);
+        getPersonnelMarket().writeToXML(writer, indent, this);
 
         // TODO : AbstractContractMarket : Uncomment
         // CAW: implicit DEPENDS-ON to the <missions> and <campaignOptions> node, do not
@@ -6609,65 +6663,65 @@ public class Campaign implements ITechManager {
 
         // Windchild: implicit DEPENDS-ON to the <campaignOptions> node, do not move
         // this above it
-        getUnitMarket().writeToXML(pw, indent);
+        getUnitMarket().writeToXML(writer, indent);
 
         // Against the Bot
         if (getCampaignOptions().isUseAtB()) {
             // TODO : AbstractContractMarket : Remove next two lines
             // CAW: implicit DEPENDS-ON to the <missions> node, do not move this above it
-            contractMarket.writeToXML(this, pw, indent);
+            contractMarket.writeToXML(this, writer, indent);
 
             if (!combatTeams.isEmpty()) {
-                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "combatTeams");
+                MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "combatTeams");
                 for (CombatTeam combatTeam : combatTeams.values()) {
                     if (forceIds.containsKey(combatTeam.getForceId())) {
-                        combatTeam.writeToXML(pw, indent);
+                        combatTeam.writeToXML(writer, indent);
                     }
                 }
-                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "combatTeams");
+                MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "combatTeams");
             }
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shipSearchStart", getShipSearchStart());
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shipSearchType", shipSearchType);
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shipSearchResult", shipSearchResult);
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shipSearchExpiration", getShipSearchExpiration());
-            MHQXMLUtility.writeSimpleXMLTag(pw,
+            MHQXMLUtility.writeSimpleXMLTag(writer, indent, "shipSearchStart", getShipSearchStart());
+            MHQXMLUtility.writeSimpleXMLTag(writer, indent, "shipSearchType", shipSearchType);
+            MHQXMLUtility.writeSimpleXMLTag(writer, indent, "shipSearchResult", shipSearchResult);
+            MHQXMLUtility.writeSimpleXMLTag(writer, indent, "shipSearchExpiration", getShipSearchExpiration());
+            MHQXMLUtility.writeSimpleXMLTag(writer,
                   indent,
                   "autoResolveBehaviorSettings",
                   autoResolveBehaviorSettings.getDescription());
         }
 
-        retirementDefectionTracker.writeToXML(pw, indent);
+        retirementDefectionTracker.writeToXML(writer, indent);
 
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "personnelWhoAdvancedInXP");
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "personnelWhoAdvancedInXP");
         for (Person person : personnelWhoAdvancedInXP) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personWhoAdvancedInXP", person.getId());
+            MHQXMLUtility.writeSimpleXMLTag(writer, indent, "personWhoAdvancedInXP", person.getId());
         }
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "personnelWhoAdvancedInXP");
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "personnelWhoAdvancedInXP");
 
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "automatedMothballUnits");
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "automatedMothballUnits");
         for (UUID unitId : automatedMothballUnits) {
             if (unitId == null) {
                 // <50.03 compatibility handler
                 continue;
             }
 
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mothballedUnit", unitId);
+            MHQXMLUtility.writeSimpleXMLTag(writer, indent, "mothballedUnit", unitId);
         }
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "automatedMothballUnits");
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "temporaryPrisonerCapacity", temporaryPrisonerCapacity);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "processProcurement", processProcurement);
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "automatedMothballUnits");
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "temporaryPrisonerCapacity", temporaryPrisonerCapacity);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "processProcurement", processProcurement);
 
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw, ++indent, "partsInUse");
-        writePartInUseToXML(pw, indent);
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "partsInUse");
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, ++indent, "partsInUse");
+        writePartInUseToXML(writer, indent);
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "partsInUse");
 
         if (MekHQ.getMHQOptions().getWriteCustomsToXML()) {
-            writeCustoms(pw);
+            writeCustoms(writer);
         }
 
         // Okay, we're done.
         // Close everything out and be done with it.
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "campaign");
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "campaign");
     }
 
     private void writeCustoms(PrintWriter pw1) {
