@@ -480,7 +480,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
         txtCommand.setName("txtCommand");
         txtCommand.setText(contract.getCommandRights().toString());
-        txtCommand.setToolTipText(contract.getCommandRights().getToolTipText());
+        txtCommand.setToolTipText(wordWrap(contract.getCommandRights().getToolTipText()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 7;
@@ -674,7 +674,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.insets = new Insets(0, 0, 5, 0);
         gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.anchor = GridBagConstraints.NORTH;
         pnlStats.add(lblBelligerents, gridBagConstraints);
 
         lblLocation.setName("lblLocation");
@@ -880,7 +880,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
         txtCommand.setName("txtCommand");
         txtCommand.setText(contract.getCommandRights().toString());
-        txtCommand.setToolTipText(contract.getCommandRights().getToolTipText());
+        txtCommand.setToolTipText(wordWrap(contract.getCommandRights().getToolTipText()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;

@@ -1559,8 +1559,6 @@ public class Refit extends Part implements IAcquisitionWork {
         // don't forget to switch entities!
         // ----------------- from here on oldUnit refers to the new entity -------------------------
         oldUnit.setEntity(newEntity);
-        // Bay capacities might have changed - reset them
-        oldUnit.initializeAllTransportSpace();
 
         // set up new parts
         ArrayList<Part> newParts = new ArrayList<>();
@@ -1701,6 +1699,11 @@ public class Refit extends Part implements IAcquisitionWork {
         getCampaign().clearGameData(oldUnit.getEntity());
         getCampaign().reloadGameEntities();
         C3Util.copyC3Networks(oldEntity, oldUnit.getEntity());
+
+        // Bay capacities might have changed - reset them
+        oldUnit.clearAllTransportSpace();
+        oldUnit.initializeAllTransportSpace();
+        campaign.updateTransportInTransports(oldUnit);
 
         // reload any soldiers
         for (Person soldier : soldiers) {

@@ -76,8 +76,8 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
     private static final String TARGET_UNKNOWN = "--";
     //endregion Variable Declarations
 
-    public MekHQUnitSelectorDialog(JFrame frame, UnitLoadingDialog unitLoadingDialog,
-                                   Campaign campaign, boolean addToCampaign) {
+    public MekHQUnitSelectorDialog(JFrame frame, UnitLoadingDialog unitLoadingDialog, Campaign campaign,
+          boolean addToCampaign) {
         super(frame, unitLoadingDialog);
         this.campaign = campaign;
         this.addToCampaign = addToCampaign;
@@ -96,7 +96,8 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         gameTechLevel = campaign.getCampaignOptions().getTechLevel();
         eraBasedTechLevel = campaign.getCampaignOptions().isVariableTechLevel();
 
-        if (campaign.getCampaignOptions().isAllowClanPurchases() && campaign.getCampaignOptions().isAllowISPurchases()) {
+        if (campaign.getCampaignOptions().isAllowClanPurchases() &&
+                  campaign.getCampaignOptions().isAllowISPurchases()) {
             techLevelDisplayType = TECH_LEVEL_DISPLAY_IS_CLAN;
         } else if (campaign.getCampaignOptions().isAllowClanPurchases()) {
             techLevelDisplayType = TECH_LEVEL_DISPLAY_CLAN;
@@ -115,6 +116,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
             buttonSelect = new JButton(Messages.getString("MekSelectorDialog.Buy", TARGET_UNKNOWN));
             buttonSelect.setName("buttonBuy");
             buttonSelect.addActionListener(this);
+            buttonSelect.setEnabled(false);
             panelButtons.add(buttonSelect, new GridBagConstraints());
 
             if (campaign.isGM()) {
@@ -122,6 +124,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
                 buttonSelectClose = new JButton(Messages.getString("MekSelectorDialog.AddGM"));
                 buttonSelectClose.setName("buttonAddGM");
                 buttonSelectClose.addActionListener(this);
+                buttonSelectClose.setEnabled(false);
                 panelButtons.add(buttonSelectClose, new GridBagConstraints());
             }
 
@@ -163,18 +166,18 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
 
             if (entity == null || isUnsupportedEntity(entity)) {
                 final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
-                    MekHQ.getMHQOptions().getLocale());
+                      MekHQ.getMHQOptions().getLocale());
 
                 String reason;
                 if (entity == null) {
                     reason = MHQInternationalization.getTextAt(resources.getBaseBundleName(),
-                        "mekSelectorDialog.unsupported.null");
+                          "mekSelectorDialog.unsupported.null");
                 } else if (entity.getUnitType() == UnitType.GUN_EMPLACEMENT) {
                     reason = MHQInternationalization.getTextAt(resources.getBaseBundleName(),
-                        "mekSelectorDialog.unsupported.gunEmplacement");
+                          "mekSelectorDialog.unsupported.gunEmplacement");
                 } else {
                     reason = MHQInternationalization.getTextAt(resources.getBaseBundleName(),
-                        "mekSelectorDialog.unsupported.droneOs");
+                          "mekSelectorDialog.unsupported.droneOs");
                 }
 
                 campaign.addReport(String.format(
@@ -202,8 +205,8 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
     //endregion Button Methods
 
     /**
-     * We need to override this to add some MekHQ specific functionality, namely changing button
-     * names when the selected entity is chosen
+     * We need to override this to add some MekHQ specific functionality, namely changing button names when the selected
+     * entity is chosen
      *
      * @return selectedEntity, or null if there isn't one
      */
@@ -216,15 +219,16 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
                 buttonSelect.setEnabled(false);
                 buttonSelect.setText(Messages.getString("MekSelectorDialog.Buy", TARGET_UNKNOWN));
                 buttonSelect.setToolTipText(null);
+                buttonSelectClose.setEnabled(false);
             }
         } else {
             selectedUnit = new UnitOrder(entity, campaign);
             if (addToCampaign) {
                 buttonSelect.setEnabled(true);
                 final TargetRoll target = campaign.getTargetForAcquisition(selectedUnit);
-                buttonSelect.setText(Messages.getString("MekSelectorDialog.Buy",
-                        target.getValueAsString()));
+                buttonSelect.setText(Messages.getString("MekSelectorDialog.Buy", target.getValueAsString()));
                 buttonSelect.setToolTipText(target.getDesc());
+                buttonSelectClose.setEnabled(true);
             }
         }
 
@@ -257,7 +261,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         final int nClass = comboWeight.getSelectedIndex();
         final int nUnit = comboUnitType.getSelectedIndex() - 1;
         final boolean checkSupportVee = Messages.getString("MekSelectorDialog.SupportVee")
-                .equals(comboUnitType.getSelectedItem());
+                                              .equals(comboUnitType.getSelectedItem());
         // If the current expression doesn't parse, don't update.
         try {
             unitTypeFilter = new RowFilter<>() {
@@ -276,25 +280,26 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
                     }
 
                     if (
-                            /* year limits */
-                            (!enableYearLimits || (mek.getYear() <= allowedYear))
-                            /* Clan/IS limits */
-                            && (campaign.getCampaignOptions().isAllowClanPurchases() || !TechConstants.isClan(mek.getType()))
-                            && (campaign.getCampaignOptions().isAllowISPurchases() || TechConstants.isClan(mek.getType()))
-                            /* Canon */
-                            && (!canonOnly || mek.isCanon())
-                            /* Weight */
-                            && ((nClass == mek.getWeightClass()) || (nClass == EntityWeightClass.SIZE))
-                            /* Technology Level */
-                            && ((null != tech) && campaign.isLegal(tech))
-                            && (techLevelMatch)
-                            /* Support Vehicles */
-                            && ((nUnit == -1)
-                                    || (!checkSupportVee && mek.getUnitType().equals(UnitType.getTypeName(nUnit)))
-                                    || (checkSupportVee && mek.isSupport()))
-                            /* Advanced Search */
-                            && ((searchFilter == null) || MekSearchFilter.isMatch(mek, searchFilter))
-                    ) {
+                        /* year limits */
+                          (!enableYearLimits || (mek.getYear() <= allowedYear))
+                                /* Clan/IS limits */ &&
+                                (campaign.getCampaignOptions().isAllowClanPurchases() ||
+                                       !TechConstants.isClan(mek.getType())) &&
+                                (campaign.getCampaignOptions().isAllowISPurchases() ||
+                                       TechConstants.isClan(mek.getType()))
+                                /* Canon */ &&
+                                (!canonOnly || mek.isCanon())
+                                /* Weight */ &&
+                                ((nClass == mek.getWeightClass()) || (nClass == EntityWeightClass.SIZE))
+                                /* Technology Level */ &&
+                                ((null != tech) && campaign.isLegal(tech)) &&
+                                (techLevelMatch)
+                                /* Support Vehicles */ &&
+                                ((nUnit == -1) ||
+                                       (!checkSupportVee && mek.getUnitType().equals(UnitType.getTypeName(nUnit))) ||
+                                       (checkSupportVee && mek.isSupport()))
+                                /* Advanced Search */ &&
+                                ((searchFilter == null) || MekSearchFilter.isMatch(mek, searchFilter))) {
                         if (!textFilter.getText().isBlank()) {
                             String text = textFilter.getText();
                             return mek.getName().toLowerCase().contains(text.toLowerCase());

@@ -32,9 +32,23 @@
  */
 package mekhq.campaign.personnel.death;
 
+import static mekhq.campaign.personnel.enums.TenYearAgeRange.determineAgeRange;
+import static mekhq.campaign.universe.enums.EraFlag.*;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+
 import megamek.Version;
 import megamek.common.Compute;
-import megamek.common.EquipmentType;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.util.weightedMaps.WeightedDoubleMap;
@@ -58,17 +72,6 @@ import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.time.LocalDate;
-import java.util.*;
-
-import static mekhq.campaign.personnel.enums.TenYearAgeRange.determineAgeRange;
-import static mekhq.campaign.universe.enums.EraFlag.*;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
-import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 
 /**
  * Handles logic for simulating random deaths in a campaign.
@@ -96,7 +99,7 @@ public class RandomDeath {
     private final Map<AgeGroup, Boolean> enabledAgeGroups;
     private final boolean enableRandomDeathSuicideCause;
     private Map<Gender, Map<TenYearAgeRange, WeightedDoubleMap<PersonnelStatus>>> causes;
-    private final double randomDeathMultiplier;
+    private double randomDeathMultiplier;
 
     // Base Chances
     private final List<RandomDeathChance> deathChances = List.of(
@@ -368,7 +371,9 @@ public class RandomDeath {
             return false;
         }
 
-        return randomInt(DIE_SIZE) < actualDeathChance;
+        int roll = randomInt(DIE_SIZE);
+
+        return roll < actualDeathChance;
     }
 
     /**

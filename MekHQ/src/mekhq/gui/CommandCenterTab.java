@@ -88,6 +88,7 @@ import mekhq.gui.dialog.reportDialogs.TransportReportDialog;
 import mekhq.gui.dialog.reportDialogs.UnitRatingReportDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.ProcurementTableModel;
+import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.TargetSorter;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
@@ -229,9 +230,11 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.weighty = 0.0;
         panCommand.add(panIcon, gridBagConstraints);
 
+        JPanel pnlTutorial = new TutorialHyperlinkPanel("commandCenterTab");
+
         setLayout(new BorderLayout());
         add(panCommand, BorderLayout.CENTER);
-
+        add(pnlTutorial, BorderLayout.SOUTH);
     }
 
     private void initInfoPanel() {

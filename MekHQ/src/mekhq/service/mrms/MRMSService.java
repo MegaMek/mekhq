@@ -1228,25 +1228,29 @@ public class MRMSService {
 
         @Override
         public int compare(Person tech1, Person tech2) {
-            // Sort the valid techs by applicable skill. Let's start with the least
-            // experienced and
-            // work our way up until we find someone who can perform the work. If we have
-            // two techs
-            // with the same skill, put the one with the lesser XP in the front. If we have
-            // tech
-            // with the same XP, put the one with the more time ahead.
+            // Sort the valid techs by applicable skill. Let's start with the least experienced and work our way up
+            // until we find someone who can perform the work. If we have two techs with the same XP, put the one with
+            // the more time ahead.
             Skill skill1 = tech1.getSkillForWorkingOn(partWork);
             Skill skill2 = tech2.getSkillForWorkingOn(partWork);
 
-            if (skill1.getExperienceLevel() == skill2.getExperienceLevel()) {
-                if ((tech1.getXP() == tech2.getXP()) || (skill1.getLevel() == SkillType.EXP_ELITE)) {
-                    return tech1.getMinutesLeft() - tech2.getMinutesLeft();
-                } else {
-                    return (tech1.getXP() < tech2.getXP()) ? -1 : 1;
-                }
+            // Nulls at the end
+            if (skill1 == null && skill2 == null) {
+                return Integer.compare(tech1.getMinutesLeft(), tech2.getMinutesLeft());
+            }
+            if (skill1 == null) {
+                return 1;
+            }
+            if (skill2 == null) {
+                return -1;
             }
 
-            return skill1.getExperienceLevel() < skill2.getExperienceLevel() ? -1 : 1;
+            int experienceCompare = Integer.compare(skill1.getTotalSkillLevel(), skill2.getTotalSkillLevel());
+            if (experienceCompare != 0) {
+                return experienceCompare;
+            }
+
+            return Integer.compare(tech1.getMinutesLeft(), tech2.getMinutesLeft());
         }
     }
 

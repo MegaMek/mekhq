@@ -32,6 +32,26 @@
  */
 package mekhq.gui;
 
+import java.awt.BorderLayout;
+import java.awt.Dialog.ModalityType;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.time.LocalDate;
+import java.util.Objects;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
+
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
@@ -45,18 +65,10 @@ import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType
 import mekhq.campaign.stratcon.StratconStrategicObjective;
 import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.gui.enums.MHQTabType;
+import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.stratcon.CampaignManagementDialog;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.utilities.ReportingUtilities;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.Dialog.ModalityType;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.time.LocalDate;
-import java.util.Objects;
 
 /**
  * This class contains code relevant to rendering the StratCon ("AtB Campaign State") tab.
@@ -113,10 +125,11 @@ public class StratconTab extends CampaignGuiTab {
                 StratconCampaignState campaignState = currentTDI.contract.getStratconCampaignState();
                 objectivesCollapsed = !objectivesCollapsed;
                 objectiveStatusText.setText(getStrategicObjectiveText(campaignState));
-              }
-            });
+            }
+        });
 
         setLayout(new BorderLayout());
+
         stratconPanel = new StratconPanel(getCampaignGui(), infoPanelText);
         JScrollPane scrollPane = new JScrollPane(stratconPanel);
         scrollPane.getHorizontalScrollBar().setUnitIncrement(StratconPanel.HEX_X_RADIUS);
@@ -125,12 +138,22 @@ public class StratconTab extends CampaignGuiTab {
 
         // TODO: lance role assignment UI here?
 
+        JPanel pnlTutorial = new TutorialHyperlinkPanel("stratConTab");
+
+        JPanel centerPanel = new JPanel();
+        centerPanel.setLayout(new BorderLayout());
+        centerPanel.add(scrollPane, BorderLayout.CENTER);
+        centerPanel.add(pnlTutorial, BorderLayout.SOUTH);
+
+        this.add(centerPanel, BorderLayout.CENTER);
+
         initializeInfoPanel();
         cmd = new CampaignManagementDialog(this);
 
         JScrollPane infoScrollPane = new JScrollPaneWithSpeed(infoPanel);
         infoScrollPane.setMaximumSize(new Dimension(UIUtil.scaleForGUI(UIUtil.scaleForGUI(600), infoScrollPane.getHeight())));
         this.add(infoScrollPane, BorderLayout.EAST);
+
         MekHQ.registerHandler(this);
     }
 

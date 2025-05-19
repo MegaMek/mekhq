@@ -114,6 +114,8 @@ public class StratconScenarioWizard extends JDialog {
 
     private JComboBox<String> cboTransportType = new JComboBox<>();
 
+    private boolean wasCanceled;
+
     private JPanel contentPanel;
     private JButton btnCommit;
     private JButton btnCancel;
@@ -160,6 +162,14 @@ public class StratconScenarioWizard extends JDialog {
         availableLeadershipUnits.clearSelection();
 
         setUI(isPrimaryForce);
+    }
+
+    public boolean isWasCanceled() {
+        return wasCanceled;
+    }
+
+    public void setWasCanceled(boolean wasCancelled) {
+        this.wasCanceled = wasCancelled;
     }
 
     /**
@@ -703,7 +713,10 @@ public class StratconScenarioWizard extends JDialog {
 
         btnCancel = new JButton(MHQInternationalization.getTextAt(resourcePath, "leadershipCancel.text"));
         btnCancel.setActionCommand("CANCEL_CLICK");
-        btnCancel.addActionListener(evt -> closeWizard());
+        btnCancel.addActionListener(evt -> {
+            wasCanceled = true;
+            closeWizard();
+        });
         btnCancel.setEnabled(true);
 
         // Configure layout constraints for the buttons

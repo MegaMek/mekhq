@@ -1099,8 +1099,12 @@ public class StratconPanel extends JPanel implements ActionListener {
                     scenarioWizard.toFront();
                     scenarioWizard.setVisible(true);
                 }
-                if (selectedScenario != null && !isCommitForces()) {
+                if (selectedScenario != null && scenarioWizard.isWasCanceled()) {
+                    logger.info("Scenario wizard was cancelled. Resetting scenario to default state.");
                     selectedScenario.resetScenario(campaign);
+
+                    // We currently retain the wizard in memory, so need to make sure we reset the canceled state
+                    scenarioWizard.setWasCanceled(false);
                 }
 
                 setCommitForces(false);
