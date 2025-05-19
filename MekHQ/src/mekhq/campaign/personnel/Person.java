@@ -53,7 +53,6 @@ import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.SkillType.*;
-import static mekhq.campaign.personnel.skills.SkillType.getSkillsBySkillSubType;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
@@ -124,6 +123,7 @@ import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.work.IPartWork;
 import mekhq.utilities.MHQXMLUtility;
+import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -3869,6 +3869,11 @@ public class Person {
 
         final boolean isAlternativeQualityAveraging = campaignOptions.isAlternativeQualityAveraging();
 
+        final int adjustedReputation = getAdjustedReputation(campaignOptions.isUseAgeEffects(),
+              campaign.isClanCampaign(),
+              campaign.getLocalDate(),
+              rankLevel);
+
         // Optional skills such as Admin for Techs are not counted towards the character's experience level, except
         // in the special case of Vehicle Gunners. So we only want to fetch the base professions.
         List<String> associatedSkillNames = role.getSkillsForProfession();
@@ -3876,15 +3881,17 @@ public class Person {
         return switch (role) {
             case VEHICLE_GUNNER -> {
                 if (!isUseArtillery) {
-                    yield calculateExperienceLevelForProfession(associatedSkillNames, isAlternativeQualityAveraging);
+                    yield calculateExperienceLevelForProfession(associatedSkillNames,
+                          isAlternativeQualityAveraging,
+                          adjustedReputation);
                 } else {
                     if ((hasSkill(SkillType.S_GUN_VEE)) && (hasSkill(SkillType.S_ARTILLERY))) {
-                        yield Math.max((getSkill(SkillType.S_GUN_VEE).getExperienceLevel()),
-                              (getSkill(SkillType.S_ARTILLERY).getExperienceLevel()));
+                        yield Math.max((getSkill(SkillType.S_GUN_VEE).getExperienceLevel(options, atowAttributes)),
+                              (getSkill(SkillType.S_ARTILLERY).getExperienceLevel(options, atowAttributes)));
                     } else if (hasSkill(SkillType.S_GUN_VEE)) {
-                        yield getSkill(SkillType.S_GUN_VEE).getExperienceLevel();
+                        yield getSkill(SkillType.S_GUN_VEE).getExperienceLevel(options, atowAttributes);
                     } else if (hasSkill(SkillType.S_ARTILLERY)) {
-                        yield getSkill(SkillType.S_ARTILLERY).getExperienceLevel();
+                        yield getSkill(SkillType.S_ARTILLERY).getExperienceLevel(options, atowAttributes);
                     } else {
                         yield SkillType.EXP_NONE;
                     }
@@ -3910,7 +3917,7 @@ public class Person {
                         continue;
                     }
 
-                    int currentExperienceLevel = skill.getExperienceLevel();
+                    int currentExperienceLevel = skill.getExperienceLevel(options, atowAttributes);
                     if (currentExperienceLevel > highestExperienceLevel) {
                         highestExperienceLevel = currentExperienceLevel;
                     }
@@ -3946,7 +3953,9 @@ public class Person {
                     yield Math.max(0, levelSum / divisor);
                 }
             }
-            default -> calculateExperienceLevelForProfession(associatedSkillNames, isAlternativeQualityAveraging);
+            default -> calculateExperienceLevelForProfession(associatedSkillNames,
+                  isAlternativeQualityAveraging,
+                  adjustedReputation);
         };
     }
 
@@ -3980,7 +3989,8 @@ public class Person {
      * @author Illiani
      * @since 0.50.06
      */
-    private int calculateExperienceLevelForProfession(List<String> skillNames, boolean isAlternativeQualityAveraging) {
+    private int calculateExperienceLevelForProfession(List<String> skillNames, boolean isAlternativeQualityAveraging,
+          int adjustedReputation) {
         if (skillNames.isEmpty()) {
             // If we're not tracking skills for this profession, it always counts as REGULAR
             return SkillType.EXP_REGULAR;
@@ -4005,11 +4015,11 @@ public class Person {
                 return SkillType.EXP_NONE;
             }
 
-            int individualSkillLevel = skill.getTotalSkillLevel();
+            int individualSkillLevel = skill.getTotalSkillLevel(options, atowAttributes, adjustedReputation);
             totalSkillLevel += individualSkillLevel;
 
             if (isAlternativeQualityAveraging) {
-                int expLevel = skill.getExperienceLevel();
+                int expLevel = skill.getExperienceLevel(options, atowAttributes, adjustedReputation);
                 if (expectedExperienceLevel == null) {
                     expectedExperienceLevel = expLevel;
                 } else if (!expectedExperienceLevel.equals(expLevel)) {
@@ -5454,19 +5464,18 @@ public class Person {
      * @param isUseAgingEffects Indicates whether aging effects should be applied to the reputation calculation.
      * @param isClanCampaign    Indicates whether the current campaign is specific to a clan.
      * @param today             The current date used to calculate the character's age.
-     * @param rankIndex         The rank index of the character, which can adjust the reputation modifier in clan-based
+     * @param rankLevel         The rank index of the character, which can adjust the reputation modifier in clan-based
      *                          campaigns.
      *
      * @return The adjusted reputation value, accounting for factors like age, clan campaign status, bloodname
      *       possession, and rank. If aging effects are disabled, the base reputation value is returned.
      */
     public int getAdjustedReputation(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today,
-          int rankIndex) {
+          int rankLevel) {
         int modifier = isUseAgingEffects ?
                              getReputationAgeModifier(getAge(today),
                                    isClanCampaign,
-                                   !isNullOrBlank(bloodname),
-                                   rankIndex) :
+                                   !isNullOrBlank(bloodname), rankLevel) :
                              0;
         return reputation + modifier;
     }

@@ -688,6 +688,10 @@ public class RetirementDefectionTracker {
     public static int getCombinedSkillValues(Campaign campaign, String skillType) {
         int combinedSkillValues = 0;
 
+        boolean isUseAgingEffects = campaign.getCampaignOptions().isUseAgeEffects();
+        boolean isClanCampaign = campaign.isClanCampaign();
+        LocalDate today = campaign.getLocalDate();
+
         for (Person person : campaign.getActivePersonnel(false)) {
             boolean isAdmin = person.getPrimaryRole().isAdministratorHR() ||
                                     person.getSecondaryRole().isAdministratorHR();
@@ -703,7 +707,15 @@ public class RetirementDefectionTracker {
                 continue;
             }
 
-            combinedSkillValues += skill.getTotalSkillLevel() + mediatorModifier;
+            int adjustedReputation = person.getAdjustedReputation(isUseAgingEffects,
+                  isClanCampaign,
+                  today,
+                  person.getRankLevel());
+            int skillLevel = skill.getTotalSkillLevel(person.getOptions(),
+                  person.getATOWAttributes(),
+                  adjustedReputation);
+
+            combinedSkillValues += skillLevel + mediatorModifier;
         }
 
         return combinedSkillValues;

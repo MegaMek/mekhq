@@ -1269,10 +1269,8 @@ public class MRMSService {
             // until we find someone who can perform the work. If we have two techs with the same XP, put the one with
             // the more time ahead.
             Skill skill1 = tech1.getSkillForWorkingOn(partWork);
-            int skill1ExperienceLevel = skill1.getExperienceLevel(tech1.getOptions(), tech1.getATOWAttributes());
 
             Skill skill2 = tech2.getSkillForWorkingOn(partWork);
-            int skill2ExperienceLevel = skill2.getExperienceLevel(tech2.getOptions(), tech2.getATOWAttributes());
 
             // Nulls at the end
             if (skill1 == null && skill2 == null) {
@@ -1285,7 +1283,9 @@ public class MRMSService {
                 return -1;
             }
 
-            int experienceCompare = Integer.compare(skill1.getTotalSkillLevel(), skill2.getTotalSkillLevel());
+            int experienceCompare = Integer.compare(skill1.getTotalSkillLevel(tech1.getOptions(),
+                            tech1.getATOWAttributes()),
+                    skill2.getTotalSkillLevel(tech2.getOptions(), tech2.getATOWAttributes()));
             if (experienceCompare != 0) {
                 return experienceCompare;
             }

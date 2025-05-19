@@ -1888,7 +1888,7 @@ public class PersonViewPanel extends JScrollablePanel {
             // TODO enable once attribute modifier sare implemented
             //            JLabel lblValue = new JLabel(String.format("<html>%s%s</html>", skill.toString(options, attributes, adjustedReputation), adjustment));
             JLabel lblValue = new JLabel(String.format("<html>%s%s</html>",
-                  skill.toString(options, adjustedReputation),
+                  skill.toString(options, attributes, adjustedReputation),
                   adjustment));
             lblName.setLabelFor(lblValue);
             String tooltip = wordWrap(skill.getTooltip(options, attributes, adjustedReputation));

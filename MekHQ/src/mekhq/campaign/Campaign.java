@@ -4703,7 +4703,7 @@ public class Campaign implements ITechManager {
                     effectiveSkillLevel = SkillType.EXP_ULTRA_GREEN;
                 } else {
                     // destroyed - set the effective level to legendary
-                    effectiveSkillLvl = SkillType.EXP_LEGENDARY;
+                    effectiveSkillLevel = SkillType.EXP_LEGENDARY;
                 }
             }
             report = report + partWork.fail(effectiveSkillLevel);
