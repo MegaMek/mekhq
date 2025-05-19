@@ -25,14 +25,19 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign;
 
 import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
-import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.TRANSIT_DISORIENTATION_SYNDROME;
 import static mekhq.campaign.personnel.BodyLocation.INTERNAL;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_TRANSIT_DISORIENTATION_SYNDROME;
+import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.TRANSIT_DISORIENTATION_SYNDROME;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.io.PrintWriter;
@@ -54,6 +59,7 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.utilities.MHQXMLUtility;
+import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -67,7 +73,7 @@ import org.w3c.dom.NodeList;
 public class CurrentLocation {
     private static final MMLogger logger = MMLogger.create(CurrentLocation.class);
 
-    private static final String RESOURCE_BUNDLE = "mekhq.resources." + CurrentLocation.class.getSimpleName();
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.CurrentLocation";
 
     private PlanetarySystem currentSystem;
     // keep track of jump path
@@ -277,7 +283,7 @@ public class CurrentLocation {
                                            " to " +
                                            jumpPath.get(1).getName(campaign.getLocalDate()))) {
                         campaign.addReport("<font color='" +
-                                                 MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                                                 ReportingUtilities.getNegativeColor() +
                                                  "'><b>You cannot afford to make the jump!</b></font>");
                         return;
                     }

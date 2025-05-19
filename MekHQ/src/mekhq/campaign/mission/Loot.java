@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission;
 
@@ -63,6 +68,7 @@ import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
+import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -218,7 +224,7 @@ public class Loot {
 
             campaign.addReport(String.format(resources.getString("looted.cash"),
                   cash.toAmountAndSymbolString(),
-                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                  spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                   CLOSING_SPAN_TAG));
         }
 
@@ -258,7 +264,7 @@ public class Loot {
         if (!lootedParts.isEmpty()) {
             String lootedPartsReport = lootedParts.toString().replace("[", "").replace("]", "");
             campaign.addReport(String.format(resources.getString("looted.successful.parts"),
-                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                  spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                   CLOSING_SPAN_TAG,
                   lootedPartsReport));
         }
@@ -266,7 +272,7 @@ public class Loot {
         if (!abandonedParts.isEmpty()) {
             String abandonedPartsReport = abandonedParts.toString().replace("[", "").replace("]", "");
             campaign.addReport(String.format(resources.getString("looted.failed.parts"),
-                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   CLOSING_SPAN_TAG,
                   abandonedPartsReport));
         }

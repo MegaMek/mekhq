@@ -519,7 +519,7 @@ public class ForceViewPanel extends JScrollablePanel {
                 String injuriesMessage = " " + injuryCount + (injuryCount == 1 ? " injury" : " injuries");
 
                 toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
-                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(), injuriesMessage));
+                    ReportingUtilities.getNegativeColor(), injuriesMessage));
             }
 
         } else {
@@ -531,7 +531,7 @@ public class ForceViewPanel extends JScrollablePanel {
                 String hitsMessage = " " + hitCount + (hitCount == 1 ? " hit" : " hits");
 
                 toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
-                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(), hitsMessage));
+                    ReportingUtilities.getNegativeColor(), hitsMessage));
             }
         }
 
@@ -547,7 +547,7 @@ public class ForceViewPanel extends JScrollablePanel {
             String fatigueMessage = effectiveFatigue + " fatigue";
 
             toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
-                MekHQ.getMHQOptions().getFontColorWarningHexColor(), fatigueMessage));
+                ReportingUtilities.getWarningColor(), fatigueMessage));
         }
 
         if (!(isInjured || isFatigued)) {

@@ -55,10 +55,9 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 
 /**
- * The {@code DialogRoleplayEvent} class handles the creation and display of roleplay event dialogs for convoy missions
- * in MekHQ. These dialogs provide narrative elements to enhance the immersion of convoy missions by using dynamic
- * content, player convoy details, and localized text.
+ * @deprecated unused
  */
+@Deprecated(since = "0.05.06", forRemoval = true)
 public class DialogRoleplayEvent extends JDialog {
     final int LEFT_WIDTH = UIUtil.scaleForGUI(200);
     final int RIGHT_WIDTH = UIUtil.scaleForGUI(400);

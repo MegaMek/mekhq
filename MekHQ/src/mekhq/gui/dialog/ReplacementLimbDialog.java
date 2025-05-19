@@ -50,8 +50,8 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
  * <p>The dialog uses localized resources to display messages and creates responses based
  * on campaign and patient details.</p>
  */
-public class ReplacementLimbDialog {
-    final private static String RESOURCE_BUNDLE = "mekhq.resources." + ReplacementLimbDialog.class.getSimpleName();
+public class ReplacementLimbDialog extends ImmersiveDialogCore {
+    final private static String RESOURCE_BUNDLE = "mekhq.resources.ReplacementLimbDialog";
 
     final private Campaign campaign;
     private int choiceIndex = 0;
@@ -93,7 +93,7 @@ public class ReplacementLimbDialog {
               null,
               null,
               false);
-        
+
         choiceIndex = dialog.getDialogChoice();
     }
 
