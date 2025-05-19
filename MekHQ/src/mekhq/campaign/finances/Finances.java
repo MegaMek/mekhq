@@ -52,6 +52,7 @@ import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.event.LoanDefaultedEvent;
 import mekhq.campaign.event.TransactionCreditEvent;
 import mekhq.campaign.event.TransactionDebitEvent;
@@ -310,9 +311,23 @@ public class Finances {
         loans.add(loan);
     }
 
+    public void addReportInsufficientFunds(Campaign campaign, String report) {
+        campaign.addReport(String.format("<font color='" +
+                                               MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                                               "'>" +
+                                               resourceMap.getString("InsufficientFunds.text"),
+              report,
+              "</font>"));
+    }
+
     public void newDay(final Campaign campaign, final LocalDate yesterday, final LocalDate today) {
+        // Let's get these variables
+        CampaignOptions campaignOpts = campaign.getCampaignOptions();
+        boolean isNewYear = campaignOpts.getFinancialYearDuration().isEndOfFinancialYear(today);
+        boolean isNewMonth = (today.getDayOfMonth() == 1);
+        Accountant accountant = campaign.getAccountant();
         // check for a new fiscal year
-        if (campaign.getCampaignOptions().getFinancialYearDuration().isEndOfFinancialYear(campaign.getLocalDate())) {
+        if (isNewYear) {
             // calculate profits
             Money profits = getProfits();
             campaign.addReport(String.format(resourceMap.getString("Profits.finances"),
@@ -322,13 +337,13 @@ public class Finances {
             newFiscalYear(campaign);
 
             // pay taxes
-            if ((campaign.getCampaignOptions().isUseTaxes()) && (!profits.isZero())) {
+            if ((campaignOpts.isUseTaxes()) && (!profits.isZero())) {
                 payTaxes(campaign, profits);
             }
         }
 
         // Handle contract payments
-        if (today.getDayOfMonth() == 1) {
+        if (isNewMonth) {
             for (Contract contract : campaign.getActiveContracts()) {
                 credit(TransactionType.CONTRACT_PAYMENT,
                       today,
@@ -346,11 +361,11 @@ public class Finances {
         getAssets().forEach(asset -> asset.processNewDay(campaign, yesterday, today, this));
 
         // Handle peacetime operating expenses, payroll, and loan payments
-        if (today.getDayOfMonth() == 1) {
-            if (campaign.getCampaignOptions().isUsePeacetimeCost()) {
-                if (!campaign.getCampaignOptions().isShowPeacetimeCost()) {
+        if (isNewMonth) {
+            if (campaignOpts.isUsePeacetimeCost()) {
+                if (!campaignOpts.isShowPeacetimeCost()) {
                     // Do not include salaries as that will be tracked below
-                    Money peacetimeCost = campaign.getAccountant().getPeacetimeCost(false);
+                    Money peacetimeCost = accountant.getPeacetimeCost(false);
 
                     if (debit(TransactionType.MAINTENANCE,
                           today,
@@ -359,17 +374,12 @@ public class Finances {
                         campaign.addReport(String.format(resourceMap.getString("PeacetimeCosts.text"),
                               peacetimeCost.toAmountAndSymbolString()));
                     } else {
-                        campaign.addReport(String.format("<font color='" +
-                                                               MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
-                                                               "'>" +
-                                                               resourceMap.getString("InsufficientFunds.text"),
-                              resourceMap.getString("OperatingCosts.text"),
-                              "</font>"));
+                        addReportInsufficientFunds(campaign, resourceMap.getString("OperatingCosts.text"));
                     }
                 } else {
-                    Money sparePartsCost = campaign.getAccountant().getMonthlySpareParts();
-                    Money ammoCost = campaign.getAccountant().getMonthlyAmmo();
-                    Money fuelCost = campaign.getAccountant().getMonthlyFuel();
+                    Money sparePartsCost = accountant.getMonthlySpareParts();
+                    Money ammoCost = accountant.getMonthlyAmmo();
+                    Money fuelCost = accountant.getMonthlyFuel();
 
                     if (debit(TransactionType.MAINTENANCE,
                           today,
@@ -378,12 +388,7 @@ public class Finances {
                         campaign.addReport(String.format(resourceMap.getString("PeacetimeCostsParts.text"),
                               sparePartsCost.toAmountAndSymbolString()));
                     } else {
-                        campaign.addReport(String.format("<font color='" +
-                                                               MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
-                                                               "'>" +
-                                                               resourceMap.getString("InsufficientFunds.text"),
-                              resourceMap.getString("SpareParts.text"),
-                              "</font>"));
+                        addReportInsufficientFunds(campaign, resourceMap.getString("SpareParts.text"));
                     }
 
                     if (debit(TransactionType.MAINTENANCE,
@@ -393,12 +398,7 @@ public class Finances {
                         campaign.addReport(String.format(resourceMap.getString("PeacetimeCostsAmmunition.text"),
                               ammoCost.toAmountAndSymbolString()));
                     } else {
-                        campaign.addReport(String.format("<font color='" +
-                                                               MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
-                                                               "'>" +
-                                                               resourceMap.getString("InsufficientFunds.text"),
-                              resourceMap.getString("TrainingMunitions.text"),
-                              "</font>"));
+                        addReportInsufficientFunds(campaign,resourceMap.getString("TrainingMunitions.text"));
                     }
 
                     if (debit(TransactionType.MAINTENANCE,
@@ -408,38 +408,28 @@ public class Finances {
                         campaign.addReport(String.format(resourceMap.getString("PeacetimeCostsFuel.text"),
                               fuelCost.toAmountAndSymbolString()));
                     } else {
-                        campaign.addReport(String.format("<font color='" +
-                                                               MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
-                                                               "'>" +
-                                                               resourceMap.getString("InsufficientFunds.text"),
-                              resourceMap.getString("Fuel.text"),
-                              "</font>"));
+                        addReportInsufficientFunds(campaign, resourceMap.getString("Fuel.text"));
                     }
                 }
             }
 
-            if (campaign.getCampaignOptions().isPayForSalaries()) {
+            if (campaignOpts.isPayForSalaries()) {
 
-                Money payRollCost = campaign.getAccountant().getPayRoll();
+                Money payRollCost = accountant.getPayRoll();
 
                 if (debit(TransactionType.SALARIES,
                       today,
                       payRollCost,
                       resourceMap.getString("Salaries.title"),
-                      campaign.getAccountant().getPayRollSummary(),
-                      campaign.getCampaignOptions().isTrackTotalEarnings())) {
+                      accountant.getPayRollSummary(),
+                      campaignOpts.isTrackTotalEarnings())) {
                     campaign.addReport(String.format(resourceMap.getString("Salaries.text"),
                           payRollCost.toAmountAndSymbolString()));
 
                 } else {
-                    campaign.addReport(String.format("<font color='" +
-                                                           MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
-                                                           "'>" +
-                                                           resourceMap.getString("InsufficientFunds.text"),
-                          resourceMap.getString("Payroll.text"),
-                          "</font>"));
+                    addReportInsufficientFunds(campaign, resourceMap.getString("Payroll.text"));
 
-                    if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
+                    if (campaignOpts.isUseLoyaltyModifiers()) {
                         for (Person person : campaign.getPersonnel()) {
                             if (person.getStatus().isDepartedUnit()) {
                                 continue;
@@ -463,19 +453,14 @@ public class Finances {
             }
 
             // Handle overhead expenses
-            if (campaign.getCampaignOptions().isPayForOverhead()) {
-                Money overheadCost = campaign.getAccountant().getOverheadExpenses();
+            if (campaignOpts.isPayForOverhead()) {
+                Money overheadCost = accountant.getOverheadExpenses();
 
                 if (debit(TransactionType.OVERHEAD, today, overheadCost, resourceMap.getString("Overhead.title"))) {
                     campaign.addReport(String.format(resourceMap.getString("Overhead.text"),
                           overheadCost.toAmountAndSymbolString()));
                 } else {
-                    campaign.addReport(String.format("<font color='" +
-                                                           MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
-                                                           "'>" +
-                                                           resourceMap.getString("InsufficientFunds.text"),
-                          resourceMap.getString("OverheadCosts.text"),
-                          "</font>"));
+                    addReportInsufficientFunds(campaign, resourceMap.getString("OverheadCosts.text"));
                 }
             }
         }
