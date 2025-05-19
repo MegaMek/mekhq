@@ -24,14 +24,19 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.procreation;
 
-import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.POSTPARTUM_RECOVERY;
 import static mekhq.campaign.personnel.BodyLocation.INTERNAL;
 import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
 import static mekhq.campaign.personnel.enums.BloodGroup.getInheritedBloodGroup;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
+import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.POSTPARTUM_RECOVERY;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.time.LocalDate;
@@ -84,7 +89,7 @@ public abstract class AbstractProcreation {
     public static final IntKey PREGNANCY_CHILDREN_DATA = new IntKey("procreation:children");
     public static final StringKey PREGNANCY_FATHER_DATA = new StringKey("procreation:father");
 
-    private static final String RESOURCE_BUNDLE = "mekhq.resources." + AbstractProcreation.class.getSimpleName();
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.AbstractProcreation";
     //endregion Variable Declarations
 
     //region Constructors
@@ -451,8 +456,8 @@ public abstract class AbstractProcreation {
             // set loyalty
             baby.setLoyalty(Compute.d6(4, 3));
 
-            // Recruit the baby
-            campaign.recruitPerson(baby, prisonerStatus, true, true);
+            // Recruit the baby but do not employ the baby. Babies can't have jobs. They don't have object permanence.
+            campaign.recruitPerson(baby, prisonerStatus, true, true, false);
 
             // if the mother is at school, add the baby to the list of tag alongs
             if (mother.getStatus().isStudent()) {

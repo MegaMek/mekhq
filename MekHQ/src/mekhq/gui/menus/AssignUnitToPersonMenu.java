@@ -130,9 +130,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
         final boolean usesSoloPilot = units[0].usesSoloPilot();
         final boolean isVTOL = entity instanceof VTOL;
         final boolean isMek = entity instanceof Mek;
-        final boolean isTripod = entity instanceof TripodMek;
-        final boolean isQuadMek = entity instanceof QuadMek;
-        final boolean isSuperHeavyMek = isMek && entity.isSuperHeavy();
+        final boolean isMekWithGunner = (!usesSoloPilot && isMek);
         final boolean isProtoMek = entity instanceof ProtoMek;
         final boolean isConventionalAircraft = entity instanceof ConvFighter;
         final boolean isSmallCraftOrJumpShip = (entity instanceof SmallCraft) || (entity instanceof Jumpship);
@@ -159,6 +157,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                                        .stream()
                                        .filter(person -> person.getStatus().isActive())
                                        .filter(person -> !person.getPrisonerStatus().isCurrentPrisoner())
+                                       .filter(person -> person.isEmployed())
                                        .filter(person -> person.getUnit() == null)
                                        .filter(person -> !Profession.getProfessionFromPersonnelRole(person.getPrimaryRole())
                                                                 .isCivilian())
@@ -238,7 +237,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
         // Pilot Menu
         if (canTakeMoreDrivers) {
             // Pilot Menu
-            if (usesSoloPilot || isVTOL || isSmallCraftOrJumpShip || isSuperHeavyMek || isTripod || isQuadMek) {
+            if (isMek || usesSoloPilot || isVTOL || isSmallCraftOrJumpShip) {
                 if (isMek) {
                     filteredPersonnel = personnel.stream()
                                               .filter(person -> person.getPrimaryRole().isMekWarriorGrouping() ||
@@ -444,13 +443,14 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
         }
 
         // Gunners Menu
-        if (canTakeMoreGunners && (isTank || isSmallCraftOrJumpShip || isSuperHeavyMek || isTripod || isQuadMek)) {
+
+        if (canTakeMoreGunners && (isTank || isSmallCraftOrJumpShip || isMekWithGunner)) {
             filteredPersonnel = personnel.stream()
                                       .filter(person -> (isSmallCraftOrJumpShip &&
                                                                person.hasRole(PersonnelRole.VESSEL_GUNNER)) ||
                                                               (isTank &&
                                                                      person.hasRole(PersonnelRole.VEHICLE_GUNNER)) ||
-                                                              ((isSuperHeavyMek || isTripod || isQuadMek) &&
+                                                              ((isMekWithGunner) &&
                                                                      person.getPrimaryRole().isMekWarriorGrouping() ||
                                                                      person.getSecondaryRole().isMekWarriorGrouping()))
                                       .collect(Collectors.toList());
@@ -476,7 +476,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                         skillLevel = person.getSkillLevel(campaign, !person.getPrimaryRole().isVesselGunner());
                     } else if (isTank) {
                         skillLevel = person.getSkillLevel(campaign, !person.getPrimaryRole().isVehicleGunner());
-                    } else if (isSuperHeavyMek || isTripod || isQuadMek) {
+                    } else if (isMekWithGunner) {
                         skillLevel = person.getSkillLevel(campaign, !person.getPrimaryRole().isMekWarriorGrouping());
                     }
 

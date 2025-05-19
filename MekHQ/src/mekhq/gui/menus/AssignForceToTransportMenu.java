@@ -28,8 +28,10 @@
 
 package mekhq.gui.menus;
 
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
+import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.enums.TransporterType;
@@ -171,4 +173,25 @@ public abstract class AssignForceToTransportMenu extends JScrollableMenu {
      */
     protected abstract void transportMenuAction(ActionEvent evt, TransporterType transporterType, Unit transport, Set<Unit> units);
 
+    /**
+     * Shared updates used by {@link AssignForceToShipTransportMenu} and {@link AssignForceToTacticalTransportMenu}
+     * @param transport transport (Unit) that has loaded these units
+     * @param units units being assigned to the transport
+     * @param oldTransports transports (Unit) that had previously transported the units
+     */
+    protected void updateTransportsForTransportMenuAction(CampaignTransportType campaignTransportType, Unit transport,
+          Set<Unit> units, Set<Unit> oldTransports) {
+        if (!oldTransports.isEmpty()) {
+            oldTransports.forEach(oldTransport -> {
+                oldTransport.initializeAllTransportSpace();
+                campaign.updateTransportInTransports(campaignTransportType, oldTransport);
+            });
+            oldTransports.forEach(oldTransport -> MekHQ.triggerEvent(new UnitChangedEvent(transport)));
+        }
+        for (Unit unit : units) {
+            MekHQ.triggerEvent(new UnitChangedEvent(unit));
+        }
+        campaign.updateTransportInTransports(campaignTransportType, transport);
+        MekHQ.triggerEvent(new UnitChangedEvent(transport));
+    }
 }

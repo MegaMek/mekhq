@@ -33,7 +33,9 @@
  */
 package mekhq.campaign.personnel.turnoverAndRetention;
 
+import static java.lang.Math.round;
 import static mekhq.campaign.personnel.Person.getLoyaltyName;
+import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_MEDIATOR;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
 
 import java.io.PrintWriter;
@@ -59,6 +61,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Profession;
+import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.FactionHints;
@@ -657,44 +660,20 @@ public class RetirementDefectionTracker {
      * @return the total administrative strain of the campaign
      */
     public static int getAdministrativeStrain(Campaign campaign) {
-        int personnel = 0;
-        int proto = 0;
-        int multiCrew = 0;
-        int other = 0;
+        double personnel = 0;
 
-        for (Person person : campaign.getActivePersonnel(true)) {
-            if ((person.getPrimaryRole().isCivilian()) ||
-                      (person.getPrisonerStatus().isPrisoner()) ||
-                      (person.getPrisonerStatus().isPrisonerDefector())) {
-                other++;
-            } else if (person.getUnit() != null) {
-                if (person.getUnit().isCommander(person)) {
-                    if (person.getUnit().getEntity().isProtoMek()) {
-                        proto++;
-                    } else {
-                        multiCrew++;
-                    }
-                }
+        for (Person person : campaign.getActivePersonnel(false)) {
+            PersonnelRole primaryRole = person.getPrimaryRole();
+            if (primaryRole.isAssistant() && person.getSecondaryRole().isNone()) {
+                continue;
+            } else if (primaryRole.isCivilian()) {
+                personnel += 0.1;
             } else {
-                if ((person.getPrimaryRole().isAstech()) && person.getSecondaryRole().isNone()) {
-                    continue;
-                } else if ((person.getPrimaryRole().isMedic()) && person.getSecondaryRole().isNone()) {
-                    continue;
-                } else if ((person.getPrimaryRole().isMedic()) && person.getSecondaryRole().isAstech()) {
-                    continue;
-                } else if ((person.getPrimaryRole().isAstech()) && person.getSecondaryRole().isMedic()) {
-                    continue;
-                }
-
                 personnel++;
             }
         }
 
-        personnel += proto / 5;
-        personnel += multiCrew / campaign.getCampaignOptions().getMultiCrewStrainDivider();
-        personnel += other / (campaign.getCampaignOptions().getMultiCrewStrainDivider() * 2);
-
-        return personnel;
+        return (int) round(personnel);
     }
 
     /**
@@ -707,21 +686,24 @@ public class RetirementDefectionTracker {
     public static int getCombinedSkillValues(Campaign campaign, String skillType) {
         int combinedSkillValues = 0;
 
-        for (Person person : campaign.getActivePersonnel(true)) {
-            if ((!person.getPrisonerStatus().isPrisoner()) || (!person.getPrisonerStatus().isPrisonerDefector())) {
-                if (person.getPrimaryRole().isAdministratorHR()) {
-                    if (person.hasSkill(skillType)) {
-                        combinedSkillValues += person.getSkill(skillType).getLevel();
-                        combinedSkillValues += person.getSkill(skillType).getBonus();
-                    }
-                } else if (person.getSecondaryRole().isAdministratorHR()) {
-                    if (person.hasSkill(skillType)) {
-                        combinedSkillValues += person.getSkill(skillType).getLevel();
-                        combinedSkillValues += person.getSkill(skillType).getBonus();
-                    }
-                }
+        for (Person person : campaign.getActivePersonnel(false)) {
+            boolean isAdmin = person.getPrimaryRole().isAdministratorHR() ||
+                                    person.getSecondaryRole().isAdministratorHR();
+            if (!isAdmin) {
+                continue;
             }
+
+            PersonnelOptions options = person.getOptions();
+            int mediatorModifier = options.booleanOption(ADMIN_MEDIATOR) ? 1 : 0;
+
+            Skill skill = person.getSkill(skillType);
+            if (skill == null) {
+                continue;
+            }
+
+            combinedSkillValues += skill.getTotalSkillLevel() + mediatorModifier;
         }
+
         return combinedSkillValues;
     }
 
@@ -1124,6 +1106,13 @@ public class RetirementDefectionTracker {
         }
 
         public static boolean isBreakingContract(Person person, LocalDate localDate, int ContractDuration) {
+            LocalDate recruitmentDate = person.getRecruitment();
+
+            // There is no contract to break
+            if (recruitmentDate == null) {
+                return false;
+            }
+
             return ChronoUnit.MONTHS.between(person.getRecruitment(), localDate) < ContractDuration;
         }
     }

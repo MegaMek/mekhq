@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui;
 
@@ -75,6 +80,7 @@ import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.gui.stratcon.StratconScenarioWizard;
 import mekhq.gui.stratcon.TrackForceAssignmentUI;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * This panel handles AtB-Stratcon GUI interactions with a specific scenario track.
@@ -192,12 +198,6 @@ public class StratconPanel extends JPanel implements ActionListener {
         rightClickMenu = new JPopupMenu();
 
         StratconScenario scenario = getSelectedScenario();
-
-        if (campaignState.getContract().getCommandRights().isIntegrated()) {
-            menuItemManageForceAssignments = new JMenuItem();
-            menuItemManageForceAssignments.setText("Unable to Deploy: Integrated Command");
-            rightClickMenu.add(menuItemManageForceAssignments);
-        }
 
         // display "Manage Force Assignment" if there is not a force already on the hex
         // except if there is already a non-cloaked scenario here.
@@ -930,7 +930,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                                        currentTrack.getRevealedCoords().contains(boardState.getSelectedCoords());
         if (coordsRevealed) {
             infoBuilder.append("<span color='")
-                  .append(MekHQ.getMHQOptions().getFontColorPositiveHexColor())
+                  .append(ReportingUtilities.getPositiveColor())
                   .append("'><i>Recon Complete</i></span><br/>");
         }
 
@@ -957,13 +957,13 @@ public class StratconPanel extends JPanel implements ActionListener {
                 if (facility.isStrategicObjective()) {
                     infoBuilder.append(String.format("<br/><span color='%s'>Contract objective located</span>",
                           facility.getOwner() == Allied ?
-                                MekHQ.getMHQOptions().getFontColorPositiveHexColor() :
-                                MekHQ.getMHQOptions().getFontColorNegativeHexColor()));
+                                ReportingUtilities.getPositiveColor() :
+                                ReportingUtilities.getNegativeColor()));
                 }
                 infoBuilder.append("<span color='")
                       .append(facility.getOwner() == Allied ?
-                                    MekHQ.getMHQOptions().getFontColorPositiveHexColor() :
-                                    MekHQ.getMHQOptions().getFontColorNegativeHexColor())
+                                    ReportingUtilities.getPositiveColor() :
+                                    ReportingUtilities.getNegativeColor())
                       .append("'>")
                       .append("<br/>")
                       .append(facility.getFormattedDisplayableName());
@@ -1099,8 +1099,12 @@ public class StratconPanel extends JPanel implements ActionListener {
                     scenarioWizard.toFront();
                     scenarioWizard.setVisible(true);
                 }
-                if (selectedScenario != null && !isCommitForces()) {
+                if (selectedScenario != null && scenarioWizard.isWasCanceled()) {
+                    logger.info("Scenario wizard was cancelled. Resetting scenario to default state.");
                     selectedScenario.resetScenario(campaign);
+
+                    // We currently retain the wizard in memory, so need to make sure we reset the canceled state
+                    scenarioWizard.setWasCanceled(false);
                 }
 
                 setCommitForces(false);

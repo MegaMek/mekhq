@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.stratcon;
 
@@ -83,6 +88,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.gui.StratconPanel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.utilities.MHQInternationalization;
+import mekhq.utilities.ReportingUtilities;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.util.Pair;
 
@@ -107,6 +113,8 @@ public class StratconScenarioWizard extends JDialog {
     private CampaignTransportType selectedCampaignTransportType = null;
 
     private JComboBox<String> cboTransportType = new JComboBox<>();
+
+    private boolean wasCanceled;
 
     private JPanel contentPanel;
     private JButton btnCommit;
@@ -154,6 +162,14 @@ public class StratconScenarioWizard extends JDialog {
         availableLeadershipUnits.clearSelection();
 
         setUI(isPrimaryForce);
+    }
+
+    public boolean isWasCanceled() {
+        return wasCanceled;
+    }
+
+    public void setWasCanceled(boolean wasCancelled) {
+        this.wasCanceled = wasCancelled;
     }
 
     /**
@@ -614,7 +630,7 @@ public class StratconScenarioWizard extends JDialog {
 
         if (injuryCount > 0) {
             sb.append(String.format(", <span color='" +
-                                          MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                                          ReportingUtilities.getNegativeColor() +
                                           "'>%d/%d injured crew</span>", injuryCount, u.getCrew().size()));
         }
 
@@ -697,7 +713,10 @@ public class StratconScenarioWizard extends JDialog {
 
         btnCancel = new JButton(MHQInternationalization.getTextAt(resourcePath, "leadershipCancel.text"));
         btnCancel.setActionCommand("CANCEL_CLICK");
-        btnCancel.addActionListener(evt -> closeWizard());
+        btnCancel.addActionListener(evt -> {
+            wasCanceled = true;
+            closeWizard();
+        });
         btnCancel.setEnabled(true);
 
         // Configure layout constraints for the buttons

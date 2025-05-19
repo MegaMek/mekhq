@@ -33,15 +33,19 @@
 package mekhq.campaign.personnel.enums;
 
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import megamek.codeUtilities.MathUtility;
 import megamek.logging.MMLogger;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 
 /**
@@ -153,7 +157,7 @@ public enum PersonnelRole {
 
     // region Variable Declarations
     private static final MMLogger logger = MMLogger.create(PersonnelRole.class);
-    private static final String RESOURCE_BUNDLE = "mekhq.resources." + PersonnelRole.class.getSimpleName();
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.PersonnelRole";
 
     private final PersonnelRoleSubType subType;
     private final boolean hasClanName;
@@ -225,6 +229,97 @@ public enum PersonnelRole {
         return getFormattedTextAt(RESOURCE_BUNDLE, name() + ".label" + (useClan ? ".clan" : ""));
     }
 
+    /**
+     * @deprecated use {@link #getTooltip(boolean)} instead
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
+    public String getDescription() {
+        return getDescription(false);
+    }
+
+    /**
+     * Retrieves the plain text description for this personnel role from the resource bundle.
+     *
+     * @return the description string associated with the personnel role.
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public String getDescription(final boolean isClan) {
+        final boolean useClan = isClan && hasClanName;
+        return getTextAt(RESOURCE_BUNDLE, name() + ".description" + (useClan ? ".clan" : ""));
+    }
+
+    /**
+     * @deprecated use {@link #getTooltip(boolean)} instead
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
+    public String getTooltip() {
+        return getTooltip(false);
+    }
+
+    /**
+     * Builds an HTML tooltip string providing a description of this personnel role and a list of related skills with
+     * their linked attributes, if available.
+     *
+     * <p>If the list of skills for this profession is not empty, the tooltip will include each skill followed by its
+     * relevant {@link SkillAttribute} types. Otherwise, a default formatted description is returned from the resource
+     * bundle.</p>
+     *
+     * @return an HTML-formatted tooltip string detailing the profession and corresponding skills.
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public String getTooltip(final boolean isClan) {
+        StringBuilder tooltip = new StringBuilder(getDescription(isClan)).append("<br>");
+
+        List<String> skills = new ArrayList<>();
+        if (this == VEHICLE_CREW) {
+            // Vehicle Crew is a bit of a special case as any of these skills makes a character eligible for
+            // experience level improvements.
+            List<String> relevantSkills = List.of(SkillType.S_TECH_MEK,
+                  SkillType.S_TECH_AERO,
+                  SkillType.S_TECH_MECHANIC,
+                  SkillType.S_TECH_BA,
+                  SkillType.S_SURGERY,
+                  SkillType.S_MEDTECH,
+                  SkillType.S_ASTECH,
+                  SkillType.S_COMMUNICATIONS, SkillType.S_ART_COOKING,
+                  SkillType.S_SENSOR_OPERATIONS);
+            skills.addAll(relevantSkills);
+        } else {
+            skills.addAll(getSkillsForProfession());
+        }
+
+        for (String skill : skills) {
+            tooltip.append("<br>- ").append(skill);
+
+            SkillType skillType = SkillType.getType(skill);
+
+            if (skillType != null) {
+                List<SkillAttribute> linkedAttributes = new ArrayList<>(skillType.getAttributes());
+                linkedAttributes.remove(SkillAttribute.NONE);
+
+                for (SkillAttribute attribute : linkedAttributes) {
+                    if (linkedAttributes.indexOf(attribute) == 0) {
+                        tooltip.append(" (");
+                    }
+
+                    tooltip.append(attribute.getLabel());
+
+                    if (linkedAttributes.indexOf(attribute) < linkedAttributes.size() - 1) {
+                        tooltip.append(", ");
+                    } else if (linkedAttributes.indexOf(attribute) == linkedAttributes.size() - 1) {
+                        tooltip.append(')');
+                    }
+                }
+            }
+        }
+
+        return tooltip.toString();
+    }
+
     public int getMnemonic() {
         return mnemonic;
     }
@@ -263,6 +358,118 @@ public enum PersonnelRole {
             case INTELLIGENCE -> intelligence;
             case WILLPOWER -> willpower;
             case CHARISMA -> charisma;
+        };
+    }
+
+    /**
+     * @return a list of skill names representing the profession-appropriate skills
+     *
+     * @see #getSkillsForProfession(boolean, boolean, boolean, boolean, boolean)
+     */
+    public List<String> getSkillsForProfession() {
+        return getSkillsForProfession(false, false, false, false, false);
+    }
+
+
+    /**
+     * Retrieves the list of skill names relevant to this profession, tailored according to provided campaign or
+     * generation options.
+     *
+     * <p>The set of returned skills may vary depending on input flags that define whether certain support or
+     * specialty skills (such as Negotiation, Scrounge, Administration, or Artillery) should be included for appropriate
+     * roles.</p>
+     *
+     * <p>This method is typically used during personnel creation or skill assignment to ensure each role receives a
+     * fitting skill set based on campaign rules and user preferences.</p>
+     *
+     * @param isAdminsHaveNegotiation    if {@code true}, includes Negotiation skill for administrators
+     * @param isAdminsHaveScrounge       if {@code true}, includes Scrounge skill for administrators
+     * @param isDoctorsUseAdministration if {@code true}, includes Administration skill for medical roles
+     * @param isTechsUseAdministration   if {@code true}, includes Administration skill for technical roles
+     * @param isUseArtillery             if {@code true}, includes Artillery skills where applicable
+     *
+     * @return a list of skill names representing the profession-appropriate skills
+     */
+    public List<String> getSkillsForProfession(boolean isAdminsHaveNegotiation, boolean isAdminsHaveScrounge,
+          boolean isDoctorsUseAdministration, boolean isTechsUseAdministration, boolean isUseArtillery) {
+        return switch (this) {
+            case MEKWARRIOR -> {
+                if (isUseArtillery) {
+                    yield List.of(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK, SkillType.S_ARTILLERY);
+                } else {
+                    yield List.of(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK);
+                }
+            }
+            case LAM_PILOT ->
+                  List.of(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK, SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO);
+            case GROUND_VEHICLE_DRIVER -> List.of(SkillType.S_PILOT_GVEE);
+            case NAVAL_VEHICLE_DRIVER -> List.of(SkillType.S_PILOT_NVEE);
+            case VTOL_PILOT -> List.of(SkillType.S_PILOT_VTOL);
+            case VEHICLE_GUNNER -> {
+                if (isUseArtillery) {
+                    yield List.of(SkillType.S_GUN_VEE, SkillType.S_ARTILLERY);
+                } else {
+                    yield List.of(SkillType.S_GUN_VEE);
+                }
+            }
+            case VEHICLE_CREW, MECHANIC -> List.of(SkillType.S_TECH_MECHANIC);
+            case AEROSPACE_PILOT -> List.of(SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO);
+            case CONVENTIONAL_AIRCRAFT_PILOT -> List.of(SkillType.S_GUN_JET, SkillType.S_PILOT_JET);
+            case PROTOMEK_PILOT -> List.of(SkillType.S_GUN_PROTO);
+            case BATTLE_ARMOUR -> List.of(SkillType.S_GUN_BA, SkillType.S_ANTI_MEK);
+            case SOLDIER -> List.of(SkillType.S_SMALL_ARMS);
+            case VESSEL_PILOT -> List.of(SkillType.S_PILOT_SPACE);
+            case VESSEL_GUNNER -> List.of(SkillType.S_GUN_SPACE);
+            case VESSEL_CREW -> {
+                if (isTechsUseAdministration) {
+                    yield List.of(SkillType.S_TECH_VESSEL, SkillType.S_ADMIN);
+                } else {
+                    yield List.of(SkillType.S_TECH_VESSEL);
+                }
+            }
+            case VESSEL_NAVIGATOR -> List.of(SkillType.S_NAVIGATION);
+            case MEK_TECH -> {
+                if (isTechsUseAdministration) {
+                    yield List.of(SkillType.S_TECH_MEK, SkillType.S_ADMIN);
+                } else {
+                    yield List.of(SkillType.S_TECH_MEK);
+                }
+            }
+            case AERO_TEK -> {
+                if (isTechsUseAdministration) {
+                    yield List.of(SkillType.S_TECH_AERO, SkillType.S_ADMIN);
+                } else {
+                    yield List.of(SkillType.S_TECH_AERO);
+                }
+            }
+            case BA_TECH -> {
+                if (isTechsUseAdministration) {
+                    yield List.of(SkillType.S_TECH_BA, SkillType.S_ADMIN);
+                } else {
+                    yield List.of(SkillType.S_TECH_BA);
+                }
+            }
+            case ASTECH -> List.of(SkillType.S_ASTECH);
+            case DOCTOR -> {
+                if (isDoctorsUseAdministration) {
+                    yield List.of(SkillType.S_SURGERY, SkillType.S_ADMIN);
+                } else {
+                    yield List.of(SkillType.S_SURGERY);
+                }
+            }
+            case MEDIC -> List.of(SkillType.S_MEDTECH);
+            case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_HR -> {
+                if (isAdminsHaveNegotiation && isAdminsHaveScrounge) {
+                    yield List.of(SkillType.S_ADMIN, SkillType.S_NEGOTIATION, SkillType.S_SCROUNGE);
+                } else if (isAdminsHaveNegotiation) {
+                    yield List.of(SkillType.S_ADMIN, SkillType.S_NEGOTIATION);
+                } else if (isAdminsHaveScrounge) {
+                    yield List.of(SkillType.S_ADMIN, SkillType.S_SCROUNGE);
+                } else {
+                    yield List.of(SkillType.S_ADMIN);
+                }
+            }
+            case DEPENDENT, NONE -> List.of();
         };
     }
     // endregion Getters
@@ -608,10 +815,12 @@ public enum PersonnelRole {
         return isDoctor() || isMedic();
     }
 
+
     /**
-     * @deprecated Unused
+     * Determines if the current entity is an assistant by checking if it is either an Astech or a Medic.
+     *
+     * @return {@code true} if the entity is an assistant (either an Astech or a Medic), {@code false} otherwise.
      */
-    @Deprecated(since = "0.50.06", forRemoval = true)
     public boolean isAssistant() {
         return isAstech() || isMedic();
     }
@@ -809,5 +1018,24 @@ public enum PersonnelRole {
     @Override
     public String toString() {
         return getLabel(false);
+    }
+
+    /**
+     * Returns an array of all {@link PersonnelRole} values sorted alphabetically by their display label.
+     *
+     * <p>
+     * The sorting is performed based on the label returned by {@code getLabel(clanCampaign)} for each role,
+     * ensuring that the roles are ordered according to the user-facing names, which may differ depending
+     * on whether a clan campaign is in effect.
+     * </p>
+     *
+     * @param clanCampaign {@code true} to use labels appropriate for a clan campaign;
+     *                     {@code false} to use standard labels
+     * @return a {@code PersonnelRole[]} containing all enum values sorted alphabetically by label
+     * @since 0.50.06
+     */
+    public static PersonnelRole[] getValuesSortedAlphabetically(boolean clanCampaign) {
+        return Arrays.stream(PersonnelRole.values()).sorted(Comparator.comparing(role -> role.getLabel(clanCampaign)))
+                     .toArray(PersonnelRole[]::new);
     }
 }

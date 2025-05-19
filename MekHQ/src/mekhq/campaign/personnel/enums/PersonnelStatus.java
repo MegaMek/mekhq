@@ -40,9 +40,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * Represents the various statuses that a {@link Person} can have within MekHQ.
@@ -222,10 +222,10 @@ public enum PersonnelStatus {
         final String RESOURCE_KEY = name() + ".report";
 
         String OPENING_SPAN_TEXT = switch (severity) {
-            case NEGATIVE -> spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor());
-            case WARNING -> spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
+            case NEGATIVE -> spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
+            case WARNING -> spanOpeningWithCustomColor(ReportingUtilities.getWarningColor());
             case NEUTRAL -> "";
-            case POSITIVE -> spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor());
+            case POSITIVE -> spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor());
         };
 
         String CLOSING_SPAN_TEXT = OPENING_SPAN_TEXT.isBlank() ? "" : CLOSING_SPAN_TAG;
@@ -517,6 +517,18 @@ public enum PersonnelStatus {
                      isAwol() ||
                      isStudent() ||
                      isMissing();
+    }
+
+    /**
+     * Determines whether a person is eligible to receive a salary.
+     *
+     * @return {@code true} if the person is eligible to receive a salary; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public boolean isSalaryEligible() {
+        return isActive() || isPoW() || isOnLeave() || isOnMaternityLeave() || isStudent();
     }
 
     /**

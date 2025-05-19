@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.force;
 
@@ -53,6 +58,7 @@ import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
@@ -124,15 +130,10 @@ public class CombatTeam {
             return formationSize;
         }
 
-        formationLevelDepth++; // Lance is depth 0, so we need to add +1 to get the number of iterations
-
-        for (int i = 0; i < formationLevelDepth; i++) {
-
-            if (faction.isComStarOrWoB()) {
-                formationSize *= 6;
-            } else {
-                formationSize *= 3;
-            }
+        if (faction.isComStarOrWoB()) {
+            formationSize *= (int) Math.pow(6, formationLevelDepth);
+        } else {
+            formationSize *= (int) Math.pow(3, formationLevelDepth);
         }
 
         return formationSize;
@@ -695,21 +696,24 @@ public class CombatTeam {
             try {
                 Unit unit = campaign.getUnit(id);
                 Entity entity = unit.getEntity();
-
-                boolean isClan = campaign.getFaction().isClan();
                 long entityType = entity.getEntityType();
 
-                if (entityType == ETYPE_TANK) {
-                    if (isClan || campaign.getCampaignOptions().isAdjustPlayerVehicles()) {
-                        weight += entity.getWeight() * 0.5;
-                    } else {
-                        weight += entity.getWeight();
-                    }
-                } else if (entityType == ETYPE_AEROSPACEFIGHTER) {
-                    if (isClan) {
-                        weight += entity.getWeight() * 0.5;
-                    } else {
-                        weight += entity.getWeight();
+                boolean isClan = campaign.isClanCampaign();
+
+                CampaignOptions campaignOptions = campaign.getCampaignOptions();
+                if (campaignOptions.isUseAtB() && !campaignOptions.isUseStratCon()) {
+                    if (entityType == ETYPE_TANK) {
+                        if (isClan || campaignOptions.isAdjustPlayerVehicles()) {
+                            weight += entity.getWeight() * 0.5;
+                        } else {
+                            weight += entity.getWeight();
+                        }
+                    } else if (entityType == ETYPE_AEROSPACEFIGHTER) {
+                        if (isClan) {
+                            weight += entity.getWeight() * 0.5;
+                        } else {
+                            weight += entity.getWeight();
+                        }
                     }
                 } else {
                     weight += entity.getWeight();

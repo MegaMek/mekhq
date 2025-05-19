@@ -54,7 +54,6 @@ import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.CombatRole;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.gui.model.DataTableModel;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
@@ -205,15 +204,6 @@ public class LanceAssignmentView extends JPanel {
         panRequiredLances.add(tblRequiredLances.getTableHeader());
         panRequiredLances.add(tblRequiredLances);
         add(panRequiredLances);
-
-        int cmdrStrategy = 0;
-        if ((campaign.getFlaggedCommander() != null) &&
-                  (campaign.getFlaggedCommander().getSkill(SkillType.S_STRATEGY) != null)) {
-            cmdrStrategy = campaign.getFlaggedCommander().getSkill(SkillType.S_STRATEGY).getLevel();
-        }
-        int maxDeployedLances = campaign.getCampaignOptions().getBaseStrategyDeployment() +
-                                      campaign.getCampaignOptions().getAdditionalStrategyDeployment() * cmdrStrategy;
-        add(new JLabel("Maximum Deployed Forces: " + maxDeployedLances));
 
         panAssignments = new JPanel();
         panAssignments.setLayout(new BoxLayout(panAssignments, BoxLayout.Y_AXIS));

@@ -61,7 +61,6 @@ import megamek.common.ITechnology;
 import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
@@ -71,6 +70,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.enums.HonorRating;
 import mekhq.gui.dialog.DefectionOffer;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * Handles events and processes related to capturing prisoners.
@@ -286,7 +286,7 @@ public class CapturePrisoners {
                     campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
                           "bondsref.report",
                           prisoner.getFullName(),
-                          spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                          spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                           CLOSING_SPAN_TAG));
 
                     campaign.removePerson(prisoner);
@@ -309,7 +309,7 @@ public class CapturePrisoners {
                     campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
                           "bondsref.report",
                           prisoner.getFullName(),
-                          spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                          spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                           CLOSING_SPAN_TAG));
 
                     campaign.removePerson(prisoner);
@@ -327,7 +327,7 @@ public class CapturePrisoners {
                         campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
                               "seppuku.report",
                               prisoner.getFullName(),
-                              spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                              spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                               CLOSING_SPAN_TAG));
 
                         campaign.removePerson(prisoner);
@@ -484,7 +484,7 @@ public class CapturePrisoners {
 
         // 'Recruit' prisoner
         PrisonerStatus prisonerStatus = prisoner.getPrisonerStatus();
-        campaign.recruitPerson(prisoner, prisonerStatus);
+        campaign.recruitPerson(prisoner, prisonerStatus, false, true, false);
 
         if (prisonerStatus.isPrisonerDefector()) {
             campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "defection.report", prisoner.getHyperlinkedName()));

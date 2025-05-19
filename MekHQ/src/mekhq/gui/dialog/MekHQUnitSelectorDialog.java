@@ -24,31 +24,48 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
+
+import static mekhq.utilities.EntityUtilities.isUnsupportedEntity;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
+
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.regex.PatternSyntaxException;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.RowFilter;
 
 import megamek.client.ui.Messages;
 import megamek.client.ui.advancedsearch.MekSearchFilter;
 import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
-import megamek.common.*;
+import megamek.common.Entity;
+import megamek.common.EntityWeightClass;
+import megamek.common.ITechnology;
+import megamek.common.MekSummary;
+import megamek.common.TargetRoll;
+import megamek.common.TechConstants;
+import megamek.common.UnitType;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.unit.UnitTechProgression;
 import mekhq.utilities.MHQInternationalization;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.regex.PatternSyntaxException;
-
-import static mekhq.utilities.EntityUtilities.isUnsupportedEntity;
-import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
-import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
+import mekhq.utilities.ReportingUtilities;
 
 public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
     //region Variable Declarations
@@ -59,8 +76,8 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
     private static final String TARGET_UNKNOWN = "--";
     //endregion Variable Declarations
 
-    public MekHQUnitSelectorDialog(JFrame frame, UnitLoadingDialog unitLoadingDialog,
-                                   Campaign campaign, boolean addToCampaign) {
+    public MekHQUnitSelectorDialog(JFrame frame, UnitLoadingDialog unitLoadingDialog, Campaign campaign,
+          boolean addToCampaign) {
         super(frame, unitLoadingDialog);
         this.campaign = campaign;
         this.addToCampaign = addToCampaign;
@@ -79,7 +96,8 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         gameTechLevel = campaign.getCampaignOptions().getTechLevel();
         eraBasedTechLevel = campaign.getCampaignOptions().isVariableTechLevel();
 
-        if (campaign.getCampaignOptions().isAllowClanPurchases() && campaign.getCampaignOptions().isAllowISPurchases()) {
+        if (campaign.getCampaignOptions().isAllowClanPurchases() &&
+                  campaign.getCampaignOptions().isAllowISPurchases()) {
             techLevelDisplayType = TECH_LEVEL_DISPLAY_IS_CLAN;
         } else if (campaign.getCampaignOptions().isAllowClanPurchases()) {
             techLevelDisplayType = TECH_LEVEL_DISPLAY_CLAN;
@@ -98,6 +116,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
             buttonSelect = new JButton(Messages.getString("MekSelectorDialog.Buy", TARGET_UNKNOWN));
             buttonSelect.setName("buttonBuy");
             buttonSelect.addActionListener(this);
+            buttonSelect.setEnabled(false);
             panelButtons.add(buttonSelect, new GridBagConstraints());
 
             if (campaign.isGM()) {
@@ -105,6 +124,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
                 buttonSelectClose = new JButton(Messages.getString("MekSelectorDialog.AddGM"));
                 buttonSelectClose.setName("buttonAddGM");
                 buttonSelectClose.addActionListener(this);
+                buttonSelectClose.setEnabled(false);
                 panelButtons.add(buttonSelectClose, new GridBagConstraints());
             }
 
@@ -146,23 +166,23 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
 
             if (entity == null || isUnsupportedEntity(entity)) {
                 final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
-                    MekHQ.getMHQOptions().getLocale());
+                      MekHQ.getMHQOptions().getLocale());
 
                 String reason;
                 if (entity == null) {
                     reason = MHQInternationalization.getTextAt(resources.getBaseBundleName(),
-                        "mekSelectorDialog.unsupported.null");
+                          "mekSelectorDialog.unsupported.null");
                 } else if (entity.getUnitType() == UnitType.GUN_EMPLACEMENT) {
                     reason = MHQInternationalization.getTextAt(resources.getBaseBundleName(),
-                        "mekSelectorDialog.unsupported.gunEmplacement");
+                          "mekSelectorDialog.unsupported.gunEmplacement");
                 } else {
                     reason = MHQInternationalization.getTextAt(resources.getBaseBundleName(),
-                        "mekSelectorDialog.unsupported.droneOs");
+                          "mekSelectorDialog.unsupported.droneOs");
                 }
 
                 campaign.addReport(String.format(
                     reason,
-                    spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                    spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                     CLOSING_SPAN_TAG));
 
                 dispose();
@@ -185,8 +205,8 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
     //endregion Button Methods
 
     /**
-     * We need to override this to add some MekHQ specific functionality, namely changing button
-     * names when the selected entity is chosen
+     * We need to override this to add some MekHQ specific functionality, namely changing button names when the selected
+     * entity is chosen
      *
      * @return selectedEntity, or null if there isn't one
      */
@@ -199,15 +219,16 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
                 buttonSelect.setEnabled(false);
                 buttonSelect.setText(Messages.getString("MekSelectorDialog.Buy", TARGET_UNKNOWN));
                 buttonSelect.setToolTipText(null);
+                buttonSelectClose.setEnabled(false);
             }
         } else {
             selectedUnit = new UnitOrder(entity, campaign);
             if (addToCampaign) {
                 buttonSelect.setEnabled(true);
                 final TargetRoll target = campaign.getTargetForAcquisition(selectedUnit);
-                buttonSelect.setText(Messages.getString("MekSelectorDialog.Buy",
-                        target.getValueAsString()));
+                buttonSelect.setText(Messages.getString("MekSelectorDialog.Buy", target.getValueAsString()));
                 buttonSelect.setToolTipText(target.getDesc());
+                buttonSelectClose.setEnabled(true);
             }
         }
 
@@ -240,7 +261,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         final int nClass = comboWeight.getSelectedIndex();
         final int nUnit = comboUnitType.getSelectedIndex() - 1;
         final boolean checkSupportVee = Messages.getString("MekSelectorDialog.SupportVee")
-                .equals(comboUnitType.getSelectedItem());
+                                              .equals(comboUnitType.getSelectedItem());
         // If the current expression doesn't parse, don't update.
         try {
             unitTypeFilter = new RowFilter<>() {
@@ -259,25 +280,26 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
                     }
 
                     if (
-                            /* year limits */
-                            (!enableYearLimits || (mek.getYear() <= allowedYear))
-                            /* Clan/IS limits */
-                            && (campaign.getCampaignOptions().isAllowClanPurchases() || !TechConstants.isClan(mek.getType()))
-                            && (campaign.getCampaignOptions().isAllowISPurchases() || TechConstants.isClan(mek.getType()))
-                            /* Canon */
-                            && (!canonOnly || mek.isCanon())
-                            /* Weight */
-                            && ((nClass == mek.getWeightClass()) || (nClass == EntityWeightClass.SIZE))
-                            /* Technology Level */
-                            && ((null != tech) && campaign.isLegal(tech))
-                            && (techLevelMatch)
-                            /* Support Vehicles */
-                            && ((nUnit == -1)
-                                    || (!checkSupportVee && mek.getUnitType().equals(UnitType.getTypeName(nUnit)))
-                                    || (checkSupportVee && mek.isSupport()))
-                            /* Advanced Search */
-                            && ((searchFilter == null) || MekSearchFilter.isMatch(mek, searchFilter))
-                    ) {
+                        /* year limits */
+                          (!enableYearLimits || (mek.getYear() <= allowedYear))
+                                /* Clan/IS limits */ &&
+                                (campaign.getCampaignOptions().isAllowClanPurchases() ||
+                                       !TechConstants.isClan(mek.getType())) &&
+                                (campaign.getCampaignOptions().isAllowISPurchases() ||
+                                       TechConstants.isClan(mek.getType()))
+                                /* Canon */ &&
+                                (!canonOnly || mek.isCanon())
+                                /* Weight */ &&
+                                ((nClass == mek.getWeightClass()) || (nClass == EntityWeightClass.SIZE))
+                                /* Technology Level */ &&
+                                ((null != tech) && campaign.isLegal(tech)) &&
+                                (techLevelMatch)
+                                /* Support Vehicles */ &&
+                                ((nUnit == -1) ||
+                                       (!checkSupportVee && mek.getUnitType().equals(UnitType.getTypeName(nUnit))) ||
+                                       (checkSupportVee && mek.isSupport()))
+                                /* Advanced Search */ &&
+                                ((searchFilter == null) || MekSearchFilter.isMatch(mek, searchFilter))) {
                         if (!textFilter.getText().isBlank()) {
                             String text = textFilter.getText();
                             return mek.getName().toLowerCase().contains(text.toLowerCase());

@@ -183,6 +183,7 @@ public class CampaignOptions {
     private int autoLogisticsActuators;
     private int autoLogisticsJumpJets;
     private int autoLogisticsEngines;
+    private int autoLogisticsWeapons;
     private int autoLogisticsOther;
 
     // Delivery
@@ -441,7 +442,6 @@ public class CampaignOptions {
 
     private boolean useAdministrativeStrain;
     private int administrativeCapacity;
-    private int multiCrewStrainDivider;
 
     private boolean useManagementSkill;
     private boolean useCommanderLeadershipOnly;
@@ -466,6 +466,8 @@ public class CampaignOptions {
     private boolean sellUnits;
     private boolean sellParts;
     private boolean payForRecruitment;
+    private boolean payForFood;
+    private boolean payForHousing;
     private boolean useLoanLimits;
     private boolean usePercentageMaint; // Unofficial
     private boolean infantryDontCount; // Unofficial
@@ -597,11 +599,6 @@ public class CampaignOptions {
     // Contract Operations
     private boolean mercSizeLimited;
     private boolean restrictPartsByMission;
-    private boolean limitLanceWeight;
-    private boolean limitLanceNumUnits;
-    private boolean useStrategy;
-    private int baseStrategyDeployment;
-    private int additionalStrategyDeployment;
     private final int[] atbBattleChance;
     private boolean generateChases;
 
@@ -711,6 +708,7 @@ public class CampaignOptions {
         autoLogisticsActuators = 100;
         autoLogisticsJumpJets = 50;
         autoLogisticsEngines = 0;
+        autoLogisticsWeapons = 50;
         autoLogisticsOther = 0;
 
         // Delivery
@@ -1046,7 +1044,6 @@ public class CampaignOptions {
 
         setUseAdministrativeStrain(true);
         setAdministrativeCapacity(10);
-        setMultiCrewStrainDivider(5);
 
         setUseManagementSkill(true);
         setUseCommanderLeadershipOnly(false);
@@ -1071,6 +1068,8 @@ public class CampaignOptions {
         sellUnits = false;
         sellParts = false;
         payForRecruitment = false;
+        payForFood = false;
+        payForHousing = false;
         useLoanLimits = false;
         usePercentageMaint = false;
         infantryDontCount = false;
@@ -1220,11 +1219,6 @@ public class CampaignOptions {
         // Contract Operations
         mercSizeLimited = false;
         restrictPartsByMission = true;
-        limitLanceWeight = true;
-        limitLanceNumUnits = true;
-        useStrategy = true;
-        baseStrategyDeployment = 3;
-        additionalStrategyDeployment = 1;
         atbBattleChance = new int[CombatRole.values().length - 1];
         atbBattleChance[CombatRole.MANEUVER.ordinal()] = 40;
         atbBattleChance[CombatRole.FRONTLINE.ordinal()] = 20;
@@ -2223,12 +2217,20 @@ public class CampaignOptions {
         this.administrativeCapacity = administrativeCapacity;
     }
 
+    /**
+     * @deprecated Unused
+     */
+    @Deprecated(since = "0.50.6", forRemoval = true)
     public Integer getMultiCrewStrainDivider() {
-        return multiCrewStrainDivider;
+        return 1;
     }
 
+    /**
+     * @deprecated Unused
+     */
+    @Deprecated(since = "0.50.6", forRemoval = true)
     public void setMultiCrewStrainDivider(final Integer multiCrewStrainDivider) {
-        this.multiCrewStrainDivider = multiCrewStrainDivider;
+
     }
 
     public boolean isUseManagementSkill() {
@@ -3321,6 +3323,22 @@ public class CampaignOptions {
         this.payForRecruitment = payForRecruitment;
     }
 
+    public boolean isPayForFood() {
+        return payForFood;
+    }
+
+    public void setPayForFood(final boolean payForFood) {
+        this.payForFood = payForFood;
+    }
+
+    public boolean isPayForHousing() {
+        return payForHousing;
+    }
+
+    public void setPayForHousing(final boolean payForHousing) {
+        this.payForHousing = payForHousing;
+    }
+
     public boolean isUseLoanLimits() {
         return useLoanLimits;
     }
@@ -4394,6 +4412,14 @@ public class CampaignOptions {
         this.autoLogisticsEngines = autoLogisticsEngines;
     }
 
+    public int getAutoLogisticsWeapons() {
+        return autoLogisticsWeapons;
+    }
+
+    public void setAutoLogisticsWeapons(int autoLogisticsWeapons) {
+        this.autoLogisticsWeapons = autoLogisticsWeapons;
+    }
+
     public int getAutoLogisticsOther() {
         return autoLogisticsOther;
     }
@@ -4690,28 +4716,49 @@ public class CampaignOptions {
         this.usePlanetaryConditions = usePlanetaryConditions;
     }
 
+    /**
+     * @deprecated unused.
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public boolean isUseStrategy() {
-        return useStrategy;
+        return false;
     }
 
+    /**
+     * @deprecated unused.
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public void setUseStrategy(final boolean useStrategy) {
-        this.useStrategy = useStrategy;
     }
 
+    /**
+     * @deprecated unused except in deprecated methods
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public int getBaseStrategyDeployment() {
-        return baseStrategyDeployment;
+        return 0;
     }
 
+    /**
+     * @deprecated unused.
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public void setBaseStrategyDeployment(final int baseStrategyDeployment) {
-        this.baseStrategyDeployment = baseStrategyDeployment;
     }
 
+    /**
+     * @deprecated unused except in deprecated methods
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public int getAdditionalStrategyDeployment() {
-        return additionalStrategyDeployment;
+        return 0;
     }
 
+    /**
+     * @deprecated unused.
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public void setAdditionalStrategyDeployment(final int additionalStrategyDeployment) {
-        this.additionalStrategyDeployment = additionalStrategyDeployment;
     }
 
     public boolean isRestrictPartsByMission() {
@@ -4722,20 +4769,34 @@ public class CampaignOptions {
         this.restrictPartsByMission = restrictPartsByMission;
     }
 
+    /**
+     * @deprecated unused.
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public boolean isLimitLanceWeight() {
-        return limitLanceWeight;
+        return false;
     }
 
+    /**
+     * @deprecated unused.
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public void setLimitLanceWeight(final boolean limitLanceWeight) {
-        this.limitLanceWeight = limitLanceWeight;
     }
 
+    /**
+     * @deprecated unused.
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public boolean isLimitLanceNumUnits() {
-        return limitLanceNumUnits;
+        return false;
     }
 
+    /**
+     * @deprecated unused.
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public void setLimitLanceNumUnits(final boolean limitLanceNumUnits) {
-        this.limitLanceNumUnits = limitLanceNumUnits;
     }
 
     public boolean isAllowOpForAeros() {
@@ -4950,6 +5011,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsActuators", autoLogisticsActuators);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsJumpJets", autoLogisticsJumpJets);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsEngines", autoLogisticsEngines);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsWeapons", autoLogisticsWeapons);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsOther", autoLogisticsOther);
 
         // region Personnel Tab
@@ -5125,7 +5187,6 @@ public class CampaignOptions {
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAdministrativeStrain", isUseAdministrativeStrain());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "administrativeStrain", getAdministrativeCapacity());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "multiCrewStrainDivider", getMultiCrewStrainDivider());
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useManagementSkill", isUseManagementSkill());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useCommanderLeadershipOnly", isUseCommanderLeadershipOnly());
@@ -5292,6 +5353,8 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sellUnits", sellUnits);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sellParts", sellParts);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForRecruitment", payForRecruitment);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForFood", payForFood);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForHousing", payForHousing);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useLoanLimits", useLoanLimits);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePercentageMaint", usePercentageMaint);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "infantryDontCount", infantryDontCount);
@@ -5426,12 +5489,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useWeatherConditions", useWeatherConditions);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useLightConditions", useLightConditions);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePlanetaryConditions", usePlanetaryConditions);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useStrategy", useStrategy);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "baseStrategyDeployment", baseStrategyDeployment);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "additionalStrategyDeployment", additionalStrategyDeployment);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "restrictPartsByMission", restrictPartsByMission);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "limitLanceWeight", limitLanceWeight);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "limitLanceNumUnits", limitLanceNumUnits);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignPortraitOnRoleChange", assignPortraitOnRoleChange);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowDuplicatePortraits", allowDuplicatePortraits);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowOpForAeros", isAllowOpForAeros());
@@ -5689,25 +5747,27 @@ public class CampaignOptions {
 
                     // autoLogistics
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsHeatSink")) {
-                    retVal.autoLogisticsHeatSink = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.autoLogisticsHeatSink = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsMekHead")) {
-                    retVal.autoLogisticsMekHead = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.autoLogisticsMekHead = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsMekLocation")) {
-                    retVal.autoLogisticsMekLocation = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.autoLogisticsMekLocation = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsNonRepairableLocation")) {
-                    retVal.autoLogisticsNonRepairableLocation = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.autoLogisticsNonRepairableLocation = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsArmor")) {
-                    retVal.autoLogisticsArmor = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.autoLogisticsArmor = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsAmmunition")) {
-                    retVal.autoLogisticsAmmunition = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.autoLogisticsAmmunition = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsActuators")) {
-                    retVal.autoLogisticsActuators = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.autoLogisticsActuators = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsJumpJets")) {
-                    retVal.autoLogisticsJumpJets = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.autoLogisticsJumpJets = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsEngines")) {
-                    retVal.autoLogisticsEngines = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.autoLogisticsEngines = MathUtility.parseInt(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("autoLogisticsWeapons")) {
+                    retVal.autoLogisticsWeapons = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsOther")) {
-                    retVal.autoLogisticsOther = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.autoLogisticsOther = MathUtility.parseInt(wn2.getTextContent().trim());
 
                     // region Personnel Tab
                     // region General Personnel
@@ -6182,8 +6242,6 @@ public class CampaignOptions {
                     retVal.setUseAdministrativeStrain(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("administrativeStrain")) {
                     retVal.setAdministrativeCapacity(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (nodeName.equalsIgnoreCase("multiCrewStrainDivider")) {
-                    retVal.setMultiCrewStrainDivider(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("useManagementSkill")) {
                     retVal.setUseManagementSkill(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("useCommanderLeadershipOnly")) {
@@ -6225,6 +6283,10 @@ public class CampaignOptions {
                     retVal.sellParts = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (nodeName.equalsIgnoreCase("payForRecruitment")) {
                     retVal.payForRecruitment = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("payForFood")) {
+                    retVal.payForFood = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("payForHousing")) {
+                    retVal.payForHousing = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (nodeName.equalsIgnoreCase("useLoanLimits")) {
                     retVal.useLoanLimits = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("usePercentageMaint")) {
@@ -6445,18 +6507,8 @@ public class CampaignOptions {
                     retVal.useLightConditions = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("usePlanetaryConditions")) {
                     retVal.usePlanetaryConditions = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (nodeName.equalsIgnoreCase("useStrategy")) {
-                    retVal.useStrategy = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (nodeName.equalsIgnoreCase("baseStrategyDeployment")) {
-                    retVal.baseStrategyDeployment = Integer.parseInt(wn2.getTextContent().trim());
-                } else if (nodeName.equalsIgnoreCase("additionalStrategyDeployment")) {
-                    retVal.additionalStrategyDeployment = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("restrictPartsByMission")) {
                     retVal.restrictPartsByMission = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (nodeName.equalsIgnoreCase("limitLanceWeight")) {
-                    retVal.limitLanceWeight = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (nodeName.equalsIgnoreCase("limitLanceNumUnits")) {
-                    retVal.limitLanceNumUnits = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("allowOpForLocalUnits")) {
                     retVal.setAllowOpForLocalUnits(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("allowOpForAeros")) {
@@ -6761,8 +6813,8 @@ public class CampaignOptions {
      * @param gameOptions the {@link GameOptions} to update based on the current campaign options.
      */
     public void updateGameOptionsFromCampaignOptions(GameOptions gameOptions) {
-        gameOptions.getOption(RPG_COMMAND_INIT).setValue(useTactics);
         gameOptions.getOption(RPG_INDIVIDUAL_INITIATIVE).setValue(useInitiativeBonus);
+        gameOptions.getOption(RPG_COMMAND_INIT).setValue(useTactics || useInitiativeBonus);
         gameOptions.getOption(RPG_TOUGHNESS).setValue(useToughness);
         gameOptions.getOption(RPG_ARTILLERY_SKILL).setValue(useArtillery);
         gameOptions.getOption(RPG_PILOT_ADVANTAGES).setValue(useAbilities);

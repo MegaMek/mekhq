@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission;
 
@@ -44,7 +49,7 @@ import static mekhq.campaign.mission.Scenario.T_GROUND;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_CIVILIANS;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX;
-import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
 import static mekhq.campaign.universe.IUnitGenerator.unitTypeSupportsWeightClass;
 import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
 
@@ -55,6 +60,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import megamek.client.bot.princess.CardinalEdge;
+import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
@@ -2716,19 +2722,19 @@ public class AtBDynamicScenarioFactory {
      */
     public static @Nullable Entity createEntityWithCrew(Faction faction, SkillLevel skill, Campaign campaign,
           MekSummary unitData) {
-        Entity en;
+        Entity entity;
         try {
-            en = new MekFileParser(unitData.getSourceFile(), unitData.getEntryName()).getEntity();
+            entity = new MekFileParser(unitData.getSourceFile(), unitData.getEntryName()).getEntity();
         } catch (Exception ex) {
             logger.error("Unable to load entity: {}: {}", unitData.getSourceFile(), unitData.getEntryName(), ex);
             return null;
         }
 
-        en.setOwner(campaign.getPlayer());
-        en.setGame(campaign.getGame());
+        entity.setOwner(campaign.getPlayer());
+        entity.setGame(campaign.getGame());
 
-        RandomNameGenerator rng = RandomNameGenerator.getInstance();
-        rng.setChosenFaction(faction.getNameGenerator());
+        RandomNameGenerator nameGenerator = RandomNameGenerator.getInstance();
+        nameGenerator.setChosenFaction(faction.getNameGenerator());
 
         Gender gender;
         int nonBinaryDiceSize = campaign.getCampaignOptions().getNonBinaryDiceSize();
@@ -2739,7 +2745,9 @@ public class AtBDynamicScenarioFactory {
             gender = RandomGenderGenerator.generate();
         }
 
-        String[] crewNameArray = rng.generateGivenNameSurnameSplit(gender, faction.isClan(), faction.getShortName());
+        String[] crewNameArray = nameGenerator.generateGivenNameSurnameSplit(gender,
+              faction.isClan(),
+              faction.getShortName());
         String crewName = crewNameArray[0];
         crewName += !StringUtility.isNullOrBlank(crewNameArray[1]) ? ' ' + crewNameArray[1] : "";
 
@@ -2762,11 +2770,11 @@ public class AtBDynamicScenarioFactory {
         skill = SkillLevel.parseFromInteger(skillValue);
 
         skillGenerator.setLevel(skill);
-        int[] skills = skillGenerator.generateRandomSkills(en);
+        int[] skills = skillGenerator.generateRandomSkills(entity);
 
         if (faction.isClan() && (d6(2) > (6 - skill.ordinal() + skills[0] + skills[1]))) {
             Phenotype phenotype = Phenotype.NONE;
-            switch (en.getUnitType()) {
+            switch (entity.getUnitType()) {
                 case MEK:
                     phenotype = Phenotype.MEKWARRIOR;
                     break;
@@ -2809,23 +2817,28 @@ public class AtBDynamicScenarioFactory {
 
         extraData.put(0, innerMap);
 
-        en.setCrew(new Crew(en.getCrew().getCrewType(),
-              crewName,
-              Compute.getFullCrewSize(en),
+        // Create the crew object
+        Crew entityCrew = new Crew(entity.getCrew().getCrewType(),
+              crewName, Compute.getFullCrewSize(entity),
               skills[0],
               skills[1],
               gender,
-              faction.isClan(),
-              extraData));
+              faction.isClan(), extraData);
+
+        // Assign a callsign to the unit commander
+        entityCrew.setNickname(RandomCallsignGenerator.getInstance().generate(), 0);
+
+        // Assign the crew to the unit
+        entity.setCrew(entityCrew);
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         if (campaignOptions.isUseTactics() || campaignOptions.isUseInitiativeBonus()) {
-            en.getCrew().setCommandBonus(getTacticsModifier(skill, campaign.getRandomSkillPreferences(), faction));
+            entity.getCrew().setCommandBonus(getTacticsModifier(skill, campaign.getRandomSkillPreferences(), faction));
         }
 
-        en.setExternalIdAsString(UUID.randomUUID().toString());
+        entity.setExternalIdAsString(UUID.randomUUID().toString());
 
-        return en;
+        return entity;
     }
 
     /**
@@ -2876,7 +2889,7 @@ public class AtBDynamicScenarioFactory {
           Faction faction) {
         int skillLevel = 0;
         if (skill.isGreenOrGreater()) {
-            int adjustedValue = Math.min(skill.getAdjustedValue(), EXP_ELITE);
+            int adjustedValue = Math.min(skill.getAdjustedValue(), EXP_LEGENDARY);
             int commandSkillsModifier = randomSkillPreferences.getCommandSkillsModifier(adjustedValue);
 
             int skillRoll = clamp(d6(2) + commandSkillsModifier, 2, 12);
@@ -2887,11 +2900,6 @@ public class AtBDynamicScenarioFactory {
                 case 12 -> 4;
                 default -> 0; // 2
             };
-        }
-
-        // Are they a formation leader? If so, increase their 'tactics' by 2
-        if (randomInt(getStandardForceSize(faction)) == 0) {
-            skillLevel = Math.min(skillLevel + 2, 10);
         }
 
         if (randomSkillPreferences.randomizeSkill()) {

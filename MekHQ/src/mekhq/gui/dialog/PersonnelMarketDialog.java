@@ -85,6 +85,7 @@ import mekhq.gui.enums.PersonnelTableModelColumn;
 import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.view.PersonViewPanel;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com) (code borrowed heavily from MegaMekLab UnitSelectorDialog
@@ -385,7 +386,7 @@ public class PersonnelMarketDialog extends JDialog {
                                          selectedPerson.getSalary(campaign).multipliedBy(2) :
                                          Money.zero()).plus(unitCost))) {
                 campaign.addReport("<font color='" +
-                                         MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                                         ReportingUtilities.getNegativeColor() +
                                          "'><b>Insufficient funds. Transaction cancelled</b>.</font>");
             } else {
                 /*
@@ -412,7 +413,7 @@ public class PersonnelMarketDialog extends JDialog {
             Entity en = personnelMarket.getAttachedEntity(selectedPerson);
             UUID pid = selectedPerson.getId();
 
-            if (campaign.recruitPerson(selectedPerson, true)) {
+            if (campaign.recruitPerson(selectedPerson, true, true)) {
                 addUnit(en, false);
                 personnelMarket.removePerson(selectedPerson);
                 personnelModel.setData(personnelMarket.getPersonnel());

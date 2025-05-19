@@ -136,7 +136,7 @@ public enum PersonnelTableModelColumn {
     MARRIAGEABLE("PersonnelTableModelColumn.MARRIAGEABLE.text"),
     DIVORCEABLE("PersonnelTableModelColumn.DIVORCEABLE.text"),
     TRYING_TO_CONCEIVE("PersonnelTableModelColumn.TRYING_TO_CONCEIVE.text"),
-    IMMORTAL("PersonnelTableModelColumn.IMMORTAL.text"),
+    IMMORTAL("PersonnelTableModelColumn.IMMORTAL.text"), EMPLOYED("PersonnelTableModelColumn.EMPLOYED.text"),
     TOUGHNESS("PersonnelTableModelColumn.TOUGHNESS.text"),
     CONNECTIONS("PersonnelTableModelColumn.CONNECTIONS.text"),
     WEALTH("PersonnelTableModelColumn.WEALTH.text"),
@@ -418,6 +418,10 @@ public enum PersonnelTableModelColumn {
         return this == IMMORTAL;
     }
 
+    public boolean isEmployed() {
+        return this == EMPLOYED;
+    }
+
     public boolean isToughness() {
         return this == TOUGHNESS;
     }
@@ -613,7 +617,7 @@ public enum PersonnelTableModelColumn {
                              SkillType.getColoredExperienceLevelName(person.getExperienceLevel(campaign, false)) +
                              "</html>";
             case PERSONNEL_ROLE:
-                return person.getRoleDesc();
+                return person.getFormatedRoleDescriptions(today);
             case UNIT_ASSIGNMENT: {
                 if (loadAssignmentFromMarket) {
                     final Entity entity = personnelMarket.getAttachedEntity(person);
@@ -865,6 +869,8 @@ public enum PersonnelTableModelColumn {
                 return resources.getString(person.getStatus().isDead() ?
                                                  "NA.text" :
                                                  (person.isImmortal() ? "Yes.text" : "No.text"));
+            case EMPLOYED:
+                return resources.getString(person.isEmployed() ? "Yes.text" : "No.text");
             case TOUGHNESS:
                 return Integer.toString(person.getToughness());
             case CONNECTIONS:
@@ -985,7 +991,8 @@ public enum PersonnelTableModelColumn {
             case PERSON, UNIT_ASSIGNMENT -> 125;
             case RANK, FIRST_NAME, GIVEN_NAME, DEPLOYED -> 70;
             case LAST_NAME, SURNAME, BLOODNAME, CALLSIGN, SKILL_LEVEL, SALARY -> 50;
-            case PERSONNEL_ROLE, FORCE -> 100;
+            case PERSONNEL_ROLE -> 150;
+            case FORCE -> 100;
             default -> 20;
         };
     }
@@ -1033,7 +1040,6 @@ public enum PersonnelTableModelColumn {
                      DEPLOYED,
                      INJURIES,
                      XP -> true;
-                case SALARY -> campaign.getCampaignOptions().isPayForSalaries();
                 default -> false;
             };
             case PILOT_GUNNERY_SKILLS -> switch (this) {
@@ -1079,6 +1085,7 @@ public enum PersonnelTableModelColumn {
             case BIOGRAPHICAL -> switch (this) {
                 case RANK, FIRST_NAME, LAST_NAME, AGE, PERSONNEL_STATUS, PERSONNEL_ROLE, EDUCATION -> true;
                 case ORIGIN_FACTION, ORIGIN_PLANET -> campaign.getCampaignOptions().isShowOriginFaction();
+                case SALARY -> campaign.getCampaignOptions().isPayForSalaries();
                 default -> false;
             };
             case FLUFF -> switch (this) {

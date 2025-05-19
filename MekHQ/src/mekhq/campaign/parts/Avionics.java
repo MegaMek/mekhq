@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
@@ -36,17 +41,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.skills.SkillType;
 import org.w3c.dom.Node;
-
-import megamek.common.Aero;
-import megamek.common.Compute;
-import megamek.common.CriticalSlot;
-import megamek.common.Dropship;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.IAero;
-import megamek.common.Jumpship;
-import megamek.common.LandAirMek;
-import megamek.common.TechAdvancement;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -71,13 +65,14 @@ public class Avionics extends Part {
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
         int priorHits = hits;
-        if (null != unit
-                && (unit.getEntity().getEntityType() & (Entity.ETYPE_AEROSPACEFIGHTER | Entity.ETYPE_LAND_AIR_MEK)) != 0) {
+        if (null != unit &&
+                  (unit.getEntity().getEntityType() & (Entity.ETYPE_AEROSPACEFIGHTER | Entity.ETYPE_LAND_AIR_MEK)) !=
+                        0) {
             hits = ((IAero) unit.getEntity()).getAvionicsHits();
-            if (checkForDestruction
-                    && hits > priorHits
-                    && (hits < 3 && !campaign.getCampaignOptions().isUseAeroSystemHits())
-                    && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+            if (checkForDestruction &&
+                      hits > priorHits &&
+                      (hits < 3 && !campaign.getCampaignOptions().isUseAeroSystemHits()) &&
+                      Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                 remove(false);
             } else if (hits >= 3) {
                 remove(false);
@@ -207,8 +202,18 @@ public class Avionics extends Part {
 
     @Override
     public Money getStickerPrice() {
-        // TODO: table in TechManual makes no sense - where are control systems for ASFs?
-        return Money.zero();
+        // Tech Manual p283 - cost is only valid for Conventional Fighters
+        if (unit == null) {
+            return Money.zero();
+        }
+
+        Entity entity = unit.getEntity();
+
+        if (entity != null && entity.isConventionalFighter()) {
+            return Money.of(4000 * this.unitTonnage * 0.1);
+        } else {
+            return Money.zero();
+        }
     }
 
     @Override

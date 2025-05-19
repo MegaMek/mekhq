@@ -81,6 +81,7 @@ import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.TaskTableModel;
 import mekhq.gui.model.TechTableModel;
 import mekhq.gui.model.UnitTableModel;
+import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.sorter.TaskSorter;
 import mekhq.gui.sorter.TechSorter;
 import mekhq.gui.sorter.UnitStatusSorter;
@@ -148,7 +149,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
               MekHQ.getMHQOptions().getLocale());
         GridBagConstraints gridBagConstraints;
 
-        setLayout(new GridLayout());
+        setLayout(new BorderLayout());
 
         JPanel panServicedUnits = new JPanel(new GridBagLayout());
 
@@ -464,6 +465,15 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         add(panTasks);
         add(panTechs);
 
+        JPanel centerPanel = new JPanel(new GridLayout(1, 3));
+        centerPanel.add(panServicedUnits);
+        centerPanel.add(panTasks);
+        centerPanel.add(panTechs);
+        add(centerPanel, BorderLayout.CENTER);
+
+        JPanel pnlTutorial = new TutorialHyperlinkPanel("repairTab");
+        add(pnlTutorial, BorderLayout.SOUTH);
+
         filterTechs();
     }
 
@@ -762,7 +772,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                 int modePenalty = part.getMode().expReduction;
                 if (skill == null) {
                     return false;
-                } else if (part.getSkillMin() > SkillType.EXP_ELITE) {
+                } else if (part.getSkillMin() > SkillType.EXP_LEGENDARY) {
                     return false;
                 } else if (tech.getMinutesLeft() <= 0) {
                     return false;
