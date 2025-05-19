@@ -31,10 +31,8 @@ package mekhq.gui.menus;
 import mekhq.campaign.unit.enums.TransporterType;
 import mekhq.campaign.utilities.CampaignTransportUtilities;
 import mekhq.utilities.MHQInternationalization;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
-import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.unit.Unit;
 
 import javax.swing.*;
@@ -106,15 +104,7 @@ public class AssignForceToShipTransportMenu extends AssignForceToTransportMenu {
 
         }
         Set<Unit> oldTransports = transport.loadShipTransport(transporterType, units);
-        if (!oldTransports.isEmpty()) {
-            oldTransports.forEach(oldTransport -> campaign.updateTransportInTransports(campaignTransportType, oldTransport));
-            oldTransports.forEach(oldTransport -> MekHQ.triggerEvent(new UnitChangedEvent(transport)));
-        }
-        for (Unit unit : units) {
-            MekHQ.triggerEvent(new UnitChangedEvent(unit));
-        }
-        campaign.updateTransportInTransports(campaignTransportType, transport);
-        MekHQ.triggerEvent(new UnitChangedEvent(transport));
+        updateTransportsForTransportMenuAction(SHIP_TRANSPORT, transport, units, oldTransports);
     }
 
 }
