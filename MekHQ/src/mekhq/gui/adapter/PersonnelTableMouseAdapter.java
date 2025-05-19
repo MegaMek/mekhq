@@ -1072,6 +1072,14 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_SPENDING_SPREE: {
                 for (Person person : people) {
+                    if (!person.getPrisonerStatus().isFreeOrBondsman()) {
+                        continue;
+                    }
+
+                    if (!person.getStatus().isActive()) {
+                        continue;
+                    }
+
                     if (person.getWealth() > MINIMUM_WEALTH) {
                         if (person.isHasPerformedExtremeExpenditure()) {
                             String report = getExpenditureExhaustedReportMessage(person.getHyperlinkedFullTitle());
@@ -3769,9 +3777,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             int spending = getExpenditure(willpower, wealth);
             String spendingString = Money.of(spending).toAmountString();
             menuItem = new JMenuItem(String.format(resources.getString("wealth.extreme.single"), spendingString));
-            menuItem.setEnabled(!person.isHasPerformedExtremeExpenditure());
+            menuItem.setEnabled(!person.isHasPerformedExtremeExpenditure() &&
+                                      person.getStatus().isActive() &&
+                                      person.getPrisonerStatus().isFreeOrBondsman());
         } else {
             menuItem = new JMenuItem(resources.getString("wealth.extreme.multiple"));
+            menuItem.setEnabled(StaticChecks.areAnyActive(selected) && StaticChecks.areAnyFreeOrBondsman(selected));
         }
         menuItem.setActionCommand(CMD_SPENDING_SPREE);
         menuItem.addActionListener(this);

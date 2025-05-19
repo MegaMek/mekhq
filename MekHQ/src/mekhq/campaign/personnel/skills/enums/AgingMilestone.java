@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.skills.enums;
 
@@ -35,7 +40,7 @@ import megamek.logging.MMLogger;
 public enum AgingMilestone {
     NONE(0, 25, 0, 0, 0, 0, 0, 0, 0, 0, false, false),
     TWENTY_FIVE(25, 31, 50, 50, 0, 50, 50, 50, 50, 0, false, false),
-    THIRTY_ONE(31, 14, 50, 50, 0, 50, 50, 50, 0, 1, false, false),
+    THIRTY_ONE(31, 41, 50, 50, 0, 50, 50, 50, 0, 1, false, false),
     FORTY_ONE(41, 51, 0, 0, -50, 0, 0, 0, 0, 1, false, false),
     FIFTY_ONE(51, 61, 0, -100, 0, -100, 0, 0, -50, 2, false, false),
     SIXTY_ONE(61, 71, -100, -100, -100, 0, 50, 0, -50, 2, true, false),
@@ -65,7 +70,6 @@ public enum AgingMilestone {
     private final int reputation;
     private final boolean slowLearner;
     private final boolean glassJaw;
-
     // Cumulative values
     private int cumulativeStrength;
     private int cumulativeBody;
@@ -121,6 +125,32 @@ public enum AgingMilestone {
         this.glassJaw = glassJaw;
     }
 
+    /**
+     * Retrieves the value of the specified skill attribute for this object.
+     *
+     * <p><b>Usage:</b> this exists to assit testing and should not be directly called. Use
+     * {@link #getAttributeModifier(SkillAttribute)} instead.</p>
+     *
+     * @param attribute the {@link SkillAttribute} to retrieve; must not be {@code null}
+     *
+     * @return the integer value of the specified attribute, or {@code NO_SKILL_ATTRIBUTE} if
+     *       {@code SkillAttribute.NONE} is provided
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public int getAttribute(SkillAttribute attribute) {
+        return switch (attribute) {
+            case NONE -> NO_SKILL_ATTRIBUTE;
+            case STRENGTH -> strength;
+            case BODY -> body;
+            case DEXTERITY -> dexterity;
+            case REFLEXES -> reflexes;
+            case INTELLIGENCE -> intelligence;
+            case WILLPOWER -> willpower;
+            case CHARISMA -> charisma;
+        };
+    }
 
     // Getters
     public int getMilestone() {
