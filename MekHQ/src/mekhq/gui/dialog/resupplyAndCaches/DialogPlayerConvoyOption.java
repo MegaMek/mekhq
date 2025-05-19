@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.resupplyAndCaches;
 
@@ -235,8 +240,7 @@ public class DialogPlayerConvoyOption extends JDialog {
         // New panel (to be added below the button panel)
         JPanel infoPanel = new JPanel(new BorderLayout());
         JLabel lblInfo = new JLabel(String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-              RIGHT_WIDTH + LEFT_WIDTH,
-              getFormattedTextAt(RESOURCE_BUNDLE, "documentation.prompt")));
+              RIGHT_WIDTH + LEFT_WIDTH, getFormattedTextAt(RESOURCE_BUNDLE, "outOfCharacter.convoyPicker")));
         lblInfo.setHorizontalAlignment(SwingConstants.CENTER);
         infoPanel.add(lblInfo, BorderLayout.CENTER);
         infoPanel.setBorder(BorderFactory.createEtchedBorder());
