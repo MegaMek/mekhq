@@ -50,6 +50,7 @@ import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_CIVILIANS;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
+import static mekhq.campaign.personnel.skills.SkillType.S_STRATEGY;
 import static mekhq.campaign.universe.IUnitGenerator.unitTypeSupportsWeightClass;
 import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
 
@@ -98,6 +99,7 @@ import mekhq.campaign.mission.ScenarioObjective.TimeLimitType;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 import mekhq.campaign.personnel.Bloodname;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
@@ -4083,7 +4085,7 @@ public class AtBDynamicScenarioFactory {
         }
 
         // Make note of battle commander strategy
-        int strategy = scenario.getLanceCommanderSkill(SkillType.S_STRATEGY, campaign);
+        int strategy = 0;
 
         // For player forces where there's an associated force template, we can set the
         // deployment turn explicitly or use a stagger algorithm.
@@ -4094,6 +4096,13 @@ public class AtBDynamicScenarioFactory {
 
             List<Entity> forceEntities = new ArrayList<>();
             Force playerForce = campaign.getForce(forceID);
+            UUID commanderId = playerForce.getForceCommanderID();
+            Person commander = campaign.getPerson(commanderId);
+            if (commander != null && commander.hasSkill(S_STRATEGY)) {
+                strategy = commander.getSkill(S_STRATEGY).getTotalSkillLevel();
+            } else {
+                strategy = 0;
+            }
 
             for (UUID unitID : playerForce.getAllUnits(true)) {
                 Unit currentUnit = campaign.getUnit(unitID);
