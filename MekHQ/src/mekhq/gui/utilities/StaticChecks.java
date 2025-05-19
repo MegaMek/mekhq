@@ -323,6 +323,10 @@ public class StaticChecks {
         return Arrays.stream(people).allMatch(p -> p.getStatus().isActive());
     }
 
+    public static boolean areAnyActive(Person... people) {
+        return Stream.of(people).anyMatch(p -> p.getStatus().isActive());
+    }
+
     /**
      * Determines whether all specified people are currently employed and have not departed their unit.
      *
@@ -376,6 +380,10 @@ public class StaticChecks {
 
     public static boolean areAnyFree(Person... people) {
         return Stream.of(people).anyMatch(p -> p.getPrisonerStatus().isFree());
+    }
+
+    public static boolean areAnyFreeOrBondsman(Person... people) {
+        return Stream.of(people).anyMatch(p -> p.getPrisonerStatus().isFreeOrBondsman());
     }
 
     public static boolean areAllPrisoners(Person... people) {
