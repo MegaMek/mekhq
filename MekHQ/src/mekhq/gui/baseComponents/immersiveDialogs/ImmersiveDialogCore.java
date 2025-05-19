@@ -415,7 +415,7 @@ public class ImmersiveDialogCore extends JDialog {
         CampaignGUI campaignGUI = campaign.getApp().getCampaigngui();
 
         if (commandKey.equalsIgnoreCase(GLOSSARY_COMMAND_STRING)) {
-            new GlossaryDialog(parent, campaign, entryKey);
+            new GlossaryDialog(parent, entryKey);
         } else if (commandKey.equalsIgnoreCase(PERSON_COMMAND_STRING)) {
             final UUID id = UUID.fromString(reference.split(":")[1]);
             campaignGUI.focusOnPerson(id);
