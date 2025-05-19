@@ -38,6 +38,7 @@ import static mekhq.campaign.mission.enums.MissionStatus.PARTIAL;
 import static mekhq.campaign.mission.enums.MissionStatus.SUCCESS;
 import static mekhq.campaign.mission.enums.ScenarioStatus.REFUSED_ENGAGEMENT;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
+import static mekhq.utilities.MHQInternationalization.getText;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -108,13 +109,13 @@ import mekhq.gui.dialog.NewContractDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.ScenarioTableModel;
+import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.sorter.DateStringComparator;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.view.AtBScenarioViewPanel;
 import mekhq.gui.view.LanceAssignmentView;
 import mekhq.gui.view.MissionViewPanel;
 import mekhq.gui.view.ScenarioViewPanel;
-import mekhq.utilities.MHQInternationalization;
 
 /**
  * Displays Mission/Contract and Scenario details.
@@ -350,8 +351,11 @@ public final class BriefingTab extends CampaignGuiTab {
         splitBrief.setResizeWeight(0.5);
         splitBrief.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, ev -> refreshScenarioView());
 
+        JPanel pnlTutorial = new TutorialHyperlinkPanel("missionTab");
+
         setLayout(new BorderLayout());
         add(splitBrief, BorderLayout.CENTER);
+        add(pnlTutorial, BorderLayout.SOUTH);
     }
 
     private void addMission() {
@@ -898,14 +902,14 @@ public final class BriefingTab extends CampaignGuiTab {
     private void promptAutoResolve(Scenario scenario) {
         // the options for the auto resolve method follow a predefined order, which is the same as the order in the enum
         // and it uses that to preselect the option that is currently set in the campaign options
-        Object[] options = new Object[] { MHQInternationalization.getText("AutoResolveMethod.PRINCESS.text"),
-                                          MHQInternationalization.getText("AutoResolveMethod.ABSTRACT_COMBAT.text"), };
+        Object[] options = new Object[] { getText("AutoResolveMethod.PRINCESS.text"),
+                                          getText("AutoResolveMethod.ABSTRACT_COMBAT.text"), };
 
         var preSelectedOptionIndex = getCampaignOptions().getAutoResolveMethod().ordinal();
 
         var selectedOption = JOptionPane.showOptionDialog(getFrame(),
-              MHQInternationalization.getText("AutoResolveMethod.promptForAutoResolveMethod.text"),
-              MHQInternationalization.getText("AutoResolveMethod.promptForAutoResolveMethod.title"),
+              getText("AutoResolveMethod.promptForAutoResolveMethod.text"),
+              getText("AutoResolveMethod.promptForAutoResolveMethod.title"),
               JOptionPane.YES_NO_OPTION,
               JOptionPane.QUESTION_MESSAGE,
               null,

@@ -32,15 +32,19 @@
  */
 package mekhq.gui;
 
-import static mekhq.utilities.MHQInternationalization.getFormattedText;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import javax.swing.*;
-import javax.swing.event.HyperlinkEvent;
+import javax.swing.DropMode;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTree;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.tree.TreeSelectionModel;
 
 import megamek.common.event.Subscribe;
@@ -57,11 +61,11 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.TOEMouseAdapter;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.handler.TOETransferHandler;
 import mekhq.gui.model.CrewListModel;
 import mekhq.gui.model.OrgTreeModel;
+import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.view.ForceViewPanel;
 import mekhq.gui.view.PersonViewPanel;
@@ -108,23 +112,11 @@ public final class TOETab extends CampaignGuiTab {
         orgTree.setDropMode(DropMode.ON);
         orgTree.setTransferHandler(new TOETransferHandler(getCampaignGui()));
 
-        JEditorPane keyPane = new JEditorPane();
-        keyPane.setContentType("text/html");
-        keyPane.setText(getFormattedText("TOE.keyText"));
-        keyPane.setEditable(false);
-        keyPane.setBorder(null);
-        keyPane.setOpaque(false);
-        keyPane.addHyperlinkListener(evt -> {
-            if (evt.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                ImmersiveDialogCore.handleImmersiveHyperlinkClick(null, getCampaign(), evt.getDescription());
-            }
-        });
-        JPanel southPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        southPanel.add(keyPane);
+        JPanel pnlTutorial = new TutorialHyperlinkPanel("toeTab");
 
         JPanel leftPanel = new JPanel(new BorderLayout());
         leftPanel.add(new JScrollPane(orgTree), BorderLayout.CENTER);
-        leftPanel.add(southPanel, BorderLayout.SOUTH);
+        leftPanel.add(pnlTutorial, BorderLayout.SOUTH);
 
         panForceView = new JPanel();
         panForceView.getAccessibleContext().setAccessibleName("Selected Force Viewer");

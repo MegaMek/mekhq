@@ -503,6 +503,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.updateGameOptionsFromCampaignOptions(campaign.getGameOptions());
             MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
         }
+
+        campaign.resetRandomDeath();
     }
 
     /**
