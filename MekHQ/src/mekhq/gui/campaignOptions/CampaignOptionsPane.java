@@ -41,6 +41,8 @@ import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.ABRIDGED;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP_ABRIDGED;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createSubTabs;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.spaUtilities.enums.AbilityCategory.CHARACTER_CREATION_ONLY;
 import static mekhq.utilities.spaUtilities.enums.AbilityCategory.CHARACTER_FLAW;
 import static mekhq.utilities.spaUtilities.enums.AbilityCategory.COMBAT_ABILITY;
@@ -61,6 +63,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.event.OptionsChangedEvent;
+import mekhq.campaign.personnel.enums.PersonnelRoleSubType;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.Faction;
@@ -89,9 +92,6 @@ import mekhq.gui.campaignOptions.contents.*;
  * </ul>
  */
 public class CampaignOptionsPane extends AbstractMHQTabbedPane {
-    private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
-    private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
-
     private static final int SCROLL_SPEED = 16;
     private static final int HEADER_FONT_SIZE = 5;
 
@@ -103,6 +103,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private PersonnelTab personnelTab;
     private BiographyTab biographyTab;
     private RelationshipsTab relationshipsTab;
+    private SalariesTab salariesTab;
     private TurnoverAndRetentionTab turnoverAndRetentionTab;
     private AdvancementTab advancementTab;
     private SkillsTab skillsTab;
@@ -122,7 +123,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
      * @param mode     the {@link CampaignOptionsDialogMode} for configuring the pane's behavior
      */
     public CampaignOptionsPane(final JFrame frame, final Campaign campaign, CampaignOptionsDialogMode mode) {
-        super(frame, resources, "campaignOptionsDialog");
+        super(frame, ResourceBundle.getBundle(getCampaignOptionsResourceBundle()), "campaignOptionsDialog");
         this.campaign = campaign;
         this.campaignOptions = campaign.getCampaignOptions();
         this.mode = mode;
@@ -143,8 +144,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         }
 
         addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
-              round(HEADER_FONT_SIZE * uiScale),
-              resources.getString("generalPanel.title")), createGeneralTab(mode));
+              round(HEADER_FONT_SIZE * uiScale), getTextAt(getCampaignOptionsResourceBundle(), "generalPanel.title")),
+              createGeneralTab(mode));
 
         JTabbedPane humanResourcesParentTab = createHumanResourcesParentTab();
         createTab("humanResourcesParentTab", humanResourcesParentTab);
@@ -183,7 +184,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         if (mode != ABRIDGED && mode != STARTUP_ABRIDGED) {
             addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
                   round(HEADER_FONT_SIZE * uiScale),
-                  resources.getString(resourceName + ".title")), tabScrollPane);
+                  getTextAt(getCampaignOptionsResourceBundle(), resourceName + ".title")), tabScrollPane);
         }
     }
 
@@ -224,11 +225,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
               personnelTab.createAwardsTab(),
               "prisonersAndDependentsTab",
               personnelTab.createPrisonersAndDependentsTab(),
-              "medicalTab",
-              personnelTab.createMedicalTab(),
-              "salariesTab",
-              personnelTab.createSalariesTab()));
-        personnelTab.loadValuesFromCampaignOptions();
+              "medicalTab", personnelTab.createMedicalTab()));
+        personnelTab.loadValuesFromCampaignOptions(campaign.getVersion());
 
         // Biography
         biographyTab = new BiographyTab(campaign, generalTab);
@@ -258,6 +256,17 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
               relationshipsTab.createProcreationTab()));
         relationshipsTab.loadValuesFromCampaignOptions();
 
+        // Personnel
+        salariesTab = new SalariesTab(campaignOptions);
+
+        JTabbedPane salariesContentTabs = createSubTabs(Map.of("0combatSalariesTab",
+              salariesTab.createSalariesTab(PersonnelRoleSubType.COMBAT),
+              "1supportSalariesTab",
+              salariesTab.createSalariesTab(PersonnelRoleSubType.SUPPORT),
+              "2civilianSalariesTab",
+              salariesTab.createSalariesTab(PersonnelRoleSubType.CIVILIAN)));
+        salariesTab.loadValuesFromCampaignOptions();
+
         // Turnover and Retention
         turnoverAndRetentionTab = new TurnoverAndRetentionTab(campaignOptions);
 
@@ -269,21 +278,22 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         // Add Tabs
         humanResourcesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
-              4,
-              resources.getString("personnelContentTabs.title")), personnelContentTabs);
+              4, getTextAt(getCampaignOptionsResourceBundle(), "personnelContentTabs.title")), personnelContentTabs);
+        humanResourcesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
+              4, getTextAt(getCampaignOptionsResourceBundle(), "biographyContentTabs.title")), biographyContentTabs);
+        humanResourcesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
+              4, getTextAt(getCampaignOptionsResourceBundle(), "relationshipsContentTabs.title")),
+              relationshipsContentTabs);
+        humanResourcesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
+              4, getTextAt(getCampaignOptionsResourceBundle(), "turnoverAndRetentionContentTabs.title")),
+              turnoverAndRetentionContentTabs);
         humanResourcesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
               4,
-              resources.getString("biographyContentTabs.title")), biographyContentTabs);
-        humanResourcesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
-              4,
-              resources.getString("relationshipsContentTabs.title")), relationshipsContentTabs);
-        humanResourcesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
-              4,
-              resources.getString("turnoverAndRetentionContentTabs.title")), turnoverAndRetentionContentTabs);
+              getTextAt(getCampaignOptionsResourceBundle(), "salariesContentTabs.title")), salariesContentTabs);
 
         addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
-              4,
-              resources.getString("humanResourcesParentTab.title")), humanResourcesParentTab);
+              4, getTextAt(getCampaignOptionsResourceBundle(), "humanResourcesParentTab.title")),
+              humanResourcesParentTab);
 
         return humanResourcesParentTab;
     }
@@ -339,18 +349,15 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         // Add Tabs
         advancementParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
-              4,
-              resources.getString("awardsAndRandomizationContentTabs.title")), awardsAndRandomizationContentTabs);
+              4, getTextAt(getCampaignOptionsResourceBundle(), "awardsAndRandomizationContentTabs.title")),
+              awardsAndRandomizationContentTabs);
         advancementParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
-              4,
-              resources.getString("skillsContentTabs.title")), skillsContentTabs);
+              4, getTextAt(getCampaignOptionsResourceBundle(), "skillsContentTabs.title")), skillsContentTabs);
         advancementParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
-              4,
-              resources.getString("abilityContentTabs.title")), abilityContentTabs);
+              4, getTextAt(getCampaignOptionsResourceBundle(), "abilityContentTabs.title")), abilityContentTabs);
 
         addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
-              4,
-              resources.getString("advancementParentTab.title")), advancementParentTab);
+              4, getTextAt(getCampaignOptionsResourceBundle(), "advancementParentTab.title")), advancementParentTab);
 
         return advancementParentTab;
     }
@@ -387,15 +394,15 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         // Add tabs
         equipmentAndSuppliesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
-              4,
-              resources.getString("suppliesAndAcquisitionContentTabs.title")), suppliesAndAcquisitionContentTabs);
+              4, getTextAt(getCampaignOptionsResourceBundle(), "suppliesAndAcquisitionContentTabs.title")),
+              suppliesAndAcquisitionContentTabs);
         equipmentAndSuppliesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
-              4,
-              resources.getString("repairsAndMaintenanceContentTabs.title")), repairsAndMaintenanceContentTabs);
+              4, getTextAt(getCampaignOptionsResourceBundle(), "repairsAndMaintenanceContentTabs.title")),
+              repairsAndMaintenanceContentTabs);
 
         addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
-              4,
-              resources.getString("logisticsAndMaintenanceParentTab.title")), equipmentAndSuppliesParentTab);
+              4, getTextAt(getCampaignOptionsResourceBundle(), "logisticsAndMaintenanceParentTab.title")),
+              equipmentAndSuppliesParentTab);
 
         return equipmentAndSuppliesParentTab;
     }
@@ -441,18 +448,15 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         // Add tabs
         strategicOperationsParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
-              4,
-              resources.getString("financesContentTabs.title")), financesContentTabs);
+              4, getTextAt(getCampaignOptionsResourceBundle(), "financesContentTabs.title")), financesContentTabs);
         strategicOperationsParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
-              4,
-              resources.getString("marketsContentTabs.title")), marketsContentTabs);
+              4, getTextAt(getCampaignOptionsResourceBundle(), "marketsContentTabs.title")), marketsContentTabs);
         strategicOperationsParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
-              4,
-              resources.getString("rulesetsContentTabs.title")), rulesetsContentTabs);
+              4, getTextAt(getCampaignOptionsResourceBundle(), "rulesetsContentTabs.title")), rulesetsContentTabs);
 
         addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
-              4,
-              resources.getString("strategicOperationsParentTab.title")), strategicOperationsParentTab);
+              4, getTextAt(getCampaignOptionsResourceBundle(), "strategicOperationsParentTab.title")),
+              strategicOperationsParentTab);
 
         return strategicOperationsParentTab;
     }
@@ -488,6 +492,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         personnelTab.applyCampaignOptionsToCampaign(campaign, options);
         biographyTab.applyCampaignOptionsToCampaign(options);
         relationshipsTab.applyCampaignOptionsToCampaign(options);
+        salariesTab.applyCampaignOptionsToCampaign(options);
         turnoverAndRetentionTab.applyCampaignOptionsToCampaign(options);
 
         // Advancement
@@ -512,6 +517,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.updateGameOptionsFromCampaignOptions(campaign.getGameOptions());
             MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
         }
+
+        campaign.resetRandomDeath();
     }
 
     /**
@@ -533,7 +540,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         generalTab.loadValuesFromCampaignOptions(presetCampaignOptions, presetDate, presetFaction);
 
         // Human Resources
-        personnelTab.loadValuesFromCampaignOptions(presetCampaignOptions);
+        personnelTab.loadValuesFromCampaignOptions(presetCampaignOptions, campaign.getVersion());
         biographyTab.loadValuesFromCampaignOptions(presetCampaignOptions,
               presetCampaignOptions.getRandomOriginOptions(),
               campaignPreset.getRankSystem());

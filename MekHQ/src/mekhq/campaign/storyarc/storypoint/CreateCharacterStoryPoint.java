@@ -208,7 +208,7 @@ public class CreateCharacterStoryPoint extends StoryPoint {
         BackgroundsController.generateBackground(campaign, person);
 
         // generate personality
-        PersonalityController.generatePersonality(person);
+        PersonalityController.generatePersonality(person, false);
 
         // set education
         setInitialEducationLevel(campaign, person);

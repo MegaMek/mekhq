@@ -24,14 +24,21 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui;
 
 import static megamek.client.ratgenerator.ForceDescriptor.RATING_5;
+import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.mission.enums.MissionStatus.PARTIAL;
 import static mekhq.campaign.mission.enums.MissionStatus.SUCCESS;
 import static mekhq.campaign.mission.enums.ScenarioStatus.REFUSED_ENGAGEMENT;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
+import static mekhq.utilities.MHQInternationalization.getText;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -58,6 +65,7 @@ import megamek.common.Game;
 import megamek.common.GunEmplacement;
 import megamek.common.annotations.Nullable;
 import megamek.common.containers.MunitionTree;
+import megamek.common.enums.Gender;
 import megamek.common.event.Subscribe;
 import megamek.common.options.OptionsConstants;
 import megamek.common.util.sorter.NaturalOrderComparator;
@@ -90,6 +98,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.adapter.ScenarioTableMouseAdapter;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.dialog.CompleteMissionDialog;
 import mekhq.gui.dialog.CustomizeAtBContractDialog;
 import mekhq.gui.dialog.CustomizeMissionDialog;
@@ -100,18 +109,21 @@ import mekhq.gui.dialog.NewContractDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.ScenarioTableModel;
+import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.sorter.DateStringComparator;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.view.AtBScenarioViewPanel;
 import mekhq.gui.view.LanceAssignmentView;
 import mekhq.gui.view.MissionViewPanel;
 import mekhq.gui.view.ScenarioViewPanel;
-import mekhq.utilities.MHQInternationalization;
 
 /**
  * Displays Mission/Contract and Scenario details.
  */
 public final class BriefingTab extends CampaignGuiTab {
+    private static ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
+          MekHQ.getMHQOptions().getLocale());
+
     private LanceAssignmentView panLanceAssignment;
     private JSplitPane splitScenario;
     private JTable scenarioTable;
@@ -158,9 +170,6 @@ public final class BriefingTab extends CampaignGuiTab {
      */
     @Override
     public void initTab() {
-        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
-              MekHQ.getMHQOptions().getLocale());
-
         JPanel panMission = new JPanel(new GridBagLayout());
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -342,8 +351,11 @@ public final class BriefingTab extends CampaignGuiTab {
         splitBrief.setResizeWeight(0.5);
         splitBrief.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, ev -> refreshScenarioView());
 
+        JPanel pnlTutorial = new TutorialHyperlinkPanel("missionTab");
+
         setLayout(new BorderLayout());
         add(splitBrief, BorderLayout.CENTER);
+        add(pnlTutorial, BorderLayout.SOUTH);
     }
 
     private void addMission() {
@@ -502,7 +514,21 @@ public final class BriefingTab extends CampaignGuiTab {
                   Objects.equals(String.valueOf(cmd.getStatus()), "Success"));
         }
 
-        // Get rid of any remaining scenarios
+        // Undeploy forces
+        for (Force force : getCampaign().getAllForces()) {
+            int scenarioAssignment = force.getScenarioId();
+            if (scenarioAssignment != NO_ASSIGNED_SCENARIO) {
+                Scenario scenario = getCampaign().getScenario(force.getScenarioId());
+
+                // This shouldn't be necessary, but now is as good a time as any to check for null scenarios
+                if (scenario == null || scenario.getMissionId() == mission.getId()) {
+                    force.setScenarioId(NO_ASSIGNED_SCENARIO, getCampaign());
+                    continue;
+                }
+            }
+        }
+
+        // Resolve any outstanding scenarios
         for (Scenario scenario : mission.getCurrentScenarios()) {
             scenario.setStatus(REFUSED_ENGAGEMENT);
         }
@@ -591,6 +617,16 @@ public final class BriefingTab extends CampaignGuiTab {
                         JOptionPane.YES_NO_OPTION)) {
             return;
         }
+
+        // Undeploy forces
+        for (Scenario scenario : mission.getScenarios()) {
+            for (Force force : getCampaign().getAllForces()) {
+                if (force.getScenarioId() == scenario.getId()) {
+                    force.setScenarioId(NO_ASSIGNED_SCENARIO, getCampaign());
+                }
+            }
+        }
+
         getCampaign().removeMission(mission);
         final List<Mission> missions = getCampaign().getSortedMissions();
         comboMission.setSelectedItem(missions.isEmpty() ? null : missions.get(0));
@@ -732,8 +768,100 @@ public final class BriefingTab extends CampaignGuiTab {
         }
     }
 
+    /**
+     * Initiates the start of the selected scenario after confirming briefing acceptance.
+     *
+     * <p>This method first presents the scenario briefing dialog to the user via {@link #createBriefingDialog()}. If
+     * the user cancels or does not accept the briefing, the method returns and does not proceed further. If accepted,
+     * it calls {@link #startScenario(BehaviorSettings)} to begin the scenario.</p>
+     */
     private void startScenario() {
+        if (!createBriefingDialog()) {
+            return;
+        }
+
         startScenario(null);
+    }
+
+    /**
+     * Displays a dialog presenting the scenario briefing and allows the user to accept or cancel the scenario.
+     *
+     * <p>This method retrieves the selected scenario from the scenario table, obtains relevant mission and commander
+     * information, constructs the description with preserved line breaks, and then shows an
+     * {@code ImmersiveDialogSimple} with accept and cancel buttons.</p>
+     *
+     * @return {@code true} if the user accepts the scenario or no scenario is selected; {@code false} if the scenario
+     *       is canceled.
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    private boolean createBriefingDialog() {
+        int row = scenarioTable.getSelectedRow();
+        if (row < 0) {
+            return true;
+        }
+        Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
+        if (scenario == null) {
+            return true;
+        }
+
+        String description = scenario.getDescription().replaceAll("(\r\n|\n)", "<br>");
+
+        // If there isn't a description, we have nothing to display, so just act as if the player confirmed the dialog
+        if (description.isBlank()) {
+            return true;
+        }
+
+        Mission mission = null;
+        if (scenario.getMissionId() != -1) {
+            mission = getCampaign().getMission(scenario.getMissionId());
+        }
+        if (mission == null) {
+            mission = comboMission.getSelectedItem();
+        }
+
+        Person speaker = null;
+        if (mission instanceof AtBContract contract) {
+            speaker = contract.getEmployerLiaison();
+        } else {
+            // If we're not working with an AtBContract we have to generate the liaison each time
+            speaker = getCampaign().newPerson(PersonnelRole.ADMINISTRATOR_COMMAND, "MERC", Gender.RANDOMIZE);
+        }
+
+        List<Person> forceCommanders = new ArrayList<>();
+        for (Force force : getCampaign().getAllForces()) {
+            Person commander = getCampaign().getPerson(force.getForceCommanderID());
+            if (commander != null) {
+                forceCommanders.add(commander);
+            }
+        }
+
+        Person overallCommander = null;
+        for (Person commander : forceCommanders) {
+            if (overallCommander == null) {
+                overallCommander = commander;
+                continue;
+            }
+
+            if (commander.outRanksUsingSkillTiebreaker(getCampaign(), overallCommander)) {
+                overallCommander = commander;
+            }
+        }
+
+        List<String> buttons = List.of(resourceMap.getString("dialogScenarioAcceptance.button.accept"),
+              resourceMap.getString("dialogScenarioAcceptance.button.cancel"));
+
+        ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(getCampaign(),
+              speaker,
+              overallCommander,
+              description,
+              buttons,
+              resourceMap.getString("dialogScenarioAcceptance.outOfCharacter"),
+              null,
+              false);
+
+        return dialog.getDialogChoice() == 0;
     }
 
 
@@ -774,14 +902,14 @@ public final class BriefingTab extends CampaignGuiTab {
     private void promptAutoResolve(Scenario scenario) {
         // the options for the auto resolve method follow a predefined order, which is the same as the order in the enum
         // and it uses that to preselect the option that is currently set in the campaign options
-        Object[] options = new Object[] { MHQInternationalization.getText("AutoResolveMethod.PRINCESS.text"),
-                                          MHQInternationalization.getText("AutoResolveMethod.ABSTRACT_COMBAT.text"), };
+        Object[] options = new Object[] { getText("AutoResolveMethod.PRINCESS.text"),
+                                          getText("AutoResolveMethod.ABSTRACT_COMBAT.text"), };
 
         var preSelectedOptionIndex = getCampaignOptions().getAutoResolveMethod().ordinal();
 
         var selectedOption = JOptionPane.showOptionDialog(getFrame(),
-              MHQInternationalization.getText("AutoResolveMethod.promptForAutoResolveMethod.text"),
-              MHQInternationalization.getText("AutoResolveMethod.promptForAutoResolveMethod.title"),
+              getText("AutoResolveMethod.promptForAutoResolveMethod.text"),
+              getText("AutoResolveMethod.promptForAutoResolveMethod.title"),
               JOptionPane.YES_NO_OPTION,
               JOptionPane.QUESTION_MESSAGE,
               null,

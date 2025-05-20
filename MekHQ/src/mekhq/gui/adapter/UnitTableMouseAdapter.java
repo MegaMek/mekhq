@@ -38,6 +38,7 @@ import static megamek.common.enums.SkillLevel.GREEN;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.enums.SkillLevel.ULTRA_GREEN;
 import static megamek.common.enums.SkillLevel.VETERAN;
+import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
 import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
 
 import java.awt.event.ActionEvent;
@@ -623,7 +624,11 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 int maintenanceTime = unit.getMaintenanceTime();
 
                 if ((time - maintenanceTime) >= 0) {
-                    campaign.doMaintenance(unit);
+                    // This will increase the number of days until maintenance and then perform the maintenance. We
+                    // do it this way to ensure that everything is processed cleanly.
+                    while (unit.getDaysSinceMaintenance() != 0) {
+                        campaign.doMaintenance(unit);
+                    }
                 } else {
                     campaign.addReport(String.format(resources.getString("maintenanceAdHoc.unable"),
                           tech.getHyperlinkedFullTitle(),
@@ -947,6 +952,9 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 menuItem.setActionCommand(COMMAND_PERFORM_AD_HOC_MAINTENANCE);
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(gui.getCampaign().getCampaignOptions().isCheckMaintenance());
+                if (oneSelected && menuItem.isEnabled()) {
+                    menuItem.setEnabled(unit.getDaysSinceMaintenance() != 0);
+                }
 
                 popup.add(menuItem);
             }
@@ -1035,11 +1043,13 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             }
 
             // fill with personnel
-            if (oneAvailableUnitBelowMaxCrew) {
-                menuItem = new JMenuItem(resources.getString("hireMinimumComplement.text"));
-                menuItem.setActionCommand(COMMAND_HIRE_FULL);
-                menuItem.addActionListener(this);
-                popup.add(menuItem);
+            if (gui.getCampaign().getCampaignOptions().getPersonnelMarketStyle() != MEKHQ) {
+                if (oneAvailableUnitBelowMaxCrew) {
+                    menuItem = new JMenuItem(resources.getString("hireMinimumComplement.text"));
+                    menuItem.setActionCommand(COMMAND_HIRE_FULL);
+                    menuItem.addActionListener(this);
+                    popup.add(menuItem);
+                }
             }
 
             if (Stream.of(units).allMatch(u -> u.getCamouflage().equals(units[0].getCamouflage()))) {

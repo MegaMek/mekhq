@@ -69,6 +69,7 @@ import mekhq.gui.dialog.PartsReportDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.gui.model.TechTableModel;
+import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.PartsDetailSorter;
 import mekhq.gui.sorter.TechSorter;
@@ -354,8 +355,11 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         splitWarehouse.setOneTouchExpandable(true);
         splitWarehouse.setResizeWeight(1.0);
 
+        JPanel pnlTutorial = new TutorialHyperlinkPanel("warehouseTab");
+
         setLayout(new BorderLayout());
         add(splitWarehouse, BorderLayout.CENTER);
+        add(pnlTutorial, BorderLayout.SOUTH);
     }
 
     /**
@@ -517,13 +521,15 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
                 int modePenalty = part.getMode().expReduction;
                 if (skill == null) {
                     return false;
-                } else if (part.getSkillMin() > SkillType.EXP_ELITE) {
+                } else if (part.getSkillMin() > SkillType.EXP_LEGENDARY) {
                     return false;
                 } else if (tech.getMinutesLeft() <= 0) {
                     return false;
                 } else {
                     return getCampaign().getCampaignOptions().isDestroyByMargin() ||
-                                 (part.getSkillMin() <= (skill.getExperienceLevel() - modePenalty));
+                                 (part.getSkillMin() <=
+                                        (skill.getExperienceLevel(tech.getOptions(), tech.getATOWAttributes()) -
+                                               modePenalty));
                 }
             }
         };

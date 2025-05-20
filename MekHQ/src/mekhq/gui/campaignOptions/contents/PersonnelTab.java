@@ -24,38 +24,34 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.campaignOptions.contents;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createGroupLayout;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.ResourceBundle;
 import javax.swing.*;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.GroupLayout.ParallelGroup;
-import javax.swing.GroupLayout.SequentialGroup;
-import javax.swing.JSpinner.DefaultEditor;
 
+import megamek.Version;
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.annotations.Nullable;
-import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.enums.AwardBonus;
-import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
-import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
@@ -97,12 +93,10 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
  * </p>
  */
 public class PersonnelTab {
-    private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
-    private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
-
     private final CampaignOptions campaignOptions;
 
     //start General Tab
+    private CampaignOptionsHeaderPanel generalHeader;
     private JPanel pnlPersonnelGeneralOptions;
     private JCheckBox chkUseTactics;
     private JCheckBox chkUseInitiativeBonus;
@@ -142,6 +136,7 @@ public class PersonnelTab {
     //end Personnel Logs Tab
 
     //start Personnel Information Tab
+    private CampaignOptionsHeaderPanel personnelInformationHeader;
     private JCheckBox chkUseTimeInService;
     private JLabel lblTimeInServiceDisplayFormat;
     private MMComboBox<TimeInDisplayFormat> comboTimeInServiceDisplayFormat;
@@ -154,6 +149,7 @@ public class PersonnelTab {
     //end Personnel Information Tab
 
     //start Awards Tab
+    private CampaignOptionsHeaderPanel awardsHeader;
     private JPanel pnlAwardsGeneralOptions;
     private JLabel lblAwardBonusStyle;
     private MMComboBox<AwardBonus> comboAwardBonusStyle;
@@ -181,6 +177,7 @@ public class PersonnelTab {
     //end Awards Tab
 
     //start Medical Tab
+    private CampaignOptionsHeaderPanel medicalHeader;
     private JCheckBox chkUseAdvancedMedical;
     private JLabel lblHealWaitingPeriod;
     private JSpinner spnHealWaitingPeriod;
@@ -196,6 +193,7 @@ public class PersonnelTab {
     //end Medical Tab
 
     //start Prisoners and Dependents Tab
+    private CampaignOptionsHeaderPanel prisonersAndDependentsHeader;
     private JPanel prisonerPanel;
     private JLabel lblPrisonerCaptureStyle;
     private MMComboBox<PrisonerCaptureStyle> comboPrisonerCaptureStyle;
@@ -205,23 +203,6 @@ public class PersonnelTab {
     private JCheckBox chkUseRandomDependentAddition;
     private JCheckBox chkUseRandomDependentRemoval;
     //end Prisoners and Dependents Tab
-
-    //start Salaries Tab
-    private JCheckBox chkDisableSecondaryRoleSalary;
-
-    private JPanel pnlSalaryMultipliersPanel;
-    private JLabel lblAntiMekSalary;
-    private JSpinner spnAntiMekSalary;
-    private JLabel lblSpecialistInfantrySalary;
-    private JSpinner spnSpecialistInfantrySalary;
-
-    private JPanel pnlSalaryExperienceMultipliersPanel;
-    private Map<SkillLevel, JLabel> lblSalaryExperienceMultipliers;
-    private Map<SkillLevel, JSpinner> spnSalaryExperienceMultipliers;
-
-    private JPanel pnlSalaryBaseSalaryPanel;
-    private JLabel[] lblBaseSalary;
-    private JSpinner[] spnBaseSalary;
     //end Salaries Tab
 
     /**
@@ -246,31 +227,6 @@ public class PersonnelTab {
         initializeAwardsTab();
         initializeMedicalTab();
         initializePrisonersAndDependentsTab();
-        initializeSalariesTab();
-    }
-
-    /**
-     * Initializes the components of the Salaries Tab. This includes settings for personnel salaries, such as
-     * multipliers and base salary rates.
-     */
-    private void initializeSalariesTab() {
-        chkDisableSecondaryRoleSalary = new JCheckBox();
-
-        pnlSalaryMultipliersPanel = new JPanel();
-
-        lblAntiMekSalary = new JLabel();
-        spnAntiMekSalary = new JSpinner();
-
-        lblSpecialistInfantrySalary = new JLabel();
-        spnSpecialistInfantrySalary = new JSpinner();
-
-        pnlSalaryExperienceMultipliersPanel = new JPanel();
-        lblSalaryExperienceMultipliers = new HashMap<>();
-        spnSalaryExperienceMultipliers = new HashMap<>();
-
-        pnlSalaryBaseSalaryPanel = new JPanel();
-        lblBaseSalary = new JLabel[29];
-        spnBaseSalary = new JSpinner[29];
     }
 
     /**
@@ -437,8 +393,9 @@ public class PersonnelTab {
      */
     public JPanel createGeneralTab() {
         // Header
-        JPanel headerPanel = new CampaignOptionsHeaderPanel("PersonnelGeneralTab",
-              getImageDirectory() + "logo_clan_wolverine.png");
+        generalHeader = new CampaignOptionsHeaderPanel("PersonnelGeneralTab",
+              getImageDirectory() + "logo_clan_wolverine.png",
+              5);
 
         // Contents
         pnlPersonnelGeneralOptions = createGeneralOptionsPanel();
@@ -462,7 +419,7 @@ public class PersonnelTab {
 
         layoutParent.gridwidth = 5;
         layoutParent.gridy = 0;
-        panelParent.add(headerPanel, layoutParent);
+        panelParent.add(generalHeader, layoutParent);
 
         layoutParent.gridx = 0;
         layoutParent.gridy++;
@@ -484,15 +441,26 @@ public class PersonnelTab {
     private JPanel createGeneralOptionsPanel() {
         // Contents
         chkUseTactics = new CampaignOptionsCheckBox("UseTactics");
+        chkUseTactics.addMouseListener(createTipPanelUpdater(generalHeader, "UseTactics"));
         chkUseInitiativeBonus = new CampaignOptionsCheckBox("UseInitiativeBonus");
+        chkUseInitiativeBonus.addMouseListener(createTipPanelUpdater(generalHeader, "UseInitiativeBonus"));
         chkUseToughness = new CampaignOptionsCheckBox("UseToughness");
+        chkUseToughness.addMouseListener(createTipPanelUpdater(generalHeader, "UseToughness"));
         chkUseRandomToughness = new CampaignOptionsCheckBox("UseRandomToughness");
+        chkUseRandomToughness.addMouseListener(createTipPanelUpdater(generalHeader, "UseRandomToughness"));
         chkUseArtillery = new CampaignOptionsCheckBox("UseArtillery");
+        chkUseArtillery.addMouseListener(createTipPanelUpdater(generalHeader, "UseArtillery"));
         chkUseAbilities = new CampaignOptionsCheckBox("UseAbilities");
+        chkUseAbilities.addMouseListener(createTipPanelUpdater(generalHeader, "UseAbilities"));
         chkUseEdge = new CampaignOptionsCheckBox("UseEdge");
+        chkUseEdge.addMouseListener(createTipPanelUpdater(generalHeader, "UseEdge"));
         chkUseSupportEdge = new CampaignOptionsCheckBox("UseSupportEdge");
+        chkUseSupportEdge.addMouseListener(createTipPanelUpdater(generalHeader, "UseSupportEdge"));
         chkUseImplants = new CampaignOptionsCheckBox("UseImplants");
+        chkUseImplants.addMouseListener(createTipPanelUpdater(generalHeader, "UseImplants"));
         chkUseAlternativeQualityAveraging = new CampaignOptionsCheckBox("UseAlternativeQualityAveraging");
+        chkUseAlternativeQualityAveraging.addMouseListener(createTipPanelUpdater(generalHeader,
+              "UseAlternativeQualityAveraging"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PersonnelGeneralTab");
@@ -544,8 +512,11 @@ public class PersonnelTab {
     private JPanel createPersonnelCleanUpPanel() {
         // Contents
         chkUsePersonnelRemoval = new CampaignOptionsCheckBox("UsePersonnelRemoval");
+        chkUsePersonnelRemoval.addMouseListener(createTipPanelUpdater(generalHeader, "UsePersonnelRemoval"));
         chkUseRemovalExemptCemetery = new CampaignOptionsCheckBox("UseRemovalExemptCemetery");
+        chkUseRemovalExemptCemetery.addMouseListener(createTipPanelUpdater(generalHeader, "UseRemovalExemptCemetery"));
         chkUseRemovalExemptRetirees = new CampaignOptionsCheckBox("UseRemovalExemptRetirees");
+        chkUseRemovalExemptRetirees.addMouseListener(createTipPanelUpdater(generalHeader, "UseRemovalExemptRetirees"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PersonnelCleanUpPanel", true, "PersonnelCleanUpPanel");
@@ -581,9 +552,15 @@ public class PersonnelTab {
     private JPanel createAdministratorsPanel() {
         // Contents
         chkAdminsHaveNegotiation = new CampaignOptionsCheckBox("AdminsHaveNegotiation");
+        chkAdminsHaveNegotiation.addMouseListener(createTipPanelUpdater(generalHeader, "AdminsHaveNegotiation"));
         chkAdminExperienceLevelIncludeNegotiation = new CampaignOptionsCheckBox("AdminExperienceLevelIncludeNegotiation");
+        chkAdminExperienceLevelIncludeNegotiation.addMouseListener(createTipPanelUpdater(generalHeader,
+              "AdminExperienceLevelIncludeNegotiation"));
         chkAdminsHaveScrounge = new CampaignOptionsCheckBox("AdminsHaveScrounge");
+        chkAdminsHaveScrounge.addMouseListener(createTipPanelUpdater(generalHeader, "AdminsHaveScrounge"));
         chkAdminExperienceLevelIncludeScrounge = new CampaignOptionsCheckBox("AdminExperienceLevelIncludeScrounge");
+        chkAdminExperienceLevelIncludeScrounge.addMouseListener(createTipPanelUpdater(generalHeader,
+              "AdminExperienceLevelIncludeScrounge"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("AdministratorsPanel", true, "AdministratorsPanel");
@@ -612,8 +589,9 @@ public class PersonnelTab {
      */
     public JPanel createAwardsTab() {
         // Header
-        JPanel headerPanel = new CampaignOptionsHeaderPanel("AwardsTab",
-              getImageDirectory() + "logo_outworld_alliance.png");
+        awardsHeader = new CampaignOptionsHeaderPanel("AwardsTab",
+              getImageDirectory() + "logo_outworld_alliance.png",
+              5);
 
         // Contents
         pnlAwardsGeneralOptions = createAwardsGeneralOptionsPanel();
@@ -622,7 +600,9 @@ public class PersonnelTab {
         txtAwardSetFilterList = new JTextArea(10, 60);
         txtAwardSetFilterList.setLineWrap(true);
         txtAwardSetFilterList.setWrapStyleWord(true);
-        txtAwardSetFilterList.setToolTipText(wordWrap(resources.getString("lblAwardSetFilterList.tooltip")));
+        txtAwardSetFilterList.addMouseListener(createTipPanelUpdater(awardsHeader, "AwardSetFilterList"));
+        txtAwardSetFilterList.setToolTipText(wordWrap(getTextAt(getCampaignOptionsResourceBundle(),
+              "lblAwardSetFilterList.tooltip")));
         txtAwardSetFilterList.setName("txtAwardSetFilterList");
         txtAwardSetFilterList.setText("");
         JScrollPane scrollAwardSetFilterList = new JScrollPane(txtAwardSetFilterList);
@@ -652,7 +632,7 @@ public class PersonnelTab {
 
         layoutParent.gridwidth = 5;
         layoutParent.gridy = 0;
-        panelParent.add(headerPanel, layoutParent);
+        panelParent.add(awardsHeader, layoutParent);
 
         layoutParent.gridx = 0;
         layoutParent.gridy++;
@@ -679,6 +659,7 @@ public class PersonnelTab {
     JPanel createAwardsGeneralOptionsPanel() {
         // Contents
         lblAwardBonusStyle = new CampaignOptionsLabel("AwardBonusStyle");
+        lblAwardBonusStyle.addMouseListener(createTipPanelUpdater(awardsHeader, "AwardBonusStyle"));
         comboAwardBonusStyle.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
@@ -690,17 +671,24 @@ public class PersonnelTab {
                 return this;
             }
         });
+        comboAwardBonusStyle.addMouseListener(createTipPanelUpdater(awardsHeader, "AwardBonusStyle"));
 
         lblAwardTierSize = new CampaignOptionsLabel("AwardTierSize");
+        lblAwardTierSize.addMouseListener(createTipPanelUpdater(awardsHeader, "AwardTierSize"));
         spnAwardTierSize = new CampaignOptionsSpinner("AwardTierSize", 5, 1, 100, 1);
+        spnAwardTierSize.addMouseListener(createTipPanelUpdater(awardsHeader, "AwardTierSize"));
 
         chkEnableAutoAwards = new CampaignOptionsCheckBox("EnableAutoAwards");
+        chkEnableAutoAwards.addMouseListener(createTipPanelUpdater(awardsHeader, "EnableAutoAwards"));
 
         chkIssuePosthumousAwards = new CampaignOptionsCheckBox("IssuePosthumousAwards");
+        chkIssuePosthumousAwards.addMouseListener(createTipPanelUpdater(awardsHeader, "IssuePosthumousAwards"));
 
         chkIssueBestAwardOnly = new CampaignOptionsCheckBox("IssueBestAwardOnly");
+        chkIssueBestAwardOnly.addMouseListener(createTipPanelUpdater(awardsHeader, "IssueBestAwardOnly"));
 
         chkIgnoreStandardSet = new CampaignOptionsCheckBox("IgnoreStandardSet");
+        chkIgnoreStandardSet.addMouseListener(createTipPanelUpdater(awardsHeader, "IgnoreStandardSet"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("AwardsGeneralOptionsPanel");
@@ -743,17 +731,30 @@ public class PersonnelTab {
     private JPanel createAutoAwardsFilterPanel() {
         // Contents
         chkEnableContractAwards = new CampaignOptionsCheckBox("EnableContractAwards");
+        chkEnableContractAwards.addMouseListener(createTipPanelUpdater(awardsHeader, "EnableContractAwards"));
         chkEnableFactionHunterAwards = new CampaignOptionsCheckBox("EnableFactionHunterAwards");
+        chkEnableFactionHunterAwards.addMouseListener(createTipPanelUpdater(awardsHeader, "EnableFactionHunterAwards"));
         chkEnableInjuryAwards = new CampaignOptionsCheckBox("EnableInjuryAwards");
+        chkEnableInjuryAwards.addMouseListener(createTipPanelUpdater(awardsHeader, "EnableInjuryAwards"));
         chkEnableIndividualKillAwards = new CampaignOptionsCheckBox("EnableIndividualKillAwards");
+        chkEnableIndividualKillAwards.addMouseListener(createTipPanelUpdater(awardsHeader,
+              "EnableIndividualKillAwards"));
         chkEnableFormationKillAwards = new CampaignOptionsCheckBox("EnableFormationKillAwards");
+        chkEnableFormationKillAwards.addMouseListener(createTipPanelUpdater(awardsHeader, "EnableFormationKillAwards"));
         chkEnableRankAwards = new CampaignOptionsCheckBox("EnableRankAwards");
+        chkEnableRankAwards.addMouseListener(createTipPanelUpdater(awardsHeader, "EnableRankAwards"));
         chkEnableScenarioAwards = new CampaignOptionsCheckBox("EnableScenarioAwards");
+        chkEnableScenarioAwards.addMouseListener(createTipPanelUpdater(awardsHeader, "EnableScenarioAwards"));
         chkEnableSkillAwards = new CampaignOptionsCheckBox("EnableSkillAwards");
+        chkEnableSkillAwards.addMouseListener(createTipPanelUpdater(awardsHeader, "EnableSkillAwards"));
         chkEnableTheatreOfWarAwards = new CampaignOptionsCheckBox("EnableTheatreOfWarAwards");
+        chkEnableTheatreOfWarAwards.addMouseListener(createTipPanelUpdater(awardsHeader, "EnableTheatreOfWarAwards"));
         chkEnableTimeAwards = new CampaignOptionsCheckBox("EnableTimeAwards");
+        chkEnableTimeAwards.addMouseListener(createTipPanelUpdater(awardsHeader, "EnableTimeAwards"));
         chkEnableTrainingAwards = new CampaignOptionsCheckBox("EnableTrainingAwards");
+        chkEnableTrainingAwards.addMouseListener(createTipPanelUpdater(awardsHeader, "EnableTrainingAwards"));
         chkEnableMiscAwards = new CampaignOptionsCheckBox("EnableMiscAwards");
+        chkEnableMiscAwards.addMouseListener(createTipPanelUpdater(awardsHeader, "EnableMiscAwards"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("AutoAwardsFilterPanel", true, "AutoAwardsFilterPanel");
@@ -802,29 +803,42 @@ public class PersonnelTab {
      */
     public JPanel createMedicalTab() {
         // Header
-        JPanel headerPanel = new CampaignOptionsHeaderPanel("MedicalTab",
-              getImageDirectory() + "logo_duchy_of_tamarind_abbey.png");
+        medicalHeader = new CampaignOptionsHeaderPanel("MedicalTab",
+              getImageDirectory() + "logo_duchy_of_tamarind_abbey.png",
+              3);
 
         // Contents
         chkUseAdvancedMedical = new CampaignOptionsCheckBox("UseAdvancedMedical");
+        chkUseAdvancedMedical.addMouseListener(createTipPanelUpdater(medicalHeader, "UseAdvancedMedical"));
 
         lblHealWaitingPeriod = new CampaignOptionsLabel("HealWaitingPeriod");
+        lblHealWaitingPeriod.addMouseListener(createTipPanelUpdater(medicalHeader, "HealWaitingPeriod"));
         spnHealWaitingPeriod = new CampaignOptionsSpinner("HealWaitingPeriod", 1, 1, 30, 1);
+        spnHealWaitingPeriod.addMouseListener(createTipPanelUpdater(medicalHeader, "HealWaitingPeriod"));
 
         lblNaturalHealWaitingPeriod = new CampaignOptionsLabel("NaturalHealWaitingPeriod");
+        lblNaturalHealWaitingPeriod.addMouseListener(createTipPanelUpdater(medicalHeader, "NaturalHealWaitingPeriod"));
         spnNaturalHealWaitingPeriod = new CampaignOptionsSpinner("NaturalHealWaitingPeriod", 1, 1, 365, 1);
+        spnNaturalHealWaitingPeriod.addMouseListener(createTipPanelUpdater(medicalHeader, "NaturalHealWaitingPeriod"));
 
         lblMinimumHitsForVehicles = new CampaignOptionsLabel("MinimumHitsForVehicles");
+        lblMinimumHitsForVehicles.addMouseListener(createTipPanelUpdater(medicalHeader, "MinimumHitsForVehicles"));
         spnMinimumHitsForVehicles = new CampaignOptionsSpinner("MinimumHitsForVehicles", 1, 1, 5, 1);
+        spnMinimumHitsForVehicles.addMouseListener(createTipPanelUpdater(medicalHeader, "MinimumHitsForVehicles"));
 
         chkUseRandomHitsForVehicles = new CampaignOptionsCheckBox("UseRandomHitsForVehicles");
+        chkUseRandomHitsForVehicles.addMouseListener(createTipPanelUpdater(medicalHeader, "UseRandomHitsForVehicles"));
 
         chkUseTougherHealing = new CampaignOptionsCheckBox("UseTougherHealing");
+        chkUseTougherHealing.addMouseListener(createTipPanelUpdater(medicalHeader, "UseTougherHealing"));
 
         lblMaximumPatients = new CampaignOptionsLabel("MaximumPatients");
+        lblMaximumPatients.addMouseListener(createTipPanelUpdater(medicalHeader, "MaximumPatients"));
         spnMaximumPatients = new CampaignOptionsSpinner("MaximumPatients", 25, 1, 100, 1);
+        spnMaximumPatients.addMouseListener(createTipPanelUpdater(medicalHeader, "MaximumPatients"));
 
         chkDoctorsUseAdministration = new CampaignOptionsCheckBox("DoctorsUseAdministration");
+        chkDoctorsUseAdministration.addMouseListener(createTipPanelUpdater(medicalHeader, "DoctorsUseAdministration"));
 
         final JPanel panelLeft = new CampaignOptionsStandardPanel("MedicalTabLeft");
         final GridBagConstraints layoutLeft = new CampaignOptionsGridBagConstraints(panelLeft);
@@ -880,7 +894,7 @@ public class PersonnelTab {
         layoutParent.gridwidth = 5;
         layoutParent.gridx = 0;
         layoutParent.gridy = 0;
-        panelParent.add(headerPanel, layoutParent);
+        panelParent.add(medicalHeader, layoutParent);
 
         layoutParent.gridy++;
         layoutParent.gridwidth = 1;
@@ -901,17 +915,28 @@ public class PersonnelTab {
      */
     public JPanel createPersonnelInformationTab() {
         // Header
-        JPanel headerPanel = new CampaignOptionsHeaderPanel("PersonnelInformation",
-              getImageDirectory() + "logo_rasalhague_dominion.png");
+        personnelInformationHeader = new CampaignOptionsHeaderPanel("PersonnelInformation",
+              getImageDirectory() + "logo_rasalhague_dominion.png",
+              4);
 
         // Contents
         chkUseTimeInService = new CampaignOptionsCheckBox("UseTimeInService");
+        chkUseTimeInService.addMouseListener(createTipPanelUpdater(personnelInformationHeader, "UseTimeInService"));
         lblTimeInServiceDisplayFormat = new CampaignOptionsLabel("TimeInServiceDisplayFormat");
+        lblTimeInServiceDisplayFormat.addMouseListener(createTipPanelUpdater(personnelInformationHeader,
+              "TimeInServiceDisplayFormat"));
         chkUseTimeInRank = new CampaignOptionsCheckBox("UseTimeInRank");
+        chkUseTimeInRank.addMouseListener(createTipPanelUpdater(personnelInformationHeader, "UseTimeInRank"));
         lblTimeInRankDisplayFormat = new CampaignOptionsLabel("TimeInRankDisplayFormat");
+        lblTimeInRankDisplayFormat.addMouseListener(createTipPanelUpdater(personnelInformationHeader,
+              "TimeInRankDisplayFormat"));
         chkTrackTotalEarnings = new CampaignOptionsCheckBox("TrackTotalEarnings");
+        chkTrackTotalEarnings.addMouseListener(createTipPanelUpdater(personnelInformationHeader, "TrackTotalEarnings"));
         chkTrackTotalXPEarnings = new CampaignOptionsCheckBox("TrackTotalXPEarnings");
+        chkTrackTotalXPEarnings.addMouseListener(createTipPanelUpdater(personnelInformationHeader,
+              "TrackTotalXPEarnings"));
         chkShowOriginFaction = new CampaignOptionsCheckBox("ShowOriginFaction");
+        chkShowOriginFaction.addMouseListener(createTipPanelUpdater(personnelInformationHeader, "ShowOriginFaction"));
 
         JPanel pnlPersonnelLogs = createPersonnelLogsPanel();
 
@@ -955,7 +980,7 @@ public class PersonnelTab {
         layoutParent.gridwidth = 5;
         layoutParent.gridx = 0;
         layoutParent.gridy = 0;
-        panelParent.add(headerPanel, layoutParent);
+        panelParent.add(personnelInformationHeader, layoutParent);
 
         layoutParent.gridy++;
         layoutParent.gridwidth = 1;
@@ -976,16 +1001,35 @@ public class PersonnelTab {
     JPanel createPersonnelLogsPanel() {
         // Contents
         chkUseTransfers = new CampaignOptionsCheckBox("UseTransfers");
+        chkUseTransfers.addMouseListener(createTipPanelUpdater(personnelInformationHeader, "UseTransfers"));
         chkUseExtendedTOEForceName = new CampaignOptionsCheckBox("UseExtendedTOEForceName");
+        chkUseExtendedTOEForceName.addMouseListener(createTipPanelUpdater(personnelInformationHeader,
+              "UseExtendedTOEForceName"));
         chkPersonnelLogSkillGain = new CampaignOptionsCheckBox("PersonnelLogSkillGain");
+        chkPersonnelLogSkillGain.addMouseListener(createTipPanelUpdater(personnelInformationHeader,
+              "PersonnelLogSkillGain"));
         chkPersonnelLogAbilityGain = new CampaignOptionsCheckBox("PersonnelLogAbilityGain");
+        chkPersonnelLogAbilityGain.addMouseListener(createTipPanelUpdater(personnelInformationHeader,
+              "PersonnelLogAbilityGain"));
         chkPersonnelLogEdgeGain = new CampaignOptionsCheckBox("PersonnelLogEdgeGain");
+        chkPersonnelLogEdgeGain.addMouseListener(createTipPanelUpdater(personnelInformationHeader,
+              "PersonnelLogEdgeGain"));
         chkDisplayPersonnelLog = new CampaignOptionsCheckBox("DisplayPersonnelLog");
+        chkDisplayPersonnelLog.addMouseListener(createTipPanelUpdater(personnelInformationHeader,
+              "DisplayPersonnelLog"));
         chkDisplayScenarioLog = new CampaignOptionsCheckBox("DisplayScenarioLog");
+        chkDisplayScenarioLog.addMouseListener(createTipPanelUpdater(personnelInformationHeader, "DisplayScenarioLog"));
         chkDisplayKillRecord = new CampaignOptionsCheckBox("DisplayKillRecord");
+        chkDisplayKillRecord.addMouseListener(createTipPanelUpdater(personnelInformationHeader, "DisplayKillRecord"));
         chkDisplayMedicalRecord = new CampaignOptionsCheckBox("DisplayMedicalRecord");
+        chkDisplayMedicalRecord.addMouseListener(createTipPanelUpdater(personnelInformationHeader,
+              "DisplayMedicalRecord"));
         chkDisplayAssignmentRecord = new CampaignOptionsCheckBox("DisplayAssignmentRecord");
+        chkDisplayAssignmentRecord.addMouseListener(createTipPanelUpdater(personnelInformationHeader,
+              "DisplayAssignmentRecord"));
         chkDisplayPerformanceRecord = new CampaignOptionsCheckBox("DisplayPerformanceRecord");
+        chkDisplayPerformanceRecord.addMouseListener(createTipPanelUpdater(personnelInformationHeader,
+              "DisplayPerformanceRecord"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PersonnelLogsPanel", true, "PersonnelLogsPanel");
@@ -1037,8 +1081,9 @@ public class PersonnelTab {
      */
     public JPanel createPrisonersAndDependentsTab() {
         // Header
-        JPanel headerPanel = new CampaignOptionsHeaderPanel("PrisonersAndDependentsTab",
-              getImageDirectory() + "logo_illyrian_palatinate.png");
+        prisonersAndDependentsHeader = new CampaignOptionsHeaderPanel("PrisonersAndDependentsTab",
+              getImageDirectory() + "logo_illyrian_palatinate.png",
+              2);
 
         // Contents
         prisonerPanel = createPrisonersPanel();
@@ -1051,7 +1096,7 @@ public class PersonnelTab {
         layoutParent.gridwidth = 5;
         layoutParent.gridx = 0;
         layoutParent.gridy = 0;
-        panel.add(headerPanel, layoutParent);
+        panel.add(prisonersAndDependentsHeader, layoutParent);
 
         layoutParent.gridy++;
         layoutParent.gridwidth = 1;
@@ -1072,6 +1117,8 @@ public class PersonnelTab {
     private JPanel createPrisonersPanel() {
         // Contents
         lblPrisonerCaptureStyle = new CampaignOptionsLabel("PrisonerCaptureStyle");
+        lblPrisonerCaptureStyle.addMouseListener(createTipPanelUpdater(prisonersAndDependentsHeader,
+              "PrisonerCaptureStyle"));
         comboPrisonerCaptureStyle.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
@@ -1083,8 +1130,12 @@ public class PersonnelTab {
                 return this;
             }
         });
+        comboPrisonerCaptureStyle.addMouseListener(createTipPanelUpdater(prisonersAndDependentsHeader,
+              "PrisonerCaptureStyle"));
 
         chkResetTemporaryPrisonerCapacity = new CampaignOptionsCheckBox("ResetTemporaryPrisonerCapacity");
+        chkResetTemporaryPrisonerCapacity.addMouseListener(createTipPanelUpdater(prisonersAndDependentsHeader,
+              "ResetTemporaryPrisonerCapacity"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PrisonersPanel", true, "PrisonersPanel");
@@ -1113,7 +1164,11 @@ public class PersonnelTab {
     private JPanel createDependentsPanel() {
         // Contents
         chkUseRandomDependentAddition = new CampaignOptionsCheckBox("UseRandomDependentAddition");
+        chkUseRandomDependentAddition.addMouseListener(createTipPanelUpdater(prisonersAndDependentsHeader,
+              "UseRandomDependentAddition"));
         chkUseRandomDependentRemoval = new CampaignOptionsCheckBox("UseRandomDependentRemoval");
+        chkUseRandomDependentRemoval.addMouseListener(createTipPanelUpdater(prisonersAndDependentsHeader,
+              "UseRandomDependentRemoval"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("DependentsPanel", true, "DependentsPanel");
@@ -1131,263 +1186,82 @@ public class PersonnelTab {
     }
 
     /**
-     * Creates the layout for the Salaries Tab, including components for salary multipliers and base salary settings.
-     *
-     * @return a {@link JPanel} representing the Salaries Tab.
+     * @deprecated This content has been moved to its own tab
      */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public JPanel createSalariesTab() {
         // Header
-        JPanel headerPanel = new CampaignOptionsHeaderPanel("SalariesTab",
-              getImageDirectory() + "logo_clan_coyote.png");
-
-        // Contents
-        chkDisableSecondaryRoleSalary = new CampaignOptionsCheckBox("DisableSecondaryRoleSalary");
-        pnlSalaryMultipliersPanel = createSalaryMultipliersPanel();
-        pnlSalaryExperienceMultipliersPanel = createExperienceMultipliersPanel();
-        pnlSalaryBaseSalaryPanel = createBaseSalariesPanel();
+        //        salariesHeader = new CampaignOptionsHeaderPanel("SalariesTab", getImageDirectory() + "logo_clan_coyote.png", 2);
+        //
+        //        // Contents
+        //        chkDisableSecondaryRoleSalary = new CampaignOptionsCheckBox("DisableSecondaryRoleSalary");
+        //        chkDisableSecondaryRoleSalary.addMouseListener(createTipPanelUpdater(salariesHeader,
+        //              "DisableSecondaryRoleSalary"));
+        //        pnlSalaryMultipliersPanel = createSalaryMultipliersPanel();
+        //        pnlSalaryExperienceMultipliersPanel = createExperienceMultipliersPanel();
+        //        pnlSalaryBaseSalaryPanel = createBaseSalariesPanel();
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("SalariesTab", true);
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.gridwidth = 5;
-        layout.gridy = 0;
-        panel.add(headerPanel, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        layout.gridwidth = 1;
-        panel.add(chkDisableSecondaryRoleSalary, layout);
-
-        layout.gridy++;
-        panel.add(pnlSalaryMultipliersPanel, layout);
-        layout.gridx++;
-        panel.add(pnlSalaryExperienceMultipliersPanel, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        layout.gridwidth = 2;
-        panel.add(pnlSalaryBaseSalaryPanel, layout);
+        //        layout.gridwidth = 5;
+        //        layout.gridy = 0;
+        //        panel.add(salariesHeader, layout);
+        //
+        //        layout.gridx = 0;
+        //        layout.gridy++;
+        //        layout.gridwidth = 1;
+        //        panel.add(chkDisableSecondaryRoleSalary, layout);
+        //
+        //        layout.gridy++;
+        //        panel.add(pnlSalaryMultipliersPanel, layout);
+        //        layout.gridx++;
+        //        panel.add(pnlSalaryExperienceMultipliersPanel, layout);
+        //
+        //        layout.gridx = 0;
+        //        layout.gridy++;
+        //        layout.gridwidth = 2;
+        //        panel.add(pnlSalaryBaseSalaryPanel, layout);
 
         // Create Parent Panel and return
         return createParentPanel(panel, "SalariesTab");
     }
 
     /**
-     * Creates the panel for configuring salary multipliers for specific roles in the Salaries Tab.
-     *
-     * @return a {@link JPanel} containing salary multiplier options.
+     * @deprecated use {@link #loadValuesFromCampaignOptions(Version)} instead.
      */
-    private JPanel createSalaryMultipliersPanel() {
-        // Contents
-        lblAntiMekSalary = new CampaignOptionsLabel("AntiMekSalary");
-        spnAntiMekSalary = new CampaignOptionsSpinner("AntiMekSalary", 0, 0, 100, 0.01);
-
-        lblSpecialistInfantrySalary = new CampaignOptionsLabel("SpecialistInfantrySalary");
-        spnSpecialistInfantrySalary = new CampaignOptionsSpinner("SpecialistInfantrySalary", 0, 0, 100, 0.01);
-
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("SalaryMultipliersPanel", true, "SalaryMultipliersPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridy = 0;
-        layout.gridx = 0;
-        layout.gridwidth = 1;
-        panel.add(lblAntiMekSalary, layout);
-        layout.gridx++;
-        panel.add(spnAntiMekSalary, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblSpecialistInfantrySalary, layout);
-        layout.gridx++;
-        panel.add(spnSpecialistInfantrySalary, layout);
-
-        return panel;
-    }
-
-    /**
-     * Creates the panel for configuring experience multipliers based on skill levels in the Salaries Tab.
-     *
-     * @return a {@link JPanel} containing settings for skill-based experience multipliers.
-     */
-    private JPanel createExperienceMultipliersPanel() {
-        // Contents
-        SkillLevel[] skillLevels = Skills.SKILL_LEVELS;
-
-        for (final SkillLevel skillLevel : skillLevels) {
-            final JLabel label = new CampaignOptionsLabel("SkillLevel" + skillLevel.toString(), null, true);
-            label.setToolTipText(resources.getString("lblSkillLevelMultiplier.tooltip"));
-            lblSalaryExperienceMultipliers.put(skillLevel, label);
-
-            final JSpinner spinner = new CampaignOptionsSpinner("SkillLevel" + skillLevel, null, 0, 0, 100, 0.1, true);
-            spinner.setToolTipText(resources.getString("lblSkillLevelMultiplier.tooltip"));
-            spnSalaryExperienceMultipliers.put(skillLevel, spinner);
-        }
-
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("ExperienceMultipliersPanel",
-              true,
-              "ExperienceMultipliersPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridy = 0;
-        layout.gridx = 0;
-        layout.gridwidth = 1;
-        panel.add(lblSalaryExperienceMultipliers.get(skillLevels[0]), layout);
-        layout.gridx++;
-        panel.add(spnSalaryExperienceMultipliers.get(skillLevels[0]), layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblSalaryExperienceMultipliers.get(skillLevels[4]), layout);
-        layout.gridx++;
-        panel.add(spnSalaryExperienceMultipliers.get(skillLevels[4]), layout);
-
-        // new column
-
-        layout.gridx = 2;
-        layout.gridy = 0;
-        panel.add(lblSalaryExperienceMultipliers.get(skillLevels[1]), layout);
-        layout.gridx++;
-        panel.add(spnSalaryExperienceMultipliers.get(skillLevels[1]), layout);
-
-        layout.gridx = 2;
-        layout.gridy++;
-        panel.add(lblSalaryExperienceMultipliers.get(skillLevels[5]), layout);
-        layout.gridx++;
-        panel.add(spnSalaryExperienceMultipliers.get(skillLevels[5]), layout);
-
-        // new column
-
-        layout.gridx = 4;
-        layout.gridy = 0;
-        panel.add(lblSalaryExperienceMultipliers.get(skillLevels[2]), layout);
-        layout.gridx++;
-        panel.add(spnSalaryExperienceMultipliers.get(skillLevels[2]), layout);
-
-        layout.gridx = 4;
-        layout.gridy++;
-        panel.add(lblSalaryExperienceMultipliers.get(skillLevels[6]), layout);
-        layout.gridx++;
-        panel.add(spnSalaryExperienceMultipliers.get(skillLevels[6]), layout);
-
-        // new column
-
-        layout.gridx = 6;
-        layout.gridy = 0;
-        panel.add(lblSalaryExperienceMultipliers.get(skillLevels[3]), layout);
-        layout.gridx++;
-        panel.add(spnSalaryExperienceMultipliers.get(skillLevels[3]), layout);
-
-        layout.gridx = 6;
-        layout.gridy++;
-        panel.add(lblSalaryExperienceMultipliers.get(skillLevels[7]), layout);
-        layout.gridx++;
-        panel.add(spnSalaryExperienceMultipliers.get(skillLevels[7]), layout);
-
-        return panel;
-    }
-
-    /**
-     * Creates the panel for configuring base salaries for various personnel roles in the Salaries Tab.
-     *
-     * @return a {@link JPanel} containing settings for base salaries.
-     */
-    private JPanel createBaseSalariesPanel() {
-        // Contents
-        for (final PersonnelRole personnelRole : PersonnelRole.values()) {
-            String componentName = personnelRole.toString().replaceAll(" ", "");
-
-            // JLabel
-            JLabel jLabel = new JLabel(personnelRole.toString());
-            jLabel.setName("lbl" + componentName);
-
-            Dimension labelSize = jLabel.getPreferredSize();
-            jLabel.setMinimumSize(UIUtil.scaleForGUI(labelSize.width, labelSize.height));
-
-            // JSpinner
-            JSpinner jSpinner = new JSpinner();
-            jSpinner.setModel(new SpinnerNumberModel(0.0, 0.0, 1000000, 10.0));
-            jSpinner.setName("spn" + componentName);
-
-            DefaultEditor editor = (DefaultEditor) jSpinner.getEditor();
-            editor.getTextField().setHorizontalAlignment(JTextField.LEFT);
-
-            Dimension spinnerSize = jSpinner.getPreferredSize();
-            jSpinner.setMinimumSize(UIUtil.scaleForGUI(spinnerSize.width, spinnerSize.height));
-
-            // Component Tracking Assignment
-            lblBaseSalary[personnelRole.ordinal()] = jLabel;
-            spnBaseSalary[personnelRole.ordinal()] = jSpinner;
-        }
-
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("BaseSalariesPanel", true, "BaseSalariesPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
-
-        SequentialGroup mainHorizontalGroup = layout.createSequentialGroup();
-        SequentialGroup mainVerticalGroup = layout.createSequentialGroup();
-
-        int columns = 3;
-        int rows = (int) Math.ceil((double) lblBaseSalary.length / columns);
-
-        // Create an array to store ParallelGroups for each column
-        ParallelGroup[] columnGroups = new ParallelGroup[columns];
-        for (int i = 0; i < columns; i++) {
-            columnGroups[i] = layout.createParallelGroup();
-        }
-
-        for (int j = 0; j < rows; j++) {
-            ParallelGroup verticalGroup = layout.createParallelGroup(Alignment.BASELINE);
-
-            for (int i = 0; i < columns; i++) {
-                int index = i * rows + j;
-
-                if (index < lblBaseSalary.length) {
-                    // Create a SequentialGroup for the label and spinner
-                    SequentialGroup horizontalSequentialGroup = layout.createSequentialGroup();
-
-                    horizontalSequentialGroup.addComponent(lblBaseSalary[index]);
-                    horizontalSequentialGroup.addComponent(spnBaseSalary[index]);
-                    if (i != (columns - 1)) {
-                        horizontalSequentialGroup.addGap(10);
-                    }
-
-                    // Add the SequentialGroup to the column's ParallelGroup
-                    columnGroups[i].addGroup(horizontalSequentialGroup);
-
-                    verticalGroup.addComponent(lblBaseSalary[index]);
-                    verticalGroup.addComponent(spnBaseSalary[index]);
-                }
-            }
-            mainVerticalGroup.addGroup(verticalGroup);
-        }
-        for (ParallelGroup columnGroup : columnGroups) {
-            mainHorizontalGroup.addGroup(columnGroup);
-        }
-
-        layout.setHorizontalGroup(mainHorizontalGroup);
-        layout.setVerticalGroup(mainVerticalGroup);
-
-        return panel;
+    @Deprecated(since = "0.50.06", forRemoval = true)
+    public void loadValuesFromCampaignOptions() {
+        loadValuesFromCampaignOptions(null, new Version());
     }
 
     /**
      * Shortcut method to load default {@link CampaignOptions} values into the tab components.
      */
-    public void loadValuesFromCampaignOptions() {
-        loadValuesFromCampaignOptions(null);
+    public void loadValuesFromCampaignOptions(Version version) {
+        loadValuesFromCampaignOptions(null, version);
     }
 
     /**
-     * Loads the values from the provided {@link CampaignOptions} into the Personnel Tab components. If no preset
-     * options are provided, the current {@link CampaignOptions} instance is used.
-     *
-     * @param presetCampaignOptions optional custom {@link CampaignOptions} to load into the tab.
+     * @deprecated use {@link #loadValuesFromCampaignOptions(CampaignOptions, Version)} instead.
      */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions) {
+        loadValuesFromCampaignOptions(presetCampaignOptions, new Version());
+    }
+
+    /**
+     * Loads and applies configuration values from the provided {@link CampaignOptions} object, or uses the default
+     * campaign options if none are provided. The configuration includes general settings, personnel logs, personnel
+     * information, awards, medical settings, prisoner and dependent settings, and salary-related options. It also
+     * adjusts certain values based on the version of the application.
+     *
+     * @param presetCampaignOptions the {@link CampaignOptions} object to load settings from. If null, default campaign
+     *                              options will be used.
+     * @param version               the version of the application, used to determine adjustments for compatibility.
+     */
+    public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions, Version version) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;
@@ -1469,17 +1343,6 @@ public class PersonnelTab {
         comboPrisonerCaptureStyle.setSelectedItem(options.getPrisonerCaptureStyle());
         chkUseRandomDependentAddition.setSelected(options.isUseRandomDependentAddition());
         chkUseRandomDependentRemoval.setSelected(options.isUseRandomDependentRemoval());
-
-        // Salaries
-        chkDisableSecondaryRoleSalary.setSelected(options.isDisableSecondaryRoleSalary());
-        spnAntiMekSalary.setValue(options.getSalaryAntiMekMultiplier());
-        spnSpecialistInfantrySalary.setValue(options.getSalarySpecialistInfantryMultiplier());
-        for (final Entry<SkillLevel, JSpinner> entry : spnSalaryExperienceMultipliers.entrySet()) {
-            entry.getValue().setValue(options.getSalaryXPMultipliers().get(entry.getKey()));
-        }
-        for (int i = 0; i < spnBaseSalary.length; i++) {
-            spnBaseSalary[i].setValue(options.getRoleBaseSalaries()[i].getAmount().doubleValue());
-        }
     }
 
     /**
@@ -1574,18 +1437,5 @@ public class PersonnelTab {
         }
         options.setUseRandomDependentAddition(chkUseRandomDependentAddition.isSelected());
         options.setUseRandomDependentRemoval(chkUseRandomDependentRemoval.isSelected());
-
-        // Salaries
-        options.setDisableSecondaryRoleSalary(chkDisableSecondaryRoleSalary.isSelected());
-        options.setSalaryAntiMekMultiplier((double) spnAntiMekSalary.getValue());
-        options.setSalarySpecialistInfantryMultiplier((double) spnSpecialistInfantrySalary.getValue());
-
-        for (final Entry<SkillLevel, JSpinner> entry : spnSalaryExperienceMultipliers.entrySet()) {
-            options.getSalaryXPMultipliers().put(entry.getKey(), (Double) entry.getValue().getValue());
-        }
-
-        for (final PersonnelRole personnelRole : PersonnelRole.values()) {
-            options.setRoleBaseSalary(personnelRole, (double) spnBaseSalary[personnelRole.ordinal()].getValue());
-        }
     }
 }

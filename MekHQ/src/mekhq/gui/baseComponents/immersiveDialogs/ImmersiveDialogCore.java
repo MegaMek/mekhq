@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.baseComponents.immersiveDialogs;
 
@@ -53,6 +58,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkEvent.EventType;
 
@@ -66,6 +72,7 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Factions;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.GlossaryDialog;
 
@@ -177,7 +184,7 @@ public class ImmersiveDialogCore extends JDialog {
      *
      * @return The padding value as an integer.
      */
-    protected int getPADDING() {
+    protected int getPadding() {
         return PADDING;
     }
 
@@ -230,6 +237,7 @@ public class ImmersiveDialogCore extends JDialog {
         // Left box for speaker details
         if (leftSpeaker != null) {
             JPanel pnlLeftSpeaker = buildSpeakerPanel(leftSpeaker, campaign);
+            pnlLeftSpeaker.setBorder(new EmptyBorder(0, getPadding(), 0, 0));
 
             // Add pnlLeftSpeaker to mainPanel
             constraints.gridx = gridx;
@@ -252,6 +260,7 @@ public class ImmersiveDialogCore extends JDialog {
         // Right box for speaker details
         if (rightSpeaker != null) {
             JPanel pnlRightSpeaker = buildSpeakerPanel(rightSpeaker, campaign);
+            pnlRightSpeaker.setBorder(new EmptyBorder(0, 0, 0, getPadding()));
 
             // Add pnlRightSpeaker to mainPanel
             constraints.gridx = gridx;
@@ -325,6 +334,7 @@ public class ImmersiveDialogCore extends JDialog {
         editorPane.setEditable(false);
         editorPane.setFocusable(false);
         editorPane.setBorder(BorderFactory.createEmptyBorder());
+        editorPane.setBorder(new EmptyBorder(0, getPadding(), 0, getPadding()));
 
         // Use inline CSS to set font family, size, and other style properties
         String fontStyle = "font-family: Noto Sans;";
@@ -408,7 +418,7 @@ public class ImmersiveDialogCore extends JDialog {
         CampaignGUI campaignGUI = campaign.getApp().getCampaigngui();
 
         if (commandKey.equalsIgnoreCase(GLOSSARY_COMMAND_STRING)) {
-            new GlossaryDialog(parent, campaign, entryKey);
+            new GlossaryDialog(parent, entryKey);
         } else if (commandKey.equalsIgnoreCase(PERSON_COMMAND_STRING)) {
             final UUID id = UUID.fromString(reference.split(":")[1]);
             campaignGUI.focusOnPerson(id);
@@ -496,7 +506,7 @@ public class ImmersiveDialogCore extends JDialog {
      */
     protected JPanel populateButtonPanel(List<ButtonLabelTooltipPair> buttons, boolean isVerticalLayout,
           @Nullable JPanel supplementalPanel) {
-        final int padding = getPADDING();
+        final int padding = getPadding();
 
         // Main container panel to hold the spinner and button panel
         JPanel containerPanel = new JPanel();
@@ -772,17 +782,23 @@ public class ImmersiveDialogCore extends JDialog {
             return campaign.getCampaignFactionIcon();
         }
 
-        Portrait portrait = speaker.getPortrait();
+        Image baseImage;
+        if (campaign.getPersonnel().contains(speaker)) {
+            Portrait portrait = speaker.getPortrait();
 
-        if (portrait == null || Objects.equals(portrait.getFilename(), DEFAULT_PORTRAIT_FILENAME)) {
-            return campaign.getCampaignFactionIcon();
+            if (portrait == null || Objects.equals(portrait.getFilename(), DEFAULT_PORTRAIT_FILENAME)) {
+                return campaign.getCampaignFactionIcon();
+            }
+
+            baseImage = portrait.getBaseImage();
+        } else {
+            baseImage = Factions.getFactionLogo(campaign.getGameYear(), speaker.getOriginFaction().getShortName())
+                              .getImage();
         }
 
         // The following sorcery is due to the compressed manner in which personnel portraits are stored.
         // We need to manipulate the original base image, otherwise it looks grainy and terrible.
         ImageObserver observer = (img, infoFlags, x, y, width, height) -> true;
-
-        Image baseImage = portrait.getBaseImage();
         int baseImageHeight = baseImage.getHeight(observer);
         int baseImageWidth = baseImage.getWidth(observer);
         int targetWidth = Math.max(1, IMAGE_WIDTH);

@@ -25,8 +25,16 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.market;
+
+import static mekhq.campaign.personnel.skills.SkillType.EXP_ULTRA_GREEN;
+import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
@@ -52,6 +60,7 @@ import mekhq.campaign.event.MarketNewPersonnelEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.HangarStatistics;
@@ -62,6 +71,7 @@ import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+@Deprecated(since = "0.50.06", forRemoval = false)
 public class PersonnelMarket {
     private static final MMLogger logger = MMLogger.create(PersonnelMarket.class);
 
@@ -538,19 +548,22 @@ public class PersonnelMarket {
         return retval;
     }
 
+    /**
+     * @deprecated Unused. Seems to be an unused alternative to
+     *       {@link mekhq.campaign.againstTheBot.AtBConfiguration#shipSearchTargetRoll(int, Campaign)}
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public TargetRoll getShipSearchTarget(Campaign campaign, boolean jumpship) {
         TargetRoll target = new TargetRoll(jumpship ? 12 : 10, "Base");
-        Person adminLog = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_LOGISTICS, SkillType.S_ADMIN);
-        int adminLogExp = (adminLog == null) ?
-                                SkillType.EXP_ULTRA_GREEN :
-                                adminLog.getSkill(SkillType.S_ADMIN).getExperienceLevel();
-        for (Person p : campaign.getAdmins()) {
-            if ((p.getPrimaryRole().isAdministratorLogistics() || p.getSecondaryRole().isAdministratorLogistics()) &&
-                      p.getSkill(SkillType.S_ADMIN).getExperienceLevel() > adminLogExp) {
-                adminLogExp = p.getSkill(SkillType.S_ADMIN).getExperienceLevel();
-            }
+        Person logisticsAdmin = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_LOGISTICS, SkillType.S_ADMIN);
+
+        int experienceLevel = EXP_ULTRA_GREEN;
+        if (logisticsAdmin != null && logisticsAdmin.hasSkill(S_ADMIN)) {
+            Skill skill = logisticsAdmin.getSkill(S_ADMIN);
+            experienceLevel = skill.getExperienceLevel(logisticsAdmin.getOptions(), logisticsAdmin.getATOWAttributes());
         }
-        target.addModifier(SkillType.EXP_REGULAR - adminLogExp, "Admin/Logistics");
+
+        target.addModifier(SkillType.EXP_REGULAR - experienceLevel, "Admin/Logistics");
         target.addModifier(IUnitRating.DRAGOON_C - campaign.getAtBUnitRatingMod(), "Unit Rating");
         return target;
     }

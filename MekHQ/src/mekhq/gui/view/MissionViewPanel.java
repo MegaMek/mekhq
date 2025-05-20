@@ -67,6 +67,7 @@ import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.MarkdownRenderer;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * A custom panel that gets filled in with goodies from a scenario object
@@ -479,7 +480,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
         txtCommand.setName("txtCommand");
         txtCommand.setText(contract.getCommandRights().toString());
-        txtCommand.setToolTipText(contract.getCommandRights().getToolTipText());
+        txtCommand.setToolTipText(wordWrap(contract.getCommandRights().getToolTipText()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 7;
@@ -570,7 +571,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
             String lead = "<html><font>";
             if (currentSalvagePct > maxSalvagePct) {
-                lead = "<html><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>";
+                lead = "<html><font color='" + ReportingUtilities.getNegativeColor() + "'>";
             }
             lblSalvagePct2.setText(lead + currentSalvagePct + "%</font> <span>(max " + maxSalvagePct + "%)</span></html>");
         }
@@ -673,7 +674,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.insets = new Insets(0, 0, 5, 0);
         gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.anchor = GridBagConstraints.NORTH;
         pnlStats.add(lblBelligerents, gridBagConstraints);
 
         lblLocation.setName("lblLocation");
@@ -879,7 +880,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
         txtCommand.setName("txtCommand");
         txtCommand.setText(contract.getCommandRights().toString());
-        txtCommand.setToolTipText(contract.getCommandRights().getToolTipText());
+        txtCommand.setToolTipText(wordWrap(contract.getCommandRights().getToolTipText()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;

@@ -266,7 +266,7 @@ public class RandomDependents {
                 if (roll == 0) {
                     final Person dependent = campaign.newDependent(RANDOMIZE);
 
-                    campaign.recruitPerson(dependent, FREE, true, false);
+                    campaign.recruitPerson(dependent, FREE, true, false, false);
 
                     campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "dependentJoinsForce.report",
                           dependent.getFullName(),

@@ -60,6 +60,7 @@ import static mekhq.campaign.personnel.skills.SkillType.S_ARTILLERY;
 import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
 import static mekhq.campaign.personnel.skills.SkillType.getType;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.WILLPOWER;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeInterviewersNotes;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.processAdHocExecution;
 import static mekhq.utilities.spaUtilities.SpaUtilities.getSpaCategory;
@@ -83,8 +84,10 @@ import javax.swing.JTable;
 
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
+import megamek.client.ratgenerator.CrewDescriptor;
 import megamek.client.ui.dialogs.PortraitChooserDialog;
 import megamek.codeUtilities.MathUtility;
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Crew;
 import megamek.common.EntityWeightClass;
 import megamek.common.Mounted;
@@ -136,6 +139,7 @@ import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.personnel.skills.Aging;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -216,6 +220,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_EDIT_HITS = "EDIT_HITS";
     private static final String CMD_EDIT = "EDIT";
     private static final String CMD_SACK = "SACK";
+    private static final String CMD_EMPLOY = "EMPLOY";
     private static final String CMD_SPENDING_SPREE = "SPENDING_SPREE";
     private static final String CMD_REMOVE = "REMOVE";
     private static final String CMD_EDGE_TRIGGER = "EDGE";
@@ -233,6 +238,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_BUY_TRAIT = "BUY_TRAIT";
     private static final String CMD_CHANGE_ATTRIBUTE = "CHANGE_ATTRIBUTE";
     private static final String CMD_SET_ATTRIBUTE = "SET_ATTRIBUTE";
+    private static final String CMD_RANDOM_PROFESSION = "RANDOM_PROFESSION";
     private static final String CMD_ADD_SPOUSE = "SPOUSE";
     private static final String CMD_REMOVE_SPOUSE = "REMOVE_SPOUSE";
     private static final String CMD_ADD_PREGNANCY = "ADD_PREGNANCY";
@@ -441,6 +447,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 for (final Person person : people) {
                     person.setPrimaryRole(getCampaign(), role);
                     writePersonalityDescription(person);
+                    writeInterviewersNotes(person);
                     getCampaign().personUpdated(person);
                     if (getCampaignOptions().isUsePortraitForRole(role) &&
                               getCampaignOptions().isAssignPortraitOnRoleChange() &&
@@ -633,11 +640,21 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 selectedPerson.improveSkill(type);
                 selectedPerson.spendXP(cost);
 
+                Skill skill = selectedPerson.getSkill(type);
+                SkillType skillType = skill.getType();
+
+                int adjustedReputation = selectedPerson.getAdjustedReputation(getCampaignOptions().isUseAgeEffects(),
+                      getCampaign().isClanCampaign(),
+                      getCampaign().getLocalDate(),
+                      selectedPerson.getRankLevel());
+
                 PerformanceLogger.improvedSkill(getCampaign(),
                       selectedPerson,
                       getCampaign().getLocalDate(),
-                      selectedPerson.getSkill(type).getType().getName(),
-                      selectedPerson.getSkill(type).toString());
+                      skillType.getName(),
+                      skill.toString(selectedPerson.getOptions(),
+                            selectedPerson.getATOWAttributes(),
+                            adjustedReputation));
                 getCampaign().addReport(String.format(resources.getString("improved.format"),
                       selectedPerson.getHyperlinkedName(),
                       type));
@@ -692,6 +709,49 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                 for (Person person : people) {
                     person.setAttributeScore(attribute, choice);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                    getCampaign().personUpdated(person);
+                }
+
+                break;
+            }
+            case CMD_RANDOM_PROFESSION: {
+                List<PersonnelRole> possibleRoles = PersonnelRole.getCivilianRolesExceptNone();
+                LocalDate today = getCampaign().getLocalDate();
+
+                for (Person person : people) {
+                    // Under 16s are considered children and unable to be assigned a profession
+                    if (person.isChild(today)) {
+                        continue;
+                    }
+
+                    List<PersonnelRole> eligibleRoles = new ArrayList<>(possibleRoles);
+
+                    int personAge = person.getAge(today);
+
+                    if (personAge < 18) {
+                        // Characters under 18 years old are strictly unable to be assigned these roles.
+                        // This is project policy.
+                        eligibleRoles.remove(PersonnelRole.ADULT_ENTERTAINER);
+                        eligibleRoles.remove(PersonnelRole.LUXURY_COMPANION);
+                    }
+
+                    PersonnelRole randomProfession = ObjectUtility.getRandomItem(eligibleRoles);
+                    int experienceLevel = CrewDescriptor.randomExperienceLevel();
+
+                    for (String skillName : randomProfession.getSkillsForProfession()) {
+                        if (person.getSkill(skillName) != null) { // They already have this skill
+                            continue;
+                        }
+
+                        SkillType skillType = SkillType.getType(skillName);
+                        int targetLevel = skillType.getExperienceLevel(experienceLevel);
+                        person.addSkill(skillName, targetLevel, 0);
+                    }
+
+                    Aging.updateAllSkillAgeModifiers(today, person);
+                    person.setPrimaryRole(getCampaign(), randomProfession);
+
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                     getCampaign().personUpdated(person);
                 }
@@ -1026,18 +1086,21 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_SACK: {
                 boolean showDialog = false;
                 List<Person> toRemove = new ArrayList<>();
-                for (Person person : people) {
-                    if (!person.getPrimaryRole().isCivilian()) {
-                        if (getCampaign().getRetirementDefectionTracker()
-                                  .removeFromCampaign(person, false, true, getCampaign(), null)) {
-                            showDialog = true;
+                if (getCampaignOptions().isUseAtB()) {
+                    for (Person person : people) {
+                        if (!person.getPrimaryRole().isCivilian()) {
+                            if (getCampaign().getRetirementDefectionTracker()
+                                      .removeFromCampaign(person, false, true, getCampaign(), null)) {
+                                showDialog = true;
+                            } else {
+                                toRemove.add(person);
+                            }
                         } else {
                             toRemove.add(person);
                         }
-                    } else {
-                        toRemove.add(person);
                     }
                 }
+
                 if (showDialog) {
                     RetirementDefectionDialog rdd = new RetirementDefectionDialog(gui, null, false);
 
@@ -1070,8 +1133,23 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
                 break;
             }
+            case CMD_EMPLOY: {
+                for (Person person : people) {
+                    getCampaign().recruitPerson(person);
+                }
+
+                break;
+            }
             case CMD_SPENDING_SPREE: {
                 for (Person person : people) {
+                    if (!person.getPrisonerStatus().isFreeOrBondsman()) {
+                        continue;
+                    }
+
+                    if (!person.getStatus().isActive()) {
+                        continue;
+                    }
+
                     if (person.getWealth() > MINIMUM_WEALTH) {
                         if (person.isHasPerformedExtremeExpenditure()) {
                             String report = getExpenditureExhaustedReportMessage(person.getHyperlinkedFullTitle());
@@ -1495,7 +1573,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_PERSONALITY: {
                 for (Person person : people) {
-                    PersonalityController.generatePersonality(person);
+                    PersonalityController.generatePersonality(person, false);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
@@ -1556,6 +1634,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     person.setGivenName(name[0]);
                     person.setSurname(name[1]);
                     writePersonalityDescription(person);
+                    writeInterviewersNotes(person);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
@@ -1655,8 +1734,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             if (person.isDoctor()) {
                 Skill skill = person.getSkill(S_SURGERY);
 
-                if (skill != null &&
-                          skill.getFinalSkillValue(person.getOptions()) >=
+                if (skill != null && skill.getFinalSkillValue(person.getOptions(), person.getATOWAttributes()) >=
                                 REPLACEMENT_LIMB_MINIMUM_SKILL_REQUIRED_TYPES_3_4_5) {
                     suitableDoctors.add(person);
                 }
@@ -1688,7 +1766,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       suitableDoctors,
                       selectedPerson,
                       cost);
-                int choice = replacementLimbDialog.getDialogChoice();
+                int choice = replacementLimbDialog.getChoiceIndex();
 
                 // If the user chose to decline the surgery
                 if (choice == 0) {
@@ -2053,8 +2131,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
 
             if (allCanPerform) {
-                cbMenuItem = new JCheckBoxMenuItem(role.toString());
-                cbMenuItem.setToolTipText(wordWrap(role.getTooltip(), 50));
+                cbMenuItem = new JCheckBoxMenuItem(role.getLabel(getCampaign().isClanCampaign()));
+                cbMenuItem.setToolTipText(wordWrap(role.getTooltip(getCampaign().isClanCampaign()), 50));
                 cbMenuItem.setActionCommand(makeCommand(CMD_PRIMARY_ROLE, role.name()));
                 cbMenuItem.addActionListener(this);
                 if (oneSelected && role == person.getPrimaryRole()) {
@@ -2097,8 +2175,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
 
             if (allCanPerform) {
-                cbMenuItem = new JCheckBoxMenuItem(role.toString());
-                cbMenuItem.setToolTipText(wordWrap(role.getTooltip()));
+                cbMenuItem = new JCheckBoxMenuItem(role.getLabel(getCampaign().isClanCampaign()));
+                cbMenuItem.setToolTipText(wordWrap(role.getTooltip(getCampaign().isClanCampaign())));
                 cbMenuItem.setActionCommand(makeCommand(CMD_SECONDARY_ROLE, role.name()));
                 cbMenuItem.addActionListener(this);
                 if (oneSelected && role == person.getSecondaryRole()) {
@@ -2477,30 +2555,36 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                         if (filteredFaction != null) {
                                             int educationLevel = academy.getEducationLevel(person);
 
-                                            String[] skills = academy.getCurriculums()
+                                            String[] skillNames = academy.getCurriculums()
                                                                     .get(person.getEduCourseIndex())
                                                                     .split(",");
 
-                                            skills = Arrays.stream(skills).map(String::trim).toArray(String[]::new);
+                                            skillNames = Arrays.stream(skillNames)
+                                                               .map(String::trim)
+                                                               .toArray(String[]::new);
 
-                                            for (String skill : skills) {
-                                                if (skill.equalsIgnoreCase("none")) {
+                                            for (String skillName : skillNames) {
+                                                if (skillName.equalsIgnoreCase("none")) {
                                                     continue;
                                                 }
 
-                                                if (skill.equalsIgnoreCase("xp")) {
+                                                if (skillName.equalsIgnoreCase("xp")) {
                                                     if (EducationLevel.parseToInt(person.getEduHighestEducation()) <
                                                               educationLevel) {
                                                         improvementPossible++;
                                                     }
                                                 } else {
-                                                    String skillParsed = skillParser(skill);
+                                                    String skillParsed = skillParser(skillName);
+                                                    Skill skill = person.getSkill(skillParsed);
 
-                                                    if ((person.hasSkill(skillParsed)) &&
-                                                              (person.getSkill(skillParsed).getExperienceLevel() <
-                                                                     educationLevel)) {
-                                                        improvementPossible++;
-                                                    } else if (!person.hasSkill(skillParsed)) {
+                                                    if (skill != null) {
+                                                        int skillLevel = skill.getLevel();
+                                                        int experienceLevel = skill.getType()
+                                                                                    .getExperienceLevel(skillLevel);
+                                                        if (experienceLevel < educationLevel) {
+                                                            improvementPossible++;
+                                                        }
+                                                    } else {
                                                         improvementPossible++;
                                                     }
                                                 }
@@ -3014,52 +3098,26 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
 
             JMenu currentMenu = new JMenu(resources.getString("spendOnCurrentSkills.text"));
-
             JMenu combatGunnerySkillsCurrent = new JMenu(resources.getString("combatGunnerySkills.text"));
-            currentMenu.add(combatGunnerySkillsCurrent);
-
             JMenu combatPilotingSkillsCurrent = new JMenu(resources.getString("combatPilotingSkills.text"));
-            currentMenu.add(combatPilotingSkillsCurrent);
-
             JMenu supportSkillsCurrent = new JMenu(resources.getString("supportSkills.text"));
-            currentMenu.add(supportSkillsCurrent);
             JMenu supportSkillsCommandCurrent = new JMenu(resources.getString("supportSkills.command"));
-            supportSkillsCurrent.add(supportSkillsCommandCurrent);
-
             JMenu roleplaySkillsCurrent = new JMenu(resources.getString("roleplaySkills.text"));
-            currentMenu.add(roleplaySkillsCurrent);
             JMenu roleplaySkillsArtCurrent = new JMenu(resources.getString("roleplaySkills.art"));
-            roleplaySkillsCurrent.add(roleplaySkillsArtCurrent);
             JMenu roleplaySkillsInterestCurrent = new JMenu(resources.getString("roleplaySkills.interest"));
-            roleplaySkillsCurrent.add(roleplaySkillsInterestCurrent);
             JMenu roleplaySkillsScienceCurrent = new JMenu(resources.getString("roleplaySkills.science"));
-            roleplaySkillsCurrent.add(roleplaySkillsScienceCurrent);
             JMenu roleplaySkillsSecurityCurrent = new JMenu(resources.getString("roleplaySkills.security"));
-            roleplaySkillsCurrent.add(roleplaySkillsSecurityCurrent);
 
             JMenu newSkillsMenu = new JMenu(resources.getString("spendOnNewSkills.text"));
-
             JMenu combatGunnerySkillsNew = new JMenu(resources.getString("combatGunnerySkills.text"));
-            newSkillsMenu.add(combatGunnerySkillsNew);
-
             JMenu combatPilotingSkillsNew = new JMenu(resources.getString("combatPilotingSkills.text"));
-            newSkillsMenu.add(combatPilotingSkillsNew);
-
             JMenu supportSkillsNew = new JMenu(resources.getString("supportSkills.text"));
-            newSkillsMenu.add(supportSkillsNew);
             JMenu supportSkillsCommandNew = new JMenu(resources.getString("supportSkills.command"));
-            supportSkillsNew.add(supportSkillsCommandNew);
-
             JMenu roleplaySkillsNew = new JMenu(resources.getString("roleplaySkills.text"));
-            newSkillsMenu.add(roleplaySkillsNew);
             JMenu roleplaySkillsArtNew = new JMenu(resources.getString("roleplaySkills.art"));
-            roleplaySkillsNew.add(roleplaySkillsArtNew);
             JMenu roleplaySkillsInterestNew = new JMenu(resources.getString("roleplaySkills.interest"));
-            roleplaySkillsNew.add(roleplaySkillsInterestNew);
             JMenu roleplaySkillsScienceNew = new JMenu(resources.getString("roleplaySkills.science"));
-            roleplaySkillsNew.add(roleplaySkillsScienceNew);
             JMenu roleplaySkillsSecurityNew = new JMenu(resources.getString("roleplaySkills.security"));
-            roleplaySkillsNew.add(roleplaySkillsSecurityNew);
 
             int adjustedReputation = person.getAdjustedReputation(getCampaignOptions().isUseAgeEffects(),
                   getCampaign().isClanCampaign(),
@@ -3140,8 +3198,71 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     }
                 }
             }
-            JMenuHelpers.addMenuIfNonEmpty(menu, currentMenu);
-            JMenuHelpers.addMenuIfNonEmpty(menu, newSkillsMenu);
+
+
+            if (combatGunnerySkillsCurrent.getMenuComponentCount() > 0) {
+                currentMenu.add(combatGunnerySkillsCurrent);
+            }
+            if (combatPilotingSkillsCurrent.getMenuComponentCount() > 0) {
+                currentMenu.add(combatPilotingSkillsCurrent);
+            }
+            if (supportSkillsCommandCurrent.getMenuComponentCount() > 0) {
+                supportSkillsCurrent.add(supportSkillsCommandCurrent);
+            }
+            if (supportSkillsCurrent.getMenuComponentCount() > 0) {
+                currentMenu.add(supportSkillsCurrent);
+            }
+            if (roleplaySkillsArtCurrent.getMenuComponentCount() > 0) {
+                roleplaySkillsCurrent.add(roleplaySkillsArtCurrent);
+            }
+            if (roleplaySkillsInterestCurrent.getMenuComponentCount() > 0) {
+                roleplaySkillsCurrent.add(roleplaySkillsInterestCurrent);
+            }
+            if (roleplaySkillsScienceCurrent.getMenuComponentCount() > 0) {
+                roleplaySkillsCurrent.add(roleplaySkillsScienceCurrent);
+            }
+            if (roleplaySkillsSecurityCurrent.getMenuComponentCount() > 0) {
+                roleplaySkillsCurrent.add(roleplaySkillsSecurityCurrent);
+            }
+            if (roleplaySkillsCurrent.getMenuComponentCount() > 0) {
+                currentMenu.add(roleplaySkillsCurrent);
+            }
+
+            if (currentMenu.getMenuComponentCount() > 0) {
+                menu.add(currentMenu);
+            }
+
+            if (combatGunnerySkillsNew.getMenuComponentCount() > 0) {
+                newSkillsMenu.add(combatGunnerySkillsNew);
+            }
+            if (combatPilotingSkillsNew.getMenuComponentCount() > 0) {
+                newSkillsMenu.add(combatPilotingSkillsNew);
+            }
+            if (supportSkillsCommandNew.getMenuComponentCount() > 0) {
+                supportSkillsNew.add(supportSkillsCommandNew);
+            }
+            if (supportSkillsNew.getMenuComponentCount() > 0) {
+                newSkillsMenu.add(supportSkillsNew);
+            }
+            if (roleplaySkillsArtNew.getMenuComponentCount() > 0) {
+                roleplaySkillsNew.add(roleplaySkillsArtNew);
+            }
+            if (roleplaySkillsInterestNew.getMenuComponentCount() > 0) {
+                roleplaySkillsNew.add(roleplaySkillsInterestNew);
+            }
+            if (roleplaySkillsScienceNew.getMenuComponentCount() > 0) {
+                roleplaySkillsNew.add(roleplaySkillsScienceNew);
+            }
+            if (roleplaySkillsSecurityNew.getMenuComponentCount() > 0) {
+                roleplaySkillsNew.add(roleplaySkillsSecurityNew);
+            }
+            if (roleplaySkillsNew.getMenuComponentCount() > 0) {
+                newSkillsMenu.add(roleplaySkillsNew);
+            }
+
+            if (newSkillsMenu.getMenuComponentCount() > 0) {
+                menu.add(newSkillsMenu);
+            }
 
             JMenu traitsMenu = new JMenu(resources.getString("spendOnTraits.text"));
             double costMultiplier = getCampaignOptions().getXpCostMultiplier();
@@ -3719,9 +3840,16 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         menuItem.setEnabled(true);
         popup.add(menuItem);
 
-        if (getCampaignOptions().isUseAtB() && StaticChecks.areAllActive(selected)) {
+        if (StaticChecks.areAllEmployed(selected)) {
             menuItem = new JMenuItem(resources.getString("sack.text"));
             menuItem.setActionCommand(CMD_SACK);
+            menuItem.addActionListener(this);
+            popup.add(menuItem);
+        }
+
+        if (!StaticChecks.areAllEmployed(selected)) {
+            menuItem = new JMenuItem(resources.getString("employ.text"));
+            menuItem.setActionCommand(CMD_EMPLOY);
             menuItem.addActionListener(this);
             popup.add(menuItem);
         }
@@ -3732,9 +3860,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             int spending = getExpenditure(willpower, wealth);
             String spendingString = Money.of(spending).toAmountString();
             menuItem = new JMenuItem(String.format(resources.getString("wealth.extreme.single"), spendingString));
-            menuItem.setEnabled(!person.isHasPerformedExtremeExpenditure());
+            menuItem.setEnabled(!person.isHasPerformedExtremeExpenditure() &&
+                                      person.getStatus().isActive() &&
+                                      person.getPrisonerStatus().isFreeOrBondsman());
         } else {
             menuItem = new JMenuItem(resources.getString("wealth.extreme.multiple"));
+            menuItem.setEnabled(StaticChecks.areAnyActive(selected) && StaticChecks.areAnyFreeOrBondsman(selected));
         }
         menuItem.setActionCommand(CMD_SPENDING_SPREE);
         menuItem.addActionListener(this);
@@ -3849,6 +3980,22 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             cbMenuItem.addActionListener(evt -> {
                 final boolean tryingToConceive = !person.isTryingToConceive();
                 Stream.of(selected).forEach(p -> p.setTryingToConceive(tryingToConceive));
+            });
+            menu.add(cbMenuItem);
+        }
+
+        if (getCampaignOptions().isUseRandomPersonalities()) {
+            cbMenuItem = new JCheckBoxMenuItem(resources.getString("miHidePersonality.text"));
+            cbMenuItem.setToolTipText(MultiLineTooltip.splitToolTip(resources.getString("miHidePersonality.toolTipText"),
+                  100));
+            cbMenuItem.setName("miHidePersonality");
+            cbMenuItem.setSelected(person.isHidePersonality());
+            cbMenuItem.addActionListener(evt -> {
+                final boolean hidePersonality = !person.isHidePersonality();
+                Stream.of(selected).forEach(selectedPerson -> {
+                    selectedPerson.setHidePersonality(hidePersonality);
+                    MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+                });
             });
             menu.add(cbMenuItem);
         }
@@ -4140,6 +4287,14 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 attributesMenu.add(menuItem);
             }
             menu.add(attributesMenu);
+
+            menuItem = new JMenuItem(resources.getString("generateRandomCivilianProfession.text"));
+            menuItem.setToolTipText(wordWrap(String.format(resources.getString(
+                  "generateRandomCivilianProfession.tooltip"))));
+            menuItem.setActionCommand(makeCommand(CMD_RANDOM_PROFESSION));
+            menuItem.addActionListener(this);
+            menuItem.setEnabled(getCampaign().isGM());
+            menu.add(menuItem);
 
             JMenuHelpers.addMenuIfNonEmpty(popup, menu);
         }

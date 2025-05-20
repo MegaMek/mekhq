@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.market.contractMarket;
 
@@ -272,18 +277,9 @@ public abstract class AbstractContractMarket {
         // Calculate base formation size and effective unit force
         int effectiveForces = AtBContract.calculateBaseNumberOfRequiredLances(campaign);
 
-        // Calculate maximum deployed forces based on strategy options
-        int maxDeployableCombatTeams = effectiveForces;
-        if (campaign.getCampaignOptions().isUseStrategy()) {
-            maxDeployableCombatTeams = Math.max(calculateMaxDeployableCombatTeams(campaign), 1);
-        }
-
-        // Clamp available forces to the max deployable limit
-        int availableForces = Math.min(effectiveForces, maxDeployableCombatTeams);
-
         // If bypassing variance, apply flat reduction (reduce force by 1/3)
         if (bypassVariance) {
-            return Math.max(availableForces - calculateBypassVarianceReduction(availableForces), 1);
+            return Math.max(effectiveForces - calculateBypassVarianceReduction(effectiveForces), 1);
         }
 
         // Apply variance based on a die roll
@@ -291,14 +287,14 @@ public abstract class AbstractContractMarket {
         double varianceFactor = calculateVarianceFactor(varianceRoll);
 
         // Adjust available forces based on variance, ensuring minimum clamping
-        int adjustedForces = availableForces - (int) Math.floor((double) availableForces / varianceFactor);
+        int adjustedForces = effectiveForces - (int) Math.floor((double) effectiveForces / varianceFactor);
 
         if (adjustedForces < 1) {
             adjustedForces = 1;
         }
 
         // Return the clamped value, ensuring it does not exceed max-deployable forces
-        return Math.min(adjustedForces, maxDeployableCombatTeams);
+        return Math.min(adjustedForces, effectiveForces);
     }
 
     /**
@@ -348,17 +344,9 @@ public abstract class AbstractContractMarket {
     }
 
     /**
-     * Calculates the maximum number of deployable combat teams based on the given campaign's options.
-     *
-     * <p>
-     * This method retrieves campaign options and calculates the total deployable combat teams using the base strategy
-     * deployment, additional strategy deployment, and the campaign's commander strategy.
-     * </p>
-     *
-     * @param campaign the campaign object containing the necessary data to perform the calculation
-     *
-     * @return the total number of deployable combat teams
+     * @deprecated unused.
      */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public int calculateMaxDeployableCombatTeams(Campaign campaign) {
         CampaignOptions options = campaign.getCampaignOptions();
         int baseStrategyDeployment = options.getBaseStrategyDeployment();
@@ -841,12 +829,20 @@ public abstract class AbstractContractMarket {
         return mod;
     }
 
+    /**
+     * @deprecated use {@link #writeToXML(Campaign, PrintWriter, int)} instead
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public void writeToXML(final PrintWriter pw, int indent) {
+        return;
+    }
+
+    public void writeToXML(Campaign campaign, final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "contractMarket");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "method", method.toString());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastId", lastId);
         for (final Contract contract : contracts) {
-            contract.writeToXML(pw, indent);
+            contract.writeToXML(campaign, pw, indent);
         }
 
         for (final Integer key : clauseMods.keySet()) {

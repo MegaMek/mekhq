@@ -36,6 +36,7 @@ package mekhq.gui;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
+import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
 import static mekhq.campaign.personnel.skills.SkillType.getExperienceLevelName;
 import static mekhq.gui.dialog.nagDialogs.NagController.triggerDailyNags;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -92,6 +93,7 @@ import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
+import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.Part;
@@ -131,6 +133,7 @@ import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.io.FileType;
 import mekhq.utilities.MHQXMLUtility;
+import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -187,6 +190,7 @@ public class CampaignGUI extends JPanel {
     private final JButton btnMassTraining = new JButton(resourceMap.getString("btnMassTraining.text"));
     private final JToggleButton btnGMMode = new MMToggleButton(resourceMap.getString("btnGMMode.text"));
     private final JToggleButton btnOvertime = new MMToggleButton(resourceMap.getString("btnOvertime.text"));
+    private final JButton btnGlossary = new JButton(resourceMap.getString("btnGlossary.text"));
 
     ReportHyperlinkListener reportHLL;
 
@@ -769,7 +773,7 @@ public class CampaignGUI extends JPanel {
                 miHire.setMnemonic(role.getMnemonic());
                 miHire.setAccelerator(KeyStroke.getKeyStroke(role.getMnemonic(), InputEvent.ALT_DOWN_MASK));
             }
-            miHire.setToolTipText(role.getDescription());
+            miHire.setToolTipText(role.getDescription(getCampaign().isClanCampaign()));
             miHire.setActionCommand(role.name());
             miHire.addActionListener(this::hirePerson);
 
@@ -1156,9 +1160,22 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.insets = new Insets(3, 10, 3, 3);
         btnPanel.add(lblLocation, gridBagConstraints);
 
-        btnAdvanceMultipleDays.addActionListener(e -> new AdvanceDaysDialog(getFrame(), this).setVisible(true));
+        btnGlossary.addActionListener(evt -> new FullGlossaryDialog(getCampaign()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.VERTICAL;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.gridheight = 2;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
+        gridBagConstraints.insets = new Insets(3, 3, 3, 15);
+        btnPanel.add(btnGlossary, gridBagConstraints);
+
+        btnAdvanceMultipleDays.addActionListener(e -> new AdvanceDaysDialog(getFrame(), this).setVisible(true));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0;
@@ -1170,7 +1187,7 @@ public class CampaignGUI extends JPanel {
         btnMassTraining.setToolTipText(resourceMap.getString("btnMassTraining.toolTipText"));
         btnMassTraining.addActionListener(e -> new BatchXPDialog(getFrame(), getCampaign()).setVisible(true));
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0;
@@ -1183,7 +1200,7 @@ public class CampaignGUI extends JPanel {
         btnGMMode.setSelected(getCampaign().isGM());
         btnGMMode.addActionListener(e -> getCampaign().setGMMode(btnGMMode.isSelected()));
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0;
@@ -1195,7 +1212,7 @@ public class CampaignGUI extends JPanel {
         btnOvertime.setToolTipText(resourceMap.getString("btnOvertime.toolTipText"));
         btnOvertime.addActionListener(evt -> getCampaign().setOvertime(btnOvertime.isSelected()));
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0;
@@ -1228,7 +1245,7 @@ public class CampaignGUI extends JPanel {
         });
         btnAdvanceDay.setMnemonic(KeyEvent.VK_A);
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = GridBagConstraints.VERTICAL;
         gridBagConstraints.weightx = 0.0;
@@ -1483,7 +1500,7 @@ public class CampaignGUI extends JPanel {
     public void showNews(int id) {
         NewsItem news = getCampaign().getNews().getNewsItem(id);
         if (null != news) {
-            new NewsDialog(getCampaign(), news);
+            new NewsDialog(getCampaign(), news.getFullDescription());
         }
     }
 
@@ -1494,9 +1511,22 @@ public class CampaignGUI extends JPanel {
         npd.setVisible(true);
     }
 
+    /**
+     * Opens the personnel market dialog to hire a person, using the appropriate market style based on campaign
+     * options.
+     *
+     * <p>If the personnel market is disabled in the campaign options, a deprecated {@link PersonnelMarketDialog} is
+     * displayed. Otherwise, the new personnel market dialog is shown according to the campaign's current market
+     * style.</p>
+     */
     public void hirePersonMarket() {
-        PersonnelMarketDialog pmd = new PersonnelMarketDialog(getFrame(), this, getCampaign());
-        pmd.setVisible(true);
+        PersonnelMarketStyle marketStyle = getCampaign().getCampaignOptions().getPersonnelMarketStyle();
+        if (marketStyle == PERSONNEL_MARKET_DISABLED) {
+            PersonnelMarketDialog pmd = new PersonnelMarketDialog(getFrame(), this, getCampaign());
+            pmd.setVisible(true);
+        } else {
+            getCampaign().getNewPersonnelMarket().showPersonnelMarketDialog();
+        }
     }
 
     private void hireBulkPersonnel() {
@@ -1905,7 +1935,9 @@ public class CampaignGUI extends JPanel {
                 }
                 name = tech.getFullTitle() +
                              ", " +
-                             getExperienceLevelName(tech.getSkillForWorkingOn(unit).getExperienceLevel()) +
+                             getExperienceLevelName(tech.getSkillForWorkingOn(unit)
+                                                          .getExperienceLevel(tech.getOptions(),
+                                                                tech.getATOWAttributes())) +
                              " (" +
                              time +
                              "min)";
@@ -2162,22 +2194,22 @@ public class CampaignGUI extends JPanel {
                     continue;
                 }
 
-                Person p = Person.generateInstanceFromXML(wn2, getCampaign(), version);
-                if ((p != null) && (getCampaign().getPerson(p.getId()) != null)) {
+                Person person = Person.generateInstanceFromXML(wn2, getCampaign(), version);
+                if ((person != null) && (getCampaign().getPerson(person.getId()) != null)) {
                     logger.error("ERROR: Cannot load person who exists, ignoring. (Name: {}, Id {})",
-                          p.getFullName(),
-                          p.getId());
-                    p = null;
+                          person.getFullName(),
+                          person.getId());
+                    person = null;
                 }
 
-                if (p != null) {
-                    getCampaign().recruitPerson(p, true);
+                if (person != null) {
+                    getCampaign().recruitPerson(person, true, person.isEmployed());
 
                     // Clear some values we no longer should have set in case this
                     // has transferred campaigns or things in the campaign have
                     // changed...
-                    p.setUnit(null);
-                    p.clearTechUnits();
+                    person.setUnit(null);
+                    person.clearTechUnits();
                 }
             }
 
@@ -2485,7 +2517,7 @@ public class CampaignGUI extends JPanel {
         String inDebt = "";
         if (getCampaign().getFinances().isInDebt()) {
             // FIXME : Localize
-            inDebt = " <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>(in Debt)</font>";
+            inDebt = " <font color='" + ReportingUtilities.getNegativeColor() + "'>(in Debt)</font>";
         }
         // FIXME : Localize
         String text = "<html><b>Funds</b>: " + funds.toAmountAndSymbolString() + inDebt + "</html>";

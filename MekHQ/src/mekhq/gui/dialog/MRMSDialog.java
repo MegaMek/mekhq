@@ -264,8 +264,7 @@ public class MRMSDialog extends JDialog {
             campaignGUI.getCampaign().getWarehouse().forEachSparePart(part -> {
                 if (!part.isBeingWorkedOn() &&
                           part.needsFixing() &&
-                          !(part instanceof AmmoBin) &&
-                          (part.getSkillMin() <= SkillType.EXP_ELITE)) {
+                          !(part instanceof AmmoBin) && (part.getSkillMin() <= SkillType.EXP_LEGENDARY)) {
                     completePartsList.add(part);
                 }
             });
@@ -395,6 +394,7 @@ public class MRMSDialog extends JDialog {
               "PartsPanel.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
         partsTableModel = new PartsTableModel();
+        partsTableModel.setData(new ArrayList<>());
         partsTable = new JTable(partsTableModel);
         partsTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         partsTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -759,6 +759,8 @@ public class MRMSDialog extends JDialog {
         skillModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_REGULAR));
         skillModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_VETERAN));
         skillModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_ELITE));
+        skillModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_HEROIC));
+        skillModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_LEGENDARY));
         skillModel.setSelectedItem(SkillType.getExperienceLevelName(selectedValue));
         JComboBox<String> skillCBox = new JComboBox<>(skillModel);
         skillCBox.setEnabled(enabled);

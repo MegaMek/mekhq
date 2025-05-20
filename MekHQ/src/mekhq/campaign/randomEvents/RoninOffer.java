@@ -43,11 +43,11 @@ import static mekhq.campaign.personnel.PersonUtility.reRollAdvantages;
 import static mekhq.campaign.personnel.PersonUtility.reRollLoyalty;
 import static mekhq.campaign.personnel.enums.PersonnelRole.AEROSPACE_PILOT;
 import static mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.PersonalityTraitType.AGGRESSION;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.PersonalityTraitType.AMBITION;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.PersonalityTraitType.GREED;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.PersonalityTraitType.SOCIAL;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.generateBigPersonality;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.generatePersonality;
+import static mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType.AGGRESSION;
+import static mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType.AMBITION;
+import static mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType.GREED;
+import static mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType.SOCIAL;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.ArrayList;
@@ -67,10 +67,10 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.randomEvents.personalities.PersonalityController.PersonalityTraitType;
 import mekhq.campaign.randomEvents.personalities.enums.Aggression;
 import mekhq.campaign.randomEvents.personalities.enums.Ambition;
 import mekhq.campaign.randomEvents.personalities.enums.Greed;
+import mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType;
 import mekhq.campaign.randomEvents.personalities.enums.Social;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
@@ -84,7 +84,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
  * process based on the player’s choices.</p>
  */
 public class RoninOffer {
-    private static final String RESOURCE_BUNDLE = "mekhq.resources." + RoninOffer.class.getSimpleName();
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.RoninOffer";
 
     private final Campaign campaign;
 
@@ -124,7 +124,7 @@ public class RoninOffer {
               role,
               VETERAN);
 
-        generateBigPersonality(ronin);
+        generatePersonality(ronin, true);
 
         SkillLevel skillLevel = ronin.getSkillLevel(campaign, false);
         reRollLoyalty(ronin, skillLevel);
@@ -174,7 +174,7 @@ public class RoninOffer {
             campaignState.changeSupportPoints(-requiredCombatTeams);
         }
 
-        campaign.recruitPerson(ronin, true);
+        campaign.recruitPerson(ronin, true, true);
     }
 
 
@@ -298,7 +298,7 @@ public class RoninOffer {
             }
         }
 
-        PersonalityTraitType chosenTrait = null;
+        mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType chosenTrait = null;
 
         if (!majorTraits.isEmpty()) {
             chosenTrait = ObjectUtility.getRandomItem(majorTraits);

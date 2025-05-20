@@ -24,10 +24,16 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
+import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
 import static mekhq.campaign.randomEvents.prisoners.RecoverMIAPersonnel.abandonMissingPersonnel;
 
 import java.awt.BorderLayout;
@@ -53,10 +59,12 @@ import mekhq.MekHQ;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
+import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.enums.MHQTabType;
+import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.view.JumpPathViewPanel;
@@ -170,6 +178,9 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         panMap.setSelectedSystem(getCampaign().getLocation().getCurrentSystem());
         panMapView.add(panMap, BorderLayout.CENTER);
 
+        JPanel pnlTutorial = new TutorialHyperlinkPanel("mapTab");
+        panMapView.add(pnlTutorial, BorderLayout.SOUTH);
+
         mapView = new JViewport();
         mapView.setMinimumSize(new Dimension(600, 600));
         mapView.setView(panMapView);
@@ -228,6 +239,11 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         getCampaign().getUnits().forEach(unit -> unit.setSite(Unit.SITE_FACILITY_BASIC));
 
         abandonMissingPersonnel(getCampaign());
+
+        NewPersonnelMarket personnelMarket = getCampaign().getNewPersonnelMarket();
+        if (personnelMarket.getAssociatedPersonnelMarketStyle() == MEKHQ) {
+            personnelMarket.clearCurrentApplicants();
+        }
     }
 
     private void refreshSystemView() {

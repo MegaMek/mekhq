@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
@@ -32,6 +37,7 @@ import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.util.Objects;
 
+import megamek.common.Aero;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
@@ -39,6 +45,7 @@ import megamek.common.ITechnology;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.TechAdvancement;
+import megamek.common.Warship;
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.ArmorType;
 import megamek.logging.MMLogger;
@@ -139,7 +146,7 @@ public class Armor extends Part implements IAcquisitionWork {
         }
         toReturn.append("</b><br/>").append(getDetails()).append("<br/>");
 
-        if (getSkillMin() <= SkillType.EXP_ELITE) {
+        if (getSkillMin() <= SkillType.EXP_LEGENDARY) {
             toReturn.append(getTimeLeft())
                   .append(" minutes")
                   .append(null != getTech() ? " (scheduled)" : "")
@@ -361,13 +368,13 @@ public class Armor extends Part implements IAcquisitionWork {
         newPart.setDaysToArrival(transitDays);
         if (campaign.getQuartermaster().buyPart(newPart, transitDays)) {
             return "<font color='" +
-                         MekHQ.getMHQOptions().getFontColorPositiveHexColor() +
+                         ReportingUtilities.getPositiveColor() +
                          "'><b> part found</b>.</font> It will be delivered in " +
                          transitDays +
                          " days.";
         } else {
             return "<font color='" +
-                         MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                         ReportingUtilities.getNegativeColor() +
                          "'><b> You cannot afford this part. Transaction cancelled</b>.</font>";
         }
     }
@@ -380,7 +387,7 @@ public class Armor extends Part implements IAcquisitionWork {
     @Override
     public String failToFind() {
         return "<font color='" +
-                     MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                     ReportingUtilities.getNegativeColor() +
                      "'><b> part not found</b>.</font>";
     }
 
@@ -410,16 +417,31 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     public int getBaseTimeFor(Entity entity) {
-        if (null != entity) {
-            if (entity instanceof Tank) {
-                return 3;
-            }
-            // December 2017 errata, only large craft should return 15m/point.
-            else if (entity.hasETypeFlag(Entity.ETYPE_DROPSHIP) || entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
-                return 15;
-            }
+        if (entity == null) {
+            return 5;
         }
-        return 5;
+        // FIXME: this mess is because switch cannot switch on longs as of Java 17.
+        // Options include: Waiting for Java to support that, or changing the entire
+        // way the 'ETYPE' works on Entity to implement bitset or some similar.
+        // For repair types, see CamOps, Master Repair Table, p207
+        String typeKey;
+        if (entity instanceof Tank) {
+            typeKey = "TANK";
+        } else if (entity instanceof Warship) {
+            typeKey = "CAPITAL";
+        } else if (entity instanceof Aero) {
+            typeKey = "AEROSPACE";
+        } else {
+            typeKey = "DEFAULT";
+        }
+
+        return (switch (typeKey) {
+            case "TANK" -> 3;
+            case "CAPITAL" -> 120;
+            case "AEROSPACE" -> 15;
+            default -> 5;
+        });
+
     }
 
     @Override
@@ -574,18 +596,21 @@ public class Armor extends Part implements IAcquisitionWork {
 
     /**
      * Searches the warehouse for a compatible parts and returns how many points of armor are found.
+     *
      * @return returns points of armor are found
      */
     public int getAmountAvailable() {
         return campaign.getWarehouse()
-                     .streamSpareParts().filter(this::isSameArmorPart)
+                     .streamSpareParts()
+                     .filter(this::isSameArmorPart)
                      .mapToInt(part -> ((Armor) part).getAmount())
                      .sum();
     }
 
     /**
-     * Searches the warehouse for a compatible parts changes the amount available. This will continue to remove parts
-     * if more than one part needs to be removed to cover the amount.
+     * Searches the warehouse for a compatible parts changes the amount available. This will continue to remove parts if
+     * more than one part needs to be removed to cover the amount.
+     *
      * @param amount points of armor to add or remove
      */
     public void changeAmountAvailable(int amount) {
@@ -618,7 +643,7 @@ public class Armor extends Part implements IAcquisitionWork {
         // if we are impossible to fix now, we should scrap this amount of armor
         // from spares and start over
         String scrap = "";
-        if (skillMin > SkillType.EXP_ELITE) {
+        if (skillMin > SkillType.EXP_LEGENDARY) {
             scrap = " Armor supplies lost!";
             if (isSalvaging()) {
                 remove(false);
@@ -632,7 +657,7 @@ public class Armor extends Part implements IAcquisitionWork {
             }
         }
         return " <font color='" +
-                     MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                     ReportingUtilities.getNegativeColor() +
                      "'><b> failed." +
                      scrap +
                      "</b></font>";
@@ -715,7 +740,9 @@ public class Armor extends Part implements IAcquisitionWork {
 
     /**
      * Finds a spare part, if applicable, and changes its amount, creating a new part if needed.
+     *
      * @param amount value to change the part's amount by. Can be positive to add or negative to remove.
+     *
      * @return leftover amount; should be 0 except when removing if the part removed didn't have enough
      */
     protected int changeAmountAvailableSingle(int amount) {
@@ -741,14 +768,12 @@ public class Armor extends Part implements IAcquisitionWork {
 
     /**
      * Not sure how true this title is, it was used in {@link Armor#getAmountAvailable}
+     *
      * @param part is this part the same
-     * @return true if the two parts are the same, at least as far as {@link Armor#getAmountAvailable} is
-     * concerned
+     *
+     * @return true if the two parts are the same, at least as far as {@link Armor#getAmountAvailable} is concerned
      */
     private boolean isSameArmorPart(Part part) {
-        return (part instanceof Armor armor) &&
-                     armor.isPresent() &&
-                     !armor.isReservedForRefit() &&
-                     isSameType(armor);
+        return (part instanceof Armor armor) && armor.isPresent() && !armor.isReservedForRefit() && isSameType(armor);
     }
 }

@@ -24,11 +24,17 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.campaignOptions.contents;
 
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_F;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 
 import java.awt.GridBagConstraints;
@@ -66,6 +72,7 @@ public class FinancesTab {
     private final CampaignOptions campaignOptions;
 
     //start General Options
+    private CampaignOptionsHeaderPanel financesGeneralOptions;
     private JPanel pnlGeneralOptions;
     private JCheckBox useLoanLimitsBox;
     private JCheckBox usePercentageMaintenanceBox;
@@ -87,6 +94,8 @@ public class FinancesTab {
     private JCheckBox payForMaintainBox;
     private JCheckBox payForTransportBox;
     private JCheckBox payForRecruitmentBox;
+    private JCheckBox payForFoodBox;
+    private JCheckBox payForHousingBox;
 
 
     private JPanel pnlSales;
@@ -106,6 +115,7 @@ public class FinancesTab {
     //end General Options
 
     //start Price Multipliers
+    private CampaignOptionsHeaderPanel priceMultipliersHeader;
     private JPanel pnlGeneralMultipliers;
     private JLabel lblCommonPartPriceMultiplier;
     private JSpinner spnCommonPartPriceMultiplier;
@@ -194,6 +204,8 @@ public class FinancesTab {
         payForMaintainBox = new JCheckBox();
         payForTransportBox = new JCheckBox();
         payForRecruitmentBox = new JCheckBox();
+        payForFoodBox = new JCheckBox();
+        payForHousingBox = new JCheckBox();
 
         // Sales
         pnlSales = new JPanel();
@@ -223,8 +235,8 @@ public class FinancesTab {
      */
     public JPanel createFinancesGeneralOptionsTab() {
         // Header
-        JPanel headerPanel = new CampaignOptionsHeaderPanel("FinancesGeneralTab",
-              getImageDirectory() + "logo_star_league.png");
+        financesGeneralOptions = new CampaignOptionsHeaderPanel("FinancesGeneralTab",
+              getImageDirectory() + "logo_star_league.png", 6);
 
         // Contents
         pnlGeneralOptions = createGeneralOptionsPanel();
@@ -249,7 +261,7 @@ public class FinancesTab {
 
         layoutParent.gridwidth = 5;
         layoutParent.gridy = 0;
-        panel.add(headerPanel, layoutParent);
+        panel.add(financesGeneralOptions, layoutParent);
 
         layoutParent.gridx = 0;
         layoutParent.gridy++;
@@ -277,13 +289,25 @@ public class FinancesTab {
     private JPanel createPaymentsPanel() {
         // Contents
         payForPartsBox = new CampaignOptionsCheckBox("PayForPartsBox");
+        payForPartsBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "PayForPartsBox"));
         payForRepairsBox = new CampaignOptionsCheckBox("PayForRepairsBox");
+        payForRepairsBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "PayForRepairsBox"));
         payForUnitsBox = new CampaignOptionsCheckBox("PayForUnitsBox");
+        payForUnitsBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "PayForUnitsBox"));
         payForSalariesBox = new CampaignOptionsCheckBox("PayForSalariesBox");
+        payForSalariesBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "PayForSalariesBox"));
         payForOverheadBox = new CampaignOptionsCheckBox("PayForOverheadBox");
+        payForOverheadBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "PayForOverheadBox"));
         payForMaintainBox = new CampaignOptionsCheckBox("PayForMaintainBox");
+        payForMaintainBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "PayForMaintainBox"));
         payForTransportBox = new CampaignOptionsCheckBox("PayForTransportBox");
+        payForTransportBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "PayForTransportBox"));
         payForRecruitmentBox = new CampaignOptionsCheckBox("PayForRecruitmentBox");
+        payForRecruitmentBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "PayForRecruitmentBox"));
+        payForFoodBox = new CampaignOptionsCheckBox("PayForFoodBox");
+        payForRecruitmentBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "PayForFoodBox"));
+        payForHousingBox = new CampaignOptionsCheckBox("PayForHousingBox");
+        payForRecruitmentBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "PayForHousingBox"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PaymentsPanel", true, "PaymentsPanel");
@@ -313,6 +337,12 @@ public class FinancesTab {
         panel.add(payForTransportBox, layout);
         layout.gridx++;
         panel.add(payForRecruitmentBox, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(payForFoodBox, layout);
+        layout.gridx++;
+        panel.add(payForHousingBox, layout);
 
         return panel;
     }
@@ -354,17 +384,33 @@ public class FinancesTab {
     private JPanel createGeneralOptionsPanel() {
         // Contents
         useLoanLimitsBox = new CampaignOptionsCheckBox("UseLoanLimitsBox");
+        useLoanLimitsBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "UseLoanLimitsBox"));
         usePercentageMaintenanceBox = new CampaignOptionsCheckBox("UsePercentageMaintenanceBox");
+        usePercentageMaintenanceBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
+              "UsePercentageMaintenanceBox"));
         useExtendedPartsModifierBox = new CampaignOptionsCheckBox("UseExtendedPartsModifierBox");
+        useExtendedPartsModifierBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
+              "UseExtendedPartsModifierBox"));
         usePeacetimeCostBox = new CampaignOptionsCheckBox("UsePeacetimeCostBox");
+        usePeacetimeCostBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "UsePeacetimeCostBox"));
         showPeacetimeCostBox = new CampaignOptionsCheckBox("ShowPeacetimeCostBox");
+        showPeacetimeCostBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "ShowPeacetimeCostBox"));
 
         lblFinancialYearDuration = new CampaignOptionsLabel("FinancialYearDuration");
+        lblFinancialYearDuration.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
+              "FinancialYearDuration"));
+        comboFinancialYearDuration.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
+              "FinancialYearDuration"));
 
         newFinancialYearFinancesToCSVExportBox = new CampaignOptionsCheckBox("NewFinancialYearFinancesToCSVExportBox");
+        newFinancialYearFinancesToCSVExportBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
+              "NewFinancialYearFinancesToCSVExportBox"));
 
         chkSimulateGrayMonday = new CampaignOptionsCheckBox("SimulateGrayMonday");
+        chkSimulateGrayMonday.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "SimulateGrayMonday"));
         chkAllowMonthlyReinvestment = new CampaignOptionsCheckBox("AllowMonthlyReinvestment");
+        chkAllowMonthlyReinvestment.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
+              "AllowMonthlyReinvestment"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("GeneralOptionsPanel");
@@ -417,7 +463,9 @@ public class FinancesTab {
     private JPanel createSalesPanel() {
         // Contents
         sellUnitsBox = new CampaignOptionsCheckBox("SellUnitsBox");
+        sellUnitsBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "SellUnitsBox"));
         sellPartsBox = new CampaignOptionsCheckBox("SellPartsBox");
+        sellPartsBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "SellPartsBox"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("SalesPanel", true, "SalesPanel");
@@ -443,9 +491,12 @@ public class FinancesTab {
     private JPanel createTaxesPanel() {
         // Contents
         chkUseTaxes = new CampaignOptionsCheckBox("UseTaxesBox");
+        chkUseTaxes.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "UseTaxesBox"));
 
         lblTaxesPercentage = new CampaignOptionsLabel("TaxesPercentage");
+        lblTaxesPercentage.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "TaxesPercentage"));
         spnTaxesPercentage = new CampaignOptionsSpinner("TaxesPercentage", 30, 1, 100, 1);
+        spnTaxesPercentage.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "TaxesPercentage"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("TaxesPanel", true, "TaxesPanel");
@@ -476,7 +527,9 @@ public class FinancesTab {
     private JPanel createSharesPanel() {
         // Contents
         chkUseShareSystem = new CampaignOptionsCheckBox("UseShareSystem");
+        chkUseShareSystem.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "UseShareSystem"));
         chkSharesForAll = new CampaignOptionsCheckBox("SharesForAll");
+        chkSharesForAll.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "SharesForAll"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("SharesPanel", true, "SharesPanel");
@@ -538,9 +591,8 @@ public class FinancesTab {
      */
     public JPanel createPriceMultipliersTab() {
         // Header
-        JPanel headerPanel = new CampaignOptionsHeaderPanel("PriceMultipliersTab",
-              getImageDirectory() + "logo_clan_stone_lion.png",
-              true);
+        priceMultipliersHeader = new CampaignOptionsHeaderPanel("PriceMultipliersTab",
+              getImageDirectory() + "logo_clan_stone_lion.png", true, true, 2);
 
         // Contents
         pnlGeneralMultipliers = createGeneralMultipliersPanel();
@@ -554,7 +606,7 @@ public class FinancesTab {
         layout.gridwidth = 5;
         layout.gridx = 0;
         layout.gridy = 0;
-        panel.add(headerPanel, layout);
+        panel.add(priceMultipliersHeader, layout);
 
         layout.gridy++;
         layout.gridwidth = 1;
@@ -578,34 +630,58 @@ public class FinancesTab {
     private JPanel createGeneralMultipliersPanel() {
         // Contents
         lblCommonPartPriceMultiplier = new CampaignOptionsLabel("CommonPartPriceMultiplier");
+        lblCommonPartPriceMultiplier.addMouseListener(createTipPanelUpdater(priceMultipliersHeader,
+              "CommonPartPriceMultiplier"));
         spnCommonPartPriceMultiplier = new CampaignOptionsSpinner("CommonPartPriceMultiplier", 1.0, 0.1, 100, 0.1);
+        spnCommonPartPriceMultiplier.addMouseListener(createTipPanelUpdater(priceMultipliersHeader,
+              "CommonPartPriceMultiplier"));
 
         lblInnerSphereUnitPriceMultiplier = new CampaignOptionsLabel("InnerSphereUnitPriceMultiplier");
+        lblInnerSphereUnitPriceMultiplier.addMouseListener(createTipPanelUpdater(priceMultipliersHeader,
+              "InnerSphereUnitPriceMultiplier"));
         spnInnerSphereUnitPriceMultiplier = new CampaignOptionsSpinner("InnerSphereUnitPriceMultiplier",
               1.0,
               0.1,
               100,
               0.1);
+        spnInnerSphereUnitPriceMultiplier.addMouseListener(createTipPanelUpdater(priceMultipliersHeader,
+              "InnerSphereUnitPriceMultiplier"));
 
         lblInnerSpherePartPriceMultiplier = new CampaignOptionsLabel("InnerSpherePartPriceMultiplier");
+        lblInnerSpherePartPriceMultiplier.addMouseListener(createTipPanelUpdater(priceMultipliersHeader,
+              "InnerSpherePartPriceMultiplier"));
         spnInnerSpherePartPriceMultiplier = new CampaignOptionsSpinner("InnerSpherePartPriceMultiplier",
               1.0,
               0.1,
               100,
               0.1);
+        spnInnerSpherePartPriceMultiplier.addMouseListener(createTipPanelUpdater(priceMultipliersHeader,
+              "InnerSpherePartPriceMultiplier"));
 
         lblClanUnitPriceMultiplier = new CampaignOptionsLabel("ClanUnitPriceMultiplier");
+        lblClanUnitPriceMultiplier.addMouseListener(createTipPanelUpdater(priceMultipliersHeader,
+              "ClanUnitPriceMultiplier"));
         spnClanUnitPriceMultiplier = new CampaignOptionsSpinner("ClanUnitPriceMultiplier", 1.0, 0.1, 100, 0.1);
+        spnClanUnitPriceMultiplier.addMouseListener(createTipPanelUpdater(priceMultipliersHeader,
+              "ClanUnitPriceMultiplier"));
 
         lblClanPartPriceMultiplier = new CampaignOptionsLabel("ClanPartPriceMultiplier");
+        lblClanPartPriceMultiplier.addMouseListener(createTipPanelUpdater(priceMultipliersHeader,
+              "ClanPartPriceMultiplier"));
         spnClanPartPriceMultiplier = new CampaignOptionsSpinner("ClanPartPriceMultiplier", 1.0, 0.1, 100, 0.1);
+        spnClanPartPriceMultiplier.addMouseListener(createTipPanelUpdater(priceMultipliersHeader,
+              "ClanPartPriceMultiplier"));
 
         lblMixedTechUnitPriceMultiplier = new CampaignOptionsLabel("MixedTechUnitPriceMultiplier");
+        lblMixedTechUnitPriceMultiplier.addMouseListener(createTipPanelUpdater(priceMultipliersHeader,
+              "MixedTechUnitPriceMultiplier"));
         spnMixedTechUnitPriceMultiplier = new CampaignOptionsSpinner("MixedTechUnitPriceMultiplier",
               1.0,
               0.1,
               100,
               0.1);
+        spnMixedTechUnitPriceMultiplier.addMouseListener(createTipPanelUpdater(priceMultipliersHeader,
+              "MixedTechUnitPriceMultiplier"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("GeneralMultipliersPanel",
@@ -709,25 +785,37 @@ public class FinancesTab {
     private JPanel createOtherMultipliersPanel() {
         // Contents
         lblDamagedPartsValueMultiplier = new CampaignOptionsLabel("DamagedPartsValueMultiplier");
+        lblDamagedPartsValueMultiplier.addMouseListener(createTipPanelUpdater(priceMultipliersHeader,
+              "DamagedPartsValueMultiplier"));
         spnDamagedPartsValueMultiplier = new CampaignOptionsSpinner("DamagedPartsValueMultiplier",
               0.33,
               0.00,
               1.00,
               0.05);
+        spnDamagedPartsValueMultiplier.addMouseListener(createTipPanelUpdater(priceMultipliersHeader,
+              "DamagedPartsValueMultiplier"));
 
         lblUnrepairablePartsValueMultiplier = new CampaignOptionsLabel("UnrepairablePartsValueMultiplier");
+        lblUnrepairablePartsValueMultiplier.addMouseListener(createTipPanelUpdater(priceMultipliersHeader,
+              "UnrepairablePartsValueMultiplier"));
         spnUnrepairablePartsValueMultiplier = new CampaignOptionsSpinner("UnrepairablePartsValueMultiplier",
               0.10,
               0.00,
               1.00,
               0.05);
+        spnUnrepairablePartsValueMultiplier.addMouseListener(createTipPanelUpdater(priceMultipliersHeader,
+              "UnrepairablePartsValueMultiplier"));
 
         lblCancelledOrderRefundMultiplier = new CampaignOptionsLabel("CancelledOrderRefundMultiplier");
+        lblCancelledOrderRefundMultiplier.addMouseListener(createTipPanelUpdater(priceMultipliersHeader,
+              "CancelledOrderRefundMultiplier"));
         spnCancelledOrderRefundMultiplier = new CampaignOptionsSpinner("CancelledOrderRefundMultiplier",
               0.50,
               0.00,
               1.00,
               0.05);
+        spnCancelledOrderRefundMultiplier.addMouseListener(createTipPanelUpdater(priceMultipliersHeader,
+              "CancelledOrderRefundMultiplier"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("OtherMultipliersPanel", true, "OtherMultipliersPanel");
@@ -785,6 +873,8 @@ public class FinancesTab {
         options.setPayForMaintain(payForMaintainBox.isSelected());
         options.setPayForTransport(payForTransportBox.isSelected());
         options.setPayForRecruitment(payForRecruitmentBox.isSelected());
+        options.setPayForFood(payForFoodBox.isSelected());
+        options.setPayForHousing(payForHousingBox.isSelected());
         options.setSellUnits(sellUnitsBox.isSelected());
         options.setSellParts(sellPartsBox.isSelected());
         options.setUseTaxes(chkUseTaxes.isSelected());
@@ -851,6 +941,8 @@ public class FinancesTab {
         payForMaintainBox.setSelected(options.isPayForMaintain());
         payForTransportBox.setSelected(options.isPayForTransport());
         payForRecruitmentBox.setSelected(options.isPayForRecruitment());
+        payForFoodBox.setSelected(options.isPayForFood());
+        payForHousingBox.setSelected(options.isPayForHousing());
         sellUnitsBox.setSelected(options.isSellUnits());
         sellPartsBox.setSelected(options.isSellParts());
         chkUseTaxes.setSelected(options.isUseTaxes());
