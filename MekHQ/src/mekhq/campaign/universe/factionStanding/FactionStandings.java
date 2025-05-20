@@ -113,25 +113,38 @@ public class FactionStandings {
     static final double FAME_CHANGE_CONTRACT_ACCEPT_ENEMY_NORMAL = -5.0;
 
     /**
-     * Fame decrease when accepting a contract for factions allied with the enemy.
-     */
-    static final double FAME_CHANGE_CONTRACT_ACCEPT_ENEMY_ALLY = -1.0;
-
-    /**
      * Fame decrease when accepting a contract against a Clan enemy.
      */
     static final double FAME_CHANGE_CONTRACT_ACCEPT_ENEMY_CLAN = -2.5;
 
     /**
+     * Fame decrease when accepting a contract for non-Clan factions allied with the enemy.
+     */
+    static final double FAME_CHANGE_CONTRACT_ACCEPT_ENEMY_ALLY_NORMAL = -1.0;
+
+    /**
+     * Fame decrease when accepting a contract for Clan factions allied with the enemy.
+     */
+    static final double FAME_CHANGE_CONTRACT_ACCEPT_ENEMY_ALLY_CLAN = -0.2;
+
+    /**
      * Fame penalty for breaching a contract.
      */
-    static final double FAME_CHANGE_CONTRACT_BREACH = -5.0;
+    static final double FAME_CHANGE_CONTRACT_BREACH = -10.0;
 
     /**
      * Fame penalty for refusing a batchall.
      */
     static final double FAME_CHANGE_REFUSE_BATCHALL = -5;
 
+    /**
+     * A mapping of faction names to their respective standing levels.
+     *
+     * <p>This variable is used to store and track the Fame score of factions the campaign has interacted with.</p>
+     *
+     * <p><b>Key:</b></p> A {@link String} representing the shortname of the faction (aka Faction Code).
+     * <p><b>Value:</b></p> A {@link Double} representing the campaign's Fame with that faction.
+     */
     private Map<String, Double> factionStandings;
 
     /**
