@@ -3927,8 +3927,13 @@ public class Person {
             }
             case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_HR -> {
                 int adminLevel = getSkillLevelOrNegative(SkillType.S_ADMIN);
+                adminLevel = adminLevel == -1 ? 0 : adminLevel;
+
                 int negotiationLevel = getSkillLevelOrNegative(SkillType.S_NEGOTIATION);
+                negotiationLevel = negotiationLevel == -1 ? 0 : negotiationLevel;
+
                 int scroungeLevel = getSkillLevelOrNegative(SkillType.S_SCROUNGE);
+                scroungeLevel = scroungeLevel == -1 ? 0 : scroungeLevel;
 
                 int levelSum;
                 int divisor;
@@ -4243,9 +4248,15 @@ public class Person {
     }
 
     /**
-     * @deprecated Unused
+     * Returns the experience level for the specified skill, or {@code -1} if the skill is not present.
+     *
+     * <p>If the entity has the specified skill, this method retrieves the skill and returns its experience level,
+     * potentially taking into account any configured options or attribute modifiers. Otherwise, it returns {@code -1}
+     * to indicate that the skill is not available.</p>
+     *
+     * @param skillName the name of the skill to query
+     * @return the experience level of the skill, or {@code -1} if the skill is not found
      */
-    @Deprecated(since = "0.50.06", forRemoval = true)
     public int getSkillLevelOrNegative(final String skillName) {
         if (hasSkill(skillName)) {
             return getSkill(skillName).getExperienceLevel(options, atowAttributes);
