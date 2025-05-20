@@ -1788,7 +1788,8 @@ public class StratconRulesManager {
         if (skill == null) {
             skillModifier = REGULAR.getExperienceLevel();
         } else {
-            skillModifier = REGULAR.getExperienceLevel() - skill.getExperienceLevel();
+            skillModifier = REGULAR.getExperienceLevel() - skill.getExperienceLevel(commandLiaison.getOptions(),
+             commandLiaison.getATOWAttributes());
         }
 
         // Admin Skill Modifier

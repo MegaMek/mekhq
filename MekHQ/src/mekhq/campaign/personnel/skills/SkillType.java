@@ -915,18 +915,30 @@ public class SkillType {
                      name.equals(S_ARTILLERY);
     }
 
-    public int getExperienceLevel(int lvl) {
-        if (lvl >= legendaryLvl) {
+    /**
+     * Returns the experience level constant corresponding to the given numeric level.
+     *
+     * <p>The method compares the input level against predetermined thresholds for each experience rank, in
+     * descending order: legendary, heroic, elite, veteran, regular, and green. It returns the constant representing the
+     * matching or next lower experience category. If the input level does not meet any of these thresholds, it returns
+     * the constant for the "ultra green" experience level.</p>
+     *
+     * @param level the numeric level to evaluate
+     *
+     * @return the constant representing the corresponding experience level
+     */
+    public int getExperienceLevel(final int level) {
+        if (level >= legendaryLvl) {
             return EXP_LEGENDARY;
-        } else if (lvl >= heroicLvl) {
+        } else if (level >= heroicLvl) {
             return EXP_HEROIC;
-        } else if (lvl >= eliteLvl) {
+        } else if (level >= eliteLvl) {
             return EXP_ELITE;
-        } else if (lvl >= vetLvl) {
+        } else if (level >= vetLvl) {
             return EXP_VETERAN;
-        } else if (lvl >= regLvl) {
+        } else if (level >= regLvl) {
             return EXP_REGULAR;
-        } else if (lvl >= greenLvl) {
+        } else if (level >= greenLvl) {
             return EXP_GREEN;
         } else {
             return EXP_ULTRA_GREEN;

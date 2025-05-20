@@ -1524,7 +1524,10 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             lblName = new JLabel(type);
             lblValue = new JLabel();
             if (person.hasSkill(type)) {
-                lblValue.setText(person.getSkill(type).toString(person.getOptions(), person.getReputation()));
+                lblValue.setText(person.getSkill(type)
+                                       .toString(person.getOptions(),
+                                             person.getATOWAttributes(),
+                                             person.getReputation()));
             } else {
                 lblValue.setText("-");
             }

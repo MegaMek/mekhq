@@ -67,6 +67,8 @@ import static mekhq.campaign.personnel.lifeEvents.NewYearsDayAnnouncement.isNewY
 import static mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement.isWinterHolidayMajorDay;
 import static mekhq.campaign.personnel.skills.Aging.applyAgingSPA;
 import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
+import static mekhq.campaign.personnel.skills.SkillType.S_STRATEGY;
 import static mekhq.campaign.personnel.skills.SkillType.getType;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.areFieldKitchensWithinCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenCapacity;
@@ -209,6 +211,7 @@ import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -2391,56 +2394,64 @@ public class Campaign implements ITechManager {
         // Go ahead and generate a new bloodname
         int bloodnameTarget = 6;
         PersonnelOptions options = person.getOptions();
+        Attributes attributes = person.getATOWAttributes();
         if (!ignoreDice) {
             switch (person.getPhenotype()) {
                 case MEKWARRIOR: {
                     bloodnameTarget += person.hasSkill(SkillType.S_GUN_MEK) ?
-                                             person.getSkill(SkillType.S_GUN_MEK).getFinalSkillValue(options) :
+                                             person.getSkill(SkillType.S_GUN_MEK)
+                                                   .getFinalSkillValue(options, attributes) :
                                              TargetRoll.AUTOMATIC_FAIL;
                     bloodnameTarget += person.hasSkill(SkillType.S_PILOT_MEK) ?
-                                             person.getSkill(SkillType.S_PILOT_MEK).getFinalSkillValue(options) :
+                                             person.getSkill(SkillType.S_PILOT_MEK)
+                                                   .getFinalSkillValue(options, attributes) :
                                              TargetRoll.AUTOMATIC_FAIL;
                     break;
                 }
                 case AEROSPACE: {
                     bloodnameTarget += person.hasSkill(SkillType.S_GUN_AERO) ?
-                                             person.getSkill(SkillType.S_GUN_AERO).getFinalSkillValue(options) :
+                                             person.getSkill(SkillType.S_GUN_AERO)
+                                                   .getFinalSkillValue(options, attributes) :
                                              TargetRoll.AUTOMATIC_FAIL;
                     bloodnameTarget += person.hasSkill(SkillType.S_PILOT_AERO) ?
-                                             person.getSkill(SkillType.S_PILOT_AERO).getFinalSkillValue(options) :
+                                             person.getSkill(SkillType.S_PILOT_AERO)
+                                                   .getFinalSkillValue(options, attributes) :
                                              TargetRoll.AUTOMATIC_FAIL;
                     break;
                 }
                 case ELEMENTAL: {
                     bloodnameTarget += person.hasSkill(SkillType.S_GUN_BA) ?
-                                             person.getSkill(SkillType.S_GUN_BA).getFinalSkillValue(options) :
+                                             person.getSkill(SkillType.S_GUN_BA)
+                                                   .getFinalSkillValue(options, attributes) :
                                              TargetRoll.AUTOMATIC_FAIL;
                     bloodnameTarget += person.hasSkill(SkillType.S_ANTI_MEK) ?
-                                             person.getSkill(SkillType.S_ANTI_MEK).getFinalSkillValue(options) :
+                                             person.getSkill(SkillType.S_ANTI_MEK)
+                                                   .getFinalSkillValue(options, attributes) :
                                              TargetRoll.AUTOMATIC_FAIL;
                     break;
                 }
                 case VEHICLE: {
                     bloodnameTarget += person.hasSkill(SkillType.S_GUN_VEE) ?
-                                             person.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue(options) :
+                                             person.getSkill(SkillType.S_GUN_VEE)
+                                                   .getFinalSkillValue(options, attributes) :
                                              TargetRoll.AUTOMATIC_FAIL;
                     switch (person.getPrimaryRole()) {
                         case GROUND_VEHICLE_DRIVER:
                             bloodnameTarget += person.hasSkill(SkillType.S_PILOT_GVEE) ?
                                                      person.getSkill(SkillType.S_PILOT_GVEE)
-                                                           .getFinalSkillValue(options) :
+                                                           .getFinalSkillValue(options, attributes) :
                                                      TargetRoll.AUTOMATIC_FAIL;
                             break;
                         case NAVAL_VEHICLE_DRIVER:
                             bloodnameTarget += person.hasSkill(SkillType.S_PILOT_NVEE) ?
                                                      person.getSkill(SkillType.S_PILOT_NVEE)
-                                                           .getFinalSkillValue(options) :
+                                                           .getFinalSkillValue(options, attributes) :
                                                      TargetRoll.AUTOMATIC_FAIL;
                             break;
                         case VTOL_PILOT:
                             bloodnameTarget += person.hasSkill(SkillType.S_PILOT_VTOL) ?
                                                      person.getSkill(SkillType.S_PILOT_VTOL)
-                                                           .getFinalSkillValue(options) :
+                                                           .getFinalSkillValue(options, attributes) :
                                                      TargetRoll.AUTOMATIC_FAIL;
                             break;
                         default:
@@ -2451,7 +2462,8 @@ public class Campaign implements ITechManager {
                 case PROTOMEK: {
                     bloodnameTarget += 2 *
                                              (person.hasSkill(SkillType.S_GUN_PROTO) ?
-                                                    person.getSkill(SkillType.S_GUN_PROTO).getFinalSkillValue(options) :
+                                                    person.getSkill(SkillType.S_GUN_PROTO)
+                                                          .getFinalSkillValue(options, attributes) :
                                                     TargetRoll.AUTOMATIC_FAIL);
                     break;
                 }
@@ -2461,28 +2473,28 @@ public class Campaign implements ITechManager {
                             bloodnameTarget += 2 *
                                                      (person.hasSkill(SkillType.S_PILOT_SPACE) ?
                                                             person.getSkill(SkillType.S_PILOT_SPACE)
-                                                                  .getFinalSkillValue(options) :
+                                                                  .getFinalSkillValue(options, attributes) :
                                                             TargetRoll.AUTOMATIC_FAIL);
                             break;
                         case VESSEL_GUNNER:
                             bloodnameTarget += 2 *
                                                      (person.hasSkill(SkillType.S_GUN_SPACE) ?
                                                             person.getSkill(SkillType.S_GUN_SPACE)
-                                                                  .getFinalSkillValue(options) :
+                                                                  .getFinalSkillValue(options, attributes) :
                                                             TargetRoll.AUTOMATIC_FAIL);
                             break;
                         case VESSEL_CREW:
                             bloodnameTarget += 2 *
                                                      (person.hasSkill(SkillType.S_TECH_VESSEL) ?
                                                             person.getSkill(SkillType.S_TECH_VESSEL)
-                                                                  .getFinalSkillValue(options) :
+                                                                  .getFinalSkillValue(options, attributes) :
                                                             TargetRoll.AUTOMATIC_FAIL);
                             break;
                         case VESSEL_NAVIGATOR:
                             bloodnameTarget += 2 *
                                                      (person.hasSkill(SkillType.S_NAVIGATION) ?
                                                             person.getSkill(SkillType.S_NAVIGATION)
-                                                                  .getFinalSkillValue(options) :
+                                                                  .getFinalSkillValue(options, attributes) :
                                                             TargetRoll.AUTOMATIC_FAIL);
                             break;
                         default:
@@ -3152,51 +3164,103 @@ public class Campaign implements ITechManager {
      *
      * @return The person in the designated role with the most experience.
      */
-    public Person findBestInRole(PersonnelRole role, String primary, String secondary) {
+    public Person findBestInRole(PersonnelRole role, String primary, @Nullable String secondary) {
         int highest = 0;
-        Person retVal = null;
-        for (Person p : getActivePersonnel(true)) {
-            if (((p.getPrimaryRole() == role) || (p.getSecondaryRole() == role)) && (p.getSkill(primary) != null)) {
-                if (p.getSkill(primary).getLevel() > highest) {
-                    retVal = p;
-                    highest = p.getSkill(primary).getLevel();
-                } else if (secondary != null && p.getSkill(primary).getLevel() == highest &&
-                                 /*
-                                  * If the skill level of the current person is the same as the previous highest,
-                                  * select the current instead under the following conditions:
-                                  */
-                                 (retVal == null ||
-                                        // None has been selected yet (current has level 0)
-                                        retVal.getSkill(secondary) == null ||
-                                        // Previous selection does not have secondary
-                                        // skill
-                                        (p.getSkill(secondary) != null
-                                               // Current has secondary skill, and it is higher than the
-                                               // previous.
-                                               &&
-                                               p.getSkill(secondary).getLevel() >
-                                                     retVal.getSkill(secondary).getLevel()))) {
-                    retVal = p;
+        Person bestInRole = null;
+
+        boolean isUseAgingEffects = campaignOptions.isUseAgeEffects();
+        boolean isClanCampaign = isClanCampaign();
+
+        for (Person person : getActivePersonnel(false)) {
+            int adjustedReputation = person.getAdjustedReputation(isUseAgingEffects,
+                  isClanCampaign,
+                  currentDay,
+                  person.getRankLevel());
+
+            if (((person.getPrimaryRole() == role) || (person.getSecondaryRole() == role)) &&
+                      (person.getSkill(primary) != null)) {
+                Skill primarySkill = person.getSkill(primary);
+                int currentSkillLevel = Integer.MIN_VALUE;
+
+                if (primarySkill != null) {
+                    currentSkillLevel = primarySkill.getTotalSkillLevel(person.getOptions(),
+                          person.getATOWAttributes(),
+                          adjustedReputation);
+                }
+
+                if (bestInRole == null || currentSkillLevel > highest) {
+                    bestInRole = person;
+                    highest = currentSkillLevel;
+                } else if (secondary != null && currentSkillLevel == highest) {
+                    Skill secondarySkill = person.getSkill(primary);
+
+                    if (secondarySkill == null) {
+                        continue;
+                    }
+
+                    currentSkillLevel = secondarySkill.getTotalSkillLevel(person.getOptions(),
+                          person.getATOWAttributes(),
+                          adjustedReputation);
+
+                    int bestInRoleSecondarySkill = Integer.MIN_VALUE;
+                    if (bestInRole.hasSkill(secondary)) {
+                        int bestInRoleAdjustedReputation = bestInRole.getAdjustedReputation(isUseAgingEffects,
+                              isClanCampaign,
+                              currentDay,
+                              bestInRole.getRankLevel());
+                        bestInRoleSecondarySkill = secondarySkill.getTotalSkillLevel(bestInRole.getOptions(),
+                              bestInRole.getATOWAttributes(),
+                              bestInRoleAdjustedReputation);
+                    }
+
+                    if (currentSkillLevel > bestInRoleSecondarySkill) {
+                        bestInRole = person;
+                    }
                 }
             }
         }
-        return retVal;
+        return bestInRole;
     }
 
     public Person findBestInRole(PersonnelRole role, String skill) {
         return findBestInRole(role, skill, null);
     }
 
-    public @Nullable Person findBestAtSkill(String skill) {
-        Person person = null;
+    /**
+     * Finds and returns the {@link Person} with the highest total skill level for a specified skill.
+     *
+     * <p>This method iterates over all active personnel, calculates each individual's total skill level
+     * for the given skill (taking into account campaign options, reputation modifiers, and attributes), and determines
+     * who possesses the highest skill value. If none are found, {@code null} is returned.</p>
+     *
+     * @param skillName the name of the skill to evaluate among all active personnel
+     *
+     * @return the {@link Person} with the highest calculated total skill level in the specified skill, or {@code null}
+     *       if no qualifying person is found
+     */
+    public @Nullable Person findBestAtSkill(String skillName) {
+        Person bestAtSkill = null;
         int highest = 0;
-        for (Person p : getActivePersonnel(true)) {
-            if (p.getSkill(skill) != null && p.getSkill(skill).getLevel() > highest) {
-                highest = p.getSkill(skill).getLevel();
-                person = p;
+        for (Person person : getActivePersonnel(false)) {
+            int adjustedReputation = person.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
+                  isClanCampaign(),
+                  currentDay,
+                  person.getRankLevel());
+            Skill skill = person.getSkill(skillName);
+
+            int totalSkillLevel = Integer.MIN_VALUE;
+            if (skill != null) {
+                totalSkillLevel = skill.getTotalSkillLevel(person.getOptions(),
+                      person.getATOWAttributes(),
+                      adjustedReputation);
+            }
+
+            if (totalSkillLevel > highest) {
+                highest = totalSkillLevel;
+                bestAtSkill = person;
             }
         }
-        return person;
+        return bestAtSkill;
     }
 
     /**
@@ -3348,15 +3412,15 @@ public class Campaign implements ITechManager {
      *       found.
      */
     public @Nullable Person getLogisticsPerson() {
-        final String skill = campaignOptions.getAcquisitionSkill();
+        final String skillName = campaignOptions.getAcquisitionSkill();
         final ProcurementPersonnelPick acquisitionCategory = campaignOptions.getAcquisitionPersonnelCategory();
         final int defaultMaxAcquisitions = campaignOptions.getMaxAcquisitions();
 
         int bestSkill = -1;
         Person procurementCharacter = null;
-        if (skill.equals(S_AUTO)) {
+        if (skillName.equals(S_AUTO)) {
             return null;
-        } else if (skill.equals(S_TECH)) {
+        } else if (skillName.equals(S_TECH)) {
             for (Person person : getActivePersonnel(false)) {
                 int effectiveMaxAcquisitions = defaultMaxAcquisitions;
 
@@ -3373,9 +3437,22 @@ public class Campaign implements ITechManager {
                     continue;
                 }
 
-                if ((person.getBestTechSkill() != null) && person.getBestTechSkill().getLevel() > bestSkill) {
+                int adjustedReputation = person.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
+                      isClanCampaign(),
+                      currentDay,
+                      person.getRankLevel());
+                Skill skill = person.getSkill(skillName);
+
+                int totalSkillLevel = Integer.MIN_VALUE;
+                if (skill != null) {
+                    totalSkillLevel = skill.getTotalSkillLevel(person.getOptions(),
+                          person.getATOWAttributes(),
+                          adjustedReputation);
+                }
+
+                if (totalSkillLevel > bestSkill) {
                     procurementCharacter = person;
-                    bestSkill = person.getBestTechSkill().getLevel();
+                    bestSkill = totalSkillLevel;
                 }
             }
         } else {
@@ -3395,9 +3472,22 @@ public class Campaign implements ITechManager {
                     continue;
                 }
 
-                if (person.hasSkill(skill) && (person.getSkill(skill).getLevel() > bestSkill)) {
+                int adjustedReputation = person.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
+                      isClanCampaign(),
+                      currentDay,
+                      person.getRankLevel());
+                Skill skill = person.getSkill(skillName);
+
+                int totalSkillLevel = Integer.MIN_VALUE;
+                if (skill != null) {
+                    totalSkillLevel = skill.getTotalSkillLevel(person.getOptions(),
+                          person.getATOWAttributes(),
+                          adjustedReputation);
+                }
+
+                if (totalSkillLevel > bestSkill) {
                     procurementCharacter = person;
-                    bestSkill = person.getSkill(skill).getLevel();
+                    bestSkill = totalSkillLevel;
                 }
             }
         }
@@ -3512,9 +3602,9 @@ public class Campaign implements ITechManager {
      *       empty list if acquisitions automatically succeed.
      */
     public List<Person> getLogisticsPersonnel() {
-        final String skill = getCampaignOptions().getAcquisitionSkill();
+        final String skillName = getCampaignOptions().getAcquisitionSkill();
 
-        if (skill.equals(S_AUTO)) {
+        if (skillName.equals(S_AUTO)) {
             return Collections.emptyList();
         } else {
             final int maxAcquisitions = campaignOptions.getMaxAcquisitions();
@@ -3529,21 +3619,77 @@ public class Campaign implements ITechManager {
                 if ((maxAcquisitions > 0) && (person.getAcquisitions() >= maxAcquisitions)) {
                     continue;
                 }
-                if (skill.equals(S_TECH)) {
+                if (skillName.equals(S_TECH)) {
                     if (null != person.getBestTechSkill()) {
                         logisticsPersonnel.add(person);
                     }
-                } else if (person.hasSkill(skill)) {
+                } else if (person.hasSkill(skillName)) {
                     logisticsPersonnel.add(person);
                 }
             }
 
             // Sort by their skill level, descending.
-            logisticsPersonnel.sort((a, b) -> {
-                if (skill.equals(S_TECH)) {
-                    return Integer.compare(b.getBestTechSkill().getLevel(), a.getBestTechSkill().getLevel());
+            logisticsPersonnel.sort((person1, person2) -> {
+                if (skillName.equals(S_TECH)) {
+                    // Person 1
+                    int adjustedReputation = person1.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
+                          isClanCampaign(),
+                          currentDay,
+                          person1.getRankLevel());
+                    Skill skill = person1.getBestTechSkill();
+
+                    int person1SkillLevel = Integer.MIN_VALUE;
+                    if (skill != null) {
+                        person1SkillLevel = skill.getTotalSkillLevel(person1.getOptions(),
+                              person1.getATOWAttributes(),
+                              adjustedReputation);
+                    }
+
+                    // Person 2
+                    adjustedReputation = person2.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
+                          isClanCampaign(),
+                          currentDay,
+                          person2.getRankLevel());
+                    skill = person2.getBestTechSkill();
+
+                    int person2SkillLevel = Integer.MIN_VALUE;
+                    if (skill != null) {
+                        person2SkillLevel = skill.getTotalSkillLevel(person2.getOptions(),
+                              person2.getATOWAttributes(),
+                              adjustedReputation);
+                    }
+
+                    return Integer.compare(person1SkillLevel, person2SkillLevel);
                 } else {
-                    return Integer.compare(b.getSkill(skill).getLevel(), a.getSkill(skill).getLevel());
+                    // Person 1
+                    int adjustedReputation = person1.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
+                          isClanCampaign(),
+                          currentDay,
+                          person1.getRankLevel());
+                    Skill skill = person1.getSkill(S_TECH);
+
+                    int person1SkillLevel = Integer.MIN_VALUE;
+                    if (skill != null) {
+                        person1SkillLevel = skill.getTotalSkillLevel(person1.getOptions(),
+                              person1.getATOWAttributes(),
+                              adjustedReputation);
+                    }
+
+                    // Person 2
+                    adjustedReputation = person2.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
+                          isClanCampaign(),
+                          currentDay,
+                          person2.getRankLevel());
+                    skill = person2.getSkill(S_TECH);
+
+                    int person2SkillLevel = Integer.MIN_VALUE;
+                    if (skill != null) {
+                        person2SkillLevel = skill.getTotalSkillLevel(person2.getOptions(),
+                              person2.getATOWAttributes(),
+                              adjustedReputation);
+                    }
+
+                    return Integer.compare(person1SkillLevel, person2SkillLevel);
                 }
             });
 
@@ -4543,18 +4689,24 @@ public class Campaign implements ITechManager {
             }
         } else {
             int modePenalty = partWork.getMode().expReduction;
-            int effectiveSkillLvl = tech.getSkillForWorkingOn(partWork).getExperienceLevel() - modePenalty;
+            Skill relevantSkill = tech.getSkillForWorkingOn(partWork);
+            int actualSkillLevel = EXP_NONE;
+
+            if (relevantSkill != null) {
+                actualSkillLevel = relevantSkill.getExperienceLevel(tech.getOptions(), tech.getATOWAttributes());
+            }
+            int effectiveSkillLevel = actualSkillLevel - modePenalty;
             if (getCampaignOptions().isDestroyByMargin()) {
                 if (getCampaignOptions().getDestroyMargin() > (target.getValue() - roll)) {
                     // not destroyed - set the effective level as low as
                     // possible
-                    effectiveSkillLvl = SkillType.EXP_ULTRA_GREEN;
+                    effectiveSkillLevel = SkillType.EXP_ULTRA_GREEN;
                 } else {
                     // destroyed - set the effective level to legendary
-                    effectiveSkillLvl = SkillType.EXP_LEGENDARY;
+                    effectiveSkillLevel = SkillType.EXP_LEGENDARY;
                 }
             }
-            report = report + partWork.fail(effectiveSkillLvl);
+            report = report + partWork.fail(effectiveSkillLevel);
 
             if ((roll == 2) && (target.getValue() != TargetRoll.AUTOMATIC_FAIL)) {
                 xpGained += getCampaignOptions().getMistakeXP();
@@ -5988,7 +6140,7 @@ public class Campaign implements ITechManager {
         Force force = getForce(u.getForceId());
         if (null != force) {
             force.removeUnit(this, u.getId(), true);
-            u.setForceId(Force.FORCE_NONE);
+            u.setForceId(FORCE_NONE);
             u.setScenarioId(NO_ASSIGNED_SCENARIO);
             if (u.getEntity().hasNavalC3() && u.getEntity().calculateFreeC3Nodes() < 5) {
                 Vector<Unit> removedUnits = new Vector<>();
@@ -7377,9 +7529,32 @@ public class Campaign implements ITechManager {
         MekHQ.triggerEvent(new PersonChangedEvent(p));
     }
 
+    /**
+     * Calculates the {@link TargetRoll} required for a technician to work on a specific part task.
+     *
+     * <p>This method determines task difficulty and eligibility by evaluating the technician's skills, penalties due to
+     * work mode,
+     * unit and part constraints, time availability, helper modifiers, and campaign options. It produces
+     * context-specific messages when tasks are impossible due to skill, resource, or situation limitations.</p>
+     *
+     * <p>The result will reflect all applicable modifiers (such as overtime or era-based penalties) and communicates if
+     * a task
+     * is impossible, or has automatic success (e.g., for infantry refits).</p>
+     *
+     * @param partWork the part work task to be performed
+     * @param tech     the technician assigned to the task
+     *
+     * @return a {@link TargetRoll} capturing the total target value and reason for success or impossibility
+     */
     public TargetRoll getTargetFor(final IPartWork partWork, final Person tech) {
         final Skill skill = tech.getSkillForWorkingOn(partWork);
         int modePenalty = partWork.getMode().expReduction;
+
+        int actualSkillLevel = EXP_NONE;
+        if (skill != null) {
+            actualSkillLevel = skill.getExperienceLevel(tech.getOptions(), tech.getATOWAttributes());
+        }
+        int effectiveSkillLevel = actualSkillLevel - modePenalty;
 
         if ((partWork.getUnit() != null) && !partWork.getUnit().isAvailable(partWork instanceof Refit)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "This unit is not currently available!");
@@ -7387,8 +7562,7 @@ public class Campaign implements ITechManager {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Already being worked on by another team");
         } else if (skill == null) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Assigned tech does not have the right skills");
-        } else if (!getCampaignOptions().isDestroyByMargin() &&
-                         (partWork.getSkillMin() > (skill.getExperienceLevel() - modePenalty))) {
+        } else if (!getCampaignOptions().isDestroyByMargin() && (partWork.getSkillMin() > effectiveSkillLevel)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is beyond this tech's skill level");
         } else if (partWork.getSkillMin() > SkillType.EXP_LEGENDARY) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is impossible.");
@@ -7425,12 +7599,11 @@ public class Campaign implements ITechManager {
 
         // this is ugly, if the mode penalty drops you to green, you drop two
         // levels instead of two
-        int value = skill.getFinalSkillValue(tech.getOptions()) + modePenalty;
-        if ((modePenalty > 0) && (SkillType.EXP_GREEN == (skill.getExperienceLevel() - modePenalty))) {
+        int value = skill.getFinalSkillValue(tech.getOptions(), tech.getATOWAttributes()) + modePenalty;
+        if ((modePenalty > 0) && (SkillType.EXP_GREEN == effectiveSkillLevel)) {
             value++;
         }
-        final TargetRoll target = new TargetRoll(value,
-              SkillType.getExperienceLevelName(skill.getExperienceLevel() - modePenalty));
+        final TargetRoll target = new TargetRoll(value, SkillType.getExperienceLevelName(effectiveSkillLevel));
         if (target.getValue() == TargetRoll.IMPOSSIBLE) {
             return target;
         }
@@ -7483,8 +7656,8 @@ public class Campaign implements ITechManager {
         if (null != tech) {
             Skill skill = tech.getSkillForWorkingOn(partWork);
             if (null != skill) {
-                value = skill.getFinalSkillValue(tech.getOptions());
-                skillLevel = skill.getSkillLevel().toString();
+                value = skill.getFinalSkillValue(tech.getOptions(), tech.getATOWAttributes());
+                skillLevel = skill.getSkillLevel(tech.getOptions(), tech.getATOWAttributes()).toString();
             }
         }
 
@@ -7627,8 +7800,13 @@ public class Campaign implements ITechManager {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "It is extinct!");
         }
 
-        TargetRoll target = new TargetRoll(skill.getFinalSkillValue(person.getOptions()),
-              skill.getSkillLevel().toString());
+        int adjustedReputation = person.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
+              isClanCampaign(),
+              currentDay,
+              person.getRankLevel());
+
+        TargetRoll target = new TargetRoll(skill.getFinalSkillValue(person.getOptions(), person.getATOWAttributes()),
+              skill.getSkillLevel(person.getOptions(), person.getATOWAttributes(), adjustedReputation).toString());
         target.append(acquisition.getAllAcquisitionMods());
 
         if (getCampaignOptions().isUseAtB() && getCampaignOptions().isRestrictPartsByMission()) {
@@ -8038,11 +8216,16 @@ public class Campaign implements ITechManager {
      * @return The value of the commander's strategy skill if a commander exists, otherwise 0.
      */
     public int getCommanderStrategy() {
-        int cmdrStrategy = 0;
-        if (getFlaggedCommander() != null && getFlaggedCommander().getSkill(SkillType.S_STRATEGY) != null) {
-            cmdrStrategy = getFlaggedCommander().getSkill(SkillType.S_STRATEGY).getLevel();
+        int commanderStrategy = 0;
+        Person commander = getFlaggedCommander();
+
+        if (commander == null || !commander.hasSkill(S_STRATEGY)) {
+            return commanderStrategy;
         }
-        return cmdrStrategy;
+
+        Skill strategy = commander.getSkill(S_STRATEGY);
+
+        return strategy.getTotalSkillLevel(commander.getOptions(), commander.getATOWAttributes());
     }
 
     public RandomSkillPreferences getRandomSkillPreferences() {

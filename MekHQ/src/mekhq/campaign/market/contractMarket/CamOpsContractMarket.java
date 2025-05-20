@@ -36,6 +36,7 @@ import static megamek.common.Compute.d6;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_NETWORKER;
+import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 
 import java.time.format.DateTimeFormatter;
@@ -200,7 +201,10 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         if (negotiator == null) {
             return 0;
         }
-        return negotiator.getSkillLevel(SkillType.S_NEGOTIATION);
+        return negotiator.getSkillLevel(S_NEGOTIATION,
+              campaign.getCampaignOptions().isUseAgeEffects(),
+              campaign.isClanCampaign(),
+              campaign.getLocalDate());
     }
 
     private int rollNegotiation(int skill, int modifiers) {

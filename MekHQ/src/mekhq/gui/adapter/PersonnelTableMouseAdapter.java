@@ -640,11 +640,21 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 selectedPerson.improveSkill(type);
                 selectedPerson.spendXP(cost);
 
+                Skill skill = selectedPerson.getSkill(type);
+                SkillType skillType = skill.getType();
+
+                int adjustedReputation = selectedPerson.getAdjustedReputation(getCampaignOptions().isUseAgeEffects(),
+                      getCampaign().isClanCampaign(),
+                      getCampaign().getLocalDate(),
+                      selectedPerson.getRankLevel());
+
                 PerformanceLogger.improvedSkill(getCampaign(),
                       selectedPerson,
                       getCampaign().getLocalDate(),
-                      selectedPerson.getSkill(type).getType().getName(),
-                      selectedPerson.getSkill(type).toString());
+                      skillType.getName(),
+                      skill.toString(selectedPerson.getOptions(),
+                            selectedPerson.getATOWAttributes(),
+                            adjustedReputation));
                 getCampaign().addReport(String.format(resources.getString("improved.format"),
                       selectedPerson.getHyperlinkedName(),
                       type));
@@ -1724,8 +1734,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             if (person.isDoctor()) {
                 Skill skill = person.getSkill(S_SURGERY);
 
-                if (skill != null &&
-                          skill.getFinalSkillValue(person.getOptions()) >=
+                if (skill != null && skill.getFinalSkillValue(person.getOptions(), person.getATOWAttributes()) >=
                                 REPLACEMENT_LIMB_MINIMUM_SKILL_REQUIRED_TYPES_3_4_5) {
                     suitableDoctors.add(person);
                 }
@@ -2546,30 +2555,36 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                         if (filteredFaction != null) {
                                             int educationLevel = academy.getEducationLevel(person);
 
-                                            String[] skills = academy.getCurriculums()
+                                            String[] skillNames = academy.getCurriculums()
                                                                     .get(person.getEduCourseIndex())
                                                                     .split(",");
 
-                                            skills = Arrays.stream(skills).map(String::trim).toArray(String[]::new);
+                                            skillNames = Arrays.stream(skillNames)
+                                                               .map(String::trim)
+                                                               .toArray(String[]::new);
 
-                                            for (String skill : skills) {
-                                                if (skill.equalsIgnoreCase("none")) {
+                                            for (String skillName : skillNames) {
+                                                if (skillName.equalsIgnoreCase("none")) {
                                                     continue;
                                                 }
 
-                                                if (skill.equalsIgnoreCase("xp")) {
+                                                if (skillName.equalsIgnoreCase("xp")) {
                                                     if (EducationLevel.parseToInt(person.getEduHighestEducation()) <
                                                               educationLevel) {
                                                         improvementPossible++;
                                                     }
                                                 } else {
-                                                    String skillParsed = skillParser(skill);
+                                                    String skillParsed = skillParser(skillName);
+                                                    Skill skill = person.getSkill(skillParsed);
 
-                                                    if ((person.hasSkill(skillParsed)) &&
-                                                              (person.getSkill(skillParsed).getExperienceLevel() <
-                                                                     educationLevel)) {
-                                                        improvementPossible++;
-                                                    } else if (!person.hasSkill(skillParsed)) {
+                                                    if (skill != null) {
+                                                        int skillLevel = skill.getLevel();
+                                                        int experienceLevel = skill.getType()
+                                                                                    .getExperienceLevel(skillLevel);
+                                                        if (experienceLevel < educationLevel) {
+                                                            improvementPossible++;
+                                                        }
+                                                    } else {
                                                         improvementPossible++;
                                                     }
                                                 }

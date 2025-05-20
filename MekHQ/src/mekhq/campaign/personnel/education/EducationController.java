@@ -68,6 +68,7 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.Genealogy;
+import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.utilities.ReportingUtilities;
 
@@ -1664,10 +1665,22 @@ public class EducationController {
      * @param bonus       The bonus to apply when increasing the skill level.
      */
     private static void adjustSkillLevel(Person person, String skillParsed, int targetLevel, int bonus) {
-        int skillLevel = 0;
+        boolean underTarget = true;
+        while (underTarget) {
+            Skill skill = person.getSkill(skillParsed);
+            if (skill == null) {
+                logger.error("Skill {} not found for person {}", skillParsed, person.getFullTitle());
+                underTarget = false;
+                continue;
+            }
 
-        while (person.getSkill(skillParsed).getExperienceLevel() < targetLevel) {
-            person.addSkill(skillParsed, skillLevel++, bonus);
+            int skillLevel = skill.getLevel();
+            int experienceLevel = skill.getType().getExperienceLevel(skillLevel);
+
+            underTarget = experienceLevel <= targetLevel;
+            if (underTarget) {
+                person.addSkill(skillParsed, skillLevel + 1, bonus);
+            }
         }
     }
 
