@@ -33,9 +33,6 @@
 
 package mekhq.campaign.finances;
 
-import java.io.PrintWriter;
-import java.time.LocalDate;
-
 import megamek.common.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.unit.Unit;
@@ -43,6 +40,9 @@ import mekhq.campaign.unit.UnitOrder;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.time.LocalDate;
 
 public class Lease {
     private static final MMLogger LOGGER = MMLogger.create(UnitOrder.class);
@@ -158,30 +158,30 @@ public class Lease {
         return check.isDropShip() || check.isJumpShip();
     }
 
-    public void writeToXML(final PrintWriter pw, int indent) {
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "lease");
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "leaseCost", leaseCost);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "acquisitionDate", acquisitionDate);
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "lease");
+    public void writeToXML(final PrintWriter writer, int indent) {
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "lease");
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "leaseCost", leaseCost);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "acquisitionDate", acquisitionDate);
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "lease");
     }
 
-    public static Lease generateInstanceFromXML(Node wn, Unit u) {
+    public static Lease generateInstanceFromXML(Node writerNode, Unit parseUnit) {
         Lease retVal = new Lease();
-        NodeList nl = wn.getChildNodes();
+        NodeList nodeList = writerNode.getChildNodes();
 
         try {
-            for (int x = 0; x < nl.getLength(); x++) {
-                Node wn2 = nl.item(x);
+            for (int x = 0; x < nodeList.getLength(); x++) {
+                Node writerNode2 = nodeList.item(x);
 
-                if (wn2.getNodeName().equalsIgnoreCase("leaseCost")) {
-                    retVal.leaseCost = Money.fromXmlString(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("acquisitionDate")) {
-                    retVal.acquisitionDate = LocalDate.parse(wn2.getTextContent());
+                if (writerNode2.getNodeName().equalsIgnoreCase("leaseCost")) {
+                    retVal.leaseCost = Money.fromXmlString(writerNode2.getTextContent());
+                } else if (writerNode2.getNodeName().equalsIgnoreCase("acquisitionDate")) {
+                    retVal.acquisitionDate = LocalDate.parse(writerNode2.getTextContent());
                 }
             }
             return retVal;
         } catch (Exception ex) {
-            LOGGER.error("Could not parse lease for unit {}", u.getId(), ex);
+            LOGGER.error("Could not parse lease for unit {}", parseUnit.getId(), ex);
         }
         return null;
     }
