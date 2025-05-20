@@ -72,11 +72,65 @@ public class FactionStandings {
     private static final MMLogger LOGGER = MMLogger.create(FactionStandings.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionStandings";
 
+    /**
+     * The base fame value for all factions.
+     */
     static final double DEFAULT_FAME = 0.0;
+
+    /**
+     * The amount by which fame degrades over time.
+     */
     static final double DEFAULT_FAME_DEGRADATION = 0.25;
+
+    /**
+     * The starting fame for the campaign's faction
+     */
     static final double STARTING_FAME_SAME_FACTION = DEFAULT_FAME + 25;
+
+    /**
+     * The starting fame for factions that are allies of the campaign faction.
+     */
     static final double STARTING_FAME_ALLIED_FACTION = STARTING_FAME_SAME_FACTION / 2;
+
+    /**
+     * The starting fame for factions that are enemies of the campaign faction.
+     */
     static final double STARTING_FAME_ENEMY_FACTION = DEFAULT_FAME - 25;
+
+    /**
+     * Fame increase for successfully completing a contract for the employer.
+     */
+    static final double FAME_CHANGE_CONTRACT_SUCCESS_EMPLOYER = 5.0;
+
+    /**
+     * Fame increase for successfully completing a contract for factions allied with the employer.
+     */
+    static final double FAME_CHANGE_CONTRACT_SUCCESS_EMPLOYER_ALLY = 1.0;
+
+    /**
+     * Fame decrease when accepting a contract against a non-Clan enemy.
+     */
+    static final double FAME_CHANGE_CONTRACT_ACCEPT_ENEMY_NORMAL = -5.0;
+
+    /**
+     * Fame decrease when accepting a contract for factions allied with the enemy.
+     */
+    static final double FAME_CHANGE_CONTRACT_ACCEPT_ENEMY_ALLY = -1.0;
+
+    /**
+     * Fame decrease when accepting a contract against a Clan enemy.
+     */
+    static final double FAME_CHANGE_CONTRACT_ACCEPT_ENEMY_CLAN = -2.5;
+
+    /**
+     * Fame penalty for breaching a contract.
+     */
+    static final double FAME_CHANGE_CONTRACT_BREACH = -5.0;
+
+    /**
+     * Fame penalty for refusing a batchall.
+     */
+    static final double FAME_CHANGE_REFUSE_BATCHALL = -5;
 
     private Map<String, Double> factionStandings;
 
