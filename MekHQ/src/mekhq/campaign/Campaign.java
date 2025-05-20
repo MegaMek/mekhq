@@ -3192,7 +3192,7 @@ public class Campaign implements ITechManager {
                     bestInRole = person;
                     highest = currentSkillLevel;
                 } else if (secondary != null && currentSkillLevel == highest) {
-                    Skill secondarySkill = person.getSkill(primary);
+                    Skill secondarySkill = person.getSkill(secondary);
 
                     if (secondarySkill == null) {
                         continue;
