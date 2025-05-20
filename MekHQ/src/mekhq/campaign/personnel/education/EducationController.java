@@ -1677,7 +1677,8 @@ public class EducationController {
             int skillLevel = skill.getLevel();
             int experienceLevel = skill.getType().getExperienceLevel(skillLevel);
 
-            if (experienceLevel <= targetLevel) {
+            underTarget = experienceLevel <= targetLevel;
+            if (underTarget) {
                 person.addSkill(skillParsed, skillLevel + 1, bonus);
             }
         }
