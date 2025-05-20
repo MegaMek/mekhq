@@ -312,16 +312,13 @@ public class Finances {
     }
 
     public void addReportInsufficientFunds(Campaign campaign, String report) {
-        campaign.addReport(String.format("<font color='" +
-                                               MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
-                                               "'>" +
-                                               resourceMap.getString("InsufficientFunds.text"),
-              report,
-              "</font>"));
+        String stringToColor = resourceMap.getString("InsufficientFunds.text") + report;
+        String colorToUse = MekHQ.getMHQOptions().getFontColorNegativeHexColor();
+        campaign.addReport(ReportingUtilities.messageSurroundedBySpanWithColor(stringToColor, colorToUse));
     }
 
     public void newDay(final Campaign campaign, final LocalDate yesterday, final LocalDate today) {
-        // Let's get these variables
+        // Getting frequently used variables to simplify later statements
         CampaignOptions campaignOpts = campaign.getCampaignOptions();
         boolean isNewYear = campaignOpts.getFinancialYearDuration().isEndOfFinancialYear(today);
         boolean isNewMonth = (today.getDayOfMonth() == 1);
@@ -398,7 +395,7 @@ public class Finances {
                         campaign.addReport(String.format(resourceMap.getString("PeacetimeCostsAmmunition.text"),
                               ammoCost.toAmountAndSymbolString()));
                     } else {
-                        addReportInsufficientFunds(campaign,resourceMap.getString("TrainingMunitions.text"));
+                        addReportInsufficientFunds(campaign, resourceMap.getString("TrainingMunitions.text"));
                     }
 
                     if (debit(TransactionType.MAINTENANCE,
