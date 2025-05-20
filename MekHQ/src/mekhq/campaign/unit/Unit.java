@@ -190,6 +190,8 @@ public class Unit implements ITechnology {
 
     private MothballInfo mothballInfo;
 
+    private Lease unitLease;
+
     public Unit() {
         this(null, null);
     }
@@ -1385,7 +1387,7 @@ public class Unit implements ITechnology {
     }
 
     public Money getSellValue() {
-        if (this.unitLease != null) {
+        if (this.hasLease()) {
             return Money.zero();
         } // don't count leased vehicles
 
@@ -6817,8 +6819,6 @@ public class Unit implements ITechnology {
         };
     }
 
-    private Lease unitLease;
-
     public void addLease(Lease lease) {
         unitLease = lease;
     }
@@ -6831,6 +6831,7 @@ public class Unit implements ITechnology {
         return (unitLease != null);
     }
 
+    @Nullable
     public Lease getUnitLease() {
         return unitLease;
     }

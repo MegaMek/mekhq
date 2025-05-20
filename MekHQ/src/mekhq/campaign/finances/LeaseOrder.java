@@ -33,8 +33,6 @@
 
 package mekhq.campaign.finances;
 
-import java.io.PrintWriter;
-
 import megamek.common.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -43,6 +41,8 @@ import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
 
 public class LeaseOrder extends UnitOrder {
     private static final MMLogger LOGGER = MMLogger.create(LeaseOrder.class);
@@ -63,17 +63,16 @@ public class LeaseOrder extends UnitOrder {
      * to acquire things in the Acquisition panel.
      *
      * @param transitDays How long it takes for the unit to arrive.
-     *
      * @return The string for a successful find report.
      */
     @Override
     public String find(int transitDays) {
         super.getCampaign().getQuartermaster().createLeasedUnit((megamek.common.Entity) getNewEquipment(), transitDays);
         return "<font color='" +
-                     mekhq.MekHQ.getMHQOptions().getFontColorPositiveHexColor() +
-                     "'><b> unit found for leasing</b>.</font> It will be delivered in " +
-                     transitDays +
-                     " days.";
+                mekhq.MekHQ.getMHQOptions().getFontColorPositiveHexColor() +
+                "'><b> unit found for leasing</b>.</font> It will be delivered in " +
+                transitDays +
+                " days.";
     }
 
     /**
@@ -111,31 +110,33 @@ public class LeaseOrder extends UnitOrder {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "leaseOrder");
     }
 
-    public static LeaseOrder generateInstanceFromXML(Node wn, Campaign c) {
-        LeaseOrder retVal = new LeaseOrder();
-        retVal.setCampaign(c);
+    public static LeaseOrder generateInstanceFromXML(Node writerNode, Campaign campaign) {
+        LeaseOrder savedLeaseOrder = new LeaseOrder();
+        savedLeaseOrder.setCampaign(campaign);
 
-        NodeList nl = wn.getChildNodes();
+        NodeList childNodeList = writerNode.getChildNodes();
 
         try {
-            for (int x = 0; x < nl.getLength(); x++) {
-                Node wn2 = nl.item(x);
+            for (int x = 0; x < childNodeList.getLength(); x++) {
+                Node childNode = childNodeList.item(x);
+                String nodeName = childNode.getNodeName();
+                String nodeText = childNode.getTextContent();
 
-                if (wn2.getNodeName().equalsIgnoreCase("quantity")) {
-                    retVal.quantity = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("daysToWait")) {
-                    retVal.daysToWait = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("entity")) {
-                    retVal.entity = MHQXMLUtility.parseSingleEntityMul((Element) wn2, c);
+                if (nodeName.equalsIgnoreCase("quantity")) {
+                    savedLeaseOrder.quantity = Integer.parseInt(nodeText);
+                } else if (nodeName.equalsIgnoreCase("daysToWait")) {
+                    savedLeaseOrder.daysToWait = Integer.parseInt(nodeText);
+                } else if (nodeName.equalsIgnoreCase("entity")) {
+                    savedLeaseOrder.entity = MHQXMLUtility.parseSingleEntityMul((Element) childNode, campaign);
                 }
             }
         } catch (Exception ex) {
-            LOGGER.error("Exception while parsing lease order from {}", nl);
+            LOGGER.error("Exception while parsing lease order from {}", childNodeList);
         }
 
-        retVal.initializeParts(false);
+        savedLeaseOrder.initializeParts(false);
 
-        return retVal;
+        return savedLeaseOrder;
     }
 }
 

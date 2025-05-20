@@ -166,20 +166,22 @@ public class Lease {
     }
 
     public static Lease generateInstanceFromXML(Node writerNode, Unit parseUnit) {
-        Lease retVal = new Lease();
-        NodeList nodeList = writerNode.getChildNodes();
+        Lease savedLease = new Lease();
+        NodeList childNodeList = writerNode.getChildNodes();
 
         try {
-            for (int x = 0; x < nodeList.getLength(); x++) {
-                Node writerNode2 = nodeList.item(x);
+            for (int x = 0; x < childNodeList.getLength(); x++) {
+                Node childNode = childNodeList.item(x);
+                String nodeName = childNode.getNodeName();
+                String nodeText = childNode.getTextContent();
 
-                if (writerNode2.getNodeName().equalsIgnoreCase("leaseCost")) {
-                    retVal.leaseCost = Money.fromXmlString(writerNode2.getTextContent());
-                } else if (writerNode2.getNodeName().equalsIgnoreCase("acquisitionDate")) {
-                    retVal.acquisitionDate = LocalDate.parse(writerNode2.getTextContent());
+                if (nodeName.equalsIgnoreCase("leaseCost")) {
+                    savedLease.leaseCost = Money.fromXmlString(nodeText);
+                } else if (nodeName.equalsIgnoreCase("acquisitionDate")) {
+                    savedLease.acquisitionDate = LocalDate.parse(nodeText);
                 }
             }
-            return retVal;
+            return savedLease;
         } catch (Exception ex) {
             LOGGER.error("Could not parse lease for unit {}", parseUnit.getId(), ex);
         }

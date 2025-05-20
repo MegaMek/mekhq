@@ -190,31 +190,30 @@ public class ShoppingList {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "shoppingList");
     }
 
-    public static ShoppingList generateInstanceFromXML(Node wn, Campaign c, Version version) {
-        ShoppingList retVal = new ShoppingList();
+    public static ShoppingList generateInstanceFromXML(Node writerNode, Campaign campaign, Version version) {
+        ShoppingList savedShoppingList = new ShoppingList();
 
-        NodeList nl = wn.getChildNodes();
+        NodeList childNodeList = writerNode.getChildNodes();
 
         try {
-            for (int x = 0; x < nl.getLength(); x++) {
-                Node wn2 = nl.item(x);
-                if (wn2.getNodeName().equalsIgnoreCase("part")) {
-                    Part p = Part.generateInstanceFromXML(wn2, version);
-                    p.setCampaign(c);
-                    if (p instanceof IAcquisitionWork) {
-                        retVal.getShoppingList().add((IAcquisitionWork) p);
+            for (int x = 0; x < childNodeList.getLength(); x++) {
+                Node childNode = childNodeList.item(x);
+                if (childNode.getNodeName().equalsIgnoreCase("part")) {
+                    Part savedPart = Part.generateInstanceFromXML(childNode, version);
+                    savedPart.setCampaign(campaign);
+                    if (savedPart instanceof IAcquisitionWork) {
+                        savedShoppingList.getShoppingList().add((IAcquisitionWork) savedPart);
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("unitOrder")) {
-                    UnitOrder u = UnitOrder.generateInstanceFromXML(wn2, c);
-                    u.setCampaign(c);
-                    if (u.getEntity() != null) {
-                        retVal.getShoppingList().add(u);
+                } else if (childNode.getNodeName().equalsIgnoreCase("unitOrder")) {
+                    UnitOrder savedUnit = UnitOrder.generateInstanceFromXML(childNode, campaign);
+                    savedUnit.setCampaign(campaign);
+                    if (savedUnit.getEntity() != null) {
+                        savedShoppingList.getShoppingList().add(savedUnit);
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("leaseOrder")) {
-                    LeaseOrder u = LeaseOrder.generateInstanceFromXML(wn2, c);
-                    u.setCampaign(c);
-                    if (u.getEntity() != null) {
-                        retVal.getShoppingList().add(u);
+                } else if (childNode.getNodeName().equalsIgnoreCase("leaseOrder")) {
+                    LeaseOrder savedLeaseOrder = LeaseOrder.generateInstanceFromXML(childNode, campaign);
+                    if (savedLeaseOrder.getEntity() != null) {
+                        savedShoppingList.getShoppingList().add(savedLeaseOrder);
                     }
                 }
             }
@@ -222,7 +221,7 @@ public class ShoppingList {
             logger.error("", ex);
         }
 
-        return retVal;
+        return savedShoppingList;
     }
 
     public void restore() {
