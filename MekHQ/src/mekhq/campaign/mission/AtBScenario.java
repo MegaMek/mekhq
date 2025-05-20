@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission;
 
@@ -68,6 +73,7 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.againstTheBot.AtBStaticWeightGenerator;
 import mekhq.campaign.force.CombatTeam;
@@ -77,6 +83,8 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
 import mekhq.campaign.mission.atb.IAtBScenario;
 import mekhq.campaign.mission.enums.CombatRole;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.stratcon.StratconBiomeManifest;
@@ -322,19 +330,26 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     /**
-     * Determines battle conditions: terrain, weather, map.
+     * Initializes the battle setup by determining terrain, weather, map size, map file,
+     * and other scenario conditions based on the specified campaign and its options.
      *
-     * @param campaign
+     * <p>This process configures key battlefield parameters such as terrain type, planetary and light conditions,
+     * weather effects, and sets the map details. It also determines the number of forces involved based on the scenario type.
+     * If a valid combat team and commander with the Tactics skill are present, the number of available rerolls is set accordingly.
+     * If prerequisites (combat team, commander, or Tactics skill) are missing, rerolls are set to zero.</p>
+     *
+     * @param campaign the current {@link Campaign} containing settings and scenario data
      */
     private void initBattle(Campaign campaign) {
         setTerrain();
-        if (campaign.getCampaignOptions().isUsePlanetaryConditions() && null != campaign.getMission(getMissionId())) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        if (campaignOptions.isUsePlanetaryConditions() && null != campaign.getMission(getMissionId())) {
             setPlanetaryConditions(campaign.getMission(getMissionId()), campaign);
         }
-        if (campaign.getCampaignOptions().isUseLightConditions()) {
+        if (campaignOptions.isUseLightConditions()) {
             setLightConditions();
         }
-        if (campaign.getCampaignOptions().isUseWeatherConditions()) {
+        if (campaignOptions.isUseWeatherConditions()) {
             setWeatherConditions();
         }
         setMapSize();
@@ -345,14 +360,26 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             forceCount = 2;
         }
 
-        if (null != getCombatTeamById(campaign)) {
-            getCombatTeamById(campaign).refreshCommander(campaign);
-            if (null != getCombatTeamById(campaign).getCommander(campaign).getSkill(SkillType.S_TACTICS)) {
-                rerollsRemaining = getCombatTeamById(campaign).getCommander(campaign)
-                                         .getSkill(SkillType.S_TACTICS)
-                                         .getLevel();
-            }
+        CombatTeam combatTeam = getCombatTeamById(campaign);
+        if (combatTeam == null) {
+            rerollsRemaining = 0;
+            return;
         }
+
+        combatTeam.refreshCommander(campaign);
+        Person commander = combatTeam.getCommander(campaign);
+        if (commander == null) {
+            rerollsRemaining = 0;
+            return;
+        }
+
+        Skill tactics = commander.getSkill(SkillType.S_TACTICS);
+        if (tactics == null) {
+            rerollsRemaining = 0;
+            return;
+        }
+
+        rerollsRemaining = tactics.getTotalSkillLevel(commander.getOptions(), commander.getATOWAttributes());
     }
 
     public int getModifiedTemperature() {

@@ -24,100 +24,78 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.randomEvents.personalities.enums;
 
-import static mekhq.campaign.randomEvents.personalities.enums.Social.ENCOURAGING;
-import static mekhq.campaign.randomEvents.personalities.enums.Social.FRIENDLY;
-import static mekhq.campaign.randomEvents.personalities.enums.Social.MAXIMUM_VARIATIONS;
-import static mekhq.campaign.randomEvents.personalities.enums.Social.NONE;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+
+import java.util.Arrays;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import megamek.common.enums.Gender;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.universe.Faction;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
 public class SocialTest {
-    @Test
-    public void testFromString_ValidStatus() {
-        Social status = Social.fromString(FRIENDLY.name());
-        assertEquals(FRIENDLY, status);
-    }
-
-    @Test
-    public void testFromString_InvalidStatus() {
-        Social status = Social.fromString("INVALID_STATUS");
-
-        assertEquals(NONE, status);
-    }
-
-    @Test
-    public void testFromString_NullStatus() {
-        Social status = Social.fromString(null);
-
-        assertEquals(NONE, status);
-    }
-
-    @Test
-    public void testFromString_EmptyString() {
-        Social status = Social.fromString("");
-
-        assertEquals(NONE, status);
-    }
-
-    @Test
-    public void testFromString_FromOrdinal() {
-        Social status = Social.fromString(ENCOURAGING.ordinal() + "");
-
-        assertEquals(ENCOURAGING, status);
-    }
-
-    @Test
-    public void testGetLabel_notInvalid() {
-        for (Social status : Social.values()) {
-            String label = status.getLabel();
-            assertTrue(isResourceKeyValid(label));
+    @ParameterizedTest
+    @CsvSource(value = { "APATHETIC,APATHETIC", "INVALID_STATUS,NONE", "'',NONE", "'null',NONE", "1,APATHETIC" })
+    void testFromStringVariousInputs(String input, Social expected) {
+        if ("null".equals(input)) {
+            input = null;
         }
+        Social result = Social.fromString(input);
+        assertEquals(expected, result);
     }
 
-    @Test
-    public void testGetDescription_notInvalid() {
-        Campaign campaign = mock(Campaign.class);
-        Faction campaignFaction = mock(Faction.class);
-        when(campaignFaction.isMercenary()).thenReturn(true);
-        when(campaign.getFaction()).thenReturn(campaignFaction);
-        when(campaignFaction.getShortName()).thenReturn("MERC");
-
-        Person person = new Person(campaign);
-
-        for (Social trait : Social.values()) {
-            for (int i = 0; i < MAXIMUM_VARIATIONS; i++) {
-                person.setSocialDescriptionIndex(i);
-                String description = trait.getDescription(i, Gender.MALE, "Barry");
-                assertTrue(isResourceKeyValid(description));
-            }
-        }
+    @ParameterizedTest
+    @EnumSource(value = Social.class)
+    void testFromString_Ordinal_All(Social value) {
+        Social result = Social.fromString(String.valueOf(value.ordinal()));
+        assertEquals(value, result);
     }
 
-    @Test
-    public void testGetDescription_InvalidDescriptionIndex() {
-        String description = NONE.getDescription(MAXIMUM_VARIATIONS, Gender.MALE, "Barry");
+    @ParameterizedTest
+    @EnumSource(value = Social.class)
+    void testGetLabel_notInvalid(Social status) {
+        String label = status.getLabel();
+        assertTrue(isResourceKeyValid(label));
+    }
+
+    static Stream<Arguments> provideSocialsAndIndices() {
+        return Arrays.stream(Social.values())
+                     .flatMap(trait -> IntStream.range(0, Social.MAXIMUM_VARIATIONS)
+                                             .mapToObj(i -> Arguments.of(trait, i)));
+    }
+
+    @ParameterizedTest
+    @MethodSource(value = "provideSocialsAndIndices")
+    void testGetDescription_notInvalid(Social trait, int i) {
+        String description = trait.getDescription(i, Gender.MALE, "Barry");
         assertTrue(isResourceKeyValid(description));
     }
 
-    @Test
-    public void testGetRoninMessage_notInvalid() {
-        for (Social trait : Social.values()) {
-            for (int i = 0; i < Social.MAXIMUM_VARIATIONS; i++) {
-                String description = trait.getRoninMessage("Commander");
-                assertTrue(isResourceKeyValid(description));
-            }
-        }
+    @ParameterizedTest
+    @CsvSource(value = { "99", "1000", "-1" })
+    void testGetDescription_InvalidDescriptionIndex(int invalidIndex) {
+        String description = Social.NONE.getDescription(invalidIndex, Gender.MALE, "Barry");
+        assertTrue(isResourceKeyValid(description));
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = Social.class)
+    void testGetRoninMessage_notInvalid(Social trait) {
+        String description = trait.getRoninMessage("Commander");
+        assertTrue(isResourceKeyValid(description));
     }
 }

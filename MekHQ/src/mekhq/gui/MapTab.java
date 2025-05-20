@@ -33,6 +33,7 @@
 package mekhq.gui;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
+import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
 import static mekhq.campaign.randomEvents.prisoners.RecoverMIAPersonnel.abandonMissingPersonnel;
 
 import java.awt.BorderLayout;
@@ -58,6 +59,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
+import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -237,6 +239,11 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         getCampaign().getUnits().forEach(unit -> unit.setSite(Unit.SITE_FACILITY_BASIC));
 
         abandonMissingPersonnel(getCampaign());
+
+        NewPersonnelMarket personnelMarket = getCampaign().getNewPersonnelMarket();
+        if (personnelMarket.getAssociatedPersonnelMarketStyle() == MEKHQ) {
+            personnelMarket.clearCurrentApplicants();
+        }
     }
 
     private void refreshSystemView() {

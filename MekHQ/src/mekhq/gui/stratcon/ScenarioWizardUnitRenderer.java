@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.stratcon;
 
@@ -32,6 +37,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.icons.enums.OperationalStatus;
 import mekhq.campaign.unit.Unit;
+import mekhq.utilities.ReportingUtilities;
 
 import static mekhq.campaign.icons.enums.OperationalStatus.NOT_OPERATIONAL;
 import static mekhq.campaign.icons.enums.OperationalStatus.determineLayeredForceIconOperationalStatus;
@@ -67,11 +73,11 @@ public class ScenarioWizardUnitRenderer extends JLabel implements ListCellRender
         String statusOpenFormat = switch (operationalStatus) {
             case NOT_OPERATIONAL -> "<s>";
             case MARGINALLY_OPERATIONAL -> spanOpeningWithCustomColor(
-                MekHQ.getMHQOptions().getFontColorNegativeHexColor());
+                ReportingUtilities.getNegativeColor());
             case SUBSTANTIALLY_OPERATIONAL -> spanOpeningWithCustomColor(
-                MekHQ.getMHQOptions().getFontColorWarningHexColor());
+                ReportingUtilities.getWarningColor());
             case FULLY_OPERATIONAL, FACTORY_FRESH -> spanOpeningWithCustomColor(
-                MekHQ.getMHQOptions().getFontColorPositiveHexColor());
+                ReportingUtilities.getPositiveColor());
         };
 
         String statusCloseFormat = operationalStatus == NOT_OPERATIONAL ? "</s>" : CLOSING_SPAN_TAG;

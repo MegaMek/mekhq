@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.stratcon;
 
@@ -31,6 +36,7 @@ import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -44,6 +50,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * This class handles Support Point negotiations for StratCon.
@@ -167,7 +174,7 @@ public class SupportPointNegotiation {
 
             campaign.addReport(String.format(resources.getString("supportPoints.maximum"),
                   contract.getHyperlinkedName(),
-                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor()),
+                  spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
                   CLOSING_SPAN_TAG,
                   maxSupportPoints,
                   pluralizer));
@@ -181,7 +188,7 @@ public class SupportPointNegotiation {
             Person admin = iterator.next();
             int rollResult = Compute.d6(2);
 
-            int adminSkill = admin.getSkill(S_ADMIN).getFinalSkillValue(admin.getOptions());
+            int adminSkill = admin.getSkill(S_ADMIN).getFinalSkillValue(admin.getOptions(), admin.getATOWAttributes());
             if (rollResult >= adminSkill) {
                 negotiatedSupportPoints++;
             }
@@ -190,8 +197,8 @@ public class SupportPointNegotiation {
 
         // Determine font color based on success or failure
         String fontColor = (negotiatedSupportPoints > 0) ?
-                                 MekHQ.getMHQOptions().getFontColorPositiveHexColor() :
-                                 MekHQ.getMHQOptions().getFontColorNegativeHexColor();
+                                 ReportingUtilities.getPositiveColor() :
+                                 ReportingUtilities.getNegativeColor();
 
         // Add points to the contract if positive
         if (negotiatedSupportPoints > 0) {
@@ -236,7 +243,14 @@ public class SupportPointNegotiation {
             }
         }
 
-        adminTransport.sort((p1, p2) -> Integer.compare(getSkillValue(p2), getSkillValue(p1)));
+        boolean isUseAgingEffects = campaign.getCampaignOptions().isUseAgeEffects();
+        boolean isClanCampaign = campaign.isClanCampaign();
+        LocalDate today = campaign.getLocalDate();
+        adminTransport.sort((p1, p2) -> Integer.compare(getSkillValue(p2,
+              isUseAgingEffects,
+              isClanCampaign,
+              today,
+              p2.getRankLevel()), getSkillValue(p1, isUseAgingEffects, isClanCampaign, today, p1.getRankLevel())));
         return adminTransport;
     }
 
@@ -266,25 +280,44 @@ public class SupportPointNegotiation {
 
         if (contract == null) {
             campaign.addReport(String.format(resources.getString(reportKey),
-                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   CLOSING_SPAN_TAG));
         } else {
             campaign.addReport(String.format(resources.getString(reportKey),
                   contract.getHyperlinkedName(),
-                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   CLOSING_SPAN_TAG));
         }
     }
 
     /**
-     * Calculates the total skill value for a given person by summing their skill level and bonuses.
+     * Calculates the total skill value for a given person by combining their skill level and relevant bonuses.
      *
-     * @param person The {@link Person} whose skill value is being calculated.
+     * <p>This method retrieves the specified skill from the person and computes the total skill level,
+     * taking into account the person's options, attributes, and adjusted reputation (which itself can be
+     * influenced by aging effects, campaign type, the current date, and rank index).</p>
      *
-     * @return An {@code int} representing the total skill value (level + bonus).
+     * @param person            The {@link Person} whose skill value is being calculated.
+     * @param isUseAgingEffects Whether to apply aging effects to the reputation calculation.
+     * @param isClanCampaign    Indicates whether the current campaign is a Clan campaign.
+     * @param today             The current in-game date for age/reputation calculations.
+     * @param rankIndex         The index representing the current rank for modifiers.
+     * @return An {@link Integer} representing the total skill value after modifiers.
      */
+    private static int getSkillValue(Person person, boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today,
+          int rankIndex) {
+        Skill skill = person.getSkill(S_ADMIN);
+        return skill.getTotalSkillLevel(person.getOptions(),
+              person.getATOWAttributes(),
+              person.getAdjustedReputation(isUseAgingEffects, isClanCampaign, today, rankIndex));
+    }
+
+    /**
+     * @deprecated use {@link #getSkillValue(Person, boolean, boolean, LocalDate, int)} instead.
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     private static int getSkillValue(Person person) {
         Skill skill = person.getSkill(S_ADMIN);
-        return skill.getTotalSkillLevel();
+        return skill.getTotalSkillLevel(person.getOptions(), person.getATOWAttributes(), 0);
     }
 }

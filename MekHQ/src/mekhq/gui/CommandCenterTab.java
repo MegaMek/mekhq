@@ -792,7 +792,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         totalCost = getCampaign().getShoppingList().getTotalBuyCost();
         funds = getCampaign().getFunds();
         if (funds.compareTo(totalCost) < 0) {
-            String warningColor = MekHQ.getMHQOptions().getFontColorWarningHexColor();
+            String warningColor = ReportingUtilities.getWarningColor();
             String formatedString = "<b>" + totalCost.toAmountAndSymbolString() + "</b>";
             totalCostString = ReportingUtilities.messageSurroundedBySpanWithColor(warningColor, formatedString);
         } else {

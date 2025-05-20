@@ -166,6 +166,8 @@ public class AtBContract extends Contract {
     protected String enemyCode;
     protected String enemyName;
 
+    protected int difficulty;
+
     protected AtBContractType contractType;
     protected SkillLevel allySkill;
     protected int allyQuality;
@@ -237,6 +239,8 @@ public class AtBContract extends Contract {
         employerCode = "IND";
         enemyCode = "IND";
         enemyName = "Independent";
+
+        difficulty = Integer.MIN_VALUE;
 
         parentContract = null;
         mercSubcontract = false;
@@ -1190,6 +1194,7 @@ public class AtBContract extends Contract {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allyQuality", getAllyQuality());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enemySkill", getEnemySkill().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enemyQuality", getEnemyQuality());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "difficulty", getDifficulty());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allyBotName", getAllyBotName());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enemyBotName", getEnemyBotName());
 
@@ -1281,6 +1286,8 @@ public class AtBContract extends Contract {
                     setEnemySkill(parseFromString(item.getTextContent().trim()));
                 } else if (item.getNodeName().equalsIgnoreCase("enemyQuality")) {
                     enemyQuality = Integer.parseInt(item.getTextContent());
+                } else if (item.getNodeName().equalsIgnoreCase("difficulty")) {
+                    difficulty = Integer.parseInt(item.getTextContent());
                 } else if (item.getNodeName().equalsIgnoreCase("allyBotName")) {
                     allyBotName = item.getTextContent();
                 } else if (item.getNodeName().equalsIgnoreCase("enemyBotName")) {
@@ -1449,6 +1456,14 @@ public class AtBContract extends Contract {
 
     public void setEnemyCode(String enemyCode) {
         this.enemyCode = enemyCode;
+    }
+
+    public int getDifficulty() {
+        return difficulty;
+    }
+
+    public void setDifficulty(int difficulty) {
+        this.difficulty = difficulty;
     }
 
     public AtBContractType getContractType() {
@@ -1632,58 +1647,58 @@ public class AtBContract extends Contract {
         }
     }
 
-    public AtBContract(Contract c, Campaign campaign) {
-        this(c.getName());
+    public AtBContract(Contract contract, Campaign campaign) {
+        this(contract.getName());
 
-        setType(c.getType());
-        setSystemId(c.getSystemId());
-        setDesc(c.getDescription());
-        setStatus(c.getStatus());
-        for (Scenario s : c.getScenarios()) {
+        setType(contract.getType());
+        setSystemId(contract.getSystemId());
+        setDesc(contract.getDescription());
+        setStatus(contract.getStatus());
+        for (Scenario s : contract.getScenarios()) {
             addScenario(s);
         }
-        setId(c.getId());
-        setLength(c.getLength());
-        setStartDate(c.getStartDate());
+        setId(contract.getId());
+        setLength(contract.getLength());
+        setStartDate(contract.getStartDate());
         /*
          * Set ending date; the other calculated values will be replaced
          * from the original contract
          */
         calculateContract(campaign);
-        setMultiplier(c.getMultiplier());
-        setTransportComp(c.getTransportComp());
-        setStraightSupport(c.getStraightSupport());
-        setOverheadComp(c.getOverheadComp());
-        setCommandRights(c.getCommandRights());
-        setBattleLossComp(c.getBattleLossComp());
-        setSalvagePct(c.getSalvagePct());
-        setSalvageExchange(c.isSalvageExchange());
-        setSalvagedByUnit(c.getSalvagedByUnit());
-        setSalvagedByEmployer(c.getSalvagedByEmployer());
-        setSigningBonusPct(c.getSigningBonusPct());
-        setAdvancePct(c.getAdvancePct());
-        setMRBCFee(c.payMRBCFee());
-        setAdvanceAmount(c.getAdvanceAmount());
-        setFeeAmount(c.getFeeAmount());
-        setBaseAmount(c.getBaseAmount());
-        setOverheadAmount(c.getOverheadAmount());
-        setSupportAmount(c.getSupportAmount());
-        setTransportAmount(c.getTransportAmount());
-        setSigningBonusAmount(c.getSigningBonusAmount());
+        setMultiplier(contract.getMultiplier());
+        setTransportComp(contract.getTransportComp());
+        setStraightSupport(contract.getStraightSupport());
+        setOverheadComp(contract.getOverheadComp());
+        setCommandRights(contract.getCommandRights());
+        setBattleLossComp(contract.getBattleLossComp());
+        setSalvagePct(contract.getSalvagePct());
+        setSalvageExchange(contract.isSalvageExchange());
+        setSalvagedByUnit(contract.getSalvagedByUnit());
+        setSalvagedByEmployer(contract.getSalvagedByEmployer());
+        setSigningBonusPct(contract.getSigningBonusPct());
+        setAdvancePct(contract.getAdvancePct());
+        setMRBCFee(contract.payMRBCFee());
+        setAdvanceAmount(contract.getAdvanceAmount());
+        setFeeAmount(contract.getFeeAmount());
+        setBaseAmount(contract.getBaseAmount());
+        setOverheadAmount(contract.getOverheadAmount());
+        setSupportAmount(contract.getSupportAmount());
+        setTransportAmount(contract.getTransportAmount());
+        setSigningBonusAmount(contract.getSigningBonusAmount());
 
         /* Guess at AtBContract values */
         AtBContractType contractType = null;
         for (final AtBContractType type : AtBContractType.values()) {
-            if (type.toString().equalsIgnoreCase(c.getType())) {
+            if (type.toString().equalsIgnoreCase(contract.getType())) {
                 contractType = type;
                 break;
             }
         }
         /* Make a rough guess */
         if (contractType == null) {
-            if (c.getLength() <= 3) {
+            if (contract.getLength() <= 3) {
                 contractType = AtBContractType.OBJECTIVE_RAID;
-            } else if (c.getLength() < 12) {
+            } else if (contract.getLength() < 12) {
                 contractType = AtBContractType.GARRISON_DUTY;
             } else {
                 contractType = AtBContractType.PLANETARY_ASSAULT;
@@ -1691,7 +1706,8 @@ public class AtBContract extends Contract {
         }
         setContractType(contractType);
 
-        Faction f = Factions.getInstance().getFactionFromFullNameAndYear(c.getEmployer(), campaign.getGameYear());
+        Faction f = Factions.getInstance()
+                          .getFactionFromFullNameAndYear(contract.getEmployer(), campaign.getGameYear());
         if (null == f) {
             employerCode = "IND";
         } else {
@@ -1714,6 +1730,10 @@ public class AtBContract extends Contract {
 
         enemyBotName = getEnemyName(currentYear);
         enemyCamouflage = pickRandomCamouflage(currentYear, enemyCode);
+
+        difficulty = calculateContractDifficulty(contract.getStartDate().getYear(),
+              true,
+              campaign.getAllCombatEntities());
 
         clanTechSalvageOverride();
     }
@@ -1977,15 +1997,20 @@ public class AtBContract extends Contract {
     }
 
     /**
+     * @deprecated use {@link #getContractDifficultySkulls()} instead
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
+    public JPanel getContractDifficultySkulls(Campaign campaign) {
+        return getContractDifficultySkulls();
+    }
+
+    /**
      * This method returns a {@link JPanel} that represents the difficulty skulls for a given mission.
-     *
-     * @param campaign the campaign for which the difficulty skulls are calculated
      *
      * @return a {@link JPanel} with the difficulty skulls displayed
      */
-    public JPanel getContractDifficultySkulls(Campaign campaign) {
+    public JPanel getContractDifficultySkulls() {
         final int ERROR = -99;
-        int difficulty = calculateContractDifficulty(campaign);
 
         // Create a new JFrame
         JFrame frame = new JFrame();

@@ -134,6 +134,11 @@ public abstract class AbstractSkillGenerator {
                 continue;
             }
 
+            // No double-dipping
+            if (person.hasSkill(skillType.getName())) {
+                continue;
+            }
+
             int roleplaySkillLevel = Utilities.generateExpLevel(rskillPrefs.getRoleplaySkillModifier());
             if (roleplaySkillLevel > SkillType.EXP_ULTRA_GREEN) {
                 addSkill(person, skillType.getName(), roleplaySkillLevel, rskillPrefs.randomizeSkill(), 0);

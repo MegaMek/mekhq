@@ -130,15 +130,6 @@ public class RulesetsTab {
     private JPanel pnlPartsPanel;
     private JCheckBox chkRestrictPartsByMission;
 
-    private JPanel pnlLancePanel;
-    private JCheckBox chkLimitLanceWeight;
-    private JCheckBox chkLimitLanceNumUnits;
-    private JCheckBox chkUseStrategy;
-    private JLabel lblBaseStrategyDeployment;
-    private JSpinner spnBaseStrategyDeployment;
-    private JLabel lblAdditionalStrategyDeployment;
-    private JSpinner spnAdditionalStrategyDeployment;
-
     private JPanel pnlAutoResolve;
     private JLabel lblAutoResolveMethod;
     private MMComboBox<AutoResolveMethod> comboAutoResolveMethod;
@@ -261,16 +252,6 @@ public class RulesetsTab {
         pnlPartsPanel = new JPanel();
         chkRestrictPartsByMission = new JCheckBox();
 
-        // Lances
-        pnlLancePanel = new JPanel();
-        chkLimitLanceWeight = new JCheckBox();
-        chkLimitLanceNumUnits = new JCheckBox();
-        chkUseStrategy = new JCheckBox();
-        lblBaseStrategyDeployment = new JLabel();
-        spnBaseStrategyDeployment = new JSpinner();
-        lblAdditionalStrategyDeployment = new JLabel();
-        spnAdditionalStrategyDeployment = new JSpinner();
-
         // Auto Resolve
         pnlAutoResolve = new JPanel();
         lblAutoResolveMethod = new JLabel();
@@ -319,7 +300,6 @@ public class RulesetsTab {
         pnlScenarioModifiers = createUniversalModifiersPanel();
         pnlMapGenerationPanel = createUniversalMapGenerationPanel();
         pnlPartsPanel = createUniversalPartsPanel();
-        pnlLancePanel = createUniversalLancePanel();
 
         pnlScenarioGenerationPanel = createUniversalScenarioGenerationPanel();
         pnlCampaignOptions = createUniversalCampaignOptionsPanel();
@@ -601,8 +581,6 @@ public class RulesetsTab {
         layout.gridx = 0;
         panel.add(pnlPartsPanel, layout);
         layout.gridy++;
-        panel.add(pnlLancePanel, layout);
-        layout.gridy++;
         panel.add(pnlMapGenerationPanel, layout);
 
         return panel;
@@ -632,61 +610,6 @@ public class RulesetsTab {
 
         return panel;
     }
-
-    /**
-     * Creates the UI panel for configuring universal lance options during campaigns.
-     * <p>
-     * This panel includes settings for limiting lance weight or the number of units,
-     * managing strategy deployment, and adjusting payment for strategies. It organizes
-     * these options in a grid layout for clarity and ease of use.
-     * </p>
-     *
-     * @return a {@link JPanel} containing controls to configure lance-related options for campaigns
-     */
-    private JPanel createUniversalLancePanel() {
-        // Content
-        chkLimitLanceWeight = new CampaignOptionsCheckBox("LimitLanceWeight");
-        chkLimitLanceNumUnits = new CampaignOptionsCheckBox("LimitLanceNumUnits");
-        chkUseStrategy = new CampaignOptionsCheckBox("UseStrategy");
-        lblBaseStrategyDeployment = new CampaignOptionsLabel("BaseStrategyDeployment");
-        spnBaseStrategyDeployment = new CampaignOptionsSpinner("BaseStrategyDeployment",
-            0, 0, 10, 1);
-        lblAdditionalStrategyDeployment = new CampaignOptionsLabel("AdditionalStrategyDeployment");
-        spnAdditionalStrategyDeployment = new CampaignOptionsSpinner("AdditionalStrategyDeployment",
-            0, 0, 10, 1);
-
-        // Layout the panel
-        final JPanel panel = new CampaignOptionsStandardPanel("UniversalLancePanel", true,
-            "UniversalLancePanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridx = 0;
-        layout.gridy = 0;
-        layout.gridwidth = 2;
-        panel.add(chkLimitLanceWeight, layout);
-
-        layout.gridy++;
-        panel.add(chkLimitLanceNumUnits, layout);
-
-        layout.gridy++;
-        panel.add(chkUseStrategy, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        layout.gridwidth = 1;
-        panel.add(lblBaseStrategyDeployment, layout);
-        layout.gridx++;
-        panel.add(spnBaseStrategyDeployment, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblAdditionalStrategyDeployment, layout);
-        layout.gridx++;
-        panel.add(spnAdditionalStrategyDeployment, layout);
-
-        return panel;
-    }
-
 
     /**
      * Initializes the StratCon (Strategic Context) section of the tab.
@@ -731,15 +654,6 @@ public class RulesetsTab {
               "AutoResolveVictoryChanceEnabled"));
         chkAutoResolveExperimentalPacarGuiEnabled.addMouseListener(createTipPanelUpdater(stratConHeader,
               "AutoResolveExperimentalPacarGuiEnabled"));
-        chkLimitLanceWeight.addMouseListener(createTipPanelUpdater(stratConHeader, "LimitLanceWeight"));
-        chkLimitLanceNumUnits.addMouseListener(createTipPanelUpdater(stratConHeader, "LimitLanceNumUnits"));
-        chkUseStrategy.addMouseListener(createTipPanelUpdater(stratConHeader, "UseStrategy"));
-        lblBaseStrategyDeployment.addMouseListener(createTipPanelUpdater(stratConHeader, "BaseStrategyDeployment"));
-        spnBaseStrategyDeployment.addMouseListener(createTipPanelUpdater(stratConHeader, "BaseStrategyDeployment"));
-        lblAdditionalStrategyDeployment.addMouseListener(createTipPanelUpdater(stratConHeader,
-              "AdditionalStrategyDeployment"));
-        spnAdditionalStrategyDeployment.addMouseListener(createTipPanelUpdater(stratConHeader,
-              "AdditionalStrategyDeployment"));
         chkRestrictPartsByMission.addMouseListener(createTipPanelUpdater(stratConHeader, "RestrictPartsByMission"));
         chkUseWeatherConditions.addMouseListener(createTipPanelUpdater(stratConHeader, "UseWeatherConditions"));
         chkUseLightConditions.addMouseListener(createTipPanelUpdater(stratConHeader, "UseLightConditions"));
@@ -1156,11 +1070,6 @@ public class RulesetsTab {
         options.setUsePlanetaryConditions(chkUsePlanetaryConditions.isSelected());
         options.setFixedMapChance((int) spnFixedMapChance.getValue());
         options.setRestrictPartsByMission(chkRestrictPartsByMission.isSelected());
-        options.setLimitLanceWeight(chkLimitLanceWeight.isSelected());
-        options.setLimitLanceNumUnits(chkLimitLanceNumUnits.isSelected());
-        options.setUseStrategy(chkUseStrategy.isSelected());
-        options.setBaseStrategyDeployment((int) spnBaseStrategyDeployment.getValue());
-        options.setAdditionalStrategyDeployment((int) spnAdditionalStrategyDeployment.getValue());
         options.setAutoResolveMethod(comboAutoResolveMethod.getSelectedItem());
         options.setStrategicViewTheme(minimapThemeSelector.getSelectedItem());
         options.setAutoResolveVictoryChanceEnabled(chkAutoResolveVictoryChanceEnabled.isSelected());
@@ -1231,11 +1140,6 @@ public class RulesetsTab {
         chkUsePlanetaryConditions.setSelected(options.isUsePlanetaryConditions());
         spnFixedMapChance.setValue(options.getFixedMapChance());
         chkRestrictPartsByMission.setSelected(options.isRestrictPartsByMission());
-        chkLimitLanceWeight.setSelected(options.isLimitLanceWeight());
-        chkLimitLanceNumUnits.setSelected(options.isLimitLanceNumUnits());
-        chkUseStrategy.setSelected(options.isUseStrategy());
-        spnBaseStrategyDeployment.setValue(options.getBaseStrategyDeployment());
-        spnAdditionalStrategyDeployment.setValue(options.getAdditionalStrategyDeployment());
         comboAutoResolveMethod.setSelectedItem(options.getAutoResolveMethod());
         minimapThemeSelector.setSelectedItem(options.getStrategicViewTheme().getName());
         chkAutoResolveVictoryChanceEnabled.setSelected(options.isAutoResolveVictoryChanceEnabled());

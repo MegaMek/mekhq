@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
@@ -37,7 +42,6 @@ import megamek.common.TargetRoll;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.equipment.EquipmentPart;
@@ -45,6 +49,7 @@ import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.utilities.MHQXMLUtility;
+import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -272,10 +277,10 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         AmmoStorage newPart = getNewPart();
         newPart.setBrandNew(true);
         if (campaign.getQuartermaster().buyPart(newPart, transitDays)) {
-            return "<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor()
+            return "<font color='" + ReportingUtilities.getPositiveColor()
                     + "'><b> part found</b>.</font> It will be delivered in " + transitDays + " days.";
         } else {
-            return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
+            return "<font color='" + ReportingUtilities.getNegativeColor()
                     + "'><b> You cannot afford this part. Transaction cancelled</b>.</font>";
         }
     }
@@ -287,7 +292,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public String failToFind() {
-        return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
+        return "<font color='" + ReportingUtilities.getNegativeColor()
                 + "'><b> part not found</b>.</font>";
     }
 

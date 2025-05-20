@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.education;
 
@@ -47,6 +52,7 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.unit.Unit;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * Handles the training of combat teams within the campaign.
@@ -195,7 +201,8 @@ public class TrainingCombatTeams {
                     Skill traineeSkill = trainee.getSkill(commanderSkill);
 
                     if (traineeSkill != null) {
-                        int traineeExperienceLevel = traineeSkill.getExperienceLevel();
+                        int skillLevel = traineeSkill.getLevel();
+                        int traineeExperienceLevel = traineeSkill.getType().getExperienceLevel(skillLevel);
 
                         if (traineeExperienceLevel > EXP_GREEN) {
                             continue;
@@ -213,7 +220,7 @@ public class TrainingCombatTeams {
                     campaign.addReport(String.format(resources.getString("notLearningAnything.text"),
                           trainee.getHyperlinkedFullTitle(),
                           commander.getFullTitle(),
-                          spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                          spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                           CLOSING_SPAN_TAG));
                     trainee.setEduAcademyName("");
                     trainee.setEduEducationTime(0);
@@ -258,10 +265,12 @@ public class TrainingCombatTeams {
             }
 
             // The lowest skill is improved first
-            skillsBeingTrained.sort(Comparator.comparingInt(Skill::getExperienceLevel));
+            skillsBeingTrained.sort(Comparator.comparingInt(Skill::getLevel));
             Skill targetSkill = skillsBeingTrained.get(0);
             // The +1 is to account for the next experience level to be gained
-            int currentExperienceLevel = targetSkill.getExperienceLevel() + 1;
+
+            int currentSkillLevel = targetSkill.getLevel();
+            int currentExperienceLevel = targetSkill.getType().getExperienceLevel(currentSkillLevel + 1);
 
             int perExperienceLevelMultiplier = EDUCATION_TIME_MULTIPLIER;
             double experienceMultiplier = campaignOptions.getXpCostMultiplier();
@@ -274,16 +283,15 @@ public class TrainingCombatTeams {
             int educationTimeReduction = currentExperienceLevel * perExperienceLevelMultiplier;
             if (newEducationTime >= educationTimeReduction) {
                 trainee.setEduEducationTime(newEducationTime - educationTimeReduction);
-                targetSkill.setLevel(targetSkill.getLevel() + 1);
-
+                targetSkill.setLevel(currentSkillLevel + 1);
 
                 campaign.addReport(String.format(resources.getString("learnedNewSkill.text"),
                       commander.getFullTitle(),
                       trainee.getHyperlinkedFullTitle(),
-                      spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                      spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                       CLOSING_SPAN_TAG,
                       targetSkill.getType().getName(),
-                      targetSkill.getFinalSkillValue(trainee.getOptions())));
+                      targetSkill.getFinalSkillValue(trainee.getOptions(), trainee.getATOWAttributes())));
             }
         }
     }
@@ -319,12 +327,12 @@ public class TrainingCombatTeams {
 
                 if (skill != null) {
                     if (!educatorSkills.containsKey(professionSkill)) {
-                        educatorSkills.put(professionSkill, skill.getExperienceLevel());
+                        educatorSkills.put(professionSkill, skill.getLevel());
                     } else {
                         int educatorSkillLevel = educatorSkills.get(professionSkill);
 
-                        if (educatorSkillLevel < skill.getExperienceLevel()) {
-                            educatorSkills.put(professionSkill, skill.getExperienceLevel());
+                        if (educatorSkillLevel < skill.getLevel()) {
+                            educatorSkills.put(professionSkill, skill.getLevel());
                         }
                     }
                 }

@@ -24,8 +24,22 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.adapter;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.JTable;
 
 import megamek.common.Entity;
 import megamek.logging.MMLogger;
@@ -38,12 +52,7 @@ import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.model.ProcurementTableModel;
 import mekhq.gui.utilities.JMenuHelpers;
-
-import javax.swing.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import mekhq.utilities.ReportingUtilities;
 
 public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
     private static final MMLogger logger = MMLogger.create(ProcurementTableMouseAdapter.class);
@@ -189,12 +198,12 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
         }
 
         if (success) {
-            gui.getCampaign().addReport("<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
+            gui.getCampaign().addReport("<font color='" + ReportingUtilities.getPositiveColor() + "'>"
                     + String.format(resources.getString("ProcurementTableMouseAdapter.ProcuredItem.report") + "</font>",
                             acquisition.getAcquisitionName()));
             acquisition.decrementQuantity();
         } else {
-            gui.getCampaign().addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
+            gui.getCampaign().addReport("<font color='" + ReportingUtilities.getNegativeColor() + "'>"
                     + String.format(
                             resources.getString("ProcurementTableMouseAdapter.CannotAffordToPurchaseItem.report")
                                     + "</font>",
@@ -251,7 +260,7 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
             return;
         }
 
-        gui.getCampaign().addReport("<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
+        gui.getCampaign().addReport("<font color='" + ReportingUtilities.getPositiveColor() + "'>"
                 + String.format(resources.getString("ProcurementTableMouseAdapter.GMAdded.report") + "</font>",
                         acquisition.getAcquisitionName()));
         acquisition.decrementQuantity();
