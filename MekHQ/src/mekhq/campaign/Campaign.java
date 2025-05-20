@@ -6713,9 +6713,9 @@ public class Campaign implements ITechManager {
         newPersonnelMarket.writePersonnelMarketDataToXML(writer, indent);
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "newPersonnelMarket");
 
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "factionStandings");
-        factionStandings.writeFactionStandingsToXML(pw, indent);
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "factionStandings");
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "factionStandings");
+        factionStandings.writeFactionStandingsToXML(writer, indent);
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "factionStandings");
 
         // this handles campaigns that predate 49.20
         if (campaignStartDate == null) {

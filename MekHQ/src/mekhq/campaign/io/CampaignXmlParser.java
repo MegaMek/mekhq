@@ -816,7 +816,7 @@ public class CampaignXmlParser {
                     campaign.setReputation(new ReputationController().generateInstanceFromXML(childNode));
                 } else if (nodeName.equalsIgnoreCase("newPersonnelMarket")) {
                     campaign.setNewPersonnelMarket(generatePersonnelMarketDataFromXML(campaign, childNode, version));
-                } else if (xn.equalsIgnoreCase("factionStandings")) {
+                } else if (nodeName.equalsIgnoreCase("factionStandings")) {
                     campaign.setFactionStandings(FactionStandings.generateInstanceFromXML(childNode));
                 } else if (nodeName.equalsIgnoreCase("rankSystem")) {
                     if (!childNode.hasChildNodes()) { // we need there to be child nodes to parse from
