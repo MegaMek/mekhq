@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
@@ -141,7 +146,7 @@ public class Armor extends Part implements IAcquisitionWork {
         }
         toReturn.append("</b><br/>").append(getDetails()).append("<br/>");
 
-        if (getSkillMin() <= SkillType.EXP_ELITE) {
+        if (getSkillMin() <= SkillType.EXP_LEGENDARY) {
             toReturn.append(getTimeLeft())
                   .append(" minutes")
                   .append(null != getTech() ? " (scheduled)" : "")
@@ -363,13 +368,13 @@ public class Armor extends Part implements IAcquisitionWork {
         newPart.setDaysToArrival(transitDays);
         if (campaign.getQuartermaster().buyPart(newPart, transitDays)) {
             return "<font color='" +
-                         MekHQ.getMHQOptions().getFontColorPositiveHexColor() +
+                         ReportingUtilities.getPositiveColor() +
                          "'><b> part found</b>.</font> It will be delivered in " +
                          transitDays +
                          " days.";
         } else {
             return "<font color='" +
-                         MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                         ReportingUtilities.getNegativeColor() +
                          "'><b> You cannot afford this part. Transaction cancelled</b>.</font>";
         }
     }
@@ -382,7 +387,7 @@ public class Armor extends Part implements IAcquisitionWork {
     @Override
     public String failToFind() {
         return "<font color='" +
-                     MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                     ReportingUtilities.getNegativeColor() +
                      "'><b> part not found</b>.</font>";
     }
 
@@ -638,7 +643,7 @@ public class Armor extends Part implements IAcquisitionWork {
         // if we are impossible to fix now, we should scrap this amount of armor
         // from spares and start over
         String scrap = "";
-        if (skillMin > SkillType.EXP_ELITE) {
+        if (skillMin > SkillType.EXP_LEGENDARY) {
             scrap = " Armor supplies lost!";
             if (isSalvaging()) {
                 remove(false);
@@ -652,7 +657,7 @@ public class Armor extends Part implements IAcquisitionWork {
             }
         }
         return " <font color='" +
-                     MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                     ReportingUtilities.getNegativeColor() +
                      "'><b> failed." +
                      scrap +
                      "</b></font>";

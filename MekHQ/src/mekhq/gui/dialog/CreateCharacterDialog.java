@@ -46,6 +46,8 @@ import static mekhq.campaign.personnel.Person.MINIMUM_WEALTH;
 import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
 import static mekhq.campaign.personnel.skills.Skill.getCountDownMaxValue;
 import static mekhq.campaign.personnel.skills.Skill.getCountUpMaxValue;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeInterviewersNotes;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
 import static mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk.personalityQuirksSortedAlphabetically;
 
 import java.awt.BorderLayout;
@@ -97,7 +99,6 @@ import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.randomEvents.personalities.PersonalityController;
 import mekhq.campaign.randomEvents.personalities.enums.Aggression;
 import mekhq.campaign.randomEvents.personalities.enums.Ambition;
 import mekhq.campaign.randomEvents.personalities.enums.Greed;
@@ -1052,8 +1053,8 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
                 // Allow factions between the person's birthday
                 // and when they were recruited, or now if we're
                 // not tracking recruitment.
-                int endYear = person.getRecruitment() != null ?
-                                    Math.min(person.getRecruitment().getYear(), year) :
+                int endYear = person.getJoinedCampaign() != null ?
+                                    Math.min(person.getJoinedCampaign().getYear(), year) :
                                     year;
                 if (faction.validBetween(person.getDateOfBirth().getYear(), endYear)) {
                     factionsModel.addElement(faction);
@@ -1168,7 +1169,10 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             lblName = new JLabel(type);
             lblValue = new JLabel();
             if (person.hasSkill(type)) {
-                lblValue.setText(person.getSkill(type).toString(person.getOptions(), person.getReputation()));
+                lblValue.setText(person.getSkill(type)
+                                       .toString(person.getOptions(),
+                                             person.getATOWAttributes(),
+                                             person.getReputation()));
             } else {
                 lblValue.setText("-");
             }
@@ -1680,7 +1684,8 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             person.setSocial(comboSocial.getSelectedItem());
             person.setPersonalityQuirk(comboPersonalityQuirk.getSelectedItem());
             person.setReasoning(comboReasoning.getSelectedItem());
-            PersonalityController.writePersonalityDescription(person);
+            writePersonalityDescription(person);
+            writeInterviewersNotes(person);
         }
 
         person.setPortrait(portrait);

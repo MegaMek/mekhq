@@ -327,6 +327,29 @@ public class StaticChecks {
         return Stream.of(people).anyMatch(p -> p.getStatus().isActive());
     }
 
+    /**
+     * Determines whether all specified people are currently employed and have not departed their unit.
+     *
+     * @param people one or more {@link Person} objects to check; must not be {@code null}
+     *
+     * @return {@code true} if all people are employed and have not departed their unit; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public static boolean areAllEmployed(Person... people) {
+        for (Person person : people) {
+            if (person.getStatus().isDepartedUnit()) {
+                return false;
+            }
+
+            if (!person.isEmployed()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public static boolean areAllStudents(Person... people) {
         return Arrays.stream(people).allMatch(p -> p.getStatus().isStudent());
     }

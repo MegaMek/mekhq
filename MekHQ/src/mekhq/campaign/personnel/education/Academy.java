@@ -51,6 +51,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.education.AcademyType;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationLevel.Adapter;
+import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.FactionHints;
@@ -789,24 +790,24 @@ public class Academy implements Comparable<Academy> {
         }
 
         // here we display the skills
-        String[] skills = curriculums.get(courseIndex).split(",");
+        String[] skillNames = curriculums.get(courseIndex).split(",");
 
-        skills = Arrays.stream(skills).map(String::trim).toArray(String[]::new);
+        skillNames = Arrays.stream(skillNames).map(String::trim).toArray(String[]::new);
 
         if (personnel.size() == 1) {
-            for (String skill : skills) {
+            for (String skillName : skillNames) {
                 String skillParsed = "";
-                if (skill.equalsIgnoreCase("none")) {
-                    tooltip.append(skill).append("<br>");
+                if (skillName.equalsIgnoreCase("none")) {
+                    tooltip.append(skillName).append("<br>");
                     continue;
-                } else if (skill.equalsIgnoreCase("xp")) {
-                    tooltip.append(skill).append(" (");
+                } else if (skillName.equalsIgnoreCase("xp")) {
+                    tooltip.append(skillName).append("XP (");
                 } else {
-                    skillParsed = skillParser(skill);
+                    skillParsed = skillParser(skillName);
                     tooltip.append(skillParsed).append(" (");
                 }
 
-                if (skill.equalsIgnoreCase("xp")) {
+                if (skillName.equalsIgnoreCase("xp")) {
                     if (EducationLevel.parseToInt(person.getEduHighestEducation()) >= educationLevel) {
                         tooltip.append(resources.getString("nothingToLearn.text")).append(")<br>");
                     } else {
@@ -814,17 +815,23 @@ public class Academy implements Comparable<Academy> {
                               .append(")<br>");
                     }
                 } else {
+                    skillParsed = skillParser(skillName);
+                    Skill skill = person.getSkill(skillParsed);
 
-                    if ((person.hasSkill(skillParsed)) &&
-                              (person.getSkill(skillParsed).getExperienceLevel() >= educationLevel)) {
-                        tooltip.append(resources.getString("nothingToLearn.text")).append(")<br>");
-                    } else {
-                        tooltip.append(SkillType.getExperienceLevelName(educationLevel)).append(")<br>");
+                    if (skill != null) {
+                        int skillLevel = skill.getLevel();
+                        SkillType skillType = skill.getType();
+                        if (skillType.getExperienceLevel(skillLevel) >= educationLevel) {
+                            tooltip.append(resources.getString("nothingToLearn.text")).append(")<br>");
+                            continue;
+                        }
                     }
+
+                    tooltip.append(SkillType.getExperienceLevelName(educationLevel)).append(")<br>");
                 }
             }
         } else {
-            for (String skill : skills) {
+            for (String skill : skillNames) {
                 tooltip.append(skill).append("<br>");
             }
         }

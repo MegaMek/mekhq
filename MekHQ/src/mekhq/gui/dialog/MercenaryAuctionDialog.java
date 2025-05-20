@@ -58,7 +58,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
  * (TRO View) are available.</p>
  */
 public class MercenaryAuctionDialog extends ImmersiveDialogCore {
-    private static final String RESOURCE_BUNDLE = "mekhq.resources." + MercenaryAuctionDialog.class.getSimpleName();
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.MercenaryAuctionDialog";
 
     private Entity entity;
 

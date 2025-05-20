@@ -43,9 +43,11 @@ import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 import static mekhq.campaign.mission.AtBContract.getEffectiveNumUnits;
+import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_NETWORKER;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Set;
@@ -63,7 +65,10 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.rating.IUnitRating;
@@ -128,7 +133,16 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                 return;
             }
 
-            int numContracts = d6() - 4 + unitRatingMod;
+            Person negotiator = campaign.getSeniorAdminPerson(COMMAND);
+            int negotiatorModifier = 0;
+            if (negotiator != null) {
+                PersonnelOptions options = negotiator.getOptions();
+                if (options.booleanOption(ADMIN_NETWORKER)) {
+                    negotiatorModifier++;
+                }
+            }
+
+            int numContracts = d6() - 4 + unitRatingMod + negotiatorModifier;
 
             if (newCampaign) {
                 // For a similar reason as previously stated, we want the user to be able to jump into the action off
@@ -270,16 +284,33 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         if (campaign.getFaction().isMercenary()) {
             if (null == campaign.getRetainerEmployerCode()) {
                 int retries = MAXIMUM_GENERATION_RETRIES;
-                AtBContract retVal = null;
-                while ((retries > 0) && (retVal == null)) {
+                AtBContract contract = null;
+                while ((retries > 0) && (contract == null)) {
                     // Send only 1 retry down because we're handling retries in our loop
-                    retVal = generateAtBContract(campaign,
+                    contract = generateAtBContract(campaign,
                           RandomFactionGenerator.getInstance().getEmployer(),
                           unitRatingMod,
                           1);
+
+                    // This try-catch is specifically implemented to make testing easier. Otherwise, we would need to
+                    // define the player's TO&E, their Ally's unit availability, and their Enemy's unit availability,
+                    // a RAT generator instance and a whole other pile of stuff. So instead, we let it fail, and if we
+                    // need to specifically define difficulty in a unit test, we can do so by using
+                    // contract.setDifficulty().
+                    try {
+                        if (contract != null) {
+                            contract.setDifficulty(contract.calculateContractDifficulty(contract.getStartDate()
+                                                                                              .getYear(),
+                                  true,
+                                  campaign.getAllCombatEntities()));
+                        }
+                    } catch (Exception e) {
+                        contract.setDifficulty(5);
+                        logger.error("Unable to calculate difficulty for AtB contract " + contract, e);
+                    }
                     retries--;
                 }
-                return retVal;
+                return contract;
             } else {
                 return generateAtBContract(campaign, campaign.getRetainerEmployerCode(), unitRatingMod);
             }
@@ -602,6 +633,18 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             }
         }
 
+        // FG3 Difficulty Multiplier
+        if (campaignOptions.isUseGenericBattleValue()) {
+            int contractDifficulty = contract.getDifficulty();
+            if (contractDifficulty != Integer.MIN_VALUE && contractDifficulty <= 2) {
+                multiplier /= 0.5;
+            } else if (contractDifficulty >= 8) {
+                multiplier *= 0.5;
+            } else if (contractDifficulty >= 6) {
+                multiplier *= 0.25;
+            }
+        }
+
         // This should always be last
         if (isGrayMonday(campaign.getLocalDate(), campaign.getCampaignOptions().isSimulateGrayMonday())) {
             multiplier *= 0.25;
@@ -623,6 +666,25 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         }
     }
 
+    /**
+     * Computes and applies modifiers to the clauses of a contract based on various campaign, contract, and personnel
+     * factors.
+     *
+     * <p>This method sets up and calculates the negotiation modifiers for each contract clause, such as command,
+     * salvage,
+     * transport, and support. It takes into account the experience level of the best administrators in relevant roles,
+     * campaign options (such as age effects, faction type, unit rating, and size limitations), contract specifics,
+     * enemy faction characteristics, mission type, and employer details. Clause modifiers are further adjusted for
+     * special circumstances like government or retainer contracts, high-performing units, and employer faction
+     * type.</p>
+     *
+     * <p>After all modifiers are applied for the contract, the method triggers the resolution of each contract clause
+     * (command, salvage, support, transport) using the final calculated modifiers.</p>
+     *
+     * @param contract      the {@link AtBContract} for which clauses and modifiers are being set
+     * @param unitRatingMod the current unit rating modifier to be used in clause calculations
+     * @param campaign      the {@link Campaign} in which the contract negotiation is taking place
+     */
     private void setContractClauses(AtBContract contract, int unitRatingMod, Campaign campaign) {
         ClauseMods mods = new ClauseMods();
         clauseMods.put(contract.getId(), mods);
@@ -638,25 +700,51 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         Person adminCommand = campaign.getSeniorAdminPerson(COMMAND);
         Person adminTransport = campaign.getSeniorAdminPerson(TRANSPORT);
         Person adminLogistics = campaign.getSeniorAdminPerson(LOGISTICS);
+
+        boolean isUseAgeEffects = campaign.getCampaignOptions().isUseAgeEffects();
+        boolean isClanCampaign = campaign.isClanCampaign();
+        LocalDate today = campaign.getLocalDate();
+
         int adminCommandExp = SkillType.EXP_NONE;
         if (adminCommand != null) {
             Skill skill = adminCommand.getSkill(S_NEGOTIATION);
             if (skill != null) {
-                adminCommandExp = skill.getExperienceLevel();
+                PersonnelOptions options = adminCommand.getOptions();
+                Attributes attributes = adminCommand.getATOWAttributes();
+                int adjustedReputation = adminCommand.getAdjustedReputation(isUseAgeEffects,
+                        isClanCampaign,
+                        today,
+                        adminCommand.getRankLevel());
+
+                adminCommandExp = skill.getExperienceLevel(options, attributes, adjustedReputation);
             }
         }
         int adminTransportExp = SkillType.EXP_NONE;
         if (adminTransport != null) {
             Skill skill = adminTransport.getSkill(S_NEGOTIATION);
             if (skill != null) {
-                adminTransportExp = skill.getExperienceLevel();
+                PersonnelOptions options = adminTransport.getOptions();
+                Attributes attributes = adminTransport.getATOWAttributes();
+                int adjustedReputation = adminTransport.getAdjustedReputation(isUseAgeEffects,
+                        isClanCampaign,
+                        today,
+                        adminTransport.getRankLevel());
+
+                adminTransportExp = skill.getExperienceLevel(options, attributes, adjustedReputation);
             }
         }
         int adminLogisticsExp = SkillType.EXP_NONE;
         if (adminLogistics != null) {
             Skill skill = adminLogistics.getSkill(S_NEGOTIATION);
             if (skill != null) {
-                adminLogisticsExp = skill.getExperienceLevel();
+                PersonnelOptions options = adminLogistics.getOptions();
+                Attributes attributes = adminLogistics.getATOWAttributes();
+                int adjustedReputation = adminLogistics.getAdjustedReputation(isUseAgeEffects,
+                        isClanCampaign,
+                        today,
+                        adminLogistics.getRankLevel());
+
+                adminLogisticsExp = skill.getExperienceLevel(options, attributes, adjustedReputation);
             }
         }
 

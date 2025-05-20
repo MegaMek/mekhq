@@ -24,12 +24,14 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.skills;
 
-import static java.lang.Math.floor;
-import static java.lang.Math.max;
-import static java.lang.Math.min;
 import static megamek.common.Compute.d6;
 import static mekhq.campaign.personnel.enums.GenderDescriptors.HIS_HER_THEIR;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.BARELY_MADE_IT;
@@ -52,6 +54,7 @@ import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * This class calculates the target number for a skill check based on the person's attributes, skills, and the
@@ -63,7 +66,7 @@ import mekhq.campaign.personnel.skills.enums.SkillAttribute;
  */
 public class SkillCheckUtility {
     private static final MMLogger logger = MMLogger.create(SkillCheckUtility.class);
-    private static final String RESOURCE_BUNDLE = "mekhq.resources." + SkillCheckUtility.class.getSimpleName();
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.SkillCheckUtility";
 
     /**
      * The target number for an untrained skill check with one linked attribute.
@@ -266,11 +269,11 @@ public class SkillCheckUtility {
         String colorOpen;
         int neutralMarginValue = getMarginValue(BARELY_MADE_IT);
         if (marginOfSuccess == neutralMarginValue) {
-            colorOpen = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
+            colorOpen = spanOpeningWithCustomColor(ReportingUtilities.getWarningColor());
         } else if (marginOfSuccess < neutralMarginValue) {
-            colorOpen = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor());
+            colorOpen = spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
         } else {
-            colorOpen = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor());
+            colorOpen = spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor());
         }
         String status = getFormattedTextAt(RESOURCE_BUNDLE,
               "skillCheck.results." + (isSuccess() ? "success" : "failure"));
@@ -436,9 +439,10 @@ public class SkillCheckUtility {
             targetNumber.addModifier(UNTRAINED_SKILL_MODIFIER, getFormattedTextAt(RESOURCE_BUNDLE, "skillCheck.untrained.skill"));
         } else {
             Skill skill = person.getSkill(skillName);
-            int skillValue = skill.getFinalSkillValue(person.getOptions(), person.getReputation());
+            int skillValue = skill.getFinalSkillValue(person.getOptions(),
+                  person.getATOWAttributes(),
+                  person.getReputation());
             targetNumber.addModifier(skillValue, skillName);
-            getTotalAttributeModifier(targetNumber, characterAttributes, skillType);
         }
 
         if (skillType.isCountUp()) {
@@ -560,89 +564,6 @@ public class SkillCheckUtility {
         int difference = isCountUp ? targetNumberValue - roll : roll - targetNumberValue;
         marginOfSuccess = MarginOfSuccess.getMarginOfSuccess(difference);
         resultsText = generateResultsText(includeMarginsOfSuccessText);
-    }
-
-    /**
-     * Calculates the total attribute modifier for a given skill type based on the character's attributes
-     * and applies the modifiers to the target roll.
-     *
-     * <p>This method retrieves the attributes linked to the specified {@link SkillType} and calculates
-     * the total contribution of their modifiers to the target roll. Each attribute's score is converted
-     * into an individual modifier using {@link #getIndividualAttributeModifier(int)}, and the modifier is
-     * then added to both:</p>
-     *
-     * <ul>
-     *   <li>The total attribute modifier (returned by the method), and</li>
-     *   <li>The {@link TargetRoll}, where the attribute modifier is applied as a negative value.</li>
-     * </ul>
-     *
-     * <p>Attributes that are set to {@link SkillAttribute#NONE} are ignored during this process.</p>
-     *
-     * <p>The calculated attribute modifiers are applied directly to the {@link TargetRoll} using
-     * {@link TargetRoll#addModifier(int, String)}, where the negative modifier is associated with the
-     * attribute's label.</p>
-     *
-     * @param targetNumber         the {@link TargetRoll} representing the current target number,
-     *                             which will be adjusted based on the character's attribute modifiers
-     * @param characterAttributes  the {@link Attributes} object representing the character's
-     *                             raw attribute scores that determine the skill check modifiers
-     * @param skillType            the {@link SkillType} being assessed, whose linked attributes
-     *                             contribute to the total modifier calculation
-     *
-     * @return the total attribute modifier calculated for the given skill type, which is the sum
-     *         of the individual modifiers for each linked attribute. If any of the parameters are {@code null}
-     *         returns 0.
-     *
-     * @author Illiani
-     * @since 0.50.05
-     */
-    public static int getTotalAttributeModifier(TargetRoll targetNumber, final Attributes characterAttributes, final SkillType skillType) {
-        if (targetNumber == null || characterAttributes == null || skillType == null) {
-            return 0;
-        }
-
-        List<SkillAttribute> linkedAttributes = List.of(skillType.getFirstAttribute(), skillType.getSecondAttribute());
-
-        int totalModifier = 0;
-        for (SkillAttribute attribute : linkedAttributes) {
-            if (attribute == SkillAttribute.NONE) {
-                continue;
-            }
-
-            int attributeScore = characterAttributes.getAttribute(attribute);
-            int attributeModifier = getIndividualAttributeModifier(attributeScore);
-            totalModifier += attributeModifier;
-            targetNumber.addModifier(-attributeModifier, attribute.getLabel());
-        }
-
-        return totalModifier;
-    }
-
-    /**
-     * Calculates the individual attribute modifier for a given attribute score.
-     *
-     * <p>The modification is based on a predefined scale, with higher scores providing positive modifiers and lower
-     * scores providing negative modifiers.</p>
-     *
-     * @param attributeScore the score of the attribute
-     *
-     * @return the attribute modifier for the given score
-     *
-     * @author Illiani
-     * @since 0.50.05
-     */
-    public static int getIndividualAttributeModifier(int attributeScore) {
-        int actualScore = max(attributeScore, 0);
-
-        return switch (actualScore) { // ATOW pg 41
-            case 0 -> -4;
-            case 1 -> -2;
-            case 2, 3 -> -1;
-            case 4, 5, 6 -> 0;
-            case 7, 8, 9 -> 1;
-            case 10 -> 2;
-            default -> min(5, (int) floor((double) actualScore / 3));
-        };
     }
 
     /**
