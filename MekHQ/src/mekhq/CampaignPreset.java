@@ -32,6 +32,7 @@
  */
 package mekhq;
 
+import static megamek.SuiteConstants.LAST_MILESTONE;
 import static mekhq.MHQConstants.CAMPAIGN_PRESET_DIRECTORY;
 
 import java.io.BufferedOutputStream;
@@ -91,7 +92,12 @@ import org.w3c.dom.NodeList;
  * @author Justin "Windchild" Bowen
  */
 public class CampaignPreset {
-    private static final Version LAST_COMPATIBLE_VERSION = new Version("0.50.02");
+
+    /**
+     * Represents the last version we accept presets from. Normally, this will just be the last milestone. Sometimes,
+     * however, major changes can require us to manually assign a specific version.
+     */
+    private static final Version LAST_COMPATIBLE_VERSION = LAST_MILESTONE;
 
     private static final MMLogger logger = MMLogger.create(CampaignPreset.class);
 
