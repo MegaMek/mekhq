@@ -118,7 +118,6 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
                 buttonSelectClose = new JButton(Messages.getString("MekSelectorDialog.AddGM"));
                 buttonSelectClose.setName("buttonAddGM");
                 buttonSelectClose.addActionListener(this);
-                buttonSelectClose.setEnabled(false);
                 panelButtons.add(buttonSelectClose, new GridBagConstraints());
             }
 
@@ -212,7 +211,6 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
                 buttonSelect.setEnabled(false);
                 buttonSelect.setText(Messages.getString("MekSelectorDialog.Buy", TARGET_UNKNOWN));
                 buttonSelect.setToolTipText(null);
-                buttonSelectClose.setEnabled(false);
             }
         } else {
             selectedUnit = new UnitOrder(entity, campaign);
@@ -221,7 +219,6 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
                 final TargetRoll target = campaign.getTargetForAcquisition(selectedUnit);
                 buttonSelect.setText(Messages.getString("MekSelectorDialog.Buy", target.getValueAsString()));
                 buttonSelect.setToolTipText(target.getDesc());
-                buttonSelectClose.setEnabled(true);
             }
         }
 
