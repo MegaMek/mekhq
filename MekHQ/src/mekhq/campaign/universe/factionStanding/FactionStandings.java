@@ -473,6 +473,10 @@ public class FactionStandings {
         return fameChangeReports;
     }
 
+    // TODO accept contract
+    // TODO end contract
+    // TODO refuse Batchall
+
     /**
      * Writes all faction standings as XML out to the specified {@link PrintWriter}.
      *
