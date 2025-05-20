@@ -57,15 +57,6 @@ ext {
     mmlDir = "${rootDir}/../megameklab"
 }
 
-applicationDefaultJvmArgs = [
-            '-Xmx4096m',
-            '--add-opens',
-            'java.base/java.util=ALL-UNNAMED',
-            '--add-opens',
-            'java.base/java.util.concurrent=ALL-UNNAMED',
-            '-Dsun.awt.disablegrab=true'
-]
-
 dependencies {
     implementation "org.megamek:megamek:${version}"
     implementation("org.megamek:megameklab:${version}") {
@@ -111,6 +102,14 @@ dependencies {
 
 application {
     mainClass = 'mekhq.MekHQ'
+    applicationDefaultJvmArgs = [
+            '-Xmx4096m',
+            '--add-opens',
+            'java.base/java.util=ALL-UNNAMED',
+            '--add-opens',
+            'java.base/java.util.concurrent=ALL-UNNAMED',
+            '-Dsun.awt.disablegrab=true'
+    ]
 }
 
 run {

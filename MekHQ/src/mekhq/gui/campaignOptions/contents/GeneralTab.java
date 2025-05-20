@@ -58,7 +58,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
-import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
@@ -66,11 +65,8 @@ import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
-import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
-import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsTextField;
 import mekhq.gui.dialog.DateChooser;
@@ -93,7 +89,6 @@ import mekhq.gui.displayWrappers.FactionDisplay;
 public class GeneralTab {
     private final JFrame frame;
     private final Campaign campaign;
-    private final CampaignOptions campaignOptions;
     private final CampaignOptionsDialogMode mode;
 
     private JLabel lblName;
@@ -101,14 +96,6 @@ public class GeneralTab {
     private JButton btnNameGenerator;
     private JLabel lblFaction;
     private MMComboBox<FactionDisplay> comboFaction;
-    private JLabel lblReputation;
-    private MMComboBox<UnitRatingMethod> unitRatingMethodCombo;
-    private JLabel lblManualUnitRatingModifier;
-    private JSpinner manualUnitRatingModifier;
-    private JCheckBox chkResetCriminalRecord;
-    private JCheckBox chkClampReputationPayMultiplier;
-    private JCheckBox chkReduceReputationPerformanceModifier;
-    private JCheckBox chkReputationPerformanceModifierCutOff;
     private JLabel lblDate;
     private JButton btnDate;
     private LocalDate date;
@@ -118,6 +105,7 @@ public class GeneralTab {
     private JLabel lblIcon;
     private JButton btnIcon;
     private StandardForceIcon unitIcon;
+    private JLabel lblFurtherReading;
 
     /**
      * Constructs a new instance of the {@code GeneralTab} using the provided {@link Campaign} and {@link JFrame}.
@@ -131,7 +119,6 @@ public class GeneralTab {
         // region Variable Declarations
         this.frame = frame;
         this.campaign = campaign;
-        this.campaignOptions = campaign.getCampaignOptions();
         this.date = campaign.getLocalDate();
         this.camouflage = campaign.getCamouflage();
         this.unitIcon = campaign.getUnitIcon();
@@ -197,17 +184,6 @@ public class GeneralTab {
         comboFaction.setToolTipText(String.format("<html>%s</html>",
               getTextAt(getCampaignOptionsResourceBundle(), "lblFaction.tooltip")));
 
-        // Reputation
-        lblReputation = new CampaignOptionsLabel("Reputation");
-        unitRatingMethodCombo.setToolTipText(String.format("<html>%s</html>",
-              getTextAt(getCampaignOptionsResourceBundle(), "lblReputation.tooltip")));
-        lblManualUnitRatingModifier = new CampaignOptionsLabel("ManualUnitRatingModifier");
-        manualUnitRatingModifier = new CampaignOptionsSpinner("ManualUnitRatingModifier", 0, -1000, 1000, 1);
-        chkResetCriminalRecord = new CampaignOptionsCheckBox("ResetCriminalRecord");
-        chkClampReputationPayMultiplier = new CampaignOptionsCheckBox("ClampReputationPayMultiplier");
-        chkReduceReputationPerformanceModifier = new CampaignOptionsCheckBox("ReduceReputationPerformanceModifier");
-        chkReputationPerformanceModifierCutOff = new CampaignOptionsCheckBox("ReputationPerformanceModifierCutOff");
-
         // Date
         lblDate = new CampaignOptionsLabel("Date");
         btnDate = new CampaignOptionsButton("Date");
@@ -267,26 +243,6 @@ public class GeneralTab {
         layout.gridwidth = 2;
         panel.add(comboFaction, layout);
 
-        layout.gridwidth = 1;
-        layout.gridy++;
-        panel.add(lblReputation, layout);
-        layout.gridwidth = 2;
-        panel.add(unitRatingMethodCombo, layout);
-
-        layout.gridwidth = 1;
-        layout.gridy++;
-        panel.add(lblManualUnitRatingModifier, layout);
-        panel.add(manualUnitRatingModifier, layout);
-        layout.gridy++;
-        layout.gridwidth = 3;
-        panel.add(chkResetCriminalRecord, layout);
-        layout.gridy++;
-        panel.add(chkClampReputationPayMultiplier, layout);
-        layout.gridy++;
-        panel.add(chkReduceReputationPerformanceModifier, layout);
-        layout.gridy++;
-        panel.add(chkReputationPerformanceModifierCutOff, layout);
-
         layout.gridy++;
         layout.gridwidth = 5;
         layout.gridx = GridBagConstraints.RELATIVE;
@@ -303,6 +259,7 @@ public class GeneralTab {
 
         panel.add(iconsPanel, layout);
         layout.gridy++;
+        layout.gridwidth = 5;
         panel.add(createFurtherReadingPanel(), layout);
         generalPanel.add(panel);
 
@@ -369,17 +326,6 @@ public class GeneralTab {
 
         lblFaction = new JLabel();
         comboFaction = new MMComboBox<>("comboFaction", buildFactionDisplayOptions());
-
-        lblReputation = new JLabel();
-        unitRatingMethodCombo = new MMComboBox<>("unitRatingMethodCombo", UnitRatingMethod.values());
-
-        lblManualUnitRatingModifier = new JLabel();
-        manualUnitRatingModifier = new JSpinner();
-
-        chkResetCriminalRecord = new JCheckBox();
-        chkClampReputationPayMultiplier = new JCheckBox();
-        chkReduceReputationPerformanceModifier = new JCheckBox();
-        chkReputationPerformanceModifierCutOff = new JCheckBox();
 
         lblDate = new JLabel();
         btnDate = new JButton();
@@ -485,46 +431,22 @@ public class GeneralTab {
     /**
      * Creates a "Further Reading" panel that provides links or additional details to guide users in understanding the
      * campaign options.
-     * <p>
-     * The panel may include references to:
-     * <p>
-     * <li>BattleMech Manual (BMM)</li>
-     * <li>Total Warfare rules</li>
-     * <li>Campaign Operations documentation</li>
-     * </p>
      *
      * @return A {@link JPanel} containing additional informational components.
      */
     private JPanel createFurtherReadingPanel() {
-        // Contents
-        CampaignOptionsHeaderPanel headerPanelBMM = new CampaignOptionsHeaderPanel("BMMPanel", "", true, false, 0);
+        lblFurtherReading = new CampaignOptionsLabel("FurtherReading", null, true);
 
-        CampaignOptionsHeaderPanel headerPanelTotalWarfare = new CampaignOptionsHeaderPanel("TotalWarfarePanel",
-              "",
-              true,
-              false,
-              0);
-
-        CampaignOptionsHeaderPanel headerPanelCampaignOperations = new CampaignOptionsHeaderPanel(
-              "CampaignOperationsPanel",
-              "",
-              true,
-              false,
-              0);
-
-        // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("FurtherReadingPanel", true, "FurtherReadingPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+
         layout.gridwidth = 5;
         layout.gridx = 0;
         layout.gridy = 0;
-        panel.add(headerPanelBMM, layout);
+        layout.fill = GridBagConstraints.HORIZONTAL;
+        layout.weightx = 1.0;
 
-        layout.gridy++;
-        panel.add(headerPanelTotalWarfare, layout);
-
-        layout.gridy++;
-        panel.add(headerPanelCampaignOperations, layout);
+        panel.add(lblFurtherReading, layout);
 
         return panel;
     }
@@ -534,11 +456,11 @@ public class GeneralTab {
      * <p>
      * This is a convenience method that uses the default campaign options, default date, and default faction to
      * populate the relevant data fields in the user interface. It essentially delegates the work to the overloaded
-     * method {@link #loadValuesFromCampaignOptions(CampaignOptions, LocalDate, Faction)} with all parameters set to
+     * method {@link #loadValuesFromCampaignOptions(LocalDate, Faction)} with all parameters set to
      * {@code null}.
      */
     public void loadValuesFromCampaignOptions() {
-        loadValuesFromCampaignOptions(null, null, null);
+        loadValuesFromCampaignOptions(null, null);
     }
 
     /**
@@ -558,27 +480,13 @@ public class GeneralTab {
      *     <li>Performing required UI updates (e.g., repainting date labels).</li>
      * </ul>
      *
-     * @param presetCampaignOptions Optional {@link CampaignOptions} used to populate values. If {@code null}, the
-     *                              current campaign options are used.
-     * @param presetDate            Optional {@link LocalDate} to be used as the active date. If {@code null}, the
+     *  @param presetDate            Optional {@link LocalDate} to be used as the active date. If {@code null}, the
      *                              campaign's current date is used.
      * @param presetFaction         Optional {@link Faction} to be used in the faction selection field. If {@code null},
      *                              the campaign's default faction is used.
      */
-    public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions,
-          @Nullable LocalDate presetDate, @Nullable Faction presetFaction) {
-        CampaignOptions options = presetCampaignOptions;
-        if (presetCampaignOptions == null) {
-            options = this.campaignOptions;
-        }
-
+    public void loadValuesFromCampaignOptions(@Nullable LocalDate presetDate, @Nullable Faction presetFaction) {
         txtName.setText(campaign.getName());
-
-        unitRatingMethodCombo.setSelectedItem(options.getUnitRatingMethod());
-        manualUnitRatingModifier.setValue(options.getManualUnitRatingModifier());
-        chkClampReputationPayMultiplier.setSelected(options.isClampReputationPayMultiplier());
-        chkReduceReputationPerformanceModifier.setSelected(options.isReduceReputationPerformanceModifier());
-        chkReputationPerformanceModifierCutOff.setSelected(options.isReputationPerformanceModifierCutOff());
 
         date = campaign.getLocalDate();
         if (presetDate != null) {
@@ -601,13 +509,10 @@ public class GeneralTab {
      * Applies the updated campaign options from the general tab's UI components to the {@link Campaign}. This method
      * ensures that any changes made in the UI are reflected in the campaign's settings.
      *
-     * @param presetCampaignOptions An optional {@link CampaignOptions} to apply instead of the campaign's current
-     *                              options.
      * @param isStartUp             A boolean indicating if the campaign is in a startup state.
      * @param isSaveAction          A boolean indicating if this is a save action.
      */
-    public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions, boolean isStartUp,
-          boolean isSaveAction) {
+    public void applyCampaignOptionsToCampaign(boolean isStartUp, boolean isSaveAction) {
         // First, we apply any updates to the campaign
         if (!isSaveAction) {
             campaign.setName(txtName.getText());
@@ -633,24 +538,5 @@ public class GeneralTab {
             campaign.setCamouflage(camouflage);
             campaign.setUnitIcon(unitIcon);
         }
-
-        // Then updates to Campaign Options
-        CampaignOptions options = presetCampaignOptions;
-        if (presetCampaignOptions == null) {
-            options = this.campaignOptions;
-        }
-
-        options.setUnitRatingMethod(unitRatingMethodCombo.getSelectedItem());
-        options.setManualUnitRatingModifier((int) manualUnitRatingModifier.getValue());
-
-        if (chkResetCriminalRecord.isSelected()) {
-            campaign.setDateOfLastCrime(null);
-            campaign.setCrimeRating(0);
-            campaign.setCrimePirateModifier(0);
-        }
-
-        options.setClampReputationPayMultiplier(chkClampReputationPayMultiplier.isSelected());
-        options.setReduceReputationPerformanceModifier(chkReduceReputationPerformanceModifier.isSelected());
-        options.setReputationPerformanceModifierCutOff(chkReputationPerformanceModifierCutOff.isSelected());
     }
 }
