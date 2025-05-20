@@ -162,12 +162,17 @@ tasks.register('connectorSystemZip', Zip) {
     outputs.dir "${fileStagingDir}/${data}/universe/planetary_systems"
 }
 
+tasks.register("copyLicenseFiles", Exec) {
+    commandLine "cp", "../LICENSE", "../LICENSE.code", "../LICENSE.assets", "../README.md", "docs"
+}
+
 tasks.register('stageFiles', Copy) {
     description = 'Stages files that are to be copied into the distribution.'
 
-    dependsOn generateDynamicFiles
     dependsOn gradle.includedBuild('megamek').task(':megamek:generateDynamicFiles')
     dependsOn gradle.includedBuild('megameklab').task(':megameklab:generateDynamicFiles')
+    dependsOn generateDynamicFiles
+    dependsOn copyLicenseFiles
 
     dependsOn canonSystemZip
     dependsOn connectorSystemZip
@@ -199,7 +204,6 @@ tasks.register('stageFiles', Copy) {
     include "${mmconf}/**"
     include "${userdata}"
     include "${userdata}/data/universe/"
-    include 'license.txt'
     include 'SubmitBug.html'
     include "sentry.properties"
     include "*.ini"
