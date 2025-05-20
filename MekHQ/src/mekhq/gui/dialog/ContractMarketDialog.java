@@ -67,7 +67,9 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.FactionComboBox;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.dialog.resupplyAndCaches.DialogContractStart;
@@ -540,6 +542,21 @@ public class ContractMarketDialog extends JDialog {
             // must be invoked after campaign.addMission to ensure presence of mission ID
             selectedContract.acceptContract(campaign);
             contractStartPrompt(campaign, selectedContract);
+
+            // Process Faction Standings Changes
+            if (campaign.getCampaignOptions().isTrackFactionStanding()) {
+                Faction enemy = null;
+                if (selectedContract instanceof AtBContract contract) {
+                    enemy = contract.getEnemy();
+                }
+
+                FactionStandings factionStandings = campaign.getFactionStandings();
+                List<String> standingsReports = factionStandings.processContractAccept(enemy, campaign.getLocalDate());
+
+                for (String standingReport : standingsReports) {
+                    campaign.addReport(standingReport);
+                }
+            }
 
             contractMarket.removeContract(selectedContract);
             ((DefaultTableModel) tableContracts.getModel()).removeRow(tableContracts.convertRowIndexToModel(

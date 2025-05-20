@@ -90,9 +90,14 @@ public class FactionStandings {
     static final double STARTING_FAME_ALLIED_FACTION = STARTING_FAME_SAME_FACTION / 2;
 
     /**
-     * The starting fame for factions that are enemies of the campaign faction.
+     * The starting fame for factions that are rivals of the campaign faction.
      */
-    static final double STARTING_FAME_ENEMY_FACTION = DEFAULT_FAME - 25;
+    static final double STARTING_FAME_ENEMY_FACTION_RIVAL = DEFAULT_FAME - 25;
+
+    /**
+     * The starting fame for factions that are at war with the campaign faction.
+     */
+    static final double STARTING_FAME_ENEMY_FACTION_AT_WAR = DEFAULT_FAME - 40;
 
     /**
      * Fame increase for successfully completing a contract for the employer.
@@ -244,7 +249,14 @@ public class FactionStandings {
             }
 
             if (factionHints.isAtWarWith(campaignFaction, otherFaction, today)) {
-                report = changeFameForFaction(otherFactionCode, STARTING_FAME_ENEMY_FACTION, gameYear);
+                report = changeFameForFaction(otherFactionCode, STARTING_FAME_ENEMY_FACTION_AT_WAR, gameYear);
+                if (!report.isBlank()) {
+                    fameChangeReports.add(report);
+                }
+            }
+
+            if (factionHints.isRivalOf(campaignFaction, otherFaction, today)) {
+                report = changeFameForFaction(otherFactionCode, STARTING_FAME_ENEMY_FACTION_RIVAL, gameYear);
                 if (!report.isBlank()) {
                     fameChangeReports.add(report);
                 }

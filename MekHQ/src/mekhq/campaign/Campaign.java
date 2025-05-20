@@ -5053,10 +5053,18 @@ public class Campaign implements ITechManager {
 
         for (AtBContract contract : getActiveAtBContracts()) {
             if (campaignOptions.isUseGenericBattleValue()) {
-                if (contract.getStartDate().equals(getLocalDate())) {
-                    if (getCampaignOptions().isUseGenericBattleValue() &&
-                              BatchallFactions.usesBatchalls(contract.getEnemyCode())) {
-                        contract.setBatchallAccepted(contract.initiateBatchall(this));
+                if (contract.getStartDate().equals(currentDay)) {
+                    String factionCode = contract.getEnemyCode();
+                    if (BatchallFactions.usesBatchalls(factionCode)) {
+                        if (contract.initiateBatchall(this)) {
+                            contract.setBatchallAccepted(true);
+                        } else {
+                            contract.setBatchallAccepted(false);
+
+                            if (campaignOptions.isTrackFactionStanding()) {
+                                factionStandings.processRefusedBatchall(factionCode, currentDay.getYear());
+                            }
+                        }
                     }
                 }
             }
