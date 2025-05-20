@@ -32,30 +32,27 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
-import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
-import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
-
-import java.io.PrintWriter;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-
 import megamek.codeUtilities.MathUtility;
+import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
+import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.FactionHints;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel;
 import mekhq.utilities.MHQXMLUtility;
+import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.util.*;
+
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 /**
  * Stores and manages the standing values between factions in the Faction Standings system.
@@ -108,6 +105,36 @@ public class FactionStandings {
     static final double FAME_CHANGE_CONTRACT_SUCCESS_EMPLOYER_ALLY = 1.0;
 
     /**
+     * Fame increase for completing a 'partial success' contract for the employer.
+     */
+    static final double FAME_CHANGE_CONTRACT_PARTIAL_EMPLOYER = 1.0;
+
+    /**
+     * Fame increase for completing a 'partial success' contract for factions allied with the employer.
+     */
+    static final double FAME_CHANGE_CONTRACT_PARTIAL_EMPLOYER_ALLY = 0.2;
+
+    /**
+     * Fame penalty for failing a contract for the employer.
+     */
+    static final double FAME_CHANGE_CONTRACT_FAILURE_EMPLOYER = -1.0;
+
+    /**
+     * Fame penalty for completing a 'partial success' contract for factions allied with the employer.
+     */
+    static final double FAME_CHANGE_CONTRACT_FAILURE_EMPLOYER_ALLY = -0.2;
+
+    /**
+     * Fame penalty for breaching a contract (employer).
+     */
+    static final double FAME_CHANGE_CONTRACT_BREACH_EMPLOYER = -10.0;
+
+    /**
+     * Fame penalty for breaching a contract (employer's allies).
+     */
+    static final double FAME_CHANGE_CONTRACT_BREACH_EMPLOYER_ALLY = -2;
+
+    /**
      * Fame decrease when accepting a contract against a non-Clan enemy.
      */
     static final double FAME_CHANGE_CONTRACT_ACCEPT_ENEMY_NORMAL = -5.0;
@@ -126,11 +153,6 @@ public class FactionStandings {
      * Fame decrease when accepting a contract for Clan factions allied with the enemy.
      */
     static final double FAME_CHANGE_CONTRACT_ACCEPT_ENEMY_ALLY_CLAN = -0.2;
-
-    /**
-     * Fame penalty for breaching a contract.
-     */
-    static final double FAME_CHANGE_CONTRACT_BREACH = -10.0;
 
     /**
      * Fame penalty for refusing a batchall.
@@ -376,9 +398,9 @@ public class FactionStandings {
             }
 
             if (newMilestone.getStandingLevel() > originalMilestone.getStandingLevel()) {
-                reportingColor = MekHQ.getMHQOptions().getFontColorPositiveHexColor();
+                reportingColor = ReportingUtilities.getPositiveColor();
             } else {
-                reportingColor = MekHQ.getMHQOptions().getFontColorNegativeHexColor();
+                reportingColor = ReportingUtilities.getNegativeColor();
             }
 
             milestoneChangeReport = getFormattedTextAt(RESOURCE_BUNDLE,
@@ -387,7 +409,7 @@ public class FactionStandings {
                   newMilestone.getLabel(relevantFaction),
                   CLOSING_SPAN_TAG);
         } else {
-            reportingColor = MekHQ.getMHQOptions().getFontColorWarningHexColor();
+            reportingColor = ReportingUtilities.getWarningColor();
 
             milestoneChangeReport = getFormattedTextAt(RESOURCE_BUNDLE, "factionStandings.change.report.milestone.same",
                   spanOpeningWithCustomColor(reportingColor),
@@ -398,10 +420,10 @@ public class FactionStandings {
         // Build final report
         String deltaDirection;
         if (newFame > originalFame) {
-            reportingColor = MekHQ.getMHQOptions().getFontColorPositiveHexColor();
+            reportingColor = ReportingUtilities.getPositiveColor();
             deltaDirection = getTextAt(RESOURCE_BUNDLE, "factionStandings.change.increased");
         } else {
-            reportingColor = MekHQ.getMHQOptions().getFontColorNegativeHexColor();
+            reportingColor = ReportingUtilities.getNegativeColor();
             deltaDirection = getTextAt(RESOURCE_BUNDLE, "factionStandings.change.decreased");
         }
 
@@ -486,9 +508,221 @@ public class FactionStandings {
         return fameChangeReports;
     }
 
-    // TODO accept contract
-    // TODO end contract
-    // TODO refuse Batchall
+    /**
+     * Processes the acceptance of a contract against a specified enemy faction and applies fame changes to all relevant
+     * factions.
+     *
+     * <p>This method iterates through all factions in the game, adjusting their fame values based on relationships to
+     * the specified enemy faction and the contract's context. Fame deltas are applied for the enemy faction itself, as
+     * well as any factions allied with the enemy. The changes vary depending on whether the factions are clans or
+     * non-clans, and different fame penalties are applied accordingly.</p>
+     *
+     * <p>For each application of a fame delta, a report string is generated and included in the result list if it is
+     * not blank.</p>
+     *
+     * @param enemyFaction The {@link Faction} representing the enemy against whom the contract is accepted.
+     * @param today        The {@link LocalDate} representing the game date on which the contract is accepted.
+     *
+     * @return A {@link List} of {@link String} objects summarizing any fame changes that occurred as a result of
+     *       accepting the contract.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public List<String> processContractAccept(@Nullable Faction enemyFaction, LocalDate today) {
+        // If we're missing the relevant faction, alert the player and abort
+        if (enemyFaction == null) {
+            String report = getMissingFactionReport(false);
+
+            return List.of(report);
+        }
+
+        List<String> fameChangeReports = new ArrayList<>();
+
+        int gameYear = today.getYear();
+
+        Collection<Faction> allFactions = Factions.getInstance().getFactions();
+        FactionHints factionHints = FactionHints.defaultFactionHints();
+
+        String report;
+        double fameDelta;
+        for (Faction otherFaction : allFactions) {
+            if (isUntrackedFaction(otherFaction)) {
+                continue;
+            }
+
+            String otherFactionCode = otherFaction.getShortName();
+            if (otherFaction.equals(enemyFaction)) {
+                if (otherFaction.isClan()) {
+                    fameDelta = FAME_CHANGE_CONTRACT_ACCEPT_ENEMY_CLAN;
+                } else {
+
+                    fameDelta = FAME_CHANGE_CONTRACT_ACCEPT_ENEMY_NORMAL;
+                }
+
+                report = changeFameForFaction(otherFactionCode, fameDelta, gameYear);
+                if (!report.isBlank()) {
+                    fameChangeReports.add(report);
+                }
+                continue;
+            }
+
+            if (factionHints.isAlliedWith(enemyFaction, otherFaction, today)) {
+                if (otherFaction.isClan()) {
+                    fameDelta = FAME_CHANGE_CONTRACT_ACCEPT_ENEMY_ALLY_CLAN;
+                } else {
+
+                    fameDelta = FAME_CHANGE_CONTRACT_ACCEPT_ENEMY_ALLY_NORMAL;
+                }
+
+                report = changeFameForFaction(otherFactionCode, fameDelta, gameYear);
+                if (!report.isBlank()) {
+                    fameChangeReports.add(report);
+                }
+            }
+        }
+
+        return fameChangeReports;
+    }
+
+    /**
+     * Processes the outcome of a contract upon its completion and updates fame standings accordingly.
+     *
+     * <p>Depending on the mission status (success, partial, failure, or breach), this method determines the appropriate
+     * fame delta for the employer faction and its allies.</p>
+     *
+     * <p>If the employer faction is missing, a report is generated and returned accordingly. This report informs the
+     * player that they need to manually apply the Standing change via the Standing Report GUI.</p>
+     *
+     * <p>Fame changes are applied to the employer and all allied factions, and corresponding report strings are
+     * returned for each fame change applied.</p>
+     *
+     * @param employerFaction The {@link Faction} that employed the contract, or {@code null} if unavailable.
+     * @param today           The {@link LocalDate} representing the date of contract completion.
+     * @param missionStatus   The {@link MissionStatus} of the contract upon completion.
+     * @return A {@link List} of strings summarizing any fame changes or messages relating to missing factions.
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public List<String> processContractCompletion(@Nullable Faction employerFaction, LocalDate today, MissionStatus missionStatus) {
+        // If the mission is still active, there is nothing to process, so abort
+        if (missionStatus == MissionStatus.ACTIVE) {
+            return new ArrayList<>();
+        }
+
+        // If we're missing the relevant faction, alert the player and abort
+        if (employerFaction == null) {
+            String report = getMissingFactionReport(true);
+
+            return List.of(report);
+        }
+
+        double fameDeltaEmployer = 0.0;
+        double fameDeltaEmployerAlly = 0.0;
+        switch (missionStatus) {
+            case SUCCESS -> {
+                fameDeltaEmployer = FAME_CHANGE_CONTRACT_SUCCESS_EMPLOYER;
+                fameDeltaEmployerAlly = FAME_CHANGE_CONTRACT_SUCCESS_EMPLOYER_ALLY;
+            }
+            case PARTIAL -> {
+                fameDeltaEmployer = FAME_CHANGE_CONTRACT_PARTIAL_EMPLOYER;
+                fameDeltaEmployerAlly = FAME_CHANGE_CONTRACT_PARTIAL_EMPLOYER_ALLY;
+            }
+            case FAILED -> {
+                fameDeltaEmployer = FAME_CHANGE_CONTRACT_FAILURE_EMPLOYER;
+                fameDeltaEmployerAlly = FAME_CHANGE_CONTRACT_FAILURE_EMPLOYER_ALLY;
+            }
+            case BREACH -> {
+                fameDeltaEmployer = FAME_CHANGE_CONTRACT_BREACH_EMPLOYER;
+                fameDeltaEmployerAlly = FAME_CHANGE_CONTRACT_BREACH_EMPLOYER_ALLY;
+            }
+        }
+
+        // If there is no change to make, we exit early so as not to process faction data needlessly
+        if ((fameDeltaEmployer + fameDeltaEmployerAlly) == 0.0) {
+            return new ArrayList<>();
+        }
+
+        List<String> fameChangeReports = new ArrayList<>();
+
+        int gameYear = today.getYear();
+
+        Collection<Faction> allFactions = Factions.getInstance().getFactions();
+        FactionHints factionHints = FactionHints.defaultFactionHints();
+
+        String report;
+        for (Faction otherFaction : allFactions) {
+            if (isUntrackedFaction(otherFaction)) {
+                continue;
+            }
+
+            String otherFactionCode = otherFaction.getShortName();
+            if (otherFaction.equals(employerFaction)) {
+                report = changeFameForFaction(otherFactionCode, fameDeltaEmployer, gameYear);
+                if (!report.isBlank()) {
+                    fameChangeReports.add(report);
+                }
+                continue;
+            }
+
+            if (factionHints.isAlliedWith(employerFaction, otherFaction, today)) {
+                report = changeFameForFaction(otherFactionCode, fameDeltaEmployerAlly, gameYear);
+                if (!report.isBlank()) {
+                    fameChangeReports.add(report);
+                }
+            }
+        }
+
+        return fameChangeReports;
+    }
+
+    /**
+     * Generates a report message indicating that the relevant faction (employer or enemy) is missing.
+     *
+     * <p>The message varies depending on whether the context is contract completion or acceptance.</p>
+     *
+     * @param isContractCompletion {@code true} if the report is for contract completion, {@code false} for contract acceptance.
+     * @return A {@link String} representing the formatted report message for the missing faction scenario.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private static String getMissingFactionReport(boolean isContractCompletion) {
+        String contractStatus = isContractCompletion ? "completion" : "acceptance";
+        String relevantFaction = isContractCompletion ? "employer" : "enemy";
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, "factionStandings.change.report.missingFaction",
+                spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()), CLOSING_SPAN_TAG,
+                getTextAt(RESOURCE_BUNDLE, "factionStandings.change." + contractStatus),
+                getTextAt(RESOURCE_BUNDLE, "factionStandings.change." + relevantFaction));
+    }
+
+    /**
+     * Processes the penalty for refusing a batchall against a specific Clan faction.
+     *
+     * <p>This method applies a fame penalty to the given clan faction code for the specified year and generates a fame
+     * change report if applicable.</p>
+     *
+     * <p>This method is included as a shortcut to allow developers to call Batchall refusal changes without needing to
+     * worry about setting up bespoke methods any time this could occur.</p>
+     *
+     * @param clanFactionCode The code representing the clan faction being penalized.
+     * @param gameYear        The year in which the batchall was refused.
+     * @return A {@link List} of fame change report strings relating to the refusal.
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public List<String> processRefusedBatchall(String clanFactionCode, int gameYear) {
+        List<String> fameChangeReports = new ArrayList<>();
+
+        String report = changeFameForFaction(clanFactionCode, FAME_CHANGE_REFUSE_BATCHALL, gameYear);
+
+        if (!report.isBlank()) {
+            fameChangeReports.add(report);
+        }
+
+        return fameChangeReports;
+    }
 
     /**
      * Writes all faction standings as XML out to the specified {@link PrintWriter}.
@@ -523,7 +757,7 @@ public class FactionStandings {
      *
      * <p>If any parsing errors occur for individual entries, an error is logged and the process continues.</p>
      *
-     * <p></p>If the entire node cannot be parsed, an error is logged and an (empty) {@link FactionStandings} is still
+     * <p>If the entire node cannot be parsed, an error is logged and an (empty) {@link FactionStandings} is still
      * returned.</p>
      *
      * @param parentNode the XML node containing faction standings data, typically as a parent "standings" element
