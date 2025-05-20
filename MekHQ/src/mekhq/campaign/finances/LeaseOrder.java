@@ -58,6 +58,14 @@ public class LeaseOrder extends UnitOrder {
     private LeaseOrder() {
     }
 
+    /**
+     * This function is called from Campaign newDay when successfully acquiring equipment, or when using the GM function
+     * to acquire things in the Acquisition panel.
+     *
+     * @param transitDays How long it takes for the unit to arrive.
+     *
+     * @return The string for a successful find report.
+     */
     @Override
     public String find(int transitDays) {
         super.getCampaign().getQuartermaster().createLeasedUnit((megamek.common.Entity) getNewEquipment(), transitDays);

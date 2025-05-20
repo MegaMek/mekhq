@@ -463,7 +463,7 @@ public class CampaignOptions {
     private boolean payForOverhead;
     private boolean payForMaintain;
     private boolean payForTransport;
-    private boolean payForLeases;
+    private boolean trackLeases;
     private boolean sellUnits;
     private boolean sellParts;
     private boolean payForRecruitment;
@@ -1069,7 +1069,7 @@ public class CampaignOptions {
         payForOverhead = false;
         payForMaintain = false;
         payForTransport = false;
-        payForLeases = false;
+        trackLeases = false;
         sellUnits = false;
         sellParts = false;
         payForRecruitment = false;
@@ -3308,11 +3308,11 @@ public class CampaignOptions {
     }
 
     public boolean isTrackLeases() {
-        return payForLeases;
+        return trackLeases;
     }
 
-    public void setTrackLeases(final boolean payForLeases) {
-        this.payForLeases = payForLeases;
+    public void setTrackLeases(final boolean trackLeases) {
+        this.trackLeases = trackLeases;
     }
 
     public boolean isSellUnits() {
@@ -5315,7 +5315,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForOverhead", payForOverhead);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForMaintain", payForMaintain);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForTransport", payForTransport);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForLeases", payForLeases);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "trackLeases", trackLeases);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sellUnits", sellUnits);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sellParts", sellParts);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForRecruitment", payForRecruitment);
@@ -6246,8 +6246,8 @@ public class CampaignOptions {
                     retVal.payForMaintain = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (nodeName.equalsIgnoreCase("payForTransport")) {
                     retVal.payForTransport = Boolean.parseBoolean(wn2.getTextContent());
-                } else if (nodeName.equalsIgnoreCase("payForLeases")) {
-                    retVal.payForLeases = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("trackLeases")) {
+                    retVal.trackLeases = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (nodeName.equalsIgnoreCase("sellUnits")) {
                     retVal.sellUnits = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (nodeName.equalsIgnoreCase("sellParts")) {

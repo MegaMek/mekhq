@@ -591,6 +591,10 @@ public class Quartermaster {
             LOGGER.error(new NullPointerException(), "null unit passed into createLeasedUnit");
             return false;
         }
+        if (!campaign.getCampaignOptions().isTrackLeases()) {
+            LOGGER.error("attempted to call createLeasedUnit in a campaign where isTrackLeases is disabled");
+            return false;
+        }
         PartQuality quality = PartQuality.QUALITY_D;
 
         if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
@@ -636,12 +640,12 @@ public class Quartermaster {
                   unit.getName());
             return;
         }
-
-        Money lastMonthLease = unit.getUnitLease().getFinalLeaseCost(getCampaign().getLocalDate());
+        LocalDate thisDate = getCampaign().getLocalDate();
+        Money lastMonthLease = unit.getUnitLease().getFinalLeaseCost(thisDate);
 
         getCampaign().getFinances()
               .debit(TransactionType.UNIT_CANCEL_LEASE,
-                    getCampaign().getLocalDate(),
+                    thisDate,
                     lastMonthLease,
                     "Final Monthly Lease of " + unit.getName());
 
