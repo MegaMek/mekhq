@@ -36,6 +36,7 @@ import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.mission.enums.MissionStatus;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.FactionHints;
 import mekhq.campaign.universe.Factions;
@@ -102,67 +103,72 @@ public class FactionStandings {
     /**
      * Fame increase for successfully completing a contract for the employer.
      */
-    static final double FAME_CHANGE_CONTRACT_SUCCESS_EMPLOYER = 5.0;
+    static final double FAME_DELTA_CONTRACT_SUCCESS_EMPLOYER = 5.0;
 
     /**
      * Fame increase for successfully completing a contract for factions allied with the employer.
      */
-    static final double FAME_CHANGE_CONTRACT_SUCCESS_EMPLOYER_ALLY = 1.0;
+    static final double FAME_DELTA_CONTRACT_SUCCESS_EMPLOYER_ALLY = 1.0;
 
     /**
      * Fame increase for completing a 'partial success' contract for the employer.
      */
-    static final double FAME_CHANGE_CONTRACT_PARTIAL_EMPLOYER = 1.0;
+    static final double FAME_DELTA_CONTRACT_PARTIAL_EMPLOYER = 1.0;
 
     /**
      * Fame increase for completing a 'partial success' contract for factions allied with the employer.
      */
-    static final double FAME_CHANGE_CONTRACT_PARTIAL_EMPLOYER_ALLY = 0.2;
+    static final double FAME_DELTA_CONTRACT_PARTIAL_EMPLOYER_ALLY = 0.2;
 
     /**
      * Fame penalty for failing a contract for the employer.
      */
-    static final double FAME_CHANGE_CONTRACT_FAILURE_EMPLOYER = -1.0;
+    static final double FAME_DELTA_CONTRACT_FAILURE_EMPLOYER = -1.0;
 
     /**
      * Fame penalty for completing a 'partial success' contract for factions allied with the employer.
      */
-    static final double FAME_CHANGE_CONTRACT_FAILURE_EMPLOYER_ALLY = -0.2;
+    static final double FAME_DELTA_CONTRACT_FAILURE_EMPLOYER_ALLY = -0.2;
 
     /**
      * Fame penalty for breaching a contract (employer).
      */
-    static final double FAME_CHANGE_CONTRACT_BREACH_EMPLOYER = -10.0;
+    static final double FAME_DELTA_CONTRACT_BREACH_EMPLOYER = -10.0;
 
     /**
      * Fame penalty for breaching a contract (employer's allies).
      */
-    static final double FAME_CHANGE_CONTRACT_BREACH_EMPLOYER_ALLY = -2;
+    static final double FAME_DELTA_CONTRACT_BREACH_EMPLOYER_ALLY = -2;
 
     /**
      * Fame decrease when accepting a contract against a non-Clan enemy.
      */
-    static final double FAME_CHANGE_CONTRACT_ACCEPT_ENEMY_NORMAL = -5.0;
+    static final double FAME_DELTA_CONTRACT_ACCEPT_ENEMY_NORMAL = -5.0;
 
     /**
      * Fame decrease when accepting a contract against a Clan enemy.
      */
-    static final double FAME_CHANGE_CONTRACT_ACCEPT_ENEMY_CLAN = -2.5;
+    static final double FAME_DELTA_CONTRACT_ACCEPT_ENEMY_CLAN = -2.5;
 
     /**
      * Fame decrease when accepting a contract for non-Clan factions allied with the enemy.
      */
-    static final double FAME_CHANGE_CONTRACT_ACCEPT_ENEMY_ALLY_NORMAL = -1.0;
+    static final double FAME_DELTA_CONTRACT_ACCEPT_ENEMY_ALLY_NORMAL = -1.0;
 
     /**
      * Fame decrease when accepting a contract for Clan factions allied with the enemy.
      */
-    static final double FAME_CHANGE_CONTRACT_ACCEPT_ENEMY_ALLY_CLAN = -0.2;
+    static final double FAME_DELTA_CONTRACT_ACCEPT_ENEMY_ALLY_CLAN = -0.2;
 
     /**
      * Fame penalty for refusing a batchall.
      */
-    static final double FAME_CHANGE_REFUSE_BATCHALL = -5;
+    static final double FAME_DELTA_REFUSE_BATCHALL = -5;
+
+    /**
+     * Fame penalty for refusing a batchall.
+     */
+    static final double FAME_DELTA_EXECUTING_PRISONER = -0.1;
 
     /**
      * A mapping of faction names to their respective standing levels.
@@ -217,7 +223,7 @@ public class FactionStandings {
      * @author Illiani
      * @since 0.50.07
      */
-    public List<String> initializeStartingFameValues(Faction campaignFaction, LocalDate today) {
+    public List<String> initializeStartingFameValues(final Faction campaignFaction, final LocalDate today) {
         List<String> fameChangeReports = new ArrayList<>();
 
         int gameYear = today.getYear();
@@ -397,7 +403,8 @@ public class FactionStandings {
      * @author Illiani
      * @since 0.50.07
      */
-    private String getFameChangedReport(double delta, int gameYear, String factionCode, double newFame, double originalFame) {
+    private String getFameChangedReport(final double delta, final int gameYear, final String factionCode, final double newFame,
+                                        final double originalFame) {
         Faction relevantFaction = Factions.getInstance().getFaction(factionCode);
         FactionStandingLevel originalMilestone = FactionStandingUtilities.calculateFactionStandingLevel(originalFame);
         FactionStandingLevel newMilestone = FactionStandingUtilities.calculateFactionStandingLevel(newFame);
@@ -495,7 +502,7 @@ public class FactionStandings {
      * @author Illiani
      * @since 0.50.07
      */
-    public List<String> processFameDegradation(int gameYear) {
+    public List<String> processFameDegradation(final int gameYear) {
         List<String> fameChangeReports = new ArrayList<>();
         LOGGER.info("Processing fame decay for {} factions.", factionStandings.size());
         for (String factionCode : new HashSet<>(factionStandings.keySet())) {
@@ -541,7 +548,7 @@ public class FactionStandings {
      * @author Illiani
      * @since 0.50.07
      */
-    public List<String> processContractAccept(@Nullable Faction enemyFaction, LocalDate today) {
+    public List<String> processContractAccept(@Nullable final Faction enemyFaction, final LocalDate today) {
         // If we're missing the relevant faction, alert the player and abort
         if (enemyFaction == null) {
             String report = getMissingFactionReport(false);
@@ -566,10 +573,10 @@ public class FactionStandings {
             String otherFactionCode = otherFaction.getShortName();
             if (otherFaction.equals(enemyFaction)) {
                 if (otherFaction.isClan()) {
-                    fameDelta = FAME_CHANGE_CONTRACT_ACCEPT_ENEMY_CLAN;
+                    fameDelta = FAME_DELTA_CONTRACT_ACCEPT_ENEMY_CLAN;
                 } else {
 
-                    fameDelta = FAME_CHANGE_CONTRACT_ACCEPT_ENEMY_NORMAL;
+                    fameDelta = FAME_DELTA_CONTRACT_ACCEPT_ENEMY_NORMAL;
                 }
 
                 report = changeFameForFaction(otherFactionCode, fameDelta, gameYear);
@@ -581,10 +588,10 @@ public class FactionStandings {
 
             if (factionHints.isAlliedWith(enemyFaction, otherFaction, today)) {
                 if (otherFaction.isClan()) {
-                    fameDelta = FAME_CHANGE_CONTRACT_ACCEPT_ENEMY_ALLY_CLAN;
+                    fameDelta = FAME_DELTA_CONTRACT_ACCEPT_ENEMY_ALLY_CLAN;
                 } else {
 
-                    fameDelta = FAME_CHANGE_CONTRACT_ACCEPT_ENEMY_ALLY_NORMAL;
+                    fameDelta = FAME_DELTA_CONTRACT_ACCEPT_ENEMY_ALLY_NORMAL;
                 }
 
                 report = changeFameForFaction(otherFactionCode, fameDelta, gameYear);
@@ -616,7 +623,8 @@ public class FactionStandings {
      * @author Illiani
      * @since 0.50.07
      */
-    public List<String> processContractCompletion(@Nullable Faction employerFaction, LocalDate today, MissionStatus missionStatus) {
+    public List<String> processContractCompletion(@Nullable final Faction employerFaction, final LocalDate today,
+                                                  final MissionStatus missionStatus) {
         // If the mission is still active, there is nothing to process, so abort
         if (missionStatus == MissionStatus.ACTIVE) {
             return new ArrayList<>();
@@ -633,20 +641,20 @@ public class FactionStandings {
         double fameDeltaEmployerAlly = 0.0;
         switch (missionStatus) {
             case SUCCESS -> {
-                fameDeltaEmployer = FAME_CHANGE_CONTRACT_SUCCESS_EMPLOYER;
-                fameDeltaEmployerAlly = FAME_CHANGE_CONTRACT_SUCCESS_EMPLOYER_ALLY;
+                fameDeltaEmployer = FAME_DELTA_CONTRACT_SUCCESS_EMPLOYER;
+                fameDeltaEmployerAlly = FAME_DELTA_CONTRACT_SUCCESS_EMPLOYER_ALLY;
             }
             case PARTIAL -> {
-                fameDeltaEmployer = FAME_CHANGE_CONTRACT_PARTIAL_EMPLOYER;
-                fameDeltaEmployerAlly = FAME_CHANGE_CONTRACT_PARTIAL_EMPLOYER_ALLY;
+                fameDeltaEmployer = FAME_DELTA_CONTRACT_PARTIAL_EMPLOYER;
+                fameDeltaEmployerAlly = FAME_DELTA_CONTRACT_PARTIAL_EMPLOYER_ALLY;
             }
             case FAILED -> {
-                fameDeltaEmployer = FAME_CHANGE_CONTRACT_FAILURE_EMPLOYER;
-                fameDeltaEmployerAlly = FAME_CHANGE_CONTRACT_FAILURE_EMPLOYER_ALLY;
+                fameDeltaEmployer = FAME_DELTA_CONTRACT_FAILURE_EMPLOYER;
+                fameDeltaEmployerAlly = FAME_DELTA_CONTRACT_FAILURE_EMPLOYER_ALLY;
             }
             case BREACH -> {
-                fameDeltaEmployer = FAME_CHANGE_CONTRACT_BREACH_EMPLOYER;
-                fameDeltaEmployerAlly = FAME_CHANGE_CONTRACT_BREACH_EMPLOYER_ALLY;
+                fameDeltaEmployer = FAME_DELTA_CONTRACT_BREACH_EMPLOYER;
+                fameDeltaEmployerAlly = FAME_DELTA_CONTRACT_BREACH_EMPLOYER_ALLY;
             }
         }
 
@@ -699,7 +707,7 @@ public class FactionStandings {
      * @author Illiani
      * @since 0.50.07
      */
-    private static String getMissingFactionReport(boolean isContractCompletion) {
+    private static String getMissingFactionReport(final boolean isContractCompletion) {
         String contractStatus = isContractCompletion ? "completion" : "acceptance";
         String relevantFaction = isContractCompletion ? "employer" : "enemy";
 
@@ -724,13 +732,51 @@ public class FactionStandings {
      * @author Illiani
      * @since 0.50.07
      */
-    public List<String> processRefusedBatchall(String clanFactionCode, int gameYear) {
+    public List<String> processRefusedBatchall(final String clanFactionCode, final int gameYear) {
         List<String> fameChangeReports = new ArrayList<>();
 
-        String report = changeFameForFaction(clanFactionCode, FAME_CHANGE_REFUSE_BATCHALL, gameYear);
+        String report = changeFameForFaction(clanFactionCode, FAME_DELTA_REFUSE_BATCHALL, gameYear);
 
         if (!report.isBlank()) {
             fameChangeReports.add(report);
+        }
+
+        return fameChangeReports;
+    }
+
+    /**
+     * Applies fame changes when the player executes prisoners of war.
+     *
+     * <p>For each victim in the specified list, the method identifies their origin faction and increments a fame penalty
+     * for that faction, unless the faction is untracked. If multiple prisoners originate from the same faction, their
+     * penalties are accumulated.</p>
+     *
+     * <p>After processing all victims, the method applies the total fame change for each affected faction for the
+     * specified game year, and collects any resulting fame change reports.</p>
+     *
+     * @param victims  the list of {@link Person} prisoners executed by the player
+     * @param gameYear the year in which the executions and fame changes occur
+     * @return a {@link List} of non-blank fame change report strings for each affected faction
+     */
+    public List<String> executePrisonersOfWar(final List<Person> victims, final int gameYear) {
+        Map<String, Double> affectedFactions = new HashMap<>();
+
+        for (Person victim : victims) {
+            Faction originFaction = victim.getOriginFaction();
+            if (isUntrackedFaction(originFaction)) {
+                continue;
+            }
+
+            String factionCode = originFaction.getShortName();
+            affectedFactions.merge(factionCode, FAME_DELTA_EXECUTING_PRISONER, Double::sum);
+        }
+
+        List<String> fameChangeReports = new ArrayList<>();
+        for (Map.Entry<String, Double> entry : affectedFactions.entrySet()) {
+            String report = changeFameForFaction(entry.getKey(), entry.getValue(), gameYear);
+            if (!report.isBlank()) {
+                fameChangeReports.add(report);
+            }
         }
 
         return fameChangeReports;

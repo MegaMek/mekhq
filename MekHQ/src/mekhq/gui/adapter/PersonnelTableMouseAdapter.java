@@ -151,6 +151,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.PersonnelTab;
 import mekhq.gui.control.EditLogControl.LogType;
@@ -1882,6 +1883,18 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         }
 
         if (isExecution) {
+            if (getCampaign().getCampaignOptions().isTrackFactionStanding()) {
+                FactionStandings factionStandings = getCampaign().getFactionStandings();
+
+                List<Person> listOfPrisoners = Arrays.asList(prisoners);
+                List<String> reports = factionStandings.executePrisonersOfWar(listOfPrisoners,
+                      getCampaign().getGameYear());
+
+                for (String report : reports) {
+                    getCampaign().addReport(report);
+                }
+            }
+
             processAdHocExecution(getCampaign(), prisoners.length);
         }
     }

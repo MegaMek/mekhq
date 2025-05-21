@@ -5062,7 +5062,12 @@ public class Campaign implements ITechManager {
                             contract.setBatchallAccepted(false);
 
                             if (campaignOptions.isTrackFactionStanding()) {
-                                factionStandings.processRefusedBatchall(factionCode, currentDay.getYear());
+                                List<String> reports = factionStandings.processRefusedBatchall(factionCode,
+                                      currentDay.getYear());
+
+                                for (String report : reports) {
+                                    addReport(report);
+                                }
                             }
                         }
                     }
