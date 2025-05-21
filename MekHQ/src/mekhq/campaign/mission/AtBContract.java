@@ -469,9 +469,7 @@ public class AtBContract extends Contract {
             caclulatedForceSize = 1;
         }
 
-        int baseRequiredLances = effectiveNumUnits / caclulatedForceSize;
-
-        return max(baseRequiredLances, 1);
+        return max(caclulatedForceSize, 1);
     }
 
     /**
