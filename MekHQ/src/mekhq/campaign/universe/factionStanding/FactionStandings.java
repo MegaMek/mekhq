@@ -32,6 +32,21 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
+import static megamek.codeUtilities.MathUtility.clamp;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
+
+import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+
 import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
@@ -45,16 +60,6 @@ import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.time.LocalDate;
-import java.util.*;
-
-import static megamek.codeUtilities.MathUtility.clamp;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
-import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
-import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 /**
  * Stores and manages the standing values between factions in the Faction Standings system.
@@ -74,12 +79,12 @@ public class FactionStandings {
     /**
      * This value defines the upper limit of fame a campaign can achieve with a faction.
      */
-    static final double MAXIMUM_FAME = 120.0;
+    static final double MAXIMUM_FAME = 60.0;
 
     /**
      * A constant representing the minimum fame a campaign can have with a faction.
      */
-    static final double MINIMUM_FAME = -120.0;
+    static final double MINIMUM_FAME = -60.0;
 
     /**
      * The base fame value for all factions.
