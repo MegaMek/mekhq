@@ -266,7 +266,9 @@ public class FactionStandingReport extends JDialog {
 
         // Fame slider
         int roundedFame = (int) Math.round(factionFame); // JSlider doesn't accept doubles, so we round.
-        JSlider sldFame = new JSlider(-120, 120, roundedFame);
+        int minimumFame = (int) Math.floor(FactionStandings.getMinimumFame());
+        int maximumFame = (int) Math.ceil(FactionStandings.getMaximumFame());
+        JSlider sldFame = new JSlider(minimumFame, maximumFame, roundedFame);
         sldFame.setEnabled(false);
         sldFame.setMaximumSize(new Dimension(Integer.MAX_VALUE, lblFactionImage.getPreferredSize().height));
         sldFame.setAlignmentX(JSlider.CENTER_ALIGNMENT);
