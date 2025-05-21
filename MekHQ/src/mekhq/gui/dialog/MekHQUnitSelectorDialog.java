@@ -155,6 +155,8 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
             buttonClose = new JButton(Messages.getString("Close"));
             buttonClose.setName("buttonClose");
             buttonClose.addActionListener(this);
+            buttonClose.setEnabled(true);
+            panelButtons.add(buttonClose, new GridBagConstraints());
         } else {
             // This branch is for adding units where they will not be going to the hanger.
             buttonSelect.setText(Messages.getString("MekSelectorDialog.Add"));
@@ -171,9 +173,9 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
                 selectedUnit = null;
                 setVisible(false);
             });
+            buttonClose.setEnabled(true);
+            panelButtons.add(buttonClose, new GridBagConstraints());
         }
-        buttonClose.setEnabled(true);
-        panelButtons.add(buttonClose, new GridBagConstraints());
 
         // This displays the BV of the selected unit.
         buttonShowBV.setText(Messages.getString("MekSelectorDialog.BV"));
@@ -205,7 +207,6 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
                     reason = MHQInternationalization.getTextAt(resources.getBaseBundleName(),
                           "mekSelectorDialog.unsupported.droneOs");
                 }
-
                 campaign.addReport(String.format(reason,
                       spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                       CLOSING_SPAN_TAG));
@@ -225,6 +226,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         if (isBadSelection()) {
             return;
         }
+        Entity entity = selectedUnit.getEntity();
         campaign.getShoppingList().addShoppingItem(selectedUnit, 1, campaign);
     }
 
