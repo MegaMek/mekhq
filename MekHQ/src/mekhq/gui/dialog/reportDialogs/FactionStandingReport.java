@@ -1,10 +1,12 @@
 package mekhq.gui.dialog.reportDialogs;
 
+import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.MouseAdapter;
@@ -64,7 +66,10 @@ public class FactionStandingReport extends JDialog {
     private final Factions factions;
     private final boolean isGM;
 
-    private JPanel pnlReport;
+    private final List<String> innerSphereFactions = new ArrayList<>();
+    private final List<String> clanFactions = new ArrayList<>();
+    private final List<String> peripheryFactions = new ArrayList<>();
+    private final List<String> deadFactions = new ArrayList<>();
 
     /**
      * Constructs a new {@code FactionStandingReport} dialog.
@@ -85,6 +90,7 @@ public class FactionStandingReport extends JDialog {
         this.factionStandings = factionStandings;
         factions = Factions.getInstance();
 
+        sortFactions();
         createReportPanel();
         initializeDialogParameters();
     }
@@ -112,22 +118,69 @@ public class FactionStandingReport extends JDialog {
      * @author Illiani
      * @since 0.50.07
      */
+    private JPanel createReportPanelForFactionGroup(List<String> factions) {
+        if (factions.isEmpty()) {
+            return new JPanel();
+        }
+
+        JPanel pnlFactionReport = new JPanel();
+        pnlFactionReport.setName("factionReportPanel" + factions);
+        pnlFactionReport.setLayout(new BoxLayout(pnlFactionReport, BoxLayout.Y_AXIS));
+
+        JPanel groupPanel = new JPanel(new WrapLayout(WrapLayout.LEFT, PADDING, PADDING));
+        groupPanel.setName("factionReportGroupPanel" + factions);
+        for (String faction : factions) {
+            JPanel factionPanel = createFactionPanel(faction);
+            groupPanel.add(factionPanel);
+        }
+        JScrollPane groupScrollPane = new JScrollPaneWithSpeed(groupPanel,
+              JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+              JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        groupScrollPane.setName("factionReportGroupScrollPane" + factions);
+        groupScrollPane.setBorder(RoundedLineBorder.createRoundedLineBorder());
+
+        pnlFactionReport.add(groupScrollPane);
+
+        return pnlFactionReport;
+    }
+
     private void createReportPanel() {
-        pnlReport = new JPanel();
-        pnlReport.setLayout(new BoxLayout(pnlReport, BoxLayout.Y_AXIS));
+        // Create the tabbed pane
+        String innerSphereTabTitle = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.tab.innerSphere");
+        String clanTabTitle = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.tab.clan");
+        String peripheryTabTitle = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.tab.periphery");
+        String deadTabTitle = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.tab.dead");
 
-        JScrollPane allFactionStandingsPanels = createFactionStandingsPanel();
-        pnlReport.add(allFactionStandingsPanels);
+        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane.setName("tabbedPane");
+        tabbedPane.addTab(innerSphereTabTitle, createReportPanelForFactionGroup(innerSphereFactions));
+        tabbedPane.addTab(clanTabTitle, createReportPanelForFactionGroup(clanFactions));
+        tabbedPane.addTab(peripheryTabTitle, createReportPanelForFactionGroup(peripheryFactions));
+        tabbedPane.addTab(deadTabTitle, createReportPanelForFactionGroup(deadFactions));
+        setFontScaling(tabbedPane, true, 1.5);
 
+        // If a tab only contains an empty Container, disable it. This will occur if the relevant faction list is empty.
+        for (int i = 0; i < tabbedPane.getTabCount(); i++) {
+            Component component = tabbedPane.getComponentAt(i);
+            boolean isEmpty = (component instanceof Container) && ((Container) component).getComponentCount() == 0;
+            tabbedPane.setEnabledAt(i, !isEmpty);
+        }
+
+        // Create effects and buttons panels
         JPanel pnlEffects = createEffectsPanel();
         pnlEffects.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
-        pnlReport.add(pnlEffects);
 
         JPanel pnlButtons = createButtonsPanel();
         pnlButtons.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
+
+        // Main report panel with vertical stacking
+        JPanel pnlReport = new JPanel();
+        pnlReport.setLayout(new BoxLayout(pnlReport, BoxLayout.Y_AXIS));
+        pnlReport.add(tabbedPane);
+        pnlReport.add(pnlEffects);
         pnlReport.add(pnlButtons);
 
-        add(pnlReport);
+        setContentPane(pnlReport);
     }
 
     /**
@@ -140,15 +193,16 @@ public class FactionStandingReport extends JDialog {
      */
     private JPanel createEffectsPanel() {
         JPanel pnlEffects = new JPanel(new BorderLayout());
+        pnlEffects.setName("pnlFactionStandingEffects");
 
         JTextArea lblStandingEffects = new JTextArea();
+        lblStandingEffects.setName(EFFECTS_PANEL_LABEL_NAME);
         lblStandingEffects.setEditable(false);
         lblStandingEffects.setWrapStyleWord(true);
         lblStandingEffects.setLineWrap(true);
         lblStandingEffects.setOpaque(false);
         lblStandingEffects.setBorder(null);
         lblStandingEffects.setFocusable(false);
-        lblStandingEffects.setName(EFFECTS_PANEL_LABEL_NAME);
         lblStandingEffects.setText("");
         lblStandingEffects.setMaximumSize(new Dimension(Integer.MAX_VALUE, UIUtil.scaleForGUI(30)));
 
@@ -168,10 +222,12 @@ public class FactionStandingReport extends JDialog {
      */
     private JPanel createButtonsPanel() {
         JPanel pnlButtons = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        pnlButtons.setName("pnlButtons");
         pnlButtons.setMaximumSize(new Dimension(Integer.MAX_VALUE, UIUtil.scaleForGUI(30)));
 
         JButton btnDocumentation = new JButton(getTextAt(RESOURCE_BUNDLE,
               "factionStandingReport.button.documentation"));
+        btnDocumentation.setName("btnDocumentation");
         btnDocumentation.addActionListener(e -> new GlossaryDialog(this, "FACTION_STANDING"));
         btnDocumentation.setFocusable(false);
         btnDocumentation.setBorder(RoundedLineBorder.createRoundedLineBorder());
@@ -180,6 +236,7 @@ public class FactionStandingReport extends JDialog {
         pnlButtons.add(Box.createHorizontalStrut(UIUtil.scaleForGUI(50)));
 
         JButton btnGmTools = new JButton(getTextAt(RESOURCE_BUNDLE, "factionStandingReport.button.gmTools"));
+        btnGmTools.setName("btnGmTools");
         btnGmTools.setFocusable(false);
         btnGmTools.setBorder(RoundedLineBorder.createRoundedLineBorder());
         btnGmTools.setEnabled(isGM);
@@ -191,34 +248,28 @@ public class FactionStandingReport extends JDialog {
         return pnlButtons;
     }
 
-    /**
-     * Constructs the main scrollable panel which displays all faction standings and each faction's details using
-     * a wrapped layout.
-     *
-     * @return a {@link JScrollPane} containing all faction standings panels
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    private JScrollPane createFactionStandingsPanel() {
-        JPanel pnlFactionStandingsReport = new JPanel(new WrapLayout(WrapLayout.LEFT, PADDING, PADDING));
-
-        JScrollPane allFactionStandingsPanels = new JScrollPaneWithSpeed(pnlFactionStandingsReport,
-              JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-              JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        allFactionStandingsPanels.setBorder(RoundedLineBorder.createRoundedLineBorder());
-
-        // Sort alphabetically
+    private void sortFactions() {
         Set<String> allFactionStandingsSet = factionStandings.getAllFactionStandings().keySet();
         List<String> sortedFactionStandings = new ArrayList<>(allFactionStandingsSet);
         Collections.sort(sortedFactionStandings);
 
         for (String factionCode : sortedFactionStandings) {
-            JPanel pnlFactionStanding = createFactionPanel(factionCode);
-            pnlFactionStandingsReport.add(pnlFactionStanding);
-        }
+            Faction faction = factions.getFaction(factionCode);
+            if (faction == null) {
+                LOGGER.error(new NullPointerException(), "Failed to find faction with code: {}", factionCode);
+                continue;
+            }
 
-        return allFactionStandingsPanels;
+            if (!faction.validIn(gameYear)) {
+                deadFactions.add(factionCode);
+            } else if (faction.isClan()) {
+                clanFactions.add(factionCode);
+            } else if (faction.isPeriphery()) {
+                peripheryFactions.add(factionCode);
+            } else {
+                innerSphereFactions.add(factionCode);
+            }
+        }
     }
 
     /**
@@ -230,11 +281,14 @@ public class FactionStandingReport extends JDialog {
      * @author Illiani
      * @since 0.50.07
      */
-    private JPanel createFactionPanel(String factionCode) {
-        Faction faction = factions.getFaction(factionCode);
+    private JPanel createFactionPanel(final String factionCode) {
+        final Faction faction = factions.getFaction(factionCode);
         if (faction == null) {
-            LOGGER.error(new NullPointerException(), "Failed to find faction with code: {}", factionCode);
-            return new JPanel();
+            LOGGER.error(new NullPointerException(),
+                  "Failed to find faction with code: {} - skipping faction panel",
+                  factionCode);
+            JPanel lblEmptyPanelFromNullFaction = new JPanel();
+            lblEmptyPanelFromNullFaction.setName("lblEmptyPanelFromNullFaction" + factionCode);
         }
 
         final double factionFame = factionStandings.getFameForFaction(factionCode);
@@ -242,6 +296,7 @@ public class FactionStandingReport extends JDialog {
 
         // Parent panel
         JPanel pnlFactionStanding = new JPanel();
+        pnlFactionStanding.setName("pnlFactionStanding" + factionCode);
         pnlFactionStanding.setLayout(new BoxLayout(pnlFactionStanding, BoxLayout.Y_AXIS));
         pnlFactionStanding.setBorder(createStandingColoredRoundedTitledBorder(factionStanding.getStandingLevel()));
         pnlFactionStanding.setPreferredSize(UIUtil.scaleForGUI(500, 250));
@@ -252,6 +307,7 @@ public class FactionStandingReport extends JDialog {
         ImageIcon icon = Factions.getFactionLogo(gameYear, factionCode);
         icon = ImageUtilities.scaleImageIcon(icon, UIUtil.scaleForGUI(100), true);
         JLabel lblFactionImage = new JLabel(icon);
+        lblFactionImage.setName("lblFactionImage" + factionCode);
         lblFactionImage.setMaximumSize(new Dimension(Integer.MAX_VALUE, lblFactionImage.getPreferredSize().height));
         lblFactionImage.setAlignmentX(JLabel.CENTER_ALIGNMENT);
         pnlFactionStanding.add(lblFactionImage);
@@ -259,16 +315,18 @@ public class FactionStandingReport extends JDialog {
         // Faction Descriptions
         String factionDescription = getDescriptionForFaction(faction, factionFame);
         JLabel lblDetails = new JLabel(factionDescription);
+        lblDetails.setName("lblFactionDetails" + factionCode);
         lblDetails.setMaximumSize(new Dimension(Integer.MAX_VALUE, lblDetails.getPreferredSize().height));
         lblDetails.setAlignmentX(CENTER_ALIGNMENT);
         lblDetails.setHorizontalAlignment(SwingConstants.CENTER);
         pnlFactionStanding.add(lblDetails);
 
-        // Fame slider
+        // Fame Slider
         int roundedFame = (int) Math.round(factionFame); // JSlider doesn't accept doubles, so we round.
         int minimumFame = (int) Math.floor(FactionStandings.getMinimumFame());
         int maximumFame = (int) Math.ceil(FactionStandings.getMaximumFame());
         JSlider sldFame = new JSlider(minimumFame, maximumFame, roundedFame);
+        sldFame.setName("sldFactionFame" + factionCode);
         sldFame.setEnabled(false);
         sldFame.setMaximumSize(new Dimension(Integer.MAX_VALUE, lblFactionImage.getPreferredSize().height));
         sldFame.setAlignmentX(JSlider.CENTER_ALIGNMENT);
@@ -291,39 +349,35 @@ public class FactionStandingReport extends JDialog {
         return factionStanding.getEffectsDescription();
     }
 
-    /**
-     * Returns a {@link MouseAdapter} that updates the effects panel with the provided replacement text when the mouse
-     * enters a faction standing panel.
-     *
-     * @param replacementText the text to display in the effects panel
-     *
-     * @return a {@link MouseAdapter} used for mouse event handling
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
     public MouseAdapter createEffectsPanelUpdater(String replacementText) {
-        if (replacementText == null) {
-            replacementText = "";
-        }
-        final String effectsText = replacementText;
+        final String effectsText = replacementText == null ? "" : replacementText;
         return new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent mouseEvent) {
-                for (Component component : pnlReport.getComponents()) {
-                    if (component instanceof JPanel panel) {
-                        for (Component componentInPanel : panel.getComponents()) {
-                            if (componentInPanel instanceof JTextArea textArea) {
-                                String labelName = textArea.getName();
-                                if (labelName != null && labelName.contains(EFFECTS_PANEL_LABEL_NAME)) {
-                                    textArea.setText(effectsText);
-                                }
-                            }
-                        }
-                    }
+                JTextArea effectsArea = findComponentByName(getContentPane(),
+                      EFFECTS_PANEL_LABEL_NAME,
+                      JTextArea.class);
+                if (effectsArea != null) {
+                    LOGGER.debug("Updating effects panel with text: {}", effectsText);
+                    effectsArea.setText(effectsText);
                 }
             }
         };
+    }
+
+    private <T extends Component> T findComponentByName(Container container, String name, Class<T> type) {
+        for (Component component : container.getComponents()) {
+            if (type.isInstance(component) && name.equals(component.getName())) {
+                return type.cast(component);
+            }
+            if (component instanceof Container child) {
+                T found = findComponentByName(child, name, type);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
     }
 
     /**
