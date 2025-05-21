@@ -786,7 +786,7 @@ public class FactionStandings {
      * Writes all faction standings as XML out to the specified {@link PrintWriter}.
      *
      * <p>The output includes each faction code and its current fame value as a separate tag, indented for
-     * readability within a parent <standings> element.</p>
+     * readability within a parent {@code standings} element.</p>
      *
      * <p>This is primarily used for saving campaign data.</p>
      *
@@ -809,7 +809,7 @@ public class FactionStandings {
      *
      * <p>This method reads child elements of the provided XML node, looking for a "standings" element.</p>
      *
-     * <p></p>For each faction code found as a subelement, it extracts the faction's fame value from the element's text
+     * <p>For each faction code found as a subelement, it extracts the faction's fame value from the element's text
      * content. Parsed standing values are collected into a map, and then applied to a new {@link FactionStandings}
      * instance.</p>
      *
