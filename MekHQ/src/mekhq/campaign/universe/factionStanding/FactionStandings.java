@@ -218,7 +218,7 @@ public class FactionStandings {
      * @author Illiani
      * @since 0.50.07
      */
-    public double getMaximumFame() {
+    public static double getMaximumFame() {
         return MAXIMUM_FAME;
     }
 
@@ -228,7 +228,7 @@ public class FactionStandings {
      * @author Illiani
      * @since 0.50.07
      */
-    public double getMinimumFame() {
+    public static double getMinimumFame() {
         return MINIMUM_FAME;
     }
 
