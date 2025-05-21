@@ -271,6 +271,10 @@ public class FactionStandings {
 
         String report;
         for (Faction otherFaction : allFactions) {
+            if (!otherFaction.validIn(gameYear)) {
+                continue;
+            }
+
             String otherFactionCode = otherFaction.getShortName();
 
             if (isUntrackedFaction(otherFactionCode)) {
@@ -333,12 +337,11 @@ public class FactionStandings {
     public static boolean isUntrackedFaction(final String factionCode) {
         final List<String> untrackedFactionTags = Arrays.asList("MERC",
               "PIR",
-              "RON",
+              "RON", "REB",
               "IND",
               "ABN",
               "UND",
-              "NONE",
-              "DIS");
+              "NONE", "DIS");
 
         return untrackedFactionTags.contains(factionCode);
     }
@@ -561,6 +564,16 @@ public class FactionStandings {
         List<String> fameChangeReports = new ArrayList<>();
         LOGGER.info("Processing fame decay for {} factions.", factionStandings.size());
         for (String factionCode : new HashSet<>(factionStandings.keySet())) {
+            Faction faction = Factions.getInstance().getFaction(factionCode);
+            if (faction == null) {
+                LOGGER.info("Faction {} is missing from the Factions collection. Skipping.", factionCode);
+                continue;
+            }
+
+            if (isNotValidForTracking(faction, gameYear, factionCode)) {
+                continue;
+            }
+
             double currentFame = factionStandings.get(factionCode);
 
             if (currentFame != DEFAULT_FAME) {
@@ -621,6 +634,10 @@ public class FactionStandings {
         String report;
         double fameDelta;
         for (Faction otherFaction : allFactions) {
+            if (!otherFaction.validIn(gameYear)) {
+                continue;
+            }
+
             String otherFactionCode = otherFaction.getShortName();
 
             if (isUntrackedFaction(otherFactionCode)) {
@@ -730,9 +747,10 @@ public class FactionStandings {
         for (Faction otherFaction : allFactions) {
             String otherFactionCode = otherFaction.getShortName();
 
-            if (isUntrackedFaction(otherFactionCode)) {
+            if (isNotValidForTracking(otherFaction, gameYear, otherFactionCode)) {
                 continue;
             }
+
             if (otherFaction.equals(employerFaction)) {
                 report = changeFameForFaction(otherFactionCode, fameDeltaEmployer, gameYear);
                 if (!report.isBlank()) {
@@ -750,6 +768,14 @@ public class FactionStandings {
         }
 
         return fameChangeReports;
+    }
+
+    private boolean isNotValidForTracking(Faction otherFaction, int gameYear, String otherFactionCode) {
+        if (!otherFaction.validIn(gameYear)) {
+            return true;
+        }
+
+        return isUntrackedFaction(otherFactionCode);
     }
 
     /**
