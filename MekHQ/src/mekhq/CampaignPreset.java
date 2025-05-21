@@ -56,6 +56,7 @@ import java.util.stream.Collectors;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import megamek.SuiteConstants;
 import megamek.Version;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.GameOptions;
@@ -96,6 +97,8 @@ public class CampaignPreset {
     /**
      * Represents the last version we accept presets from. Normally, this will just be the last milestone. Sometimes,
      * however, major changes can require us to manually assign a specific version.
+     *
+     * @see SuiteConstants#LAST_MILESTONE
      */
     private static final Version LAST_COMPATIBLE_VERSION = LAST_MILESTONE;
 
