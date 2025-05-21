@@ -58,15 +58,15 @@ import mekhq.campaign.universe.Faction;
  * @since 0.50.07
  */
 public enum FactionStandingLevel {
-    STANDING_LEVEL_0(0, Integer.MIN_VALUE, -100, -4, 0.0, false, true, false, 0, -2, 3.0, -3, 0.6, -2, -4),
-    STANDING_LEVEL_1(1, -100, -80, -3, 0.25, false, true, false, 0, -1, 2.0, -2, 0.7, -1, -3),
-    STANDING_LEVEL_2(2, -80, -50, -2, 0.5, false, false, true, 1, 0, 1.75, -1, 0.8, -1, -2),
-    STANDING_LEVEL_3(3, -50, -20, -1, 0.75, false, false, true, 2, 0, 1.5, 0, 0.9, 0, -1),
-    STANDING_LEVEL_4(4, -20, 20, 0, 1.0, false, false, true, 3, 0, 1.0, 0, 1.0, 0, 0),
-    STANDING_LEVEL_5(5, 20, 50, 1, 1.9, false, false, true, 4, 0, 1.0, 0, 1.05, 0, 1),
-    STANDING_LEVEL_6(6, 50, 80, 2, 1.5, false, false, true, 5, 0, 0.85, 1, 1.1, 1, 1),
-    STANDING_LEVEL_7(7, 80, 100, 3, 1.75, true, false, true, 10, 1, 0.80, 2, 1.15, 1, 2),
-    STANDING_LEVEL_8(8, 100, Integer.MAX_VALUE, 4, 2.0, true, false, true, 15, 2, 0.75, 3, 1.2, 2, 3);
+    STANDING_LEVEL_0(0, Integer.MIN_VALUE, -50, -4, 0.0, false, true, false, 0, -2, 3.0, -3, 0.6, -2, -4),
+    STANDING_LEVEL_1(1, -50, -40, -3, 0.25, false, true, false, 0, -1, 2.0, -2, 0.7, -1, -3),
+    STANDING_LEVEL_2(2, -40, -25, -2, 0.5, false, false, true, 1, 0, 1.75, -1, 0.8, -1, -2),
+    STANDING_LEVEL_3(3, -25, -10, -1, 0.75, false, false, true, 2, 0, 1.5, 0, 0.9, 0, -1),
+    STANDING_LEVEL_4(4, -10, 10, 0, 1.0, false, false, true, 3, 0, 1.0, 0, 1.0, 0, 0),
+    STANDING_LEVEL_5(5, 10, 25, 1, 1.9, false, false, true, 4, 0, 1.0, 0, 1.05, 0, 1),
+    STANDING_LEVEL_6(6, 25, 40, 2, 1.5, false, false, true, 5, 0, 0.85, 1, 1.1, 1, 1),
+    STANDING_LEVEL_7(7, 40, 50, 3, 1.75, true, false, true, 10, 1, 0.80, 2, 1.15, 1, 2),
+    STANDING_LEVEL_8(8, 50, Integer.MAX_VALUE, 4, 2.0, true, false, true, 15, 2, 0.75, 3, 1.2, 2, 3);
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionStandings";
     private static final MMLogger LOGGER = MMLogger.create(FactionStandingLevel.class);
