@@ -41,6 +41,7 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -266,14 +267,16 @@ public class FactionStandings {
 
         Collection<Faction> allFactions = Factions.getInstance().getFactions();
         FactionHints factionHints = FactionHints.defaultFactionHints();
+        boolean isPirate = campaignFaction.isPirate();
 
         String report;
         for (Faction otherFaction : allFactions) {
-            if (isUntrackedFaction(otherFaction)) {
+            String otherFactionCode = otherFaction.getShortName();
+
+            if (isUntrackedFaction(otherFactionCode)) {
                 continue;
             }
 
-            String otherFactionCode = otherFaction.getShortName();
             if (otherFaction.equals(campaignFaction)) {
                 report = changeFameForFaction(otherFactionCode, STARTING_FAME_SAME_FACTION, gameYear);
                 if (!report.isBlank()) {
@@ -282,7 +285,8 @@ public class FactionStandings {
                 continue;
             }
 
-            if (factionHints.isAlliedWith(campaignFaction, otherFaction, today)) {
+            if ((isPirate && otherFaction.isPirate()) ||
+                      factionHints.isAlliedWith(campaignFaction, otherFaction, today)) {
                 report = changeFameForFaction(otherFactionCode, STARTING_FAME_ALLIED_FACTION, gameYear);
                 if (!report.isBlank()) {
                     fameChangeReports.add(report);
@@ -290,10 +294,12 @@ public class FactionStandings {
                 }
             }
 
-            if (factionHints.isAtWarWith(campaignFaction, otherFaction, today)) {
+            if ((isPirate && !otherFaction.isPirate()) ||
+                      factionHints.isAtWarWith(campaignFaction, otherFaction, today)) {
                 report = changeFameForFaction(otherFactionCode, STARTING_FAME_ENEMY_FACTION_AT_WAR, gameYear);
                 if (!report.isBlank()) {
                     fameChangeReports.add(report);
+                    continue;
                 }
             }
 
@@ -301,6 +307,7 @@ public class FactionStandings {
                 report = changeFameForFaction(otherFactionCode, STARTING_FAME_ENEMY_FACTION_RIVAL, gameYear);
                 if (!report.isBlank()) {
                     fameChangeReports.add(report);
+                    continue;
                 }
             }
         }
@@ -311,18 +318,29 @@ public class FactionStandings {
     /**
      * Determines if the specified faction is considered "untracked."
      *
-     * <p>A faction is untracked if it is classified as a mercenary, rebel or pirate, corporation, or independent.</p>
+     * <p>A faction is untracked if it represents an aggregate of independent 'factions', rather than a faction we can
+     * track. For example, "PIR" (pirates) is used to abstractly represent all pirates, but individual pirate groups
+     * are not tracked. As there is no unified body to gain or loss Fame with, we choose not to track Standing with
+     * that faction.</p>
      *
-     * @param otherFaction the {@link Faction} to check
+     * <p><b>Note:</b> We're calling out the specific faction codes and not the tags to ensure that we're not
+     * accidentally filtering out factions that we might want to track.</p>
      *
-     * @return {@code true} if the faction is mercenary, rebel or pirate, corporation, or independent; {@code false}
-     *       otherwise
+     * @param factionCode the {@link Faction} to check
+     *
+     * @return {@code true} if the faction is untracked; {@code false} otherwise
      */
-    public static boolean isUntrackedFaction(Faction otherFaction) {
-        return otherFaction.isMercenary() ||
-                     otherFaction.isRebelOrPirate() ||
-                     otherFaction.isCorporation() ||
-                     otherFaction.isIndependent();
+    public static boolean isUntrackedFaction(final String factionCode) {
+        final List<String> untrackedFactionTags = Arrays.asList("MERC",
+              "PIR",
+              "RON",
+              "IND",
+              "ABN",
+              "UND",
+              "NONE",
+              "DIS");
+
+        return untrackedFactionTags.contains(factionCode);
     }
 
     /**
@@ -603,11 +621,12 @@ public class FactionStandings {
         String report;
         double fameDelta;
         for (Faction otherFaction : allFactions) {
-            if (isUntrackedFaction(otherFaction)) {
+            String otherFactionCode = otherFaction.getShortName();
+
+            if (isUntrackedFaction(otherFactionCode)) {
                 continue;
             }
 
-            String otherFactionCode = otherFaction.getShortName();
             if (otherFaction.equals(enemyFaction)) {
                 if (otherFaction.isClan()) {
                     fameDelta = FAME_DELTA_CONTRACT_ACCEPT_ENEMY_CLAN;
@@ -709,11 +728,11 @@ public class FactionStandings {
 
         String report;
         for (Faction otherFaction : allFactions) {
-            if (isUntrackedFaction(otherFaction)) {
+            String otherFactionCode = otherFaction.getShortName();
+
+            if (isUntrackedFaction(otherFactionCode)) {
                 continue;
             }
-
-            String otherFactionCode = otherFaction.getShortName();
             if (otherFaction.equals(employerFaction)) {
                 report = changeFameForFaction(otherFactionCode, fameDeltaEmployer, gameYear);
                 if (!report.isBlank()) {
@@ -800,11 +819,12 @@ public class FactionStandings {
 
         for (Person victim : victims) {
             Faction originFaction = victim.getOriginFaction();
-            if (isUntrackedFaction(originFaction)) {
+            String factionCode = originFaction.getShortName();
+
+            if (isUntrackedFaction(factionCode)) {
                 continue;
             }
 
-            String factionCode = originFaction.getShortName();
             affectedFactions.merge(factionCode, FAME_DELTA_EXECUTING_PRISONER, Double::sum);
         }
 
