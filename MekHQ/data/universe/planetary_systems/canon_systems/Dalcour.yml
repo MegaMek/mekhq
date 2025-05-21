@@ -39,9 +39,7 @@ planet:
     event:
       - date: '2702-10-01'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 49221.0
         socioIndustrial: C-D-A-D-D
       - date: '2704-11-10'
@@ -124,9 +122,7 @@ planet:
         population: 124880674.0
       - date: '3079-06-21'
         faction:
-          source: canon
-          value:
-            - DTA
+          - DTA
       - date: '3080-01-01'
         population: 126413549.0
       - date: '3090-01-01'
@@ -139,9 +135,7 @@ planet:
         socioIndustrial: C-C-A-B-C
       - date: '3120-07-18'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 132232095.0
       - date: '3130-01-01'
         population: 133614484.0
@@ -151,15 +145,8 @@ planet:
         population: 135254565.0
       - date: '3145-07-06'
         faction:
-          source: canon
-          value:
-            - DTA
+          - DTA
         population: 136450058.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Junge's Ship
     type: TERRESTRIAL
     orbitalDist: 0.35

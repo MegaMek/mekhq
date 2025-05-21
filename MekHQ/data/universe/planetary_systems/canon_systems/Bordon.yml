@@ -56,9 +56,7 @@ planet:
     event:
       - date: '2242-05-04'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 58282.0
         socioIndustrial: D-D-B-D-D
       - date: '2250-01-01'
@@ -73,9 +71,7 @@ planet:
         population: 11357256.0
       - date: '2300-08-03'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 23081524.0
       - date: '2310-01-01'
         population: 42322926.0
@@ -118,9 +114,7 @@ planet:
         population: 1481843432.0
       - date: '2500-09-18'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
         population: 1538029828.0
       - date: '2510-01-01'
         population: 1589926065.0
@@ -180,23 +174,17 @@ planet:
         population: 1877967845.0
       - date: '2767-03-13'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2770-01-01'
         population: 1863127529.0
       - date: '2779-03-13'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-01-01'
         population: 1843414311.0
       - date: '2786-02-10'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2790-01-01'
         population: 1814620885.0
       - date: '2800-01-01'
@@ -217,9 +205,7 @@ planet:
         population: 1731831909.0
       - date: '2864-10-14'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2870-01-01'
         population: 1708048587.0
       - date: '2880-01-01'
@@ -234,9 +220,7 @@ planet:
         population: 1703512456.0
       - date: '2920-02-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 1706051203.0
       - date: '2930-01-01'
         population: 1705869739.0
@@ -276,14 +260,10 @@ planet:
         population: 1503301552.0
       - date: '3081-07-12'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3082-04-01'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1508421477.0
       - date: '3099-01-01'
@@ -298,23 +278,14 @@ planet:
         population: 1559341668.0
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3137-10-01'
         faction:
-          source: canon
-          value:
-            - CvW
+          - CvW
       - date: '3140-01-01'
         population: 1577535350.0
       - date: '3145-01-01'
         population: 1585125722.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name:
       source: canon
       value: Bordon
@@ -344,9 +315,7 @@ planet:
     event:
       - date: '2242-06-11'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 51014.0
         socioIndustrial: D-D-A-D-D
       - date: '2250-01-01'
@@ -363,9 +332,7 @@ planet:
         population: 10547673.0
       - date: '2300-11-02'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 21421066.0
       - date: '2310-01-01'
         population: 39590679.0
@@ -409,9 +376,7 @@ planet:
         population: 1738205720.0
       - date: '2500-11-07'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
         population: 1792557688.0
       - date: '2510-01-01'
         population: 1844808238.0
@@ -473,23 +438,17 @@ planet:
         population: 2013359708.0
       - date: '2767-03-16'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2770-01-01'
         population: 1998934832.0
       - date: '2779-06-22'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-01-01'
         population: 1959292545.0
       - date: '2786-05-22'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2790-01-01'
         population: 1923212588.0
       - date: '2800-01-01'
@@ -510,9 +469,7 @@ planet:
         population: 1852141608.0
       - date: '2864-02-15'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2870-01-01'
         population: 1839697942.0
       - date: '2880-01-01'
@@ -527,9 +484,7 @@ planet:
         population: 1824173021.0
       - date: '2920-11-03'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 1797838328.0
       - date: '2930-01-01'
         population: 1778551190.0
@@ -569,14 +524,10 @@ planet:
         population: 1651815690.0
       - date: '3081-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3082-04-20'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1662088761.0
       - date: '3100-01-01'
@@ -593,23 +544,14 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3137-10-01'
         faction:
-          source: canon
-          value:
-            - CvW
+          - CvW
       - date: '3140-01-01'
         population: 1699739665.0
       - date: '3145-01-01'
         population: 1705869756.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Messer's Belt
     type: ASTEROID_BELT
     orbitalDist: 1.28

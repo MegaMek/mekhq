@@ -65,9 +65,7 @@ planet:
     event:
       - date: '2269-01-07'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 52979.0
         socioIndustrial: D-D-C-D-D
       - date: '2270-01-01'
@@ -78,9 +76,7 @@ planet:
         population: 783518.0
       - date: '2299-11-13'
         faction:
-          source: canon
-          value:
-            - FoS
+          - FoS
       - date: '2300-01-01'
         population: 2163426.0
       - date: '2310-01-01'
@@ -91,9 +87,9 @@ planet:
         population: 21163672.0
       - date: '2340-01-01'
         population: 36878943.0
-      - date: '2341-02-20'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2350-01-01'
@@ -217,9 +213,7 @@ planet:
         socioIndustrial: D-C-D-C-D
       - date: '2900-01-18'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 918997238.0
       - date: '2910-01-01'
         population: 888643574.0
@@ -247,22 +241,16 @@ planet:
         population: 882851655.0
       - date: '3025-06-29'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3030-01-01'
         population: 886481234.0
       - date: '3035-11-22'
         faction:
-          source: canon
-          value:
-            - LA
-            - FWL
+          - FC
+          - FWL
       - date: '3035-11-23'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3040-01-23'
         population: 894316694.0
         socioIndustrial: C-C-C-C-C
@@ -276,9 +264,7 @@ planet:
         population: 922290230.0
       - date: '3081-07-29'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 935667293.0
       - date: '3095-01-01'
@@ -291,9 +277,7 @@ planet:
         population: 960121613.0
       - date: '3120-12-05'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 972684677.0
       - date: '3130-01-01'
         population: 979713279.0
@@ -303,9 +287,7 @@ planet:
         population: 983836728.0
       - date: '3145-10-13'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 986990048.0
   - name: Chichester
     type: TERRESTRIAL

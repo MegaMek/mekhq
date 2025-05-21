@@ -137,9 +137,7 @@ planet:
     event:
       - date: '2243-02-25'
         faction:
-          source: canon
-          value:
-            - TGU
+          - TGU
         population: 59104.0
         socioIndustrial: D-D-C-F-B
       - date: '2250-01-01'
@@ -170,7 +168,7 @@ planet:
         population: 240919550.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -321,17 +319,10 @@ planet:
         socioIndustrial: C-B-C-B-B
       - date: '3030-10-28'
         faction:
-          source: canon
-          value:
-            - FS
+          - FC
         population: 1287739195.0
       - date: '3040-01-01'
         population: 1297563297.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3047-01-01'
         socioIndustrial: B-A-C-A-A
       - date: '3050-01-01'
@@ -340,40 +331,30 @@ planet:
         population: 1316383388.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3068-10-18'
         faction:
-          source: canon
-          value:
-            - FS
-            - WOB
+          - FS
+          - WOB
       - date: '3068-11-03'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3070-01-01'
         population: 1327487581.0
       - date: '3079-03-10'
         faction:
-          source: canon
-          value:
-            - Stone
-            - WOB
+          - Stone
+          - WOB
       - date: '3079-03-12'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 1339221023.0
       - date: '3081-06-07'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1349437878.0
       - date: '3100-01-01'
@@ -382,14 +363,10 @@ planet:
         population: 1361909990.0
       - date: '3112-11-01'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '3113-05-01'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3120-01-01'
         population: 1361909990.0
       - date: '3130-01-01'
@@ -400,16 +377,12 @@ planet:
         socioIndustrial: B-A-C-A-A
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 1363545263.0
       - date: '3145-10-31'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 1363272581.0
   - name: WHY-5
     type: TERRESTRIAL

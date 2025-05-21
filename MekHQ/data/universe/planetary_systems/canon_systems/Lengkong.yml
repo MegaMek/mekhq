@@ -36,9 +36,7 @@ planet:
     event:
       - date: '2411-08-06'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 49123.0
         socioIndustrial: D-D-B-F-C
       - date: '2420-01-01'
@@ -198,9 +196,7 @@ planet:
         population: 361379914.0
       - date: '3081-07-18'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 363263984.0
       - date: '3093-01-01'
@@ -219,9 +215,7 @@ planet:
         population: 376655057.0
       - date: '3145-02-04'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 377409120.0
   - name: Kawilarang's Wheel
     type: GIANT_TERRESTRIAL

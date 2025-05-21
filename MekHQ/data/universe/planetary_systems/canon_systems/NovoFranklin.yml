@@ -147,9 +147,7 @@ planet:
     event:
       - date: '2598-03-22'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 48519.0
         socioIndustrial: D-D-C-C-F
       - date: '2600-01-01'
@@ -191,9 +189,7 @@ planet:
         population: 108719.0
       - date: '2750-08-10'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 109056.0
       - date: '2760-01-01'
         population: 109353.0
@@ -287,11 +283,6 @@ planet:
         population: 42645028.0
       - date: '3145-01-01'
         population: 42704772.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - IND
   - name: Hyppolyte
     type: ICE_GIANT
     orbitalDist: 50.44

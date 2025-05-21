@@ -89,9 +89,7 @@ planet:
     event:
       - date: '2254-12-02'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 57037.0
         socioIndustrial: D-D-A-F-D
       - date: '2260-01-01'
@@ -110,9 +108,7 @@ planet:
         population: 6608348.0
       - date: '2325-07-23'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2330-01-01'
         population: 9949360.0
       - date: '2340-01-01'
@@ -282,29 +278,21 @@ planet:
         population: 73437154.0
       - date: '3072-09-09'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3075-12-09'
         faction:
-          source: canon
-          value:
-            - CGB
-            - CSR
-            - WOB
-            - Stone
+          - CGB
+          - CSR
+          - WOB
+          - Stone
       - date: '3075-12-23'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 74086253.0
       - date: '3081-10-27'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 75025645.0
       - date: '3095-01-01'
@@ -321,16 +309,12 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 79984270.0
       - date: '3145-10-18'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 80594466.0
   - name: Alcides
     type: TERRESTRIAL

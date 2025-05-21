@@ -36,9 +36,7 @@ planet:
     event:
       - date: '2722-05-06'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 49310.0
         socioIndustrial: B-D-A-D-F
       - date: '2723-08-11'
@@ -59,9 +57,7 @@ planet:
         population: 4151320.0
       - date: '2779-11-29'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2780-01-01'
         population: 6690444.0
       - date: '2790-01-01'
@@ -92,17 +88,13 @@ planet:
         population: 3150.0
       - date: '2916-05-12'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
       - date: '3095-05-17'
         faction:
-          source: canon
-          value:
-            - RT
+          - RT
         hpg: X
         population: 50000.0
         socioIndustrial: F-F-A-D-F
@@ -118,11 +110,6 @@ planet:
         population: 256345.0
       - date: '3145-01-01'
         population: 284725.0
-      - date: '2108-12-05'
-        name: Anatolia
-      - date: '3130-01-01'
-        name: Pillory
-        message: Anatolia renamed to Pillory
   - name: Ellis
     type: DWARF_TERRESTRIAL
     orbitalDist: 0.14

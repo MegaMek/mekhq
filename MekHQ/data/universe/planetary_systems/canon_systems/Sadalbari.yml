@@ -92,9 +92,7 @@ planet:
     event:
       - date: '2275-11-23'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 45764.0
         socioIndustrial: D-D-C-D-F
       - date: '2280-01-01'
@@ -111,9 +109,7 @@ planet:
         population: 14761078.0
       - date: '2340-10-16'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 27412153.0
       - date: '2341-01-01'
         socioIndustrial: C-C-C-C-F
@@ -281,9 +277,7 @@ planet:
         population: 1367376703.0
       - date: '3081-12-04'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1366283239.0
       - date: '3098-01-01'
@@ -298,16 +292,12 @@ planet:
         population: 1372308130.0
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 1380014614.0
       - date: '3145-01-21'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 1380014614.0
   - name: J2
     type: TERRESTRIAL

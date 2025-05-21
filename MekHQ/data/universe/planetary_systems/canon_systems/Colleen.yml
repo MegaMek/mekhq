@@ -86,9 +86,7 @@ planet:
     event:
       - date: '3067-11-11'
         faction:
-          source: canon
-          value:
-            - CBS
+          - CBS
         population: 50000.0
         socioIndustrial: B-B-A-C-C
       - date: '3068-09-14'
@@ -99,42 +97,30 @@ planet:
         population: 68171.0
       - date: '3075-08-26'
         faction:
-          source: canon
-          value:
-            - CBS
+          - CBS
       - date: '3080-01-01'
         population: 167088.0
-      - date: '3083-12-31'
-        faction:
-          source: canon
-          value:
-            - CCC
-            - CBS
       - date: '3083-04-22'
         faction:
-          source: canon
-          value:
-            - CCC
-            - CBS
-            - CSL
-            - CCO
+          - CCC
+          - CBS
+          - CSL
+          - CCO
       - date: '3083-07-01'
         faction:
-          source: canon
-          value:
-            - CCC
-            - CBS
-            - CSA
+          - CCC
+          - CBS
+          - CSA
       - date: '3083-12-18'
         faction:
-          source: canon
-          value:
-            - CBS
+          - CBS
+      - date: '3083-12-31'
+        faction:
+          - CCC
+          - CBS
       - date: '3085-03-21'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         population:
           source: canon
           value: 0.0

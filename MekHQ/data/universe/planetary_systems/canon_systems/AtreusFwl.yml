@@ -111,9 +111,7 @@ planet:
     event:
       - date: '2160-05-31'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 61123.0
         socioIndustrial: D-D-B-F-F
       - date: '2170-01-01'
@@ -134,9 +132,7 @@ planet:
         population: 14811867.0
       - date: '2241-10-04'
         faction:
-          source: canon
-          value:
-            - MCM
+          - MCM
       - date: '2250-01-01'
         population: 21592358.0
       - date: '2260-01-01'
@@ -145,7 +141,7 @@ planet:
         population: 40794069.0
       - date: '2271-06-01'
         faction:
-          source: canon
+          source: 'Handbook: House Marik'
           value:
             - FWL
       - date: '2280-01-01'
@@ -332,9 +328,7 @@ planet:
         population: 377418842.0
       - date: '3079-09-17'
         faction:
-          source: canon
-          value:
-            - MSC
+          - MSC
       - date: '3080-01-01'
         population: 381593367.0
       - date: '3090-01-01'
@@ -357,9 +351,7 @@ planet:
         population: 391175206.0
       - date: '3145-10-20'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 391801587.0
   - name: Senachwine
     type: DWARF_TERRESTRIAL

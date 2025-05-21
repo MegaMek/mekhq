@@ -61,9 +61,7 @@ planet:
     event:
       - date: '2360-09-14'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 58645.0
         socioIndustrial: D-D-A-D-F
       - date: '2370-01-01'
@@ -212,15 +210,15 @@ planet:
         population: 129964558.0
       - date: '3026-01-01'
         socioIndustrial: D-F-B-C-D
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 129859202.0
       - date: '3040-01-01'
         population: 131138078.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3045-01-01'
         socioIndustrial: C-D-A-C-D
       - date: '3050-01-01'
@@ -229,7 +227,7 @@ planet:
         population: 132920446.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -251,15 +249,8 @@ planet:
         population: 149732564.0
       - date: '3145-10-04'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 150935229.0
-      - date: '3152-06-01'
-        faction:
-          source: sucs
-          value:
-            - FS
   - name: Nanna
     type: GIANT_TERRESTRIAL
     orbitalDist: 0.7

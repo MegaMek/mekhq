@@ -99,7 +99,7 @@ planet:
     event:
       - date: '3052-08-04'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
         population: 9954.0
@@ -118,9 +118,7 @@ planet:
         population: 55160.0
       - date: '3110-09-07'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         population: 0.0
   - name: Barrio Balboa
     type: GIANT_TERRESTRIAL

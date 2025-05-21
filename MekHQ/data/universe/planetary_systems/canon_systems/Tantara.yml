@@ -39,9 +39,7 @@ planet:
     event:
       - date: '2700-09-29'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 49694.0
         socioIndustrial: C-F-B-F-D
       - date: '2701-01-04'
@@ -114,11 +112,12 @@ planet:
         population: 412240160.0
       - date: '3020-01-01'
         population: 402482924.0
-      - date: '3030-12-07'
+      - date: '3029-11-16'
         faction:
-          source: canon
+          source: NAIS 4th SW Atlas, Vol 2
           value:
             - SIC
+      - date: '3030-12-07'
         population: 399926698.0
       - date: '3040-01-01'
         population: 405605607.0
@@ -130,9 +129,7 @@ planet:
         population: 415748818.0
       - date: '3063-12-02'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '3070-01-01'
         population: 419801204.0
       - date: '3080-01-01'

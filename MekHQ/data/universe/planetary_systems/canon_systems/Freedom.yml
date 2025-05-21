@@ -181,9 +181,7 @@ planet:
     event:
       - date: '2139-10-16'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 65607.0
         socioIndustrial: D-D-B-C-B
       - date: '2140-01-01'
@@ -208,25 +206,17 @@ planet:
         population: 54805113.0
       - date: '2235-03-27'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2236-06-15'
         faction:
-          source: canon
-          value:
-            - IND
-            - TA
+          - IND
+          - TA
       - date: '2236-08-25'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
       - date: '2237-12-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2240-01-01'
         population: 80703758.0
       - date: '2250-01-01'
@@ -243,9 +233,7 @@ planet:
         population: 313737421.0
       - date: '2299-08-17'
         faction:
-          source: canon
-          value:
-            - FoS
+          - FoS
       - date: '2300-01-01'
         population: 377543406.0
       - date: '2310-01-01'
@@ -256,9 +244,9 @@ planet:
         population: 589228791.0
       - date: '2340-01-01'
         population: 665465642.0
-      - date: '2341-01-07'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2350-01-01'
@@ -382,18 +370,14 @@ planet:
         population: 917617176.0
       - date: '2891-05-27'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2897-01-01'
         socioIndustrial: C-C-C-D-C
       - date: '2900-01-01'
         population: 880530047.0
       - date: '2910-01-16'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 840735538.0
       - date: '2920-01-01'
         population: 805950868.0
@@ -417,17 +401,17 @@ planet:
         population: 693882467.0
       - date: '3020-01-01'
         population: 707637935.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 710640835.0
       - date: '3039-01-01'
         socioIndustrial: B-C-C-C-B
       - date: '3040-01-01'
         population: 717782894.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3046-01-01'
         socioIndustrial:
           source: canon
@@ -436,7 +420,7 @@ planet:
         population: 724344529.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -463,17 +447,10 @@ planet:
           value: X
       - date: '3140-11-14'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 772758938.0
       - date: '3145-01-01'
         population: 777253963.0
-      - date: '3152-06-01'
-        faction:
-          source: sucs
-          value:
-            - IND
   - name: South Woodbury
     type: DWARF_TERRESTRIAL
     orbitalDist: 2.0

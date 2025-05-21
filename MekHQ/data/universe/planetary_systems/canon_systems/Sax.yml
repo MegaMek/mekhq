@@ -79,9 +79,7 @@ planet:
     event:
       - date: '2597-07-15'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 46397.0
         socioIndustrial: C-D-D-D-D
       - date: '2600-01-01'
@@ -183,15 +181,11 @@ planet:
         population: 1622451596.0
       - date: '3030-12-08'
         faction:
-          source: canon
-          value:
-            - MOC
-            - CC
+          - MOC
+          - CC
       - date: '3030-12-20'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '3040-01-01'
         population: 1637283287.0
       - date: '3044-01-01'

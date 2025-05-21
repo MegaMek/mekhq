@@ -61,9 +61,7 @@ planet:
     event:
       - date: '3130-01-16'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 50000.0
         socioIndustrial: D-D-B-D-B
       - date: '3138-01-22'
@@ -72,11 +70,6 @@ planet:
         population: 138660.0
       - date: '3145-01-01'
         population: 149235.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - IND
   - name: Huang
     type: DWARF_TERRESTRIAL
     orbitalDist: 0.8

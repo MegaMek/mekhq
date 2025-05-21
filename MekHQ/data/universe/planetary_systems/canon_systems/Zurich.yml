@@ -125,9 +125,7 @@ planet:
     event:
       - date: '2261-04-06'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 50719.0
         socioIndustrial: D-D-C-D-F
       - date: '2270-01-01'
@@ -142,9 +140,7 @@ planet:
         population: 14144771.0
       - date: '2315-06-12'
         faction:
-          source: canon
-          value:
-            - DoL
+          - DoL
       - date: '2320-01-01'
         population: 28924580.0
       - date: '2330-01-01'
@@ -157,7 +153,7 @@ planet:
         population: 207191941.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -208,9 +204,7 @@ planet:
         population: 1817802827.0
       - date: '2571-03-01'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2580-01-01'
         population: 1860582275.0
       - date: '2590-01-01'
@@ -257,23 +251,17 @@ planet:
         population: 2379399736.0
       - date: '2767-07-20'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2770-01-01'
         population: 2382069955.0
       - date: '2779-09-23'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-01-01'
         population: 2337529213.0
       - date: '2786-02-27'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '2790-01-01'
         population: 2289848525.0
       - date: '2800-01-01'
@@ -332,20 +320,13 @@ planet:
           value: 1841000000.0
       - date: '3028-10-01'
         faction:
-          source: canon
-          value:
-            - FS
+          - FC
       - date: '3030-01-01'
         population: 1683900365.0
       - date: '3033-01-01'
         socioIndustrial: C-B-C-B-F
       - date: '3040-01-01'
         population: 1484330610.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3045-01-01'
         socioIndustrial: C-B-C-A-D
       - date: '3050-01-01'
@@ -354,28 +335,22 @@ planet:
         population: 1189160682.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
         population: 1081481630.0
       - date: '3072-02-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3079-04-27'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '3080-01-01'
         population: 1098485025.0
       - date: '3085-12-07'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1116872066.0
       - date: '3100-01-01'
@@ -394,16 +369,12 @@ planet:
         socioIndustrial: C-A-C-A-D
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 1186410047.0
       - date: '3145-11-10'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 1196657173.0
   - name: Kruyersmorgendämmerung
     type: ICE_GIANT

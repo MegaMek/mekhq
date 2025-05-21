@@ -47,9 +47,7 @@ planet:
     event:
       - date: '2652-04-14'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
         population: 53130.0
         socioIndustrial: C-D-C-D-F
       - date: '2656-01-01'
@@ -88,9 +86,7 @@ planet:
         population: 113554426.0
       - date: '2783-09-17'
         faction:
-          source: canon
-          value:
-            - MOC
+          - MOC
       - date: '2790-01-01'
         population: 110360064.0
       - date: '2800-01-01'
@@ -105,17 +101,13 @@ planet:
         population: 360733.0
       - date: '2840-12-13'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
       - date: '3025-10-01'
         faction:
-          source: canon
-          value:
-            - IE
+          - IE
         population: 894.0
         socioIndustrial: B-X-X-X-X
   - name: San Andreas

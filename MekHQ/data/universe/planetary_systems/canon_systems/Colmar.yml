@@ -29,9 +29,7 @@ planet:
     event:
       - date: '2640-12-06'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 44768.0
         socioIndustrial: C-D-B-D-C
       - date: '2647-12-12'
@@ -64,9 +62,7 @@ planet:
         population: 279606122.0
       - date: '2750-11-20'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 287714987.0
       - date: '2760-01-01'
         population: 294110682.0
@@ -128,22 +124,22 @@ planet:
         population: 257127090.0
       - date: '3028-01-01'
         socioIndustrial: B-C-C-C-C
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 257760713.0
       - date: '3040-01-01'
         population: 261237952.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3041-01-01'
         socioIndustrial: A-C-B-B-C
       - date: '3050-01-01'
         population: 264233104.0
       - date: '3050-08-06'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
       - date: '3060-01-01'
@@ -172,12 +168,7 @@ planet:
         population: 289637947.0
       - date: '3147-06-17'
         faction:
-          source: canon
-          value:
-            - CHH
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - CHH
   - name: Lugh

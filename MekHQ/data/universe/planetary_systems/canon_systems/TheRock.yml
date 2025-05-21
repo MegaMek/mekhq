@@ -47,9 +47,7 @@ planet:
     event:
       - date: '2779-08-11'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         hpg: X
         population: 47548.0
         socioIndustrial: B-C-C-D-D
@@ -109,9 +107,7 @@ planet:
         population: 5763443.0
       - date: '3025-10-10'
         faction:
-          source: canon
-          value:
-            - OC
+          - OC
       - date: '3030-01-01'
         population: 5810328.0
       - date: '3040-01-01'
@@ -120,7 +116,7 @@ planet:
         socioIndustrial: D-D-C-D-C
       - date: '3049-09-05'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CW
       - date: '3050-01-01'
@@ -131,9 +127,7 @@ planet:
         population: 6052287.0
       - date: '3071-01-25'
         faction:
-          source: canon
-          value:
-            - CHH
+          - CHH
       - date: '3080-01-01'
         population: 6115560.0
       - date: '3090-01-01'
@@ -142,9 +136,7 @@ planet:
         population: 6271630.0
       - date: '3100-02-07'
         faction:
-          source: canon
-          value:
-            - TB
+          - TB
       - date: '3103-01-01'
         socioIndustrial: D-D-C-D-C
       - date: '3110-01-01'

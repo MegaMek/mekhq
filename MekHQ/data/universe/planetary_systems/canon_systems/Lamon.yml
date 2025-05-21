@@ -48,9 +48,7 @@ planet:
     event:
       - date: '2345-05-31'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 56020.0
         socioIndustrial: D-D-B-D-D
       - date: '2350-01-01'
@@ -203,15 +201,15 @@ planet:
         population: 8118037514.0
       - date: '3028-01-01'
         socioIndustrial: B-B-C-B-D
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 8116783111.0
       - date: '3040-01-01'
         population: 8204098997.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3041-01-01'
         socioIndustrial: A-A-B-A-D
       - date: '3044-01-01'
@@ -220,7 +218,7 @@ planet:
         population: 8274958508.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -247,9 +245,7 @@ planet:
         population: 9177307924.0
       - date: '3145-10-16'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 9212248038.0
   - name: Beelzebul
     type: DWARF_TERRESTRIAL

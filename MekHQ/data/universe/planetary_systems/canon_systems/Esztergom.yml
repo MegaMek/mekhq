@@ -98,9 +98,7 @@ planet:
     event:
       - date: '2712-11-17'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 43490.0
         socioIndustrial: B-F-A-D-B
       - date: '2717-01-18'
@@ -153,9 +151,7 @@ planet:
         population: 345.0
       - date: '2923-03-19'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X

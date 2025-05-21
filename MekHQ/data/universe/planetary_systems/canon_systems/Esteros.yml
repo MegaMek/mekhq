@@ -49,9 +49,7 @@ planet:
     event:
       - date: '2619-02-19'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 55007.0
         socioIndustrial: C-C-C-F-D
       - date: '2620-01-01'
@@ -151,31 +149,27 @@ planet:
         population: 2445916630.0
       - date: '3026-01-01'
         socioIndustrial: B-C-D-B-C
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 2451345705.0
       - date: '3040-01-01'
         population: 2475486992.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3042-01-01'
         socioIndustrial: A-B-C-A-C
       - date: '3050-01-01'
         population: 2492876192.0
       - date: '3057-12-01'
         faction:
-          source: canon
-          value:
-            - ARDC
+          - ARDC
       - date: '3060-01-01'
         population: 2509383590.0
       - date: '3067-04-24'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '3070-01-01'
         population: 2537900441.0
       - date: '3080-01-01'
@@ -198,15 +192,11 @@ planet:
         population: 2786362944.0
       - date: '3145-02-10'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 2804252854.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
   - name: Helius
     type: ICE_GIANT
     orbitalDist: 0.07

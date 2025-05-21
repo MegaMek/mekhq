@@ -156,9 +156,7 @@ planet:
     event:
       - date: '2223-07-16'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 61331.0
         socioIndustrial: D-C-C-D-C
       - date: '2230-01-01'
@@ -173,9 +171,7 @@ planet:
         population: 8184833.0
       - date: '2275-10-26'
         faction:
-          source: canon
-          value:
-            - CH
+          - CH
       - date: '2280-01-01'
         population: 16189413.0
       - date: '2290-01-01'
@@ -188,9 +184,7 @@ planet:
         population: 76028087.0
       - date: '2315-09-19'
         faction:
-          source: canon
-          value:
-            - DoL
+          - DoL
       - date: '2320-01-01'
         population: 112602657.0
       - date: '2330-01-01'
@@ -203,7 +197,7 @@ planet:
         population: 340000227.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -252,9 +246,7 @@ planet:
         population: 1303927152.0
       - date: '2571-04-24'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2580-01-01'
         population: 1311461768.0
       - date: '2590-01-01'
@@ -299,28 +291,20 @@ planet:
         population: 1274593918.0
       - date: '2767-11-08'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2770-01-01'
         population: 1274297029.0
       - date: '2779-09-23'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-01-01'
         population: 1267672452.0
       - date: '2786-10-24'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '2790-08-20'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 1265113014.0
       - date: '2800-01-01'
         population: 1254526435.0
@@ -373,58 +357,41 @@ planet:
         population: 943051027.0
       - date: '3030-10-05'
         faction:
-          source: canon
-          value:
-            - FS
+          - FC
         population: 934756258.0
       - date: '3040-01-01'
         population: 945946306.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3044-01-01'
         socioIndustrial: B-B-C-B-B
       - date: '3050-01-01'
         population: 959282691.0
       - date: '3057-11-01'
         faction:
-          source: canon
-          value:
-            - CM
+          - CM
       - date: '3060-01-01'
         population: 969990045.0
       - date: '3065-03-26'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3068-08-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3070-01-01'
         population: 979150940.0
       - date: '3077-01-10'
         faction:
-          source: canon
-          value:
-            - CC
-            - WOB
+          - CC
+          - WOB
       - date: '3077-01-12'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '3080-01-01'
         population: 992756888.0
       - date: '3085-01-28'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1011597262.0
       - date: '3096-01-01'
@@ -441,9 +408,7 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '3140-01-01'
         population: 1091039083.0
       - date: '3145-01-01'

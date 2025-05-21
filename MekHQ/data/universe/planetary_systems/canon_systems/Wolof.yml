@@ -38,9 +38,7 @@ planet:
     event:
       - date: '2646-02-10'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 51868.0
         socioIndustrial: C-C-A-D-C
       - date: '2650-01-01'
@@ -149,9 +147,7 @@ planet:
         population: 328490768.0
       - date: '3081-06-02'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 332655937.0
       - date: '3098-01-01'
@@ -168,9 +164,7 @@ planet:
         population: 351816149.0
       - date: '3145-05-02'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 352520485.0
   - name: Wodin
     type: DWARF_TERRESTRIAL

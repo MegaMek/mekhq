@@ -52,9 +52,7 @@ planet:
     event:
       - date: '2289-05-04'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 43159.0
         socioIndustrial: D-D-B-F-C
       - date: '2290-01-01'
@@ -71,9 +69,7 @@ planet:
         population: 7734126.0
       - date: '2350-11-24'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 14502706.0
       - date: '2360-01-01'
         population: 24833183.0
@@ -223,15 +219,15 @@ planet:
         population: 403273691.0
       - date: '3026-01-01'
         socioIndustrial: B-D-C-C-C
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 390470513.0
       - date: '3040-01-01'
         population: 394789399.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3044-01-01'
         socioIndustrial: A-C-C-B-B
       - date: '3050-01-01'
@@ -240,7 +236,7 @@ planet:
         population: 402281646.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -265,15 +261,8 @@ planet:
         population: 440386370.0
       - date: '3145-11-02'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 441532865.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FS
   - name: Croft's Rift
     type: ICE_GIANT
     orbitalDist: 1.44

@@ -63,9 +63,7 @@ planet:
     event:
       - date: '2214-04-19'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 56086.0
         socioIndustrial: D-D-A-D-F
       - date: '2220-01-01'
@@ -92,9 +90,7 @@ planet:
         population: 232434724.0
       - date: '2315-04-17'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2320-01-01'
         population: 340440145.0
       - date: '2330-01-01'
@@ -193,23 +189,17 @@ planet:
         population: 3719999128.0
       - date: '2767-10-18'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2770-01-01'
         population: 3677644273.0
       - date: '2779-01-25'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-01-01'
         population: 3618438219.0
       - date: '2790-02-01'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 3556080001.0
       - date: '2800-01-01'
         population: 3516638509.0
@@ -263,66 +253,47 @@ planet:
         socioIndustrial: C-B-B-B-D
       - date: '3030-04-06'
         faction:
-          source: canon
-          value:
-            - LA
+          - FC
         population: 2860140430.0
       - date: '3040-01-01'
         population: 2891775650.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3046-01-01'
         socioIndustrial: B-A-A-A-D
       - date: '3050-01-01'
         population: 2916752165.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3057-11-01'
         faction:
-          source: canon
-          value:
-            - DC
-            - LA
+          - DC
+          - LA
       - date: '3060-01-01'
         population: 2943415745.0
       - date: '3062-02-16'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '3070-01-01'
         population: 2975376915.0
       - date: '3072-02-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3075-07-28'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3076-07-21'
         faction:
-          source: canon
-          value:
-            - CGB
-            - CSR
-            - Stone
-            - WOB
+          - CGB
+          - CSR
+          - Stone
+          - WOB
       - date: '3080-01-01'
         population: 2997476371.0
       - date: '3081-01-25'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 3021552358.0
       - date: '3100-01-01'
@@ -339,25 +310,16 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 3167588982.0
       - date: '3145-01-09'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 3174565349.0
       - date: '3150-04-01'
         faction:
-          source: canon
-          value:
-            - RD
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - RD
   - name: Korda

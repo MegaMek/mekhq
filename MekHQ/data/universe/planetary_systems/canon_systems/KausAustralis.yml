@@ -108,9 +108,7 @@ planet:
     event:
       - date: '2271-04-17'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 43410.0
         socioIndustrial: D-F-C-D-F
       - date: '2280-01-01'
@@ -125,9 +123,7 @@ planet:
         population: 11843596.0
       - date: '2325-09-29'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2330-01-01'
         population: 24226849.0
       - date: '2333-01-01'
@@ -298,27 +294,19 @@ planet:
         population: 1712975557.0
       - date: '3072-02-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3075-10-06'
         faction:
-          source: canon
-          value:
-            - CGB
-            - WOB
+          - CGB
+          - WOB
       - date: '3075-10-10'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 1725353488.0
       - date: '3081-04-25'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1752129579.0
       - date: '3099-01-01'
@@ -335,16 +323,12 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 1929058288.0
       - date: '3145-12-08'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
         population: 1944552649.0
   - name: Saint-Henri
     type: DWARF_TERRESTRIAL

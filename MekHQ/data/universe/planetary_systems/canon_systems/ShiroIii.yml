@@ -90,9 +90,7 @@ planet:
     event:
       - date: '2173-01-16'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 48798.0
         socioIndustrial: D-D-D-D-D
       - date: '2180-01-01'
@@ -111,9 +109,7 @@ planet:
         population: 6488141.0
       - date: '2250-01-13'
         faction:
-          source: canon
-          value:
-            - SIS
+          - SIS
         population: 10137690.0
       - date: '2260-01-01'
         population: 15136668.0
@@ -139,22 +135,18 @@ planet:
         population: 136142009.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2368-06-09'
         faction:
-          source: canon
-          value:
-            - CC
-            - FWL
+          - CC
+          - FWL
       - date: '2370-01-01'
         population: 152534510.0
       - date: '2379-09-26'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '2380-01-01'
         population: 168831942.0
       - date: '2390-01-01'
@@ -200,9 +192,7 @@ planet:
         population: 334640390.0
       - date: '2571-09-10'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '2580-01-01'
         population: 340360960.0
       - date: '2590-01-01'
@@ -279,9 +269,7 @@ planet:
         socioIndustrial: B-C-D-C-C
       - date: '2900-02-12'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 288665904.0
       - date: '2910-01-01'
         population: 283711210.0
@@ -309,44 +297,30 @@ planet:
         population: 237039418.0
       - date: '3025-08-07'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3030-02-19'
         population: 237747489.0
         socioIndustrial: B-B-D-C-C
       - date: '3030-09-11'
         faction:
-          source: canon
-          value:
-            - DA
+          - DA
       - date: '3032-09-04'
         faction:
-          source: canon
-          value:
-            - DA
+          - DA
       - date: '3035-10-07'
         faction:
-          source: canon
-          value:
-            - FWL
-            - DA
+          - FWL
+          - DA
       - date: '3035-10-12'
         faction:
-          source: canon
-          value:
-            - DA
+          - DA
       - date: '3036-05-24'
         faction:
-          source: canon
-          value:
-            - FWL
-            - DA
+          - FWL
+          - DA
       - date: '3036-06-07'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3040-01-01'
         population: 240858384.0
       - date: '3049-01-01'
@@ -361,9 +335,7 @@ planet:
         population: 251014107.0
       - date: '3079-01-25'
         faction:
-          source: canon
-          value:
-            - DA
+          - DA
       - date: '3080-01-01'
         population: 252777370.0
       - date: '3090-01-01'

@@ -47,9 +47,7 @@ planet:
     event:
       - date: '2266-09-21'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 63212.0
         socioIndustrial: C-D-F-F-F
       - date: '2270-01-01'
@@ -64,9 +62,7 @@ planet:
         population: 16128072.0
       - date: '2315-02-18'
         faction:
-          source: canon
-          value:
-            - DoL
+          - DoL
       - date: '2320-01-01'
         population: 36744351.0
       - date: '2330-01-01'
@@ -81,7 +77,7 @@ planet:
         population: 362128299.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -185,9 +181,7 @@ planet:
         population: 5009789965.0
       - date: '2821-04-12'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2830-01-01'
         population: 4983057563.0
       - date: '2840-01-01'
@@ -206,9 +200,7 @@ planet:
         population: 4913433697.0
       - date: '2900-08-19'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 4899455875.0
       - date: '2907-01-01'
         socioIndustrial: C-C-F-B-D
@@ -256,14 +248,10 @@ planet:
         population: 5115229072.0
       - date: '3081-12-13'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3082-12-06'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 5127520365.0
       - date: '3100-01-01'
@@ -277,22 +265,13 @@ planet:
         population: 5197730992.0
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 5233196007.0
       - date: '3145-06-27'
         faction:
-          source: canon
-          value:
-            - OP
+          - OP
         population: 5255221652.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Pandora
     type: TERRESTRIAL
     orbitalDist: 0.9
@@ -315,9 +294,7 @@ planet:
     event:
       - date: '2266-03-11'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 58481.0
         socioIndustrial: D-D-B-D-D
       - date: '2270-01-01'
@@ -334,9 +311,7 @@ planet:
         population: 8642413.0
       - date: '2315-06-07'
         faction:
-          source: canon
-          value:
-            - DoL
+          - DoL
       - date: '2320-01-01'
         population: 18355425.0
       - date: '2330-01-01'
@@ -349,7 +324,7 @@ planet:
         population: 149967009.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -450,9 +425,7 @@ planet:
         population: 1687675662.0
       - date: '2821-08-11'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2830-01-01'
         population: 1683038172.0
       - date: '2840-01-01'
@@ -473,9 +446,7 @@ planet:
         socioIndustrial: C-D-C-C-D
       - date: '2900-03-27'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 1683292648.0
       - date: '2910-01-01'
         population: 1685075057.0
@@ -520,14 +491,10 @@ planet:
         socioIndustrial: A-B-B-B-D
       - date: '3081-08-12'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3082-03-26'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1713389885.0
       - date: '3100-01-01'
@@ -542,22 +509,13 @@ planet:
         population: 1789030399.0
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 1789030399.0
       - date: '3145-08-06'
         faction:
-          source: canon
-          value:
-            - OP
+          - OP
         population: 1788314930.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Ceneus
     type: DWARF_TERRESTRIAL
     orbitalDist: 2.52

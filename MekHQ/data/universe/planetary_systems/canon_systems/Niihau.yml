@@ -43,9 +43,7 @@ planet:
     event:
       - date: '2268-07-04'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 53952.0
         socioIndustrial: D-D-B-C-D
       - date: '2270-01-01'
@@ -60,9 +58,7 @@ planet:
         population: 4207510.0
       - date: '2315-08-16'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2320-01-01'
         population: 8392036.0
       - date: '2330-01-01'
@@ -233,9 +229,7 @@ planet:
         population: 606057729.0
       - date: '3081-11-05'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 605815355.0
       - date: '3093-01-01'
@@ -244,9 +238,7 @@ planet:
         population: 605815355.0
       - date: '3110-08-21'
         faction:
-          source: canon
-          value:
-            - DTA
+          - DTA
         population: 606300201.0
       - date: '3120-01-01'
         population: 608000220.0
@@ -256,9 +248,7 @@ planet:
         population: 615340174.0
       - date: '3145-06-13'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 616695413.0
   - name: Godheim Belt
     type: ASTEROID_BELT

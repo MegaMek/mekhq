@@ -93,9 +93,7 @@ planet:
     event:
       - date: '2139-12-23'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 45663.0
         socioIndustrial: C-D-B-C-C
       - date: '2140-01-01'
@@ -122,9 +120,7 @@ planet:
         population: 172759540.0
       - date: '2241-11-27'
         faction:
-          source: canon
-          value:
-            - MCM
+          - MCM
       - date: '2250-01-01'
         population: 257347392.0
       - date: '2260-01-01'
@@ -133,7 +129,7 @@ planet:
         population: 497593503.0
       - date: '2271-06-01'
         faction:
-          source: canon
+          source: 'Handbook: House Marik'
           value:
             - FWL
       - date: '2280-01-01'
@@ -332,9 +328,7 @@ planet:
         population: 4819436644.0
       - date: '3079-01-07'
         faction:
-          source: canon
-          value:
-            - MSC
+          - MSC
       - date: '3080-01-01'
         population: 4841657121.0
       - date: '3090-01-01'
@@ -355,28 +349,14 @@ planet:
           value: X
       - date: '3137-08-01'
         faction:
-          source: canon
-          value:
-            - MiC
+          - MiC
       - date: '3139-07-01'
         faction:
-          source: canon
-          value:
-            - CP
+          - CP
       - date: '3140-01-01'
         population: 5115407390.0
       - date: '3145-01-01'
         population: 5148250985.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
-      - date: '3152-06-01'
-        faction:
-          source: sucs
-          value:
-            - CP
   - name: Mortazavi
     type: TERRESTRIAL
     orbitalDist: 0.8

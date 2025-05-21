@@ -44,9 +44,7 @@ planet:
     event:
       - date: '2218-06-14'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 36756.0
         socioIndustrial: C-D-C-F-F
       - date: '2220-01-01'
@@ -81,9 +79,7 @@ planet:
         population: 147303914.0
       - date: '2355-07-29'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2360-01-01'
         population: 183283012.0
       - date: '2370-01-01'
@@ -100,9 +96,7 @@ planet:
         population: 397054523.0
       - date: '2418-01-14'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2420-01-01'
         population: 439562853.0
       - date: '2430-01-01'
@@ -251,16 +245,12 @@ planet:
         population: 1058867356.0
       - date: '3079-03-07'
         faction:
-          source: canon
-          value:
-            - SHC
+          - SHC
       - date: '3080-01-01'
         population: 1077883940.0
       - date: '3085-08-11'
         faction:
-          source: canon
-          value:
-            - MSC
+          - MSC
       - date: '3090-01-01'
         population: 1099658640.0
       - date: '3092-01-01'
@@ -279,15 +269,11 @@ planet:
         population: 1190531451.0
       - date: '3145-04-26'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 1197935675.0
       - date: '3151-09-13'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
   - name: La Sarre
     type: TERRESTRIAL
     orbitalDist: 0.35

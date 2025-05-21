@@ -33,9 +33,7 @@ planet:
     event:
       - date: '2891-07-13'
         faction:
-          source: canon
-          value:
-            - HL
+          - HL
         population: 48290.0
         socioIndustrial: C-D-A-D-F
       - date: '2894-01-12'
@@ -96,9 +94,7 @@ planet:
         population: 2613259.0
       - date: '3140-11-09'
         faction:
-          source: canon
-          value:
-            - CEI
+          - CEI
       - date: '3145-01-01'
         population: 2611169.0
   - name: Zawoja

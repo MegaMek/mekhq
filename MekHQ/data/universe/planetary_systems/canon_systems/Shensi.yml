@@ -121,9 +121,7 @@ planet:
     event:
       - date: '2176-02-19'
         faction:
-          source: canon
-          value:
-            - SSUP
+          - SSUP
         population: 51733.0
         socioIndustrial: F-F-F-D-D
       - date: '2180-01-01'
@@ -168,7 +166,7 @@ planet:
         population: 1590410138.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -321,56 +319,39 @@ planet:
         socioIndustrial: C-C-F-C-D
       - date: '3028-08-29'
         faction:
-          source: canon
-          value:
-            - CC
-            - FS
+          - CC
+          - FC
       - date: '3028-09-05'
         faction:
-          source: canon
-          value:
-            - FS
+          - FC
       - date: '3030-01-01'
         population: 3669076921.0
       - date: '3030-02-28'
         faction:
-          source: canon
-          value:
-            - LA
+          - FC
       - date: '3033-01-01'
         socioIndustrial: B-B-F-B-D
       - date: '3040-01-01'
         population: 3691157558.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3041-01-01'
         socioIndustrial: A-A-F-A-C
       - date: '3050-01-01'
         population: 3721921660.0
       - date: '3057-11-01'
         faction:
-          source: canon
-          value:
-            - CM
+          - CM
       - date: '3060-01-01'
         population: 3764594339.0
       - date: '3062-12-13'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '3070-01-01'
         population: 3810422633.0
       - date: '3080-01-01'
         population: 3861053641.0
       - date: '3085-07-22'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 3916271723.0
       - date: '3100-01-01'
@@ -387,16 +368,12 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 4085075091.0
       - date: '3145-01-08'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 4085075091.0
   - name: Hsi Ho
     type: TERRESTRIAL
@@ -424,9 +401,7 @@ planet:
     event:
       - date: '2176-05-17'
         faction:
-          source: canon
-          value:
-            - SSUP
+          - SSUP
         population: 70590.0
         socioIndustrial: C-C-A-D-D
       - date: '2180-01-01'
@@ -471,7 +446,7 @@ planet:
         population: 813524322.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -616,55 +591,38 @@ planet:
         population: 1525537167.0
       - date: '3028-08-29'
         faction:
-          source: canon
-          value:
-            - CC
-            - FS
+          - CC
+          - FC
       - date: '3028-09-05'
         faction:
-          source: canon
-          value:
-            - FS
+          - FC
+      - date: '3030-02-28'
+        faction:
+          - FC
       - date: '3030-10-26'
         population: 1523790458.0
         socioIndustrial: C-B-B-B-D
-      - date: '3030-02-28'
-        faction:
-          source: canon
-          value:
-            - LA
       - date: '3040-01-01'
         population: 1541415196.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3048-01-01'
         socioIndustrial: C-A-A-A-C
       - date: '3050-01-01'
         population: 1560179616.0
       - date: '3057-11-01'
         faction:
-          source: canon
-          value:
-            - CM
+          - CM
       - date: '3060-01-01'
         population: 1577751848.0
       - date: '3062-12-03'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '3070-01-01'
         population: 1595841132.0
       - date: '3080-01-01'
         population: 1605444962.0
       - date: '3085-01-03'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1614137814.0
       - date: '3100-01-01'
@@ -679,16 +637,12 @@ planet:
         population: 1628730624.0
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 1642798110.0
       - date: '3145-05-06'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 1645428691.0
   - name: Davison
     type: GAS_GIANT

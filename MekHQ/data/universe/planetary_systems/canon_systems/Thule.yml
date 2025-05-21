@@ -96,9 +96,7 @@ planet:
     event:
       - date: '2250-02-02'
         faction:
-          source: canon
-          value:
-            - PoR
+          - PoR
         population: 41087.0
         socioIndustrial: D-D-B-D-C
       - date: '2260-01-01'
@@ -121,31 +119,23 @@ planet:
         population: 7013749.0
       - date: '2333-02-05'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2334-03-10'
         faction:
-          source: canon
-          value:
-            - PoR
+          - PoR
       - date: '2340-01-01'
         population: 9800825.0
       - date: '2350-01-01'
         population: 13121285.0
       - date: '2354-01-31'
         faction:
-          source: canon
-          value:
-            - PoR
-            - DC
+          - PoR
+          - DC
       - date: '2360-01-01'
         population: 16898323.0
       - date: '2367-10-31'
         faction:
-          source: canon
-          value:
-            - PoR
+          - PoR
       - date: '2370-01-01'
         population: 21000387.0
       - date: '2380-01-01'
@@ -176,9 +166,7 @@ planet:
         population: 79557925.0
       - date: '2510-09-28'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 82146070.0
       - date: '2520-01-01'
         population: 84148759.0
@@ -296,7 +284,7 @@ planet:
         population: 93683533.0
       - date: '3034-03-13'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FRR
       - date: '3040-01-01'
@@ -313,13 +301,13 @@ planet:
         population: 96064749.0
       - date: '3050-03-01'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - FRR
             - CGB
       - date: '3050-03-03'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CGB
       - date: '3060-01-01'
@@ -328,51 +316,37 @@ planet:
         population: 98664226.0
       - date: '3074-08-29'
         faction:
-          source: canon
-          value:
-            - CGB
-            - CB
-            - CHH
+          - CGB
+          - CB
+          - CHH
       - date: '3074-08-30'
         faction:
-          source: canon
-          value:
-            - CGB
+          - CGB
       - date: '3080-01-01'
         population: 99277844.0
       - date: '3090-01-01'
         population: 99218296.0
       - date: '3099-05-23'
         faction:
-          source: canon
-          value:
-            - CGB
-            - DC
+          - CGB
+          - DC
       - date: '3099-06-14'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '3100-01-01'
         population: 99218296.0
       - date: '3100-09-22'
         faction:
-          source: canon
-          value:
-            - DC
-            - CGB
+          - DC
+          - CGB
       - date: '3100-09-30'
         faction:
-          source: canon
-          value:
-            - CGB
+          - CGB
       - date: '3102-01-01'
         socioIndustrial: C-B-B-B-B
       - date: '3103-03-13'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
       - date: '3110-01-01'
         population: 100155345.0
       - date: '3120-01-01'

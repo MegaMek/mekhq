@@ -109,9 +109,7 @@ planet:
     event:
       - date: '2173-08-22'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 56131.0
         socioIndustrial: D-D-A-F-B
       - date: '2180-01-01'
@@ -130,9 +128,7 @@ planet:
         population: 28173468.0
       - date: '2243-12-04'
         faction:
-          source: canon
-          value:
-            - TGU
+          - TGU
       - date: '2250-01-01'
         population: 49139814.0
       - date: '2260-01-01'
@@ -161,7 +157,7 @@ planet:
         population: 1132644113.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -293,9 +289,7 @@ planet:
         population: 2558160112.0
       - date: '2930-04-01'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2940-01-01'
         population: 2503548425.0
       - date: '2950-01-01'
@@ -312,15 +306,11 @@ planet:
         population: 2355458297.0
       - date: '3008-03-29'
         faction:
-          source: canon
-          value:
-            - FS
-            - CC
+          - FS
+          - CC
       - date: '3008-04-22'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '3010-01-01'
         population: 2360487445.0
       - date: '3020-01-01'
@@ -329,6 +319,11 @@ planet:
         population:
           source: canon
           value: 2349000000.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 2240371926.0
       - date: '3040-06-28'
@@ -336,11 +331,6 @@ planet:
         socioIndustrial:
           source: canon
           value: C-C-B-C-B
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3041-01-01'
         socioIndustrial:
           source: canon
@@ -351,39 +341,33 @@ planet:
         population: 1565415507.0
       - date: '3062-12-09'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FC
             - LA
       - date: '3063-05-11'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FC
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3069-06-30'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3070-01-01'
         population: 1466841650.0
       - date: '3078-04-01'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '3080-01-01'
         population: 1483362621.0
       - date: '3085-09-07'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1498270664.0
       - date: '3096-01-01'
@@ -394,30 +378,22 @@ planet:
         population: 1504576634.0
       - date: '3112-04-01'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '3113-05-01'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3120-01-01'
         population: 1506985883.0
       - date: '3130-01-01'
         population: 1509398991.0
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 1516661522.0
       - date: '3145-05-01'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 1523958997.0
   - name: Tartaros
     type: DWARF_TERRESTRIAL

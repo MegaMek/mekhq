@@ -120,9 +120,7 @@ planet:
     event:
       - date: '2273-06-30'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 55318.0
         socioIndustrial: C-D-A-C-C
       - date: '2279-01-01'
@@ -139,9 +137,7 @@ planet:
         population: 9308398.0
       - date: '2325-01-23'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2330-01-01'
         population: 18712909.0
       - date: '2340-01-01'
@@ -307,9 +303,7 @@ planet:
         population: 825998419.0
       - date: '3081-05-29'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 833132639.0
       - date: '3100-01-01'
@@ -324,16 +318,12 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 851494346.0
       - date: '3145-02-15'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 852005396.0
         socioIndustrial: C-C-A-D-B
   - name: Abū Z̧aby Jadida

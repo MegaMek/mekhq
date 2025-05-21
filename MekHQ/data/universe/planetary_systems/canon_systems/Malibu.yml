@@ -85,9 +85,7 @@ planet:
     event:
       - date: '2332-09-26'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 40105.0
         socioIndustrial: D-D-D-D-D
       - date: '2340-01-01'
@@ -184,9 +182,7 @@ planet:
         population: 226878315.0
       - date: '2779-04-19'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2780-01-01'
         population: 229428805.0
       - date: '2790-01-01'
@@ -241,22 +237,22 @@ planet:
         population: 185938253.0
       - date: '3020-01-01'
         population: 183557294.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 182890572.0
       - date: '3040-01-01'
         population: 185283671.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3049-01-01'
         socioIndustrial: D-D-C-F-C
       - date: '3050-01-01'
         population: 187820742.0
       - date: '3050-06-27'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
       - date: '3060-01-01'
@@ -285,9 +281,7 @@ planet:
         population: 210184982.0
       - date: '3152-03-15'
         faction:
-          source: canon
-          value:
-            - CHH
+          - CHH
   - name: Chernabog
     type: DWARF_TERRESTRIAL
     orbitalDist: 3.36

@@ -54,9 +54,7 @@ planet:
     event:
       - date: '2642-12-03'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 56503.0
         socioIndustrial: C-D-D-C-D
       - date: '2647-01-05'
@@ -95,9 +93,7 @@ planet:
         population: 934238017.0
       - date: '2790-04-02'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 924663113.0
       - date: '2800-01-01'
         population: 901295819.0
@@ -169,9 +165,7 @@ planet:
         population: 685996126.0
       - date: '3081-03-27'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 698455857.0
       - date: '3100-01-01'
@@ -189,9 +183,7 @@ planet:
         population: 758597990.0
       - date: '3145-07-14'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 764232437.0
   - name: Pastier's Planet
     type: GIANT_TERRESTRIAL

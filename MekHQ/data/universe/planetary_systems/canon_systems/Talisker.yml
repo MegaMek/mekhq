@@ -79,10 +79,6 @@ planet:
         icon: oddmoon2
     event:
       - date: '2318-06-27'
-        faction:
-          source: canon
-          value:
-            - LA
         population: 47404.0
         socioIndustrial: D-D-D-D-B
       - date: '2320-01-01'
@@ -91,6 +87,11 @@ planet:
         population: 237517.0
       - date: '2340-01-01'
         population: 732984.0
+      - date: '2341-01-01'
+        faction:
+          source: 'Handbook: House Steiner'
+          value:
+            - LA
       - date: '2346-01-01'
         socioIndustrial: C-C-D-C-B
       - date: '2350-01-01'
@@ -195,9 +196,7 @@ planet:
         population: 499687664.0
       - date: '2821-12-07'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2830-01-01'
         population: 499149784.0
       - date: '2840-01-01'
@@ -208,9 +207,7 @@ planet:
         population: 428606.0
       - date: '2854-06-11'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X

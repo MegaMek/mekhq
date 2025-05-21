@@ -48,9 +48,7 @@ planet:
     event:
       - date: '2245-05-07'
         faction:
-          source: canon
-          value:
-            - SIMA
+          - SIMA
         population: 57552.0
         socioIndustrial: D-D-B-D-B
       - date: '2250-01-01'
@@ -81,7 +79,7 @@ planet:
         population: 72310406.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -228,25 +226,22 @@ planet:
         population: 292508841.0
       - date: '3025-11-07'
         faction:
-          source: canon
+          - CC
+          - FS
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
           value:
             - CC
-            - FS
+            - FC
       - date: '3030-01-04'
         faction:
-          source: canon
-          value:
-            - FS
+          - FC
         population: 289452291.0
       - date: '3034-01-01'
         socioIndustrial: C-D-C-D-B
       - date: '3040-01-01'
         population: 293239736.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3048-01-01'
         socioIndustrial: B-C-B-C-A
       - date: '3050-01-01'
@@ -255,26 +250,18 @@ planet:
         population: 299103745.0
       - date: '3069-03-21'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '3069-11-06'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3070-01-01'
         population: 302654075.0
       - date: '3073-02-01'
         faction:
-          source: canon
-          value:
-            - KP
+          - KP
       - date: '3080-07-07'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 305818101.0
       - date: '3090-01-01'
         population: 309571934.0
@@ -294,9 +281,7 @@ planet:
         population: 321497731.0
       - date: '3145-07-23'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 321819389.0
   - name: Inanna Belt I
     type: ASTEROID_BELT

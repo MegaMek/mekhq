@@ -96,9 +96,7 @@ planet:
     event:
       - date: '2605-12-24'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 47486.0
         socioIndustrial: C-D-A-F-C
       - date: '2610-01-01'
@@ -151,46 +149,29 @@ planet:
         population: 234911258.0
       - date: '2814-02-28'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2930-01-01'
         faction:
-          source: canon
-          value:
-            - ARC
+          - ARC
       - date: '3022-01-01'
         faction:
-          source: canon
-          value:
-            - ARD
+          - ARD
       - date: '3025-01-25'
         faction:
-          source: assumption
-          value:
-            - ARC
-            - ARD
+          - ARC
+          - ARD
       - date: '3025-03-01'
         faction:
-          source: assumption
-          value:
-            - ARC
+          - ARC
       - date: '3026-01-01'
         faction:
-          source: canon
-          value:
-            - ARC
+          - ARC
         population:
           source: canon
           value: 1409000000.0
         socioIndustrial:
           source: canon
           value: C-C-A-B-B
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN
   - name: Viracocha
     type: TERRESTRIAL
     orbitalDist: 0.9

@@ -70,9 +70,7 @@ planet:
     event:
       - date: '2272-12-03'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 56628.0
         socioIndustrial: D-F-B-D-B
       - date: '2280-01-01'
@@ -89,9 +87,7 @@ planet:
         population: 27102055.0
       - date: '2340-11-27'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 50302384.0
       - date: '2350-01-01'
         population: 85799744.0
@@ -243,15 +239,15 @@ planet:
         population: 1626735280.0
       - date: '3026-01-01'
         socioIndustrial: B-C-B-C-C
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 1619366470.0
       - date: '3040-01-01'
         population: 1628134702.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3042-01-01'
         socioIndustrial: B-B-B-B-B
       - date: '3050-01-01'
@@ -260,7 +256,7 @@ planet:
         population: 1652245059.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -285,15 +281,8 @@ planet:
         population: 1816905910.0
       - date: '3145-07-22'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 1831865791.0
-      - date: '3152-06-01'
-        faction:
-          source: sucs
-          value:
-            - FS
   - name: P5-1 Belt
     type: ASTEROID_BELT
     orbitalDist: 2.8

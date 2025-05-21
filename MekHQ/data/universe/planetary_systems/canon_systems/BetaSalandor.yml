@@ -79,9 +79,7 @@ planet:
     event:
       - date: '3095-02-22'
         faction:
-          source: canon
-          value:
-            - IE
+          - IE
         hpg: X
         population: 50000.0
         socioIndustrial: F-F-A-C-F

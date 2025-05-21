@@ -133,9 +133,7 @@ planet:
     event:
       - date: '2610-11-03'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 46388.0
         socioIndustrial: C-D-A-D-D
       - date: '2620-01-03'
@@ -175,9 +173,7 @@ planet:
         population: 2317219136.0
       - date: '2750-11-07'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 2360046396.0
       - date: '2760-01-01'
         population: 2378235814.0
@@ -245,6 +241,11 @@ planet:
         population: 2246418941.0
       - date: '3020-01-01'
         population: 2232132024.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-09-28'
         population: 2237515347.0
         socioIndustrial: B-C-C-D-C
@@ -255,22 +256,17 @@ planet:
         socioIndustrial:
           source: canon
           value: B-B-A-B-C
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3050-01-01'
         population: 2282259658.0
       - date: '3050-09-22'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
             - FC
       - date: '3050-10-13'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
       - date: '3060-01-01'

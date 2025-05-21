@@ -98,9 +98,7 @@ planet:
     event:
       - date: '2259-05-26'
         faction:
-          source: canon
-          value:
-            - SCon
+          - SCon
         population: 34928.0
         socioIndustrial: D-D-B-D-B
       - date: '2260-01-01'
@@ -113,9 +111,7 @@ planet:
         population: 1185571.0
       - date: '2293-08-14'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2300-01-01'
         population: 2775199.0
       - date: '2310-01-01'
@@ -288,16 +284,12 @@ planet:
         population: 803615737.0
       - date: '3079-10-12'
         faction:
-          source: canon
-          value:
-            - SC
+          - SC
       - date: '3080-01-01'
         population: 810556635.0
       - date: '3082-06-22'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 813805355.0
       - date: '3100-01-01'
@@ -314,22 +306,16 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 827923878.0
       - date: '3145-06-15'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 828917983.0
       - date: '3151-12-01'
         faction:
-          source: canon
-          value:
-            - CP
+          - CP
   - name: O'Day's Pride
     type: TERRESTRIAL
     orbitalDist: 2.8
