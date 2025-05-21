@@ -32,6 +32,21 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
+import static megamek.codeUtilities.MathUtility.clamp;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
+
+import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+
 import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
@@ -45,15 +60,6 @@ import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.time.LocalDate;
-import java.util.*;
-
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
-import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
-import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 /**
  * Stores and manages the standing values between factions in the Faction Standings system.
@@ -69,6 +75,16 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 public class FactionStandings {
     private static final MMLogger LOGGER = MMLogger.create(FactionStandings.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionStandings";
+
+    /**
+     * This value defines the upper limit of fame a campaign can achieve with a faction.
+     */
+    static final double MAXIMUM_FAME = 120.0;
+
+    /**
+     * A constant representing the minimum fame a campaign can have with a faction.
+     */
+    static final double MINIMUM_FAME = -120.0;
 
     /**
      * The base fame value for all factions.
@@ -194,6 +210,26 @@ public class FactionStandings {
      */
     public FactionStandings() {
         this.factionStandings = new HashMap<>();
+    }
+
+    /**
+     * @return the maximum fame the campaign can have with a faction.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public double getMaximumFame() {
+        return MAXIMUM_FAME;
+    }
+
+    /**
+     * @return the minimum fame the campaign can have with a faction.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public double getMinimumFame() {
+        return MINIMUM_FAME;
     }
 
     /**
@@ -341,7 +377,8 @@ public class FactionStandings {
      * @since 0.50.07
      */
     public void setFameForFaction(final String factionCode, final double fame) {
-        factionStandings.put(factionCode, fame);
+        double fameValue = clamp(fame, MINIMUM_FAME, MAXIMUM_FAME);
+        factionStandings.put(factionCode, fameValue);
     }
 
     /**
@@ -372,7 +409,7 @@ public class FactionStandings {
         }
 
         double originalFame = getFameForFaction(factionCode);
-        double newFame = originalFame + delta;
+        double newFame = clamp(originalFame + delta, MINIMUM_FAME, MAXIMUM_FAME);
 
         factionStandings.put(factionCode, newFame);
 
