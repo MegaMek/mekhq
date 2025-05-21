@@ -42,8 +42,8 @@ public class FactionStandingUtilities {
     /**
      * Determines the {@link FactionStandingLevel} corresponding to the given fame value.
      *
-     * <p>Iterates through all defined standing levels and returns the one whose fame range (inclusive of minimum
-     * and maximum) contains the provided fame value.</p>
+     * <p>Iterates through all defined standing levels and returns the one whose fame range (exclusive of minimum,
+     * and inclusive of maximum) contains the provided fame value.</p>
      *
      * <p>If the fame value does not fall within any defined standing level range, this method logs a warning and
      * returns {@link FactionStandingLevel#STANDING_LEVEL_4} as a default.</p>
