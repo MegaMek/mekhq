@@ -32,11 +32,16 @@
  */
 package mekhq.campaign.universe.factionStanding.enums;
 
-import static mekhq.utilities.MHQInternationalization.getTextAt;
-
 import megamek.codeUtilities.MathUtility;
 import megamek.logging.MMLogger;
 import mekhq.campaign.universe.Faction;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.ReportingUtilities.*;
 
 /**
  * Represents a standing level within the Faction Standing reputation system.
@@ -386,6 +391,99 @@ public enum FactionStandingLevel {
         String key = "factionStandingLevel." + name() + '.' + factionType + ".description";
 
         return getTextAt(RESOURCE_BUNDLE, key);
+    }
+
+    /**
+     * Generates a textual description of all effects based on the current faction standing modifiers.
+     *
+     * <p>This method inspects various modifiers (such as negotiation, resupply, command circuit access, outlaw status,
+     * batchall permission, recruitment popularity, barracks cost, unit market rarity, contract pay, and support point
+     * modifiers) and compiles their effects into a comma-separated string. Only effects that deviate from their default
+     * values are included in the output.</p>
+     *
+     * @return a comma-separated {@link String} listing all active faction standing effects; returns
+     * an empty string if there are no effects.
+     */
+    public String getEffectsDescription() {
+        List<String> effects = new ArrayList<>();
+
+        // If we're fetching for STANDING_LEVEL_4, then we're guaranteed not to pass any of the conditionals, so exit.
+        if (this == STANDING_LEVEL_4) {
+            return "";
+        }
+
+        if (negotiationModifier != STANDING_LEVEL_4.getNegotiationModifier()) {
+            effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.negotiation",
+                    getPolarityOfModifier(negotiationModifier)));
+        }
+
+        if (resupplyWeightModifier != STANDING_LEVEL_4.getResupplyWeightModifier()) {
+            int resupplyPercentage = (int) resupplyWeightModifier * 100;
+            effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.resupply",
+                    resupplyPercentage));
+        }
+
+        if (hasCommandCircuitAccess != STANDING_LEVEL_4.hasCommandCircuitAccess()) {
+            effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.commandCircuit",
+                    spanOpeningWithCustomColor(getPositiveColor()), CLOSING_SPAN_TAG));
+        }
+
+        if (isOutlawed != STANDING_LEVEL_4.isOutlawed()) {
+            effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.outlawed",
+                    spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG));
+        }
+
+        if (!isBatchallAllowed) {
+            effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.batchall",
+                    spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG));
+        }
+
+        if (recruitmentTickets != STANDING_LEVEL_4.getRecruitmentTickets()) {
+            effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.recruitment.popularity",
+                    getPolarityOfModifier(recruitmentTickets - 3)));
+        }
+
+        if (recruitmentRollsModifier != STANDING_LEVEL_4.getRecruitmentRollsModifier()) {
+            effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.recruitment.rolls",
+                    getPolarityOfModifier(recruitmentRollsModifier)));
+        }
+
+        if (barrackCostsMultiplier != STANDING_LEVEL_4.getBarrackCostsMultiplier()) {
+            int barracksCostPercentage = (int) barrackCostsMultiplier * 100;
+            effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.barracks",
+                    barracksCostPercentage));
+        }
+
+        if (unitMarketRarityModifier != STANDING_LEVEL_4.getUnitMarketRarityModifier()) {
+            effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.unitMarket",
+                    getPolarityOfModifier(unitMarketRarityModifier)));
+        }
+
+        if (contractPayMultiplier != STANDING_LEVEL_4.getContractPayMultiplier()) {
+            int payPercentage = (int) contractPayMultiplier * 100;
+            effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.contractPay",
+                    payPercentage));
+        }
+
+        if (supportPointModifierContractStart != STANDING_LEVEL_4.getSupportPointModifierContractStart()) {
+            effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.supportPoints.signing",
+                    getPolarityOfModifier(supportPointModifierContractStart)));
+        }
+
+        if (supportPointModifierPeriodic != STANDING_LEVEL_4.getSupportPointModifierPeriodic()) {
+            effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.supportPoints.periodic",
+                    getPolarityOfModifier(supportPointModifierContractStart)));
+        }
+
+        return String.join(", ", effects);
+    }
+
+    private static String getPolarityOfModifier(int modifier) {
+        if (modifier >= 0) {
+            return "+" + modifier;
+        }
+
+        return modifier + "";
     }
 
     /**
