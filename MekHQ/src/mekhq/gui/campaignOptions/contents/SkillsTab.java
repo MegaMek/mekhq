@@ -77,6 +77,7 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
+import mekhq.gui.utilities.RoundedLineBorder;
 
 /**
  * SkillsTab is a component of the campaign options user interface that allows players to configure the rules and costs
@@ -243,6 +244,7 @@ public class SkillsTab {
 
         // Create a button to toggle the table
         JButton hideAllButton = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "btnHideAll.text"));
+        hideAllButton.setBorder(RoundedLineBorder.createRoundedLineBorder());
         hideAllButton.addActionListener(e -> {
             setVisibleForAll(false);
 
@@ -252,6 +254,7 @@ public class SkillsTab {
 
         // Create a button to toggle the table
         JButton showAllButton = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "btnDisplayAll.text"));
+        showAllButton.setBorder(RoundedLineBorder.createRoundedLineBorder());
         showAllButton.addActionListener(e -> {
             setVisibleForAll(true);
 
@@ -415,6 +418,7 @@ public class SkillsTab {
         allSkillMilestones.put(skill.getName(), skillMilestones);
 
         JButton copyButton = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "btnCopy.text"));
+        copyButton.setBorder(RoundedLineBorder.createRoundedLineBorder());
         copyButton.addActionListener(e -> {
             storedTargetNumber = (Integer) spnTargetNumber.getValue();
 
@@ -428,6 +432,7 @@ public class SkillsTab {
         });
 
         JButton pasteButton = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "btnPaste.text"));
+        pasteButton.setBorder(RoundedLineBorder.createRoundedLineBorder());
         pasteButton.addActionListener(e -> {
             spnTargetNumber.setValue(storedTargetNumber);
 
@@ -438,12 +443,13 @@ public class SkillsTab {
         });
 
         final JPanel panel = new CampaignOptionsStandardPanel(panelName);
-        panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(),
+        panel.setBorder(BorderFactory.createTitledBorder(RoundedLineBorder.createRoundedLineBorder(),
               String.format(skill.getName())));
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         // Create a button to toggle the table
         JButton toggleButton = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "btnToggle.text"));
+        toggleButton.setBorder(RoundedLineBorder.createRoundedLineBorder());
         toggleButton.addActionListener(e -> {
             for (JLabel label : labels) {
                 label.setVisible(!label.isVisible());

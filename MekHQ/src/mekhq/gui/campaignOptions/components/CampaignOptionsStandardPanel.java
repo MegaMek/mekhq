@@ -40,6 +40,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
 import megamek.client.ui.swing.util.UIUtil;
+import mekhq.gui.utilities.RoundedLineBorder;
 
 /**
  * A specialized {@link JPanel} tailored for use in campaign options dialogs.
@@ -105,11 +106,10 @@ public class CampaignOptionsStandardPanel extends JPanel {
         if (includeBorder) {
             if (borderTitle.isBlank()) {
                 // Add an untitled etched border
-                setBorder(BorderFactory.createEtchedBorder());
+                setBorder(RoundedLineBorder.createRoundedLineBorder());
             } else {
                 // Add a titled border with localized title
-                setBorder(BorderFactory.createTitledBorder(
-                        BorderFactory.createEtchedBorder(),
+                setBorder(BorderFactory.createTitledBorder(RoundedLineBorder.createRoundedLineBorder(),
                         String.format("<html>%s</html>", borderTitle)));
             }
         }

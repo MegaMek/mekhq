@@ -75,6 +75,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.GlossaryDialog;
+import mekhq.gui.utilities.RoundedLineBorder;
 
 /**
  * An immersive dialog used in MekHQ to display interactions between speakers, messages, and actions. The dialog
@@ -558,7 +559,8 @@ public class ImmersiveDialogCore extends JDialog {
                 String label = buttonStrings.btnLabel();
                 String tooltip = buttonStrings.btnTooltip();
                 if (label != null) {
-                    button = new JButton(label);
+                    button = new JButton();
+                    button.setText(String.format("<html><div style='text-align:center;'>%s</div></html>", label));
 
                     if (tooltip != null) {
                         button.setToolTipText(wordWrap(tooltip));
@@ -601,6 +603,8 @@ public class ImmersiveDialogCore extends JDialog {
             if (preferredSize.height > largestSize.height) {
                 largestSize.height = preferredSize.height;
             }
+
+            button.setBorder(RoundedLineBorder.createRoundedLineBorder());
 
             buttonList.add(button);
         }

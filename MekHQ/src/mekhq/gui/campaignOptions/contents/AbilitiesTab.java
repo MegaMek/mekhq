@@ -72,6 +72,7 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 import mekhq.gui.dialog.EditSpecialAbilityDialog;
+import mekhq.gui.utilities.RoundedLineBorder;
 import mekhq.utilities.spaUtilities.enums.AbilityCategory;
 
 /**
@@ -451,7 +452,7 @@ public class AbilitiesTab {
                 }
             };
 
-            setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(),
+            setBorder(BorderFactory.createTitledBorder(RoundedLineBorder.createRoundedLineBorder(),
                   String.format("<html>%s</html>", name)));
             setName("pnl" + name);
         }
