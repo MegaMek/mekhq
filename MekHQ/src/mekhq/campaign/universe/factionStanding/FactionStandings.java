@@ -32,21 +32,6 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
-import static megamek.codeUtilities.MathUtility.clamp;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
-import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
-import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
-
-import java.io.PrintWriter;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-
 import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
@@ -60,6 +45,16 @@ import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.util.*;
+
+import static megamek.codeUtilities.MathUtility.clamp;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 /**
  * Stores and manages the standing values between factions in the Faction Standings system.
@@ -99,7 +94,7 @@ public class FactionStandings {
     /**
      * The starting fame for the campaign's faction
      */
-    static final double STARTING_FAME_SAME_FACTION = DEFAULT_FAME + 25;
+    static final double STARTING_FAME_SAME_FACTION = FactionStandingLevel.STANDING_LEVEL_5.getMaximumFame() / 2;
 
     /**
      * The starting fame for factions that are allies of the campaign faction.
@@ -107,79 +102,79 @@ public class FactionStandings {
     static final double STARTING_FAME_ALLIED_FACTION = STARTING_FAME_SAME_FACTION / 2;
 
     /**
-     * The starting fame for factions that are rivals of the campaign faction.
-     */
-    static final double STARTING_FAME_ENEMY_FACTION_RIVAL = DEFAULT_FAME - 25;
-
-    /**
      * The starting fame for factions that are at war with the campaign faction.
      */
-    static final double STARTING_FAME_ENEMY_FACTION_AT_WAR = DEFAULT_FAME - 40;
+    static final double STARTING_FAME_ENEMY_FACTION_AT_WAR = FactionStandingLevel.STANDING_LEVEL_3.getMinimumFame() / 2;
+
+    /**
+     * The starting fame for factions that are rivals of the campaign faction.
+     */
+    static final double STARTING_FAME_ENEMY_FACTION_RIVAL = STARTING_FAME_ENEMY_FACTION_AT_WAR / 2;
 
     /**
      * Fame increase for successfully completing a contract for the employer.
      */
-    static final double FAME_DELTA_CONTRACT_SUCCESS_EMPLOYER = 5.0;
+    static final double FAME_DELTA_CONTRACT_SUCCESS_EMPLOYER = DEFAULT_FAME_DEGRADATION * 5;
 
     /**
      * Fame increase for successfully completing a contract for factions allied with the employer.
      */
-    static final double FAME_DELTA_CONTRACT_SUCCESS_EMPLOYER_ALLY = 1.0;
+    static final double FAME_DELTA_CONTRACT_SUCCESS_EMPLOYER_ALLY = DEFAULT_FAME_DEGRADATION * 2;
 
     /**
      * Fame increase for completing a 'partial success' contract for the employer.
      */
-    static final double FAME_DELTA_CONTRACT_PARTIAL_EMPLOYER = 1.0;
+    static final double FAME_DELTA_CONTRACT_PARTIAL_EMPLOYER = FAME_DELTA_CONTRACT_SUCCESS_EMPLOYER / 3;
 
     /**
      * Fame increase for completing a 'partial success' contract for factions allied with the employer.
      */
-    static final double FAME_DELTA_CONTRACT_PARTIAL_EMPLOYER_ALLY = 0.2;
+    static final double FAME_DELTA_CONTRACT_PARTIAL_EMPLOYER_ALLY = FAME_DELTA_CONTRACT_SUCCESS_EMPLOYER_ALLY / 3;
 
     /**
      * Fame penalty for failing a contract for the employer.
      */
-    static final double FAME_DELTA_CONTRACT_FAILURE_EMPLOYER = -1.0;
+    static final double FAME_DELTA_CONTRACT_FAILURE_EMPLOYER = -FAME_DELTA_CONTRACT_SUCCESS_EMPLOYER;
 
     /**
      * Fame penalty for completing a 'partial success' contract for factions allied with the employer.
      */
-    static final double FAME_DELTA_CONTRACT_FAILURE_EMPLOYER_ALLY = -0.2;
+    static final double FAME_DELTA_CONTRACT_FAILURE_EMPLOYER_ALLY = -FAME_DELTA_CONTRACT_SUCCESS_EMPLOYER_ALLY;
 
     /**
      * Fame penalty for breaching a contract (employer).
      */
-    static final double FAME_DELTA_CONTRACT_BREACH_EMPLOYER = -10.0;
+    static final double FAME_DELTA_CONTRACT_BREACH_EMPLOYER = -(FAME_DELTA_CONTRACT_SUCCESS_EMPLOYER * 2);
 
     /**
      * Fame penalty for breaching a contract (employer's allies).
      */
-    static final double FAME_DELTA_CONTRACT_BREACH_EMPLOYER_ALLY = -2;
+    static final double FAME_DELTA_CONTRACT_BREACH_EMPLOYER_ALLY = -(FAME_DELTA_CONTRACT_SUCCESS_EMPLOYER_ALLY * 2);
 
     /**
      * Fame decrease when accepting a contract against a non-Clan enemy.
      */
-    static final double FAME_DELTA_CONTRACT_ACCEPT_ENEMY_NORMAL = -5.0;
+    static final double FAME_DELTA_CONTRACT_ACCEPT_ENEMY_NORMAL = -FAME_DELTA_CONTRACT_SUCCESS_EMPLOYER;
 
     /**
      * Fame decrease when accepting a contract against a Clan enemy.
      */
-    static final double FAME_DELTA_CONTRACT_ACCEPT_ENEMY_CLAN = -2.5;
+    static final double FAME_DELTA_CONTRACT_ACCEPT_ENEMY_CLAN = -FAME_DELTA_CONTRACT_SUCCESS_EMPLOYER_ALLY;
 
     /**
      * Fame decrease when accepting a contract for non-Clan factions allied with the enemy.
      */
-    static final double FAME_DELTA_CONTRACT_ACCEPT_ENEMY_ALLY_NORMAL = -1.0;
+    static final double FAME_DELTA_CONTRACT_ACCEPT_ENEMY_ALLY_NORMAL = FAME_DELTA_CONTRACT_ACCEPT_ENEMY_NORMAL / 2;
 
     /**
      * Fame decrease when accepting a contract for Clan factions allied with the enemy.
      */
-    static final double FAME_DELTA_CONTRACT_ACCEPT_ENEMY_ALLY_CLAN = -0.2;
+    static final double FAME_DELTA_CONTRACT_ACCEPT_ENEMY_ALLY_CLAN = FAME_DELTA_CONTRACT_ACCEPT_ENEMY_CLAN / 2;
 
     /**
      * Fame penalty for refusing a batchall.
      */
-    static final double FAME_DELTA_REFUSE_BATCHALL = -5;
+    static final double FAME_DELTA_REFUSE_BATCHALL = FAME_DELTA_CONTRACT_BREACH_EMPLOYER;
 
     /**
      * Fame penalty for refusing a batchall.
