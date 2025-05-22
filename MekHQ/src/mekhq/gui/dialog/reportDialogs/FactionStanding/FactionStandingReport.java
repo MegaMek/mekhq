@@ -354,7 +354,6 @@ public class FactionStandingReport extends JDialog {
         btnGmTools.setName("btnSimulateContract");
         btnGmTools.setFocusable(false);
         btnGmTools.setBorder(RoundedLineBorder.createRoundedLineBorder());
-        btnGmTools.setEnabled(isGM);
         btnGmTools.addActionListener(e -> {
             // TODO Simulate Contract Dialog
         });
