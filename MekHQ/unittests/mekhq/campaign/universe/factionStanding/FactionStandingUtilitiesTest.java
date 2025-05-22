@@ -32,70 +32,71 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
+import static mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel.STANDING_LEVEL_0;
+import static mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel.STANDING_LEVEL_8;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.Arrays;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
 import mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.Arrays;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-
-import static mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel.STANDING_LEVEL_0;
-import static mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel.STANDING_LEVEL_8;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 class FactionStandingUtilitiesTest {
     @Test
-    void test_calculateFactionStandingLevel_veryLowFame() {
+    void test_calculateFactionStandingLevel_veryLowRegard() {
         // Setup
-        int fame = Integer.MIN_VALUE + 1; // values must be above Integer#MIN_VALUE
+        int regard = Integer.MIN_VALUE + 1; // values must be above Integer#MIN_VALUE
 
         // Act
-        FactionStandingLevel result = FactionStandingUtilities.calculateFactionStandingLevel(fame);
+        FactionStandingLevel result = FactionStandingUtilities.calculateFactionStandingLevel(regard);
 
         // Assert
-        assertEquals(STANDING_LEVEL_0, result, "Expected default STANDING_LEVEL_0 for very low Fame.");
+        assertEquals(STANDING_LEVEL_0, result, "Expected default STANDING_LEVEL_0 for very low Regard.");
     }
 
     @Test
-    void test_calculateFactionStandingLevel_veryHighFame() {
+    void test_calculateFactionStandingLevel_veryHighRegard() {
         // Setup
-        int fame = Integer.MAX_VALUE;
+        int regard = Integer.MAX_VALUE;
 
         // Act
-        FactionStandingLevel result = FactionStandingUtilities.calculateFactionStandingLevel(fame);
+        FactionStandingLevel result = FactionStandingUtilities.calculateFactionStandingLevel(regard);
 
         // Assert
-        assertEquals(STANDING_LEVEL_8, result, "Expected default STANDING_LEVEL_8 for very high Fame.");
+        assertEquals(STANDING_LEVEL_8, result, "Expected default STANDING_LEVEL_8 for very high Regard.");
     }
 
-    @ParameterizedTest(name = "Fame {0} → Standing {1}")
-    @MethodSource(value = "fameAndExpectedStandingLevel")
-    void testCalculateFactionStandingLevel_AllLevels(int fame, FactionStandingLevel expectedStanding) {
+    @ParameterizedTest(name = "Regard {0} → Standing {1}")
+    @MethodSource(value = "regardAndExpectedStandingLevel")
+    void testCalculateFactionStandingLevel_AllLevels(int regard, FactionStandingLevel expectedStanding) {
         // Act
-        FactionStandingLevel result = FactionStandingUtilities.calculateFactionStandingLevel(fame);
+        FactionStandingLevel result = FactionStandingUtilities.calculateFactionStandingLevel(regard);
 
         // Assert
-        assertEquals(expectedStanding, result, "Expected " + expectedStanding.name() + " for " + fame + " fame.");
+        assertEquals(expectedStanding, result, "Expected " + expectedStanding.name() + " for " + regard + " regard.");
     }
 
-    private static Stream<Arguments> fameAndExpectedStandingLevel() {
+    private static Stream<Arguments> regardAndExpectedStandingLevel() {
         return Arrays.stream(FactionStandingLevel.values()).flatMap(standing -> {
             // We're casting to an int as we don't need to check every possible decimal value.
             // If all ints pass the test, then all doubles will too.
-            int minimumFame = (int) standing.getMinimumFame() + 1;
-            int maximumFame = (int) standing.getMaximumFame();
+            int minimumRegard = (int) standing.getMinimumRegard() + 1;
+            int maximumRegard = (int) standing.getMaximumRegard();
             // These special handlers stop us iterating for all values between Integer#MIN_VALUE and
             // Integer#MAX_VALUE.
             if (standing == STANDING_LEVEL_0) {
-                minimumFame = -110;
+                minimumRegard = -110;
             }
             if (standing == STANDING_LEVEL_8) {
-                maximumFame = 110;
+                maximumRegard = 110;
             }
-            return IntStream.rangeClosed(minimumFame, maximumFame).mapToObj(fame -> Arguments.of(fame, standing));
+            return IntStream.rangeClosed(minimumRegard, maximumRegard)
+                         .mapToObj(regard -> Arguments.of(regard, standing));
         });
     }
 }

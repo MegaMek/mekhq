@@ -68,10 +68,10 @@ import org.w3c.dom.NodeList;
 /**
  * Stores and manages the standing values between factions in the Faction Standings system.
  *
- * <p>A {@link FactionStandings} object tracks the current fame values for all relevant factions using faction codes
- * as keys and numeric fame as values. Values may be positive (good reputation), negative (bad reputation), or zero
+ * <p>A {@link FactionStandings} object tracks the current Regard values for all relevant factions using faction codes
+ * as keys and numeric Regard as values. Values may be positive (good reputation), negative (bad reputation), or zero
  * (neutral). This class provides functionality to initialize standings according to relationships, adjust and degrade
- * fame values, serialize data to XML, and reconstruct state from XML.</p>
+ * Regard values, serialize data to XML, and reconstruct state from XML.</p>
  *
  * @author Illiani
  * @since 0.50.07
@@ -81,144 +81,165 @@ public class FactionStandings {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionStandings";
 
     /**
-     * This value defines the upper limit of fame a campaign can achieve with a faction.
+     * This value defines the upper limit of Regard a campaign can achieve with a faction.
      */
-    static final double MAXIMUM_FAME = 60.0;
+    static final double MAXIMUM_REGARD = 60.0;
 
     /**
-     * A constant representing the minimum fame a campaign can have with a faction.
+     * A constant representing the minimum regard a campaign can have with a faction.
      */
-    static final double MINIMUM_FAME = -60.0;
+    static final double MINIMUM_REGARD = -60.0;
 
     /**
-     * The base fame value for all factions.
+     * The base regard value for all factions.
      */
-    static final double DEFAULT_FAME = 0.0;
+    static final double DEFAULT_REGARD = 0.0;
 
     /**
-     * The amount by which fame degrades over time.
+     * The amount by which regard degrades over time.
      */
-    static final double DEFAULT_FAME_DEGRADATION = 0.25;
+    static final double DEFAULT_REGARD_DEGRADATION = 0.25;
 
     /**
-     * The starting fame for the campaign's faction
+     * The starting regard for the campaign's faction
      */
-    static final double STARTING_FAME_SAME_FACTION = FactionStandingLevel.STANDING_LEVEL_5.getMaximumFame() / 2;
+    static final double STARTING_REGARD_SAME_FACTION = FactionStandingLevel.STANDING_LEVEL_5.getMaximumRegard() / 2;
 
     /**
-     * The starting fame for factions that are allies of the campaign faction.
+     * The starting regard for factions that are allies of the campaign faction.
      */
-    static final double STARTING_FAME_ALLIED_FACTION = STARTING_FAME_SAME_FACTION / 2;
+    static final double STARTING_REGARD_ALLIED_FACTION = STARTING_REGARD_SAME_FACTION / 2;
 
     /**
-     * The starting fame for factions that are at war with the campaign faction.
+     * The starting regard for factions that are at war with the campaign faction.
      */
-    static final double STARTING_FAME_ENEMY_FACTION_AT_WAR = FactionStandingLevel.STANDING_LEVEL_3.getMinimumFame() / 2;
+    static final double STARTING_REGARD_ENEMY_FACTION_AT_WAR = FactionStandingLevel.STANDING_LEVEL_3.getMinimumRegard() /
+                                                                     2;
 
     /**
-     * The starting fame for factions that are rivals of the campaign faction.
+     * The starting regard for factions that are rivals of the campaign faction.
      */
-    static final double STARTING_FAME_ENEMY_FACTION_RIVAL = STARTING_FAME_ENEMY_FACTION_AT_WAR / 2;
+    static final double STARTING_REGARD_ENEMY_FACTION_RIVAL = STARTING_REGARD_ENEMY_FACTION_AT_WAR / 2;
 
     /**
-     * Fame increase for successfully completing a contract for the employer.
+     * The political regard adjustment for the campaign's faction
      */
-    static final double FAME_DELTA_CONTRACT_SUCCESS_EMPLOYER = DEFAULT_FAME_DEGRADATION * 5;
+    static final double POLITICAL_REGARD_SAME_FACTION = DEFAULT_REGARD_DEGRADATION * 50;
 
     /**
-     * Fame increase for successfully completing a contract for factions allied with the employer.
+     * The political regard adjustment for factions that are allies of the campaign faction.
      */
-    static final double FAME_DELTA_CONTRACT_SUCCESS_EMPLOYER_ALLY = DEFAULT_FAME_DEGRADATION * 2;
+    static final double POLITICAL_REGARD_ALLIED_FACTION = DEFAULT_REGARD_DEGRADATION * 25;
 
     /**
-     * Fame increase for completing a 'partial success' contract for the employer.
+     * The political regard adjustment for factions that are at war with the campaign faction.
      */
-    static final double FAME_DELTA_CONTRACT_PARTIAL_EMPLOYER = FAME_DELTA_CONTRACT_SUCCESS_EMPLOYER / 3;
+    static final double POLITICAL_REGARD_ENEMY_FACTION_AT_WAR = -POLITICAL_REGARD_SAME_FACTION;
 
     /**
-     * Fame increase for completing a 'partial success' contract for factions allied with the employer.
+     * The political regard adjustment for factions that are rivals of the campaign faction.
      */
-    static final double FAME_DELTA_CONTRACT_PARTIAL_EMPLOYER_ALLY = FAME_DELTA_CONTRACT_SUCCESS_EMPLOYER_ALLY / 3;
+    static final double POLITICAL_REGARD_ENEMY_FACTION_RIVAL = -POLITICAL_REGARD_ALLIED_FACTION;
 
     /**
-     * Fame penalty for failing a contract for the employer.
+     * Regard increase for successfully completing a contract for the employer.
      */
-    static final double FAME_DELTA_CONTRACT_FAILURE_EMPLOYER = -FAME_DELTA_CONTRACT_SUCCESS_EMPLOYER;
+    static final double REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER = DEFAULT_REGARD_DEGRADATION * 5;
 
     /**
-     * Fame penalty for completing a 'partial success' contract for factions allied with the employer.
+     * Regard increase for successfully completing a contract for factions allied with the employer.
      */
-    static final double FAME_DELTA_CONTRACT_FAILURE_EMPLOYER_ALLY = -FAME_DELTA_CONTRACT_SUCCESS_EMPLOYER_ALLY;
+    static final double REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER_ALLY = DEFAULT_REGARD_DEGRADATION * 2;
 
     /**
-     * Fame penalty for breaching a contract (employer).
+     * Regard increase for completing a 'partial success' contract for the employer.
      */
-    static final double FAME_DELTA_CONTRACT_BREACH_EMPLOYER = -(FAME_DELTA_CONTRACT_SUCCESS_EMPLOYER * 2);
+    static final double REGARD_DELTA_CONTRACT_PARTIAL_EMPLOYER = REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER / 3;
 
     /**
-     * Fame penalty for breaching a contract (employer's allies).
+     * Regard increase for completing a 'partial success' contract for factions allied with the employer.
      */
-    static final double FAME_DELTA_CONTRACT_BREACH_EMPLOYER_ALLY = -(FAME_DELTA_CONTRACT_SUCCESS_EMPLOYER_ALLY * 2);
+    static final double REGARD_DELTA_CONTRACT_PARTIAL_EMPLOYER_ALLY = REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER_ALLY / 3;
 
     /**
-     * Fame decrease when accepting a contract against a non-Clan enemy.
+     * Regard penalty for failing a contract for the employer.
      */
-    static final double FAME_DELTA_CONTRACT_ACCEPT_ENEMY_NORMAL = -FAME_DELTA_CONTRACT_SUCCESS_EMPLOYER;
+    static final double REGARD_DELTA_CONTRACT_FAILURE_EMPLOYER = -REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER;
 
     /**
-     * Fame decrease when accepting a contract against a Clan enemy.
+     * Regard penalty for completing a 'partial success' contract for factions allied with the employer.
      */
-    static final double FAME_DELTA_CONTRACT_ACCEPT_ENEMY_CLAN = -FAME_DELTA_CONTRACT_SUCCESS_EMPLOYER_ALLY;
+    static final double REGARD_DELTA_CONTRACT_FAILURE_EMPLOYER_ALLY = -REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER_ALLY;
 
     /**
-     * Fame decrease when accepting a contract for non-Clan factions allied with the enemy.
+     * Regard penalty for breaching a contract (employer).
      */
-    static final double FAME_DELTA_CONTRACT_ACCEPT_ENEMY_ALLY_NORMAL = FAME_DELTA_CONTRACT_ACCEPT_ENEMY_NORMAL / 2;
+    static final double REGARD_DELTA_CONTRACT_BREACH_EMPLOYER = -(REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER * 2);
 
     /**
-     * Fame decrease when accepting a contract for Clan factions allied with the enemy.
+     * Regard penalty for breaching a contract (employer's allies).
      */
-    static final double FAME_DELTA_CONTRACT_ACCEPT_ENEMY_ALLY_CLAN = FAME_DELTA_CONTRACT_ACCEPT_ENEMY_CLAN / 2;
+    static final double REGARD_DELTA_CONTRACT_BREACH_EMPLOYER_ALLY = -(REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER_ALLY * 2);
 
     /**
-     * Fame penalty for refusing a batchall.
+     * Regard decrease when accepting a contract against a non-Clan enemy.
      */
-    static final double FAME_DELTA_REFUSE_BATCHALL = FAME_DELTA_CONTRACT_BREACH_EMPLOYER;
+    static final double REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_NORMAL = -REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER;
 
     /**
-     * Fame penalty for refusing a batchall.
+     * Regard decrease when accepting a contract against a Clan enemy.
      */
-    static final double FAME_DELTA_EXECUTING_PRISONER = -0.1;
+    static final double REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_CLAN = -REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER_ALLY;
+
+    /**
+     * Regard decrease when accepting a contract for non-Clan factions allied with the enemy.
+     */
+    static final double REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_ALLY_NORMAL = REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_NORMAL / 2;
+
+    /**
+     * Regard decrease when accepting a contract for Clan factions allied with the enemy.
+     */
+    static final double REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_ALLY_CLAN = REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_CLAN / 2;
+
+    /**
+     * Regard penalty for refusing a batchall.
+     */
+    static final double REGARD_DELTA_REFUSE_BATCHALL = REGARD_DELTA_CONTRACT_BREACH_EMPLOYER;
+
+    /**
+     * Regard penalty for refusing a batchall.
+     */
+    static final double REGARD_DELTA_EXECUTING_PRISONER = -0.1;
 
     /**
      * A mapping of faction names to their respective standing levels.
      *
-     * <p>This variable is used to store and track the Fame score of factions the campaign has interacted with.</p>
+     * <p>This variable is used to store and track the Regard score of factions the campaign has interacted with.</p>
      *
      * <p><b>Key:</b></p> A {@link String} representing the shortname of the faction (aka Faction Code).
-     * <p><b>Value:</b></p> A {@link Double} representing the campaign's Fame with that faction.
+     * <p><b>Value:</b></p> A {@link Double} representing the campaign's Regard with that faction.
      */
-    private Map<String, Double> factionStandings = new HashMap<>();
+    private Map<String, Double> factionRegard = new HashMap<>();
 
     /**
      * A mapping of faction names to their respective standing levels.
      *
-     * <p>This variable is used to store and track the temporary Fame modifier from factions at war or allied.</p>
+     * <p>This variable is used to store and track the temporary Regard modifier from factions at war or allied.</p>
      *
      * <p><b>Key:</b></p> A {@link String} representing the shortname of the faction (aka Faction Code).
-     * <p><b>Value:</b></p> A {@link Double} representing the campaign's Fame with that faction.
+     * <p><b>Value:</b></p> A {@link Double} representing the campaign's Regard with that faction.
      */
-    private final Map<String, Double> dynamicTemporaryFame = new HashMap<>();
+    private Map<String, Double> politicalRegard = new HashMap<>();
 
     /**
-     * Constructs an empty standings map. No initial relationships or fame values are set.
+     * Constructs an empty standings map. No initial relationships or regard values are set.
      *
      * <p><b>Usage:</b> this does not populate the 'standing' map with any values. That has to be handled
      * separately.</p>
      *
      * <p>If we're starting a new campaign, we should follow up object construction with a call to
-     * {@link #initializeStartingFameValues(Faction, LocalDate)} and
-     * {@link #updateDynamicTemporaryFame(Faction, LocalDate)}</p>
+     * {@link #initializeStartingRegardValues(Faction, LocalDate)} and
+     * {@link #updatePoliticalRegard(Faction, LocalDate)}</p>
      *
      * @author Illiani
      * @since 0.50.07
@@ -227,38 +248,38 @@ public class FactionStandings {
     }
 
     /**
-     * @return the maximum fame the campaign can have with a faction.
+     * @return the maximum regard the campaign can have with a faction.
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public static double getMaximumFame() {
-        return MAXIMUM_FAME;
+    public static double getMaximumRegard() {
+        return MAXIMUM_REGARD;
     }
 
     /**
-     * @return the minimum fame the campaign can have with a faction.
+     * @return the minimum regard the campaign can have with a faction.
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public static double getMinimumFame() {
-        return MINIMUM_FAME;
+    public static double getMinimumRegard() {
+        return MINIMUM_REGARD;
     }
 
     /**
-     * Initializes faction fame standings at the start of a campaign or when performing a full reset.
+     * Initializes faction regard standings at the start of a campaign or when performing a full reset.
      *
-     * <p>This method sets up initial Fame values for all factions relative to the given campaign faction on a
+     * <p>This method sets up initial Regard values for all factions relative to the given campaign faction on a
      * specified date. Direct allies, direct enemies, and secondary relationships (such as allies of enemies) are
-     * each assigned distinct starting fame values, determined by the configuration in {@link FactionStandingLevel}.</p>
+     * each assigned distinct starting regard values, determined by the configuration in {@link FactionStandingLevel}.</p>
      *
      * <p>The process is performed in two passes:</p>
      * <ul>
-     *     <li><b>First pass:</b> Identifies and assigns Fame to the campaign faction itself, direct allies, and
-     *     direct enemies. Allies receive a positive Fame boost, enemies receive a negative one, and the campaign
-     *     faction starts with a high positive Fame.</li>
-     *     <li><b>Second pass:</b> Assigns intermediate fame values to factions indirectly related to the campaign
+     *     <li><b>First pass:</b> Identifies and assigns Regard to the campaign faction itself, direct allies, and
+     *     direct enemies. Allies receive a positive Regard boost, enemies receive a negative one, and the campaign
+     *     faction starts with a high positive Regard.</li>
+     *     <li><b>Second pass:</b> Assigns intermediate regard values to factions indirectly related to the campaign
      *     faction (such as allies of enemies), while skipping those already processed in the first pass.</li>
      * </ul>
      *
@@ -267,20 +288,19 @@ public class FactionStandings {
      *
      * @param campaignFaction the main faction from which all relationships are evaluated
      * @param today the current campaign date, used to determine relationships between factions
-     * @return a list of formatted report strings describing each fame value that was set during initialization;
+     * @return a list of formatted report strings describing each regard value that was set during initialization;
      *         one entry per modified faction
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public List<String> initializeStartingFameValues(final Faction campaignFaction, final LocalDate today) {
-        List<String> fameChangeReports = new ArrayList<>();
+    public List<String> initializeStartingRegardValues(final Faction campaignFaction, final LocalDate today) {
+        List<String> regardChangeReports = new ArrayList<>();
 
         int gameYear = today.getYear();
 
         Collection<Faction> allFactions = Factions.getInstance().getFactions();
         FactionHints factionHints = FactionHints.defaultFactionHints();
-        boolean isPirate = campaignFaction.isPirate();
 
         String report;
         for (Faction otherFaction : allFactions) {
@@ -295,41 +315,38 @@ public class FactionStandings {
             }
 
             if (otherFaction.equals(campaignFaction)) {
-                report = changeFameForFaction(otherFactionCode, STARTING_FAME_SAME_FACTION, gameYear);
+                report = changeRegardForFaction(otherFactionCode, STARTING_REGARD_SAME_FACTION, gameYear);
                 if (!report.isBlank()) {
-                    fameChangeReports.add(report);
+                    regardChangeReports.add(report);
                 }
                 continue;
             }
 
-            if ((isPirate && otherFaction.isPirate()) ||
-                      factionHints.isAlliedWith(campaignFaction, otherFaction, today)) {
-                report = changeFameForFaction(otherFactionCode, STARTING_FAME_ALLIED_FACTION, gameYear);
+            if (factionHints.isAlliedWith(campaignFaction, otherFaction, today)) {
+                report = changeRegardForFaction(otherFactionCode, STARTING_REGARD_ALLIED_FACTION, gameYear);
                 if (!report.isBlank()) {
-                    fameChangeReports.add(report);
+                    regardChangeReports.add(report);
                     continue;
                 }
             }
 
-            if ((isPirate && !otherFaction.isPirate()) ||
-                      factionHints.isAtWarWith(campaignFaction, otherFaction, today)) {
-                report = changeFameForFaction(otherFactionCode, STARTING_FAME_ENEMY_FACTION_AT_WAR, gameYear);
+            if (factionHints.isAtWarWith(campaignFaction, otherFaction, today)) {
+                report = changeRegardForFaction(otherFactionCode, STARTING_REGARD_ENEMY_FACTION_AT_WAR, gameYear);
                 if (!report.isBlank()) {
-                    fameChangeReports.add(report);
+                    regardChangeReports.add(report);
                     continue;
                 }
             }
 
             if (factionHints.isRivalOf(campaignFaction, otherFaction, today)) {
-                report = changeFameForFaction(otherFactionCode, STARTING_FAME_ENEMY_FACTION_RIVAL, gameYear);
+                report = changeRegardForFaction(otherFactionCode, STARTING_REGARD_ENEMY_FACTION_RIVAL, gameYear);
                 if (!report.isBlank()) {
-                    fameChangeReports.add(report);
-                    continue;
+                    regardChangeReports.add(report);
                 }
             }
         }
 
-        return fameChangeReports;
+        return regardChangeReports;
     }
 
     /**
@@ -337,7 +354,7 @@ public class FactionStandings {
      *
      * <p>A faction is untracked if it represents an aggregate of independent 'factions', rather than a faction we can
      * track. For example, "PIR" (pirates) is used to abstractly represent all pirates, but individual pirate groups
-     * are not tracked. As there is no unified body to gain or loss Fame with, we choose not to track Standing with
+     * are not tracked. As there is no unified body to gain or loss Regard with, we choose not to track Standing with
      * that faction.</p>
      *
      * <p><b>Note:</b> We're calling out the specific faction codes and not the tags to ensure that we're not
@@ -364,112 +381,127 @@ public class FactionStandings {
      *
      * <p>Existing contents are discarded. After this call, only the entries in the given map remain.</p>
      *
-     * @param factionStandings the new map of faction codes to fame values
+     * @param factionRegard the new map of faction codes to regard values
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public void setFactionStandings(Map<String, Double> factionStandings) {
-        this.factionStandings = factionStandings;
+    public void setFactionRegard(Map<String, Double> factionRegard) {
+        this.factionRegard = factionRegard;
+    }
+
+
+    /**
+     * Replaces the current map of faction standings with the provided map.
+     *
+     * <p>Existing contents are discarded. After this call, only the entries in the given map remain.</p>
+     *
+     * @param politicalRegard the new map of faction codes to regard values
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public void setPoliticalRegard(Map<String, Double> politicalRegard) {
+        this.politicalRegard = politicalRegard;
     }
 
     /**
      * Retrieves all current faction standings.
      *
-     * @return a {@link Map} containing all faction codes mapped to their current fame values.
+     * @return a {@link Map} containing all faction codes mapped to their current regard values.
      *
      * @author Illiani
      * @since 0.50.07
      */
     public Map<String, Double> getAllFactionStandings() {
-        return factionStandings;
+        return factionRegard;
     }
 
     /**
      * Retrieves all current faction standings based on political climate.
      *
-     * @return a {@link Map} containing all faction codes mapped to their current fame values.
+     * @return a {@link Map} containing all faction codes mapped to their current regard values.
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public Map<String, Double> getAllDynamicTemporaryFame() {
-        return dynamicTemporaryFame;
+    public Map<String, Double> getAllPoliticalRegard() {
+        return politicalRegard;
     }
 
     /**
-     * Retrieves the current fame value for the specified faction.
+     * Retrieves the current regard value for the specified faction.
      *
      * @param factionCode a unique code identifying the faction
-     * @param includeCurrentPolitics whether to include temporary modifiers from current politics
+     * @param includeCurrentClimate whether to include temporary modifiers from the current political climate
      *
-     * @return the fame value for the faction, or 0 if none is present
+     * @return the regard value for the faction, or 0 if none is present
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public double getFameForFaction(final String factionCode, final boolean includeCurrentPolitics) {
-        double fame = factionStandings.getOrDefault(factionCode, DEFAULT_FAME);
+    public double getRegardForFaction(final String factionCode, final boolean includeCurrentClimate) {
+        double regard = factionRegard.getOrDefault(factionCode, DEFAULT_REGARD);
 
-        if (includeCurrentPolitics) {
-            fame += dynamicTemporaryFame.getOrDefault(factionCode, DEFAULT_FAME);
+        if (includeCurrentClimate) {
+            regard += politicalRegard.getOrDefault(factionCode, DEFAULT_REGARD);
         }
 
-        return fame;
+        return clamp(regard, MINIMUM_REGARD, MAXIMUM_REGARD);
     }
 
     /**
-     * Sets the fame value for the specified faction, directly assigning (or overwriting) the value.
+     * Sets the regard value for the specified faction, directly assigning (or overwriting) the value.
      *
      * <p>If the faction code does not already exist, a new entry is created.</p>
      *
      * @param factionCode a unique code identifying the faction
-     * @param fame        the fame (standing) value to assign
+     * @param regard        the regard (standing) value to assign
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public void setFameForFaction(final String factionCode, final double fame) {
-        double fameValue = clamp(fame, MINIMUM_FAME, MAXIMUM_FAME);
-        factionStandings.put(factionCode, fameValue);
+    public void setRegardForFaction(final String factionCode, final double regard) {
+        double regardValue = clamp(regard, MINIMUM_REGARD, MAXIMUM_REGARD);
+        factionRegard.put(factionCode, regardValue);
     }
 
     /**
-     * Adjusts the fame value for a specified faction by a given amount and generates a detailed report of any change.
+     * Adjusts the regard value for a specified faction by a given amount and generates a detailed report of any change.
      *
-     * <p>Retrieves the current fame of the specified faction and alters it by {@code delta}. If the faction does not
+     * <p>Retrieves the current regard of the specified faction and alters it by {@code delta}. If the faction does not
      * exist in the standings, it is initialized with the specified delta value. The method determines if this
      * adjustment causes the faction to cross a standing milestone, as defined in {@link FactionStandingLevel}. If a
      * milestone transition occurs, the report includes a message highlighting this change. The generated report uses
      * color formatting to indicate the direction of change (increase or decrease) and displays the faction’s full
      * name for the current game year.</p>
      *
-     * <p>If {@code delta} is zero, the method leaves fame and milestones unchanged and returns an empty string.</p>
+     * <p>If {@code delta} is zero, the method leaves regard and milestones unchanged and returns an empty string.</p>
      *
-     * @param factionCode unique identifier for the faction whose fame should be adjusted
-     * @param delta the amount to increment or decrement the faction's fame (can be positive or negative)
+     * @param factionCode unique identifier for the faction whose regard should be adjusted
+     * @param delta the amount to increment or decrement the faction's regard (can be positive or negative)
      * @param gameYear the current in-game year, affecting how faction names are displayed in reports
-     * @return a formatted {@link String} describing the fame change and any milestone transition, or an empty string
+     * @return a formatted {@link String} describing the regard change and any milestone transition, or an empty string
      * if {@code delta} is zero
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public String changeFameForFaction(final String factionCode, final double delta, final int gameYear) {
+    public String changeRegardForFaction(final String factionCode, final double delta, final int gameYear) {
         if (delta == 0) {
-            LOGGER.debug("A change of 0 Fame requested for {}. Shortcutting the method.", factionCode);
+            LOGGER.debug("A change of 0 Regard requested for {}. Shortcutting the method.", factionCode);
             return "";
         }
 
-        double originalFame = getFameForFaction(factionCode, false);
-        double newFame = clamp(originalFame + delta, MINIMUM_FAME, MAXIMUM_FAME);
+        double originalRegard = getRegardForFaction(factionCode, false);
+        double newRegard = clamp(originalRegard + delta, MINIMUM_REGARD, MAXIMUM_REGARD);
 
-        factionStandings.put(factionCode, newFame);
+        factionRegard.put(factionCode, newRegard);
 
-        return getFameChangedReport(delta, gameYear, factionCode, newFame, originalFame);
+        return getRegardChangedReport(delta, gameYear, factionCode, newRegard, originalRegard);
     }
 
-    public String updateDynamicTemporaryFame(final Faction campaignFaction, final LocalDate today) {
+    public String updatePoliticalRegard(final Faction campaignFaction, final LocalDate today) {
         Collection<Faction> allFactions = Factions.getInstance().getFactions();
         FactionHints factionHints = FactionHints.defaultFactionHints();
         boolean isPirate = campaignFaction.isPirate();
@@ -486,56 +518,55 @@ public class FactionStandings {
             }
 
             if (otherFaction.equals(campaignFaction)) {
-                dynamicTemporaryFame.put(otherFactionCode, STARTING_FAME_SAME_FACTION);
+                politicalRegard.put(otherFactionCode, POLITICAL_REGARD_SAME_FACTION);
                 continue;
             }
 
             if ((isPirate && otherFaction.isPirate()) ||
                       factionHints.isAlliedWith(campaignFaction, otherFaction, today)) {
-                dynamicTemporaryFame.put(otherFactionCode, STARTING_FAME_ALLIED_FACTION);
+                politicalRegard.put(otherFactionCode, POLITICAL_REGARD_ALLIED_FACTION);
                 continue;
             }
 
             if ((isPirate && !otherFaction.isPirate()) ||
                       factionHints.isAtWarWith(campaignFaction, otherFaction, today)) {
-                dynamicTemporaryFame.put(otherFactionCode, STARTING_FAME_ENEMY_FACTION_AT_WAR);
+                politicalRegard.put(otherFactionCode, POLITICAL_REGARD_ENEMY_FACTION_AT_WAR);
                 continue;
             }
 
             if (factionHints.isRivalOf(campaignFaction, otherFaction, today)) {
-                dynamicTemporaryFame.put(otherFactionCode, STARTING_FAME_ENEMY_FACTION_RIVAL);
+                politicalRegard.put(otherFactionCode, POLITICAL_REGARD_ENEMY_FACTION_RIVAL);
                 continue;
             }
 
-            dynamicTemporaryFame.remove(otherFactionCode);
+            politicalRegard.remove(otherFactionCode);
         }
 
         StringBuilder report = new StringBuilder();
         String factionName;
-        double temporaryFame;
+        double climateRegard;
         String reportFormat = "<br>- %s: <span color='%s'><b>%s</b>" + CLOSING_SPAN_TAG;
 
-        List<String> sortedFactionCodes = new ArrayList<>(dynamicTemporaryFame.keySet());
+        List<String> sortedFactionCodes = new ArrayList<>(politicalRegard.keySet());
         Collections.sort(sortedFactionCodes);
         for (String factionCode : sortedFactionCodes) {
             Faction faction = Factions.getInstance().getFaction(factionCode);
             if (faction == null) {
                 LOGGER.warn("Faction {} is missing from the Factions collection. Skipping.",
-                      dynamicTemporaryFame.get(factionCode));
+                      politicalRegard.get(factionCode));
                 continue;
             }
 
             factionName = faction.getFullName(today.getYear());
-            temporaryFame = dynamicTemporaryFame.get(factionCode);
-            String color = temporaryFame >= 0 ? getPositiveColor() : getNegativeColor();
+            climateRegard = politicalRegard.get(factionCode);
+            String color = climateRegard >= 0 ? getPositiveColor() : getNegativeColor();
 
-            report.append(String.format(reportFormat, factionName, color, temporaryFame));
+            report.append(String.format(reportFormat, factionName, color, climateRegard));
         }
 
         if (!report.isEmpty()) {
             report.insert(0,
-                  getFormattedTextAt(RESOURCE_BUNDLE,
-                        "factionStandings.change.report.politics",
+                  getFormattedTextAt(RESOURCE_BUNDLE, "factionStandings.change.report.climate",
                         spanOpeningWithCustomColor(getWarningColor()),
                         CLOSING_SPAN_TAG));
         }
@@ -544,34 +575,34 @@ public class FactionStandings {
     }
 
     /**
-     * Builds a formatted report string describing changes to a faction's fame and any milestone transitions.
+     * Builds a formatted report string describing changes to a faction's regard and any milestone transitions.
      *
-     * <p>This method generates detailed feedback about a Fame value adjustment for a faction, including whether a
+     * <p>This method generates detailed feedback about a Regard value adjustment for a faction, including whether a
      * milestone ({@link FactionStandingLevel}) has changed as a result. The report text uses color formatting to
      * visually indicate the change's nature (positive, negative, or neutral); includes the faction's name for the
-     * current game year; the direction and magnitude of the fame change; and a message about the milestone
+     * current game year; the direction and magnitude of the regard change; and a message about the milestone
      * status—whether a new milestone was reached or the faction remains within the same milestone.</p>
      *
      * <p>If the relevant faction is not present, a default faction is used for milestone reporting.</p>
      *
      * <p>An additional prefix may be applied to the faction name.</p>
      *
-     * @param delta        the amount of Fame gained or lost
+     * @param delta        the amount of Regard gained or lost
      * @param gameYear     the current in-game year, used to render the appropriate faction name
-     * @param factionCode  unique identifier for the faction whose Fame should be adjusted
-     * @param newFame      the Fame value after the delta is applied
-     * @param originalFame the Fame value before the delta is applied
+     * @param factionCode  unique identifier for the faction whose Regard should be adjusted
+     * @param newRegard      the Regard value after the delta is applied
+     * @param originalRegard the Regard value before the delta is applied
      *
-     * @return a formatted {@link String} describing the fame change, direction, and any milestone transition
+     * @return a formatted {@link String} describing the regard change, direction, and any milestone transition
      *
      * @author Illiani
      * @since 0.50.07
      */
-    private String getFameChangedReport(final double delta, final int gameYear, final String factionCode, final double newFame,
-                                        final double originalFame) {
+    private String getRegardChangedReport(final double delta, final int gameYear, final String factionCode,
+          final double newRegard, final double originalRegard) {
         Faction relevantFaction = Factions.getInstance().getFaction(factionCode);
-        FactionStandingLevel originalMilestone = FactionStandingUtilities.calculateFactionStandingLevel(originalFame);
-        FactionStandingLevel newMilestone = FactionStandingUtilities.calculateFactionStandingLevel(newFame);
+        FactionStandingLevel originalMilestone = FactionStandingUtilities.calculateFactionStandingLevel(originalRegard);
+        FactionStandingLevel newMilestone = FactionStandingUtilities.calculateFactionStandingLevel(newRegard);
 
         String reportingColor;
         String milestoneChangeReport;
@@ -602,7 +633,7 @@ public class FactionStandings {
 
         // Build final report
         String deltaDirection;
-        if (newFame > originalFame) {
+        if (newRegard > originalRegard) {
             reportingColor = getPositiveColor();
             deltaDirection = getTextAt(RESOURCE_BUNDLE, "factionStandings.change.increased");
         } else {
@@ -633,7 +664,7 @@ public class FactionStandings {
      * @since 0.50.07
      */
     public void wipeAllFactionStandings() {
-        factionStandings.clear();
+        factionRegard.clear();
     }
 
     /**
@@ -645,14 +676,14 @@ public class FactionStandings {
      * @since 0.50.07
      */
     public void resetFactionStanding(final String factionCode) {
-        factionStandings.remove(factionCode);
+        factionRegard.remove(factionCode);
     }
 
     /**
-     * Gradually reduces all non-zero faction fame values toward zero by a fixed increment, simulating fame decay over time.
+     * Gradually reduces all non-zero faction regard values toward zero by a fixed increment, simulating regard decay over time.
      *
-     * <p>For each faction with a non-zero fame value, the method decrements positive values and increments negative
-     * values by a fixed amount. This step-wise adjustment continues fame's progression toward zero, with fame being
+     * <p>For each faction with a non-zero regard value, the method decrements positive values and increments negative
+     * values by a fixed amount. This step-wise adjustment continues regard's progression toward zero, with Regard being
      * set to exactly zero if it otherwise crosses zero, thus preventing overshooting. For each adjustment, a report
      * string is generated if an actual change occurs.</p>
      *
@@ -660,16 +691,16 @@ public class FactionStandings {
      * time.</p>
      *
      * @param gameYear the current in-game year, used for proper display of faction names in reports
-     * @return a list of formatted report strings describing each fame change made during this process; one entry per
+     * @return a list of formatted report strings describing each regard change made during this process; one entry per
      * modified faction, or an empty list if no changes occurred
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public List<String> processFameDegradation(final int gameYear) {
-        List<String> fameChangeReports = new ArrayList<>();
-        LOGGER.info("Processing fame decay for {} factions.", factionStandings.size());
-        for (String factionCode : new HashSet<>(factionStandings.keySet())) {
+    public List<String> processRegardDegradation(final int gameYear) {
+        List<String> regardChangeReports = new ArrayList<>();
+        LOGGER.info("Processing regard decay for {} factions.", factionRegard.size());
+        for (String factionCode : new HashSet<>(factionRegard.keySet())) {
             Faction faction = Factions.getInstance().getFaction(factionCode);
             if (faction == null) {
                 LOGGER.info("Faction {} is missing from the Factions collection. Skipping.", factionCode);
@@ -680,43 +711,45 @@ public class FactionStandings {
                 continue;
             }
 
-            double currentFame = factionStandings.get(factionCode);
+            double currentRegard = factionRegard.get(factionCode);
 
-            if (currentFame != DEFAULT_FAME) {
-                double delta = currentFame > DEFAULT_FAME ? -DEFAULT_FAME_DEGRADATION : DEFAULT_FAME_DEGRADATION;
-                String report = changeFameForFaction(factionCode, delta, gameYear);
-                double newFame = getFameForFaction(factionCode, false);
+            if (currentRegard != DEFAULT_REGARD) {
+                double delta = currentRegard > DEFAULT_REGARD ?
+                                     -DEFAULT_REGARD_DEGRADATION :
+                                     DEFAULT_REGARD_DEGRADATION;
+                String report = changeRegardForFaction(factionCode, delta, gameYear);
+                double newRegard = getRegardForFaction(factionCode, false);
 
-                if ((currentFame > DEFAULT_FAME && newFame < DEFAULT_FAME) ||
-                          (currentFame < DEFAULT_FAME && newFame > DEFAULT_FAME)) {
-                    setFameForFaction(factionCode, DEFAULT_FAME);
+                if ((currentRegard > DEFAULT_REGARD && newRegard < DEFAULT_REGARD) ||
+                          (currentRegard < DEFAULT_REGARD && newRegard > DEFAULT_REGARD)) {
+                    setRegardForFaction(factionCode, DEFAULT_REGARD);
                 }
 
                 if (!report.isBlank()) {
-                    fameChangeReports.add(report);
+                    regardChangeReports.add(report);
                 }
             }
         }
 
-        return fameChangeReports;
+        return regardChangeReports;
     }
 
     /**
-     * Processes the acceptance of a contract against a specified enemy faction and applies fame changes to all relevant
+     * Processes the acceptance of a contract against a specified enemy faction and applies regard changes to all relevant
      * factions.
      *
-     * <p>This method iterates through all factions in the game, adjusting their fame values based on relationships to
-     * the specified enemy faction and the contract's context. Fame deltas are applied for the enemy faction itself, as
+     * <p>This method iterates through all factions in the game, adjusting their regard values based on relationships to
+     * the specified enemy faction and the contract's context. Regard deltas are applied for the enemy faction itself, as
      * well as any factions allied with the enemy. The changes vary depending on whether the factions are clans or
-     * non-clans, and different fame penalties are applied accordingly.</p>
+     * non-clans, and different regard penalties are applied accordingly.</p>
      *
-     * <p>For each application of a fame delta, a report string is generated and included in the result list if it is
+     * <p>For each application of a regard delta, a report string is generated and included in the result list if it is
      * not blank.</p>
      *
      * @param enemyFaction The {@link Faction} representing the enemy against whom the contract is accepted.
      * @param today        The {@link LocalDate} representing the game date on which the contract is accepted.
      *
-     * @return A {@link List} of {@link String} objects summarizing any fame changes that occurred as a result of
+     * @return A {@link List} of {@link String} objects summarizing any regard changes that occurred as a result of
      *       accepting the contract.
      *
      * @author Illiani
@@ -730,7 +763,7 @@ public class FactionStandings {
             return List.of(report);
         }
 
-        List<String> fameChangeReports = new ArrayList<>();
+        List<String> regardChangeReports = new ArrayList<>();
 
         int gameYear = today.getYear();
 
@@ -738,7 +771,7 @@ public class FactionStandings {
         FactionHints factionHints = FactionHints.defaultFactionHints();
 
         String report;
-        double fameDelta;
+        double regardDelta;
         for (Faction otherFaction : allFactions) {
             if (!otherFaction.validIn(gameYear)) {
                 continue;
@@ -752,53 +785,53 @@ public class FactionStandings {
 
             if (otherFaction.equals(enemyFaction)) {
                 if (otherFaction.isClan()) {
-                    fameDelta = FAME_DELTA_CONTRACT_ACCEPT_ENEMY_CLAN;
+                    regardDelta = REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_CLAN;
                 } else {
 
-                    fameDelta = FAME_DELTA_CONTRACT_ACCEPT_ENEMY_NORMAL;
+                    regardDelta = REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_NORMAL;
                 }
 
-                report = changeFameForFaction(otherFactionCode, fameDelta, gameYear);
+                report = changeRegardForFaction(otherFactionCode, regardDelta, gameYear);
                 if (!report.isBlank()) {
-                    fameChangeReports.add(report);
+                    regardChangeReports.add(report);
                 }
                 continue;
             }
 
             if (factionHints.isAlliedWith(enemyFaction, otherFaction, today)) {
                 if (otherFaction.isClan()) {
-                    fameDelta = FAME_DELTA_CONTRACT_ACCEPT_ENEMY_ALLY_CLAN;
+                    regardDelta = REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_ALLY_CLAN;
                 } else {
 
-                    fameDelta = FAME_DELTA_CONTRACT_ACCEPT_ENEMY_ALLY_NORMAL;
+                    regardDelta = REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_ALLY_NORMAL;
                 }
 
-                report = changeFameForFaction(otherFactionCode, fameDelta, gameYear);
+                report = changeRegardForFaction(otherFactionCode, regardDelta, gameYear);
                 if (!report.isBlank()) {
-                    fameChangeReports.add(report);
+                    regardChangeReports.add(report);
                 }
             }
         }
 
-        return fameChangeReports;
+        return regardChangeReports;
     }
 
     /**
-     * Processes the outcome of a contract upon its completion and updates fame standings accordingly.
+     * Processes the outcome of a contract upon its completion and updates regard standings accordingly.
      *
      * <p>Depending on the mission status (success, partial, failure, or breach), this method determines the appropriate
-     * fame delta for the employer faction and its allies.</p>
+     * regard delta for the employer faction and its allies.</p>
      *
      * <p>If the employer faction is missing, a report is generated and returned accordingly. This report informs the
      * player that they need to manually apply the Standing change via the Standing Report GUI.</p>
      *
-     * <p>Fame changes are applied to the employer and all allied factions, and corresponding report strings are
-     * returned for each fame change applied.</p>
+     * <p>Regard changes are applied to the employer and all allied factions, and corresponding report strings are
+     * returned for each regard change applied.</p>
      *
      * @param employerFaction The {@link Faction} that employed the contract, or {@code null} if unavailable.
      * @param today           The {@link LocalDate} representing the date of contract completion.
      * @param missionStatus   The {@link MissionStatus} of the contract upon completion.
-     * @return A {@link List} of strings summarizing any fame changes or messages relating to missing factions.
+     * @return A {@link List} of strings summarizing any regard changes or messages relating to missing factions.
      * @author Illiani
      * @since 0.50.07
      */
@@ -816,33 +849,33 @@ public class FactionStandings {
             return List.of(report);
         }
 
-        double fameDeltaEmployer = 0.0;
-        double fameDeltaEmployerAlly = 0.0;
+        double regardDeltaEmployer = 0.0;
+        double regardDeltaEmployerAlly = 0.0;
         switch (missionStatus) {
             case SUCCESS -> {
-                fameDeltaEmployer = FAME_DELTA_CONTRACT_SUCCESS_EMPLOYER;
-                fameDeltaEmployerAlly = FAME_DELTA_CONTRACT_SUCCESS_EMPLOYER_ALLY;
+                regardDeltaEmployer = REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER;
+                regardDeltaEmployerAlly = REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER_ALLY;
             }
             case PARTIAL -> {
-                fameDeltaEmployer = FAME_DELTA_CONTRACT_PARTIAL_EMPLOYER;
-                fameDeltaEmployerAlly = FAME_DELTA_CONTRACT_PARTIAL_EMPLOYER_ALLY;
+                regardDeltaEmployer = REGARD_DELTA_CONTRACT_PARTIAL_EMPLOYER;
+                regardDeltaEmployerAlly = REGARD_DELTA_CONTRACT_PARTIAL_EMPLOYER_ALLY;
             }
             case FAILED -> {
-                fameDeltaEmployer = FAME_DELTA_CONTRACT_FAILURE_EMPLOYER;
-                fameDeltaEmployerAlly = FAME_DELTA_CONTRACT_FAILURE_EMPLOYER_ALLY;
+                regardDeltaEmployer = REGARD_DELTA_CONTRACT_FAILURE_EMPLOYER;
+                regardDeltaEmployerAlly = REGARD_DELTA_CONTRACT_FAILURE_EMPLOYER_ALLY;
             }
             case BREACH -> {
-                fameDeltaEmployer = FAME_DELTA_CONTRACT_BREACH_EMPLOYER;
-                fameDeltaEmployerAlly = FAME_DELTA_CONTRACT_BREACH_EMPLOYER_ALLY;
+                regardDeltaEmployer = REGARD_DELTA_CONTRACT_BREACH_EMPLOYER;
+                regardDeltaEmployerAlly = REGARD_DELTA_CONTRACT_BREACH_EMPLOYER_ALLY;
             }
         }
 
         // If there is no change to make, we exit early so as not to process faction data needlessly
-        if ((fameDeltaEmployer + fameDeltaEmployerAlly) == 0.0) {
+        if ((regardDeltaEmployer + regardDeltaEmployerAlly) == 0.0) {
             return new ArrayList<>();
         }
 
-        List<String> fameChangeReports = new ArrayList<>();
+        List<String> regardChangeReports = new ArrayList<>();
 
         int gameYear = today.getYear();
 
@@ -858,22 +891,22 @@ public class FactionStandings {
             }
 
             if (otherFaction.equals(employerFaction)) {
-                report = changeFameForFaction(otherFactionCode, fameDeltaEmployer, gameYear);
+                report = changeRegardForFaction(otherFactionCode, regardDeltaEmployer, gameYear);
                 if (!report.isBlank()) {
-                    fameChangeReports.add(report);
+                    regardChangeReports.add(report);
                 }
                 continue;
             }
 
             if (factionHints.isAlliedWith(employerFaction, otherFaction, today)) {
-                report = changeFameForFaction(otherFactionCode, fameDeltaEmployerAlly, gameYear);
+                report = changeRegardForFaction(otherFactionCode, regardDeltaEmployerAlly, gameYear);
                 if (!report.isBlank()) {
-                    fameChangeReports.add(report);
+                    regardChangeReports.add(report);
                 }
             }
         }
 
-        return fameChangeReports;
+        return regardChangeReports;
     }
 
     private boolean isNotValidForTracking(Faction otherFaction, int gameYear, String otherFactionCode) {
@@ -909,7 +942,7 @@ public class FactionStandings {
     /**
      * Processes the penalty for refusing a batchall against a specific Clan faction.
      *
-     * <p>This method applies a fame penalty to the given clan faction code for the specified year and generates a fame
+     * <p>This method applies a regard penalty to the given clan faction code for the specified year and generates a regard
      * change report if applicable.</p>
      *
      * <p>This method is included as a shortcut to allow developers to call Batchall refusal changes without needing to
@@ -917,35 +950,35 @@ public class FactionStandings {
      *
      * @param clanFactionCode The code representing the clan faction being penalized.
      * @param gameYear        The year in which the batchall was refused.
-     * @return A {@link List} of fame change report strings relating to the refusal.
+     * @return A {@link List} of regard change report strings relating to the refusal.
      * @author Illiani
      * @since 0.50.07
      */
     public List<String> processRefusedBatchall(final String clanFactionCode, final int gameYear) {
-        List<String> fameChangeReports = new ArrayList<>();
+        List<String> regardChangeReports = new ArrayList<>();
 
-        String report = changeFameForFaction(clanFactionCode, FAME_DELTA_REFUSE_BATCHALL, gameYear);
+        String report = changeRegardForFaction(clanFactionCode, REGARD_DELTA_REFUSE_BATCHALL, gameYear);
 
         if (!report.isBlank()) {
-            fameChangeReports.add(report);
+            regardChangeReports.add(report);
         }
 
-        return fameChangeReports;
+        return regardChangeReports;
     }
 
     /**
-     * Applies fame changes when the player executes prisoners of war.
+     * Applies regard changes when the player executes prisoners of war.
      *
-     * <p>For each victim in the specified list, the method identifies their origin faction and increments a fame penalty
+     * <p>For each victim in the specified list, the method identifies their origin faction and increments a regard penalty
      * for that faction, unless the faction is untracked. If multiple prisoners originate from the same faction, their
      * penalties are accumulated.</p>
      *
-     * <p>After processing all victims, the method applies the total fame change for each affected faction for the
-     * specified game year and collects any resulting fame change reports.</p>
+     * <p>After processing all victims, the method applies the total regard change for each affected faction for the
+     * specified game year and collects any resulting regard change reports.</p>
      *
      * @param victims  the list of {@link Person} prisoners executed by the player
-     * @param gameYear the year in which the executions and fame changes occur
-     * @return a {@link List} of non-blank fame change report strings for each affected faction
+     * @param gameYear the year in which the executions and regard changes occur
+     * @return a {@link List} of non-blank regard change report strings for each affected faction
      */
     public List<String> executePrisonersOfWar(final List<Person> victims, final int gameYear) {
         Map<String, Double> affectedFactions = new HashMap<>();
@@ -958,24 +991,24 @@ public class FactionStandings {
                 continue;
             }
 
-            affectedFactions.merge(factionCode, FAME_DELTA_EXECUTING_PRISONER, Double::sum);
+            affectedFactions.merge(factionCode, REGARD_DELTA_EXECUTING_PRISONER, Double::sum);
         }
 
-        List<String> fameChangeReports = new ArrayList<>();
+        List<String> regardChangeReports = new ArrayList<>();
         for (Map.Entry<String, Double> entry : affectedFactions.entrySet()) {
-            String report = changeFameForFaction(entry.getKey(), entry.getValue(), gameYear);
+            String report = changeRegardForFaction(entry.getKey(), entry.getValue(), gameYear);
             if (!report.isBlank()) {
-                fameChangeReports.add(report);
+                regardChangeReports.add(report);
             }
         }
 
-        return fameChangeReports;
+        return regardChangeReports;
     }
 
     /**
      * Writes all faction standings as XML out to the specified {@link PrintWriter}.
      *
-     * <p>The output includes each faction code and its current fame value as a separate tag, indented for
+     * <p>The output includes each faction code and its current regard value as a separate tag, indented for
      * readability within a parent {@code standings} element.</p>
      *
      * <p>This is primarily used for saving campaign data.</p>
@@ -987,11 +1020,17 @@ public class FactionStandings {
      * @since 0.50.07
      */
     public void writeFactionStandingsToXML(final PrintWriter writer, int indent) {
-        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "standings");
-        for (String factionCode : factionStandings.keySet()) {
-            MHQXMLUtility.writeSimpleXMLTag(writer, indent, factionCode, factionStandings.get(factionCode).toString());
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "factionRegard");
+        for (String factionCode : factionRegard.keySet()) {
+            MHQXMLUtility.writeSimpleXMLTag(writer, indent, factionCode, factionRegard.get(factionCode).toString());
         }
-        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "standings");
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "factionRegard");
+
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "politicalRegard");
+        for (String factionCode : politicalRegard.keySet()) {
+            MHQXMLUtility.writeSimpleXMLTag(writer, indent, factionCode, politicalRegard.get(factionCode).toString());
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "politicalRegard");
     }
 
     /**
@@ -999,7 +1038,7 @@ public class FactionStandings {
      *
      * <p>This method reads child elements of the provided XML node, looking for a "standings" element.</p>
      *
-     * <p>For each faction code found as a subelement, it extracts the faction's fame value from the element's text
+     * <p>For each faction code found as a subelement, it extracts the faction's regard value from the element's text
      * content. Parsed standing values are collected into a map, and then applied to a new {@link FactionStandings}
      * instance.</p>
      *
@@ -1020,36 +1059,39 @@ public class FactionStandings {
         NodeList childNodes = parentNode.getChildNodes();
 
         FactionStandings standings = new FactionStandings();
-
-        Map<String, Double> factionStandings = new HashMap<>();
         try {
             for (int i = 0; i < childNodes.getLength(); i++) {
                 Node childNode = childNodes.item(i);
                 String nodeName = childNode.getNodeName();
 
-                if (nodeName.equalsIgnoreCase("standings")) {
-                    NodeList factionEntries = childNode.getChildNodes();
-
-                    for (int factionEntry = 0; factionEntry < factionEntries.getLength(); factionEntry++) {
-                        Node node = factionEntries.item(factionEntry);
-
-                        if (node.getNodeType() == Node.ELEMENT_NODE) {
-                            try {
-                                factionStandings.put(node.getNodeName(),
-                                      MathUtility.parseDouble(node.getTextContent(), DEFAULT_FAME));
-                            } catch (Exception ex) {
-                                LOGGER.error("Could not parse {}: ", node.getNodeName(), ex);
-                            }
-                        }
-                    }
+                if (nodeName.equalsIgnoreCase("factionRegard")) {
+                    standings.setFactionRegard(processRegardNode(childNode, nodeName));
+                } else if (nodeName.equalsIgnoreCase("politicalRegard")) {
+                    standings.setPoliticalRegard(processRegardNode(childNode, nodeName));
                 }
             }
-
-            standings.setFactionStandings(factionStandings);
         } catch (Exception ex) {
             LOGGER.error("Could not parse FactionStandings: ", ex);
         }
 
         return standings;
+    }
+
+    private static Map<String, Double> processRegardNode(Node childNode, String logLabel) {
+        NodeList factionEntries = childNode.getChildNodes();
+        Map<String, Double> regard = new HashMap<>();
+        for (int i = 0; i < factionEntries.getLength(); i++) {
+            Node node = factionEntries.item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                try {
+                    regard.put(node.getNodeName(),
+                          MathUtility.parseDouble(node.getTextContent(), FactionStandings.DEFAULT_REGARD));
+                } catch (Exception ex) {
+                    LOGGER.error("Could not parse {} {}: ", logLabel, node.getNodeName(), ex);
+                }
+            }
+        }
+
+        return regard;
     }
 }

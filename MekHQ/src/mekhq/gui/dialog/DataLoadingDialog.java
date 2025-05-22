@@ -374,12 +374,12 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
 
                 // initialize starting faction standings
                 FactionStandings factionStandings = campaign.getFactionStandings();
-                List<String> standingReports = factionStandings.initializeStartingFameValues(campaign.getFaction(),
+                List<String> standingReports = factionStandings.initializeStartingRegardValues(campaign.getFaction(),
                       campaign.getLocalDate());
                 for (String report : standingReports) {
                     campaign.addReport(report);
                 }
-                String report = factionStandings.updateDynamicTemporaryFame(campaign.getFaction(),
+                String report = factionStandings.updatePoliticalRegard(campaign.getFaction(),
                       campaign.getLocalDate());
                 campaign.addReport(report);
                 // endregion Progress 6

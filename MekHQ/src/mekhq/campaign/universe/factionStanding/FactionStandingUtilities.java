@@ -40,41 +40,41 @@ public class FactionStandingUtilities {
     private static final MMLogger LOGGER = MMLogger.create(FactionStandingUtilities.class);
 
     /**
-     * Determines the {@link FactionStandingLevel} corresponding to the given fame value.
+     * Determines the {@link FactionStandingLevel} corresponding to the given regard value.
      *
-     * <p>Iterates through all defined standing levels and returns the one whose fame range (exclusive of minimum,
-     * and inclusive of maximum) contains the provided fame value.</p>
+     * <p>Iterates through all defined standing levels and returns the one whose regard range (exclusive of minimum,
+     * and inclusive of maximum) contains the provided regard value.</p>
      *
-     * <p>If the fame value does not fall within any defined standing level range, this method logs a warning and
+     * <p>If the regard value does not fall within any defined standing level range, this method logs a warning and
      * returns {@link FactionStandingLevel#STANDING_LEVEL_4} as a default.</p>
      *
-     * @param fame the fame value to evaluate
+     * @param regard the regard value to evaluate
      *
-     * @return the matching {@code FactionStandingLevel} for the given fame, or {@code STANDING_LEVEL_4} if no match is
+     * @return the matching {@code FactionStandingLevel} for the given regard, or {@code STANDING_LEVEL_4} if no match is
      *       found
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public static FactionStandingLevel calculateFactionStandingLevel(double fame) {
+    public static FactionStandingLevel calculateFactionStandingLevel(double regard) {
         for (FactionStandingLevel standingLevel : FactionStandingLevel.values()) {
-            if (fame > standingLevel.getMinimumFame() && fame <= standingLevel.getMaximumFame()) {
+            if (regard > standingLevel.getMinimumRegard() && regard <= standingLevel.getMaximumRegard()) {
                 return standingLevel;
             }
         }
 
         // I'm not expecting this to happen given we already accept all values between Integer#MIN_VALUE and
         // Integer#MAX_VALUE. But if it somehow does, we'll just return STANDING_LEVEL_4 as a default.
-        LOGGER.warn("Fame value {} is outside of the faction standing level range. Returning STANDING_LEVEL_4.",
+        LOGGER.warn("Regard value {} is outside of the faction standing level range. Returning STANDING_LEVEL_4.",
               FactionStandingLevel.STANDING_LEVEL_4);
 
         return FactionStandingLevel.STANDING_LEVEL_4;
     }
 
     /**
-     * Retrieves the current standing level based on the provided fame value.
+     * Retrieves the current standing level based on the provided regard value.
      *
-     * @param fame the fame value used to evaluate the faction standing level
+     * @param regard the regard value used to evaluate the faction standing level
      *
      * @return the corresponding standing level as an integer
      *
@@ -82,16 +82,16 @@ public class FactionStandingUtilities {
      * @see FactionStandingLevel#getStandingLevel()
      * @since 0.50.07
      */
-    public static int getStandingLevel(final double fame) {
-        final FactionStandingLevel standing = calculateFactionStandingLevel(fame);
+    public static int getStandingLevel(final double regard) {
+        final FactionStandingLevel standing = calculateFactionStandingLevel(regard);
 
         return standing.getStandingLevel();
     }
 
     /**
-     * Retrieves the negotiation modifier associated with the provided fame value.
+     * Retrieves the negotiation modifier associated with the provided regard value.
      *
-     * @param fame the fame value to evaluate
+     * @param regard the regard value to evaluate
      *
      * @return the negotiation modifier
      *
@@ -99,16 +99,16 @@ public class FactionStandingUtilities {
      * @see FactionStandingLevel#getNegotiationModifier()
      * @since 0.50.07
      */
-    public static int getNegotiationModifier(final double fame) {
-        final FactionStandingLevel standing = calculateFactionStandingLevel(fame);
+    public static int getNegotiationModifier(final double regard) {
+        final FactionStandingLevel standing = calculateFactionStandingLevel(regard);
 
         return standing.getNegotiationModifier();
     }
 
     /**
-     * Returns the resupply weight modifier for the specified fame value.
+     * Returns the resupply weight modifier for the specified regard value.
      *
-     * @param fame the fame value to evaluate
+     * @param regard the regard value to evaluate
      *
      * @return the resupply weight modifier as a double
      *
@@ -116,16 +116,16 @@ public class FactionStandingUtilities {
      * @see FactionStandingLevel#getResupplyWeightModifier()
      * @since 0.50.07
      */
-    public static double getResupplyWeightModifier(final double fame) {
-        final FactionStandingLevel standing = calculateFactionStandingLevel(fame);
+    public static double getResupplyWeightModifier(final double regard) {
+        final FactionStandingLevel standing = calculateFactionStandingLevel(regard);
 
         return standing.getResupplyWeightModifier();
     }
 
     /**
-     * Determines if the command circuit access is available at the given fame value.
+     * Determines if the command circuit access is available at the given regard value.
      *
-     * @param fame the fame value to evaluate
+     * @param regard the regard value to evaluate
      *
      * @return {@code true} if command circuit access is granted; {@code false} otherwise
      *
@@ -133,16 +133,16 @@ public class FactionStandingUtilities {
      * @see FactionStandingLevel#hasCommandCircuitAccess()
      * @since 0.50.07
      */
-    public static boolean hasCommandCircuitAccess(final double fame) {
-        final FactionStandingLevel standing = calculateFactionStandingLevel(fame);
+    public static boolean hasCommandCircuitAccess(final double regard) {
+        final FactionStandingLevel standing = calculateFactionStandingLevel(regard);
 
         return standing.hasCommandCircuitAccess();
     }
 
     /**
-     * Checks whether the specified fame value results in outlawed status.
+     * Checks whether the specified regard value results in outlawed status.
      *
-     * @param fame the fame value to evaluate
+     * @param regard the regard value to evaluate
      *
      * @return {@code true} if outlawed; {@code false} otherwise
      *
@@ -150,16 +150,16 @@ public class FactionStandingUtilities {
      * @see FactionStandingLevel#isOutlawed()
      * @since 0.50.07
      */
-    public static boolean isOutlawed(final double fame) {
-        final FactionStandingLevel standing = calculateFactionStandingLevel(fame);
+    public static boolean isOutlawed(final double regard) {
+        final FactionStandingLevel standing = calculateFactionStandingLevel(regard);
 
         return standing.isOutlawed();
     }
 
     /**
-     * Checks if Batchalls are allowed for the provided fame value.
+     * Checks if Batchalls are allowed for the provided regard value.
      *
-     * @param fame the fame value to evaluate
+     * @param regard the regard value to evaluate
      *
      * @return {@code true} if Batchall is allowed; {@code false} otherwise
      *
@@ -167,16 +167,16 @@ public class FactionStandingUtilities {
      * @see FactionStandingLevel#isBatchallAllowed()
      * @since 0.50.07
      */
-    public static boolean isBatchallAllowed(final double fame) {
-        final FactionStandingLevel standing = calculateFactionStandingLevel(fame);
+    public static boolean isBatchallAllowed(final double regard) {
+        final FactionStandingLevel standing = calculateFactionStandingLevel(regard);
 
         return standing.isBatchallAllowed();
     }
 
     /**
-     * Returns the number of recruitment tickets granted for the given fame value.
+     * Returns the number of recruitment tickets granted for the given regard value.
      *
-     * @param fame the fame value to evaluate
+     * @param regard the regard value to evaluate
      *
      * @return the number of recruitment tickets
      *
@@ -184,16 +184,16 @@ public class FactionStandingUtilities {
      * @see FactionStandingLevel#getRecruitmentTickets()
      * @since 0.50.07
      */
-    public static int getRecruitmentTickets(final double fame) {
-        final FactionStandingLevel standing = calculateFactionStandingLevel(fame);
+    public static int getRecruitmentTickets(final double regard) {
+        final FactionStandingLevel standing = calculateFactionStandingLevel(regard);
 
         return standing.getRecruitmentTickets();
     }
 
     /**
-     * Returns the recruitment rolls modifier based on the specified fame value.
+     * Returns the recruitment rolls modifier based on the specified regard value.
      *
-     * @param fame the fame value to evaluate
+     * @param regard the regard value to evaluate
      *
      * @return the recruitment rolls modifier
      *
@@ -201,16 +201,16 @@ public class FactionStandingUtilities {
      * @see FactionStandingLevel#getRecruitmentRollsModifier()
      * @since 0.50.07
      */
-    public static int getRecruitmentRollsModifier(final double fame) {
-        final FactionStandingLevel standing = calculateFactionStandingLevel(fame);
+    public static int getRecruitmentRollsModifier(final double regard) {
+        final FactionStandingLevel standing = calculateFactionStandingLevel(regard);
 
         return standing.getRecruitmentRollsModifier();
     }
 
     /**
-     * Retrieves the barrack costs multiplier for the specified fame value.
+     * Retrieves the barrack costs multiplier for the specified regard value.
      *
-     * @param fame the fame value to evaluate
+     * @param regard the regard value to evaluate
      *
      * @return the barrack costs multiplier as a double
      *
@@ -218,16 +218,16 @@ public class FactionStandingUtilities {
      * @see FactionStandingLevel#getBarrackCostsMultiplier()
      * @since 0.50.07
      */
-    public static double getBarrackCostsMultiplier(final double fame) {
-        final FactionStandingLevel standing = calculateFactionStandingLevel(fame);
+    public static double getBarrackCostsMultiplier(final double regard) {
+        final FactionStandingLevel standing = calculateFactionStandingLevel(regard);
 
         return standing.getBarrackCostsMultiplier();
     }
 
     /**
-     * Returns the unit market rarity modifier for the given fame value.
+     * Returns the unit market rarity modifier for the given regard value.
      *
-     * @param fame the fame value to evaluate
+     * @param regard the regard value to evaluate
      *
      * @return the unit market rarity modifier
      *
@@ -235,16 +235,16 @@ public class FactionStandingUtilities {
      * @see FactionStandingLevel#getUnitMarketRarityModifier()
      * @since 0.50.07
      */
-    public static int getUnitMarketRarityModifier(final double fame) {
-        final FactionStandingLevel standing = calculateFactionStandingLevel(fame);
+    public static int getUnitMarketRarityModifier(final double regard) {
+        final FactionStandingLevel standing = calculateFactionStandingLevel(regard);
 
         return standing.getUnitMarketRarityModifier();
     }
 
     /**
-     * Retrieves the contract pay multiplier corresponding to the specified fame value.
+     * Retrieves the contract pay multiplier corresponding to the specified regard value.
      *
-     * @param fame the fame value to evaluate
+     * @param regard the regard value to evaluate
      *
      * @return the contract pay multiplier as a double
      *
@@ -252,16 +252,16 @@ public class FactionStandingUtilities {
      * @see FactionStandingLevel#getContractPayMultiplier()
      * @since 0.50.07
      */
-    public static double getContractPayMultiplier(final double fame) {
-        final FactionStandingLevel standing = calculateFactionStandingLevel(fame);
+    public static double getContractPayMultiplier(final double regard) {
+        final FactionStandingLevel standing = calculateFactionStandingLevel(regard);
 
         return standing.getContractPayMultiplier();
     }
 
     /**
-     * Returns the support point modifier applied at the start of a contract for the given fame value.
+     * Returns the support point modifier applied at the start of a contract for the given regard value.
      *
-     * @param fame the fame value to evaluate
+     * @param regard the regard value to evaluate
      *
      * @return the support point modifier for contract start
      *
@@ -269,16 +269,16 @@ public class FactionStandingUtilities {
      * @see FactionStandingLevel#getSupportPointModifierContractStart()
      * @since 0.50.07
      */
-    public static int getSupportPointModifierContractStart(final double fame) {
-        final FactionStandingLevel standing = calculateFactionStandingLevel(fame);
+    public static int getSupportPointModifierContractStart(final double regard) {
+        final FactionStandingLevel standing = calculateFactionStandingLevel(regard);
 
         return standing.getSupportPointModifierContractStart();
     }
 
     /**
-     * Returns the periodic support point modifier for the specified fame value.
+     * Returns the periodic support point modifier for the specified regard value.
      *
-     * @param fame the fame value to evaluate
+     * @param regard the regard value to evaluate
      *
      * @return the periodic support point modifier
      *
@@ -286,8 +286,8 @@ public class FactionStandingUtilities {
      * @see FactionStandingLevel#getSupportPointModifierPeriodic()
      * @since 0.50.07
      */
-    public static int getSupportPointModifierPeriodic(final double fame) {
-        final FactionStandingLevel standing = calculateFactionStandingLevel(fame);
+    public static int getSupportPointModifierPeriodic(final double regard) {
+        final FactionStandingLevel standing = calculateFactionStandingLevel(regard);
 
         return standing.getSupportPointModifierPeriodic();
     }

@@ -70,34 +70,34 @@ class FactionStandingsTest {
         assertFalse(Factions.getInstance().getFactions().isEmpty(), "Factions list is empty");
     }
 
-    static Stream<Arguments> initializeStartingFameValuesProvider() {
-        return Stream.of( // targetFaction, expectedFame, expectedStanding
+    static Stream<Arguments> initializeStartingRegardValuesProvider() {
+        return Stream.of( // targetFaction, expectedRegard, expectedStanding
               // Federated Suns (same faction)
-              Arguments.of("FS", STARTING_FAME_SAME_FACTION, STANDING_LEVEL_5),
+              Arguments.of("FS", STARTING_REGARD_SAME_FACTION, STANDING_LEVEL_5),
               // Lyran Commonwealth (allied faction)
-              Arguments.of("LA", STARTING_FAME_ALLIED_FACTION, STANDING_LEVEL_4),
+              Arguments.of("LA", STARTING_REGARD_ALLIED_FACTION, STANDING_LEVEL_4),
               // Capellan Confederation (enemy faction)
-              Arguments.of("CC", STARTING_FAME_ENEMY_FACTION_AT_WAR, STANDING_LEVEL_3),
+              Arguments.of("CC", STARTING_REGARD_ENEMY_FACTION_AT_WAR, STANDING_LEVEL_3),
               // ComStar (neutral faction)
-              Arguments.of("CS", DEFAULT_FAME, STANDING_LEVEL_4));
+              Arguments.of("CS", DEFAULT_REGARD, STANDING_LEVEL_4));
     }
 
     @ParameterizedTest(name = "{0}")
-    @MethodSource(value = "initializeStartingFameValuesProvider")
-    void test_initializeStartingFameValues(String targetFaction, double expectedFame,
+    @MethodSource(value = "initializeStartingRegardValuesProvider")
+    void test_initializeStartingRegardValues(String targetFaction, double expectedRegard,
           FactionStandingLevel expectedStanding) {
         // Setup
         FactionStandings factionStandings = getStartingFactionStandings();
 
         // Act
-        double actualFame = factionStandings.getFameForFaction(targetFaction, false);
-        FactionStandingLevel actualStanding = calculateFactionStandingLevel(actualFame);
+        double actualRegard = factionStandings.getRegardForFaction(targetFaction, false);
+        FactionStandingLevel actualStanding = calculateFactionStandingLevel(actualRegard);
 
         // Assert
-        assertEquals(expectedFame, actualFame, "Expected fame of " + expectedFame + " but got " + actualFame);
+        assertEquals(expectedRegard, actualRegard, "Expected regard of " + expectedRegard + " but got " + actualRegard);
         assertEquals(expectedStanding,
               actualStanding,
-              "Expected fame level of " + expectedStanding.name() + " but got " + actualStanding.name());
+              "Expected regard level of " + expectedStanding.name() + " but got " + actualStanding.name());
     }
 
     private static FactionStandings getStartingFactionStandings() {
@@ -105,54 +105,66 @@ class FactionStandingsTest {
         LocalDate today = LocalDate.of(3028, 8, 20); // Start of the 4th Succession War
 
         FactionStandings factionStandings = new FactionStandings();
-        factionStandings.initializeStartingFameValues(campaignFaction, today);
+        factionStandings.initializeStartingRegardValues(campaignFaction, today);
 
         return factionStandings;
     }
 
+    static Stream<Arguments> initializeDynamicRegardValuesProvider() {
+        return Stream.of( // targetFaction, expectedRegard, expectedStanding
+              // Federated Suns (same faction)
+              Arguments.of("FS", POLITICAL_REGARD_SAME_FACTION, STANDING_LEVEL_5),
+              // Lyran Commonwealth (allied faction)
+              Arguments.of("LA", POLITICAL_REGARD_ALLIED_FACTION, STANDING_LEVEL_4),
+              // Capellan Confederation (enemy faction)
+              Arguments.of("CC", POLITICAL_REGARD_ENEMY_FACTION_AT_WAR, STANDING_LEVEL_3),
+              // ComStar (neutral faction)
+              Arguments.of("CS", DEFAULT_REGARD, STANDING_LEVEL_4));
+    }
+
     @ParameterizedTest(name = "{0}")
-    @MethodSource(value = "initializeStartingFameValuesProvider")
-    void test_initializeDynamicFameValues(String targetFaction, double expectedFame,
+    @MethodSource(value = "initializeDynamicRegardValuesProvider")
+    void test_initializeDynamicRegardValues(String targetFaction, double expectedRegard,
           FactionStandingLevel expectedStanding) {
         // Setup
         Faction campaignFaction = Factions.getInstance().getFaction("FS"); // Federated Suns
         LocalDate today = LocalDate.of(3028, 8, 20); // Start of the 4th Succession War
 
         FactionStandings factionStandings = new FactionStandings();
-        factionStandings.updateDynamicTemporaryFame(campaignFaction, today);
+        factionStandings.updatePoliticalRegard(campaignFaction, today);
 
         // Act
-        double actualFame = factionStandings.getFameForFaction(targetFaction, true);
-        FactionStandingLevel actualStanding = calculateFactionStandingLevel(actualFame);
+        double actualRegard = factionStandings.getRegardForFaction(targetFaction, true);
+        FactionStandingLevel actualStanding = calculateFactionStandingLevel(actualRegard);
 
         // Assert
-        assertEquals(expectedFame, actualFame, "Expected fame of " + expectedFame + " but got " + actualFame);
+        assertEquals(expectedRegard, actualRegard, "Expected regard of " + expectedRegard + " but got " + actualRegard);
         assertEquals(expectedStanding,
               actualStanding,
-              "Expected fame level of " + expectedStanding.name() + " but got " + actualStanding.name());
+              "Expected regard level of " + expectedStanding.name() + " but got " + actualStanding.name());
     }
 
-    static Stream<Arguments> processFameDegradationProvider() {
-        return Stream.of( // initialFame, expectedFame
-              Arguments.of("Positive Degraded", 5.0, 5.0 - DEFAULT_FAME_DEGRADATION),
-              Arguments.of("Negative Degraded", -5.0, -5.0 + DEFAULT_FAME_DEGRADATION),
-              Arguments.of("Low Positive Fame Degraded", 0.1, DEFAULT_FAME),
-              Arguments.of("Low Negative Fame Degraded", -0.1, DEFAULT_FAME));
+    static Stream<Arguments> processRegardDegradationProvider() {
+        return Stream.of( // initialRegard, expectedRegard
+              Arguments.of("Positive Degraded", 5.0, 5.0 - DEFAULT_REGARD_DEGRADATION),
+              Arguments.of("Negative Degraded", -5.0, -5.0 + DEFAULT_REGARD_DEGRADATION),
+              Arguments.of("Low Positive Regard Degraded", 0.1, DEFAULT_REGARD),
+              Arguments.of("Low Negative Regard Degraded", -0.1, DEFAULT_REGARD));
     }
 
     @ParameterizedTest(name = "{0}")
-    @MethodSource(value = "processFameDegradationProvider")
-    void test_processFameDegradation(String testName, double initialFame, double expectedFame) {
+    @MethodSource(value = "processRegardDegradationProvider")
+    void test_processRegardDegradation(String testName, double initialRegard, double expectedRegard) {
         // Setup
         FactionStandings factionStandings = new FactionStandings();
-        factionStandings.setFameForFaction("CS", initialFame);
+        factionStandings.setRegardForFaction("CS", initialRegard);
 
         // Act
-        factionStandings.processFameDegradation(3025);
+        factionStandings.processRegardDegradation(3025);
 
         // Assert
-        double actualFame = factionStandings.getFameForFaction("CS", false);
-        assertEquals(expectedFame, actualFame, "Expected fame of " + expectedFame + " but got " + actualFame);
+        double actualRegard = factionStandings.getRegardForFaction("CS", false);
+        assertEquals(expectedRegard, actualRegard, "Expected regard of " + expectedRegard + " but got " + actualRegard);
     }
 
     private static Stream<Arguments> provideContractAcceptCases() {
@@ -160,30 +172,22 @@ class FactionStandingsTest {
                     "FS",
                     10.0,
                     "LA",
-                    5.0,
-                    FAME_DELTA_CONTRACT_ACCEPT_ENEMY_NORMAL,
-                    FAME_DELTA_CONTRACT_ACCEPT_ENEMY_ALLY_NORMAL),
+                    5.0, REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_NORMAL, REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_ALLY_NORMAL),
               Arguments.of("CCO Enemy, CGB Enemy's Ally",
                     "CCO",
                     10.0,
                     "CGB",
-                    5.0,
-                    FAME_DELTA_CONTRACT_ACCEPT_ENEMY_CLAN,
-                    FAME_DELTA_CONTRACT_ACCEPT_ENEMY_ALLY_CLAN),
+                    5.0, REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_CLAN, REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_ALLY_CLAN),
               Arguments.of("CS Enemy, CSJ Enemy's Ally",
                     "CS",
                     10.0,
                     "CSJ",
-                    5.0,
-                    FAME_DELTA_CONTRACT_ACCEPT_ENEMY_NORMAL,
-                    FAME_DELTA_CONTRACT_ACCEPT_ENEMY_ALLY_CLAN),
+                    5.0, REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_NORMAL, REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_ALLY_CLAN),
               Arguments.of("CSJ Enemy, CS Enemy's Ally",
                     "CSJ",
                     10.0,
                     "CS",
-                    5.0,
-                    FAME_DELTA_CONTRACT_ACCEPT_ENEMY_CLAN,
-                    FAME_DELTA_CONTRACT_ACCEPT_ENEMY_ALLY_NORMAL));
+                    5.0, REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_CLAN, REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_ALLY_NORMAL));
     }
 
     @ParameterizedTest(name = "{0}")
@@ -192,8 +196,8 @@ class FactionStandingsTest {
           String secondaryFaction, double secondaryStart, double expectedPrimaryDelta, double expectedSecondaryDelta) {
         // Setup
         FactionStandings factionStandings = new FactionStandings();
-        factionStandings.setFameForFaction(primaryFaction, primaryStart);
-        factionStandings.setFameForFaction(secondaryFaction, secondaryStart);
+        factionStandings.setRegardForFaction(primaryFaction, primaryStart);
+        factionStandings.setRegardForFaction(secondaryFaction, secondaryStart);
 
         Faction enemyFaction = Factions.getInstance().getFaction(primaryFaction);
         LocalDate today = LocalDate.of(3049, 11, 3);
@@ -202,49 +206,42 @@ class FactionStandingsTest {
         factionStandings.processContractAccept(enemyFaction, today);
 
         // Assert
-        assertEquals(primaryStart + expectedPrimaryDelta, factionStandings.getFameForFaction(primaryFaction, false),
-              "Incorrect fame for " + primaryFaction);
+        assertEquals(primaryStart + expectedPrimaryDelta,
+              factionStandings.getRegardForFaction(primaryFaction, false),
+              "Incorrect regard for " + primaryFaction);
         assertEquals(secondaryStart + expectedSecondaryDelta,
-              factionStandings.getFameForFaction(secondaryFaction, false),
-              "Incorrect fame for " + secondaryFaction + " (ally)");
+              factionStandings.getRegardForFaction(secondaryFaction, false),
+              "Incorrect regard for " + secondaryFaction + " (ally)");
     }
 
     private static Stream<Arguments> provideContractStatuses() {
-        return Stream.of( // Mission status, startingFSFame, startingLAFame, expectedFSFame, expectedLAFame
+        return Stream.of( // Mission status, startingFSRegard, startingLARegard, expectedFSRegard, expectedLARegard
               Arguments.of("Mission Success",
                     MissionStatus.SUCCESS,
                     10.0,
-                    5.0,
-                    FAME_DELTA_CONTRACT_SUCCESS_EMPLOYER,
-                    FAME_DELTA_CONTRACT_SUCCESS_EMPLOYER_ALLY),
+                    5.0, REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER, REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER_ALLY),
               Arguments.of("Mission Partial Success",
                     MissionStatus.PARTIAL,
                     10.0,
-                    5.0,
-                    FAME_DELTA_CONTRACT_PARTIAL_EMPLOYER,
-                    FAME_DELTA_CONTRACT_PARTIAL_EMPLOYER_ALLY),
+                    5.0, REGARD_DELTA_CONTRACT_PARTIAL_EMPLOYER, REGARD_DELTA_CONTRACT_PARTIAL_EMPLOYER_ALLY),
               Arguments.of("Mission Failed",
                     MissionStatus.FAILED,
                     10.0,
-                    5.0,
-                    FAME_DELTA_CONTRACT_FAILURE_EMPLOYER,
-                    FAME_DELTA_CONTRACT_FAILURE_EMPLOYER_ALLY),
+                    5.0, REGARD_DELTA_CONTRACT_FAILURE_EMPLOYER, REGARD_DELTA_CONTRACT_FAILURE_EMPLOYER_ALLY),
               Arguments.of("Mission Contract Breached",
                     MissionStatus.BREACH,
                     10.0,
-                    5.0,
-                    FAME_DELTA_CONTRACT_BREACH_EMPLOYER,
-                    FAME_DELTA_CONTRACT_BREACH_EMPLOYER_ALLY));
+                    5.0, REGARD_DELTA_CONTRACT_BREACH_EMPLOYER, REGARD_DELTA_CONTRACT_BREACH_EMPLOYER_ALLY));
     }
 
     @ParameterizedTest(name = "{0}")
     @MethodSource(value = "provideContractStatuses")
-    void test_processContractCompletion_variousOutcomes(String testName, MissionStatus status, double startingFsFame,
-          double startingLaFame, double expectedFsDelta, double expectedLaDelta) {
+    void test_processContractCompletion_variousOutcomes(String testName, MissionStatus status, double startingFsRegard,
+          double startingLaRegard, double expectedFsDelta, double expectedLaDelta) {
         // Setup
         FactionStandings factionStandings = new FactionStandings();
-        factionStandings.setFameForFaction("FS", startingFsFame);
-        factionStandings.setFameForFaction("LA", startingLaFame);
+        factionStandings.setRegardForFaction("FS", startingFsRegard);
+        factionStandings.setRegardForFaction("LA", startingLaRegard);
 
         Faction employerFaction = Factions.getInstance().getFaction("FS");
         LocalDate today = LocalDate.of(3028, 8, 20);
@@ -253,17 +250,19 @@ class FactionStandingsTest {
         factionStandings.processContractCompletion(employerFaction, today, status);
 
         // Assert
-        assertEquals(startingFsFame + expectedFsDelta, factionStandings.getFameForFaction("FS", false),
-              "Incorrect fame for FS (" + status + ")");
-        assertEquals(startingLaFame + expectedLaDelta, factionStandings.getFameForFaction("LA", false),
-              "Incorrect fame for LA (ally) (" + status + ")");
+        assertEquals(startingFsRegard + expectedFsDelta,
+              factionStandings.getRegardForFaction("FS", false),
+              "Incorrect regard for FS (" + status + ")");
+        assertEquals(startingLaRegard + expectedLaDelta,
+              factionStandings.getRegardForFaction("LA", false),
+              "Incorrect regard for LA (ally) (" + status + ")");
     }
 
     @Test
-    void test_processRefusedBatchall_decreasesFame() {
+    void test_processRefusedBatchall_decreasesRegard() {
         // Setup
         FactionStandings factionStandings = new FactionStandings();
-        factionStandings.setFameForFaction("CW", 10.0); // Clan Wolf with fame 10.0
+        factionStandings.setRegardForFaction("CW", 10.0); // Clan Wolf with regard 10.0
 
         int gameYear = 3050;
 
@@ -273,18 +272,18 @@ class FactionStandingsTest {
         // Assert
         assertEquals(1, reports.size(), "Reports size mismatch");
 
-        double expectedFame = 10.0 + FAME_DELTA_REFUSE_BATCHALL;
-        double actualFame = factionStandings.getFameForFaction("CW", false);
-        assertEquals(expectedFame, actualFame, "Incorrect fame for clan faction after refused Batchall");
+        double expectedRegard = 10.0 + REGARD_DELTA_REFUSE_BATCHALL;
+        double actualRegard = factionStandings.getRegardForFaction("CW", false);
+        assertEquals(expectedRegard, actualRegard, "Incorrect regard for clan faction after refused Batchall");
     }
 
     @Test
     void test_executePrisonersOfWar() {
         // Setup
         FactionStandings factionStandings = new FactionStandings();
-        factionStandings.setFameForFaction("FS", 10.0); // Initial fame for Federated Suns
-        factionStandings.setFameForFaction("CC", 20.0); // Initial fame for Capellan Confederation
-        factionStandings.setFameForFaction("CS", -5.0); // Initial fame for ComStar
+        factionStandings.setRegardForFaction("FS", 10.0); // Initial regard for Federated Suns
+        factionStandings.setRegardForFaction("CC", 20.0); // Initial regard for Capellan Confederation
+        factionStandings.setRegardForFaction("CS", -5.0); // Initial regard for ComStar
 
         Campaign mockCampaign = mock(Campaign.class);
         when(mockCampaign.getFaction()).thenReturn(Factions.getInstance().getDefaultFaction());
@@ -311,16 +310,16 @@ class FactionStandingsTest {
         // Assert
         assertEquals(3, reports.size(), "Reports size mismatch");
 
-        double expected = 10.0 + FAME_DELTA_EXECUTING_PRISONER;
-        double actual = factionStandings.getFameForFaction("FS", false);
-        assertEquals(expected, actual, "Incorrect fame for FS");
+        double expected = 10.0 + REGARD_DELTA_EXECUTING_PRISONER;
+        double actual = factionStandings.getRegardForFaction("FS", false);
+        assertEquals(expected, actual, "Incorrect regard for FS");
 
-        expected = 20.0 + (FAME_DELTA_EXECUTING_PRISONER * 2);
-        actual = factionStandings.getFameForFaction("CC", false);
-        assertEquals(expected, actual, "Incorrect fame for CC");
+        expected = 20.0 + (REGARD_DELTA_EXECUTING_PRISONER * 2);
+        actual = factionStandings.getRegardForFaction("CC", false);
+        assertEquals(expected, actual, "Incorrect regard for CC");
 
-        expected = -5.0 + FAME_DELTA_EXECUTING_PRISONER;
-        actual = factionStandings.getFameForFaction("CS", false);
-        assertEquals(expected, actual, "Incorrect fame for CS");
+        expected = -5.0 + REGARD_DELTA_EXECUTING_PRISONER;
+        actual = factionStandings.getRegardForFaction("CS", false);
+        assertEquals(expected, actual, "Incorrect regard for CS");
     }
 }
