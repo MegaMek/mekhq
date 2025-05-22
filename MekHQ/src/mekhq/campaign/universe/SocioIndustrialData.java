@@ -243,6 +243,9 @@ public class SocioIndustrialData {
 
         private PlanetaryRating getRatingFromString(String rating) {
             try {
+                if (rating == null) {
+                    return PlanetaryRating.C;
+                }
                 return PlanetaryRating.fromName(rating.toUpperCase(Locale.ROOT));
             } catch (IllegalArgumentException e) {
                 // If the rating is not valid, return a default value but first let's evaluate 
