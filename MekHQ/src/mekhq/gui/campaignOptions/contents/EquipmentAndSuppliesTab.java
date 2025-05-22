@@ -800,17 +800,6 @@ public class EquipmentAndSuppliesTab {
         return spinnerHeight;
     }
 
-    private int getSpinnerHeight() {
-        int spinnerHeight = 0;
-        if (spnPlanetAcquireIndustryBonus != null && spnPlanetAcquireIndustryBonus.length > 0 && spnPlanetAcquireIndustryBonus[0] != null) {
-            spinnerHeight = spnPlanetAcquireIndustryBonus[0].getPreferredSize().height;
-        } else {
-            //fallback
-            spinnerHeight = new JSpinner().getPreferredSize().height; 
-        }
-        return spinnerHeight;
-    }
-
     /**
      * Creates and configures a {@code JPanel} that serves as the Industry Modifiers Panel. The panel contains labels
      * and spinners arranged in a grid layout to display and allow modification of industry bonuses.
