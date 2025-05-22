@@ -380,6 +380,8 @@ public class ImmersiveDialogCore extends JDialog {
         // Add the buttons panel to the northPanel
         northPanel.add(buttonPanel, BorderLayout.SOUTH);
 
+        northPanel.setBorder(RoundedLineBorder.createRoundedLineBorder());
+
         return northPanel;
     }
 
@@ -452,7 +454,7 @@ public class ImmersiveDialogCore extends JDialog {
         JPanel pnlOutOfCharacter = new JPanel(new GridBagLayout());
 
         // Create a compound border with an etched border and padding (empty border)
-        pnlOutOfCharacter.setBorder(BorderFactory.createEtchedBorder());
+        pnlOutOfCharacter.setBorder(RoundedLineBorder.createRoundedLineBorder());
 
         // Create a JEditorPane for the message
         JEditorPane editorPane = new JEditorPane();
