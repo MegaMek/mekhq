@@ -401,7 +401,7 @@ public class Campaign implements ITechManager {
     private final CampaignSummary campaignSummary;
     private final Quartermaster quartermaster;
     private StoryArc storyArc;
-    private final FameAndInfamyController fameAndInfamy;
+    private final FameAndInfamyController regardAndInfamy;
     private BehaviorSettings autoResolveBehaviorSettings;
     private List<UUID> automatedMothballUnits;
     private int temporaryPrisonerCapacity;
@@ -501,7 +501,7 @@ public class Campaign implements ITechManager {
         campaignSummary = new CampaignSummary(this);
         quartermaster = new Quartermaster(this);
         fieldKitchenWithinCapacity = false;
-        fameAndInfamy = new FameAndInfamyController();
+        regardAndInfamy = new FameAndInfamyController();
         autoResolveBehaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR;
         automatedMothballUnits = new ArrayList<>();
         temporaryPrisonerCapacity = DEFAULT_TEMPORARY_CAPACITY;
@@ -5642,9 +5642,9 @@ public class Campaign implements ITechManager {
             // Change Year Game Option
             getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(getGameYear());
 
-            // Degrade Fame
-            List<String> degradedFameReports = factionStandings.processFameDegradation(currentDay.getYear());
-            for (String report : degradedFameReports) {
+            // Degrade Regard
+            List<String> degradedRegardReports = factionStandings.processRegardDegradation(currentDay.getYear());
+            for (String report : degradedRegardReports) {
                 addReport(report);
             }
         }
@@ -5733,7 +5733,7 @@ public class Campaign implements ITechManager {
 
         // Faction Standing
         if (isFirstOfMonth && campaignOptions.isTrackFactionStanding()) {
-            String report = factionStandings.updateDynamicTemporaryFame(faction, currentDay);
+            String report = factionStandings.updatePoliticalRegard(faction, currentDay);
             addReport(report);
         }
 
@@ -6632,7 +6632,7 @@ public class Campaign implements ITechManager {
     }
 
     public FameAndInfamyController getFameAndInfamy() {
-        return fameAndInfamy;
+        return regardAndInfamy;
     }
 
     /**
@@ -6841,9 +6841,9 @@ public class Campaign implements ITechManager {
             storyArc.writeToXml(writer, indent);
         }
 
-        // Fame and Infamy
-        if (fameAndInfamy != null) {
-            fameAndInfamy.writeToXml(writer, indent);
+        // Regard and Infamy
+        if (regardAndInfamy != null) {
+            regardAndInfamy.writeToXml(writer, indent);
         }
 
         // Markets

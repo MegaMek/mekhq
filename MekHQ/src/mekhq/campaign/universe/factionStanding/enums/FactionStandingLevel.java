@@ -52,7 +52,7 @@ import static mekhq.utilities.ReportingUtilities.*;
  *
  * <p>Each standing level encapsulates:</p>
  * <ul>
- *   <li>The fame threshold range for the level</li>
+ *   <li>The regard threshold range for the level</li>
  *   <li>Contract negotiation and payment modifiers</li>
  *   <li>Resource, recruitment, market, and cost multipliers</li>
  *   <li>Special status indicators, such as outlawed state or command circuit access</li>
@@ -84,8 +84,8 @@ public enum FactionStandingLevel {
     private final static int MAXIMUM_STANDING_LEVEL = 8;
 
     private final int standingLevel;
-    private final double minimumFame;
-    private final double maximumFame;
+    private final double minimumRegard;
+    private final double maximumRegard;
     private final int negotiationModifier;
     private final double resupplyWeightModifier;
     private final boolean hasCommandCircuitAccess;
@@ -103,8 +103,8 @@ public enum FactionStandingLevel {
      * Constructs a standing level with all modifiers and properties.
      *
      * @param standingLevel                     The level of the standing. Should be exclusive to this standing level.
-     * @param minimumFame                       Minimum fame for this level (inclusive).
-     * @param maximumFame                       Maximum fame for this level (exclusive).
+     * @param minimumRegard                       Minimum regard for this level (inclusive).
+     * @param maximumRegard                       Maximum regard for this level (exclusive).
      * @param negotiationModifier               Modifier to contract negotiations.
      * @param resupplyWeightModifier            Modifier for resupply weight calculations.
      * @param hasCommandCircuitAccess           Whether Command Circuit access is granted at this level.
@@ -120,14 +120,14 @@ public enum FactionStandingLevel {
      * @author Illiani
      * @since 0.50.07
      */
-    FactionStandingLevel(int standingLevel, int minimumFame, int maximumFame, int negotiationModifier,
+    FactionStandingLevel(int standingLevel, int minimumRegard, int maximumRegard, int negotiationModifier,
           double resupplyWeightModifier, boolean hasCommandCircuitAccess, boolean isOutlawed, boolean isBatchallAllowed,
           int recruitmentTickets, int recruitmentRollsModifier, double barrackCostsMultiplier,
           int unitMarketRarityModifier, double contractPayMultiplier, int supportPointModifierContractStart,
           int supportPointModifierPeriodic) {
         this.standingLevel = standingLevel;
-        this.minimumFame = minimumFame;
-        this.maximumFame = maximumFame;
+        this.minimumRegard = minimumRegard;
+        this.maximumRegard = maximumRegard;
         this.negotiationModifier = negotiationModifier;
         this.resupplyWeightModifier = resupplyWeightModifier;
         this.hasCommandCircuitAccess = hasCommandCircuitAccess;
@@ -166,27 +166,27 @@ public enum FactionStandingLevel {
     }
 
     /**
-     * Retrieves the minimum fame value associated with this faction standing.
+     * Retrieves the minimum regard value associated with this faction standing.
      *
-     * @return the minimum fame as a double.
+     * @return the minimum regard as a double.
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public double getMinimumFame() {
-        return minimumFame;
+    public double getMinimumRegard() {
+        return minimumRegard;
     }
 
     /**
-     * Retrieves the maximum fame value associated with the faction standing.
+     * Retrieves the maximum regard value associated with the faction standing.
      *
-     * @return A double representing the maximum fame value.
+     * @return A double representing the maximum regard value.
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public double getMaximumFame() {
-        return maximumFame;
+    public double getMaximumRegard() {
+        return maximumRegard;
     }
 
     /**
