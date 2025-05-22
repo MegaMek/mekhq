@@ -373,15 +373,17 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 campaign.setReputation(reputationController);
 
                 // initialize starting faction standings
-                FactionStandings factionStandings = campaign.getFactionStandings();
-                List<String> standingReports = factionStandings.initializeStartingRegardValues(campaign.getFaction(),
-                      campaign.getLocalDate());
-                for (String report : standingReports) {
+                if (campaign.getCampaignOptions().isTrackFactionStanding()) {
+                    FactionStandings factionStandings = campaign.getFactionStandings();
+                    List<String> standingReports = factionStandings.initializeStartingRegardValues(campaign.getFaction(),
+                          campaign.getLocalDate());
+                    for (String report : standingReports) {
+                        campaign.addReport(report);
+                    }
+                    String report = factionStandings.updateClimateRegard(campaign.getFaction(),
+                          campaign.getLocalDate());
                     campaign.addReport(report);
                 }
-                String report = factionStandings.updateClimateRegard(campaign.getFaction(),
-                      campaign.getLocalDate());
-                campaign.addReport(report);
                 // endregion Progress 6
 
                 // region Progress 7

@@ -567,7 +567,7 @@ public class FactionStandings {
             return "";
         }
 
-        return buildClimateReport(today).toString();
+        return buildClimateReport(campaignFaction.isPirate(), today).toString();
     }
 
     /**
@@ -579,6 +579,7 @@ public class FactionStandings {
      *
      * <p>If any entries exist, an introductory line is inserted at the beginning.</p>
      *
+     * @param campaignIsPirate whether the faction is a pirate faction
      * @param today the {@link LocalDate} used for retrieving year-specific faction names
      *
      * @return a {@link StringBuilder} containing the formatted climate regard report
@@ -586,7 +587,7 @@ public class FactionStandings {
      * @author Illiani
      * @since 0.50.07
      */
-    private StringBuilder buildClimateReport(LocalDate today) {
+    private StringBuilder buildClimateReport(boolean campaignIsPirate, LocalDate today) {
         StringBuilder report = new StringBuilder();
         String factionName;
         double regard;
@@ -595,6 +596,13 @@ public class FactionStandings {
         List<String> sortedFactionCodes = new ArrayList<>(climateRegard.keySet());
         Collections.sort(sortedFactionCodes);
         for (String factionCode : sortedFactionCodes) {
+            regard = climateRegard.get(factionCode);
+
+            // We don't report negative Regard for pirates because they're always negative.
+            if (campaignIsPirate && regard < 0) {
+                continue;
+            }
+
             Faction faction = Factions.getInstance().getFaction(factionCode);
             if (faction == null) {
                 LOGGER.warn("Faction {} is missing from the Factions collection. Skipping.",
@@ -603,16 +611,22 @@ public class FactionStandings {
             }
 
             factionName = faction.getFullName(today.getYear());
-            regard = climateRegard.get(factionCode);
             String color = regard >= 0 ? getPositiveColor() : getNegativeColor();
 
             report.append(String.format(reportFormat, factionName, color, regard));
         }
 
         if (!report.isEmpty()) {
-            report.insert(0,
-                  getFormattedTextAt(RESOURCE_BUNDLE, "factionStandings.change.report.climate",
+            String reportKey = campaignIsPirate ?
+                                     "factionStandings.change.report.climate.pirate" :
+                                     "factionStandings.change.report.climate";
+
+            report.insert(0, getFormattedTextAt(RESOURCE_BUNDLE,
+                  reportKey,
                         spanOpeningWithCustomColor(getWarningColor()),
+                  CLOSING_SPAN_TAG,
+                  spanOpeningWithCustomColor(getNegativeColor()),
+                  CLIMATE_REGARD_ENEMY_FACTION_AT_WAR,
                         CLOSING_SPAN_TAG));
         }
         return report;
@@ -957,12 +971,10 @@ public class FactionStandings {
      * Determines whether a given faction should be excluded from tracking for regard (including climate regard, based
      * on its validity in the specified game year or if it is considered "untracked."
      *
-     * @param otherFaction     the {@link Faction} to evaluate
-     * @param gameYear         the year for which validity should be checked
+     * @param otherFaction the {@link Faction} to evaluate
+     * @param gameYear the year for which validity should be checked
      * @param otherFactionCode the short code identifying the other faction
-     *
-     * @return {@code true} if the faction is either invalid in the specified year or is untracked; {@code false}
-     *       otherwise
+     * @return {@code true} if the faction is either invalid in the specified year or is untracked; {@code false} otherwise
      *
      * @author Illiani
      * @since 0.50.07
