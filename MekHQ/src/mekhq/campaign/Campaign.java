@@ -57,7 +57,6 @@ import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
 import static mekhq.campaign.personnel.DiscretionarySpending.performDiscretionarySpending;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_INTERSTELLAR_NEGOTIATOR;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_LOGISTICIAN;
-import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_SCROUNGE;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.TrainingCombatTeams.processTrainingCombatTeams;
@@ -373,8 +372,10 @@ public class Campaign implements ITechManager {
     private ShoppingList shoppingList;
 
     private NewPersonnelMarket newPersonnelMarket;
+
     @Deprecated(since = "0.50.06", forRemoval = false)
     private PersonnelMarket personnelMarket;
+
     private AbstractContractMarket contractMarket;
     private AbstractUnitMarket unitMarket;
 
@@ -1686,15 +1687,16 @@ public class Campaign implements ITechManager {
 
     /**
      * This will update the transport in the transports list with current capacities. When a unit is added or removed
-     * from a transport, that information needs updated in the campaign transport map. This method will update the
-     * map for every {@code CampaignTransportType} for the given transport.
+     * from a transport, that information needs updated in the campaign transport map. This method will update the map
+     * for every {@code CampaignTransportType} for the given transport.
+     *
+     * @param transport Unit
      *
      * @see Campaign#updateTransportInTransports(CampaignTransportType, Unit)
-     * @param transport             Unit
      */
     public void updateTransportInTransports(Unit transport) {
         for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
-            updateTransportInTransports (campaignTransportType, transport);
+            updateTransportInTransports(campaignTransportType, transport);
         }
     }
 
@@ -2043,7 +2045,9 @@ public class Campaign implements ITechManager {
      * performed by a game master that recruitment actions should be logged, and the character should be employed.
      *
      * @param person the person to recruit; must not be {@code null}
+     *
      * @return {@code true} if recruitment was successful and the person was added or employed; {@code false} otherwise
+     *
      * @see #recruitPerson(Person, PrisonerStatus, boolean, boolean, boolean)
      */
     public boolean recruitPerson(Person person) {
@@ -2059,17 +2063,19 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Recruits a person into the campaign roster using their current prisoner status,
-     * allowing specification of both game master and employment flags.
+     * Recruits a person into the campaign roster using their current prisoner status, allowing specification of both
+     * game master and employment flags.
      * <p>
-     * This is a convenience overload that enables logging and allows caller to choose
-     * whether the person is employed upon recruitment.
+     * This is a convenience overload that enables logging and allows caller to choose whether the person is employed
+     * upon recruitment.
      * </p>
      *
      * @param person the person to recruit; must not be {@code null}
      * @param gmAdd  if {@code true}, recruitment is performed by a game master (bypassing funds check)
      * @param employ if {@code true}, the person is marked as employed in the campaign
+     *
      * @return {@code true} if recruitment was successful and personnel was added or employed; {@code false} otherwise
+     *
      * @see #recruitPerson(Person, PrisonerStatus, boolean, boolean, boolean)
      */
     public boolean recruitPerson(Person person, boolean gmAdd, boolean employ) {
@@ -2091,10 +2097,12 @@ public class Campaign implements ITechManager {
      * actions should be logged. If successful, the person is marked as employed based on the given flag.
      * </p>
      *
-     * @param person          the person to recruit; must not be {@code null}
-     * @param prisonerStatus  the prison status to assign to the person
-     * @param employ          if {@code true}, the person is marked as employed in the campaign
+     * @param person         the person to recruit; must not be {@code null}
+     * @param prisonerStatus the prison status to assign to the person
+     * @param employ         if {@code true}, the person is marked as employed in the campaign
+     *
      * @return {@code true} if recruitment was successful and personnel was added or employed; {@code false} otherwise
+     *
      * @see #recruitPerson(Person, PrisonerStatus, boolean, boolean, boolean)
      */
     public boolean recruitPerson(Person person, PrisonerStatus prisonerStatus, boolean employ) {
@@ -2114,9 +2122,8 @@ public class Campaign implements ITechManager {
      * optional relationship simulation.
      *
      * <p>If the {@code employ} parameter is {@code true} and the person is not already employed, this method
-     * optionally
-     * deducts recruitment costs from campaign finances (unless performed by a game master). The person's status and
-     * campaign logs are updated accordingly.</p>
+     * optionally deducts recruitment costs from campaign finances (unless performed by a game master). The person's
+     * status and campaign logs are updated accordingly.</p>
      *
      * <p>If the person is a new recruit, their joining date and personnel entry are initialized, and relationship
      * history may be simulated based on campaign options and role.</p>
@@ -2590,30 +2597,6 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Retrieves a list of all active personnel, including prisoners.
-     *
-     * <p>
-     * This method is deprecated and defaults to including prisoners in the result. Use
-     * {@link #getActivePersonnel(boolean)} instead for more explicit behavior control.
-     * </p>
-     *
-     * <p>
-     * This method was Deprecated during 50.04's dev cycle. In prior versions this method wasn't explicit in its
-     * inclusion of prisoners in the return. I've opted to Deprecate this method as it is far better to be explicit in
-     * whether you want to include prisoners or not. This avoids a lot of potentially unique bugs.
-     * </p>
-     *
-     * @return A {@link List} of {@link Person} objects representing all active personnel, including prisoners.
-     *
-     * @deprecated Use {@link #getActivePersonnel(boolean)} to specify whether to include prisoners. Mediated in 0.50
-     *       .06, remove in 0.50.07
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public List<Person> getActivePersonnel() {
-        return getActivePersonnel(true);
-    }
-
-    /**
      * Retrieves a list of active personnel in the campaign, optionally including prisoners.
      *
      * <p>
@@ -2653,6 +2636,7 @@ public class Campaign implements ITechManager {
 
     /**
      * @return a list of people who are currently eligible to receive a salary.
+     *
      * @author Illiani
      * @since 0.50.06
      */
@@ -3430,10 +3414,6 @@ public class Campaign implements ITechManager {
                 int effectiveMaxAcquisitions = defaultMaxAcquisitions;
 
                 PersonnelOptions options = person.getOptions();
-                if (options.booleanOption(ADMIN_SCROUNGE)) {
-                    effectiveMaxAcquisitions++;
-                }
-
                 if (isIneligibleToPerformProcurement(person, acquisitionCategory)) {
                     continue;
                 }
@@ -3465,9 +3445,6 @@ public class Campaign implements ITechManager {
                 int effectiveMaxAcquisitions = defaultMaxAcquisitions;
 
                 PersonnelOptions options = person.getOptions();
-                if (options.booleanOption(ADMIN_SCROUNGE)) {
-                    effectiveMaxAcquisitions++;
-                }
 
                 if (isIneligibleToPerformProcurement(person, acquisitionCategory)) {
                     continue;
@@ -4660,7 +4637,8 @@ public class Campaign implements ITechManager {
                        (getCampaignOptions().getDestroyMargin() <= (target.getValue() - roll))) ||
                       (!getCampaignOptions().isDestroyByMargin()
                              // if a legendary, primary tech and destroy by margin is NOT on
-                             && ((tech.getExperienceLevel(this, false) == SkillType.EXP_LEGENDARY) ||
+                             &&
+                             ((tech.getExperienceLevel(this, false) == SkillType.EXP_LEGENDARY) ||
                                     tech.getPrimaryRole().isVehicleCrew())) // For vessel crews
                             && (roll < target.getValue())) {
                 tech.changeCurrentEdge(-1);
@@ -5248,14 +5226,6 @@ public class Campaign implements ITechManager {
         if (MekHQ.getMHQOptions().getNewDayOptimizeMedicalAssignments()) {
             new OptimizeInfirmaryAssignments(this);
         }
-    }
-
-    /**
-     * @deprecated use {@link Person#resetCurrentEdge()} instead
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    private void processWeeklyEdgeResets(Person person) {
-        person.resetCurrentEdge();
     }
 
     /**
@@ -6346,24 +6316,6 @@ public class Campaign implements ITechManager {
         this.faction = faction;
     }
 
-    /**
-     * @since 0.50.04
-     * @deprecated {@link Campaign#getFaction()}.getShortName() instead. Mitigated in 0.50.06, remove in 0.50.07
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public String getFactionCode() {
-        return getFaction().getShortName();
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated Use {@link Campaign#setFaction(Faction)} instead. Mitigated in 0.50.06, remove in 0.50.07
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public void setFactionCode(final String factionCode) {
-        setFaction(Factions.getInstance().getFaction(factionCode));
-    }
-
     public String getRetainerEmployerCode() {
         return retainerEmployerCode;
     }
@@ -6674,22 +6626,13 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "faction", getFaction().getShortName());
         if (retainerEmployerCode != null) {
             MHQXMLUtility.writeSimpleXMLTag(writer, indent, "retainerEmployerCode", retainerEmployerCode);
-
-            if (retainerStartDate == null) {
-                // this handles <50.0 campaigns
-                MHQXMLUtility.writeSimpleXMLTag(writer, indent, "retainerStartDate", currentDay);
-            } else {
-                MHQXMLUtility.writeSimpleXMLTag(writer, indent, "retainerStartDate", retainerStartDate);
-            }
+            MHQXMLUtility.writeSimpleXMLTag(writer, indent, "retainerStartDate", retainerStartDate);
         }
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "crimeRating", crimeRating);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "crimePirateModifier", crimePirateModifier);
 
-        // this handles <50.0 campaigns
         if (dateOfLastCrime != null) {
             MHQXMLUtility.writeSimpleXMLTag(writer, indent, "dateOfLastCrime", dateOfLastCrime);
-        } else if (getAdjustedCrimeRating() < 0) {
-            MHQXMLUtility.writeSimpleXMLTag(writer, indent, "dateOfLastCrime", currentDay);
         }
 
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "reputation");
@@ -6787,11 +6730,6 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "skillTypes");
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "specialAbilities");
         for (String key : SpecialAbility.getSpecialAbilities().keySet()) {
-            // <50.01 compatibility handler
-            if (Objects.equals(key, "clan_tech_knowledge")) {
-                continue;
-            }
-
             SpecialAbility.getAbility(key).writeToXML(writer, indent);
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "specialAbilities");
@@ -6857,11 +6795,6 @@ public class Campaign implements ITechManager {
 
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "automatedMothballUnits");
         for (UUID unitId : automatedMothballUnits) {
-            if (unitId == null) {
-                // <50.03 compatibility handler
-                continue;
-            }
-
             MHQXMLUtility.writeSimpleXMLTag(writer, indent, "mothballedUnit", unitId);
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "automatedMothballUnits");
@@ -7537,14 +7470,12 @@ public class Campaign implements ITechManager {
     /**
      * Calculates the {@link TargetRoll} required for a technician to work on a specific part task.
      *
-     * <p>This method determines task difficulty and eligibility by evaluating the technician's skills, penalties due to
-     * work mode,
-     * unit and part constraints, time availability, helper modifiers, and campaign options. It produces
+     * <p>This method determines task difficulty and eligibility by evaluating the technician's skills, penalties due
+     * to work mode, unit and part constraints, time availability, helper modifiers, and campaign options. It produces
      * context-specific messages when tasks are impossible due to skill, resource, or situation limitations.</p>
      *
-     * <p>The result will reflect all applicable modifiers (such as overtime or era-based penalties) and communicates if
-     * a task
-     * is impossible, or has automatic success (e.g., for infantry refits).</p>
+     * <p>The result will reflect all applicable modifiers (such as overtime or era-based penalties) and communicates
+     * if a task is impossible, or has automatic success (e.g., for infantry refits).</p>
      *
      * @param partWork the part work task to be performed
      * @param tech     the technician assigned to the task

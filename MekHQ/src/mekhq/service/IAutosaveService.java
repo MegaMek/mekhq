@@ -39,13 +39,7 @@ public interface IAutosaveService {
      * @param campaign Campaign to save
      */
     void requestDayAdvanceAutosave(Campaign campaign);
-
-    /**
-     * @deprecated use {@link #requestBeforeScenarioAutosave} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    void requestBeforeMissionAutosave(Campaign campaign);
-
+    
     /**
      * Handles auto-saving before a scenario starts.
      *

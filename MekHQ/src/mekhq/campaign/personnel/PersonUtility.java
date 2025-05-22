@@ -102,31 +102,14 @@ public class PersonUtility {
     }
 
     /**
-     * @deprecated use {@link #overrideSkills(boolean, boolean, boolean, boolean, boolean, boolean, Person, PersonnelRole, SkillLevel)}
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public static void overrideSkills(boolean isAdminsHaveNegotiation, boolean isAdminsHaveScrounge,
-                                      boolean isUseExtraRandom, Person person, PersonnelRole primaryRole,
-                                      SkillLevel skillLevel) {
-        overrideSkills(isAdminsHaveNegotiation,
-              isAdminsHaveScrounge,
-              false,
-              false,
-              isUseExtraRandom,
-              person,
-              primaryRole,
-              skillLevel);
-    }
-
-    /**
-     * @deprecated use {@link #overrideSkills(boolean, boolean, boolean, boolean, boolean, boolean, Person, PersonnelRole, SkillLevel)}
+     * @deprecated use
+     *       {@link #overrideSkills(boolean, boolean, boolean, boolean, boolean, Person, PersonnelRole, SkillLevel)}
      */
     @Deprecated(since = "0.50.06", forRemoval = true)
-    public static void overrideSkills(boolean isAdminsHaveNegotiation, boolean isAdminsHaveScrounge,
-          boolean isDoctorsUseAdministration, boolean isTechsUseAdministration, boolean isUseExtraRandom, Person person,
-          PersonnelRole primaryRole, SkillLevel skillLevel) {
+    public static void overrideSkills(boolean isAdminsHaveNegotiation, boolean isDoctorsUseAdministration,
+          boolean isTechsUseAdministration, boolean isUseExtraRandom, Person person, PersonnelRole primaryRole,
+          SkillLevel skillLevel) {
         overrideSkills(isAdminsHaveNegotiation,
-              isAdminsHaveScrounge,
               isDoctorsUseAdministration,
               isTechsUseAdministration,
               false,
@@ -138,15 +121,14 @@ public class PersonUtility {
     }
 
     /**
-     * Assigns and overrides the skills of a {@link Person} based on their role, experience level,
-     * and campaign-specific settings.
+     * Assigns and overrides the skills of a {@link Person} based on their role, experience level, and campaign-specific
+     * settings.
      *
      * <p>This method determines the appropriate skill set for the given person by consulting their primary role
-     * and campaign preferences. The chosen skills are then assigned to the person, with optional randomization of
-     * their levels if specified.</p>
+     * and campaign preferences. The chosen skills are then assigned to the person, with optional randomization of their
+     * levels if specified.</p>
      *
      * @param isAdminsHaveNegotiation    if {@code true}, administrators are assigned the Negotiation skill.
-     * @param isAdminsHaveScrounge       if {@code true}, administrators are assigned the Scrounge skill.
      * @param isDoctorsUseAdministration if {@code true}, doctors are given the Administration skill.
      * @param isTechsUseAdministration   if {@code true}, technicians are given the Administration skill.
      * @param isUseArtillery             if {@code true}, roles that can use it are assigned Artillery skills.
@@ -155,12 +137,10 @@ public class PersonUtility {
      * @param primaryRole                the {@link PersonnelRole} used to determine which skills to assign.
      * @param skillLevel                 the {@link SkillLevel} to use as a baseline for assigned skills.
      */
-    public static void overrideSkills(boolean isAdminsHaveNegotiation, boolean isAdminsHaveScrounge,
-                                      boolean isDoctorsUseAdministration, boolean isTechsUseAdministration,
-          boolean isUseArtillery, boolean isUseExtraRandom, Person person, PersonnelRole primaryRole,
-                                      SkillLevel skillLevel) {
+    public static void overrideSkills(boolean isAdminsHaveNegotiation, boolean isDoctorsUseAdministration,
+          boolean isTechsUseAdministration, boolean isUseArtillery, boolean isUseExtraRandom, Person person,
+          PersonnelRole primaryRole, SkillLevel skillLevel) {
         List<String> skills = primaryRole.getSkillsForProfession(isAdminsHaveNegotiation,
-              isAdminsHaveScrounge,
               isDoctorsUseAdministration,
               isTechsUseAdministration,
               isUseArtillery);
@@ -183,7 +163,7 @@ public class PersonUtility {
      *                   otherwise.
      */
     private static void addSkillsAndRandomize(Person person, List<String> skills, SkillLevel skillLevel,
-                                              boolean randomize) {
+          boolean randomize) {
         for (String skill : skills) {
             addSkillFixedExperienceLevel(person, skill, skillLevel);
         }

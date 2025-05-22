@@ -361,9 +361,8 @@ public final class BatchXPDialog extends JDialog {
      * corresponding XP cost for each person.
      *
      * <p>This method retrieves the chosen skill, calculates the XP cost (with applicable multipliers and campaign
-     * options),
-     * upgrades the skill for each listed person, deducts the XP, logs the improvements, and updates campaign data.
-     * After each round of improvements, the personnel table is refreshed to reflect any updated entries, and the
+     * options), upgrades the skill for each listed person, deducts the XP, logs the improvements, and updates campaign
+     * data. After each round of improvements, the personnel table is refreshed to reflect any updated entries, and the
      * operation continues until there are no more eligible personnel remaining.</p>
      *
      * <p>At the end, a report is added to summarize the improved skill and affected personnel count.</p>
@@ -483,14 +482,6 @@ public final class BatchXPDialog extends JDialog {
 
         public void setNoOfficers(boolean noOfficers) {
             this.noOfficers = noOfficers;
-        }
-
-        /**
-         * @deprecated Use {@link #setSkillName(String)} instead.
-         */
-        @Deprecated(since = "0.50.05", forRemoval = true)
-        public void setSkill(String skill) {
-            this.skillName = skill;
         }
 
         /**

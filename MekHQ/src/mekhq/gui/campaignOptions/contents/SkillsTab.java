@@ -149,12 +149,7 @@ public class SkillsTab {
         lblEdgeCost = new JLabel();
         spnEdgeCost = new JSpinner();
     }
-
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public JPanel createSkillsTab(boolean isCombatTab) {
-        return createSkillsTab(isCombatTab ? COMBAT_GUNNERY : SUPPORT);
-    }
-
+    
     /**
      * Creates the main panel for the SkillsTab UI based on the provided {@link SkillSubType} category.
      *
