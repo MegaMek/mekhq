@@ -32,16 +32,21 @@
  */
 package mekhq.campaign.universe.factionStanding.enums;
 
-import megamek.codeUtilities.MathUtility;
-import megamek.logging.MMLogger;
-import mekhq.campaign.universe.Faction;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getNegativeColor;
+import static mekhq.utilities.ReportingUtilities.getPositiveColor;
+import static mekhq.utilities.ReportingUtilities.getWarningColor;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
-import static mekhq.utilities.ReportingUtilities.*;
+import megamek.codeUtilities.MathUtility;
+import megamek.logging.MMLogger;
+import mekhq.campaign.universe.Faction;
 
 /**
  * Represents a standing level within the Faction Standing reputation system.
@@ -76,9 +81,9 @@ public enum FactionStandingLevel {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionStandings";
     private static final MMLogger LOGGER = MMLogger.create(FactionStandingLevel.class);
 
-    private final static String LABEL_SUFFIX_INNER_SPHERE = "innerSphere";
-    private final static String LABEL_SUFFIX_CLAN = "clan";
-    private final static String LABEL_SUFFIX_COMSTAR = "comStar";
+    private final static String FALLBACK_LABEL_SUFFIX_INNER_SPHERE = "innerSphere";
+    private final static String FALLBACK_LABEL_SUFFIX_CLAN = "clan";
+    private final static String FALLBACK_LABEL_SUFFIX_PERIPHERY = "periphery";
 
     private final static int MINIMUM_STANDING_LEVEL = 0;
     private final static int MAXIMUM_STANDING_LEVEL = 8;
@@ -366,19 +371,23 @@ public enum FactionStandingLevel {
      * @since 0.50.07
      */
     public String getLabel(Faction relevantFaction) {
-        String factionType = getSuffix(relevantFaction);
+        String key = "factionStandingLevel." + name() + '.' + relevantFaction.getShortName() + ".label";
+        String label = getTextAt(RESOURCE_BUNDLE, key);
 
-        String key = "factionStandingLevel." + name() + '.' + factionType + ".label";
+        if (isResourceKeyValid(label)) {
+            return label;
+        }
 
+        // Use Fallback
+        String fallbackSuffix = getFallbackSuffix(relevantFaction);
+        key = "factionStandingLevel." + name() + '.' + fallbackSuffix + ".label";
         return getTextAt(RESOURCE_BUNDLE, key);
     }
 
     /**
      * Retrieves the description associated with the faction standing, based on the specified {@link Faction}.
      *
-     * @param relevantFaction the {@link Faction} used to determine the specific description for the standing. The
-     *                        faction helps provide context, such as whether it is a clan, ComStar, or an Inner Sphere
-     *                        faction.
+     * @param relevantFaction the {@link Faction} used to determine the specific description for the standing.
      *
      * @return a {@link String} representing the description of the faction standing.
      *
@@ -386,11 +395,27 @@ public enum FactionStandingLevel {
      * @since 0.50.07
      */
     public String getDescription(Faction relevantFaction) {
-        String factionType = getSuffix(relevantFaction);
+        String label = " ";
 
-        String key = "factionStandingLevel." + name() + '.' + factionType + ".description";
+        String key = "factionStandingLevel." + name() + '.' + relevantFaction.getShortName() + ".description";
+        label = getTextAt(RESOURCE_BUNDLE, key);
 
-        return getTextAt(RESOURCE_BUNDLE, key);
+        if (isResourceKeyValid(label)) {
+            return label;
+        } else {
+            // If the key is invalid, we don't want to return an empty string as that will mess with gui spacing.
+            // Instead, we return a placeholder white space.
+            label = " "; // This can be removed if we ever decide to use the fallback code below.
+        }
+
+        // For descriptions, we don't want to use the fallback because the description becomes quickly repetitive, and
+        // it detracts from the overall experience. However, if we change our mind, the following code can be used.
+        //        // Use Fallback
+        //        String fallbackSuffix = getFallbackSuffix(relevantFaction);
+        //        key = "factionStandingLevel." + name() + '.' + fallbackSuffix + ".description";
+        //        label = getTextAt(RESOURCE_BUNDLE, key);
+
+        return label;
     }
 
     /**
@@ -417,18 +442,15 @@ public enum FactionStandingLevel {
                     getPolarityOfModifier(negotiationModifier)));
         }
 
-        if (resupplyWeightModifier != STANDING_LEVEL_4.getResupplyWeightModifier()) {
-            int resupplyPercentage = (int) resupplyWeightModifier * 100;
-            effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.resupply",
-                    resupplyPercentage));
-        }
+        int resupplyPercentage = (int) resupplyWeightModifier * 100;
+        effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.resupply", resupplyPercentage));
 
-        if (hasCommandCircuitAccess != STANDING_LEVEL_4.hasCommandCircuitAccess()) {
+        if (hasCommandCircuitAccess) {
             effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.commandCircuit",
                     spanOpeningWithCustomColor(getPositiveColor()), CLOSING_SPAN_TAG));
         }
 
-        if (isOutlawed != STANDING_LEVEL_4.isOutlawed()) {
+        if (isOutlawed) {
             effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.outlawed",
                     spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG));
         }
@@ -438,32 +460,25 @@ public enum FactionStandingLevel {
                     spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG));
         }
 
-        if (recruitmentTickets != STANDING_LEVEL_4.getRecruitmentTickets()) {
-            effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.recruitment.popularity",
-                    getPolarityOfModifier(recruitmentTickets - 3)));
-        }
+        effects.add(getFormattedTextAt(RESOURCE_BUNDLE,
+              "factionStandingLevel.recruitment.popularity",
+              getPolarityOfModifier(recruitmentTickets - STANDING_LEVEL_4.getRecruitmentTickets())));
 
         if (recruitmentRollsModifier != STANDING_LEVEL_4.getRecruitmentRollsModifier()) {
             effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.recruitment.rolls",
                     getPolarityOfModifier(recruitmentRollsModifier)));
         }
 
-        if (barrackCostsMultiplier != STANDING_LEVEL_4.getBarrackCostsMultiplier()) {
-            int barracksCostPercentage = (int) barrackCostsMultiplier * 100;
-            effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.barracks",
-                    barracksCostPercentage));
-        }
+        int barracksCostPercentage = (int) barrackCostsMultiplier * 100;
+        effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.barracks", barracksCostPercentage));
 
         if (unitMarketRarityModifier != STANDING_LEVEL_4.getUnitMarketRarityModifier()) {
             effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.unitMarket",
                     getPolarityOfModifier(unitMarketRarityModifier)));
         }
 
-        if (contractPayMultiplier != STANDING_LEVEL_4.getContractPayMultiplier()) {
-            int payPercentage = (int) contractPayMultiplier * 100;
-            effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.contractPay",
-                    payPercentage));
-        }
+        int payPercentage = (int) contractPayMultiplier * 100;
+        effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.contractPay", payPercentage));
 
         if (supportPointModifierContractStart != STANDING_LEVEL_4.getSupportPointModifierContractStart()) {
             effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.supportPoints.signing",
@@ -487,25 +502,25 @@ public enum FactionStandingLevel {
     }
 
     /**
-     * Determines the appropriate suffix label for the given {@link Faction} based on its characteristics.
+     * Determines the appropriate fallback suffix for the given {@link Faction} based on its characteristics.
      *
      * @param relevantFaction the {@link Faction} whose suffix label is being determined. It will provide information
-     *                        about whether the faction is a clan, ComStar, or of the Inner Sphere.
+     *                        about whether the faction is a clan, periphery, or of the Inner Sphere.
      *
      * @return the suffix label as a {@link String} representing the type of the faction. Possible values include a clan
-     *       label, ComStar label, or Inner Sphere label.
+     *       suffix, periphery suffix, or Inner Sphere suffix.
      *
      * @author Illiani
      * @since 0.50.07
      */
-    private static String getSuffix(Faction relevantFaction) {
+    private static String getFallbackSuffix(Faction relevantFaction) {
         if (relevantFaction.isClan()) {
-            return LABEL_SUFFIX_CLAN;
-        } else if (relevantFaction.isComStarOrWoB()) {
-            return LABEL_SUFFIX_COMSTAR;
+            return FALLBACK_LABEL_SUFFIX_CLAN;
+        } else if (relevantFaction.isPeriphery()) {
+            return FALLBACK_LABEL_SUFFIX_PERIPHERY;
         }
 
-        return LABEL_SUFFIX_INNER_SPHERE;
+        return FALLBACK_LABEL_SUFFIX_INNER_SPHERE;
     }
 
     /**

@@ -32,31 +32,6 @@
  */
 package mekhq.gui.dialog.reportDialogs.FactionStanding;
 
-import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
-import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
-import static mekhq.utilities.ReportingUtilities.getNegativeColor;
-import static mekhq.utilities.ReportingUtilities.getPositiveColor;
-import static mekhq.utilities.ReportingUtilities.getWarningColor;
-import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
-
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.border.CompoundBorder;
-
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.logging.MMLogger;
 import megamek.utilities.ImageUtilities;
@@ -71,6 +46,22 @@ import mekhq.gui.dialog.GlossaryDialog;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.RoundedLineBorder;
 import mekhq.gui.utilities.WrapLayout;
+
+import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
+import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.ReportingUtilities.*;
 
 /**
  * Displays a dialog window that visualizes a report on faction standings for the current campaign year. Shows
@@ -383,8 +374,8 @@ public class FactionStandingReport extends JDialog {
         pnlFactionStanding.setName("pnlFactionStanding" + factionCode);
         pnlFactionStanding.setLayout(new BoxLayout(pnlFactionStanding, BoxLayout.Y_AXIS));
         pnlFactionStanding.setBorder(createStandingColoredRoundedTitledBorder(factionStanding.getStandingLevel()));
-        pnlFactionStanding.setPreferredSize(UIUtil.scaleForGUI(500, 350));
-        pnlFactionStanding.setMaximumSize(UIUtil.scaleForGUI(500, 350));
+        pnlFactionStanding.setPreferredSize(UIUtil.scaleForGUI(500, 400));
+        pnlFactionStanding.setMaximumSize(UIUtil.scaleForGUI(500, 400));
         pnlFactionStanding.addMouseListener(createEffectsPanelUpdater(getEffectsDescription(climateRegard)));
 
         // Faction Logo
@@ -399,8 +390,9 @@ public class FactionStandingReport extends JDialog {
         // Faction Descriptions
         String factionDescription = getDescriptionForFaction(faction, climateRegard);
         JLabel lblDetails = new JLabel(factionDescription);
+        lblDetails.setPreferredSize(UIUtil.scaleForGUI(500, 200));
+        lblDetails.setMaximumSize(UIUtil.scaleForGUI(Integer.MAX_VALUE, 200));
         lblDetails.setName("lblFactionDetails" + factionCode);
-        lblDetails.setMaximumSize(new Dimension(Integer.MAX_VALUE, lblDetails.getPreferredSize().height));
         lblDetails.setAlignmentX(CENTER_ALIGNMENT);
         lblDetails.setHorizontalAlignment(SwingConstants.CENTER);
         pnlFactionStanding.add(lblDetails);
