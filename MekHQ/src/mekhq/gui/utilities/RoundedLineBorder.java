@@ -32,16 +32,13 @@
  */
 package mekhq.gui.utilities;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import javax.swing.BorderFactory;
+import mekhq.MHQConstants;
+
+import javax.swing.*;
 import javax.swing.border.AbstractBorder;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
+import java.awt.*;
 
 /**
  * {@code RoundedLineBorder} is a custom border implementation for Swing components that draws a rectangular border with
@@ -70,7 +67,7 @@ public class RoundedLineBorder extends AbstractBorder {
      * @since 0.50.7
      */
     public static CompoundBorder createRoundedLineBorder() {
-        Border rounded = new RoundedLineBorder(Color.GRAY, 2, 16);
+        Border rounded = new RoundedLineBorder(MHQConstants.BORDER_COLOR_GRAY, 2, 16);
         Border padding = BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING);
 
         return BorderFactory.createCompoundBorder(rounded, padding);

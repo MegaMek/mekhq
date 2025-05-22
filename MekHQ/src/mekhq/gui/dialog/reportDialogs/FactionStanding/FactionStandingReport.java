@@ -32,9 +32,12 @@
  */
 package mekhq.gui.dialog.reportDialogs.FactionStanding;
 
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.logging.MMLogger;
 import megamek.utilities.ImageUtilities;
+import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.FactionHints;
@@ -59,6 +62,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import static java.lang.Math.round;
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.*;
@@ -78,17 +82,22 @@ public class FactionStandingReport extends JDialog {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionStandings";
 
     /**
-     * The amount of padding, scaled for the user interface, used to ensure consistent spacing within components of the
-     * Faction Standing Report dialog.
-     */
-    private static final int PADDING = UIUtil.scaleForGUI(10);
-    /**
      * A label name constant for the Effects Panel in the Faction Standing Report dialog.
      *
      * <p>This value is used to reference the specific UI component and allow us to dynamically update the faction
      * standing effects display.</p>
      */
     private static final String EFFECTS_PANEL_LABEL_NAME = "lblFactionStandingEffects";
+
+    private static final int PADDING = UIUtil.scaleForGUI(10);
+    private static final int FACTION_PANEL_WIDTH = UIUtil.scaleForGUI(500);
+    private static final int FACTION_PANEL_HEIGHT = UIUtil.scaleForGUI(400);
+    private static final int FACTION_DESCRIPTION_WIDTH = FACTION_PANEL_WIDTH;
+    private static final int FACTION_DESCRIPTION_HEIGHT = UIUtil.scaleForGUI(200);
+    private static final int FACTION_EFFECTS_MINIMUM_HEIGHT = UIUtil.scaleForGUI(70);
+    private static final int REPORT_BUTTONS_MAXIMUM_HEIGHT = UIUtil.scaleForGUI(30);
+    private static final int REPORT_BUTTON_SPACE_WIDTH = UIUtil.scaleForGUI(50);
+    private static final int REPORT_IMAGE_WIDTH = 100; // Scaled by scaleImageIcon call
 
     private final JFrame frame;
     private final LocalDate today;
@@ -117,6 +126,7 @@ public class FactionStandingReport extends JDialog {
      */
     public FactionStandingReport(final JFrame frame, final FactionStandings factionStandings, final LocalDate today,
           final boolean isGM, final Faction campaignFaction) {
+        super();
         this.frame = frame;
         this.today = today;
         this.gameYear = today.getYear();
@@ -138,12 +148,19 @@ public class FactionStandingReport extends JDialog {
      */
     private void initializeDialogParameters() {
         setTitle(getTextAt(RESOURCE_BUNDLE, "factionStandingReport.title"));
-        setSize(1000, 1000);
-        setLocationRelativeTo(frame);
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+
+        // Just big enough for one faction panel
+        int dialogDefaultWidth = (int) round(FACTION_PANEL_WIDTH * 1.15);
+        int combinedHeight = FACTION_PANEL_HEIGHT + FACTION_EFFECTS_MINIMUM_HEIGHT + REPORT_BUTTONS_MAXIMUM_HEIGHT;
+        int dialogDefaultHeight = (int) round(combinedHeight * 1.25);
+        setMinimumSize(new Dimension(dialogDefaultWidth, dialogDefaultHeight));
+
         setResizable(true);
         setModal(true);
-        setVisible(true);
+        setPreferences(); // Must be before setVisible
+        setLocationRelativeTo(frame);
+
+        setVisible(true); // Should always be last
     }
 
     /**
@@ -300,10 +317,12 @@ public class FactionStandingReport extends JDialog {
         lblStandingEffects.setBorder(null);
         lblStandingEffects.setFocusable(false);
         lblStandingEffects.setText("");
-        lblStandingEffects.setMaximumSize(new Dimension(Integer.MAX_VALUE, UIUtil.scaleForGUI(30)));
+        lblStandingEffects.setMinimumSize(new Dimension(Integer.MAX_VALUE, FACTION_EFFECTS_MINIMUM_HEIGHT));
+        lblStandingEffects.setPreferredSize(new Dimension(Integer.MAX_VALUE, FACTION_EFFECTS_MINIMUM_HEIGHT));
 
         pnlEffects.add(lblStandingEffects, BorderLayout.CENTER);
-        pnlEffects.setMaximumSize(new Dimension(Integer.MAX_VALUE, UIUtil.scaleForGUI(30)));
+        pnlEffects.setMinimumSize(new Dimension(Integer.MAX_VALUE, FACTION_EFFECTS_MINIMUM_HEIGHT));
+        pnlEffects.setPreferredSize(new Dimension(Integer.MAX_VALUE, FACTION_EFFECTS_MINIMUM_HEIGHT));
 
         return pnlEffects;
     }
@@ -319,7 +338,7 @@ public class FactionStandingReport extends JDialog {
     private JPanel createButtonsPanel() {
         JPanel pnlButtons = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
         pnlButtons.setName("pnlButtons");
-        pnlButtons.setMaximumSize(new Dimension(Integer.MAX_VALUE, UIUtil.scaleForGUI(30)));
+        pnlButtons.setMaximumSize(new Dimension(Integer.MAX_VALUE, REPORT_BUTTONS_MAXIMUM_HEIGHT));
 
         JButton btnDocumentation = new JButton(getTextAt(RESOURCE_BUNDLE,
               "factionStandingReport.button.documentation"));
@@ -329,17 +348,29 @@ public class FactionStandingReport extends JDialog {
         btnDocumentation.setBorder(RoundedLineBorder.createRoundedLineBorder());
         pnlButtons.add(btnDocumentation);
 
-        pnlButtons.add(Box.createHorizontalStrut(UIUtil.scaleForGUI(50)));
+        pnlButtons.add(Box.createHorizontalStrut(REPORT_BUTTON_SPACE_WIDTH));
 
         JButton btnGmTools = new JButton(getTextAt(RESOURCE_BUNDLE, "factionStandingReport.button.gmTools"));
-        btnGmTools.setName("btnGmTools");
+        btnGmTools.setName("btnSimulateContract");
         btnGmTools.setFocusable(false);
         btnGmTools.setBorder(RoundedLineBorder.createRoundedLineBorder());
         btnGmTools.setEnabled(isGM);
         btnGmTools.addActionListener(e -> {
-            // TODO GM Tools Dialog
+            // TODO Simulate Contract Dialog
         });
         pnlButtons.add(btnGmTools);
+
+        pnlButtons.add(Box.createHorizontalStrut(REPORT_BUTTON_SPACE_WIDTH));
+
+        JButton btnSimulateContract = new JButton(getTextAt(RESOURCE_BUNDLE, "factionStandingReport.button.contract"));
+        btnSimulateContract.setName("btnSimulateContract");
+        btnSimulateContract.setFocusable(false);
+        btnSimulateContract.setBorder(RoundedLineBorder.createRoundedLineBorder());
+        btnSimulateContract.setEnabled(isGM);
+        btnSimulateContract.addActionListener(e -> {
+            // TODO GM Tools Dialog
+        });
+        pnlButtons.add(btnSimulateContract);
 
         return pnlButtons;
     }
@@ -374,13 +405,13 @@ public class FactionStandingReport extends JDialog {
         pnlFactionStanding.setName("pnlFactionStanding" + factionCode);
         pnlFactionStanding.setLayout(new BoxLayout(pnlFactionStanding, BoxLayout.Y_AXIS));
         pnlFactionStanding.setBorder(createStandingColoredRoundedTitledBorder(factionStanding.getStandingLevel()));
-        pnlFactionStanding.setPreferredSize(UIUtil.scaleForGUI(500, 400));
-        pnlFactionStanding.setMaximumSize(UIUtil.scaleForGUI(500, 400));
+        pnlFactionStanding.setPreferredSize(new Dimension(FACTION_PANEL_WIDTH, FACTION_PANEL_HEIGHT));
+        pnlFactionStanding.setMaximumSize(new Dimension(FACTION_PANEL_WIDTH, FACTION_PANEL_HEIGHT));
         pnlFactionStanding.addMouseListener(createEffectsPanelUpdater(getEffectsDescription(climateRegard)));
 
         // Faction Logo
         ImageIcon icon = Factions.getFactionLogo(gameYear, factionCode);
-        icon = ImageUtilities.scaleImageIcon(icon, UIUtil.scaleForGUI(100), true);
+        icon = ImageUtilities.scaleImageIcon(icon, REPORT_IMAGE_WIDTH, true);
         JLabel lblFactionImage = new JLabel(icon);
         lblFactionImage.setName("lblFactionImage" + factionCode);
         lblFactionImage.setMaximumSize(new Dimension(Integer.MAX_VALUE, lblFactionImage.getPreferredSize().height));
@@ -390,8 +421,8 @@ public class FactionStandingReport extends JDialog {
         // Faction Descriptions
         String factionDescription = getDescriptionForFaction(faction, climateRegard);
         JLabel lblDetails = new JLabel(factionDescription);
-        lblDetails.setPreferredSize(UIUtil.scaleForGUI(500, 200));
-        lblDetails.setMaximumSize(UIUtil.scaleForGUI(Integer.MAX_VALUE, 200));
+        lblDetails.setPreferredSize(new Dimension(FACTION_DESCRIPTION_WIDTH, FACTION_DESCRIPTION_HEIGHT));
+        lblDetails.setMaximumSize(new Dimension(FACTION_DESCRIPTION_WIDTH, FACTION_DESCRIPTION_HEIGHT));
         lblDetails.setName("lblFactionDetails" + factionCode);
         lblDetails.setAlignmentX(CENTER_ALIGNMENT);
         lblDetails.setHorizontalAlignment(SwingConstants.CENTER);
@@ -426,7 +457,7 @@ public class FactionStandingReport extends JDialog {
      * @since 0.50.07
      */
     public static Border createStandingColoredRoundedTitledBorder(final int factionStandingLevel) {
-        Color color = Color.GRAY;
+        Color color = MHQConstants.BORDER_COLOR_GRAY;
         if (factionStandingLevel <= 1) {
             color = MekHQ.getMHQOptions().getFontColorNegative();
         } else if (factionStandingLevel <= 3) {
@@ -522,8 +553,8 @@ public class FactionStandingReport extends JDialog {
      * @since 0.50.07
      */
     private static JSlider getRegardSlider(String factionCode, double factionRegard, double climateRegard) {
-        int roundedFactionRegard = (int) Math.round(factionRegard); // JSlider doesn't accept doubles, so we round.
-        int roundedClimateRegard = (int) Math.round(climateRegard); // JSlider doesn't accept doubles, so we round.
+        int roundedFactionRegard = (int) round(factionRegard); // JSlider doesn't accept doubles, so we round.
+        int roundedClimateRegard = (int) round(climateRegard); // JSlider doesn't accept doubles, so we round.
         int minimumRegard = (int) Math.floor(FactionStandings.getMinimumRegard());
         int maximumRegard = (int) Math.ceil(FactionStandings.getMaximumRegard());
         JSlider sldRegard = new FactionStandingSlider(minimumRegard,
@@ -603,5 +634,18 @@ public class FactionStandingReport extends JDialog {
             }
         }
         return null;
+    }
+
+    /**
+     * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek.
+     */
+    private void setPreferences() {
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(FactionStandingReport.class);
+            this.setName("FactionStandingReport");
+            preferences.manage(new JWindowPreference(this));
+        } catch (Exception ex) {
+            LOGGER.error("Failed to set user preferences", ex);
+        }
     }
 }
