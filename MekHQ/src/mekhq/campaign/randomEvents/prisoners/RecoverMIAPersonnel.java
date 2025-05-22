@@ -84,7 +84,9 @@ public class RecoverMIAPersonnel {
         ITechnology.Faction techFaction = isClan ? ITechnology.getFactionFromMMAbbr("CLAN") : ITechnology.getFactionFromMMAbbr("IS");
         try {
             // searchingFaction being null is fine because we're just ignoring any exceptions
-            techFaction = ITechnology.getFactionFromMMAbbr(searchingFaction.getShortName());
+            if (searchingFaction != null) {
+                techFaction = ITechnology.getFactionFromMMAbbr(searchingFaction.getShortName());
+            }
         } catch (Exception ignored) {
             // if we can't get the tech faction, we just use the fallbacks already assigned.
         }
