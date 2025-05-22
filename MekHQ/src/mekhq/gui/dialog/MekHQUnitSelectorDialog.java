@@ -206,10 +206,9 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
                           "mekSelectorDialog.unsupported.droneOs");
                 }
 
-                campaign.addReport(String.format(
-                    reason,
-                    spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
-                    CLOSING_SPAN_TAG));
+                campaign.addReport(String.format(reason,
+                      spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
+                      CLOSING_SPAN_TAG));
 
                 return true;
             }
@@ -352,9 +351,15 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
             }
         }
 
-        // Did we match text entered into the searchFilter dialog?
+        // if we have an advanced filter set, does it match that filter?
         if ((searchFilter != null) && !MekSearchFilter.isMatch(mek, searchFilter)) {
             return false;
+        }
+
+        // If a string is in the text filter, does the name match?
+        if (!textFilter.getText().isBlank()) {
+            String text = textFilter.getText();
+            return mek.getName().toLowerCase().contains(text.toLowerCase());
         }
         // If all tests passed, then include this unit
         return true;
