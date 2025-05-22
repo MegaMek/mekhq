@@ -32,6 +32,10 @@
  */
 package mekhq.module.atb;
 
+import static mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR_HR;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
+import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
+
 import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -57,11 +61,13 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.RandomFactionGenerator;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * Main engine of the Against the Bot campaign system.
@@ -98,64 +104,67 @@ public class AtBEventProcessor {
             } else {
                 ev.getCampaign()
                       .addReport("<html><font color='" +
-                                       MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                                       ReportingUtilities.getNegativeColor() +
                                        "'>Insufficient funds for paid recruitment.</font></html>");
             }
         }
     }
 
+    /**
+     * Performs the paid recruitment process for a campaign, generating and adding new recruitable personnel to the
+     * personnel market.
+     *
+     * <p>The recruitment process considers the type of recruit being sought, the campaign's unit rating, financial
+     * state,
+     * and the experience level of the best available HR administrator. Based on these factors, it computes a
+     * recruitment roll using two six-sided dice plus all modifiers. The number of new recruits to generate is
+     * determined by the result of this roll. Each new recruit is created and added to the campaign's personnel
+     * market.</p>
+     *
+     * @param campaign the {@link Campaign} instance in which recruitment is to take place
+     */
     private void doPaidRecruitment(Campaign campaign) {
-        int mod;
-        switch (campaign.getPersonnelMarket().getPaidRecruitRole()) {
-            case MEKWARRIOR:
-                mod = -2;
-                break;
-            case SOLDIER:
-                mod = 2;
-                break;
-            case MEK_TECH:
-            case MECHANIC:
-            case AERO_TEK:
-            case BA_TECH:
-            case DOCTOR:
-                mod = 1;
-                break;
-            default:
-                mod = 0;
-                break;
-        }
+        int modifier = switch (campaign.getPersonnelMarket().getPaidRecruitRole()) {
+            case MEKWARRIOR -> -2;
+            case SOLDIER -> 2;
+            case MEK_TECH, MECHANIC, AERO_TEK, BA_TECH, DOCTOR -> 1;
+            default -> 0;
+        };
 
-        mod += campaign.getAtBUnitRatingMod() - IUnitRating.DRAGOON_C;
+        modifier += campaign.getAtBUnitRatingMod() - IUnitRating.DRAGOON_C;
         if (campaign.getFinances().isInDebt()) {
-            mod -= 3;
+            modifier -= 3;
         }
 
-        Person adminHR = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_HR, SkillType.S_ADMIN);
-        int adminHRExp = (adminHR == null) ?
-                               SkillType.EXP_ULTRA_GREEN :
-                               adminHR.getSkill(SkillType.S_ADMIN).getExperienceLevel();
-        mod += adminHRExp - 2;
-        int q = 0;
-        int r = Compute.d6(2) + mod;
-
-        if (r > 15) {
-            q = 6;
-        } else if (r > 12) {
-            q = 5;
-        } else if (r > 10) {
-            q = 4;
-        } else if (r > 8) {
-            q = 3;
-        } else if (r > 5) {
-            q = 2;
-        } else if (r > 3) {
-            q = 1;
+        Person adminHR = campaign.findBestInRole(ADMINISTRATOR_HR, S_ADMIN);
+        Skill adminSkill = adminHR.getSkill(S_ADMIN);
+        int adminExperienceLevel = EXP_NONE;
+        if (adminSkill != null) {
+            adminExperienceLevel = adminSkill.getExperienceLevel(adminHR.getOptions(), adminHR.getATOWAttributes());
         }
 
-        for (int i = 0; i < q; i++) {
-            Person p = campaign.newPerson(campaign.getPersonnelMarket().getPaidRecruitRole());
-            campaign.getPersonnelMarket().addPerson(p);
-            addRecruitUnit(p);
+        modifier += adminExperienceLevel - 2;
+        int quantityOfRecruits = 0;
+        int roll = Compute.d6(2) + modifier;
+
+        if (roll > 15) {
+            quantityOfRecruits = 6;
+        } else if (roll > 12) {
+            quantityOfRecruits = 5;
+        } else if (roll > 10) {
+            quantityOfRecruits = 4;
+        } else if (roll > 8) {
+            quantityOfRecruits = 3;
+        } else if (roll > 5) {
+            quantityOfRecruits = 2;
+        } else if (roll > 3) {
+            quantityOfRecruits = 1;
+        }
+
+        for (int i = 0; i < quantityOfRecruits; i++) {
+            Person recruit = campaign.newPerson(campaign.getPersonnelMarket().getPaidRecruitRole());
+            campaign.getPersonnelMarket().addPerson(recruit);
+            addRecruitUnit(recruit);
         }
     }
 

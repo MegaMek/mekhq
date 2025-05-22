@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui;
 
@@ -34,7 +39,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.io.File;
 import java.util.ResourceBundle;
-
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -83,11 +87,11 @@ import megameklab.ui.util.MegaMekLabFileSaver;
 import megameklab.ui.util.RefreshListener;
 import megameklab.util.CConfig;
 import megameklab.util.UnitUtil;
-import mekhq.MekHQ;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
+import mekhq.utilities.ReportingUtilities;
 
 public class MekLabTab extends CampaignGuiTab {
     private static final MMLogger logger = MMLogger.create(MekLabTab.class);
@@ -394,11 +398,11 @@ public class MekLabTab extends CampaignGuiTab {
         lblMove.setText("Movement: " + walk + "/" + run + "/" + jump);
         if (bvDiff > 0) {
             lblBV.setText("<html>BV: " + entity.calculateBattleValue(true, true) + " (<font color='"
-                    + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>+"
+                    + ReportingUtilities.getPositiveColor() + "'>+"
                     + bvDiff + "</font>)</html>");
         } else if (bvDiff < 0) {
             lblBV.setText("<html>BV: " + entity.calculateBattleValue(true, true) + " (<font color='"
-                    + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>" + bvDiff
+                    + ReportingUtilities.getNegativeColor() + "'>" + bvDiff
                     + "</font>)</html>");
         } else {
             lblBV.setText("<html>BV: " + entity.calculateBattleValue(true, true) + " (+" + bvDiff + ")</html>");
@@ -406,13 +410,13 @@ public class MekLabTab extends CampaignGuiTab {
 
         if (currentTonnage != tonnage) {
             lblTons.setText(
-                    "<html>Tonnage: <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
+                    "<html>Tonnage: <font color='" + ReportingUtilities.getNegativeColor() + "'>"
                             + currentTonnage + '/' + tonnage + "</font></html>");
         } else {
             lblTons.setText("Tonnage: " + currentTonnage + '/' + tonnage);
         }
         if (totalHeat > heat) {
-            lblHeat.setText("<html>Heat: <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
+            lblHeat.setText("<html>Heat: <font color='" + ReportingUtilities.getNegativeColor() + "'>"
                     + totalHeat + '/' + heat + "</font></html>");
         } else {
             lblHeat.setText("<html>Heat: " + totalHeat + '/' + heat + "</html>");

@@ -788,7 +788,9 @@ public class Resupply {
                       campaign.isClanCampaign(),
                       campaign.getLocalDate(),
                       negotiator.getRankLevel());
-                int skillLevel = skill.getFinalSkillValue(negotiator.getOptions(), reputation);
+                int skillLevel = skill.getFinalSkillValue(negotiator.getOptions(),
+                      negotiator.getATOWAttributes(),
+                      reputation);
                 negotiatorSkill = skill.getType().getExperienceLevel(skillLevel);
             }
         }

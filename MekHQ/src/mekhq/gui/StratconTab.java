@@ -68,6 +68,7 @@ import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.stratcon.CampaignManagementDialog;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * This class contains code relevant to rendering the StratCon ("AtB Campaign State") tab.
@@ -350,9 +351,9 @@ public class StratconTab extends CampaignGuiTab {
 
         StringBuilder sb = new StringBuilder();
         if (completedObjectives >= desiredObjectives) {
-            sb.append("<span color='").append(MekHQ.getMHQOptions().getFontColorPositiveHexColor()).append("'>");
+            sb.append("<span color='").append(ReportingUtilities.getPositiveColor()).append("'>");
         } else {
-            sb.append("<span color='").append(MekHQ.getMHQOptions().getFontColorNegativeHexColor()).append("'>");
+            sb.append("<span color='").append(ReportingUtilities.getNegativeColor()).append("'>");
         }
 
         // special logic for non-independent command clauses
@@ -392,13 +393,13 @@ public class StratconTab extends CampaignGuiTab {
                 // special case: allied facilities can get lost at any point in time
                 if ((objective.getObjectiveType() == StrategicObjectiveType.AlliedFacilityControl) &&
                         !campaignState.allowEarlyVictory()) {
-                    sb.append("<span color='").append(MekHQ.getMHQOptions().getFontColorWarningHexColor()).append("'>").append(OBJECTIVE_IN_PROGRESS);
+                    sb.append("<span color='").append(ReportingUtilities.getWarningColor()).append("'>").append(OBJECTIVE_IN_PROGRESS);
                 } else if (objectiveCompleted) {
-                    sb.append("<span color='").append(MekHQ.getMHQOptions().getFontColorPositiveHexColor()).append("'>").append(OBJECTIVE_COMPLETED);
+                    sb.append("<span color='").append(ReportingUtilities.getPositiveColor()).append("'>").append(OBJECTIVE_COMPLETED);
                 } else if (objectiveFailed) {
-                    sb.append("<span color='").append(MekHQ.getMHQOptions().getFontColorNegativeHexColor()).append("'>").append(OBJECTIVE_FAILED);
+                    sb.append("<span color='").append(ReportingUtilities.getNegativeColor()).append("'>").append(OBJECTIVE_FAILED);
                 } else {
-                    sb.append("<span color='").append(MekHQ.getMHQOptions().getFontColorWarningHexColor()).append("'>").append(OBJECTIVE_IN_PROGRESS);
+                    sb.append("<span color='").append(ReportingUtilities.getWarningColor()).append("'>").append(OBJECTIVE_IN_PROGRESS);
                 }
 
                 sb.append(' ');
@@ -447,11 +448,11 @@ public class StratconTab extends CampaignGuiTab {
             boolean contractIsActive = campaignState.getContract().isActiveOn(getCampaignGui().getCampaign().getLocalDate());
 
             if (contractIsActive) {
-                sb.append("<span color='").append(MekHQ.getMHQOptions().getFontColorWarningHexColor()).append("'>").append(OBJECTIVE_IN_PROGRESS);
+                sb.append("<span color='").append(ReportingUtilities.getWarningColor()).append("'>").append(OBJECTIVE_IN_PROGRESS);
             } else if (campaignState.getVictoryPoints() > 0) {
-                sb.append("<span color='").append(MekHQ.getMHQOptions().getFontColorPositiveHexColor()).append("'>").append(OBJECTIVE_COMPLETED);
+                sb.append("<span color='").append(ReportingUtilities.getPositiveColor()).append("'>").append(OBJECTIVE_COMPLETED);
             } else {
-                sb.append("<span color='").append(MekHQ.getMHQOptions().getFontColorNegativeHexColor()).append("'>").append(OBJECTIVE_FAILED);
+                sb.append("<span color='").append(ReportingUtilities.getNegativeColor()).append("'>").append(OBJECTIVE_FAILED);
             }
 
             sb.append(" Maintain Campaign Victory Point count above 0 by completing Turning Point scenarios")

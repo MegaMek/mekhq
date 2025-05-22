@@ -35,6 +35,7 @@ package mekhq.campaign;
 
 import static megamek.common.TechConstants.getSimpleLevel;
 import static megamek.common.options.OptionsConstants.*;
+import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
 import static mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick.ALL;
 import static mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick.SUPPORT;
 
@@ -67,6 +68,7 @@ import mekhq.campaign.finances.enums.FinancialYearDuration;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketMethod;
+import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.enums.*;
@@ -472,6 +474,8 @@ public class CampaignOptions {
     private boolean sellUnits;
     private boolean sellParts;
     private boolean payForRecruitment;
+    private boolean payForFood;
+    private boolean payForHousing;
     private boolean useLoanLimits;
     private boolean usePercentageMaint; // Unofficial
     private boolean infantryDontCount; // Unofficial
@@ -559,11 +563,15 @@ public class CampaignOptions {
 
     // region Markets Tab
     // Personnel Market
-    private String personnelMarketName;
-    private boolean personnelMarketReportRefresh;
-    private Map<SkillLevel, Integer> personnelMarketRandomRemovalTargets;
-    private double personnelMarketDylansWeight;
+    private PersonnelMarketStyle personnelMarketStyle;
     private boolean usePersonnelHireHiringHallOnly;
+    private boolean personnelMarketReportRefresh;
+    @Deprecated(since = "0.50.06", forRemoval = false)
+    private String personnelMarketName;
+    @Deprecated(since = "0.50.06", forRemoval = false)
+    private Map<SkillLevel, Integer> personnelMarketRandomRemovalTargets;
+    @Deprecated(since = "0.50.06", forRemoval = false)
+    private double personnelMarketDylansWeight;
 
     // Unit Market
     private UnitMarketMethod unitMarketMethod;
@@ -603,11 +611,6 @@ public class CampaignOptions {
     // Contract Operations
     private boolean mercSizeLimited;
     private boolean restrictPartsByMission;
-    private boolean limitLanceWeight;
-    private boolean limitLanceNumUnits;
-    private boolean useStrategy;
-    private int baseStrategyDeployment;
-    private int additionalStrategyDeployment;
     private final int[] atbBattleChance;
     private boolean generateChases;
 
@@ -839,6 +842,9 @@ public class CampaignOptions {
         getSalaryXPMultipliers().put(SkillLevel.HEROIC, 6.4);
         getSalaryXPMultipliers().put(SkillLevel.LEGENDARY, 12.8);
         setRoleBaseSalaries(new Money[personnelRoles.length]);
+        for (PersonnelRole role : personnelRoles) {
+            setRoleBaseSalary(role, 250);
+        }
         setRoleBaseSalary(PersonnelRole.MEKWARRIOR, 1500);
         setRoleBaseSalary(PersonnelRole.LAM_PILOT, 2250);
         setRoleBaseSalary(PersonnelRole.GROUND_VEHICLE_DRIVER, 900);
@@ -866,8 +872,9 @@ public class CampaignOptions {
         setRoleBaseSalary(PersonnelRole.ADMINISTRATOR_LOGISTICS, 500);
         setRoleBaseSalary(PersonnelRole.ADMINISTRATOR_TRANSPORT, 500);
         setRoleBaseSalary(PersonnelRole.ADMINISTRATOR_HR, 500);
-        setRoleBaseSalary(PersonnelRole.DEPENDENT, 0);
+        setRoleBaseSalary(PersonnelRole.DEPENDENT, 50);
         setRoleBaseSalary(PersonnelRole.NONE, 0);
+
 
         // Awards
         setAwardBonusStyle(AwardBonus.BOTH);
@@ -1073,6 +1080,8 @@ public class CampaignOptions {
         sellUnits = false;
         sellParts = false;
         payForRecruitment = false;
+        payForFood = false;
+        payForHousing = false;
         useLoanLimits = false;
         usePercentageMaint = false;
         infantryDontCount = false;
@@ -1167,6 +1176,7 @@ public class CampaignOptions {
 
         // region Markets Tab
         // Personnel Market
+        personnelMarketStyle = PERSONNEL_MARKET_DISABLED;
         setPersonnelMarketName(PersonnelMarket.getTypeName(PersonnelMarket.TYPE_NONE));
         setPersonnelMarketReportRefresh(true);
         setPersonnelMarketRandomRemovalTargets(new HashMap<>());
@@ -1222,11 +1232,6 @@ public class CampaignOptions {
         // Contract Operations
         mercSizeLimited = false;
         restrictPartsByMission = true;
-        limitLanceWeight = true;
-        limitLanceNumUnits = true;
-        useStrategy = true;
-        baseStrategyDeployment = 3;
-        additionalStrategyDeployment = 1;
         atbBattleChance = new int[CombatRole.values().length - 1];
         atbBattleChance[CombatRole.MANEUVER.ordinal()] = 40;
         atbBattleChance[CombatRole.FRONTLINE.ordinal()] = 20;
@@ -3331,6 +3336,22 @@ public class CampaignOptions {
         this.payForRecruitment = payForRecruitment;
     }
 
+    public boolean isPayForFood() {
+        return payForFood;
+    }
+
+    public void setPayForFood(final boolean payForFood) {
+        this.payForFood = payForFood;
+    }
+
+    public boolean isPayForHousing() {
+        return payForHousing;
+    }
+
+    public void setPayForHousing(final boolean payForHousing) {
+        this.payForHousing = payForHousing;
+    }
+
     public boolean isUseLoanLimits() {
         return useLoanLimits;
     }
@@ -3526,6 +3547,14 @@ public class CampaignOptions {
 
     // region Markets Tab
     // region Personnel Market
+    public PersonnelMarketStyle getPersonnelMarketStyle() {
+        return personnelMarketStyle;
+    }
+
+    public void setPersonnelMarketStyle(final PersonnelMarketStyle personnelMarketStyle) {
+        this.personnelMarketStyle = personnelMarketStyle;
+    }
+
     public String getPersonnelMarketName() {
         return personnelMarketName;
     }
@@ -4697,28 +4726,49 @@ public class CampaignOptions {
         this.usePlanetaryConditions = usePlanetaryConditions;
     }
 
+    /**
+     * @deprecated unused.
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public boolean isUseStrategy() {
-        return useStrategy;
+        return false;
     }
 
+    /**
+     * @deprecated unused.
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public void setUseStrategy(final boolean useStrategy) {
-        this.useStrategy = useStrategy;
     }
 
+    /**
+     * @deprecated unused except in deprecated methods
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public int getBaseStrategyDeployment() {
-        return baseStrategyDeployment;
+        return 0;
     }
 
+    /**
+     * @deprecated unused.
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public void setBaseStrategyDeployment(final int baseStrategyDeployment) {
-        this.baseStrategyDeployment = baseStrategyDeployment;
     }
 
+    /**
+     * @deprecated unused except in deprecated methods
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public int getAdditionalStrategyDeployment() {
-        return additionalStrategyDeployment;
+        return 0;
     }
 
+    /**
+     * @deprecated unused.
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public void setAdditionalStrategyDeployment(final int additionalStrategyDeployment) {
-        this.additionalStrategyDeployment = additionalStrategyDeployment;
     }
 
     public boolean isRestrictPartsByMission() {
@@ -4729,20 +4779,34 @@ public class CampaignOptions {
         this.restrictPartsByMission = restrictPartsByMission;
     }
 
+    /**
+     * @deprecated unused.
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public boolean isLimitLanceWeight() {
-        return limitLanceWeight;
+        return false;
     }
 
+    /**
+     * @deprecated unused.
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public void setLimitLanceWeight(final boolean limitLanceWeight) {
-        this.limitLanceWeight = limitLanceWeight;
     }
 
+    /**
+     * @deprecated unused.
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public boolean isLimitLanceNumUnits() {
-        return limitLanceNumUnits;
+        return false;
     }
 
+    /**
+     * @deprecated unused.
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public void setLimitLanceNumUnits(final boolean limitLanceNumUnits) {
-        this.limitLanceNumUnits = limitLanceNumUnits;
     }
 
     public boolean isAllowOpForAeros() {
@@ -5299,6 +5363,8 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sellUnits", sellUnits);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sellParts", sellParts);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForRecruitment", payForRecruitment);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForFood", payForFood);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForHousing", payForHousing);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useLoanLimits", useLoanLimits);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePercentageMaint", usePercentageMaint);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "infantryDontCount", infantryDontCount);
@@ -5350,6 +5416,7 @@ public class CampaignOptions {
 
         // region Markets Tab
         // region Personnel Market
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelMarketStyle", getPersonnelMarketStyle().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelMarketName", getPersonnelMarketName());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelMarketReportRefresh", isPersonnelMarketReportRefresh());
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "personnelMarketRandomRemovalTargets");
@@ -5433,12 +5500,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useWeatherConditions", useWeatherConditions);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useLightConditions", useLightConditions);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePlanetaryConditions", usePlanetaryConditions);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useStrategy", useStrategy);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "baseStrategyDeployment", baseStrategyDeployment);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "additionalStrategyDeployment", additionalStrategyDeployment);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "restrictPartsByMission", restrictPartsByMission);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "limitLanceWeight", limitLanceWeight);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "limitLanceNumUnits", limitLanceNumUnits);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignPortraitOnRoleChange", assignPortraitOnRoleChange);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowDuplicatePortraits", allowDuplicatePortraits);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowOpForAeros", isAllowOpForAeros());
@@ -5903,7 +5965,15 @@ public class CampaignOptions {
                                     Double.parseDouble(wn3.getTextContent().trim()));
                     }
                 } else if (nodeName.equalsIgnoreCase("salaryTypeBase")) {
-                    retVal.setRoleBaseSalaries(Utilities.readMoneyArray(wn2, retVal.getRoleBaseSalaries().length));
+                    Money[] defaultSalaries = retVal.getRoleBaseSalaries();
+                    Money[] newSalaries = Utilities.readMoneyArray(wn2);
+
+                    Money[] mergedSalaries = new Money[PersonnelRole.values().length];
+                    for (int i = 0; i < mergedSalaries.length; i++) {
+                        mergedSalaries[i] = (newSalaries[i] != null) ? newSalaries[i] : defaultSalaries[i];
+                    }
+
+                    retVal.setRoleBaseSalaries(mergedSalaries);
                     // endregion Salary
 
                     // region Awards
@@ -6280,6 +6350,10 @@ public class CampaignOptions {
                     retVal.sellParts = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (nodeName.equalsIgnoreCase("payForRecruitment")) {
                     retVal.payForRecruitment = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("payForFood")) {
+                    retVal.payForFood = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("payForHousing")) {
+                    retVal.payForHousing = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (nodeName.equalsIgnoreCase("useLoanLimits")) {
                     retVal.useLoanLimits = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("usePercentageMaint")) {
@@ -6349,6 +6423,8 @@ public class CampaignOptions {
 
                     // region Markets Tab
                     // region Personnel Market
+                } else if (nodeName.equalsIgnoreCase("personnelMarketStyle")) {
+                    retVal.setPersonnelMarketStyle(PersonnelMarketStyle.fromString(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("personnelMarketName")) {
                     String marketName = wn2.getTextContent().trim();
                     // Backwards compatibility with saves from before these rules moved to Camops
@@ -6500,18 +6576,8 @@ public class CampaignOptions {
                     retVal.useLightConditions = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("usePlanetaryConditions")) {
                     retVal.usePlanetaryConditions = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (nodeName.equalsIgnoreCase("useStrategy")) {
-                    retVal.useStrategy = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (nodeName.equalsIgnoreCase("baseStrategyDeployment")) {
-                    retVal.baseStrategyDeployment = Integer.parseInt(wn2.getTextContent().trim());
-                } else if (nodeName.equalsIgnoreCase("additionalStrategyDeployment")) {
-                    retVal.additionalStrategyDeployment = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("restrictPartsByMission")) {
                     retVal.restrictPartsByMission = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (nodeName.equalsIgnoreCase("limitLanceWeight")) {
-                    retVal.limitLanceWeight = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (nodeName.equalsIgnoreCase("limitLanceNumUnits")) {
-                    retVal.limitLanceNumUnits = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("allowOpForLocalUnits")) {
                     retVal.setAllowOpForLocalUnits(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("allowOpForAeros")) {

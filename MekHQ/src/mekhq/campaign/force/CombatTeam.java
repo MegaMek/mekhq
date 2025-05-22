@@ -187,7 +187,7 @@ public class CombatTeam {
         return commanderId;
     }
 
-    public Person getCommander(Campaign campaign) {
+    public @Nullable Person getCommander(Campaign campaign) {
         return campaign.getPerson(commanderId);
     }
 

@@ -300,7 +300,7 @@ public abstract class Part implements IPartWork, ITechnology {
         }
 
         if (!ignoreDamage && needsFixing() && !isPriceAdjustedForAmount()) {
-            cost = cost.multipliedBy((getSkillMin() > SkillType.EXP_ELITE) ?
+            cost = cost.multipliedBy((getSkillMin() > SkillType.EXP_LEGENDARY) ?
                                            campaign.getCampaignOptions().getUnrepairablePartsValueMultiplier() :
                                            campaign.getCampaignOptions().getDamagedPartsValueMultiplier());
         }
@@ -455,7 +455,7 @@ public abstract class Part implements IPartWork, ITechnology {
             toReturn.append("<br>");
         }
 
-        if (getSkillMin() <= SkillType.EXP_ELITE) {
+        if (getSkillMin() <= SkillType.EXP_LEGENDARY) {
             toReturn.append(getTimeLeft())
                   .append(" minutes")
                   .append(null != getTech() ? " (scheduled)" : "")
@@ -1063,7 +1063,7 @@ public abstract class Part implements IPartWork, ITechnology {
         skillMin = ++rating;
         timeSpent = 0;
         shorthandedMod = 0;
-        return ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
+        return ReportingUtilities.messageSurroundedBySpanWithColor(ReportingUtilities.getNegativeColor(),
               "<b> failed</b>") + ".";
     }
 

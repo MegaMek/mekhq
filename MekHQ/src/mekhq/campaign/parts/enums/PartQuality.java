@@ -24,12 +24,16 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
-
-
 package mekhq.campaign.parts.enums;
 
 import mekhq.MekHQ;
+import mekhq.utilities.ReportingUtilities;
 
 import java.util.*;
 import megamek.common.ITechnology.TechRating;
@@ -158,9 +162,9 @@ public enum PartQuality {
      */
     public String getHexColor() {
         return switch (this) {
-            case QUALITY_A, QUALITY_B -> MekHQ.getMHQOptions().getFontColorNegativeHexColor();
-            case QUALITY_C, QUALITY_D -> MekHQ.getMHQOptions().getFontColorWarningHexColor();
-            case QUALITY_E, QUALITY_F -> MekHQ.getMHQOptions().getFontColorPositiveHexColor();
+            case QUALITY_A, QUALITY_B -> ReportingUtilities.getNegativeColor();
+            case QUALITY_C, QUALITY_D -> ReportingUtilities.getWarningColor();
+            case QUALITY_E, QUALITY_F -> ReportingUtilities.getPositiveColor();
 
         };
     }

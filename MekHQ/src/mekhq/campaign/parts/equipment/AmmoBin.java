@@ -347,14 +347,14 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     @Override
     public String find(int transitDays) {
         return "<font color='" +
-                     MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                     ReportingUtilities.getNegativeColor() +
                      "'> You shouldn't be here (AmmoBin.find()).</font>";
     }
 
     @Override
     public String failToFind() {
         return "<font color='" +
-                     MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                     ReportingUtilities.getNegativeColor() +
                      "'> You shouldn't be here (AmmoBin.failToFind()).</font>";
     }
 
