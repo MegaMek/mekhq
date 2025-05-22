@@ -110,8 +110,20 @@ class FactionStandingsTest {
         return factionStandings;
     }
 
+    static Stream<Arguments> initializeDynamicFameValuesProvider() {
+        return Stream.of( // targetFaction, expectedFame, expectedStanding
+              // Federated Suns (same faction)
+              Arguments.of("FS", POLITICAL_FAME_SAME_FACTION, STANDING_LEVEL_5),
+              // Lyran Commonwealth (allied faction)
+              Arguments.of("LA", POLITICAL_FAME_ALLIED_FACTION, STANDING_LEVEL_4),
+              // Capellan Confederation (enemy faction)
+              Arguments.of("CC", POLITICAL_FAME_ENEMY_FACTION_AT_WAR, STANDING_LEVEL_3),
+              // ComStar (neutral faction)
+              Arguments.of("CS", DEFAULT_FAME, STANDING_LEVEL_4));
+    }
+
     @ParameterizedTest(name = "{0}")
-    @MethodSource(value = "initializeStartingFameValuesProvider")
+    @MethodSource(value = "initializeDynamicFameValuesProvider")
     void test_initializeDynamicFameValues(String targetFaction, double expectedFame,
           FactionStandingLevel expectedStanding) {
         // Setup

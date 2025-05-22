@@ -121,6 +121,26 @@ public class FactionStandings {
     static final double STARTING_FAME_ENEMY_FACTION_RIVAL = STARTING_FAME_ENEMY_FACTION_AT_WAR / 2;
 
     /**
+     * The political fame adjustment for the campaign's faction
+     */
+    static final double POLITICAL_FAME_SAME_FACTION = DEFAULT_FAME_DEGRADATION * 50;
+
+    /**
+     * The political fame adjustment for factions that are allies of the campaign faction.
+     */
+    static final double POLITICAL_FAME_ALLIED_FACTION = DEFAULT_FAME_DEGRADATION * 25;
+
+    /**
+     * The political fame adjustment for factions that are at war with the campaign faction.
+     */
+    static final double POLITICAL_FAME_ENEMY_FACTION_AT_WAR = -POLITICAL_FAME_SAME_FACTION;
+
+    /**
+     * The political fame adjustment for factions that are rivals of the campaign faction.
+     */
+    static final double POLITICAL_FAME_ENEMY_FACTION_RIVAL = -POLITICAL_FAME_ALLIED_FACTION;
+
+    /**
      * Fame increase for successfully completing a contract for the employer.
      */
     static final double FAME_DELTA_CONTRACT_SUCCESS_EMPLOYER = DEFAULT_FAME_DEGRADATION * 5;
@@ -198,7 +218,7 @@ public class FactionStandings {
      * <p><b>Key:</b></p> A {@link String} representing the shortname of the faction (aka Faction Code).
      * <p><b>Value:</b></p> A {@link Double} representing the campaign's Fame with that faction.
      */
-    private Map<String, Double> factionStandings = new HashMap<>();
+    private Map<String, Double> factionFame = new HashMap<>();
 
     /**
      * A mapping of faction names to their respective standing levels.
@@ -208,7 +228,7 @@ public class FactionStandings {
      * <p><b>Key:</b></p> A {@link String} representing the shortname of the faction (aka Faction Code).
      * <p><b>Value:</b></p> A {@link Double} representing the campaign's Fame with that faction.
      */
-    private final Map<String, Double> dynamicTemporaryFame = new HashMap<>();
+    private Map<String, Double> politicalFame = new HashMap<>();
 
     /**
      * Constructs an empty standings map. No initial relationships or fame values are set.
@@ -280,7 +300,6 @@ public class FactionStandings {
 
         Collection<Faction> allFactions = Factions.getInstance().getFactions();
         FactionHints factionHints = FactionHints.defaultFactionHints();
-        boolean isPirate = campaignFaction.isPirate();
 
         String report;
         for (Faction otherFaction : allFactions) {
@@ -302,8 +321,7 @@ public class FactionStandings {
                 continue;
             }
 
-            if ((isPirate && otherFaction.isPirate()) ||
-                      factionHints.isAlliedWith(campaignFaction, otherFaction, today)) {
+            if (factionHints.isAlliedWith(campaignFaction, otherFaction, today)) {
                 report = changeFameForFaction(otherFactionCode, STARTING_FAME_ALLIED_FACTION, gameYear);
                 if (!report.isBlank()) {
                     fameChangeReports.add(report);
@@ -311,8 +329,7 @@ public class FactionStandings {
                 }
             }
 
-            if ((isPirate && !otherFaction.isPirate()) ||
-                      factionHints.isAtWarWith(campaignFaction, otherFaction, today)) {
+            if (factionHints.isAtWarWith(campaignFaction, otherFaction, today)) {
                 report = changeFameForFaction(otherFactionCode, STARTING_FAME_ENEMY_FACTION_AT_WAR, gameYear);
                 if (!report.isBlank()) {
                     fameChangeReports.add(report);
@@ -364,13 +381,28 @@ public class FactionStandings {
      *
      * <p>Existing contents are discarded. After this call, only the entries in the given map remain.</p>
      *
-     * @param factionStandings the new map of faction codes to fame values
+     * @param factionFame the new map of faction codes to fame values
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public void setFactionStandings(Map<String, Double> factionStandings) {
-        this.factionStandings = factionStandings;
+    public void setFactionFame(Map<String, Double> factionFame) {
+        this.factionFame = factionFame;
+    }
+
+
+    /**
+     * Replaces the current map of faction standings with the provided map.
+     *
+     * <p>Existing contents are discarded. After this call, only the entries in the given map remain.</p>
+     *
+     * @param politicalFame the new map of faction codes to fame values
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public void setPoliticalFame(Map<String, Double> politicalFame) {
+        this.politicalFame = politicalFame;
     }
 
     /**
@@ -382,7 +414,7 @@ public class FactionStandings {
      * @since 0.50.07
      */
     public Map<String, Double> getAllFactionStandings() {
-        return factionStandings;
+        return factionFame;
     }
 
     /**
@@ -393,8 +425,8 @@ public class FactionStandings {
      * @author Illiani
      * @since 0.50.07
      */
-    public Map<String, Double> getAllDynamicTemporaryFame() {
-        return dynamicTemporaryFame;
+    public Map<String, Double> getAllPoliticalFame() {
+        return politicalFame;
     }
 
     /**
@@ -409,13 +441,13 @@ public class FactionStandings {
      * @since 0.50.07
      */
     public double getFameForFaction(final String factionCode, final boolean includeCurrentPolitics) {
-        double fame = factionStandings.getOrDefault(factionCode, DEFAULT_FAME);
+        double fame = factionFame.getOrDefault(factionCode, DEFAULT_FAME);
 
         if (includeCurrentPolitics) {
-            fame += dynamicTemporaryFame.getOrDefault(factionCode, DEFAULT_FAME);
+            fame += politicalFame.getOrDefault(factionCode, DEFAULT_FAME);
         }
 
-        return fame;
+        return clamp(fame, MINIMUM_FAME, MAXIMUM_FAME);
     }
 
     /**
@@ -431,7 +463,7 @@ public class FactionStandings {
      */
     public void setFameForFaction(final String factionCode, final double fame) {
         double fameValue = clamp(fame, MINIMUM_FAME, MAXIMUM_FAME);
-        factionStandings.put(factionCode, fameValue);
+        factionFame.put(factionCode, fameValue);
     }
 
     /**
@@ -464,7 +496,7 @@ public class FactionStandings {
         double originalFame = getFameForFaction(factionCode, false);
         double newFame = clamp(originalFame + delta, MINIMUM_FAME, MAXIMUM_FAME);
 
-        factionStandings.put(factionCode, newFame);
+        factionFame.put(factionCode, newFame);
 
         return getFameChangedReport(delta, gameYear, factionCode, newFame, originalFame);
     }
@@ -486,28 +518,28 @@ public class FactionStandings {
             }
 
             if (otherFaction.equals(campaignFaction)) {
-                dynamicTemporaryFame.put(otherFactionCode, STARTING_FAME_SAME_FACTION);
+                politicalFame.put(otherFactionCode, POLITICAL_FAME_SAME_FACTION);
                 continue;
             }
 
             if ((isPirate && otherFaction.isPirate()) ||
                       factionHints.isAlliedWith(campaignFaction, otherFaction, today)) {
-                dynamicTemporaryFame.put(otherFactionCode, STARTING_FAME_ALLIED_FACTION);
+                politicalFame.put(otherFactionCode, POLITICAL_FAME_ALLIED_FACTION);
                 continue;
             }
 
             if ((isPirate && !otherFaction.isPirate()) ||
                       factionHints.isAtWarWith(campaignFaction, otherFaction, today)) {
-                dynamicTemporaryFame.put(otherFactionCode, STARTING_FAME_ENEMY_FACTION_AT_WAR);
+                politicalFame.put(otherFactionCode, POLITICAL_FAME_ENEMY_FACTION_AT_WAR);
                 continue;
             }
 
             if (factionHints.isRivalOf(campaignFaction, otherFaction, today)) {
-                dynamicTemporaryFame.put(otherFactionCode, STARTING_FAME_ENEMY_FACTION_RIVAL);
+                politicalFame.put(otherFactionCode, POLITICAL_FAME_ENEMY_FACTION_RIVAL);
                 continue;
             }
 
-            dynamicTemporaryFame.remove(otherFactionCode);
+            politicalFame.remove(otherFactionCode);
         }
 
         StringBuilder report = new StringBuilder();
@@ -515,18 +547,18 @@ public class FactionStandings {
         double temporaryFame;
         String reportFormat = "<br>- %s: <span color='%s'><b>%s</b>" + CLOSING_SPAN_TAG;
 
-        List<String> sortedFactionCodes = new ArrayList<>(dynamicTemporaryFame.keySet());
+        List<String> sortedFactionCodes = new ArrayList<>(politicalFame.keySet());
         Collections.sort(sortedFactionCodes);
         for (String factionCode : sortedFactionCodes) {
             Faction faction = Factions.getInstance().getFaction(factionCode);
             if (faction == null) {
                 LOGGER.warn("Faction {} is missing from the Factions collection. Skipping.",
-                      dynamicTemporaryFame.get(factionCode));
+                      politicalFame.get(factionCode));
                 continue;
             }
 
             factionName = faction.getFullName(today.getYear());
-            temporaryFame = dynamicTemporaryFame.get(factionCode);
+            temporaryFame = politicalFame.get(factionCode);
             String color = temporaryFame >= 0 ? getPositiveColor() : getNegativeColor();
 
             report.append(String.format(reportFormat, factionName, color, temporaryFame));
@@ -633,7 +665,7 @@ public class FactionStandings {
      * @since 0.50.07
      */
     public void wipeAllFactionStandings() {
-        factionStandings.clear();
+        factionFame.clear();
     }
 
     /**
@@ -645,7 +677,7 @@ public class FactionStandings {
      * @since 0.50.07
      */
     public void resetFactionStanding(final String factionCode) {
-        factionStandings.remove(factionCode);
+        factionFame.remove(factionCode);
     }
 
     /**
@@ -668,8 +700,8 @@ public class FactionStandings {
      */
     public List<String> processFameDegradation(final int gameYear) {
         List<String> fameChangeReports = new ArrayList<>();
-        LOGGER.info("Processing fame decay for {} factions.", factionStandings.size());
-        for (String factionCode : new HashSet<>(factionStandings.keySet())) {
+        LOGGER.info("Processing fame decay for {} factions.", factionFame.size());
+        for (String factionCode : new HashSet<>(factionFame.keySet())) {
             Faction faction = Factions.getInstance().getFaction(factionCode);
             if (faction == null) {
                 LOGGER.info("Faction {} is missing from the Factions collection. Skipping.", factionCode);
@@ -680,7 +712,7 @@ public class FactionStandings {
                 continue;
             }
 
-            double currentFame = factionStandings.get(factionCode);
+            double currentFame = factionFame.get(factionCode);
 
             if (currentFame != DEFAULT_FAME) {
                 double delta = currentFame > DEFAULT_FAME ? -DEFAULT_FAME_DEGRADATION : DEFAULT_FAME_DEGRADATION;
@@ -987,11 +1019,17 @@ public class FactionStandings {
      * @since 0.50.07
      */
     public void writeFactionStandingsToXML(final PrintWriter writer, int indent) {
-        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "standings");
-        for (String factionCode : factionStandings.keySet()) {
-            MHQXMLUtility.writeSimpleXMLTag(writer, indent, factionCode, factionStandings.get(factionCode).toString());
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "factionFame");
+        for (String factionCode : factionFame.keySet()) {
+            MHQXMLUtility.writeSimpleXMLTag(writer, indent, factionCode, factionFame.get(factionCode).toString());
         }
-        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "standings");
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "factionFame");
+
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "politicalFame");
+        for (String factionCode : politicalFame.keySet()) {
+            MHQXMLUtility.writeSimpleXMLTag(writer, indent, factionCode, politicalFame.get(factionCode).toString());
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "politicalFame");
     }
 
     /**
@@ -1020,36 +1058,39 @@ public class FactionStandings {
         NodeList childNodes = parentNode.getChildNodes();
 
         FactionStandings standings = new FactionStandings();
-
-        Map<String, Double> factionStandings = new HashMap<>();
         try {
             for (int i = 0; i < childNodes.getLength(); i++) {
                 Node childNode = childNodes.item(i);
                 String nodeName = childNode.getNodeName();
 
-                if (nodeName.equalsIgnoreCase("standings")) {
-                    NodeList factionEntries = childNode.getChildNodes();
-
-                    for (int factionEntry = 0; factionEntry < factionEntries.getLength(); factionEntry++) {
-                        Node node = factionEntries.item(factionEntry);
-
-                        if (node.getNodeType() == Node.ELEMENT_NODE) {
-                            try {
-                                factionStandings.put(node.getNodeName(),
-                                      MathUtility.parseDouble(node.getTextContent(), DEFAULT_FAME));
-                            } catch (Exception ex) {
-                                LOGGER.error("Could not parse {}: ", node.getNodeName(), ex);
-                            }
-                        }
-                    }
+                if (nodeName.equalsIgnoreCase("factionFame")) {
+                    standings.setFactionFame(processFameNode(childNode, nodeName));
+                } else if (nodeName.equalsIgnoreCase("politicalFame")) {
+                    standings.setPoliticalFame(processFameNode(childNode, nodeName));
                 }
             }
-
-            standings.setFactionStandings(factionStandings);
         } catch (Exception ex) {
             LOGGER.error("Could not parse FactionStandings: ", ex);
         }
 
         return standings;
+    }
+
+    private static Map<String, Double> processFameNode(Node childNode, String logLabel) {
+        NodeList factionEntries = childNode.getChildNodes();
+        Map<String, Double> fame = new HashMap<>();
+        for (int i = 0; i < factionEntries.getLength(); i++) {
+            Node node = factionEntries.item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                try {
+                    fame.put(node.getNodeName(),
+                          MathUtility.parseDouble(node.getTextContent(), FactionStandings.DEFAULT_FAME));
+                } catch (Exception ex) {
+                    LOGGER.error("Could not parse {} {}: ", logLabel, node.getNodeName(), ex);
+                }
+            }
+        }
+
+        return fame;
     }
 }

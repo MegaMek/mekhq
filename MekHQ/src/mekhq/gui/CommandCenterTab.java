@@ -81,7 +81,7 @@ import mekhq.gui.dialog.PartsReportDialog;
 import mekhq.gui.dialog.PartsStoreDialog;
 import mekhq.gui.dialog.UnitMarketDialog;
 import mekhq.gui.dialog.reportDialogs.CargoReportDialog;
-import mekhq.gui.dialog.reportDialogs.FactionStandingReport;
+import mekhq.gui.dialog.reportDialogs.FactionStanding.FactionStandingReport;
 import mekhq.gui.dialog.reportDialogs.HangarReportDialog;
 import mekhq.gui.dialog.reportDialogs.PersonnelReportDialog;
 import mekhq.gui.dialog.reportDialogs.ReputationReportDialog;
@@ -631,8 +631,9 @@ public final class CommandCenterTab extends CampaignGuiTab {
         btnFactionStanding.setEnabled(getCampaign().getCampaignOptions().isTrackFactionStanding());
         btnFactionStanding.addActionListener(evt -> new FactionStandingReport(getCampaignGui().getFrame(),
               getCampaign().getFactionStandings(),
-              getCampaign().getGameYear(),
-              getCampaign().isGM()));
+              getCampaign().getLocalDate(),
+              getCampaign().isGM(),
+              getCampaign().getFaction()));
         panReports.add(btnFactionStanding);
 
         panReports.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panReports.title")));

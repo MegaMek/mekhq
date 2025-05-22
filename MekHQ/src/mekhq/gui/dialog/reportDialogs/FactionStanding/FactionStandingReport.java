@@ -1,7 +1,44 @@
-package mekhq.gui.dialog.reportDialogs;
+/*
+ * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
+ */
+package mekhq.gui.dialog.reportDialogs.FactionStanding;
 
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getNegativeColor;
+import static mekhq.utilities.ReportingUtilities.getPositiveColor;
+import static mekhq.utilities.ReportingUtilities.getWarningColor;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -11,6 +48,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -24,6 +62,7 @@ import megamek.logging.MMLogger;
 import megamek.utilities.ImageUtilities;
 import mekhq.MekHQ;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.FactionHints;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
@@ -61,10 +100,12 @@ public class FactionStandingReport extends JDialog {
     private static final String EFFECTS_PANEL_LABEL_NAME = "lblFactionStandingEffects";
 
     private final JFrame frame;
+    private final LocalDate today;
     private final int gameYear;
     private final FactionStandings factionStandings;
     private final Factions factions;
     private final boolean isGM;
+    private final Faction campaignFaction;
 
     private final List<String> innerSphereFactions = new ArrayList<>();
     private final List<String> clanFactions = new ArrayList<>();
@@ -76,17 +117,20 @@ public class FactionStandingReport extends JDialog {
      *
      * @param frame            the parent frame for this dialog
      * @param factionStandings the object containing faction standing values to report on
-     * @param gameYear         the current campaign year
+     * @param today            the current campaign date
      * @param isGM             whether the player currently has GM Mode enabled
+     * @param campaignFaction  the current campaign faction
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public FactionStandingReport(final JFrame frame, final FactionStandings factionStandings, final int gameYear,
-          final boolean isGM) {
+    public FactionStandingReport(final JFrame frame, final FactionStandings factionStandings, final LocalDate today,
+          final boolean isGM, final Faction campaignFaction) {
         this.frame = frame;
-        this.gameYear = gameYear;
+        this.today = today;
+        this.gameYear = today.getYear();
         this.isGM = isGM;
+        this.campaignFaction = campaignFaction;
         this.factionStandings = factionStandings;
         factions = Factions.getInstance();
 
@@ -251,7 +295,7 @@ public class FactionStandingReport extends JDialog {
     private void sortFactions() {
         Set<String> allFactionStandingsSet = factionStandings.getAllFactionStandings().keySet();
         List<String> sortedFactionStandings = new ArrayList<>(allFactionStandingsSet);
-        for (String factionCode : factionStandings.getAllDynamicTemporaryFame().keySet()) {
+        for (String factionCode : factionStandings.getAllPoliticalFame().keySet()) {
             if (!allFactionStandingsSet.contains(factionCode)) {
                 sortedFactionStandings.add(factionCode);
             }
@@ -297,17 +341,19 @@ public class FactionStandingReport extends JDialog {
             return lblEmptyPanelFromNullFaction;
         }
 
-        final double factionFame = factionStandings.getFameForFaction(factionCode, true);
-        final FactionStandingLevel factionStanding = FactionStandingUtilities.calculateFactionStandingLevel(factionFame);
+        final double factionFame = factionStandings.getFameForFaction(factionCode, false);
+        final double politicalFame = factionStandings.getFameForFaction(factionCode, true);
+        final FactionStandingLevel factionStanding = FactionStandingUtilities.calculateFactionStandingLevel(
+              politicalFame);
 
         // Parent panel
         JPanel pnlFactionStanding = new JPanel();
         pnlFactionStanding.setName("pnlFactionStanding" + factionCode);
         pnlFactionStanding.setLayout(new BoxLayout(pnlFactionStanding, BoxLayout.Y_AXIS));
         pnlFactionStanding.setBorder(createStandingColoredRoundedTitledBorder(factionStanding.getStandingLevel()));
-        pnlFactionStanding.setPreferredSize(UIUtil.scaleForGUI(500, 250));
-        pnlFactionStanding.setMaximumSize(UIUtil.scaleForGUI(500, 250));
-        pnlFactionStanding.addMouseListener(createEffectsPanelUpdater(getEffectsDescription(factionFame)));
+        pnlFactionStanding.setPreferredSize(UIUtil.scaleForGUI(500, 350));
+        pnlFactionStanding.setMaximumSize(UIUtil.scaleForGUI(500, 350));
+        pnlFactionStanding.addMouseListener(createEffectsPanelUpdater(getEffectsDescription(politicalFame)));
 
         // Faction Logo
         ImageIcon icon = Factions.getFactionLogo(gameYear, factionCode);
@@ -319,7 +365,7 @@ public class FactionStandingReport extends JDialog {
         pnlFactionStanding.add(lblFactionImage);
 
         // Faction Descriptions
-        String factionDescription = getDescriptionForFaction(faction, factionFame);
+        String factionDescription = getDescriptionForFaction(faction, politicalFame);
         JLabel lblDetails = new JLabel(factionDescription);
         lblDetails.setName("lblFactionDetails" + factionCode);
         lblDetails.setMaximumSize(new Dimension(Integer.MAX_VALUE, lblDetails.getPreferredSize().height));
@@ -328,23 +374,25 @@ public class FactionStandingReport extends JDialog {
         pnlFactionStanding.add(lblDetails);
 
         // Fame Slider
-        JSlider sldFame = getFameSlider(factionCode, factionFame);
+        JSlider sldFame = getFameSlider(factionCode, factionFame, politicalFame);
         pnlFactionStanding.add(sldFame);
 
         return pnlFactionStanding;
     }
 
-    private static JSlider getFameSlider(String factionCode, double factionFame) {
-        int roundedFame = (int) Math.round(factionFame); // JSlider doesn't accept doubles, so we round.
+    private static JSlider getFameSlider(String factionCode, double factionFame, double politicalFame) {
+        int roundedFactionFame = (int) Math.round(factionFame); // JSlider doesn't accept doubles, so we round.
+        int roundedPoliticalFame = (int) Math.round(politicalFame); // JSlider doesn't accept doubles, so we round.
         int minimumFame = (int) Math.floor(FactionStandings.getMinimumFame());
         int maximumFame = (int) Math.ceil(FactionStandings.getMaximumFame());
-        JSlider sldFame = new JSlider(minimumFame, maximumFame, roundedFame);
+        JSlider sldFame = new FactionStandingSlider(minimumFame, maximumFame, roundedFactionFame, roundedPoliticalFame);
         sldFame.setName("sldFactionFame" + factionCode);
         sldFame.setEnabled(false);
-        sldFame.setMaximumSize(new Dimension(Integer.MAX_VALUE, sldFame.getPreferredSize().height));
+        sldFame.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
         sldFame.setAlignmentX(JSlider.CENTER_ALIGNMENT);
         return sldFame;
     }
+
 
     /**
      * Calculates the standing effects description string for a given faction fame value.
@@ -407,9 +455,39 @@ public class FactionStandingReport extends JDialog {
         String factionStandingLabel = factionStanding.getLabel(faction);
         String factionStandingDescription = factionStanding.getDescription(faction);
 
-        return String.format("<html><div style='text-align: center;'><h1>%s</h1><h2>%s</h2><i>%s</i></div></html>",
+        FactionHints factionHints = FactionHints.defaultFactionHints();
+        LocalDate firstOfMonth = today.withDayOfMonth(1); // Political states update on the 1st in Faction Standing
+        boolean isAtWar = factionHints.isAtWarWith(campaignFaction, faction, firstOfMonth);
+        boolean isAllied = factionHints.isAlliedWith(campaignFaction, faction, firstOfMonth);
+        boolean isRival = factionHints.isRivalOf(campaignFaction, faction, firstOfMonth);
+        boolean isSame = campaignFaction.getShortName().equals(faction.getShortName());
+
+        String addendum = " "; // The whitespace is important to ensure consistent GUI spacing.
+        String color = "";
+
+        if (isSame) {
+            addendum = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.addendum.parent");
+            color = MekHQ.getMHQOptions().getFontColorSkillEliteHexColor();
+        } else if (isAtWar) {
+            addendum = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.addendum.atWar");
+            color = getNegativeColor();
+        } else if (isAllied) {
+            addendum = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.addendum.allied");
+            color = getPositiveColor();
+        } else if (isRival) {
+            addendum = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.addendum.rival");
+            color = getWarningColor();
+        }
+
+        return String.format("<html><div style='text-align: center;'><h1>%s</h1>" +
+                                   "<h2>%s</h2>" +
+                                   "<h2>%s%s%s</h2>" +
+                                   "<i>%s</i></div></html>",
               factionName,
               factionStandingLabel,
+              spanOpeningWithCustomColor(color),
+              addendum,
+              CLOSING_SPAN_TAG,
               factionStandingDescription);
     }
 
