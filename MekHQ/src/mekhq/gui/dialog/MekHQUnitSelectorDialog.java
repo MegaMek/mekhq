@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -149,8 +154,6 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
             buttonClose = new JButton(Messages.getString("Close"));
             buttonClose.setName("buttonClose");
             buttonClose.addActionListener(this);
-            buttonClose.setEnabled(true);
-            panelButtons.add(buttonClose, new GridBagConstraints());
         } else {
             // This branch is for adding units where they will not be going to the hanger.
             buttonSelect.setText(Messages.getString("MekSelectorDialog.Add"));
@@ -167,9 +170,9 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
                 selectedUnit = null;
                 setVisible(false);
             });
-            buttonClose.setEnabled(true);
-            panelButtons.add(buttonClose, new GridBagConstraints());
         }
+        buttonClose.setEnabled(true);
+        panelButtons.add(buttonClose, new GridBagConstraints());
 
         // This displays the BV of the selected unit.
         buttonShowBV.setText(Messages.getString("MekSelectorDialog.BV"));
@@ -209,6 +212,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
             }
             return false;
         }
+        // In this case, getSelectedEntity() == null, and this selection is bad
         return true;
     }
 
@@ -219,7 +223,6 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         if (isBadSelection()) {
             return;
         }
-        Entity entity = selectedUnit.getEntity();
         campaign.getShoppingList().addShoppingItem(selectedUnit, 1, campaign);
     }
 
@@ -302,6 +305,59 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         return selectedEntity;
     }
 
+    private boolean isAllowedUnit(MekSummary mek, int nClass, ITechnology tech, boolean techLevelMatch,
+          boolean checkSupportVee, int nUnit) {
+        // If year limits are enabled, check that the mek is available now
+        if (enableYearLimits && (mek.getYear() > allowedYear)) {
+            return false;
+        }
+        // If a Clan mek, check that Clan meks are allowed to be purchased
+        if (!(campaign.getCampaignOptions().isAllowClanPurchases()) && TechConstants.isClan(mek.getType())) {
+            return false;
+        }
+        // if an IS mek, check that IS meks are allowed to be purchased
+        if (!(campaign.getCampaignOptions().isAllowISPurchases()) && !TechConstants.isClan(mek.getType())) {
+            return false;
+        }
+        // If canonOnly is set, is this mech Canon?
+        if (canonOnly && !mek.isCanon()) {
+            return false;
+        }
+        // Does weight match current weight class filter?
+        if ((nClass != mek.getWeightClass()) && nClass != EntityWeightClass.SIZE) {
+            return false;
+        }
+        // If the tech level is selected, does the selected tech level match?
+        if ((tech == null) || !campaign.isLegal(tech)) {
+            return false;
+        }
+        if (!techLevelMatch) {
+            return false;
+        }
+
+        // Filter by unit type and support vehicles:
+        // If a specific unit type is requested in the Unit Type dropdown (nUnit != -1):
+        //     - if checkSupportVee then use "Support Vehicle" as this is not a default typeName from Megamek
+        //     - If support vehicles should *not* be included, the unit must exactly match the requested type.
+        //     - If support vehicles *should* be included, the unit must be a support vehicle (regardless of type).
+        if (nUnit != -1) {
+            String unitTypeName = checkSupportVee ? "Support Vehicle" : UnitType.getTypeName(nUnit);
+            boolean isCorrectType = mek.getUnitType().equals(unitTypeName);
+            boolean isSupport = mek.isSupport();
+            if ((!checkSupportVee && !isCorrectType) || (checkSupportVee && !isSupport)) {
+                return false;
+            }
+        }
+
+        // Did we match text entered into the searchFilter dialog?
+        if ((searchFilter != null) && !MekSearchFilter.isMatch(mek, searchFilter)) {
+            return false;
+        }
+        // If all tests passed, then include this unit
+        return true;
+
+    }
+
     @Override
     protected void filterUnits() {
         RowFilter<MekTableModel, Integer> unitTypeFilter;
@@ -333,27 +389,28 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
                             break;
                         }
                     }
-
+                    return isAllowedUnit(mek, nClass, tech, techLevelMatch, checkSupportVee, nUnit);
+                    /*
                     if (
-                        /* year limits */
-                          (!enableYearLimits || (mek.getYear() <= allowedYear))
-                                /* Clan/IS limits */ &&
+                        // year limits
+                          (!enableYearLimits || (mek.getYear() <= allowedYear)) &&
+                                // Clan/IS limits &&
                                 (campaign.getCampaignOptions().isAllowClanPurchases() ||
                                        !TechConstants.isClan(mek.getType())) &&
                                 (campaign.getCampaignOptions().isAllowISPurchases() ||
-                                       TechConstants.isClan(mek.getType()))
-                                /* Canon */ &&
-                                (!canonOnly || mek.isCanon())
-                                /* Weight */ &&
-                                ((nClass == mek.getWeightClass()) || (nClass == EntityWeightClass.SIZE))
-                                /* Technology Level */ &&
+                                       TechConstants.isClan(mek.getType())) &&
+                                // Canon
+                                (!canonOnly || mek.isCanon()) &&
+                                // Weight
+                                ((nClass == mek.getWeightClass()) || (nClass == EntityWeightClass.SIZE)) &&
+                                // Technology Level
                                 ((null != tech) && campaign.isLegal(tech)) &&
-                                (techLevelMatch)
-                                /* Support Vehicles */ &&
+                                (techLevelMatch) &&
+                                //* Support Vehicles
                                 ((nUnit == -1) ||
                                        (!checkSupportVee && mek.getUnitType().equals(UnitType.getTypeName(nUnit))) ||
-                                       (checkSupportVee && mek.isSupport()))
-                                /* Advanced Search */ &&
+                                       (checkSupportVee && mek.isSupport())) &&
+                                // Advanced Search
                                 ((searchFilter == null) || MekSearchFilter.isMatch(mek, searchFilter))) {
                         if (!textFilter.getText().isBlank()) {
                             String text = textFilter.getText();
@@ -361,7 +418,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
                         }
                         return true;
                     }
-                    return false;
+                    return false;*/
                 }
             };
         } catch (PatternSyntaxException ignored) {
