@@ -374,6 +374,30 @@ public class FactionStandings {
     }
 
     /**
+     * Retrieves all current faction standings.
+     *
+     * @return a {@link Map} containing all faction codes mapped to their current fame values.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public Map<String, Double> getAllFactionStandings() {
+        return factionStandings;
+    }
+
+    /**
+     * Retrieves all current faction standings based on political climate.
+     *
+     * @return a {@link Map} containing all faction codes mapped to their current fame values.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public Map<String, Double> getAllDynamicTemporaryFame() {
+        return dynamicTemporaryFame;
+    }
+
+    /**
      * Retrieves the current fame value for the specified faction.
      *
      * @param factionCode a unique code identifying the faction
