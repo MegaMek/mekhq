@@ -818,6 +818,10 @@ public class CampaignXmlParser {
                     campaign.setNewPersonnelMarket(generatePersonnelMarketDataFromXML(campaign, childNode, version));
                 } else if (nodeName.equalsIgnoreCase("factionStandings")) {
                     campaign.setFactionStandings(FactionStandings.generateInstanceFromXML(childNode));
+                    // This dynamic temporary Fame is not stored but built dynamically, and initializing it here
+                    // allows us to avoid needing to pass extra values into the above initializer
+                    FactionStandings factionStandings = campaign.getFactionStandings();
+                    factionStandings.updateDynamicTemporaryFame(campaign.getFaction(), campaign.getLocalDate());
                 } else if (nodeName.equalsIgnoreCase("rankSystem")) {
                     if (!childNode.hasChildNodes()) { // we need there to be child nodes to parse from
                         continue;

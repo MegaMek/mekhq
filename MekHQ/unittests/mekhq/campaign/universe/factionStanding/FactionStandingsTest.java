@@ -90,7 +90,7 @@ class FactionStandingsTest {
         FactionStandings factionStandings = getStartingFactionStandings();
 
         // Act
-        double actualFame = factionStandings.getFameForFaction(targetFaction);
+        double actualFame = factionStandings.getFameForFaction(targetFaction, false);
         FactionStandingLevel actualStanding = calculateFactionStandingLevel(actualFame);
 
         // Assert
@@ -108,6 +108,28 @@ class FactionStandingsTest {
         factionStandings.initializeStartingFameValues(campaignFaction, today);
 
         return factionStandings;
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource(value = "initializeStartingFameValuesProvider")
+    void test_initializeDynamicFameValues(String targetFaction, double expectedFame,
+          FactionStandingLevel expectedStanding) {
+        // Setup
+        Faction campaignFaction = Factions.getInstance().getFaction("FS"); // Federated Suns
+        LocalDate today = LocalDate.of(3028, 8, 20); // Start of the 4th Succession War
+
+        FactionStandings factionStandings = new FactionStandings();
+        factionStandings.updateDynamicTemporaryFame(campaignFaction, today);
+
+        // Act
+        double actualFame = factionStandings.getFameForFaction(targetFaction, true);
+        FactionStandingLevel actualStanding = calculateFactionStandingLevel(actualFame);
+
+        // Assert
+        assertEquals(expectedFame, actualFame, "Expected fame of " + expectedFame + " but got " + actualFame);
+        assertEquals(expectedStanding,
+              actualStanding,
+              "Expected fame level of " + expectedStanding.name() + " but got " + actualStanding.name());
     }
 
     static Stream<Arguments> processFameDegradationProvider() {
@@ -129,7 +151,7 @@ class FactionStandingsTest {
         factionStandings.processFameDegradation(3025);
 
         // Assert
-        double actualFame = factionStandings.getFameForFaction("CS");
+        double actualFame = factionStandings.getFameForFaction("CS", false);
         assertEquals(expectedFame, actualFame, "Expected fame of " + expectedFame + " but got " + actualFame);
     }
 
@@ -180,11 +202,10 @@ class FactionStandingsTest {
         factionStandings.processContractAccept(enemyFaction, today);
 
         // Assert
-        assertEquals(primaryStart + expectedPrimaryDelta,
-              factionStandings.getFameForFaction(primaryFaction),
+        assertEquals(primaryStart + expectedPrimaryDelta, factionStandings.getFameForFaction(primaryFaction, false),
               "Incorrect fame for " + primaryFaction);
         assertEquals(secondaryStart + expectedSecondaryDelta,
-              factionStandings.getFameForFaction(secondaryFaction),
+              factionStandings.getFameForFaction(secondaryFaction, false),
               "Incorrect fame for " + secondaryFaction + " (ally)");
     }
 
@@ -232,11 +253,9 @@ class FactionStandingsTest {
         factionStandings.processContractCompletion(employerFaction, today, status);
 
         // Assert
-        assertEquals(startingFsFame + expectedFsDelta,
-              factionStandings.getFameForFaction("FS"),
+        assertEquals(startingFsFame + expectedFsDelta, factionStandings.getFameForFaction("FS", false),
               "Incorrect fame for FS (" + status + ")");
-        assertEquals(startingLaFame + expectedLaDelta,
-              factionStandings.getFameForFaction("LA"),
+        assertEquals(startingLaFame + expectedLaDelta, factionStandings.getFameForFaction("LA", false),
               "Incorrect fame for LA (ally) (" + status + ")");
     }
 
@@ -255,7 +274,7 @@ class FactionStandingsTest {
         assertEquals(1, reports.size(), "Reports size mismatch");
 
         double expectedFame = 10.0 + FAME_DELTA_REFUSE_BATCHALL;
-        double actualFame = factionStandings.getFameForFaction("CW");
+        double actualFame = factionStandings.getFameForFaction("CW", false);
         assertEquals(expectedFame, actualFame, "Incorrect fame for clan faction after refused Batchall");
     }
 
@@ -293,15 +312,15 @@ class FactionStandingsTest {
         assertEquals(3, reports.size(), "Reports size mismatch");
 
         double expected = 10.0 + FAME_DELTA_EXECUTING_PRISONER;
-        double actual = factionStandings.getFameForFaction("FS");
+        double actual = factionStandings.getFameForFaction("FS", false);
         assertEquals(expected, actual, "Incorrect fame for FS");
 
         expected = 20.0 + (FAME_DELTA_EXECUTING_PRISONER * 2);
-        actual = factionStandings.getFameForFaction("CC");
+        actual = factionStandings.getFameForFaction("CC", false);
         assertEquals(expected, actual, "Incorrect fame for CC");
 
         expected = -5.0 + FAME_DELTA_EXECUTING_PRISONER;
-        actual = factionStandings.getFameForFaction("CS");
+        actual = factionStandings.getFameForFaction("CS", false);
         assertEquals(expected, actual, "Incorrect fame for CS");
     }
 }

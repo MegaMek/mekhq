@@ -36,6 +36,9 @@ import static megamek.codeUtilities.MathUtility.clamp;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getNegativeColor;
+import static mekhq.utilities.ReportingUtilities.getPositiveColor;
+import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.io.PrintWriter;
@@ -43,6 +46,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -58,7 +62,6 @@ import mekhq.campaign.universe.FactionHints;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel;
 import mekhq.utilities.MHQXMLUtility;
-import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -195,7 +198,17 @@ public class FactionStandings {
      * <p><b>Key:</b></p> A {@link String} representing the shortname of the faction (aka Faction Code).
      * <p><b>Value:</b></p> A {@link Double} representing the campaign's Fame with that faction.
      */
-    private Map<String, Double> factionStandings;
+    private Map<String, Double> factionStandings = new HashMap<>();
+
+    /**
+     * A mapping of faction names to their respective standing levels.
+     *
+     * <p>This variable is used to store and track the temporary Fame modifier from factions at war or allied.</p>
+     *
+     * <p><b>Key:</b></p> A {@link String} representing the shortname of the faction (aka Faction Code).
+     * <p><b>Value:</b></p> A {@link Double} representing the campaign's Fame with that faction.
+     */
+    private final Map<String, Double> dynamicTemporaryFame = new HashMap<>();
 
     /**
      * Constructs an empty standings map. No initial relationships or fame values are set.
@@ -204,13 +217,13 @@ public class FactionStandings {
      * separately.</p>
      *
      * <p>If we're starting a new campaign, we should follow up object construction with a call to
-     * {@link #initializeStartingFameValues(Faction, LocalDate)}</p>
+     * {@link #initializeStartingFameValues(Faction, LocalDate)} and
+     * {@link #updateDynamicTemporaryFame(Faction, LocalDate)}</p>
      *
      * @author Illiani
      * @since 0.50.07
      */
     public FactionStandings() {
-        this.factionStandings = new HashMap<>();
     }
 
     /**
@@ -361,29 +374,24 @@ public class FactionStandings {
     }
 
     /**
-     * Retrieves all current faction standings.
-     *
-     * @return a {@link Map} containing all faction codes mapped to their current fame values.
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    public Map<String, Double> getAllFactionStandings() {
-        return factionStandings;
-    }
-
-    /**
      * Retrieves the current fame value for the specified faction.
      *
      * @param factionCode a unique code identifying the faction
+     * @param includeCurrentPolitics whether to include temporary modifiers from current politics
      *
      * @return the fame value for the faction, or 0 if none is present
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public double getFameForFaction(final String factionCode) {
-        return factionStandings.getOrDefault(factionCode, DEFAULT_FAME);
+    public double getFameForFaction(final String factionCode, final boolean includeCurrentPolitics) {
+        double fame = factionStandings.getOrDefault(factionCode, DEFAULT_FAME);
+
+        if (includeCurrentPolitics) {
+            fame += dynamicTemporaryFame.getOrDefault(factionCode, DEFAULT_FAME);
+        }
+
+        return fame;
     }
 
     /**
@@ -429,12 +437,86 @@ public class FactionStandings {
             return "";
         }
 
-        double originalFame = getFameForFaction(factionCode);
+        double originalFame = getFameForFaction(factionCode, false);
         double newFame = clamp(originalFame + delta, MINIMUM_FAME, MAXIMUM_FAME);
 
         factionStandings.put(factionCode, newFame);
 
         return getFameChangedReport(delta, gameYear, factionCode, newFame, originalFame);
+    }
+
+    public String updateDynamicTemporaryFame(final Faction campaignFaction, final LocalDate today) {
+        Collection<Faction> allFactions = Factions.getInstance().getFactions();
+        FactionHints factionHints = FactionHints.defaultFactionHints();
+        boolean isPirate = campaignFaction.isPirate();
+
+        for (Faction otherFaction : allFactions) {
+            if (!otherFaction.validIn(today.getYear())) {
+                continue;
+            }
+
+            String otherFactionCode = otherFaction.getShortName();
+
+            if (isUntrackedFaction(otherFactionCode)) {
+                continue;
+            }
+
+            if (otherFaction.equals(campaignFaction)) {
+                dynamicTemporaryFame.put(otherFactionCode, STARTING_FAME_SAME_FACTION);
+                continue;
+            }
+
+            if ((isPirate && otherFaction.isPirate()) ||
+                      factionHints.isAlliedWith(campaignFaction, otherFaction, today)) {
+                dynamicTemporaryFame.put(otherFactionCode, STARTING_FAME_ALLIED_FACTION);
+                continue;
+            }
+
+            if ((isPirate && !otherFaction.isPirate()) ||
+                      factionHints.isAtWarWith(campaignFaction, otherFaction, today)) {
+                dynamicTemporaryFame.put(otherFactionCode, STARTING_FAME_ENEMY_FACTION_AT_WAR);
+                continue;
+            }
+
+            if (factionHints.isRivalOf(campaignFaction, otherFaction, today)) {
+                dynamicTemporaryFame.put(otherFactionCode, STARTING_FAME_ENEMY_FACTION_RIVAL);
+                continue;
+            }
+
+            dynamicTemporaryFame.remove(otherFactionCode);
+        }
+
+        StringBuilder report = new StringBuilder();
+        String factionName;
+        double temporaryFame;
+        String reportFormat = "<br>- %s: <span color='%s'><b>%s</b>" + CLOSING_SPAN_TAG;
+
+        List<String> sortedFactionCodes = new ArrayList<>(dynamicTemporaryFame.keySet());
+        Collections.sort(sortedFactionCodes);
+        for (String factionCode : sortedFactionCodes) {
+            Faction faction = Factions.getInstance().getFaction(factionCode);
+            if (faction == null) {
+                LOGGER.warn("Faction {} is missing from the Factions collection. Skipping.",
+                      dynamicTemporaryFame.get(factionCode));
+                continue;
+            }
+
+            factionName = faction.getFullName(today.getYear());
+            temporaryFame = dynamicTemporaryFame.get(factionCode);
+            String color = temporaryFame >= 0 ? getPositiveColor() : getNegativeColor();
+
+            report.append(String.format(reportFormat, factionName, color, temporaryFame));
+        }
+
+        if (!report.isEmpty()) {
+            report.insert(0,
+                  getFormattedTextAt(RESOURCE_BUNDLE,
+                        "factionStandings.change.report.politics",
+                        spanOpeningWithCustomColor(getWarningColor()),
+                        CLOSING_SPAN_TAG));
+        }
+
+        return report.toString();
     }
 
     /**
@@ -475,9 +557,9 @@ public class FactionStandings {
             }
 
             if (newMilestone.getStandingLevel() > originalMilestone.getStandingLevel()) {
-                reportingColor = ReportingUtilities.getPositiveColor();
+                reportingColor = getPositiveColor();
             } else {
-                reportingColor = ReportingUtilities.getNegativeColor();
+                reportingColor = getNegativeColor();
             }
 
             milestoneChangeReport = getFormattedTextAt(RESOURCE_BUNDLE,
@@ -486,7 +568,7 @@ public class FactionStandings {
                   newMilestone.getLabel(relevantFaction),
                   CLOSING_SPAN_TAG);
         } else {
-            reportingColor = ReportingUtilities.getWarningColor();
+            reportingColor = getWarningColor();
 
             milestoneChangeReport = getFormattedTextAt(RESOURCE_BUNDLE, "factionStandings.change.report.milestone.same",
                   spanOpeningWithCustomColor(reportingColor),
@@ -497,10 +579,10 @@ public class FactionStandings {
         // Build final report
         String deltaDirection;
         if (newFame > originalFame) {
-            reportingColor = ReportingUtilities.getPositiveColor();
+            reportingColor = getPositiveColor();
             deltaDirection = getTextAt(RESOURCE_BUNDLE, "factionStandings.change.increased");
         } else {
-            reportingColor = ReportingUtilities.getNegativeColor();
+            reportingColor = getNegativeColor();
             deltaDirection = getTextAt(RESOURCE_BUNDLE, "factionStandings.change.decreased");
         }
 
@@ -579,7 +661,7 @@ public class FactionStandings {
             if (currentFame != DEFAULT_FAME) {
                 double delta = currentFame > DEFAULT_FAME ? -DEFAULT_FAME_DEGRADATION : DEFAULT_FAME_DEGRADATION;
                 String report = changeFameForFaction(factionCode, delta, gameYear);
-                double newFame = getFameForFaction(factionCode);
+                double newFame = getFameForFaction(factionCode, false);
 
                 if ((currentFame > DEFAULT_FAME && newFame < DEFAULT_FAME) ||
                           (currentFame < DEFAULT_FAME && newFame > DEFAULT_FAME)) {
@@ -794,7 +876,8 @@ public class FactionStandings {
         String relevantFaction = isContractCompletion ? "employer" : "enemy";
 
         return getFormattedTextAt(RESOURCE_BUNDLE, "factionStandings.change.report.missingFaction",
-                spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()), CLOSING_SPAN_TAG,
+              spanOpeningWithCustomColor(getWarningColor()),
+              CLOSING_SPAN_TAG,
                 getTextAt(RESOURCE_BUNDLE, "factionStandings.change." + contractStatus),
                 getTextAt(RESOURCE_BUNDLE, "factionStandings.change." + relevantFaction));
     }
@@ -834,7 +917,7 @@ public class FactionStandings {
      * penalties are accumulated.</p>
      *
      * <p>After processing all victims, the method applies the total fame change for each affected faction for the
-     * specified game year, and collects any resulting fame change reports.</p>
+     * specified game year and collects any resulting fame change reports.</p>
      *
      * @param victims  the list of {@link Person} prisoners executed by the player
      * @param gameYear the year in which the executions and fame changes occur
