@@ -605,12 +605,12 @@ public class PersonViewPanel extends JScrollablePanel {
      * <p>This method checks whether abilities and/or implants are enabled in the campaign options.</p>
      *
      * <p>For each enabled category, it iterates over the person's corresponding options. If an option is selected
-     * (its boolean value is {@code true}), it retrieves the corresponding {@link IOption} instance and adds it to
-     * the result map, associating it with a string indicating its category (e.g., {@code LVL3_ADVANTAGES} for
-     * abilities or {@code MD_ADVANTAGES} for implants).</p>
+     * (its boolean value is {@code true}), it retrieves the corresponding {@link IOption} instance and adds it to the
+     * result map, associating it with a string indicating its category (e.g., {@code LVL3_ADVANTAGES} for abilities or
+     * {@code MD_ADVANTAGES} for implants).</p>
      *
-     * @return a {@link Map} where the key is a relevant {@link IOption} (representing a special ability or implant)
-     *         and the value is a {@link String} indicating the ability or implant category
+     * @return a {@link Map} where the key is a relevant {@link IOption} (representing a special ability or implant) and
+     *       the value is a {@link String} indicating the ability or implant category
      *
      * @author Illiani
      * @since 0.50.06
@@ -2114,7 +2114,8 @@ public class PersonViewPanel extends JScrollablePanel {
 
         JLabel lblLoyalty = null;
         int loyaltyModifier = person.getLoyaltyModifier(person.getLoyalty());
-        if ((campaignOptions.isUseLoyaltyModifiers()) && (!campaignOptions.isUseHideLoyalty()) &&
+        if ((campaignOptions.isUseLoyaltyModifiers()) &&
+                  (!campaignOptions.isUseHideLoyalty()) &&
                   (loyaltyModifier != 0)) {
             String loyaltyLabel = String.format(resourceMap.getString("format.traitValue"),
                   resourceMap.getString("lblLoyalty.text"),
@@ -2134,7 +2135,8 @@ public class PersonViewPanel extends JScrollablePanel {
             StringBuilder fatigueDisplay = new StringBuilder("<html>");
             int fatigueTurnoverModifier = MathUtility.clamp(((effectiveFatigue - 1) / 4) - 1, 0, 3);
             if (effectiveFatigue != baseFatigue) {
-                fatigueDisplay.append("<s><font color='gray'>").append(baseFatigue)
+                fatigueDisplay.append("<s><font color='gray'>")
+                      .append(baseFatigue)
                       .append("</font></s> ")
                       .append(effectiveFatigue);
             } else {
@@ -2293,14 +2295,6 @@ public class PersonViewPanel extends JScrollablePanel {
             adjustment = String.format(" %s%s%s", spanOpeningWithCustomColor(color), "&#x25B2", CLOSING_SPAN_TAG);
         }
         return adjustment;
-    }
-
-    /**
-     * @deprecated use {@link #fillPersonalLog()} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    private JPanel fillLog() {
-        return fillPersonalLog();
     }
 
     private JPanel fillPersonalLog() {
@@ -2577,6 +2571,7 @@ public class PersonViewPanel extends JScrollablePanel {
      * <p>After updating, the panel is revalidated and repainted to reflect the changes.</p>
      *
      * @param person the {@link Person} to display, or {@code null} for empty content
+     *
      * @author Illiani
      * @since 0.50.06
      */

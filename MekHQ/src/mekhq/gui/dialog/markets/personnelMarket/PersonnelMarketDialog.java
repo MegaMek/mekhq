@@ -409,8 +409,9 @@ public class PersonnelMarketDialog {
     /**
      * Initializes and returns the detail view pane for the selected person.
      *
-     * @param selectedPerson   reference to the selected person
-     * @param mainPanel        main panel where the split pane is embedded
+     * @param selectedPerson reference to the selected person
+     * @param mainPanel      main panel where the split pane is embedded
+     *
      * @return a configured {@link JSplitPane} for applicant details
      *
      * @author Illiani
@@ -440,7 +441,7 @@ public class PersonnelMarketDialog {
     /**
      * Performs the hiring action for the selected applicant.
      *
-     * @param isGM  whether the hire action is performed by a game master
+     * @param isGM whether the hire action is performed by a game master
      *
      * @author Illiani
      * @since 0.50.06
@@ -459,7 +460,7 @@ public class PersonnelMarketDialog {
                                   "finances.personnelMarket.hire",
                                   applicant.getFullTitle()));
             }
-            campaign.recruitPerson(applicant, isGM);
+            campaign.recruitPerson(applicant, isGM, true);
         }
 
         // Remove all recruited persons from the applicant list

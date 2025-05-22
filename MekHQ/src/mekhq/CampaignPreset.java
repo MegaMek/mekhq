@@ -32,6 +32,7 @@
  */
 package mekhq;
 
+import static megamek.SuiteConstants.LAST_MILESTONE;
 import static mekhq.MHQConstants.CAMPAIGN_PRESET_DIRECTORY;
 
 import java.io.BufferedOutputStream;
@@ -468,8 +469,7 @@ public class CampaignPreset {
             return null;
         }
 
-        // TODO Replace this with the Milestone Constant once we hit a Milestone after 49.19.1
-        if (version.isLowerThan(LAST_COMPATIBLE_VERSION)) {
+        if (version.isLowerThan(LAST_MILESTONE)) {
             logger.error("Campaign Presets from {} are incompatible with version {}.", version, MHQConstants.VERSION);
             return null;
         }

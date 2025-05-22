@@ -106,7 +106,8 @@ public class AceDuelBuiltInScenario extends AtBScenario {
     }
 
     @Override
-    public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities, ArrayList<Entity> enemyEntities) {
+    public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
+          ArrayList<Entity> enemyEntities) {
         setStartingPos(startPos[Compute.randomInt(4)]);
         int enemyStart = getStartingPos() + 4;
 
@@ -118,14 +119,20 @@ public class AceDuelBuiltInScenario extends AtBScenario {
             final Entity en;
             if (weight == EntityWeightClass.WEIGHT_COLOSSAL) {
                 // Treat Colossal as a unique case, generating at that tier
-                en = getEntity(getContract(campaign).getEnemyCode(), getContract(campaign).getEnemySkill(),
-                        getContract(campaign).getEnemyQuality(), UnitType.MEK,
-                        EntityWeightClass.WEIGHT_COLOSSAL, campaign);
+                en = getEntity(getContract(campaign).getEnemyCode(),
+                      getContract(campaign).getEnemySkill(),
+                      getContract(campaign).getEnemyQuality(),
+                      UnitType.MEK,
+                      EntityWeightClass.WEIGHT_COLOSSAL,
+                      campaign);
             } else {
                 // Generate up to a maximum of Assault
-                en = getEntity(getContract(campaign).getEnemyCode(), getContract(campaign).getEnemySkill(),
-                        getContract(campaign).getEnemyQuality(), UnitType.MEK,
-                        Math.min(weight + 1, EntityWeightClass.WEIGHT_ASSAULT), campaign);
+                en = getEntity(getContract(campaign).getEnemyCode(),
+                      getContract(campaign).getEnemySkill(),
+                      getContract(campaign).getEnemyQuality(),
+                      UnitType.MEK,
+                      Math.min(weight + 1, EntityWeightClass.WEIGHT_ASSAULT),
+                      campaign);
             }
 
             if (en == null) {
@@ -134,8 +141,8 @@ public class AceDuelBuiltInScenario extends AtBScenario {
             }
 
             if (weight >= EntityWeightClass.WEIGHT_ASSAULT) {
-                en.getCrew().setGunnery(en.getCrew().getGunnery() - 1);
-                en.getCrew().setPiloting(en.getCrew().getPiloting() - 1);
+                en.getCrew().setGunnery(en.getCrew().getGunnery() - 1, en.getCrew().getCrewType().getGunnerPos());
+                en.getCrew().setPiloting(en.getCrew().getPiloting() - 1, en.getCrew().getCrewType().getPilotPos());
             }
 
             enemyEntities = new ArrayList<>();
@@ -151,7 +158,12 @@ public class AceDuelBuiltInScenario extends AtBScenario {
         super.setObjectives(campaign, contract);
 
         ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 1, 100);
-        ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this, 1, 100, false);
+        ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign,
+              contract,
+              this,
+              1,
+              100,
+              false);
 
         getScenarioObjectives().add(destroyHostiles);
         getScenarioObjectives().add(keepFriendliesAlive);
