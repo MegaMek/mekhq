@@ -379,7 +379,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 for (String report : standingReports) {
                     campaign.addReport(report);
                 }
-                String report = factionStandings.updatePoliticalRegard(campaign.getFaction(),
+                String report = factionStandings.updateClimateRegard(campaign.getFaction(),
                       campaign.getLocalDate());
                 campaign.addReport(report);
                 // endregion Progress 6

@@ -113,11 +113,11 @@ class FactionStandingsTest {
     static Stream<Arguments> initializeDynamicRegardValuesProvider() {
         return Stream.of( // targetFaction, expectedRegard, expectedStanding
               // Federated Suns (same faction)
-              Arguments.of("FS", POLITICAL_REGARD_SAME_FACTION, STANDING_LEVEL_5),
+              Arguments.of("FS", CLIMATE_REGARD_SAME_FACTION, STANDING_LEVEL_5),
               // Lyran Commonwealth (allied faction)
-              Arguments.of("LA", POLITICAL_REGARD_ALLIED_FACTION, STANDING_LEVEL_4),
+              Arguments.of("LA", CLIMATE_REGARD_ALLIED_FACTION, STANDING_LEVEL_4),
               // Capellan Confederation (enemy faction)
-              Arguments.of("CC", POLITICAL_REGARD_ENEMY_FACTION_AT_WAR, STANDING_LEVEL_3),
+              Arguments.of("CC", CLIMATE_REGARD_ENEMY_FACTION_AT_WAR, STANDING_LEVEL_3),
               // ComStar (neutral faction)
               Arguments.of("CS", DEFAULT_REGARD, STANDING_LEVEL_4));
     }
@@ -131,7 +131,7 @@ class FactionStandingsTest {
         LocalDate today = LocalDate.of(3028, 8, 20); // Start of the 4th Succession War
 
         FactionStandings factionStandings = new FactionStandings();
-        factionStandings.updatePoliticalRegard(campaignFaction, today);
+        factionStandings.updateClimateRegard(campaignFaction, today);
 
         // Act
         double actualRegard = factionStandings.getRegardForFaction(targetFaction, true);

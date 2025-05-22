@@ -5733,7 +5733,7 @@ public class Campaign implements ITechManager {
 
         // Faction Standing
         if (isFirstOfMonth && campaignOptions.isTrackFactionStanding()) {
-            String report = factionStandings.updatePoliticalRegard(faction, currentDay);
+            String report = factionStandings.updateClimateRegard(faction, currentDay);
             addReport(report);
         }
 
