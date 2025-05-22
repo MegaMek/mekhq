@@ -122,24 +122,24 @@ public class FactionStandings {
     static final double STARTING_REGARD_ENEMY_FACTION_RIVAL = STARTING_REGARD_ENEMY_FACTION_AT_WAR / 2;
 
     /**
-     * The political regard adjustment for the campaign's faction
+     * The climate regard adjustment for the campaign's faction
      */
-    static final double POLITICAL_REGARD_SAME_FACTION = DEFAULT_REGARD_DEGRADATION * 50;
+    static final double CLIMATE_REGARD_SAME_FACTION = DEFAULT_REGARD_DEGRADATION * 50;
 
     /**
-     * The political regard adjustment for factions that are allies of the campaign faction.
+     * The climate regard adjustment for factions that are allies of the campaign faction.
      */
-    static final double POLITICAL_REGARD_ALLIED_FACTION = DEFAULT_REGARD_DEGRADATION * 25;
+    static final double CLIMATE_REGARD_ALLIED_FACTION = DEFAULT_REGARD_DEGRADATION * 25;
 
     /**
-     * The political regard adjustment for factions that are at war with the campaign faction.
+     * The climate regard adjustment for factions that are at war with the campaign faction.
      */
-    static final double POLITICAL_REGARD_ENEMY_FACTION_AT_WAR = -POLITICAL_REGARD_SAME_FACTION;
+    static final double CLIMATE_REGARD_ENEMY_FACTION_AT_WAR = -CLIMATE_REGARD_SAME_FACTION;
 
     /**
-     * The political regard adjustment for factions that are rivals of the campaign faction.
+     * The climate regard adjustment for factions that are rivals of the campaign faction.
      */
-    static final double POLITICAL_REGARD_ENEMY_FACTION_RIVAL = -POLITICAL_REGARD_ALLIED_FACTION;
+    static final double CLIMATE_REGARD_ENEMY_FACTION_RIVAL = -CLIMATE_REGARD_ALLIED_FACTION;
 
     /**
      * Regard increase for successfully completing a contract for the employer.
@@ -229,7 +229,7 @@ public class FactionStandings {
      * <p><b>Key:</b></p> A {@link String} representing the shortname of the faction (aka Faction Code).
      * <p><b>Value:</b></p> A {@link Double} representing the campaign's Regard with that faction.
      */
-    private Map<String, Double> politicalRegard = new HashMap<>();
+    private Map<String, Double> climateRegard = new HashMap<>();
 
     /**
      * Constructs an empty standings map. No initial relationships or regard values are set.
@@ -239,7 +239,7 @@ public class FactionStandings {
      *
      * <p>If we're starting a new campaign, we should follow up object construction with a call to
      * {@link #initializeStartingRegardValues(Faction, LocalDate)} and
-     * {@link #updatePoliticalRegard(Faction, LocalDate)}</p>
+     * {@link #updateClimateRegard(Faction, LocalDate)}</p>
      *
      * @author Illiani
      * @since 0.50.07
@@ -396,13 +396,13 @@ public class FactionStandings {
      *
      * <p>Existing contents are discarded. After this call, only the entries in the given map remain.</p>
      *
-     * @param politicalRegard the new map of faction codes to regard values
+     * @param climateRegard the new map of faction codes to regard values
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public void setPoliticalRegard(Map<String, Double> politicalRegard) {
-        this.politicalRegard = politicalRegard;
+    public void setClimateRegard(Map<String, Double> climateRegard) {
+        this.climateRegard = climateRegard;
     }
 
     /**
@@ -418,22 +418,22 @@ public class FactionStandings {
     }
 
     /**
-     * Retrieves all current faction standings based on political climate.
+     * Retrieves all current faction standings based on climate climate.
      *
      * @return a {@link Map} containing all faction codes mapped to their current regard values.
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public Map<String, Double> getAllPoliticalRegard() {
-        return politicalRegard;
+    public Map<String, Double> getAllClimateRegard() {
+        return climateRegard;
     }
 
     /**
      * Retrieves the current regard value for the specified faction.
      *
      * @param factionCode a unique code identifying the faction
-     * @param includeCurrentClimate whether to include temporary modifiers from the current political climate
+     * @param includeCurrentClimate whether to include temporary modifiers from the current climate climate
      *
      * @return the regard value for the faction, or 0 if none is present
      *
@@ -444,7 +444,7 @@ public class FactionStandings {
         double regard = factionRegard.getOrDefault(factionCode, DEFAULT_REGARD);
 
         if (includeCurrentClimate) {
-            regard += politicalRegard.getOrDefault(factionCode, DEFAULT_REGARD);
+            regard += climateRegard.getOrDefault(factionCode, DEFAULT_REGARD);
         }
 
         return clamp(regard, MINIMUM_REGARD, MAXIMUM_REGARD);
@@ -501,10 +501,33 @@ public class FactionStandings {
         return getRegardChangedReport(delta, gameYear, factionCode, newRegard, originalRegard);
     }
 
-    public String updatePoliticalRegard(final Faction campaignFaction, final LocalDate today) {
+    /**
+     * Updates the internal map representing the "climate regard"—an attitude or relationship level—between the
+     * specified campaign faction and all other factions for the given date.
+     *
+     * <p>The method iterates over all factions and assigns a regard value based on alliances, wars, rivalry, and
+     * whether the faction is untracked or invalid for the specified year.</p>
+     *
+     * <p>Existing climateRegard entries are removed.</p>
+     *
+     * <p>After updating, this method generates and returns an HTML-formatted report summarizing the new climate
+     * regard standings for all relevant factions.</p>
+     *
+     * @param campaignFaction the {@link Faction} representing the campaign's primary faction
+     * @param today           the {@link LocalDate} to use for validating factions and determining relationships
+     *
+     * @return an HTML-formatted {@link String} report of faction climate regard changes
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String updateClimateRegard(final Faction campaignFaction, final LocalDate today) {
         Collection<Faction> allFactions = Factions.getInstance().getFactions();
         FactionHints factionHints = FactionHints.defaultFactionHints();
         boolean isPirate = campaignFaction.isPirate();
+
+        // Clear any existing climate regard entries
+        climateRegard.clear();
 
         for (Faction otherFaction : allFactions) {
             if (!otherFaction.validIn(today.getYear())) {
@@ -518,50 +541,71 @@ public class FactionStandings {
             }
 
             if (otherFaction.equals(campaignFaction)) {
-                politicalRegard.put(otherFactionCode, POLITICAL_REGARD_SAME_FACTION);
+                climateRegard.put(otherFactionCode, CLIMATE_REGARD_SAME_FACTION);
                 continue;
             }
 
             if ((isPirate && otherFaction.isPirate()) ||
                       factionHints.isAlliedWith(campaignFaction, otherFaction, today)) {
-                politicalRegard.put(otherFactionCode, POLITICAL_REGARD_ALLIED_FACTION);
+                climateRegard.put(otherFactionCode, CLIMATE_REGARD_ALLIED_FACTION);
                 continue;
             }
 
             if ((isPirate && !otherFaction.isPirate()) ||
                       factionHints.isAtWarWith(campaignFaction, otherFaction, today)) {
-                politicalRegard.put(otherFactionCode, POLITICAL_REGARD_ENEMY_FACTION_AT_WAR);
+                climateRegard.put(otherFactionCode, CLIMATE_REGARD_ENEMY_FACTION_AT_WAR);
                 continue;
             }
 
             if (factionHints.isRivalOf(campaignFaction, otherFaction, today)) {
-                politicalRegard.put(otherFactionCode, POLITICAL_REGARD_ENEMY_FACTION_RIVAL);
-                continue;
+                climateRegard.put(otherFactionCode, CLIMATE_REGARD_ENEMY_FACTION_RIVAL);
             }
-
-            politicalRegard.remove(otherFactionCode);
         }
 
+        // If we're not handling any climate modifiers, return an empty string
+        if (climateRegard.isEmpty()) {
+            return "";
+        }
+
+        return buildClimateReport(today).toString();
+    }
+
+    /**
+     * Builds an HTML-formatted report summarizing the current "climate regard" standings between the campaign faction
+     * and all other tracked factions for the specified date.
+     *
+     * <p>The report includes each faction's name and its corresponding regard value, color-coded to indicate
+     * positive or negative standing.</p>
+     *
+     * <p>If any entries exist, an introductory line is inserted at the beginning.</p>
+     *
+     * @param today the {@link LocalDate} used for retrieving year-specific faction names
+     *
+     * @return a {@link StringBuilder} containing the formatted climate regard report
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private StringBuilder buildClimateReport(LocalDate today) {
         StringBuilder report = new StringBuilder();
         String factionName;
-        double climateRegard;
+        double regard;
         String reportFormat = "<br>- %s: <span color='%s'><b>%s</b>" + CLOSING_SPAN_TAG;
 
-        List<String> sortedFactionCodes = new ArrayList<>(politicalRegard.keySet());
+        List<String> sortedFactionCodes = new ArrayList<>(climateRegard.keySet());
         Collections.sort(sortedFactionCodes);
         for (String factionCode : sortedFactionCodes) {
             Faction faction = Factions.getInstance().getFaction(factionCode);
             if (faction == null) {
-                LOGGER.warn("Faction {} is missing from the Factions collection. Skipping.",
-                      politicalRegard.get(factionCode));
+                LOGGER.warn("Faction {} is missing from the Factions collection. Skipping.", climateRegard.get(factionCode));
                 continue;
             }
 
             factionName = faction.getFullName(today.getYear());
-            climateRegard = politicalRegard.get(factionCode);
-            String color = climateRegard >= 0 ? getPositiveColor() : getNegativeColor();
+            regard = climateRegard.get(factionCode);
+            String color = regard >= 0 ? getPositiveColor() : getNegativeColor();
 
-            report.append(String.format(reportFormat, factionName, color, climateRegard));
+            report.append(String.format(reportFormat, factionName, color, regard));
         }
 
         if (!report.isEmpty()) {
@@ -570,8 +614,7 @@ public class FactionStandings {
                         spanOpeningWithCustomColor(getWarningColor()),
                         CLOSING_SPAN_TAG));
         }
-
-        return report.toString();
+        return report;
     }
 
     /**
@@ -909,6 +952,18 @@ public class FactionStandings {
         return regardChangeReports;
     }
 
+    /**
+     * Determines whether a given faction should be excluded from tracking for regard (including climate regard, based
+     * on its validity in the specified game year or if it is considered "untracked."
+     *
+     * @param otherFaction the {@link Faction} to evaluate
+     * @param gameYear the year for which validity should be checked
+     * @param otherFactionCode the short code identifying the other faction
+     * @return {@code true} if the faction is either invalid in the specified year or is untracked; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private boolean isNotValidForTracking(Faction otherFaction, int gameYear, String otherFactionCode) {
         if (!otherFaction.validIn(gameYear)) {
             return true;
@@ -1026,11 +1081,11 @@ public class FactionStandings {
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "factionRegard");
 
-        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "politicalRegard");
-        for (String factionCode : politicalRegard.keySet()) {
-            MHQXMLUtility.writeSimpleXMLTag(writer, indent, factionCode, politicalRegard.get(factionCode).toString());
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "climateRegard");
+        for (String factionCode : climateRegard.keySet()) {
+            MHQXMLUtility.writeSimpleXMLTag(writer, indent, factionCode, climateRegard.get(factionCode).toString());
         }
-        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "politicalRegard");
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "climateRegard");
     }
 
     /**
@@ -1066,8 +1121,8 @@ public class FactionStandings {
 
                 if (nodeName.equalsIgnoreCase("factionRegard")) {
                     standings.setFactionRegard(processRegardNode(childNode, nodeName));
-                } else if (nodeName.equalsIgnoreCase("politicalRegard")) {
-                    standings.setPoliticalRegard(processRegardNode(childNode, nodeName));
+                } else if (nodeName.equalsIgnoreCase("climateRegard")) {
+                    standings.setClimateRegard(processRegardNode(childNode, nodeName));
                 }
             }
         } catch (Exception ex) {
@@ -1077,6 +1132,20 @@ public class FactionStandings {
         return standings;
     }
 
+    /**
+     * Parses a node containing faction regard information and returns a mapping of faction codes to their
+     * corresponding regard values as doubles.
+     *
+     * <p>Each child element node is processed for its name and text value. If the value cannot be parsed as a
+     * double, a default is used and the error is logged with the provided label.</p>
+     *
+     * @param childNode the XML {@link Node} containing child entries representing faction regards
+     * @param logLabel a label to help identify log messages during parsing errors
+     * @return a {@link Map} of faction codes to parsed regard values
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private static Map<String, Double> processRegardNode(Node childNode, String logLabel) {
         NodeList factionEntries = childNode.getChildNodes();
         Map<String, Double> regard = new HashMap<>();

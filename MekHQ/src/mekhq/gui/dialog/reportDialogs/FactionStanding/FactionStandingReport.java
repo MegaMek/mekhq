@@ -74,7 +74,7 @@ import mekhq.gui.utilities.WrapLayout;
 
 /**
  * Displays a dialog window that visualizes a report on faction standings for the current campaign year. Shows
- * individual faction panels with images, standing levels, fame sliders, and interactive details on standing effects.
+ * individual faction panels with images, standing levels, regard sliders, and interactive details on standing effects.
  *
  * <p>This dialog provides a convenient summary as well as documentation and GM tool links related to faction
  * standings.</p>
@@ -156,38 +156,66 @@ public class FactionStandingReport extends JDialog {
     }
 
     /**
-     * Creates the main report panel. Contains the scrollable faction standings panel, effects panel, and buttons
-     * panel.
+     * Sorts all factions into appropriate categories based on their current standing and properties.
+     *
+     * <p>The method collects all faction codes from both the overall standings and the climate regard, combining
+     * them into a sorted list. For each faction, it determines if the faction:</p>
+     *
+     * <ul>
+     *     <li>is no longer valid in the current game year (added to {@code deadFactions}),</li>
+     *     <li>is a Clan-type faction (added to {@code clanFactions}),</li>
+     *     <li>is a Periphery-type faction (added to {@code peripheryFactions}),</li>
+     *     <li>or is an Inner Sphere faction (added to {@code innerSphereFactions}).</li>
+     * </ul>
+     *
+     * <p>Logs an error if a faction code cannot be resolved to a {@code Faction}.</p>
      *
      * @author Illiani
      * @since 0.50.07
      */
-    private JPanel createReportPanelForFactionGroup(List<String> factions) {
-        if (factions.isEmpty()) {
-            return new JPanel();
+    private void sortFactions() {
+        Set<String> allFactionStandingsSet = factionStandings.getAllFactionStandings().keySet();
+        List<String> sortedFactionStandings = new ArrayList<>(allFactionStandingsSet);
+        for (String factionCode : factionStandings.getAllClimateRegard().keySet()) {
+            if (!allFactionStandingsSet.contains(factionCode)) {
+                sortedFactionStandings.add(factionCode);
+            }
         }
+        Collections.sort(sortedFactionStandings);
 
-        JPanel pnlFactionReport = new JPanel();
-        pnlFactionReport.setName("factionReportPanel" + factions);
-        pnlFactionReport.setLayout(new BoxLayout(pnlFactionReport, BoxLayout.Y_AXIS));
+        for (String factionCode : sortedFactionStandings) {
+            Faction faction = factions.getFaction(factionCode);
+            if (faction == null) {
+                LOGGER.error(new NullPointerException(), "Failed to find faction with code: {}", factionCode);
+                continue;
+            }
 
-        JPanel groupPanel = new JPanel(new WrapLayout(WrapLayout.LEFT, PADDING, PADDING));
-        groupPanel.setName("factionReportGroupPanel" + factions);
-        for (String faction : factions) {
-            JPanel factionPanel = createFactionPanel(faction);
-            groupPanel.add(factionPanel);
+            if (!faction.validIn(gameYear)) {
+                deadFactions.add(factionCode);
+            } else if (faction.isClan()) {
+                clanFactions.add(factionCode);
+            } else if (faction.isPeriphery()) {
+                peripheryFactions.add(factionCode);
+            } else {
+                innerSphereFactions.add(factionCode);
+            }
         }
-        JScrollPane groupScrollPane = new JScrollPaneWithSpeed(groupPanel,
-              JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-              JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        groupScrollPane.setName("factionReportGroupScrollPane" + factions);
-        groupScrollPane.setBorder(RoundedLineBorder.createRoundedLineBorder());
-
-        pnlFactionReport.add(groupScrollPane);
-
-        return pnlFactionReport;
     }
 
+    /**
+     * Constructs the main report panel for the faction standing report dialog.
+     *
+     * <p>This method creates a tabbed pane, adding a separate tab for each faction category (Inner Sphere, Clan,
+     * Periphery, and Dead) with content provided by {@code createReportPanelForFactionGroup} using the relevant faction
+     * lists. Each tab's title is retrieved from a resource bundle for localization.</p>
+     *
+     * <p>If a tab's panel is empty, that tab is disabled to prevent selection. The method also creates and sets up
+     * effects and buttons panels, applies layout configuration and font scaling, and then assembles all components in a
+     * vertically stacked panel, which is set as the dialog's main content pane.</p>
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private void createReportPanel() {
         // Create the tabbed pane
         String innerSphereTabTitle = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.tab.innerSphere");
@@ -225,6 +253,39 @@ public class FactionStandingReport extends JDialog {
         pnlReport.add(pnlButtons);
 
         setContentPane(pnlReport);
+    }
+
+    /**
+     * Creates the main report panel. Contains the scrollable faction standings panel, effects panel, and buttons
+     * panel.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private JPanel createReportPanelForFactionGroup(List<String> factions) {
+        if (factions.isEmpty()) {
+            return new JPanel();
+        }
+
+        JPanel pnlFactionReport = new JPanel();
+        pnlFactionReport.setName("factionReportPanel" + factions);
+        pnlFactionReport.setLayout(new BoxLayout(pnlFactionReport, BoxLayout.Y_AXIS));
+
+        JPanel groupPanel = new JPanel(new WrapLayout(WrapLayout.LEFT, PADDING, PADDING));
+        groupPanel.setName("factionReportGroupPanel" + factions);
+        for (String faction : factions) {
+            JPanel factionPanel = createFactionPanel(faction);
+            groupPanel.add(factionPanel);
+        }
+        JScrollPane groupScrollPane = new JScrollPaneWithSpeed(groupPanel,
+              JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+              JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        groupScrollPane.setName("factionReportGroupScrollPane" + factions);
+        groupScrollPane.setBorder(RoundedLineBorder.createRoundedLineBorder());
+
+        pnlFactionReport.add(groupScrollPane);
+
+        return pnlFactionReport;
     }
 
     /**
@@ -292,37 +353,8 @@ public class FactionStandingReport extends JDialog {
         return pnlButtons;
     }
 
-    private void sortFactions() {
-        Set<String> allFactionStandingsSet = factionStandings.getAllFactionStandings().keySet();
-        List<String> sortedFactionStandings = new ArrayList<>(allFactionStandingsSet);
-        for (String factionCode : factionStandings.getAllPoliticalFame().keySet()) {
-            if (!allFactionStandingsSet.contains(factionCode)) {
-                sortedFactionStandings.add(factionCode);
-            }
-        }
-        Collections.sort(sortedFactionStandings);
-
-        for (String factionCode : sortedFactionStandings) {
-            Faction faction = factions.getFaction(factionCode);
-            if (faction == null) {
-                LOGGER.error(new NullPointerException(), "Failed to find faction with code: {}", factionCode);
-                continue;
-            }
-
-            if (!faction.validIn(gameYear)) {
-                deadFactions.add(factionCode);
-            } else if (faction.isClan()) {
-                clanFactions.add(factionCode);
-            } else if (faction.isPeriphery()) {
-                peripheryFactions.add(factionCode);
-            } else {
-                innerSphereFactions.add(factionCode);
-            }
-        }
-    }
-
     /**
-     * Constructs a panel describing the specified faction, including logo, description, and fame slider.
+     * Constructs a panel describing the specified faction, including logo, description, and regard slider.
      *
      * @param factionCode the code of the faction to be displayed
      * @return a {@link JPanel} representing the faction's standing information
@@ -341,10 +373,10 @@ public class FactionStandingReport extends JDialog {
             return lblEmptyPanelFromNullFaction;
         }
 
-        final double factionFame = factionStandings.getFameForFaction(factionCode, false);
-        final double politicalFame = factionStandings.getFameForFaction(factionCode, true);
+        final double factionRegard = factionStandings.getRegardForFaction(factionCode, false);
+        final double climateRegard = factionStandings.getRegardForFaction(factionCode, true);
         final FactionStandingLevel factionStanding = FactionStandingUtilities.calculateFactionStandingLevel(
-              politicalFame);
+              climateRegard);
 
         // Parent panel
         JPanel pnlFactionStanding = new JPanel();
@@ -353,7 +385,7 @@ public class FactionStandingReport extends JDialog {
         pnlFactionStanding.setBorder(createStandingColoredRoundedTitledBorder(factionStanding.getStandingLevel()));
         pnlFactionStanding.setPreferredSize(UIUtil.scaleForGUI(500, 350));
         pnlFactionStanding.setMaximumSize(UIUtil.scaleForGUI(500, 350));
-        pnlFactionStanding.addMouseListener(createEffectsPanelUpdater(getEffectsDescription(politicalFame)));
+        pnlFactionStanding.addMouseListener(createEffectsPanelUpdater(getEffectsDescription(climateRegard)));
 
         // Faction Logo
         ImageIcon icon = Factions.getFactionLogo(gameYear, factionCode);
@@ -365,7 +397,7 @@ public class FactionStandingReport extends JDialog {
         pnlFactionStanding.add(lblFactionImage);
 
         // Faction Descriptions
-        String factionDescription = getDescriptionForFaction(faction, politicalFame);
+        String factionDescription = getDescriptionForFaction(faction, climateRegard);
         JLabel lblDetails = new JLabel(factionDescription);
         lblDetails.setName("lblFactionDetails" + factionCode);
         lblDetails.setMaximumSize(new Dimension(Integer.MAX_VALUE, lblDetails.getPreferredSize().height));
@@ -373,122 +405,11 @@ public class FactionStandingReport extends JDialog {
         lblDetails.setHorizontalAlignment(SwingConstants.CENTER);
         pnlFactionStanding.add(lblDetails);
 
-        // Fame Slider
-        JSlider sldFame = getFameSlider(factionCode, factionFame, politicalFame);
-        pnlFactionStanding.add(sldFame);
+        // Regard Slider
+        JSlider sldRegard = getRegardSlider(factionCode, factionRegard, climateRegard);
+        pnlFactionStanding.add(sldRegard);
 
         return pnlFactionStanding;
-    }
-
-    private static JSlider getFameSlider(String factionCode, double factionFame, double politicalFame) {
-        int roundedFactionFame = (int) Math.round(factionFame); // JSlider doesn't accept doubles, so we round.
-        int roundedPoliticalFame = (int) Math.round(politicalFame); // JSlider doesn't accept doubles, so we round.
-        int minimumFame = (int) Math.floor(FactionStandings.getMinimumFame());
-        int maximumFame = (int) Math.ceil(FactionStandings.getMaximumFame());
-        JSlider sldFame = new FactionStandingSlider(minimumFame, maximumFame, roundedFactionFame, roundedPoliticalFame);
-        sldFame.setName("sldFactionFame" + factionCode);
-        sldFame.setEnabled(false);
-        sldFame.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
-        sldFame.setAlignmentX(JSlider.CENTER_ALIGNMENT);
-        return sldFame;
-    }
-
-
-    /**
-     * Calculates the standing effects description string for a given faction fame value.
-     *
-     * @param factionFame the fame value of the faction
-     * @return the standing effects description for the corresponding {@link FactionStandingLevel}
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    private static String getEffectsDescription(double factionFame) {
-        FactionStandingLevel factionStanding = FactionStandingUtilities.calculateFactionStandingLevel(factionFame);
-        return factionStanding.getEffectsDescription();
-    }
-
-    public MouseAdapter createEffectsPanelUpdater(String replacementText) {
-        final String effectsText = replacementText == null ? "" : replacementText;
-        return new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent mouseEvent) {
-                JTextArea effectsArea = findComponentByName(getContentPane(),
-                      EFFECTS_PANEL_LABEL_NAME,
-                      JTextArea.class);
-                if (effectsArea != null) {
-                    LOGGER.debug("Updating effects panel with text: {}", effectsText);
-                    effectsArea.setText(effectsText);
-                }
-            }
-        };
-    }
-
-    private <T extends Component> T findComponentByName(Container container, String name, Class<T> type) {
-        for (Component component : container.getComponents()) {
-            if (type.isInstance(component) && name.equals(component.getName())) {
-                return type.cast(component);
-            }
-            if (component instanceof Container child) {
-                T found = findComponentByName(child, name, type);
-                if (found != null) {
-                    return found;
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Constructs the HTML markup string used to describe a faction's details and standing.
-     *
-     * @param faction      the faction object
-     * @param factionFame  the fame value for this faction
-     * @return a HTML string for displaying faction details, standing, and description
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    private String getDescriptionForFaction(Faction faction, double factionFame) {
-        String factionName = faction.getFullName(gameYear);
-        FactionStandingLevel factionStanding = FactionStandingUtilities.calculateFactionStandingLevel(factionFame);
-        String factionStandingLabel = factionStanding.getLabel(faction);
-        String factionStandingDescription = factionStanding.getDescription(faction);
-
-        FactionHints factionHints = FactionHints.defaultFactionHints();
-        LocalDate firstOfMonth = today.withDayOfMonth(1); // Political states update on the 1st in Faction Standing
-        boolean isAtWar = factionHints.isAtWarWith(campaignFaction, faction, firstOfMonth);
-        boolean isAllied = factionHints.isAlliedWith(campaignFaction, faction, firstOfMonth);
-        boolean isRival = factionHints.isRivalOf(campaignFaction, faction, firstOfMonth);
-        boolean isSame = campaignFaction.getShortName().equals(faction.getShortName());
-
-        String addendum = " "; // The whitespace is important to ensure consistent GUI spacing.
-        String color = "";
-
-        if (isSame) {
-            addendum = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.addendum.parent");
-            color = MekHQ.getMHQOptions().getFontColorSkillEliteHexColor();
-        } else if (isAtWar) {
-            addendum = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.addendum.atWar");
-            color = getNegativeColor();
-        } else if (isAllied) {
-            addendum = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.addendum.allied");
-            color = getPositiveColor();
-        } else if (isRival) {
-            addendum = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.addendum.rival");
-            color = getWarningColor();
-        }
-
-        return String.format("<html><div style='text-align: center;'><h1>%s</h1>" +
-                                   "<h2>%s</h2>" +
-                                   "<h2>%s%s%s</h2>" +
-                                   "<i>%s</i></div></html>",
-              factionName,
-              factionStandingLabel,
-              spanOpeningWithCustomColor(color),
-              addendum,
-              CLOSING_SPAN_TAG,
-              factionStandingDescription);
     }
 
     /**
@@ -535,5 +456,160 @@ public class FactionStandingReport extends JDialog {
         }
 
         return BorderFactory.createTitledBorder(compound, title.toString());
+    }
+
+    /**
+     * Constructs the HTML markup string used to describe a faction's details and standing.
+     *
+     * @param faction       the faction object
+     * @param factionRegard the regard value for this faction
+     *
+     * @return a HTML string for displaying faction details, standing, and description
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private String getDescriptionForFaction(Faction faction, double factionRegard) {
+        String factionName = faction.getFullName(gameYear);
+        FactionStandingLevel factionStanding = FactionStandingUtilities.calculateFactionStandingLevel(factionRegard);
+        String factionStandingLabel = factionStanding.getLabel(faction);
+        String factionStandingDescription = factionStanding.getDescription(faction);
+
+        FactionHints factionHints = FactionHints.defaultFactionHints();
+        LocalDate firstOfMonth = today.withDayOfMonth(1); // Climate states update on the 1st in Faction Standing
+        boolean isAtWar = factionHints.isAtWarWith(campaignFaction, faction, firstOfMonth);
+        boolean isAllied = factionHints.isAlliedWith(campaignFaction, faction, firstOfMonth);
+        boolean isRival = factionHints.isRivalOf(campaignFaction, faction, firstOfMonth);
+        boolean isSame = campaignFaction.getShortName().equals(faction.getShortName());
+
+        String addendum = " "; // The whitespace is important to ensure consistent GUI spacing.
+        String color = "";
+
+        if (isSame) {
+            addendum = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.addendum.parent");
+            color = MekHQ.getMHQOptions().getFontColorSkillEliteHexColor();
+        } else if (isAtWar) {
+            addendum = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.addendum.atWar");
+            color = getNegativeColor();
+        } else if (isAllied) {
+            addendum = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.addendum.allied");
+            color = getPositiveColor();
+        } else if (isRival) {
+            addendum = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.addendum.rival");
+            color = getWarningColor();
+        }
+
+        return String.format("<html><div style='text-align: center;'><h1>%s</h1>" +
+                                   "<h2>%s</h2>" +
+                                   "<h2>%s%s%s</h2>" +
+                                   "<i>%s</i></div></html>",
+              factionName,
+              factionStandingLabel,
+              spanOpeningWithCustomColor(color),
+              addendum,
+              CLOSING_SPAN_TAG,
+              factionStandingDescription);
+    }
+
+    /**
+     * Creates and configures a {@link JSlider} to visually represent the regard values for a faction.
+     *
+     * <p>The slider uses integer values, so the provided double regard values are rounded.</p>
+     *
+     * <p>The minimum and maximum values are determined using {@link FactionStandings#getMinimumRegard()} and
+     * {@link FactionStandings#getMaximumRegard()}.</p>
+     *
+     * @param factionCode   the code identifying the faction, used to set the slider's name
+     * @param factionRegard the current regard value for the faction; will be rounded to the nearest {@link Integer}
+     * @param climateRegard the climate regard value for the faction; will be rounded to the nearest {@link Integer}
+     *
+     * @return a {@link JSlider} (specifically, a {@link FactionStandingSlider}) configured for the faction, disabled
+     *       and styled
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private static JSlider getRegardSlider(String factionCode, double factionRegard, double climateRegard) {
+        int roundedFactionRegard = (int) Math.round(factionRegard); // JSlider doesn't accept doubles, so we round.
+        int roundedClimateRegard = (int) Math.round(climateRegard); // JSlider doesn't accept doubles, so we round.
+        int minimumRegard = (int) Math.floor(FactionStandings.getMinimumRegard());
+        int maximumRegard = (int) Math.ceil(FactionStandings.getMaximumRegard());
+        JSlider sldRegard = new FactionStandingSlider(minimumRegard,
+              maximumRegard,
+              roundedFactionRegard,
+              roundedClimateRegard);
+        sldRegard.setName("sldFactionRegard" + factionCode);
+        sldRegard.setEnabled(false);
+        sldRegard.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
+        sldRegard.setAlignmentX(JSlider.CENTER_ALIGNMENT);
+        return sldRegard;
+    }
+
+    /**
+     * Calculates the standing effects description string for a given faction regard value.
+     *
+     * @param factionRegard the regard value of the faction
+     * @return the standing effects description for the corresponding {@link FactionStandingLevel}
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private static String getEffectsDescription(double factionRegard) {
+        FactionStandingLevel factionStanding = FactionStandingUtilities.calculateFactionStandingLevel(factionRegard);
+        return factionStanding.getEffectsDescription();
+    }
+
+    /**
+     * Creates a mouse adapter that updates the effects panel's text when the mouse enters the associated 
+     * component.
+     *
+     * @param replacementText the text to set in the effects panel; if null, an empty string is used
+     * @return a {@link MouseAdapter} that updates the effects panel on mouse enter
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public MouseAdapter createEffectsPanelUpdater(String replacementText) {
+        final String effectsText = replacementText == null ? "" : replacementText;
+        return new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent mouseEvent) {
+                JTextArea effectsArea = findComponentByName(getContentPane(),
+                      EFFECTS_PANEL_LABEL_NAME,
+                      JTextArea.class);
+                if (effectsArea != null) {
+                    LOGGER.debug("Updating effects panel with text: {}", effectsText);
+                    effectsArea.setText(effectsText);
+                }
+            }
+        };
+    }
+
+    /**
+     * Recursively searches the given container and its children for a component of the specified type with the given
+     * name.
+     *
+     * @param container the container to search within
+     * @param name the name of the component to find
+     * @param type the class type of the component to find
+     * @param <T> the type parameter extending {@link Component}
+     * @return the found component cast to the specified type, or null if not found
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private <T extends Component> T findComponentByName(Container container, String name, Class<T> type) {
+        for (Component component : container.getComponents()) {
+            if (type.isInstance(component) && name.equals(component.getName())) {
+                return type.cast(component);
+            }
+            if (component instanceof Container child) {
+                T found = findComponentByName(child, name, type);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
     }
 }
