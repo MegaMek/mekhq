@@ -5665,8 +5665,7 @@ public class Campaign implements ITechManager {
         processNewDayPersonnel();
 
         // Needs to be before 'processNewDayATB' so that Dependents can't leave the
-        // moment they
-        // arrive via AtB Bonus Events
+        // moment they arrive via AtB Bonus Events
         if (location.isOnPlanet() && isFirstOfMonth) {
             RandomDependents randomDependents = new RandomDependents(this);
             randomDependents.processMonthlyRemovalAndAddition();
@@ -5730,6 +5729,12 @@ public class Campaign implements ITechManager {
         // Random Events
         if (currentDay.isAfter(GRAY_MONDAY_EVENTS_BEGIN) && currentDay.isBefore(GRAY_MONDAY_EVENTS_END)) {
             new GrayMonday(this, currentDay);
+        }
+
+        // Faction Standing
+        if (isFirstOfMonth && campaignOptions.isTrackFactionStanding()) {
+            String report = factionStandings.updateDynamicTemporaryFame(faction, currentDay);
+            addReport(report);
         }
 
         // This must be the last step before returning true
