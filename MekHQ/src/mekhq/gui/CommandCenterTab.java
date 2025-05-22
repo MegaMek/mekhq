@@ -81,7 +81,6 @@ import mekhq.gui.dialog.PartsReportDialog;
 import mekhq.gui.dialog.PartsStoreDialog;
 import mekhq.gui.dialog.UnitMarketDialog;
 import mekhq.gui.dialog.reportDialogs.CargoReportDialog;
-import mekhq.gui.dialog.reportDialogs.FactionStanding.FactionStandingReport;
 import mekhq.gui.dialog.reportDialogs.HangarReportDialog;
 import mekhq.gui.dialog.reportDialogs.PersonnelReportDialog;
 import mekhq.gui.dialog.reportDialogs.ReputationReportDialog;
@@ -143,7 +142,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
     // available reports
     private JPanel panReports;
     private JButton btnUnitRating;
-    private JButton btnFactionStanding;
 
     //icon panel
     private JPanel panIcon;
@@ -594,7 +592,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
      * Initialize the panel for displaying available reports
      */
     private void initReportsPanel() {
-        panReports = new JPanel(new GridLayout(6, 1));
+        panReports = new JPanel(new GridLayout(5, 1));
 
         JButton btnTransportReport = new JButton(resourceMap.getString("btnTransportReport.text"));
         btnTransportReport.addActionListener(ev -> new TransportReportDialog(getCampaignGui().getFrame(),
@@ -617,7 +615,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
         panReports.add(btnCargoCapacity);
 
         btnUnitRating = new JButton(resourceMap.getString("btnUnitRating.text"));
-        btnUnitRating.setEnabled(getCampaign().getCampaignOptions().getUnitRatingMethod().isEnabled());
+        btnUnitRating.setVisible(getCampaign().getCampaignOptions().getUnitRatingMethod().isEnabled());
+
         if (getCampaign().getCampaignOptions().getUnitRatingMethod().isFMMR()) {
             btnUnitRating.addActionListener(evt -> new UnitRatingReportDialog(getCampaignGui().getFrame(),
                   getCampaign()).setVisible(true));
@@ -626,15 +625,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
                   getCampaign()).setVisible(true));
         }
         panReports.add(btnUnitRating);
-
-        btnFactionStanding = new JButton(resourceMap.getString("btnFactionStanding.text"));
-        btnFactionStanding.setEnabled(getCampaign().getCampaignOptions().isTrackFactionStanding());
-        btnFactionStanding.addActionListener(evt -> new FactionStandingReport(getCampaignGui().getFrame(),
-              getCampaign().getFactionStandings(),
-              getCampaign().getLocalDate(),
-              getCampaign().isGM(),
-              getCampaign().getFaction()));
-        panReports.add(btnFactionStanding);
 
         panReports.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panReports.title")));
     }
