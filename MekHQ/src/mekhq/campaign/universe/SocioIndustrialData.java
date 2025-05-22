@@ -223,6 +223,9 @@ public class SocioIndustrialData {
 
         private PlanetarySophistication getSophisticationFromString(String sophistication) {
             try {
+                if (sophistication == null) {
+                    return PlanetarySophistication.C;
+                }
                 return PlanetarySophistication.fromName(sophistication.toUpperCase(Locale.ROOT));
             } catch (IllegalArgumentException e) {
                 // If the rating is not valid, return a default value but first let's evaluate 
