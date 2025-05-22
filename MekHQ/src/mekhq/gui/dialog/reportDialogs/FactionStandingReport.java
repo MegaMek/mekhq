@@ -251,6 +251,11 @@ public class FactionStandingReport extends JDialog {
     private void sortFactions() {
         Set<String> allFactionStandingsSet = factionStandings.getAllFactionStandings().keySet();
         List<String> sortedFactionStandings = new ArrayList<>(allFactionStandingsSet);
+        for (String factionCode : factionStandings.getAllDynamicTemporaryFame().keySet()) {
+            if (!allFactionStandingsSet.contains(factionCode)) {
+                sortedFactionStandings.add(factionCode);
+            }
+        }
         Collections.sort(sortedFactionStandings);
 
         for (String factionCode : sortedFactionStandings) {
@@ -289,9 +294,10 @@ public class FactionStandingReport extends JDialog {
                   factionCode);
             JPanel lblEmptyPanelFromNullFaction = new JPanel();
             lblEmptyPanelFromNullFaction.setName("lblEmptyPanelFromNullFaction" + factionCode);
+            return lblEmptyPanelFromNullFaction;
         }
 
-        final double factionFame = factionStandings.getFameForFaction(factionCode);
+        final double factionFame = factionStandings.getFameForFaction(factionCode, true);
         final FactionStandingLevel factionStanding = FactionStandingUtilities.calculateFactionStandingLevel(factionFame);
 
         // Parent panel
@@ -322,17 +328,22 @@ public class FactionStandingReport extends JDialog {
         pnlFactionStanding.add(lblDetails);
 
         // Fame Slider
+        JSlider sldFame = getFameSlider(factionCode, factionFame);
+        pnlFactionStanding.add(sldFame);
+
+        return pnlFactionStanding;
+    }
+
+    private static JSlider getFameSlider(String factionCode, double factionFame) {
         int roundedFame = (int) Math.round(factionFame); // JSlider doesn't accept doubles, so we round.
         int minimumFame = (int) Math.floor(FactionStandings.getMinimumFame());
         int maximumFame = (int) Math.ceil(FactionStandings.getMaximumFame());
         JSlider sldFame = new JSlider(minimumFame, maximumFame, roundedFame);
         sldFame.setName("sldFactionFame" + factionCode);
         sldFame.setEnabled(false);
-        sldFame.setMaximumSize(new Dimension(Integer.MAX_VALUE, lblFactionImage.getPreferredSize().height));
+        sldFame.setMaximumSize(new Dimension(Integer.MAX_VALUE, sldFame.getPreferredSize().height));
         sldFame.setAlignmentX(JSlider.CENTER_ALIGNMENT);
-        pnlFactionStanding.add(sldFame);
-
-        return pnlFactionStanding;
+        return sldFame;
     }
 
     /**
