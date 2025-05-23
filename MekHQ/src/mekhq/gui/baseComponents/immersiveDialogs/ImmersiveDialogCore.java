@@ -75,6 +75,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.GlossaryDialog;
+import mekhq.gui.utilities.RoundedLineBorder;
 
 /**
  * An immersive dialog used in MekHQ to display interactions between speakers, messages, and actions. The dialog
@@ -379,6 +380,8 @@ public class ImmersiveDialogCore extends JDialog {
         // Add the buttons panel to the northPanel
         northPanel.add(buttonPanel, BorderLayout.SOUTH);
 
+        northPanel.setBorder(RoundedLineBorder.createRoundedLineBorder());
+
         return northPanel;
     }
 
@@ -451,7 +454,7 @@ public class ImmersiveDialogCore extends JDialog {
         JPanel pnlOutOfCharacter = new JPanel(new GridBagLayout());
 
         // Create a compound border with an etched border and padding (empty border)
-        pnlOutOfCharacter.setBorder(BorderFactory.createEtchedBorder());
+        pnlOutOfCharacter.setBorder(RoundedLineBorder.createRoundedLineBorder());
 
         // Create a JEditorPane for the message
         JEditorPane editorPane = new JEditorPane();
@@ -558,7 +561,8 @@ public class ImmersiveDialogCore extends JDialog {
                 String label = buttonStrings.btnLabel();
                 String tooltip = buttonStrings.btnTooltip();
                 if (label != null) {
-                    button = new JButton(label);
+                    button = new JButton();
+                    button.setText(String.format("<html><div style='text-align:center;'>%s</div></html>", label));
 
                     if (tooltip != null) {
                         button.setToolTipText(wordWrap(tooltip));
@@ -601,6 +605,8 @@ public class ImmersiveDialogCore extends JDialog {
             if (preferredSize.height > largestSize.height) {
                 largestSize.height = preferredSize.height;
             }
+
+            button.setBorder(RoundedLineBorder.createRoundedLineBorder());
 
             buttonList.add(button);
         }
