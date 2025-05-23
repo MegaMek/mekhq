@@ -465,7 +465,8 @@ public class Unit implements ITechnology {
      *
      * @return transported units summary of that type, or null
      */
-    public @Nullable AbstractTransportedUnitsSummary getTransportedUnitsSummary(CampaignTransportType campaignTransportType) {
+    public @Nullable AbstractTransportedUnitsSummary getTransportedUnitsSummary(
+          CampaignTransportType campaignTransportType) {
         for (AbstractTransportedUnitsSummary transportedUnitSummary : transportedUnitsSummaries) {
             if (transportedUnitSummary.getClass() == campaignTransportType.getTransportedUnitsSummaryType()) {
                 return transportedUnitSummary;
@@ -2704,9 +2705,6 @@ public class Unit implements ITechnology {
                     } else {
                         retVal.setTransportAssignment(campaignTransportType, new TransportAssignment(new UnitRef(id)));
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("tacticalTransportedUnitId")) {
-                    // Legacy support for 50.03 tactical transport saves
-                    retVal.addTacticalTransportedUnit(new UnitRef(UUID.fromString(wn2.getTextContent())));
                 } else if (wn2.getNodeName().equalsIgnoreCase("transportedUnit")) {
                     NamedNodeMap attributes = wn2.getAttributes();
                     CampaignTransportType campaignTransportType = CampaignTransportType.valueOf(attributes.getNamedItem(
@@ -4500,7 +4498,8 @@ public class Unit implements ITechnology {
                 entity.getCrew()
                       .setCommandBonus(commander.getSkill(SkillType.S_TACTICS)
                                              .getTotalSkillLevel(commander.getOptions(),
-                                                   commander.getATOWAttributes(), 0));
+                                                   commander.getATOWAttributes(),
+                                                   0));
             }
         }
 
@@ -4897,8 +4896,8 @@ public class Unit implements ITechnology {
             artillery += pilot.getInjuryModifiers(false);
         }
         LAMPilot crew = (LAMPilot) entity.getCrew();
-        crew.setPiloting(Math.min(max(pilotingMek, 0), 8));
-        crew.setGunnery(Math.min(max(gunneryMek, 0), 8));
+        crew.setPiloting(Math.min(max(pilotingMek, 0), 8), crew.getCrewType().getPilotPos());
+        crew.setGunnery(Math.min(max(gunneryMek, 0), 8), crew.getCrewType().getGunnerPos());
         crew.setPilotingAero(Math.min(max(pilotingAero, 0), 8));
         crew.setGunneryAero(Math.min(max(gunneryAero, 0), 8));
         entity.getCrew().setArtillery(Math.min(max(artillery, 0), 8), 0);

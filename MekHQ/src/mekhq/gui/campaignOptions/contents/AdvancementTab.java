@@ -282,7 +282,8 @@ public class AdvancementTab {
     public JPanel xpAwardsTab() {
         // Header
         xpAwardsHeader = new CampaignOptionsHeaderPanel("XpAwardsTab",
-              getImageDirectory() + "logo_clan_steel_viper.png", 8);
+              getImageDirectory() + "logo_clan_steel_viper.png",
+              8);
 
         // Contents
         lblXpCostMultiplier = new CampaignOptionsLabel("XpCostMultiplier");
@@ -657,14 +658,14 @@ public class AdvancementTab {
     public JPanel skillRandomizationTab() {
         // Header
         skillRandomizationHeader = new CampaignOptionsHeaderPanel("SkillRandomizationTab",
-              getImageDirectory() + "logo_republic_of_the_sphere.png", 12);
+              getImageDirectory() + "logo_republic_of_the_sphere.png",
+              12);
 
         // Contents
         chkExtraRandomness = new CampaignOptionsCheckBox("ExtraRandomness");
         chkExtraRandomness.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "ExtraRandomness"));
         chkComingOfAgeSPAs = new CampaignOptionsCheckBox("ComingOfAgeAbilities");
-        chkComingOfAgeSPAs.addMouseListener(createTipPanelUpdater(skillRandomizationHeader,
-              "ComingOfAgeAbilities"));
+        chkComingOfAgeSPAs.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "ComingOfAgeAbilities"));
 
         pnlPhenotype = createPhenotypePanel();
         pnlRandomAbilities = createAbilityPanel();
@@ -977,32 +978,6 @@ public class AdvancementTab {
     }
 
     /**
-     * @deprecated unused.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    private JPanel createRoleplaySkillsPanel() {
-        // Contents
-        lblRoleplaySkillsModifier = new CampaignOptionsLabel("RoleplaySkillsModifier");
-        lblRoleplaySkillsModifier.addMouseListener(createTipPanelUpdater(skillRandomizationHeader,
-              "RoleplaySkillsModifier"));
-        spnRoleplaySkillsModifier = new CampaignOptionsSpinner("RoleplaySkillsModifier", 0, -12, 12, 1);
-        spnRoleplaySkillsModifier.addMouseListener(createTipPanelUpdater(skillRandomizationHeader,
-              "RoleplaySkillsModifier"));
-
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("RoleplaySkillsPanel", true, "RoleplaySkillsPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-        layout.gridwidth = 1;
-        layout.gridx = 0;
-        layout.gridy = 0;
-        panel.add(lblRoleplaySkillsModifier, layout);
-        layout.gridx++;
-        panel.add(spnRoleplaySkillsModifier, layout);
-
-        return panel;
-    }
-
-    /**
      * Creates and returns the Small Arms panel, which allows users to configure settings for combat and non-combat
      * small arms bonuses.
      *
@@ -1139,7 +1114,10 @@ public class AdvancementTab {
     public JPanel recruitmentBonusesTab() {
         // Header
         recruitmentBonusesHeader = new CampaignOptionsHeaderPanel("RecruitmentBonusesTab",
-              getImageDirectory() + "logo_calderon_protectorate.png", true, false, 0);
+              getImageDirectory() + "logo_calderon_protectorate.png",
+              true,
+              false,
+              0);
 
         // Contents
         pnlRecruitmentBonusesCombat = createRecruitmentBonusesCombatPanel();

@@ -113,13 +113,12 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
     // endregion Variable Declarations
 
     // region Constructors
-    public DataLoadingDialog(final JFrame frame, final MekHQ application,
-            final @Nullable File campaignFile) {
+    public DataLoadingDialog(final JFrame frame, final MekHQ application, final @Nullable File campaignFile) {
         this(frame, application, campaignFile, null, false);
     }
 
-    public DataLoadingDialog(final JFrame frame, final MekHQ application,
-            final @Nullable File campaignFile, StoryArcStub stub, final boolean isInAppNewCampaign) {
+    public DataLoadingDialog(final JFrame frame, final MekHQ application, final @Nullable File campaignFile,
+          StoryArcStub stub, final boolean isInAppNewCampaign) {
         super(frame, "DataLoadingDialog", "DataLoadingDialog.title");
         this.application = application;
         this.campaignFile = campaignFile;
@@ -174,8 +173,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
 
     @Override
     protected Container createCenterPane() {
-        setSplash(UIUtil.createSplashComponent(
-                getApplication().getIconPackage().getLoadingScreenImages(), getFrame()));
+        setSplash(UIUtil.createSplashComponent(getApplication().getIconPackage().getLoadingScreenImages(), getFrame()));
         return getSplash();
     }
 
@@ -225,21 +223,22 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 progressBar.setString(resources.getString("loadingUnits.text"));
                 break;
             case 6:
-                progressBar.setString(resources.getString(
-                        (getCampaignFile() == null) ? "initializingNewCampaign.text" : "loadingCampaign.text"));
+                progressBar.setString(resources.getString((getCampaignFile() == null) ?
+                                                                "initializingNewCampaign.text" :
+                                                                "loadingCampaign.text"));
                 break;
             case 7:
-                progressBar.setString(resources.getString(
-                        (getCampaignFile() == null) ? "applyingNewCampaign.text" : "applyingLoadedCampaign.text"));
+                progressBar.setString(resources.getString((getCampaignFile() == null) ?
+                                                                "applyingNewCampaign.text" :
+                                                                "applyingLoadedCampaign.text"));
                 break;
             default:
                 progressBar.setString(resources.getString("Error.text"));
                 break;
         }
 
-        getAccessibleContext().setAccessibleDescription(String.format(
-                resources.getString("DataLoadingDialog.progress.accessibleDescription"),
-                progressBar.getString()));
+        getAccessibleContext().setAccessibleDescription(String.format(resources.getString(
+              "DataLoadingDialog.progress.accessibleDescription"), progressBar.getString()));
     }
     // endregion PropertyChangeListener
 
@@ -255,16 +254,19 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
 
         /**
          * This uses the following stages of loading:
-         * 0 : Basics
-         * 1 : Factions
-         * 2 : Names
-         * 3 : Planetary Systems
-         * 4 : Portraits, Camouflage, Mek Tileset, Force Icons, Awards
-         * 5 : Units
-         * 6 : New Campaign / Campaign Loading
-         * 7 : Campaign Application
+         * <ol>
+         *     <li>Basics</li>
+         *     <li>Factions</li>
+         *     <li>Names</li>
+         *     <li>Planetary Systems</li>
+         *     <li>Portraits, Camouflage, Mek Tileset, Force Icons, Awards</li>
+         *     <li>Units</li>
+         *     <li>New Campaign / Campaign Loading</li>
+         *     <li>Campaign Application</li>
+         * </ol>
          *
          * @return The loaded campaign
+         *
          * @throws Exception if anything goes wrong
          */
         @Override
@@ -324,8 +326,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 campaign = new Campaign();
 
                 // Campaign Preset
-                final SelectPresetDialog presetSelectionDialog =
-                    new SelectPresetDialog(getFrame(), true, true);
+                final SelectPresetDialog presetSelectionDialog = new SelectPresetDialog(getFrame(), true, true);
                 CampaignPreset preset;
                 boolean isSelect = false;
 
@@ -341,8 +342,9 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                         isSelect = true;
                     }
                     case PRESET_SELECTION_CUSTOMIZE -> preset = presetSelectionDialog.getSelectedPreset();
-                    default -> throw new IllegalStateException("Unexpected value in mekhq/gui/dialog/DataLoadingDialog.java/Step 6: "
-                        + presetSelectionDialog.getReturnState());
+                    default -> throw new IllegalStateException(
+                          "Unexpected value in mekhq/gui/dialog/DataLoadingDialog.java/Step 6: " +
+                                presetSelectionDialog.getReturnState());
                 }
 
                 // MegaMek Options
@@ -357,8 +359,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 campaign.setStartingSystem((preset == null) ? null : preset.getPlanet());
 
                 CampaignOptionsDialogMode mode = isSelect ? STARTUP_ABRIDGED : STARTUP;
-                CampaignOptionsDialog optionsDialog =
-                    new CampaignOptionsDialog(getFrame(), campaign, preset, mode);
+                CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(getFrame(), campaign, preset, mode);
                 setVisible(false); // cede visibility to `optionsDialog`
                 optionsDialog.setVisible(true);
                 if (optionsDialog.wasCanceled()) {
@@ -388,16 +389,20 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
 
                 // region Progress 7
                 setProgress(7);
-                campaign.beginReport(
-                        "<b>" + MekHQ.getMHQOptions().getLongDisplayFormattedDate(campaign.getLocalDate()) + "</b>");
+                campaign.beginReport("<b>" +
+                                           MekHQ.getMHQOptions().getLongDisplayFormattedDate(campaign.getLocalDate()) +
+                                           "</b>");
 
                 // Setup Personnel Modules
-                campaign.setMarriage(campaign.getCampaignOptions().getRandomMarriageMethod()
-                        .getMethod(campaign.getCampaignOptions()));
-                campaign.setDivorce(campaign.getCampaignOptions().getRandomDivorceMethod()
-                        .getMethod(campaign.getCampaignOptions()));
-                campaign.setProcreation(campaign.getCampaignOptions().getRandomProcreationMethod()
-                        .getMethod(campaign.getCampaignOptions()));
+                campaign.setMarriage(campaign.getCampaignOptions()
+                                           .getRandomMarriageMethod()
+                                           .getMethod(campaign.getCampaignOptions()));
+                campaign.setDivorce(campaign.getCampaignOptions()
+                                          .getRandomDivorceMethod()
+                                          .getMethod(campaign.getCampaignOptions()));
+                campaign.setProcreation(campaign.getCampaignOptions()
+                                              .getRandomProcreationMethod()
+                                              .getMethod(campaign.getCampaignOptions()));
 
                 // Setup Markets
                 campaign.refreshPersonnelMarkets();
@@ -444,13 +449,6 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 // Make sure campaign options event handlers get their data
                 MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
 
-                // this is to handle pre-50.0 campaigns
-                if (campaign.getReputation() == null) {
-                    ReputationController reputationController = new ReputationController();
-                    reputationController.initializeReputation(campaign);
-                    campaign.setReputation(reputationController);
-                }
-
                 unassignCrewFromUnsupportedUnits(campaign.getUnits());
                 // endregion Progress 7
             }
@@ -467,8 +465,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
          * <p>If the entity is {@code null}, it is skipped. For unsupported unit types, the unit's
          * crew is cleared using {@link Unit#clearCrew()}.</p>
          *
-         * @param units The {@link Collection} of {@link Unit} instances to process.
-         *              Must not be {@code null}.
+         * @param units The {@link Collection} of {@link Unit} instances to process. Must not be {@code null}.
          */
         private void unassignCrewFromUnsupportedUnits(Collection<Unit> units) {
             for (Unit unit : units) {
@@ -498,26 +495,26 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 logger.error("", ex);
                 if (ex.getCause() instanceof NullEntityException) {
                     JOptionPane.showMessageDialog(null,
-                            String.format(resources.getString("DataLoadingDialog.NullEntityException.text"),
-                                    ex.getCause().getMessage()),
-                            resources.getString("DataLoadingDialog.NullEntityException.title"),
-                            JOptionPane.ERROR_MESSAGE);
+                          String.format(resources.getString("DataLoadingDialog.NullEntityException.text"),
+                                ex.getCause().getMessage()),
+                          resources.getString("DataLoadingDialog.NullEntityException.title"),
+                          JOptionPane.ERROR_MESSAGE);
                 } else if (ex.getCause() instanceof NullPointerException) {
                     JOptionPane.showMessageDialog(null,
-                            String.format(resources.getString("DataLoadingDialog.NullPointerException.text"),
-                                    ex.getCause().getMessage()),
-                            resources.getString("DataLoadingDialog.NullPointerException.title"),
-                            JOptionPane.ERROR_MESSAGE);
+                          String.format(resources.getString("DataLoadingDialog.NullPointerException.text"),
+                                ex.getCause().getMessage()),
+                          resources.getString("DataLoadingDialog.NullPointerException.title"),
+                          JOptionPane.ERROR_MESSAGE);
                 } else if (ex.getCause() instanceof OutOfMemoryError) {
                     JOptionPane.showMessageDialog(null,
-                            resources.getString("DataLoadingDialog.OutOfMemoryError.text"),
-                            resources.getString("DataLoadingDialog.OutOfMemoryError.title"),
-                            JOptionPane.ERROR_MESSAGE);
+                          resources.getString("DataLoadingDialog.OutOfMemoryError.text"),
+                          resources.getString("DataLoadingDialog.OutOfMemoryError.title"),
+                          JOptionPane.ERROR_MESSAGE);
                 } else {
                     JOptionPane.showMessageDialog(null,
-                            resources.getString("DataLoadingDialog.ExecutionException.text"),
-                            resources.getString("DataLoadingDialog.ExecutionException.title"),
-                            JOptionPane.ERROR_MESSAGE);
+                          resources.getString("DataLoadingDialog.ExecutionException.text"),
+                          resources.getString("DataLoadingDialog.ExecutionException.title"),
+                          JOptionPane.ERROR_MESSAGE);
                 }
                 campaign = null;
             }

@@ -773,24 +773,7 @@ public final class MHQOptions extends SuiteOptions {
     public void setAutosaveYearlyValue(boolean value) {
         userPreferences.node(MHQConstants.AUTOSAVE_NODE).putBoolean(MHQConstants.SAVE_YEARLY_KEY, value);
     }
-
-
-    /**
-     * @deprecated use {@link #getAutosaveBeforeScenariosValue()} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public boolean getAutosaveBeforeMissionsValue() {
-        return getAutosaveBeforeScenariosValue();
-    }
-
-    /**
-     * @deprecated use {@link #setAutosaveBeforeScenariosValue(boolean)} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public void setAutosaveBeforeMissionsValue(boolean value) {
-        setAutosaveBeforeScenariosValue(value);
-    }
-
+    
     public boolean getAutosaveBeforeScenariosValue() {
         return userPreferences.node(MHQConstants.AUTOSAVE_NODE)
                      .getBoolean(MHQConstants.SAVE_BEFORE_SCENARIOS_KEY, true);
