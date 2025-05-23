@@ -76,6 +76,7 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsTextField;
 import mekhq.gui.dialog.DateChooser;
 import mekhq.gui.dialog.iconDialogs.UnitIconDialog;
 import mekhq.gui.displayWrappers.FactionDisplay;
+import mekhq.gui.utilities.RoundedLineBorder;
 
 /**
  * Represents a tab within the campaign options UI that allows the user to configure general campaign settings. This
@@ -292,7 +293,7 @@ public class GeneralTab {
         layout.gridx = GridBagConstraints.RELATIVE;
 
         JPanel iconsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        iconsPanel.setBorder(BorderFactory.createEtchedBorder());
+        iconsPanel.setBorder(RoundedLineBorder.createRoundedLineBorder());
         iconsPanel.setMinimumSize(UIUtil.scaleForGUI(0, 120));
 
         iconsPanel.add(lblIcon);
@@ -391,6 +392,7 @@ public class GeneralTab {
                 return UIUtil.scaleForGUI(100, 100);
             }
         };
+        btnCamo.setBorder(RoundedLineBorder.createRoundedLineBorder());
 
         lblIcon = new JLabel();
         btnIcon = new JButton() {
@@ -399,6 +401,7 @@ public class GeneralTab {
                 return UIUtil.scaleForGUI(100, 100);
             }
         };
+        btnIcon.setBorder(RoundedLineBorder.createRoundedLineBorder());
     }
 
     /**
@@ -443,6 +446,7 @@ public class GeneralTab {
 
         this.date = date;
         btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
+        btnDate.setBorder(RoundedLineBorder.createRoundedLineBorder());
         btnDate.revalidate();
         btnDate.repaint();
 

@@ -50,6 +50,7 @@ import megamek.client.ui.swing.util.UIUtil;
 import megamek.logging.MMLogger;
 import mekhq.CampaignPreset;
 import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
+import mekhq.gui.utilities.RoundedLineBorder;
 
 /**
  * A dialog for selecting campaign presets. Extends {@link JDialog}. Keeps track of the selected preset and return
@@ -156,7 +157,7 @@ public class SelectPresetDialog extends JDialog {
         outerPanel.add(centerPanel, gbc);
 
         JPanel bottomPanel = new JPanel();
-        bottomPanel.setBorder(BorderFactory.createEtchedBorder());
+        bottomPanel.setBorder(RoundedLineBorder.createRoundedLineBorder());
         JLabel newLabel = new JLabel();
         newLabel.setHorizontalAlignment(JLabel.CENTER);
         bottomPanel.add(newLabel);

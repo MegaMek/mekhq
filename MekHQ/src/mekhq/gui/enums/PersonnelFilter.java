@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.enums;
 
@@ -106,7 +111,9 @@ public enum PersonnelFilter {
     STUDENT("PersonnelFilter.STUDENT.text", "PersonnelFilter.STUDENT.toolTipText", false, false),
     MISSING("PersonnelFilter.MISSING.text", "PersonnelFilter.MISSING.toolTipText", false, false),
     KIA("PersonnelFilter.KIA.text", "PersonnelFilter.KIA.toolTipText", false, false),
-    DEAD("PersonnelFilter.DEAD.text", "PersonnelFilter.DEAD.toolTipText", false, false);
+    DEAD("PersonnelFilter.DEAD.text", "PersonnelFilter.DEAD.toolTipText", false, false),
+    BACKGROUND_CHARACTER("PersonnelFilter.BACKGROUND_CHARACTER.text",
+          "PersonnelFilter.BACKGROUND_CHARACTER.toolTipText");
     // endregion Expanded Personnel Tab Filters
     // endregion Enum Declarations
 
@@ -501,6 +508,7 @@ public enum PersonnelFilter {
                     active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
                             person.getPrimaryRole().isAdministratorHR() : person.hasRole(PersonnelRole.ADMINISTRATOR_HR));
             case DEPENDENT -> ((!dead) && (active && person.getPrimaryRole().isCivilian()));
+            case BACKGROUND_CHARACTER -> person.getStatus().isBackground();
             case FOUNDER -> ((!dead) && (person.isFounder()));
             case KIDS -> ((!dead) && (!status.isLeft()) && (person.isChild(currentDate)));
             case PRISONER -> ((!dead) && ((person.getPrisonerStatus().isCurrentPrisoner()) || (person.getPrisonerStatus().isBondsman())));

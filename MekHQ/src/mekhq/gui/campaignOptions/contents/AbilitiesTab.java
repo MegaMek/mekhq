@@ -52,7 +52,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -72,6 +71,7 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 import mekhq.gui.dialog.EditSpecialAbilityDialog;
+import mekhq.gui.utilities.RoundedLineBorder;
 import mekhq.utilities.spaUtilities.enums.AbilityCategory;
 
 /**
@@ -451,8 +451,7 @@ public class AbilitiesTab {
                 }
             };
 
-            setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(),
-                  String.format("<html>%s</html>", name)));
+            setBorder(RoundedLineBorder.createRoundedLineBorder(name));
             setName("pnl" + name);
         }
     }
