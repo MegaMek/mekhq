@@ -75,6 +75,7 @@ import mekhq.gui.baseComponents.SortedComboBoxModel;
 import mekhq.gui.dialog.CompanyGenerationOptionsDialog;
 import mekhq.gui.dialog.DateChooser;
 import mekhq.gui.displayWrappers.FactionDisplay;
+import mekhq.gui.utilities.RoundedLineBorder;
 
 /**
  * @author Justin "Windchild" Bowen
@@ -391,6 +392,7 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
     private JPanel createStartupPanel() {
         // Initialize Components Used in ActionListeners
         final JButton btnDate = new JButton(MekHQ.getMHQOptions().getDisplayFormattedDate(getDate()));
+        btnDate.setBorder(RoundedLineBorder.createRoundedLineBorder());
 
         // Create Panel Components
         setChkSpecifyDate(new JCheckBox(resources.getString("chkSpecifyDate.text")));

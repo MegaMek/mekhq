@@ -330,13 +330,14 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     /**
-     * Initializes the battle setup by determining terrain, weather, map size, map file,
-     * and other scenario conditions based on the specified campaign and its options.
+     * Initializes the battle setup by determining terrain, weather, map size, map file, and other scenario conditions
+     * based on the specified campaign and its options.
      *
      * <p>This process configures key battlefield parameters such as terrain type, planetary and light conditions,
-     * weather effects, and sets the map details. It also determines the number of forces involved based on the scenario type.
-     * If a valid combat team and commander with the Tactics skill are present, the number of available rerolls is set accordingly.
-     * If prerequisites (combat team, commander, or Tactics skill) are missing, rerolls are set to zero.</p>
+     * weather effects, and sets the map details. It also determines the number of forces involved based on the scenario
+     * type. If a valid combat team and commander with the Tactics skill are present, the number of available rerolls is
+     * set accordingly. If prerequisites (combat team, commander, or Tactics skill) are missing, rerolls are set to
+     * zero.</p>
      *
      * @param campaign the current {@link Campaign} containing settings and scenario data
      */
@@ -1995,9 +1996,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                     deploymentDelay = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("usingFixedMap")) {
                     setUsingFixedMap(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                    // <50.02 compatibility handler
-                } else if (wn2.getNodeName().equalsIgnoreCase("lanceCount") ||
-                                 wn2.getNodeName().equalsIgnoreCase("forceCount")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("forceCount")) {
                     forceCount = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("rerollsRemaining")) {
                     rerollsRemaining = Integer.parseInt(wn2.getTextContent());

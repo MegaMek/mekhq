@@ -32,6 +32,7 @@
  */
 package mekhq;
 
+import java.awt.Color;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.Month;
@@ -144,6 +145,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String FONT_COLOR_SKILL_REGULAR = "fontColorSkillRegular";
     public static final String FONT_COLOR_SKILL_VETERAN = "fontColorSkillVeteran";
     public static final String FONT_COLOR_SKILL_ELITE = "fontColorSkillElite";
+    public static final Color BORDER_COLOR_GRAY = new Color(100, 100, 100);
     // endregion Colours
 
     // region Fonts
@@ -158,11 +160,6 @@ public final class MHQConstants extends SuiteConstants {
     public static final String SAVE_WEEKLY_KEY = "saveWeekly";
     public static final String SAVE_MONTHLY_KEY = "saveMonthly";
     public static final String SAVE_YEARLY_KEY = "saveYearly";
-    /**
-     * @deprecated use {@link #SAVE_BEFORE_SCENARIOS_KEY} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public static final String SAVE_BEFORE_MISSIONS_KEY = "saveBeforeMissions";
     public static final String SAVE_BEFORE_SCENARIOS_KEY = "saveBeforeScenarios";
     public static final String SAVE_BEFORE_MISSION_END = "saveBeforeMissionEnd";
     public static final String MAXIMUM_NUMBER_SAVES_KEY = "maximumNumberAutoSaves";

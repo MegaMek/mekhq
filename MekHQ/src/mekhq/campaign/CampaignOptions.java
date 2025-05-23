@@ -43,10 +43,12 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import megamek.Version;
 import megamek.codeUtilities.MathUtility;
@@ -57,7 +59,6 @@ import megamek.common.options.GameOptions;
 import megamek.common.preference.ClientPreferences;
 import megamek.common.preference.PreferenceManager;
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.autoresolve.AutoResolveMethod;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
@@ -70,7 +71,6 @@ import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.enums.*;
-import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
@@ -78,6 +78,9 @@ import mekhq.service.mrms.MRMSOption;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
+import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 
 /**
  * @author natit
@@ -199,9 +202,10 @@ public class CampaignOptions {
     private boolean noClanPartsFromIS;
     private int penaltyClanPartsFromIS;
     private boolean planetAcquisitionVerbose;
-    private final int[] planetTechAcquisitionBonus;
-    private final int[] planetIndustryAcquisitionBonus;
-    private final int[] planetOutputAcquisitionBonus;
+    private final EnumMap<PlanetarySophistication, Integer> planetTechAcquisitionBonus = new EnumMap<>(PlanetarySophistication.class);
+    private final EnumMap<PlanetaryRating, Integer> planetIndustryAcquisitionBonus = new EnumMap<>(PlanetaryRating.class);
+    private final EnumMap<PlanetaryRating, Integer> planetOutputAcquisitionBonus = new EnumMap<>(PlanetaryRating.class);
+
     // endregion Supplies and Acquisition Tab
 
     // region Tech Limits Tab
@@ -254,9 +258,7 @@ public class CampaignOptions {
 
     // Admin
     private boolean adminsHaveNegotiation;
-    private boolean adminsHaveScrounge;
     private boolean adminExperienceLevelIncludeNegotiation;
-    private boolean adminExperienceLevelIncludeScrounge;
 
     // Medical
     private boolean useAdvancedMedical; // Unofficial
@@ -344,7 +346,6 @@ public class CampaignOptions {
     private boolean logMarriageNameChanges;
     private Map<MergingSurnameStyle, Integer> marriageSurnameWeights;
     private RandomMarriageMethod randomMarriageMethod;
-    private boolean useRandomSameSexMarriages; // legacy, pre-50.01
     private boolean useRandomClanPersonnelMarriages;
     private boolean useRandomPrisonerMarriages;
     private int randomMarriageAgeRange;
@@ -730,27 +731,23 @@ public class CampaignOptions {
         penaltyClanPartsFromIS = 4;
         planetAcquisitionVerbose = false;
         // Planet Socio-Industrial Modifiers
-        planetTechAcquisitionBonus = new int[6];
-        planetTechAcquisitionBonus[EquipmentType.RATING_A] = -1;
-        planetTechAcquisitionBonus[EquipmentType.RATING_B] = 0;
-        planetTechAcquisitionBonus[EquipmentType.RATING_C] = 1;
-        planetTechAcquisitionBonus[EquipmentType.RATING_D] = 2;
-        planetTechAcquisitionBonus[EquipmentType.RATING_E] = 4;
-        planetTechAcquisitionBonus[EquipmentType.RATING_F] = 8;
-        planetIndustryAcquisitionBonus = new int[6];
-        planetIndustryAcquisitionBonus[EquipmentType.RATING_A] = 0;
-        planetIndustryAcquisitionBonus[EquipmentType.RATING_B] = 0;
-        planetIndustryAcquisitionBonus[EquipmentType.RATING_C] = 0;
-        planetIndustryAcquisitionBonus[EquipmentType.RATING_D] = 0;
-        planetIndustryAcquisitionBonus[EquipmentType.RATING_E] = 0;
-        planetIndustryAcquisitionBonus[EquipmentType.RATING_F] = 0;
-        planetOutputAcquisitionBonus = new int[6];
-        planetOutputAcquisitionBonus[EquipmentType.RATING_A] = -1;
-        planetOutputAcquisitionBonus[EquipmentType.RATING_B] = 0;
-        planetOutputAcquisitionBonus[EquipmentType.RATING_C] = 1;
-        planetOutputAcquisitionBonus[EquipmentType.RATING_D] = 2;
-        planetOutputAcquisitionBonus[EquipmentType.RATING_E] = 4;
-        planetOutputAcquisitionBonus[EquipmentType.RATING_F] = 8;
+        planetTechAcquisitionBonus.put(PlanetarySophistication.ADVANCED, -2); // TODO: needs to be verified
+        planetTechAcquisitionBonus.put(PlanetarySophistication.A, -1);
+        planetTechAcquisitionBonus.put(PlanetarySophistication.B, 0);
+        planetTechAcquisitionBonus.put(PlanetarySophistication.C, 1);
+        planetTechAcquisitionBonus.put(PlanetarySophistication.D, 2);
+        planetTechAcquisitionBonus.put(PlanetarySophistication.F, 8);
+        planetTechAcquisitionBonus.put(PlanetarySophistication.REGRESSED, 16); // TODO: needs to be verified
+        planetIndustryAcquisitionBonus.put(PlanetaryRating.A, 0);
+        planetIndustryAcquisitionBonus.put(PlanetaryRating.B, 0);
+        planetIndustryAcquisitionBonus.put(PlanetaryRating.C, 0);
+        planetIndustryAcquisitionBonus.put(PlanetaryRating.D, 0);
+        planetIndustryAcquisitionBonus.put(PlanetaryRating.F, 0);
+        planetOutputAcquisitionBonus.put(PlanetaryRating.A, -1);
+        planetOutputAcquisitionBonus.put(PlanetaryRating.B, 0);
+        planetOutputAcquisitionBonus.put(PlanetaryRating.C, 1);
+        planetOutputAcquisitionBonus.put(PlanetaryRating.D, 2);
+        planetOutputAcquisitionBonus.put(PlanetaryRating.F, 8);
         // endregion Supplies and Acquisitions Tab
 
         // region Tech Limits Tab
@@ -802,8 +799,6 @@ public class CampaignOptions {
         // Admin
         setAdminsHaveNegotiation(false);
         setAdminExperienceLevelIncludeNegotiation(false);
-        setAdminsHaveScrounge(false);
-        setAdminExperienceLevelIncludeScrounge(false);
 
         // Medical
         setUseAdvancedMedical(false);
@@ -1850,14 +1845,6 @@ public class CampaignOptions {
         this.adminsHaveNegotiation = useAdminsHaveNegotiation;
     }
 
-    public boolean isAdminsHaveScrounge() {
-        return adminsHaveScrounge;
-    }
-
-    public void setAdminsHaveScrounge(final boolean useAdminsHaveScrounge) {
-        this.adminsHaveScrounge = useAdminsHaveScrounge;
-    }
-
     public boolean isAdminExperienceLevelIncludeNegotiation() {
         return adminExperienceLevelIncludeNegotiation;
     }
@@ -1866,13 +1853,6 @@ public class CampaignOptions {
         this.adminExperienceLevelIncludeNegotiation = useAdminExperienceLevelIncludeNegotiation;
     }
 
-    public boolean isAdminExperienceLevelIncludeScrounge() {
-        return adminExperienceLevelIncludeScrounge;
-    }
-
-    public void setAdminExperienceLevelIncludeScrounge(final boolean useAdminExperienceLevelIncludeScrounge) {
-        this.adminExperienceLevelIncludeScrounge = useAdminExperienceLevelIncludeScrounge;
-    }
     // endregion Expanded Personnel Information
 
     // region Medical
@@ -1995,24 +1975,8 @@ public class CampaignOptions {
         this.useRandomPersonalityReputation = useRandomPersonalityReputation;
     }
 
-    /**
-     * @deprecated replaced by {@link #isUseReasoningXpMultiplier()}
-     */
-    @Deprecated(since = "0.50.5", forRemoval = true)
-    public boolean isUseIntelligenceXpMultiplier() {
-        return useReasoningXpMultiplier;
-    }
-
     public boolean isUseReasoningXpMultiplier() {
         return useReasoningXpMultiplier;
-    }
-
-    /**
-     * @deprecated replaced by {@link #setUseReasoningXpMultiplier(boolean)}
-     */
-    @Deprecated(since = "0.50.5", forRemoval = true)
-    public void setUseIntelligenceXpMultiplier(final boolean useIntelligenceXpMultiplier) {
-        this.useReasoningXpMultiplier = useIntelligenceXpMultiplier;
     }
 
     public void setUseReasoningXpMultiplier(final boolean useReasoningXpMultiplier) {
@@ -4087,22 +4051,6 @@ public class CampaignOptions {
     }
 
     /**
-     * @deprecated Use {@link #isAcquisitionPersonnelCategory(ProcurementPersonnelPick)} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public boolean isAcquisitionSupportStaffOnly() {
-        return acquisitionPersonnelCategory == SUPPORT;
-    }
-
-    /**
-     * @deprecated Use {@link #setAcquisitionPersonnelCategory(ProcurementPersonnelPick)} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public void setAcquisitionSupportStaffOnly(final boolean acquisitionSupportStaffOnly) {
-        this.acquisitionPersonnelCategory = acquisitionSupportStaffOnly ? SUPPORT : ALL;
-    }
-
-    /**
      * Checks if the acquisition personnel category matches a specified category.
      *
      * @param category The {@link ProcurementPersonnelPick} category to check against.
@@ -4285,39 +4233,28 @@ public class CampaignOptions {
         this.isAcquisitionPenalty = isAcquisitionPenalty;
     }
 
-    public int getPlanetTechAcquisitionBonus(final int type) {
-        return ((type < 0) || (type >= planetTechAcquisitionBonus.length)) ? 0 : planetTechAcquisitionBonus[type];
+    public int getPlanetTechAcquisitionBonus(final PlanetarySophistication sophistication) {
+        return planetTechAcquisitionBonus.getOrDefault(sophistication, 0);
     }
 
-    public void setPlanetTechAcquisitionBonus(final int base, final int type) {
-        if ((type < 0) || (type >= planetTechAcquisitionBonus.length)) {
-            return;
-        }
-        this.planetTechAcquisitionBonus[type] = base;
+    public void setPlanetTechAcquisitionBonus(final int base, final PlanetarySophistication sophistication) {
+        this.planetTechAcquisitionBonus.put(sophistication, base);
     }
 
-    public int getPlanetIndustryAcquisitionBonus(final int type) {
-        return ((type < 0) || (type >= planetIndustryAcquisitionBonus.length)) ?
-                     0 :
-                     planetIndustryAcquisitionBonus[type];
+    public int getPlanetIndustryAcquisitionBonus(final PlanetaryRating rating) {
+        return planetIndustryAcquisitionBonus.getOrDefault(rating, 0);
     }
 
-    public void setPlanetIndustryAcquisitionBonus(final int base, final int type) {
-        if ((type < 0) || (type >= planetIndustryAcquisitionBonus.length)) {
-            return;
-        }
-        this.planetIndustryAcquisitionBonus[type] = base;
+    public void setPlanetIndustryAcquisitionBonus(final int base, final PlanetaryRating rating) {
+        this.planetIndustryAcquisitionBonus.put(rating, base);
     }
 
-    public int getPlanetOutputAcquisitionBonus(final int type) {
-        return ((type < 0) || (type >= planetOutputAcquisitionBonus.length)) ? 0 : planetOutputAcquisitionBonus[type];
+    public int getPlanetOutputAcquisitionBonus(final PlanetaryRating rating) {
+        return planetOutputAcquisitionBonus.getOrDefault(rating, 0);
     }
 
-    public void setPlanetOutputAcquisitionBonus(final int base, final int type) {
-        if ((type < 0) || (type >= planetOutputAcquisitionBonus.length)) {
-            return;
-        }
-        this.planetOutputAcquisitionBonus[type] = base;
+    public void setPlanetOutputAcquisitionBonus(final int base, final PlanetaryRating rating) {
+        this.planetOutputAcquisitionBonus.put(rating, base);
     }
 
     public boolean isDestroyByMargin() {
@@ -4804,10 +4741,6 @@ public class CampaignOptions {
     public void setLimitLanceWeight(final boolean limitLanceWeight) {
     }
 
-    /**
-     * @deprecated unused.
-     */
-    @Deprecated(since = "0.50.06", forRemoval = true)
     public boolean isLimitLanceNumUnits() {
         return false;
     }
@@ -5076,15 +5009,10 @@ public class CampaignOptions {
 
         // region Admin
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "adminsHaveNegotiation", isAdminsHaveNegotiation());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "adminsHaveScrounge", isAdminsHaveScrounge());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "adminExperienceLevelIncludeNegotiation",
               isAdminExperienceLevelIncludeNegotiation());
-        MHQXMLUtility.writeSimpleXMLTag(pw,
-              indent,
-              "adminExperienceLevelIncludeScrounge",
-              isAdminExperienceLevelIncludeScrounge());
         // endregion Admin
 
         // region Medical
@@ -5524,9 +5452,18 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioModBV", scenarioModBV);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoConfigMunitions", autoConfigMunitions);
 
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetTechAcquisitionBonus", planetTechAcquisitionBonus);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetIndustryAcquisitionBonus", planetIndustryAcquisitionBonus);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetOutputAcquisitionBonus", planetOutputAcquisitionBonus);
+        String planetTechAcquisitionBonusString = Arrays.stream(PlanetarySophistication.values())
+                        .map(sophistication -> planetTechAcquisitionBonus.getOrDefault(sophistication, 0).toString())
+                        .collect(Collectors.joining(","));
+        String planetIndustryAcquisitionBonusString = Arrays.stream(PlanetaryRating.values())
+                        .map(rating -> planetIndustryAcquisitionBonus.getOrDefault(rating, 0).toString())
+                        .collect(Collectors.joining(","));
+        String planetOutputAcquisitionBonusString = Arrays.stream(PlanetaryRating.values())
+                        .map(rating -> planetOutputAcquisitionBonus.getOrDefault(rating, 0).toString())
+                        .collect(Collectors.joining(","));
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetTechAcquisitionBonus", planetTechAcquisitionBonusString);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetIndustryAcquisitionBonus", planetIndustryAcquisitionBonusString);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetOutputAcquisitionBonus", planetOutputAcquisitionBonusString);
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePortraitForType", isUsePortraitForRoles());
 
@@ -5629,17 +5566,11 @@ public class CampaignOptions {
                     campaignOptions.successXP = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("mistakeXP")) {
                     campaignOptions.mistakeXP = Integer.parseInt(nodeContents);
-                } else if (nodeName.equalsIgnoreCase("vocationalXP")
-                                 // <50.03 compatibility handler
-                                 || nodeName.equalsIgnoreCase("idleXP")) {
+                } else if (nodeName.equalsIgnoreCase("vocationalXP")) {
                     campaignOptions.vocationalXP = Integer.parseInt(nodeContents);
-                } else if (nodeName.equalsIgnoreCase("vocationalXPTargetNumber")
-                                 // <50.03 compatibility handler
-                                 || nodeName.equalsIgnoreCase("targetIdleXP")) {
+                } else if (nodeName.equalsIgnoreCase("vocationalXPTargetNumber")) {
                     campaignOptions.vocationalXPTargetNumber = Integer.parseInt(nodeContents);
-                } else if (nodeName.equalsIgnoreCase("vocationalXPCheckFrequency")
-                                 // <50.03 compatibility handler
-                                 || nodeName.equalsIgnoreCase("monthsIdleXP")) {
+                } else if (nodeName.equalsIgnoreCase("vocationalXPCheckFrequency")) {
                     campaignOptions.vocationalXPCheckFrequency = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("contractNegotiationXP")) {
                     campaignOptions.contractNegotiationXP = Integer.parseInt(nodeContents);
@@ -5668,8 +5599,7 @@ public class CampaignOptions {
                 } else if (nodeName.equalsIgnoreCase("usePlanetaryAcquisition")) {
                     campaignOptions.usePlanetaryAcquisition = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("planetAcquisitionFactionLimit")) {
-                    campaignOptions.setPlanetAcquisitionFactionLimit(PlanetaryAcquisitionFactionLimit.parseFromString(
-                          nodeContents));
+                    campaignOptions.setPlanetAcquisitionFactionLimit(PlanetaryAcquisitionFactionLimit.parseFromString(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("planetAcquisitionNoClanCrossover")) {
                     campaignOptions.planetAcquisitionNoClanCrossover = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("noClanPartsFromIS")) {
@@ -5682,18 +5612,57 @@ public class CampaignOptions {
                     campaignOptions.maxJumpsPlanetaryAcquisition = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("planetTechAcquisitionBonus")) {
                     String[] values = nodeContents.split(",");
-                    for (int i = 0; i < values.length; i++) {
-                        campaignOptions.planetTechAcquisitionBonus[i] = Integer.parseInt(values[i]);
+                    if (values.length == 6) {
+                        // < 0.50.07 compatibility handler
+                        campaignOptions.planetTechAcquisitionBonus.put(PlanetarySophistication.A, Integer.parseInt(values[0]));
+                        campaignOptions.planetTechAcquisitionBonus.put(PlanetarySophistication.B, Integer.parseInt(values[1]));
+                        campaignOptions.planetTechAcquisitionBonus.put(PlanetarySophistication.C, Integer.parseInt(values[2]));
+                        campaignOptions.planetTechAcquisitionBonus.put(PlanetarySophistication.D, Integer.parseInt(values[3]));
+                        campaignOptions.planetTechAcquisitionBonus.put(PlanetarySophistication.F, Integer.parseInt(values[5]));
+                    } else
+                    if (values.length == PlanetarySophistication.values().length) {
+                        // >= 0.50.07 compatibility handler
+                        for (int i = 0; i < values.length; i++) {
+                            campaignOptions.planetTechAcquisitionBonus.put(PlanetarySophistication.fromIndex(i), Integer.parseInt(values[i]));
+                        }
+                    } else {
+                        logger.error("Invalid number of values for planetTechAcquisitionBonus: {}", values.length);
                     }
                 } else if (nodeName.equalsIgnoreCase("planetIndustryAcquisitionBonus")) {
                     String[] values = nodeContents.split(",");
-                    for (int i = 0; i < values.length; i++) {
-                        campaignOptions.planetIndustryAcquisitionBonus[i] = Integer.parseInt(values[i]);
+                    if (values.length == 6) {
+                        // < 0.50.07 compatibility handler
+                        campaignOptions.planetIndustryAcquisitionBonus.put(PlanetaryRating.A, Integer.parseInt(values[0]));
+                        campaignOptions.planetIndustryAcquisitionBonus.put(PlanetaryRating.B, Integer.parseInt(values[1]));
+                        campaignOptions.planetIndustryAcquisitionBonus.put(PlanetaryRating.C, Integer.parseInt(values[2]));
+                        campaignOptions.planetIndustryAcquisitionBonus.put(PlanetaryRating.D, Integer.parseInt(values[3]));
+                        campaignOptions.planetIndustryAcquisitionBonus.put(PlanetaryRating.F, Integer.parseInt(values[5]));
+                    } else
+                        // >= 0.50.07 compatibility handler
+                    if (values.length == PlanetaryRating.values().length) {
+                        for (int i = 0; i < values.length; i++) {
+                            campaignOptions.planetIndustryAcquisitionBonus.put(PlanetaryRating.fromIndex(i), Integer.parseInt(values[i]));
+                        }
+                    } else {
+                        logger.error("Invalid number of values for planetIndustryAcquisitionBonus: {}", values.length);
                     }
                 } else if (nodeName.equalsIgnoreCase("planetOutputAcquisitionBonus")) {
                     String[] values = nodeContents.split(",");
-                    for (int i = 0; i < values.length; i++) {
-                        campaignOptions.planetOutputAcquisitionBonus[i] = Integer.parseInt(values[i]);
+                    if (values.length == 6) {
+                        // < 0.50.07 compatibility handler
+                        campaignOptions.planetOutputAcquisitionBonus.put(PlanetaryRating.A, Integer.parseInt(values[0]));
+                        campaignOptions.planetOutputAcquisitionBonus.put(PlanetaryRating.B, Integer.parseInt(values[1]));
+                        campaignOptions.planetOutputAcquisitionBonus.put(PlanetaryRating.C, Integer.parseInt(values[2]));
+                        campaignOptions.planetOutputAcquisitionBonus.put(PlanetaryRating.D, Integer.parseInt(values[3]));
+                        campaignOptions.planetOutputAcquisitionBonus.put(PlanetaryRating.F, Integer.parseInt(values[5]));
+                    } else
+                        // >= 0.50.07 compatibility handler
+                    if (values.length == PlanetaryRating.values().length) {
+                        for (int i = 0; i < values.length; i++) {
+                            campaignOptions.planetOutputAcquisitionBonus.put(PlanetaryRating.fromIndex(i), Integer.parseInt(values[i]));
+                        }
+                    } else {
+                        logger.error("Invalid number of values for planetOutputAcquisitionBonus: {}", values.length);
                     }
                 } else if (nodeName.equalsIgnoreCase("equipmentContractPercent")) {
                     campaignOptions.setEquipmentContractPercent(Double.parseDouble(nodeContents));
@@ -5859,12 +5828,8 @@ public class CampaignOptions {
                     campaignOptions.setShowOriginFaction(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("adminsHaveNegotiation")) {
                     campaignOptions.setAdminsHaveNegotiation(Boolean.parseBoolean(nodeContents));
-                } else if (nodeName.equalsIgnoreCase("adminsHaveScrounge")) {
-                    campaignOptions.setAdminsHaveScrounge(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("adminExperienceLevelIncludeNegotiation")) {
                     campaignOptions.setAdminExperienceLevelIncludeNegotiation(Boolean.parseBoolean(nodeContents));
-                } else if (nodeName.equalsIgnoreCase("adminExperienceLevelIncludeScrounge")) {
-                    campaignOptions.setAdminExperienceLevelIncludeScrounge(Boolean.parseBoolean(nodeContents));
                     // endregion Expanded Personnel Information
 
                     // region Medical
@@ -6011,9 +5976,7 @@ public class CampaignOptions {
                     campaignOptions.setUseRandomPersonalities(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useRandomPersonalityReputation")) {
                     campaignOptions.setUseRandomPersonalityReputation(Boolean.parseBoolean(nodeContents));
-                    // useIntelligenceXpMultiplier is a compatibility handler for <50.05
-                } else if ((nodeName.equalsIgnoreCase("useReasoningXpMultiplier")) ||
-                                 (nodeName.equalsIgnoreCase("useIntelligenceXpMultiplier"))) {
+                } else if ((nodeName.equalsIgnoreCase("useReasoningXpMultiplier"))) {
                     campaignOptions.setUseReasoningXpMultiplier(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useSimulatedRelationships")) {
                     campaignOptions.setUseSimulatedRelationships(Boolean.parseBoolean(nodeContents));
@@ -6065,14 +6028,12 @@ public class CampaignOptions {
                             continue;
                         }
                         campaignOptions.getMarriageSurnameWeights()
-                              .put(MergingSurnameStyle.parseFromString(wn3.getNodeName()
-                                                                                                         .trim()),
+                              .put(MergingSurnameStyle.parseFromString(wn3.getNodeName().trim()),
                               Integer.parseInt(wn3.getTextContent().trim()));
                     }
                 } else if (nodeName.equalsIgnoreCase("randomMarriageMethod")) {
                     campaignOptions.setRandomMarriageMethod(RandomMarriageMethod.fromString(nodeContents));
-                } else if (nodeName.equalsIgnoreCase("useRandomClanPersonnelMarriages") ||
-                                 nodeName.equalsIgnoreCase("useRandomClannerMarriages")) { // Legacy, 0.49.12 removal
+                } else if (nodeName.equalsIgnoreCase("useRandomClanPersonnelMarriages")) {
                     campaignOptions.setUseRandomClanPersonnelMarriages(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useRandomPrisonerMarriages")) {
                     campaignOptions.setUseRandomPrisonerMarriages(Boolean.parseBoolean(nodeContents));
@@ -6336,10 +6297,10 @@ public class CampaignOptions {
                     campaignOptions.useExtendedPartsModifier = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("showPeacetimeCost")) {
                     campaignOptions.showPeacetimeCost = Boolean.parseBoolean(nodeContents);
-                } else if (nodeName.equalsIgnoreCase("financialYearDuration")) {
-                    campaignOptions.setFinancialYearDuration(FinancialYearDuration.parseFromString(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("newFinancialYearFinancesToCSVExport")) {
                     campaignOptions.newFinancialYearFinancesToCSVExport = Boolean.parseBoolean(nodeContents);
+                } else if (nodeName.equalsIgnoreCase("financialYearDuration")) {
+                    campaignOptions.setFinancialYearDuration(FinancialYearDuration.parseFromString(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("simulateGrayMonday")) {
                     campaignOptions.simulateGrayMonday = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("allowMonthlyReinvestment")) {
@@ -6568,149 +6529,6 @@ public class CampaignOptions {
                     campaignOptions.setScenarioModBV(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("autoconfigMunitions")) {
                     campaignOptions.setAutoConfigMunitions(Boolean.parseBoolean(nodeContents));
-
-                    // region Legacy
-                    // Removed in 0.49.*
-                } else if (nodeName.equalsIgnoreCase("salaryXPMultiplier")) { // Legacy, 0.49.12 removal
-                    String[] values = nodeContents.split(",");
-                    for (int i = 0; i < values.length; i++) {
-                        campaignOptions.getSalaryXPMultipliers()
-                              .put(Skills.SKILL_LEVELS[i + 1], Double.parseDouble(values[i]));
-                    }
-                } else if (nodeName.equalsIgnoreCase("personnelMarketRandomEliteRemoval")) { // Legacy, 0.49.12
-                    // removal
-                    campaignOptions.getPersonnelMarketRandomRemovalTargets()
-                          .put(SkillLevel.ELITE, Integer.parseInt(nodeContents));
-                } else if (nodeName.equalsIgnoreCase("personnelMarketRandomVeteranRemoval")) { // Legacy,
-                    // 0.49.12
-                    // removal
-                    campaignOptions.getPersonnelMarketRandomRemovalTargets()
-                          .put(SkillLevel.VETERAN, Integer.parseInt(nodeContents));
-                } else if (nodeName.equalsIgnoreCase("personnelMarketRandomRegularRemoval")) { // Legacy,
-                    // 0.49.12
-                    // removal
-                    campaignOptions.getPersonnelMarketRandomRemovalTargets()
-                          .put(SkillLevel.REGULAR, Integer.parseInt(nodeContents));
-                } else if (nodeName.equalsIgnoreCase("personnelMarketRandomGreenRemoval")) { // Legacy, 0.49.12
-                    // removal
-                    campaignOptions.getPersonnelMarketRandomRemovalTargets()
-                          .put(SkillLevel.GREEN, Integer.parseInt(nodeContents));
-                } else if (nodeName.equalsIgnoreCase("personnelMarketRandomUltraGreenRemoval")) { // Legacy,
-                    // 0.49.12
-                    // removal
-                    campaignOptions.getPersonnelMarketRandomRemovalTargets()
-                          .put(SkillLevel.ULTRA_GREEN, Integer.parseInt(nodeContents));
-                } else if (nodeName.equalsIgnoreCase("randomizeOrigin")) { // Legacy, 0.49.7 Removal
-                    campaignOptions.getRandomOriginOptions().setRandomizeOrigin(Boolean.parseBoolean(nodeContents));
-                } else if (nodeName.equalsIgnoreCase("randomizeDependentOrigin")) { // Legacy, 0.49.7 Removal
-                    campaignOptions.getRandomOriginOptions()
-                          .setRandomizeDependentOrigin(Boolean.parseBoolean(nodeContents));
-                } else if (nodeName.equalsIgnoreCase("originSearchRadius")) { // Legacy, 0.49.7 Removal
-                    campaignOptions.getRandomOriginOptions().setOriginSearchRadius(Integer.parseInt(nodeContents));
-                } else if (nodeName.equalsIgnoreCase("extraRandomOrigin")) { // Legacy, 0.49.7 Removal
-                    campaignOptions.getRandomOriginOptions().setExtraRandomOrigin(Boolean.parseBoolean(nodeContents));
-                } else if (nodeName.equalsIgnoreCase("originDistanceScale")) { // Legacy, 0.49.7 Removal
-                    campaignOptions.getRandomOriginOptions().setOriginDistanceScale(Double.parseDouble(nodeContents));
-                } else if (nodeName.equalsIgnoreCase("dependentsNeverLeave")) { // Legacy - 0.49.7 Removal
-                    campaignOptions.setUseRandomDependentRemoval(!Boolean.parseBoolean(nodeContents));
-                } else if (nodeName.equalsIgnoreCase("marriageAgeRange")) { // Legacy - 0.49.6 Removal
-                    campaignOptions.setRandomMarriageAgeRange(Integer.parseInt(nodeContents));
-                } else if (nodeName.equalsIgnoreCase("useRandomMarriages")) { // Legacy - 0.49.6 Removal
-                    campaignOptions.setRandomMarriageMethod(Boolean.parseBoolean(nodeContents) ?
-                                                         RandomMarriageMethod.DICE_ROLL :
-                                                         RandomMarriageMethod.NONE);
-                } else if (nodeName.equalsIgnoreCase("logMarriageNameChange")) { // Legacy - 0.49.6 Removal
-                    campaignOptions.setLogMarriageNameChanges(Boolean.parseBoolean(nodeContents));
-                } else if (nodeName.equalsIgnoreCase("randomMarriageSurnameWeights")) { // Legacy - 0.49.6
-                    // Removal
-                    final String[] values = nodeContents.split(",");
-                    if (values.length == 13) {
-                        final MergingSurnameStyle[] marriageSurnameStyles = MergingSurnameStyle.values();
-                        for (int i = 0; i < values.length; i++) {
-                            campaignOptions.getMarriageSurnameWeights()
-                                  .put(marriageSurnameStyles[i], Integer.parseInt(values[i]));
-                        }
-                    } else if (values.length == 9) {
-                        campaignOptions.migrateMarriageSurnameWeights47(values);
-                    } else {
-                        logger.error("Unknown length of randomMarriageSurnameWeights");
-                    }
-                } else if (nodeName.equalsIgnoreCase("logConception")) { // Legacy - 0.49.4 Removal
-                    campaignOptions.setLogProcreation(Boolean.parseBoolean(nodeContents));
-                } else if (nodeName.equalsIgnoreCase("staticRATs")) { // Legacy - 0.49.4 Removal
-                    campaignOptions.setUseStaticRATs(true);
-                } else if (nodeName.equalsIgnoreCase("ignoreRatEra")) { // Legacy - 0.49.4 Removal
-                    campaignOptions.setIgnoreRATEra(true);
-                } else if (nodeName.equalsIgnoreCase("clanPriceModifier")) { // Legacy - 0.49.3 Removal
-                    final double value = Double.parseDouble(nodeContents);
-                    campaignOptions.setClanUnitPriceMultiplier(value);
-                    campaignOptions.setClanPartPriceMultiplier(value);
-                } else if (nodeName.equalsIgnoreCase("usedPartsValueA")) { // Legacy - 0.49.3 Removal
-                    campaignOptions.getUsedPartPriceMultipliers()[0] = Double.parseDouble(nodeContents);
-                } else if (nodeName.equalsIgnoreCase("usedPartsValueB")) { // Legacy - 0.49.3 Removal
-                    campaignOptions.getUsedPartPriceMultipliers()[1] = Double.parseDouble(nodeContents);
-                } else if (nodeName.equalsIgnoreCase("usedPartsValueC")) { // Legacy - 0.49.3 Removal
-                    campaignOptions.getUsedPartPriceMultipliers()[2] = Double.parseDouble(nodeContents);
-                } else if (nodeName.equalsIgnoreCase("usedPartsValueD")) { // Legacy - 0.49.3 Removal
-                    campaignOptions.getUsedPartPriceMultipliers()[3] = Double.parseDouble(nodeContents);
-                } else if (nodeName.equalsIgnoreCase("usedPartsValueE")) { // Legacy - 0.49.3 Removal
-                    campaignOptions.getUsedPartPriceMultipliers()[4] = Double.parseDouble(nodeContents);
-                } else if (nodeName.equalsIgnoreCase("usedPartsValueF")) { // Legacy - 0.49.3 Removal
-                    campaignOptions.getUsedPartPriceMultipliers()[5] = Double.parseDouble(nodeContents);
-                } else if (nodeName.equalsIgnoreCase("damagedPartsValue")) { // Legacy - 0.49.3 Removal
-                    campaignOptions.setDamagedPartsValueMultiplier(Double.parseDouble(nodeContents));
-                } else if (nodeName.equalsIgnoreCase("canceledOrderReimbursement")) { // Legacy - 0.49.3
-                    // Removal
-                    campaignOptions.setCancelledOrderRefundMultiplier(Double.parseDouble(nodeContents));
-
-                    // Removed in 0.47.*
-                } else if (nodeName.equalsIgnoreCase("personnelMarketType")) { // Legacy
-                    campaignOptions.setPersonnelMarketName(PersonnelMarket.getTypeName(Integer.parseInt(nodeContents)));
-                } else if (nodeName.equalsIgnoreCase("intensity")) { // Legacy
-                    double intensity = Double.parseDouble(nodeContents);
-
-                    campaignOptions.atbBattleChance[CombatRole.MANEUVER.ordinal()] = (int) Math.round(((40.0 *
-                                                                                                              intensity) /
-                                                                                                    (40.0 * intensity +
-                                                                                                           60.0)) *
-                                                                                                   100.0 + 0.5);
-                    campaignOptions.atbBattleChance[CombatRole.FRONTLINE.ordinal()] = (int) Math.round(((20.0 *
-                                                                                                               intensity) /
-                                                                                                     (20.0 * intensity +
-                                                                                                            80.0)) *
-                                                                                                    100.0 + 0.5);
-                    campaignOptions.atbBattleChance[CombatRole.PATROL.ordinal()] = (int) Math.round(((60.0 *
-                                                                                                            intensity) /
-                                                                                                  (60.0 * intensity +
-                                                                                                         40.0)) *
-                                                                                                 100.0 + 0.5);
-                    campaignOptions.atbBattleChance[CombatRole.TRAINING.ordinal()] = (int) Math.round(((10.0 *
-                                                                                                              intensity) /
-                                                                                                    (10.0 * intensity +
-                                                                                                           90.0)) *
-                                                                                                   100.0 + 0.5);
-                } else if (nodeName.equalsIgnoreCase("personnelMarketType")) { // Legacy
-                    campaignOptions.personnelMarketName = PersonnelMarket.getTypeName(Integer.parseInt(nodeContents));
-                } else if (nodeName.equalsIgnoreCase("startGameDelay")) { // Legacy
-                    MekHQ.getMHQOptions().setStartGameDelay(Integer.parseInt(nodeContents));
-                } else if (nodeName.equalsIgnoreCase("historicalDailyLog")) { // Legacy
-                    MekHQ.getMHQOptions().setHistoricalDailyLog(Boolean.parseBoolean(nodeContents));
-                } else if (nodeName.equalsIgnoreCase("useUnitRating") // Legacy
-                                 || nodeName.equalsIgnoreCase("useDragoonRating")) { // Legacy
-                    if (!Boolean.parseBoolean(nodeContents)) {
-                        campaignOptions.setUnitRatingMethod(UnitRatingMethod.NONE);
-                    }
-                } else if (nodeName.equalsIgnoreCase("probPhenoMW")) { // Legacy
-                    campaignOptions.phenotypeProbabilities[Phenotype.MEKWARRIOR.ordinal()] = Integer.parseInt(
-                          nodeContents);
-                } else if (nodeName.equalsIgnoreCase("probPhenoBA")) { // Legacy
-                    campaignOptions.phenotypeProbabilities[Phenotype.ELEMENTAL.ordinal()] = Integer.parseInt(
-                          nodeContents);
-                } else if (nodeName.equalsIgnoreCase("probPhenoAero")) { // Legacy
-                    campaignOptions.phenotypeProbabilities[Phenotype.AEROSPACE.ordinal()] = Integer.parseInt(
-                          nodeContents);
-                } else if (nodeName.equalsIgnoreCase("probPhenoVee")) { // Legacy
-                    campaignOptions.phenotypeProbabilities[Phenotype.VEHICLE.ordinal()] = Integer.parseInt(nodeContents);
                 }
             } catch (Exception ex) {
                 logger.error(ex, "Unknown Exception: generationCampaignOptionsFromXML");
