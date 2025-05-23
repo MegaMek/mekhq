@@ -57,7 +57,6 @@ import megamek.common.options.GameOptions;
 import megamek.common.preference.ClientPreferences;
 import megamek.common.preference.PreferenceManager;
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.autoresolve.AutoResolveMethod;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
@@ -70,7 +69,6 @@ import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.enums.*;
-import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
@@ -5597,13 +5595,13 @@ public class CampaignOptions {
                 } else if (nodeName.equalsIgnoreCase("successXP")) {
                     campaignOptions.successXP = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("mistakeXP")) {
-                    campaignOptions.mistakeXP = Integer.parseInt(nodeContents.trim());
+                    campaignOptions.mistakeXP = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("vocationalXP")) {
-                    campaignOptions.vocationalXP = Integer.parseInt(nodeContents.trim());
+                    campaignOptions.vocationalXP = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("vocationalXPTargetNumber")) {
-                    campaignOptions.vocationalXPTargetNumber = Integer.parseInt(nodeContents.trim());
+                    campaignOptions.vocationalXPTargetNumber = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("vocationalXPCheckFrequency")) {
-                    campaignOptions.vocationalXPCheckFrequency = Integer.parseInt(nodeContents.trim());
+                    campaignOptions.vocationalXPCheckFrequency = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("contractNegotiationXP")) {
                     campaignOptions.contractNegotiationXP = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("adminWeeklyXP")) {
@@ -5821,9 +5819,9 @@ public class CampaignOptions {
                 } else if (nodeName.equalsIgnoreCase("showOriginFaction")) {
                     campaignOptions.setShowOriginFaction(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("adminsHaveNegotiation")) {
-                    campaignOptions.setAdminsHaveNegotiation(Boolean.parseBoolean(nodeContents));
+                    retVal.setAdminsHaveNegotiation(Boolean.parseBoolean(wn2.getTextContent()));
                 } else if (nodeName.equalsIgnoreCase("adminExperienceLevelIncludeNegotiation")) {
-                    campaignOptions.setAdminExperienceLevelIncludeNegotiation(Boolean.parseBoolean(nodeContents));
+                    retVal.setAdminExperienceLevelIncludeNegotiation(Boolean.parseBoolean(wn2.getTextContent()));
                     // endregion Expanded Personnel Information
 
                     // region Medical
@@ -5963,9 +5961,9 @@ public class CampaignOptions {
                 } else if (nodeName.equalsIgnoreCase("useRandomPersonalities")) {
                     campaignOptions.setUseRandomPersonalities(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useRandomPersonalityReputation")) {
-                    campaignOptions.setUseRandomPersonalityReputation(Boolean.parseBoolean(nodeContents.trim()));
+                    campaignOptions.setUseRandomPersonalityReputation(Boolean.parseBoolean(nodeContents));
                 } else if ((nodeName.equalsIgnoreCase("useReasoningXpMultiplier"))) {
-                    campaignOptions.setUseReasoningXpMultiplier(Boolean.parseBoolean(nodeContents.trim()));
+                    campaignOptions.setUseReasoningXpMultiplier(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useSimulatedRelationships")) {
                     campaignOptions.setUseSimulatedRelationships(Boolean.parseBoolean(nodeContents));
                     // endregion Random Histories
@@ -6021,9 +6019,9 @@ public class CampaignOptions {
                               Integer.parseInt(wn3.getTextContent().trim()));
                     }
                 } else if (nodeName.equalsIgnoreCase("randomMarriageMethod")) {
-                    campaignOptions.setRandomMarriageMethod(RandomMarriageMethod.fromString(nodeContents.trim()));
+                    campaignOptions.setRandomMarriageMethod(RandomMarriageMethod.fromString(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useRandomClanPersonnelMarriages")) {
-                    campaignOptions.setUseRandomClanPersonnelMarriages(Boolean.parseBoolean(nodeContents.trim()));
+                    campaignOptions.setUseRandomClanPersonnelMarriages(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useRandomPrisonerMarriages")) {
                     campaignOptions.setUseRandomPrisonerMarriages(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("randomMarriageAgeRange")) {
@@ -6286,8 +6284,6 @@ public class CampaignOptions {
                     campaignOptions.useExtendedPartsModifier = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("showPeacetimeCost")) {
                     campaignOptions.showPeacetimeCost = Boolean.parseBoolean(nodeContents);
-                } else if (nodeName.equalsIgnoreCase("financialYearDuration")) {
-                    campaignOptions.setFinancialYearDuration(FinancialYearDuration.valueOf(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("newFinancialYearFinancesToCSVExport")) {
                     campaignOptions.newFinancialYearFinancesToCSVExport = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("simulateGrayMonday")) {
