@@ -383,14 +383,6 @@ public abstract class AbstractContractMarket {
     }
 
     /**
-     * @deprecated use {@link #rollCommandClause(Contract, int, boolean)} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    protected void rollCommandClause(final Contract contract, final int modifier) {
-        rollCommandClause(contract, modifier, true);
-    }
-
-    /**
      * Calculates and sets the command rights clause for a contract based on a roll and modifier.
      *
      * <p>This method determines the appropriate {@link ContractCommandRights} for the given {@link Contract},
@@ -575,14 +567,6 @@ public abstract class AbstractContractMarket {
     }
 
     /**
-     * @deprecated use {@link #setAllyRating(AtBContract, int, SkillLevel)} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    protected void setAllyRating(AtBContract contract, int year) {
-        setAllyRating(contract, year, REGULAR);
-    }
-
-    /**
      * Calculates and sets the ally skill and quality ratings for the given contract.
      *
      * <p>The ally rating is influenced by multiple factors:</p>
@@ -644,14 +628,6 @@ public abstract class AbstractContractMarket {
 
         // Assign ally quality rating
         contract.setAllyQuality(getQualityRating(d6(2) + mod));
-    }
-
-    /**
-     * @deprecated use {@link #setEnemyRating(AtBContract, int, SkillLevel)} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    protected void setEnemyRating(AtBContract contract, int year) {
-        setEnemyRating(contract, year, REGULAR);
     }
 
     /**

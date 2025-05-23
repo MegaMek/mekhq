@@ -714,7 +714,8 @@ public class Person {
      */
     public String getLastName() {
         String lastName = !isNullOrBlank(getBloodname()) ?
-                                getBloodname() : !isNullOrBlank(getSurname()) ? getSurname() : "";
+                                getBloodname() :
+                                !isNullOrBlank(getSurname()) ? getSurname() : "";
         if (!isNullOrBlank(getPostNominal())) {
             lastName += (lastName.isBlank() ? "" : " ") + getPostNominal();
         }
@@ -1108,16 +1109,15 @@ public class Person {
 
         return switch (role) {
             case VEHICLE_CREW -> Stream.of(SkillType.S_TECH_MEK,
-                        SkillType.S_TECH_AERO,
-                        SkillType.S_TECH_MECHANIC,
-                        SkillType.S_TECH_BA,
-                        SkillType.S_SURGERY,
-                        SkillType.S_MEDTECH,
-                        SkillType.S_ASTECH,
-                        SkillType.S_COMMUNICATIONS,
-                        SkillType.S_SENSOR_OPERATIONS,
-                        SkillType.S_ART_COOKING)
-                                       .anyMatch(this::hasSkill);
+                  SkillType.S_TECH_AERO,
+                  SkillType.S_TECH_MECHANIC,
+                  SkillType.S_TECH_BA,
+                  SkillType.S_SURGERY,
+                  SkillType.S_MEDTECH,
+                  SkillType.S_ASTECH,
+                  SkillType.S_COMMUNICATIONS,
+                  SkillType.S_SENSOR_OPERATIONS,
+                  SkillType.S_ART_COOKING).anyMatch(this::hasSkill);
             case AEROSPACE_PILOT -> hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO);
             case CONVENTIONAL_AIRCRAFT_PILOT -> hasSkill(SkillType.S_GUN_JET) && hasSkill(SkillType.S_PILOT_JET);
             case PROTOMEK_PILOT -> hasSkill(SkillType.S_GUN_PROTO);
@@ -1515,7 +1515,8 @@ public class Person {
         String report = String.format(resources.getString("loyaltyChangeReport.text"),
               getHyperlinkedFullTitle(),
               "<span color=" + color + "'>",
-              changeString, CLOSING_SPAN_TAG);
+              changeString,
+              CLOSING_SPAN_TAG);
 
         campaign.addReport(report);
     }
@@ -2288,48 +2289,16 @@ public class Person {
               PersonalityQuirk.MAXIMUM_VARIATIONS - 1);
     }
 
-    /**
-     * @deprecated replaced by {@link #getReasoning()}
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public Reasoning getIntelligence() {
-        return reasoning;
-    }
-
     public Reasoning getReasoning() {
         return reasoning;
-    }
-
-    /**
-     * @deprecated replaced by {@link #setReasoning(Reasoning)}
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public void setIntelligence(final Reasoning reasoning) {
-        this.reasoning = reasoning;
     }
 
     public void setReasoning(final Reasoning reasoning) {
         this.reasoning = reasoning;
     }
 
-    /**
-     * @deprecated replaced by {@link #getReasoningDescriptionIndex()} ()}
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public int getIntelligenceDescriptionIndex() {
-        return reasoningDescriptionIndex;
-    }
-
     public int getReasoningDescriptionIndex() {
         return reasoningDescriptionIndex;
-    }
-
-    /**
-     * @deprecated replaced by {@link #setReasoningDescriptionIndex(int)}
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public void setIntelligenceDescriptionIndex(final int intelligenceDescriptionIndex) {
-        setReasoningDescriptionIndex(intelligenceDescriptionIndex);
     }
 
     /**
@@ -2926,9 +2895,7 @@ public class Person {
                     person.secondaryDesignator = ROMDesignation.parseFromString(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("daysToWaitForHealing")) {
                     person.daysToWaitForHealing = MathUtility.parseInt(wn2.getTextContent());
-                } else if (nodeName.equalsIgnoreCase("vocationalXPTimer")
-                                 // <50.03 compatibility handler
-                                 || nodeName.equalsIgnoreCase("idleMonths")) {
+                } else if (nodeName.equalsIgnoreCase("vocationalXPTimer")) {
                     person.vocationalXPTimer = MathUtility.parseInt(wn2.getTextContent());
                 } else if (nodeName.equalsIgnoreCase("id")) {
                     person.id = UUID.fromString(wn2.getTextContent());
@@ -3312,12 +3279,9 @@ public class Person {
                     person.personalityQuirk = PersonalityQuirk.fromString(wn2.getTextContent());
                 } else if (nodeName.equalsIgnoreCase("personalityQuirkDescriptionIndex")) {
                     person.personalityQuirkDescriptionIndex = MathUtility.parseInt(wn2.getTextContent());
-                    // 'intelligence' is a <50.05 compatibility handler
-                } else if ((nodeName.equalsIgnoreCase("reasoning")) || (nodeName.equalsIgnoreCase("intelligence"))) {
+                } else if ((nodeName.equalsIgnoreCase("reasoning"))) {
                     person.reasoning = Reasoning.fromString(wn2.getTextContent());
-                    // 'intelligenceDescriptionIndex' is a <50.05 compatibility handler
-                } else if ((nodeName.equalsIgnoreCase("reasoningDescriptionIndex")) ||
-                                 (nodeName.equalsIgnoreCase("intelligenceDescriptionIndex"))) {
+                } else if ((nodeName.equalsIgnoreCase("reasoningDescriptionIndex"))) {
                     person.reasoningDescriptionIndex = MathUtility.parseInt(wn2.getTextContent());
                 } else if (nodeName.equalsIgnoreCase("personalityDescription")) {
                     person.personalityDescription = wn2.getTextContent();
@@ -3844,7 +3808,7 @@ public class Person {
      *         <b>Vehicle Crew:</b> Returns the highest experience level among a specific set of technical and support skills.
      *     </li>
      *     <li>
-     *         <b>Administrators:</b> Averages the Administrator skill and (optionally) Negotiation and/or Scrounge skills,
+     *         <b>Administrators:</b> Averages the Administrator skill and (optionally) Negotiation skills,
      *         depending on campaign options. If all selected skills are untrained, returns {@link SkillType#EXP_NONE}.
      *         Otherwise, returns the average, floored at 0.
      *     </li>
@@ -3864,7 +3828,6 @@ public class Person {
 
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
         final boolean doAdminCountNegotiation = campaignOptions.isAdminExperienceLevelIncludeNegotiation();
-        final boolean doAdminCountScrounge = campaignOptions.isAdminExperienceLevelIncludeScrounge();
         final boolean isUseArtillery = campaignOptions.isUseArtillery();
 
         final boolean isAlternativeQualityAveraging = campaignOptions.isAlternativeQualityAveraging();
@@ -3907,7 +3870,8 @@ public class Person {
                       SkillType.S_SURGERY,
                       SkillType.S_MEDTECH,
                       SkillType.S_ASTECH,
-                      SkillType.S_COMMUNICATIONS, SkillType.S_ART_COOKING,
+                      SkillType.S_COMMUNICATIONS,
+                      SkillType.S_ART_COOKING,
                       SkillType.S_SENSOR_OPERATIONS);
                 int highestExperienceLevel = SkillType.EXP_NONE;
                 for (String relevantSkill : relevantSkills) {
@@ -3932,20 +3896,11 @@ public class Person {
                 int negotiationLevel = getSkillLevelOrNegative(SkillType.S_NEGOTIATION);
                 negotiationLevel = negotiationLevel == -1 ? 0 : negotiationLevel;
 
-                int scroungeLevel = getSkillLevelOrNegative(SkillType.S_SCROUNGE);
-                scroungeLevel = scroungeLevel == -1 ? 0 : scroungeLevel;
-
                 int levelSum;
                 int divisor;
 
-                if (doAdminCountNegotiation && doAdminCountScrounge) {
-                    levelSum = adminLevel + negotiationLevel + scroungeLevel;
-                    divisor = 3;
-                } else if (doAdminCountNegotiation) {
+                if (doAdminCountNegotiation) {
                     levelSum = adminLevel + negotiationLevel;
-                    divisor = 2;
-                } else if (doAdminCountScrounge) {
-                    levelSum = adminLevel + scroungeLevel;
                     divisor = 2;
                 } else {
                     levelSum = adminLevel;
@@ -4064,13 +4019,11 @@ public class Person {
 
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
         final boolean isAdminsHaveNegotiation = campaignOptions.isAdminsHaveNegotiation();
-        final boolean isAdminsHaveScrounge = campaignOptions.isAdminsHaveScrounge();
         final boolean isDoctorsUseAdministration = campaignOptions.isDoctorsUseAdministration();
         final boolean isTechsUseAdministration = campaignOptions.isTechsUseAdministration();
         final boolean isUseArtillery = campaignOptions.isUseArtillery();
 
         return profession.getSkillsForProfession(isAdminsHaveNegotiation,
-              isAdminsHaveScrounge,
               isDoctorsUseAdministration,
               isTechsUseAdministration,
               isUseArtillery);
@@ -4197,9 +4150,7 @@ public class Person {
     }
 
     public String fail() {
-        return " <font color='" +
-                     ReportingUtilities.getNegativeColor() +
-                     "'><b>Failed to heal.</b></font>";
+        return " <font color='" + ReportingUtilities.getNegativeColor() + "'><b>Failed to heal.</b></font>";
     }
 
     // region skill
@@ -4255,6 +4206,7 @@ public class Person {
      * to indicate that the skill is not available.</p>
      *
      * @param skillName the name of the skill to query
+     *
      * @return the experience level of the skill, or {@code -1} if the skill is not found
      */
     public int getSkillLevelOrNegative(final String skillName) {
@@ -4338,14 +4290,6 @@ public class Person {
             addSkill(skillName, 0, 0);
         }
         MekHQ.triggerEvent(new PersonChangedEvent(this));
-    }
-
-    /**
-     * @deprecated Use {@link #getCostToImprove(String, boolean)} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public int getCostToImprove(final String skillName) {
-        return getCostToImprove(skillName, false);
     }
 
     /**
@@ -4665,14 +4609,17 @@ public class Person {
     /**
      * Determines whether the user possesses the necessary skills to operate the given entity.
      *
-     * <p>The required skills are based on the type of the provided entity. The method checks for specific piloting or gunnery
-     * skills relevant to the entity type, such as Mechs, VTOLs, tanks, aerospace units, battle armor, and others.</p>
+     * <p>The required skills are based on the type of the provided entity. The method checks for specific piloting or
+     * gunnery skills relevant to the entity type, such as Mechs, VTOLs, tanks, aerospace units, battle armor, and
+     * others.</p>
      *
      * <p>If the appropriate skill(s) for the entity type are present, the method returns {@code true}; otherwise, it
      * returns {@code false}.</p>
      *
      * @param entity the entity to be checked for driving capability
-     * @return {@code true} if the required skill(s) to drive or operate the given entity are present; {@code false} otherwise
+     *
+     * @return {@code true} if the required skill(s) to drive or operate the given entity are present; {@code false}
+     *       otherwise
      */
     public boolean canDrive(final Entity entity) {
         if (entity instanceof LandAirMek) {
@@ -4711,6 +4658,7 @@ public class Person {
      * otherwise.</p>
      *
      * @param entity the entity to check for gunnery capability
+     *
      * @return {@code true} if the user is qualified to operate weapons for the given entity; {@code false} otherwise
      */
     public boolean canGun(final Entity entity) {
@@ -4748,6 +4696,7 @@ public class Person {
      * .</p>
      *
      * @param entity the entity to check for technical capability
+     *
      * @return {@code true} if the user is qualified to service or repair the given entity; {@code false} otherwise
      */
     public boolean canTech(final Entity entity) {
@@ -4767,14 +4716,6 @@ public class Person {
         } else {
             return false;
         }
-    }
-
-    /**
-     * @deprecated Use {@link #getDailyAvailableTechTime(boolean)}.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public int getDailyAvailableTechTime() {
-        return getDailyAvailableTechTime(false);
     }
 
     /**
@@ -4978,14 +4919,6 @@ public class Person {
     }
 
     /**
-     * @deprecated Use {@link #resetMinutesLeft(boolean)}.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public void resetMinutesLeft() {
-        resetMinutesLeft(false);
-    }
-
-    /**
      * Resets the number of minutes and overtime minutes a person has left for tasks, based on their primary or
      * secondary role. Administrative adjustments may be applied for technicians if specified.
      *
@@ -5042,9 +4975,8 @@ public class Person {
      * Determines and returns the tech skill with the highest experience level possessed by this entity.
      *
      * <p>This method evaluates all available technical skills (such as Mek, Aero, Mechanic, and Battle Armor tech
-     * skills)
-     * and selects the one with the greatest experience level. If multiple skills are present, the one with the highest
-     * experience is returned. If no relevant tech skills are found, returns {@code null}.</p>
+     * skills) and selects the one with the greatest experience level. If multiple skills are present, the one with the
+     * highest experience is returned. If no relevant tech skills are found, returns {@code null}.</p>
      *
      * @return the {@link Skill} object representing the highest-level technical skill, or {@code null} if none are
      *       present
@@ -5249,9 +5181,7 @@ public class Person {
         if (part.isRightTechType(S_TECH_MECHANIC) && hasSkill(S_TECH_MECHANIC)) {
             if ((skill == null) ||
                       (skill.getFinalSkillValue(options, atowAttributes, reputation) >
-                             getSkill(S_TECH_MECHANIC).getFinalSkillValue(options,
-                                   atowAttributes,
-                                   reputation))) {
+                             getSkill(S_TECH_MECHANIC).getFinalSkillValue(options, atowAttributes, reputation))) {
                 skill = getSkill(S_TECH_MECHANIC);
             }
         }
@@ -5259,9 +5189,7 @@ public class Person {
         if (part.isRightTechType(S_TECH_VESSEL) && hasSkill(S_TECH_VESSEL)) {
             if ((skill == null) ||
                       (skill.getFinalSkillValue(options, atowAttributes, reputation) >
-                             getSkill(S_TECH_VESSEL).getFinalSkillValue(options,
-                                   atowAttributes,
-                                   reputation))) {
+                             getSkill(S_TECH_VESSEL).getFinalSkillValue(options, atowAttributes, reputation))) {
                 skill = getSkill(S_TECH_VESSEL);
             }
         }
@@ -5287,9 +5215,7 @@ public class Person {
         if (hasSkill(S_TECH_MECHANIC)) {
             if ((skill == null) ||
                       (skill.getFinalSkillValue(options, atowAttributes, reputation) >
-                             getSkill(S_TECH_MECHANIC).getFinalSkillValue(options,
-                                   atowAttributes,
-                                   reputation))) {
+                             getSkill(S_TECH_MECHANIC).getFinalSkillValue(options, atowAttributes, reputation))) {
                 skill = getSkill(S_TECH_MECHANIC);
             }
         }
@@ -5309,7 +5235,7 @@ public class Person {
         if (unit == null) {
             return null;
         } else if (((unit.getEntity() instanceof Mek) || (unit.getEntity() instanceof ProtoMek)) &&
-                                                   hasSkill(S_TECH_MEK)) {
+                         hasSkill(S_TECH_MEK)) {
             return getSkill(S_TECH_MEK);
         } else if ((unit.getEntity() instanceof BattleArmor) && hasSkill(S_TECH_BA)) {
             return getSkill(S_TECH_BA);
@@ -5320,7 +5246,8 @@ public class Person {
             return getSkill(S_TECH_VESSEL);
         } else if ((unit.getEntity() instanceof Aero) &&
                          !(unit.getEntity() instanceof Dropship) &&
-                         !(unit.getEntity() instanceof Jumpship) && hasSkill(S_TECH_AERO)) {
+                         !(unit.getEntity() instanceof Jumpship) &&
+                         hasSkill(S_TECH_AERO)) {
             return getSkill(S_TECH_AERO);
         } else {
             return null;
@@ -5486,7 +5413,8 @@ public class Person {
         int modifier = isUseAgingEffects ?
                              getReputationAgeModifier(getAge(today),
                                    isClanCampaign,
-                                   !isNullOrBlank(bloodname), rankLevel) :
+                                   !isNullOrBlank(bloodname),
+                                   rankLevel) :
                              0;
         return reputation + modifier;
     }
@@ -5901,22 +5829,6 @@ public class Person {
               isPiloting ? ModifierValue.PILOTING : ModifierValue.GUNNERY);
     }
 
-    /**
-     * @deprecated use {@link #getInjuryModifiers(boolean)} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public int getPilotingInjuryMod() {
-        return getInjuryModifiers(true);
-    }
-
-    /**
-     * @deprecated use {@link #getInjuryModifiers(boolean)} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public int getGunneryInjuryMod() {
-        return getInjuryModifiers(false);
-    }
-
     public boolean hasInjuries(final boolean permanentCheck) {
         return !injuries.isEmpty() &&
                      (!permanentCheck ||
@@ -6106,23 +6018,6 @@ public class Person {
             case 17 -> -2;
             default -> -3;
         };
-    }
-
-    /**
-     * @deprecated replaced by {@link #getIntelligenceXpCostMultiplier(boolean)} which was then replaced by
-     *       {@link #getReasoningXpCostMultiplier(boolean)}.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public double getIntelligenceXpCostMultiplier(CampaignOptions campaignOptions) {
-        return getReasoningXpCostMultiplier(campaignOptions.isUseReasoningXpMultiplier());
-    }
-
-    /**
-     * @deprecated replaced by {@link #getReasoningXpCostMultiplier(boolean)}
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public double getIntelligenceXpCostMultiplier(final boolean useReasoningXpCostMultiplier) {
-        return getReasoningXpCostMultiplier(useReasoningXpCostMultiplier);
     }
 
     /**

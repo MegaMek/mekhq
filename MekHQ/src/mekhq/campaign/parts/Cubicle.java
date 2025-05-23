@@ -27,6 +27,8 @@
  */
 package mekhq.campaign.parts;
 
+import java.io.PrintWriter;
+
 import megamek.common.BayType;
 import megamek.common.Entity;
 import megamek.common.ITechnology;
@@ -38,12 +40,8 @@ import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.PrintWriter;
-import java.util.Objects;
-
 /**
- * A transport bay cubicle for a Mek, ProtoMek, vehicle, fighter, or small
- * craft.
+ * A transport bay cubicle for a Mek, ProtoMek, vehicle, fighter, or small craft.
  *
  * @author Neoancient
  */
@@ -155,8 +153,7 @@ public class Cubicle extends Part {
 
     @Override
     public boolean isSamePartType(Part part) {
-        return (part instanceof Cubicle)
-                && (((Cubicle) part).getBayType() == bayType);
+        return (part instanceof Cubicle) && (((Cubicle) part).getBayType() == bayType);
     }
 
     @Override
@@ -173,23 +170,8 @@ public class Cubicle extends Part {
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
             if (wn2.getNodeName().equalsIgnoreCase("bayType")) {
-                // <50.01 compatibility handler
                 String bayRawValue = wn2.getTextContent();
-
-                if (Objects.equals(bayRawValue, "MECH")) {
-                    bayRawValue = "MEK";
-                }
-
-                if (Objects.equals(bayRawValue, "PROTOMECH")) {
-                    bayRawValue = "PROTOMEK";
-                }
-
                 bayType = BayType.parse(bayRawValue);
-                if (null == bayType) {
-                    logger.error(String.format("Could not parse bay type %s treating as BayType.Mek",
-                        wn2.getTextContent()));
-                    bayType = BayType.MEK;
-                }
                 name = bayType.getDisplayName() + " Cubicle";
             }
         }

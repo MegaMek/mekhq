@@ -676,32 +676,7 @@ public abstract class Part implements IPartWork, ITechnology {
         NamedNodeMap attrs = wn.getAttributes();
         Node classNameNode = attrs.getNamedItem("type");
         String className = classNameNode.getTextContent();
-
-        // <50.01 compatibility handlers
-        if (className.equalsIgnoreCase("mekhq.campaign.parts.MekEngine")) {
-            className = "mekhq.campaign.parts.EnginePart";
-        } else if (className.equalsIgnoreCase("mekhq.campaign.parts.MissingMekEngine")) {
-            className = "mekhq.campaign.parts.MissingEnginePart";
-        } else if (className.equalsIgnoreCase("mekhq.campaign.parts.EquipmentPart")) {
-            className = "mekhq.campaign.parts.equipment.EquipmentPart";
-        } else if (className.equalsIgnoreCase("mekhq.campaign.parts.MissingEquipmentPart")) {
-            className = "mekhq.campaign.parts.equipment.MissingEquipmentPart";
-        } else if (className.equalsIgnoreCase("mekhq.campaign.parts.AmmoBin")) {
-            className = "mekhq.campaign.parts.equipment.AmmoBin";
-        } else if (className.equalsIgnoreCase("mekhq.campaign.parts.MissingAmmoBin")) {
-            className = "mekhq.campaign.parts.equipment.MissingAmmoBin";
-        } else if (className.equalsIgnoreCase("mekhq.campaign.parts.JumpJet")) {
-            className = "mekhq.campaign.parts.equipment.JumpJet";
-        } else if (className.equalsIgnoreCase("mekhq.campaign.parts.MissingJumpJet")) {
-            className = "mekhq.campaign.parts.equipment.MissingJumpJet";
-        } else if (className.equalsIgnoreCase("mekhq.campaign.parts.HeatSink")) {
-            className = "mekhq.campaign.parts.equipment.HeatSink";
-        } else if (className.equalsIgnoreCase("mekhq.campaign.parts.MissingHeatSink")) {
-            className = "mekhq.campaign.parts.equipment.MissingHeatSink";
-        } else if (className.equalsIgnoreCase("mekhq.campaign.parts.VeeStabiliser")) {
-            className = "mekhq.campaign.parts.VeeStabilizer";
-        }
-
+        
         Part retVal = null;
         try {
             // Instantiate the correct child class, and call its parsing function.

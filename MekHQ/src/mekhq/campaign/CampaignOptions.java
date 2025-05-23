@@ -57,7 +57,6 @@ import megamek.common.options.GameOptions;
 import megamek.common.preference.ClientPreferences;
 import megamek.common.preference.PreferenceManager;
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.autoresolve.AutoResolveMethod;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
@@ -70,7 +69,6 @@ import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.enums.*;
-import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
@@ -254,9 +252,7 @@ public class CampaignOptions {
 
     // Admin
     private boolean adminsHaveNegotiation;
-    private boolean adminsHaveScrounge;
     private boolean adminExperienceLevelIncludeNegotiation;
-    private boolean adminExperienceLevelIncludeScrounge;
 
     // Medical
     private boolean useAdvancedMedical; // Unofficial
@@ -344,7 +340,6 @@ public class CampaignOptions {
     private boolean logMarriageNameChanges;
     private Map<MergingSurnameStyle, Integer> marriageSurnameWeights;
     private RandomMarriageMethod randomMarriageMethod;
-    private boolean useRandomSameSexMarriages; // legacy, pre-50.01
     private boolean useRandomClanPersonnelMarriages;
     private boolean useRandomPrisonerMarriages;
     private int randomMarriageAgeRange;
@@ -815,8 +810,6 @@ public class CampaignOptions {
         // Admin
         setAdminsHaveNegotiation(false);
         setAdminExperienceLevelIncludeNegotiation(false);
-        setAdminsHaveScrounge(false);
-        setAdminExperienceLevelIncludeScrounge(false);
 
         // Medical
         setUseAdvancedMedical(false);
@@ -1863,14 +1856,6 @@ public class CampaignOptions {
         this.adminsHaveNegotiation = useAdminsHaveNegotiation;
     }
 
-    public boolean isAdminsHaveScrounge() {
-        return adminsHaveScrounge;
-    }
-
-    public void setAdminsHaveScrounge(final boolean useAdminsHaveScrounge) {
-        this.adminsHaveScrounge = useAdminsHaveScrounge;
-    }
-
     public boolean isAdminExperienceLevelIncludeNegotiation() {
         return adminExperienceLevelIncludeNegotiation;
     }
@@ -1879,13 +1864,6 @@ public class CampaignOptions {
         this.adminExperienceLevelIncludeNegotiation = useAdminExperienceLevelIncludeNegotiation;
     }
 
-    public boolean isAdminExperienceLevelIncludeScrounge() {
-        return adminExperienceLevelIncludeScrounge;
-    }
-
-    public void setAdminExperienceLevelIncludeScrounge(final boolean useAdminExperienceLevelIncludeScrounge) {
-        this.adminExperienceLevelIncludeScrounge = useAdminExperienceLevelIncludeScrounge;
-    }
     // endregion Expanded Personnel Information
 
     // region Medical
@@ -2008,24 +1986,8 @@ public class CampaignOptions {
         this.useRandomPersonalityReputation = useRandomPersonalityReputation;
     }
 
-    /**
-     * @deprecated replaced by {@link #isUseReasoningXpMultiplier()}
-     */
-    @Deprecated(since = "0.50.5", forRemoval = true)
-    public boolean isUseIntelligenceXpMultiplier() {
-        return useReasoningXpMultiplier;
-    }
-
     public boolean isUseReasoningXpMultiplier() {
         return useReasoningXpMultiplier;
-    }
-
-    /**
-     * @deprecated replaced by {@link #setUseReasoningXpMultiplier(boolean)}
-     */
-    @Deprecated(since = "0.50.5", forRemoval = true)
-    public void setUseIntelligenceXpMultiplier(final boolean useIntelligenceXpMultiplier) {
-        this.useReasoningXpMultiplier = useIntelligenceXpMultiplier;
     }
 
     public void setUseReasoningXpMultiplier(final boolean useReasoningXpMultiplier) {
@@ -4100,22 +4062,6 @@ public class CampaignOptions {
     }
 
     /**
-     * @deprecated Use {@link #isAcquisitionPersonnelCategory(ProcurementPersonnelPick)} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public boolean isAcquisitionSupportStaffOnly() {
-        return acquisitionPersonnelCategory == SUPPORT;
-    }
-
-    /**
-     * @deprecated Use {@link #setAcquisitionPersonnelCategory(ProcurementPersonnelPick)} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public void setAcquisitionSupportStaffOnly(final boolean acquisitionSupportStaffOnly) {
-        this.acquisitionPersonnelCategory = acquisitionSupportStaffOnly ? SUPPORT : ALL;
-    }
-
-    /**
      * Checks if the acquisition personnel category matches a specified category.
      *
      * @param category The {@link ProcurementPersonnelPick} category to check against.
@@ -4817,10 +4763,6 @@ public class CampaignOptions {
     public void setLimitLanceWeight(final boolean limitLanceWeight) {
     }
 
-    /**
-     * @deprecated unused.
-     */
-    @Deprecated(since = "0.50.06", forRemoval = true)
     public boolean isLimitLanceNumUnits() {
         return false;
     }
@@ -5089,15 +5031,10 @@ public class CampaignOptions {
 
         // region Admin
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "adminsHaveNegotiation", isAdminsHaveNegotiation());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "adminsHaveScrounge", isAdminsHaveScrounge());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "adminExperienceLevelIncludeNegotiation",
               isAdminExperienceLevelIncludeNegotiation());
-        MHQXMLUtility.writeSimpleXMLTag(pw,
-              indent,
-              "adminExperienceLevelIncludeScrounge",
-              isAdminExperienceLevelIncludeScrounge());
         // endregion Admin
 
         // region Medical
@@ -5658,19 +5595,13 @@ public class CampaignOptions {
                 } else if (nodeName.equalsIgnoreCase("successXP")) {
                     campaignOptions.successXP = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("mistakeXP")) {
-                    campaignOptions.mistakeXP = Integer.parseInt(nodeContents);
-                } else if (nodeName.equalsIgnoreCase("vocationalXP")
-                                 // <50.03 compatibility handler
-                                 || nodeName.equalsIgnoreCase("idleXP")) {
-                    campaignOptions.vocationalXP = Integer.parseInt(nodeContents);
-                } else if (nodeName.equalsIgnoreCase("vocationalXPTargetNumber")
-                                 // <50.03 compatibility handler
-                                 || nodeName.equalsIgnoreCase("targetIdleXP")) {
-                    campaignOptions.vocationalXPTargetNumber = Integer.parseInt(nodeContents);
-                } else if (nodeName.equalsIgnoreCase("vocationalXPCheckFrequency")
-                                 // <50.03 compatibility handler
-                                 || nodeName.equalsIgnoreCase("monthsIdleXP")) {
-                    campaignOptions.vocationalXPCheckFrequency = Integer.parseInt(nodeContents);
+                    campaignOptions.mistakeXP = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("vocationalXP")) {
+                    campaignOptions.vocationalXP = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("vocationalXPTargetNumber")) {
+                    campaignOptions.vocationalXPTargetNumber = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("vocationalXPCheckFrequency")) {
+                    campaignOptions.vocationalXPCheckFrequency = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("contractNegotiationXP")) {
                     campaignOptions.contractNegotiationXP = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("adminWeeklyXP")) {
@@ -5888,13 +5819,9 @@ public class CampaignOptions {
                 } else if (nodeName.equalsIgnoreCase("showOriginFaction")) {
                     campaignOptions.setShowOriginFaction(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("adminsHaveNegotiation")) {
-                    campaignOptions.setAdminsHaveNegotiation(Boolean.parseBoolean(nodeContents));
-                } else if (nodeName.equalsIgnoreCase("adminsHaveScrounge")) {
-                    campaignOptions.setAdminsHaveScrounge(Boolean.parseBoolean(nodeContents));
+                    campaignOptions.setAdminsHaveNegotiation(Boolean.parseBoolean(wn2.getTextContent()));
                 } else if (nodeName.equalsIgnoreCase("adminExperienceLevelIncludeNegotiation")) {
-                    campaignOptions.setAdminExperienceLevelIncludeNegotiation(Boolean.parseBoolean(nodeContents));
-                } else if (nodeName.equalsIgnoreCase("adminExperienceLevelIncludeScrounge")) {
-                    campaignOptions.setAdminExperienceLevelIncludeScrounge(Boolean.parseBoolean(nodeContents));
+                    campaignOptions.setAdminExperienceLevelIncludeNegotiation(Boolean.parseBoolean(wn2.getTextContent()));
                     // endregion Expanded Personnel Information
 
                     // region Medical
@@ -6034,11 +5961,9 @@ public class CampaignOptions {
                 } else if (nodeName.equalsIgnoreCase("useRandomPersonalities")) {
                     campaignOptions.setUseRandomPersonalities(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useRandomPersonalityReputation")) {
-                    campaignOptions.setUseRandomPersonalityReputation(Boolean.parseBoolean(nodeContents));
-                    // useIntelligenceXpMultiplier is a compatibility handler for <50.05
-                } else if ((nodeName.equalsIgnoreCase("useReasoningXpMultiplier")) ||
-                                 (nodeName.equalsIgnoreCase("useIntelligenceXpMultiplier"))) {
-                    campaignOptions.setUseReasoningXpMultiplier(Boolean.parseBoolean(nodeContents));
+                    campaignOptions.setUseRandomPersonalityReputation(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if ((nodeName.equalsIgnoreCase("useReasoningXpMultiplier"))) {
+                    campaignOptions.setUseReasoningXpMultiplier(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("useSimulatedRelationships")) {
                     campaignOptions.setUseSimulatedRelationships(Boolean.parseBoolean(nodeContents));
                     // endregion Random Histories
@@ -6094,10 +6019,9 @@ public class CampaignOptions {
                               Integer.parseInt(wn3.getTextContent().trim()));
                     }
                 } else if (nodeName.equalsIgnoreCase("randomMarriageMethod")) {
-                    campaignOptions.setRandomMarriageMethod(RandomMarriageMethod.fromString(nodeContents));
-                } else if (nodeName.equalsIgnoreCase("useRandomClanPersonnelMarriages") ||
-                                 nodeName.equalsIgnoreCase("useRandomClannerMarriages")) { // Legacy, 0.49.12 removal
-                    campaignOptions.setUseRandomClanPersonnelMarriages(Boolean.parseBoolean(nodeContents));
+                    campaignOptions.setRandomMarriageMethod(RandomMarriageMethod.fromString(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("useRandomClanPersonnelMarriages")) {
+                    campaignOptions.setUseRandomClanPersonnelMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("useRandomPrisonerMarriages")) {
                     campaignOptions.setUseRandomPrisonerMarriages(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("randomMarriageAgeRange")) {
