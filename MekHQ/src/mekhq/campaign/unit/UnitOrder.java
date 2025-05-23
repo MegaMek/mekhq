@@ -310,17 +310,17 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
             target.addModifier(+1, "ProtoMek");
         }
         // parts need to be initialized for this to work
-        int avail = getAvailability();
+        AvailabilityValue avail = getAvailability();
         if (this.isExtinctIn(getCampaign().getGameYear())) {
-            avail = EquipmentType.RATING_X;
+            avail = AvailabilityValue.X;
         }
         int availabilityMod = Availability.getAvailabilityModifier(avail);
-        target.addModifier(availabilityMod, "availability (" + ITechnology.getRatingName(avail) + ")");
+        target.addModifier(availabilityMod, "availability (" + avail.getName() + ")");
         return target;
     }
 
     @Override
-    public int getAvailability() {
+    public AvailabilityValue getAvailability() {
         return calcYearAvailability(getCampaign().getGameYear(), getCampaign().useClanTechBase(),
                 getCampaign().getTechFaction());
     }
@@ -385,12 +385,12 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
     }
 
     @Override
-    public boolean isIntroducedBy(int year, boolean clan, int techFaction) {
+    public boolean isIntroducedBy(int year, boolean clan, ITechnology.Faction techFaction) {
         return getIntroductionDate(clan, techFaction) <= year;
     }
 
     @Override
-    public boolean isExtinctIn(int year, boolean clan, int techFaction) {
+    public boolean isExtinctIn(int year, boolean clan, ITechnology.Faction techFaction) {
         return isExtinct(year, clan, techFaction);
     }
 

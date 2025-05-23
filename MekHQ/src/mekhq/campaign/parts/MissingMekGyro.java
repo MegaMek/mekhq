@@ -120,14 +120,14 @@ public class MissingMekGyro extends MissingPart {
     }
 
     @Override
-    public int getTechRating() {
+    public TechRating getTechRating() {
         switch (type) {
             case Mek.GYRO_COMPACT:
             case Mek.GYRO_HEAVY_DUTY:
             case Mek.GYRO_XL:
-                return EquipmentType.RATING_E;
+                return TechRating.E;
             default:
-                return EquipmentType.RATING_D;
+                return TechRating.D;
         }
     }
 
