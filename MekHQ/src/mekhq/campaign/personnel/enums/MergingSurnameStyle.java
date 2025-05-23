@@ -41,38 +41,51 @@ import mekhq.campaign.personnel.Person;
 
 public enum MergingSurnameStyle {
     // region Enum Declarations
-    NO_CHANGE("MergingSurnameStyle.NO_CHANGE.text", "MergingSurnameStyle.NO_CHANGE.toolTipText",
-            "MergingSurnameStyle.NO_CHANGE.dropDownText"),
-    YOURS("MergingSurnameStyle.YOURS.text", "MergingSurnameStyle.YOURS.toolTipText",
-            "MergingSurnameStyle.YOURS.dropDownText"),
-    SPOUSE("MergingSurnameStyle.SPOUSE.text", "MergingSurnameStyle.SPOUSE.toolTipText",
-            "MergingSurnameStyle.SPOUSE.dropDownText"),
+    NO_CHANGE("MergingSurnameStyle.NO_CHANGE.text",
+          "MergingSurnameStyle.NO_CHANGE.toolTipText",
+          "MergingSurnameStyle.NO_CHANGE.dropDownText"),
+    YOURS("MergingSurnameStyle.YOURS.text",
+          "MergingSurnameStyle.YOURS.toolTipText",
+          "MergingSurnameStyle.YOURS.dropDownText"),
+    SPOUSE("MergingSurnameStyle.SPOUSE.text",
+          "MergingSurnameStyle.SPOUSE.toolTipText",
+          "MergingSurnameStyle.SPOUSE.dropDownText"),
 
-    SPACE_YOURS("MergingSurnameStyle.SPACE_YOURS.text", "MergingSurnameStyle.SPACE_YOURS.toolTipText",
-            "MergingSurnameStyle.SPACE_YOURS.dropDownText"),
-    BOTH_SPACE_YOURS("MergingSurnameStyle.BOTH_SPACE_YOURS.text", "MergingSurnameStyle.BOTH_SPACE_YOURS.toolTipText",
-            "MergingSurnameStyle.BOTH_SPACE_YOURS.dropDownText"),
-    HYPHEN_YOURS("MergingSurnameStyle.HYPHEN_YOURS.text", "MergingSurnameStyle.HYPHEN_YOURS.toolTipText",
-            "MergingSurnameStyle.HYPHEN_YOURS.dropDownText"),
-    BOTH_HYPHEN_YOURS("MergingSurnameStyle.BOTH_HYPHEN_YOURS.text", "MergingSurnameStyle.BOTH_HYPHEN_YOURS.toolTipText",
-            "MergingSurnameStyle.BOTH_HYPHEN_YOURS.dropDownText"),
+    SPACE_YOURS("MergingSurnameStyle.SPACE_YOURS.text",
+          "MergingSurnameStyle.SPACE_YOURS.toolTipText",
+          "MergingSurnameStyle.SPACE_YOURS.dropDownText"),
+    BOTH_SPACE_YOURS("MergingSurnameStyle.BOTH_SPACE_YOURS.text",
+          "MergingSurnameStyle.BOTH_SPACE_YOURS.toolTipText",
+          "MergingSurnameStyle.BOTH_SPACE_YOURS.dropDownText"),
+    HYPHEN_YOURS("MergingSurnameStyle.HYPHEN_YOURS.text",
+          "MergingSurnameStyle.HYPHEN_YOURS.toolTipText",
+          "MergingSurnameStyle.HYPHEN_YOURS.dropDownText"),
+    BOTH_HYPHEN_YOURS("MergingSurnameStyle.BOTH_HYPHEN_YOURS.text",
+          "MergingSurnameStyle.BOTH_HYPHEN_YOURS.toolTipText",
+          "MergingSurnameStyle.BOTH_HYPHEN_YOURS.dropDownText"),
 
-    SPACE_SPOUSE("MergingSurnameStyle.SPACE_SPOUSE.text", "MergingSurnameStyle.SPACE_SPOUSE.toolTipText",
-            "MergingSurnameStyle.SPACE_SPOUSE.dropDownText"),
-    BOTH_SPACE_SPOUSE("MergingSurnameStyle.BOTH_SPACE_SPOUSE.text", "MergingSurnameStyle.BOTH_SPACE_SPOUSE.toolTipText",
-            "MergingSurnameStyle.BOTH_SPACE_SPOUSE.dropDownText"),
-    HYPHEN_SPOUSE("MergingSurnameStyle.HYPHEN_SPOUSE.text", "MergingSurnameStyle.HYPHEN_SPOUSE.toolTipText",
-            "MergingSurnameStyle.HYPHEN_SPOUSE.dropDownText"),
+    SPACE_SPOUSE("MergingSurnameStyle.SPACE_SPOUSE.text",
+          "MergingSurnameStyle.SPACE_SPOUSE.toolTipText",
+          "MergingSurnameStyle.SPACE_SPOUSE.dropDownText"),
+    BOTH_SPACE_SPOUSE("MergingSurnameStyle.BOTH_SPACE_SPOUSE.text",
+          "MergingSurnameStyle.BOTH_SPACE_SPOUSE.toolTipText",
+          "MergingSurnameStyle.BOTH_SPACE_SPOUSE.dropDownText"),
+    HYPHEN_SPOUSE("MergingSurnameStyle.HYPHEN_SPOUSE.text",
+          "MergingSurnameStyle.HYPHEN_SPOUSE.toolTipText",
+          "MergingSurnameStyle.HYPHEN_SPOUSE.dropDownText"),
     BOTH_HYPHEN_SPOUSE("MergingSurnameStyle.BOTH_HYPHEN_SPOUSE.text",
-            "MergingSurnameStyle.BOTH_HYPHEN_SPOUSE.toolTipText",
-            "MergingSurnameStyle.BOTH_HYPHEN_SPOUSE.dropDownText"),
+          "MergingSurnameStyle.BOTH_HYPHEN_SPOUSE.toolTipText",
+          "MergingSurnameStyle.BOTH_HYPHEN_SPOUSE.dropDownText"),
 
-    MALE("MergingSurnameStyle.MALE.text", "MergingSurnameStyle.MALE.toolTipText",
-            "MergingSurnameStyle.MALE.dropDownText"),
-    FEMALE("MergingSurnameStyle.FEMALE.text", "MergingSurnameStyle.FEMALE.toolTipText",
-            "MergingSurnameStyle.FEMALE.dropDownText"),
-    WEIGHTED("MergingSurnameStyle.WEIGHTED.text", "MergingSurnameStyle.WEIGHTED.toolTipText",
-            "MergingSurnameStyle.WEIGHTED.dropDownText");
+    MALE("MergingSurnameStyle.MALE.text",
+          "MergingSurnameStyle.MALE.toolTipText",
+          "MergingSurnameStyle.MALE.dropDownText"),
+    FEMALE("MergingSurnameStyle.FEMALE.text",
+          "MergingSurnameStyle.FEMALE.toolTipText",
+          "MergingSurnameStyle.FEMALE.dropDownText"),
+    WEIGHTED("MergingSurnameStyle.WEIGHTED.text",
+          "MergingSurnameStyle.WEIGHTED.toolTipText",
+          "MergingSurnameStyle.WEIGHTED.dropDownText");
     // endregion Enum Declarations
 
     // region Variable Declarations
@@ -84,7 +97,7 @@ public enum MergingSurnameStyle {
     // region Constructors
     MergingSurnameStyle(final String name, final String toolTipText, final String dropDownText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
         this.dropDownText = resources.getString(dropDownText);
@@ -167,13 +180,13 @@ public enum MergingSurnameStyle {
      * @param origin   the origin person
      * @param spouse   the origin person's new spouse
      */
-    public void apply(final Campaign campaign, final LocalDate today, final Person origin,
-            final Person spouse) {
+    public void apply(final Campaign campaign, final LocalDate today, final Person origin, final Person spouse) {
         final String surname = origin.getSurname();
         final String spouseSurname = spouse.getSurname();
-        final MergingSurnameStyle surnameStyle = isWeighted()
-                ? createWeightedSurnameMap(campaign.getCampaignOptions().getMarriageSurnameWeights()).randomItem()
-                : this;
+        final MergingSurnameStyle surnameStyle = isWeighted() ?
+                                                       createWeightedSurnameMap(campaign.getCampaignOptions()
+                                                                                      .getMarriageSurnameWeights()).randomItem() :
+                                                       this;
 
         switch (surnameStyle) {
             case NO_CHANGE:
@@ -269,9 +282,11 @@ public enum MergingSurnameStyle {
             case WEIGHTED:
             default:
                 MMLogger.create(MergingSurnameStyle.class)
-                        .error(String.format(
-                                "Merging Surname Style %s is not defined, and cannot be used for \"%s\" and \"%s\"",
-                                surnameStyle.name(), origin.getFullName(), spouse.getFullName()));
+                      .error(String.format(
+                            "Merging Surname Style %s is not defined, and cannot be used for \"%s\" and \"%s\"",
+                            surnameStyle.name(),
+                            origin.getFullName(),
+                            spouse.getFullName()));
                 break;
         }
 
@@ -288,10 +303,10 @@ public enum MergingSurnameStyle {
 
     /**
      * @param weights the weights to use in creating the weighted surname map
+     *
      * @return the created weighted surname map
      */
-    WeightedIntMap<MergingSurnameStyle> createWeightedSurnameMap(
-            final Map<MergingSurnameStyle, Integer> weights) {
+    WeightedIntMap<MergingSurnameStyle> createWeightedSurnameMap(final Map<MergingSurnameStyle, Integer> weights) {
         final WeightedIntMap<MergingSurnameStyle> map = new WeightedIntMap<>();
         for (final MergingSurnameStyle style : MergingSurnameStyle.values()) {
             if (style.isWeighted()) {
@@ -303,8 +318,10 @@ public enum MergingSurnameStyle {
     }
 
     // region File I/O
+
     /**
      * @param text containing the MergingSurnameStyle
+     *
      * @return the saved MergingSurnameStyle
      */
     public static MergingSurnameStyle parseFromString(final String text) {
@@ -314,22 +331,8 @@ public enum MergingSurnameStyle {
 
         }
 
-        // Migration Occurred in 0.49.9
-        switch (text) {
-            case "HYP_YOURS":
-                return HYPHEN_YOURS;
-            case "BOTH_HYP_YOURS":
-                return BOTH_HYPHEN_YOURS;
-            case "HYP_SPOUSE":
-                return HYPHEN_SPOUSE;
-            case "BOTH_HYP_SPOUSE":
-                return BOTH_HYPHEN_SPOUSE;
-            default:
-                break;
-        }
-
         MMLogger.create(MergingSurnameStyle.class)
-                .error("Unable to parse " + text + " into a MergingSurnameStyle. Returning FEMALE.");
+              .error("Unable to parse " + text + " into a MergingSurnameStyle. Returning FEMALE.");
         return FEMALE;
     }
     // endregion File I/O

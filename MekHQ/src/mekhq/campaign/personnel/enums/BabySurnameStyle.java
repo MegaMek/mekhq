@@ -41,20 +41,20 @@ public enum BabySurnameStyle {
     MOTHERS("BabySurnameStyle.MOTHERS.text", "BabySurnameStyle.MOTHERS.toolTipText"),
     MOTHERS_FATHERS("BabySurnameStyle.MOTHERS_FATHERS.text", "BabySurnameStyle.MOTHERS_FATHERS.toolTipText"),
     MOTHERS_HYPHEN_FATHERS("BabySurnameStyle.MOTHERS_HYPHEN_FATHERS.text",
-            "BabySurnameStyle.MOTHERS_HYPHEN_FATHERS.toolTipText"),
+          "BabySurnameStyle.MOTHERS_HYPHEN_FATHERS.toolTipText"),
     FATHERS_MOTHERS("BabySurnameStyle.FATHERS_MOTHERS.text", "BabySurnameStyle.FATHERS_MOTHERS.toolTipText"),
     FATHERS_HYPHEN_MOTHERS("BabySurnameStyle.FATHERS_HYPHEN_MOTHERS.text",
-            "BabySurnameStyle.FATHERS_HYPHEN_MOTHERS.toolTipText"),
+          "BabySurnameStyle.FATHERS_HYPHEN_MOTHERS.toolTipText"),
     WELSH_PATRONYMICS("BabySurnameStyle.WELSH_PATRONYMICS.text", "BabySurnameStyle.WELSH_PATRONYMICS.toolTipText"),
     WELSH_MATRONYMICS("BabySurnameStyle.WELSH_MATRONYMICS.text", "BabySurnameStyle.WELSH_MATRONYMICS.toolTipText"),
     ICELANDIC_PATRONYMICS("BabySurnameStyle.ICELANDIC_PATRONYMICS.text",
-            "BabySurnameStyle.ICELANDIC_PATRONYMICS.toolTipText"),
+          "BabySurnameStyle.ICELANDIC_PATRONYMICS.toolTipText"),
     ICELANDIC_MATRONYMICS("BabySurnameStyle.ICELANDIC_MATRONYMICS.text",
-            "BabySurnameStyle.ICELANDIC_MATRONYMICS.toolTipText"),
+          "BabySurnameStyle.ICELANDIC_MATRONYMICS.toolTipText"),
     ICELANDIC_COMBINATION_NYMICS("BabySurnameStyle.ICELANDIC_COMBINATION_NYMICS.text",
-            "BabySurnameStyle.ICELANDIC_COMBINATION_NYMICS.toolTipText"),
+          "BabySurnameStyle.ICELANDIC_COMBINATION_NYMICS.toolTipText"),
     RUSSIAN_PATRONYMICS("BabySurnameStyle.RUSSIAN_PATRONYMICS.text",
-            "BabySurnameStyle.RUSSIAN_PATRONYMICS.toolTipText");
+          "BabySurnameStyle.RUSSIAN_PATRONYMICS.toolTipText");
     // endregion Enum Declaration
 
     // region Variable Declarations
@@ -65,7 +65,7 @@ public enum BabySurnameStyle {
     // region Constructors
     BabySurnameStyle(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
@@ -127,8 +127,7 @@ public enum BabySurnameStyle {
     }
     // endregion Boolean Comparison Methods
 
-    public String generateBabySurname(final Person mother, final @Nullable Person father,
-            final Gender babyGender) {
+    public String generateBabySurname(final Person mother, final @Nullable Person father, final Gender babyGender) {
         final boolean hasFather = father != null;
         switch (this) {
             case WELSH_PATRONYMICS:
@@ -139,8 +138,9 @@ public enum BabySurnameStyle {
                 return getWelshNymic(mother.getGivenName(), babyGender);
             case ICELANDIC_COMBINATION_NYMICS:
                 if (hasFather) {
-                    return getIcelandicNymic(mother.getGivenName(), babyGender)
-                            + ' ' + getIcelandicNymic(father.getGivenName(), babyGender);
+                    return getIcelandicNymic(mother.getGivenName(), babyGender) +
+                                 ' ' +
+                                 getIcelandicNymic(father.getGivenName(), babyGender);
                 }
             case ICELANDIC_PATRONYMICS:
                 if (hasFather) {
@@ -179,11 +179,11 @@ public enum BabySurnameStyle {
     }
 
     /**
-     * This creates a Welsh-style Surname based on the supplied given name and the
-     * gender of the baby
+     * This creates a Welsh-style Surname based on the supplied given name and the gender of the baby
      *
      * @param givenName  the given name to create the surname from
      * @param babyGender the baby's gender
+     *
      * @return The Welsh-style surname
      */
     private String getWelshNymic(final String givenName, final Gender babyGender) {
@@ -215,11 +215,11 @@ public enum BabySurnameStyle {
     }
 
     /**
-     * This creates an Icelandic-style surname based on the supplied given name and
-     * the gender of the baby
+     * This creates an Icelandic-style surname based on the supplied given name and the gender of the baby
      *
      * @param givenName  the given name to create the surname from
      * @param babyGender the baby's gender
+     *
      * @return The Icelandic-style surname
      */
     private String getIcelandicNymic(final String givenName, final Gender babyGender) {
@@ -234,11 +234,11 @@ public enum BabySurnameStyle {
     }
 
     /**
-     * This creates an Russian-style surname based on the supplied given name and
-     * the gender of the baby
+     * This creates an Russian-style surname based on the supplied given name and the gender of the baby
      *
      * @param givenName  the given name to create the surname from
      * @param babyGender the baby's gender
+     *
      * @return The Russian-style surname
      */
     private String getRussianNymic(final String givenName, final Gender babyGender) {
@@ -261,8 +261,10 @@ public enum BabySurnameStyle {
     }
 
     // region File I/O
+
     /**
      * @param text containing the BabySurnameStyle
+     *
      * @return the saved BabySurnameStyle
      */
     public static BabySurnameStyle parseFromString(final String text) {
@@ -272,32 +274,8 @@ public enum BabySurnameStyle {
 
         }
 
-        // Migration Occurred in 0.49.9
-        switch (text) {
-            case "MOTHERS_HYP_FATHERS":
-                return MOTHERS_HYPHEN_FATHERS;
-            case "FATHERS_HYP_MOTHERS":
-                return FATHERS_HYPHEN_MOTHERS;
-            default:
-                break;
-        }
-
-        // 0.47.* Migration
-        try {
-            switch (Integer.parseInt(text)) {
-                case 0:
-                    return MOTHERS;
-                case 1:
-                    return FATHERS;
-                default:
-                    break;
-            }
-        } catch (Exception ignored) {
-
-        }
-
         MMLogger.create(BabySurnameStyle.class)
-                .error("Unable to parse " + text + " into a BabySurnameStyle. Returning MOTHERS.");
+              .error("Unable to parse " + text + " into a BabySurnameStyle. Returning MOTHERS.");
         return MOTHERS;
     }
     // endregion File I/O

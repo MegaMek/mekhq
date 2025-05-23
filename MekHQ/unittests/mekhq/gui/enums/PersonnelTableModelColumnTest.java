@@ -490,17 +490,6 @@ public class PersonnelTableModelColumnTest {
     }
 
     @Test
-    public void testIsScrounge() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.SCROUNGE) {
-                assertTrue(personnelTableModelColumn.isScrounge());
-            } else {
-                assertFalse(personnelTableModelColumn.isScrounge());
-            }
-        }
-    }
-
-    @Test
     public void testIsInjuries() {
         for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
             if (personnelTableModelColumn == PersonnelTableModelColumn.INJURIES) {
@@ -879,8 +868,7 @@ public class PersonnelTableModelColumnTest {
                      TECH_VESSEL,
                      MEDICAL,
                      ADMINISTRATION,
-                     NEGOTIATION,
-                     SCROUNGE ->
+                     NEGOTIATION ->
                       assertInstanceOf(BonusSorter.class, personnelTableModelColumn.getComparator(mockCampaign));
                 case INJURIES,
                      KILLS,

@@ -118,7 +118,6 @@ public enum PersonnelTableModelColumn {
     MEDICAL("PersonnelTableModelColumn.MEDICAL.text"),
     ADMINISTRATION("PersonnelTableModelColumn.ADMINISTRATION.text"),
     NEGOTIATION("PersonnelTableModelColumn.NEGOTIATION.text"),
-    @Deprecated(since = "0.50.05", forRemoval = true) SCROUNGE("PersonnelTableModelColumn.SCROUNGE.text"),
     INJURIES("PersonnelTableModelColumn.INJURIES.text"),
     KILLS("PersonnelTableModelColumn.KILLS.text"),
     SALARY("PersonnelTableModelColumn.SALARY.text"),
@@ -137,7 +136,8 @@ public enum PersonnelTableModelColumn {
     MARRIAGEABLE("PersonnelTableModelColumn.MARRIAGEABLE.text"),
     DIVORCEABLE("PersonnelTableModelColumn.DIVORCEABLE.text"),
     TRYING_TO_CONCEIVE("PersonnelTableModelColumn.TRYING_TO_CONCEIVE.text"),
-    IMMORTAL("PersonnelTableModelColumn.IMMORTAL.text"), EMPLOYED("PersonnelTableModelColumn.EMPLOYED.text"),
+    IMMORTAL("PersonnelTableModelColumn.IMMORTAL.text"),
+    EMPLOYED("PersonnelTableModelColumn.EMPLOYED.text"),
     TOUGHNESS("PersonnelTableModelColumn.TOUGHNESS.text"),
     CONNECTIONS("PersonnelTableModelColumn.CONNECTIONS.text"),
     WEALTH("PersonnelTableModelColumn.WEALTH.text"),
@@ -339,10 +339,6 @@ public enum PersonnelTableModelColumn {
         return this == NEGOTIATION;
     }
 
-    public boolean isScrounge() {
-        return this == SCROUNGE;
-    }
-
     public boolean isInjuries() {
         return this == INJURIES;
     }
@@ -481,16 +477,6 @@ public enum PersonnelTableModelColumn {
 
     public boolean isSocial() {
         return this == SOCIAL;
-    }
-
-    /**
-     * When this is removed {@link #isATOWIntelligence()} should be renamed to just 'isIntelligence()'
-     *
-     * @deprecated replaced by {@link #isReasoning()}
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public boolean isIntelligence() {
-        return isReasoning();
     }
 
     public boolean isReasoning() {
@@ -832,16 +818,13 @@ public enum PersonnelTableModelColumn {
                              "-";
             case NEGOTIATION:
                 return person.hasSkill(SkillType.S_NEGOTIATION) ?
-                             Integer.toString(person.getSkill(SkillType.S_NEGOTIATION).getFinalSkillValue(options, attributes,
+                             Integer.toString(person.getSkill(SkillType.S_NEGOTIATION)
+                                                    .getFinalSkillValue(options,
+                                                          attributes,
                                                           person.getAdjustedReputation(isUseAgeEffects,
                                                                 isClanCampaign,
                                                                 today,
                                                                 person.getRankLevel()))) :
-                             "-";
-            case SCROUNGE:
-                return person.hasSkill(SkillType.S_SCROUNGE) ?
-                             Integer.toString(person.getSkill(SkillType.S_SCROUNGE)
-                                                    .getFinalSkillValue(options, attributes)) :
                              "-";
             case INJURIES:
                 if (campaign.getCampaignOptions().isUseAdvancedMedical()) {
@@ -1102,7 +1085,7 @@ public enum PersonnelTableModelColumn {
                 default -> false;
             };
             case ADMINISTRATIVE_SKILLS -> switch (this) {
-                case RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, ADMINISTRATION, NEGOTIATION, SCROUNGE -> true;
+                case RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, ADMINISTRATION, NEGOTIATION -> true;
                 default -> false;
             };
             case BIOGRAPHICAL -> switch (this) {
@@ -1209,8 +1192,7 @@ public enum PersonnelTableModelColumn {
                  TECH_VESSEL,
                  MEDICAL,
                  ADMINISTRATION,
-                 NEGOTIATION,
-                 SCROUNGE -> new BonusSorter();
+                 NEGOTIATION -> new BonusSorter();
             case INJURIES,
                  KILLS,
                  XP,

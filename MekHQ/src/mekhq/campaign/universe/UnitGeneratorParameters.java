@@ -180,15 +180,7 @@ public class UnitGeneratorParameters implements Cloneable {
     public void setMissionRoles(Collection<MissionRole> missionRoles) {
         this.missionRoles = missionRoles;
     }
-
-    /**
-     * @deprecated no indicated uses.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public void clearMissionRoles() {
-        missionRoles.clear();
-    }
-
+    
     public void addMissionRole(MissionRole role) {
         missionRoles.add(role);
     }
