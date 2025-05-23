@@ -5595,13 +5595,13 @@ public class CampaignOptions {
                 } else if (nodeName.equalsIgnoreCase("successXP")) {
                     campaignOptions.successXP = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("mistakeXP")) {
-                    retVal.mistakeXP = Integer.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.mistakeXP = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("vocationalXP")) {
-                    retVal.vocationalXP = Integer.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.vocationalXP = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("vocationalXPTargetNumber")) {
-                    retVal.vocationalXPTargetNumber = Integer.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.vocationalXPTargetNumber = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("vocationalXPCheckFrequency")) {
-                    retVal.vocationalXPCheckFrequency = Integer.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.vocationalXPCheckFrequency = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("contractNegotiationXP")) {
                     campaignOptions.contractNegotiationXP = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("adminWeeklyXP")) {
@@ -5819,9 +5819,9 @@ public class CampaignOptions {
                 } else if (nodeName.equalsIgnoreCase("showOriginFaction")) {
                     campaignOptions.setShowOriginFaction(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("adminsHaveNegotiation")) {
-                    nodeName.setAdminsHaveNegotiation(Boolean.parseBoolean(wn2.getTextContent()));
+                    retVal.setAdminsHaveNegotiation(Boolean.parseBoolean(wn2.getTextContent()));
                 } else if (nodeName.equalsIgnoreCase("adminExperienceLevelIncludeNegotiation")) {
-                    nodeName.setAdminExperienceLevelIncludeNegotiation(Boolean.parseBoolean(wn2.getTextContent()));
+                    retVal.setAdminExperienceLevelIncludeNegotiation(Boolean.parseBoolean(wn2.getTextContent()));
                     // endregion Expanded Personnel Information
 
                     // region Medical
@@ -5961,9 +5961,9 @@ public class CampaignOptions {
                 } else if (nodeName.equalsIgnoreCase("useRandomPersonalities")) {
                     campaignOptions.setUseRandomPersonalities(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useRandomPersonalityReputation")) {
-                    nodeName.setUseRandomPersonalityReputation(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseRandomPersonalityReputation(Boolean.parseBoolean(nodeContents));
                 } else if ((nodeName.equalsIgnoreCase("useReasoningXpMultiplier"))) {
-                    nodeName.setUseReasoningXpMultiplier(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseReasoningXpMultiplier(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useSimulatedRelationships")) {
                     campaignOptions.setUseSimulatedRelationships(Boolean.parseBoolean(nodeContents));
                     // endregion Random Histories
@@ -6019,9 +6019,9 @@ public class CampaignOptions {
                               Integer.parseInt(wn3.getTextContent().trim()));
                     }
                 } else if (nodeName.equalsIgnoreCase("randomMarriageMethod")) {
-                    nodeName.setRandomMarriageMethod(RandomMarriageMethod.fromString(wn2.getTextContent().trim()));
+                    campaignOptions.setRandomMarriageMethod(RandomMarriageMethod.fromString(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useRandomClanPersonnelMarriages")) {
-                    nodeName.setUseRandomClanPersonnelMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseRandomClanPersonnelMarriages(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useRandomPrisonerMarriages")) {
                     campaignOptions.setUseRandomPrisonerMarriages(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("randomMarriageAgeRange")) {
@@ -6283,7 +6283,7 @@ public class CampaignOptions {
                 } else if (nodeName.equalsIgnoreCase("useExtendedPartsModifier")) {
                     campaignOptions.useExtendedPartsModifier = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("showPeacetimeCost")) {
-                    nodeName.showPeacetimeCost = Boolean.parseBoolean(wn2.getTextContent());
+                    campaignOptions.showPeacetimeCost = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("newFinancialYearFinancesToCSVExport")) {
                     campaignOptions.newFinancialYearFinancesToCSVExport = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("simulateGrayMonday")) {
