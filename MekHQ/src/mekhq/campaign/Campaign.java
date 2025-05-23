@@ -2171,7 +2171,10 @@ public class Campaign implements ITechManager {
             if (getCampaignOptions().isUseSimulatedRelationships()) {
                 if ((prisonerStatus.isFree()) &&
                           (!person.getOriginFaction().isClan()) &&
-                          (!person.getPrimaryRole().isDependent())) {
+                          // We don't simulate for civilians, otherwise MekHQ will try to simulate the entire
+                          // relationship history of everyone the recruit has ever married or birthed. This will
+                          // cause a StackOverflow. -- Illiani, May/21/2025
+                          (!person.getPrimaryRole().isCivilian())) {
                     simulateRelationshipHistory(person);
                 }
             }
@@ -2224,10 +2227,14 @@ public class Campaign implements ITechManager {
             return;
         }
 
-        List<Person> children = new ArrayList<>();
-        Person currentSpouse = null;
         Person babysFather = null;
         Person spousesBabysFather = null;
+        List<Person> currentChildren = new ArrayList<>(); // Children that join with the character
+        List<Person> priorChildren = new ArrayList<>(); // Children that were lost during divorce
+
+        Person currentSpouse = null; // The current spouse
+        List<Person> allSpouses = new ArrayList<>(); // All spouses current or divorced
+
 
         // run the simulation
         for (long weeksRemaining = weeksBetween; weeksRemaining >= 0; weeksRemaining--) {
@@ -2242,7 +2249,7 @@ public class Campaign implements ITechManager {
 
                     // there is a chance a departing spouse might take some of their children with
                     // them
-                    for (Person child : children) {
+                    for (Person child : currentChildren) {
                         if (child.getGenealogy().getParents().contains(currentSpouse)) {
                             if (randomInt(2) == 0) {
                                 toRemove.add(child);
@@ -2250,7 +2257,9 @@ public class Campaign implements ITechManager {
                         }
                     }
 
-                    children.removeAll(toRemove);
+                    currentChildren.removeAll(toRemove);
+
+                    priorChildren.addAll(toRemove);
 
                     currentSpouse = null;
                 }
@@ -2259,6 +2268,7 @@ public class Campaign implements ITechManager {
 
                 if (person.getGenealogy().hasSpouse()) {
                     currentSpouse = person.getGenealogy().getSpouse();
+                    allSpouses.add(currentSpouse);
                 }
             }
 
@@ -2284,7 +2294,6 @@ public class Campaign implements ITechManager {
                       true);
 
                 if (currentSpouse.isPregnant()) {
-
                     if (person.getGender().isMale()) {
                         spousesBabysFather = person;
                     }
@@ -2292,32 +2301,43 @@ public class Campaign implements ITechManager {
             }
 
             if ((person.isPregnant()) && (currentDate.isAfter(person.getDueDate()))) {
-                children.addAll(getProcreation().birthHistoric(this, localDate, person, babysFather));
+                currentChildren.addAll(getProcreation().birthHistoric(this, localDate, person, babysFather));
                 babysFather = null;
             }
 
             if ((currentSpouse != null) &&
                       (currentSpouse.isPregnant()) &&
                       (currentDate.isAfter(currentSpouse.getDueDate()))) {
-                children.addAll(getProcreation().birthHistoric(this, localDate, currentSpouse, spousesBabysFather));
+                currentChildren.addAll(getProcreation().birthHistoric(this,
+                      localDate,
+                      currentSpouse,
+                      spousesBabysFather));
                 spousesBabysFather = null;
             }
         }
 
         // with the simulation concluded, we add the current spouse (if any) and any
         // remaining children to the unit
-        if (currentSpouse != null) {
-            recruitPerson(currentSpouse, PrisonerStatus.FREE, true, false, false);
+        for (Person spouse : allSpouses) {
+            recruitPerson(spouse, PrisonerStatus.FREE, true, false, false);
 
-            addReport(String.format(resources.getString("relativeJoinsForce.text"),
-                  currentSpouse.getHyperlinkedFullTitle(),
-                  person.getHyperlinkedFullTitle(),
-                  resources.getString("relativeJoinsForceSpouse.text")));
+            if (currentSpouse == spouse) {
+                addReport(String.format(resources.getString("relativeJoinsForce.text"),
+                      spouse.getHyperlinkedFullTitle(),
+                      person.getHyperlinkedFullTitle(),
+                      resources.getString("relativeJoinsForceSpouse.text")));
+            } else {
+                spouse.setStatus(PersonnelStatus.BACKGROUND_CHARACTER);
+            }
 
-            MekHQ.triggerEvent(new PersonChangedEvent(currentSpouse));
+            MekHQ.triggerEvent(new PersonChangedEvent(spouse));
         }
 
-        for (Person child : children) {
+        List<Person> allChildren = new ArrayList<>();
+        allChildren.addAll(currentChildren);
+        allChildren.addAll(priorChildren);
+
+        for (Person child : allChildren) {
             child.setOriginFaction(person.getOriginFaction());
             child.setOriginPlanet(person.getOriginPlanet());
 
@@ -2356,10 +2376,14 @@ public class Campaign implements ITechManager {
 
             recruitPerson(child, PrisonerStatus.FREE, true, false, false);
 
-            addReport(String.format(resources.getString("relativeJoinsForce.text"),
-                  child.getHyperlinkedFullTitle(),
-                  person.getHyperlinkedFullTitle(),
-                  resources.getString("relativeJoinsForceChild.text")));
+            if (currentChildren.contains(child)) {
+                addReport(String.format(resources.getString("relativeJoinsForce.text"),
+                      child.getHyperlinkedFullTitle(),
+                      person.getHyperlinkedFullTitle(),
+                      resources.getString("relativeJoinsForceChild.text")));
+            } else {
+                child.setStatus(PersonnelStatus.BACKGROUND_CHARACTER);
+            }
 
             MekHQ.triggerEvent(new PersonChangedEvent(child));
         }
