@@ -67,7 +67,7 @@ public class SkillDeprecationTool {
      * This list should be updated following each Milestone release. If there are no skills in the list, an empty array
      * MUST be left; otherwise we will run into NPEs during campaign loading.</p>
      *
-     * <p><b>Last Updated:</b> 50.06</p>
+     * <p><b>Last Updated:</b> 50.07</p>
      */
     public static final List<SkillType> DEPRECATED_SKILLS = List.of();
 
