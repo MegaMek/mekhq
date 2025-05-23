@@ -32,6 +32,33 @@
  */
 package mekhq.gui.dialog.reportDialogs.FactionStanding;
 
+import static java.lang.Math.round;
+import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
+import static mekhq.gui.dialog.reportDialogs.FactionStanding.SimulateMissionDialog.handleFactionRegardUpdates;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getNegativeColor;
+import static mekhq.utilities.ReportingUtilities.getPositiveColor;
+import static mekhq.utilities.ReportingUtilities.getWarningColor;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.util.UIUtil;
@@ -39,6 +66,7 @@ import megamek.logging.MMLogger;
 import megamek.utilities.ImageUtilities;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
+import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.FactionHints;
 import mekhq.campaign.universe.Factions;
@@ -49,23 +77,6 @@ import mekhq.gui.dialog.GlossaryDialog;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.RoundedLineBorder;
 import mekhq.gui.utilities.WrapLayout;
-
-import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.border.CompoundBorder;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
-import static java.lang.Math.round;
-import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
-import static mekhq.utilities.ReportingUtilities.*;
 
 /**
  * Displays a dialog window that visualizes a report on faction standings for the current campaign year. Shows
@@ -106,38 +117,50 @@ public class FactionStandingReport extends JDialog {
     private final Factions factions;
     private final boolean isGM;
     private final Faction campaignFaction;
+    private final ImageIcon campaignIcon;
 
     private final List<String> innerSphereFactions = new ArrayList<>();
     private final List<String> clanFactions = new ArrayList<>();
     private final List<String> peripheryFactions = new ArrayList<>();
     private final List<String> deadFactions = new ArrayList<>();
 
+    private final List<String> reports = new ArrayList<>();
+
     /**
-     * Constructs a new {@code FactionStandingReport} dialog.
+     * Constructs a {@link FactionStandingReport} which generates a {@link JDialog} displaying faction standings for the
+     * specified campaign and related data.
      *
-     * @param frame            the parent frame for this dialog
-     * @param factionStandings the object containing faction standing values to report on
-     * @param today            the current campaign date
-     * @param isGM             whether the player currently has GM Mode enabled
-     * @param campaignFaction  the current campaign faction
+     * @param frame The parent {@link JFrame} that acts as the owner of this report dialog.
+     * @param factionStandings The object containing the standings of factions in the campaign.
+     * @param today The current date for reference in the report.
+     * @param isGM A boolean indicating whether the user is a Game Master (GM).
+     * @param campaignFaction The primary faction for the campaign associated with the report.
+     * @param campaignIcon An {@link ImageIcon} for the campaign (either a custom user icon or faction icon).
      *
      * @author Illiani
      * @since 0.50.07
      */
     public FactionStandingReport(final JFrame frame, final FactionStandings factionStandings, final LocalDate today,
-          final boolean isGM, final Faction campaignFaction) {
-        super();
+          final boolean isGM, final Faction campaignFaction, final ImageIcon campaignIcon) {
         this.frame = frame;
         this.today = today;
         this.gameYear = today.getYear();
         this.isGM = isGM;
         this.campaignFaction = campaignFaction;
+        this.campaignIcon = campaignIcon;
         this.factionStandings = factionStandings;
         factions = Factions.getInstance();
 
         sortFactions();
         createReportPanel();
         initializeDialogParameters();
+    }
+
+    /**
+     * @return a list of Faction Standing change reports.
+     */
+    public List<String> getReports() {
+        return reports;
     }
 
     /**
@@ -353,9 +376,10 @@ public class FactionStandingReport extends JDialog {
         JButton btnGmTools = new JButton(getTextAt(RESOURCE_BUNDLE, "factionStandingReport.button.gmTools"));
         btnGmTools.setName("btnSimulateContract");
         btnGmTools.setFocusable(false);
+        btnGmTools.setEnabled(isGM);
         btnGmTools.setBorder(RoundedLineBorder.createRoundedLineBorder());
         btnGmTools.addActionListener(e -> {
-            // TODO Simulate Contract Dialog
+            // TODO GM Tools Dialog
         });
         pnlButtons.add(btnGmTools);
 
@@ -365,13 +389,30 @@ public class FactionStandingReport extends JDialog {
         btnSimulateContract.setName("btnSimulateContract");
         btnSimulateContract.setFocusable(false);
         btnSimulateContract.setBorder(RoundedLineBorder.createRoundedLineBorder());
-        btnSimulateContract.setEnabled(isGM);
-        btnSimulateContract.addActionListener(e -> {
-            // TODO GM Tools Dialog
-        });
+        btnSimulateContract.addActionListener(e -> triggerMissionSimulationDialog());
         pnlButtons.add(btnSimulateContract);
 
         return pnlButtons;
+    }
+
+    /**
+     * Opens the Simulate Mission dialog, allowing the user to choose the employer and enemy factions, as well as the
+     * mission status. After selections are made, the method updates faction standings accordingly.
+     *
+     * <p>This method blocks until the dialog is closed, then retrieves the selected values and applies any necessary
+     * updates to faction standings.</p>
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private void triggerMissionSimulationDialog() {
+        SimulateMissionDialog dialog = new SimulateMissionDialog(campaignIcon, campaignFaction, today, null);
+
+        Faction employerChoice = dialog.getEmployerChoice();
+        Faction enemyChoice = dialog.getEnemyChoice();
+        MissionStatus statusChoice = dialog.getStatusChoice();
+
+        reports.addAll(handleFactionRegardUpdates(employerChoice, enemyChoice, statusChoice, today, factionStandings));
     }
 
     /**
