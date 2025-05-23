@@ -47,7 +47,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
@@ -55,6 +54,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import megamek.logging.MMLogger;
+import mekhq.gui.baseComponents.RoundedJButton;
 import mekhq.gui.utilities.RoundedLineBorder;
 
 /**
@@ -239,8 +239,7 @@ public class ManualMissionRegardConfirmationDialog extends JDialog {
         JPanel pnlButton = new JPanel(new FlowLayout(FlowLayout.CENTER, PADDING, PADDING));
 
         String label = getTextAt(RESOURCE_BUNDLE, "simulateContractDialog.button.confirm");
-        JButton btnConfirm = new JButton(label);
-        btnConfirm.setBorder(RoundedLineBorder.createRoundedLineBorder());
+        RoundedJButton btnConfirm = new RoundedJButton(label);
         btnConfirm.addActionListener(evt -> dispose());
 
         pnlButton.add(btnConfirm);

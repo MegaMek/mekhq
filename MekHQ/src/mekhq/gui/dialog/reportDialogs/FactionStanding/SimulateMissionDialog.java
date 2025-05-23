@@ -51,7 +51,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import javax.swing.*;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.ImageIcon;
+import javax.swing.JDialog;
+import javax.swing.JEditorPane;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.HyperlinkEvent;
 
@@ -62,6 +70,7 @@ import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
+import mekhq.gui.baseComponents.RoundedJButton;
 import mekhq.gui.dialog.GlossaryDialog;
 import mekhq.gui.utilities.RoundedLineBorder;
 
@@ -486,8 +495,7 @@ public class SimulateMissionDialog extends JDialog {
         JPanel pnlButton = new JPanel(new FlowLayout(FlowLayout.CENTER, PADDING, PADDING));
 
         String label = getTextAt(RESOURCE_BUNDLE, "simulateContractDialog.button.confirm");
-        JButton btnConfirm = new JButton(label);
-        btnConfirm.setBorder(RoundedLineBorder.createRoundedLineBorder());
+        RoundedJButton btnConfirm = new RoundedJButton(label);
         btnConfirm.addActionListener(evt -> {
             int employerChoiceIndex = comboEmployerFaction.getSelectedIndex();
             if (employerChoiceIndex != UNTRACKED_FACTION_INDEX) { // If it's untracked leave the choice null
