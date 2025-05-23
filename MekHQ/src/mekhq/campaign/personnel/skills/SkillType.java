@@ -152,7 +152,6 @@ public class SkillType {
     public static final String S_ART_INSTRUMENT = "Art/Instrument" + RP_ONLY_TAG;
     public static final String S_ART_SINGING = "Art/Singing" + RP_ONLY_TAG;
     public static final String S_ART_OTHER = "Art/Other" + RP_ONLY_TAG;
-    public static final String S_CLIMBING = "Climbing" + RP_ONLY_TAG;
     public static final String S_COMMUNICATIONS = "Communications/Any" + RP_ONLY_TAG;
     public static final String S_COMPUTERS = "Computers" + RP_ONLY_TAG;
     public static final String S_CRYPTOGRAPHY = "Cryptography" + RP_ONLY_TAG;
@@ -229,7 +228,7 @@ public class SkillType {
                                                S_ACTING, S_ANIMAL_HANDLING, S_APPRAISAL, S_ARCHERY, S_ART_COOKING,
                                                S_ART_DANCING, S_ART_DRAWING, S_ART_PAINTING, S_ART_POETRY,
                                                S_ART_SCULPTURE, S_ART_INSTRUMENT, S_ART_SINGING, S_ART_WRITING,
-                                               S_ART_OTHER, S_CLIMBING, S_COMMUNICATIONS, S_COMPUTERS, S_CRYPTOGRAPHY,
+                                               S_ART_OTHER, S_COMMUNICATIONS, S_COMPUTERS, S_CRYPTOGRAPHY,
                                                S_DEMOLITIONS, S_DISGUISE, S_ESCAPE_ARTIST, S_FORGERY,
                                                S_INTEREST_HISTORY, S_INTEREST_LITERATURE, S_INTEREST_HOLO_GAMES,
                                                S_INTEREST_SPORTS, S_INTEREST_FASHION, S_INTEREST_MUSIC,
@@ -942,7 +941,6 @@ public class SkillType {
         lookupHash.put(S_ART_COOKING, createArtCooking());
         lookupHash.put(S_ART_SINGING, createArtSinging());
         lookupHash.put(S_ART_OTHER, createArtOther());
-        lookupHash.put(S_CLIMBING, createClimbing());
         lookupHash.put(S_COMMUNICATIONS, createCommunications());
         lookupHash.put(S_COMPUTERS, createComputers());
         lookupHash.put(S_CRYPTOGRAPHY, createCryptography());
@@ -1330,7 +1328,6 @@ public class SkillType {
             case S_ART_INSTRUMENT -> createArtInstrument();
             case S_ART_SINGING -> createArtSinging();
             case S_ART_OTHER -> createArtOther();
-            case S_CLIMBING -> createClimbing();
             case S_COMMUNICATIONS, "Communications (RP Only)" -> createCommunications();
             case S_COMPUTERS -> createComputers();
             case S_CRYPTOGRAPHY -> createCryptography();
@@ -1395,8 +1392,7 @@ public class SkillType {
             case S_SUPPORT_WEAPONS -> createSupportWeapons();
             case S_RUNNING -> createRunning();
             default -> {
-                logger.errorDialog("REPORT TO MEGAMEK TEAM",
-                      "Unexpected value in compatibilityHandler: {}",
+                logger.warn("Unexpected value in compatibilityHandler: {}",
                       skillType.getName());
                 yield null;
             }
@@ -2174,22 +2170,6 @@ public class SkillType {
               ROLEPLAY_ART,
               DEXTERITY,
               INTELLIGENCE,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
-    }
-
-    public static SkillType createClimbing() {
-        return new SkillType(S_CLIMBING,
-              7,
-              false,
-              ROLEPLAY_GENERAL,
-              DEXTERITY,
-              NONE,
               null,
               null,
               null,
