@@ -55,8 +55,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
-import javax.swing.border.EtchedBorder;
 
+import megamek.client.ui.swing.util.UIUtil;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
@@ -64,6 +64,7 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.JScrollablePanel;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.MarkdownRenderer;
@@ -149,8 +150,9 @@ public class MissionViewPanel extends JScrollablePanel {
 
         setLayout(new GridBagLayout());
 
+        pnlStats.setMaximumSize(UIUtil.scaleForGUI(300, Integer.MAX_VALUE));
         pnlStats.setName("pnlStats");
-        pnlStats.setBorder(BorderFactory.createTitledBorder(mission.getName()));
+        pnlStats.setBorder(RoundedLineBorder.createRoundedLineBorder(mission.getName()));
         fillStats();
 
         gridBagConstraints = new GridBagConstraints();
@@ -165,7 +167,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
         if (mission instanceof AtBContract) {
             pnlStats.setName("pnlTutorial");
-            pnlStats.setBorder(BorderFactory.createTitledBorder(mission.getName()));
+            pnlStats.setBorder(RoundedLineBorder.createRoundedLineBorder(mission.getName()));
             fillTutorial();
 
             gridBagConstraints = new GridBagConstraints();
@@ -1141,7 +1143,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
         pnlTutorial = new JPanel(new BorderLayout());
 
-        pnlTutorial.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+        pnlTutorial.setBorder(RoundedLineBorder.createRoundedLineBorder());
         pnlTutorial.setPreferredSize(new Dimension(800, 0));
         pnlTutorial.add(scrollPane, BorderLayout.CENTER);
     }
