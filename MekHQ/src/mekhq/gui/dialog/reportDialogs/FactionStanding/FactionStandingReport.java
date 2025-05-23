@@ -367,7 +367,6 @@ public class FactionStandingReport extends JDialog {
         btnDocumentation.setName("btnDocumentation");
         btnDocumentation.addActionListener(e -> new GlossaryDialog(this, "FACTION_STANDING"));
         btnDocumentation.setFocusable(false);
-        btnDocumentation.setBorder(RoundedLineBorder.createRoundedLineBorder());
         pnlButtons.add(btnDocumentation);
 
         pnlButtons.add(Box.createHorizontalStrut(REPORT_BUTTON_SPACE_WIDTH));
@@ -377,7 +376,6 @@ public class FactionStandingReport extends JDialog {
         btnGmTools.setName("btnSimulateContract");
         btnGmTools.setFocusable(false);
         btnGmTools.setEnabled(isGM);
-        btnGmTools.setBorder(RoundedLineBorder.createRoundedLineBorder());
         btnGmTools.addActionListener(e -> {
             // TODO GM Tools Dialog
         });
@@ -389,7 +387,6 @@ public class FactionStandingReport extends JDialog {
               "factionStandingReport.button.contract"));
         btnSimulateContract.setName("btnSimulateContract");
         btnSimulateContract.setFocusable(false);
-        btnSimulateContract.setBorder(RoundedLineBorder.createRoundedLineBorder());
         btnSimulateContract.addActionListener(e -> {
             // TODO Simulate Contract Dialog
         });
