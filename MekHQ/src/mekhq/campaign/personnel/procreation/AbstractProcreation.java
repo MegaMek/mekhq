@@ -567,7 +567,8 @@ public abstract class AbstractProcreation {
                                   .generateBabySurname(mother, father, baby.getGender()));
 
             baby.setDateOfBirth(mother.getDueDate());
-            baby.removeAllSkills();// Limit skills by age for children and adolescents
+            baby.removeAllSkills(); // Limit skills by age for children and adolescents
+            baby.setPrimaryRole(campaign, PersonnelRole.DEPENDENT); // Babies can't have jobs
 
             // re-roll SPAs to include in any age and skill adjustments
             Enumeration<IOption> options = new PersonnelOptions().getOptions(PersonnelOptions.LVL3_ADVANTAGES);

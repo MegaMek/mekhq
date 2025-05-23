@@ -28,9 +28,13 @@
  */
 package mekhq.campaign.parts;
 
+import static java.lang.Math.*;
+
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.logging.MMLogger;
+import megamek.common.ITechnology.AvailabilityValue;
+import megamek.common.ITechnology.TechRating;
 
 /**
  * Helper functions for determining part availability and tech base
@@ -42,22 +46,21 @@ import megamek.logging.MMLogger;
 public class Availability {
     private static final MMLogger logger = MMLogger.create(Availability.class);
 
-    public static int getAvailabilityModifier(int availability) {
+    public static int getAvailabilityModifier(AvailabilityValue availability) {
         switch (availability) {
-            case ITechnology.RATING_A:
+            case A:
                 return -4;
-            case ITechnology.RATING_B:
+            case B:
                 return -3;
-            case ITechnology.RATING_C:
+            case C:
                 return -2;
-            case ITechnology.RATING_D:
+            case D:
                 return -1;
-            case ITechnology.RATING_E:
+            case E:
                 return 0;
-            case ITechnology.RATING_F:
+            case F:
                 return 2;
-            case ITechnology.RATING_FSTAR:
-            case ITechnology.RATING_X:
+            case X:
                 // FIXME : Per IO, any IS equipment with a base SW availability of E-F that goes
                 // FIXME : extinct during the SW has it increased by 1 with F+1 meaning that
                 // there
@@ -73,19 +76,19 @@ public class Availability {
         }
     }
 
-    public static int getTechModifier(int tech) {
+    public static int getTechModifier(TechRating tech) {
         switch (tech) {
-            case EquipmentType.RATING_A:
+            case A:
                 return -4;
-            case EquipmentType.RATING_B:
+            case B:
                 return -2;
-            case EquipmentType.RATING_C:
+            case C:
                 return 0;
-            case EquipmentType.RATING_D:
+            case D:
                 return 1;
-            case EquipmentType.RATING_E:
+            case E:
                 return 2;
-            case EquipmentType.RATING_F:
+            case F:
                 return 3;
             default:
                 logger.error("Attempting to get tech modifier for unknown rating of " + tech);

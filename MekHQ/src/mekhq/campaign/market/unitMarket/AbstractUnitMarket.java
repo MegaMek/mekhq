@@ -242,9 +242,10 @@ public abstract class AbstractUnitMarket {
      * @return the generated transit duration
      */
     protected int generateTransitDuration(final Campaign campaign) {
-        return campaign.getCampaignOptions().isInstantUnitMarketDelivery() ?
-                     0 :
-                     campaign.calculatePartTransitTime(Compute.d6(2) - 2);
+        if (campaign.getCampaignOptions().isInstantUnitMarketDelivery()) {
+            return 0;
+        } 
+        return campaign.calculatePartTransitTime(Compute.d6(2) - 2);
     }
 
     /**

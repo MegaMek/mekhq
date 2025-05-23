@@ -42,6 +42,7 @@ import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import javax.swing.JButton;
 
 import megamek.common.annotations.Nullable;
+import mekhq.gui.utilities.RoundedLineBorder;
 
 /**
  * A specialized {@link JButton} used in the campaign options dialog.
@@ -87,6 +88,7 @@ public class CampaignOptionsButton extends JButton {
     public CampaignOptionsButton(String name, @Nullable Integer customWrapSize) {
         // Sets the button's text from the resource bundle
         super(getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".text"));
+        setBorder(RoundedLineBorder.createRoundedLineBorder());
 
         // Sets the button's tooltip, applying word wrapping based on customWrapSize
         String tooltipText = getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".tooltip");
