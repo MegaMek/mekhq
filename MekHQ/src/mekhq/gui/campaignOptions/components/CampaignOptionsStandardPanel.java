@@ -36,7 +36,6 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOpti
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.Dimension;
-import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
 import megamek.client.ui.swing.util.UIUtil;
@@ -109,8 +108,7 @@ public class CampaignOptionsStandardPanel extends JPanel {
                 setBorder(RoundedLineBorder.createRoundedLineBorder());
             } else {
                 // Add a titled border with localized title
-                setBorder(BorderFactory.createTitledBorder(RoundedLineBorder.createRoundedLineBorder(),
-                        String.format("<html>%s</html>", borderTitle)));
+                setBorder(RoundedLineBorder.createRoundedLineBorder(borderTitle));
             }
         }
 

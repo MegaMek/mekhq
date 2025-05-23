@@ -58,7 +58,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -438,8 +437,7 @@ public class SkillsTab {
         });
 
         final JPanel panel = new CampaignOptionsStandardPanel(panelName);
-        panel.setBorder(BorderFactory.createTitledBorder(RoundedLineBorder.createRoundedLineBorder(),
-              String.format(skill.getName())));
+        panel.setBorder(RoundedLineBorder.createRoundedLineBorder(skill.getName()));
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         // Create a button to toggle the table
