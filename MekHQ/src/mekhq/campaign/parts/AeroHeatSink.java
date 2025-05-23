@@ -198,13 +198,13 @@ public class AeroHeatSink extends Part {
     }
 
     @Override
-    public int getTechRating() {
+    public TechRating getTechRating() {
         if (type == CLAN_HEAT_DOUBLE) {
-            return EquipmentType.RATING_F;
+            return EquipmentType.TechRating.F;
         } else if (type == Aero.HEAT_DOUBLE) {
-            return EquipmentType.RATING_E;
+            return EquipmentType.TechRating.E;
         } else {
-            return EquipmentType.RATING_C;
+            return EquipmentType.TechRating.C;
         }
     }
 

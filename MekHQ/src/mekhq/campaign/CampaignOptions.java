@@ -43,10 +43,12 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import megamek.Version;
 import megamek.codeUtilities.MathUtility;
@@ -76,6 +78,9 @@ import mekhq.service.mrms.MRMSOption;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
+import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 
 /**
  * @author natit
@@ -197,9 +202,10 @@ public class CampaignOptions {
     private boolean noClanPartsFromIS;
     private int penaltyClanPartsFromIS;
     private boolean planetAcquisitionVerbose;
-    private final int[] planetTechAcquisitionBonus;
-    private final int[] planetIndustryAcquisitionBonus;
-    private final int[] planetOutputAcquisitionBonus;
+    private final EnumMap<PlanetarySophistication, Integer> planetTechAcquisitionBonus = new EnumMap<>(PlanetarySophistication.class);
+    private final EnumMap<PlanetaryRating, Integer> planetIndustryAcquisitionBonus = new EnumMap<>(PlanetaryRating.class);
+    private final EnumMap<PlanetaryRating, Integer> planetOutputAcquisitionBonus = new EnumMap<>(PlanetaryRating.class);
+
     // endregion Supplies and Acquisition Tab
 
     // region Tech Limits Tab
@@ -635,6 +641,7 @@ public class CampaignOptions {
     private int autoResolveNumberOfScenarios;
     private boolean autoResolveExperimentalPacarGuiEnabled;
     // endregion Against the Bot Tab
+
     // endregion Variable Declarations
 
     // region Constructors
@@ -724,27 +731,23 @@ public class CampaignOptions {
         penaltyClanPartsFromIS = 4;
         planetAcquisitionVerbose = false;
         // Planet Socio-Industrial Modifiers
-        planetTechAcquisitionBonus = new int[6];
-        planetTechAcquisitionBonus[EquipmentType.RATING_A] = -1;
-        planetTechAcquisitionBonus[EquipmentType.RATING_B] = 0;
-        planetTechAcquisitionBonus[EquipmentType.RATING_C] = 1;
-        planetTechAcquisitionBonus[EquipmentType.RATING_D] = 2;
-        planetTechAcquisitionBonus[EquipmentType.RATING_E] = 4;
-        planetTechAcquisitionBonus[EquipmentType.RATING_F] = 8;
-        planetIndustryAcquisitionBonus = new int[6];
-        planetIndustryAcquisitionBonus[EquipmentType.RATING_A] = 0;
-        planetIndustryAcquisitionBonus[EquipmentType.RATING_B] = 0;
-        planetIndustryAcquisitionBonus[EquipmentType.RATING_C] = 0;
-        planetIndustryAcquisitionBonus[EquipmentType.RATING_D] = 0;
-        planetIndustryAcquisitionBonus[EquipmentType.RATING_E] = 0;
-        planetIndustryAcquisitionBonus[EquipmentType.RATING_F] = 0;
-        planetOutputAcquisitionBonus = new int[6];
-        planetOutputAcquisitionBonus[EquipmentType.RATING_A] = -1;
-        planetOutputAcquisitionBonus[EquipmentType.RATING_B] = 0;
-        planetOutputAcquisitionBonus[EquipmentType.RATING_C] = 1;
-        planetOutputAcquisitionBonus[EquipmentType.RATING_D] = 2;
-        planetOutputAcquisitionBonus[EquipmentType.RATING_E] = 4;
-        planetOutputAcquisitionBonus[EquipmentType.RATING_F] = 8;
+        planetTechAcquisitionBonus.put(PlanetarySophistication.ADVANCED, -2); // TODO: needs to be verified
+        planetTechAcquisitionBonus.put(PlanetarySophistication.A, -1);
+        planetTechAcquisitionBonus.put(PlanetarySophistication.B, 0);
+        planetTechAcquisitionBonus.put(PlanetarySophistication.C, 1);
+        planetTechAcquisitionBonus.put(PlanetarySophistication.D, 2);
+        planetTechAcquisitionBonus.put(PlanetarySophistication.F, 8);
+        planetTechAcquisitionBonus.put(PlanetarySophistication.REGRESSED, 16); // TODO: needs to be verified
+        planetIndustryAcquisitionBonus.put(PlanetaryRating.A, 0);
+        planetIndustryAcquisitionBonus.put(PlanetaryRating.B, 0);
+        planetIndustryAcquisitionBonus.put(PlanetaryRating.C, 0);
+        planetIndustryAcquisitionBonus.put(PlanetaryRating.D, 0);
+        planetIndustryAcquisitionBonus.put(PlanetaryRating.F, 0);
+        planetOutputAcquisitionBonus.put(PlanetaryRating.A, -1);
+        planetOutputAcquisitionBonus.put(PlanetaryRating.B, 0);
+        planetOutputAcquisitionBonus.put(PlanetaryRating.C, 1);
+        planetOutputAcquisitionBonus.put(PlanetaryRating.D, 2);
+        planetOutputAcquisitionBonus.put(PlanetaryRating.F, 8);
         // endregion Supplies and Acquisitions Tab
 
         // region Tech Limits Tab
@@ -4230,39 +4233,28 @@ public class CampaignOptions {
         this.isAcquisitionPenalty = isAcquisitionPenalty;
     }
 
-    public int getPlanetTechAcquisitionBonus(final int type) {
-        return ((type < 0) || (type >= planetTechAcquisitionBonus.length)) ? 0 : planetTechAcquisitionBonus[type];
+    public int getPlanetTechAcquisitionBonus(final PlanetarySophistication sophistication) {
+        return planetTechAcquisitionBonus.getOrDefault(sophistication, 0);
     }
 
-    public void setPlanetTechAcquisitionBonus(final int base, final int type) {
-        if ((type < 0) || (type >= planetTechAcquisitionBonus.length)) {
-            return;
-        }
-        this.planetTechAcquisitionBonus[type] = base;
+    public void setPlanetTechAcquisitionBonus(final int base, final PlanetarySophistication sophistication) {
+        this.planetTechAcquisitionBonus.put(sophistication, base);
     }
 
-    public int getPlanetIndustryAcquisitionBonus(final int type) {
-        return ((type < 0) || (type >= planetIndustryAcquisitionBonus.length)) ?
-                     0 :
-                     planetIndustryAcquisitionBonus[type];
+    public int getPlanetIndustryAcquisitionBonus(final PlanetaryRating rating) {
+        return planetIndustryAcquisitionBonus.getOrDefault(rating, 0);
     }
 
-    public void setPlanetIndustryAcquisitionBonus(final int base, final int type) {
-        if ((type < 0) || (type >= planetIndustryAcquisitionBonus.length)) {
-            return;
-        }
-        this.planetIndustryAcquisitionBonus[type] = base;
+    public void setPlanetIndustryAcquisitionBonus(final int base, final PlanetaryRating rating) {
+        this.planetIndustryAcquisitionBonus.put(rating, base);
     }
 
-    public int getPlanetOutputAcquisitionBonus(final int type) {
-        return ((type < 0) || (type >= planetOutputAcquisitionBonus.length)) ? 0 : planetOutputAcquisitionBonus[type];
+    public int getPlanetOutputAcquisitionBonus(final PlanetaryRating rating) {
+        return planetOutputAcquisitionBonus.getOrDefault(rating, 0);
     }
 
-    public void setPlanetOutputAcquisitionBonus(final int base, final int type) {
-        if ((type < 0) || (type >= planetOutputAcquisitionBonus.length)) {
-            return;
-        }
-        this.planetOutputAcquisitionBonus[type] = base;
+    public void setPlanetOutputAcquisitionBonus(final int base, final PlanetaryRating rating) {
+        this.planetOutputAcquisitionBonus.put(rating, base);
     }
 
     public boolean isDestroyByMargin() {
@@ -5460,668 +5452,722 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioModBV", scenarioModBV);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoConfigMunitions", autoConfigMunitions);
 
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetTechAcquisitionBonus", planetTechAcquisitionBonus);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetIndustryAcquisitionBonus", planetIndustryAcquisitionBonus);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetOutputAcquisitionBonus", planetOutputAcquisitionBonus);
+        String planetTechAcquisitionBonusString = Arrays.stream(PlanetarySophistication.values())
+                        .map(sophistication -> planetTechAcquisitionBonus.getOrDefault(sophistication, 0).toString())
+                        .collect(Collectors.joining(","));
+        String planetIndustryAcquisitionBonusString = Arrays.stream(PlanetaryRating.values())
+                        .map(rating -> planetIndustryAcquisitionBonus.getOrDefault(rating, 0).toString())
+                        .collect(Collectors.joining(","));
+        String planetOutputAcquisitionBonusString = Arrays.stream(PlanetaryRating.values())
+                        .map(rating -> planetOutputAcquisitionBonus.getOrDefault(rating, 0).toString())
+                        .collect(Collectors.joining(","));
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetTechAcquisitionBonus", planetTechAcquisitionBonusString);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetIndustryAcquisitionBonus", planetIndustryAcquisitionBonusString);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetOutputAcquisitionBonus", planetOutputAcquisitionBonusString);
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePortraitForType", isUsePortraitForRoles());
+
 
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "campaignOptions");
     }
 
-    public static CampaignOptions generateCampaignOptionsFromXml(Node wn, Version version) {
+    public static CampaignOptions generateCampaignOptionsFromXml(Node parentNod, Version version) {
         logger.info("Loading Campaign Options from Version {} XML...", version);
 
-        wn.normalize();
-        CampaignOptions retVal = new CampaignOptions();
-        NodeList wList = wn.getChildNodes();
+        parentNod.normalize();
+        CampaignOptions campaignOptions = new CampaignOptions();
+        NodeList childNodes = parentNod.getChildNodes();
 
         // Okay, let's iterate through the children, eh?
-        for (int x = 0; x < wList.getLength(); x++) {
-            Node wn2 = wList.item(x);
-            String nodeName = wn2.getNodeName();
+        for (int node = 0; node < childNodes.getLength(); node++) {
+            Node childNode = childNodes.item(node);
+            String nodeName = childNode.getNodeName();
 
             // If it's not an element node, we ignore it.
-            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
+            if (childNode.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }
 
-            logger.debug("{}\n\t{}", nodeName, wn2.getTextContent());
+            String nodeContents = childNode.getTextContent().trim();
+
+            logger.debug("{}\n\t{}", nodeName, nodeContents);
             try {
                 // region Repair and Maintenance Tab
                 if (nodeName.equalsIgnoreCase("checkMaintenance")) {
-                    retVal.checkMaintenance = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    campaignOptions.checkMaintenance = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("maintenanceCycleDays")) {
-                    retVal.maintenanceCycleDays = Integer.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.maintenanceCycleDays = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("maintenanceBonus")) {
-                    retVal.maintenanceBonus = Integer.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.maintenanceBonus = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("useQualityMaintenance")) {
-                    retVal.useQualityMaintenance = Boolean.parseBoolean(wn2.getTextContent());
+                    campaignOptions.useQualityMaintenance = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("reverseQualityNames")) {
-                    retVal.reverseQualityNames = Boolean.parseBoolean(wn2.getTextContent());
+                    campaignOptions.reverseQualityNames = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("useRandomUnitQualities")) {
-                    retVal.setUseRandomUnitQualities(Boolean.parseBoolean(wn2.getTextContent()));
+                    campaignOptions.setUseRandomUnitQualities(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("usePlanetaryModifiers")) {
-                    retVal.setUsePlanetaryModifiers(Boolean.parseBoolean(wn2.getTextContent()));
+                    campaignOptions.setUsePlanetaryModifiers(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useUnofficialMaintenance")) {
-                    retVal.setUseUnofficialMaintenance(Boolean.parseBoolean(wn2.getTextContent()));
+                    campaignOptions.setUseUnofficialMaintenance(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("logMaintenance")) {
-                    retVal.logMaintenance = Boolean.parseBoolean(wn2.getTextContent());
+                    campaignOptions.logMaintenance = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("defaultMaintenanceTime")) {
-                    retVal.defaultMaintenanceTime = Integer.parseInt(wn2.getTextContent());
+                    campaignOptions.defaultMaintenanceTime = Integer.parseInt(nodeContents);
 
                     // region Mass Repair / Mass Salvage
                 } else if (nodeName.equalsIgnoreCase("mrmsUseRepair")) {
-                    retVal.setMRMSUseRepair(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setMRMSUseRepair(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("mrmsUseSalvage")) {
-                    retVal.setMRMSUseSalvage(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setMRMSUseSalvage(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("mrmsUseExtraTime")) {
-                    retVal.setMRMSUseExtraTime(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setMRMSUseExtraTime(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("mrmsUseRushJob")) {
-                    retVal.setMRMSUseRushJob(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setMRMSUseRushJob(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("mrmsAllowCarryover")) {
-                    retVal.setMRMSAllowCarryover(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setMRMSAllowCarryover(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("mrmsOptimizeToCompleteToday")) {
-                    retVal.setMRMSOptimizeToCompleteToday(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setMRMSOptimizeToCompleteToday(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("mrmsScrapImpossible")) {
-                    retVal.setMRMSScrapImpossible(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setMRMSScrapImpossible(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("mrmsUseAssignedTechsFirst")) {
-                    retVal.setMRMSUseAssignedTechsFirst(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setMRMSUseAssignedTechsFirst(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("mrmsReplacePod")) {
-                    retVal.setMRMSReplacePod(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setMRMSReplacePod(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("mrmsOptions")) {
-                    retVal.setMRMSOptions(MRMSOption.parseListFromXML(wn2, version));
+                    campaignOptions.setMRMSOptions(MRMSOption.parseListFromXML(childNode, version));
                     // endregion Mass Repair / Mass Salvage
                     // endregion Repair and Maintenance Tab
 
                 } else if (nodeName.equalsIgnoreCase("useFactionForNames")) {
-                    retVal.setUseOriginFactionForNames(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseOriginFactionForNames(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useEraMods")) {
-                    retVal.useEraMods = Boolean.parseBoolean(wn2.getTextContent());
+                    campaignOptions.useEraMods = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("assignedTechFirst")) {
-                    retVal.assignedTechFirst = Boolean.parseBoolean(wn2.getTextContent());
+                    campaignOptions.assignedTechFirst = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("resetToFirstTech")) {
-                    retVal.resetToFirstTech = Boolean.parseBoolean(wn2.getTextContent());
+                    campaignOptions.resetToFirstTech = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("techsUseAdministration")) {
-                    retVal.techsUseAdministration = Boolean.parseBoolean(wn2.getTextContent());
+                    campaignOptions.techsUseAdministration = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("useQuirks")) {
-                    retVal.useQuirks = Boolean.parseBoolean(wn2.getTextContent());
+                    campaignOptions.useQuirks = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("xpCostMultiplier")) {
-                    retVal.xpCostMultiplier = Double.parseDouble(wn2.getTextContent().trim());
+                    campaignOptions.xpCostMultiplier = Double.parseDouble(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("scenarioXP")) {
-                    retVal.scenarioXP = Integer.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.scenarioXP = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("killsForXP")) {
-                    retVal.killsForXP = Integer.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.killsForXP = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("killXPAward")) {
-                    retVal.killXPAward = Integer.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.killXPAward = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("nTasksXP")) {
-                    retVal.nTasksXP = Integer.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.nTasksXP = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("tasksXP")) {
-                    retVal.tasksXP = Integer.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.tasksXP = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("successXP")) {
-                    retVal.successXP = Integer.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.successXP = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("mistakeXP")) {
-                    retVal.mistakeXP = Integer.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.mistakeXP = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("vocationalXP")) {
-                    retVal.vocationalXP = Integer.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.vocationalXP = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("vocationalXPTargetNumber")) {
-                    retVal.vocationalXPTargetNumber = Integer.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.vocationalXPTargetNumber = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("vocationalXPCheckFrequency")) {
-                    retVal.vocationalXPCheckFrequency = Integer.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.vocationalXPCheckFrequency = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("contractNegotiationXP")) {
-                    retVal.contractNegotiationXP = Integer.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.contractNegotiationXP = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("adminWeeklyXP")) {
-                    retVal.adminXP = Integer.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.adminXP = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("adminXPPeriod")) {
-                    retVal.adminXPPeriod = Integer.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.adminXPPeriod = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("missionXpFail")) {
-                    retVal.missionXpFail = Integer.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.missionXpFail = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("missionXpSuccess")) {
-                    retVal.missionXpSuccess = Integer.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.missionXpSuccess = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("missionXpOutstandingSuccess")) {
-                    retVal.missionXpOutstandingSuccess = Integer.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.missionXpOutstandingSuccess = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("edgeCost")) {
-                    retVal.edgeCost = Integer.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.edgeCost = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("waitingPeriod")) {
-                    retVal.waitingPeriod = Integer.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.waitingPeriod = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("acquisitionSkill")) {
-                    retVal.acquisitionSkill = wn2.getTextContent().trim();
+                    campaignOptions.acquisitionSkill = nodeContents;
                 } else if (nodeName.equalsIgnoreCase("unitTransitTime")) {
-                    retVal.unitTransitTime = Integer.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.unitTransitTime = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("clanAcquisitionPenalty")) {
-                    retVal.clanAcquisitionPenalty = Integer.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.clanAcquisitionPenalty = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("isAcquisitionPenalty")) {
-                    retVal.isAcquisitionPenalty = Integer.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.isAcquisitionPenalty = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("usePlanetaryAcquisition")) {
-                    retVal.usePlanetaryAcquisition = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    campaignOptions.usePlanetaryAcquisition = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("planetAcquisitionFactionLimit")) {
-                    retVal.setPlanetAcquisitionFactionLimit(PlanetaryAcquisitionFactionLimit.parseFromString(wn2.getTextContent()
-                                                                                                                   .trim()));
+                    campaignOptions.setPlanetAcquisitionFactionLimit(PlanetaryAcquisitionFactionLimit.parseFromString(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("planetAcquisitionNoClanCrossover")) {
-                    retVal.planetAcquisitionNoClanCrossover = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    campaignOptions.planetAcquisitionNoClanCrossover = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("noClanPartsFromIS")) {
-                    retVal.noClanPartsFromIS = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    campaignOptions.noClanPartsFromIS = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("penaltyClanPartsFromIS")) {
-                    retVal.penaltyClanPartsFromIS = Integer.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.penaltyClanPartsFromIS = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("planetAcquisitionVerbose")) {
-                    retVal.planetAcquisitionVerbose = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    campaignOptions.planetAcquisitionVerbose = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("maxJumpsPlanetaryAcquisition")) {
-                    retVal.maxJumpsPlanetaryAcquisition = Integer.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.maxJumpsPlanetaryAcquisition = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("planetTechAcquisitionBonus")) {
-                    String[] values = wn2.getTextContent().split(",");
-                    for (int i = 0; i < values.length; i++) {
-                        retVal.planetTechAcquisitionBonus[i] = Integer.parseInt(values[i]);
+                    String[] values = nodeContents.split(",");
+                    if (values.length == 6) {
+                        // < 0.50.07 compatibility handler
+                        campaignOptions.planetTechAcquisitionBonus.put(PlanetarySophistication.A, Integer.parseInt(values[0]));
+                        campaignOptions.planetTechAcquisitionBonus.put(PlanetarySophistication.B, Integer.parseInt(values[1]));
+                        campaignOptions.planetTechAcquisitionBonus.put(PlanetarySophistication.C, Integer.parseInt(values[2]));
+                        campaignOptions.planetTechAcquisitionBonus.put(PlanetarySophistication.D, Integer.parseInt(values[3]));
+                        campaignOptions.planetTechAcquisitionBonus.put(PlanetarySophistication.F, Integer.parseInt(values[5]));
+                    } else
+                    if (values.length == PlanetarySophistication.values().length) {
+                        // >= 0.50.07 compatibility handler
+                        for (int i = 0; i < values.length; i++) {
+                            campaignOptions.planetTechAcquisitionBonus.put(PlanetarySophistication.fromIndex(i), Integer.parseInt(values[i]));
+                        }
+                    } else {
+                        logger.error("Invalid number of values for planetTechAcquisitionBonus: {}", values.length);
                     }
                 } else if (nodeName.equalsIgnoreCase("planetIndustryAcquisitionBonus")) {
-                    String[] values = wn2.getTextContent().split(",");
-                    for (int i = 0; i < values.length; i++) {
-                        retVal.planetIndustryAcquisitionBonus[i] = Integer.parseInt(values[i]);
+                    String[] values = nodeContents.split(",");
+                    if (values.length == 6) {
+                        // < 0.50.07 compatibility handler
+                        campaignOptions.planetIndustryAcquisitionBonus.put(PlanetaryRating.A, Integer.parseInt(values[0]));
+                        campaignOptions.planetIndustryAcquisitionBonus.put(PlanetaryRating.B, Integer.parseInt(values[1]));
+                        campaignOptions.planetIndustryAcquisitionBonus.put(PlanetaryRating.C, Integer.parseInt(values[2]));
+                        campaignOptions.planetIndustryAcquisitionBonus.put(PlanetaryRating.D, Integer.parseInt(values[3]));
+                        campaignOptions.planetIndustryAcquisitionBonus.put(PlanetaryRating.F, Integer.parseInt(values[5]));
+                    } else
+                        // >= 0.50.07 compatibility handler
+                    if (values.length == PlanetaryRating.values().length) {
+                        for (int i = 0; i < values.length; i++) {
+                            campaignOptions.planetIndustryAcquisitionBonus.put(PlanetaryRating.fromIndex(i), Integer.parseInt(values[i]));
+                        }
+                    } else {
+                        logger.error("Invalid number of values for planetIndustryAcquisitionBonus: {}", values.length);
                     }
                 } else if (nodeName.equalsIgnoreCase("planetOutputAcquisitionBonus")) {
-                    String[] values = wn2.getTextContent().split(",");
-                    for (int i = 0; i < values.length; i++) {
-                        retVal.planetOutputAcquisitionBonus[i] = Integer.parseInt(values[i]);
+                    String[] values = nodeContents.split(",");
+                    if (values.length == 6) {
+                        // < 0.50.07 compatibility handler
+                        campaignOptions.planetOutputAcquisitionBonus.put(PlanetaryRating.A, Integer.parseInt(values[0]));
+                        campaignOptions.planetOutputAcquisitionBonus.put(PlanetaryRating.B, Integer.parseInt(values[1]));
+                        campaignOptions.planetOutputAcquisitionBonus.put(PlanetaryRating.C, Integer.parseInt(values[2]));
+                        campaignOptions.planetOutputAcquisitionBonus.put(PlanetaryRating.D, Integer.parseInt(values[3]));
+                        campaignOptions.planetOutputAcquisitionBonus.put(PlanetaryRating.F, Integer.parseInt(values[5]));
+                    } else
+                        // >= 0.50.07 compatibility handler
+                    if (values.length == PlanetaryRating.values().length) {
+                        for (int i = 0; i < values.length; i++) {
+                            campaignOptions.planetOutputAcquisitionBonus.put(PlanetaryRating.fromIndex(i), Integer.parseInt(values[i]));
+                        }
+                    } else {
+                        logger.error("Invalid number of values for planetOutputAcquisitionBonus: {}", values.length);
                     }
                 } else if (nodeName.equalsIgnoreCase("equipmentContractPercent")) {
-                    retVal.setEquipmentContractPercent(Double.parseDouble(wn2.getTextContent().trim()));
+                    campaignOptions.setEquipmentContractPercent(Double.parseDouble(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("dropShipContractPercent")) {
-                    retVal.setDropShipContractPercent(Double.parseDouble(wn2.getTextContent().trim()));
+                    campaignOptions.setDropShipContractPercent(Double.parseDouble(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("jumpShipContractPercent")) {
-                    retVal.setJumpShipContractPercent(Double.parseDouble(wn2.getTextContent().trim()));
+                    campaignOptions.setJumpShipContractPercent(Double.parseDouble(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("warShipContractPercent")) {
-                    retVal.setWarShipContractPercent(Double.parseDouble(wn2.getTextContent().trim()));
+                    campaignOptions.setWarShipContractPercent(Double.parseDouble(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("equipmentContractBase")) {
-                    retVal.equipmentContractBase = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    campaignOptions.equipmentContractBase = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("equipmentContractSaleValue")) {
-                    retVal.equipmentContractSaleValue = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    campaignOptions.equipmentContractSaleValue = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("blcSaleValue")) {
-                    retVal.blcSaleValue = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    campaignOptions.blcSaleValue = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("overageRepaymentInFinalPayment")) {
-                    retVal.setOverageRepaymentInFinalPayment(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setOverageRepaymentInFinalPayment(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("acquisitionSupportStaffOnly")) {
-                    retVal.acquisitionPersonnelCategory = Boolean.parseBoolean(wn2.getTextContent().trim()) ?
+                    campaignOptions.acquisitionPersonnelCategory = Boolean.parseBoolean(nodeContents) ?
                                                                 SUPPORT :
                                                                 ALL;
                 } else if (nodeName.equalsIgnoreCase("acquisitionPersonnelCategory")) {
-                    retVal.acquisitionPersonnelCategory = ProcurementPersonnelPick.fromString(wn2.getTextContent()
-                                                                                                    .trim());
+                    campaignOptions.acquisitionPersonnelCategory = ProcurementPersonnelPick.fromString(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("limitByYear")) {
-                    retVal.limitByYear = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    campaignOptions.limitByYear = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("disallowExtinctStuff")) {
-                    retVal.disallowExtinctStuff = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    campaignOptions.disallowExtinctStuff = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("allowClanPurchases")) {
-                    retVal.allowClanPurchases = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    campaignOptions.allowClanPurchases = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("allowISPurchases")) {
-                    retVal.allowISPurchases = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    campaignOptions.allowISPurchases = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("allowCanonOnly")) {
-                    retVal.allowCanonOnly = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    campaignOptions.allowCanonOnly = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("allowCanonRefitOnly")) {
-                    retVal.allowCanonRefitOnly = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    campaignOptions.allowCanonRefitOnly = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("useAmmoByType")) {
-                    retVal.useAmmoByType = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    campaignOptions.useAmmoByType = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("variableTechLevel")) {
-                    retVal.variableTechLevel = Boolean.parseBoolean(wn2.getTextContent());
+                    campaignOptions.variableTechLevel = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("factionIntroDate")) {
-                    retVal.factionIntroDate = Boolean.parseBoolean(wn2.getTextContent());
+                    campaignOptions.factionIntroDate = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("techLevel")) {
-                    retVal.techLevel = Integer.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.techLevel = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("unitRatingMethod") ||
                                  nodeName.equalsIgnoreCase("dragoonsRatingMethod")) {
-                    retVal.setUnitRatingMethod(UnitRatingMethod.parseFromString(wn2.getTextContent().trim()));
+                    campaignOptions.setUnitRatingMethod(UnitRatingMethod.parseFromString(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("manualUnitRatingModifier")) {
-                    retVal.setManualUnitRatingModifier(Integer.parseInt(wn2.getTextContent()));
+                    campaignOptions.setManualUnitRatingModifier(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("clampReputationPayMultiplier")) {
-                    retVal.setClampReputationPayMultiplier(Boolean.parseBoolean(wn2.getTextContent()));
+                    campaignOptions.setClampReputationPayMultiplier(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("reduceReputationPerformanceModifier")) {
-                    retVal.setReduceReputationPerformanceModifier(Boolean.parseBoolean(wn2.getTextContent()));
+                    campaignOptions.setReduceReputationPerformanceModifier(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("reputationPerformanceModifierCutOff")) {
-                    retVal.setReputationPerformanceModifierCutOff(Boolean.parseBoolean(wn2.getTextContent()));
+                    campaignOptions.setReputationPerformanceModifierCutOff(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("usePortraitForType")) {
-                    String[] values = wn2.getTextContent().split(",");
+                    String[] values = nodeContents.split(",");
                     for (int i = 0; i < values.length; i++) {
-                        retVal.setUsePortraitForRole(i, Boolean.parseBoolean(values[i].trim()));
+                        campaignOptions.setUsePortraitForRole(i, Boolean.parseBoolean(values[i].trim()));
                     }
                 } else if (nodeName.equalsIgnoreCase("assignPortraitOnRoleChange")) {
-                    retVal.assignPortraitOnRoleChange = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    campaignOptions.assignPortraitOnRoleChange = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("allowDuplicatePortraits")) {
-                    retVal.allowDuplicatePortraits = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    campaignOptions.allowDuplicatePortraits = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("destroyByMargin")) {
-                    retVal.destroyByMargin = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    campaignOptions.destroyByMargin = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("destroyMargin")) {
-                    retVal.destroyMargin = Integer.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.destroyMargin = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("destroyPartTarget")) {
-                    retVal.destroyPartTarget = Integer.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.destroyPartTarget = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("useAeroSystemHits")) {
-                    retVal.useAeroSystemHits = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    campaignOptions.useAeroSystemHits = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("maxAcquisitions")) {
-                    retVal.maxAcquisitions = Integer.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.maxAcquisitions = Integer.parseInt(nodeContents);
 
                     // autoLogistics
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsHeatSink")) {
-                    retVal.autoLogisticsHeatSink = MathUtility.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.autoLogisticsHeatSink = MathUtility.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsMekHead")) {
-                    retVal.autoLogisticsMekHead = MathUtility.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.autoLogisticsMekHead = MathUtility.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsMekLocation")) {
-                    retVal.autoLogisticsMekLocation = MathUtility.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.autoLogisticsMekLocation = MathUtility.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsNonRepairableLocation")) {
-                    retVal.autoLogisticsNonRepairableLocation = MathUtility.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.autoLogisticsNonRepairableLocation = MathUtility.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsArmor")) {
-                    retVal.autoLogisticsArmor = MathUtility.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.autoLogisticsArmor = MathUtility.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsAmmunition")) {
-                    retVal.autoLogisticsAmmunition = MathUtility.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.autoLogisticsAmmunition = MathUtility.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsActuators")) {
-                    retVal.autoLogisticsActuators = MathUtility.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.autoLogisticsActuators = MathUtility.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsJumpJets")) {
-                    retVal.autoLogisticsJumpJets = MathUtility.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.autoLogisticsJumpJets = MathUtility.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsEngines")) {
-                    retVal.autoLogisticsEngines = MathUtility.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.autoLogisticsEngines = MathUtility.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsWeapons")) {
-                    retVal.autoLogisticsWeapons = MathUtility.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.autoLogisticsWeapons = MathUtility.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("autoLogisticsOther")) {
-                    retVal.autoLogisticsOther = MathUtility.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.autoLogisticsOther = MathUtility.parseInt(nodeContents);
 
                     // region Personnel Tab
                     // region General Personnel
                 } else if (nodeName.equalsIgnoreCase("useTactics")) {
-                    retVal.setUseTactics(Boolean.parseBoolean(wn2.getTextContent()));
+                    campaignOptions.setUseTactics(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useInitiativeBonus")) {
-                    retVal.setUseInitiativeBonus(Boolean.parseBoolean(wn2.getTextContent()));
+                    campaignOptions.setUseInitiativeBonus(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useToughness")) {
-                    retVal.setUseToughness(Boolean.parseBoolean(wn2.getTextContent()));
+                    campaignOptions.setUseToughness(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useRandomToughness")) {
-                    retVal.setUseRandomToughness(Boolean.parseBoolean(wn2.getTextContent()));
+                    campaignOptions.setUseRandomToughness(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useArtillery")) {
-                    retVal.setUseArtillery(Boolean.parseBoolean(wn2.getTextContent()));
+                    campaignOptions.setUseArtillery(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useAbilities")) {
-                    retVal.setUseAbilities(Boolean.parseBoolean(wn2.getTextContent()));
+                    campaignOptions.setUseAbilities(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useEdge")) {
-                    retVal.setUseEdge(Boolean.parseBoolean(wn2.getTextContent()));
+                    campaignOptions.setUseEdge(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useSupportEdge")) {
-                    retVal.setUseSupportEdge(Boolean.parseBoolean(wn2.getTextContent()));
+                    campaignOptions.setUseSupportEdge(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useImplants")) {
-                    retVal.setUseImplants(Boolean.parseBoolean(wn2.getTextContent()));
+                    campaignOptions.setUseImplants(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("alternativeQualityAveraging")) {
-                    retVal.setAlternativeQualityAveraging(Boolean.parseBoolean(wn2.getTextContent()));
+                    campaignOptions.setAlternativeQualityAveraging(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useAgeEffects")) {
-                    retVal.setUseAgeEffects(Boolean.parseBoolean(wn2.getTextContent()));
+                    campaignOptions.setUseAgeEffects(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useTransfers")) {
-                    retVal.setUseTransfers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseTransfers(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useExtendedTOEForceName")) {
-                    retVal.setUseExtendedTOEForceName(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseExtendedTOEForceName(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("personnelLogSkillGain")) {
-                    retVal.setPersonnelLogSkillGain(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setPersonnelLogSkillGain(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("personnelLogAbilityGain")) {
-                    retVal.setPersonnelLogAbilityGain(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setPersonnelLogAbilityGain(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("personnelLogEdgeGain")) {
-                    retVal.setPersonnelLogEdgeGain(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setPersonnelLogEdgeGain(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("displayPersonnelLog")) {
-                    retVal.setDisplayPersonnelLog(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setDisplayPersonnelLog(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("displayScenarioLog")) {
-                    retVal.setDisplayScenarioLog(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setDisplayScenarioLog(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("displayKillRecord")) {
-                    retVal.setDisplayKillRecord(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setDisplayKillRecord(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("displayMedicalRecord")) {
-                    retVal.setDisplayMedicalRecord(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setDisplayMedicalRecord(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("displayAssignmentRecord")) {
-                    retVal.setDisplayAssignmentRecord(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setDisplayAssignmentRecord(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("displayPerformanceRecord")) {
-                    retVal.setDisplayPerformanceRecord(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setDisplayPerformanceRecord(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("rewardComingOfAgeAbilities")) {
-                    retVal.setRewardComingOfAgeAbilities(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setRewardComingOfAgeAbilities(Boolean.parseBoolean(nodeContents));
                     // endregion General Personnel
 
                     // region Expanded Personnel Information
                 } else if (nodeName.equalsIgnoreCase("useTimeInService")) {
-                    retVal.setUseTimeInService(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseTimeInService(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("timeInServiceDisplayFormat")) {
-                    retVal.setTimeInServiceDisplayFormat(TimeInDisplayFormat.valueOf(wn2.getTextContent().trim()));
+                    campaignOptions.setTimeInServiceDisplayFormat(TimeInDisplayFormat.valueOf(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useTimeInRank")) {
-                    retVal.setUseTimeInRank(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseTimeInRank(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("timeInRankDisplayFormat")) {
-                    retVal.setTimeInRankDisplayFormat(TimeInDisplayFormat.valueOf(wn2.getTextContent().trim()));
+                    campaignOptions.setTimeInRankDisplayFormat(TimeInDisplayFormat.valueOf(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("trackTotalEarnings")) {
-                    retVal.setTrackTotalEarnings(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setTrackTotalEarnings(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("trackTotalXPEarnings")) {
-                    retVal.setTrackTotalXPEarnings(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setTrackTotalXPEarnings(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("showOriginFaction")) {
-                    retVal.setShowOriginFaction(Boolean.parseBoolean(wn2.getTextContent()));
+                    campaignOptions.setShowOriginFaction(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("adminsHaveNegotiation")) {
-                    retVal.setAdminsHaveNegotiation(Boolean.parseBoolean(wn2.getTextContent()));
+                    campaignOptions.setAdminsHaveNegotiation(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("adminExperienceLevelIncludeNegotiation")) {
-                    retVal.setAdminExperienceLevelIncludeNegotiation(Boolean.parseBoolean(wn2.getTextContent()));
+                    campaignOptions.setAdminExperienceLevelIncludeNegotiation(Boolean.parseBoolean(nodeContents));
                     // endregion Expanded Personnel Information
 
                     // region Medical
                 } else if (nodeName.equalsIgnoreCase("useAdvancedMedical")) {
-                    retVal.setUseAdvancedMedical(Boolean.parseBoolean(wn2.getTextContent()));
+                    campaignOptions.setUseAdvancedMedical(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("healWaitingPeriod")) {
-                    retVal.setHealingWaitingPeriod(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setHealingWaitingPeriod(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("naturalHealingWaitingPeriod")) {
-                    retVal.setNaturalHealingWaitingPeriod(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setNaturalHealingWaitingPeriod(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("minimumHitsForVehicles")) {
-                    retVal.setMinimumHitsForVehicles(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setMinimumHitsForVehicles(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useRandomHitsForVehicles")) {
-                    retVal.setUseRandomHitsForVehicles(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseRandomHitsForVehicles(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("tougherHealing")) {
-                    retVal.setTougherHealing(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setTougherHealing(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("maximumPatients")) {
-                    retVal.setMaximumPatients(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setMaximumPatients(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("doctorsUseAdministration")) {
-                    retVal.setDoctorsUseAdministration(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setDoctorsUseAdministration(Boolean.parseBoolean(nodeContents));
                     // endregion Medical
 
                     // region Prisoners
                 } else if (nodeName.equalsIgnoreCase("prisonerCaptureStyle")) {
-                    retVal.setPrisonerCaptureStyle(PrisonerCaptureStyle.fromString(wn2.getTextContent().trim()));
+                    campaignOptions.setPrisonerCaptureStyle(PrisonerCaptureStyle.fromString(nodeContents));
                     // endregion Prisoners
 
                     // region Dependent
                 } else if (nodeName.equalsIgnoreCase("useRandomDependentAddition")) {
-                    retVal.setUseRandomDependentAddition(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseRandomDependentAddition(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useRandomDependentRemoval")) {
-                    retVal.setUseRandomDependentRemoval(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseRandomDependentRemoval(Boolean.parseBoolean(nodeContents));
                     // endregion Dependent
 
                     // region Personnel Removal
                 } else if (nodeName.equalsIgnoreCase("usePersonnelRemoval")) {
-                    retVal.setUsePersonnelRemoval(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUsePersonnelRemoval(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useRemovalExemptCemetery")) {
-                    retVal.setUseRemovalExemptCemetery(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseRemovalExemptCemetery(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useRemovalExemptRetirees")) {
-                    retVal.setUseRemovalExemptRetirees(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseRemovalExemptRetirees(Boolean.parseBoolean(nodeContents));
                     // endregion Personnel Removal
 
                     // region Salary
                 } else if (nodeName.equalsIgnoreCase("disableSecondaryRoleSalary")) {
-                    retVal.setDisableSecondaryRoleSalary(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setDisableSecondaryRoleSalary(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("salaryAntiMekMultiplier")) {
-                    retVal.setSalaryAntiMekMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                    campaignOptions.setSalaryAntiMekMultiplier(Double.parseDouble(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("salarySpecialistInfantryMultiplier")) {
-                    retVal.setSalarySpecialistInfantryMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                    campaignOptions.setSalarySpecialistInfantryMultiplier(Double.parseDouble(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("salaryXPMultipliers")) {
-                    if (!wn2.hasChildNodes()) {
+                    if (!childNode.hasChildNodes()) {
                         continue;
                     }
-                    final NodeList nl2 = wn2.getChildNodes();
+                    final NodeList nl2 = childNode.getChildNodes();
                     for (int j = 0; j < nl2.getLength(); j++) {
                         final Node wn3 = nl2.item(j);
                         if (wn3.getNodeType() != Node.ELEMENT_NODE) {
                             continue;
                         }
-                        retVal.getSalaryXPMultipliers()
+                        campaignOptions.getSalaryXPMultipliers()
                               .put(SkillLevel.valueOf(wn3.getNodeName().trim()),
                                     Double.parseDouble(wn3.getTextContent().trim()));
                     }
                 } else if (nodeName.equalsIgnoreCase("salaryTypeBase")) {
-                    Money[] defaultSalaries = retVal.getRoleBaseSalaries();
-                    Money[] newSalaries = Utilities.readMoneyArray(wn2);
+                    Money[] defaultSalaries = campaignOptions.getRoleBaseSalaries();
+                    Money[] newSalaries = Utilities.readMoneyArray(childNode);
 
                     Money[] mergedSalaries = new Money[PersonnelRole.values().length];
                     for (int i = 0; i < mergedSalaries.length; i++) {
-                        mergedSalaries[i] = (newSalaries[i] != null) ? newSalaries[i] : defaultSalaries[i];
+                        try {
+                            mergedSalaries[i] = (newSalaries[i] != null) ? newSalaries[i] : defaultSalaries[i];
+                        } catch (Exception e) {
+                            // This will happen if we ever add a new profession, as it will exceed the entries in
+                            // the child node
+                            mergedSalaries[i] = defaultSalaries[i];
+                        }
                     }
 
-                    retVal.setRoleBaseSalaries(mergedSalaries);
+                    campaignOptions.setRoleBaseSalaries(mergedSalaries);
                     // endregion Salary
 
                     // region Awards
                 } else if (nodeName.equalsIgnoreCase("awardBonusStyle")) {
-                    retVal.setAwardBonusStyle(AwardBonus.valueOf(wn2.getTextContent().trim()));
+                    campaignOptions.setAwardBonusStyle(AwardBonus.valueOf(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("enableAutoAwards")) {
-                    retVal.setEnableAutoAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setEnableAutoAwards(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("issuePosthumousAwards")) {
-                    retVal.setIssuePosthumousAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setIssuePosthumousAwards(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("issueBestAwardOnly")) {
-                    retVal.setIssueBestAwardOnly(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setIssueBestAwardOnly(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("ignoreStandardSet")) {
-                    retVal.setIgnoreStandardSet(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setIgnoreStandardSet(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("awardTierSize")) {
-                    retVal.setAwardTierSize(Integer.parseInt(wn2.getTextContent()));
+                    campaignOptions.setAwardTierSize(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("enableContractAwards")) {
-                    retVal.setEnableContractAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setEnableContractAwards(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("enableFactionHunterAwards")) {
-                    retVal.setEnableFactionHunterAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setEnableFactionHunterAwards(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("enableInjuryAwards")) {
-                    retVal.setEnableInjuryAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setEnableInjuryAwards(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("enableIndividualKillAwards")) {
-                    retVal.setEnableIndividualKillAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setEnableIndividualKillAwards(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("enableFormationKillAwards")) {
-                    retVal.setEnableFormationKillAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setEnableFormationKillAwards(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("enableRankAwards")) {
-                    retVal.setEnableRankAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setEnableRankAwards(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("enableScenarioAwards")) {
-                    retVal.setEnableScenarioAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setEnableScenarioAwards(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("enableSkillAwards")) {
-                    retVal.setEnableSkillAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setEnableSkillAwards(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("enableTheatreOfWarAwards")) {
-                    retVal.setEnableTheatreOfWarAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setEnableTheatreOfWarAwards(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("enableTimeAwards")) {
-                    retVal.setEnableTimeAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setEnableTimeAwards(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("enableTrainingAwards")) {
-                    retVal.setEnableTrainingAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setEnableTrainingAwards(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("enableMiscAwards")) {
-                    retVal.setEnableMiscAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setEnableMiscAwards(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("awardSetFilterList")) {
-                    retVal.setAwardSetFilterList(wn2.getTextContent().trim());
+                    campaignOptions.setAwardSetFilterList(nodeContents);
                     // endregion Awards
                     // endregion Personnel Tab
 
                     // region Life Paths Tab
                     // region Personnel Randomization
                 } else if (nodeName.equalsIgnoreCase("useDylansRandomXP")) {
-                    retVal.setUseDylansRandomXP(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseDylansRandomXP(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("nonBinaryDiceSize")) {
-                    retVal.setNonBinaryDiceSize(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setNonBinaryDiceSize(Integer.parseInt(nodeContents));
                     // endregion Personnel Randomization
 
                     // region Random Histories
                 } else if (nodeName.equalsIgnoreCase("randomOriginOptions")) {
-                    if (!wn2.hasChildNodes()) {
+                    if (!childNode.hasChildNodes()) {
                         continue;
                     }
-                    final RandomOriginOptions randomOriginOptions = RandomOriginOptions.parseFromXML(wn2.getChildNodes(),
+                    final RandomOriginOptions randomOriginOptions = RandomOriginOptions.parseFromXML(childNode.getChildNodes(),
                           true);
                     if (randomOriginOptions == null) {
                         continue;
                     }
-                    retVal.setRandomOriginOptions(randomOriginOptions);
+                    campaignOptions.setRandomOriginOptions(randomOriginOptions);
                 } else if (nodeName.equalsIgnoreCase("useRandomPersonalities")) {
-                    retVal.setUseRandomPersonalities(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseRandomPersonalities(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useRandomPersonalityReputation")) {
-                    retVal.setUseRandomPersonalityReputation(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseRandomPersonalityReputation(Boolean.parseBoolean(nodeContents));
                 } else if ((nodeName.equalsIgnoreCase("useReasoningXpMultiplier"))) {
-                    retVal.setUseReasoningXpMultiplier(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseReasoningXpMultiplier(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useSimulatedRelationships")) {
-                    retVal.setUseSimulatedRelationships(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseSimulatedRelationships(Boolean.parseBoolean(nodeContents));
                     // endregion Random Histories
 
                     // region Family
                 } else if (nodeName.equalsIgnoreCase("familyDisplayLevel")) {
-                    retVal.setFamilyDisplayLevel(FamilialRelationshipDisplayLevel.parseFromString(wn2.getTextContent()
-                                                                                                        .trim()));
+                    campaignOptions.setFamilyDisplayLevel(FamilialRelationshipDisplayLevel.parseFromString(nodeContents));
                     // endregion Family
 
                     // region anniversaries
                 } else if (nodeName.equalsIgnoreCase("announceBirthdays")) {
-                    retVal.setAnnounceBirthdays(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setAnnounceBirthdays(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("announceRecruitmentAnniversaries")) {
-                    retVal.setAnnounceRecruitmentAnniversaries(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setAnnounceRecruitmentAnniversaries(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("announceOfficersOnly")) {
-                    retVal.setAnnounceOfficersOnly(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setAnnounceOfficersOnly(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("announceChildBirthdays")) {
-                    retVal.setAnnounceChildBirthdays(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setAnnounceChildBirthdays(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("showLifeEventDialogBirths")) {
-                    retVal.setShowLifeEventDialogBirths(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setShowLifeEventDialogBirths(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("showLifeEventDialogComingOfAge")) {
-                    retVal.setShowLifeEventDialogComingOfAge(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setShowLifeEventDialogComingOfAge(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("showLifeEventDialogCelebrations")) {
-                    retVal.setShowLifeEventDialogCelebrations(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setShowLifeEventDialogCelebrations(Boolean.parseBoolean(nodeContents));
                     // endregion anniversaries
 
                     // region Marriage
                 } else if (nodeName.equalsIgnoreCase("useManualMarriages")) {
-                    retVal.setUseManualMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseManualMarriages(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useClanPersonnelMarriages")) {
-                    retVal.setUseClanPersonnelMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseClanPersonnelMarriages(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("usePrisonerMarriages")) {
-                    retVal.setUsePrisonerMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUsePrisonerMarriages(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("checkMutualAncestorsDepth")) {
-                    retVal.setCheckMutualAncestorsDepth(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setCheckMutualAncestorsDepth(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("noInterestInMarriageDiceSize")) {
-                    retVal.setNoInterestInMarriageDiceSize(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setNoInterestInMarriageDiceSize(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("logMarriageNameChanges")) {
-                    retVal.setLogMarriageNameChanges(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setLogMarriageNameChanges(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("marriageSurnameWeights")) {
-                    if (!wn2.hasChildNodes()) {
+                    if (!childNode.hasChildNodes()) {
                         continue;
                     }
-                    final NodeList nl2 = wn2.getChildNodes();
+                    final NodeList nl2 = childNode.getChildNodes();
                     for (int j = 0; j < nl2.getLength(); j++) {
                         final Node wn3 = nl2.item(j);
                         if (wn3.getNodeType() != Node.ELEMENT_NODE) {
                             continue;
                         }
-                        retVal.getMarriageSurnameWeights().put(MergingSurnameStyle.parseFromString(wn3.getNodeName()
-                                                                                                         .trim()),
+                        campaignOptions.getMarriageSurnameWeights()
+                              .put(MergingSurnameStyle.parseFromString(wn3.getNodeName().trim()),
                               Integer.parseInt(wn3.getTextContent().trim()));
                     }
                 } else if (nodeName.equalsIgnoreCase("randomMarriageMethod")) {
-                    retVal.setRandomMarriageMethod(RandomMarriageMethod.fromString(wn2.getTextContent().trim()));
+                    campaignOptions.setRandomMarriageMethod(RandomMarriageMethod.fromString(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useRandomClanPersonnelMarriages")) {
-                    retVal.setUseRandomClanPersonnelMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseRandomClanPersonnelMarriages(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useRandomPrisonerMarriages")) {
-                    retVal.setUseRandomPrisonerMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseRandomPrisonerMarriages(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("randomMarriageAgeRange")) {
-                    retVal.setRandomMarriageAgeRange(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setRandomMarriageAgeRange(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("randomMarriageDiceSize")) {
-                    retVal.setRandomMarriageDiceSize(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setRandomMarriageDiceSize(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("randomSameSexMarriageDiceSize")) {
-                    retVal.setRandomSameSexMarriageDiceSize(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setRandomSameSexMarriageDiceSize(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useRandomSameSexMarriages")) { // Legacy, pre-50.01
-                    if (!Boolean.parseBoolean(wn2.getTextContent().trim())) {
-                        retVal.setRandomSameSexMarriageDiceSize(0);
+                    if (!Boolean.parseBoolean(nodeContents)) {
+                        campaignOptions.setRandomSameSexMarriageDiceSize(0);
                     }
                 } else if (nodeName.equalsIgnoreCase("randomNewDependentMarriage")) {
-                    retVal.setRandomNewDependentMarriage(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setRandomNewDependentMarriage(Integer.parseInt(nodeContents));
                     // endregion Marriage
 
                     // region Divorce
                 } else if (nodeName.equalsIgnoreCase("useManualDivorce")) {
-                    retVal.setUseManualDivorce(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseManualDivorce(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useClanPersonnelDivorce")) {
-                    retVal.setUseClanPersonnelDivorce(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseClanPersonnelDivorce(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("usePrisonerDivorce")) {
-                    retVal.setUsePrisonerDivorce(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUsePrisonerDivorce(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("divorceSurnameWeights")) {
-                    if (!wn2.hasChildNodes()) {
+                    if (!childNode.hasChildNodes()) {
                         continue;
                     }
-                    final NodeList nl2 = wn2.getChildNodes();
+                    final NodeList nl2 = childNode.getChildNodes();
                     for (int j = 0; j < nl2.getLength(); j++) {
                         final Node wn3 = nl2.item(j);
                         if (wn3.getNodeType() != Node.ELEMENT_NODE) {
                             continue;
                         }
-                        retVal.getDivorceSurnameWeights()
+                        campaignOptions.getDivorceSurnameWeights()
                               .put(SplittingSurnameStyle.valueOf(wn3.getNodeName().trim()),
                                     Integer.parseInt(wn3.getTextContent().trim()));
                     }
                 } else if (nodeName.equalsIgnoreCase("randomDivorceMethod")) {
-                    retVal.setRandomDivorceMethod(RandomDivorceMethod.fromString(wn2.getTextContent().trim()));
+                    campaignOptions.setRandomDivorceMethod(RandomDivorceMethod.fromString(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useRandomOppositeSexDivorce")) {
-                    retVal.setUseRandomOppositeSexDivorce(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseRandomOppositeSexDivorce(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useRandomSameSexDivorce")) {
-                    retVal.setUseRandomSameSexDivorce(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseRandomSameSexDivorce(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useRandomClanPersonnelDivorce")) {
-                    retVal.setUseRandomClanPersonnelDivorce(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseRandomClanPersonnelDivorce(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useRandomPrisonerDivorce")) {
-                    retVal.setUseRandomPrisonerDivorce(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseRandomPrisonerDivorce(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("randomDivorceDiceSize")) {
-                    retVal.setRandomDivorceDiceSize(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setRandomDivorceDiceSize(Integer.parseInt(nodeContents));
                     // endregion Divorce
 
                     // region Procreation
                 } else if (nodeName.equalsIgnoreCase("useManualProcreation")) {
-                    retVal.setUseManualProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseManualProcreation(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useClanPersonnelProcreation")) {
-                    retVal.setUseClanPersonnelProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseClanPersonnelProcreation(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("usePrisonerProcreation")) {
-                    retVal.setUsePrisonerProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUsePrisonerProcreation(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("multiplePregnancyOccurrences")) {
-                    retVal.setMultiplePregnancyOccurrences(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setMultiplePregnancyOccurrences(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("babySurnameStyle")) {
-                    retVal.setBabySurnameStyle(BabySurnameStyle.parseFromString(wn2.getTextContent().trim()));
+                    campaignOptions.setBabySurnameStyle(BabySurnameStyle.parseFromString(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("assignNonPrisonerBabiesFounderTag")) {
-                    retVal.setAssignNonPrisonerBabiesFounderTag(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setAssignNonPrisonerBabiesFounderTag(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("assignChildrenOfFoundersFounderTag")) {
-                    retVal.setAssignChildrenOfFoundersFounderTag(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setAssignChildrenOfFoundersFounderTag(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useMaternityLeave")) {
-                    retVal.setUseMaternityLeave(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseMaternityLeave(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("determineFatherAtBirth")) {
-                    retVal.setDetermineFatherAtBirth(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setDetermineFatherAtBirth(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("displayTrueDueDate")) {
-                    retVal.setDisplayTrueDueDate(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setDisplayTrueDueDate(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("noInterestInChildrenDiceSize")) {
-                    retVal.setNoInterestInChildrenDiceSize(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setNoInterestInChildrenDiceSize(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("logProcreation")) {
-                    retVal.setLogProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setLogProcreation(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("randomProcreationMethod")) {
-                    retVal.setRandomProcreationMethod(RandomProcreationMethod.fromString(wn2.getTextContent().trim()));
+                    campaignOptions.setRandomProcreationMethod(RandomProcreationMethod.fromString(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useRelationshiplessRandomProcreation")) {
-                    retVal.setUseRelationshiplessRandomProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseRelationshiplessRandomProcreation(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useRandomClanPersonnelProcreation")) {
-                    retVal.setUseRandomClanPersonnelProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseRandomClanPersonnelProcreation(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useRandomPrisonerProcreation")) {
-                    retVal.setUseRandomPrisonerProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseRandomPrisonerProcreation(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("randomProcreationRelationshipDiceSize")) {
-                    retVal.setRandomProcreationRelationshipDiceSize(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setRandomProcreationRelationshipDiceSize(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("randomProcreationRelationshiplessDiceSize")) {
-                    retVal.setRandomProcreationRelationshiplessDiceSize(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setRandomProcreationRelationshiplessDiceSize(Integer.parseInt(nodeContents));
                     // endregion Procreation
 
                     // region Education
                 } else if (nodeName.equalsIgnoreCase("useEducationModule")) {
-                    retVal.setUseEducationModule(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseEducationModule(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("curriculumXpRate")) {
-                    retVal.setCurriculumXpRate(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setCurriculumXpRate(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("maximumJumpCount")) {
-                    retVal.setMaximumJumpCount(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setMaximumJumpCount(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useReeducationCamps")) {
-                    retVal.setUseReeducationCamps(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseReeducationCamps(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("enableLocalAcademies")) {
-                    retVal.setEnableLocalAcademies(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setEnableLocalAcademies(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("enablePrestigiousAcademies")) {
-                    retVal.setEnablePrestigiousAcademies(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setEnablePrestigiousAcademies(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("enableUnitEducation")) {
-                    retVal.setEnableUnitEducation(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setEnableUnitEducation(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("enableOverrideRequirements")) {
-                    retVal.setEnableOverrideRequirements(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setEnableOverrideRequirements(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("enableShowIneligibleAcademies")) {
-                    retVal.setEnableShowIneligibleAcademies(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setEnableShowIneligibleAcademies(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("entranceExamBaseTargetNumber")) {
-                    retVal.setEntranceExamBaseTargetNumber(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setEntranceExamBaseTargetNumber(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("facultyXpRate")) {
-                    retVal.setFacultyXpRate(Double.parseDouble(wn2.getTextContent().trim()));
+                    campaignOptions.setFacultyXpRate(Double.parseDouble(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("enableBonuses")) {
-                    retVal.setEnableBonuses(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setEnableBonuses(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("adultDropoutChance")) {
-                    retVal.setAdultDropoutChance(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setAdultDropoutChance(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("childrenDropoutChance")) {
-                    retVal.setChildrenDropoutChance(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setChildrenDropoutChance(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("allAges")) {
-                    retVal.setAllAges(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setAllAges(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("militaryAcademyAccidents")) {
-                    retVal.setMilitaryAcademyAccidents(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setMilitaryAcademyAccidents(Integer.parseInt(nodeContents));
                     // endregion Education
                 } else if (nodeName.equalsIgnoreCase("enabledRandomDeathAgeGroups")) {
-                    if (!wn2.hasChildNodes()) {
+                    if (!childNode.hasChildNodes()) {
                         continue;
                     }
-                    final NodeList nl2 = wn2.getChildNodes();
+                    final NodeList nl2 = childNode.getChildNodes();
                     for (int i = 0; i < nl2.getLength(); i++) {
                         final Node wn3 = nl2.item(i);
                         try {
-                            retVal.getEnabledRandomDeathAgeGroups()
+                            campaignOptions.getEnabledRandomDeathAgeGroups()
                                   .put(AgeGroup.valueOf(wn3.getNodeName()),
                                         Boolean.parseBoolean(wn3.getTextContent().trim()));
                         } catch (Exception ignored) {
@@ -6129,358 +6175,360 @@ public class CampaignOptions {
                         }
                     }
                 } else if (nodeName.equalsIgnoreCase("useRandomDeathSuicideCause")) {
-                    retVal.setUseRandomDeathSuicideCause(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseRandomDeathSuicideCause(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("randomDeathMultiplier")) {
-                    retVal.setRandomDeathMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                    campaignOptions.setRandomDeathMultiplier(Double.parseDouble(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useRandomRetirement")) {
-                    retVal.setUseRandomRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseRandomRetirement(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("turnoverBaseTn")) {
-                    retVal.setTurnoverFixedTargetNumber(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setTurnoverFixedTargetNumber(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("turnoverFrequency")) {
-                    retVal.setTurnoverFrequency(TurnoverFrequency.valueOf(wn2.getTextContent().trim()));
+                    campaignOptions.setTurnoverFrequency(TurnoverFrequency.valueOf(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("trackOriginalUnit")) {
-                    retVal.setTrackOriginalUnit(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setTrackOriginalUnit(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("aeroRecruitsHaveUnits")) {
-                    retVal.setAeroRecruitsHaveUnits(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setAeroRecruitsHaveUnits(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useContractCompletionRandomRetirement")) {
-                    retVal.setUseContractCompletionRandomRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseContractCompletionRandomRetirement(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useRandomFounderTurnover")) {
-                    retVal.setUseRandomFounderTurnover(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseRandomFounderTurnover(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useFounderRetirement")) {
-                    retVal.setUseFounderRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseFounderRetirement(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useSubContractSoldiers")) {
-                    retVal.setUseSubContractSoldiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseSubContractSoldiers(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("serviceContractDuration")) {
-                    retVal.setServiceContractDuration(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setServiceContractDuration(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("serviceContractModifier")) {
-                    retVal.setServiceContractModifier(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setServiceContractModifier(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("payBonusDefault")) {
-                    retVal.setPayBonusDefault(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setPayBonusDefault(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("payBonusDefaultThreshold")) {
-                    retVal.setPayBonusDefaultThreshold(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setPayBonusDefaultThreshold(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useCustomRetirementModifiers")) {
-                    retVal.setUseCustomRetirementModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseCustomRetirementModifiers(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useFatigueModifiers")) {
-                    retVal.setUseFatigueModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseFatigueModifiers(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useSkillModifiers")) {
-                    retVal.setUseSkillModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseSkillModifiers(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useAgeModifiers")) {
-                    retVal.setUseAgeModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseAgeModifiers(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useUnitRatingModifiers")) {
-                    retVal.setUseUnitRatingModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseUnitRatingModifiers(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useFactionModifiers")) {
-                    retVal.setUseFactionModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseFactionModifiers(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useMissionStatusModifiers")) {
-                    retVal.setUseMissionStatusModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseMissionStatusModifiers(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useHostileTerritoryModifiers")) {
-                    retVal.setUseHostileTerritoryModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseHostileTerritoryModifiers(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useFamilyModifiers")) {
-                    retVal.setUseFamilyModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseFamilyModifiers(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useLoyaltyModifiers")) {
-                    retVal.setUseLoyaltyModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseLoyaltyModifiers(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useHideLoyalty")) {
-                    retVal.setUseHideLoyalty(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseHideLoyalty(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("payoutRateOfficer")) {
-                    retVal.setPayoutRateOfficer(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setPayoutRateOfficer(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("payoutRateEnlisted")) {
-                    retVal.setPayoutRateEnlisted(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setPayoutRateEnlisted(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("payoutRetirementMultiplier")) {
-                    retVal.setPayoutRetirementMultiplier(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setPayoutRetirementMultiplier(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("usePayoutServiceBonus")) {
-                    retVal.setUsePayoutServiceBonus(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUsePayoutServiceBonus(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("payoutServiceBonusRate")) {
-                    retVal.setPayoutServiceBonusRate(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setPayoutServiceBonusRate(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useAdministrativeStrain")) {
-                    retVal.setUseAdministrativeStrain(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseAdministrativeStrain(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("administrativeStrain")) {
-                    retVal.setAdministrativeCapacity(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setAdministrativeCapacity(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useManagementSkill")) {
-                    retVal.setUseManagementSkill(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseManagementSkill(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useCommanderLeadershipOnly")) {
-                    retVal.setUseCommanderLeadershipOnly(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseCommanderLeadershipOnly(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("managementSkillPenalty")) {
-                    retVal.setManagementSkillPenalty(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setManagementSkillPenalty(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useFatigue")) {
-                    retVal.setUseFatigue(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseFatigue(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("fatigueRate")) {
-                    retVal.setFatigueRate(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setFatigueRate(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useInjuryFatigue")) {
-                    retVal.setUseInjuryFatigue(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseInjuryFatigue(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("fieldKitchenCapacity")) {
-                    retVal.setFieldKitchenCapacity(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setFieldKitchenCapacity(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("fieldKitchenIgnoreNonCombatants")) {
-                    retVal.setFieldKitchenIgnoreNonCombatants(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setFieldKitchenIgnoreNonCombatants(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("fatigueLeaveThreshold")) {
-                    retVal.setFatigueLeaveThreshold(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setFatigueLeaveThreshold(Integer.parseInt(nodeContents));
                     // endregion Turnover and Retention
 
                     // region Finances Tab
                 } else if (nodeName.equalsIgnoreCase("payForParts")) {
-                    retVal.payForParts = Boolean.parseBoolean(wn2.getTextContent());
+                    campaignOptions.payForParts = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("payForRepairs")) {
-                    retVal.payForRepairs = Boolean.parseBoolean(wn2.getTextContent());
+                    campaignOptions.payForRepairs = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("payForUnits")) {
-                    retVal.payForUnits = Boolean.parseBoolean(wn2.getTextContent());
+                    campaignOptions.payForUnits = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("payForSalaries")) {
-                    retVal.payForSalaries = Boolean.parseBoolean(wn2.getTextContent());
+                    campaignOptions.payForSalaries = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("payForOverhead")) {
-                    retVal.payForOverhead = Boolean.parseBoolean(wn2.getTextContent());
+                    campaignOptions.payForOverhead = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("payForMaintain")) {
-                    retVal.payForMaintain = Boolean.parseBoolean(wn2.getTextContent());
+                    campaignOptions.payForMaintain = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("payForTransport")) {
-                    retVal.payForTransport = Boolean.parseBoolean(wn2.getTextContent());
+                    campaignOptions.payForTransport = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("sellUnits")) {
-                    retVal.sellUnits = Boolean.parseBoolean(wn2.getTextContent());
+                    campaignOptions.sellUnits = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("sellParts")) {
-                    retVal.sellParts = Boolean.parseBoolean(wn2.getTextContent());
+                    campaignOptions.sellParts = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("payForRecruitment")) {
-                    retVal.payForRecruitment = Boolean.parseBoolean(wn2.getTextContent());
+                    campaignOptions.payForRecruitment = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("payForFood")) {
-                    retVal.payForFood = Boolean.parseBoolean(wn2.getTextContent());
+                    campaignOptions.payForFood = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("payForHousing")) {
-                    retVal.payForHousing = Boolean.parseBoolean(wn2.getTextContent());
+                    campaignOptions.payForHousing = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("useLoanLimits")) {
-                    retVal.useLoanLimits = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    campaignOptions.useLoanLimits = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("usePercentageMaint")) {
-                    retVal.usePercentageMaint = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    campaignOptions.usePercentageMaint = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("infantryDontCount")) {
-                    retVal.infantryDontCount = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    campaignOptions.infantryDontCount = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("usePeacetimeCost")) {
-                    retVal.usePeacetimeCost = Boolean.parseBoolean(wn2.getTextContent());
+                    campaignOptions.usePeacetimeCost = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("useExtendedPartsModifier")) {
-                    retVal.useExtendedPartsModifier = Boolean.parseBoolean(wn2.getTextContent());
+                    campaignOptions.useExtendedPartsModifier = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("showPeacetimeCost")) {
-                    retVal.showPeacetimeCost = Boolean.parseBoolean(wn2.getTextContent());
+                    campaignOptions.showPeacetimeCost = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("newFinancialYearFinancesToCSVExport")) {
-                    retVal.newFinancialYearFinancesToCSVExport = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    campaignOptions.newFinancialYearFinancesToCSVExport = Boolean.parseBoolean(nodeContents);
+                } else if (nodeName.equalsIgnoreCase("financialYearDuration")) {
+                    campaignOptions.setFinancialYearDuration(FinancialYearDuration.parseFromString(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("simulateGrayMonday")) {
-                    retVal.simulateGrayMonday = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    campaignOptions.simulateGrayMonday = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("allowMonthlyReinvestment")) {
-                    retVal.allowMonthlyReinvestment = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    campaignOptions.allowMonthlyReinvestment = Boolean.parseBoolean(nodeContents);
 
                     // region Price Multipliers
                 } else if (nodeName.equalsIgnoreCase("commonPartPriceMultiplier")) {
-                    retVal.setCommonPartPriceMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                    campaignOptions.setCommonPartPriceMultiplier(Double.parseDouble(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("innerSphereUnitPriceMultiplier")) {
-                    retVal.setInnerSphereUnitPriceMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                    campaignOptions.setInnerSphereUnitPriceMultiplier(Double.parseDouble(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("innerSpherePartPriceMultiplier")) {
-                    retVal.setInnerSpherePartPriceMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                    campaignOptions.setInnerSpherePartPriceMultiplier(Double.parseDouble(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("clanUnitPriceMultiplier")) {
-                    retVal.setClanUnitPriceMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                    campaignOptions.setClanUnitPriceMultiplier(Double.parseDouble(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("clanPartPriceMultiplier")) {
-                    retVal.setClanPartPriceMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                    campaignOptions.setClanPartPriceMultiplier(Double.parseDouble(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("mixedTechUnitPriceMultiplier")) {
-                    retVal.setMixedTechUnitPriceMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                    campaignOptions.setMixedTechUnitPriceMultiplier(Double.parseDouble(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("usedPartPriceMultipliers")) {
-                    final String[] values = wn2.getTextContent().split(",");
+                    final String[] values = nodeContents.split(",");
                     for (int i = 0; i < values.length; i++) {
                         try {
-                            retVal.getUsedPartPriceMultipliers()[i] = Double.parseDouble(values[i]);
+                            campaignOptions.getUsedPartPriceMultipliers()[i] = Double.parseDouble(values[i]);
                         } catch (Exception ignored) {
 
                         }
                     }
                 } else if (nodeName.equalsIgnoreCase("damagedPartsValueMultiplier")) {
-                    retVal.setDamagedPartsValueMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                    campaignOptions.setDamagedPartsValueMultiplier(Double.parseDouble(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("unrepairablePartsValueMultiplier")) {
-                    retVal.setUnrepairablePartsValueMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                    campaignOptions.setUnrepairablePartsValueMultiplier(Double.parseDouble(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("cancelledOrderRefundMultiplier")) {
-                    retVal.setCancelledOrderRefundMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                    campaignOptions.setCancelledOrderRefundMultiplier(Double.parseDouble(nodeContents));
                     // endregion Price Multipliers
 
                     // region Taxes
                 } else if (nodeName.equalsIgnoreCase("useTaxes")) {
-                    retVal.setUseTaxes(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseTaxes(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("taxesPercentage")) {
-                    retVal.setTaxesPercentage(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setTaxesPercentage(Integer.parseInt(nodeContents));
                     // endregion Taxes
                     // endregion Finances Tab
 
                     // Shares
                 } else if (nodeName.equalsIgnoreCase("useShareSystem")) {
-                    retVal.setUseShareSystem(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseShareSystem(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("sharesForAll")) {
-                    retVal.setSharesForAll(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setSharesForAll(Boolean.parseBoolean(nodeContents));
                     // endregion Price Multipliers
                     // endregion Finances Tab
 
                     // region Markets Tab
                     // region Personnel Market
                 } else if (nodeName.equalsIgnoreCase("personnelMarketStyle")) {
-                    retVal.setPersonnelMarketStyle(PersonnelMarketStyle.fromString(wn2.getTextContent().trim()));
+                    campaignOptions.setPersonnelMarketStyle(PersonnelMarketStyle.fromString(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("personnelMarketName")) {
-                    String marketName = wn2.getTextContent().trim();
+                    String marketName = nodeContents;
                     // Backwards compatibility with saves from before these rules moved to Camops
                     if (marketName.equals("Strat Ops")) {
                         marketName = "Campaign Ops";
                     }
-                    retVal.setPersonnelMarketName(marketName);
+                    campaignOptions.setPersonnelMarketName(marketName);
                 } else if (nodeName.equalsIgnoreCase("personnelMarketReportRefresh")) {
-                    retVal.setPersonnelMarketReportRefresh(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setPersonnelMarketReportRefresh(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("personnelMarketRandomRemovalTargets")) {
-                    if (!wn2.hasChildNodes()) {
+                    if (!childNode.hasChildNodes()) {
                         continue;
                     }
-                    final NodeList nl2 = wn2.getChildNodes();
+                    final NodeList nl2 = childNode.getChildNodes();
                     for (int j = 0; j < nl2.getLength(); j++) {
                         final Node wn3 = nl2.item(j);
                         if (wn3.getNodeType() != Node.ELEMENT_NODE) {
                             continue;
                         }
-                        retVal.getPersonnelMarketRandomRemovalTargets()
+                        campaignOptions.getPersonnelMarketRandomRemovalTargets()
                               .put(SkillLevel.valueOf(wn3.getNodeName().trim()),
                                     Integer.parseInt(wn3.getTextContent().trim()));
                     }
                 } else if (nodeName.equalsIgnoreCase("personnelMarketDylansWeight")) {
-                    retVal.setPersonnelMarketDylansWeight(Double.parseDouble(wn2.getTextContent().trim()));
+                    campaignOptions.setPersonnelMarketDylansWeight(Double.parseDouble(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("usePersonnelHireHiringHallOnly")) {
-                    retVal.setUsePersonnelHireHiringHallOnly(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUsePersonnelHireHiringHallOnly(Boolean.parseBoolean(nodeContents));
                     // endregion Personnel Market
 
                     // region Unit Market
                 } else if (nodeName.equalsIgnoreCase("unitMarketMethod")) {
-                    retVal.setUnitMarketMethod(UnitMarketMethod.valueOf(wn2.getTextContent().trim()));
+                    campaignOptions.setUnitMarketMethod(UnitMarketMethod.valueOf(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("unitMarketRegionalMekVariations")) {
-                    retVal.setUnitMarketRegionalMekVariations(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUnitMarketRegionalMekVariations(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("unitMarketSpecialUnitChance")) {
-                    retVal.setUnitMarketSpecialUnitChance(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setUnitMarketSpecialUnitChance(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("unitMarketRarityModifier")) {
-                    retVal.setUnitMarketRarityModifier(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setUnitMarketRarityModifier(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("instantUnitMarketDelivery")) {
-                    retVal.setInstantUnitMarketDelivery(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setInstantUnitMarketDelivery(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("mothballUnitMarketDeliveries")) {
-                    retVal.setMothballUnitMarketDeliveries(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setMothballUnitMarketDeliveries(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("unitMarketReportRefresh")) {
-                    retVal.setUnitMarketReportRefresh(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUnitMarketReportRefresh(Boolean.parseBoolean(nodeContents));
                     // endregion Unit Market
 
                     // region Contract Market
                 } else if (nodeName.equalsIgnoreCase("contractMarketMethod")) {
-                    retVal.setContractMarketMethod(ContractMarketMethod.valueOf(wn2.getTextContent().trim()));
+                    campaignOptions.setContractMarketMethod(ContractMarketMethod.valueOf(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("contractSearchRadius")) {
-                    retVal.setContractSearchRadius(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setContractSearchRadius(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("variableContractLength")) {
-                    retVal.setVariableContractLength(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setVariableContractLength(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useDynamicDifficulty")) {
-                    retVal.setUseDynamicDifficulty(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseDynamicDifficulty(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("contractMarketReportRefresh")) {
-                    retVal.setContractMarketReportRefresh(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setContractMarketReportRefresh(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("contractMaxSalvagePercentage")) {
-                    retVal.setContractMaxSalvagePercentage(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setContractMaxSalvagePercentage(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("dropShipBonusPercentage")) {
-                    retVal.setDropShipBonusPercentage(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setDropShipBonusPercentage(Integer.parseInt(nodeContents));
                     // endregion Contract Market
                     // endregion Markets Tab
 
                     // region RATs Tab
                 } else if (nodeName.equals("useStaticRATs")) {
-                    retVal.setUseStaticRATs(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setUseStaticRATs(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("rats")) {
-                    retVal.setRATs(MHQXMLUtility.unEscape(wn2.getTextContent().trim()).split(","));
+                    campaignOptions.setRATs(MHQXMLUtility.unEscape(nodeContents).split(","));
                 } else if (nodeName.equals("ignoreRATEra")) {
-                    retVal.setIgnoreRATEra(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setIgnoreRATEra(Boolean.parseBoolean(nodeContents));
                     // endregion RATs Tab
 
                     // region AtB Tab
                 } else if (nodeName.equalsIgnoreCase("skillLevel")) {
-                    retVal.setSkillLevel(SkillLevel.parseFromString(wn2.getTextContent().trim()));
+                    campaignOptions.setSkillLevel(SkillLevel.parseFromString(nodeContents));
                     // region ACAR Tab
                 } else if (nodeName.equalsIgnoreCase("autoResolveMethod")) {
-                    retVal.setAutoResolveMethod(AutoResolveMethod.valueOf(wn2.getTextContent().trim()));
+                    campaignOptions.setAutoResolveMethod(AutoResolveMethod.valueOf(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("autoResolveVictoryChanceEnabled")) {
-                    retVal.setAutoResolveVictoryChanceEnabled(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setAutoResolveVictoryChanceEnabled(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("autoResolveNumberOfScenarios")) {
-                    retVal.setAutoResolveNumberOfScenarios(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setAutoResolveNumberOfScenarios(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("autoResolveUseExperimentalPacarGui")) {
-                    retVal.setAutoResolveExperimentalPacarGuiEnabled(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setAutoResolveExperimentalPacarGuiEnabled(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("strategicViewTheme")) {
-                    retVal.setStrategicViewTheme(wn2.getTextContent().trim());
+                    campaignOptions.setStrategicViewTheme(nodeContents);
                     // endregion ACAR Tab
                     // endregion AtB Tab
 
                 } else if (nodeName.equalsIgnoreCase("phenotypeProbabilities")) {
-                    String[] values = wn2.getTextContent().split(",");
+                    String[] values = nodeContents.split(",");
                     for (int i = 0; i < values.length; i++) {
-                        retVal.phenotypeProbabilities[i] = Integer.parseInt(values[i]);
+                        campaignOptions.phenotypeProbabilities[i] = Integer.parseInt(values[i]);
                     }
                 } else if (nodeName.equalsIgnoreCase("useAtB")) {
-                    retVal.useAtB = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    campaignOptions.useAtB = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("useStratCon")) {
-                    retVal.useStratCon = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    campaignOptions.useStratCon = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("useAero")) {
-                    retVal.useAero = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    campaignOptions.useAero = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("useVehicles")) {
-                    retVal.useVehicles = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    campaignOptions.useVehicles = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("clanVehicles")) {
-                    retVal.clanVehicles = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    campaignOptions.clanVehicles = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("useGenericBattleValue")) {
-                    retVal.useGenericBattleValue = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    campaignOptions.useGenericBattleValue = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("useVerboseBidding")) {
-                    retVal.useVerboseBidding = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    campaignOptions.useVerboseBidding = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("doubleVehicles")) {
-                    retVal.doubleVehicles = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    campaignOptions.doubleVehicles = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("adjustPlayerVehicles")) {
-                    retVal.adjustPlayerVehicles = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    campaignOptions.adjustPlayerVehicles = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("opForLanceTypeMeks")) {
-                    retVal.setOpForLanceTypeMeks(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setOpForLanceTypeMeks(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("opForLanceTypeMixed")) {
-                    retVal.setOpForLanceTypeMixed(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setOpForLanceTypeMixed(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("opForLanceTypeVehicles")) {
-                    retVal.setOpForLanceTypeVehicles(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setOpForLanceTypeVehicles(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("opForUsesVTOLs")) {
-                    retVal.setOpForUsesVTOLs(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setOpForUsesVTOLs(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useDropShips")) {
-                    retVal.useDropShips = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    campaignOptions.useDropShips = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("mercSizeLimited")) {
-                    retVal.mercSizeLimited = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    campaignOptions.mercSizeLimited = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("regionalMekVariations")) {
-                    retVal.regionalMekVariations = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    campaignOptions.regionalMekVariations = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("attachedPlayerCamouflage")) {
-                    retVal.attachedPlayerCamouflage = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    campaignOptions.attachedPlayerCamouflage = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("playerControlsAttachedUnits")) {
-                    retVal.setPlayerControlsAttachedUnits(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setPlayerControlsAttachedUnits(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("atbBattleChance")) {
-                    String[] values = wn2.getTextContent().split(",");
+                    String[] values = nodeContents.split(",");
                     for (int i = 0; i < values.length; i++) {
                         try {
-                            retVal.atbBattleChance[i] = Integer.parseInt(values[i]);
+                            campaignOptions.atbBattleChance[i] = Integer.parseInt(values[i]);
                         } catch (Exception ignored) {
                             // Badly coded, but this is to migrate devs and their games as the swap was
                             // done before a release and is thus better to handle this way than through
                             // a more code complex method
-                            retVal.atbBattleChance[i] = (int) Math.round(Double.parseDouble(values[i]));
+                            campaignOptions.atbBattleChance[i] = (int) Math.round(Double.parseDouble(values[i]));
                         }
                     }
                 } else if (nodeName.equalsIgnoreCase("generateChases")) {
-                    retVal.setGenerateChases(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setGenerateChases(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useWeatherConditions")) {
-                    retVal.useWeatherConditions = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    campaignOptions.useWeatherConditions = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("useLightConditions")) {
-                    retVal.useLightConditions = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    campaignOptions.useLightConditions = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("usePlanetaryConditions")) {
-                    retVal.usePlanetaryConditions = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    campaignOptions.usePlanetaryConditions = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("restrictPartsByMission")) {
-                    retVal.restrictPartsByMission = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    campaignOptions.restrictPartsByMission = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("allowOpForLocalUnits")) {
-                    retVal.setAllowOpForLocalUnits(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setAllowOpForLocalUnits(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("allowOpForAeros")) {
-                    retVal.setAllowOpForAeros(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setAllowOpForAeros(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("opForAeroChance")) {
-                    retVal.setOpForAeroChance(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setOpForAeroChance(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("opForLocalUnitChance")) {
-                    retVal.setOpForLocalUnitChance(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setOpForLocalUnitChance(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("fixedMapChance")) {
-                    retVal.fixedMapChance = Integer.parseInt(wn2.getTextContent().trim());
+                    campaignOptions.fixedMapChance = Integer.parseInt(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("spaUpgradeIntensity")) {
-                    retVal.setSpaUpgradeIntensity(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setSpaUpgradeIntensity(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("scenarioModMax")) {
-                    retVal.setScenarioModMax(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setScenarioModMax(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("scenarioModChance")) {
-                    retVal.setScenarioModChance(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setScenarioModChance(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("scenarioModBV")) {
-                    retVal.setScenarioModBV(Integer.parseInt(wn2.getTextContent().trim()));
+                    campaignOptions.setScenarioModBV(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("autoconfigMunitions")) {
-                    retVal.setAutoConfigMunitions(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    campaignOptions.setAutoConfigMunitions(Boolean.parseBoolean(nodeContents));
                 }
             } catch (Exception ex) {
                 logger.error(ex, "Unknown Exception: generationCampaignOptionsFromXML");
@@ -6489,7 +6537,7 @@ public class CampaignOptions {
 
         logger.debug("Load Campaign Options Complete!");
 
-        return retVal;
+        return campaignOptions;
     }
 
     /**
@@ -6583,6 +6631,7 @@ public class CampaignOptions {
     public void setAutoResolveExperimentalPacarGuiEnabled(boolean autoResolveExperimentalPacarGuiEnabled) {
         this.autoResolveExperimentalPacarGuiEnabled = autoResolveExperimentalPacarGuiEnabled;
     }
+
 
     /**
      * Updates the campaign options to reflect the current game options settings.

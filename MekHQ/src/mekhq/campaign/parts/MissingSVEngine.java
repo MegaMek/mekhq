@@ -51,7 +51,7 @@ import mekhq.utilities.MHQXMLUtility;
 public class MissingSVEngine extends MissingPart {
     private double engineTonnage;
     private int etype;
-    private int techRating;
+    private TechRating techRating;
     private FuelType fuelType;
 
     private TechAdvancement techAdvancement;
@@ -61,7 +61,7 @@ public class MissingSVEngine extends MissingPart {
      */
 
     public MissingSVEngine() {
-        this(0, 0.0, Engine.COMBUSTION_ENGINE, RATING_D, FuelType.PETROCHEMICALS, null);
+        this(0, 0.0, Engine.COMBUSTION_ENGINE, TechRating.D, FuelType.PETROCHEMICALS, null);
     }
 
     /**
@@ -71,13 +71,13 @@ public class MissingSVEngine extends MissingPart {
      *                      tons.
      * @param engineTonnage The mass of the engine
      * @param etype         An {@link Engine} type constant
-     * @param techRating    The engine's tech rating, {@code RATING_A} through
-     *                      {@code RATING_F}
+     * @param techRating    The engine's tech rating, {@code TechRating.A} through
+     *                      {@code TechRating.F}
      * @param fuelType      Needed to distinguish different types of internal
      *                      combustion engines.
      * @param campaign      The campaign instance
      */
-    public MissingSVEngine(int unitTonnage, double engineTonnage, int etype, int techRating,
+    public MissingSVEngine(int unitTonnage, double engineTonnage, int etype, TechRating techRating,
             FuelType fuelType, Campaign campaign) {
         super(unitTonnage, campaign);
         this.engineTonnage = engineTonnage;
@@ -87,7 +87,7 @@ public class MissingSVEngine extends MissingPart {
 
         Engine engine = new Engine(10, etype, Engine.SUPPORT_VEE_ENGINE);
         techAdvancement = engine.getTechAdvancement();
-        name = String.format("%s (%s) Engine", engine.getEngineName(), ITechnology.getRatingName(techRating));
+        name = String.format("%s (%s) Engine", engine.getEngineName(), techRating.getName());
     }
 
     /**
@@ -105,7 +105,7 @@ public class MissingSVEngine extends MissingPart {
     }
 
     @Override
-    public int getTechRating() {
+    public TechRating getTechRating() {
         return techRating;
     }
 
@@ -143,7 +143,7 @@ public class MissingSVEngine extends MissingPart {
         indent = writeToXMLBegin(pw, indent);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, NODE_ENGINE_TONNAGE, engineTonnage);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, NODE_ETYPE, etype);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, NODE_TECH_RATING, ITechnology.getRatingName(techRating));
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, NODE_TECH_RATING, techRating.getName());
         if (etype == Engine.COMBUSTION_ENGINE) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, NODE_FUEL_TYPE, fuelType.name());
         }
@@ -163,12 +163,7 @@ public class MissingSVEngine extends MissingPart {
                     etype = Integer.parseInt(wn.getTextContent());
                     break;
                 case NODE_TECH_RATING:
-                    for (int i = 0; i < ratingNames.length; i++) {
-                        if (ratingNames[i].equals(wn.getTextContent())) {
-                            techRating = i;
-                            break;
-                        }
-                    }
+                    techRating = TechRating.fromName(wn.getTextContent());
                     break;
                 case NODE_FUEL_TYPE:
                     fuelType = FuelType.valueOf(wn.getTextContent());

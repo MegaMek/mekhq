@@ -30,6 +30,7 @@ package mekhq.campaign;
 import megamek.common.AmmoType;
 import megamek.common.Entity;
 import megamek.common.EquipmentTypeLookup;
+import megamek.common.ITechnology.TechBase;
 import megamek.common.Infantry;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.EventSpy;
@@ -1549,6 +1550,7 @@ public class QuartermasterTest {
         when(mockOmniPartClone.getStickerPrice()).thenReturn(Money.of(5.0));
         when(mockOmniPart.clone()).thenReturn(mockOmniPartClone);
         when(mockOmniPartClone.clone()).thenReturn(mockOmniPartClone); // CAW: test only.
+        when(mockOmniPartClone.getTechBase()).thenReturn(TechBase.ALL);
 
         // ...and depod that part...
         quartermaster.depodPart(mockOmniPart, 1);
@@ -1572,6 +1574,7 @@ public class QuartermasterTest {
         // OmniPods cost 1/5th the part's cost, so since our mock part costs
         // 5 C-bills, if we're calculating things properly then the OmniPod will cost only a buck.
         assertEquals(Money.of(1.0), omniPod.getActualValue());
+    
     }
 
     @Test

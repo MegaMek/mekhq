@@ -87,7 +87,8 @@ public enum PersonnelStatus {
     SUICIDE(NotificationSeverity.NEGATIVE, true, true),
     ENEMY_BONDSMAN(NotificationSeverity.NEGATIVE, false, false),
     BONDSREF(NotificationSeverity.NEGATIVE, true, true),
-    SEPPUKU(NotificationSeverity.NEGATIVE, true, true);
+    SEPPUKU(NotificationSeverity.NEGATIVE, true, true),
+    BACKGROUND_CHARACTER(NotificationSeverity.WARNING, false, false);
 
     /**
      * Represents the severity levels of a status.
@@ -251,45 +252,45 @@ public enum PersonnelStatus {
     // region Boolean Comparison Methods
 
     /**
-     * Checks if the character has the {@code ACTIVE} personnel status.
+     * Checks if the character has the {@link #ACTIVE} personnel status.
      *
-     * @return {@code true} if the character has the {@code ACTIVE} personnel status {@code false} otherwise.
+     * @return {@code true} if the character has the {@link #ACTIVE} personnel status {@code false} otherwise.
      */
     public boolean isActive() {
         return this == ACTIVE;
     }
 
     /**
-     * Checks if the character has the {@code MIA} personnel status.
+     * Checks if the character has the {@link #MIA} personnel status.
      *
-     * @return {@code true} if the character has the {@code MIA} personnel status {@code false} otherwise.
+     * @return {@code true} if the character has the {@link #MIA} personnel status {@code false} otherwise.
      */
     public boolean isMIA() {
         return this == MIA;
     }
 
     /**
-     * Checks if the character has the {@code POW} personnel status.
+     * Checks if the character has the {@link #POW} personnel status.
      *
-     * @return {@code true} if the character has the {@code POW} personnel status {@code false} otherwise.
+     * @return {@code true} if the character has the {@link #POW} personnel status {@code false} otherwise.
      */
     public boolean isPoW() {
         return this == POW;
     }
 
     /**
-     * Checks if the character has the {@code ON_LEAVE} personnel status.
+     * Checks if the character has the {@link #ON_LEAVE} personnel status.
      *
-     * @return {@code true} if the character has the {@code ON_LEAVE} personnel status {@code false} otherwise.
+     * @return {@code true} if the character has the {@link #ON_LEAVE} personnel status {@code false} otherwise.
      */
     public boolean isOnLeave() {
         return this == ON_LEAVE;
     }
 
     /**
-     * Checks if the character has the {@code ON_MATERNITY_LEAVE} personnel status.
+     * Checks if the character has the {@link #ON_MATERNITY_LEAVE} personnel status.
      *
-     * @return {@code true} if the character has the {@code ON_MATERNITY_LEAVE} personnel status {@code false}
+     * @return {@code true} if the character has the {@link #ON_MATERNITY_LEAVE} personnel status {@code false}
      *       otherwise.
      */
     public boolean isOnMaternityLeave() {
@@ -297,153 +298,153 @@ public enum PersonnelStatus {
     }
 
     /**
-     * Checks if the character has the {@code AWOL} personnel status.
+     * Checks if the character has the {@link #AWOL} personnel status.
      *
-     * @return {@code true} if the character has the {@code AWOL} personnel status {@code false} otherwise.
+     * @return {@code true} if the character has the {@link #AWOL} personnel status {@code false} otherwise.
      */
     public boolean isAwol() {
         return this == AWOL;
     }
 
     /**
-     * Checks if the character has the {@code RETIRED} personnel status.
+     * Checks if the character has the {@link #RETIRED} personnel status.
      *
-     * @return {@code true} if the character has the {@code RETIRED} personnel status {@code false} otherwise.
+     * @return {@code true} if the character has the {@link #RETIRED} personnel status {@code false} otherwise.
      */
     public boolean isRetired() {
         return this == RETIRED;
     }
 
     /**
-     * Checks if the character has the {@code RESIGNED} personnel status.
+     * Checks if the character has the {@link #RESIGNED} personnel status.
      *
-     * @return {@code true} if the character has the {@code RESIGNED} personnel status {@code false} otherwise.
+     * @return {@code true} if the character has the {@link #RESIGNED} personnel status {@code false} otherwise.
      */
     public boolean isResigned() {
         return this == RESIGNED;
     }
 
     /**
-     * Checks if the character has the {@code SACKED} personnel status.
+     * Checks if the character has the {@link #SACKED} personnel status.
      *
-     * @return {@code true} if the character has the {@code SACKED} personnel status {@code false} otherwise.
+     * @return {@code true} if the character has the {@link #SACKED} personnel status {@code false} otherwise.
      */
     public boolean isSacked() {
         return this == SACKED;
     }
 
     /**
-     * Checks if the character has the {@code LEFT} personnel status.
+     * Checks if the character has the {@link #LEFT} personnel status.
      *
-     * @return {@code true} if the character has the {@code LEFT} personnel status {@code false} otherwise.
+     * @return {@code true} if the character has the {@link #LEFT} personnel status {@code false} otherwise.
      */
     public boolean isLeft() {
         return this == LEFT;
     }
 
     /**
-     * Checks if the character has the {@code DESERTED} personnel status.
+     * Checks if the character has the {@link #DESERTED} personnel status.
      *
-     * @return {@code true} if the character has the {@code DESERTED} personnel status {@code false} otherwise.
+     * @return {@code true} if the character has the {@link #DESERTED} personnel status {@code false} otherwise.
      */
     public boolean isDeserted() {
         return this == DESERTED;
     }
 
     /**
-     * Checks if the character has the {@code DEFECTED} personnel status.
+     * Checks if the character has the {@link #DEFECTED} personnel status.
      *
-     * @return {@code true} if the character has the {@code DEFECTED} personnel status {@code false} otherwise.
+     * @return {@code true} if the character has the {@link #DEFECTED} personnel status {@code false} otherwise.
      */
     public boolean isDefected() {
         return this == DEFECTED;
     }
 
     /**
-     * Checks if the character has the {@code STUDENT} personnel status.
+     * Checks if the character has the {@link #STUDENT} personnel status.
      *
-     * @return {@code true} if the character has the {@code STUDENT} personnel status {@code false} otherwise.
+     * @return {@code true} if the character has the {@link #STUDENT} personnel status {@code false} otherwise.
      */
     public boolean isStudent() {
         return this == STUDENT;
     }
 
     /**
-     * Checks if the character has the {@code MISSING} personnel status.
+     * Checks if the character has the {@link #MISSING} personnel status.
      *
-     * @return {@code true} if the character has the {@code MISSING} personnel status {@code false} otherwise.
+     * @return {@code true} if the character has the {@link #MISSING} personnel status {@code false} otherwise.
      */
     public boolean isMissing() {
         return this == MISSING;
     }
 
     /**
-     * Checks if the character has the {@code KIA} personnel status.
+     * Checks if the character has the {@link #KIA} personnel status.
      *
-     * @return {@code true} if the character has the {@code KIA} personnel status {@code false} otherwise.
+     * @return {@code true} if the character has the {@link #KIA} personnel status {@code false} otherwise.
      */
     public boolean isKIA() {
         return this == KIA;
     }
 
     /**
-     * Checks if the character has the {@code HOMICIDE} personnel status.
+     * Checks if the character has the {@link #HOMICIDE} personnel status.
      *
-     * @return {@code true} if the character has the {@code HOMICIDE} personnel status {@code false} otherwise.
+     * @return {@code true} if the character has the {@link #HOMICIDE} personnel status {@code false} otherwise.
      */
     public boolean isHomicide() {
         return this == HOMICIDE;
     }
 
     /**
-     * Checks if the character has the {@code WOUNDS} personnel status.
+     * Checks if the character has the {@link #WOUNDS} personnel status.
      *
-     * @return {@code true} if the character has the {@code WOUNDS} personnel status {@code false} otherwise.
+     * @return {@code true} if the character has the {@link #WOUNDS} personnel status {@code false} otherwise.
      */
     public boolean isWounds() {
         return this == WOUNDS;
     }
 
     /**
-     * Checks if the character has the {@code DISEASE} personnel status.
+     * Checks if the character has the {@link #DISEASE} personnel status.
      *
-     * @return {@code true} if the character has the {@code DISEASE} personnel status {@code false} otherwise.
+     * @return {@code true} if the character has the {@link #DISEASE} personnel status {@code false} otherwise.
      */
     public boolean isDisease() {
         return this == DISEASE;
     }
 
     /**
-     * Checks if the character has the {@code ACCIDENTAL} personnel status.
+     * Checks if the character has the {@link #ACCIDENTAL} personnel status.
      *
-     * @return {@code true} if the character has the {@code ACCIDENTAL} personnel status {@code false} otherwise.
+     * @return {@code true} if the character has the {@link #ACCIDENTAL} personnel status {@code false} otherwise.
      */
     public boolean isAccidental() {
         return this == ACCIDENTAL;
     }
 
     /**
-     * Checks if the character has the {@code NATURAL_CAUSES} personnel status.
+     * Checks if the character has the {@link #NATURAL_CAUSES} personnel status.
      *
-     * @return {@code true} if the character has the {@code NATURAL_CAUSES} personnel status {@code false} otherwise.
+     * @return {@code true} if the character has the {@link #NATURAL_CAUSES} personnel status {@code false} otherwise.
      */
     public boolean isNaturalCauses() {
         return this == NATURAL_CAUSES;
     }
 
     /**
-     * Checks if the character has the {@code OLD_AGE} personnel status.
+     * Checks if the character has the {@link #OLD_AGE} personnel status.
      *
-     * @return {@code true} if the character has the {@code OLD_AGE} personnel status {@code false} otherwise.
+     * @return {@code true} if the character has the {@link #OLD_AGE} personnel status {@code false} otherwise.
      */
     public boolean isOldAge() {
         return this == OLD_AGE;
     }
 
     /**
-     * Checks if the character has the {@code MEDICAL_COMPLICATIONS} personnel status.
+     * Checks if the character has the {@link #MEDICAL_COMPLICATIONS} personnel status.
      *
-     * @return {@code true} if the character has the {@code MEDICAL_COMPLICATIONS} personnel status {@code false}
+     * @return {@code true} if the character has the {@link #MEDICAL_COMPLICATIONS} personnel status {@code false}
      *       otherwise.
      */
     public boolean isMedicalComplications() {
@@ -451,9 +452,9 @@ public enum PersonnelStatus {
     }
 
     /**
-     * Checks if the character has the {@code PREGNANCY_COMPLICATIONS} personnel status.
+     * Checks if the character has the {@link #PREGNANCY_COMPLICATIONS} personnel status.
      *
-     * @return {@code true} if the character has the {@code PREGNANCY_COMPLICATIONS} personnel status {@code false}
+     * @return {@code true} if the character has the {@link #PREGNANCY_COMPLICATIONS} personnel status {@code false}
      *       otherwise.
      */
     public boolean isPregnancyComplications() {
@@ -461,48 +462,58 @@ public enum PersonnelStatus {
     }
 
     /**
-     * Checks if the character has the {@code UNDETERMINED} personnel status.
+     * Checks if the character has the {@link #UNDETERMINED} personnel status.
      *
-     * @return {@code true} if the character has the {@code UNDETERMINED} personnel status {@code false} otherwise.
+     * @return {@code true} if the character has the {@link #UNDETERMINED} personnel status {@code false} otherwise.
      */
     public boolean isUndetermined() {
         return this == UNDETERMINED;
     }
 
     /**
-     * Checks if the character has the {@code SUICIDE} personnel status.
+     * Checks if the character has the {@link #SUICIDE} personnel status.
      *
-     * @return {@code true} if the character has the {@code SUICIDE} personnel status {@code false} otherwise.
+     * @return {@code true} if the character has the {@link #SUICIDE} personnel status {@code false} otherwise.
      */
     public boolean isSuicide() {
         return this == SUICIDE;
     }
 
     /**
-     * Checks if the character has the {@code ENEMY_BONDSMAN} personnel status.
+     * Checks if the character has the {@link #ENEMY_BONDSMAN} personnel status.
      *
-     * @return {@code true} if the character has the {@code ENEMY_BONDS} personnel status {@code false} otherwise.
+     * @return {@code true} if the character has the {@link #ENEMY_BONDSMAN} personnel status {@code false} otherwise.
      */
     public boolean isEnemyBondsman() {
         return this == ENEMY_BONDSMAN;
     }
 
     /**
-     * Checks if the character has the {@code BONDSREF} personnel status.
+     * Checks if the character has the {@link #BONDSREF} personnel status.
      *
-     * @return {@code true} if the character has the {@code BONDSREF} personnel status {@code false} otherwise.
+     * @return {@code true} if the character has the {@link #BONDSREF} personnel status {@code false} otherwise.
      */
     public boolean isBondsref() {
         return this == BONDSREF;
     }
 
     /**
-     * Checks if the character has the {@code SEPPUKU} personnel status.
+     * Checks if the character has the {@link #SEPPUKU} personnel status.
      *
-     * @return {@code true} if the character has the {@code SEPPUKU} personnel status {@code false} otherwise.
+     * @return {@code true} if the character has the {@link #SEPPUKU} personnel status {@code false} otherwise.
      */
     public boolean isSeppuku() {
         return this == SEPPUKU;
+    }
+
+    /**
+     * Checks if the character has the {@link #BACKGROUND_CHARACTER} personnel status.
+     *
+     * @return {@code true} if the character has the {@link #BACKGROUND_CHARACTER} personnel status {@code false}
+     *       otherwise.
+     */
+    public boolean isBackground() {
+        return this == BACKGROUND_CHARACTER;
     }
 
     /**
@@ -542,8 +553,9 @@ public enum PersonnelStatus {
                      isDeserted() ||
                      isDefected() ||
                      isMissing() ||
-                     isLeft() ||
-                     isEnemyBondsman();
+                     isLeft() || isEnemyBondsman() ||
+                     // We count background characters as departed, even though they technically never joined
+                     isBackground();
     }
 
     /**
