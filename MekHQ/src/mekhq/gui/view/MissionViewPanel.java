@@ -150,7 +150,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
         setLayout(new GridBagLayout());
 
-        pnlStats.setMaximumSize(UIUtil.scaleForGUI(300, Integer.MAX_VALUE));
+        pnlStats.setMaximumSize(UIUtil.scaleForGUI(200, Integer.MAX_VALUE));
         pnlStats.setName("pnlStats");
         pnlStats.setBorder(RoundedLineBorder.createRoundedLineBorder(mission.getName()));
         fillStats();
