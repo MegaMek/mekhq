@@ -168,7 +168,7 @@ public enum FinancialYearDuration {
             return valueOf(text);
         } catch (Exception ignored) {
             MMLogger.create(FinancialYearDuration.class)
-                  .error(ignored, "Unable to parse " + text + " into a FinancialYearDuration. Returning ANNUAL.");
+                  .error(ignored, "Unable to parse {} into a FinancialYearDuration. Returning ANNUAL.", text);
             return ANNUAL;
 
         }
