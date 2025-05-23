@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.utilities;
+package mekhq.gui.baseComponents.roundedComponents;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -57,7 +57,7 @@ import mekhq.MHQConstants;
  * @since 0.50.07
  */
 public class RoundedLineBorder extends AbstractBorder {
-    private static final int PADDING = 10;
+    private static final int PADDING = 5;
 
     private final Color color;
     private final int thickness;

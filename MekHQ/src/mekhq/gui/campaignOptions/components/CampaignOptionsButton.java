@@ -40,7 +40,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 
 import megamek.common.annotations.Nullable;
-import mekhq.gui.baseComponents.RoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 
 /**
  * A specialized {@link RoundedJButton} used in the campaign options dialog.

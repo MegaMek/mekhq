@@ -53,8 +53,8 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 import megamek.utilities.ImageUtilities;
-import mekhq.gui.baseComponents.RoundedJButton;
-import mekhq.gui.utilities.RoundedLineBorder;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
 /**
  * A dialog that provides introductory information for new players starting the quickstart campaign. This dialog

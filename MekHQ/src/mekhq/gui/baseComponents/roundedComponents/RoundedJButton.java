@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.baseComponents;
+package mekhq.gui.baseComponents.roundedComponents;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -40,7 +40,6 @@ import javax.swing.JButton;
 import javax.swing.border.Border;
 
 import mekhq.MHQConstants;
-import mekhq.gui.utilities.RoundedLineBorder;
 
 /**
  * {@link RoundedJButton} is a custom {@link JButton} implementation that renders a button with rounded corners and a

@@ -49,9 +49,9 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.logging.MMLogger;
 import mekhq.CampaignPreset;
-import mekhq.gui.baseComponents.RoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
-import mekhq.gui.utilities.RoundedLineBorder;
 
 /**
  * A dialog for selecting campaign presets. Extends {@link JDialog}. Keeps track of the selected preset and return
