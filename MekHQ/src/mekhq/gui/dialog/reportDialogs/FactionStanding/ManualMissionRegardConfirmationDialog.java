@@ -1,3 +1,35 @@
+/*
+ * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
+ */
 package mekhq.gui.dialog.reportDialogs.FactionStanding;
 
 import static java.lang.Integer.MAX_VALUE;
@@ -21,43 +53,69 @@ import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.HyperlinkEvent;
 
 import megamek.logging.MMLogger;
-import mekhq.gui.dialog.GlossaryDialog;
 import mekhq.gui.utilities.RoundedLineBorder;
 
-public class SimulatedMissionConfirmationDialog extends JDialog {
+/**
+ * Displays a modal dialog to confirm the results of a {@link SimulateMissionDialog} or {@link ManualMissionDialog}.
+ *
+ * @author Illiani
+ * @since 0.50.07
+ */
+public class ManualMissionRegardConfirmationDialog extends JDialog {
     private static final MMLogger LOGGER = MMLogger.create(SimulateMissionDialog.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionStandings";
 
     private final int PADDING = scaleForGUI(10);
     protected static final int IMAGE_WIDTH = scaleForGUI(200);
-    protected static final int CENTER_WIDTH = scaleForGUI(400);
-    public final static String GLOSSARY_COMMAND_STRING = "GLOSSARY";
+    protected static final int CENTER_WIDTH = scaleForGUI(300);
 
     private ImageIcon campaignIcon;
-    private boolean updateWasSuccess;
+    private final boolean updateWasSuccess;
 
-    public SimulatedMissionConfirmationDialog(ImageIcon campaignIcon, boolean updateWasSuccess) {
+    /**
+     * Constructs a SimulatedMissionConfirmationDialog.
+     *
+     * @param campaignIcon     {@link ImageIcon} to represent the campaign in the dialog.
+     * @param updateWasSuccess {@code true} if the simulated mission was successful, {@code false} otherwise.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public ManualMissionRegardConfirmationDialog(JDialog parent, ImageIcon campaignIcon, boolean updateWasSuccess) {
         this.campaignIcon = campaignIcon;
         this.updateWasSuccess = updateWasSuccess;
 
         populateDialog();
-        initializeDialog();
+        initializeDialog(parent);
     }
 
-    private void initializeDialog() {
+    /**
+     * Initializes general properties of the dialog, such as the title, modality, screen location, close operation, and
+     * visibility.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private void initializeDialog(JDialog parent) {
         setTitle(getTextAt(RESOURCE_BUNDLE, "factionStandingReport.title"));
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setLocationRelativeTo(null);
         setResizable(false);
         pack();
+        setLocationRelativeTo(parent);
         setModal(true);
         setAlwaysOnTop(true);
         setVisible(true);
     }
 
+    /**
+     * Builds the main layout of the dialog, including left (icon) and center (text, button) panels, and adds them to
+     * the dialog.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private void populateDialog() {
         JPanel mainPanel = new JPanel(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
@@ -87,6 +145,14 @@ public class SimulatedMissionConfirmationDialog extends JDialog {
         add(mainPanel, BorderLayout.CENTER);
     }
 
+    /**
+     * Builds the left-side GUI component containing the campaign icon.
+     *
+     * @return {@link JPanel} containing the scaled campaign icon.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private JPanel buildLeftPanel() {
         JPanel pnlCampaign = new JPanel();
         pnlCampaign.setLayout(new BoxLayout(pnlCampaign, BoxLayout.Y_AXIS));
@@ -103,6 +169,14 @@ public class SimulatedMissionConfirmationDialog extends JDialog {
         return pnlCampaign;
     }
 
+    /**
+     * Builds the center panel containing informational message and control buttons.
+     *
+     * @return {@link JPanel} with message and button components.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private JPanel populateCenterPanel() {
         JPanel pnlParent = new JPanel();
         pnlParent.setLayout(new BoxLayout(pnlParent, BoxLayout.Y_AXIS));
@@ -121,6 +195,14 @@ public class SimulatedMissionConfirmationDialog extends JDialog {
         return pnlParent;
     }
 
+    /**
+     * Builds the panel displaying the confirmation message to the user.
+     *
+     * @return {@link JPanel} displaying the success or failure message in a styled editor pane.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private JPanel populateInstructionsPanel() {
         JPanel pnlInstructions = new JPanel(new FlowLayout(FlowLayout.CENTER, PADDING, PADDING));
 
@@ -128,7 +210,6 @@ public class SimulatedMissionConfirmationDialog extends JDialog {
         editorPane.setContentType("text/html");
         editorPane.setEditable(false);
         editorPane.setFocusable(false);
-        editorPane.addHyperlinkListener(this::hyperlinkEventListenerActions);
 
         String instructionsKey = updateWasSuccess ?
                                        "simulateContractDialog.confirmation.success" :
@@ -144,6 +225,16 @@ public class SimulatedMissionConfirmationDialog extends JDialog {
         return pnlInstructions;
     }
 
+    /**
+     * Builds the panel containing the confirmation (OK) button.
+     *
+     * <p>When pressed, the dialog is closed.</p>
+     *
+     * @return {@link JPanel} containing the confirm button.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private JPanel populateButtonPanel() {
         JPanel pnlButton = new JPanel(new FlowLayout(FlowLayout.CENTER, PADDING, PADDING));
 
@@ -155,24 +246,5 @@ public class SimulatedMissionConfirmationDialog extends JDialog {
         pnlButton.add(btnConfirm);
 
         return pnlButton;
-    }
-
-    private void hyperlinkEventListenerActions(HyperlinkEvent evt) {
-        if (evt.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-            handleImmersiveHyperlinkClick(evt.getDescription());
-        }
-    }
-
-    private void handleImmersiveHyperlinkClick(String reference) {
-        String[] splitReference = reference.split(":");
-
-        String commandKey = splitReference[0];
-        String entryKey = splitReference[1];
-
-        if (commandKey.equalsIgnoreCase(GLOSSARY_COMMAND_STRING)) {
-            new GlossaryDialog(this, entryKey);
-        } else {
-            LOGGER.warn("Invalid hyperlink command: {}", commandKey);
-        }
     }
 }

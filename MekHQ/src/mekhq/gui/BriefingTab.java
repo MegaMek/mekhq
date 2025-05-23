@@ -38,6 +38,7 @@ import static mekhq.campaign.mission.enums.MissionStatus.PARTIAL;
 import static mekhq.campaign.mission.enums.MissionStatus.SUCCESS;
 import static mekhq.campaign.mission.enums.ScenarioStatus.REFUSED_ENGAGEMENT;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
+import static mekhq.gui.dialog.reportDialogs.FactionStanding.SimulateMissionDialog.handleFactionRegardUpdates;
 import static mekhq.utilities.MHQInternationalization.getText;
 
 import java.awt.BorderLayout;
@@ -109,6 +110,8 @@ import mekhq.gui.dialog.MissionTypeDialog;
 import mekhq.gui.dialog.NewAtBContractDialog;
 import mekhq.gui.dialog.NewContractDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
+import mekhq.gui.dialog.reportDialogs.FactionStanding.ManualMissionDialog;
+import mekhq.gui.dialog.reportDialogs.FactionStanding.SimulateMissionDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.ScenarioTableModel;
 import mekhq.gui.panels.TutorialHyperlinkPanel;
@@ -519,16 +522,35 @@ public final class BriefingTab extends CampaignGuiTab {
 
         // Update Faction Standings
         if (campaignOptions.isTrackFactionStanding()) {
-            Faction employer = null;
+            FactionStandings factionStandings = getCampaign().getFactionStandings();
+            List<String> reports = new ArrayList<>();
+
             if (mission instanceof AtBContract contract) {
-                employer = contract.getEmployerFaction();
+                Faction employer = contract.getEmployerFaction();
+                reports = factionStandings.processContractCompletion(employer, today, status);
+            } else {
+                SimulateMissionDialog dialog = new ManualMissionDialog(getFrame(),
+                      getCampaign().getCampaignFactionIcon(),
+                      getCampaign().getFaction(),
+                      getCampaign().getLocalDate(),
+                      status,
+                      mission.getName());
+
+                Faction employerChoice = dialog.getEmployerChoice();
+                Faction enemyChoice = dialog.getEnemyChoice();
+                MissionStatus statusChoice = dialog.getStatusChoice();
+
+                reports.addAll(handleFactionRegardUpdates(employerChoice,
+                      enemyChoice,
+                      statusChoice,
+                      today,
+                      factionStandings));
             }
 
-            FactionStandings factionStandings = getCampaign().getFactionStandings();
-            List<String> standingsReports = factionStandings.processContractCompletion(employer, today, status);
-
-            for (String standingReport : standingsReports) {
-                getCampaign().addReport(standingReport);
+            for (String report : reports) {
+                if (report != null && !report.isBlank()) {
+                    getCampaign().addReport(report);
+                }
             }
         }
 

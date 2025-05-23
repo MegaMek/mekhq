@@ -1,3 +1,35 @@
+/*
+ * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
+ */
 package mekhq.gui.dialog.reportDialogs.FactionStanding;
 
 import static java.lang.Integer.MAX_VALUE;
@@ -19,15 +51,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JEditorPane;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.HyperlinkEvent;
 
@@ -41,6 +65,17 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.dialog.GlossaryDialog;
 import mekhq.gui.utilities.RoundedLineBorder;
 
+/**
+ * Dialog window to simulate missions and adjust faction standings based on employer, enemy, and mission status
+ * selections within a campaign.
+ *
+ * <p>This dialog allows users to choose employer and enemy factions, set the current mission status, and provides
+ * contextual instructions and options relevant to faction interactions for the campaign. It presents UI components for
+ * these selections and manages associated logic.</p>
+ *
+ * @author Illiani
+ * @since 0.50.07
+ */
 public class SimulateMissionDialog extends JDialog {
     private static final MMLogger LOGGER = MMLogger.create(SimulateMissionDialog.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionStandings";
@@ -55,7 +90,6 @@ public class SimulateMissionDialog extends JDialog {
     private final Faction campaignFaction;
     private final LocalDate today;
     private final int gameYear;
-    private final String missionName;
 
     private final List<Faction> allFactions = new ArrayList<>();
     private Faction employerChoice = null;
@@ -64,47 +98,115 @@ public class SimulateMissionDialog extends JDialog {
     private MMComboBox<String> comboEnemyFaction;
 
     private final List<MissionStatus> allStatuses = new ArrayList<>();
-    MMComboBox<String> comboMissionStatus = null;
-    private MissionStatus statusChoice = MissionStatus.ACTIVE;
+    private MMComboBox<String> comboMissionStatus = null;
+    private MissionStatus statusChoice = MissionStatus.SUCCESS;
 
+    /**
+     * Constructs a dialog to simulate a mission for the given campaign, using the supplied campaign icon, faction, and
+     * date.
+     *
+     * @param campaignIcon        {@link ImageIcon} representing the campaign.
+     * @param campaignFaction     {@link Faction} representing the campaign.
+     * @param today               The current {@link LocalDate}.
+     * @param defaultStatusChoice The default mission status to be selected.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     public SimulateMissionDialog(ImageIcon campaignIcon, Faction campaignFaction, LocalDate today,
-          @Nullable String missionName) {
+          MissionStatus defaultStatusChoice) {
         this.campaignIcon = campaignIcon;
         this.campaignFaction = campaignFaction;
         this.today = today;
         this.gameYear = today.getYear();
-        this.missionName = missionName;
+        this.statusChoice = defaultStatusChoice;
+    }
+
+    /**
+     * Constructs a dialog to simulate a mission for the given campaign, providing a parent frame for modality.
+     *
+     * @param parent          The parent {@link JFrame} for the dialog.
+     * @param campaignIcon    {@link ImageIcon} representing the campaign.
+     * @param campaignFaction {@link Faction} representing the campaign.
+     * @param today           The current {@link LocalDate}.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public SimulateMissionDialog(JFrame parent, ImageIcon campaignIcon, Faction campaignFaction, LocalDate today) {
+        this.campaignIcon = campaignIcon;
+        this.campaignFaction = campaignFaction;
+        this.today = today;
+        this.gameYear = today.getYear();
 
         populateFactionsList();
         populateStatusList();
         populateDialog();
-        initializeDialog();
+        initializeDialog(parent);
     }
 
+    /**
+     * Returns the faction chosen as the employer in this simulation dialog.
+     *
+     * @return the selected employer {@link Faction}, or {@code null} if none is selected.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     public @Nullable Faction getEmployerChoice() {
         return employerChoice;
     }
 
+    /**
+     * Returns the faction chosen as the enemy in this simulation dialog.
+     *
+     * @return the selected enemy {@link Faction}, or {@code null} if none is selected.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     public @Nullable Faction getEnemyChoice() {
         return enemyChoice;
     }
 
+    /**
+     * Returns the mission status selected in the dialog.
+     *
+     * @return the selected {@link MissionStatus}, or {@code null} if none is selected.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     public @Nullable MissionStatus getStatusChoice() {
         return statusChoice;
     }
 
-    private void initializeDialog() {
+    /**
+     * Initializes the dialog with components, setting the parent if provided.
+     *
+     * @param parent the parent {@link JFrame} for the dialog.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    void initializeDialog(JFrame parent) {
         setTitle(getTextAt(RESOURCE_BUNDLE, "factionStandingReport.title"));
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setLocationRelativeTo(null);
         setResizable(false);
         pack();
+        setLocationRelativeTo(parent);
         setModal(true);
         setAlwaysOnTop(true);
         setVisible(true);
     }
 
-    private void populateDialog() {
+    /**
+     * Populates the dialog UI with relevant factions and mission status options.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    void populateDialog() {
         JPanel mainPanel = new JPanel(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.insets = new Insets(PADDING, 0, PADDING, 0);
@@ -133,16 +235,43 @@ public class SimulateMissionDialog extends JDialog {
         add(mainPanel, BorderLayout.CENTER);
     }
 
-    private void populateFactionsList() {
-        List<Faction> activeFactions = new ArrayList<>(Factions.getInstance().getActiveFactions(today));
+    /**
+     * Fills the internal list of all available factions for selection.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    void populateFactionsList() {
+        Factions factions = Factions.getInstance();
+        List<Faction> activeFactions = new ArrayList<>(factions.getActiveFactions(today));
+
+        activeFactions.removeIf(faction -> FactionStandings.isUntrackedFaction(faction.getShortName()));
         activeFactions.sort(Comparator.comparing(faction -> faction.getFullName(today.getYear())));
+
+        // This is a placeholder to ensure that the indexes of the combos and the list remain in sync
+        allFactions.add(UNTRACKED_FACTION_INDEX, factions.getFaction("NONE"));
+
         allFactions.addAll(activeFactions);
     }
 
-    private void populateStatusList() {
+    /**
+     * Fills the internal list of possible mission statuses for selection.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    void populateStatusList() {
         Collections.addAll(allStatuses, MissionStatus.values());
     }
 
+    /**
+     * Builds and returns the panel displayed on the left side of the dialog, which include campaign-related graphics.
+     *
+     * @return the constructed left-side {@link JPanel}.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private JPanel buildLeftPanel() {
         JPanel pnlCampaign = new JPanel();
         pnlCampaign.setLayout(new BoxLayout(pnlCampaign, BoxLayout.Y_AXIS));
@@ -159,6 +288,14 @@ public class SimulateMissionDialog extends JDialog {
         return pnlCampaign;
     }
 
+    /**
+     * Builds and returns the center panel containing the main input controls.
+     *
+     * @return the constructed center {@link JPanel}.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private JPanel populateCenterPanel() {
         JPanel pnlParent = new JPanel();
         pnlParent.setLayout(new BoxLayout(pnlParent, BoxLayout.Y_AXIS));
@@ -183,6 +320,14 @@ public class SimulateMissionDialog extends JDialog {
         return pnlParent;
     }
 
+    /**
+     * Creates a panel with instructions for using the dialog and making selections.
+     *
+     * @return the constructed instructions {@link JPanel}.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private JPanel populateInstructionsPanel() {
         JPanel pnlInstructions = new JPanel(new FlowLayout(FlowLayout.CENTER, PADDING, PADDING));
 
@@ -192,11 +337,9 @@ public class SimulateMissionDialog extends JDialog {
         editorPane.setFocusable(false);
         editorPane.addHyperlinkListener(this::hyperlinkEventListenerActions);
 
-        String missionText = missionName == null ?
-                                   getTextAt(RESOURCE_BUNDLE, "simulateContractDialog.instructions.noMission") :
-                                   missionName;
-        String instructions = getFormattedTextAt(RESOURCE_BUNDLE, "simulateContractDialog.instructions", missionText);
-
+        String instructions = getFormattedTextAt(RESOURCE_BUNDLE,
+              "simulateContractDialog.instructions",
+              getMissionName());
         String fontStyle = "font-family: Noto Sans;";
         editorPane.setText(String.format("<div style='width: %s; %s'>%s</div>", CENTER_WIDTH, fontStyle, instructions));
         setFontScaling(editorPane, false, 1.1);
@@ -206,6 +349,26 @@ public class SimulateMissionDialog extends JDialog {
         return pnlInstructions;
     }
 
+    /**
+     * Returns the display name for the current mission, as used within the dialog.
+     *
+     * @return the name of the mission.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    protected String getMissionName() {
+        return getTextAt(RESOURCE_BUNDLE, "simulateContractDialog.instructions.noMission");
+    }
+
+    /**
+     * Populates and returns the contract (mission) details panel for the dialog.
+     *
+     * @return the constructed contract {@link JPanel}.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private JPanel populateContractPanel() {
         JPanel pnlFactions = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -221,7 +384,7 @@ public class SimulateMissionDialog extends JDialog {
         gbc.anchor = GridBagConstraints.LINE_START;
         comboEmployerFaction = new MMComboBox<>("comboEmployerFaction", buildFactionModel());
         if (allFactions.contains(campaignFaction)) {
-            comboEmployerFaction.setSelectedItem(campaignFaction);
+            comboEmployerFaction.setSelectedItem(campaignFaction.getFullName(gameYear));
         }
         pnlFactions.add(comboEmployerFaction, gbc);
 
@@ -233,36 +396,57 @@ public class SimulateMissionDialog extends JDialog {
 
         gbc.gridx = 1;
         gbc.anchor = GridBagConstraints.LINE_START;
-        comboEnemyFaction = new MMComboBox<>("comboMissionStatus", buildFactionModel());
-        if (allFactions.contains(campaignFaction)) {
-            comboEnemyFaction.setSelectedItem(campaignFaction);
-        }
+        comboEnemyFaction = new MMComboBox<>("comboEnemyFaction", buildFactionModel());
         pnlFactions.add(comboEnemyFaction, gbc);
 
-        gbc.gridy = 2;
-        gbc.gridx = 0;
-        gbc.anchor = GridBagConstraints.LINE_END;
-        JLabel lblMissionStatus = new JLabel(getTextAt(RESOURCE_BUNDLE, "simulateContractDialog.label.status"));
-        pnlFactions.add(lblMissionStatus, gbc);
+        comboMissionStatus = getComboMissionStatus();
+        if (comboMissionStatus != null) { // This will be null if we're suppressing the combo box
+            gbc.gridy = 2;
+            gbc.gridx = 0;
+            gbc.anchor = GridBagConstraints.LINE_END;
+            JLabel lblMissionStatus = new JLabel(getTextAt(RESOURCE_BUNDLE, "simulateContractDialog.label.status"));
+            pnlFactions.add(lblMissionStatus, gbc);
 
-        gbc.gridx = 1;
-        gbc.anchor = GridBagConstraints.LINE_START;
-        comboMissionStatus = new MMComboBox<>("comboMissionStatus", buildMissionStatusModel());
-        if (allFactions.contains(campaignFaction)) {
-            comboMissionStatus.setSelectedItem(campaignFaction);
+            gbc.gridx = 1;
+            gbc.anchor = GridBagConstraints.LINE_START;
+            pnlFactions.add(comboMissionStatus, gbc);
         }
-        pnlFactions.add(comboMissionStatus, gbc);
 
         return pnlFactions;
     }
 
+    /**
+     * Returns the combo box UI element used for mission status selection, if present.
+     *
+     * @return the {@link MMComboBox} for mission status selection, or {@code null} if not created.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    protected @Nullable MMComboBox<String> getComboMissionStatus() {
+        comboMissionStatus = new MMComboBox<>("comboMissionStatus", buildMissionStatusModel());
+
+        if (allStatuses.contains(statusChoice)) {
+            comboMissionStatus.setSelectedItem(statusChoice.toString());
+        }
+
+        return comboMissionStatus;
+    }
+
+    /**
+     * Builds a combo box model containing all available factions for selection.
+     *
+     * @return a {@link DefaultComboBoxModel} containing faction names.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private DefaultComboBoxModel<String> buildFactionModel() {
         DefaultComboBoxModel<String> factionModel = new DefaultComboBoxModel<>();
         factionModel.addElement(getTextAt(RESOURCE_BUNDLE, "simulateContractDialog.combo.untracked"));
 
         for (Faction faction : allFactions) {
-            // Don't allow the player to pick factions we're not tracking
-            if (FactionStandings.isUntrackedFaction(faction.getShortName())) {
+            if (faction.equals(allFactions.get(UNTRACKED_FACTION_INDEX))) {
                 continue;
             }
 
@@ -272,6 +456,14 @@ public class SimulateMissionDialog extends JDialog {
         return factionModel;
     }
 
+    /**
+     * Builds a combo box model containing all available mission status values.
+     *
+     * @return a {@link DefaultComboBoxModel} containing mission status names.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private DefaultComboBoxModel<String> buildMissionStatusModel() {
         DefaultComboBoxModel<String> missionStatusModel = new DefaultComboBoxModel<>();
 
@@ -282,6 +474,14 @@ public class SimulateMissionDialog extends JDialog {
         return missionStatusModel;
     }
 
+    /**
+     * Creates and returns the panel containing action buttons for the dialog.
+     *
+     * @return the constructed button {@link JPanel}.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private JPanel populateButtonPanel() {
         JPanel pnlButton = new JPanel(new FlowLayout(FlowLayout.CENTER, PADDING, PADDING));
 
@@ -291,16 +491,18 @@ public class SimulateMissionDialog extends JDialog {
         btnConfirm.addActionListener(evt -> {
             int employerChoiceIndex = comboEmployerFaction.getSelectedIndex();
             if (employerChoiceIndex != UNTRACKED_FACTION_INDEX) { // If it's untracked leave the choice null
-                employerChoice = allFactions.get(employerChoiceIndex + 1); // This accounts for the 'untracked' option
+                employerChoice = allFactions.get(employerChoiceIndex);
             }
 
             int enemyChoiceIndex = comboEnemyFaction.getSelectedIndex();
             if (enemyChoiceIndex != UNTRACKED_FACTION_INDEX) { // If it's untracked leave the choice null
-                enemyChoice = allFactions.get(enemyChoiceIndex + 1); // This accounts for the 'untracked' option
+                enemyChoice = allFactions.get(enemyChoiceIndex);
             }
 
-            int missionStatusChoiceIndex = comboMissionStatus.getSelectedIndex();
-            statusChoice = allStatuses.get(missionStatusChoiceIndex);
+            if (comboMissionStatus != null) {
+                int missionStatusChoiceIndex = comboMissionStatus.getSelectedIndex();
+                statusChoice = allStatuses.get(missionStatusChoiceIndex);
+            }
 
             boolean wasUpdated = false;
             if (enemyChoice != null) {
@@ -309,8 +511,19 @@ public class SimulateMissionDialog extends JDialog {
                 wasUpdated = true;
             }
 
-            new SimulatedMissionConfirmationDialog(campaignIcon, wasUpdated);
-            dispose();
+            // If we didn't successfully update, we want the player to have another chance. This is especially
+            // important if this dialog is being triggered at the conclusion of a non-StratCon mission.
+            if (wasUpdated) {
+                dispose();
+            } else {
+                setVisible(false);
+            }
+
+            new ManualMissionRegardConfirmationDialog(this, campaignIcon, wasUpdated);
+
+            if (!wasUpdated) {
+                setVisible(true); // This should always be present otherwise we can lock up the player's client
+            }
         });
 
         pnlButton.add(btnConfirm);
@@ -318,12 +531,28 @@ public class SimulateMissionDialog extends JDialog {
         return pnlButton;
     }
 
-    private void hyperlinkEventListenerActions(HyperlinkEvent evt) {
+    /**
+     * Handles actions to perform when a hyperlink event occurs in the dialog, such as glossary lookups.
+     *
+     * @param evt the {@link HyperlinkEvent} that was received.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    protected void hyperlinkEventListenerActions(HyperlinkEvent evt) {
         if (evt.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
             handleImmersiveHyperlinkClick(evt.getDescription());
         }
     }
 
+    /**
+     * Processes logic when immersive (in-dialog) hyperlinks are clicked.
+     *
+     * @param reference the string reference associated with the hyperlink.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private void handleImmersiveHyperlinkClick(String reference) {
         String[] splitReference = reference.split(":");
 
@@ -337,6 +566,20 @@ public class SimulateMissionDialog extends JDialog {
         }
     }
 
+    /**
+     * Calculates and describes updates to faction regard values in response to mission simulation parameters, for
+     * both employer and enemy.
+     *
+     * @param employer        the employer faction, or {@code null} if not specified
+     * @param enemy           the enemy faction, or {@code null} if not specified
+     * @param status          the mission status applied to the simulation
+     * @param today           the current date of the simulation
+     * @param factionStandings the {@link FactionStandings} object holding all faction Regard data
+     * @return a list of strings detailing each regard update performed as a result
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     public static List<String> handleFactionRegardUpdates(@Nullable final Faction employer,
           @Nullable final Faction enemy, final MissionStatus status, final LocalDate today,
           final FactionStandings factionStandings) {

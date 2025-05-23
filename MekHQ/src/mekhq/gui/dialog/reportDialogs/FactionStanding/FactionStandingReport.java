@@ -32,33 +32,6 @@
  */
 package mekhq.gui.dialog.reportDialogs.FactionStanding;
 
-import static java.lang.Math.round;
-import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
-import static mekhq.gui.dialog.reportDialogs.FactionStanding.SimulateMissionDialog.handleFactionRegardUpdates;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
-import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
-import static mekhq.utilities.ReportingUtilities.getNegativeColor;
-import static mekhq.utilities.ReportingUtilities.getPositiveColor;
-import static mekhq.utilities.ReportingUtilities.getWarningColor;
-import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
-
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.border.CompoundBorder;
-
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.util.UIUtil;
@@ -77,6 +50,24 @@ import mekhq.gui.dialog.GlossaryDialog;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.RoundedLineBorder;
 import mekhq.gui.utilities.WrapLayout;
+
+import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
+import static java.lang.Math.round;
+import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
+import static mekhq.gui.dialog.reportDialogs.FactionStanding.SimulateMissionDialog.handleFactionRegardUpdates;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.ReportingUtilities.*;
 
 /**
  * Displays a dialog window that visualizes a report on faction standings for the current campaign year. Shows
@@ -406,7 +397,7 @@ public class FactionStandingReport extends JDialog {
      * @since 0.50.07
      */
     private void triggerMissionSimulationDialog() {
-        SimulateMissionDialog dialog = new SimulateMissionDialog(campaignIcon, campaignFaction, today, null);
+        SimulateMissionDialog dialog = new SimulateMissionDialog(frame, campaignIcon, campaignFaction, today);
 
         Faction employerChoice = dialog.getEmployerChoice();
         Faction enemyChoice = dialog.getEnemyChoice();
