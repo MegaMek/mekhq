@@ -138,6 +138,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String FATIGUED_BACKGROUND = "fatiguedBackground";
     public static final String STRATCON_HEX_COORD_FOREGROUND = "stratconHexCoordForeground";
     public static final String FONT_COLOR_NEGATIVE = "fontColorNegative";
+    public static final String FONT_COLOR_AMAZING = "fontColorAmazing";
     public static final String FONT_COLOR_POSITIVE = "fontColorPositive";
     public static final String FONT_COLOR_WARNING = "fontColorWarning";
     public static final String FONT_COLOR_SKILL_ULTRAGREEN = "fontColorSkillUltraGreen";

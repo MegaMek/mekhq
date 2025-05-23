@@ -438,26 +438,33 @@ public enum FactionStandingLevel {
         }
 
         if (negotiationModifier != STANDING_LEVEL_4.getNegotiationModifier()) {
-            effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.negotiation",
-                    getPolarityOfModifier(negotiationModifier)));
+            effects.add(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "factionStandingLevel.negotiation",
+                  getPolarityOfModifier(negotiationModifier)));
         }
 
         int resupplyPercentage = (int) resupplyWeightModifier * 100;
         effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.resupply", resupplyPercentage));
 
         if (hasCommandCircuitAccess) {
-            effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.commandCircuit",
-                    spanOpeningWithCustomColor(getPositiveColor()), CLOSING_SPAN_TAG));
+            effects.add(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "factionStandingLevel.commandCircuit",
+                  spanOpeningWithCustomColor(getPositiveColor()),
+                  CLOSING_SPAN_TAG));
         }
 
         if (isOutlawed) {
-            effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.outlawed",
-                    spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG));
+            effects.add(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "factionStandingLevel.outlawed",
+                  spanOpeningWithCustomColor(getNegativeColor()),
+                  CLOSING_SPAN_TAG));
         }
 
         if (!isBatchallAllowed) {
-            effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.batchall",
-                    spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG));
+            effects.add(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "factionStandingLevel.batchall",
+                  spanOpeningWithCustomColor(getWarningColor()),
+                  CLOSING_SPAN_TAG));
         }
 
         effects.add(getFormattedTextAt(RESOURCE_BUNDLE,
@@ -465,29 +472,33 @@ public enum FactionStandingLevel {
               getPolarityOfModifier(recruitmentTickets - STANDING_LEVEL_4.getRecruitmentTickets())));
 
         if (recruitmentRollsModifier != STANDING_LEVEL_4.getRecruitmentRollsModifier()) {
-            effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.recruitment.rolls",
-                    getPolarityOfModifier(recruitmentRollsModifier)));
+            effects.add(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "factionStandingLevel.recruitment.rolls",
+                  getPolarityOfModifier(recruitmentRollsModifier)));
         }
 
         int barracksCostPercentage = (int) barrackCostsMultiplier * 100;
         effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.barracks", barracksCostPercentage));
 
         if (unitMarketRarityModifier != STANDING_LEVEL_4.getUnitMarketRarityModifier()) {
-            effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.unitMarket",
-                    getPolarityOfModifier(unitMarketRarityModifier)));
+            effects.add(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "factionStandingLevel.unitMarket",
+                  getPolarityOfModifier(unitMarketRarityModifier)));
         }
 
         int payPercentage = (int) contractPayMultiplier * 100;
         effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.contractPay", payPercentage));
 
         if (supportPointModifierContractStart != STANDING_LEVEL_4.getSupportPointModifierContractStart()) {
-            effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.supportPoints.signing",
-                    getPolarityOfModifier(supportPointModifierContractStart)));
+            effects.add(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "factionStandingLevel.supportPoints.signing",
+                  getPolarityOfModifier(supportPointModifierContractStart)));
         }
 
         if (supportPointModifierPeriodic != STANDING_LEVEL_4.getSupportPointModifierPeriodic()) {
-            effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.supportPoints.periodic",
-                    getPolarityOfModifier(supportPointModifierContractStart)));
+            effects.add(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "factionStandingLevel.supportPoints.periodic",
+                  getPolarityOfModifier(supportPointModifierContractStart)));
         }
 
         return String.join(", ", effects);

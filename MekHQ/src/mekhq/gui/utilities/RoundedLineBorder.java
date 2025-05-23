@@ -32,13 +32,19 @@
  */
 package mekhq.gui.utilities;
 
-import mekhq.MHQConstants;
-
-import javax.swing.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import javax.swing.BorderFactory;
 import javax.swing.border.AbstractBorder;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
-import java.awt.*;
+import javax.swing.border.TitledBorder;
+
+import mekhq.MHQConstants;
 
 /**
  * {@code RoundedLineBorder} is a custom border implementation for Swing components that draws a rectangular border with
@@ -48,7 +54,7 @@ import java.awt.*;
  * convenience method to create a compound border with built-in padding.</p>
  *
  * @author Illiani
- * @since 0.50.7
+ * @since 0.50.07
  */
 public class RoundedLineBorder extends AbstractBorder {
     private static final int PADDING = 10;
@@ -64,13 +70,30 @@ public class RoundedLineBorder extends AbstractBorder {
      * @return a compound border with a rounded line border and padding.
      *
      * @author Illiani
-     * @since 0.50.7
+     * @since 0.50.07
      */
     public static CompoundBorder createRoundedLineBorder() {
         Border rounded = new RoundedLineBorder(MHQConstants.BORDER_COLOR_GRAY, 2, 16);
         Border padding = BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING);
 
         return BorderFactory.createCompoundBorder(rounded, padding);
+    }
+
+    /**
+     * Creates a compound border consisting of a rounded line border with a specified titled label.
+     *
+     * <p>The title is rendered as HTML to allow rich text formatting.</p>
+     *
+     * @param borderTitle the title to display on the border; HTML markup can be used.
+     *
+     * @return a {@link TitledBorder} with a rounded line and titled label.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public static TitledBorder createRoundedLineBorder(String borderTitle) {
+        return BorderFactory.createTitledBorder(RoundedLineBorder.createRoundedLineBorder(),
+              String.format("<html>%s</html>", borderTitle));
     }
 
     /**
@@ -81,7 +104,7 @@ public class RoundedLineBorder extends AbstractBorder {
      * @param arc       the arc (corner radius) of the border in pixels
      *
      * @author Illiani
-     * @since 0.50.7
+     * @since 0.50.07
      */
     public RoundedLineBorder(final Color color, final int thickness, final int arc) {
         this.color = color;
@@ -100,7 +123,7 @@ public class RoundedLineBorder extends AbstractBorder {
      * @param height    the height of the painted border
      *
      * @author Illiani
-     * @since 0.50.7
+     * @since 0.50.07
      */
     @Override
     public void paintBorder(Component component, Graphics graphics, int xPosition, int yPosition, int width,

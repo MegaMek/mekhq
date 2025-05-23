@@ -608,7 +608,8 @@ public class FactionStandings {
 
             Faction faction = Factions.getInstance().getFaction(factionCode);
             if (faction == null) {
-                LOGGER.warn("Faction {} is missing from the Factions collection. Skipping.", climateRegard.get(factionCode));
+                LOGGER.warn("Faction {} is missing from the Factions collection. Skipping.",
+                      climateRegard.get(factionCode));
                 continue;
             }
 

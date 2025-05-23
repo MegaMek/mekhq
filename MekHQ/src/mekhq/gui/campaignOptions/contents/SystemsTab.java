@@ -228,7 +228,7 @@ public class SystemsTab {
               "ReputationPerformanceModifierCutOff"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("ReputationGeneralOptionsPanel", true);
+        final JPanel panel = new CampaignOptionsStandardPanel("ReputationSanityOptionsPanel", true);
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridy = 0;
