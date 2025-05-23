@@ -92,19 +92,13 @@ import org.w3c.dom.NodeList;
 public abstract class Part implements IPartWork, ITechnology {
     private static final MMLogger logger = MMLogger.create(Part.class);
 
-    public static final int T_UNKNOWN = -1;
-    public static final int T_BOTH = 0;
-    public static final int T_IS = 1;
-    public static final int T_CLAN = 2;
-
     protected static final TechAdvancement TA_POD = Entity.getOmniAdvancement();
     // Generic TechAdvancement for a number of basic components.
-    protected static final TechAdvancement TA_GENERIC = new TechAdvancement(TECH_BASE_ALL).setAdvancement(DATE_ES,
-                DATE_ES,
-                DATE_ES)
-                                                              .setTechRating(RATING_C)
-                                                              .setAvailability(RATING_C, RATING_C, RATING_C, RATING_C)
-                                                              .setStaticTechLevel(SimpleTechLevel.STANDARD);
+    protected static final TechAdvancement TA_GENERIC = new TechAdvancement(TechBase.ALL)
+        .setAdvancement(DATE_ES, DATE_ES, DATE_ES)
+        .setTechRating(TechRating.C)
+        .setAvailability(AvailabilityValue.C, AvailabilityValue.C, AvailabilityValue.C, AvailabilityValue.C)
+        .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     protected String name;
     protected int id;
@@ -288,13 +282,13 @@ public abstract class Part implements IPartWork, ITechnology {
         }
 
         switch (getTechBase()) {
-            case T_IS:
+            case IS:
                 cost = cost.multipliedBy(campaign.getCampaignOptions().getInnerSphereUnitPriceMultiplier());
                 break;
-            case T_CLAN:
+            case CLAN:
                 cost = cost.multipliedBy(campaign.getCampaignOptions().getClanUnitPriceMultiplier());
                 break;
-            case T_BOTH:
+            case ALL:
             default:
                 cost = cost.multipliedBy(campaign.getCampaignOptions().getCommonPartPriceMultiplier());
                 break;
@@ -507,15 +501,15 @@ public abstract class Part implements IPartWork, ITechnology {
         return getTechBaseName(getTechBase());
     }
 
-    public static String getTechBaseName(int base) {
+    public static String getTechBaseName(TechBase base) {
         switch (base) {
-            case T_BOTH:
+            case ALL:
                 return "IS/Clan";
-            case T_CLAN:
+            case CLAN:
                 return "Clan";
-            case T_IS:
+            case IS:
                 return "IS";
-            case T_UNKNOWN:
+            case UNKNOWN:
                 return "UNKNOWN";
             default:
                 return "??";
@@ -545,7 +539,7 @@ public abstract class Part implements IPartWork, ITechnology {
         }
     }
 
-    public SimpleTechLevel getSimpleTechLevel(int year, boolean clan, int faction) {
+    public SimpleTechLevel getSimpleTechLevel(int year, boolean clan, Faction faction) {
         if (campaign.useVariableTechLevel()) {
             return getSimpleLevel(year, clan, faction);
         } else {
@@ -593,7 +587,7 @@ public abstract class Part implements IPartWork, ITechnology {
     }
 
     protected boolean isClanTechBase() {
-        return getTechBase() == TECH_BASE_CLAN;
+        return getTechBase() == ITechnology.TechBase.CLAN;
     }
 
     public abstract void writeToXML(PrintWriter pw, int indent);
@@ -676,32 +670,7 @@ public abstract class Part implements IPartWork, ITechnology {
         NamedNodeMap attrs = wn.getAttributes();
         Node classNameNode = attrs.getNamedItem("type");
         String className = classNameNode.getTextContent();
-
-        // <50.01 compatibility handlers
-        if (className.equalsIgnoreCase("mekhq.campaign.parts.MekEngine")) {
-            className = "mekhq.campaign.parts.EnginePart";
-        } else if (className.equalsIgnoreCase("mekhq.campaign.parts.MissingMekEngine")) {
-            className = "mekhq.campaign.parts.MissingEnginePart";
-        } else if (className.equalsIgnoreCase("mekhq.campaign.parts.EquipmentPart")) {
-            className = "mekhq.campaign.parts.equipment.EquipmentPart";
-        } else if (className.equalsIgnoreCase("mekhq.campaign.parts.MissingEquipmentPart")) {
-            className = "mekhq.campaign.parts.equipment.MissingEquipmentPart";
-        } else if (className.equalsIgnoreCase("mekhq.campaign.parts.AmmoBin")) {
-            className = "mekhq.campaign.parts.equipment.AmmoBin";
-        } else if (className.equalsIgnoreCase("mekhq.campaign.parts.MissingAmmoBin")) {
-            className = "mekhq.campaign.parts.equipment.MissingAmmoBin";
-        } else if (className.equalsIgnoreCase("mekhq.campaign.parts.JumpJet")) {
-            className = "mekhq.campaign.parts.equipment.JumpJet";
-        } else if (className.equalsIgnoreCase("mekhq.campaign.parts.MissingJumpJet")) {
-            className = "mekhq.campaign.parts.equipment.MissingJumpJet";
-        } else if (className.equalsIgnoreCase("mekhq.campaign.parts.HeatSink")) {
-            className = "mekhq.campaign.parts.equipment.HeatSink";
-        } else if (className.equalsIgnoreCase("mekhq.campaign.parts.MissingHeatSink")) {
-            className = "mekhq.campaign.parts.equipment.MissingHeatSink";
-        } else if (className.equalsIgnoreCase("mekhq.campaign.parts.VeeStabiliser")) {
-            className = "mekhq.campaign.parts.VeeStabilizer";
-        }
-
+        
         Part retVal = null;
         try {
             // Instantiate the correct child class, and call its parsing function.
@@ -932,7 +901,7 @@ public abstract class Part implements IPartWork, ITechnology {
         // but we will make this user customizable
         final TargetRoll mods = new TargetRoll(campaign.getCampaignOptions().getMaintenanceBonus(), "maintenance");
         mods.addModifier(Availability.getTechModifier(getTechRating()),
-              "tech rating " + ITechnology.getRatingName(getTechRating()));
+              "tech rating " + getTechRating().getName());
 
         if (getUnit() == null) {
             return mods;
@@ -1613,12 +1582,12 @@ public abstract class Part implements IPartWork, ITechnology {
     }
 
     @Override
-    public int getTechBase() {
+    public TechBase getTechBase() {
         return getTechAdvancement().getTechBase();
     }
 
     @Override
-    public int getTechRating() {
+    public TechRating getTechRating() {
         return getTechAdvancement().getTechRating();
     }
 
@@ -1707,28 +1676,33 @@ public abstract class Part implements IPartWork, ITechnology {
     }
 
     @Override
-    public int getBaseAvailability(int era) {
+    public AvailabilityValue getBaseAvailability(Era era) {
         if (omniPodded) {
-            return Math.max(getTechAdvancement().getBaseAvailability(era), TA_POD.getBaseAvailability(era));
+            AvailabilityValue av = getTechAdvancement().getBaseAvailability(era);
+            AvailabilityValue podRating = TA_POD.getBaseAvailability(era);
+            return podRating.isBetterThan(av) ? podRating : av;
         }
         return getTechAdvancement().getBaseAvailability(era);
     }
 
-    public int getAvailability() {
+    public AvailabilityValue getAvailability() {
         return calcYearAvailability(campaign.getGameYear(), campaign.useClanTechBase(), campaign.getTechFaction());
     }
 
     @Override
-    public int calcYearAvailability(int year, boolean clan) {
-        int av = getTechAdvancement().calcYearAvailability(campaign.getGameYear(), campaign.getFaction().isClan());
+    public AvailabilityValue calcYearAvailability(int year, boolean clan) {
+        AvailabilityValue av = getTechAdvancement().calcYearAvailability(campaign.getGameYear(), campaign.getFaction().isClan());
         if (omniPodded) {
-            av = Math.max(av, TA_POD.calcYearAvailability(campaign.getGameYear(), campaign.getFaction().isClan()));
+            AvailabilityValue podRating = TA_POD.calcYearAvailability(campaign.getGameYear(), campaign.getFaction().isClan());
+            if (podRating.isBetterThan(av)) {
+                av = podRating;
+            }
         }
         return av;
     }
 
     @Override
-    public int getIntroductionDate(boolean clan, int faction) {
+    public int getIntroductionDate(boolean clan, Faction faction) {
         if (omniPodded) {
             return Math.max(getTechAdvancement().getIntroductionDate(clan, faction),
                   TA_POD.getIntroductionDate(clan, faction));
@@ -1737,7 +1711,7 @@ public abstract class Part implements IPartWork, ITechnology {
     }
 
     @Override
-    public int getPrototypeDate(boolean clan, int faction) {
+    public int getPrototypeDate(boolean clan, Faction faction) {
         if (omniPodded) {
             return Math.max(getTechAdvancement().getPrototypeDate(clan, faction),
                   TA_POD.getPrototypeDate(clan, faction));
@@ -1746,7 +1720,7 @@ public abstract class Part implements IPartWork, ITechnology {
     }
 
     @Override
-    public int getProductionDate(boolean clan, int faction) {
+    public int getProductionDate(boolean clan, Faction faction) {
         if (omniPodded) {
             return Math.max(getTechAdvancement().getProductionDate(clan, faction),
                   TA_POD.getProductionDate(clan, faction));
@@ -1755,12 +1729,12 @@ public abstract class Part implements IPartWork, ITechnology {
     }
 
     @Override
-    public int getExtinctionDate(boolean clan, int faction) {
+    public int getExtinctionDate(boolean clan, Faction faction) {
         return getTechAdvancement().getExtinctionDate(clan, faction);
     }
 
     @Override
-    public int getReintroductionDate(boolean clan, int faction) {
+    public int getReintroductionDate(boolean clan, Faction faction) {
         return getTechAdvancement().getReintroductionDate(clan, faction);
     }
 

@@ -104,7 +104,6 @@ public class PersonnelOptions extends PilotOptions {
     public static final String EXCEPTIONAL_ATTRIBUTE_WILLPOWER = "exceptional_attribute_willpower";
     public static final String EXCEPTIONAL_ATTRIBUTE_CHARISMA = "exceptional_attribute_charisma";
 
-    public static final String ADMIN_SCROUNGE = "admin_scrounge";
     public static final String ADMIN_MEDIATOR = "admin_mediator";
     public static final String ADMIN_LOGISTICIAN = "admin_logistician";
     public static final String ADMIN_COORDINATOR = "admin_coordinator";
@@ -195,7 +194,6 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, EXCEPTIONAL_ATTRIBUTE_WILLPOWER, false);
         addOption(l3a, EXCEPTIONAL_ATTRIBUTE_CHARISMA, false);
 
-        addOption(l3a, ADMIN_SCROUNGE, false);
         addOption(l3a, ADMIN_MEDIATOR, false);
         addOption(l3a, ADMIN_LOGISTICIAN, false);
         addOption(l3a, ADMIN_COORDINATOR, false);

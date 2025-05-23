@@ -31,8 +31,10 @@ package mekhq.campaign.universe;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
@@ -42,14 +44,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.util.StdConverter;
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.EquipmentType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.AcademyFactory;
 import mekhq.campaign.universe.enums.HPGRating;
 import mekhq.campaign.universe.enums.HiringHallLevel;
-
-import javax.xml.transform.Source;
 
 /**
  * This is a PlanetarySystem object that will contain information
@@ -61,6 +60,77 @@ import javax.xml.transform.Source;
 @JsonIgnoreProperties(ignoreUnknown=true)
 @JsonDeserialize(converter= PlanetarySystem.PlanetarySystemPostLoader.class)
 public class PlanetarySystem {
+
+    
+    // --- Sophistication Rating Enum ---
+    public enum PlanetarySophistication {
+        ADVANCED(0, "Advanced"),
+        A(1, "A"),
+        B(2, "B"),
+        C(3, "C"),
+        D(4, "D"),
+        F(5, "F"),
+        REGRESSED(6, "Regressed");
+
+        private final int index;
+        private final String name;
+        private static final Map<Integer, PlanetarySophistication> INDEX_LOOKUP = new HashMap<>();
+        private static final Map<String, PlanetarySophistication> NAME_LOOKUP = new HashMap<>();
+        static {
+            for (PlanetarySophistication tr : values()) {
+                INDEX_LOOKUP.put(tr.index, tr);
+                NAME_LOOKUP.put(tr.name, tr);
+            }
+        }
+        PlanetarySophistication(int idx, String name) { this.index = idx; this.name = name; }
+        public int getIndex() { return index; }
+        public String getName() { return name; }
+        public static PlanetarySophistication fromIndex(int idx) {
+            PlanetarySophistication tr = INDEX_LOOKUP.get(idx);
+            if (tr == null) throw new IllegalArgumentException("Invalid PlanetarySophistication index: " + idx);
+            return tr;
+        }
+        public static PlanetarySophistication fromName(String name) {
+            PlanetarySophistication tr = NAME_LOOKUP.get(name);
+            if (tr == null) throw new IllegalArgumentException("Invalid PlanetarySophistication name: " + name);
+            return tr;
+        }
+    }
+
+    // --- Planetary Rating Enum ---
+    public enum PlanetaryRating {
+        A(0, "A"),
+        B(1, "B"),
+        C(2, "C"),
+        D(3, "D"),
+        F(4, "F");
+
+        private final int index;
+        private final String name;
+        private static final Map<Integer, PlanetaryRating> INDEX_LOOKUP = new HashMap<>();
+        private static final Map<String, PlanetaryRating> NAME_LOOKUP = new HashMap<>();
+        static {
+            for (PlanetaryRating tr : values()) {
+                INDEX_LOOKUP.put(tr.index, tr);
+                NAME_LOOKUP.put(tr.name, tr);
+            }
+        }
+        PlanetaryRating(int idx, String name) { this.index = idx; this.name = name; }
+        public int getIndex() { return index; }
+        public String getName() { return name; }
+        public static PlanetaryRating fromIndex(int idx) {
+            PlanetaryRating tr = INDEX_LOOKUP.get(idx);
+            if (tr == null) throw new IllegalArgumentException("Invalid PlanetaryRating index: " + idx);
+            return tr;
+        }
+        public static PlanetaryRating fromName(String name) {
+            PlanetaryRating tr = NAME_LOOKUP.get(name);
+            if (tr == null) throw new IllegalArgumentException("Invalid PlanetaryRating name: " + name);
+            return tr;
+        }
+    }
+
+
     @JsonProperty("xcood")
     private Double x;
     @JsonProperty("ycood")
@@ -170,28 +240,28 @@ public class PlanetarySystem {
 
     /** highest socio-industrial ratings among all planets in-system for the map **/
     public SocioIndustrialData getSocioIndustrial(LocalDate when) {
-        int tech = EquipmentType.RATING_X;
-        int industry = EquipmentType.RATING_X;
-        int rawMaterials = EquipmentType.RATING_X;
-        int output = EquipmentType.RATING_X;
-        int agriculture = EquipmentType.RATING_X;
+        PlanetarySophistication tech = PlanetarySophistication.REGRESSED;
+        PlanetaryRating industry = PlanetaryRating.F;
+        PlanetaryRating rawMaterials = PlanetaryRating.F;
+        PlanetaryRating output = PlanetaryRating.F;
+        PlanetaryRating agriculture = PlanetaryRating.F;
 
         for (Planet planet : planets.values()) {
             SocioIndustrialData sic = planet.getSocioIndustrial(when);
             if (null != sic) {
-                if (sic.tech < tech) {
+                if (sic.tech.getIndex() < tech.getIndex()) {
                     tech = sic.tech;
                 }
-                if (sic.industry < industry) {
+                if (sic.industry.getIndex() < industry.getIndex()) {
                     industry = sic.industry;
                 }
-                if (sic.rawMaterials < rawMaterials) {
+                if (sic.rawMaterials.getIndex() < rawMaterials.getIndex()) {
                     rawMaterials = sic.rawMaterials;
                 }
-                if (sic.output < output) {
+                if (sic.output.getIndex() < output.getIndex()) {
                     output = sic.output;
                 }
-                if (sic.agriculture < agriculture) {
+                if (sic.agriculture.getIndex() < agriculture.getIndex()) {
                     agriculture = sic.agriculture;
                 }
             }

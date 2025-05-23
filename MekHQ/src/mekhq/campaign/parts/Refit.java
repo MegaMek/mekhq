@@ -2632,27 +2632,27 @@ public class Refit extends Part implements IAcquisitionWork {
     @Override
     public TargetRoll getAllAcquisitionMods() {
         TargetRoll roll = new TargetRoll();
-        int avail = EquipmentType.RATING_A;
+        AvailabilityValue avail = AvailabilityValue.A;
         int techBaseMod = 0;
         for (Part part : shoppingList) {
-            if (getTechBase() == T_CLAN && campaign.getCampaignOptions().getClanAcquisitionPenalty() > techBaseMod) {
+            if (getTechBase() == TechBase.CLAN && campaign.getCampaignOptions().getClanAcquisitionPenalty() > techBaseMod) {
                 techBaseMod = campaign.getCampaignOptions().getClanAcquisitionPenalty();
-            } else if (getTechBase() == T_IS && campaign.getCampaignOptions().getIsAcquisitionPenalty() > techBaseMod) {
+            } else if (getTechBase() == TechBase.IS && campaign.getCampaignOptions().getIsAcquisitionPenalty() > techBaseMod) {
                 techBaseMod = campaign.getCampaignOptions().getIsAcquisitionPenalty();
-            } else if (getTechBase() == T_BOTH) {
+            } else if (getTechBase() == TechBase.ALL) {
                 int penalty = Math.min(campaign.getCampaignOptions().getClanAcquisitionPenalty(),
                       campaign.getCampaignOptions().getIsAcquisitionPenalty());
                 if (penalty > techBaseMod) {
                     techBaseMod = penalty;
                 }
             }
-            avail = Math.max(avail, part.getAvailability());
+            avail = AvailabilityValue.fromIndex(Math.max(avail.getIndex(), part.getAvailability().getIndex()));
         }
         if (techBaseMod > 0) {
             roll.addModifier(techBaseMod, "tech limit");
         }
         int availabilityMod = Availability.getAvailabilityModifier(avail);
-        roll.addModifier(availabilityMod, "availability (" + ITechnology.getRatingName(avail) + ")");
+        roll.addModifier(availabilityMod, "availability (" + avail.getName() + ")");
         return roll;
     }
 
@@ -2679,8 +2679,8 @@ public class Refit extends Part implements IAcquisitionWork {
      * Tech base is basically irrelevant for a refit kit
      */
     @Override
-    public int getTechBase() {
-        return Part.T_BOTH;
+    public TechBase getTechBase() {
+        return Part.TechBase.ALL;
     }
 
     /**
@@ -2966,8 +2966,8 @@ public class Refit extends Part implements IAcquisitionWork {
      * @return 0
      */
     @Override
-    public int getTechRating() {
-        return 0;
+    public TechRating getTechRating() {
+        return TechRating.A; // Was 0 pre-conversion to ENUM, so this is the same
     }
 
     /**
@@ -3058,7 +3058,7 @@ public class Refit extends Part implements IAcquisitionWork {
      * @return should probably always be true
      */
     @Override
-    public boolean isIntroducedBy(int year, boolean clan, int techFaction) {
+    public boolean isIntroducedBy(int year, boolean clan, ITechnology.Faction techFaction) {
         return getIntroductionDate(clan, techFaction) <= year;
     }
 
@@ -3068,7 +3068,7 @@ public class Refit extends Part implements IAcquisitionWork {
      * @return should probably always be false
      */
     @Override
-    public boolean isExtinctIn(int year, boolean clan, int techFaction) {
+    public boolean isExtinctIn(int year, boolean clan, ITechnology.Faction techFaction) {
         return isExtinct(year, clan, techFaction);
     }
 

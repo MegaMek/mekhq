@@ -116,30 +116,6 @@ public enum Phenotype {
     }
 
     /**
-     * @deprecated use {@link #getLabel()} instead
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public String getName() {
-        return getLabel();
-    }
-
-    /**
-     * @deprecated use {@link #getLabel()} instead
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public String getGroupingName() {
-        return getLabel();
-    }
-
-    /**
-     * @deprecated use {@link #getTooltip()} instead
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public String getToolTipText() {
-        return getTooltip();
-    }
-
-    /**
      * Checks whether the phenotype is a Clan Trueborn phenotype.
      *
      * @return a boolean, {@code true} if the phenotype is Trueborn, otherwise {@code false}.
@@ -347,15 +323,7 @@ public enum Phenotype {
     }
 
     // region File I/O
-
-    /**
-     * @deprecated use {@link #fromString(String)} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public static Phenotype parseFromString(final String phenotype) {
-        return fromString(phenotype);
-    }
-
+    
     /**
      * Converts a string representation to a corresponding {@link Phenotype} value.
      *

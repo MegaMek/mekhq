@@ -53,7 +53,6 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.enums.AwardBonus;
 import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
@@ -117,8 +116,6 @@ public class PersonnelTab {
     private JPanel pnlAdministrators;
     private JCheckBox chkAdminsHaveNegotiation;
     private JCheckBox chkAdminExperienceLevelIncludeNegotiation;
-    private JCheckBox chkAdminsHaveScrounge;
-    private JCheckBox chkAdminExperienceLevelIncludeScrounge;
     //end General Tab
 
     //start Personnel Logs Tab
@@ -364,25 +361,6 @@ public class PersonnelTab {
         pnlAdministrators = new JPanel();
         chkAdminsHaveNegotiation = new JCheckBox();
         chkAdminExperienceLevelIncludeNegotiation = new JCheckBox();
-        chkAdminsHaveScrounge = new JCheckBox();
-        chkAdminExperienceLevelIncludeScrounge = new JCheckBox();
-    }
-
-    /**
-     * Retrieves a {@link DefaultComboBoxModel} containing all valid {@link PrisonerStatus} options, except for the
-     * {@code PrisonerStatus.FREE} enumeration.
-     *
-     * @return a {@link DefaultComboBoxModel} containing the prisoner status options.
-     *
-     * @deprecated unused, no alternative necessary
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    private DefaultComboBoxModel<PrisonerStatus> getPrisonerStatusOptions() {
-        final DefaultComboBoxModel<PrisonerStatus> prisonerStatusModel = new DefaultComboBoxModel<>(PrisonerStatus.values());
-        // we don't want this as a standard use case for prisoners
-        prisonerStatusModel.removeElement(PrisonerStatus.FREE);
-
-        return prisonerStatusModel;
     }
 
     /**
@@ -547,7 +525,7 @@ public class PersonnelTab {
     /**
      * Creates the panel for administrative settings in the General Tab.
      *
-     * @return a {@link JPanel} containing settings related to administrators, such as negotiation and scrounge options.
+     * @return a {@link JPanel} containing settings related to administrators, such as negotiation options.
      */
     private JPanel createAdministratorsPanel() {
         // Contents
@@ -556,11 +534,6 @@ public class PersonnelTab {
         chkAdminExperienceLevelIncludeNegotiation = new CampaignOptionsCheckBox("AdminExperienceLevelIncludeNegotiation");
         chkAdminExperienceLevelIncludeNegotiation.addMouseListener(createTipPanelUpdater(generalHeader,
               "AdminExperienceLevelIncludeNegotiation"));
-        chkAdminsHaveScrounge = new CampaignOptionsCheckBox("AdminsHaveScrounge");
-        chkAdminsHaveScrounge.addMouseListener(createTipPanelUpdater(generalHeader, "AdminsHaveScrounge"));
-        chkAdminExperienceLevelIncludeScrounge = new CampaignOptionsCheckBox("AdminExperienceLevelIncludeScrounge");
-        chkAdminExperienceLevelIncludeScrounge.addMouseListener(createTipPanelUpdater(generalHeader,
-              "AdminExperienceLevelIncludeScrounge"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("AdministratorsPanel", true, "AdministratorsPanel");
@@ -572,12 +545,6 @@ public class PersonnelTab {
 
         layout.gridy++;
         panel.add(chkAdminExperienceLevelIncludeNegotiation, layout);
-
-        layout.gridy++;
-        panel.add(chkAdminsHaveScrounge, layout);
-
-        layout.gridy++;
-        panel.add(chkAdminExperienceLevelIncludeScrounge, layout);
 
         return panel;
     }
@@ -1283,8 +1250,6 @@ public class PersonnelTab {
         chkUseRemovalExemptRetirees.setSelected(options.isUseRemovalExemptRetirees());
         chkAdminsHaveNegotiation.setSelected(options.isAdminsHaveNegotiation());
         chkAdminExperienceLevelIncludeNegotiation.setSelected(options.isAdminExperienceLevelIncludeNegotiation());
-        chkAdminsHaveScrounge.setSelected(options.isAdminsHaveScrounge());
-        chkAdminExperienceLevelIncludeScrounge.setSelected(options.isAdminExperienceLevelIncludeScrounge());
 
         // Personnel Log
         chkUseTransfers.setSelected(options.isUseTransfers());
@@ -1374,8 +1339,6 @@ public class PersonnelTab {
         options.setUseRemovalExemptRetirees(chkUseRemovalExemptRetirees.isSelected());
         options.setAdminsHaveNegotiation(chkAdminsHaveNegotiation.isSelected());
         options.setAdminExperienceLevelIncludeNegotiation(chkAdminExperienceLevelIncludeNegotiation.isSelected());
-        options.setAdminsHaveScrounge(chkAdminsHaveScrounge.isSelected());
-        options.setAdminExperienceLevelIncludeScrounge(chkAdminExperienceLevelIncludeScrounge.isSelected());
 
         // Personnel Log
         options.setUseTransfers(chkUseTransfers.isSelected());

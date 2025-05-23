@@ -88,42 +88,6 @@ public enum EducationLevel {
     // region File I/O
 
     /**
-     * @deprecated use {@link #fromString(String)} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public static EducationLevel parseFromString(final String educationLevel) {
-        return switch (educationLevel) {
-            case "None", "Early Childhood" -> EARLY_CHILDHOOD;
-            case "High School" -> HIGH_SCHOOL;
-            case "College" -> COLLEGE;
-            case "Post-Graduate" -> POST_GRADUATE;
-            case "Doctorate" -> DOCTORATE;
-            default -> throw new IllegalStateException(
-                  "Unexpected value in mekhq/campaign/personnel/enums/education/EducationLevel.java/parseFromString: " +
-                        educationLevel);
-        };
-    }
-
-    /**
-     * @deprecated use {@link #fromString(String)} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public static EducationLevel parseFromInt(final int educationLevel) {
-        return switch (educationLevel) {
-            case 0 -> EARLY_CHILDHOOD;
-            case 1 -> HIGH_SCHOOL;
-            case 2 -> COLLEGE;
-            case 3 -> POST_GRADUATE;
-            case 4 -> DOCTORATE;
-            default -> throw new IllegalStateException(
-                  "Unexpected value in mekhq/campaign/personnel/enums/education/EducationLevel.java/parseFromInt: " +
-                        educationLevel);
-        };
-    }
-
-    // region File I/O
-
-    /**
      * Converts a string to its corresponding {@link EducationLevel} enum constant, if possible.
      *
      * <p>This method attempts to map the input string to an {@link EducationLevel} in multiple ways:</p>
