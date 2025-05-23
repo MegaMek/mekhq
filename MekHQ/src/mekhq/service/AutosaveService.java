@@ -75,16 +75,7 @@ public class AutosaveService implements IAutosaveService {
             performAutosave(campaign);
         }
     }
-
-    /**
-     * @deprecated Use {@code requestBeforeScenarioAutosave} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    @Override
-    public void requestBeforeMissionAutosave(final Campaign campaign) {
-        requestBeforeScenarioAutosave(campaign);
-    }
-
+    
     @Override
     public void requestBeforeScenarioAutosave(final Campaign campaign) {
         Objects.requireNonNull(campaign);

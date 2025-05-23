@@ -431,8 +431,7 @@ public enum PersonnelRole {
     }
 
     PersonnelRole(final PersonnelRoleSubType subType, final int mnemonic, final int strength, final int body,
-          final int dexterity,
-          final int reflexes, final int intelligence, final int willpower, final int charisma) {
+          final int dexterity, final int reflexes, final int intelligence, final int willpower, final int charisma) {
         this(subType, false, mnemonic, strength, body, dexterity, reflexes, intelligence, willpower, charisma);
     }
 
@@ -453,14 +452,6 @@ public enum PersonnelRole {
     // endregion Constructors
 
     // region Getters
-
-    /**
-     * @deprecated use {@link #getLabel(boolean)} instead
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public String getName(final boolean isClan) {
-        return getLabel(isClan);
-    }
 
     /**
      * Retrieves the label for this instance, optionally using a clan-specific label if applicable.
@@ -539,7 +530,8 @@ public enum PersonnelRole {
                   SkillType.S_SURGERY,
                   SkillType.S_MEDTECH,
                   SkillType.S_ASTECH,
-                  SkillType.S_COMMUNICATIONS, SkillType.S_ART_COOKING,
+                  SkillType.S_COMMUNICATIONS,
+                  SkillType.S_ART_COOKING,
                   SkillType.S_SENSOR_OPERATIONS);
             skills.addAll(relevantSkills);
         } else {
@@ -618,10 +610,10 @@ public enum PersonnelRole {
     /**
      * @return a list of skill names representing the profession-appropriate skills
      *
-     * @see #getSkillsForProfession(boolean, boolean, boolean, boolean, boolean)
+     * @see #getSkillsForProfession(boolean, boolean, boolean, boolean)
      */
     public List<String> getSkillsForProfession() {
-        return getSkillsForProfession(false, false, false, false, false);
+        return getSkillsForProfession(false, false, false, false);
     }
 
 
@@ -630,22 +622,21 @@ public enum PersonnelRole {
      * generation options.
      *
      * <p>The set of returned skills may vary depending on input flags that define whether certain support or
-     * specialty skills (such as Negotiation, Scrounge, Administration, or Artillery) should be included for appropriate
+     * specialty skills (such as Negotiation, Administration, or Artillery) should be included for appropriate
      * roles.</p>
      *
      * <p>This method is typically used during personnel creation or skill assignment to ensure each role receives a
      * fitting skill set based on campaign rules and user preferences.</p>
      *
      * @param isAdminsHaveNegotiation    if {@code true}, includes Negotiation skill for administrators
-     * @param isAdminsHaveScrounge       if {@code true}, includes Scrounge skill for administrators
      * @param isDoctorsUseAdministration if {@code true}, includes Administration skill for medical roles
      * @param isTechsUseAdministration   if {@code true}, includes Administration skill for technical roles
      * @param isUseArtillery             if {@code true}, includes Artillery skills where applicable
      *
      * @return a list of skill names representing the profession-appropriate skills
      */
-    public List<String> getSkillsForProfession(boolean isAdminsHaveNegotiation, boolean isAdminsHaveScrounge,
-          boolean isDoctorsUseAdministration, boolean isTechsUseAdministration, boolean isUseArtillery) {
+    public List<String> getSkillsForProfession(boolean isAdminsHaveNegotiation, boolean isDoctorsUseAdministration,
+          boolean isTechsUseAdministration, boolean isUseArtillery) {
         return switch (this) {
             case MEKWARRIOR -> {
                 if (isUseArtillery) {
@@ -713,12 +704,8 @@ public enum PersonnelRole {
             }
             case MEDIC -> List.of(SkillType.S_MEDTECH);
             case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_HR -> {
-                if (isAdminsHaveNegotiation && isAdminsHaveScrounge) {
-                    yield List.of(SkillType.S_ADMIN, SkillType.S_NEGOTIATION, SkillType.S_SCROUNGE);
-                } else if (isAdminsHaveNegotiation) {
+                if (isAdminsHaveNegotiation) {
                     yield List.of(SkillType.S_ADMIN, SkillType.S_NEGOTIATION);
-                } else if (isAdminsHaveScrounge) {
-                    yield List.of(SkillType.S_ADMIN, SkillType.S_SCROUNGE);
                 } else {
                     yield List.of(SkillType.S_ADMIN);
                 }
@@ -1227,15 +1214,6 @@ public enum PersonnelRole {
     }
 
     /**
-     * @since 0.50.04
-     * @deprecated use {@code isConventionalAircraftPilot()}. Remediated in 0.50.06, remove in 0.50.07
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public boolean isConventionalAirGrouping() {
-        return isConventionalAircraftPilot();
-    }
-
-    /**
      * @return {@code true} if the character is assigned to the Ground Vehicle Driver, Vehicle Gunner, or the Vehicle
      *       Crew role, {@code false} otherwise.
      */
@@ -1349,8 +1327,8 @@ public enum PersonnelRole {
 
     /**
      * @return {@code true} if the character's assigned role has a subtype of {@link PersonnelRoleSubType#CIVILIAN},
-     *         {@code false} otherwise. This method no longer considers roles such as {@code DEPENDENT} or {@code NONE}
-     *         as civilian roles, as in previous implementations.
+     *       {@code false} otherwise. This method no longer considers roles such as {@code DEPENDENT} or {@code NONE} as
+     *       civilian roles, as in previous implementations.
      */
     public boolean isCivilian() {
         return isSubType(PersonnelRoleSubType.CIVILIAN);
@@ -1358,14 +1336,6 @@ public enum PersonnelRole {
     // endregion Boolean Comparison Methods
 
     // region Static Methods
-
-    /**
-     * @deprecated Use {@link #getMarketableRoles()}.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public static List<PersonnelRole> getMilitaryRoles() {
-        return getMarketableRoles();
-    }
 
     /**
      * @return a list of roles that can be included in the personnel market
@@ -1472,16 +1442,6 @@ public enum PersonnelRole {
     }
     // endregion Static Methods
 
-    // region File I/O
-
-    /**
-     * @deprecated use {@link #fromString(String)} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public static PersonnelRole parseFromString(final String personnelRole) {
-        return fromString(personnelRole);
-    }
-
     /**
      * Converts a given string into a {@code PersonnelRole}.
      *
@@ -1572,18 +1532,21 @@ public enum PersonnelRole {
      * Returns an array of all {@link PersonnelRole} values sorted alphabetically by their display label.
      *
      * <p>
-     * The sorting is performed based on the label returned by {@code getLabel(clanCampaign)} for each role,
-     * ensuring that the roles are ordered according to the user-facing names, which may differ depending
-     * on whether a clan campaign is in effect.
+     * The sorting is performed based on the label returned by {@code getLabel(clanCampaign)} for each role, ensuring
+     * that the roles are ordered according to the user-facing names, which may differ depending on whether a clan
+     * campaign is in effect.
      * </p>
      *
-     * @param clanCampaign {@code true} to use labels appropriate for a clan campaign;
-     *                     {@code false} to use standard labels
+     * @param clanCampaign {@code true} to use labels appropriate for a clan campaign; {@code false} to use standard
+     *                     labels
+     *
      * @return a {@code PersonnelRole[]} containing all enum values sorted alphabetically by label
+     *
      * @since 0.50.06
      */
     public static PersonnelRole[] getValuesSortedAlphabetically(boolean clanCampaign) {
-        return Arrays.stream(PersonnelRole.values()).sorted(Comparator.comparing(role -> role.getLabel(clanCampaign)))
+        return Arrays.stream(PersonnelRole.values())
+                     .sorted(Comparator.comparing(role -> role.getLabel(clanCampaign)))
                      .toArray(PersonnelRole[]::new);
     }
 }
