@@ -119,6 +119,7 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
             person.removeAllSkills();
             // regenerate expLvl to factor in skill changes from age
             expLvl = generateExperienceLevel(person);
+            person.setPrimaryRole(campaign, PersonnelRole.DEPENDENT);
         } else if (age < 18) {
             person.limitSkills(1);
 

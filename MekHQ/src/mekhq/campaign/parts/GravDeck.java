@@ -49,10 +49,10 @@ import org.w3c.dom.NodeList;
 public class GravDeck extends Part {
     private static final MMLogger logger = MMLogger.create(GravDeck.class);
 
-    static final TechAdvancement TA_GRAV_DECK = new TechAdvancement(TECH_BASE_ALL)
+    static final TechAdvancement TA_GRAV_DECK = new TechAdvancement(TechBase.ALL)
             .setAdvancement(DATE_ES, DATE_ES, DATE_ES)
-            .setTechRating(RATING_B)
-            .setAvailability(RATING_C, RATING_C, RATING_C, RATING_C)
+            .setTechRating(TechRating.B)
+            .setAvailability(AvailabilityValue.C, AvailabilityValue.C, AvailabilityValue.C, AvailabilityValue.C)
             .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     private int deckType;

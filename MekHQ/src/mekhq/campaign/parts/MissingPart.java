@@ -301,11 +301,11 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
     @Override
     public TargetRoll getAllAcquisitionMods() {
         TargetRoll target = new TargetRoll();
-        if (getTechBase() == T_CLAN && campaign.getCampaignOptions().getClanAcquisitionPenalty() > 0) {
+        if (getTechBase() == TechBase.CLAN && campaign.getCampaignOptions().getClanAcquisitionPenalty() > 0) {
             target.addModifier(campaign.getCampaignOptions().getClanAcquisitionPenalty(), "clan-tech");
-        } else if (getTechBase() == T_IS && campaign.getCampaignOptions().getIsAcquisitionPenalty() > 0) {
+        } else if (getTechBase() == TechBase.IS && campaign.getCampaignOptions().getIsAcquisitionPenalty() > 0) {
             target.addModifier(campaign.getCampaignOptions().getIsAcquisitionPenalty(), "Inner Sphere tech");
-        } else if (getTechBase() == T_BOTH) {
+        } else if (getTechBase() == TechBase.ALL) {
             int penalty = Math.min(campaign.getCampaignOptions().getClanAcquisitionPenalty(),
                   campaign.getCampaignOptions().getIsAcquisitionPenalty());
             if (penalty > 0) {
@@ -313,9 +313,9 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
             }
         }
         //availability mod
-        int avail = getAvailability();
+        AvailabilityValue avail = getAvailability();
         int availabilityMod = Availability.getAvailabilityModifier(avail);
-        target.addModifier(availabilityMod, "availability (" + ITechnology.getRatingName(avail) + ')');
+        target.addModifier(availabilityMod, "availability (" + avail.getName() + ')');
 
         return target;
     }
@@ -493,12 +493,12 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
     }
 
     @Override
-    public boolean isIntroducedBy(int year, boolean clan, int techFaction) {
+    public boolean isIntroducedBy(int year, boolean clan, ITechnology.Faction techFaction) {
         return getIntroductionDate(clan, techFaction) <= year;
     }
 
     @Override
-    public boolean isExtinctIn(int year, boolean clan, int techFaction) {
+    public boolean isExtinctIn(int year, boolean clan, ITechnology.Faction techFaction) {
         return isExtinct(year, clan, techFaction);
     }
 }
