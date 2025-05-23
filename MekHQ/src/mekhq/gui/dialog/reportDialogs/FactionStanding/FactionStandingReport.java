@@ -32,6 +32,32 @@
  */
 package mekhq.gui.dialog.reportDialogs.FactionStanding;
 
+import static java.lang.Math.round;
+import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getNegativeColor;
+import static mekhq.utilities.ReportingUtilities.getPositiveColor;
+import static mekhq.utilities.ReportingUtilities.getWarningColor;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.util.UIUtil;
@@ -45,27 +71,11 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel;
+import mekhq.gui.baseComponents.RoundedJButton;
 import mekhq.gui.dialog.GlossaryDialog;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.RoundedLineBorder;
 import mekhq.gui.utilities.WrapLayout;
-
-import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.border.CompoundBorder;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
-import static java.lang.Math.round;
-import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
-import static mekhq.utilities.ReportingUtilities.*;
 
 /**
  * Displays a dialog window that visualizes a report on faction standings for the current campaign year. Shows
@@ -352,7 +362,7 @@ public class FactionStandingReport extends JDialog {
         pnlButtons.setName("pnlButtons");
         pnlButtons.setMaximumSize(new Dimension(Integer.MAX_VALUE, REPORT_BUTTONS_MAXIMUM_HEIGHT));
 
-        JButton btnDocumentation = new JButton(getTextAt(RESOURCE_BUNDLE,
+        RoundedJButton btnDocumentation = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
               "factionStandingReport.button.documentation"));
         btnDocumentation.setName("btnDocumentation");
         btnDocumentation.addActionListener(e -> new GlossaryDialog(this, "FACTION_STANDING"));
@@ -362,7 +372,8 @@ public class FactionStandingReport extends JDialog {
 
         pnlButtons.add(Box.createHorizontalStrut(REPORT_BUTTON_SPACE_WIDTH));
 
-        JButton btnGmTools = new JButton(getTextAt(RESOURCE_BUNDLE, "factionStandingReport.button.gmTools"));
+        RoundedJButton btnGmTools = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
+              "factionStandingReport.button.gmTools"));
         btnGmTools.setName("btnSimulateContract");
         btnGmTools.setFocusable(false);
         btnGmTools.setEnabled(isGM);
@@ -374,7 +385,8 @@ public class FactionStandingReport extends JDialog {
 
         pnlButtons.add(Box.createHorizontalStrut(REPORT_BUTTON_SPACE_WIDTH));
 
-        JButton btnSimulateContract = new JButton(getTextAt(RESOURCE_BUNDLE, "factionStandingReport.button.contract"));
+        RoundedJButton btnSimulateContract = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
+              "factionStandingReport.button.contract"));
         btnSimulateContract.setName("btnSimulateContract");
         btnSimulateContract.setFocusable(false);
         btnSimulateContract.setBorder(RoundedLineBorder.createRoundedLineBorder());
