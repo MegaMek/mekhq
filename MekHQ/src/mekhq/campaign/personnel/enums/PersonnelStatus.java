@@ -144,7 +144,7 @@ public enum PersonnelStatus {
      *                                 prisoners.
      */
     PersonnelStatus(final NotificationSeverity severity, final boolean isPrisonerSuitableStatus,
-                    final boolean isCauseOfDeath) {
+          final boolean isCauseOfDeath) {
         this.severity = severity;
         this.isPrisonerSuitableStatus = isPrisonerSuitableStatus;
         this.isCauseOfDeath = isCauseOfDeath;
@@ -560,7 +560,9 @@ public enum PersonnelStatus {
                      isMedicalComplications() ||
                      isPregnancyComplications() ||
                      isUndetermined() ||
-                     isSuicide() || isBondsref() || isSeppuku();
+                     isSuicide() ||
+                     isBondsref() ||
+                     isSeppuku();
     }
 
     /**
@@ -570,14 +572,6 @@ public enum PersonnelStatus {
         return isDead() || isMIA();
     }
     // endregion Boolean Comparison Methods
-
-    /**
-     * @deprecated use {@link #getImplementedStatuses(boolean, boolean)} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public static List<PersonnelStatus> getImplementedStatuses() {
-        return getImplementedStatuses(true, true);
-    }
 
     /**
      * Retrieves a list of implemented personnel statuses based on the specified criteria.

@@ -75,7 +75,6 @@ import megamek.common.Tank;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
-import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
@@ -134,7 +133,6 @@ public class SkillType {
     public static final String S_ADMIN = "Administration";
     public static final String S_NEGOTIATION = "Negotiation";
     public static final String S_LEADER = "Leadership";
-    public static final String S_SCROUNGE = "Scrounge";
     public static final String S_STRATEGY = "Strategy";
     public static final String S_TACTICS = "Tactics/Any";
 
@@ -154,7 +152,6 @@ public class SkillType {
     public static final String S_ART_INSTRUMENT = "Art/Instrument" + RP_ONLY_TAG;
     public static final String S_ART_SINGING = "Art/Singing" + RP_ONLY_TAG;
     public static final String S_ART_OTHER = "Art/Other" + RP_ONLY_TAG;
-    public static final String S_CLIMBING = "Climbing" + RP_ONLY_TAG;
     public static final String S_COMMUNICATIONS = "Communications/Any" + RP_ONLY_TAG;
     public static final String S_COMPUTERS = "Computers" + RP_ONLY_TAG;
     public static final String S_CRYPTOGRAPHY = "Cryptography" + RP_ONLY_TAG;
@@ -227,12 +224,12 @@ public class SkillType {
                                                S_PILOT_SPACE, S_GUN_SPACE, S_ARTILLERY, S_GUN_BA, S_GUN_PROTO,
                                                S_SMALL_ARMS, S_ANTI_MEK, S_TECH_MEK, S_TECH_MECHANIC, S_TECH_AERO,
                                                S_TECH_BA, S_TECH_VESSEL, S_ASTECH, S_SURGERY, S_MEDTECH, S_NAVIGATION,
-                                               S_ADMIN, S_TACTICS, S_STRATEGY, S_NEGOTIATION, S_LEADER, S_SCROUNGE,
-                                               S_ACROBATICS, S_ACTING, S_ANIMAL_HANDLING, S_APPRAISAL, S_ARCHERY,
-                                               S_ART_COOKING, S_ART_DANCING, S_ART_DRAWING, S_ART_PAINTING,
-                                               S_ART_POETRY, S_ART_SCULPTURE, S_ART_INSTRUMENT, S_ART_SINGING,
-                                               S_ART_WRITING, S_ART_OTHER, S_CLIMBING, S_COMMUNICATIONS, S_COMPUTERS,
-                                               S_CRYPTOGRAPHY, S_DEMOLITIONS, S_DISGUISE, S_ESCAPE_ARTIST, S_FORGERY,
+                                               S_ADMIN, S_TACTICS, S_STRATEGY, S_NEGOTIATION, S_LEADER, S_ACROBATICS,
+                                               S_ACTING, S_ANIMAL_HANDLING, S_APPRAISAL, S_ARCHERY, S_ART_COOKING,
+                                               S_ART_DANCING, S_ART_DRAWING, S_ART_PAINTING, S_ART_POETRY,
+                                               S_ART_SCULPTURE, S_ART_INSTRUMENT, S_ART_SINGING, S_ART_WRITING,
+                                               S_ART_OTHER, S_COMMUNICATIONS, S_COMPUTERS, S_CRYPTOGRAPHY,
+                                               S_DEMOLITIONS, S_DISGUISE, S_ESCAPE_ARTIST, S_FORGERY,
                                                S_INTEREST_HISTORY, S_INTEREST_LITERATURE, S_INTEREST_HOLO_GAMES,
                                                S_INTEREST_SPORTS, S_INTEREST_FASHION, S_INTEREST_MUSIC,
                                                S_INTEREST_MILITARY, S_INTEREST_ANTIQUES, S_INTEREST_THEOLOGY,
@@ -240,17 +237,16 @@ public class SkillType {
                                                S_INTEREST_ECONOMICS, S_INTEREST_POP_CULTURE, S_INTEREST_ASTROLOGY,
                                                S_INTEREST_FISHING, S_INTEREST_MYTHOLOGY, S_INTEREST_CARTOGRAPHY,
                                                S_INTEREST_ARCHEOLOGY, S_INTEREST_HOLO_CINEMA, S_INTEREST_EXOTIC_ANIMALS,
-                                               S_INTEREST_LAW,
-                                               S_INTEREST_OTHER, S_INTERROGATION, S_INVESTIGATION, S_LANGUAGES,
-                                               S_MARTIAL_ARTS, S_PERCEPTION, S_SLEIGHT_OF_HAND, S_PROTOCOLS,
-                                               S_SCIENCE_BIOLOGY, S_SCIENCE_CHEMISTRY, S_SCIENCE_MATHEMATICS,
-                                               S_SCIENCE_PHYSICS, S_SCIENCE_MILITARY, S_SCIENCE_GEOLOGY,
-                                               S_SCIENCE_XENOBIOLOGY, S_SCIENCE_PHARMACOLOGY, S_SCIENCE_GENETICS,
-                                               S_SCIENCE_PSYCHOLOGY, S_SCIENCE_OTHER, S_SECURITY_SYSTEMS_ELECTRONIC,
-                                               S_SECURITY_SYSTEMS_MECHANICAL, S_SENSOR_OPERATIONS, S_STEALTH,
-                                               S_STREETWISE, S_SURVIVAL, S_TRACKING, S_CAREER_ANY, S_SWIMMING,
-                                               S_ZERO_G_OPERATIONS, S_RUNNING, S_TRAINING, S_MELEE_WEAPONS,
-                                               S_THROWN_WEAPONS, S_SUPPORT_WEAPONS };
+                                               S_INTEREST_LAW, S_INTEREST_OTHER, S_INTERROGATION, S_INVESTIGATION,
+                                               S_LANGUAGES, S_MARTIAL_ARTS, S_PERCEPTION, S_SLEIGHT_OF_HAND,
+                                               S_PROTOCOLS, S_SCIENCE_BIOLOGY, S_SCIENCE_CHEMISTRY,
+                                               S_SCIENCE_MATHEMATICS, S_SCIENCE_PHYSICS, S_SCIENCE_MILITARY,
+                                               S_SCIENCE_GEOLOGY, S_SCIENCE_XENOBIOLOGY, S_SCIENCE_PHARMACOLOGY,
+                                               S_SCIENCE_GENETICS, S_SCIENCE_PSYCHOLOGY, S_SCIENCE_OTHER,
+                                               S_SECURITY_SYSTEMS_ELECTRONIC, S_SECURITY_SYSTEMS_MECHANICAL,
+                                               S_SENSOR_OPERATIONS, S_STEALTH, S_STREETWISE, S_SURVIVAL, S_TRACKING,
+                                               S_CAREER_ANY, S_SWIMMING, S_ZERO_G_OPERATIONS, S_RUNNING, S_TRAINING,
+                                               S_MELEE_WEAPONS, S_THROWN_WEAPONS, S_SUPPORT_WEAPONS };
 
 
     public static Map<String, SkillType> lookupHash;
@@ -330,16 +326,6 @@ public class SkillType {
             case ELITE, HEROIC, LEGENDARY -> MekHQ.getMHQOptions().getFontColorSkillEliteHexColor();
             default -> "";
         };
-    }
-
-    /**
-     * @deprecated was previously used by Campaign Options, now unused.
-     *
-     *       <p>Use {@link #isSubTypeOf(SkillSubType)} instead.</p>
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public static boolean isCombatSkill(SkillType skill) {
-        return skill.isSubTypeOf(COMBAT_GUNNERY) || skill.isSubTypeOf(COMBAT_PILOTING);
     }
 
     /**
@@ -482,10 +468,10 @@ public class SkillType {
      *
      *                        <p>For example:</p>
      *                        <pre>
-     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
-     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
-     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
-     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </pre>
+     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
+     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
+     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
+     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       </pre>
      *
      * @author Illiani
      * @since 0.50.05
@@ -594,14 +580,6 @@ public class SkillType {
 
     public void setTarget(int t) {
         target = t;
-    }
-
-    /**
-     * @deprecated replaced by {@link #isCountUp()}
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public boolean countUp() {
-        return countUp;
     }
 
     public boolean isCountUp() {
@@ -886,36 +864,6 @@ public class SkillType {
     }
 
     /**
-     * @deprecated use {@link #isSubTypeOf(SkillSubType)} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public boolean isPiloting() {
-        return name.equals(S_PILOT_MEK) ||
-                     name.equals(S_PILOT_AERO) ||
-                     name.equals(S_PILOT_GVEE) ||
-                     name.equals(S_PILOT_VTOL) ||
-                     name.equals(S_PILOT_NVEE) ||
-                     name.equals(S_PILOT_JET) ||
-                     name.equals(S_PILOT_SPACE);
-    }
-
-    /**
-     * @deprecated use {@link #isSubTypeOf(SkillSubType)} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public boolean isGunnery() {
-        return name.equals(S_GUN_MEK) ||
-                     name.equals(S_GUN_AERO) ||
-                     name.equals(S_GUN_VEE) ||
-                     name.equals(S_GUN_BA) ||
-                     name.equals(S_SMALL_ARMS) ||
-                     name.equals(S_GUN_JET) ||
-                     name.equals(S_GUN_SPACE) ||
-                     name.equals(S_GUN_PROTO) ||
-                     name.equals(S_ARTILLERY);
-    }
-
-    /**
      * Returns the experience level constant corresponding to the given numeric level.
      *
      * <p>The method compares the input level against predetermined thresholds for each experience rank, in
@@ -978,7 +926,6 @@ public class SkillType {
         lookupHash.put(S_ADMIN, createAdmin());
         lookupHash.put(S_LEADER, createLeadership());
         lookupHash.put(S_NEGOTIATION, createNegotiation());
-        lookupHash.put(S_SCROUNGE, createScrounge());
         lookupHash.put(S_ACROBATICS, createAcrobatics());
         lookupHash.put(S_ACTING, createActing());
         lookupHash.put(S_ANIMAL_HANDLING, createAnimalHandling());
@@ -994,7 +941,6 @@ public class SkillType {
         lookupHash.put(S_ART_COOKING, createArtCooking());
         lookupHash.put(S_ART_SINGING, createArtSinging());
         lookupHash.put(S_ART_OTHER, createArtOther());
-        lookupHash.put(S_CLIMBING, createClimbing());
         lookupHash.put(S_COMMUNICATIONS, createCommunications());
         lookupHash.put(S_COMPUTERS, createComputers());
         lookupHash.put(S_CRYPTOGRAPHY, createCryptography());
@@ -1058,30 +1004,6 @@ public class SkillType {
         lookupHash.put(S_MELEE_WEAPONS, createMeleeWeapons());
         lookupHash.put(S_THROWN_WEAPONS, createThrownWeapons());
         lookupHash.put(S_SUPPORT_WEAPONS, createSupportWeapons());
-
-        // Remove below after Milestone Release post 0.49.19
-        lookupHash.put("Piloting/Mech", createPilotingMek());
-        lookupHash.put("Gunnery/Mech", createGunneryMek());
-        lookupHash.put("Anti-Mech", createAntiMek());
-        lookupHash.put("Tech/Mech", createTechMek());
-        lookupHash.put("Gunnery/ProtoMech", createGunneryProto());
-        lookupHash.put("Medtech", createMedTech());
-        lookupHash.put("Gunnery/Battlesuit", createGunneryBA());
-        lookupHash.put("Tech/BA", createTechBA());
-
-        // Remove below after Milestone Release post 0.49.19
-        lookupHash.put("Anti-Mek", createAntiMek());
-        lookupHash.put("MedTech", createMedTech());
-        lookupHash.put("Communications", createCommunications());
-        lookupHash.put("Sleight of Hand (RP Only)", createSleightOfHand());
-        lookupHash.put("Protocols (RP Only)", createProtocols());
-        lookupHash.put("Survival (RP Only)", createSurvival());
-        lookupHash.put("Languages (RP Only)", createLanguage());
-        lookupHash.put("Hyperspace Navigation", createNavigation());
-        lookupHash.put("Streetwise (RP Only)", createStreetwise());
-        lookupHash.put("Doctor", createSurgery());
-        lookupHash.put("Tactics", createTactics());
-        lookupHash.put("Tracking (RP Only)", createTracking());
     }
 
     public static @Nullable SkillType getType(String skillName) {
@@ -1205,14 +1127,6 @@ public class SkillType {
     }
 
     /**
-     * @deprecated use {@link #generateInstanceFromXML(Node, Version)} instead
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public static void generateInstanceFromXML(Node workingNode) {
-        generateInstanceFromXML(workingNode, MHQConstants.VERSION);
-    }
-
-    /**
      * Generates an instance of {@link SkillType} from an XML node.
      *
      * @param workingNode The XML node containing the skill data.
@@ -1230,18 +1144,7 @@ public class SkillType {
 
                     // The above code can be uncommented once these handlers have been removed
                     String name = wn2.getTextContent().trim().toLowerCase();
-                    //Start <50.01 compatibility handler.
-                    skillType.name = switch (name) {
-                        case "piloting/mech" -> "Piloting/Mek";
-                        case "gunnery/mech" -> S_GUN_MEK;
-                        case "gunnery/battlesuit" -> S_GUN_BA;
-                        case "gunnery/protomech" -> S_GUN_PROTO;
-                        case "anti-mech" -> S_ANTI_MEK;
-                        case "tech/mech" -> S_TECH_MEK;
-                        case "tech/ba" -> S_TECH_BA;
-                        case "medtech" -> S_MEDTECH;
-                        default -> wn2.getTextContent().trim();
-                    };
+
                     //Start <50.07 compatibility handler.
                     skillType.name = switch (name) {
                         case "anti-mech" -> S_ANTI_MEK;
@@ -1258,7 +1161,6 @@ public class SkillType {
                         case "tracking (rp only)" -> S_TRACKING;
                         default -> wn2.getTextContent().trim();
                     };
-                    //End <50.01 compatibility handler
                 } else if (wn2.getNodeName().equalsIgnoreCase("target")) {
                     skillType.target = MathUtility.parseInt(wn2.getTextContent(), skillType.target);
                 } else if (wn2.getNodeName().equalsIgnoreCase("greenLvl")) {
@@ -1305,14 +1207,6 @@ public class SkillType {
         } catch (Exception ex) {
             logger.error("", ex);
         }
-    }
-
-    /**
-     * @deprecated use {@link #generateSeparateInstanceFromXML(Node, Map, Version)} instead
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public static void generateSeparateInstanceFromXML(final Node wn, final Map<String, SkillType> hash) {
-        generateSeparateInstanceFromXML(wn, hash, MHQConstants.VERSION);
     }
 
     public static void generateSeparateInstanceFromXML(final Node wn, final Map<String, SkillType> hash,
@@ -1372,8 +1266,7 @@ public class SkillType {
      * Updates {@link SkillType} from <0.50.05 by setting its subtype and attributes based on the skill name.
      *
      * <p>The method creates a temporary {@link SkillType} with the correct configuration based on the input skill
-     * name,
-     * then copies the {@link SkillType#subType}, {@link SkillType#firstAttribute}, and
+     * name, then copies the {@link SkillType#subType}, {@link SkillType#firstAttribute}, and
      * {@link SkillType#secondAttribute} values to the provided {@link SkillType}.<p>
      *
      * <p>For each skill type, it logs the updates made to help with debugging and tracking compatibility changes.</p>
@@ -1418,7 +1311,6 @@ public class SkillType {
             case S_ADMIN -> createAdmin();
             case S_NEGOTIATION -> createNegotiation();
             case S_LEADER -> createLeadership();
-            case S_SCROUNGE -> createScrounge();
             case S_STRATEGY -> createStrategy();
             case S_TACTICS, "Tactics" -> createTactics();
             case S_ACROBATICS -> createAcrobatics();
@@ -1436,7 +1328,6 @@ public class SkillType {
             case S_ART_INSTRUMENT -> createArtInstrument();
             case S_ART_SINGING -> createArtSinging();
             case S_ART_OTHER -> createArtOther();
-            case S_CLIMBING -> createClimbing();
             case S_COMMUNICATIONS, "Communications (RP Only)" -> createCommunications();
             case S_COMPUTERS -> createComputers();
             case S_CRYPTOGRAPHY -> createCryptography();
@@ -1501,8 +1392,7 @@ public class SkillType {
             case S_SUPPORT_WEAPONS -> createSupportWeapons();
             case S_RUNNING -> createRunning();
             default -> {
-                logger.errorDialog("REPORT TO MEGAMEK TEAM",
-                      "Unexpected value in compatibilityHandler: {}",
+                logger.warn("Unexpected value in compatibilityHandler: {}",
                       skillType.getName());
                 yield null;
             }
@@ -1530,7 +1420,9 @@ public class SkillType {
               COMBAT_PILOTING,
               REFLEXES,
               DEXTERITY,
-              2, null, null,
+              2,
+              null,
+              null,
               null,
               null,
               null,
@@ -1544,7 +1436,9 @@ public class SkillType {
               COMBAT_GUNNERY,
               REFLEXES,
               DEXTERITY,
-              2, null, null,
+              2,
+              null,
+              null,
               null,
               null,
               null,
@@ -1559,7 +1453,9 @@ public class SkillType {
               COMBAT_PILOTING,
               REFLEXES,
               DEXTERITY,
-              2, null, null,
+              2,
+              null,
+              null,
               null,
               null,
               null,
@@ -1573,7 +1469,9 @@ public class SkillType {
               COMBAT_GUNNERY,
               REFLEXES,
               DEXTERITY,
-              2, null, null,
+              2,
+              null,
+              null,
               null,
               null,
               null,
@@ -1588,7 +1486,9 @@ public class SkillType {
               COMBAT_PILOTING,
               REFLEXES,
               DEXTERITY,
-              2, null, null,
+              2,
+              null,
+              null,
               null,
               null,
               null,
@@ -1602,7 +1502,9 @@ public class SkillType {
               COMBAT_GUNNERY,
               REFLEXES,
               DEXTERITY,
-              2, null, null,
+              2,
+              null,
+              null,
               null,
               null,
               null,
@@ -1617,7 +1519,9 @@ public class SkillType {
               COMBAT_PILOTING,
               REFLEXES,
               DEXTERITY,
-              2, null, null,
+              2,
+              null,
+              null,
               null,
               null,
               null,
@@ -1631,7 +1535,9 @@ public class SkillType {
               COMBAT_GUNNERY,
               REFLEXES,
               DEXTERITY,
-              2, null, null,
+              2,
+              null,
+              null,
               null,
               null,
               null,
@@ -1646,7 +1552,9 @@ public class SkillType {
               COMBAT_PILOTING,
               REFLEXES,
               DEXTERITY,
-              2, null, null,
+              2,
+              null,
+              null,
               null,
               null,
               null,
@@ -1660,7 +1568,9 @@ public class SkillType {
               COMBAT_PILOTING,
               REFLEXES,
               DEXTERITY,
-              2, null, null,
+              2,
+              null,
+              null,
               null,
               null,
               null,
@@ -1674,7 +1584,9 @@ public class SkillType {
               COMBAT_PILOTING,
               REFLEXES,
               DEXTERITY,
-              2, null, null,
+              2,
+              null,
+              null,
               null,
               null,
               null,
@@ -1688,7 +1600,9 @@ public class SkillType {
               COMBAT_GUNNERY,
               REFLEXES,
               DEXTERITY,
-              2, null, null,
+              2,
+              null,
+              null,
               null,
               null,
               null,
@@ -1703,7 +1617,9 @@ public class SkillType {
               COMBAT_GUNNERY,
               INTELLIGENCE,
               WILLPOWER,
-              2, null, null,
+              2,
+              null,
+              null,
               null,
               null,
               null,
@@ -1718,7 +1634,9 @@ public class SkillType {
               COMBAT_GUNNERY,
               REFLEXES,
               DEXTERITY,
-              2, null, null,
+              2,
+              null,
+              null,
               null,
               null,
               null,
@@ -1733,7 +1651,9 @@ public class SkillType {
               COMBAT_GUNNERY,
               REFLEXES,
               DEXTERITY,
-              2, null, null,
+              2,
+              null,
+              null,
               null,
               null,
               null,
@@ -1748,7 +1668,9 @@ public class SkillType {
               COMBAT_GUNNERY,
               DEXTERITY,
               NONE,
-              2, null, null,
+              2,
+              null,
+              null,
               null,
               null,
               null,
@@ -1761,8 +1683,11 @@ public class SkillType {
               8,
               false,
               COMBAT_PILOTING,
-              DEXTERITY, NONE,
-              2, null, null,
+              DEXTERITY,
+              NONE,
+              2,
+              null,
+              null,
               null,
               null,
               null,
@@ -1776,7 +1701,9 @@ public class SkillType {
               false,
               SUPPORT,
               DEXTERITY,
-              INTELLIGENCE, null, null,
+              INTELLIGENCE,
+              null,
+              null,
               null,
               null,
               null,
@@ -1796,7 +1723,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
                               DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL });
     }
@@ -1808,7 +1737,9 @@ public class SkillType {
               false,
               SUPPORT,
               DEXTERITY,
-              INTELLIGENCE, null, null,
+              INTELLIGENCE,
+              null,
+              null,
               null,
               null,
               null,
@@ -1824,7 +1755,9 @@ public class SkillType {
               false,
               SUPPORT,
               DEXTERITY,
-              INTELLIGENCE, null, null,
+              INTELLIGENCE,
+              null,
+              null,
               null,
               null,
               null,
@@ -1844,7 +1777,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
                               DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL });
     }
@@ -1860,7 +1795,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 12, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
                               DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
                               DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL });
@@ -1873,7 +1810,9 @@ public class SkillType {
               false,
               SUPPORT,
               DEXTERITY,
-              INTELLIGENCE, null, null,
+              INTELLIGENCE,
+              null,
+              null,
               null,
               null,
               null,
@@ -1888,7 +1827,9 @@ public class SkillType {
               false,
               SUPPORT,
               INTELLIGENCE,
-              NONE, null, null,
+              NONE,
+              null,
+              null,
               null,
               null,
               null,
@@ -1909,7 +1850,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL });
     }
 
@@ -1923,7 +1866,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 12, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 });
     }
 
@@ -1937,7 +1882,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 12, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 });
     }
 
@@ -1951,7 +1898,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 8, 4, 0, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
                               DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL });
     }
@@ -1966,7 +1915,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 12, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 });
     }
 
@@ -1976,22 +1927,9 @@ public class SkillType {
               false,
               SUPPORT,
               CHARISMA,
-              NONE, null, null,
+              NONE,
               null,
               null,
-              null,
-              null,
-              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 });
-    }
-
-    public static SkillType createScrounge() {
-        // This skill doesn't exist in ATOW, so we copied the linked attributes from Negotiation
-        return new SkillType(S_SCROUNGE,
-              10,
-              false,
-              SUPPORT,
-              CHARISMA,
-              NONE, null, null,
               null,
               null,
               null,
@@ -2009,7 +1947,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
@@ -2019,7 +1959,9 @@ public class SkillType {
               false,
               ROLEPLAY_GENERAL,
               CHARISMA,
-              NONE, null, null,
+              NONE,
+              null,
+              null,
               null,
               null,
               null,
@@ -2033,7 +1975,9 @@ public class SkillType {
               false,
               ROLEPLAY_GENERAL,
               WILLPOWER,
-              NONE, null, null,
+              NONE,
+              null,
+              null,
               null,
               null,
               null,
@@ -2051,7 +1995,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
@@ -2065,7 +2011,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
@@ -2075,7 +2023,9 @@ public class SkillType {
               false,
               ROLEPLAY_ART,
               DEXTERITY,
-              INTELLIGENCE, null, null,
+              INTELLIGENCE,
+              null,
+              null,
               null,
               null,
               null,
@@ -2089,7 +2039,9 @@ public class SkillType {
               false,
               ROLEPLAY_ART,
               DEXTERITY,
-              INTELLIGENCE, null, null,
+              INTELLIGENCE,
+              null,
+              null,
               null,
               null,
               null,
@@ -2107,7 +2059,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
@@ -2121,7 +2075,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
@@ -2135,7 +2091,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
@@ -2150,7 +2108,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
@@ -2165,7 +2125,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
@@ -2175,7 +2137,9 @@ public class SkillType {
               false,
               ROLEPLAY_ART,
               DEXTERITY,
-              INTELLIGENCE, null, null,
+              INTELLIGENCE,
+              null,
+              null,
               null,
               null,
               null,
@@ -2189,7 +2153,9 @@ public class SkillType {
               false,
               ROLEPLAY_ART,
               DEXTERITY,
-              INTELLIGENCE, null, null,
+              INTELLIGENCE,
+              null,
+              null,
               null,
               null,
               null,
@@ -2207,21 +2173,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
-              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
-    }
-
-    public static SkillType createClimbing() {
-        return new SkillType(S_CLIMBING,
-              7,
-              false,
-              ROLEPLAY_GENERAL,
-              DEXTERITY,
-              NONE,
               null,
               null,
               null,
-              null, null, null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
@@ -2235,7 +2189,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
@@ -2249,7 +2205,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
@@ -2263,7 +2221,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
@@ -2277,7 +2237,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
@@ -2287,7 +2249,9 @@ public class SkillType {
               false,
               ROLEPLAY_GENERAL,
               CHARISMA,
-              NONE, null, null,
+              NONE,
+              null,
+              null,
               null,
               null,
               null,
@@ -2305,7 +2269,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
@@ -2315,7 +2281,9 @@ public class SkillType {
               false,
               ROLEPLAY_GENERAL,
               DEXTERITY,
-              INTELLIGENCE, null, null,
+              INTELLIGENCE,
+              null,
+              null,
               null,
               null,
               null,
@@ -2329,7 +2297,9 @@ public class SkillType {
               false,
               ROLEPLAY_INTEREST,
               INTELLIGENCE,
-              WILLPOWER, null, null,
+              WILLPOWER,
+              null,
+              null,
               null,
               null,
               null,
@@ -2347,7 +2317,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
@@ -2357,7 +2329,9 @@ public class SkillType {
               false,
               ROLEPLAY_INTEREST,
               INTELLIGENCE,
-              WILLPOWER, null, null,
+              WILLPOWER,
+              null,
+              null,
               null,
               null,
               null,
@@ -2371,7 +2345,9 @@ public class SkillType {
               false,
               ROLEPLAY_INTEREST,
               INTELLIGENCE,
-              WILLPOWER, null, null,
+              WILLPOWER,
+              null,
+              null,
               null,
               null,
               null,
@@ -2389,7 +2365,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
@@ -2403,7 +2381,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
@@ -2413,7 +2393,9 @@ public class SkillType {
               false,
               ROLEPLAY_INTEREST,
               INTELLIGENCE,
-              WILLPOWER, null, null,
+              WILLPOWER,
+              null,
+              null,
               null,
               null,
               null,
@@ -2427,7 +2409,9 @@ public class SkillType {
               false,
               ROLEPLAY_INTEREST,
               INTELLIGENCE,
-              WILLPOWER, null, null,
+              WILLPOWER,
+              null,
+              null,
               null,
               null,
               null,
@@ -2445,7 +2429,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
@@ -2455,7 +2441,9 @@ public class SkillType {
               false,
               ROLEPLAY_INTEREST,
               INTELLIGENCE,
-              WILLPOWER, null, null,
+              WILLPOWER,
+              null,
+              null,
               null,
               null,
               null,
@@ -2469,7 +2457,9 @@ public class SkillType {
               false,
               ROLEPLAY_INTEREST,
               INTELLIGENCE,
-              WILLPOWER, null, null,
+              WILLPOWER,
+              null,
+              null,
               null,
               null,
               null,
@@ -2487,7 +2477,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
@@ -2501,7 +2493,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
@@ -2511,7 +2505,9 @@ public class SkillType {
               false,
               ROLEPLAY_INTEREST,
               INTELLIGENCE,
-              WILLPOWER, null, null,
+              WILLPOWER,
+              null,
+              null,
               null,
               null,
               null,
@@ -2525,7 +2521,9 @@ public class SkillType {
               false,
               ROLEPLAY_INTEREST,
               INTELLIGENCE,
-              WILLPOWER, null, null,
+              WILLPOWER,
+              null,
+              null,
               null,
               null,
               null,
@@ -2543,7 +2541,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
@@ -2553,7 +2553,9 @@ public class SkillType {
               false,
               ROLEPLAY_INTEREST,
               INTELLIGENCE,
-              WILLPOWER, null, null,
+              WILLPOWER,
+              null,
+              null,
               null,
               null,
               null,
@@ -2567,7 +2569,9 @@ public class SkillType {
               false,
               ROLEPLAY_INTEREST,
               INTELLIGENCE,
-              WILLPOWER, null, null,
+              WILLPOWER,
+              null,
+              null,
               null,
               null,
               null,
@@ -2585,7 +2589,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
@@ -2599,7 +2605,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
@@ -2609,7 +2617,9 @@ public class SkillType {
               false,
               ROLEPLAY_INTEREST,
               INTELLIGENCE,
-              WILLPOWER, null, null,
+              WILLPOWER,
+              null,
+              null,
               null,
               null,
               null,
@@ -2627,7 +2637,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
@@ -2637,7 +2649,9 @@ public class SkillType {
               false,
               ROLEPLAY_INTEREST,
               INTELLIGENCE,
-              WILLPOWER, null, null,
+              WILLPOWER,
+              null,
+              null,
               null,
               null,
               null,
@@ -2655,7 +2669,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
@@ -2665,7 +2681,9 @@ public class SkillType {
               false,
               ROLEPLAY_GENERAL,
               INTELLIGENCE,
-              WILLPOWER, null, null,
+              WILLPOWER,
+              null,
+              null,
               null,
               null,
               null,
@@ -2679,7 +2697,9 @@ public class SkillType {
               false,
               ROLEPLAY_GENERAL,
               INTELLIGENCE,
-              CHARISMA, null, null,
+              CHARISMA,
+              null,
+              null,
               null,
               null,
               null,
@@ -2697,7 +2717,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
@@ -2711,7 +2733,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
@@ -2727,7 +2751,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
@@ -2737,7 +2763,9 @@ public class SkillType {
               false,
               ROLEPLAY_GENERAL,
               WILLPOWER,
-              CHARISMA, null, null,
+              CHARISMA,
+              null,
+              null,
               null,
               null,
               null,
@@ -2755,7 +2783,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
@@ -2765,7 +2795,9 @@ public class SkillType {
               false,
               ROLEPLAY_SCIENCE,
               INTELLIGENCE,
-              WILLPOWER, null, null,
+              WILLPOWER,
+              null,
+              null,
               null,
               null,
               null,
@@ -2779,7 +2811,9 @@ public class SkillType {
               false,
               ROLEPLAY_SCIENCE,
               INTELLIGENCE,
-              WILLPOWER, null, null,
+              WILLPOWER,
+              null,
+              null,
               null,
               null,
               null,
@@ -2797,7 +2831,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
@@ -2811,7 +2847,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
@@ -2821,7 +2859,9 @@ public class SkillType {
               false,
               ROLEPLAY_SCIENCE,
               INTELLIGENCE,
-              WILLPOWER, null, null,
+              WILLPOWER,
+              null,
+              null,
               null,
               null,
               null,
@@ -2835,7 +2875,9 @@ public class SkillType {
               false,
               ROLEPLAY_SCIENCE,
               INTELLIGENCE,
-              WILLPOWER, null, null,
+              WILLPOWER,
+              null,
+              null,
               null,
               null,
               null,
@@ -2853,7 +2895,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
@@ -2863,7 +2907,9 @@ public class SkillType {
               false,
               ROLEPLAY_SCIENCE,
               INTELLIGENCE,
-              WILLPOWER, null, null,
+              WILLPOWER,
+              null,
+              null,
               null,
               null,
               null,
@@ -2877,7 +2923,9 @@ public class SkillType {
               false,
               ROLEPLAY_SCIENCE,
               INTELLIGENCE,
-              WILLPOWER, null, null,
+              WILLPOWER,
+              null,
+              null,
               null,
               null,
               null,
@@ -2895,7 +2943,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
@@ -2909,7 +2959,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
@@ -2923,7 +2975,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
@@ -2933,7 +2987,9 @@ public class SkillType {
               false,
               ROLEPLAY_GENERAL,
               INTELLIGENCE,
-              WILLPOWER, null, null,
+              WILLPOWER,
+              null,
+              null,
               null,
               null,
               null,
@@ -2951,7 +3007,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
@@ -2961,7 +3019,9 @@ public class SkillType {
               false,
               ROLEPLAY_GENERAL,
               CHARISMA,
-              NONE, null, null,
+              NONE,
+              null,
+              null,
               null,
               null,
               null,
@@ -2975,7 +3035,9 @@ public class SkillType {
               false,
               ROLEPLAY_GENERAL,
               DEXTERITY,
-              INTELLIGENCE, null, null,
+              INTELLIGENCE,
+              null,
+              null,
               null,
               null,
               null,
@@ -2993,7 +3055,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
@@ -3007,7 +3071,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
@@ -3021,7 +3087,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
@@ -3031,7 +3099,9 @@ public class SkillType {
               false,
               ROLEPLAY_GENERAL,
               REFLEXES,
-              NONE, null, null,
+              NONE,
+              null,
+              null,
               null,
               null,
               null,
@@ -3049,7 +3119,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
@@ -3063,7 +3135,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
@@ -3077,7 +3151,9 @@ public class SkillType {
               null,
               null,
               null,
-              null, null, null,
+              null,
+              null,
+              null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
@@ -3087,7 +3163,9 @@ public class SkillType {
               false,
               ROLEPLAY_GENERAL,
               STRENGTH,
-              NONE, null, null,
+              NONE,
+              null,
+              null,
               null,
               null,
               null,
@@ -3101,7 +3179,9 @@ public class SkillType {
               false,
               ROLEPLAY_GENERAL,
               REFLEXES,
-              DEXTERITY, null, null,
+              DEXTERITY,
+              null,
+              null,
               null,
               null,
               null,

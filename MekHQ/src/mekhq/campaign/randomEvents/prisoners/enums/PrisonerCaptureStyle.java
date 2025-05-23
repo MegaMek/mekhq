@@ -27,9 +27,9 @@
  */
 package mekhq.campaign.randomEvents.prisoners.enums;
 
-import megamek.logging.MMLogger;
-
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
+import megamek.logging.MMLogger;
 
 /**
  * Defines the available styles for handling prisoner capture.
@@ -52,6 +52,7 @@ public enum PrisonerCaptureStyle {
     final private String RESOURCE_BUNDLE = "mekhq.resources." + getClass().getSimpleName();
 
     //region Getters
+
     /**
      * Retrieves the localized label for the current capture style.
      *
@@ -82,6 +83,7 @@ public enum PrisonerCaptureStyle {
     //endregion Getters
 
     //region Boolean Comparison Methods
+
     /**
      * Determines if the current capture style is {@code NONE}.
      *
@@ -111,34 +113,29 @@ public enum PrisonerCaptureStyle {
     //endregion Boolean Comparison Methods
 
     // region File I/O
+
     /**
-     * Converts the specified string into its corresponding {@link PrisonerCaptureStyle} enum value.
-     * The method attempts to interpret the string as either the name of an enum constant or an
-     * ordinal value of the enum. If the conversion fails, the method logs an error and returns the
-     * default value {@code NONE}.
+     * Converts the specified string into its corresponding {@link PrisonerCaptureStyle} enum value. The method attempts
+     * to interpret the string as either the name of an enum constant or an ordinal value of the enum. If the conversion
+     * fails, the method logs an error and returns the default value {@code NONE}.
      *
-     * @param text the string to be converted into a {@link PrisonerCaptureStyle} enum value. It can
-     *            be the name of the enum constant or its ordinal value as a string.
-     * @return the corresponding {@link PrisonerCaptureStyle} enum constant if the string matches a
-     * name or ordinal value, otherwise {@code NONE}.
+     * @param text the string to be converted into a {@link PrisonerCaptureStyle} enum value. It can be the name of the
+     *             enum constant or its ordinal value as a string.
+     *
+     * @return the corresponding {@link PrisonerCaptureStyle} enum constant if the string matches a name or ordinal
+     *       value, otherwise {@code NONE}.
      */
     public static PrisonerCaptureStyle fromString(String text) {
         MMLogger logger = MMLogger.create(PrisonerCaptureStyle.class);
 
         try {
             return PrisonerCaptureStyle.valueOf(text.toUpperCase().replace(" ", "_"));
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         try {
             return PrisonerCaptureStyle.values()[Integer.parseInt(text)];
-        } catch (Exception ignored) {}
-
-        // <50.04 compatibility handler
-        if (text.equalsIgnoreCase("ATB") || text.equalsIgnoreCase("TAHARQA")) {
-            // We return NONE here as both CAMPAIGN_OPERATIONS and MEKHQ are significant departures
-            // from either legacy option.
-            logger.info("Legacy PrisonerCaptureStyle ordinal: {} - returning {}.", text, NONE);
-            return NONE;
+        } catch (Exception ignored) {
         }
 
         logger.error("Unknown PrisonerCaptureStyle ordinal: {} - returning {}.", text, NONE);

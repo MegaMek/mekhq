@@ -50,7 +50,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -117,7 +116,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.education.EducationController;
-import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -718,8 +716,8 @@ public class CampaignXmlParser {
     /**
      * Pulled out purely for encapsulation. Makes the code neater and easier to read.
      *
-     * @param campaign The Campaign object that is being populated.
-     * @param parentNode    The XML node we're working from.
+     * @param campaign   The Campaign object that is being populated.
+     * @param parentNode The XML node we're working from.
      *
      * @throws DOMException
      */
@@ -1623,7 +1621,7 @@ public class CampaignXmlParser {
             }
 
             // clan flag might not have been properly set in early versions
-            if ((prt instanceof EnginePart) && prt.getName().contains("(Clan") && (prt.getTechBase() != Part.T_CLAN)) {
+            if ((prt instanceof EnginePart) && prt.getName().contains("(Clan") && (prt.getTechBase() != Part.TechBase.CLAN)) {
                 ((EnginePart) prt).fixClanFlag();
             }
             if ((prt instanceof MissingEnginePart) && (null != u) && (u.getEntity() instanceof Tank)) {
@@ -1632,7 +1630,7 @@ public class CampaignXmlParser {
             }
             if ((prt instanceof MissingEnginePart) &&
                       prt.getName().contains("(Clan") &&
-                      (prt.getTechBase() != Part.T_CLAN)) {
+                      (prt.getTechBase() != Part.TechBase.CLAN)) {
                 ((MissingEnginePart) prt).fixClanFlag();
             }
 
@@ -1763,85 +1761,6 @@ public class CampaignXmlParser {
     //region Ancestry Migration
     private static final Map<UUID, List<Person>> ancestryMigrationMap = new HashMap<>();
 
-    /**
-     * This method is used to add people to the ancestry migration map that is used to migrate from the old Ancestors
-     * setup to {@link mekhq.campaign.personnel.familyTree.Genealogy} starting from 0.47.8
-     *
-     * @param ancestorsId the Person's Ancestor Id
-     * @param person      the person to add the the above HashMap
-     */
-    public static void addToAncestryMigrationMap(UUID ancestorsId, Person person) {
-        ancestryMigrationMap.putIfAbsent(ancestorsId, new ArrayList<>());
-        ancestryMigrationMap.get(ancestorsId).add(person);
-    }
-
-    /**
-     * This method is used to migrate from Ancestry nodes to {@link mekhq.campaign.personnel.familyTree.Genealogy} since
-     * the swap-over in 0.47.8
-     *
-     * @param wn the node containing the saved ancestry
-     */
-    private static void migrateAncestorNodes(Campaign campaign, Node wn) {
-        NodeList wList = wn.getChildNodes();
-
-        for (int x = 0; x < wList.getLength(); x++) {
-            // First, we determine the node values
-            UUID id = null;
-            Person father = null;
-            Person mother = null;
-            Node wn2 = wList.item(x);
-
-            if ((wn2.getNodeType() != Node.ELEMENT_NODE) || !wn2.getNodeName().equalsIgnoreCase("ancestor")) {
-                continue;
-            }
-
-            NodeList nl = wn2.getChildNodes();
-            for (int y = 0; y < nl.getLength(); y++) {
-                Node wn3 = nl.item(y);
-                if (wn3.getNodeName().equalsIgnoreCase("id")) {
-                    id = UUID.fromString(wn3.getTextContent().trim());
-                } else if (wn3.getNodeName().equalsIgnoreCase("fatherId")) {
-                    father = campaign.getPerson(UUID.fromString(wn3.getTextContent().trim()));
-                } else if (wn3.getNodeName().equalsIgnoreCase("motherId")) {
-                    mother = campaign.getPerson(UUID.fromString(wn3.getTextContent().trim()));
-                }
-            }
-
-            // We skip the Person if they are null or cannot be migrated
-            if ((id == null) || !ancestryMigrationMap.containsKey(id)) {
-                continue;
-            }
-
-            // Finally, we migrate the individual person data
-            Iterator<Person> people = ancestryMigrationMap.get(id).iterator();
-            while (people.hasNext()) {
-                Person person = people.next();
-                people.remove();
-
-                if (father == null) {
-                    logger.warn("Unknown father does not exist, skipping adding Genealogy for them.");
-                } else if (father.getId() != null) {
-                    person.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, father);
-                    father.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, person);
-                } else {
-                    logger.warn("Person with id " +
-                                      father.getId() +
-                                      "does not exist, skipping adding Genealogy for them.");
-                }
-
-                if (mother == null) {
-                    logger.warn("Unknown mother does not exist, skipping adding Genealogy for them.");
-                } else if (mother.getId() != null) {
-                    person.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, mother);
-                    mother.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, person);
-                } else {
-                    logger.warn("Person with id " +
-                                      mother.getId() +
-                                      " does not exist, skipping adding Genealogy for them.");
-                }
-            }
-        }
-    }
     // endregion Ancestry Migration
     // endregion Migration Methods
 }

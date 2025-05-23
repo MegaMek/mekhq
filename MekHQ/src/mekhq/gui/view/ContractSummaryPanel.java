@@ -91,7 +91,7 @@ public class ContractSummaryPanel extends JPanel {
     private Person logisticsNegotiator;
 
     private final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractMarketDialog",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
     private ContractPaymentBreakdown contractPaymentBreakdown;
 
     // These three are used locally to ensure consistent formatting
@@ -154,7 +154,7 @@ public class ContractSummaryPanel extends JPanel {
     private void fillStats() {
         //region Variable Initialization
         // TODO : Switch me to use IUnitRating
-        String[] ratingNames = {"F", "D", "C", "B", "A"};
+        String[] ratingNames = { "F", "D", "C", "B", "A" };
 
         // Initializing the GridBagConstraint used for Labels
         // To use this you MUST AND ONLY overwrite gridy
@@ -248,7 +248,7 @@ public class ContractSummaryPanel extends JPanel {
         mainPanel.add(lblLocation, gridBagConstraintsLabels);
 
         JLabel txtLocation = new JLabel(String.format("<html><a href='#'>%s</a></html>",
-                contract.getSystemName(campaign.getLocalDate())));
+              contract.getSystemName(campaign.getLocalDate())));
         txtLocation.setName("txtLocation");
         txtLocation.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         txtLocation.addMouseListener(new MouseAdapter() {
@@ -262,8 +262,7 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsText.gridy = y;
         mainPanel.add(txtLocation, gridBagConstraintsText);
 
-        if (contract instanceof AtBContract
-            && Systems.getInstance().getSystems().get(contract.getSystemId()) != null) {
+        if (contract instanceof AtBContract && Systems.getInstance().getSystems().get(contract.getSystemId()) != null) {
             JLabel lblDistance = new JLabel(resourceMap.getString("lblDistance.text"));
             lblDistance.setName("lblDistance");
             gridBagConstraintsLabels.gridy = ++y;
@@ -272,10 +271,10 @@ public class ContractSummaryPanel extends JPanel {
             JumpPath path = campaign.calculateJumpPath(campaign.getCurrentSystem(), contract.getSystem());
 
             int days = (int) Math.ceil(path.getTotalTime(contract.getStartDate(),
-                    campaign.getLocation().getTransitTime()));
+                  campaign.getLocation().getTransitTime()));
             int jumps = path.getJumps();
-            if (campaign.getCurrentSystem().getId().equals(contract.getSystemId())
-                    && campaign.getLocation().isOnPlanet()) {
+            if (campaign.getCurrentSystem().getId().equals(contract.getSystemId()) &&
+                      campaign.getLocation().isOnPlanet()) {
                 days = 0;
                 jumps = 0;
             }
@@ -291,8 +290,9 @@ public class ContractSummaryPanel extends JPanel {
         mainPanel.add(lblAllyRating, gridBagConstraintsLabels);
 
         if (contract instanceof AtBContract) {
-            JLabel txtAllyRating = new JLabel(((AtBContract) contract).getAllySkill()
-                    + "/" + ratingNames[((AtBContract) contract).getAllyQuality()]);
+            JLabel txtAllyRating = new JLabel(((AtBContract) contract).getAllySkill() +
+                                                    "/" +
+                                                    ratingNames[((AtBContract) contract).getAllyQuality()]);
             txtAllyRating.setName("txtAllyRating");
             gridBagConstraintsText.gridy = y;
             mainPanel.add(txtAllyRating, gridBagConstraintsText);
@@ -302,8 +302,9 @@ public class ContractSummaryPanel extends JPanel {
             gridBagConstraintsLabels.gridy = ++y;
             mainPanel.add(lblEnemyRating, gridBagConstraintsLabels);
 
-            JLabel txtEnemyRating = new JLabel(((AtBContract) contract).getEnemySkill()
-                    + "/" + ratingNames[((AtBContract) contract).getEnemyQuality()]);
+            JLabel txtEnemyRating = new JLabel(((AtBContract) contract).getEnemySkill() +
+                                                     "/" +
+                                                     ratingNames[((AtBContract) contract).getEnemyQuality()]);
             txtEnemyRating.setName("txtEnemyRating");
             gridBagConstraintsText.gridy = y;
             mainPanel.add(txtEnemyRating, gridBagConstraintsText);
@@ -373,13 +374,13 @@ public class ContractSummaryPanel extends JPanel {
                     return;
                 }
                 if (contract instanceof AtBContract) {
-                    campaign.getContractMarket().rerollClause((AtBContract) contract,
-                            AbstractContractMarket.CLAUSE_COMMAND, campaign);
+                    campaign.getContractMarket()
+                          .rerollClause((AtBContract) contract, AbstractContractMarket.CLAUSE_COMMAND, campaign);
                     setCommandRerollButtonText((JButton) ev.getSource());
                     txtCommand.setText(contract.getCommandRights().toString());
                     txtCommand.setToolTipText(wordWrap(contract.getCommandRights().getToolTipText()));
-                    if (campaign.getContractMarket().getRerollsUsed(contract,
-                            AbstractContractMarket.CLAUSE_COMMAND) >= cmdRerolls) {
+                    if (campaign.getContractMarket().getRerollsUsed(contract, AbstractContractMarket.CLAUSE_COMMAND) >=
+                              cmdRerolls) {
                         btn.setEnabled(false);
                     }
                     refreshAmounts();
@@ -422,12 +423,12 @@ public class ContractSummaryPanel extends JPanel {
                     return;
                 }
                 if (contract instanceof AtBContract) {
-                    campaign.getContractMarket().rerollClause((AtBContract) contract,
-                            AbstractContractMarket.CLAUSE_TRANSPORT, campaign);
+                    campaign.getContractMarket()
+                          .rerollClause((AtBContract) contract, AbstractContractMarket.CLAUSE_TRANSPORT, campaign);
                     setTransportRerollButtonText((JButton) ev.getSource());
                     txtTransport.setText(contract.getTransportCompString());
-                    if (campaign.getContractMarket().getRerollsUsed(contract,
-                            AbstractContractMarket.CLAUSE_TRANSPORT) >= tranRerolls) {
+                    if (campaign.getContractMarket()
+                              .getRerollsUsed(contract, AbstractContractMarket.CLAUSE_TRANSPORT) >= tranRerolls) {
                         btn.setEnabled(false);
                     }
                     refreshAmounts();
@@ -444,8 +445,8 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsLabels.gridy = ++y;
         mainPanel.add(lblSalvageRights, gridBagConstraintsLabels);
 
-        JLabel txtSalvageRights = new JLabel(contract.getSalvagePctString()
-                + (contract.isSalvageExchange() ? " (Exchange)" : ""));
+        JLabel txtSalvageRights = new JLabel(contract.getSalvagePctString() +
+                                                   (contract.isSalvageExchange() ? " (Exchange)" : ""));
         txtSalvageRights.setName("txtSalvageRights");
 
         if (!hasSalvageRerolls()) {
@@ -468,13 +469,13 @@ public class ContractSummaryPanel extends JPanel {
                     return;
                 }
                 if (contract instanceof AtBContract) {
-                    campaign.getContractMarket().rerollClause((AtBContract) contract,
-                        AbstractContractMarket.CLAUSE_SALVAGE, campaign);
+                    campaign.getContractMarket()
+                          .rerollClause((AtBContract) contract, AbstractContractMarket.CLAUSE_SALVAGE, campaign);
                     setSalvageRerollButtonText((JButton) ev.getSource());
-                    txtSalvageRights.setText(contract.getSalvagePctString()
-                        + (contract.isSalvageExchange() ? " (Exchange)" : ""));
-                    if (campaign.getContractMarket().getRerollsUsed(contract,
-                        AbstractContractMarket.CLAUSE_SALVAGE) >= logRerolls) {
+                    txtSalvageRights.setText(contract.getSalvagePctString() +
+                                                   (contract.isSalvageExchange() ? " (Exchange)" : ""));
+                    if (campaign.getContractMarket().getRerollsUsed(contract, AbstractContractMarket.CLAUSE_SALVAGE) >=
+                              logRerolls) {
                         btn.setEnabled(false);
                     }
                     refreshAmounts();
@@ -517,13 +518,13 @@ public class ContractSummaryPanel extends JPanel {
                     return;
                 }
                 if (contract instanceof AtBContract) {
-                    campaign.getContractMarket().rerollClause((AtBContract) contract,
-                            AbstractContractMarket.CLAUSE_SUPPORT, campaign);
+                    campaign.getContractMarket()
+                          .rerollClause((AtBContract) contract, AbstractContractMarket.CLAUSE_SUPPORT, campaign);
                     setSupportRerollButtonText((JButton) ev.getSource());
                     txtStraightSupport.setText(contract.getStraightSupportString());
                     txtBattleLossComp.setText(contract.getBattleLossCompString());
-                    if (campaign.getContractMarket().getRerollsUsed(contract,
-                            AbstractContractMarket.CLAUSE_SUPPORT) >= logRerolls) {
+                    if (campaign.getContractMarket().getRerollsUsed(contract, AbstractContractMarket.CLAUSE_SUPPORT) >=
+                              logRerolls) {
                         btn.setEnabled(false);
                     }
                     refreshAmounts();
@@ -561,24 +562,28 @@ public class ContractSummaryPanel extends JPanel {
     }
 
     private boolean hasTransportRerolls() {
-        return allowRerolls && (campaign.getContractMarket().getRerollsUsed(contract,
-                AbstractContractMarket.CLAUSE_TRANSPORT) < tranRerolls);
+        return allowRerolls &&
+                     (campaign.getContractMarket().getRerollsUsed(contract, AbstractContractMarket.CLAUSE_TRANSPORT) <
+                            tranRerolls);
     }
 
     private boolean hasCommandRerolls() {
         // Only allow command clause rerolls for mercenaries and pirates; house units are always integrated
-        return allowRerolls && (campaign.getContractMarket().getRerollsUsed(contract,
-                    AbstractContractMarket.CLAUSE_COMMAND) < cmdRerolls);
+        return allowRerolls &&
+                     (campaign.getContractMarket().getRerollsUsed(contract, AbstractContractMarket.CLAUSE_COMMAND) <
+                            cmdRerolls);
     }
 
     private boolean hasSalvageRerolls() {
-        return allowRerolls && (campaign.getContractMarket().getRerollsUsed(contract,
-            AbstractContractMarket.CLAUSE_SALVAGE) < logRerolls);
+        return allowRerolls &&
+                     (campaign.getContractMarket().getRerollsUsed(contract, AbstractContractMarket.CLAUSE_SALVAGE) <
+                            logRerolls);
     }
 
     private boolean hasSupportRerolls() {
-        return allowRerolls && (campaign.getContractMarket().getRerollsUsed(contract,
-                AbstractContractMarket.CLAUSE_SUPPORT) < logRerolls);
+        return allowRerolls &&
+                     (campaign.getContractMarket().getRerollsUsed(contract, AbstractContractMarket.CLAUSE_SUPPORT) <
+                            logRerolls);
     }
 
     private void setCommandRerollButtonText(JButton rerollButton) {
@@ -609,14 +614,6 @@ public class ContractSummaryPanel extends JPanel {
 
     private void setSupportRerollButtonText(JButton rerollButton) {
         setSalvageRerollButtonText(rerollButton);
-    }
-
-    /**
-     * @deprecated use {@link #generateRerollText(String)} instead.}
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    private String generateRerollText(int rerolls) {
-        return generateRerollText("( " + rerolls + ')');
     }
 
     private String generateRerollText(String addendum) {

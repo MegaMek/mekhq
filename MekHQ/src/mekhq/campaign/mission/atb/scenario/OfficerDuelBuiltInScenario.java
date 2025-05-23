@@ -107,7 +107,7 @@ public class OfficerDuelBuiltInScenario extends AtBScenario {
 
     @Override
     public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
-                                       ArrayList<Entity> enemyEntities) {
+          ArrayList<Entity> enemyEntities) {
         setStartingPos(startPos[Compute.randomInt(4)]);
         int enemyStart = getStartingPos() + 4;
 
@@ -121,14 +121,20 @@ public class OfficerDuelBuiltInScenario extends AtBScenario {
             final Entity en;
             if (weight == EntityWeightClass.WEIGHT_COLOSSAL) {
                 // Treat Colossal as a unique case, generating at that tier
-                en = getEntity(contract.getEnemyCode(), contract.getEnemySkill(),
-                        contract.getEnemyQuality(), UnitType.MEK, EntityWeightClass.WEIGHT_COLOSSAL,
-                        campaign);
+                en = getEntity(contract.getEnemyCode(),
+                      contract.getEnemySkill(),
+                      contract.getEnemyQuality(),
+                      UnitType.MEK,
+                      EntityWeightClass.WEIGHT_COLOSSAL,
+                      campaign);
             } else {
                 // Generate up to a maximum of Assault
-                en = getEntity(contract.getEnemyCode(), contract.getEnemySkill(),
-                        contract.getEnemyQuality(), UnitType.MEK,
-                        Math.min(weight + 1, EntityWeightClass.WEIGHT_ASSAULT), campaign);
+                en = getEntity(contract.getEnemyCode(),
+                      contract.getEnemySkill(),
+                      contract.getEnemyQuality(),
+                      UnitType.MEK,
+                      Math.min(weight + 1, EntityWeightClass.WEIGHT_ASSAULT),
+                      campaign);
             }
 
             if (en == null) {
@@ -137,8 +143,8 @@ public class OfficerDuelBuiltInScenario extends AtBScenario {
             }
 
             if (weight >= EntityWeightClass.WEIGHT_ASSAULT) {
-                en.getCrew().setGunnery(en.getCrew().getGunnery() - 1);
-                en.getCrew().setPiloting(en.getCrew().getPiloting() - 1);
+                en.getCrew().setGunnery(en.getCrew().getGunnery() - 1, en.getCrew().getCrewType().getGunnerPos());
+                en.getCrew().setPiloting(en.getCrew().getPiloting() - 1, en.getCrew().getCrewType().getPilotPos());
             }
 
             enemyEntities = new ArrayList<>();
@@ -155,7 +161,11 @@ public class OfficerDuelBuiltInScenario extends AtBScenario {
 
         ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 1, 100);
         ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign,
-                contract, this, 1,100, false);
+              contract,
+              this,
+              1,
+              100,
+              false);
 
         getScenarioObjectives().add(destroyHostiles);
         getScenarioObjectives().add(keepFriendliesAlive);
