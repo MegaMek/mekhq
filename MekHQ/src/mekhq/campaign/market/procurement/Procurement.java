@@ -29,6 +29,8 @@ package mekhq.campaign.market.procurement;
 
 import megamek.common.Compute;
 import megamek.common.ITechnology;
+import megamek.common.ITechnology.Era;
+import megamek.common.ITechnology.TechBase;
 import megamek.common.SimpleTechLevel;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
@@ -52,9 +54,9 @@ import static megamek.common.SimpleTechLevel.STANDARD;
 public class Procurement {
     private final int negotiatorSkillRating;
     private final int gameYear;
-    private final int techEra;
+    private final Era techEra;
     private final Faction originFaction;
-    private final int factionTechCode;
+    private final ITechnology.Faction factionTechCode;
     private static final MMLogger logger = MMLogger.create(Procurement.class);
 
     /**
@@ -70,35 +72,51 @@ public class Procurement {
         this.gameYear = gameYear;
         this.originFaction = originFaction;
 
-        factionTechCode = getFactionTechCode(originFaction);
+        factionTechCode = getTechFaction(originFaction);
         techEra = getTechEra(gameYear);
     }
 
     /**
-     * Given a faction, returns the corresponding faction code.
+     * Given a faction, returns the corresponding tech faction code.
      *
      * @param faction Faction instance
-     * @return returns corresponding faction code.
+     * @return returns corresponding faction.
+     * 
+     * @deprecated Use {@link #getTechFaction(Faction)} instead.
      */
-    public static int getFactionTechCode(Faction faction) {
-        int allCodesCount = MM_FACTION_CODES.length;
-        for (int i = 0; i < allCodesCount; i++) {
-            if (MM_FACTION_CODES[i].equals(faction.getShortName())) {
-                return i;
-            }
+    @Deprecated
+    public static ITechnology.Faction getFactionTechCode(Faction faction) {
+        return getTechFaction(faction);
+    }
+
+    /**
+     * Given a faction, returns the corresponding tech faction code.
+     *
+     * @param faction Faction instance
+     * @return returns corresponding faction.
+     */
+    public static ITechnology.Faction getTechFaction(Faction faction) {
+        ITechnology.Faction result = ITechnology.Faction.fromMMAbbr(faction.getShortName());
+        if (result != ITechnology.Faction.NONE) {
+            return result;
         }
 
+        // If the result faction is NONE, I check if I maybe got a not found in the ENUM.
+        if (result.getCodeMM().toUpperCase().equals(faction.getShortName().toUpperCase())) {
+            return result;
+        }
+ 
         logger.info("Unable to retrieve Tech Faction. Using fallback.");
 
         if (faction.isClan()) {
             logger.info("Returning: Clan");
-            return F_CLAN;
+            return ITechnology.Faction.CLAN;
         } else if (faction.isPeriphery()) {
             logger.info("Returning: Periphery");
-            return F_PER;
+            return ITechnology.Faction.PER;
         } else {
             logger.info("Returning: Inner Sphere");
-            return F_IS;
+            return ITechnology.Faction.IS;
         }
     }
 
@@ -194,15 +212,15 @@ public class Procurement {
      * @return The calculated base target number.
      */
     private int getConsumableBaseTargetNumber(Part part, boolean useHardExtinction) {
-        int availability = getAvailability(part, useHardExtinction);
+        AvailabilityValue availability = getAvailability(part, useHardExtinction);
 
         int targetNumber =  switch (availability) {
-            case RATING_A -> 2;
-            case RATING_B -> 3;
-            case RATING_C -> 4;
-            case RATING_D -> 6;
-            case RATING_E -> 8;
-            case RATING_F -> 10;
+            case A -> 2;
+            case B -> 3;
+            case C -> 4;
+            case D -> 6;
+            case E -> 8;
+            case F -> 10;
             // This value is deliberately impossible on 2d6
             default -> 13; // X or F*
         };
@@ -228,15 +246,15 @@ public class Procurement {
      * @return The calculated base target number.
      */
     private int getBaseTargetNumber(Part part, boolean useHardExtinction) {
-        int availability = getAvailability(part, useHardExtinction);
+        AvailabilityValue availability = getAvailability(part, useHardExtinction);
 
         return switch (availability) {
-            case RATING_A -> 3;
-            case RATING_B -> 4;
-            case RATING_C -> 6;
-            case RATING_D -> 8;
-            case RATING_E -> 10;
-            case RATING_F -> 11;
+            case A -> 3;
+            case B -> 4;
+            case C -> 6;
+            case D -> 8;
+            case E -> 10;
+            case F -> 11;
             // This value is deliberately impossible on 2d6
             default -> 13; // X or F*
         };
@@ -249,21 +267,21 @@ public class Procurement {
      * @param useHardExtinction a boolean flag that indicates whether to enforce hard extinctions
      * @return The calculated availability rate.
      */
-    private int getAvailability(Part part, boolean useHardExtinction) {
-        int availability = part.calcYearAvailability(gameYear, originFaction.isClan(), factionTechCode);
+    private AvailabilityValue getAvailability(Part part, boolean useHardExtinction) {
+        AvailabilityValue availability = part.calcYearAvailability(gameYear, originFaction.isClan(), factionTechCode);
 
-        if (part.getTechBase() == TECH_BASE_IS) {
-            availability = getInnerSphereTechBaseRating(part, availability);
+        if (part.getTechBase() == TechBase.IS) {
+            availability = getInnerSphereBaseAvailability(part, availability);
             return performTrulyExtinctCheck(part, availability, useHardExtinction);
         }
 
-        if (part.getTechBase() == TECH_BASE_CLAN) {
-            availability = getClanTechBaseRating(part, availability);
+        if (part.getTechBase() == ITechnology.TechBase.CLAN) {
+            availability = getClanBaseAvailability(part, availability);
             return performTrulyExtinctCheck(part, availability, useHardExtinction);
         }
 
         // Tech Base: All
-        availability = getCommonTechBaseRating(part, availability);
+        availability = getCommonBaseAvailability(part, availability);
         return performTrulyExtinctCheck(part, availability, useHardExtinction);
     }
 
@@ -276,16 +294,16 @@ public class Procurement {
      * @param useHardExtinction a boolean flag that indicates whether to enforce hard extinctions.
      * @return The revised availability rate based on the performed extinction check.
      */
-    private int performTrulyExtinctCheck(Part part, int availability, boolean useHardExtinction) {
+    private AvailabilityValue performTrulyExtinctCheck(Part part, AvailabilityValue availability, boolean useHardExtinction) {
         if (part.isExtinct(gameYear, originFaction.isClan(), factionTechCode)) {
             int extinctionYear = part.getExtinctionDate(originFaction.isClan(), factionTechCode);
 
             if ((gameYear > extinctionYear) && useHardExtinction) {
-                return RATING_X;
+                return AvailabilityValue.X;
             }
 
             if (gameYear < (extinctionYear + 10)) {
-                return Compute.d6() > 3 ? availability : RATING_X;
+                return Compute.d6() > 3 ? availability : AvailabilityValue.X;
             }
         }
 
@@ -299,24 +317,27 @@ public class Procurement {
      * @param availability The calculated availability rate for the part.
      * @return The revised availability rate based on Clan Tech Base rules.
      */
-    private int getClanTechBaseRating(Part part, int availability) {
+    private AvailabilityValue getClanBaseAvailability(Part part, AvailabilityValue availability) {
         if (originFaction.isClan()) {
             if (gameYear >= part.getCommonDate()) {
-                return Math.max(RATING_A, availability - 1);
+                int easier = Math.max(AvailabilityValue.A.getIndex(), availability.getIndex() - 1);
+                return AvailabilityValue.fromIndex(easier);
             }
         }
 
-        if (techEra < ERA_CLAN) {
-            return RATING_X;
+        if (techEra.getIndex() < Era.CLAN.getIndex()) {
+            return AvailabilityValue.X;
         }
 
-        availability++;
+        int harder = Math.min(availability.getIndex() + 1, AvailabilityValue.F.getIndex());
+        AvailabilityValue result = AvailabilityValue.fromIndex(harder);
 
-        if (availability > RATING_F) {
-            return Compute.d6() > 3 ? RATING_F : RATING_X;
+        // If the result is above F, randomize between F and X
+        if (result == AvailabilityValue.F && availability.getIndex() + 1 > AvailabilityValue.F.getIndex()) {
+            return Compute.d6() > 3 ? AvailabilityValue.F : AvailabilityValue.X;
         }
 
-        return availability;
+        return result;
     }
 
     /**
@@ -326,23 +347,23 @@ public class Procurement {
      * @param availability The calculated availability rate for the part.
      * @return The revised availability rate based on Inner Sphere Tech Base rules.
      */
-    private int getInnerSphereTechBaseRating(Part part, int availability) {
+    private AvailabilityValue getInnerSphereBaseAvailability(Part part, AvailabilityValue availability) {
         if (originFaction.isClan()) {
-            if (techEra < ERA_CLAN && part.getPrototypeDate(false) >= 2780) {
-                return ITechnology.RATING_X;
+            if ((techEra.getIndex() < Era.CLAN.getIndex()) && (part.getPrototypeDate(false) >= 2780)) {
+                return AvailabilityValue.X;
             } else {
                 int extinctionYear = part.getExtinctionDate(true);
 
-                if ((techEra == ERA_SW)
+                if ((techEra == Era.SW)
                     && (gameYear >= extinctionYear)) {
-                    return Compute.d6() > 3 ? RATING_F : RATING_X;
+                    return Compute.d6() > 3 ? AvailabilityValue.F : AvailabilityValue.X;
                 } else {
                     return availability;
                 }
             }
         }
 
-        return getCommonTechBaseRating(part, availability);
+        return getCommonBaseAvailability(part, availability);
     }
 
     /**
@@ -352,15 +373,15 @@ public class Procurement {
      * @param availability The calculated availability rate for the part.
      * @return The revised availability rate based on Common Tech Base rules.
      */
-    private int getCommonTechBaseRating(Part part, int availability) {
+    private AvailabilityValue getCommonBaseAvailability(Part part, AvailabilityValue availability) {
         if (!originFaction.isClan()) {
-            if (part.getBaseAvailability(techEra) >= RATING_E) {
-                if (availability == RATING_FSTAR || availability == RATING_X) {
+            if (part.getBaseAvailability(techEra).isBetterOrEqualThan(AvailabilityValue.E)) {
+                if (availability == AvailabilityValue.X) {
                     int extinctionYear = part.getExtinctionDate();
 
-                    if ((techEra == ERA_SW)
+                    if ((techEra == Era.SW)
                         && (gameYear >= extinctionYear)) {
-                        return Compute.d6() > 3 ? RATING_F : RATING_X;
+                        return Compute.d6() > 3 ? AvailabilityValue.F : AvailabilityValue.X;
                     } else {
                         return availability;
                     }

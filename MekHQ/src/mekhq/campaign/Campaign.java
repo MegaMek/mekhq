@@ -107,6 +107,7 @@ import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
+import megamek.client.ratgenerator.AvailabilityRating;
 import megamek.client.ui.swing.util.PlayerColour;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
@@ -124,6 +125,8 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
 import megamek.common.util.BuildingBlock;
+import megamek.common.ITechnology.AvailabilityValue;
+import megamek.common.ITechnology.TechRating;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
@@ -260,6 +263,8 @@ import mekhq.service.IAutosaveService;
 import mekhq.service.mrms.MRMSService;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
+import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
+import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 
 /**
  * The main campaign class, keeps track of teams and units
@@ -325,7 +330,7 @@ public class Campaign implements ITechManager {
     private Hashtable<Integer, CombatTeam> combatTeams; // AtB
 
     private Faction faction;
-    private int techFactionCode;
+    private ITechnology.Faction techFaction;
     private String retainerEmployerCode; // AtB
     private LocalDate retainerStartDate; // AtB
     private RankSystem rankSystem;
@@ -449,7 +454,7 @@ public class Campaign implements ITechManager {
         campaignStartDate = null;
         campaignOptions = new CampaignOptions();
         setFaction(Factions.getInstance().getDefaultFaction());
-        techFactionCode = ITechnology.F_MERC;
+        techFaction = ITechnology.Faction.MERC;
         CurrencyManager.getInstance().setCampaign(this);
         location = new CurrentLocation(Systems.getInstance().getSystems().get("Galatea"), 0);
         isAvoidingEmptySystems = true;
@@ -3986,7 +3991,7 @@ public class Campaign implements ITechManager {
                              getLocalDate(),
                              getCampaignOptions(),
                              getFaction(),
-                             acquisition.getTechBase() == Part.T_CLAN);
+                             acquisition.getTechBase() == Part.TechBase.CLAN);
 
         if (target.getValue() == TargetRoll.IMPOSSIBLE) {
             if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
@@ -4004,9 +4009,9 @@ public class Campaign implements ITechManager {
         }
         SocioIndustrialData socioIndustrial = system.getPrimaryPlanet().getSocioIndustrial(getLocalDate());
         CampaignOptions options = getCampaignOptions();
-        int tech = options.getPlanetTechAcquisitionBonus(socioIndustrial.tech);
-        int industry = options.getPlanetIndustryAcquisitionBonus(socioIndustrial.industry);
-        int outputs = options.getPlanetOutputAcquisitionBonus(socioIndustrial.output);
+        int techBonus = options.getPlanetTechAcquisitionBonus(socioIndustrial.tech);
+        int industryBonus = options.getPlanetIndustryAcquisitionBonus(socioIndustrial.industry);
+        int outputsBonus = options.getPlanetOutputAcquisitionBonus(socioIndustrial.output);
         if (d6(2) < target.getValue()) {
             // no contacts on this planet, move along
             if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
@@ -4020,14 +4025,14 @@ public class Campaign implements ITechManager {
                                 " at TN: " +
                                 target.getValue() +
                                 " - Modifiers (Tech: " +
-                                (tech > 0 ? "+" : "") +
-                                tech +
+                                (techBonus > 0 ? "+" : "") +
+                                techBonus +
                                 ", Industry: " +
-                                (industry > 0 ? "+" : "") +
-                                industry +
+                                (industryBonus > 0 ? "+" : "") +
+                                industryBonus +
                                 ", Outputs: " +
-                                (outputs > 0 ? "+" : "") +
-                                outputs +
+                                (outputsBonus > 0 ? "+" : "") +
+                                outputsBonus +
                                 ") </font>");
             }
             return PartAcquisitionResult.PlanetSpecificFailure;
@@ -4043,14 +4048,14 @@ public class Campaign implements ITechManager {
                                 " at TN: " +
                                 target.getValue() +
                                 " - Modifiers (Tech: " +
-                                (tech > 0 ? "+" : "") +
-                                tech +
+                                (techBonus > 0 ? "+" : "") +
+                                techBonus +
                                 ", Industry: " +
-                                (industry > 0 ? "+" : "") +
-                                industry +
+                                (industryBonus > 0 ? "+" : "") +
+                                industryBonus +
                                 ", Outputs: " +
-                                (outputs > 0 ? "+" : "") +
-                                outputs +
+                                (outputsBonus > 0 ? "+" : "") +
+                                outputsBonus +
                                 ") </font>");
             }
             return PartAcquisitionResult.Success;
@@ -4111,7 +4116,7 @@ public class Campaign implements ITechManager {
                                  getLocalDate(),
                                  getCampaignOptions(),
                                  getFaction(),
-                                 acquisition.getTechBase() == Part.T_CLAN);
+                                 acquisition.getTechBase() == Part.TechBase.CLAN);
         }
         report += "attempts to find " + acquisition.getAcquisitionName();
 
@@ -7712,10 +7717,10 @@ public class Campaign implements ITechManager {
                   "You must wait until the new cycle to check for this part. Further" +
                         " attempts will be added to the shopping list.");
         }
-        if (acquisition.getTechBase() == Part.T_CLAN && !getCampaignOptions().isAllowClanPurchases()) {
+        if (acquisition.getTechBase() == Part.TechBase.CLAN && !getCampaignOptions().isAllowClanPurchases()) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "You cannot acquire clan parts");
         }
-        if (acquisition.getTechBase() == Part.T_IS && !getCampaignOptions().isAllowISPurchases()) {
+        if (acquisition.getTechBase() == Part.TechBase.IS && !getCampaignOptions().isAllowISPurchases()) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "You cannot acquire inner sphere parts");
         }
         if (getCampaignOptions().getTechLevel() < Utilities.getSimpleTechLevel(acquisition.getTechLevel())) {
@@ -7727,7 +7732,7 @@ public class Campaign implements ITechManager {
         }
         if (getCampaignOptions().isDisallowExtinctStuff() &&
                   (acquisition.isExtinctIn(getGameYear(), useClanTechBase(), getTechFaction()) ||
-                         acquisition.getAvailability() == EquipmentType.RATING_X)) {
+                         acquisition.getAvailability().equals(AvailabilityValue.X))) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "It is extinct!");
         }
 
@@ -8799,6 +8804,32 @@ public class Campaign implements ITechManager {
 
         return Math.toIntExact(ChronoUnit.DAYS.between(getLocalDate(), arrivalDate));
     }
+    /**
+     * Calculates the transit time for the arrival of parts or supplies based on the availability of the item, a random
+     * roll, and campaign-specific transit time settings.
+     *
+     * <p>
+     * The transit time is calculated using the following factors:
+     * <ul>
+     * <li>A fixed base modifier value defined by campaign rules.</li>
+     * <li>A random roll of 1d6 to add variability to the calculation.</li>
+     * <li>The availability value of the requested parts or supplies from the
+     * acquisition details.</li>
+     * </ul>
+     *
+     * <p>
+     * The calculated duration is applied in units (days, weeks, or months) based on
+     * the campaign's
+     * configuration for transit time.
+     * </p>
+     *
+     * @param availability the Availability of the part
+     *
+     * @return the number of days required for the parts or units to arrive based on the calculated transit time.
+     */
+    public int calculatePartTransitTime(AvailabilityValue availability) {
+        return calculatePartTransitTime(availability.getIndex());
+    }
 
     /**
      * This returns a PartInventory object detailing the current count for a part on hand, in transit, and ordered.
@@ -9564,33 +9595,36 @@ public class Campaign implements ITechManager {
     }
 
     @Override
-    public int getTechFaction() {
-        return techFactionCode;
+    public ITechnology.Faction getTechFaction() {
+        return techFaction;
     }
 
     public void updateTechFactionCode() {
         if (campaignOptions.isFactionIntroDate()) {
-            for (int i = 0; i < ITechnology.MM_FACTION_CODES.length; i++) {
-                if (ITechnology.MM_FACTION_CODES[i].equals(getFaction().getShortName())) {
-                    techFactionCode = i;
-                    UnitTechProgression.loadFaction(techFactionCode);
+            for (ITechnology.Faction f : ITechnology.Faction.values()) {
+                if (f.equals(ITechnology.Faction.NONE)) {
+                    continue;
+                }
+                if (f.getCodeMM().equals(getFaction().getShortName())) {
+                    techFaction = f;
+                    UnitTechProgression.loadFaction(techFaction);
                     return;
                 }
             }
             // If the tech progression data does not include the current faction,
             // use a generic.
             if (getFaction().isClan()) {
-                techFactionCode = ITechnology.F_CLAN;
+                techFaction = ITechnology.Faction.CLAN;
             } else if (getFaction().isPeriphery()) {
-                techFactionCode = ITechnology.F_PER;
+                techFaction = ITechnology.Faction.PER;
             } else {
-                techFactionCode = ITechnology.F_IS;
+                techFaction = ITechnology.Faction.IS;
             }
         } else {
-            techFactionCode = ITechnology.F_NONE;
+            techFaction = ITechnology.Faction.NONE;
         }
         // Unit tech level will be calculated if the code has changed.
-        UnitTechProgression.loadFaction(techFactionCode);
+        UnitTechProgression.loadFaction(techFaction);
     }
 
     @Override

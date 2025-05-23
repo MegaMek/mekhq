@@ -5943,19 +5943,19 @@ public class Unit implements ITechnology {
         return null;
     }
 
-    public int getAvailability(int era) {
+    public AvailabilityValue getAvailability(int era) {
         // take the highest availability of all parts
-        int availability = EquipmentType.RATING_A;
+        AvailabilityValue availability = AvailabilityValue.A;
         for (Part p : parts) {
-            int newAvailability = p.getAvailability();
+            AvailabilityValue newAvailability = p.getAvailability();
             // Taharqa: it's not clear whether a unit should really be considered extinct when its parts are extinct
             // as many probably outlive the production of parts it would be better to just use the unit extinction
             // date itself, but given that there are no canon extinction/re-intro dates for units, we will use this
             // instead
             if (p.isExtinct(getCampaign().getGameYear(), getCampaign().getFaction().isClan())) {
-                newAvailability = EquipmentType.RATING_X;
+                newAvailability = AvailabilityValue.X;
             }
-            if (newAvailability > availability) {
+            if (newAvailability.isBetterThan(availability)) {
                 availability = newAvailability;
             }
         }
@@ -6412,17 +6412,17 @@ public class Unit implements ITechnology {
         if (getCampaign().getCampaignOptions().isUseExtendedPartsModifier()) {
             Engine engine = entity.getEngine();
             int currentYear = getCampaign().getGameYear();
-            int rating = getTechRating();
+            TechRating rating = getTechRating();
             if (((currentYear > 2859) && (currentYear < 3040)) &&
                       (!getCampaign().getFaction().isClan() && !getCampaign().getFaction().isComStar())) {
-                if (rating > EquipmentType.RATING_D) {
+                if (rating.isBetterThan(TechRating.D)) {
                     partsCost = partsCost.multipliedBy(5.0);
                 }
             }
 
-            if (rating == EquipmentType.RATING_E) {
+            if (rating.equals(TechRating.E)) {
                 partsCost = partsCost.multipliedBy(1.1);
-            } else if (rating == EquipmentType.RATING_F) {
+            } else if (rating.equals(TechRating.F)) {
                 partsCost = partsCost.multipliedBy(1.25);
             }
 
@@ -6622,9 +6622,9 @@ public class Unit implements ITechnology {
         return getTechProgression(getCampaign().getTechFaction());
     }
 
-    private ITechnology getTechProgression(int techFaction) {
+    private ITechnology getTechProgression(ITechnology.Faction techFaction) {
         // If useFactionIntroDate is false, use the base data that was calculated for the Entity when it was loaded.
-        if (techFaction < 0) {
+        if (techFaction.equals(ITechnology.Faction.NONE)) {
             return getEntity();
         }
         // First check whether it has already been calculated for this faction, but don't wait if it hasn't.
@@ -6647,7 +6647,7 @@ public class Unit implements ITechnology {
     }
 
     @Override
-    public int getTechBase() {
+    public TechBase getTechBase() {
         return getTechProgression().getTechBase();
     }
 
@@ -6682,37 +6682,37 @@ public class Unit implements ITechnology {
     }
 
     @Override
-    public int getTechRating() {
+    public TechRating getTechRating() {
         return getTechProgression().getTechRating();
     }
 
     @Override
-    public int getBaseAvailability(int era) {
+    public AvailabilityValue getBaseAvailability(Era era) {
         return getTechProgression().getBaseAvailability(era);
     }
 
     @Override
-    public int getIntroductionDate(boolean clan, int faction) {
+    public int getIntroductionDate(boolean clan, ITechnology.Faction faction) {
         return getTechProgression(faction).getIntroductionDate(clan, faction);
     }
 
     @Override
-    public int getPrototypeDate(boolean clan, int faction) {
+    public int getPrototypeDate(boolean clan, ITechnology.Faction faction) {
         return getTechProgression(faction).getPrototypeDate(clan, faction);
     }
 
     @Override
-    public int getProductionDate(boolean clan, int faction) {
+    public int getProductionDate(boolean clan, ITechnology.Faction faction) {
         return getTechProgression(faction).getProductionDate(clan, faction);
     }
 
     @Override
-    public int getExtinctionDate(boolean clan, int faction) {
+    public int getExtinctionDate(boolean clan, ITechnology.Faction faction) {
         return getTechProgression(faction).getExtinctionDate(clan, faction);
     }
 
     @Override
-    public int getReintroductionDate(boolean clan, int faction) {
+    public int getReintroductionDate(boolean clan, ITechnology.Faction faction) {
         return getTechProgression(faction).getReintroductionDate(clan, faction);
     }
 
@@ -6732,7 +6732,7 @@ public class Unit implements ITechnology {
         }
     }
 
-    public SimpleTechLevel getSimpleTechLevel(int year, boolean clan, int faction) {
+    public SimpleTechLevel getSimpleTechLevel(int year, boolean clan, ITechnology.Faction faction) {
         if (getCampaign().useVariableTechLevel()) {
             return getSimpleLevel(year, clan, faction);
         } else {
@@ -6746,7 +6746,7 @@ public class Unit implements ITechnology {
     }
 
     @Override
-    public int calcYearAvailability(int year, boolean clan, int faction) {
+    public AvailabilityValue calcYearAvailability(int year, boolean clan, ITechnology.Faction faction) {
         return getTechProgression(faction).calcYearAvailability(year, clan);
     }
 

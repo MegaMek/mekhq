@@ -222,9 +222,9 @@ public class Avionics extends Part {
     }
 
     @Override
-    public int getTechRating() {
+    public TechRating getTechRating() {
         // go with conventional fighter avionics
-        return EquipmentType.RATING_B;
+        return TechRating.B;
     }
 
     @Override
