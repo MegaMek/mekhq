@@ -47,13 +47,13 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 import megamek.utilities.ImageUtilities;
+import mekhq.gui.baseComponents.RoundedJButton;
 import mekhq.gui.utilities.RoundedLineBorder;
 
 /**
@@ -146,8 +146,8 @@ public class NewPlayerQuickstartDialog extends JDialog {
         mainPanel.add(Box.createRigidArea(scaleForGUI(0, PADDING)));
 
         // Add Confirm button
-        JButton confirmButton = new JButton(getFormattedTextAt(RESOURCE_BUNDLE, "NewPlayerQuickstartDialog.button"));
-        confirmButton.setBorder(RoundedLineBorder.createRoundedLineBorder());
+        RoundedJButton confirmButton = new RoundedJButton(getFormattedTextAt(RESOURCE_BUNDLE,
+              "NewPlayerQuickstartDialog.button"));
         confirmButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         mainPanel.add(confirmButton);
         mainPanel.add(Box.createRigidArea(scaleForGUI(0, PADDING)));

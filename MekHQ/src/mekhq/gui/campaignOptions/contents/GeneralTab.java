@@ -64,6 +64,7 @@ import mekhq.campaign.universe.Factions;
 import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
+import mekhq.gui.baseComponents.RoundedJButton;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
@@ -99,7 +100,7 @@ public class GeneralTab {
 
     private JLabel lblName;
     private JTextField txtName;
-    private JButton btnNameGenerator;
+    private RoundedJButton btnNameGenerator;
     private JLabel lblFaction;
     private MMComboBox<FactionDisplay> comboFaction;
     private JLabel lblReputation;
@@ -111,13 +112,13 @@ public class GeneralTab {
     private JCheckBox chkReduceReputationPerformanceModifier;
     private JCheckBox chkReputationPerformanceModifierCutOff;
     private JLabel lblDate;
-    private JButton btnDate;
+    private RoundedJButton btnDate;
     private LocalDate date;
     private JLabel lblCamo;
-    private JButton btnCamo;
+    private RoundedJButton btnCamo;
     private Camouflage camouflage;
     private JLabel lblIcon;
-    private JButton btnIcon;
+    private RoundedJButton btnIcon;
     private StandardForceIcon unitIcon;
 
     /**
@@ -366,7 +367,7 @@ public class GeneralTab {
         lblName = new JLabel();
         txtName = new JTextField();
 
-        btnNameGenerator = new JButton();
+        btnNameGenerator = new RoundedJButton();
 
         lblFaction = new JLabel();
         comboFaction = new MMComboBox<>("comboFaction", buildFactionDisplayOptions());
@@ -383,25 +384,23 @@ public class GeneralTab {
         chkReputationPerformanceModifierCutOff = new JCheckBox();
 
         lblDate = new JLabel();
-        btnDate = new JButton();
+        btnDate = new RoundedJButton();
 
         lblCamo = new JLabel();
-        btnCamo = new JButton() {
+        btnCamo = new RoundedJButton() {
             @Override
             public Dimension getPreferredSize() {
                 return UIUtil.scaleForGUI(100, 100);
             }
         };
-        btnCamo.setBorder(RoundedLineBorder.createRoundedLineBorder());
 
         lblIcon = new JLabel();
-        btnIcon = new JButton() {
+        btnIcon = new RoundedJButton() {
             @Override
             public Dimension getPreferredSize() {
                 return UIUtil.scaleForGUI(100, 100);
             }
         };
-        btnIcon.setBorder(RoundedLineBorder.createRoundedLineBorder());
     }
 
     /**
@@ -446,7 +445,6 @@ public class GeneralTab {
 
         this.date = date;
         btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
-        btnDate.setBorder(RoundedLineBorder.createRoundedLineBorder());
         btnDate.revalidate();
         btnDate.repaint();
 

@@ -58,7 +58,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -71,6 +70,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
+import mekhq.gui.baseComponents.RoundedJButton;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
@@ -237,8 +237,8 @@ public class SkillsTab {
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         // Create a button to toggle the table
-        JButton hideAllButton = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "btnHideAll.text"));
-        hideAllButton.setBorder(RoundedLineBorder.createRoundedLineBorder());
+        RoundedJButton hideAllButton = new RoundedJButton(getTextAt(getCampaignOptionsResourceBundle(),
+              "btnHideAll.text"));
         hideAllButton.addActionListener(e -> {
             setVisibleForAll(false);
 
@@ -247,8 +247,8 @@ public class SkillsTab {
         });
 
         // Create a button to toggle the table
-        JButton showAllButton = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "btnDisplayAll.text"));
-        showAllButton.setBorder(RoundedLineBorder.createRoundedLineBorder());
+        RoundedJButton showAllButton = new RoundedJButton(getTextAt(getCampaignOptionsResourceBundle(),
+              "btnDisplayAll.text"));
         showAllButton.addActionListener(e -> {
             setVisibleForAll(true);
 
@@ -411,8 +411,7 @@ public class SkillsTab {
         allSkillCosts.put(skill.getName(), skillCosts);
         allSkillMilestones.put(skill.getName(), skillMilestones);
 
-        JButton copyButton = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "btnCopy.text"));
-        copyButton.setBorder(RoundedLineBorder.createRoundedLineBorder());
+        RoundedJButton copyButton = new RoundedJButton(getTextAt(getCampaignOptionsResourceBundle(), "btnCopy.text"));
         copyButton.addActionListener(e -> {
             storedTargetNumber = (Integer) spnTargetNumber.getValue();
 
@@ -425,8 +424,7 @@ public class SkillsTab {
             }
         });
 
-        JButton pasteButton = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "btnPaste.text"));
-        pasteButton.setBorder(RoundedLineBorder.createRoundedLineBorder());
+        RoundedJButton pasteButton = new RoundedJButton(getTextAt(getCampaignOptionsResourceBundle(), "btnPaste.text"));
         pasteButton.addActionListener(e -> {
             spnTargetNumber.setValue(storedTargetNumber);
 
@@ -441,8 +439,8 @@ public class SkillsTab {
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         // Create a button to toggle the table
-        JButton toggleButton = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "btnToggle.text"));
-        toggleButton.setBorder(RoundedLineBorder.createRoundedLineBorder());
+        RoundedJButton toggleButton = new RoundedJButton(getTextAt(getCampaignOptionsResourceBundle(),
+              "btnToggle.text"));
         toggleButton.addActionListener(e -> {
             for (JLabel label : labels) {
                 label.setVisible(!label.isVisible());
