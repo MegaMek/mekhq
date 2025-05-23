@@ -629,11 +629,20 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
         btnFactionStanding = new JButton(resourceMap.getString("btnFactionStanding.text"));
         btnFactionStanding.setEnabled(getCampaign().getCampaignOptions().isTrackFactionStanding());
-        btnFactionStanding.addActionListener(evt -> new FactionStandingReport(getCampaignGui().getFrame(),
-              getCampaign().getFactionStandings(),
-              getCampaign().getLocalDate(),
-              getCampaign().isGM(),
-              getCampaign().getFaction()));
+        btnFactionStanding.addActionListener(evt -> {
+            FactionStandingReport factionStandingReport = new FactionStandingReport(getCampaignGui().getFrame(),
+                  getCampaign().getFactionStandings(),
+                  getCampaign().getLocalDate(),
+                  getCampaign().isGM(),
+                  getCampaign().getFaction(),
+                  getCampaign().getCampaignFactionIcon());
+
+            for (String report : factionStandingReport.getReports()) {
+                if (report != null && !report.isBlank()) {
+                    getCampaign().addReport(report);
+                }
+            }
+        });
         panReports.add(btnFactionStanding);
 
         panReports.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panReports.title")));

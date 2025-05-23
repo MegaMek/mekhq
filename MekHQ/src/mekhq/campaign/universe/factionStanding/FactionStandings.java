@@ -366,12 +366,10 @@ public class FactionStandings {
      */
     public static boolean isUntrackedFaction(final String factionCode) {
         final List<String> untrackedFactionTags = Arrays.asList("MERC",
-              "PIR",
-              "RON", "REB",
+              "PIR", "RON", "REB",
               "IND",
               "ABN",
-              "UND",
-              "NONE", "DIS");
+              "UND", "NONE", "CLAN", "DIS");
 
         return untrackedFactionTags.contains(factionCode);
     }

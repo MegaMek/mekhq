@@ -106,38 +106,50 @@ public class FactionStandingReport extends JDialog {
     private final Factions factions;
     private final boolean isGM;
     private final Faction campaignFaction;
+    private final ImageIcon campaignIcon;
 
     private final List<String> innerSphereFactions = new ArrayList<>();
     private final List<String> clanFactions = new ArrayList<>();
     private final List<String> peripheryFactions = new ArrayList<>();
     private final List<String> deadFactions = new ArrayList<>();
 
+    private final List<String> reports = new ArrayList<>();
+
     /**
-     * Constructs a new {@code FactionStandingReport} dialog.
+     * Constructs a {@link FactionStandingReport} which generates a {@link JDialog} displaying faction standings for the
+     * specified campaign and related data.
      *
-     * @param frame            the parent frame for this dialog
-     * @param factionStandings the object containing faction standing values to report on
-     * @param today            the current campaign date
-     * @param isGM             whether the player currently has GM Mode enabled
-     * @param campaignFaction  the current campaign faction
+     * @param frame The parent {@link JFrame} that acts as the owner of this report dialog.
+     * @param factionStandings The object containing the standings of factions in the campaign.
+     * @param today The current date for reference in the report.
+     * @param isGM A boolean indicating whether the user is a Game Master (GM).
+     * @param campaignFaction The primary faction for the campaign associated with the report.
+     * @param campaignIcon An {@link ImageIcon} for the campaign (either a custom user icon or faction icon).
      *
      * @author Illiani
      * @since 0.50.07
      */
     public FactionStandingReport(final JFrame frame, final FactionStandings factionStandings, final LocalDate today,
-          final boolean isGM, final Faction campaignFaction) {
-        super();
+                                 final boolean isGM, final Faction campaignFaction, final ImageIcon campaignIcon) {
         this.frame = frame;
         this.today = today;
         this.gameYear = today.getYear();
         this.isGM = isGM;
         this.campaignFaction = campaignFaction;
+        this.campaignIcon = campaignIcon;
         this.factionStandings = factionStandings;
         factions = Factions.getInstance();
 
         sortFactions();
         createReportPanel();
         initializeDialogParameters();
+    }
+
+    /**
+     * @return a list of Faction Standing change reports.
+     */
+    public List<String> getReports() {
+        return reports;
     }
 
     /**
@@ -353,9 +365,10 @@ public class FactionStandingReport extends JDialog {
         JButton btnGmTools = new JButton(getTextAt(RESOURCE_BUNDLE, "factionStandingReport.button.gmTools"));
         btnGmTools.setName("btnSimulateContract");
         btnGmTools.setFocusable(false);
+        btnGmTools.setEnabled(isGM);
         btnGmTools.setBorder(RoundedLineBorder.createRoundedLineBorder());
         btnGmTools.addActionListener(e -> {
-            // TODO Simulate Contract Dialog
+            // TODO GM Tools Dialog
         });
         pnlButtons.add(btnGmTools);
 
@@ -365,9 +378,8 @@ public class FactionStandingReport extends JDialog {
         btnSimulateContract.setName("btnSimulateContract");
         btnSimulateContract.setFocusable(false);
         btnSimulateContract.setBorder(RoundedLineBorder.createRoundedLineBorder());
-        btnSimulateContract.setEnabled(isGM);
         btnSimulateContract.addActionListener(e -> {
-            // TODO GM Tools Dialog
+            // TODO Simulate Contract Dialog
         });
         pnlButtons.add(btnSimulateContract);
 
