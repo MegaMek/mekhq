@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.finances.enums;
 
@@ -33,6 +38,7 @@ import java.time.format.TextStyle;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 
 public enum FinancialYearDuration {
@@ -146,6 +152,27 @@ public enum FinancialYearDuration {
             default:
                 return Integer.toString(year);
         }
+    }
+
+    /**
+     * Parses a string representation of a financial year duration and converts it to a FinancialYearDuration enum
+     * instance. If the string cannot be parsed, the default value of ANNUAL is returned.
+     *
+     * @param text the string to be converted to a FinancialYearDuration. It typically should represent one of the valid
+     *             enum constant names.
+     *
+     * @return the corresponding FinancialYearDuration enum instance, or ANNUAL if parsing fails.
+     */
+    public static FinancialYearDuration parseFromString(final String text) {
+        try {
+            return valueOf(text);
+        } catch (Exception ignored) {
+            MMLogger.create(FinancialYearDuration.class)
+                  .error(ignored, "Unable to parse " + text + " into a FinancialYearDuration. Returning ANNUAL.");
+            return ANNUAL;
+
+        }
+
     }
 
     @Override

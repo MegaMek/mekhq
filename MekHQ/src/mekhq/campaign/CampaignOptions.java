@@ -6253,6 +6253,8 @@ public class CampaignOptions {
                     retVal.showPeacetimeCost = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (nodeName.equalsIgnoreCase("newFinancialYearFinancesToCSVExport")) {
                     retVal.newFinancialYearFinancesToCSVExport = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("financialYearDuration")) {
+                    retVal.setFinancialYearDuration(FinancialYearDuration.parseFromString(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("simulateGrayMonday")) {
                     retVal.simulateGrayMonday = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("allowMonthlyReinvestment")) {
