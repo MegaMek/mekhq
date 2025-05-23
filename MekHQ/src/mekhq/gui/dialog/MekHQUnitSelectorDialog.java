@@ -397,35 +397,6 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
                         }
                     }
                     return isAllowedUnit(mek, nClass, tech, techLevelMatch, checkSupportVee, nUnit);
-                    /*
-                    if (
-                        // year limits
-                          (!enableYearLimits || (mek.getYear() <= allowedYear)) &&
-                                // Clan/IS limits &&
-                                (campaign.getCampaignOptions().isAllowClanPurchases() ||
-                                       !TechConstants.isClan(mek.getType())) &&
-                                (campaign.getCampaignOptions().isAllowISPurchases() ||
-                                       TechConstants.isClan(mek.getType())) &&
-                                // Canon
-                                (!canonOnly || mek.isCanon()) &&
-                                // Weight
-                                ((nClass == mek.getWeightClass()) || (nClass == EntityWeightClass.SIZE)) &&
-                                // Technology Level
-                                ((null != tech) && campaign.isLegal(tech)) &&
-                                (techLevelMatch) &&
-                                //* Support Vehicles
-                                ((nUnit == -1) ||
-                                       (!checkSupportVee && mek.getUnitType().equals(UnitType.getTypeName(nUnit))) ||
-                                       (checkSupportVee && mek.isSupport())) &&
-                                // Advanced Search
-                                ((searchFilter == null) || MekSearchFilter.isMatch(mek, searchFilter))) {
-                        if (!textFilter.getText().isBlank()) {
-                            String text = textFilter.getText();
-                            return mek.getName().toLowerCase().contains(text.toLowerCase());
-                        }
-                        return true;
-                    }
-                    return false;*/
                 }
             };
         } catch (PatternSyntaxException ignored) {
