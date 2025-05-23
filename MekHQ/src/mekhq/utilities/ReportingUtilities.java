@@ -125,6 +125,18 @@ public class ReportingUtilities {
     }
 
     /**
+     * Returns the hex color code used for an amazing status or messages.
+     *
+     * @return the hex color string representing a amazing color
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public static String getAmazingColor() {
+        return MekHQ.getMHQOptions().getFontColorAmazingHexColor();
+    }
+
+    /**
      * Returns the hex color code used for positive status or messages.
      *
      * @return the hex color string representing a positive color
