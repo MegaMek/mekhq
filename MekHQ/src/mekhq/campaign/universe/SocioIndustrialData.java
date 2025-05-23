@@ -222,42 +222,36 @@ public class SocioIndustrialData {
         }
 
         private PlanetarySophistication getSophisticationFromString(String sophistication) {
+            if (sophistication == null) {
+                return PlanetarySophistication.C;
+            }
             try {
-                if (sophistication == null) {
-                    return PlanetarySophistication.C;
-                }
                 return PlanetarySophistication.fromName(sophistication.toUpperCase(Locale.ROOT));
             } catch (IllegalArgumentException e) {
                 // If the rating is not valid, return a default value but first let's evaluate 
                 // some special cases to be retrocompatible with the old codes
-                if (sophistication != null) {
-                    sophistication = sophistication.toUpperCase(Locale.ROOT);
-                    if (sophistication.equals("ADV")) {
+                switch (sophistication.toUpperCase(Locale.ROOT)) {
+                    case "ADV":
                         return PlanetarySophistication.ADVANCED;
-                    } else if (sophistication.equals("R")) {
+                    case "R":
+                    case "X":
                         return PlanetarySophistication.REGRESSED;
-                    } else if (sophistication.equals("X")) {
-                        return PlanetarySophistication.REGRESSED;
-                    }
                 }
                 return PlanetarySophistication.C;
             }
         }
 
         private PlanetaryRating getRatingFromString(String rating) {
+            if (rating == null) {
+                return PlanetaryRating.C;
+            }
             try {
-                if (rating == null) {
-                    return PlanetaryRating.C;
-                }
                 return PlanetaryRating.fromName(rating.toUpperCase(Locale.ROOT));
             } catch (IllegalArgumentException e) {
                 // If the rating is not valid, return a default value but first let's evaluate 
                 // some special cases to be retrocompatible with the old codes
-                if (rating != null) {
-                    rating = rating.toUpperCase(Locale.ROOT);
-                    if (rating.equals("X")) {
-                        return PlanetaryRating.F;
-                    }
+                if (rating.toUpperCase(Locale.ROOT).equals("X")) {
+                    return PlanetaryRating.F;
                 }
                 return PlanetaryRating.C;
             }
