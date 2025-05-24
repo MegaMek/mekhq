@@ -71,7 +71,7 @@ public class SystemsTab {
     private final Campaign campaign;
     private final CampaignOptions campaignOptions;
 
-    //start Reputation Tab
+    // Reputation Tab
     private CampaignOptionsHeaderPanel reputationHeader;
 
     private JPanel pnlReputationGeneralOptions;
@@ -85,6 +85,22 @@ public class SystemsTab {
     private JCheckBox chkClampReputationPayMultiplier;
     private JCheckBox chkReduceReputationPerformanceModifier;
     private JCheckBox chkReputationPerformanceModifierCutOff;
+
+    // Faction Standing Tab
+    private CampaignOptionsHeaderPanel factionStandingHeader;
+    private JCheckBox chkTrackFactionStanding;
+
+    private JPanel pnlFactionStandingModifiersPanel;
+    private JCheckBox chkUseFactionStandingNegotiation;
+    private JCheckBox chkUseFactionStandingResupply;
+    private JCheckBox chkUseFactionStandingCommandCircuit;
+    private JCheckBox chkUseFactionStandingOutlawed;
+    private JCheckBox chkUseFactionStandingBatchallRestrictions;
+    private JCheckBox chkUseFactionStandingRecruitment;
+    private JCheckBox chkUseFactionStandingBarracksCosts;
+    private JCheckBox chkUseFactionStandingUnitMarket;
+    private JCheckBox chkUseFactionStandingContractPay;
+    private JCheckBox chkUseFactionStandingSupportPoints;
 
     /**
      * Constructs a new {@code SystemsTab} for the specified campaign.
@@ -230,6 +246,140 @@ public class SystemsTab {
     }
 
     /**
+     * Creates the Faction Standing tab panel, containing grouped UI elements for Faction Standing options and its
+     * header.
+     *
+     * @return a {@link JPanel} component representing the entire Faction Standing tab UI
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public JPanel createFactionStandingTab() {
+        // Header
+        factionStandingHeader = new CampaignOptionsHeaderPanel("FactionStandingTab",
+              getImageDirectory() + "logo_morgrains_valkyrate.png",
+              3);
+
+        // Contents
+        chkTrackFactionStanding = new CampaignOptionsCheckBox("TrackFactionStanding");
+        chkTrackFactionStanding.addMouseListener(createTipPanelUpdater(factionStandingHeader, "TrackFactionStanding"));
+
+        pnlFactionStandingModifiersPanel = createFactionStandingModifiersPanel();
+
+        // Layout the Panel
+        final JPanel panel = new CampaignOptionsStandardPanel("FactionStandingTab", true);
+        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
+
+        layoutParent.gridwidth = 5;
+        layoutParent.gridx = 0;
+        layoutParent.gridy = 0;
+        panel.add(factionStandingHeader, layoutParent);
+
+        layoutParent.gridy++;
+        layoutParent.gridwidth = 1;
+        panel.add(chkTrackFactionStanding, layoutParent);
+
+        layoutParent.gridy++;
+        layoutParent.gridwidth = 2;
+        panel.add(pnlFactionStandingModifiersPanel, layoutParent);
+
+        // Create Parent Panel and return
+        return createParentPanel(panel, "FactionStandingTab");
+    }
+
+    /**
+     * Creates and lays out the Faction Standing modifiers panel, which includes various checkboxes for limiting Faction
+     * Standing modifiers.
+     *
+     * @return a {@link JPanel} containing the Faction Standing modifier controls
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private JPanel createFactionStandingModifiersPanel() {
+        // Contents
+        chkUseFactionStandingNegotiation = new CampaignOptionsCheckBox("UseFactionStandingNegotiation");
+        chkUseFactionStandingNegotiation.addMouseListener(createTipPanelUpdater(factionStandingHeader,
+              "UseFactionStandingNegotiation"));
+
+        chkUseFactionStandingResupply = new CampaignOptionsCheckBox("UseFactionStandingResupply");
+        chkUseFactionStandingResupply.addMouseListener(createTipPanelUpdater(factionStandingHeader,
+              "UseFactionStandingResupply"));
+
+        chkUseFactionStandingCommandCircuit = new CampaignOptionsCheckBox("UseFactionStandingCommandCircuit");
+        chkUseFactionStandingCommandCircuit.addMouseListener(createTipPanelUpdater(factionStandingHeader,
+              "UseFactionStandingCommandCircuit"));
+
+        chkUseFactionStandingOutlawed = new CampaignOptionsCheckBox("UseFactionStandingOutlawed");
+        chkUseFactionStandingOutlawed.addMouseListener(createTipPanelUpdater(factionStandingHeader,
+              "UseFactionStandingOutlawed"));
+
+        chkUseFactionStandingBatchallRestrictions = new CampaignOptionsCheckBox("UseFactionStandingBatchallRestrictions");
+        chkUseFactionStandingBatchallRestrictions.addMouseListener(createTipPanelUpdater(factionStandingHeader,
+              "UseFactionStandingBatchallRestrictions"));
+
+        chkUseFactionStandingRecruitment = new CampaignOptionsCheckBox("UseFactionStandingRecruitment");
+        chkUseFactionStandingRecruitment.addMouseListener(createTipPanelUpdater(factionStandingHeader,
+              "UseFactionStandingRecruitment"));
+
+        chkUseFactionStandingBarracksCosts = new CampaignOptionsCheckBox("UseFactionStandingBarracksCosts");
+        chkUseFactionStandingBarracksCosts.addMouseListener(createTipPanelUpdater(factionStandingHeader,
+              "UseFactionStandingBarracksCosts"));
+
+        chkUseFactionStandingUnitMarket = new CampaignOptionsCheckBox("UseFactionStandingUnitMarket");
+        chkUseFactionStandingUnitMarket.addMouseListener(createTipPanelUpdater(factionStandingHeader,
+              "UseFactionStandingUnitMarket"));
+
+        chkUseFactionStandingContractPay = new CampaignOptionsCheckBox("UseFactionStandingContractPay");
+        chkUseFactionStandingContractPay.addMouseListener(createTipPanelUpdater(factionStandingHeader,
+              "UseFactionStandingContractPay"));
+
+        chkUseFactionStandingSupportPoints = new CampaignOptionsCheckBox("UseFactionStandingSupportPoints");
+        chkUseFactionStandingSupportPoints.addMouseListener(createTipPanelUpdater(factionStandingHeader,
+              "UseFactionStandingSupportPoints"));
+
+        // Layout the Panel
+        final JPanel panel = new CampaignOptionsStandardPanel("FactionStandingModifiersPanel", true);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+
+        layout.gridy = 0;
+        layout.gridx = 0;
+        layout.gridwidth = 1;
+        panel.add(chkTrackFactionStanding, layout);
+
+        layout.gridy++;
+        panel.add(chkUseFactionStandingNegotiation, layout);
+        layout.gridx++;
+        panel.add(chkUseFactionStandingResupply, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(chkUseFactionStandingCommandCircuit, layout);
+        layout.gridx++;
+        panel.add(chkUseFactionStandingOutlawed, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(chkUseFactionStandingBatchallRestrictions, layout);
+        layout.gridx++;
+        panel.add(chkUseFactionStandingRecruitment, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(chkUseFactionStandingBarracksCosts, layout);
+        layout.gridx++;
+        panel.add(chkUseFactionStandingUnitMarket, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(chkUseFactionStandingContractPay, layout);
+        layout.gridx++;
+        panel.add(chkUseFactionStandingSupportPoints, layout);
+
+        return panel;
+    }
+
+    /**
      * Loads values from the current campaign or an optional preset campaign options into the UI components, updating
      * their states to match the data.
      *
@@ -263,6 +413,19 @@ public class SystemsTab {
         chkClampReputationPayMultiplier.setSelected(options.isClampReputationPayMultiplier());
         chkReduceReputationPerformanceModifier.setSelected(options.isReduceReputationPerformanceModifier());
         chkReputationPerformanceModifierCutOff.setSelected(options.isReputationPerformanceModifierCutOff());
+
+        // Faction Standing
+        chkTrackFactionStanding.setSelected(options.isTrackFactionStanding());
+        chkUseFactionStandingNegotiation.setSelected(options.isUseFactionStandingNegotiation());
+        chkUseFactionStandingResupply.setSelected(options.isUseFactionStandingResupply());
+        chkUseFactionStandingCommandCircuit.setSelected(options.isUseFactionStandingCommandCircuit());
+        chkUseFactionStandingOutlawed.setSelected(options.isUseFactionStandingOutlawed());
+        chkUseFactionStandingBatchallRestrictions.setSelected(options.isUseFactionStandingBatchallRestrictions());
+        chkUseFactionStandingRecruitment.setSelected(options.isUseFactionStandingRecruitment());
+        chkUseFactionStandingBarracksCosts.setSelected(options.isUseFactionStandingBarracksCosts());
+        chkUseFactionStandingUnitMarket.setSelected(options.isUseFactionStandingUnitMarket());
+        chkUseFactionStandingContractPay.setSelected(options.isUseFactionStandingContractPay());
+        chkUseFactionStandingSupportPoints.setSelected(options.isUseFactionStandingSupportPoints());
     }
 
     /**
@@ -294,5 +457,18 @@ public class SystemsTab {
         options.setClampReputationPayMultiplier(chkClampReputationPayMultiplier.isSelected());
         options.setReduceReputationPerformanceModifier(chkReduceReputationPerformanceModifier.isSelected());
         options.setReputationPerformanceModifierCutOff(chkReputationPerformanceModifierCutOff.isSelected());
+
+        // Faction Standing
+        options.setTrackFactionStanding(chkTrackFactionStanding.isSelected());
+        options.setUseFactionStandingNegotiation(chkUseFactionStandingNegotiation.isSelected());
+        options.setUseFactionStandingResupply(chkUseFactionStandingResupply.isSelected());
+        options.setUseFactionStandingCommandCircuit(chkUseFactionStandingCommandCircuit.isSelected());
+        options.setUseFactionStandingOutlawed(chkUseFactionStandingOutlawed.isSelected());
+        options.setUseFactionStandingBatchallRestrictions(chkUseFactionStandingBatchallRestrictions.isSelected());
+        options.setUseFactionStandingRecruitment(chkUseFactionStandingRecruitment.isSelected());
+        options.setUseFactionStandingBarracksCosts(chkUseFactionStandingBarracksCosts.isSelected());
+        options.setUseFactionStandingUnitMarket(chkUseFactionStandingUnitMarket.isSelected());
+        options.setUseFactionStandingContractPay(chkUseFactionStandingContractPay.isSelected());
+        options.setUseFactionStandingSupportPoints(chkUseFactionStandingSupportPoints.isSelected());
     }
 }

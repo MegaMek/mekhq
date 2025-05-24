@@ -24,16 +24,21 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
-package mekhq.campaign.universe.fameAndInfamy;
+package mekhq.campaign.universe.factionStanding;
+
+import java.util.List;
+import java.util.ResourceBundle;
 
 import megamek.codeUtilities.MathUtility;
 import megamek.common.Compute;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-
-import java.util.List;
-import java.util.ResourceBundle;
 
 /**
  * Provides utility methods for working with clan factions within the Fame and Infamy module:

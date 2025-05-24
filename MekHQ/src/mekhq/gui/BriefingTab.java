@@ -80,6 +80,7 @@ import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import megameklab.util.UnitPrintManager;
 import mekhq.MekHQ;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.autoresolve.AutoResolveMethod;
 import mekhq.campaign.event.*;
 import mekhq.campaign.finances.Money;
@@ -105,6 +106,7 @@ import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.adapter.ScenarioTableMouseAdapter;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
@@ -416,6 +418,8 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
+        CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
+
         getCampaign().getApp().getAutosaveService().requestBeforeMissionEndAutosave(getCampaign());
 
         final CompleteMissionDialog cmd = new CompleteMissionDialog(getFrame());
@@ -435,7 +439,7 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        if (getCampaign().getCampaignOptions().isUseAtB() && (mission instanceof AtBContract)) {
+        if (campaignOptions.isUseAtB() && (mission instanceof AtBContract)) {
             if (((AtBContract) mission).contractExtended(getCampaign())) {
                 return;
             }
@@ -447,8 +451,8 @@ public final class BriefingTab extends CampaignGuiTab {
         // apply mission xp
         int xpAward = getMissionXpAward(cmd.getStatus(), mission);
 
+        LocalDate today = getCampaign().getLocalDate();
         if (xpAward > 0) {
-            LocalDate today = getCampaign().getLocalDate();
             for (Person person : getCampaign().getActivePersonnel(false)) {
                 if (person.isChild(today)) {
                     continue;
@@ -479,8 +483,7 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         // resolve turnover
-        if ((getCampaign().getCampaignOptions().isUseRandomRetirement()) &&
-                  (getCampaign().getCampaignOptions().isUseContractCompletionRandomRetirement())) {
+        if ((campaignOptions.isUseRandomRetirement()) && (campaignOptions.isUseContractCompletionRandomRetirement())) {
             RetirementDefectionDialog rdd = new RetirementDefectionDialog(getCampaignGui(), mission, true);
 
             if (rdd.wasAborted()) {
@@ -512,12 +515,12 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        if (getCampaign().getCampaignOptions().isUseAtB() && (mission instanceof AtBContract)) {
+        if (campaignOptions.isUseAtB() && (mission instanceof AtBContract)) {
             getCampaign().getContractMarket().checkForFollowup(getCampaign(), (AtBContract) mission);
         }
 
         // prompt autoAwards ceremony
-        if (getCampaign().getCampaignOptions().isEnableAutoAwards()) {
+        if (campaignOptions.isEnableAutoAwards()) {
             AutoAwardsController autoAwardsController = new AutoAwardsController();
 
             // for the purposes of Mission Accomplished awards, we do not count partial
@@ -525,6 +528,21 @@ public final class BriefingTab extends CampaignGuiTab {
             autoAwardsController.PostMissionController(getCampaign(),
                   mission,
                   Objects.equals(String.valueOf(cmd.getStatus()), "Success"));
+        }
+
+        // Update Faction Standings
+        if (campaignOptions.isTrackFactionStanding()) {
+            Faction employer = null;
+            if (mission instanceof AtBContract contract) {
+                employer = contract.getEmployerFaction();
+            }
+
+            FactionStandings factionStandings = getCampaign().getFactionStandings();
+            List<String> standingsReports = factionStandings.processContractCompletion(employer, today, status);
+
+            for (String standingReport : standingsReports) {
+                getCampaign().addReport(standingReport);
+            }
         }
 
         // Undeploy forces

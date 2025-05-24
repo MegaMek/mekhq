@@ -244,7 +244,8 @@ import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.universe.eras.Era;
 import mekhq.campaign.universe.eras.Eras;
-import mekhq.campaign.universe.fameAndInfamy.BatchallFactions;
+import mekhq.campaign.universe.factionStanding.BatchallFactions;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.campaign.universe.fameAndInfamy.FameAndInfamyController;
 import mekhq.campaign.universe.selectors.factionSelectors.AbstractFactionSelector;
 import mekhq.campaign.universe.selectors.factionSelectors.DefaultFactionSelector;
@@ -400,12 +401,13 @@ public class Campaign implements ITechManager {
     private int crimeRating;
     private int crimePirateModifier;
     private LocalDate dateOfLastCrime;
+    private FactionStandings factionStandings;
     private int initiativeBonus;
     private int initiativeMaxBonus;
     private final CampaignSummary campaignSummary;
     private final Quartermaster quartermaster;
     private StoryArc storyArc;
-    private final FameAndInfamyController fameAndInfamy;
+    private final FameAndInfamyController regardAndInfamy;
     private BehaviorSettings autoResolveBehaviorSettings;
     private List<UUID> automatedMothballUnits;
     private int temporaryPrisonerCapacity;
@@ -467,6 +469,7 @@ public class Campaign implements ITechManager {
         retainerEmployerCode = null;
         retainerStartDate = null;
         reputation = null;
+        factionStandings = new FactionStandings();
         crimeRating = 0;
         crimePirateModifier = 0;
         dateOfLastCrime = null;
@@ -504,7 +507,7 @@ public class Campaign implements ITechManager {
         campaignSummary = new CampaignSummary(this);
         quartermaster = new Quartermaster(this);
         fieldKitchenWithinCapacity = false;
-        fameAndInfamy = new FameAndInfamyController();
+        regardAndInfamy = new FameAndInfamyController();
         autoResolveBehaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR;
         automatedMothballUnits = new ArrayList<>();
         temporaryPrisonerCapacity = DEFAULT_TEMPORARY_CAPACITY;
@@ -5057,10 +5060,23 @@ public class Campaign implements ITechManager {
 
         for (AtBContract contract : getActiveAtBContracts()) {
             if (campaignOptions.isUseGenericBattleValue()) {
-                if (contract.getStartDate().equals(getLocalDate())) {
-                    if (getCampaignOptions().isUseGenericBattleValue() &&
-                              BatchallFactions.usesBatchalls(contract.getEnemyCode())) {
-                        contract.setBatchallAccepted(contract.initiateBatchall(this));
+                if (contract.getStartDate().equals(currentDay)) {
+                    String factionCode = contract.getEnemyCode();
+                    if (BatchallFactions.usesBatchalls(factionCode)) {
+                        if (contract.initiateBatchall(this)) {
+                            contract.setBatchallAccepted(true);
+                        } else {
+                            contract.setBatchallAccepted(false);
+
+                            if (campaignOptions.isTrackFactionStanding()) {
+                                List<String> reports = factionStandings.processRefusedBatchall(factionCode,
+                                      currentDay.getYear());
+
+                                for (String report : reports) {
+                                    addReport(report);
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -5596,6 +5612,8 @@ public class Campaign implements ITechManager {
         // Advance the day by one
         final LocalDate yesterday = currentDay;
         currentDay = currentDay.plusDays(1);
+        boolean isFirstOfMonth = currentDay.getDayOfMonth() == 1;
+        boolean isNewYear = currentDay.getDayOfYear() == 1;
 
         // Check for important dates
         if (campaignOptions.isShowLifeEventDialogCelebrations()) {
@@ -5616,12 +5634,18 @@ public class Campaign implements ITechManager {
         beginReport("<b>" + MekHQ.getMHQOptions().getLongDisplayFormattedDate(getLocalDate()) + "</b>");
 
         // New Year Changes
-        if (currentDay.getDayOfYear() == 1) {
+        if (isNewYear) {
             // News is reloaded
             reloadNews();
 
             // Change Year Game Option
             getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(getGameYear());
+
+            // Degrade Regard
+            List<String> degradedRegardReports = factionStandings.processRegardDegradation(currentDay.getYear());
+            for (String report : degradedRegardReports) {
+                addReport(report);
+            }
         }
 
         readNews();
@@ -5640,9 +5664,8 @@ public class Campaign implements ITechManager {
         processNewDayPersonnel();
 
         // Needs to be before 'processNewDayATB' so that Dependents can't leave the
-        // moment they
-        // arrive via AtB Bonus Events
-        if ((location.isOnPlanet()) && (currentDay.getDayOfMonth() == 1)) {
+        // moment they arrive via AtB Bonus Events
+        if (location.isOnPlanet() && isFirstOfMonth) {
             RandomDependents randomDependents = new RandomDependents(this);
             randomDependents.processMonthlyRemovalAndAddition();
         }
@@ -5660,14 +5683,14 @@ public class Campaign implements ITechManager {
             processEducationNewDay();
         }
 
-        if ((campaignOptions.isEnableAutoAwards()) && (currentDay.getDayOfMonth() == 1)) {
+        if (campaignOptions.isEnableAutoAwards() && isFirstOfMonth) {
             AutoAwardsController autoAwardsController = new AutoAwardsController();
             autoAwardsController.ManualController(this, false);
         }
 
         // Prisoner events can occur on Monday or the 1st of the month depending on the
         // type of event
-        if (currentDay.getDayOfWeek() == DayOfWeek.MONDAY || currentDay.getDayOfMonth() == 1) {
+        if (currentDay.getDayOfWeek() == DayOfWeek.MONDAY || isFirstOfMonth) {
             new PrisonerEventManager(this);
         }
 
@@ -5685,7 +5708,7 @@ public class Campaign implements ITechManager {
         finances.newDay(this, yesterday, getLocalDate());
 
         // process removal of old personnel data on the first day of each month
-        if ((campaignOptions.isUsePersonnelRemoval()) && (currentDay.getDayOfMonth() == 1)) {
+        if (campaignOptions.isUsePersonnelRemoval() && isFirstOfMonth) {
             performPersonnelCleanUp();
         }
 
@@ -5705,6 +5728,12 @@ public class Campaign implements ITechManager {
         // Random Events
         if (currentDay.isAfter(GRAY_MONDAY_EVENTS_BEGIN) && currentDay.isBefore(GRAY_MONDAY_EVENTS_END)) {
             new GrayMonday(this, currentDay);
+        }
+
+        // Faction Standing
+        if (isFirstOfMonth && campaignOptions.isTrackFactionStanding()) {
+            String report = factionStandings.updateClimateRegard(faction, currentDay);
+            addReport(report);
         }
 
         // This must be the last step before returning true
@@ -6417,6 +6446,14 @@ public class Campaign implements ITechManager {
         this.reputation = reputation;
     }
 
+    public FactionStandings getFactionStandings() {
+        return factionStandings;
+    }
+
+    public void setFactionStandings(FactionStandings factionStandings) {
+        this.factionStandings = factionStandings;
+    }
+
     private void addInMemoryLogHistory(LogEntry le) {
         if (!inMemoryLogHistory.isEmpty()) {
             while (ChronoUnit.DAYS.between(inMemoryLogHistory.get(0).getDate(), le.getDate()) >
@@ -6576,7 +6613,7 @@ public class Campaign implements ITechManager {
     }
 
     public FameAndInfamyController getFameAndInfamy() {
-        return fameAndInfamy;
+        return regardAndInfamy;
     }
 
     /**
@@ -6665,6 +6702,10 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "newPersonnelMarket");
         newPersonnelMarket.writePersonnelMarketDataToXML(writer, indent);
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "newPersonnelMarket");
+
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "factionStandings");
+        factionStandings.writeFactionStandingsToXML(writer, indent);
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "factionStandings");
 
         // this handles campaigns that predate 49.20
         if (campaignStartDate == null) {
@@ -6767,9 +6808,9 @@ public class Campaign implements ITechManager {
             storyArc.writeToXml(writer, indent);
         }
 
-        // Fame and Infamy
-        if (fameAndInfamy != null) {
-            fameAndInfamy.writeToXml(writer, indent);
+        // Regard and Infamy
+        if (regardAndInfamy != null) {
+            regardAndInfamy.writeToXml(writer, indent);
         }
 
         // Markets
