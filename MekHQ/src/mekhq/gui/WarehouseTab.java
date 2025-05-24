@@ -66,8 +66,8 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.PartsTableMouseAdapter;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
-import mekhq.gui.baseComponents.roundedComponents.RoundedJToggleButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.gui.baseComponents.roundedComponents.RoundedMMToggleButton;
 import mekhq.gui.dialog.PartsReportDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.PartsTableModel;
@@ -113,7 +113,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     private JTable partsTable;
     private JTable techTable;
     private RoundedJButton btnDoTask;
-    private RoundedJToggleButton btnShowAllTechsWarehouse;
+    private RoundedMMToggleButton btnShowAllTechsWarehouse;
     private JLabel lblTargetNumWarehouse;
     private JTextArea textTargetWarehouse;
     private JLabel astechPoolLabel;
@@ -303,7 +303,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         gridBagConstraints.insets = new Insets(2, 2, 2, 2);
         panelDoTask.add(scrTargetWarehouse, gridBagConstraints);
 
-        btnShowAllTechsWarehouse = new RoundedJToggleButton(resourceMap.getString("btnShowAllTechs.text"));
+        btnShowAllTechsWarehouse = new RoundedMMToggleButton(resourceMap.getString("btnShowAllTechs.text"));
         btnShowAllTechsWarehouse.setToolTipText(resourceMap.getString("btnShowAllTechs.toolTipText"));
         btnShowAllTechsWarehouse.addActionListener(ev -> filterTechs());
         gridBagConstraints = new GridBagConstraints();

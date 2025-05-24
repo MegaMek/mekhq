@@ -93,7 +93,7 @@ public class RoundedLineBorder extends AbstractBorder {
      */
     public static TitledBorder createRoundedLineBorder(String borderTitle) {
         return BorderFactory.createTitledBorder(RoundedLineBorder.createRoundedLineBorder(),
-              String.format("<html>%s</html>", borderTitle));
+              String.format("<html><b>%s</b></html>", borderTitle));
     }
 
     /**

@@ -76,8 +76,8 @@ import mekhq.campaign.work.IPartWork;
 import mekhq.gui.adapter.ServicedUnitsTableMouseAdapter;
 import mekhq.gui.adapter.TaskTableMouseAdapter;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
-import mekhq.gui.baseComponents.roundedComponents.RoundedJToggleButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.gui.baseComponents.roundedComponents.RoundedMMToggleButton;
 import mekhq.gui.dialog.AcquisitionsDialog;
 import mekhq.gui.dialog.MRMSDialog;
 import mekhq.gui.enums.MHQTabType;
@@ -107,7 +107,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     private JTable taskTable;
     private JTable techTable;
     private RoundedJButton btnDoTask;
-    private RoundedJToggleButton btnShowAllTechs;
+    private RoundedMMToggleButton btnShowAllTechs;
     private JScrollPane scrTextTarget;
     private JLabel lblTargetNum;
     private JTextPane txtServicedUnitView;
@@ -435,7 +435,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
 
         JPanel panTechs = new JPanel(new GridBagLayout());
 
-        btnShowAllTechs = new RoundedJToggleButton(resourceMap.getString("btnShowAllTechs.text"));
+        btnShowAllTechs = new RoundedMMToggleButton(resourceMap.getString("btnShowAllTechs.text"));
         btnShowAllTechs.setToolTipText(resourceMap.getString("btnShowAllTechs.toolTipText"));
         btnShowAllTechs.setName("btnShowAllTechs");
         btnShowAllTechs.addActionListener(ev -> filterTechs());
