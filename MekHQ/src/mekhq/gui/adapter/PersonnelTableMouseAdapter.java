@@ -60,6 +60,7 @@ import static mekhq.campaign.personnel.skills.SkillType.S_ARTILLERY;
 import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
 import static mekhq.campaign.personnel.skills.SkillType.getType;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.WILLPOWER;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeInterviewersNotes;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.processAdHocExecution;
 import static mekhq.utilities.spaUtilities.SpaUtilities.getSpaCategory;
@@ -83,8 +84,10 @@ import javax.swing.JTable;
 
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
+import megamek.client.ratgenerator.CrewDescriptor;
 import megamek.client.ui.dialogs.PortraitChooserDialog;
 import megamek.codeUtilities.MathUtility;
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Crew;
 import megamek.common.EntityWeightClass;
 import megamek.common.Mounted;
@@ -136,6 +139,7 @@ import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.personnel.skills.Aging;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -147,6 +151,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.PersonnelTab;
 import mekhq.gui.control.EditLogControl.LogType;
@@ -205,17 +210,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_BUY_EDGE = "EDGE_BUY";
     private static final String CMD_SET_EDGE = "EDGE_SET";
     private static final String CMD_SET_XP = "XP_SET";
-    /**
-     * @deprecated use {@code CMD_ADD_XP} instead
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    private static final String CMD_ADD_1_XP = "XP_ADD_1";
     private static final String CMD_ADD_XP = "XP_ADD";
     private static final String CMD_EDIT_BIOGRAPHY = "BIOGRAPHY";
     private static final String CMD_EDIT_PORTRAIT = "PORTRAIT";
     private static final String CMD_EDIT_HITS = "EDIT_HITS";
     private static final String CMD_EDIT = "EDIT";
     private static final String CMD_SACK = "SACK";
+    private static final String CMD_EMPLOY = "EMPLOY";
     private static final String CMD_SPENDING_SPREE = "SPENDING_SPREE";
     private static final String CMD_REMOVE = "REMOVE";
     private static final String CMD_EDGE_TRIGGER = "EDGE";
@@ -233,6 +234,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_BUY_TRAIT = "BUY_TRAIT";
     private static final String CMD_CHANGE_ATTRIBUTE = "CHANGE_ATTRIBUTE";
     private static final String CMD_SET_ATTRIBUTE = "SET_ATTRIBUTE";
+    private static final String CMD_RANDOM_PROFESSION = "RANDOM_PROFESSION";
     private static final String CMD_ADD_SPOUSE = "SPOUSE";
     private static final String CMD_REMOVE_SPOUSE = "REMOVE_SPOUSE";
     private static final String CMD_ADD_PREGNANCY = "ADD_PREGNANCY";
@@ -441,6 +443,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 for (final Person person : people) {
                     person.setPrimaryRole(getCampaign(), role);
                     writePersonalityDescription(person);
+                    writeInterviewersNotes(person);
                     getCampaign().personUpdated(person);
                     if (getCampaignOptions().isUsePortraitForRole(role) &&
                               getCampaignOptions().isAssignPortraitOnRoleChange() &&
@@ -633,11 +636,21 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 selectedPerson.improveSkill(type);
                 selectedPerson.spendXP(cost);
 
+                Skill skill = selectedPerson.getSkill(type);
+                SkillType skillType = skill.getType();
+
+                int adjustedReputation = selectedPerson.getAdjustedReputation(getCampaignOptions().isUseAgeEffects(),
+                      getCampaign().isClanCampaign(),
+                      getCampaign().getLocalDate(),
+                      selectedPerson.getRankLevel());
+
                 PerformanceLogger.improvedSkill(getCampaign(),
                       selectedPerson,
                       getCampaign().getLocalDate(),
-                      selectedPerson.getSkill(type).getType().getName(),
-                      selectedPerson.getSkill(type).toString());
+                      skillType.getName(),
+                      skill.toString(selectedPerson.getOptions(),
+                            selectedPerson.getATOWAttributes(),
+                            adjustedReputation));
                 getCampaign().addReport(String.format(resources.getString("improved.format"),
                       selectedPerson.getHyperlinkedName(),
                       type));
@@ -692,6 +705,49 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                 for (Person person : people) {
                     person.setAttributeScore(attribute, choice);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                    getCampaign().personUpdated(person);
+                }
+
+                break;
+            }
+            case CMD_RANDOM_PROFESSION: {
+                List<PersonnelRole> possibleRoles = PersonnelRole.getCivilianRolesExceptNone();
+                LocalDate today = getCampaign().getLocalDate();
+
+                for (Person person : people) {
+                    // Under 16s are considered children and unable to be assigned a profession
+                    if (person.isChild(today)) {
+                        continue;
+                    }
+
+                    List<PersonnelRole> eligibleRoles = new ArrayList<>(possibleRoles);
+
+                    int personAge = person.getAge(today);
+
+                    if (personAge < 18) {
+                        // Characters under 18 years old are strictly unable to be assigned these roles.
+                        // This is project policy.
+                        eligibleRoles.remove(PersonnelRole.ADULT_ENTERTAINER);
+                        eligibleRoles.remove(PersonnelRole.LUXURY_COMPANION);
+                    }
+
+                    PersonnelRole randomProfession = ObjectUtility.getRandomItem(eligibleRoles);
+                    int experienceLevel = CrewDescriptor.randomExperienceLevel();
+
+                    for (String skillName : randomProfession.getSkillsForProfession()) {
+                        if (person.getSkill(skillName) != null) { // They already have this skill
+                            continue;
+                        }
+
+                        SkillType skillType = SkillType.getType(skillName);
+                        int targetLevel = skillType.getExperienceLevel(experienceLevel);
+                        person.addSkill(skillName, targetLevel, 0);
+                    }
+
+                    Aging.updateAllSkillAgeModifiers(today, person);
+                    person.setPrimaryRole(getCampaign(), randomProfession);
+
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                     getCampaign().personUpdated(person);
                 }
@@ -1026,18 +1082,21 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_SACK: {
                 boolean showDialog = false;
                 List<Person> toRemove = new ArrayList<>();
-                for (Person person : people) {
-                    if (!person.getPrimaryRole().isCivilian()) {
-                        if (getCampaign().getRetirementDefectionTracker()
-                                  .removeFromCampaign(person, false, true, getCampaign(), null)) {
-                            showDialog = true;
+                if (getCampaignOptions().isUseAtB()) {
+                    for (Person person : people) {
+                        if (!person.getPrimaryRole().isCivilian()) {
+                            if (getCampaign().getRetirementDefectionTracker()
+                                      .removeFromCampaign(person, false, true, getCampaign(), null)) {
+                                showDialog = true;
+                            } else {
+                                toRemove.add(person);
+                            }
                         } else {
                             toRemove.add(person);
                         }
-                    } else {
-                        toRemove.add(person);
                     }
                 }
+
                 if (showDialog) {
                     RetirementDefectionDialog rdd = new RetirementDefectionDialog(gui, null, false);
 
@@ -1068,6 +1127,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         }
                     }
                 }
+                break;
+            }
+            case CMD_EMPLOY: {
+                for (Person person : people) {
+                    getCampaign().recruitPerson(person);
+                }
+
                 break;
             }
             case CMD_SPENDING_SPREE: {
@@ -1503,7 +1569,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_PERSONALITY: {
                 for (Person person : people) {
-                    PersonalityController.generatePersonality(person);
+                    PersonalityController.generatePersonality(person, false);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
@@ -1564,6 +1630,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     person.setGivenName(name[0]);
                     person.setSurname(name[1]);
                     writePersonalityDescription(person);
+                    writeInterviewersNotes(person);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
@@ -1664,7 +1731,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 Skill skill = person.getSkill(S_SURGERY);
 
                 if (skill != null &&
-                          skill.getFinalSkillValue(person.getOptions()) >=
+                          skill.getFinalSkillValue(person.getOptions(), person.getATOWAttributes()) >=
                                 REPLACEMENT_LIMB_MINIMUM_SKILL_REQUIRED_TYPES_3_4_5) {
                     suitableDoctors.add(person);
                 }
@@ -1696,7 +1763,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       suitableDoctors,
                       selectedPerson,
                       cost);
-                int choice = replacementLimbDialog.getDialogChoice();
+                int choice = replacementLimbDialog.getChoiceIndex();
 
                 // If the user chose to decline the surgery
                 if (choice == 0) {
@@ -1760,14 +1827,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     }
 
     /**
-     * @deprecated use {@link #processPrisonerResolutionCommand(Person[], String, String, boolean)} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    private void processPrisonerResolutionCommand(Person[] prisoners, String message, String title) {
-        processPrisonerResolutionCommand(prisoners, message, title);
-    }
-
-    /**
      * Processes a prisoner resolution command, allowing a user to confirm a specific action (e.g., releasing or
      * executing prisoners) via a dialog box. If confirmed, this method removes the selected prisoners from the campaign
      * and optionally triggers additional execution-specific logic.
@@ -1812,6 +1871,18 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         }
 
         if (isExecution) {
+            if (getCampaign().getCampaignOptions().isTrackFactionStanding()) {
+                FactionStandings factionStandings = getCampaign().getFactionStandings();
+
+                List<Person> listOfPrisoners = Arrays.asList(prisoners);
+                List<String> reports = factionStandings.executePrisonersOfWar(listOfPrisoners,
+                      getCampaign().getGameYear());
+
+                for (String report : reports) {
+                    getCampaign().addReport(report);
+                }
+            }
+
             processAdHocExecution(getCampaign(), prisoners.length);
         }
     }
@@ -2485,30 +2556,36 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                         if (filteredFaction != null) {
                                             int educationLevel = academy.getEducationLevel(person);
 
-                                            String[] skills = academy.getCurriculums()
-                                                                    .get(person.getEduCourseIndex())
-                                                                    .split(",");
+                                            String[] skillNames = academy.getCurriculums()
+                                                                        .get(person.getEduCourseIndex())
+                                                                        .split(",");
 
-                                            skills = Arrays.stream(skills).map(String::trim).toArray(String[]::new);
+                                            skillNames = Arrays.stream(skillNames)
+                                                               .map(String::trim)
+                                                               .toArray(String[]::new);
 
-                                            for (String skill : skills) {
-                                                if (skill.equalsIgnoreCase("none")) {
+                                            for (String skillName : skillNames) {
+                                                if (skillName.equalsIgnoreCase("none")) {
                                                     continue;
                                                 }
 
-                                                if (skill.equalsIgnoreCase("xp")) {
+                                                if (skillName.equalsIgnoreCase("xp")) {
                                                     if (EducationLevel.parseToInt(person.getEduHighestEducation()) <
                                                               educationLevel) {
                                                         improvementPossible++;
                                                     }
                                                 } else {
-                                                    String skillParsed = skillParser(skill);
+                                                    String skillParsed = skillParser(skillName);
+                                                    Skill skill = person.getSkill(skillParsed);
 
-                                                    if ((person.hasSkill(skillParsed)) &&
-                                                              (person.getSkill(skillParsed).getExperienceLevel() <
-                                                                     educationLevel)) {
-                                                        improvementPossible++;
-                                                    } else if (!person.hasSkill(skillParsed)) {
+                                                    if (skill != null) {
+                                                        int skillLevel = skill.getLevel();
+                                                        int experienceLevel = skill.getType()
+                                                                                    .getExperienceLevel(skillLevel);
+                                                        if (experienceLevel < educationLevel) {
+                                                            improvementPossible++;
+                                                        }
+                                                    } else {
                                                         improvementPossible++;
                                                     }
                                                 }
@@ -3764,9 +3841,16 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         menuItem.setEnabled(true);
         popup.add(menuItem);
 
-        if (getCampaignOptions().isUseAtB() && StaticChecks.areAllActive(selected)) {
+        if (StaticChecks.areAllEmployed(selected)) {
             menuItem = new JMenuItem(resources.getString("sack.text"));
             menuItem.setActionCommand(CMD_SACK);
+            menuItem.addActionListener(this);
+            popup.add(menuItem);
+        }
+
+        if (!StaticChecks.areAllEmployed(selected)) {
+            menuItem = new JMenuItem(resources.getString("employ.text"));
+            menuItem.setActionCommand(CMD_EMPLOY);
             menuItem.addActionListener(this);
             popup.add(menuItem);
         }
@@ -4204,6 +4288,14 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 attributesMenu.add(menuItem);
             }
             menu.add(attributesMenu);
+
+            menuItem = new JMenuItem(resources.getString("generateRandomCivilianProfession.text"));
+            menuItem.setToolTipText(wordWrap(String.format(resources.getString(
+                  "generateRandomCivilianProfession.tooltip"))));
+            menuItem.setActionCommand(makeCommand(CMD_RANDOM_PROFESSION));
+            menuItem.addActionListener(this);
+            menuItem.setEnabled(getCampaign().isGM());
+            menu.add(menuItem);
 
             JMenuHelpers.addMenuIfNonEmpty(popup, menu);
         }

@@ -591,6 +591,19 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.FONT_COLOR_NEGATIVE, value.getRGB());
     }
 
+    public Color getFontColorAmazing() {
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.FONT_COLOR_AMAZING, 0xC344C3));
+    }
+
+    public String getFontColorAmazingHexColor() {
+        return convertFontColorToHexColor(getFontColorAmazing());
+    }
+
+    public void setFontColorAmazing(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.FONT_COLOR_AMAZING, value.getRGB());
+    }
+
     public Color getFontColorPositive() {
         return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
                                .getInt(MHQConstants.FONT_COLOR_POSITIVE, 0x7FCF43));
@@ -773,24 +786,7 @@ public final class MHQOptions extends SuiteOptions {
     public void setAutosaveYearlyValue(boolean value) {
         userPreferences.node(MHQConstants.AUTOSAVE_NODE).putBoolean(MHQConstants.SAVE_YEARLY_KEY, value);
     }
-
-
-    /**
-     * @deprecated use {@link #getAutosaveBeforeScenariosValue()} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public boolean getAutosaveBeforeMissionsValue() {
-        return getAutosaveBeforeScenariosValue();
-    }
-
-    /**
-     * @deprecated use {@link #setAutosaveBeforeScenariosValue(boolean)} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public void setAutosaveBeforeMissionsValue(boolean value) {
-        setAutosaveBeforeScenariosValue(value);
-    }
-
+    
     public boolean getAutosaveBeforeScenariosValue() {
         return userPreferences.node(MHQConstants.AUTOSAVE_NODE)
                      .getBoolean(MHQConstants.SAVE_BEFORE_SCENARIOS_KEY, true);

@@ -24,8 +24,17 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.market;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import megamek.common.Compute;
 import mekhq.campaign.Campaign;
@@ -33,16 +42,13 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.module.api.PersonnelMarketMethod;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
 /**
  * Generation method for personnel market that adds a random number of recruits of a random type
  * each day and removes them based on skill (with more experienced leaving more quickly).
  *
  * @author Neoancient
  */
+@Deprecated(since = "0.50.06", forRemoval = false)
 public class PersonnelMarketRandom implements PersonnelMarketMethod {
 
     @Override

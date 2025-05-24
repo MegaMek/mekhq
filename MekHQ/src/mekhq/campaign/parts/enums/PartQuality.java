@@ -24,14 +24,19 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
-
-
 package mekhq.campaign.parts.enums;
 
 import mekhq.MekHQ;
+import mekhq.utilities.ReportingUtilities;
 
 import java.util.*;
+import megamek.common.ITechnology.TechRating;
 
 /**
  * Represents the quality of a Part. Quality is a scale that ranges from A to F.
@@ -43,24 +48,67 @@ import java.util.*;
  * Internally quality is represented by a number 0 to 5, bad to good.
  */
 public enum PartQuality {
-    QUALITY_A(0),
-    QUALITY_B(1),
-    QUALITY_C(2),
-    QUALITY_D(3),
-    QUALITY_E(4),
-    QUALITY_F(5);
+    QUALITY_A(0, "A", "F", 3, TechRating.A),
+    QUALITY_B(1, "B", "E", 2, TechRating.B),
+    QUALITY_C(2, "C", "D", 1, TechRating.C),
+    QUALITY_D(3, "D", "C", 0, TechRating.D),
+    QUALITY_E(4, "E", "B", -1, TechRating.E),
+    QUALITY_F(5, "F", "A", -2, TechRating.F);
 
-    public final int numericQuality;
+    private final int index;
+    private final String name;
+    private final String reversedName;
+    private final int repairModifier;
+    private final TechRating techRating;
+    private static final Map<Integer, PartQuality> INDEX_LOOKUP = new HashMap<>();
+    private static final Map<String, PartQuality> NAME_LOOKUP = new HashMap<>();
+    private static final Map<String, PartQuality> REVERSED_NAME_LOOKUP = new HashMap<>();
 
-    private PartQuality(int quality) {
-        this.numericQuality = quality;
+    static {
+        for (PartQuality q : values()) {
+            INDEX_LOOKUP.put(q.index, q);
+            NAME_LOOKUP.put(q.name, q);
+            REVERSED_NAME_LOOKUP.put(q.reversedName, q);
+        }
+    }
+    private PartQuality(int index, String name, String reversedName, int repairModifier, TechRating techRating) {
+        this.index = index;
+        this.name = name;
+        this.reversedName = reversedName;
+        this.repairModifier = repairModifier;
+        this.techRating = techRating;
     }
 
     /**
      * @return numeric quality 0-5 bad-good
      */
     public int toNumeric() {
-        return this.numericQuality;
+        return this.index;
+    }
+
+    /**
+     * @return String letter name for quality A-F bad-good
+     */
+    public String getName() {
+        return getName(false);
+    }
+
+    /**
+     * @param reversed - are quality names reversed per the campaign option
+     * @return String letter name for quality A-F bad-good (or good-bad if reversed)
+     */
+    public String getName(boolean reversed) {
+        if (reversed) {
+            return this.reversedName;
+        }
+        return this.name;
+    }
+
+    /**
+     * @return TechRating for this quality
+     */
+    public TechRating getTechRating() {
+        return this.techRating;
     }
 
     /**
@@ -69,15 +117,11 @@ public enum PartQuality {
      * @throws IllegalArgumentException
      */
     public static PartQuality fromNumeric(int rawQuality) {
-        return switch (rawQuality) {
-            case 0 -> QUALITY_A;
-            case 1 -> QUALITY_B;
-            case 2 -> QUALITY_C;
-            case 3 -> QUALITY_D;
-            case 4 -> QUALITY_E;
-            case 5 -> QUALITY_F;
-            default -> throw new IllegalArgumentException("rawQuality must be int 0-5");
-        };
+        try {
+            return INDEX_LOOKUP.get(rawQuality);
+        } catch (NullPointerException e) {
+            throw new IllegalArgumentException("rawQuality must be int 0-5");
+        }
     }
 
     /**
@@ -85,26 +129,7 @@ public enum PartQuality {
      * @return String letter name for quality A-F bad-good (or good-bad if reversed)
      */
     public String toName(boolean reversed) {
-        if (!reversed) {
-            return switch(this) {
-                case QUALITY_A -> "A";
-                case QUALITY_B -> "B";
-                case QUALITY_C -> "C";
-                case QUALITY_D -> "D";
-                case QUALITY_E -> "E";
-                case QUALITY_F -> "F";
-            };
-        } else {
-            return switch(this) {
-                case QUALITY_B -> "E";
-                case QUALITY_A -> "F";
-                case QUALITY_C -> "D";
-                case QUALITY_D -> "C";
-                case QUALITY_E -> "B";
-                case QUALITY_F -> "A";
-                default -> "?";
-            };
-        }
+        return getName(reversed);
     }
 
   /**
@@ -114,26 +139,14 @@ public enum PartQuality {
    * @throws IllegalArgumentException
    */
     public static PartQuality fromName(String code, boolean reversed) {
-        if (!reversed) {
-            return switch(code) {
-                case "A" -> PartQuality.QUALITY_A;
-                case "B" -> PartQuality.QUALITY_B;
-                case "C" -> PartQuality.QUALITY_C;
-                case "D" -> PartQuality.QUALITY_D;
-                case "E" -> PartQuality.QUALITY_E;
-                case "F" -> PartQuality.QUALITY_F;
-                default -> throw new IllegalArgumentException("Expecting one-char string A to F");
-            };
-        } else {
-            return switch(code) {
-                case "F" -> PartQuality.QUALITY_A;
-                case "E" -> PartQuality.QUALITY_B;
-                case "D" -> PartQuality.QUALITY_C;
-                case "C" -> PartQuality.QUALITY_D;
-                case "B" -> PartQuality.QUALITY_E;
-                case "A" -> PartQuality.QUALITY_F;
-                default -> throw new IllegalArgumentException("Expecting one-char string A to F");
-            };
+        try {
+            if (!reversed) {
+                return NAME_LOOKUP.get(code);
+            } else {
+                return REVERSED_NAME_LOOKUP.get(code);
+            }
+        } catch (NullPointerException e) {
+            throw new IllegalArgumentException("Expecting one-char string A to F");
         }
     }
 
@@ -141,14 +154,7 @@ public enum PartQuality {
      * @return modifier for repair rolls using a part of this quality
      */
     public int getRepairModifier(){
-        return switch(this) {
-            case QUALITY_A -> 3;
-            case QUALITY_B -> 2;
-            case QUALITY_C -> 1;
-            case QUALITY_D -> 0;
-            case QUALITY_E -> -1;
-            case QUALITY_F -> -2;
-        };
+        return this.repairModifier;
     }
 
     /**
@@ -156,9 +162,9 @@ public enum PartQuality {
      */
     public String getHexColor() {
         return switch (this) {
-            case QUALITY_A, QUALITY_B -> MekHQ.getMHQOptions().getFontColorNegativeHexColor();
-            case QUALITY_C, QUALITY_D -> MekHQ.getMHQOptions().getFontColorWarningHexColor();
-            case QUALITY_E, QUALITY_F -> MekHQ.getMHQOptions().getFontColorPositiveHexColor();
+            case QUALITY_A, QUALITY_B -> ReportingUtilities.getNegativeColor();
+            case QUALITY_C, QUALITY_D -> ReportingUtilities.getWarningColor();
+            case QUALITY_E, QUALITY_F -> ReportingUtilities.getPositiveColor();
 
         };
     }
@@ -188,7 +194,10 @@ public enum PartQuality {
     /**
      * @return A list of PartQualities in order bad to good
      */
-    public static List<PartQuality> allQualities() {
+    public static List<PartQuality> allQualities(boolean reversed) {
+            if (reversed) {
+                return List.of(QUALITY_F,QUALITY_E,QUALITY_D,QUALITY_C,QUALITY_B,QUALITY_A);
+            }
             return List.of(QUALITY_A,QUALITY_B,QUALITY_C,QUALITY_D,QUALITY_E,QUALITY_F);
     }
 }

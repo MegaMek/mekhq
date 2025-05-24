@@ -57,6 +57,7 @@ import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
+import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.randomEvents.personalities.enums.Aggression;
@@ -117,7 +118,6 @@ public enum PersonnelTableModelColumn {
     MEDICAL("PersonnelTableModelColumn.MEDICAL.text"),
     ADMINISTRATION("PersonnelTableModelColumn.ADMINISTRATION.text"),
     NEGOTIATION("PersonnelTableModelColumn.NEGOTIATION.text"),
-    @Deprecated(since = "0.50.05", forRemoval = true) SCROUNGE("PersonnelTableModelColumn.SCROUNGE.text"),
     INJURIES("PersonnelTableModelColumn.INJURIES.text"),
     KILLS("PersonnelTableModelColumn.KILLS.text"),
     SALARY("PersonnelTableModelColumn.SALARY.text"),
@@ -137,6 +137,7 @@ public enum PersonnelTableModelColumn {
     DIVORCEABLE("PersonnelTableModelColumn.DIVORCEABLE.text"),
     TRYING_TO_CONCEIVE("PersonnelTableModelColumn.TRYING_TO_CONCEIVE.text"),
     IMMORTAL("PersonnelTableModelColumn.IMMORTAL.text"),
+    EMPLOYED("PersonnelTableModelColumn.EMPLOYED.text"),
     TOUGHNESS("PersonnelTableModelColumn.TOUGHNESS.text"),
     CONNECTIONS("PersonnelTableModelColumn.CONNECTIONS.text"),
     WEALTH("PersonnelTableModelColumn.WEALTH.text"),
@@ -338,10 +339,6 @@ public enum PersonnelTableModelColumn {
         return this == NEGOTIATION;
     }
 
-    public boolean isScrounge() {
-        return this == SCROUNGE;
-    }
-
     public boolean isInjuries() {
         return this == INJURIES;
     }
@@ -418,6 +415,10 @@ public enum PersonnelTableModelColumn {
         return this == IMMORTAL;
     }
 
+    public boolean isEmployed() {
+        return this == EMPLOYED;
+    }
+
     public boolean isToughness() {
         return this == TOUGHNESS;
     }
@@ -478,16 +479,6 @@ public enum PersonnelTableModelColumn {
         return this == SOCIAL;
     }
 
-    /**
-     * When this is removed {@link #isATOWIntelligence()} should be renamed to just 'isIntelligence()'
-     *
-     * @deprecated replaced by {@link #isReasoning()}
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public boolean isIntelligence() {
-        return isReasoning();
-    }
-
     public boolean isReasoning() {
         return this == REASONING;
     }
@@ -539,6 +530,7 @@ public enum PersonnelTableModelColumn {
     public String getCellValue(final Campaign campaign, final PersonnelMarket personnelMarket, final Person person,
           final boolean loadAssignmentFromMarket, final boolean groupByUnit) {
         final PersonnelOptions options = person.getOptions();
+        final Attributes attributes = person.getATOWAttributes();
 
         // We define these here, as they're used in multiple cases
         int currentAttributeValue;
@@ -686,135 +678,153 @@ public enum PersonnelTableModelColumn {
                              campaign.getScenario(unit.getScenarioId()).getName();
             case MEK:
                 return (person.hasSkill(SkillType.S_GUN_MEK) ?
-                              Integer.toString(person.getSkill(SkillType.S_GUN_MEK).getFinalSkillValue(options)) :
+                              Integer.toString(person.getSkill(SkillType.S_GUN_MEK)
+                                                     .getFinalSkillValue(options, attributes)) :
                               "-") +
                              '/' +
                              (person.hasSkill(SkillType.S_PILOT_MEK) ?
                                     Integer.toString(person.getSkill(SkillType.S_PILOT_MEK)
-                                                           .getFinalSkillValue(options)) :
+                                                           .getFinalSkillValue(options, attributes)) :
                                     "-");
             case GROUND_VEHICLE:
                 return (person.hasSkill(SkillType.S_GUN_VEE) ?
-                              Integer.toString(person.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue(options)) :
+                              Integer.toString(person.getSkill(SkillType.S_GUN_VEE)
+                                                     .getFinalSkillValue(options, attributes)) :
                               "-") +
                              '/' +
                              (person.hasSkill(SkillType.S_PILOT_GVEE) ?
                                     Integer.toString(person.getSkill(SkillType.S_PILOT_GVEE)
-                                                           .getFinalSkillValue(options)) :
+                                                           .getFinalSkillValue(options, attributes)) :
                                     "-");
             case NAVAL_VEHICLE:
                 return (person.hasSkill(SkillType.S_GUN_VEE) ?
-                              Integer.toString(person.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue(options)) :
+                              Integer.toString(person.getSkill(SkillType.S_GUN_VEE)
+                                                     .getFinalSkillValue(options, attributes)) :
                               "-") +
                              '/' +
                              (person.hasSkill(SkillType.S_PILOT_NVEE) ?
                                     Integer.toString(person.getSkill(SkillType.S_PILOT_NVEE)
-                                                           .getFinalSkillValue(options)) :
+                                                           .getFinalSkillValue(options, attributes)) :
                                     "-");
             case VTOL:
                 return (person.hasSkill(SkillType.S_GUN_VEE) ?
-                              Integer.toString(person.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue(options)) :
+                              Integer.toString(person.getSkill(SkillType.S_GUN_VEE)
+                                                     .getFinalSkillValue(options, attributes)) :
                               "-") +
                              '/' +
                              (person.hasSkill(SkillType.S_PILOT_VTOL) ?
                                     Integer.toString(person.getSkill(SkillType.S_PILOT_VTOL)
-                                                           .getFinalSkillValue(options)) :
+                                                           .getFinalSkillValue(options, attributes)) :
                                     "-");
             case AEROSPACE:
                 return (person.hasSkill(SkillType.S_GUN_AERO) ?
-                              Integer.toString(person.getSkill(SkillType.S_GUN_AERO).getFinalSkillValue(options)) :
+                              Integer.toString(person.getSkill(SkillType.S_GUN_AERO)
+                                                     .getFinalSkillValue(options, attributes)) :
                               "-") +
                              '/' +
                              (person.hasSkill(SkillType.S_PILOT_AERO) ?
                                     Integer.toString(person.getSkill(SkillType.S_PILOT_AERO)
-                                                           .getFinalSkillValue(options)) :
+                                                           .getFinalSkillValue(options, attributes)) :
                                     "-");
             case CONVENTIONAL_AIRCRAFT:
                 return (person.hasSkill(SkillType.S_GUN_JET) ?
-                              Integer.toString(person.getSkill(SkillType.S_GUN_JET).getFinalSkillValue(options)) :
+                              Integer.toString(person.getSkill(SkillType.S_GUN_JET)
+                                                     .getFinalSkillValue(options, attributes)) :
                               "-") +
                              '/' +
                              (person.hasSkill(SkillType.S_PILOT_JET) ?
                                     Integer.toString(person.getSkill(SkillType.S_PILOT_JET)
-                                                           .getFinalSkillValue(options)) :
+                                                           .getFinalSkillValue(options, attributes)) :
                                     "-");
             case VESSEL:
                 return (person.hasSkill(SkillType.S_GUN_SPACE) ?
-                              Integer.toString(person.getSkill(SkillType.S_GUN_SPACE).getFinalSkillValue(options)) :
+                              Integer.toString(person.getSkill(SkillType.S_GUN_SPACE)
+                                                     .getFinalSkillValue(options, attributes)) :
                               "-") +
                              '/' +
                              (person.hasSkill(SkillType.S_PILOT_SPACE) ?
                                     Integer.toString(person.getSkill(SkillType.S_PILOT_SPACE)
-                                                           .getFinalSkillValue(options)) :
+                                                           .getFinalSkillValue(options, attributes)) :
                                     "-");
             case BATTLE_ARMOUR:
                 return person.hasSkill(SkillType.S_GUN_BA) ?
-                             Integer.toString(person.getSkill(SkillType.S_GUN_BA).getFinalSkillValue(options)) :
+                             Integer.toString(person.getSkill(SkillType.S_GUN_BA)
+                                                    .getFinalSkillValue(options, attributes)) :
                              "-";
             case ANTI_MEK:
                 return person.hasSkill(SkillType.S_ANTI_MEK) ?
-                             Integer.toString(person.getSkill(SkillType.S_ANTI_MEK).getFinalSkillValue(options)) :
+                             Integer.toString(person.getSkill(SkillType.S_ANTI_MEK)
+                                                    .getFinalSkillValue(options, attributes)) :
                              "-";
             case SMALL_ARMS:
                 return person.hasSkill(SkillType.S_SMALL_ARMS) ?
-                             Integer.toString(person.getSkill(SkillType.S_SMALL_ARMS).getFinalSkillValue(options)) :
+                             Integer.toString(person.getSkill(SkillType.S_SMALL_ARMS)
+                                                    .getFinalSkillValue(options, attributes)) :
                              "-";
             case ARTILLERY:
                 return person.hasSkill(SkillType.S_ARTILLERY) ?
-                             Integer.toString(person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(options)) :
+                             Integer.toString(person.getSkill(SkillType.S_ARTILLERY)
+                                                    .getFinalSkillValue(options, attributes)) :
                              "-";
             case TACTICS:
                 return person.hasSkill(SkillType.S_TACTICS) ?
-                             Integer.toString(person.getSkill(SkillType.S_TACTICS).getFinalSkillValue(options)) :
+                             Integer.toString(person.getSkill(SkillType.S_TACTICS)
+                                                    .getFinalSkillValue(options, attributes)) :
                              "-";
             case STRATEGY:
                 return person.hasSkill(SkillType.S_STRATEGY) ?
-                             Integer.toString(person.getSkill(SkillType.S_STRATEGY).getFinalSkillValue(options)) :
+                             Integer.toString(person.getSkill(SkillType.S_STRATEGY)
+                                                    .getFinalSkillValue(options, attributes)) :
                              "-";
             case LEADERSHIP:
                 return person.hasSkill(SkillType.S_LEADER) ?
-                             Integer.toString(person.getSkill(SkillType.S_LEADER).getFinalSkillValue(options)) :
+                             Integer.toString(person.getSkill(SkillType.S_LEADER)
+                                                    .getFinalSkillValue(options, attributes)) :
                              "-";
             case TECH_MEK:
                 return person.hasSkill(SkillType.S_TECH_MEK) ?
-                             Integer.toString(person.getSkill(SkillType.S_TECH_MEK).getFinalSkillValue(options)) :
+                             Integer.toString(person.getSkill(SkillType.S_TECH_MEK)
+                                                    .getFinalSkillValue(options, attributes)) :
                              "-";
             case TECH_AERO:
                 return person.hasSkill(SkillType.S_TECH_AERO) ?
-                             Integer.toString(person.getSkill(SkillType.S_TECH_AERO).getFinalSkillValue(options)) :
+                             Integer.toString(person.getSkill(SkillType.S_TECH_AERO)
+                                                    .getFinalSkillValue(options, attributes)) :
                              "-";
             case TECH_MECHANIC:
                 return person.hasSkill(SkillType.S_TECH_MECHANIC) ?
-                             Integer.toString(person.getSkill(SkillType.S_TECH_MECHANIC).getFinalSkillValue(options)) :
+                             Integer.toString(person.getSkill(SkillType.S_TECH_MECHANIC)
+                                                    .getFinalSkillValue(options, attributes)) :
                              "-";
             case TECH_BA:
                 return person.hasSkill(SkillType.S_TECH_BA) ?
-                             Integer.toString(person.getSkill(SkillType.S_TECH_BA).getFinalSkillValue(options)) :
+                             Integer.toString(person.getSkill(SkillType.S_TECH_BA)
+                                                    .getFinalSkillValue(options, attributes)) :
                              "-";
             case TECH_VESSEL:
                 return person.hasSkill(SkillType.S_TECH_VESSEL) ?
-                             Integer.toString(person.getSkill(SkillType.S_TECH_VESSEL).getFinalSkillValue(options)) :
+                             Integer.toString(person.getSkill(SkillType.S_TECH_VESSEL)
+                                                    .getFinalSkillValue(options, attributes)) :
                              "-";
             case MEDICAL:
                 return person.hasSkill(SkillType.S_SURGERY) ?
-                             Integer.toString(person.getSkill(SkillType.S_SURGERY).getFinalSkillValue(options)) :
+                             Integer.toString(person.getSkill(SkillType.S_SURGERY)
+                                                    .getFinalSkillValue(options, attributes)) :
                              "-";
             case ADMINISTRATION:
                 return person.hasSkill(SkillType.S_ADMIN) ?
-                             Integer.toString(person.getSkill(SkillType.S_ADMIN).getFinalSkillValue(options)) :
+                             Integer.toString(person.getSkill(SkillType.S_ADMIN)
+                                                    .getFinalSkillValue(options, attributes)) :
                              "-";
             case NEGOTIATION:
                 return person.hasSkill(SkillType.S_NEGOTIATION) ?
                              Integer.toString(person.getSkill(SkillType.S_NEGOTIATION)
                                                     .getFinalSkillValue(options,
+                                                          attributes,
                                                           person.getAdjustedReputation(isUseAgeEffects,
                                                                 isClanCampaign,
                                                                 today,
                                                                 person.getRankLevel()))) :
-                             "-";
-            case SCROUNGE:
-                return person.hasSkill(SkillType.S_SCROUNGE) ?
-                             Integer.toString(person.getSkill(SkillType.S_SCROUNGE).getFinalSkillValue(options)) :
                              "-";
             case INJURIES:
                 if (campaign.getCampaignOptions().isUseAdvancedMedical()) {
@@ -865,6 +875,8 @@ public enum PersonnelTableModelColumn {
                 return resources.getString(person.getStatus().isDead() ?
                                                  "NA.text" :
                                                  (person.isImmortal() ? "Yes.text" : "No.text"));
+            case EMPLOYED:
+                return resources.getString(person.isEmployed() ? "Yes.text" : "No.text");
             case TOUGHNESS:
                 return Integer.toString(person.getToughness());
             case CONNECTIONS:
@@ -1073,7 +1085,7 @@ public enum PersonnelTableModelColumn {
                 default -> false;
             };
             case ADMINISTRATIVE_SKILLS -> switch (this) {
-                case RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, ADMINISTRATION, NEGOTIATION, SCROUNGE -> true;
+                case RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, ADMINISTRATION, NEGOTIATION -> true;
                 default -> false;
             };
             case BIOGRAPHICAL -> switch (this) {
@@ -1180,8 +1192,7 @@ public enum PersonnelTableModelColumn {
                  TECH_VESSEL,
                  MEDICAL,
                  ADMINISTRATION,
-                 NEGOTIATION,
-                 SCROUNGE -> new BonusSorter();
+                 NEGOTIATION -> new BonusSorter();
             case INJURIES,
                  KILLS,
                  XP,

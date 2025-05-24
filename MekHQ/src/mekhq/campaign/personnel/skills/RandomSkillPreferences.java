@@ -25,12 +25,16 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.skills;
 
 import java.io.PrintWriter;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -77,8 +81,8 @@ public class RandomSkillPreferences {
         antiMekProb = 10;
         combatSmallArmsBonus = -3;
         supportSmallArmsBonus = -10;
-        specialAbilityBonus = new int[] { -10, -10, -2, 0, 1 };
-        commandSkillsModifier = new int[] { -10, -10, -7, -4, -1 };
+        specialAbilityBonus = new int[] { -10, -10, -2, 0, 1, 1, 1 };
+        commandSkillsModifier = new int[] { -10, -10, -7, -4, -1, -1, -1 };
         roleplaySkillModifier = -12;
         artilleryProb = 10;
         artilleryBonus = -2;
@@ -92,40 +96,6 @@ public class RandomSkillPreferences {
 
     public void setOverallRecruitBonus(int b) {
         overallRecruitBonus = b;
-    }
-
-    /**
-     * @deprecated Use {@link #getRecruitmentBonus(PersonnelRole)} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public int getRecruitBonus(PersonnelRole role) {
-        return getRecruitmentBonus(role);
-    }
-
-    /**
-     * @deprecated Use {@link #addRecruitmentBonus(PersonnelRole, int)}.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public void setRecruitBonus(int index, int bonus) {
-        PersonnelRole[] personnelRoles = PersonnelRole.values();
-        PersonnelRole role = personnelRoles[index];
-        addRecruitmentBonus(role, bonus);
-    }
-
-    /**
-     * @deprecated Use {@link #getRecruitmentBonuses()}.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public int[] getRecruitBonuses() {
-        List<PersonnelRole> personnelRoles = List.of(PersonnelRole.values());
-        int[] bonuses = new int[personnelRoles.size()];
-
-        for (PersonnelRole personnelRole : personnelRoles) {
-            int index = personnelRoles.indexOf(personnelRole);
-            bonuses[index] = getRecruitmentBonus(personnelRole);
-        }
-
-        return bonuses;
     }
 
     /**
@@ -202,22 +172,6 @@ public class RandomSkillPreferences {
         this.randomizeTraits = randomizeTraits;
     }
 
-    /**
-     * @deprecated not in use.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public void setUseClanBonuses(boolean b) {
-        this.useClanBonuses = b;
-    }
-
-    /**
-     * @deprecated not in use.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public boolean useClanBonuses() {
-        return useClanBonuses;
-    }
-
     public int getAntiMekProb() {
         return antiMekProb;
     }
@@ -252,24 +206,8 @@ public class RandomSkillPreferences {
         }
     }
 
-    /**
-     * @deprecated Use {@link #getRoleplaySkillModifier()} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public int getRoleplaySkillsModifier(int experienceLevel) {
-        return roleplaySkillModifier;
-    }
-
     public int getRoleplaySkillModifier() {
         return roleplaySkillModifier;
-    }
-
-    /**
-     * @deprecated Use {@link #setRoleplaySkillModifier(int)} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public void setRoleplaySkillsModifier(int level, int bonus) {
-        setRoleplaySkillModifier(bonus);
     }
 
     public void setRoleplaySkillModifier(int roleplaySkillModifier) {
@@ -381,9 +319,7 @@ public class RandomSkillPreferences {
                     retVal.secondSkillBonus = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("recruitmentBonuses")) {
                     processRecruitmentBonusNodes(wn2, retVal);
-                } else if (wn2.getNodeName().equalsIgnoreCase("commandSkillsModifier")
-                                 // <50.04 compatibility handler
-                                 || wn2.getNodeName().equalsIgnoreCase("tacticsMod")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("commandSkillsModifier")) {
                     String[] values = wn2.getTextContent().split(",");
                     for (int i = 0; i < values.length; i++) {
                         retVal.commandSkillsModifier[i] = Integer.parseInt(values[i]);

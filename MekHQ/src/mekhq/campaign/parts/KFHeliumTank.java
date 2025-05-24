@@ -49,10 +49,10 @@ import org.w3c.dom.NodeList;
 public class KFHeliumTank extends Part {
     private static final MMLogger logger = MMLogger.create(KFHeliumTank.class);
 
-    public static final TechAdvancement TA_HELIUM_TANK = new TechAdvancement(TECH_BASE_ALL)
-            .setAdvancement(2107, 2120, 2300).setPrototypeFactions(F_TA)
-            .setProductionFactions(F_TA).setTechRating(RATING_D)
-            .setAvailability(RATING_D, RATING_E, RATING_D, RATING_D)
+    public static final TechAdvancement TA_HELIUM_TANK = new TechAdvancement(TechBase.ALL)
+            .setAdvancement(2107, 2120, 2300).setPrototypeFactions(Faction.TA)
+            .setProductionFactions(Faction.TA).setTechRating(TechRating.D)
+            .setAvailability(AvailabilityValue.D, AvailabilityValue.E, AvailabilityValue.D, AvailabilityValue.D)
             .setStaticTechLevel(SimpleTechLevel.ADVANCED);
 
     // Standard, primitive, compact, subcompact...

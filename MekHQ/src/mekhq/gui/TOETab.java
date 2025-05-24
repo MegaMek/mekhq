@@ -32,15 +32,19 @@
  */
 package mekhq.gui;
 
-import static mekhq.utilities.MHQInternationalization.getFormattedText;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import javax.swing.*;
-import javax.swing.event.HyperlinkEvent;
+import javax.swing.DropMode;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTree;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.tree.TreeSelectionModel;
 
 import megamek.common.event.Subscribe;
@@ -57,11 +61,12 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.TOEMouseAdapter;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.handler.TOETransferHandler;
 import mekhq.gui.model.CrewListModel;
 import mekhq.gui.model.OrgTreeModel;
+import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.view.ForceViewPanel;
 import mekhq.gui.view.PersonViewPanel;
@@ -107,24 +112,17 @@ public final class TOETab extends CampaignGuiTab {
         orgTree.setDragEnabled(true);
         orgTree.setDropMode(DropMode.ON);
         orgTree.setTransferHandler(new TOETransferHandler(getCampaignGui()));
+        orgTree.setBorder(RoundedLineBorder.createRoundedLineBorder());
+        orgTree.setFocusable(false);
 
-        JEditorPane keyPane = new JEditorPane();
-        keyPane.setContentType("text/html");
-        keyPane.setText(getFormattedText("TOE.keyText"));
-        keyPane.setEditable(false);
-        keyPane.setBorder(null);
-        keyPane.setOpaque(false);
-        keyPane.addHyperlinkListener(evt -> {
-            if (evt.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                ImmersiveDialogCore.handleImmersiveHyperlinkClick(null, getCampaign(), evt.getDescription());
-            }
-        });
-        JPanel southPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        southPanel.add(keyPane);
+        JPanel pnlTutorial = new TutorialHyperlinkPanel("toeTab");
 
         JPanel leftPanel = new JPanel(new BorderLayout());
-        leftPanel.add(new JScrollPane(orgTree), BorderLayout.CENTER);
-        leftPanel.add(southPanel, BorderLayout.SOUTH);
+        leftPanel.setBorder(null);
+        JScrollPane orgScrollPane = new JScrollPane(orgTree);
+        orgScrollPane.setBorder(null);
+        leftPanel.add(orgScrollPane, BorderLayout.CENTER);
+        leftPanel.add(pnlTutorial, BorderLayout.SOUTH);
 
         panForceView = new JPanel();
         panForceView.getAccessibleContext().setAccessibleName("Selected Force Viewer");
@@ -180,6 +178,7 @@ public final class TOETab extends CampaignGuiTab {
                 JPanel crewPanel = new JPanel(new BorderLayout());
                 crewPanel.getAccessibleContext().setAccessibleName("Crew for " + u.getName());
                 final JScrollPane scrollPerson = new JScrollPaneWithSpeed();
+                scrollPerson.setBorder(null);
                 crewPanel.add(scrollPerson, BorderLayout.CENTER);
                 CrewListModel model = new CrewListModel();
                 model.setData(u);
@@ -207,7 +206,9 @@ public final class TOETab extends CampaignGuiTab {
                 });
                 crewList.setSelectedIndex(0);
                 if (crewSize > 1) {
-                    crewPanel.add(new JScrollPaneWithSpeed(crewList), BorderLayout.NORTH);
+                    JScrollPaneWithSpeed crewScrollPane = new JScrollPaneWithSpeed(crewList);
+                    crewScrollPane.setBorder(null);
+                    crewPanel.add(crewScrollPane, BorderLayout.NORTH);
                 }
                 String name = "Crew";
                 if (u.usesSoloPilot()) {
@@ -218,6 +219,7 @@ public final class TOETab extends CampaignGuiTab {
                 SwingUtilities.invokeLater(() -> scrollPerson.getVerticalScrollBar().setValue(0));
             }
             final JScrollPane scrollUnit = new JScrollPaneWithSpeed(new UnitViewPanel(u, getCampaign()));
+            scrollUnit.setBorder(null);
             tabUnit.add("Unit", scrollUnit);
             panForceView.add(tabUnit, BorderLayout.CENTER);
             SwingUtilities.invokeLater(() -> scrollUnit.getVerticalScrollBar().setValue(0));
@@ -229,7 +231,9 @@ public final class TOETab extends CampaignGuiTab {
             // to not select the unit in the TO&E.
         } else if (node instanceof Force) {
             final JScrollPane scrollForce = new JScrollPaneWithSpeed(new ForceViewPanel((Force) node, getCampaign()));
+            scrollForce.setBorder(null);
             panForceView.add(scrollForce, BorderLayout.CENTER);
+            panForceView.setBorder(null);
             SwingUtilities.invokeLater(() -> scrollForce.getVerticalScrollBar().setValue(0));
         }
         panForceView.updateUI();

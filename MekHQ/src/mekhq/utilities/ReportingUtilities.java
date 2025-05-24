@@ -24,8 +24,15 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.utilities;
+
+import mekhq.MekHQ;
 
 /**
  * This class has a collection of values and methods to make writing out various
@@ -115,5 +122,53 @@ public class ReportingUtilities {
         } else {
             return "";
         }
+    }
+
+    /**
+     * Returns the hex color code used for an amazing status or messages.
+     *
+     * @return the hex color string representing a amazing color
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public static String getAmazingColor() {
+        return MekHQ.getMHQOptions().getFontColorAmazingHexColor();
+    }
+
+    /**
+     * Returns the hex color code used for positive status or messages.
+     *
+     * @return the hex color string representing a positive color
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public static String getPositiveColor() {
+        return MekHQ.getMHQOptions().getFontColorPositiveHexColor();
+    }
+
+    /**
+     * Returns the hex color code used for warning status or messages.
+     *
+     * @return the hex color string representing a warning color
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public static String getWarningColor() {
+        return MekHQ.getMHQOptions().getFontColorWarningHexColor();
+    }
+
+    /**
+     * Returns the hex color code used for negative status or messages.
+     *
+     * @return the hex color string representing a negative color
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public static String getNegativeColor() {
+        return MekHQ.getMHQOptions().getFontColorNegativeHexColor();
     }
 }

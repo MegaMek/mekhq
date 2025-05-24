@@ -65,10 +65,14 @@ import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.PartsTableMouseAdapter;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.gui.baseComponents.roundedComponents.RoundedMMToggleButton;
 import mekhq.gui.dialog.PartsReportDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.gui.model.TechTableModel;
+import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.PartsDetailSorter;
 import mekhq.gui.sorter.TechSorter;
@@ -108,12 +112,12 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     private JSplitPane splitWarehouse;
     private JTable partsTable;
     private JTable techTable;
-    private JButton btnDoTask;
-    private JToggleButton btnShowAllTechsWarehouse;
+    private RoundedJButton btnDoTask;
+    private RoundedMMToggleButton btnShowAllTechsWarehouse;
     private JLabel lblTargetNumWarehouse;
     private JTextArea textTargetWarehouse;
     private JLabel astechPoolLabel;
-    private JButton btnPartsReport;
+    private RoundedJButton btnPartsReport;
     private JComboBox<String> choiceParts;
     private JComboBox<String> choicePartsView;
 
@@ -147,8 +151,9 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
               MekHQ.getMHQOptions().getLocale());
 
         panSupplies = new JPanel(new GridBagLayout());
+        panSupplies.setBorder(RoundedLineBorder.createRoundedLineBorder());
 
-        btnPartsReport = new JButton(resourceMap.getString("btnPartsReport.text"));
+        btnPartsReport = new RoundedJButton(resourceMap.getString("btnPartsReport.text"));
         btnPartsReport.setToolTipText(resourceMap.getString("btnPartsReport.toolTipText"));
         btnPartsReport.addActionListener(evt -> new PartsReportDialog(getCampaignGui(), true).setVisible(true));
 
@@ -252,7 +257,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
 
         JPanel panelDoTask = new JPanel(new GridBagLayout());
 
-        btnDoTask = new JButton(resourceMap.getString("btnDoTask.text"));
+        btnDoTask = new RoundedJButton(resourceMap.getString("btnDoTask.text"));
         btnDoTask.setToolTipText(resourceMap.getString("btnDoTask.toolTipText"));
         btnDoTask.setEnabled(false);
         btnDoTask.setName("btnDoTask");
@@ -285,6 +290,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         textTargetWarehouse.setWrapStyleWord(true);
         textTargetWarehouse.setBorder(null);
         JScrollPane scrTargetWarehouse = new JScrollPaneWithSpeed(textTargetWarehouse);
+        scrTargetWarehouse.setBorder(RoundedLineBorder.createRoundedLineBorder());
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -297,7 +303,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         gridBagConstraints.insets = new Insets(2, 2, 2, 2);
         panelDoTask.add(scrTargetWarehouse, gridBagConstraints);
 
-        btnShowAllTechsWarehouse = new JToggleButton(resourceMap.getString("btnShowAllTechs.text"));
+        btnShowAllTechsWarehouse = new RoundedMMToggleButton(resourceMap.getString("btnShowAllTechs.text"));
         btnShowAllTechsWarehouse.setToolTipText(resourceMap.getString("btnShowAllTechs.toolTipText"));
         btnShowAllTechsWarehouse.addActionListener(ev -> filterTechs());
         gridBagConstraints = new GridBagConstraints();
@@ -323,6 +329,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         sortKeys.add(new SortKey(0, SortOrder.ASCENDING));
         techSorter.setSortKeys(sortKeys);
         JScrollPane scrollTechTable = new JScrollPaneWithSpeed(techTable);
+        scrollTechTable.setBorder(RoundedLineBorder.createRoundedLineBorder());
         scrollTechTable.setMinimumSize(new Dimension(200, 200));
         scrollTechTable.setPreferredSize(new Dimension(300, 300));
         gridBagConstraints = new GridBagConstraints();
@@ -354,8 +361,11 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         splitWarehouse.setOneTouchExpandable(true);
         splitWarehouse.setResizeWeight(1.0);
 
+        JPanel pnlTutorial = new TutorialHyperlinkPanel("warehouseTab");
+
         setLayout(new BorderLayout());
         add(splitWarehouse, BorderLayout.CENTER);
+        add(pnlTutorial, BorderLayout.SOUTH);
     }
 
     /**
@@ -517,13 +527,15 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
                 int modePenalty = part.getMode().expReduction;
                 if (skill == null) {
                     return false;
-                } else if (part.getSkillMin() > SkillType.EXP_ELITE) {
+                } else if (part.getSkillMin() > SkillType.EXP_LEGENDARY) {
                     return false;
                 } else if (tech.getMinutesLeft() <= 0) {
                     return false;
                 } else {
                     return getCampaign().getCampaignOptions().isDestroyByMargin() ||
-                                 (part.getSkillMin() <= (skill.getExperienceLevel() - modePenalty));
+                                 (part.getSkillMin() <=
+                                        (skill.getExperienceLevel(tech.getOptions(), tech.getATOWAttributes()) -
+                                               modePenalty));
                 }
             }
         };

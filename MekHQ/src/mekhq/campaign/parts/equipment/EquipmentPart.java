@@ -207,7 +207,7 @@ public class EquipmentPart extends Part {
     }
 
     @Override
-    public int getTechRating() {
+    public TechRating getTechRating() {
         return type.getTechRating();
     }
 

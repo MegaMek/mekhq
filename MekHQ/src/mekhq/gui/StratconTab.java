@@ -24,8 +24,32 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui;
+
+import java.awt.BorderLayout;
+import java.awt.Dialog.ModalityType;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.time.LocalDate;
+import java.util.Objects;
+import javax.swing.DefaultListModel;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.event.Subscribe;
@@ -39,18 +63,13 @@ import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.stratcon.StratconStrategicObjective;
 import mekhq.campaign.stratcon.StratconTrackState;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.enums.MHQTabType;
+import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.stratcon.CampaignManagementDialog;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.Dialog.ModalityType;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.time.LocalDate;
-import java.util.Objects;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * This class contains code relevant to rendering the StratCon ("AtB Campaign State") tab.
@@ -107,24 +126,38 @@ public class StratconTab extends CampaignGuiTab {
                 StratconCampaignState campaignState = currentTDI.contract.getStratconCampaignState();
                 objectivesCollapsed = !objectivesCollapsed;
                 objectiveStatusText.setText(getStrategicObjectiveText(campaignState));
-              }
-            });
+            }
+        });
 
         setLayout(new BorderLayout());
+
         stratconPanel = new StratconPanel(getCampaignGui(), infoPanelText);
         JScrollPane scrollPane = new JScrollPane(stratconPanel);
+        scrollPane.setBorder(RoundedLineBorder.createRoundedLineBorder());
         scrollPane.getHorizontalScrollBar().setUnitIncrement(StratconPanel.HEX_X_RADIUS);
         scrollPane.getVerticalScrollBar().setUnitIncrement(StratconPanel.HEX_Y_RADIUS);
+
         this.add(scrollPane, BorderLayout.CENTER);
 
         // TODO: lance role assignment UI here?
+
+        JPanel pnlTutorial = new TutorialHyperlinkPanel("stratConTab");
+
+        JPanel centerPanel = new JPanel();
+        centerPanel.setLayout(new BorderLayout());
+        centerPanel.add(scrollPane, BorderLayout.CENTER);
+        centerPanel.add(pnlTutorial, BorderLayout.SOUTH);
+
+        this.add(centerPanel, BorderLayout.CENTER);
 
         initializeInfoPanel();
         cmd = new CampaignManagementDialog(this);
 
         JScrollPane infoScrollPane = new JScrollPaneWithSpeed(infoPanel);
+        infoScrollPane.setBorder(null);
         infoScrollPane.setMaximumSize(new Dimension(UIUtil.scaleForGUI(UIUtil.scaleForGUI(600), infoScrollPane.getHeight())));
         this.add(infoScrollPane, BorderLayout.EAST);
+
         MekHQ.registerHandler(this);
     }
 
@@ -149,13 +182,15 @@ public class StratconTab extends CampaignGuiTab {
         infoPanel.add(campaignStatusText, constraints);
 
         // Add "Manage Campaign State" button
-        JButton btnManageCampaignState = new JButton("Manage SP/CVP");
+        RoundedJButton btnManageCampaignState = new RoundedJButton("Manage SP/CVP");
         btnManageCampaignState.addActionListener(this::showCampaignStateManagement);
         constraints.gridy = gridY++;
         infoPanel.add(btnManageCampaignState, constraints);
 
         // Add an expanded objective panel (scrollable)
         expandedObjectivePanel = new JScrollPaneWithSpeed(objectiveStatusText);
+        expandedObjectivePanel.setBorder(RoundedLineBorder.createRoundedLineBorder());
+        expandedObjectivePanel.setBorder(RoundedLineBorder.createRoundedLineBorder());
         expandedObjectivePanel.setPreferredSize(new Dimension(UIUtil.scaleForGUI(550, 300)));
         constraints.gridy = gridY++;
         constraints.fill = GridBagConstraints.HORIZONTAL;
@@ -180,6 +215,7 @@ public class StratconTab extends CampaignGuiTab {
         listCurrentTrack.addListSelectionListener(evt -> trackSelectionHandler());
 
         JScrollPane scrollPane = new JScrollPane(listCurrentTrack);
+        scrollPane.setBorder(RoundedLineBorder.createRoundedLineBorder());
         constraints.gridy = gridY++;
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.weightx = 1.0;
@@ -322,9 +358,9 @@ public class StratconTab extends CampaignGuiTab {
 
         StringBuilder sb = new StringBuilder();
         if (completedObjectives >= desiredObjectives) {
-            sb.append("<span color='").append(MekHQ.getMHQOptions().getFontColorPositiveHexColor()).append("'>");
+            sb.append("<span color='").append(ReportingUtilities.getPositiveColor()).append("'>");
         } else {
-            sb.append("<span color='").append(MekHQ.getMHQOptions().getFontColorNegativeHexColor()).append("'>");
+            sb.append("<span color='").append(ReportingUtilities.getNegativeColor()).append("'>");
         }
 
         // special logic for non-independent command clauses
@@ -364,13 +400,13 @@ public class StratconTab extends CampaignGuiTab {
                 // special case: allied facilities can get lost at any point in time
                 if ((objective.getObjectiveType() == StrategicObjectiveType.AlliedFacilityControl) &&
                         !campaignState.allowEarlyVictory()) {
-                    sb.append("<span color='").append(MekHQ.getMHQOptions().getFontColorWarningHexColor()).append("'>").append(OBJECTIVE_IN_PROGRESS);
+                    sb.append("<span color='").append(ReportingUtilities.getWarningColor()).append("'>").append(OBJECTIVE_IN_PROGRESS);
                 } else if (objectiveCompleted) {
-                    sb.append("<span color='").append(MekHQ.getMHQOptions().getFontColorPositiveHexColor()).append("'>").append(OBJECTIVE_COMPLETED);
+                    sb.append("<span color='").append(ReportingUtilities.getPositiveColor()).append("'>").append(OBJECTIVE_COMPLETED);
                 } else if (objectiveFailed) {
-                    sb.append("<span color='").append(MekHQ.getMHQOptions().getFontColorNegativeHexColor()).append("'>").append(OBJECTIVE_FAILED);
+                    sb.append("<span color='").append(ReportingUtilities.getNegativeColor()).append("'>").append(OBJECTIVE_FAILED);
                 } else {
-                    sb.append("<span color='").append(MekHQ.getMHQOptions().getFontColorWarningHexColor()).append("'>").append(OBJECTIVE_IN_PROGRESS);
+                    sb.append("<span color='").append(ReportingUtilities.getWarningColor()).append("'>").append(OBJECTIVE_IN_PROGRESS);
                 }
 
                 sb.append(' ');
@@ -419,11 +455,11 @@ public class StratconTab extends CampaignGuiTab {
             boolean contractIsActive = campaignState.getContract().isActiveOn(getCampaignGui().getCampaign().getLocalDate());
 
             if (contractIsActive) {
-                sb.append("<span color='").append(MekHQ.getMHQOptions().getFontColorWarningHexColor()).append("'>").append(OBJECTIVE_IN_PROGRESS);
+                sb.append("<span color='").append(ReportingUtilities.getWarningColor()).append("'>").append(OBJECTIVE_IN_PROGRESS);
             } else if (campaignState.getVictoryPoints() > 0) {
-                sb.append("<span color='").append(MekHQ.getMHQOptions().getFontColorPositiveHexColor()).append("'>").append(OBJECTIVE_COMPLETED);
+                sb.append("<span color='").append(ReportingUtilities.getPositiveColor()).append("'>").append(OBJECTIVE_COMPLETED);
             } else {
-                sb.append("<span color='").append(MekHQ.getMHQOptions().getFontColorNegativeHexColor()).append("'>").append(OBJECTIVE_FAILED);
+                sb.append("<span color='").append(ReportingUtilities.getNegativeColor()).append("'>").append(OBJECTIVE_FAILED);
             }
 
             sb.append(" Maintain Campaign Victory Point count above 0 by completing Turning Point scenarios")

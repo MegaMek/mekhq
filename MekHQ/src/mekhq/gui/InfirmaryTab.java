@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui;
 
@@ -33,6 +38,7 @@ import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -42,8 +48,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.ResourceBundle;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -51,7 +55,6 @@ import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 
 import megamek.client.ui.swing.util.UIUtil;
-import megamek.common.TargetRoll;
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
 import mekhq.campaign.CampaignOptions;
@@ -61,10 +64,13 @@ import mekhq.campaign.event.PersonEvent;
 import mekhq.campaign.event.PersonMedicalAssignmentEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.personnel.Person;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.MedicalViewDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.DocTableModel;
 import mekhq.gui.model.PatientTableModel;
+import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.sorter.PersonTitleSorter;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
@@ -73,9 +79,9 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
  */
 public final class InfirmaryTab extends CampaignGuiTab {
     private JTable docTable;
-    private JButton btnAssignDoc;
-    private JButton btnUnassignDoc;
-    private JButton btnOptimizeAssignments;
+    private RoundedJButton btnAssignDoc;
+    private RoundedJButton btnUnassignDoc;
+    private RoundedJButton btnOptimizeAssignments;
     private JList<Person> listAssignedPatient;
     private JList<Person> listUnassignedPatient;
 
@@ -116,6 +122,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
         docTable.getSelectionModel().addListSelectionListener(ev -> docTableValueChanged());
         docTable.setOpaque(false);
         JScrollPane scrollDocTable = new JScrollPaneWithSpeed(docTable);
+        scrollDocTable.setBorder(RoundedLineBorder.createRoundedLineBorder());
         scrollDocTable.setMinimumSize(new Dimension(300, 300));
         scrollDocTable.setPreferredSize(new Dimension(300, 300));
         scrollDocTable.setOpaque(false);
@@ -131,16 +138,16 @@ public final class InfirmaryTab extends CampaignGuiTab {
         add(scrollDocTable, gridBagConstraints);
 
         // Create buttons
-        btnAssignDoc = new JButton(resourceMap.getString("btnAssignDoc.text"));
+        btnAssignDoc = new RoundedJButton(resourceMap.getString("btnAssignDoc.text"));
         btnAssignDoc.setToolTipText(resourceMap.getString("btnAssignDoc.toolTipText"));
         btnAssignDoc.setEnabled(false);
         btnAssignDoc.addActionListener(ev -> assignDoctor());
 
-        btnUnassignDoc = new JButton(resourceMap.getString("btnUnassignDoc.text"));
+        btnUnassignDoc = new RoundedJButton(resourceMap.getString("btnUnassignDoc.text"));
         btnUnassignDoc.setEnabled(false);
         btnUnassignDoc.addActionListener(ev -> unassignDoctor());
 
-        btnOptimizeAssignments = new JButton(resourceMap.getString("btnOptimizeAssignments.text"));
+        btnOptimizeAssignments = new RoundedJButton(resourceMap.getString("btnOptimizeAssignments.text"));
         btnOptimizeAssignments.addActionListener(ev -> new OptimizeInfirmaryAssignments(getCampaign()));
 
         // Create a panel to group the buttons together horizontally
@@ -199,11 +206,13 @@ public final class InfirmaryTab extends CampaignGuiTab {
         });
 
         JScrollPane scrollAssignedPatient = new JScrollPaneWithSpeed(listAssignedPatient);
+        scrollAssignedPatient.setBorder(null);
         scrollAssignedPatient.setMinimumSize(new Dimension(300, 360));
         scrollAssignedPatient.setPreferredSize(new Dimension(300, 360));
         scrollAssignedPatient.setOpaque(false);
         scrollAssignedPatient.getViewport().setOpaque(false);
-        listAssignedPatient.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panAssignedPatient.title")));
+        listAssignedPatient.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
+              "panAssignedPatient.title")));
 
         unassignedPatientModel = new PatientTableModel(getCampaign());
         listUnassignedPatient = new JList<>(unassignedPatientModel);
@@ -247,11 +256,12 @@ public final class InfirmaryTab extends CampaignGuiTab {
         });
 
         JScrollPane scrollUnassignedPatient = new JScrollPaneWithSpeed(listUnassignedPatient);
+        scrollUnassignedPatient.setBorder(null);
         scrollUnassignedPatient.setMinimumSize(new Dimension(300, 200));
         scrollUnassignedPatient.setPreferredSize(new Dimension(300, 300));
         scrollUnassignedPatient.setOpaque(false);
         scrollUnassignedPatient.getViewport().setOpaque(false);
-        listUnassignedPatient.setBorder(BorderFactory.createTitledBorder(resourceMap.getString(
+        listUnassignedPatient.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
               "panUnassignedPatient.title")));
 
         gridBagConstraints = new GridBagConstraints();
@@ -273,6 +283,19 @@ public final class InfirmaryTab extends CampaignGuiTab {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         add(scrollUnassignedPatient, gridBagConstraints);
+
+        JPanel pnlTutorial = new TutorialHyperlinkPanel("infirmary");
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.SOUTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.insets = new Insets(10, 5, 5, 5);
+        add(pnlTutorial, gridBagConstraints);
+
     }
 
     /*

@@ -36,6 +36,7 @@ import static megamek.common.Board.T_SPACE;
 import static megamek.common.MiscType.createBeagleActiveProbe;
 import static megamek.common.MiscType.createCLImprovedSensors;
 import static megamek.common.MiscType.createISImprovedSensors;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.BONDSREF;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.DEFECTED;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.ENEMY_BONDSMAN;
@@ -58,10 +59,10 @@ import java.util.Objects;
 
 import megamek.common.Compute;
 import megamek.common.ITechnology;
+import megamek.common.ITechnology.AvailabilityValue;
 import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
@@ -70,7 +71,8 @@ import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.enums.HonorRating;
-import mekhq.gui.dialog.DefectionOffer;
+import mekhq.utilities.ReportingUtilities;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
 /**
  * Handles events and processes related to capturing prisoners.
@@ -142,12 +144,12 @@ public class CapturePrisoners {
         int today = campaign.getLocalDate().getYear();
         searchingFactionIsClan = searchingFaction != null && searchingFaction.isClan();
 
-        int techFaction = searchingFactionIsClan ?
-                                ITechnology.getCodeFromMMAbbr("CLAN") :
-                                ITechnology.getCodeFromMMAbbr("IS");
+        ITechnology.Faction techFaction = searchingFactionIsClan ?
+                                ITechnology.getFactionFromMMAbbr("CLAN") :
+                                ITechnology.getFactionFromMMAbbr("IS");
         try {
             // searchingFaction being null is fine because we're just ignoring any exceptions
-            techFaction = ITechnology.getCodeFromMMAbbr(searchingFaction.getShortName());
+            techFaction = ITechnology.getFactionFromMMAbbr(searchingFaction.getShortName());
         } catch (Exception ignored) {
             // if we can't get the tech faction, we just use the fallbacks already assigned.
         }
@@ -161,24 +163,25 @@ public class CapturePrisoners {
             sarTargetNumber.addModifier(GOING_TO_GROUND, "Potential Prisoner Going to Ground");
             sarTargetNumber.addModifier(SAR_CONTAINS_VTOL_OR_WIGE, "SAR Contains VTOL or WIGE");
 
-            final int isImprovedSensorsAvailability = createISImprovedSensors().calcYearAvailability(today,
+            final AvailabilityValue isImprovedSensorsAvailability = createISImprovedSensors().calcYearAvailability(today,
                   searchingFactionIsClan,
                   techFaction);
-            final int clanImprovedSensorsAvailability = createCLImprovedSensors().calcYearAvailability(today,
+            final AvailabilityValue clanImprovedSensorsAvailability = createCLImprovedSensors().calcYearAvailability(today,
                   searchingFactionIsClan,
                   techFaction);
 
-            final int improvedSensorsAvailability = searchingFactionIsClan ?
+            final AvailabilityValue improvedSensorsAvailability = searchingFactionIsClan ?
                                                           clanImprovedSensorsAvailability :
                                                           isImprovedSensorsAvailability;
 
-            final int activeProbeAvailability = createBeagleActiveProbe().calcYearAvailability(today,
+            final AvailabilityValue activeProbeAvailability = createBeagleActiveProbe().calcYearAvailability(today,
                   searchingFactionIsClan,
                   techFaction);
 
-            if (sarQuality >= improvedSensorsAvailability) {
+            // TODO: sarQuality is evaluated against the index of a AvailabilityValue. doesn't seems very nice. Refactor the whole constructor.
+            if (sarQuality >= improvedSensorsAvailability.getIndex()) {
                 sarTargetNumber.addModifier(SAR_HAS_IMPROVED_SENSORS, "SAR has Improved Sensors");
-            } else if (sarQuality >= activeProbeAvailability) {
+            } else if (sarQuality >= activeProbeAvailability.getIndex()) {
                 sarTargetNumber.addModifier(SAR_HAS_ACTIVE_PROBE, "SAR has Active Probe");
             }
         }
@@ -255,11 +258,57 @@ public class CapturePrisoners {
                     prisoner.setPrisonerStatus(campaign, PRISONER_DEFECTOR, false);
                 }
 
-                new DefectionOffer(campaign, prisoner, prisoner.isClanPersonnel());
+                boolean isBondsman = prisoner.isClanPersonnel();
+                new ImmersiveDialogSimple(campaign,
+                      campaign.getSeniorAdminPerson(HR),
+                      null,
+                      createInCharacterMessage(prisoner, isBondsman),
+                      null,
+                      getFormattedTextAt(RESOURCE_BUNDLE, (isBondsman ? "bondsman" : "defector") + ".ooc"),
+                      null,
+                      false);
             }
         }
 
         handlePostCapture(prisoner, prisoner.getPrisonerStatus());
+    }
+
+
+    /**
+     * Generates the in-character message for the dialog based on the defection offer.
+     *
+     * <p>This message customizes its narrative based on the type of defector
+     * (standard or bondsman). It provides details about the prisoner, their origin faction, and their offer to defect,
+     * addressing the player by their in-game title.</p>
+     *
+     * @param defector   The prisoner making the defection offer.
+     * @param isBondsman {@code true} if the defector is a bondsman, {@code false} otherwise.
+     *
+     * @return A formatted string containing the immersive in-character message for the player.
+     */
+    private String createInCharacterMessage(Person defector, boolean isBondsman) {
+        String typeKey = isBondsman ? "bondsman" : "defector";
+        String commanderAddress = campaign.getCommanderAddress(false);
+
+        if (isBondsman) {
+            String originFaction = defector.getOriginFaction().getFullName(campaign.getGameYear());
+
+            if (!originFaction.contains("Clan")) {
+                originFaction = "The " + originFaction;
+            }
+            return getFormattedTextAt(RESOURCE_BUNDLE,
+                  typeKey + ".message",
+                  commanderAddress,
+                  defector.getFullName(),
+                  originFaction,
+                  defector.getFirstName());
+        }
+
+        return getFormattedTextAt(RESOURCE_BUNDLE,
+              typeKey + ".message",
+              commanderAddress,
+              defector.getFullName(),
+              defector.getOriginFaction().getFullName(campaign.getGameYear()));
     }
 
     /**
@@ -286,7 +335,7 @@ public class CapturePrisoners {
                     campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
                           "bondsref.report",
                           prisoner.getFullName(),
-                          spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                          spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                           CLOSING_SPAN_TAG));
 
                     campaign.removePerson(prisoner);
@@ -309,7 +358,7 @@ public class CapturePrisoners {
                     campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
                           "bondsref.report",
                           prisoner.getFullName(),
-                          spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                          spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                           CLOSING_SPAN_TAG));
 
                     campaign.removePerson(prisoner);
@@ -327,7 +376,7 @@ public class CapturePrisoners {
                         campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
                               "seppuku.report",
                               prisoner.getFullName(),
-                              spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                              spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                               CLOSING_SPAN_TAG));
 
                         campaign.removePerson(prisoner);
@@ -484,7 +533,7 @@ public class CapturePrisoners {
 
         // 'Recruit' prisoner
         PrisonerStatus prisonerStatus = prisoner.getPrisonerStatus();
-        campaign.recruitPerson(prisoner, prisonerStatus);
+        campaign.recruitPerson(prisoner, prisonerStatus, false, true, false);
 
         if (prisonerStatus.isPrisonerDefector()) {
             campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "defection.report", prisoner.getHyperlinkedName()));

@@ -32,6 +32,7 @@
  */
 package mekhq.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -62,8 +63,10 @@ import mekhq.campaign.event.*;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.gui.adapter.UnitTableMouseAdapter;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.UnitTableModel;
+import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.PersonTitleStringSorter;
 import mekhq.gui.sorter.UnitStatusSorter;
@@ -209,14 +212,23 @@ public final class HangarTab extends CampaignGuiTab {
         unitTable.getSelectionModel().addListSelectionListener(ev -> refreshUnitView());
 
         JScrollPane scrollUnitTable = new JScrollPaneWithSpeed(unitTable);
+        scrollUnitTable.setFocusable(false);
+        scrollUnitTable.setBorder(RoundedLineBorder.createRoundedLineBorder());
+
+        JPanel pnlTutorial = new TutorialHyperlinkPanel("hangarTab");
+
+        JPanel tableAndInfoPanel = new JPanel(new BorderLayout());
+        tableAndInfoPanel.add(scrollUnitTable, BorderLayout.CENTER);
+        tableAndInfoPanel.add(pnlTutorial, BorderLayout.SOUTH);
 
         scrollUnitView = new JScrollPaneWithSpeed();
+        scrollUnitView.setBorder(RoundedLineBorder.createRoundedLineBorder());
         scrollUnitView.setMinimumSize(new Dimension(UNIT_VIEW_WIDTH, 600));
         scrollUnitView.setPreferredSize(new Dimension(UNIT_VIEW_WIDTH, 600));
         scrollUnitView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollUnitView.setViewportView(null);
 
-        splitUnit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollUnitTable, scrollUnitView);
+        splitUnit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, tableAndInfoPanel, scrollUnitView);
         splitUnit.setOneTouchExpandable(true);
         splitUnit.setResizeWeight(1.0);
         splitUnit.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, pce -> refreshUnitView());

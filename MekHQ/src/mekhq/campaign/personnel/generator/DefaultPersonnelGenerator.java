@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.generator;
 
@@ -114,6 +119,7 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
             person.removeAllSkills();
             // regenerate expLvl to factor in skill changes from age
             expLvl = generateExperienceLevel(person);
+            person.setPrimaryRole(campaign, PersonnelRole.DEPENDENT);
         } else if (age < 18) {
             person.limitSkills(1);
 
@@ -168,7 +174,7 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
         BackgroundsController.generateBackground(campaign, person);
 
         // generate personality
-        PersonalityController.generatePersonality(person);
+        PersonalityController.generatePersonality(person, false);
 
         // update skill age modifiers
         if (campaignOptions.isUseAgeEffects()) {

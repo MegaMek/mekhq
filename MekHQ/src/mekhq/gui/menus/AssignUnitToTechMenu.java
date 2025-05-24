@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.menus;
 
@@ -100,7 +105,9 @@ public class AssignUnitToTechMenu extends JScrollableMenu {
                           ((tech.getMaintenanceTimeUsing() + maintenanceTime) <= Person.PRIMARY_ROLE_SUPPORT_TIME)) {
                     final SkillLevel skillLevel = (tech.getSkillForWorkingOn(units[0]) == null) ?
                                                         SkillLevel.NONE :
-                                                        tech.getSkillForWorkingOn(units[0]).getSkillLevel();
+                                                        tech.getSkillForWorkingOn(units[0])
+                                                              .getSkillLevel(tech.getOptions(),
+                                                                    tech.getATOWAttributes());
 
                     final JScrollableMenu subMenu = switch (skillLevel) {
                         case LEGENDARY -> legendaryMenu;

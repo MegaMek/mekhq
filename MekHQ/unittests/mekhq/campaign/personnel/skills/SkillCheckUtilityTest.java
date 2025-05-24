@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.skills;
 
@@ -34,8 +39,6 @@ import static mekhq.campaign.personnel.skills.SkillCheckUtility.UNTRAINED_SKILL_
 import static mekhq.campaign.personnel.skills.SkillCheckUtility.UNTRAINED_TARGET_NUMBER_ONE_LINKED_ATTRIBUTE;
 import static mekhq.campaign.personnel.skills.SkillCheckUtility.UNTRAINED_TARGET_NUMBER_TWO_LINKED_ATTRIBUTES;
 import static mekhq.campaign.personnel.skills.SkillCheckUtility.determineTargetNumber;
-import static mekhq.campaign.personnel.skills.SkillCheckUtility.getIndividualAttributeModifier;
-import static mekhq.campaign.personnel.skills.SkillCheckUtility.getTotalAttributeModifier;
 import static mekhq.campaign.personnel.skills.SkillCheckUtility.getTotalAttributeScoreForSkill;
 import static mekhq.campaign.personnel.skills.SkillCheckUtility.performQuickSkillCheck;
 import static mekhq.campaign.personnel.skills.SkillType.S_GUN_MEK;
@@ -56,8 +59,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
@@ -87,7 +88,7 @@ class SkillCheckUtilityTest {
         int expectedMarginOfSuccess = getMarginValue(DISASTROUS);
         assertEquals(expectedMarginOfSuccess, checkUtility.getMarginOfSuccess());
 
-        String RESOURCE_BUNDLE = "mekhq.resources." + SkillCheckUtility.class.getSimpleName();
+        String RESOURCE_BUNDLE = "mekhq.resources.SkillCheckUtility";
         String expectedResultsText = getFormattedTextAt(RESOURCE_BUNDLE, "skillCheck.nullPerson");
         assertEquals(expectedResultsText, checkUtility.getResultsText());
 
@@ -105,7 +106,7 @@ class SkillCheckUtilityTest {
         int expectedMarginOfSuccess = getMarginValue(DISASTROUS);
         assertEquals(expectedMarginOfSuccess, checkUtility.getMarginOfSuccess());
 
-        String RESOURCE_BUNDLE = "mekhq.resources." + SkillCheckUtility.class.getSimpleName();
+        String RESOURCE_BUNDLE = "mekhq.resources.SkillCheckUtility";
         String expectedResultsText = getFormattedTextAt(RESOURCE_BUNDLE, "skillCheck.nullPerson");
         assertEquals(expectedResultsText, checkUtility.getResultsText());
 
@@ -120,99 +121,6 @@ class SkillCheckUtilityTest {
     void testIsPersonNull_PerformQuickSkillCheck() {
         boolean results = performQuickSkillCheck(null, S_GUN_MEK, null, 0);
         assertFalse(results);
-    }
-
-    @Test
-    void testGetTotalAttributeModifier_SingleLinkedAttribute() {
-        // Setup
-        SkillType testSkillType = new SkillType();
-        testSkillType.setFirstAttribute(REFLEXES);
-        testSkillType.setSecondAttribute(NONE);
-
-        Attributes attributes = new Attributes(DEFAULT_ATTRIBUTE_SCORE,
-              DEFAULT_ATTRIBUTE_SCORE,
-              7,
-              DEFAULT_ATTRIBUTE_SCORE,
-              DEFAULT_ATTRIBUTE_SCORE,
-              DEFAULT_ATTRIBUTE_SCORE,
-              DEFAULT_ATTRIBUTE_SCORE);
-
-        TargetRoll targetNumber = new TargetRoll();
-
-        // Act
-        int totalModifier = SkillCheckUtility.getTotalAttributeModifier(targetNumber, attributes, testSkillType);
-
-        // Assert
-        assertEquals(1, totalModifier);
-    }
-
-    @Test
-    void testGetTotalAttributeModifier_TwoLinkedAttributes() {
-        // Setup
-        SkillType testSkillType = new SkillType();
-        testSkillType.setFirstAttribute(REFLEXES);
-        testSkillType.setSecondAttribute(DEXTERITY);
-
-        Attributes attributes = new Attributes(DEFAULT_ATTRIBUTE_SCORE,
-              DEFAULT_ATTRIBUTE_SCORE,
-              7,
-              8,
-              DEFAULT_ATTRIBUTE_SCORE,
-              DEFAULT_ATTRIBUTE_SCORE,
-              DEFAULT_ATTRIBUTE_SCORE);
-
-        TargetRoll targetNumber = new TargetRoll();
-
-        // Act
-        int totalModifier = SkillCheckUtility.getTotalAttributeModifier(targetNumber, attributes, testSkillType);
-
-        // Assert
-        assertEquals(2, totalModifier);
-    }
-
-    @Test
-    void testGetTotalAttributeModifier_NoLinkedAttributes() {
-        // Setup
-        SkillType testSkillType = new SkillType();
-        testSkillType.setFirstAttribute(NONE);
-        testSkillType.setSecondAttribute(NONE);
-
-        Attributes attributes = new Attributes(DEFAULT_ATTRIBUTE_SCORE,
-              DEFAULT_ATTRIBUTE_SCORE,
-              DEFAULT_ATTRIBUTE_SCORE,
-              DEFAULT_ATTRIBUTE_SCORE,
-              DEFAULT_ATTRIBUTE_SCORE,
-              DEFAULT_ATTRIBUTE_SCORE,
-              DEFAULT_ATTRIBUTE_SCORE);
-
-        TargetRoll targetNumber = new TargetRoll();
-
-        // Act
-        int totalModifier = SkillCheckUtility.getTotalAttributeModifier(targetNumber, attributes, testSkillType);
-
-        // Assert
-        assertEquals(0, totalModifier);
-    }
-
-    @ParameterizedTest
-    @CsvSource(value = { "-10, -4", // Attribute score is below minimum, testing max()
-                         "0, -4",   // Minimum normal attribute score
-                         "1, -2",   // Attribute score of 1
-                         "2, -1",   // Attribute score of 2
-                         "3, -1",   // Attribute score of 3
-                         "4, 0",    // Attribute score of 4
-                         "5, 0",    // Attribute score of 5
-                         "6, 0",    // Attribute score of 6
-                         "7, 1",    // Attribute score of 7
-                         "8, 1",    // Attribute score of 8
-                         "9, 1",    // Attribute score of 9
-                         "10, 2",   // Maximum normal attribute score
-                         "99, 5"    // High attribute score
-    })
-    void testGetIndividualAttributeModifier(int attributeScore, int expectedModifier) {
-        assertEquals(expectedModifier,
-              getIndividualAttributeModifier(attributeScore),
-              "Attribute Score: " + attributeScore);
     }
 
     @Test
@@ -393,13 +301,9 @@ class SkillCheckUtilityTest {
                 TargetRoll targetNumber = determineTargetNumber(mockPerson, testSkillType, 0);
 
                 // Assert
-                int skillTargetNumber = skill.getFinalSkillValue(new PersonnelOptions(), 0);
-                int attributeAdjustment = getTotalAttributeModifier(new TargetRoll(),
-                      characterAttributes,
-                      testSkillType);
-                assertEquals(skillTargetNumber - attributeAdjustment,
-                      targetNumber.getValue(),
-                      "Attribute Score: " + attributeScore);
+                int skillTargetNumber = skill.getFinalSkillValue(new PersonnelOptions(), characterAttributes);
+
+                assertEquals(skillTargetNumber, targetNumber.getValue(), "Attribute Score: " + attributeScore);
             }
         }
     }
@@ -434,11 +338,8 @@ class SkillCheckUtilityTest {
             TargetRoll targetNumber = determineTargetNumber(mockPerson, testSkillType, 0);
 
             // Assert
-            int skillTargetNumber = skill.getFinalSkillValue(new PersonnelOptions(), 0);
-            int attributeAdjustment = getTotalAttributeModifier(new TargetRoll(), characterAttributes, testSkillType);
-            int expectedValue = skillTargetNumber - attributeAdjustment;
-
-            assertEquals(expectedValue, targetNumber.getValue(), targetNumber.toString());
+            int skillTargetNumber = skill.getFinalSkillValue(new PersonnelOptions(), characterAttributes);
+            assertEquals(skillTargetNumber, targetNumber.getValue(), targetNumber.toString());
         }
     }
 
@@ -472,12 +373,9 @@ class SkillCheckUtilityTest {
                 TargetRoll targetNumber = determineTargetNumber(mockPerson, testSkillType, 0);
 
                 // Assert
-                int skillTargetNumber = skill.getFinalSkillValue(new PersonnelOptions(), 0);
-                int attributeAdjustment = getTotalAttributeModifier(new TargetRoll(),
-                      characterAttributes,
-                      testSkillType);
-                assertEquals(skillTargetNumber - attributeAdjustment,
-                      targetNumber.getValue(),
+                int skillTargetNumber = skill.getFinalSkillValue(new PersonnelOptions(), characterAttributes);
+
+                assertEquals(skillTargetNumber, targetNumber.getValue(),
                       targetNumber + " [Attribute Score: " + attributeScore + ']');
             }
         }

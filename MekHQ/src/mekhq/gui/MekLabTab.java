@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui;
 
@@ -34,7 +39,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.io.File;
 import java.util.ResourceBundle;
-
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -45,6 +49,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
 import megamek.common.*;
+import megamek.common.ITechnology.FactionAffiliation;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.verifier.*;
 import megamek.logging.MMLogger;
@@ -82,11 +87,11 @@ import megameklab.ui.util.MegaMekLabFileSaver;
 import megameklab.ui.util.RefreshListener;
 import megameklab.util.CConfig;
 import megameklab.util.UnitUtil;
-import mekhq.MekHQ;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
+import mekhq.utilities.ReportingUtilities;
 
 public class MekLabTab extends CampaignGuiTab {
     private static final MMLogger logger = MMLogger.create(MekLabTab.class);
@@ -260,7 +265,7 @@ public class MekLabTab extends CampaignGuiTab {
         // options settings.
         CConfig.setParam(CConfig.TECH_EXTINCT, String.valueOf(campaignGUI.getCampaign().showExtinct()));
         CConfig.setParam(CConfig.TECH_PROGRESSION, String.valueOf(campaignGUI.getCampaign().useVariableTechLevel()));
-        CConfig.setParam(CConfig.TECH_SHOW_FACTION, String.valueOf(campaignGUI.getCampaign().getTechFaction() >= 0));
+        CConfig.setParam(CConfig.TECH_SHOW_FACTION, String.valueOf(campaignGUI.getCampaign().getTechFaction() != ITechnology.Faction.NONE));
         CConfig.setParam(CConfig.TECH_UNOFFICAL_NO_YEAR, String.valueOf(campaignGUI.getCampaign().unofficialNoYear()));
         CConfig.setParam(CConfig.TECH_USE_YEAR, String.valueOf(campaignGUI.getCampaign().getGameYear()));
         CConfig.setParam(CConfig.TECH_YEAR, String.valueOf(campaignGUI.getCampaign().getGameYear()));
@@ -393,11 +398,11 @@ public class MekLabTab extends CampaignGuiTab {
         lblMove.setText("Movement: " + walk + "/" + run + "/" + jump);
         if (bvDiff > 0) {
             lblBV.setText("<html>BV: " + entity.calculateBattleValue(true, true) + " (<font color='"
-                    + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>+"
+                    + ReportingUtilities.getPositiveColor() + "'>+"
                     + bvDiff + "</font>)</html>");
         } else if (bvDiff < 0) {
             lblBV.setText("<html>BV: " + entity.calculateBattleValue(true, true) + " (<font color='"
-                    + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>" + bvDiff
+                    + ReportingUtilities.getNegativeColor() + "'>" + bvDiff
                     + "</font>)</html>");
         } else {
             lblBV.setText("<html>BV: " + entity.calculateBattleValue(true, true) + " (+" + bvDiff + ")</html>");
@@ -405,13 +410,13 @@ public class MekLabTab extends CampaignGuiTab {
 
         if (currentTonnage != tonnage) {
             lblTons.setText(
-                    "<html>Tonnage: <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
+                    "<html>Tonnage: <font color='" + ReportingUtilities.getNegativeColor() + "'>"
                             + currentTonnage + '/' + tonnage + "</font></html>");
         } else {
             lblTons.setText("Tonnage: " + currentTonnage + '/' + tonnage);
         }
         if (totalHeat > heat) {
-            lblHeat.setText("<html>Heat: <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
+            lblHeat.setText("<html>Heat: <font color='" + ReportingUtilities.getNegativeColor() + "'>"
                     + totalHeat + '/' + heat + "</font></html>");
         } else {
             lblHeat.setText("<html>Heat: " + totalHeat + '/' + heat + "</html>");
@@ -524,7 +529,7 @@ public class MekLabTab extends CampaignGuiTab {
         @Override
         public abstract Entity getEntity();
 
-        abstract void setTechFaction(int techFaction);
+        abstract void setTechFaction(ITechnology.Faction techFaction);
 
         @Override
         public void scheduleRefresh() {
@@ -677,7 +682,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        void setTechFaction(int techFaction) {
+        void setTechFaction(ITechnology.Faction techFaction) {
             structureTab.setTechFaction(techFaction);
         }
 
@@ -808,7 +813,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        void setTechFaction(int techFaction) {
+        void setTechFaction(ITechnology.Faction techFaction) {
             structureTab.setTechFaction(techFaction);
         }
 
@@ -933,7 +938,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        void setTechFaction(int techFaction) {
+        void setTechFaction(ITechnology.Faction techFaction) {
             structureTab.setTechFaction(techFaction);
         }
     }
@@ -1057,7 +1062,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        void setTechFaction(int techFaction) {
+        void setTechFaction(ITechnology.Faction techFaction) {
             structureTab.setTechFaction(techFaction);
         }
     }
@@ -1193,7 +1198,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        void setTechFaction(int techFaction) {
+        void setTechFaction(ITechnology.Faction techFaction) {
             structureTab.setTechFaction(techFaction);
         }
     }
@@ -1313,7 +1318,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        void setTechFaction(int techFaction) {
+        void setTechFaction(ITechnology.Faction techFaction) {
             structureTab.setTechFaction(techFaction);
         }
     }
@@ -1425,7 +1430,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        void setTechFaction(int techFaction) {
+        void setTechFaction(ITechnology.Faction techFaction) {
             structureTab.setTechFaction(techFaction);
         }
     }
@@ -1552,7 +1557,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        void setTechFaction(int techFaction) {
+        void setTechFaction(ITechnology.Faction techFaction) {
             structureTab.setTechFaction(techFaction);
         }
     }
@@ -1682,7 +1687,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        void setTechFaction(int techFaction) {
+        void setTechFaction(ITechnology.Faction techFaction) {
             structureTab.setTechFaction(techFaction);
         }
     }

@@ -362,9 +362,9 @@ public class HireBulkPersonnelDialog extends JDialog {
 
                     CampaignOptions campaignOptions = campaign.getCampaignOptions();
                     overrideSkills(campaignOptions.isAdminsHaveNegotiation(),
-                          campaignOptions.isAdminsHaveScrounge(),
                           campaignOptions.isDoctorsUseAdministration(),
-                          campaignOptions.isTechsUseAdministration(), campaignOptions.isUseArtillery(),
+                          campaignOptions.isTechsUseAdministration(),
+                          campaignOptions.isUseArtillery(),
                           useExtraRandomness,
                           person,
                           selectedItem.getRole(),
@@ -398,7 +398,7 @@ public class HireBulkPersonnelDialog extends JDialog {
             reRollLoyalty(person, actualSkillLevel);
             reRollAdvantages(campaign, person, actualSkillLevel);
 
-            if (!campaign.recruitPerson(person, isGmHire)) {
+            if (!campaign.recruitPerson(person, isGmHire, true)) {
                 number = 0;
             } else {
                 number--;

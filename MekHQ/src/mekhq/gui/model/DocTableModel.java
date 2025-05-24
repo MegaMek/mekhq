@@ -32,17 +32,19 @@
  */
 package mekhq.gui.model;
 
+import static mekhq.campaign.personnel.skills.SkillType.getColoredExperienceLevelName;
+
 import java.awt.Component;
 import java.util.ArrayList;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.gui.BasicInfo;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * A table model for displaying doctors
@@ -58,32 +60,53 @@ public class DocTableModel extends DataTableModel {
 
     @Override
     public Object getValueAt(int row, int col) {
-        return getDocDesc((Person) data.get(row));
+        return getDoctorDescription((Person) data.get(row));
     }
 
+    /**
+     * @deprecated Use {@link #getDoctorDescription(Person)} instead.
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     private String getDocDesc(Person doc) {
-        StringBuilder toReturn = new StringBuilder(128);
-        toReturn.append("<html><font><b>").append(doc.getFullTitle()).append("</b><br/>");
+        return getDoctorDescription(doc);
+    }
 
-        Skill skill = doc.getSkill(SkillType.S_SURGERY);
+    /**
+     * Builds an HTML-formatted description of the given doctor, summarizing their professional details and current
+     * responsibilities.
+     *
+     * <p>The description includes the doctor's full title, doctor skill experience level (if available), skill name,
+     * total experience points, number of required medics, and number of assigned patients. The formatting and color
+     * coding may indicate special requirements based on campaign settings.</p>
+     *
+     * @param doctor the {@link Person} object representing the doctor
+     *
+     * @return a formatted HTML {@link String} describing the doctor's qualifications and status
+     */
+    private String getDoctorDescription(Person doctor) {
+        StringBuilder toReturn = new StringBuilder(128);
+        toReturn.append("<html><font><b>").append(doctor.getFullTitle()).append("</b><br/>");
+
+        Skill skill = doctor.getSkill(SkillType.S_SURGERY);
         if (null != skill) {
-            toReturn.append("<b>")
-                    .append(SkillType.getColoredExperienceLevelName(skill.getExperienceLevel()))
-                  .append("</b> " + SkillType.S_SURGERY);
+            int experienceLevel = skill.getExperienceLevel(doctor.getOptions(), doctor.getATOWAttributes());
+
+            toReturn.append("<b>").append(getColoredExperienceLevelName(experienceLevel))
+                    .append("</b> " + SkillType.S_SURGERY);
         }
 
-        toReturn.append(String.format(" (%d XP)", doc.getXP()));
+        toReturn.append(String.format(" (%d XP)", doctor.getXP()));
 
         if (campaign.requiresAdditionalMedics()) {
             toReturn.append("</font><font color='")
-                    .append(MekHQ.getMHQOptions().getFontColorNegativeHexColor()).append("'>, ")
+                    .append(ReportingUtilities.getNegativeColor()).append("'>, ")
                     .append(campaign.getMedicsPerDoctor())
                     .append(" medics</font><font><br/>");
         } else {
             toReturn.append(String.format(", %d medics<br />", campaign.getMedicsPerDoctor()));
         }
 
-        toReturn.append(String.format("%d patient(s)</font></html>", campaign.getPatientsFor(doc)));
+        toReturn.append(String.format("%d patient(s)</font></html>", campaign.getPatientsFor(doctor)));
 
         return toReturn.toString();
     }

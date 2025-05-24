@@ -41,7 +41,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.UUID;
-import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -60,6 +59,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollablePanel;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.utilities.ReportingUtilities;
 
@@ -78,6 +78,7 @@ public class ForceViewPanel extends JScrollablePanel {
         super();
         this.force = f;
         this.campaign = c;
+        this.setBorder(null);
         initComponents();
     }
 
@@ -103,7 +104,7 @@ public class ForceViewPanel extends JScrollablePanel {
         add(lblIcon, gridBagConstraints);
 
         pnlStats.setName("pnlStats");
-        pnlStats.setBorder(BorderFactory.createTitledBorder(force.getName()));
+        pnlStats.setBorder(RoundedLineBorder.createRoundedLineBorder(force.getName()));
         fillStats();
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -133,9 +134,7 @@ public class ForceViewPanel extends JScrollablePanel {
             txtDesc.setEditable(false);
             txtDesc.setContentType("text/html");
             txtDesc.setText(MarkdownRenderer.getRenderedHtml(force.getDescription()));
-            txtDesc.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createTitledBorder("Description"),
-                    BorderFactory.createEmptyBorder(0,2,2,2)));
+            txtDesc.setBorder(RoundedLineBorder.createRoundedLineBorder("Description"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = 2;
@@ -519,7 +518,7 @@ public class ForceViewPanel extends JScrollablePanel {
                 String injuriesMessage = " " + injuryCount + (injuryCount == 1 ? " injury" : " injuries");
 
                 toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
-                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(), injuriesMessage));
+                    ReportingUtilities.getNegativeColor(), injuriesMessage));
             }
 
         } else {
@@ -531,7 +530,7 @@ public class ForceViewPanel extends JScrollablePanel {
                 String hitsMessage = " " + hitCount + (hitCount == 1 ? " hit" : " hits");
 
                 toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
-                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(), hitsMessage));
+                    ReportingUtilities.getNegativeColor(), hitsMessage));
             }
         }
 
@@ -547,7 +546,7 @@ public class ForceViewPanel extends JScrollablePanel {
             String fatigueMessage = effectiveFatigue + " fatigue";
 
             toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
-                MekHQ.getMHQOptions().getFontColorWarningHexColor(), fatigueMessage));
+                ReportingUtilities.getWarningColor(), fatigueMessage));
         }
 
         if (!(isInjured || isFatigued)) {
