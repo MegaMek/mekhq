@@ -453,7 +453,7 @@ public class FactionStandingReport extends JDialog {
      * <ul>
      *     <li>≤ 1: Negative color</li>
      *     <li>≤ 3: Warning color</li>
-     *     <li>≥ 7: Elite color</li>
+     *     <li>≥ 7: Amazing color</li>
      *     <li>≥ 5: Positive color</li>
      * </ul>
      *
@@ -526,7 +526,7 @@ public class FactionStandingReport extends JDialog {
 
         if (isSame) {
             addendum = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.addendum.parent");
-            color = MekHQ.getMHQOptions().getFontColorSkillEliteHexColor();
+            color = getAmazingColor();
         } else if (isAtWar) {
             addendum = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.addendum.atWar");
             color = getNegativeColor();
