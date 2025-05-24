@@ -74,6 +74,8 @@ import mekhq.campaign.report.PersonnelReport;
 import mekhq.campaign.report.TransportReport;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.adapter.ProcurementTableMouseAdapter;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.AcquisitionsDialog;
 import mekhq.gui.dialog.MRMSDialog;
 import mekhq.gui.dialog.MekHQUnitSelectorDialog;
@@ -81,6 +83,7 @@ import mekhq.gui.dialog.PartsReportDialog;
 import mekhq.gui.dialog.PartsStoreDialog;
 import mekhq.gui.dialog.UnitMarketDialog;
 import mekhq.gui.dialog.reportDialogs.CargoReportDialog;
+import mekhq.gui.dialog.reportDialogs.FactionStanding.FactionStandingReport;
 import mekhq.gui.dialog.reportDialogs.HangarReportDialog;
 import mekhq.gui.dialog.reportDialogs.PersonnelReportDialog;
 import mekhq.gui.dialog.reportDialogs.ReputationReportDialog;
@@ -130,18 +133,19 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private JPanel panTotalCost;
     private JLabel procurementTotalCostLabel;
     private ProcurementTableModel procurementModel;
-    private JButton btnGetUnit;
-    private JButton btnGetParts;
-    private JButton btnNeededParts;
-    private JButton btnPartsReport;
-    private JButton btnPauseProcurement;
-    private JButton btnResumeProcurement;
-    private JButton btnMRMSDialog;
-    private JButton btnMRMSInstant;
+    private RoundedJButton btnGetUnit;
+    private RoundedJButton btnGetParts;
+    private RoundedJButton btnNeededParts;
+    private RoundedJButton btnPartsReport;
+    private RoundedJButton btnPauseProcurement;
+    private RoundedJButton btnResumeProcurement;
+    private RoundedJButton btnMRMSDialog;
+    private RoundedJButton btnMRMSInstant;
 
     // available reports
     private JPanel panReports;
-    private JButton btnUnitRating;
+    private RoundedJButton btnUnitRating;
+    private RoundedJButton btnFactionStanding;
 
     //icon panel
     private JPanel panIcon;
@@ -405,7 +409,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
             panInfo.add(lblFacilityCapacities, gridBagConstraints);
         }
 
-        panInfo.setBorder(BorderFactory.createTitledBorder(getCampaign().getName()));
+        panInfo.setBorder(RoundedLineBorder.createRoundedLineBorder(getCampaign().getName()));
     }
 
     /**
@@ -414,7 +418,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
      */
     private void initObjectivesPanel() {
         panObjectives = new JPanel(new BorderLayout());
-        panObjectives.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panObjectives.title")));
+        panObjectives.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("panObjectives.title")));
 
         listObjectives = new JList<>();
 
@@ -429,7 +433,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
      */
     private void initLogPanel() {
         panLog = new DailyReportLogPanel(getCampaignGui());
-        panLog.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panLog.title")));
+        panLog.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("panLog.title")));
         panLog.setMinimumSize(new Dimension(400, 100));
         panLog.setPreferredSize(new Dimension(400, 100));
     }
@@ -439,31 +443,31 @@ public final class CommandCenterTab extends CampaignGuiTab {
      */
     private void initProcurementPanel() {
         /* shopping buttons */
-        JPanel panProcurementButtons = new JPanel(new GridLayout(8, 1));
+        JPanel panProcurementButtons = new JPanel(new GridLayout(8, 1, 0, 5));
         panProcurementButtons.getAccessibleContext().setAccessibleName("Procurement Actions");
 
-        btnGetUnit = new JButton(resourceMap.getString("btnGetUnit.text"));
+        btnGetUnit = new RoundedJButton(resourceMap.getString("btnGetUnit.text"));
         btnGetUnit.setToolTipText(resourceMap.getString("btnGetUnit.toolTipText"));
         btnGetUnit.addActionListener(evt -> getUnit());
         panProcurementButtons.add(btnGetUnit);
 
-        btnGetParts = new JButton(resourceMap.getString("btnGetParts.text"));
+        btnGetParts = new RoundedJButton(resourceMap.getString("btnGetParts.text"));
         btnGetParts.setToolTipText(resourceMap.getString("btnGetParts.toolTipText"));
         btnGetParts.addActionListener(evt -> getParts());
         panProcurementButtons.add(btnGetParts);
 
-        btnNeededParts = new JButton(resourceMap.getString("btnNeededParts.text"));
+        btnNeededParts = new RoundedJButton(resourceMap.getString("btnNeededParts.text"));
         btnNeededParts.setToolTipText(resourceMap.getString("btnNeededParts.toolTipText"));
         btnNeededParts.addActionListener(evt -> new AcquisitionsDialog(getFrame(), true, getCampaignGui()).setVisible(
               true));
         panProcurementButtons.add(btnNeededParts);
 
-        btnPartsReport = new JButton(resourceMap.getString("btnPartsReport.text"));
+        btnPartsReport = new RoundedJButton(resourceMap.getString("btnPartsReport.text"));
         btnPartsReport.setToolTipText(resourceMap.getString("btnPartsReport.toolTipText"));
         btnPartsReport.addActionListener(evt -> new PartsReportDialog(getCampaignGui(), true).setVisible(true));
         panProcurementButtons.add(btnPartsReport);
 
-        btnPauseProcurement = new JButton(resourceMap.getString("btnPauseProcurement.text"));
+        btnPauseProcurement = new RoundedJButton(resourceMap.getString("btnPauseProcurement.text"));
         btnPauseProcurement.addActionListener(evt -> {
             btnPauseProcurement.setEnabled(false);
             btnResumeProcurement.setEnabled(true);
@@ -472,7 +476,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         btnPauseProcurement.setEnabled(getCampaign().isProcessProcurement());
         panProcurementButtons.add(btnPauseProcurement);
 
-        btnResumeProcurement = new JButton(resourceMap.getString("btnResumeProcurement.text"));
+        btnResumeProcurement = new RoundedJButton(resourceMap.getString("btnResumeProcurement.text"));
         btnResumeProcurement.addActionListener(evt -> {
             btnResumeProcurement.setEnabled(false);
             btnPauseProcurement.setEnabled(true);
@@ -481,7 +485,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         btnResumeProcurement.setEnabled(!getCampaign().isProcessProcurement());
         panProcurementButtons.add(btnResumeProcurement);
 
-        btnMRMSDialog = new JButton(resourceMap.getString("btnMRMSDialog.text"));
+        btnMRMSDialog = new RoundedJButton(resourceMap.getString("btnMRMSDialog.text"));
         btnMRMSDialog.setToolTipText(resourceMap.getString("btnMRMSDialog.toolTipText"));
         btnMRMSDialog.setName("btnMRMSDialog");
         btnMRMSDialog.addActionListener(evt -> new MRMSDialog(getFrame(),
@@ -492,7 +496,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         btnMRMSDialog.setVisible(MekHQ.getMHQOptions().getCommandCenterMRMS());
         panProcurementButtons.add(btnMRMSDialog);
 
-        btnMRMSInstant = new JButton(resourceMap.getString("btnMRMSInstant.text"));
+        btnMRMSInstant = new RoundedJButton(resourceMap.getString("btnMRMSInstant.text"));
         btnMRMSInstant.setToolTipText(resourceMap.getString("btnMRMSInstant.toolTipText"));
         btnMRMSInstant.setName("btnMRMSInstant");
         btnMRMSInstant.addActionListener(evt -> {
@@ -564,7 +568,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
         JScrollPane scrollProcurement = new JScrollPaneWithSpeed(procurementTable);
         panProcurement = new JPanel(new GridBagLayout());
-        panProcurement.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panProcurement.title")));
+        panProcurement.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("panProcurement.title")));
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -592,30 +596,30 @@ public final class CommandCenterTab extends CampaignGuiTab {
      * Initialize the panel for displaying available reports
      */
     private void initReportsPanel() {
-        panReports = new JPanel(new GridLayout(5, 1));
+        panReports = new JPanel(new GridLayout(6, 1, 0, 5));
 
-        JButton btnTransportReport = new JButton(resourceMap.getString("btnTransportReport.text"));
+        RoundedJButton btnTransportReport = new RoundedJButton(resourceMap.getString("btnTransportReport.text"));
         btnTransportReport.addActionListener(ev -> new TransportReportDialog(getCampaignGui().getFrame(),
               new TransportReport(getCampaign())).setVisible(true));
         panReports.add(btnTransportReport);
 
-        JButton btnHangarOverview = new JButton(resourceMap.getString("btnHangarOverview.text"));
+        RoundedJButton btnHangarOverview = new RoundedJButton(resourceMap.getString("btnHangarOverview.text"));
         btnHangarOverview.addActionListener(evt -> new HangarReportDialog(getCampaignGui().getFrame(),
               new HangarReport(getCampaign())).setVisible(true));
         panReports.add(btnHangarOverview);
 
-        JButton btnPersonnelOverview = new JButton(resourceMap.getString("btnPersonnelOverview.text"));
+        RoundedJButton btnPersonnelOverview = new RoundedJButton(resourceMap.getString("btnPersonnelOverview.text"));
         btnPersonnelOverview.addActionListener(evt -> new PersonnelReportDialog(getCampaignGui().getFrame(),
               new PersonnelReport(getCampaign())).setVisible(true));
         panReports.add(btnPersonnelOverview);
 
-        JButton btnCargoCapacity = new JButton(resourceMap.getString("btnCargoCapacity.text"));
+        RoundedJButton btnCargoCapacity = new RoundedJButton(resourceMap.getString("btnCargoCapacity.text"));
         btnCargoCapacity.addActionListener(evt -> new CargoReportDialog(getCampaignGui().getFrame(),
               new CargoReport(getCampaign())).setVisible(true));
         panReports.add(btnCargoCapacity);
 
-        btnUnitRating = new JButton(resourceMap.getString("btnUnitRating.text"));
-        btnUnitRating.setVisible(getCampaign().getCampaignOptions().getUnitRatingMethod().isEnabled());
+        btnUnitRating = new RoundedJButton(resourceMap.getString("btnUnitRating.text"));
+        btnUnitRating.setEnabled(getCampaign().getCampaignOptions().getUnitRatingMethod().isEnabled());
 
         if (getCampaign().getCampaignOptions().getUnitRatingMethod().isFMMR()) {
             btnUnitRating.addActionListener(evt -> new UnitRatingReportDialog(getCampaignGui().getFrame(),
@@ -626,7 +630,23 @@ public final class CommandCenterTab extends CampaignGuiTab {
         }
         panReports.add(btnUnitRating);
 
-        panReports.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panReports.title")));
+        btnFactionStanding = new RoundedJButton(resourceMap.getString("btnFactionStanding.text"));
+        btnFactionStanding.addActionListener(evt -> {
+            FactionStandingReport factionStandingReport = new FactionStandingReport(getCampaignGui().getFrame(),
+                  getCampaign().getFactionStandings(),
+                  getCampaign().getLocalDate(),
+                  getCampaign().isGM(),
+                  getCampaign().getFaction(),
+                  getCampaign().getCampaignFactionIcon());
+
+            for (String report : factionStandingReport.getReports()) {
+                if (report != null && !report.isBlank()) {
+                    getCampaign().addReport(report);
+                }
+            }
+        });
+        panReports.add(btnFactionStanding);
+        panReports.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("panReports.title")));
     }
 
     @Override

@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.view;
 
@@ -54,6 +59,7 @@ import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.CombatRole;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.model.DataTableModel;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
@@ -200,14 +206,14 @@ public class LanceAssignmentView extends JPanel {
 
         panRequiredLances = new JPanel();
         panRequiredLances.setLayout(new BoxLayout(panRequiredLances, BoxLayout.Y_AXIS));
-        panRequiredLances.setBorder(BorderFactory.createTitledBorder("Deployment Requirements"));
+        panRequiredLances.setBorder(RoundedLineBorder.createRoundedLineBorder("Deployment Requirements"));
         panRequiredLances.add(tblRequiredLances.getTableHeader());
         panRequiredLances.add(tblRequiredLances);
         add(panRequiredLances);
 
         panAssignments = new JPanel();
         panAssignments.setLayout(new BoxLayout(panAssignments, BoxLayout.Y_AXIS));
-        panAssignments.setBorder(BorderFactory.createTitledBorder("Current Assignments"));
+        panAssignments.setBorder(RoundedLineBorder.createRoundedLineBorder("Current Assignments"));
         panAssignments.add(tblAssignments.getTableHeader());
         panAssignments.add(tblAssignments);
         add(panAssignments);

@@ -48,6 +48,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import javax.swing.JDialog;
@@ -60,6 +61,7 @@ import javax.swing.SwingWorker;
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.swing.util.UIUtil;
+import megamek.client.ui.swing.widget.RawImagePanel;
 import megamek.common.Entity;
 import megamek.common.MekSummaryCache;
 import megamek.common.annotations.Nullable;
@@ -89,6 +91,7 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RATManager;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.eras.Eras;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.baseComponents.AbstractMHQDialogBasic;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
@@ -101,7 +104,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
     private final MekHQ application;
     private final File campaignFile;
     private final Task task;
-    private JLabel splash;
+    private RawImagePanel splash;
     private JProgressBar progressBar;
     private StoryArcStub storyArcStub;
     private boolean isInAppNewCampaign;
@@ -142,11 +145,11 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
         return task;
     }
 
-    public JLabel getSplash() {
+    public RawImagePanel getSplash() {
         return splash;
     }
 
-    public void setSplash(final JLabel splash) {
+    public void setSplash(final RawImagePanel splash) {
         this.splash = splash;
     }
 
@@ -370,6 +373,19 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 ReputationController reputationController = new ReputationController();
                 reputationController.initializeReputation(campaign);
                 campaign.setReputation(reputationController);
+
+                // initialize starting faction standings
+                if (campaign.getCampaignOptions().isTrackFactionStanding()) {
+                    FactionStandings factionStandings = campaign.getFactionStandings();
+                    List<String> standingReports = factionStandings.initializeStartingRegardValues(campaign.getFaction(),
+                          campaign.getLocalDate());
+                    for (String report : standingReports) {
+                        campaign.addReport(report);
+                    }
+                    String report = factionStandings.updateClimateRegard(campaign.getFaction(),
+                          campaign.getLocalDate());
+                    campaign.addReport(report);
+                }
                 // endregion Progress 6
 
                 // region Progress 7
