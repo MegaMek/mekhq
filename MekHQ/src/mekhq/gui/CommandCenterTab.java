@@ -83,6 +83,7 @@ import mekhq.gui.dialog.PartsReportDialog;
 import mekhq.gui.dialog.PartsStoreDialog;
 import mekhq.gui.dialog.UnitMarketDialog;
 import mekhq.gui.dialog.reportDialogs.CargoReportDialog;
+import mekhq.gui.dialog.reportDialogs.FactionStanding.FactionStandingReport;
 import mekhq.gui.dialog.reportDialogs.HangarReportDialog;
 import mekhq.gui.dialog.reportDialogs.PersonnelReportDialog;
 import mekhq.gui.dialog.reportDialogs.ReputationReportDialog;
@@ -144,6 +145,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
     // available reports
     private JPanel panReports;
     private RoundedJButton btnUnitRating;
+    private RoundedJButton btnFactionStanding;
 
     //icon panel
     private JPanel panIcon;
@@ -594,7 +596,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
      * Initialize the panel for displaying available reports
      */
     private void initReportsPanel() {
-        panReports = new JPanel(new GridLayout(5, 1, 0, 5));
+        panReports = new JPanel(new GridLayout(6, 1, 0, 5));
 
         RoundedJButton btnTransportReport = new RoundedJButton(resourceMap.getString("btnTransportReport.text"));
         btnTransportReport.addActionListener(ev -> new TransportReportDialog(getCampaignGui().getFrame(),
@@ -617,7 +619,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         panReports.add(btnCargoCapacity);
 
         btnUnitRating = new RoundedJButton(resourceMap.getString("btnUnitRating.text"));
-        btnUnitRating.setVisible(getCampaign().getCampaignOptions().getUnitRatingMethod().isEnabled());
+        btnUnitRating.setEnabled(getCampaign().getCampaignOptions().getUnitRatingMethod().isEnabled());
 
         if (getCampaign().getCampaignOptions().getUnitRatingMethod().isFMMR()) {
             btnUnitRating.addActionListener(evt -> new UnitRatingReportDialog(getCampaignGui().getFrame(),
@@ -628,6 +630,22 @@ public final class CommandCenterTab extends CampaignGuiTab {
         }
         panReports.add(btnUnitRating);
 
+        btnFactionStanding = new RoundedJButton(resourceMap.getString("btnFactionStanding.text"));
+        btnFactionStanding.addActionListener(evt -> {
+            FactionStandingReport factionStandingReport = new FactionStandingReport(getCampaignGui().getFrame(),
+                  getCampaign().getFactionStandings(),
+                  getCampaign().getLocalDate(),
+                  getCampaign().isGM(),
+                  getCampaign().getFaction(),
+                  getCampaign().getCampaignFactionIcon());
+
+            for (String report : factionStandingReport.getReports()) {
+                if (report != null && !report.isBlank()) {
+                    getCampaign().addReport(report);
+                }
+            }
+        });
+        panReports.add(btnFactionStanding);
         panReports.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("panReports.title")));
     }
 

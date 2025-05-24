@@ -619,12 +619,13 @@ public class FactionStandings {
                                      "factionStandings.change.report.climate.pirate" :
                                      "factionStandings.change.report.climate";
 
-            report.insert(0, getFormattedTextAt(RESOURCE_BUNDLE,
-                  reportKey,
+            report.insert(0,
+                  getFormattedTextAt(RESOURCE_BUNDLE,
+                        reportKey,
                         spanOpeningWithCustomColor(getWarningColor()),
-                  CLOSING_SPAN_TAG,
-                  spanOpeningWithCustomColor(getNegativeColor()),
-                  CLIMATE_REGARD_ENEMY_FACTION_AT_WAR,
+                        CLOSING_SPAN_TAG,
+                        spanOpeningWithCustomColor(getNegativeColor()),
+                        CLIMATE_REGARD_ENEMY_FACTION_AT_WAR,
                         CLOSING_SPAN_TAG));
         }
         return report;
