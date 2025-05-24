@@ -1264,6 +1264,7 @@ public class MRMSDialog extends JDialog {
         /**
          * @deprecated consider {@link #getTargetNumberPreferredSpn()}
          */
+        @Deprecated(since = "0.50.07", forRemoval = true)
         public JSpinner getMinBTHSpn() {
             return this.getTargetNumberPreferredSpn();
         }
@@ -1275,6 +1276,7 @@ public class MRMSDialog extends JDialog {
         /**
          * @deprecated consider {@link #setTargetNumberPreferredSpn(JSpinner)}
          */
+        @Deprecated(since = "0.50.07", forRemoval = true)
         public void setMinBTHSpn(JSpinner minBTHSpn) {
             this.setTargetNumberPreferredSpn(minBTHSpn);
         }
@@ -1286,6 +1288,7 @@ public class MRMSDialog extends JDialog {
         /**
          * @deprecated consider {@link #getTargetNumberMaxSpn()}
          */
+        @Deprecated(since = "0.50.07", forRemoval = true)
         public JSpinner getMaxBTHSpn() {
             return this.getTargetNumberMaxSpn();
         }
@@ -1297,6 +1300,7 @@ public class MRMSDialog extends JDialog {
         /**
          * @deprecated consider {@link #setTargetNumberMaxSpn(JSpinner)}
          */
+        @Deprecated(since = "0.50.07", forRemoval = true)
         public void setMaxBTHSpn(JSpinner maxBTHSpn) {
             this.setTargetNumberMaxSpn(maxBTHSpn);
         }

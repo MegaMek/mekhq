@@ -117,6 +117,7 @@ public class MRMSOption {
     /**
      * @deprecated consider {@link #getTargetNumberPreferred()}
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public int getBthMin() {
         return this.getTargetNumberPreferred();
     }
@@ -128,6 +129,7 @@ public class MRMSOption {
     /**
      * @deprecated consider {@link #setTargetNumberPreferred(int)}
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public void setBthMin(int bthMin) {
         this.setTargetNumberPreferred(bthMin);
     }
@@ -139,6 +141,7 @@ public class MRMSOption {
     /**
      * @deprecated consider {@link #getTargetNumberMax()}
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public int getBthMax() {
         return this.getTargetNumberMax();
     }
@@ -150,6 +153,7 @@ public class MRMSOption {
     /**
      * @deprecated consider {@link #setTargetNumberMax(int)}
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public void setBthMax(int bthMax) {
         this.setTargetNumberMax(bthMax);
     }
