@@ -40,6 +40,7 @@ import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.P
 import static mekhq.campaign.personnel.skills.SkillType.getExperienceLevelName;
 import static mekhq.gui.dialog.nagDialogs.NagController.triggerDailyNags;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getText;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -65,7 +66,6 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.GUIPreferences;
 import megamek.client.ui.swing.GameOptionsDialog;
-import megamek.client.ui.swing.MMToggleButton;
 import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
 import megamek.client.ui.swing.util.UIUtil;
@@ -120,6 +120,9 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.NewsItem;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.gui.baseComponents.roundedComponents.RoundedMMToggleButton;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog;
 import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.CampaignExportWizard.CampaignExportWizardState;
@@ -185,12 +188,13 @@ public class CampaignGUI extends JPanel {
     private JLabel lblPartsAvailabilityRating;
 
     /* for the top button panel */
-    private JPanel btnPanel;
-    private final JButton btnAdvanceMultipleDays = new JButton(resourceMap.getString("btnAdvanceMultipleDays.text"));
-    private final JButton btnMassTraining = new JButton(resourceMap.getString("btnMassTraining.text"));
-    private final JToggleButton btnGMMode = new MMToggleButton(resourceMap.getString("btnGMMode.text"));
-    private final JToggleButton btnOvertime = new MMToggleButton(resourceMap.getString("btnOvertime.text"));
-    private final JButton btnGlossary = new JButton(resourceMap.getString("btnGlossary.text"));
+    private JPanel pnlTop;
+    private final RoundedJButton btnAdvanceMultipleDays = new RoundedJButton(resourceMap.getString(
+          "btnAdvanceMultipleDays.text"));
+    private final RoundedJButton btnMassTraining = new RoundedJButton(resourceMap.getString("btnMassTraining.text"));
+    private final RoundedMMToggleButton btnGMMode = new RoundedMMToggleButton(resourceMap.getString("btnGMMode.text"));
+    private final RoundedMMToggleButton btnOvertime = new RoundedMMToggleButton(resourceMap.getString("btnOvertime.text"));
+    private final RoundedJButton btnGlossary = new RoundedJButton(resourceMap.getString("btnGlossary.text"));
 
     ReportHyperlinkListener reportHLL;
 
@@ -295,7 +299,7 @@ public class CampaignGUI extends JPanel {
         setLayout(new BorderLayout());
 
         add(tabMain, BorderLayout.CENTER);
-        add(btnPanel, BorderLayout.PAGE_START);
+        add(pnlTop, BorderLayout.PAGE_START);
         add(statusPanel, BorderLayout.PAGE_END);
 
         standardTabs.values().forEach(CampaignGuiTab::refreshAll);
@@ -1144,10 +1148,13 @@ public class CampaignGUI extends JPanel {
     }
 
     private void initTopButtons() {
-        lblLocation = new JLabel(getCampaign().getLocation().getReport(getCampaign().getLocalDate()));
+        lblLocation = new JLabel(getCampaign().getLocation()
+                                       .getReport(getCampaign().getLocalDate(),
+                                             getCampaign().calculateCostPerJump(false, true)));
+        lblLocation.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("currentLocation.title")));
 
-        btnPanel = new JPanel(new GridBagLayout());
-        btnPanel.getAccessibleContext().setAccessibleName("Campaign Actions");
+        pnlTop = new JPanel(new GridBagLayout());
+        pnlTop.getAccessibleContext().setAccessibleName(getText("currentLocation.title"));
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -1156,10 +1163,24 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.weightx = 1;
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.gridheight = 2;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(3, 10, 3, 3);
-        btnPanel.add(lblLocation, gridBagConstraints);
+        gridBagConstraints.anchor = GridBagConstraints.SOUTHWEST;
+        pnlTop.add(lblLocation, gridBagConstraints);
 
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.weightx = 1;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.gridheight = 2;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
+        pnlTop.add(getButtonPanel(), gridBagConstraints);
+    }
+
+    private JPanel getButtonPanel() {
+        JPanel pnlButton = new JPanel(new GridBagLayout());
+        pnlButton.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("campaignControls.title")));
+
+        GridBagConstraints gridBagConstraints;
         btnGlossary.addActionListener(evt -> new FullGlossaryDialog(getCampaign()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -1171,7 +1192,7 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
         gridBagConstraints.insets = new Insets(3, 3, 3, 15);
-        btnPanel.add(btnGlossary, gridBagConstraints);
+        pnlButton.add(btnGlossary, gridBagConstraints);
 
         btnAdvanceMultipleDays.addActionListener(e -> new AdvanceDaysDialog(getFrame(), this).setVisible(true));
         gridBagConstraints = new GridBagConstraints();
@@ -1182,7 +1203,7 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = GridBagConstraints.EAST;
         gridBagConstraints.insets = new Insets(3, 3, 3, 3);
-        btnPanel.add(btnAdvanceMultipleDays, gridBagConstraints);
+        pnlButton.add(btnAdvanceMultipleDays, gridBagConstraints);
 
         btnMassTraining.setToolTipText(resourceMap.getString("btnMassTraining.toolTipText"));
         btnMassTraining.addActionListener(e -> new BatchXPDialog(getFrame(), getCampaign()).setVisible(true));
@@ -1194,7 +1215,7 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = GridBagConstraints.EAST;
         gridBagConstraints.insets = new Insets(3, 3, 3, 3);
-        btnPanel.add(btnMassTraining, gridBagConstraints);
+        pnlButton.add(btnMassTraining, gridBagConstraints);
 
         btnGMMode.setToolTipText(resourceMap.getString("btnGMMode.toolTipText"));
         btnGMMode.setSelected(getCampaign().isGM());
@@ -1207,7 +1228,7 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = GridBagConstraints.EAST;
         gridBagConstraints.insets = new Insets(3, 3, 3, 3);
-        btnPanel.add(btnGMMode, gridBagConstraints);
+        pnlButton.add(btnGMMode, gridBagConstraints);
 
         btnOvertime.setToolTipText(resourceMap.getString("btnOvertime.toolTipText"));
         btnOvertime.addActionListener(evt -> getCampaign().setOvertime(btnOvertime.isSelected()));
@@ -1219,16 +1240,17 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = GridBagConstraints.EAST;
         gridBagConstraints.insets = new Insets(3, 3, 3, 3);
-        btnPanel.add(btnOvertime, gridBagConstraints);
+        pnlButton.add(btnOvertime, gridBagConstraints);
 
         // This button uses a mnemonic that is unique and listed in the initMenu JavaDoc
         String padding = "       ";
-        JButton btnAdvanceDay = new JButton(padding + resourceMap.getString("btnAdvanceDay.text") + padding);
+        RoundedJButton btnAdvanceDay = new RoundedJButton(padding +
+                                                                resourceMap.getString("btnAdvanceDay.text") +
+                                                                padding);
         btnAdvanceDay.setToolTipText(resourceMap.getString("btnAdvanceDay.toolTipText"));
         btnAdvanceDay.addActionListener(evt -> {
             // We disable the button here, as we don't want the user to be able to advance
-            // day
-            // again, until after Advance Day has completed.
+            // day  again, until after Advance Day has completed.
             btnAdvanceDay.setEnabled(false);
             btnAdvanceMultipleDays.setEnabled(false);
 
@@ -1254,7 +1276,9 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
         gridBagConstraints.insets = new Insets(3, 3, 3, 15);
-        btnPanel.add(btnAdvanceDay, gridBagConstraints);
+        pnlButton.add(btnAdvanceDay, gridBagConstraints);
+
+        return pnlButton;
     }
     // endregion Initialization
 
@@ -2551,7 +2575,9 @@ public class CampaignGUI extends JPanel {
     private final ActionScheduler fundsScheduler = new ActionScheduler(this::refreshFunds);
 
     public void refreshLocation() {
-        lblLocation.setText(getCampaign().getLocation().getReport(getCampaign().getLocalDate()));
+        lblLocation.setText(getCampaign().getLocation()
+                                  .getReport(getCampaign().getLocalDate(),
+                                        getCampaign().calculateCostPerJump(false, true)));
     }
 
     public int getTabIndexByName(String tabTitle) {
