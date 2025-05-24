@@ -366,10 +366,15 @@ public class FactionStandings {
      */
     public static boolean isUntrackedFaction(final String factionCode) {
         final List<String> untrackedFactionTags = Arrays.asList("MERC",
-              "PIR", "RON", "REB",
+              "PIR",
+              "RON",
+              "REB",
               "IND",
               "ABN",
-              "UND", "NONE", "CLAN", "DIS");
+              "UND",
+              "NONE",
+              "CLAN",
+              "DIS");
 
         return untrackedFactionTags.contains(factionCode);
     }
@@ -815,7 +820,7 @@ public class FactionStandings {
     public List<String> processContractAccept(@Nullable final Faction enemyFaction, final LocalDate today) {
         // If we're missing the relevant faction, alert the player and abort
         if (enemyFaction == null) {
-            String report = getMissingFactionReport(false);
+            String report = getMissingFactionReport();
 
             return List.of(report);
         }
@@ -897,13 +902,6 @@ public class FactionStandings {
         // If the mission is still active, there is nothing to process, so abort
         if (missionStatus == MissionStatus.ACTIVE) {
             return new ArrayList<>();
-        }
-
-        // If we're missing the relevant faction, alert the player and abort
-        if (employerFaction == null) {
-            String report = getMissingFactionReport(true);
-
-            return List.of(report);
         }
 
         double regardDeltaEmployer = 0.0;
@@ -991,21 +989,15 @@ public class FactionStandings {
      *
      * <p>The message varies depending on whether the context is contract completion or acceptance.</p>
      *
-     * @param isContractCompletion {@code true} if the report is for contract completion, {@code false} for contract acceptance.
      * @return A {@link String} representing the formatted report message for the missing faction scenario.
      *
      * @author Illiani
      * @since 0.50.07
      */
-    private static String getMissingFactionReport(final boolean isContractCompletion) {
-        String contractStatus = isContractCompletion ? "completion" : "acceptance";
-        String relevantFaction = isContractCompletion ? "employer" : "enemy";
-
+    private static String getMissingFactionReport() {
         return getFormattedTextAt(RESOURCE_BUNDLE, "factionStandings.change.report.missingFaction",
               spanOpeningWithCustomColor(getWarningColor()),
-              CLOSING_SPAN_TAG,
-                getTextAt(RESOURCE_BUNDLE, "factionStandings.change." + contractStatus),
-                getTextAt(RESOURCE_BUNDLE, "factionStandings.change." + relevantFaction));
+              CLOSING_SPAN_TAG);
     }
 
     /**

@@ -38,6 +38,7 @@ import megamek.client.ui.swing.util.UIUtil;
 import megamek.logging.MMLogger;
 import megamek.utilities.ImageUtilities;
 import mekhq.MekHQ;
+import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.FactionHints;
 import mekhq.campaign.universe.Factions;
@@ -52,7 +53,6 @@ import mekhq.gui.utilities.WrapLayout;
 
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.border.CompoundBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -64,6 +64,7 @@ import java.util.Set;
 
 import static java.lang.Math.round;
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
+import static mekhq.gui.dialog.reportDialogs.FactionStanding.SimulateMissionDialog.handleFactionRegardUpdates;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.*;
 
@@ -377,12 +378,30 @@ public class FactionStandingReport extends JDialog {
               "factionStandingReport.button.contract"));
         btnSimulateContract.setName("btnSimulateContract");
         btnSimulateContract.setFocusable(false);
-        btnSimulateContract.addActionListener(e -> {
-            // TODO Simulate Contract Dialog
-        });
+        btnSimulateContract.addActionListener(e -> triggerMissionSimulationDialog());
         pnlButtons.add(btnSimulateContract);
 
         return pnlButtons;
+    }
+
+    /**
+     * Opens the Simulate Mission dialog, allowing the user to choose the employer and enemy factions, as well as the
+     * mission status. After selections are made, the method updates faction standings accordingly.
+     *
+     * <p>This method blocks until the dialog is closed, then retrieves the selected values and applies any necessary
+     * updates to faction standings.</p>
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private void triggerMissionSimulationDialog() {
+        SimulateMissionDialog dialog = new SimulateMissionDialog(frame, campaignIcon, campaignFaction, today);
+
+        Faction employerChoice = dialog.getEmployerChoice();
+        Faction enemyChoice = dialog.getEnemyChoice();
+        MissionStatus statusChoice = dialog.getStatusChoice();
+
+        reports.addAll(handleFactionRegardUpdates(employerChoice, enemyChoice, statusChoice, today, factionStandings));
     }
 
     /**
@@ -446,7 +465,7 @@ public class FactionStandingReport extends JDialog {
     }
 
     /**
-     * Creates a {@link CompoundBorder} consisting of a {@code RoundedLineBorder} colored according to the specified
+     * Creates a  Compound Border consisting of a {@code RoundedLineBorder} colored according to the specified
      * faction standing level, combined with internal padding.
      *
      * <p>The color selection is determined by the faction standing level:<br>
