@@ -630,8 +630,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         }
         panReports.add(btnUnitRating);
 
-        btnFactionStanding = new JButton(resourceMap.getString("btnFactionStanding.text"));
-        btnFactionStanding.setEnabled(getCampaign().getCampaignOptions().isTrackFactionStanding());
+        btnFactionStanding = new RoundedJButton(resourceMap.getString("btnFactionStanding.text"));
         btnFactionStanding.addActionListener(evt -> {
             FactionStandingReport factionStandingReport = new FactionStandingReport(getCampaignGui().getFrame(),
                   getCampaign().getFactionStandings(),
