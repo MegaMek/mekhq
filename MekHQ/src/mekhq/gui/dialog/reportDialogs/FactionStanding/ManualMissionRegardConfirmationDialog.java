@@ -54,8 +54,8 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import megamek.logging.MMLogger;
-import mekhq.gui.baseComponents.RoundedJButton;
-import mekhq.gui.utilities.RoundedLineBorder;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
 /**
  * Displays a modal dialog to confirm the results of a {@link SimulateMissionDialog} or {@link ManualMissionDialog}.

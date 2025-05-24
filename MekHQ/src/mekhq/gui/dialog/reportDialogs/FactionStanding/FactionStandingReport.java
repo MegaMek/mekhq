@@ -51,6 +51,23 @@ import mekhq.gui.dialog.GlossaryDialog;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.WrapLayout;
 
+import javax.swing.*;
+import javax.swing.border.Border;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
+import static java.lang.Math.round;
+import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
+import static mekhq.gui.dialog.reportDialogs.FactionStanding.SimulateMissionDialog.handleFactionRegardUpdates;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.ReportingUtilities.*;
+
 /**
  * Displays a dialog window that visualizes a report on faction standings for the current campaign year. Shows
  * individual faction panels with images, standing levels, regard sliders, and interactive details on standing effects.
@@ -448,7 +465,7 @@ public class FactionStandingReport extends JDialog {
     }
 
     /**
-     * Creates a {@link CompoundBorder} consisting of a {@code RoundedLineBorder} colored according to the specified
+     * Creates a  Compound Border consisting of a {@code RoundedLineBorder} colored according to the specified
      * faction standing level, combined with internal padding.
      *
      * <p>The color selection is determined by the faction standing level:<br>

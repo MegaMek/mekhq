@@ -70,9 +70,9 @@ import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
-import mekhq.gui.baseComponents.RoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.GlossaryDialog;
-import mekhq.gui.utilities.RoundedLineBorder;
 
 /**
  * Dialog window to simulate missions and adjust faction standings based on employer, enemy, and mission status
