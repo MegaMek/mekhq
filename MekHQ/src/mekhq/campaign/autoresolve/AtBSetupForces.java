@@ -547,32 +547,6 @@ public class AtBSetupForces extends SetupForces {
     }
 
     /**
-     * Get the planetary conditions for the game, not used at the moment in the auto
-     * resolve, but planed for the future
-     *
-     * @return The planetary conditions object
-     */
-    private PlanetaryConditions getPlanetaryConditions() {
-        PlanetaryConditions planetaryConditions = new PlanetaryConditions();
-        if (campaign.getCampaignOptions().isUseLightConditions()) {
-            planetaryConditions.setLight(scenario.getLight());
-        }
-        if (campaign.getCampaignOptions().isUseWeatherConditions()) {
-            planetaryConditions.setWeather(scenario.getWeather());
-            planetaryConditions.setWind(scenario.getWind());
-            planetaryConditions.setFog(scenario.getFog());
-            planetaryConditions.setEMI(scenario.getEMI());
-            planetaryConditions.setBlowingSand(scenario.getBlowingSand());
-            planetaryConditions.setTemperature(scenario.getModifiedTemperature());
-        }
-        if (campaign.getCampaignOptions().isUsePlanetaryConditions()) {
-            planetaryConditions.setAtmosphere(scenario.getAtmosphere());
-            planetaryConditions.setGravity(scenario.getGravity());
-        }
-        return planetaryConditions;
-    }
-
-    /**
      * Send the entities to the game object
      *
      * @param entities The entities to send

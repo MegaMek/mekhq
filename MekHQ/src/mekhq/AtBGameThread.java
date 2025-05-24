@@ -707,26 +707,6 @@ public class AtBGameThread extends GameThread {
         return botClient;
     }
 
-    private PlanetaryConditions getPlanetaryConditions() {
-        PlanetaryConditions planetaryConditions = new PlanetaryConditions();
-        if (campaign.getCampaignOptions().isUseLightConditions()) {
-            planetaryConditions.setLight(scenario.getLight());
-        }
-        if (campaign.getCampaignOptions().isUseWeatherConditions()) {
-            planetaryConditions.setWeather(scenario.getWeather());
-            planetaryConditions.setWind(scenario.getWind());
-            planetaryConditions.setFog(scenario.getFog());
-            planetaryConditions.setEMI(scenario.getEMI());
-            planetaryConditions.setBlowingSand(scenario.getBlowingSand());
-            planetaryConditions.setTemperature(scenario.getModifiedTemperature());
-        }
-        if (campaign.getCampaignOptions().isUsePlanetaryConditions()) {
-            planetaryConditions.setAtmosphere(scenario.getAtmosphere());
-            planetaryConditions.setGravity(scenario.getGravity());
-        }
-        return planetaryConditions;
-    }
-
     /**
      * wait for the server to add the bot client, then send starting position, camo, and entities
      *

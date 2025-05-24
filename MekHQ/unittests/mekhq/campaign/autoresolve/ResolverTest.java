@@ -60,6 +60,7 @@ import megamek.common.planetaryconditions.BlowingSand;
 import megamek.common.planetaryconditions.EMI;
 import megamek.common.planetaryconditions.Fog;
 import megamek.common.planetaryconditions.Light;
+import megamek.common.planetaryconditions.PlanetaryConditions;
 import megamek.common.planetaryconditions.Weather;
 import megamek.common.planetaryconditions.Wind;
 import mekhq.campaign.Campaign;
@@ -372,6 +373,7 @@ public class ResolverTest {
         var units = getUnits(campaign, teamArrangement);
         var scenario = createScenario(campaign);
         var entities = getEntities(teamArrangement);
+        var planetaryConditions = new PlanetaryConditions();
 
         when(botForce.getCamouflage()).thenReturn(Camouflage.of(PlayerColour.MAROON));
         when(botForce.getColour()).thenReturn(PlayerColour.MAROON);
@@ -379,7 +381,8 @@ public class ResolverTest {
         when(botForce.getTeam()).thenReturn(2);
         when(botForce.getFullEntityList(any())).thenReturn(entities);
 
-        var resolver = Resolver.simulationRun(new AtBSetupForces(campaign, units, scenario, new FlattenForces()), SimulationOptions.empty(), new Board(30, 30));
+        var resolver = Resolver.simulationRun(new AtBSetupForces(campaign, units, scenario, new FlattenForces()),
+              SimulationOptions.empty(), new Board(30, 30), planetaryConditions);
         autoResolveConcludedEvent.accept(resolver.resolveSimulation());
     }
 

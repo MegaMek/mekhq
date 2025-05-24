@@ -124,6 +124,7 @@ import megamek.common.options.IBasicOption;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
+import megamek.common.planetaryconditions.PlanetaryConditions;
 import megamek.common.util.BuildingBlock;
 import megamek.common.ITechnology.AvailabilityValue;
 import megamek.common.ITechnology.TechRating;
@@ -7738,6 +7739,33 @@ public class Campaign implements ITechManager {
 
     public TargetRoll getTargetForAcquisition(final IAcquisitionWork acquisition, final @Nullable Person person) {
         return getTargetForAcquisition(acquisition, person, false);
+    }
+
+    public PlanetaryConditions getCurrentPlanetaryConditions(Scenario scenario) {
+            PlanetaryConditions planetaryConditions = new PlanetaryConditions();
+            if (scenario instanceof AtBScenario atBScenario) {
+                if (getCampaignOptions().isUseLightConditions()) {
+                    planetaryConditions.setLight(atBScenario.getLight());
+                }
+                if (getCampaignOptions().isUseWeatherConditions()) {
+                    planetaryConditions.setWeather(atBScenario.getWeather());
+                    planetaryConditions.setWind(atBScenario.getWind());
+                    planetaryConditions.setFog(atBScenario.getFog());
+                    planetaryConditions.setEMI(atBScenario.getEMI());
+                    planetaryConditions.setBlowingSand(atBScenario.getBlowingSand());
+                    planetaryConditions.setTemperature(atBScenario.getModifiedTemperature());
+
+                }
+                if (getCampaignOptions().isUsePlanetaryConditions()) {
+                    planetaryConditions.setAtmosphere(atBScenario.getAtmosphere());
+                    planetaryConditions.setGravity(atBScenario.getGravity());
+                }
+            } else {
+                planetaryConditions = scenario.createPlanetaryConditions();
+            }
+
+            return planetaryConditions;
+
     }
 
     /**

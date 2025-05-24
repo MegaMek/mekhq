@@ -81,6 +81,7 @@ import megamek.common.autoresolve.event.AutoResolveConcludedEvent;
 import megamek.common.event.*;
 import megamek.common.internationalization.I18n;
 import megamek.common.net.marshalling.SanityInputFilter;
+import megamek.common.planetaryconditions.PlanetaryConditions;
 import megamek.logging.MMLogger;
 import megamek.server.Server;
 import megamek.server.totalwarfare.TWGameManager;
@@ -756,32 +757,37 @@ public class MekHQ implements GameListener {
      * @param units The list of player units involved in the scenario
      */
     public void startAutoResolve(Scenario scenario, List<Unit> units) {
-
+        if (!(scenario instanceof AtBScenario atBScenario)) {
+            return;
+        }
         this.autosaveService.requestBeforeScenarioAutosave(getCampaign());
 
         Board board = ScenarioUtils.getBoardFor(scenario);
+
+        PlanetaryConditions planetaryConditions = getCampaign().getCurrentPlanetaryConditions(scenario);
         if (getCampaign().getCampaignOptions().isAutoResolveVictoryChanceEnabled()) {
 
             var proceed = AutoResolveChanceDialog.showDialog(campaignGUI.getFrame(),
                   getCampaign().getCampaignOptions().getAutoResolveNumberOfScenarios(),
                   Runtime.getRuntime().availableProcessors(),
                   1,
-                  new AtBSetupForces(getCampaign(), units, scenario, new SingletonForces()),
-                  board) == JOptionPane.YES_OPTION;
+                  new AtBSetupForces(getCampaign(), units, atBScenario, new SingletonForces()),
+                  board,
+                  planetaryConditions) == JOptionPane.YES_OPTION;
             if (!proceed) {
                 return;
             }
         }
 
         var event = AutoResolveProgressDialog.showDialog(campaignGUI.getFrame(),
-              new AtBSetupForces(getCampaign(), units, scenario, new SingletonForces()),
-              board);
+              new AtBSetupForces(getCampaign(), units, atBScenario, new SingletonForces()),
+              board, planetaryConditions);
 
         var autoResolveBattleReport = new AutoResolveSimulationLogDialog(campaignGUI.getFrame(), event.getLogFile());
         autoResolveBattleReport.setModal(true);
         autoResolveBattleReport.setVisible(true);
 
-        autoResolveConcluded(event, scenario);
+        autoResolveConcluded(event, atBScenario);
     }
 
     /**

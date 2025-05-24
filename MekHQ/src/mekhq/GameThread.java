@@ -53,6 +53,7 @@ import megamek.client.ui.swing.util.MegaMekController;
 import megamek.common.Entity;
 import megamek.common.MapSettings;
 import megamek.common.WeaponOrderHandler;
+import megamek.common.planetaryconditions.PlanetaryConditions;
 import megamek.common.preference.PreferenceManager;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -256,7 +257,7 @@ class GameThread extends Thread implements CloseClientListener {
                 client.sendMapSettings(mapSettings);
                 Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
 
-                client.sendPlanetaryConditions(scenario.createPlanetaryConditions());
+                client.sendPlanetaryConditions(getPlanetaryConditions());
                 Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
 
                 // set player deployment
@@ -401,6 +402,10 @@ class GameThread extends Thread implements CloseClientListener {
         }
 
         return entities;
+    }
+
+    protected PlanetaryConditions getPlanetaryConditions() {
+        return campaign.getCurrentPlanetaryConditions(scenario);
     }
 
     /*
