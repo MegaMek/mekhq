@@ -9950,8 +9950,6 @@ public class Campaign implements ITechManager {
      *
      * <p>The returned result is always the system's primary planet.</p>
      *
-     * @param campaign the campaign context for which to determine the starting planet
-     *
      * @return the {@link Planet} object representing the new campaign's starting planet
      *
      * @author Illiani
