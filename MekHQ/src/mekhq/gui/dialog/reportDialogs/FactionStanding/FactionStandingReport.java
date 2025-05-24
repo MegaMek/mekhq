@@ -38,6 +38,7 @@ import megamek.client.ui.swing.util.UIUtil;
 import megamek.logging.MMLogger;
 import megamek.utilities.ImageUtilities;
 import mekhq.MekHQ;
+import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.FactionHints;
@@ -48,6 +49,8 @@ import mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.GlossaryDialog;
+import mekhq.gui.dialog.reportDialogs.FactionStanding.gmToolsDialog.GMTools;
+import mekhq.gui.dialog.reportDialogs.FactionStanding.manualMissionDialogs.SimulateMissionDialog;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.WrapLayout;
 
@@ -57,14 +60,12 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
 
 import static java.lang.Math.round;
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
-import static mekhq.gui.dialog.reportDialogs.FactionStanding.SimulateMissionDialog.handleFactionRegardUpdates;
+import static mekhq.gui.dialog.reportDialogs.FactionStanding.manualMissionDialogs.SimulateMissionDialog.handleFactionRegardUpdates;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.*;
 
@@ -108,6 +109,7 @@ public class FactionStandingReport extends JDialog {
     private final boolean isGM;
     private final Faction campaignFaction;
     private final ImageIcon campaignIcon;
+    private final List<Mission> missions;
 
     private final List<String> innerSphereFactions = new ArrayList<>();
     private final List<String> clanFactions = new ArrayList<>();
@@ -131,7 +133,8 @@ public class FactionStandingReport extends JDialog {
      * @since 0.50.07
      */
     public FactionStandingReport(final JFrame frame, final FactionStandings factionStandings, final LocalDate today,
-                                 final boolean isGM, final Faction campaignFaction, final ImageIcon campaignIcon) {
+                                 final boolean isGM, final Faction campaignFaction, final ImageIcon campaignIcon,
+                                 final Collection<Mission> missions) {
         this.frame = frame;
         this.today = today;
         this.gameYear = today.getYear();
@@ -140,6 +143,7 @@ public class FactionStandingReport extends JDialog {
         this.campaignIcon = campaignIcon;
         this.factionStandings = factionStandings;
         factions = Factions.getInstance();
+        this.missions = new ArrayList<>(missions);
 
         sortFactions();
         createReportPanel();
@@ -368,7 +372,10 @@ public class FactionStandingReport extends JDialog {
         btnGmTools.setFocusable(false);
         btnGmTools.setEnabled(isGM);
         btnGmTools.addActionListener(e -> {
-            // TODO GM Tools Dialog
+            setVisible(false);
+            GMTools gmTools = new GMTools(this, campaignIcon, campaignFaction, today, factionStandings, missions);
+            reports.addAll(gmTools.getReports());
+            setVisible(true);
         });
         pnlButtons.add(btnGmTools);
 
@@ -378,7 +385,11 @@ public class FactionStandingReport extends JDialog {
               "factionStandingReport.button.contract"));
         btnSimulateContract.setName("btnSimulateContract");
         btnSimulateContract.setFocusable(false);
-        btnSimulateContract.addActionListener(e -> triggerMissionSimulationDialog());
+        btnSimulateContract.addActionListener(e -> {
+            setVisible(false);
+            triggerMissionSimulationDialog();
+            setVisible(true);
+        });
         pnlButtons.add(btnSimulateContract);
 
         return pnlButtons;
@@ -465,7 +476,7 @@ public class FactionStandingReport extends JDialog {
     }
 
     /**
-     * Creates a  Compound Border consisting of a {@code RoundedLineBorder} colored according to the specified
+     * Creates a Compound Border consisting of a {@code RoundedLineBorder} colored according to the specified
      * faction standing level, combined with internal padding.
      *
      * <p>The color selection is determined by the faction standing level:<br>

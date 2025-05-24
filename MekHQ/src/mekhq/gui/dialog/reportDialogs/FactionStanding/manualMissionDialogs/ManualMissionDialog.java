@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.dialog.reportDialogs.FactionStanding;
+package mekhq.gui.dialog.reportDialogs.FactionStanding.manualMissionDialogs;
 
 import java.time.LocalDate;
 import javax.swing.ImageIcon;
