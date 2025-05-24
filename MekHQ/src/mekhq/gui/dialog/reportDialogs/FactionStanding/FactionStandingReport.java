@@ -472,7 +472,7 @@ public class FactionStandingReport extends JDialog {
      * <ul>
      *     <li>≤ 1: Negative color</li>
      *     <li>≤ 3: Warning color</li>
-     *     <li>≥ 7: Elite color</li>
+     *     <li>≥ 7: Amazing color</li>
      *     <li>≥ 5: Positive color</li>
      * </ul>
      *
@@ -486,18 +486,7 @@ public class FactionStandingReport extends JDialog {
      * @since 0.50.07
      */
     public static Border createStandingColoredRoundedTitledBorder(final int factionStandingLevel) {
-        Color color = UIUtil.uiIndependentGray();
-        if (factionStandingLevel <= 1) {
-            color = MekHQ.getMHQOptions().getFontColorNegative();
-        } else if (factionStandingLevel <= 3) {
-            color = MekHQ.getMHQOptions().getFontColorWarning();
-        } else if (factionStandingLevel >= 7) {
-            color = MekHQ.getMHQOptions().getFontColorSkillElite();
-        } else if (factionStandingLevel >= 5) {
-            color = MekHQ.getMHQOptions().getFontColorPositive();
-        }
-
-        Border rounded = new RoundedLineBorder(color, 2, 16);
+        Border rounded = getRoundedBorder(factionStandingLevel);
         Border padding = BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING);
         Border compound = BorderFactory.createCompoundBorder(rounded, padding);
 
@@ -508,6 +497,23 @@ public class FactionStandingReport extends JDialog {
         }
 
         return BorderFactory.createTitledBorder(compound, title.toString());
+    }
+
+    private static Border getRoundedBorder(int factionStandingLevel) {
+        Color color;
+        if (factionStandingLevel >= 7) {
+            color = MekHQ.getMHQOptions().getFontColorAmazing();
+        } else if (factionStandingLevel >= 5) {
+            color = MekHQ.getMHQOptions().getFontColorPositive();
+        } else if (factionStandingLevel == 4) {
+            color = UIUtil.uiIndependentGray();
+        } else if (factionStandingLevel > 1) {
+            color = MekHQ.getMHQOptions().getFontColorWarning();
+        } else {
+            color = MekHQ.getMHQOptions().getFontColorNegative();
+        }
+
+        return new RoundedLineBorder(color, 2, 16);
     }
 
     /**
@@ -539,7 +545,7 @@ public class FactionStandingReport extends JDialog {
 
         if (isSame) {
             addendum = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.addendum.parent");
-            color = MekHQ.getMHQOptions().getFontColorSkillEliteHexColor();
+            color = getAmazingColor();
         } else if (isAtWar) {
             addendum = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.addendum.atWar");
             color = getNegativeColor();
