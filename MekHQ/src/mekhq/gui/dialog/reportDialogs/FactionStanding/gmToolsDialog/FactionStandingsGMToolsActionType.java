@@ -54,7 +54,7 @@ public enum FactionStandingsGMToolsActionType {
     SET_SPECIFIC_REGARD,
     /**
      * Updates faction standings based on historical contract data (i.e., completed
-     * {@link mekhq.campaign.mission.Mission objects.
+     * {@link mekhq.campaign.mission.Mission} objects).
      */
     UPDATE_HISTORIC_CONTRACTS
 }
