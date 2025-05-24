@@ -323,7 +323,7 @@ public enum Phenotype {
     }
 
     // region File I/O
-    
+
     /**
      * Converts a string representation to a corresponding {@link Phenotype} value.
      *
@@ -377,13 +377,6 @@ public enum Phenotype {
                 }
             }
         } catch (Exception ignored) {
-        }
-
-        // <50.1 compatibility
-        if (text.equalsIgnoreCase("MECHWARRIOR")) {
-            return MEKWARRIOR;
-        } else if (text.equalsIgnoreCase("PROTOMECH")) {
-            return PROTOMEK;
         }
 
         // Parse from ordinal

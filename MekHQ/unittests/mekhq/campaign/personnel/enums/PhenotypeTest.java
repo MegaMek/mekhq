@@ -48,10 +48,6 @@ class PhenotypeTest {
         assertEquals(Phenotype.AEROSPACE, Phenotype.fromString("aerospace"));
         assertEquals(Phenotype.GENERAL, Phenotype.fromString("GENERAL"));
 
-        // Deprecated names
-        assertEquals(Phenotype.MEKWARRIOR, Phenotype.fromString("MechWarrior"));
-        assertEquals(Phenotype.PROTOMEK, Phenotype.fromString("Protomech"));
-
         // Index input
         assertEquals(Phenotype.VEHICLE, Phenotype.fromString("3"));
 
