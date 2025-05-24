@@ -75,6 +75,8 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
 import mekhq.gui.adapter.ServicedUnitsTableMouseAdapter;
 import mekhq.gui.adapter.TaskTableMouseAdapter;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.AcquisitionsDialog;
 import mekhq.gui.dialog.MRMSDialog;
 import mekhq.gui.enums.MHQTabType;
@@ -103,7 +105,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     private JTable servicedUnitTable;
     private JTable taskTable;
     private JTable techTable;
-    private JButton btnDoTask;
+    private RoundedJButton btnDoTask;
     private JToggleButton btnShowAllTechs;
     private JScrollPane scrTextTarget;
     private JLabel lblTargetNum;
@@ -112,7 +114,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     private JTextPane txtResult;
     private JLabel astechPoolLabel;
     private JComboBox<String> choiceLocation;
-    private JButton btnAcquisitions;
+    private RoundedJButton btnAcquisitions;
     private JScrollPane scrollServicedUnitView;
 
     private UnitTableModel servicedUnitModel;
@@ -156,14 +158,14 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         // Add panel for action buttons
         JPanel actionButtons = new JPanel(new GridBagLayout());
 
-        JButton btnMRMSDialog = new JButton("Mass Repair/Salvage");
+        RoundedJButton btnMRMSDialog = new RoundedJButton("Mass Repair/Salvage");
         btnMRMSDialog.setToolTipText("Start Mass Repair/Salvage from dialog");
         btnMRMSDialog.setName("btnMRMSDialog");
         btnMRMSDialog.addActionListener(evt -> {
             new MRMSDialog(getFrame(), true, getCampaignGui(), null, MRMSMode.UNITS).setVisible(true);
         });
 
-        JButton btnMRMSInstantAll = new JButton("Instant Mass Repair/Salvage All");
+        RoundedJButton btnMRMSInstantAll = new RoundedJButton("Instant Mass Repair/Salvage All");
         btnMRMSInstantAll.setToolTipText(
               "Perform Mass Repair/Salvage immediately on all units using active configuration");
         btnMRMSInstantAll.setName("btnMRMSInstantAll");
@@ -175,7 +177,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                   JOptionPane.INFORMATION_MESSAGE);
         });
 
-        btnAcquisitions = new JButton("Parts");
+        btnAcquisitions = new RoundedJButton("Parts");
         btnAcquisitions.setToolTipText("Show missing/in transit/on order parts");
         btnAcquisitions.setName("btnAcquisitions");
         btnAcquisitions.addActionListener(evt -> {
@@ -260,6 +262,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         servicedUnitTable.getSelectionModel().addListSelectionListener(this::servicedUnitTableValueChanged);
         ServicedUnitsTableMouseAdapter.connect(getCampaignGui(), servicedUnitTable, servicedUnitModel);
         JScrollPane scrollServicedUnitTable = new JScrollPaneWithSpeed(servicedUnitTable);
+        scrollServicedUnitTable.setBorder(RoundedLineBorder.createRoundedLineBorder());
         scrollServicedUnitTable.setMinimumSize(new Dimension(350, 200));
         scrollServicedUnitTable.setPreferredSize(new Dimension(350, 200));
 
@@ -267,6 +270,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         txtServicedUnitView.setEditable(false);
         txtServicedUnitView.setContentType("text/html");
         scrollServicedUnitView = new JScrollPaneWithSpeed(txtServicedUnitView);
+        scrollServicedUnitView.setBorder(RoundedLineBorder.createRoundedLineBorder());
         scrollServicedUnitView.setMinimumSize(new Dimension(350, 400));
         scrollServicedUnitView.setPreferredSize(new Dimension(350, 400));
 
@@ -282,6 +286,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         panServicedUnits.add(splitServicedUnits, gridBagConstraints);
 
         JPanel panTasks = new JPanel(new GridBagLayout());
+        panTasks.setFocusable(false);
 
         techsModel = new TechTableModel(getCampaignGui(), this);
         techTable = new JTable(techsModel);
@@ -295,6 +300,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
         techSorter.setSortKeys(sortKeys);
         JScrollPane scrollTechTable = new JScrollPaneWithSpeed(techTable);
+        scrollTechTable.setBorder(RoundedLineBorder.createRoundedLineBorder());
         scrollTechTable.setMinimumSize(new Dimension(200, 200));
         scrollTechTable.setPreferredSize(new Dimension(300, 300));
 
@@ -303,7 +309,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         panDoTask.setName("panelDoTask");
         panDoTask.setPreferredSize(UIUtil.scaleForGUI(100, 100));
 
-        btnDoTask = new JButton(resourceMap.getString("btnDoTask.text"));
+        btnDoTask = new RoundedJButton(resourceMap.getString("btnDoTask.text"));
         btnDoTask.setToolTipText(resourceMap.getString("btnDoTask.toolTipText"));
         btnDoTask.setEnabled(false);
         btnDoTask.addActionListener(ev -> doTask());
@@ -360,6 +366,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         textTarget.setBorder(null);
         textTarget.setName("textTarget");
         scrTextTarget = new JScrollPaneWithSpeed(textTarget);
+        scrTextTarget.setBorder(RoundedLineBorder.createRoundedLineBorder());
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -388,7 +395,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         txtResult.setBorder(new EmptyBorder(2, 5, 2, 2));
         JPanel panResult = new JPanel(new BorderLayout());
         panResult.add(txtResult, BorderLayout.CENTER);
-        panResult.setBorder(BorderFactory.createTitledBorder("Last repair check"));
+        panResult.setBorder(RoundedLineBorder.createRoundedLineBorder("Last Repair Check"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
