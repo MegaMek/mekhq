@@ -45,8 +45,16 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.time.LocalDate;
-import javax.swing.*;
+import javax.swing.Box;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.dialogs.CamoChooserDialog;
@@ -63,6 +71,8 @@ import mekhq.campaign.universe.Factions;
 import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
@@ -72,7 +82,6 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsTextField;
 import mekhq.gui.dialog.DateChooser;
 import mekhq.gui.dialog.iconDialogs.UnitIconDialog;
 import mekhq.gui.displayWrappers.FactionDisplay;
-import mekhq.gui.utilities.RoundedLineBorder;
 
 /**
  * Represents a tab within the campaign options UI that allows the user to configure general campaign settings. This
@@ -94,17 +103,17 @@ public class GeneralTab {
 
     private JLabel lblName;
     private JTextField txtName;
-    private JButton btnNameGenerator;
+    private RoundedJButton btnNameGenerator;
     private JLabel lblFaction;
     private MMComboBox<FactionDisplay> comboFaction;
     private JLabel lblDate;
-    private JButton btnDate;
+    private RoundedJButton btnDate;
     private LocalDate date;
     private JLabel lblCamo;
-    private JButton btnCamo;
+    private RoundedJButton btnCamo;
     private Camouflage camouflage;
     private JLabel lblIcon;
-    private JButton btnIcon;
+    private RoundedJButton btnIcon;
     private StandardForceIcon unitIcon;
     private JLabel lblFurtherReading;
 
@@ -323,31 +332,29 @@ public class GeneralTab {
         lblName = new JLabel();
         txtName = new JTextField();
 
-        btnNameGenerator = new JButton();
+        btnNameGenerator = new RoundedJButton();
 
         lblFaction = new JLabel();
         comboFaction = new MMComboBox<>("comboFaction", buildFactionDisplayOptions());
 
         lblDate = new JLabel();
-        btnDate = new JButton();
+        btnDate = new RoundedJButton();
 
         lblCamo = new JLabel();
-        btnCamo = new JButton() {
+        btnCamo = new RoundedJButton() {
             @Override
             public Dimension getPreferredSize() {
                 return UIUtil.scaleForGUI(100, 100);
             }
         };
-        btnCamo.setBorder(RoundedLineBorder.createRoundedLineBorder());
 
         lblIcon = new JLabel();
-        btnIcon = new JButton() {
+        btnIcon = new RoundedJButton() {
             @Override
             public Dimension getPreferredSize() {
                 return UIUtil.scaleForGUI(100, 100);
             }
         };
-        btnIcon.setBorder(RoundedLineBorder.createRoundedLineBorder());
     }
 
     /**
@@ -392,7 +399,6 @@ public class GeneralTab {
 
         this.date = date;
         btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
-        btnDate.setBorder(RoundedLineBorder.createRoundedLineBorder());
         btnDate.revalidate();
         btnDate.repaint();
 

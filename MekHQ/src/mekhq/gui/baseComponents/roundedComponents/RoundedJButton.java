@@ -30,14 +30,16 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.baseComponents;
+package mekhq.gui.baseComponents.roundedComponents;
 
-import mekhq.MHQConstants;
-import mekhq.gui.utilities.RoundedLineBorder;
-
-import javax.swing.*;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.border.Border;
-import java.awt.*;
+
+import megamek.client.ui.swing.util.UIUtil;
 
 /**
  * {@link RoundedJButton} is a custom {@link JButton} implementation that renders a button with rounded corners and a
@@ -79,9 +81,9 @@ public class RoundedJButton extends JButton {
         setFocusPainted(false);
         RoundedLineBorder roundedBorder = new RoundedButtonBorder();
         Border paddingBorder = BorderFactory.createEmptyBorder(VERTICAL_PADDING,
-                HORIZONTAL_PADDING,
-                VERTICAL_PADDING,
-                HORIZONTAL_PADDING);
+              HORIZONTAL_PADDING,
+              VERTICAL_PADDING,
+              HORIZONTAL_PADDING);
         setBorder(BorderFactory.createCompoundBorder(roundedBorder, paddingBorder));
     }
 
@@ -92,6 +94,7 @@ public class RoundedJButton extends JButton {
      * border and padding.</p>
      *
      * @param text the text label for the button
+     *
      * @author Illiani
      * @since 0.50.07
      */
@@ -101,9 +104,9 @@ public class RoundedJButton extends JButton {
         setFocusPainted(false);
         RoundedLineBorder roundedBorder = new RoundedButtonBorder();
         Border paddingBorder = BorderFactory.createEmptyBorder(VERTICAL_PADDING,
-                HORIZONTAL_PADDING,
-                VERTICAL_PADDING,
-                HORIZONTAL_PADDING);
+              HORIZONTAL_PADDING,
+              VERTICAL_PADDING,
+              HORIZONTAL_PADDING);
         setBorder(BorderFactory.createCompoundBorder(roundedBorder, paddingBorder));
     }
 
@@ -114,6 +117,7 @@ public class RoundedJButton extends JButton {
      * <p>Uses antialiasing for smooth rendering.</p>
      *
      * @param graphics the {@link Graphics} context in which to paint
+     *
      * @author Illiani
      * @since 0.50.07
      */
@@ -158,7 +162,7 @@ public class RoundedJButton extends JButton {
          * @since 0.50.07
          */
         public RoundedButtonBorder() {
-            super(MHQConstants.BORDER_COLOR_GRAY, THICKNESS, ARC);
+            super(UIUtil.uiIndependentGray(), THICKNESS, ARC);
         }
     }
 }
