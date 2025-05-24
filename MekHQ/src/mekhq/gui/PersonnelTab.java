@@ -65,6 +65,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.event.*;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.adapter.PersonnelTableMouseAdapter;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.enums.PersonnelTabView;
@@ -227,13 +228,14 @@ public final class PersonnelTab extends CampaignGuiTab {
         personnelTable.getSelectionModel().addListSelectionListener(ev -> refreshPersonnelView());
 
         scrollPersonnelView = new JScrollPaneWithSpeed();
+        scrollPersonnelView.setBorder(RoundedLineBorder.createRoundedLineBorder());
         scrollPersonnelView.setMinimumSize(new Dimension((int) round(PERSONNEL_VIEW_WIDTH * 0.9), 600));
         scrollPersonnelView.setPreferredSize(new Dimension(PERSONNEL_VIEW_WIDTH, 600));
         scrollPersonnelView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPersonnelView.setViewportView(null);
 
         JScrollPane scrollPersonnelTable = new JScrollPaneWithSpeed(personnelTable);
-
+        scrollPersonnelTable.setBorder(RoundedLineBorder.createRoundedLineBorder());
 
         JPanel tableAndInfoPanel = new JPanel(new BorderLayout());
         tableAndInfoPanel.add(scrollPersonnelTable, BorderLayout.CENTER);
