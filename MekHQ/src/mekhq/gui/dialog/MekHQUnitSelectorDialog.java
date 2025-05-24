@@ -80,13 +80,8 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
 
     /**
      * This constructor creates the unit selector dialog for MekHQ. It loads the unit selector dialog in single-select
-     * mode. These selectors are used for:
-     *
-     * <ul>
-     *     <li>Adding units to the campaign from the Purchase Unit dialog</li>
-     *     <li>Adding units to the campaign from the 'Find Unit' dialog</li>
-     *     <li>Adding units to loot post-battle</li>
-     * </ul>
+     * mode. These selectors are used for: Adding units to the campaign from the Purchase Unit dialog. Adding units to
+     * the campaign from the 'Find Unit' dialog. Adding units to post-battle loot.
      *
      * @param frame             The frame to load the unit dialog into.
      * @param unitLoadingDialog Display this frame instead while the unit dialog is loading (in case load is slow)
