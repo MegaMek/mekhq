@@ -49,7 +49,15 @@ import java.io.File;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
-import javax.swing.*;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
@@ -101,6 +109,8 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.adapter.ScenarioTableMouseAdapter;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.CompleteMissionDialog;
 import mekhq.gui.dialog.CustomizeAtBContractDialog;
 import mekhq.gui.dialog.CustomizeMissionDialog;
@@ -123,7 +133,7 @@ import mekhq.gui.view.ScenarioViewPanel;
  * Displays Mission/Contract and Scenario details.
  */
 public final class BriefingTab extends CampaignGuiTab {
-    private static ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
+    private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
           MekHQ.getMHQOptions().getLocale());
 
     private LanceAssignmentView panLanceAssignment;
@@ -132,19 +142,19 @@ public final class BriefingTab extends CampaignGuiTab {
     private MMComboBox<Mission> comboMission;
     private JScrollPane scrollMissionView;
     private JScrollPane scrollScenarioView;
-    private JButton btnAddScenario;
-    private JButton btnEditMission;
-    private JButton btnCompleteMission;
-    private JButton btnDeleteMission;
-    private JButton btnGMGenerateScenarios;
-    private JButton btnStartGame;
-    private JButton btnJoinGame;
-    private JButton btnLoadGame;
-    private JButton btnPrintRS;
-    private JButton btnGetMul;
-    private JButton btnClearAssignedUnits;
-    private JButton btnResolveScenario;
-    private JButton btnAutoResolveScenario;
+    private RoundedJButton btnAddScenario;
+    private RoundedJButton btnEditMission;
+    private RoundedJButton btnCompleteMission;
+    private RoundedJButton btnDeleteMission;
+    private RoundedJButton btnGMGenerateScenarios;
+    private RoundedJButton btnStartGame;
+    private RoundedJButton btnJoinGame;
+    private RoundedJButton btnLoadGame;
+    private RoundedJButton btnPrintRS;
+    private RoundedJButton btnGetMul;
+    private RoundedJButton btnClearAssignedUnits;
+    private RoundedJButton btnResolveScenario;
+    private RoundedJButton btnAutoResolveScenario;
 
     private ScenarioTableModel scenarioModel;
 
@@ -204,39 +214,40 @@ public final class BriefingTab extends CampaignGuiTab {
         gridBagConstraints.weighty = 0.0;
         panMission.add(panMissionButtons, gridBagConstraints);
 
-        JButton btnAddMission = new JButton(resourceMap.getString("btnAddMission.text"));
+        RoundedJButton btnAddMission = new RoundedJButton(resourceMap.getString("btnAddMission.text"));
         btnAddMission.setToolTipText(resourceMap.getString("btnAddMission.toolTipText"));
         btnAddMission.addActionListener(ev -> addMission());
         panMissionButtons.add(btnAddMission);
 
-        btnAddScenario = new JButton(resourceMap.getString("btnAddScenario.text"));
+        btnAddScenario = new RoundedJButton(resourceMap.getString("btnAddScenario.text"));
         btnAddScenario.setToolTipText(resourceMap.getString("btnAddScenario.toolTipText"));
         btnAddScenario.addActionListener(ev -> addScenario());
         panMissionButtons.add(btnAddScenario);
 
-        btnEditMission = new JButton(resourceMap.getString("btnEditMission.text"));
+        btnEditMission = new RoundedJButton(resourceMap.getString("btnEditMission.text"));
         btnEditMission.setToolTipText(resourceMap.getString("btnEditMission.toolTipText"));
         btnEditMission.addActionListener(ev -> editMission());
         panMissionButtons.add(btnEditMission);
 
-        btnCompleteMission = new JButton(resourceMap.getString("btnCompleteMission.text"));
+        btnCompleteMission = new RoundedJButton(resourceMap.getString("btnCompleteMission.text"));
         btnCompleteMission.setToolTipText(resourceMap.getString("btnCompleteMission.toolTipText"));
         btnCompleteMission.addActionListener(ev -> completeMission());
         panMissionButtons.add(btnCompleteMission);
 
-        btnDeleteMission = new JButton(resourceMap.getString("btnDeleteMission.text"));
+        btnDeleteMission = new RoundedJButton(resourceMap.getString("btnDeleteMission.text"));
         btnDeleteMission.setToolTipText(resourceMap.getString("btnDeleteMission.toolTipText"));
         btnDeleteMission.setName("btnDeleteMission");
         btnDeleteMission.addActionListener(ev -> deleteMission());
         panMissionButtons.add(btnDeleteMission);
 
-        btnGMGenerateScenarios = new JButton(resourceMap.getString("btnGMGenerateScenarios.text"));
+        btnGMGenerateScenarios = new RoundedJButton(resourceMap.getString("btnGMGenerateScenarios.text"));
         btnGMGenerateScenarios.setToolTipText(resourceMap.getString("btnGMGenerateScenarios.toolTipText"));
         btnGMGenerateScenarios.setName("btnGMGenerateScenarios");
         btnGMGenerateScenarios.addActionListener(ev -> gmGenerateScenarios());
         panMissionButtons.add(btnGMGenerateScenarios);
 
         scrollMissionView = new JScrollPaneWithSpeed();
+        scrollMissionView.setBorder(RoundedLineBorder.createRoundedLineBorder());
         scrollMissionView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollMissionView.setViewportView(null);
         gridBagConstraints = new GridBagConstraints();
@@ -278,56 +289,57 @@ public final class BriefingTab extends CampaignGuiTab {
         gridBagConstraints.weighty = 0.0;
         panScenario.add(panScenarioButtons, gridBagConstraints);
 
-        btnStartGame = new JButton(resourceMap.getString("btnStartGame.text"));
+        btnStartGame = new RoundedJButton(resourceMap.getString("btnStartGame.text"));
         btnStartGame.setToolTipText(resourceMap.getString("btnStartGame.toolTipText"));
         btnStartGame.addActionListener(ev -> startScenario());
         btnStartGame.setEnabled(false);
         panScenarioButtons.add(btnStartGame);
 
-        btnJoinGame = new JButton(resourceMap.getString("btnJoinGame.text"));
+        btnJoinGame = new RoundedJButton(resourceMap.getString("btnJoinGame.text"));
         btnJoinGame.setToolTipText(resourceMap.getString("btnJoinGame.toolTipText"));
         btnJoinGame.addActionListener(ev -> joinScenario());
         btnJoinGame.setEnabled(false);
         panScenarioButtons.add(btnJoinGame);
 
-        btnLoadGame = new JButton(resourceMap.getString("btnLoadGame.text"));
+        btnLoadGame = new RoundedJButton(resourceMap.getString("btnLoadGame.text"));
         btnLoadGame.setToolTipText(resourceMap.getString("btnLoadGame.toolTipText"));
         btnLoadGame.addActionListener(ev -> loadScenario());
         btnLoadGame.setEnabled(false);
         panScenarioButtons.add(btnLoadGame);
 
-        btnPrintRS = new JButton(resourceMap.getString("btnPrintRS.text"));
+        btnPrintRS = new RoundedJButton(resourceMap.getString("btnPrintRS.text"));
         btnPrintRS.setToolTipText(resourceMap.getString("btnPrintRS.toolTipText"));
         btnPrintRS.addActionListener(ev -> printRecordSheets());
         btnPrintRS.setEnabled(false);
         panScenarioButtons.add(btnPrintRS);
 
-        btnGetMul = new JButton(resourceMap.getString("btnGetMul.text"));
+        btnGetMul = new RoundedJButton(resourceMap.getString("btnGetMul.text"));
         btnGetMul.setToolTipText(resourceMap.getString("btnGetMul.toolTipText"));
         btnGetMul.setName("btnGetMul");
         btnGetMul.addActionListener(ev -> deployListFile());
         btnGetMul.setEnabled(false);
         panScenarioButtons.add(btnGetMul);
 
-        btnResolveScenario = new JButton(resourceMap.getString("btnResolveScenario.text"));
+        btnResolveScenario = new RoundedJButton(resourceMap.getString("btnResolveScenario.text"));
         btnResolveScenario.setToolTipText(resourceMap.getString("btnResolveScenario.toolTipText"));
         btnResolveScenario.addActionListener(ev -> resolveScenario());
         btnResolveScenario.setEnabled(false);
         panScenarioButtons.add(btnResolveScenario);
 
-        btnAutoResolveScenario = new JButton(resourceMap.getString("btnAutoResolveScenario.text"));
+        btnAutoResolveScenario = new RoundedJButton(resourceMap.getString("btnAutoResolveScenario.text"));
         btnAutoResolveScenario.setToolTipText(resourceMap.getString("btnAutoResolveScenario.toolTipText"));
         btnAutoResolveScenario.addActionListener(ev -> autoResolveScenario());
         btnAutoResolveScenario.setEnabled(false);
         panScenarioButtons.add(btnAutoResolveScenario);
 
-        btnClearAssignedUnits = new JButton(resourceMap.getString("btnClearAssignedUnits.text"));
+        btnClearAssignedUnits = new RoundedJButton(resourceMap.getString("btnClearAssignedUnits.text"));
         btnClearAssignedUnits.setToolTipText(resourceMap.getString("btnClearAssignedUnits.toolTipText"));
         btnClearAssignedUnits.addActionListener(ev -> clearAssignedUnits());
         btnClearAssignedUnits.setEnabled(false);
         panScenarioButtons.add(btnClearAssignedUnits);
 
         scrollScenarioView = new JScrollPaneWithSpeed();
+        scrollScenarioView.setBorder(RoundedLineBorder.createRoundedLineBorder());
         scrollScenarioView.setViewportView(null);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -341,6 +353,7 @@ public final class BriefingTab extends CampaignGuiTab {
         /* ATB */
         panLanceAssignment = new LanceAssignmentView(getCampaign());
         JScrollPane paneLanceDeployment = new JScrollPaneWithSpeed(panLanceAssignment);
+        paneLanceDeployment.setBorder(null);
         paneLanceDeployment.setMinimumSize(new Dimension(200, 300));
         paneLanceDeployment.setPreferredSize(new Dimension(200, 300));
         paneLanceDeployment.setVisible(getCampaign().getCampaignOptions().isUseAtB());

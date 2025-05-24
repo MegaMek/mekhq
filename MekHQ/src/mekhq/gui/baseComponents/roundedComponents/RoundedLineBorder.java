@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.utilities;
+package mekhq.gui.baseComponents.roundedComponents;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -44,7 +44,7 @@ import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.TitledBorder;
 
-import mekhq.MHQConstants;
+import megamek.client.ui.swing.util.UIUtil;
 
 /**
  * {@code RoundedLineBorder} is a custom border implementation for Swing components that draws a rectangular border with
@@ -57,7 +57,7 @@ import mekhq.MHQConstants;
  * @since 0.50.07
  */
 public class RoundedLineBorder extends AbstractBorder {
-    private static final int PADDING = 10;
+    private static final int PADDING = 5;
 
     private final Color color;
     private final int thickness;
@@ -73,7 +73,7 @@ public class RoundedLineBorder extends AbstractBorder {
      * @since 0.50.07
      */
     public static CompoundBorder createRoundedLineBorder() {
-        Border rounded = new RoundedLineBorder(MHQConstants.BORDER_COLOR_GRAY, 2, 16);
+        Border rounded = new RoundedLineBorder(UIUtil.uiIndependentGray(), 2, 16);
         Border padding = BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING);
 
         return BorderFactory.createCompoundBorder(rounded, padding);
@@ -93,7 +93,7 @@ public class RoundedLineBorder extends AbstractBorder {
      */
     public static TitledBorder createRoundedLineBorder(String borderTitle) {
         return BorderFactory.createTitledBorder(RoundedLineBorder.createRoundedLineBorder(),
-              String.format("<html>%s</html>", borderTitle));
+              String.format("<html><b>%s</b></html>", borderTitle));
     }
 
     /**

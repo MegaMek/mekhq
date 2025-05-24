@@ -50,6 +50,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.event.LocationChangedEvent;
 import mekhq.campaign.event.TransitCompleteEvent;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.personnel.Injury;
@@ -157,10 +158,9 @@ public class CurrentLocation {
         return randomInt(2) == 1;
     }
 
-    public String getReport(LocalDate date) {
+    public String getReport(LocalDate date, Money jumpCost) {
         StringBuilder sb = new StringBuilder();
-        sb.append("<html><b>Current Location</b><br>")
-
+        sb.append("<html>")
               // First Line
               .append("In ").append(currentSystem.getPrintableName(date)).append(' ');
 
@@ -200,6 +200,11 @@ public class CurrentLocation {
         } else {
             sb.append("Not traveling");
         }
+
+        sb.append("<br/>");
+
+        // Third Line
+        sb.append("Estimated Jump Cost: ").append(jumpCost.toAmountString()).append(" C-Bills<br><br>");
 
         sb.append("</html>");
         return sb.toString();

@@ -61,6 +61,7 @@ import javax.swing.SwingWorker;
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.swing.util.UIUtil;
+import megamek.client.ui.swing.widget.RawImagePanel;
 import megamek.common.Entity;
 import megamek.common.MekSummaryCache;
 import megamek.common.annotations.Nullable;
@@ -103,7 +104,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
     private final MekHQ application;
     private final File campaignFile;
     private final Task task;
-    private JLabel splash;
+    private RawImagePanel splash;
     private JProgressBar progressBar;
     private StoryArcStub storyArcStub;
     private boolean isInAppNewCampaign;
@@ -144,11 +145,11 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
         return task;
     }
 
-    public JLabel getSplash() {
+    public RawImagePanel getSplash() {
         return splash;
     }
 
-    public void setSplash(final JLabel splash) {
+    public void setSplash(final RawImagePanel splash) {
         this.splash = splash;
     }
 

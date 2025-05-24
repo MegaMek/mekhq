@@ -52,7 +52,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -65,13 +64,14 @@ import megamek.common.options.IOptionGroup;
 import mekhq.CampaignPreset;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo;
 import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 import mekhq.gui.dialog.EditSpecialAbilityDialog;
-import mekhq.gui.utilities.RoundedLineBorder;
 import mekhq.utilities.spaUtilities.enums.AbilityCategory;
 
 /**
@@ -237,7 +237,7 @@ public class AbilitiesTab {
         };
 
         // Contents
-        JButton btnEnableAll = new CampaignOptionsButton("AddAll");
+        RoundedJButton btnEnableAll = new CampaignOptionsButton("AddAll");
         btnEnableAll.addActionListener(e -> {
             for (CampaignOptionsAbilityInfo abilityInfo : allAbilityInfo.values()) {
                 abilityInfo.setEnabled(true);
@@ -246,7 +246,7 @@ public class AbilitiesTab {
             refreshAll();
         });
 
-        JButton btnRemoveAll = new CampaignOptionsButton("RemoveAll");
+        RoundedJButton btnRemoveAll = new CampaignOptionsButton("RemoveAll");
         btnRemoveAll.addActionListener(e -> {
             for (CampaignOptionsAbilityInfo abilityInfo : allAbilityInfo.values()) {
                 abilityInfo.setEnabled(false);
@@ -353,7 +353,7 @@ public class AbilitiesTab {
         JLabel lblIncompatible = createAbilityLabel("incompatible.text", ability.getInvalidDesc());
         JLabel lblRemoves = createAbilityLabel("removes.text", ability.getRemovedDesc());
 
-        JButton btnCustomizeAbility = new CampaignOptionsButton("CustomizeAbility", null);
+        RoundedJButton btnCustomizeAbility = new CampaignOptionsButton("CustomizeAbility", null);
         btnCustomizeAbility.addActionListener(e -> {
             if (editSPA(ability)) {
                 // This will run on the SWT thread

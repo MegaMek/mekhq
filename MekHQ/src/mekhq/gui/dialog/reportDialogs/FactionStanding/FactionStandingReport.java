@@ -32,38 +32,11 @@
  */
 package mekhq.gui.dialog.reportDialogs.FactionStanding;
 
-import static java.lang.Math.round;
-import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
-import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
-import static mekhq.utilities.ReportingUtilities.getNegativeColor;
-import static mekhq.utilities.ReportingUtilities.getPositiveColor;
-import static mekhq.utilities.ReportingUtilities.getWarningColor;
-import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
-
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.border.CompoundBorder;
-
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.logging.MMLogger;
 import megamek.utilities.ImageUtilities;
-import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.FactionHints;
@@ -71,11 +44,28 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel;
-import mekhq.gui.baseComponents.RoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.GlossaryDialog;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
-import mekhq.gui.utilities.RoundedLineBorder;
 import mekhq.gui.utilities.WrapLayout;
+
+import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
+import static java.lang.Math.round;
+import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.ReportingUtilities.*;
 
 /**
  * Displays a dialog window that visualizes a report on faction standings for the current campaign year. Shows
@@ -463,7 +453,7 @@ public class FactionStandingReport extends JDialog {
      * <ul>
      *     <li>≤ 1: Negative color</li>
      *     <li>≤ 3: Warning color</li>
-     *     <li>≥ 7: Elite color</li>
+     *     <li>≥ 7: Amazing color</li>
      *     <li>≥ 5: Positive color</li>
      * </ul>
      *
@@ -477,18 +467,7 @@ public class FactionStandingReport extends JDialog {
      * @since 0.50.07
      */
     public static Border createStandingColoredRoundedTitledBorder(final int factionStandingLevel) {
-        Color color = MHQConstants.BORDER_COLOR_GRAY;
-        if (factionStandingLevel <= 1) {
-            color = MekHQ.getMHQOptions().getFontColorNegative();
-        } else if (factionStandingLevel <= 3) {
-            color = MekHQ.getMHQOptions().getFontColorWarning();
-        } else if (factionStandingLevel >= 7) {
-            color = MekHQ.getMHQOptions().getFontColorSkillElite();
-        } else if (factionStandingLevel >= 5) {
-            color = MekHQ.getMHQOptions().getFontColorPositive();
-        }
-
-        Border rounded = new RoundedLineBorder(color, 2, 16);
+        Border rounded = getRoundedBorder(factionStandingLevel);
         Border padding = BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING);
         Border compound = BorderFactory.createCompoundBorder(rounded, padding);
 
@@ -499,6 +478,23 @@ public class FactionStandingReport extends JDialog {
         }
 
         return BorderFactory.createTitledBorder(compound, title.toString());
+    }
+
+    private static Border getRoundedBorder(int factionStandingLevel) {
+        Color color;
+        if (factionStandingLevel >= 7) {
+            color = MekHQ.getMHQOptions().getFontColorAmazing();
+        } else if (factionStandingLevel >= 5) {
+            color = MekHQ.getMHQOptions().getFontColorPositive();
+        } else if (factionStandingLevel == 4) {
+            color = UIUtil.uiIndependentGray();
+        } else if (factionStandingLevel > 1) {
+            color = MekHQ.getMHQOptions().getFontColorWarning();
+        } else {
+            color = MekHQ.getMHQOptions().getFontColorNegative();
+        }
+
+        return new RoundedLineBorder(color, 2, 16);
     }
 
     /**
@@ -530,7 +526,7 @@ public class FactionStandingReport extends JDialog {
 
         if (isSame) {
             addendum = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.addendum.parent");
-            color = MekHQ.getMHQOptions().getFontColorSkillEliteHexColor();
+            color = getAmazingColor();
         } else if (isAtWar) {
             addendum = getTextAt(RESOURCE_BUNDLE, "factionStandingReport.addendum.atWar");
             color = getNegativeColor();
