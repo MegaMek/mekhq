@@ -119,6 +119,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         panTopButtons.add(new JLabel(resourceMap.getString("lblFindPlanet.text")), gridBagConstraints);
 
         suggestPlanet = new JSuggestField(getFrame(), getCampaign().getSystemNames());
+        suggestPlanet.setFocusable(false);
         suggestPlanet.addActionListener(ev -> {
             PlanetarySystem p = getCampaign().getSystemByName(suggestPlanet.getText());
             if (null != p) {
@@ -193,6 +194,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         mapView.setView(panMapView);
 
         scrollPlanetView = new JScrollPaneWithSpeed();
+        scrollPlanetView.setBorder(null);
         scrollPlanetView.setMinimumSize(new Dimension(400, 600));
         scrollPlanetView.setPreferredSize(new Dimension(400, 600));
         scrollPlanetView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);

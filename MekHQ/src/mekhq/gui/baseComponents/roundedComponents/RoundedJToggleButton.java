@@ -37,19 +37,20 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JToggleButton;
 import javax.swing.border.Border;
 
 import megamek.client.ui.swing.util.UIUtil;
 
 /**
- * {@link RoundedJButton} is a custom {@link JButton} implementation that renders a button with rounded corners and a
- * customizable border. It sets up its look and feel to complement modern UI design standards and supports custom text,
- * background highlighting on hover and press, and smooth antialiased drawing.
+ * {@link RoundedJToggleButton} is a custom {@link JButton} implementation that renders a button with rounded corners
+ * and a customizable border. It sets up its look and feel to complement modern UI design standards and supports custom
+ * text, background highlighting on hover and press, and smooth antialiased drawing.
  *
  * @author Illiani
  * @since 0.50.07
  */
-public class RoundedJButton extends JButton {
+public class RoundedJToggleButton extends JToggleButton {
     /**
      * The padding between the button border and its contents, in pixels.
      */
@@ -67,7 +68,7 @@ public class RoundedJButton extends JButton {
     private static final int ARC = 16;
 
     /**
-     * Constructs a default {@link RoundedJButton} with no text.
+     * Constructs a default {@link RoundedJToggleButton} with no text.
      *
      * <p>Sets the content area to be non-filled, disables focus painting, and sets a compound border with a rounded
      * border and padding.</p>
@@ -75,7 +76,7 @@ public class RoundedJButton extends JButton {
      * @author Illiani
      * @since 0.50.07
      */
-    public RoundedJButton() {
+    public RoundedJToggleButton() {
         super();
         setContentAreaFilled(false);
         setFocusPainted(false);
@@ -88,7 +89,7 @@ public class RoundedJButton extends JButton {
     }
 
     /**
-     * Constructs a {@link RoundedJButton} with the specified text label.
+     * Constructs a {@link RoundedJToggleButton} with the specified text label.
      *
      * <p>Sets the content area to be non-filled, disables focus painting, and sets a compound border with a rounded
      * border and padding.</p>
@@ -98,7 +99,7 @@ public class RoundedJButton extends JButton {
      * @author Illiani
      * @since 0.50.07
      */
-    public RoundedJButton(final String text) {
+    public RoundedJToggleButton(final String text) {
         super(text);
         setContentAreaFilled(false);
         setFocusPainted(false);
@@ -149,7 +150,7 @@ public class RoundedJButton extends JButton {
      * {@link RoundedButtonBorder} is a subclass of {@link RoundedLineBorder} that defines a border with a specific
      * color, thickness, and corner arc.
      *
-     * <p>Intended to be used as the border for {@link RoundedJButton}.</p>
+     * <p>Intended to be used as the border for {@link RoundedJToggleButton}.</p>
      *
      * @author Illiani
      * @since 0.50.07

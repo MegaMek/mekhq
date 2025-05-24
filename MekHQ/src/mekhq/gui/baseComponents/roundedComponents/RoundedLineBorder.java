@@ -44,7 +44,7 @@ import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.TitledBorder;
 
-import mekhq.MHQConstants;
+import megamek.client.ui.swing.util.UIUtil;
 
 /**
  * {@code RoundedLineBorder} is a custom border implementation for Swing components that draws a rectangular border with
@@ -73,7 +73,7 @@ public class RoundedLineBorder extends AbstractBorder {
      * @since 0.50.07
      */
     public static CompoundBorder createRoundedLineBorder() {
-        Border rounded = new RoundedLineBorder(MHQConstants.BORDER_COLOR_GRAY, 2, 16);
+        Border rounded = new RoundedLineBorder(UIUtil.uiIndependentGray(), 2, 16);
         Border padding = BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING);
 
         return BorderFactory.createCompoundBorder(rounded, padding);
