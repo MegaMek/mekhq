@@ -110,6 +110,7 @@ public class FactionStandingReport extends JDialog {
     private final Faction campaignFaction;
     private final ImageIcon campaignIcon;
     private final List<Mission> missions;
+    private final boolean isFactionStandingEnabled;
 
     private final List<String> innerSphereFactions = new ArrayList<>();
     private final List<String> clanFactions = new ArrayList<>();
@@ -128,13 +129,14 @@ public class FactionStandingReport extends JDialog {
      * @param isGM A boolean indicating whether the user is a Game Master (GM).
      * @param campaignFaction The primary faction for the campaign associated with the report.
      * @param campaignIcon An {@link ImageIcon} for the campaign (either a custom user icon or faction icon).
+     * @param isFactionStandingEnabled {@code true} if the tacking of Faction Standing is enabled in campaign options; {@code false} otherwise.
      *
      * @author Illiani
      * @since 0.50.07
      */
     public FactionStandingReport(final JFrame frame, final FactionStandings factionStandings, final LocalDate today,
                                  final boolean isGM, final Faction campaignFaction, final ImageIcon campaignIcon,
-                                 final Collection<Mission> missions) {
+                                 final Collection<Mission> missions, final boolean isFactionStandingEnabled) {
         this.frame = frame;
         this.today = today;
         this.gameYear = today.getYear();
@@ -144,6 +146,7 @@ public class FactionStandingReport extends JDialog {
         this.factionStandings = factionStandings;
         factions = Factions.getInstance();
         this.missions = new ArrayList<>(missions);
+        this.isFactionStandingEnabled = isFactionStandingEnabled;
 
         sortFactions();
         createReportPanel();
@@ -370,7 +373,7 @@ public class FactionStandingReport extends JDialog {
               "factionStandingReport.button.gmTools"));
         btnGmTools.setName("btnSimulateContract");
         btnGmTools.setFocusable(false);
-        btnGmTools.setEnabled(isGM);
+        btnGmTools.setEnabled(isFactionStandingEnabled && isGM);
         btnGmTools.addActionListener(e -> {
             setVisible(false);
             GMTools gmTools = new GMTools(this, campaignIcon, campaignFaction, today, factionStandings, missions);
@@ -385,6 +388,7 @@ public class FactionStandingReport extends JDialog {
               "factionStandingReport.button.contract"));
         btnSimulateContract.setName("btnSimulateContract");
         btnSimulateContract.setFocusable(false);
+        btnGmTools.setEnabled(isFactionStandingEnabled);
         btnSimulateContract.addActionListener(e -> {
             setVisible(false);
             triggerMissionSimulationDialog();
