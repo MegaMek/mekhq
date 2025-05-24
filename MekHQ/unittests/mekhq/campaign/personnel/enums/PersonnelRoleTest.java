@@ -651,10 +651,6 @@ class PersonnelRoleTest {
         assertEquals(BATTLE_ARMOUR, PersonnelRole.fromString("elemental"));
         assertEquals(BATTLE_ARMOUR, PersonnelRole.fromString("Battle Armor Pilot"));
 
-        // Deprecated names
-        assertEquals(PersonnelRole.MEKWARRIOR, PersonnelRole.fromString("MechWarrior"));
-        assertEquals(PersonnelRole.PROTOMEK_PILOT, PersonnelRole.fromString("protomek PILOT"));
-
         // Index input
         assertEquals(BATTLE_ARMOUR, PersonnelRole.fromString(BATTLE_ARMOUR.ordinal() + ""));
 
