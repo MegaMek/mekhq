@@ -53,7 +53,6 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
@@ -88,6 +87,7 @@ import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.storyarc.StoryArcStub;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.RATManager;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.eras.Eras;
@@ -357,7 +357,6 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 // This needs to be before we trigger the customize preset dialog
                 campaign.setLocalDate(DEFAULT_START_DATE);
                 campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());
-                campaign.setStartingSystem((preset == null) ? null : preset.getPlanet());
 
                 CampaignOptionsDialogMode mode = isSelect ? STARTUP_ABRIDGED : STARTUP;
                 CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(getFrame(), campaign, preset, mode);
@@ -368,6 +367,14 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 } else {
                     setVisible(true); // restore loader visibility
                 }
+
+                // Starting planet
+                Planet startingPlanet = (preset == null) ? null : preset.getPlanet();
+                // If the player hasn't set a starting planet in the preset, use the default for their chosen faction
+                if (startingPlanet == null) {
+                    startingPlanet = campaign.getNewCampaignStartingPlanet();
+                }
+                campaign.setStartingSystem(startingPlanet);
 
                 // initialize reputation
                 ReputationController reputationController = new ReputationController();
