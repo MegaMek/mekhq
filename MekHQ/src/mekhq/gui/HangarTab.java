@@ -63,6 +63,7 @@ import mekhq.campaign.event.*;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.gui.adapter.UnitTableMouseAdapter;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.panels.TutorialHyperlinkPanel;
@@ -211,6 +212,8 @@ public final class HangarTab extends CampaignGuiTab {
         unitTable.getSelectionModel().addListSelectionListener(ev -> refreshUnitView());
 
         JScrollPane scrollUnitTable = new JScrollPaneWithSpeed(unitTable);
+        scrollUnitTable.setFocusable(false);
+        scrollUnitTable.setBorder(RoundedLineBorder.createRoundedLineBorder());
 
         JPanel pnlTutorial = new TutorialHyperlinkPanel("hangarTab");
 
@@ -219,6 +222,7 @@ public final class HangarTab extends CampaignGuiTab {
         tableAndInfoPanel.add(pnlTutorial, BorderLayout.SOUTH);
 
         scrollUnitView = new JScrollPaneWithSpeed();
+        scrollUnitView.setBorder(RoundedLineBorder.createRoundedLineBorder());
         scrollUnitView.setMinimumSize(new Dimension(UNIT_VIEW_WIDTH, 600));
         scrollUnitView.setPreferredSize(new Dimension(UNIT_VIEW_WIDTH, 600));
         scrollUnitView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);

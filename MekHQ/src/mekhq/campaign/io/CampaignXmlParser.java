@@ -130,6 +130,7 @@ import mekhq.campaign.unit.cleanup.EquipmentUnscrambler;
 import mekhq.campaign.unit.cleanup.EquipmentUnscramblerResult;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.campaign.universe.fameAndInfamy.FameAndInfamyController;
 import mekhq.io.idReferenceClasses.PersonIdReference;
 import mekhq.module.atb.AtBEventProcessor;
@@ -813,6 +814,8 @@ public class CampaignXmlParser {
                     campaign.setReputation(new ReputationController().generateInstanceFromXML(childNode));
                 } else if (nodeName.equalsIgnoreCase("newPersonnelMarket")) {
                     campaign.setNewPersonnelMarket(generatePersonnelMarketDataFromXML(campaign, childNode, version));
+                } else if (nodeName.equalsIgnoreCase("factionStandings")) {
+                    campaign.setFactionStandings(FactionStandings.generateInstanceFromXML(childNode));
                 } else if (nodeName.equalsIgnoreCase("rankSystem")) {
                     if (!childNode.hasChildNodes()) { // we need there to be child nodes to parse from
                         continue;

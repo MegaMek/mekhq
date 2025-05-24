@@ -48,8 +48,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.ResourceBundle;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -66,6 +64,8 @@ import mekhq.campaign.event.PersonEvent;
 import mekhq.campaign.event.PersonMedicalAssignmentEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.personnel.Person;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.MedicalViewDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.DocTableModel;
@@ -79,9 +79,9 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
  */
 public final class InfirmaryTab extends CampaignGuiTab {
     private JTable docTable;
-    private JButton btnAssignDoc;
-    private JButton btnUnassignDoc;
-    private JButton btnOptimizeAssignments;
+    private RoundedJButton btnAssignDoc;
+    private RoundedJButton btnUnassignDoc;
+    private RoundedJButton btnOptimizeAssignments;
     private JList<Person> listAssignedPatient;
     private JList<Person> listUnassignedPatient;
 
@@ -122,6 +122,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
         docTable.getSelectionModel().addListSelectionListener(ev -> docTableValueChanged());
         docTable.setOpaque(false);
         JScrollPane scrollDocTable = new JScrollPaneWithSpeed(docTable);
+        scrollDocTable.setBorder(RoundedLineBorder.createRoundedLineBorder());
         scrollDocTable.setMinimumSize(new Dimension(300, 300));
         scrollDocTable.setPreferredSize(new Dimension(300, 300));
         scrollDocTable.setOpaque(false);
@@ -137,16 +138,16 @@ public final class InfirmaryTab extends CampaignGuiTab {
         add(scrollDocTable, gridBagConstraints);
 
         // Create buttons
-        btnAssignDoc = new JButton(resourceMap.getString("btnAssignDoc.text"));
+        btnAssignDoc = new RoundedJButton(resourceMap.getString("btnAssignDoc.text"));
         btnAssignDoc.setToolTipText(resourceMap.getString("btnAssignDoc.toolTipText"));
         btnAssignDoc.setEnabled(false);
         btnAssignDoc.addActionListener(ev -> assignDoctor());
 
-        btnUnassignDoc = new JButton(resourceMap.getString("btnUnassignDoc.text"));
+        btnUnassignDoc = new RoundedJButton(resourceMap.getString("btnUnassignDoc.text"));
         btnUnassignDoc.setEnabled(false);
         btnUnassignDoc.addActionListener(ev -> unassignDoctor());
 
-        btnOptimizeAssignments = new JButton(resourceMap.getString("btnOptimizeAssignments.text"));
+        btnOptimizeAssignments = new RoundedJButton(resourceMap.getString("btnOptimizeAssignments.text"));
         btnOptimizeAssignments.addActionListener(ev -> new OptimizeInfirmaryAssignments(getCampaign()));
 
         // Create a panel to group the buttons together horizontally
@@ -205,11 +206,13 @@ public final class InfirmaryTab extends CampaignGuiTab {
         });
 
         JScrollPane scrollAssignedPatient = new JScrollPaneWithSpeed(listAssignedPatient);
+        scrollAssignedPatient.setBorder(null);
         scrollAssignedPatient.setMinimumSize(new Dimension(300, 360));
         scrollAssignedPatient.setPreferredSize(new Dimension(300, 360));
         scrollAssignedPatient.setOpaque(false);
         scrollAssignedPatient.getViewport().setOpaque(false);
-        listAssignedPatient.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panAssignedPatient.title")));
+        listAssignedPatient.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
+              "panAssignedPatient.title")));
 
         unassignedPatientModel = new PatientTableModel(getCampaign());
         listUnassignedPatient = new JList<>(unassignedPatientModel);
@@ -253,11 +256,12 @@ public final class InfirmaryTab extends CampaignGuiTab {
         });
 
         JScrollPane scrollUnassignedPatient = new JScrollPaneWithSpeed(listUnassignedPatient);
+        scrollUnassignedPatient.setBorder(null);
         scrollUnassignedPatient.setMinimumSize(new Dimension(300, 200));
         scrollUnassignedPatient.setPreferredSize(new Dimension(300, 300));
         scrollUnassignedPatient.setOpaque(false);
         scrollUnassignedPatient.getViewport().setOpaque(false);
-        listUnassignedPatient.setBorder(BorderFactory.createTitledBorder(resourceMap.getString(
+        listUnassignedPatient.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
               "panUnassignedPatient.title")));
 
         gridBagConstraints = new GridBagConstraints();
