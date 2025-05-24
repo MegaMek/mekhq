@@ -65,6 +65,7 @@ import mekhq.campaign.randomEvents.prisoners.enums.PrisonerEvent;
 import mekhq.campaign.randomEvents.prisoners.enums.ResponseQuality;
 import mekhq.campaign.randomEvents.prisoners.records.PrisonerEventData;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.utilities.ReportingUtilities;
 
@@ -563,6 +564,15 @@ public class PrisonerEventManager {
      * @param prisoners  The list of prisoners involved in the execution.
      */
     private void processExecutions(int executions, List<Person> prisoners) {
+        if (campaign.getCampaignOptions().isTrackFactionStanding()) {
+            FactionStandings factionStandings = campaign.getFactionStandings();
+            List<String> reports = factionStandings.executePrisonersOfWar(prisoners, campaign.getGameYear());
+
+            for (String report : reports) {
+                campaign.addReport(report);
+            }
+        }
+
         for (int i = 0; i < executions; i++) {
             Person prisoner = prisoners.get(i);
             campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "execute.report", prisoner.getFullName()));

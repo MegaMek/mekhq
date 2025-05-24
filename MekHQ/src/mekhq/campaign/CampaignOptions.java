@@ -59,6 +59,7 @@ import megamek.common.options.GameOptions;
 import megamek.common.preference.ClientPreferences;
 import megamek.common.preference.PreferenceManager;
 import megamek.logging.MMLogger;
+import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.autoresolve.AutoResolveMethod;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
@@ -71,6 +72,7 @@ import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.enums.*;
+import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
@@ -642,6 +644,19 @@ public class CampaignOptions {
     private boolean autoResolveExperimentalPacarGuiEnabled;
     // endregion Against the Bot Tab
 
+    // start region Faction Standing
+    private boolean trackFactionStanding;
+    private boolean useFactionStandingNegotiation;
+    private boolean useFactionStandingResupply;
+    private boolean useFactionStandingCommandCircuit;
+    private boolean useFactionStandingOutlawed;
+    private boolean useFactionStandingBatchallRestrictions;
+    private boolean useFactionStandingRecruitment;
+    private boolean useFactionStandingBarracksCosts;
+    private boolean useFactionStandingUnitMarket;
+    private boolean useFactionStandingContractPay;
+    private boolean useFactionStandingSupportPoints;
+    //endregion Faction Standing
     // endregion Variable Declarations
 
     // region Constructors
@@ -5467,6 +5482,23 @@ public class CampaignOptions {
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePortraitForType", isUsePortraitForRoles());
 
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "trackFactionStanding", trackFactionStanding);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useFactionStandingNegotiation", useFactionStandingNegotiation);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useFactionStandingResupply", useFactionStandingResupply);
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "useFactionStandingCommandCircuit",
+              useFactionStandingCommandCircuit);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useFactionStandingOutlawed", useFactionStandingOutlawed);
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "useFactionStandingBatchallRestrictions",
+              useFactionStandingBatchallRestrictions);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useFactionStandingRecruitment", useFactionStandingRecruitment);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useFactionStandingBarracksCosts", useFactionStandingBarracksCosts);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useFactionStandingUnitMarket", useFactionStandingUnitMarket);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useFactionStandingContractPay", useFactionStandingContractPay);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useFactionStandingSupportPoints", useFactionStandingSupportPoints);
 
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "campaignOptions");
     }
@@ -6529,6 +6561,171 @@ public class CampaignOptions {
                     campaignOptions.setScenarioModBV(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("autoconfigMunitions")) {
                     campaignOptions.setAutoConfigMunitions(Boolean.parseBoolean(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("trackFactionStanding")) {
+                    campaignOptions.setTrackFactionStanding(Boolean.parseBoolean(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("useFactionStandingNegotiation")) {
+                    campaignOptions.setUseFactionStandingNegotiation(Boolean.parseBoolean(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("useFactionStandingResupply")) {
+                    campaignOptions.setUseFactionStandingResupply(Boolean.parseBoolean(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("useFactionStandingCommandCircuit")) {
+                    campaignOptions.setUseFactionStandingCommandCircuit(Boolean.parseBoolean(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("useFactionStandingOutlawed")) {
+                    campaignOptions.setUseFactionStandingOutlawed(Boolean.parseBoolean(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("useFactionStandingBatchallRestrictions")) {
+                    campaignOptions.setUseFactionStandingBatchallRestrictions(Boolean.parseBoolean(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("useFactionStandingRecruitment")) {
+                    campaignOptions.setUseFactionStandingRecruitment(Boolean.parseBoolean(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("useFactionStandingBarracksCosts")) {
+                    campaignOptions.setUseFactionStandingBarracksCosts(Boolean.parseBoolean(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("useFactionStandingUnitMarket")) {
+                    campaignOptions.setUseFactionStandingUnitMarket(Boolean.parseBoolean(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("useFactionStandingContractPay")) {
+                    campaignOptions.setUseFactionStandingContractPay(Boolean.parseBoolean(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("useFactionStandingSupportPoints")) {
+                    campaignOptions.setUseFactionStandingSupportPoints(Boolean.parseBoolean(nodeContents));
+
+                    // region Legacy
+                    // Removed in 0.49.*
+                } else if (nodeName.equalsIgnoreCase("salaryXPMultiplier")) { // Legacy, 0.49.12 removal
+                    String[] values = nodeContents.split(",");
+                    for (int i = 0; i < values.length; i++) {
+                        campaignOptions.getSalaryXPMultipliers()
+                              .put(Skills.SKILL_LEVELS[i + 1], Double.parseDouble(values[i]));
+                    }
+                } else if (nodeName.equalsIgnoreCase("personnelMarketRandomEliteRemoval")) { // Legacy, 0.49.12
+                    // removal
+                    campaignOptions.getPersonnelMarketRandomRemovalTargets()
+                          .put(SkillLevel.ELITE, Integer.parseInt(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("personnelMarketRandomVeteranRemoval")) { // Legacy,
+                    // 0.49.12
+                    // removal
+                    campaignOptions.getPersonnelMarketRandomRemovalTargets()
+                          .put(SkillLevel.VETERAN, Integer.parseInt(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("personnelMarketRandomRegularRemoval")) { // Legacy,
+                    // 0.49.12
+                    // removal
+                    campaignOptions.getPersonnelMarketRandomRemovalTargets()
+                          .put(SkillLevel.REGULAR, Integer.parseInt(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("personnelMarketRandomGreenRemoval")) { // Legacy, 0.49.12
+                    // removal
+                    campaignOptions.getPersonnelMarketRandomRemovalTargets()
+                          .put(SkillLevel.GREEN, Integer.parseInt(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("personnelMarketRandomUltraGreenRemoval")) { // Legacy,
+                    // 0.49.12
+                    // removal
+                    campaignOptions.getPersonnelMarketRandomRemovalTargets()
+                          .put(SkillLevel.ULTRA_GREEN, Integer.parseInt(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("randomizeOrigin")) { // Legacy, 0.49.7 Removal
+                    campaignOptions.getRandomOriginOptions().setRandomizeOrigin(Boolean.parseBoolean(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("randomizeDependentOrigin")) { // Legacy, 0.49.7 Removal
+                    campaignOptions.getRandomOriginOptions()
+                          .setRandomizeDependentOrigin(Boolean.parseBoolean(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("originSearchRadius")) { // Legacy, 0.49.7 Removal
+                    campaignOptions.getRandomOriginOptions().setOriginSearchRadius(Integer.parseInt(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("extraRandomOrigin")) { // Legacy, 0.49.7 Removal
+                    campaignOptions.getRandomOriginOptions().setExtraRandomOrigin(Boolean.parseBoolean(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("originDistanceScale")) { // Legacy, 0.49.7 Removal
+                    campaignOptions.getRandomOriginOptions().setOriginDistanceScale(Double.parseDouble(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("dependentsNeverLeave")) { // Legacy - 0.49.7 Removal
+                    campaignOptions.setUseRandomDependentRemoval(!Boolean.parseBoolean(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("marriageAgeRange")) { // Legacy - 0.49.6 Removal
+                    campaignOptions.setRandomMarriageAgeRange(Integer.parseInt(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("useRandomMarriages")) { // Legacy - 0.49.6 Removal
+                    campaignOptions.setRandomMarriageMethod(Boolean.parseBoolean(nodeContents) ?
+                                                         RandomMarriageMethod.DICE_ROLL :
+                                                         RandomMarriageMethod.NONE);
+                } else if (nodeName.equalsIgnoreCase("logMarriageNameChange")) { // Legacy - 0.49.6 Removal
+                    campaignOptions.setLogMarriageNameChanges(Boolean.parseBoolean(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("randomMarriageSurnameWeights")) { // Legacy - 0.49.6
+                    // Removal
+                    final String[] values = nodeContents.split(",");
+                    if (values.length == 13) {
+                        final MergingSurnameStyle[] marriageSurnameStyles = MergingSurnameStyle.values();
+                        for (int i = 0; i < values.length; i++) {
+                            campaignOptions.getMarriageSurnameWeights()
+                                  .put(marriageSurnameStyles[i], Integer.parseInt(values[i]));
+                        }
+                    } else if (values.length == 9) {
+                        campaignOptions.migrateMarriageSurnameWeights47(values);
+                    } else {
+                        logger.error("Unknown length of randomMarriageSurnameWeights");
+                    }
+                } else if (nodeName.equalsIgnoreCase("logConception")) { // Legacy - 0.49.4 Removal
+                    campaignOptions.setLogProcreation(Boolean.parseBoolean(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("staticRATs")) { // Legacy - 0.49.4 Removal
+                    campaignOptions.setUseStaticRATs(true);
+                } else if (nodeName.equalsIgnoreCase("ignoreRatEra")) { // Legacy - 0.49.4 Removal
+                    campaignOptions.setIgnoreRATEra(true);
+                } else if (nodeName.equalsIgnoreCase("clanPriceModifier")) { // Legacy - 0.49.3 Removal
+                    final double value = Double.parseDouble(nodeContents);
+                    campaignOptions.setClanUnitPriceMultiplier(value);
+                    campaignOptions.setClanPartPriceMultiplier(value);
+                } else if (nodeName.equalsIgnoreCase("usedPartsValueA")) { // Legacy - 0.49.3 Removal
+                    campaignOptions.getUsedPartPriceMultipliers()[0] = Double.parseDouble(nodeContents);
+                } else if (nodeName.equalsIgnoreCase("usedPartsValueB")) { // Legacy - 0.49.3 Removal
+                    campaignOptions.getUsedPartPriceMultipliers()[1] = Double.parseDouble(nodeContents);
+                } else if (nodeName.equalsIgnoreCase("usedPartsValueC")) { // Legacy - 0.49.3 Removal
+                    campaignOptions.getUsedPartPriceMultipliers()[2] = Double.parseDouble(nodeContents);
+                } else if (nodeName.equalsIgnoreCase("usedPartsValueD")) { // Legacy - 0.49.3 Removal
+                    campaignOptions.getUsedPartPriceMultipliers()[3] = Double.parseDouble(nodeContents);
+                } else if (nodeName.equalsIgnoreCase("usedPartsValueE")) { // Legacy - 0.49.3 Removal
+                    campaignOptions.getUsedPartPriceMultipliers()[4] = Double.parseDouble(nodeContents);
+                } else if (nodeName.equalsIgnoreCase("usedPartsValueF")) { // Legacy - 0.49.3 Removal
+                    campaignOptions.getUsedPartPriceMultipliers()[5] = Double.parseDouble(nodeContents);
+                } else if (nodeName.equalsIgnoreCase("damagedPartsValue")) { // Legacy - 0.49.3 Removal
+                    campaignOptions.setDamagedPartsValueMultiplier(Double.parseDouble(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("canceledOrderReimbursement")) { // Legacy - 0.49.3
+                    // Removal
+                    campaignOptions.setCancelledOrderRefundMultiplier(Double.parseDouble(nodeContents));
+
+                    // Removed in 0.47.*
+                } else if (nodeName.equalsIgnoreCase("personnelMarketType")) { // Legacy
+                    campaignOptions.setPersonnelMarketName(PersonnelMarket.getTypeName(Integer.parseInt(nodeContents)));
+                } else if (nodeName.equalsIgnoreCase("intensity")) { // Legacy
+                    double intensity = Double.parseDouble(nodeContents);
+
+                    campaignOptions.atbBattleChance[CombatRole.MANEUVER.ordinal()] = (int) Math.round(((40.0 *
+                                                                                                              intensity) /
+                                                                                                    (40.0 * intensity +
+                                                                                                           60.0)) *
+                                                                                                   100.0 + 0.5);
+                    campaignOptions.atbBattleChance[CombatRole.FRONTLINE.ordinal()] = (int) Math.round(((20.0 *
+                                                                                                               intensity) /
+                                                                                                     (20.0 * intensity +
+                                                                                                            80.0)) *
+                                                                                                    100.0 + 0.5);
+                    campaignOptions.atbBattleChance[CombatRole.PATROL.ordinal()] = (int) Math.round(((60.0 *
+                                                                                                            intensity) /
+                                                                                                  (60.0 * intensity +
+                                                                                                         40.0)) *
+                                                                                                 100.0 + 0.5);
+                    campaignOptions.atbBattleChance[CombatRole.TRAINING.ordinal()] = (int) Math.round(((10.0 *
+                                                                                                              intensity) /
+                                                                                                    (10.0 * intensity +
+                                                                                                           90.0)) *
+                                                                                                   100.0 + 0.5);
+                } else if (nodeName.equalsIgnoreCase("personnelMarketType")) { // Legacy
+                    campaignOptions.personnelMarketName = PersonnelMarket.getTypeName(Integer.parseInt(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("startGameDelay")) { // Legacy
+                    MekHQ.getMHQOptions().setStartGameDelay(Integer.parseInt(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("historicalDailyLog")) { // Legacy
+                    MekHQ.getMHQOptions().setHistoricalDailyLog(Boolean.parseBoolean(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("useUnitRating") // Legacy
+                                 || nodeName.equalsIgnoreCase("useDragoonRating")) { // Legacy
+                    if (!Boolean.parseBoolean(nodeContents)) {
+                        campaignOptions.setUnitRatingMethod(UnitRatingMethod.NONE);
+                    }
+                } else if (nodeName.equalsIgnoreCase("probPhenoMW")) { // Legacy
+                    campaignOptions.phenotypeProbabilities[Phenotype.MEKWARRIOR.ordinal()] = Integer.parseInt(
+                          nodeContents);
+                } else if (nodeName.equalsIgnoreCase("probPhenoBA")) { // Legacy
+                    campaignOptions.phenotypeProbabilities[Phenotype.ELEMENTAL.ordinal()] = Integer.parseInt(
+                          nodeContents);
+                } else if (nodeName.equalsIgnoreCase("probPhenoAero")) { // Legacy
+                    campaignOptions.phenotypeProbabilities[Phenotype.AEROSPACE.ordinal()] = Integer.parseInt(
+                          nodeContents);
+                } else if (nodeName.equalsIgnoreCase("probPhenoVee")) { // Legacy
+                    campaignOptions.phenotypeProbabilities[Phenotype.VEHICLE.ordinal()] = Integer.parseInt(nodeContents);
                 }
             } catch (Exception ex) {
                 logger.error(ex, "Unknown Exception: generationCampaignOptionsFromXML");
@@ -6632,6 +6829,93 @@ public class CampaignOptions {
         this.autoResolveExperimentalPacarGuiEnabled = autoResolveExperimentalPacarGuiEnabled;
     }
 
+    public boolean isUseFactionStandingNegotiation() {
+        return useFactionStandingNegotiation;
+    }
+
+    public void setUseFactionStandingNegotiation(boolean useFactionStandingNegotiation) {
+        this.useFactionStandingNegotiation = useFactionStandingNegotiation;
+    }
+
+    public boolean isUseFactionStandingResupply() {
+        return useFactionStandingResupply;
+    }
+
+    public void setUseFactionStandingResupply(boolean useFactionStandingResupply) {
+        this.useFactionStandingResupply = useFactionStandingResupply;
+    }
+
+    public boolean isUseFactionStandingCommandCircuit() {
+        return useFactionStandingCommandCircuit;
+    }
+
+    public void setUseFactionStandingCommandCircuit(boolean useFactionStandingCommandCircuit) {
+        this.useFactionStandingCommandCircuit = useFactionStandingCommandCircuit;
+    }
+
+    public boolean isUseFactionStandingOutlawed() {
+        return useFactionStandingOutlawed;
+    }
+
+    public void setUseFactionStandingOutlawed(boolean useFactionStandingOutlawed) {
+        this.useFactionStandingOutlawed = useFactionStandingOutlawed;
+    }
+
+    public boolean isUseFactionStandingBatchallRestrictions() {
+        return useFactionStandingBatchallRestrictions;
+    }
+
+    public void setUseFactionStandingBatchallRestrictions(boolean useFactionStandingBatchallRestrictions) {
+        this.useFactionStandingBatchallRestrictions = useFactionStandingBatchallRestrictions;
+    }
+
+    public boolean isUseFactionStandingRecruitment() {
+        return useFactionStandingRecruitment;
+    }
+
+    public void setUseFactionStandingRecruitment(boolean useFactionStandingRecruitment) {
+        this.useFactionStandingRecruitment = useFactionStandingRecruitment;
+    }
+
+    public boolean isUseFactionStandingBarracksCosts() {
+        return useFactionStandingBarracksCosts;
+    }
+
+    public void setUseFactionStandingBarracksCosts(boolean useFactionStandingBarracksCosts) {
+        this.useFactionStandingBarracksCosts = useFactionStandingBarracksCosts;
+    }
+
+    public boolean isUseFactionStandingUnitMarket() {
+        return useFactionStandingUnitMarket;
+    }
+
+    public void setUseFactionStandingUnitMarket(boolean useFactionStandingUnitMarket) {
+        this.useFactionStandingUnitMarket = useFactionStandingUnitMarket;
+    }
+
+    public boolean isUseFactionStandingContractPay() {
+        return useFactionStandingContractPay;
+    }
+
+    public void setUseFactionStandingContractPay(boolean useFactionStandingContractPay) {
+        this.useFactionStandingContractPay = useFactionStandingContractPay;
+    }
+
+    public boolean isUseFactionStandingSupportPoints() {
+        return useFactionStandingSupportPoints;
+    }
+
+    public void setUseFactionStandingSupportPoints(boolean useFactionStandingSupportPoints) {
+        this.useFactionStandingSupportPoints = useFactionStandingSupportPoints;
+    }
+
+    public boolean isTrackFactionStanding() {
+        return trackFactionStanding;
+    }
+
+    public void setTrackFactionStanding(boolean trackFactionStanding) {
+        this.trackFactionStanding = trackFactionStanding;
+    }
 
     /**
      * Updates the campaign options to reflect the current game options settings.

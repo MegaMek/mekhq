@@ -48,6 +48,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import javax.swing.JDialog;
@@ -90,6 +91,7 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RATManager;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.eras.Eras;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.baseComponents.AbstractMHQDialogBasic;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
@@ -371,6 +373,19 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 ReputationController reputationController = new ReputationController();
                 reputationController.initializeReputation(campaign);
                 campaign.setReputation(reputationController);
+
+                // initialize starting faction standings
+                if (campaign.getCampaignOptions().isTrackFactionStanding()) {
+                    FactionStandings factionStandings = campaign.getFactionStandings();
+                    List<String> standingReports = factionStandings.initializeStartingRegardValues(campaign.getFaction(),
+                          campaign.getLocalDate());
+                    for (String report : standingReports) {
+                        campaign.addReport(report);
+                    }
+                    String report = factionStandings.updateClimateRegard(campaign.getFaction(),
+                          campaign.getLocalDate());
+                    campaign.addReport(report);
+                }
                 // endregion Progress 6
 
                 // region Progress 7
