@@ -40,11 +40,11 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Objects;
 import java.util.ResourceBundle;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -54,6 +54,7 @@ import javax.swing.JViewport;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 
+import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
 import mekhq.campaign.JumpPath;
@@ -63,6 +64,7 @@ import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
@@ -74,6 +76,8 @@ import mekhq.gui.view.PlanetViewPanel;
  * Displays interstellar map and contains transit controls.
  */
 public final class MapTab extends CampaignGuiTab implements ActionListener {
+    private static final int PADDING = UIUtil.scaleForGUI(10);
+    
     private JViewport mapView;
     private JPanel panMapView;
     private InterstellarMapPanel panMap;
@@ -115,6 +119,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         panTopButtons.add(new JLabel(resourceMap.getString("lblFindPlanet.text")), gridBagConstraints);
 
         suggestPlanet = new JSuggestField(getFrame(), getCampaign().getSystemNames());
+        suggestPlanet.setFocusable(false);
         suggestPlanet.addActionListener(ev -> {
             PlanetarySystem p = getCampaign().getSystemByName(suggestPlanet.getText());
             if (null != p) {
@@ -130,9 +135,10 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.insets = new Insets(0, 0, 0, PADDING);
         panTopButtons.add(suggestPlanet, gridBagConstraints);
 
-        JButton btnCalculateJumpPath = new JButton(resourceMap.getString("btnCalculateJumpPath.text"));
+        RoundedJButton btnCalculateJumpPath = new RoundedJButton(resourceMap.getString("btnCalculateJumpPath.text"));
         btnCalculateJumpPath.setToolTipText(resourceMap.getString("btnCalculateJumpPath.toolTipText"));
         btnCalculateJumpPath.addActionListener(ev -> calculateJumpPath());
         gridBagConstraints = new GridBagConstraints();
@@ -142,9 +148,10 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.5;
         gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.insets = new Insets(0, 0, 0, PADDING);
         panTopButtons.add(btnCalculateJumpPath, gridBagConstraints);
 
-        JButton btnBeginTransit = new JButton(resourceMap.getString("btnBeginTransit.text"));
+        RoundedJButton btnBeginTransit = new RoundedJButton(resourceMap.getString("btnBeginTransit.text"));
         btnBeginTransit.setToolTipText(resourceMap.getString("btnBeginTransit.toolTipText"));
         btnBeginTransit.addActionListener(ev -> beginTransit());
         gridBagConstraints = new GridBagConstraints();
@@ -154,6 +161,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.5;
         gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.insets = new Insets(0, 0, 0, PADDING);
         panTopButtons.add(btnBeginTransit, gridBagConstraints);
 
         JCheckBox chkAvoidAbandonedSystems = new JCheckBox(resourceMap.getString("chkAvoidAbandonedSystems.text"));
@@ -186,10 +194,12 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         mapView.setView(panMapView);
 
         scrollPlanetView = new JScrollPaneWithSpeed();
+        scrollPlanetView.setBorder(null);
         scrollPlanetView.setMinimumSize(new Dimension(400, 600));
         scrollPlanetView.setPreferredSize(new Dimension(400, 600));
         scrollPlanetView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPlanetView.setViewportView(null);
+        scrollPlanetView.setBorder(null);
         JSplitPane splitMap = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, mapView, scrollPlanetView);
         splitMap.setOneTouchExpandable(true);
         splitMap.setResizeWeight(1.0);

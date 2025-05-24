@@ -39,13 +39,11 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.processWrapSize
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 
-import javax.swing.JButton;
-
 import megamek.common.annotations.Nullable;
-import mekhq.gui.utilities.RoundedLineBorder;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 
 /**
- * A specialized {@link JButton} used in the campaign options dialog.
+ * A specialized {@link RoundedJButton} used in the campaign options dialog.
  * <p>
  * This button's text and tooltip are dynamically loaded from a resource bundle
  * based on a given name. The tooltip can optionally include word wrapping
@@ -53,7 +51,7 @@ import mekhq.gui.utilities.RoundedLineBorder;
  * <p>
  * The button also supports font scaling adjustments.
  */
-public class CampaignOptionsButton extends JButton {
+public class CampaignOptionsButton extends RoundedJButton {
     /**
      * Constructs a new instance of {@link CampaignOptionsButton} with the specified name.
      * <p>
@@ -63,7 +61,7 @@ public class CampaignOptionsButton extends JButton {
      * The text is located in the resource bundle key {@code "lbl" + name + ".text"}.
      * The tooltip is located in the resource bundle key {@code "lbl" + name + ".tooltip"}.
      *
-     * @param name the name used to fetch the button's text and tooltip, and to set its name
+     * @param name the name used to fetch the button's text and tooltip and to set its name
      */
     public CampaignOptionsButton(String name) {
         this(name, null);
@@ -81,14 +79,13 @@ public class CampaignOptionsButton extends JButton {
      * If a custom wrap size is provided, the tooltip text will be word-wrapped
      * accordingly. If {@code customWrapSize} is {@code null}, a default wrap size is used.
      *
-     * @param name the name used to fetch the button's text and tooltip, and to set its name
+     * @param name the name used to fetch the button's text and tooltip and to set its name
      * @param customWrapSize the maximum number of characters per tooltip line,
      *                       or {@code null} for the default wrap size
      */
     public CampaignOptionsButton(String name, @Nullable Integer customWrapSize) {
         // Sets the button's text from the resource bundle
         super(getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".text"));
-        setBorder(RoundedLineBorder.createRoundedLineBorder());
 
         // Sets the button's tooltip, applying word wrapping based on customWrapSize
         String tooltipText = getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".tooltip");

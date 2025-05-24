@@ -82,7 +82,6 @@ import java.util.function.BiConsumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.accessibility.AccessibleRelation;
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -124,6 +123,7 @@ import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.JScrollablePanel;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.PersonnelEventLogModel;
 import mekhq.gui.model.PersonnelKillLogModel;
@@ -314,7 +314,7 @@ public class PersonViewPanel extends JScrollablePanel {
             } else {
                 txtDesc.setText(person.getPersonalityDescription());
             }
-            txtDesc.setBorder(BorderFactory.createTitledBorder(resourceMap.getString(borderTitleKey)));
+            txtDesc.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(borderTitleKey)));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridY;
@@ -332,8 +332,7 @@ public class PersonViewPanel extends JScrollablePanel {
             txtDesc.setEditable(false);
             txtDesc.setContentType("text/html");
             txtDesc.setText(MarkdownRenderer.getRenderedHtml(person.getBiography()));
-            txtDesc.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(resourceMap.getString(
-                  "pnlDescription.title")), BorderFactory.createEmptyBorder(0, 2, 2, 2)));
+            txtDesc.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("pnlDescription.title")));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridY;
@@ -348,12 +347,13 @@ public class PersonViewPanel extends JScrollablePanel {
         if (!person.getPersonalLog().isEmpty()) {
             JPanel pnlPersonalLogHeader = new JPanel();
             pnlPersonalLogHeader.setName("pnlLogHeader");
-            pnlPersonalLogHeader.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlLogHeader.title")));
+            pnlPersonalLogHeader.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
+                  "pnlLogHeader.title")));
             pnlPersonalLogHeader.setVisible(!campaignOptions.isDisplayPersonnelLog());
 
             JPanel pnlPersonalLog = fillPersonalLog();
             pnlPersonalLog.setName("pnlLog");
-            pnlPersonalLog.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlLog.title")));
+            pnlPersonalLog.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("pnlLog.title")));
             pnlPersonalLog.setVisible(campaignOptions.isDisplayPersonnelLog());
 
             pnlPersonalLogHeader.addMouseListener(getSwitchListener(pnlPersonalLogHeader, pnlPersonalLog));
@@ -374,13 +374,14 @@ public class PersonViewPanel extends JScrollablePanel {
         if (!person.getPerformanceLog().isEmpty()) {
             JPanel pnlPerformanceLogHeader = new JPanel();
             pnlPerformanceLogHeader.setName("pnlPerformanceLogHeader");
-            pnlPerformanceLogHeader.setBorder(BorderFactory.createTitledBorder(resourceMap.getString(
+            pnlPerformanceLogHeader.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
                   "pnlPerformanceLogHeader.title")));
             pnlPerformanceLogHeader.setVisible(!campaignOptions.isDisplayPerformanceRecord());
 
             JPanel pnlPerformanceLog = fillPerformanceLog();
             pnlPerformanceLog.setName("pnlPerformanceLog");
-            pnlPerformanceLog.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlPerformanceLog.title")));
+            pnlPerformanceLog.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
+                  "pnlPerformanceLog.title")));
             pnlPerformanceLog.setVisible(campaignOptions.isDisplayPerformanceRecord());
 
             pnlPerformanceLogHeader.addMouseListener(getSwitchListener(pnlPerformanceLogHeader, pnlPerformanceLog));
@@ -401,13 +402,14 @@ public class PersonViewPanel extends JScrollablePanel {
         if (!person.getMedicalLog().isEmpty()) {
             JPanel pnlMedicalLogHeader = new JPanel();
             pnlMedicalLogHeader.setName("pnlMedicalLogHeader");
-            pnlMedicalLogHeader.setBorder(BorderFactory.createTitledBorder(resourceMap.getString(
+            pnlMedicalLogHeader.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
                   "pnlMedicalLogHeader.title")));
             pnlMedicalLogHeader.setVisible(!campaignOptions.isDisplayMedicalRecord());
 
             JPanel pnlMedicalLog = fillMedicalLog();
             pnlMedicalLog.setName("pnlMedicalLog");
-            pnlMedicalLog.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlMedicalLog.title")));
+            pnlMedicalLog.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
+                  "pnlMedicalLog.title")));
             pnlMedicalLog.setVisible(campaignOptions.isDisplayMedicalRecord());
 
             pnlMedicalLogHeader.addMouseListener(getSwitchListener(pnlMedicalLogHeader, pnlMedicalLog));
@@ -428,15 +430,15 @@ public class PersonViewPanel extends JScrollablePanel {
         if (!person.getAssignmentLog().isEmpty()) {
             JPanel pnlAssignmentsLogHeader = new JPanel();
             pnlAssignmentsLogHeader.setName("assignmentLogHeader");
-            pnlAssignmentsLogHeader.setBorder(BorderFactory.createTitledBorder(resourceMap.getString(
+            pnlAssignmentsLogHeader.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
                   "assignmentLogHeader.title")));
             pnlAssignmentsLogHeader.setVisible(!campaignOptions.isDisplayAssignmentRecord());
 
             JPanel pnlAssignmentsLog = fillAssignmentLog();
 
             pnlAssignmentsLog.setName("assignmentLog");
-            pnlAssignmentsLog.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(resourceMap.getString(
-                  "assignmentLog.title")), BorderFactory.createEmptyBorder(0, 0, 10, 0)));
+            pnlAssignmentsLog.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
+                  "assignmentLog.title")));
             pnlAssignmentsLog.setVisible(campaignOptions.isDisplayAssignmentRecord());
 
             pnlAssignmentsLogHeader.addMouseListener(getSwitchListener(pnlAssignmentsLogHeader, pnlAssignmentsLog));
@@ -457,14 +459,14 @@ public class PersonViewPanel extends JScrollablePanel {
         if (!campaign.getKillsFor(person.getId()).isEmpty()) {
             JPanel pnlKillsHeader = new JPanel();
             pnlKillsHeader.setName("killsHeader");
-            pnlKillsHeader.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlKillsHeader.title")));
+            pnlKillsHeader.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
+                  "pnlKillsHeader.title")));
             pnlKillsHeader.setVisible(!campaignOptions.isDisplayKillRecord());
 
             JPanel pnlKills = fillKillRecord();
 
             pnlKills.setName("txtKills");
-            pnlKills.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(resourceMap.getString(
-                  "pnlKills.title")), BorderFactory.createEmptyBorder(0, 0, 10, 0)));
+            pnlKills.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("pnlKills.title")));
             pnlKills.setVisible(campaignOptions.isDisplayKillRecord());
 
             pnlKillsHeader.addMouseListener(getSwitchListener(pnlKillsHeader, pnlKills));
@@ -485,15 +487,15 @@ public class PersonViewPanel extends JScrollablePanel {
         if (!person.getScenarioLog().isEmpty()) {
             JPanel pnlScenariosLogHeader = new JPanel();
             pnlScenariosLogHeader.setName("scenarioLogHeader");
-            pnlScenariosLogHeader.setBorder(BorderFactory.createTitledBorder(resourceMap.getString(
+            pnlScenariosLogHeader.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
                   "scenarioLogHeader.title")));
             pnlScenariosLogHeader.setVisible(!campaignOptions.isDisplayScenarioLog());
 
             JPanel pnlScenariosLog = fillScenarioLog();
 
             pnlScenariosLog.setName("scenarioLog");
-            pnlScenariosLog.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(resourceMap.getString(
-                  "scenarioLog.title")), BorderFactory.createEmptyBorder(0, 0, 10, 0)));
+            pnlScenariosLog.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
+                  "scenarioLog.title")));
             pnlScenariosLog.setVisible(campaignOptions.isDisplayScenarioLog());
 
             pnlScenariosLogHeader.addMouseListener(getSwitchListener(pnlScenariosLogHeader, pnlScenariosLog));
@@ -569,7 +571,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
         JPanel pnlAllAwards = new JPanel();
         pnlAllAwards.setLayout(new BoxLayout(pnlAllAwards, BoxLayout.PAGE_AXIS));
-        pnlAllAwards.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlAwards.title")));
+        pnlAllAwards.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("pnlAwards.title")));
 
         if (awardController.hasAwardsWithMedals()) {
             JPanel pnlMedals = drawMedals();
@@ -942,7 +944,7 @@ public class PersonViewPanel extends JScrollablePanel {
         // TODO Update layout for new person view (needs that PR to be merged) - Illiani, 50.06
 
         JPanel pnlInfo = new JPanel(new GridBagLayout());
-        pnlInfo.setBorder(BorderFactory.createTitledBorder("-"));
+        pnlInfo.setBorder(RoundedLineBorder.createRoundedLineBorder("-"));
 
         // Helper to simplify row addition (text, value, isPair, gridwidth)
         BiConsumer<String[], Integer> addRow = (arr, gridwidth) -> {
@@ -984,7 +986,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
     private JPanel fillInfo() {
         JPanel pnlInfo = new JPanel(new GridBagLayout());
-        pnlInfo.setBorder(BorderFactory.createTitledBorder(person.getFullTitle()));
+        pnlInfo.setBorder(RoundedLineBorder.createRoundedLineBorder(person.getFullTitle()));
         JLabel lblType = new JLabel();
         JLabel lblUnitNotResponsibleForSalary = new JLabel();
         JLabel lblStatus1 = new JLabel();
@@ -1442,7 +1444,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
     private JPanel fillFamily() {
         JPanel pnlFamily = new JPanel(new GridBagLayout());
-        pnlFamily.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlFamily.title")));
+        pnlFamily.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("pnlFamily.title")));
 
         // family panel
         JLabel lblSpouse2 = new JLabel();
@@ -1840,7 +1842,7 @@ public class PersonViewPanel extends JScrollablePanel {
     private JPanel fillSkills(List<String> relevantSkills, String titleKey) {
         Collections.sort(relevantSkills);
         JPanel pnlSkills = new JPanel(new GridBagLayout());
-        pnlSkills.setBorder(BorderFactory.createTitledBorder(resourceMap.getString(titleKey)));
+        pnlSkills.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(titleKey)));
 
         Attributes attributes = person.getATOWAttributes();
         PersonnelOptions options = person.getOptions();
@@ -1928,7 +1930,7 @@ public class PersonViewPanel extends JScrollablePanel {
      */
     private JPanel fillAttributeModifiers(Map<SkillAttribute, Integer> relevantAttributes) {
         JPanel pnlAttributes = new JPanel(new GridBagLayout());
-        pnlAttributes.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlSkills.attributes")));
+        pnlAttributes.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("pnlSkills.attributes")));
 
         // Calculate how many rows per column for even distribution
         double numColumns = 3.0;
@@ -1992,7 +1994,8 @@ public class PersonViewPanel extends JScrollablePanel {
      */
     private JPanel fillAbilitiesAndImplants(Map<IOption, String> relevantAbilities) {
         JPanel pnlAbilitiesAndImplants = new JPanel(new GridBagLayout());
-        pnlAbilitiesAndImplants.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlSkills.abilities")));
+        pnlAbilitiesAndImplants.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
+              "pnlSkills.abilities")));
 
         // Calculate how many rows per column for even distribution
         double numColumns = 3.0;
@@ -2045,7 +2048,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
     private JPanel fillOther() {
         JPanel pnlOther = new JPanel(new GridBagLayout());
-        pnlOther.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlSkills.traits")));
+        pnlOther.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("pnlSkills.traits")));
 
         JLabel lblConnections = null;
         int connections = person.getConnections();
@@ -2411,7 +2414,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
     private JPanel fillInjuries() {
         JPanel pnlInjuries = new JPanel(new BorderLayout());
-        pnlInjuries.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlInjuries.title")));
+        pnlInjuries.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("pnlInjuries.title")));
 
         JPanel pnlInjuryDetails = new JPanel(new GridBagLayout());
         pnlInjuryDetails.getAccessibleContext().setAccessibleName("Injury Details for " + person.getFullName());

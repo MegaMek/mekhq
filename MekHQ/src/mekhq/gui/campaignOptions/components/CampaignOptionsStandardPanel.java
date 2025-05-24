@@ -39,7 +39,7 @@ import java.awt.Dimension;
 import javax.swing.JPanel;
 
 import megamek.client.ui.swing.util.UIUtil;
-import mekhq.gui.utilities.RoundedLineBorder;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
 /**
  * A specialized {@link JPanel} tailored for use in campaign options dialogs.
