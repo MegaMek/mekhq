@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -80,8 +80,13 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
 
     /**
      * This constructor creates the unit selector dialog for MekHQ. It loads the unit selector dialog in single-select
-     * mode. These selectors are used for: <ul><li>Adding units to the campaign from the Purchase Unit dialog</li><li>
-     * Adding units to the campaign from the 'Find Unit' dialog</li><li>Adding units to loot post-battle</li></ul>
+     * mode. These selectors are used for:
+     *
+     * <ul>
+     *     <li>Adding units to the campaign from the Purchase Unit dialog</li>
+     *     <li>Adding units to the campaign from the 'Find Unit' dialog</li>
+     *     <li>Adding units to loot post-battle</li>
+     * </ul>
      *
      * @param frame             The frame to load the unit dialog into.
      * @param unitLoadingDialog Display this frame instead while the unit dialog is loading (in case load is slow)
@@ -160,7 +165,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
             buttonSelect.setText(Messages.getString("MekSelectorDialog.Add"));
             buttonSelect.setName("buttonAdd");
             //the actual work will be done by whatever called this
-            buttonSelect.addActionListener(evt -> select(campaign.isGM()));
+            buttonSelect.addActionListener(evt -> select(false));
             buttonSelect.setEnabled(true);
             panelButtons.add(buttonSelect, new GridBagConstraints());
 
@@ -185,7 +190,9 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
     }
 
     /**
-     * This function validates that we have a good unit for adding to the campaign.
+     * This function checks to see if this unit is invalid to add to the campaign.
+     *
+     * @return boolean True if invalid, false if valid.
      */
     private boolean isBadSelection() {
         if (getSelectedEntity() != null) {
@@ -248,16 +255,9 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
      * Select processes the select button. This overrides a function in the AbstractUnitSelectorDialog.
      */
     @Override
-    protected void select(boolean isGM) {
-        if (isBadSelection()) {
-            return;
-        }
-        PartQuality quality = PartQuality.QUALITY_D;
-
-        if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
-            quality = UnitOrder.getRandomUnitQuality(0);
-        }
-        campaign.addNewUnit(selectedUnit.getEntity(), false, 0, quality);
+    protected void select(boolean NoOP) {
+        // No actions are needed in the case for the loot dialog to function, which is the only location this is
+        // now called.
     }
 
     /**
@@ -272,7 +272,8 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         Entity entity = super.getSelectedEntity();
         if (entity == null) {
             selectedUnit = null;
-            // If we are currently adding a unit to the campaign, we need to update the Buy and AddGM buttons.
+            // If we are currently in the Purchase Unit dialog, we need to update the state of the Buy and AddGM
+            // buttons to be disabled when no unit is selected.
             if (addToCampaign) {
                 buttonBuy.setEnabled(false);
                 buttonBuy.setText(Messages.getString("MekSelectorDialog.Buy", TARGET_UNKNOWN));
@@ -281,7 +282,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
             }
         } else {
             selectedUnit = new UnitOrder(entity, campaign);
-            // Here also, we need to update the Buy and AddGM buttons.
+            // Here also, we need to update the Buy and AddGM buttons  when a unit is selected.
             if (addToCampaign) {
                 buttonBuy.setEnabled(true);
                 final TargetRoll target = campaign.getTargetForAcquisition(selectedUnit);
