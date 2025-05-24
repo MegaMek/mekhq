@@ -226,7 +226,7 @@ public class SimulateMissionDialog extends JDialog {
 
         // Left box for campaign icon
         JPanel pnlLeft = buildLeftPanel();
-        pnlLeft.setBorder(new EmptyBorder(0, PADDING, 0, 0));
+        pnlLeft.setBorder(new EmptyBorder(PADDING, PADDING, PADDING, PADDING));
         constraints.gridx = gridx;
         constraints.gridy = 0;
         constraints.weightx = 1;
@@ -235,6 +235,7 @@ public class SimulateMissionDialog extends JDialog {
 
         // Center box for the message
         JPanel pnlCenter = populateCenterPanel();
+        pnlCenter.setBorder(new EmptyBorder(PADDING, PADDING, PADDING, PADDING));
         constraints.gridx = gridx;
         constraints.gridy = 0;
         constraints.weightx = 2;

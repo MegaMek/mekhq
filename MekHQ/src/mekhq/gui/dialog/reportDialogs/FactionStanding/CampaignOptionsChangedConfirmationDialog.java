@@ -174,7 +174,7 @@ public class CampaignOptionsChangedConfirmationDialog extends JDialog {
     void populateDialog() {
         JPanel mainPanel = new JPanel(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
-        constraints.insets = new Insets(PADDING, 0, PADDING, 0);
+        constraints.insets = new Insets(PADDING, PADDING, PADDING, PADDING);
         constraints.fill = GridBagConstraints.BOTH;
         constraints.weighty = 1;
 
@@ -182,7 +182,7 @@ public class CampaignOptionsChangedConfirmationDialog extends JDialog {
 
         // Left box for campaign icon
         JPanel pnlLeft = buildLeftPanel();
-        pnlLeft.setBorder(new EmptyBorder(0, PADDING, 0, 0));
+        pnlLeft.setBorder(new EmptyBorder(PADDING, PADDING, PADDING, PADDING));
         constraints.gridx = gridx;
         constraints.gridy = 0;
         constraints.weightx = 1;

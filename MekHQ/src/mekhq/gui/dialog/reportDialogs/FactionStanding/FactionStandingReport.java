@@ -388,7 +388,7 @@ public class FactionStandingReport extends JDialog {
               "factionStandingReport.button.contract"));
         btnSimulateContract.setName("btnSimulateContract");
         btnSimulateContract.setFocusable(false);
-        btnGmTools.setEnabled(isFactionStandingEnabled);
+        btnSimulateContract.setEnabled(isFactionStandingEnabled);
         btnSimulateContract.addActionListener(e -> {
             setVisible(false);
             triggerMissionSimulationDialog();

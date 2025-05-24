@@ -32,31 +32,6 @@
  */
 package mekhq.gui.dialog.reportDialogs.FactionStanding.gmToolsDialog;
 
-import static java.lang.Integer.MAX_VALUE;
-import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
-import static megamek.client.ui.swing.util.UIUtil.scaleForGUI;
-import static megamek.utilities.ImageUtilities.scaleImageIcon;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
-
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JDialog;
-import javax.swing.JEditorPane;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.HyperlinkEvent;
-
 import megamek.logging.MMLogger;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.universe.Faction;
@@ -65,6 +40,20 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.GlossaryDialog;
 import mekhq.gui.dialog.reportDialogs.FactionStanding.manualMissionDialogs.StandingUpdateConfirmationDialog;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.HyperlinkEvent;
+import java.awt.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.lang.Integer.MAX_VALUE;
+import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
+import static megamek.client.ui.swing.util.UIUtil.scaleForGUI;
+import static megamek.utilities.ImageUtilities.scaleImageIcon;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 /**
  * GMTools allows Game Masters to adjust Faction Standings through various operations. These operations include zeroing
@@ -161,7 +150,7 @@ public class GMTools extends JDialog {
     void populateDialog() {
         JPanel mainPanel = new JPanel(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
-        constraints.insets = new Insets(PADDING, 0, PADDING, 0);
+        constraints.insets = new Insets(PADDING, PADDING, PADDING, PADDING);
         constraints.fill = GridBagConstraints.BOTH;
         constraints.weighty = 1;
 
@@ -169,7 +158,7 @@ public class GMTools extends JDialog {
 
         // Left box for campaign icon
         JPanel pnlLeft = buildLeftPanel();
-        pnlLeft.setBorder(new EmptyBorder(0, PADDING, 0, 0));
+        pnlLeft.setBorder(new EmptyBorder(PADDING, PADDING, PADDING, PADDING));
         constraints.gridx = gridx;
         constraints.gridy = 0;
         constraints.weightx = 1;

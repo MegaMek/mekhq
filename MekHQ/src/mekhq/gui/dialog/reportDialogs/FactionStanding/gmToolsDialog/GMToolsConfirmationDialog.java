@@ -32,36 +32,24 @@
  */
 package mekhq.gui.dialog.reportDialogs.FactionStanding.gmToolsDialog;
 
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.gui.dialog.GlossaryDialog;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.HyperlinkEvent;
+import java.awt.*;
+
 import static java.lang.Integer.MAX_VALUE;
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.client.ui.swing.util.UIUtil.scaleForGUI;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
-import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
-import static mekhq.utilities.ReportingUtilities.getWarningColor;
-import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
-
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JDialog;
-import javax.swing.JEditorPane;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.HyperlinkEvent;
-
-import megamek.common.annotations.Nullable;
-import megamek.logging.MMLogger;
-import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
-import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
-import mekhq.gui.dialog.GlossaryDialog;
+import static mekhq.utilities.ReportingUtilities.*;
 
 /**
  * A confirmation dialog for {@link GMTools} actions in MekHQ's Faction Standing system.
@@ -152,7 +140,7 @@ public class GMToolsConfirmationDialog extends JDialog {
     void populateDialog() {
         JPanel mainPanel = new JPanel(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
-        constraints.insets = new Insets(PADDING, 0, PADDING, 0);
+        constraints.insets = new Insets(PADDING, PADDING, PADDING, PADDING);
         constraints.fill = GridBagConstraints.BOTH;
         constraints.weighty = 1;
 
@@ -160,7 +148,7 @@ public class GMToolsConfirmationDialog extends JDialog {
 
         // Left box for campaign icon
         JPanel pnlLeft = buildLeftPanel();
-        pnlLeft.setBorder(new EmptyBorder(0, PADDING, 0, 0));
+        pnlLeft.setBorder(new EmptyBorder(PADDING, PADDING, PADDING, PADDING));
         constraints.gridx = gridx;
         constraints.gridy = 0;
         constraints.weightx = 1;
@@ -220,28 +208,36 @@ public class GMToolsConfirmationDialog extends JDialog {
         editorPane.addHyperlinkListener(this::hyperlinkEventListenerActions);
 
         String description = getFormattedTextAt(RESOURCE_BUNDLE,
-              "gmTools." + actionType.name() + ".confirmation",
-              spanOpeningWithCustomColor(getWarningColor()),
-              CLOSING_SPAN_TAG,
-              selectedFactionName);
+                "gmTools." + actionType.name() + ".confirmation",
+                spanOpeningWithCustomColor(getWarningColor()),
+                CLOSING_SPAN_TAG,
+                selectedFactionName);
         String fontStyle = "font-family: Noto Sans;";
         editorPane.setText(String.format("<div style='width: %s; %s'>%s</div>", CENTER_WIDTH, fontStyle, description));
         setFontScaling(editorPane, false, 1.1);
         pnlCenter.add(editorPane);
 
         RoundedJButton btnCancel = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "gmTools.confirmation.button.cancel"));
-        btnCancel.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnCancel.addActionListener(evt -> dispose());
-        pnlCenter.add(btnCancel);
 
         RoundedJButton btnConfirm = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
-              "gmTools.confirmation.button.confirm"));
-        btnConfirm.setAlignmentX(Component.CENTER_ALIGNMENT);
+                "gmTools.confirmation.button.confirm"));
         btnConfirm.addActionListener(evt -> {
             actionWasConfirmed = true;
             dispose();
         });
-        pnlCenter.add(btnConfirm);
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+        buttonPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        buttonPanel.add(btnCancel);
+
+        buttonPanel.add(Box.createRigidArea(new Dimension(PADDING, 0)));
+
+        buttonPanel.add(btnConfirm);
+
+        pnlCenter.add(Box.createVerticalStrut(PADDING));
+        pnlCenter.add(buttonPanel);
 
         return pnlCenter;
     }
