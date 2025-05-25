@@ -9945,6 +9945,8 @@ public class Campaign implements ITechManager {
      *     <li>If the faction is "PIR", a random pirate faction (other than "PIR" itself) with an available starting
      *     planet is chosen, if available.</li>
      *     <li>If the faction is a clan, the generic "CLAN" faction is used as the fallback.</li>
+     *     <li>If the faction is mercenary, 75% of the time the campaign will begin on the mercenary faction
+     *     capital. Otherwise, they will begin on the capital of another playable faction.</li>
      *     <li>Otherwise, the default faction (Mercenary) is used as the fallback.</li>
      * </ul>
      *
@@ -9968,9 +9970,11 @@ public class Campaign implements ITechManager {
 
             if (faction.getShortName().equalsIgnoreCase("PIR")) {
                 List<Faction> pirateFactions = new ArrayList<>();
-                for (Faction faction : factions.getActiveFactions(currentDay)) {
-                    if (faction.isPirate() && !faction.getShortName().equalsIgnoreCase("PIR")) {
-                        pirateFactions.add(faction);
+                for (Faction activeFaction : factions.getActiveFactions(currentDay)) {
+                    if (activeFaction.isPlayable() &&
+                              activeFaction.isPirate() &&
+                              !activeFaction.getShortName().equalsIgnoreCase("PIR")) {
+                        pirateFactions.add(activeFaction);
                     }
                 }
 
@@ -9979,6 +9983,25 @@ public class Campaign implements ITechManager {
                 }
             } else if (faction.isClan()) {
                 fallbackFaction = factions.getFaction("CLAN");
+            } else if (faction.getShortName().equalsIgnoreCase("MERC")) {
+                // Most of the time, mercenary campaigns will begin on their faction capital (Galatea, etc.).
+                // However, there is a 25% chance they begin in another faction's territory
+                int roll = randomInt(4);
+
+                if (roll == 0) {
+                    fallbackFaction = factions.getFaction("MERC");
+                } else {
+                    List<Faction> recruitingFaction = new ArrayList<>();
+                    for (Faction activeFaction : factions.getActiveFactions(currentDay)) {
+                        if (activeFaction.isPlayable() && !activeFaction.isClan() && !activeFaction.isDeepPeriphery()) {
+                            recruitingFaction.add(activeFaction);
+                        }
+                    }
+
+                    if (!recruitingFaction.isEmpty()) {
+                        fallbackFaction = ObjectUtility.getRandomItem(recruitingFaction);
+                    }
+                }
             }
 
             startingSystem = fallbackFaction.getStartingPlanet(this, currentDay);
