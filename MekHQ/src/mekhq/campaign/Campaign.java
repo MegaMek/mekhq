@@ -404,7 +404,6 @@ public class Campaign implements ITechManager {
     private final CampaignSummary campaignSummary;
     private final Quartermaster quartermaster;
     private StoryArc storyArc;
-    private final FameAndInfamyController regardAndInfamy;
     private BehaviorSettings autoResolveBehaviorSettings;
     private List<UUID> automatedMothballUnits;
     private int temporaryPrisonerCapacity;
@@ -504,7 +503,6 @@ public class Campaign implements ITechManager {
         campaignSummary = new CampaignSummary(this);
         quartermaster = new Quartermaster(this);
         fieldKitchenWithinCapacity = false;
-        regardAndInfamy = new FameAndInfamyController();
         autoResolveBehaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR;
         automatedMothballUnits = new ArrayList<>();
         temporaryPrisonerCapacity = DEFAULT_TEMPORARY_CAPACITY;
@@ -6609,8 +6607,9 @@ public class Campaign implements ITechManager {
         return new ArrayList<>();
     }
 
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public FameAndInfamyController getFameAndInfamy() {
-        return regardAndInfamy;
+        return null;
     }
 
     /**
@@ -6803,11 +6802,6 @@ public class Campaign implements ITechManager {
         // current story arc
         if (null != storyArc) {
             storyArc.writeToXml(writer, indent);
-        }
-
-        // Regard and Infamy
-        if (regardAndInfamy != null) {
-            regardAndInfamy.writeToXml(writer, indent);
         }
 
         // Markets

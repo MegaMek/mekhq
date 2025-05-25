@@ -237,6 +237,7 @@ public class FameAndInfamyController {
      * @param nodeList  The XML {@link NodeList} containing the faction fame values.
      * @param campaign  The {@link Campaign} object to update with the parsed fame values.
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public static void parseFromXML(final NodeList nodeList, Campaign campaign) {
         FameAndInfamyController fameAndInfamy = campaign.getFameAndInfamy();
         try {
