@@ -60,24 +60,9 @@ public final class InjuryTypes {
     private static final MMLogger logger = MMLogger.create(InjuryType.class);
 
     // Predefined types
-    /**
-     * @deprecated use {@link #PUNCTURE} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public static final InjuryType CUT = new Puncture();
     public static final InjuryType PUNCTURE = new Puncture();
-    /**
-     * @deprecated use {@link #FRACTURE} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public static final InjuryType BRUISE = new Fracture();
     public static final InjuryType FRACTURE = new Fracture();
     public static final InjuryType LACERATION = new Laceration();
-    /**
-     * @deprecated use {@link #TORN_MUSCLE} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public static final InjuryType SPRAIN = new TornMuscle();
     public static final InjuryType TORN_MUSCLE = new TornMuscle();
     public static final InjuryType CONCUSSION = new Concussion();
     public static final InjuryType BROKEN_RIB = new BrokenRib();
@@ -698,7 +683,10 @@ public final class InjuryTypes {
 
         @Override
         public String getFluffText(BodyLocation loc, int severity, Gender gender) {
-            return "A torn muscle in " + GenderDescriptors.HIS_HER_THEIR.getDescriptor(gender) + ' ' + loc.locationName();
+            return "A torn muscle in " +
+                         GenderDescriptors.HIS_HER_THEIR.getDescriptor(gender) +
+                         ' ' +
+                         loc.locationName();
         }
 
         @Override

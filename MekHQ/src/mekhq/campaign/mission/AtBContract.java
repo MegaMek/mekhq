@@ -69,7 +69,7 @@ import static mekhq.campaign.rating.IUnitRating.DRAGOON_C;
 import static mekhq.campaign.rating.IUnitRating.DRAGOON_F;
 import static mekhq.campaign.stratcon.StratconContractDefinition.getContractDefinition;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
-import static mekhq.campaign.universe.fameAndInfamy.BatchallFactions.BATCHALL_FACTIONS;
+import static mekhq.campaign.universe.factionStanding.BatchallFactions.BATCHALL_FACTIONS;
 import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
 
 import java.awt.BorderLayout;
@@ -141,7 +141,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RandomFactionGenerator;
-import mekhq.campaign.universe.fameAndInfamy.BatchallFactions;
+import mekhq.campaign.universe.factionStanding.BatchallFactions;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -1304,9 +1304,7 @@ public class AtBContract extends Contract {
                     getEnemyCamouflage().setFilename(item.getTextContent().trim());
                 } else if (item.getTextContent().equalsIgnoreCase("enemyColour")) {
                     setEnemyColour(PlayerColour.parseFromString(item.getTextContent().trim()));
-                    // <50.03 compatibility handler
-                } else if (item.getNodeName().equalsIgnoreCase("requiredLances") ||
-                                 item.getNodeName().equalsIgnoreCase("requiredCombatTeams")) {
+                } else if (item.getNodeName().equalsIgnoreCase("requiredCombatTeams")) {
                     requiredCombatTeams = Integer.parseInt(item.getTextContent());
                 } else if (item.getNodeName().equalsIgnoreCase("moraleLevel")) {
                     setMoraleLevel(AtBMoraleLevel.parseFromString(item.getTextContent().trim()));
@@ -2053,10 +2051,13 @@ public class AtBContract extends Contract {
      * Creates and returns a {@link JPanel} containing the belligerent factions' logos for the specified game year.
      *
      * <p>This panel displays the employer and enemy faction logos side by side, separated by a styled divider.
-     * The logos are determined based on the provided game year and faction codes, scaled appropriately for the GUI.</p>
+     * The logos are determined based on the provided game year and faction codes, scaled appropriately for the
+     * GUI.</p>
      *
      * @param gameYear the year used to determine which faction logos to display
+     *
      * @return a {@link JPanel} with the employer and enemy faction logos, with a divider in between
+     *
      * @author Illiani
      * @since 0.50.06
      */

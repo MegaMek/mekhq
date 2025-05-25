@@ -101,8 +101,8 @@ public class ProtoMekSensor extends Part {
     }
 
     @Override
-    public int getTechBase() {
-        return T_CLAN;
+    public TechBase getTechBase() {
+        return TechBase.CLAN;
     }
 
     @Override

@@ -61,7 +61,7 @@ public enum PartRepairType {
     // region Constructors
     PartRepairType(final String name, final boolean validForMRMS) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Parts",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.validForMRMS = validForMRMS;
     }
@@ -132,9 +132,7 @@ public enum PartRepairType {
     // endregion Boolean Comparison Methods
 
     public static List<PartRepairType> getMRMSValidTypes() {
-        return Arrays.stream(values())
-                .filter(PartRepairType::isValidForMRMS)
-                .collect(Collectors.toList());
+        return Arrays.stream(values()).filter(PartRepairType::isValidForMRMS).collect(Collectors.toList());
     }
 
     // region File I/O
@@ -143,16 +141,6 @@ public enum PartRepairType {
             return valueOf(text);
         } catch (Exception ignored) {
 
-        }
-
-        // Text migration, which occurred in 0.49.9
-        switch (text) {
-            case "ARMOR":
-                return ARMOUR;
-            case "AMMO":
-                return AMMUNITION;
-            default:
-                break;
         }
 
         try {
@@ -191,7 +179,7 @@ public enum PartRepairType {
         }
 
         MMLogger.create(PartRepairType.class)
-                .error("Unable to parse " + text + " into a PartRepairType. Returning GENERAL_LOCATION.");
+              .error("Unable to parse " + text + " into a PartRepairType. Returning GENERAL_LOCATION.");
         return GENERAL_LOCATION;
     }
     // endregion File I/O

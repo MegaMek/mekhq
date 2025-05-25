@@ -74,6 +74,8 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.GlossaryDialog;
 
 /**
@@ -379,6 +381,8 @@ public class ImmersiveDialogCore extends JDialog {
         // Add the buttons panel to the northPanel
         northPanel.add(buttonPanel, BorderLayout.SOUTH);
 
+        northPanel.setBorder(RoundedLineBorder.createRoundedLineBorder());
+
         return northPanel;
     }
 
@@ -451,7 +455,7 @@ public class ImmersiveDialogCore extends JDialog {
         JPanel pnlOutOfCharacter = new JPanel(new GridBagLayout());
 
         // Create a compound border with an etched border and padding (empty border)
-        pnlOutOfCharacter.setBorder(BorderFactory.createEtchedBorder());
+        pnlOutOfCharacter.setBorder(RoundedLineBorder.createRoundedLineBorder());
 
         // Create a JEditorPane for the message
         JEditorPane editorPane = new JEditorPane();
@@ -529,12 +533,12 @@ public class ImmersiveDialogCore extends JDialog {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.NONE;
 
-        List<JButton> buttonList = new ArrayList<>();
+        List<RoundedJButton> buttonList = new ArrayList<>();
         Dimension largestSize = scaleForGUI(0, 0);
 
         // First pass: Create buttons and determine the largest size
         for (ButtonLabelTooltipPair buttonStrings : buttons) {
-            JButton button = null;
+            RoundedJButton button = null;
 
             if (isVerticalLayout) {
                 StringBuilder buttonLabel = new StringBuilder("<html>");
@@ -553,18 +557,19 @@ public class ImmersiveDialogCore extends JDialog {
                     buttonLabel.append(label);
                 }
 
-                button = new JButton(buttonLabel.toString());
+                button = new RoundedJButton(buttonLabel.toString());
             } else {
                 String label = buttonStrings.btnLabel();
                 String tooltip = buttonStrings.btnTooltip();
                 if (label != null) {
-                    button = new JButton(label);
+                    String text = String.format("<html><div style='text-align:center;'>%s</div></html>", label);
+                    button = new RoundedJButton(text);
 
                     if (tooltip != null) {
                         button.setToolTipText(wordWrap(tooltip));
                     }
                 } else if (tooltip != null) {
-                    button = new JButton(tooltip);
+                    button = new RoundedJButton(tooltip);
                 }
             }
 
@@ -606,12 +611,12 @@ public class ImmersiveDialogCore extends JDialog {
         }
 
         // Second pass: Set all buttons to the largest size
-        for (JButton button : buttonList) {
+        for (RoundedJButton button : buttonList) {
             button.setPreferredSize(largestSize);
         }
 
         // Final pass: Add buttons to the panel
-        for (JButton button : buttonList) {
+        for (RoundedJButton button : buttonList) {
             buttonPanel.add(button, gbc);
 
             // This ensures we don't have a button selected by default

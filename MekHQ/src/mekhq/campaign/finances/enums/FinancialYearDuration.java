@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.finances.enums;
 
@@ -54,7 +59,7 @@ public enum FinancialYearDuration {
     // region Constructors
     FinancialYearDuration(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Finances",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
@@ -95,8 +100,7 @@ public enum FinancialYearDuration {
     public boolean isEndOfFinancialYear(final LocalDate today) {
         switch (this) {
             case SEMIANNUAL:
-                return (today.getDayOfYear() == 1)
-                        || ((today.getMonthValue() == 7) && (today.getDayOfMonth() == 1));
+                return (today.getDayOfYear() == 1) || ((today.getMonthValue() == 7) && (today.getDayOfMonth() == 1));
             case BIENNIAL:
                 return (today.getDayOfYear() == 1) && (today.getYear() % 2 == 0);
             case QUINQUENNIAL:
@@ -112,14 +116,11 @@ public enum FinancialYearDuration {
     }
 
     /**
-     * This is called to get the export after the financial year has concluded
-     * according to the
-     * previous check returns true. Because of that, this is called with tomorrow's
-     * date.
+     * This is called to get the export after the financial year has concluded according to the previous check returns
+     * true. Because of that, this is called with tomorrow's date.
      *
-     * @param tomorrow tomorrow's date. Because of how this is passed in, we are
-     *                 provided that
-     *                 instead of today
+     * @param tomorrow tomorrow's date. Because of how this is passed in, we are provided that instead of today
+     *
      * @return the filename to use for the date during financial export
      */
     public String getExportFilenameDateString(final LocalDate tomorrow) {
@@ -127,15 +128,19 @@ public enum FinancialYearDuration {
         switch (this) {
             case SEMIANNUAL:
                 final boolean isStartOfYear = tomorrow.getDayOfYear() == 1;
-                return isStartOfYear
-                        ? String.format("%d %s - %s", year,
-                                Month.JULY.getDisplayName(TextStyle.SHORT, Locale.getDefault()).replaceAll("[.]", ""),
-                                Month.DECEMBER.getDisplayName(TextStyle.SHORT, Locale.getDefault()).replaceAll("[.]",
-                                        ""))
-                        : String.format("%d %s - %s", year + 1,
-                                Month.JANUARY.getDisplayName(TextStyle.SHORT, Locale.getDefault()).replaceAll("[.]",
-                                        ""),
-                                Month.JUNE.getDisplayName(TextStyle.SHORT, Locale.getDefault()).replaceAll("[.]", ""));
+                return isStartOfYear ?
+                             String.format("%d %s - %s",
+                                   year,
+                                   Month.JULY.getDisplayName(TextStyle.SHORT, Locale.getDefault())
+                                         .replaceAll("[.]", ""),
+                                   Month.DECEMBER.getDisplayName(TextStyle.SHORT, Locale.getDefault())
+                                         .replaceAll("[.]", "")) :
+                             String.format("%d %s - %s",
+                                   year + 1,
+                                   Month.JANUARY.getDisplayName(TextStyle.SHORT, Locale.getDefault())
+                                         .replaceAll("[.]", ""),
+                                   Month.JUNE.getDisplayName(TextStyle.SHORT, Locale.getDefault())
+                                         .replaceAll("[.]", ""));
             case BIENNIAL:
                 return String.format("%d - %d", year - 1, year);
             case QUINQUENNIAL:
@@ -149,23 +154,26 @@ public enum FinancialYearDuration {
         }
     }
 
-    // region File I/O
     /**
-     * This allows for the legacy parsing method of financial durations, outdated in
-     * 0.49.X
+     * Parses a string representation of a financial year duration and converts it to a FinancialYearDuration enum
+     * instance. If the string cannot be parsed, the default value of ANNUAL is returned.
+     *
+     * @param text the string to be converted to a FinancialYearDuration. It typically should represent one of the valid
+     *             enum constant names.
+     *
+     * @return the corresponding FinancialYearDuration enum instance, or ANNUAL if parsing fails.
      */
     public static FinancialYearDuration parseFromString(final String text) {
         try {
             return valueOf(text);
         } catch (Exception ignored) {
             MMLogger.create(FinancialYearDuration.class)
-                    .error(ignored, "Unable to parse " + text + " into a FinancialYearDuration. Returning ANNUAL.");
+                  .error(ignored, "Unable to parse {} into a FinancialYearDuration. Returning ANNUAL.", text);
             return ANNUAL;
 
         }
 
     }
-    // endregion File I/O
 
     @Override
     public String toString() {

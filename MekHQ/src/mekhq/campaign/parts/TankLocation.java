@@ -55,12 +55,12 @@ import org.w3c.dom.NodeList;
 public class TankLocation extends Part {
     private static final MMLogger logger = MMLogger.create(TankLocation.class);
 
-    static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_ALL).setAdvancement(2460, 2470, 2510)
+    static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TechBase.ALL).setAdvancement(2460, 2470, 2510)
                                                           .setApproximate(true, false, false)
-                                                          .setPrototypeFactions(F_TH)
-                                                          .setProductionFactions(F_TH)
-                                                          .setTechRating(RATING_D)
-                                                          .setAvailability(RATING_A, RATING_A, RATING_A, RATING_A)
+                                                          .setPrototypeFactions(Faction.TH)
+                                                          .setProductionFactions(Faction.TH)
+                                                          .setTechRating(TechRating.D)
+                                                          .setAvailability(AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A)
                                                           .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     protected int loc;

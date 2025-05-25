@@ -57,7 +57,6 @@ import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
 import static mekhq.campaign.personnel.DiscretionarySpending.performDiscretionarySpending;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_INTERSTELLAR_NEGOTIATOR;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_LOGISTICIAN;
-import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_SCROUNGE;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.TrainingCombatTeams.processTrainingCombatTeams;
@@ -111,6 +110,7 @@ import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.swing.util.PlayerColour;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
+import megamek.common.ITechnology.AvailabilityValue;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.equipment.BombMounted;
@@ -124,6 +124,7 @@ import megamek.common.options.IBasicOption;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
+import megamek.common.planetaryconditions.PlanetaryConditions;
 import megamek.common.util.BuildingBlock;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
@@ -242,7 +243,8 @@ import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.universe.eras.Era;
 import mekhq.campaign.universe.eras.Eras;
-import mekhq.campaign.universe.fameAndInfamy.BatchallFactions;
+import mekhq.campaign.universe.factionStanding.BatchallFactions;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.campaign.universe.fameAndInfamy.FameAndInfamyController;
 import mekhq.campaign.universe.selectors.factionSelectors.AbstractFactionSelector;
 import mekhq.campaign.universe.selectors.factionSelectors.DefaultFactionSelector;
@@ -326,7 +328,7 @@ public class Campaign implements ITechManager {
     private Hashtable<Integer, CombatTeam> combatTeams; // AtB
 
     private Faction faction;
-    private int techFactionCode;
+    private ITechnology.Faction techFaction;
     private String retainerEmployerCode; // AtB
     private LocalDate retainerStartDate; // AtB
     private RankSystem rankSystem;
@@ -368,8 +370,10 @@ public class Campaign implements ITechManager {
     private ShoppingList shoppingList;
 
     private NewPersonnelMarket newPersonnelMarket;
+
     @Deprecated(since = "0.50.06", forRemoval = false)
     private PersonnelMarket personnelMarket;
+
     private AbstractContractMarket contractMarket;
     private AbstractUnitMarket unitMarket;
 
@@ -394,12 +398,13 @@ public class Campaign implements ITechManager {
     private int crimeRating;
     private int crimePirateModifier;
     private LocalDate dateOfLastCrime;
+    private FactionStandings factionStandings;
     private int initiativeBonus;
     private int initiativeMaxBonus;
     private final CampaignSummary campaignSummary;
     private final Quartermaster quartermaster;
     private StoryArc storyArc;
-    private final FameAndInfamyController fameAndInfamy;
+    private final FameAndInfamyController regardAndInfamy;
     private BehaviorSettings autoResolveBehaviorSettings;
     private List<UUID> automatedMothballUnits;
     private int temporaryPrisonerCapacity;
@@ -448,7 +453,7 @@ public class Campaign implements ITechManager {
         campaignStartDate = null;
         campaignOptions = new CampaignOptions();
         setFaction(Factions.getInstance().getDefaultFaction());
-        techFactionCode = ITechnology.F_MERC;
+        techFaction = ITechnology.Faction.MERC;
         CurrencyManager.getInstance().setCampaign(this);
         location = new CurrentLocation(Systems.getInstance().getSystems().get("Galatea"), 0);
         isAvoidingEmptySystems = true;
@@ -461,6 +466,7 @@ public class Campaign implements ITechManager {
         retainerEmployerCode = null;
         retainerStartDate = null;
         reputation = null;
+        factionStandings = new FactionStandings();
         crimeRating = 0;
         crimePirateModifier = 0;
         dateOfLastCrime = null;
@@ -498,7 +504,7 @@ public class Campaign implements ITechManager {
         campaignSummary = new CampaignSummary(this);
         quartermaster = new Quartermaster(this);
         fieldKitchenWithinCapacity = false;
-        fameAndInfamy = new FameAndInfamyController();
+        regardAndInfamy = new FameAndInfamyController();
         autoResolveBehaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR;
         automatedMothballUnits = new ArrayList<>();
         temporaryPrisonerCapacity = DEFAULT_TEMPORARY_CAPACITY;
@@ -1681,15 +1687,16 @@ public class Campaign implements ITechManager {
 
     /**
      * This will update the transport in the transports list with current capacities. When a unit is added or removed
-     * from a transport, that information needs updated in the campaign transport map. This method will update the
-     * map for every {@code CampaignTransportType} for the given transport.
+     * from a transport, that information needs updated in the campaign transport map. This method will update the map
+     * for every {@code CampaignTransportType} for the given transport.
+     *
+     * @param transport Unit
      *
      * @see Campaign#updateTransportInTransports(CampaignTransportType, Unit)
-     * @param transport             Unit
      */
     public void updateTransportInTransports(Unit transport) {
         for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
-            updateTransportInTransports (campaignTransportType, transport);
+            updateTransportInTransports(campaignTransportType, transport);
         }
     }
 
@@ -2038,7 +2045,9 @@ public class Campaign implements ITechManager {
      * performed by a game master that recruitment actions should be logged, and the character should be employed.
      *
      * @param person the person to recruit; must not be {@code null}
+     *
      * @return {@code true} if recruitment was successful and the person was added or employed; {@code false} otherwise
+     *
      * @see #recruitPerson(Person, PrisonerStatus, boolean, boolean, boolean)
      */
     public boolean recruitPerson(Person person) {
@@ -2054,17 +2063,19 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Recruits a person into the campaign roster using their current prisoner status,
-     * allowing specification of both game master and employment flags.
+     * Recruits a person into the campaign roster using their current prisoner status, allowing specification of both
+     * game master and employment flags.
      * <p>
-     * This is a convenience overload that enables logging and allows caller to choose
-     * whether the person is employed upon recruitment.
+     * This is a convenience overload that enables logging and allows caller to choose whether the person is employed
+     * upon recruitment.
      * </p>
      *
      * @param person the person to recruit; must not be {@code null}
      * @param gmAdd  if {@code true}, recruitment is performed by a game master (bypassing funds check)
      * @param employ if {@code true}, the person is marked as employed in the campaign
+     *
      * @return {@code true} if recruitment was successful and personnel was added or employed; {@code false} otherwise
+     *
      * @see #recruitPerson(Person, PrisonerStatus, boolean, boolean, boolean)
      */
     public boolean recruitPerson(Person person, boolean gmAdd, boolean employ) {
@@ -2086,10 +2097,12 @@ public class Campaign implements ITechManager {
      * actions should be logged. If successful, the person is marked as employed based on the given flag.
      * </p>
      *
-     * @param person          the person to recruit; must not be {@code null}
-     * @param prisonerStatus  the prison status to assign to the person
-     * @param employ          if {@code true}, the person is marked as employed in the campaign
+     * @param person         the person to recruit; must not be {@code null}
+     * @param prisonerStatus the prison status to assign to the person
+     * @param employ         if {@code true}, the person is marked as employed in the campaign
+     *
      * @return {@code true} if recruitment was successful and personnel was added or employed; {@code false} otherwise
+     *
      * @see #recruitPerson(Person, PrisonerStatus, boolean, boolean, boolean)
      */
     public boolean recruitPerson(Person person, PrisonerStatus prisonerStatus, boolean employ) {
@@ -2109,9 +2122,8 @@ public class Campaign implements ITechManager {
      * optional relationship simulation.
      *
      * <p>If the {@code employ} parameter is {@code true} and the person is not already employed, this method
-     * optionally
-     * deducts recruitment costs from campaign finances (unless performed by a game master). The person's status and
-     * campaign logs are updated accordingly.</p>
+     * optionally deducts recruitment costs from campaign finances (unless performed by a game master). The person's
+     * status and campaign logs are updated accordingly.</p>
      *
      * <p>If the person is a new recruit, their joining date and personnel entry are initialized, and relationship
      * history may be simulated based on campaign options and role.</p>
@@ -2159,7 +2171,10 @@ public class Campaign implements ITechManager {
             if (getCampaignOptions().isUseSimulatedRelationships()) {
                 if ((prisonerStatus.isFree()) &&
                           (!person.getOriginFaction().isClan()) &&
-                          (!person.getPrimaryRole().isDependent())) {
+                          // We don't simulate for civilians, otherwise MekHQ will try to simulate the entire
+                          // relationship history of everyone the recruit has ever married or birthed. This will
+                          // cause a StackOverflow. -- Illiani, May/21/2025
+                          (!person.getPrimaryRole().isCivilian())) {
                     simulateRelationshipHistory(person);
                 }
             }
@@ -2212,10 +2227,14 @@ public class Campaign implements ITechManager {
             return;
         }
 
-        List<Person> children = new ArrayList<>();
-        Person currentSpouse = null;
         Person babysFather = null;
         Person spousesBabysFather = null;
+        List<Person> currentChildren = new ArrayList<>(); // Children that join with the character
+        List<Person> priorChildren = new ArrayList<>(); // Children that were lost during divorce
+
+        Person currentSpouse = null; // The current spouse
+        List<Person> allSpouses = new ArrayList<>(); // All spouses current or divorced
+
 
         // run the simulation
         for (long weeksRemaining = weeksBetween; weeksRemaining >= 0; weeksRemaining--) {
@@ -2230,7 +2249,7 @@ public class Campaign implements ITechManager {
 
                     // there is a chance a departing spouse might take some of their children with
                     // them
-                    for (Person child : children) {
+                    for (Person child : currentChildren) {
                         if (child.getGenealogy().getParents().contains(currentSpouse)) {
                             if (randomInt(2) == 0) {
                                 toRemove.add(child);
@@ -2238,7 +2257,9 @@ public class Campaign implements ITechManager {
                         }
                     }
 
-                    children.removeAll(toRemove);
+                    currentChildren.removeAll(toRemove);
+
+                    priorChildren.addAll(toRemove);
 
                     currentSpouse = null;
                 }
@@ -2247,6 +2268,7 @@ public class Campaign implements ITechManager {
 
                 if (person.getGenealogy().hasSpouse()) {
                     currentSpouse = person.getGenealogy().getSpouse();
+                    allSpouses.add(currentSpouse);
                 }
             }
 
@@ -2272,7 +2294,6 @@ public class Campaign implements ITechManager {
                       true);
 
                 if (currentSpouse.isPregnant()) {
-
                     if (person.getGender().isMale()) {
                         spousesBabysFather = person;
                     }
@@ -2280,32 +2301,43 @@ public class Campaign implements ITechManager {
             }
 
             if ((person.isPregnant()) && (currentDate.isAfter(person.getDueDate()))) {
-                children.addAll(getProcreation().birthHistoric(this, localDate, person, babysFather));
+                currentChildren.addAll(getProcreation().birthHistoric(this, localDate, person, babysFather));
                 babysFather = null;
             }
 
             if ((currentSpouse != null) &&
                       (currentSpouse.isPregnant()) &&
                       (currentDate.isAfter(currentSpouse.getDueDate()))) {
-                children.addAll(getProcreation().birthHistoric(this, localDate, currentSpouse, spousesBabysFather));
+                currentChildren.addAll(getProcreation().birthHistoric(this,
+                      localDate,
+                      currentSpouse,
+                      spousesBabysFather));
                 spousesBabysFather = null;
             }
         }
 
         // with the simulation concluded, we add the current spouse (if any) and any
         // remaining children to the unit
-        if (currentSpouse != null) {
-            recruitPerson(currentSpouse, PrisonerStatus.FREE, true, false, false);
+        for (Person spouse : allSpouses) {
+            recruitPerson(spouse, PrisonerStatus.FREE, true, false, false);
 
-            addReport(String.format(resources.getString("relativeJoinsForce.text"),
-                  currentSpouse.getHyperlinkedFullTitle(),
-                  person.getHyperlinkedFullTitle(),
-                  resources.getString("relativeJoinsForceSpouse.text")));
+            if (currentSpouse == spouse) {
+                addReport(String.format(resources.getString("relativeJoinsForce.text"),
+                      spouse.getHyperlinkedFullTitle(),
+                      person.getHyperlinkedFullTitle(),
+                      resources.getString("relativeJoinsForceSpouse.text")));
+            } else {
+                spouse.setStatus(PersonnelStatus.BACKGROUND_CHARACTER);
+            }
 
-            MekHQ.triggerEvent(new PersonChangedEvent(currentSpouse));
+            MekHQ.triggerEvent(new PersonChangedEvent(spouse));
         }
 
-        for (Person child : children) {
+        List<Person> allChildren = new ArrayList<>();
+        allChildren.addAll(currentChildren);
+        allChildren.addAll(priorChildren);
+
+        for (Person child : allChildren) {
             child.setOriginFaction(person.getOriginFaction());
             child.setOriginPlanet(person.getOriginPlanet());
 
@@ -2344,10 +2376,14 @@ public class Campaign implements ITechManager {
 
             recruitPerson(child, PrisonerStatus.FREE, true, false, false);
 
-            addReport(String.format(resources.getString("relativeJoinsForce.text"),
-                  child.getHyperlinkedFullTitle(),
-                  person.getHyperlinkedFullTitle(),
-                  resources.getString("relativeJoinsForceChild.text")));
+            if (currentChildren.contains(child)) {
+                addReport(String.format(resources.getString("relativeJoinsForce.text"),
+                      child.getHyperlinkedFullTitle(),
+                      person.getHyperlinkedFullTitle(),
+                      resources.getString("relativeJoinsForceChild.text")));
+            } else {
+                child.setStatus(PersonnelStatus.BACKGROUND_CHARACTER);
+            }
 
             MekHQ.triggerEvent(new PersonChangedEvent(child));
         }
@@ -2585,30 +2621,6 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Retrieves a list of all active personnel, including prisoners.
-     *
-     * <p>
-     * This method is deprecated and defaults to including prisoners in the result. Use
-     * {@link #getActivePersonnel(boolean)} instead for more explicit behavior control.
-     * </p>
-     *
-     * <p>
-     * This method was Deprecated during 50.04's dev cycle. In prior versions this method wasn't explicit in its
-     * inclusion of prisoners in the return. I've opted to Deprecate this method as it is far better to be explicit in
-     * whether you want to include prisoners or not. This avoids a lot of potentially unique bugs.
-     * </p>
-     *
-     * @return A {@link List} of {@link Person} objects representing all active personnel, including prisoners.
-     *
-     * @deprecated Use {@link #getActivePersonnel(boolean)} to specify whether to include prisoners. Mediated in 0.50
-     *       .06, remove in 0.50.07
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public List<Person> getActivePersonnel() {
-        return getActivePersonnel(true);
-    }
-
-    /**
      * Retrieves a list of active personnel in the campaign, optionally including prisoners.
      *
      * <p>
@@ -2648,6 +2660,7 @@ public class Campaign implements ITechManager {
 
     /**
      * @return a list of people who are currently eligible to receive a salary.
+     *
      * @author Illiani
      * @since 0.50.06
      */
@@ -3425,10 +3438,6 @@ public class Campaign implements ITechManager {
                 int effectiveMaxAcquisitions = defaultMaxAcquisitions;
 
                 PersonnelOptions options = person.getOptions();
-                if (options.booleanOption(ADMIN_SCROUNGE)) {
-                    effectiveMaxAcquisitions++;
-                }
-
                 if (isIneligibleToPerformProcurement(person, acquisitionCategory)) {
                     continue;
                 }
@@ -3460,9 +3469,6 @@ public class Campaign implements ITechManager {
                 int effectiveMaxAcquisitions = defaultMaxAcquisitions;
 
                 PersonnelOptions options = person.getOptions();
-                if (options.booleanOption(ADMIN_SCROUNGE)) {
-                    effectiveMaxAcquisitions++;
-                }
 
                 if (isIneligibleToPerformProcurement(person, acquisitionCategory)) {
                     continue;
@@ -4009,7 +4015,7 @@ public class Campaign implements ITechManager {
                              getLocalDate(),
                              getCampaignOptions(),
                              getFaction(),
-                             acquisition.getTechBase() == Part.T_CLAN);
+                             acquisition.getTechBase() == Part.TechBase.CLAN);
 
         if (target.getValue() == TargetRoll.IMPOSSIBLE) {
             if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
@@ -4027,9 +4033,9 @@ public class Campaign implements ITechManager {
         }
         SocioIndustrialData socioIndustrial = system.getPrimaryPlanet().getSocioIndustrial(getLocalDate());
         CampaignOptions options = getCampaignOptions();
-        int tech = options.getPlanetTechAcquisitionBonus(socioIndustrial.tech);
-        int industry = options.getPlanetIndustryAcquisitionBonus(socioIndustrial.industry);
-        int outputs = options.getPlanetOutputAcquisitionBonus(socioIndustrial.output);
+        int techBonus = options.getPlanetTechAcquisitionBonus(socioIndustrial.tech);
+        int industryBonus = options.getPlanetIndustryAcquisitionBonus(socioIndustrial.industry);
+        int outputsBonus = options.getPlanetOutputAcquisitionBonus(socioIndustrial.output);
         if (d6(2) < target.getValue()) {
             // no contacts on this planet, move along
             if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
@@ -4043,14 +4049,14 @@ public class Campaign implements ITechManager {
                                 " at TN: " +
                                 target.getValue() +
                                 " - Modifiers (Tech: " +
-                                (tech > 0 ? "+" : "") +
-                                tech +
+                                (techBonus > 0 ? "+" : "") +
+                                techBonus +
                                 ", Industry: " +
-                                (industry > 0 ? "+" : "") +
-                                industry +
+                                (industryBonus > 0 ? "+" : "") +
+                                industryBonus +
                                 ", Outputs: " +
-                                (outputs > 0 ? "+" : "") +
-                                outputs +
+                                (outputsBonus > 0 ? "+" : "") +
+                                outputsBonus +
                                 ") </font>");
             }
             return PartAcquisitionResult.PlanetSpecificFailure;
@@ -4066,14 +4072,14 @@ public class Campaign implements ITechManager {
                                 " at TN: " +
                                 target.getValue() +
                                 " - Modifiers (Tech: " +
-                                (tech > 0 ? "+" : "") +
-                                tech +
+                                (techBonus > 0 ? "+" : "") +
+                                techBonus +
                                 ", Industry: " +
-                                (industry > 0 ? "+" : "") +
-                                industry +
+                                (industryBonus > 0 ? "+" : "") +
+                                industryBonus +
                                 ", Outputs: " +
-                                (outputs > 0 ? "+" : "") +
-                                outputs +
+                                (outputsBonus > 0 ? "+" : "") +
+                                outputsBonus +
                                 ") </font>");
             }
             return PartAcquisitionResult.Success;
@@ -4134,7 +4140,7 @@ public class Campaign implements ITechManager {
                                  getLocalDate(),
                                  getCampaignOptions(),
                                  getFaction(),
-                                 acquisition.getTechBase() == Part.T_CLAN);
+                                 acquisition.getTechBase() == Part.TechBase.CLAN);
         }
         report += "attempts to find " + acquisition.getAcquisitionName();
 
@@ -4655,7 +4661,8 @@ public class Campaign implements ITechManager {
                        (getCampaignOptions().getDestroyMargin() <= (target.getValue() - roll))) ||
                       (!getCampaignOptions().isDestroyByMargin()
                              // if a legendary, primary tech and destroy by margin is NOT on
-                             && ((tech.getExperienceLevel(this, false) == SkillType.EXP_LEGENDARY) ||
+                             &&
+                             ((tech.getExperienceLevel(this, false) == SkillType.EXP_LEGENDARY) ||
                                     tech.getPrimaryRole().isVehicleCrew())) // For vessel crews
                             && (roll < target.getValue())) {
                 tech.changeCurrentEdge(-1);
@@ -5050,10 +5057,23 @@ public class Campaign implements ITechManager {
 
         for (AtBContract contract : getActiveAtBContracts()) {
             if (campaignOptions.isUseGenericBattleValue()) {
-                if (contract.getStartDate().equals(getLocalDate())) {
-                    if (getCampaignOptions().isUseGenericBattleValue() &&
-                              BatchallFactions.usesBatchalls(contract.getEnemyCode())) {
-                        contract.setBatchallAccepted(contract.initiateBatchall(this));
+                if (contract.getStartDate().equals(currentDay)) {
+                    String factionCode = contract.getEnemyCode();
+                    if (BatchallFactions.usesBatchalls(factionCode)) {
+                        if (contract.initiateBatchall(this)) {
+                            contract.setBatchallAccepted(true);
+                        } else {
+                            contract.setBatchallAccepted(false);
+
+                            if (campaignOptions.isTrackFactionStanding()) {
+                                List<String> reports = factionStandings.processRefusedBatchall(factionCode,
+                                      currentDay.getYear());
+
+                                for (String report : reports) {
+                                    addReport(report);
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -5243,14 +5263,6 @@ public class Campaign implements ITechManager {
         if (MekHQ.getMHQOptions().getNewDayOptimizeMedicalAssignments()) {
             new OptimizeInfirmaryAssignments(this);
         }
-    }
-
-    /**
-     * @deprecated use {@link Person#resetCurrentEdge()} instead
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    private void processWeeklyEdgeResets(Person person) {
-        person.resetCurrentEdge();
     }
 
     /**
@@ -5597,6 +5609,8 @@ public class Campaign implements ITechManager {
         // Advance the day by one
         final LocalDate yesterday = currentDay;
         currentDay = currentDay.plusDays(1);
+        boolean isFirstOfMonth = currentDay.getDayOfMonth() == 1;
+        boolean isNewYear = currentDay.getDayOfYear() == 1;
 
         // Check for important dates
         if (campaignOptions.isShowLifeEventDialogCelebrations()) {
@@ -5617,12 +5631,18 @@ public class Campaign implements ITechManager {
         beginReport("<b>" + MekHQ.getMHQOptions().getLongDisplayFormattedDate(getLocalDate()) + "</b>");
 
         // New Year Changes
-        if (currentDay.getDayOfYear() == 1) {
+        if (isNewYear) {
             // News is reloaded
             reloadNews();
 
             // Change Year Game Option
             getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(getGameYear());
+
+            // Degrade Regard
+            List<String> degradedRegardReports = factionStandings.processRegardDegradation(currentDay.getYear());
+            for (String report : degradedRegardReports) {
+                addReport(report);
+            }
         }
 
         readNews();
@@ -5641,9 +5661,8 @@ public class Campaign implements ITechManager {
         processNewDayPersonnel();
 
         // Needs to be before 'processNewDayATB' so that Dependents can't leave the
-        // moment they
-        // arrive via AtB Bonus Events
-        if ((location.isOnPlanet()) && (currentDay.getDayOfMonth() == 1)) {
+        // moment they arrive via AtB Bonus Events
+        if (location.isOnPlanet() && isFirstOfMonth) {
             RandomDependents randomDependents = new RandomDependents(this);
             randomDependents.processMonthlyRemovalAndAddition();
         }
@@ -5661,14 +5680,14 @@ public class Campaign implements ITechManager {
             processEducationNewDay();
         }
 
-        if ((campaignOptions.isEnableAutoAwards()) && (currentDay.getDayOfMonth() == 1)) {
+        if (campaignOptions.isEnableAutoAwards() && isFirstOfMonth) {
             AutoAwardsController autoAwardsController = new AutoAwardsController();
             autoAwardsController.ManualController(this, false);
         }
 
         // Prisoner events can occur on Monday or the 1st of the month depending on the
         // type of event
-        if (currentDay.getDayOfWeek() == DayOfWeek.MONDAY || currentDay.getDayOfMonth() == 1) {
+        if (currentDay.getDayOfWeek() == DayOfWeek.MONDAY || isFirstOfMonth) {
             new PrisonerEventManager(this);
         }
 
@@ -5686,7 +5705,7 @@ public class Campaign implements ITechManager {
         finances.newDay(this, yesterday, getLocalDate());
 
         // process removal of old personnel data on the first day of each month
-        if ((campaignOptions.isUsePersonnelRemoval()) && (currentDay.getDayOfMonth() == 1)) {
+        if (campaignOptions.isUsePersonnelRemoval() && isFirstOfMonth) {
             performPersonnelCleanUp();
         }
 
@@ -5706,6 +5725,12 @@ public class Campaign implements ITechManager {
         // Random Events
         if (currentDay.isAfter(GRAY_MONDAY_EVENTS_BEGIN) && currentDay.isBefore(GRAY_MONDAY_EVENTS_END)) {
             new GrayMonday(this, currentDay);
+        }
+
+        // Faction Standing
+        if (isFirstOfMonth && campaignOptions.isTrackFactionStanding()) {
+            String report = factionStandings.updateClimateRegard(faction, currentDay);
+            addReport(report);
         }
 
         // This must be the last step before returning true
@@ -6341,24 +6366,6 @@ public class Campaign implements ITechManager {
         this.faction = faction;
     }
 
-    /**
-     * @since 0.50.04
-     * @deprecated {@link Campaign#getFaction()}.getShortName() instead. Mitigated in 0.50.06, remove in 0.50.07
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public String getFactionCode() {
-        return getFaction().getShortName();
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated Use {@link Campaign#setFaction(Faction)} instead. Mitigated in 0.50.06, remove in 0.50.07
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public void setFactionCode(final String factionCode) {
-        setFaction(Factions.getInstance().getFaction(factionCode));
-    }
-
     public String getRetainerEmployerCode() {
         return retainerEmployerCode;
     }
@@ -6434,6 +6441,14 @@ public class Campaign implements ITechManager {
 
     public void setReputation(ReputationController reputation) {
         this.reputation = reputation;
+    }
+
+    public FactionStandings getFactionStandings() {
+        return factionStandings;
+    }
+
+    public void setFactionStandings(FactionStandings factionStandings) {
+        this.factionStandings = factionStandings;
     }
 
     private void addInMemoryLogHistory(LogEntry le) {
@@ -6595,7 +6610,7 @@ public class Campaign implements ITechManager {
     }
 
     public FameAndInfamyController getFameAndInfamy() {
-        return fameAndInfamy;
+        return regardAndInfamy;
     }
 
     /**
@@ -6669,22 +6684,13 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "faction", getFaction().getShortName());
         if (retainerEmployerCode != null) {
             MHQXMLUtility.writeSimpleXMLTag(writer, indent, "retainerEmployerCode", retainerEmployerCode);
-
-            if (retainerStartDate == null) {
-                // this handles <50.0 campaigns
-                MHQXMLUtility.writeSimpleXMLTag(writer, indent, "retainerStartDate", currentDay);
-            } else {
-                MHQXMLUtility.writeSimpleXMLTag(writer, indent, "retainerStartDate", retainerStartDate);
-            }
+            MHQXMLUtility.writeSimpleXMLTag(writer, indent, "retainerStartDate", retainerStartDate);
         }
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "crimeRating", crimeRating);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "crimePirateModifier", crimePirateModifier);
 
-        // this handles <50.0 campaigns
         if (dateOfLastCrime != null) {
             MHQXMLUtility.writeSimpleXMLTag(writer, indent, "dateOfLastCrime", dateOfLastCrime);
-        } else if (getAdjustedCrimeRating() < 0) {
-            MHQXMLUtility.writeSimpleXMLTag(writer, indent, "dateOfLastCrime", currentDay);
         }
 
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "reputation");
@@ -6693,6 +6699,10 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "newPersonnelMarket");
         newPersonnelMarket.writePersonnelMarketDataToXML(writer, indent);
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "newPersonnelMarket");
+
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "factionStandings");
+        factionStandings.writeFactionStandingsToXML(writer, indent);
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "factionStandings");
 
         // this handles campaigns that predate 49.20
         if (campaignStartDate == null) {
@@ -6782,11 +6792,6 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "skillTypes");
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "specialAbilities");
         for (String key : SpecialAbility.getSpecialAbilities().keySet()) {
-            // <50.01 compatibility handler
-            if (Objects.equals(key, "clan_tech_knowledge")) {
-                continue;
-            }
-
             SpecialAbility.getAbility(key).writeToXML(writer, indent);
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "specialAbilities");
@@ -6800,9 +6805,9 @@ public class Campaign implements ITechManager {
             storyArc.writeToXml(writer, indent);
         }
 
-        // Fame and Infamy
-        if (fameAndInfamy != null) {
-            fameAndInfamy.writeToXml(writer, indent);
+        // Regard and Infamy
+        if (regardAndInfamy != null) {
+            regardAndInfamy.writeToXml(writer, indent);
         }
 
         // Markets
@@ -6852,11 +6857,6 @@ public class Campaign implements ITechManager {
 
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "automatedMothballUnits");
         for (UUID unitId : automatedMothballUnits) {
-            if (unitId == null) {
-                // <50.03 compatibility handler
-                continue;
-            }
-
             MHQXMLUtility.writeSimpleXMLTag(writer, indent, "mothballedUnit", unitId);
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "automatedMothballUnits");
@@ -7532,14 +7532,12 @@ public class Campaign implements ITechManager {
     /**
      * Calculates the {@link TargetRoll} required for a technician to work on a specific part task.
      *
-     * <p>This method determines task difficulty and eligibility by evaluating the technician's skills, penalties due to
-     * work mode,
-     * unit and part constraints, time availability, helper modifiers, and campaign options. It produces
+     * <p>This method determines task difficulty and eligibility by evaluating the technician's skills, penalties due
+     * to work mode, unit and part constraints, time availability, helper modifiers, and campaign options. It produces
      * context-specific messages when tasks are impossible due to skill, resource, or situation limitations.</p>
      *
-     * <p>The result will reflect all applicable modifiers (such as overtime or era-based penalties) and communicates if
-     * a task
-     * is impossible, or has automatic success (e.g., for infantry refits).</p>
+     * <p>The result will reflect all applicable modifiers (such as overtime or era-based penalties) and communicates
+     * if a task is impossible, or has automatic success (e.g., for infantry refits).</p>
      *
      * @param partWork the part work task to be performed
      * @param tech     the technician assigned to the task
@@ -7739,6 +7737,33 @@ public class Campaign implements ITechManager {
         return getTargetForAcquisition(acquisition, person, false);
     }
 
+    public PlanetaryConditions getCurrentPlanetaryConditions(Scenario scenario) {
+            PlanetaryConditions planetaryConditions = new PlanetaryConditions();
+            if (scenario instanceof AtBScenario atBScenario) {
+                if (getCampaignOptions().isUseLightConditions()) {
+                    planetaryConditions.setLight(atBScenario.getLight());
+                }
+                if (getCampaignOptions().isUseWeatherConditions()) {
+                    planetaryConditions.setWeather(atBScenario.getWeather());
+                    planetaryConditions.setWind(atBScenario.getWind());
+                    planetaryConditions.setFog(atBScenario.getFog());
+                    planetaryConditions.setEMI(atBScenario.getEMI());
+                    planetaryConditions.setBlowingSand(atBScenario.getBlowingSand());
+                    planetaryConditions.setTemperature(atBScenario.getModifiedTemperature());
+
+                }
+                if (getCampaignOptions().isUsePlanetaryConditions()) {
+                    planetaryConditions.setAtmosphere(atBScenario.getAtmosphere());
+                    planetaryConditions.setGravity(atBScenario.getGravity());
+                }
+            } else {
+                planetaryConditions = scenario.createPlanetaryConditions();
+            }
+
+            return planetaryConditions;
+
+    }
+
     /**
      * Determines the target roll required for successfully acquiring a specific part or unit based on various campaign
      * settings, the acquisition details, and the person attempting the acquisition.
@@ -7781,10 +7806,10 @@ public class Campaign implements ITechManager {
                   "You must wait until the new cycle to check for this part. Further" +
                         " attempts will be added to the shopping list.");
         }
-        if (acquisition.getTechBase() == Part.T_CLAN && !getCampaignOptions().isAllowClanPurchases()) {
+        if (acquisition.getTechBase() == Part.TechBase.CLAN && !getCampaignOptions().isAllowClanPurchases()) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "You cannot acquire clan parts");
         }
-        if (acquisition.getTechBase() == Part.T_IS && !getCampaignOptions().isAllowISPurchases()) {
+        if (acquisition.getTechBase() == Part.TechBase.IS && !getCampaignOptions().isAllowISPurchases()) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "You cannot acquire inner sphere parts");
         }
         if (getCampaignOptions().getTechLevel() < Utilities.getSimpleTechLevel(acquisition.getTechLevel())) {
@@ -7796,7 +7821,7 @@ public class Campaign implements ITechManager {
         }
         if (getCampaignOptions().isDisallowExtinctStuff() &&
                   (acquisition.isExtinctIn(getGameYear(), useClanTechBase(), getTechFaction()) ||
-                         acquisition.getAvailability() == EquipmentType.RATING_X)) {
+                         acquisition.getAvailability().equals(AvailabilityValue.X))) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "It is extinct!");
         }
 
@@ -8868,6 +8893,32 @@ public class Campaign implements ITechManager {
 
         return Math.toIntExact(ChronoUnit.DAYS.between(getLocalDate(), arrivalDate));
     }
+    /**
+     * Calculates the transit time for the arrival of parts or supplies based on the availability of the item, a random
+     * roll, and campaign-specific transit time settings.
+     *
+     * <p>
+     * The transit time is calculated using the following factors:
+     * <ul>
+     * <li>A fixed base modifier value defined by campaign rules.</li>
+     * <li>A random roll of 1d6 to add variability to the calculation.</li>
+     * <li>The availability value of the requested parts or supplies from the
+     * acquisition details.</li>
+     * </ul>
+     *
+     * <p>
+     * The calculated duration is applied in units (days, weeks, or months) based on
+     * the campaign's
+     * configuration for transit time.
+     * </p>
+     *
+     * @param availability the Availability of the part
+     *
+     * @return the number of days required for the parts or units to arrive based on the calculated transit time.
+     */
+    public int calculatePartTransitTime(AvailabilityValue availability) {
+        return calculatePartTransitTime(availability.getIndex());
+    }
 
     /**
      * This returns a PartInventory object detailing the current count for a part on hand, in transit, and ordered.
@@ -9633,33 +9684,36 @@ public class Campaign implements ITechManager {
     }
 
     @Override
-    public int getTechFaction() {
-        return techFactionCode;
+    public ITechnology.Faction getTechFaction() {
+        return techFaction;
     }
 
     public void updateTechFactionCode() {
         if (campaignOptions.isFactionIntroDate()) {
-            for (int i = 0; i < ITechnology.MM_FACTION_CODES.length; i++) {
-                if (ITechnology.MM_FACTION_CODES[i].equals(getFaction().getShortName())) {
-                    techFactionCode = i;
-                    UnitTechProgression.loadFaction(techFactionCode);
+            for (ITechnology.Faction f : ITechnology.Faction.values()) {
+                if (f.equals(ITechnology.Faction.NONE)) {
+                    continue;
+                }
+                if (f.getCodeMM().equals(getFaction().getShortName())) {
+                    techFaction = f;
+                    UnitTechProgression.loadFaction(techFaction);
                     return;
                 }
             }
             // If the tech progression data does not include the current faction,
             // use a generic.
             if (getFaction().isClan()) {
-                techFactionCode = ITechnology.F_CLAN;
+                techFaction = ITechnology.Faction.CLAN;
             } else if (getFaction().isPeriphery()) {
-                techFactionCode = ITechnology.F_PER;
+                techFaction = ITechnology.Faction.PER;
             } else {
-                techFactionCode = ITechnology.F_IS;
+                techFaction = ITechnology.Faction.IS;
             }
         } else {
-            techFactionCode = ITechnology.F_NONE;
+            techFaction = ITechnology.Faction.NONE;
         }
         // Unit tech level will be calculated if the code has changed.
-        UnitTechProgression.loadFaction(techFactionCode);
+        UnitTechProgression.loadFaction(techFaction);
     }
 
     @Override
@@ -9905,5 +9959,81 @@ public class Campaign implements ITechManager {
             }
         }
         return units;
+    }
+
+
+    /**
+     * Determines the appropriate starting planet for a new campaign.
+     *
+     * <p>This method first attempts to obtain the starting planet from the campaign's primary method. If no valid
+     * system is found, or if the result is "Terra" (which is the default value used when no system is set), it selects
+     * a fallback faction's starting planet using the following logic:</p>
+     *
+     * <ul>
+     *     <li>If the faction is "PIR", a random pirate faction (other than "PIR" itself) with an available starting
+     *     planet is chosen, if available.</li>
+     *     <li>If the faction is a clan, the generic "CLAN" faction is used as the fallback.</li>
+     *     <li>If the faction is mercenary, 75% of the time the campaign will begin on the mercenary faction
+     *     capital. Otherwise, they will begin on the capital of another playable faction.</li>
+     *     <li>Otherwise, the default faction (Mercenary) is used as the fallback.</li>
+     * </ul>
+     *
+     * <p>The returned result is always the system's primary planet.</p>
+     *
+     * @return the {@link Planet} object representing the new campaign's starting planet
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public Planet getNewCampaignStartingPlanet() {
+        Factions factions = Factions.getInstance();
+
+        PlanetarySystem startingSystem = faction.getStartingPlanet(this, currentDay);
+
+        if (startingSystem == null) {
+            Faction fallbackFaction = factions.getDefaultFaction();
+            startingSystem = fallbackFaction.getStartingPlanet(this, currentDay);
+        } else if (startingSystem.getId().equalsIgnoreCase("Terra")) {
+            Faction fallbackFaction = factions.getDefaultFaction();
+
+            if (faction.getShortName().equalsIgnoreCase("PIR")) {
+                List<Faction> pirateFactions = new ArrayList<>();
+                for (Faction activeFaction : factions.getActiveFactions(currentDay)) {
+                    if (activeFaction.isPirate() &&
+                              !activeFaction.getShortName().equalsIgnoreCase("PIR")) {
+                        pirateFactions.add(activeFaction);
+                    }
+                }
+
+                if (!pirateFactions.isEmpty()) {
+                    fallbackFaction = ObjectUtility.getRandomItem(pirateFactions);
+                }
+            } else if (faction.isClan()) {
+                fallbackFaction = factions.getFaction("CLAN");
+            } else if (faction.getShortName().equalsIgnoreCase("MERC")) {
+                // Most of the time, mercenary campaigns will begin on their faction capital (Galatea, etc.).
+                // However, there is a 25% chance they begin in another faction's territory
+                int roll = randomInt(4);
+
+                if (roll == 0) {
+                    fallbackFaction = factions.getFaction("MERC");
+                } else {
+                    List<Faction> recruitingFaction = new ArrayList<>();
+                    for (Faction activeFaction : factions.getActiveFactions(currentDay)) {
+                        if (activeFaction.isPlayable() && !activeFaction.isClan() && !activeFaction.isDeepPeriphery()) {
+                            recruitingFaction.add(activeFaction);
+                        }
+                    }
+
+                    if (!recruitingFaction.isEmpty()) {
+                        fallbackFaction = ObjectUtility.getRandomItem(recruitingFaction);
+                    }
+                }
+            }
+
+            startingSystem = fallbackFaction.getStartingPlanet(this, currentDay);
+        }
+
+        return startingSystem.getPrimaryPlanet();
     }
 }

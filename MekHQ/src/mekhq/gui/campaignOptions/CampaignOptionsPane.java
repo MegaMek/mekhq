@@ -50,6 +50,7 @@ import static mekhq.utilities.spaUtilities.enums.AbilityCategory.MANEUVERING_ABI
 import static mekhq.utilities.spaUtilities.enums.AbilityCategory.UTILITY_ABILITY;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import javax.swing.JFrame;
@@ -70,6 +71,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 import mekhq.gui.campaignOptions.contents.*;
+import mekhq.gui.dialog.reportDialogs.FactionStanding.CampaignOptionsChangedConfirmationDialog;
 
 /**
  * The {@code CampaignOptionsPane} class represents a tabbed pane used for displaying and managing various campaign
@@ -112,6 +114,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private EquipmentAndSuppliesTab equipmentAndSuppliesTab;
     private FinancesTab financesTab;
     private MarketsTab marketsTab;
+    private SystemsTab systemsTab;
     private RulesetsTab rulesetsTab;
 
     /**
@@ -437,6 +440,15 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
               marketsTab.createContractMarketTab()));
         marketsTab.loadValuesFromCampaignOptions();
 
+        // Systems
+        systemsTab = new SystemsTab(campaign);
+
+        JTabbedPane systemsContentTabs = createSubTabs(Map.of("reputationTab",
+              systemsTab.createReputationTab(),
+              "factionStanding",
+              systemsTab.createFactionStandingTab()));
+        systemsTab.loadValuesFromCampaignOptions();
+
         // Rulesets
         rulesetsTab = new RulesetsTab(campaignOptions);
 
@@ -451,6 +463,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
               4, getTextAt(getCampaignOptionsResourceBundle(), "financesContentTabs.title")), financesContentTabs);
         strategicOperationsParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
               4, getTextAt(getCampaignOptionsResourceBundle(), "marketsContentTabs.title")), marketsContentTabs);
+        strategicOperationsParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
+              4,
+              getTextAt(getCampaignOptionsResourceBundle(), "systemsContentTabs.title")), systemsContentTabs);
         strategicOperationsParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
               4, getTextAt(getCampaignOptionsResourceBundle(), "rulesetsContentTabs.title")), rulesetsContentTabs);
 
@@ -486,7 +501,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // While this shouldn't break anything, it's not worth moving around.
         // For all other tabs, it makes sense to apply them in the order they
         // appear in the dialog; however, this shouldn't make any major difference.
-        generalTab.applyCampaignOptionsToCampaign(options, isStartUp, isSaveAction);
+        generalTab.applyCampaignOptionsToCampaign(isStartUp, isSaveAction);
 
         // Human Resources
         personnelTab.applyCampaignOptionsToCampaign(campaign, options);
@@ -509,6 +524,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         marketsTab.applyCampaignOptionsToCampaign(options);
         rulesetsTab.applyCampaignOptionsToCampaign(options);
 
+        boolean oldIsTrackFactionStanding = options.isTrackFactionStanding();
+        systemsTab.applyCampaignOptionsToCampaign(options);
+
         // Tidy up
         if (preset == null) {
             recalculateCombatTeams(campaign);
@@ -516,6 +534,24 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
             options.updateGameOptionsFromCampaignOptions(campaign.getGameOptions());
             MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
+        }
+
+        boolean newIsTrackFactionStandings = options.isTrackFactionStanding();
+        if (!isStartUp && newIsTrackFactionStandings != oldIsTrackFactionStanding) { // Has tracking changed?
+            CampaignOptionsChangedConfirmationDialog dialog = new CampaignOptionsChangedConfirmationDialog(null,
+                  campaign.getCampaignFactionIcon(),
+                  campaign.getFaction(),
+                  campaign.getLocalDate(),
+                  campaign.getFactionStandings(),
+                  campaign.getMissions(),
+                  newIsTrackFactionStandings);
+
+            List<String> reports = dialog.getReports();
+            for (String report : reports) {
+                if (report != null && !report.isBlank()) {
+                    campaign.addReport(report);
+                }
+            }
         }
 
         campaign.resetRandomDeath();
@@ -537,7 +573,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         LocalDate presetDate = campaignPreset.getDate();
         Faction presetFaction = campaignPreset.getFaction();
 
-        generalTab.loadValuesFromCampaignOptions(presetCampaignOptions, presetDate, presetFaction);
+        generalTab.loadValuesFromCampaignOptions(presetDate, presetFaction);
 
         // Human Resources
         personnelTab.loadValuesFromCampaignOptions(presetCampaignOptions, campaign.getVersion());
@@ -561,5 +597,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         financesTab.loadValuesFromCampaignOptions(presetCampaignOptions);
         marketsTab.loadValuesFromCampaignOptions(presetCampaignOptions);
         rulesetsTab.loadValuesFromCampaignOptions(presetCampaignOptions);
+        systemsTab.loadValuesFromCampaignOptions(presetCampaignOptions);
     }
 }

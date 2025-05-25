@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -42,13 +47,14 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 import megamek.utilities.ImageUtilities;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
 /**
  * A dialog that provides introductory information for new players starting the quickstart campaign. This dialog
@@ -140,7 +146,8 @@ public class NewPlayerQuickstartDialog extends JDialog {
         mainPanel.add(Box.createRigidArea(scaleForGUI(0, PADDING)));
 
         // Add Confirm button
-        JButton confirmButton = new JButton(getFormattedTextAt(RESOURCE_BUNDLE, "NewPlayerQuickstartDialog.button"));
+        RoundedJButton confirmButton = new RoundedJButton(getFormattedTextAt(RESOURCE_BUNDLE,
+              "NewPlayerQuickstartDialog.button"));
         confirmButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         mainPanel.add(confirmButton);
         mainPanel.add(Box.createRigidArea(scaleForGUI(0, PADDING)));
@@ -150,8 +157,7 @@ public class NewPlayerQuickstartDialog extends JDialog {
               "NewPlayerQuickstartDialog.outOfCharacter",
               DIALOG_WIDTH));
         setFontScaling(lblOutOfCharacter, false, 1);
-        lblOutOfCharacter.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(),
-              BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING)));
+        lblOutOfCharacter.setBorder(RoundedLineBorder.createRoundedLineBorder());
         lblOutOfCharacter.setAlignmentX(Component.CENTER_ALIGNMENT);
         mainPanel.add(lblOutOfCharacter);
 

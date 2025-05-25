@@ -38,19 +38,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.xml.parsers.DocumentBuilder;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * @author Neoancient
@@ -116,8 +114,8 @@ public class Bloodname {
     }
 
     public boolean isInactive(int year) {
-        return (year < startDate) || ((inactive > 0) && (inactive < year)
-                && !((reactivated > 0) && (reactivated <= year)));
+        return (year < startDate) ||
+                     ((inactive > 0) && (inactive < year) && !((reactivated > 0) && (reactivated <= year)));
     }
 
     public boolean isAbjured(int year) {
@@ -143,21 +141,14 @@ public class Bloodname {
     /**
      * @param warriorType A Phenotype constant
      * @param year        The current year of the campaign setting
-     * @return An adjustment to the frequency of this name for the phenotype.
      *
-     *         A warrior is three times as likely to have a Bloodname associated
-     *         with the
-     *         same phenotype as a general name (which is split among the three
-     *         types).
-     *         Elemental names are treated as general prior to 2870. The names that
-     *         later
-     *         became associated with ProtoMek pilots (identified in WoR) are
-     *         assumed
-     *         to have been poor performers and have a lower frequency even before
-     *         the
-     *         invention of the PM, though have a higher frequency for PM pilots
-     *         than other
-     *         aerospace names.
+     * @return An adjustment to the frequency of this name for the phenotype.
+     *       <p>
+     *       A warrior is three times as likely to have a Bloodname associated with the same phenotype as a general name
+     *       (which is split among the three types). Elemental names are treated as general prior to 2870. The names
+     *       that later became associated with ProtoMek pilots (identified in WoR) are assumed to have been poor
+     *       performers and have a lower frequency even before the invention of the PM, though have a higher frequency
+     *       for PM pilots than other aerospace names.
      */
     private int phenotypeMultiplier(Phenotype warriorType, int year) {
         switch (getPhenotype()) {
@@ -212,24 +203,27 @@ public class Bloodname {
                 } else if (wn.getNodeName().equalsIgnoreCase("reactivated")) {
                     retVal.reactivated = Integer.parseInt(wn.getTextContent().trim() + 20);
                 } else if (wn.getNodeName().equalsIgnoreCase("phenotype")) {
-                    retVal.phenotype = Phenotype.parseFromString(wn.getTextContent().trim());
+                    retVal.phenotype = Phenotype.fromString(wn.getTextContent().trim());
                 } else if (wn.getNodeName().equalsIgnoreCase("postReaving")) {
                     String[] clans = wn.getTextContent().trim().split(",");
                     for (String c : clans) {
                         retVal.postReavingClans.add(Clan.getClan(c));
                     }
                 } else if (wn.getNodeName().equalsIgnoreCase("acquired")) {
-                    retVal.acquiringClans.add(new NameAcquired(
-                            Integer.parseInt(wn.getAttributes().getNamedItem("date").getTextContent()) + 10,
-                            wn.getTextContent().trim()));
+                    retVal.acquiringClans.add(new NameAcquired(Integer.parseInt(wn.getAttributes()
+                                                                                      .getNamedItem("date")
+                                                                                      .getTextContent()) + 10,
+                          wn.getTextContent().trim()));
                 } else if (wn.getNodeName().equalsIgnoreCase("shared")) {
-                    retVal.acquiringClans.add(new NameAcquired(
-                            Integer.parseInt(wn.getAttributes().getNamedItem("date").getTextContent()),
-                            wn.getTextContent().trim()));
+                    retVal.acquiringClans.add(new NameAcquired(Integer.parseInt(wn.getAttributes()
+                                                                                      .getNamedItem("date")
+                                                                                      .getTextContent()),
+                          wn.getTextContent().trim()));
                 } else if (wn.getNodeName().equalsIgnoreCase("absorbed")) {
-                    retVal.absorbed = new NameAcquired(
-                            Integer.parseInt(wn.getAttributes().getNamedItem("date").getTextContent()),
-                            wn.getTextContent().trim());
+                    retVal.absorbed = new NameAcquired(Integer.parseInt(wn.getAttributes()
+                                                                              .getNamedItem("date")
+                                                                              .getTextContent()),
+                          wn.getTextContent().trim());
                 } else if (wn.getNodeName().equalsIgnoreCase("created")) {
                     retVal.startDate = Integer.parseInt(wn.getTextContent().trim()) + 20;
                 }
@@ -244,15 +238,14 @@ public class Bloodname {
     /**
      * Determines a likely Bloodname based on Clan, phenotype, and year.
      *
-     * @param factionCode The faction code for the Clan; must exist in
-     *                    data/names/bloodnames/clans.xml
+     * @param factionCode The faction code for the Clan; must exist in data/names/bloodnames/clans.xml
      * @param phenotype   The person's Phenotype
      * @param year        The current campaign year
-     * @return An object representing the chosen Bloodname
      *
-     *         Though based as much as possible on official sources, the method
-     *         employed here involves a
-     *         considerable amount of speculation.
+     * @return An object representing the chosen Bloodname
+     *       <p>
+     *       Though based as much as possible on official sources, the method employed here involves a considerable
+     *       amount of speculation.
      */
     public static @Nullable Bloodname randomBloodname(String factionCode, Phenotype phenotype, int year) {
         return randomBloodname(Clan.getClan(factionCode), phenotype, year);
@@ -261,25 +254,24 @@ public class Bloodname {
     /**
      * Determines a likely Bloodname based on Clan, phenotype, and year.
      *
-     * @param faction   The Clan faction; must exist in
-     *                  data/names/bloodnames/clans.xml
+     * @param faction   The Clan faction; must exist in data/names/bloodnames/clans.xml
      * @param phenotype The person's Phenotype
      * @param year      The current campaign year
-     * @return An object representing the chosen Bloodname
      *
-     *         Though based as much as possible on official sources, the method
-     *         employed here involves a
-     *         considerable amount of speculation.
+     * @return An object representing the chosen Bloodname
+     *       <p>
+     *       Though based as much as possible on official sources, the method employed here involves a considerable
+     *       amount of speculation.
      */
     public static @Nullable Bloodname randomBloodname(Clan faction, Phenotype phenotype, int year) {
         if (faction == null) {
-            logger.error("Random Bloodname attempted for a clan that does not exist."
-                    + System.lineSeparator()
-                    + "Please ensure that your clan exists in both the clans.xml and bloodnames.xml files as appropriate.");
+            logger.error("Random Bloodname attempted for a clan that does not exist." +
+                               System.lineSeparator() +
+                               "Please ensure that your clan exists in both the clans.xml and bloodnames.xml files as appropriate.");
             return null;
         } else if (phenotype == null) {
             logger.error(
-                    "Random Bloodname attempted for an unknown phenotype. Please open a bug report so this issue may be fixed.");
+                  "Random Bloodname attempted for an unknown phenotype. Please open a bug report so this issue may be fixed.");
             return null;
         }
 
@@ -325,8 +317,8 @@ public class Bloodname {
              * to be used by those Clans but not by others.
              */
             if (name.isInactive(year) ||
-                    (name.isAbjured(year) && !name.getOrigClan().equals(faction.getGenerationCode()))
-                    || (0 == name.phenotypeMultiplier(phenotype, year))) {
+                      (name.isAbjured(year) && !name.getOrigClan().equals(faction.getGenerationCode())) ||
+                      (0 == name.phenotypeMultiplier(phenotype, year))) {
                 continue;
             }
 
@@ -351,8 +343,9 @@ public class Bloodname {
                  * 1/(number of Clans) instead.
                  */
                 if (name.getOrigClan().equals(faction.getGenerationCode()) ||
-                        (null != name.getAbsorbed() && faction.getGenerationCode().equals(name.getAbsorbed().clan) &&
-                                name.getAbsorbed().year > year)) {
+                          (null != name.getAbsorbed() &&
+                                 faction.getGenerationCode().equals(name.getAbsorbed().clan) &&
+                                 name.getAbsorbed().year > year)) {
                     if (name.isExclusive() || numClans > 1) {
                         weight = new Fraction(1, numClans);
                     } else {
@@ -433,11 +426,11 @@ public class Bloodname {
     }
 
     /**
-     * Represents the decreasing frequency of non-exclusive names within the
-     * original Clan
-     * due to dispersal throughout the Clans and reavings.
+     * Represents the decreasing frequency of non-exclusive names within the original Clan due to dispersal throughout
+     * the Clans and reavings.
      *
      * @param year The current year of the campaign
+     *
      * @return A fraction that decreases by 10%/year
      */
     private static Fraction eraFraction(int year) {
