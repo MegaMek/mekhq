@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.dialog.reportDialogs.FactionStanding;
+package mekhq.gui.dialog.reportDialogs.FactionStanding.manualMissionDialogs;
 
 import static java.lang.Integer.MAX_VALUE;
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
@@ -63,7 +63,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
  * @author Illiani
  * @since 0.50.07
  */
-public class ManualMissionRegardConfirmationDialog extends JDialog {
+public class StandingUpdateConfirmationDialog extends JDialog {
     private static final MMLogger LOGGER = MMLogger.create(SimulateMissionDialog.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionStandings";
 
@@ -83,7 +83,7 @@ public class ManualMissionRegardConfirmationDialog extends JDialog {
      * @author Illiani
      * @since 0.50.07
      */
-    public ManualMissionRegardConfirmationDialog(JDialog parent, ImageIcon campaignIcon, boolean updateWasSuccess) {
+    public StandingUpdateConfirmationDialog(JDialog parent, ImageIcon campaignIcon, boolean updateWasSuccess) {
         this.campaignIcon = campaignIcon;
         this.updateWasSuccess = updateWasSuccess;
 

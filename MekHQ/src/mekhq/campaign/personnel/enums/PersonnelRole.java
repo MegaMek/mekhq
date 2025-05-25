@@ -1489,24 +1489,6 @@ public enum PersonnelRole {
         } catch (Exception ignored) {
         }
 
-        // <50.1 compatibility
-        switch (text.toUpperCase().replace(" ", "_")) {
-            case "MECHWARRIOR" -> {
-                return MEKWARRIOR;
-            }
-            case "PROTOMECH_PILOT" -> {
-                return PROTOMEK_PILOT;
-            }
-            case "MECH_TECH" -> {
-                return MEK_TECH;
-            }
-            case "AERO_TECH" -> {
-                return AERO_TEK;
-            }
-            default -> {
-            }
-        }
-
         // Parse from ordinal
         try {
             return PersonnelRole.values()[MathUtility.parseInt(text, NONE.ordinal())];

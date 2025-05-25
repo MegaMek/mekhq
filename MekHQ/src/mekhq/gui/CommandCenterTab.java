@@ -637,7 +637,9 @@ public final class CommandCenterTab extends CampaignGuiTab {
                   getCampaign().getLocalDate(),
                   getCampaign().isGM(),
                   getCampaign().getFaction(),
-                  getCampaign().getCampaignFactionIcon());
+                  getCampaign().getCampaignFactionIcon(),
+                  getCampaign().getMissions(),
+                  getCampaignOptions().isTrackFactionStanding());
 
             for (String report : factionStandingReport.getReports()) {
                 if (report != null && !report.isBlank()) {

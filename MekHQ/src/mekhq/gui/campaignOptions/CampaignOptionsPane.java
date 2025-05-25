@@ -50,6 +50,7 @@ import static mekhq.utilities.spaUtilities.enums.AbilityCategory.MANEUVERING_ABI
 import static mekhq.utilities.spaUtilities.enums.AbilityCategory.UTILITY_ABILITY;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import javax.swing.JFrame;
@@ -70,6 +71,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 import mekhq.gui.campaignOptions.contents.*;
+import mekhq.gui.dialog.reportDialogs.FactionStanding.CampaignOptionsChangedConfirmationDialog;
 
 /**
  * The {@code CampaignOptionsPane} class represents a tabbed pane used for displaying and managing various campaign
@@ -521,6 +523,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         financesTab.applyCampaignOptionsToCampaign(options);
         marketsTab.applyCampaignOptionsToCampaign(options);
         rulesetsTab.applyCampaignOptionsToCampaign(options);
+
+        boolean oldIsTrackFactionStanding = options.isTrackFactionStanding();
         systemsTab.applyCampaignOptionsToCampaign(options);
 
         // Tidy up
@@ -530,6 +534,24 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
             options.updateGameOptionsFromCampaignOptions(campaign.getGameOptions());
             MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
+        }
+
+        boolean newIsTrackFactionStandings = options.isTrackFactionStanding();
+        if (!isStartUp && newIsTrackFactionStandings != oldIsTrackFactionStanding) { // Has tracking changed?
+            CampaignOptionsChangedConfirmationDialog dialog = new CampaignOptionsChangedConfirmationDialog(null,
+                  campaign.getCampaignFactionIcon(),
+                  campaign.getFaction(),
+                  campaign.getLocalDate(),
+                  campaign.getFactionStandings(),
+                  campaign.getMissions(),
+                  newIsTrackFactionStandings);
+
+            List<String> reports = dialog.getReports();
+            for (String report : reports) {
+                if (report != null && !report.isBlank()) {
+                    campaign.addReport(report);
+                }
+            }
         }
 
         campaign.resetRandomDeath();

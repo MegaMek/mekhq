@@ -181,7 +181,7 @@ tasks.register('stageFiles', Copy) {
     include "${data}/images/awards/"
     include "${data}/images/force/"
     include "${data}/images/portraits/"
-    include "${data}/images/fluff/Mech/*.png"
+    include "${data}/images/fluff/Mek/*.png"
     include "${data}/images/misc/"
     include "${data}/images/stratcon/"
     include "${data}/images/universe/"

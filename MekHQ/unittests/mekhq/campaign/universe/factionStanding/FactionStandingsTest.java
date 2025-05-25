@@ -157,7 +157,7 @@ class FactionStandingsTest {
     void test_processRegardDegradation(String testName, double initialRegard, double expectedRegard) {
         // Setup
         FactionStandings factionStandings = new FactionStandings();
-        factionStandings.setRegardForFaction("CS", initialRegard);
+        factionStandings.setRegardForFaction("CS", initialRegard, 3151, false);
 
         // Act
         factionStandings.processRegardDegradation(3025);
@@ -196,8 +196,8 @@ class FactionStandingsTest {
           String secondaryFaction, double secondaryStart, double expectedPrimaryDelta, double expectedSecondaryDelta) {
         // Setup
         FactionStandings factionStandings = new FactionStandings();
-        factionStandings.setRegardForFaction(primaryFaction, primaryStart);
-        factionStandings.setRegardForFaction(secondaryFaction, secondaryStart);
+        factionStandings.setRegardForFaction(primaryFaction, primaryStart, 3151, false);
+        factionStandings.setRegardForFaction(secondaryFaction, secondaryStart, 3151, false);
 
         Faction enemyFaction = Factions.getInstance().getFaction(primaryFaction);
         LocalDate today = LocalDate.of(3049, 11, 3);
@@ -240,8 +240,8 @@ class FactionStandingsTest {
           double startingLaRegard, double expectedFsDelta, double expectedLaDelta) {
         // Setup
         FactionStandings factionStandings = new FactionStandings();
-        factionStandings.setRegardForFaction("FS", startingFsRegard);
-        factionStandings.setRegardForFaction("LA", startingLaRegard);
+        factionStandings.setRegardForFaction("FS", startingFsRegard, 3151, false);
+        factionStandings.setRegardForFaction("LA", startingLaRegard, 3151, false);
 
         Faction employerFaction = Factions.getInstance().getFaction("FS");
         LocalDate today = LocalDate.of(3028, 8, 20);
@@ -262,7 +262,7 @@ class FactionStandingsTest {
     void test_processRefusedBatchall_decreasesRegard() {
         // Setup
         FactionStandings factionStandings = new FactionStandings();
-        factionStandings.setRegardForFaction("CW", 10.0); // Clan Wolf with regard 10.0
+        factionStandings.setRegardForFaction("CW", 10.0, 3151, false); // Clan Wolf with regard 10.0
 
         int gameYear = 3050;
 
@@ -281,9 +281,9 @@ class FactionStandingsTest {
     void test_executePrisonersOfWar() {
         // Setup
         FactionStandings factionStandings = new FactionStandings();
-        factionStandings.setRegardForFaction("FS", 10.0); // Initial regard for Federated Suns
-        factionStandings.setRegardForFaction("CC", 20.0); // Initial regard for Capellan Confederation
-        factionStandings.setRegardForFaction("CS", -5.0); // Initial regard for ComStar
+        factionStandings.setRegardForFaction("FS", 10.0, 3151, false); // Initial regard for Federated Suns
+        factionStandings.setRegardForFaction("CC", 20.0, 3151, false); // Initial regard for Capellan Confederation
+        factionStandings.setRegardForFaction("CS", -5.0, 3151, false); // Initial regard for ComStar
 
         Campaign mockCampaign = mock(Campaign.class);
         when(mockCampaign.getFaction()).thenReturn(Factions.getInstance().getDefaultFaction());
