@@ -468,10 +468,10 @@ public class SkillType {
      *
      *                        <p>For example:</p>
      *                        <pre>
-     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
-     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
-     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
-     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       </pre>
+     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
+     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
+     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
+     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   </pre>
      *
      * @author Illiani
      * @since 0.50.05
@@ -1282,8 +1282,8 @@ public class SkillType {
         }
 
         SkillType temporarySkillType = switch (skillType.getName()) {
-            case S_PILOT_MEK, "Piloting/Mech" -> createPilotingMek();
-            case S_GUN_MEK, "Gunnery/Mech" -> createGunneryMek();
+            case S_PILOT_MEK -> createPilotingMek();
+            case S_GUN_MEK -> createGunneryMek();
             case S_PILOT_AERO -> createPilotingAero();
             case S_GUN_AERO -> createGunneryAero();
             case S_PILOT_JET -> createPilotingJet();
@@ -1295,24 +1295,24 @@ public class SkillType {
             case S_PILOT_VTOL -> createPilotingVTOL();
             case S_GUN_VEE -> createGunneryVehicle();
             case S_ARTILLERY -> createArtillery();
-            case S_GUN_BA, "Gunnery/Battlesuit" -> createGunneryBA();
-            case S_GUN_PROTO, "Gunnery/ProtoMech" -> createGunneryProto();
+            case S_GUN_BA -> createGunneryBA();
+            case S_GUN_PROTO -> createGunneryProto();
             case S_SMALL_ARMS -> createSmallArms();
-            case S_ANTI_MEK, "Anti-Mech", "Anti-Mek" -> createAntiMek();
-            case S_TECH_MEK, "Tech/Mech" -> createTechMek();
+            case S_ANTI_MEK -> createAntiMek();
+            case S_TECH_MEK -> createTechMek();
             case S_TECH_MECHANIC -> createTechMechanic();
             case S_TECH_AERO -> createTechAero();
-            case S_TECH_BA, "Tech/BA" -> createTechBA();
+            case S_TECH_BA -> createTechBA();
             case S_TECH_VESSEL -> createTechVessel();
             case S_ASTECH -> createAstech();
-            case S_SURGERY, "Doctor" -> createSurgery();
-            case S_MEDTECH, "Medtech", "MedTech" -> createMedTech();
-            case S_NAVIGATION, "Hyperspace Navigation" -> createNavigation();
+            case S_SURGERY -> createSurgery();
+            case S_MEDTECH -> createMedTech();
+            case S_NAVIGATION -> createNavigation();
             case S_ADMIN -> createAdmin();
             case S_NEGOTIATION -> createNegotiation();
             case S_LEADER -> createLeadership();
             case S_STRATEGY -> createStrategy();
-            case S_TACTICS, "Tactics" -> createTactics();
+            case S_TACTICS -> createTactics();
             case S_ACROBATICS -> createAcrobatics();
             case S_ACTING -> createActing();
             case S_ANIMAL_HANDLING -> createAnimalHandling();
@@ -1328,7 +1328,7 @@ public class SkillType {
             case S_ART_INSTRUMENT -> createArtInstrument();
             case S_ART_SINGING -> createArtSinging();
             case S_ART_OTHER -> createArtOther();
-            case S_COMMUNICATIONS, "Communications (RP Only)" -> createCommunications();
+            case S_COMMUNICATIONS -> createCommunications();
             case S_COMPUTERS -> createComputers();
             case S_CRYPTOGRAPHY -> createCryptography();
             case S_DEMOLITIONS -> createDemolitions();
@@ -1360,11 +1360,11 @@ public class SkillType {
             case S_INTEREST_OTHER -> createInterestOther();
             case S_INTERROGATION -> createInterrogation();
             case S_INVESTIGATION -> createInvestigation();
-            case S_LANGUAGES, "Languages (RP Only)" -> createLanguage();
+            case S_LANGUAGES -> createLanguage();
             case S_MARTIAL_ARTS -> createMartialArts();
             case S_PERCEPTION -> createPerception();
-            case S_SLEIGHT_OF_HAND, "Sleight of Hand (RP Only)" -> createSleightOfHand();
-            case S_PROTOCOLS, "Protocols (RP Only)" -> createProtocols();
+            case S_SLEIGHT_OF_HAND -> createSleightOfHand();
+            case S_PROTOCOLS -> createProtocols();
             case S_SCIENCE_BIOLOGY -> createScienceBiology();
             case S_SCIENCE_CHEMISTRY -> createScienceChemistry();
             case S_SCIENCE_MATHEMATICS -> createScienceMathematics();
@@ -1380,9 +1380,9 @@ public class SkillType {
             case S_SECURITY_SYSTEMS_MECHANICAL -> createSecuritySystemsMechanical();
             case S_SENSOR_OPERATIONS -> createSensorOperations();
             case S_STEALTH -> createStealth();
-            case S_STREETWISE, "Streetwise (RP Only)" -> createStreetwise();
-            case S_SURVIVAL, "Survival (RP Only)" -> createSurvival();
-            case S_TRACKING, "Tracking (RP Only)" -> createTracking();
+            case S_STREETWISE -> createStreetwise();
+            case S_SURVIVAL -> createSurvival();
+            case S_TRACKING -> createTracking();
             case S_TRAINING -> createTraining();
             case S_CAREER_ANY -> createCareer();
             case S_SWIMMING -> createSwimming();
@@ -1392,8 +1392,7 @@ public class SkillType {
             case S_SUPPORT_WEAPONS -> createSupportWeapons();
             case S_RUNNING -> createRunning();
             default -> {
-                logger.warn("Unexpected value in compatibilityHandler: {}",
-                      skillType.getName());
+                logger.warn("Unexpected value in compatibilityHandler: {}", skillType.getName());
                 yield null;
             }
         };
