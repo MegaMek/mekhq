@@ -107,10 +107,10 @@ import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
-import megamek.client.ratgenerator.AvailabilityRating;
 import megamek.client.ui.swing.util.PlayerColour;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
+import megamek.common.ITechnology.AvailabilityValue;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.equipment.BombMounted;
@@ -124,9 +124,8 @@ import megamek.common.options.IBasicOption;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
+import megamek.common.planetaryconditions.PlanetaryConditions;
 import megamek.common.util.BuildingBlock;
-import megamek.common.ITechnology.AvailabilityValue;
-import megamek.common.ITechnology.TechRating;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
@@ -264,8 +263,6 @@ import mekhq.service.IAutosaveService;
 import mekhq.service.mrms.MRMSService;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
-import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
-import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 
 /**
  * The main campaign class, keeps track of teams and units
@@ -7740,6 +7737,33 @@ public class Campaign implements ITechManager {
         return getTargetForAcquisition(acquisition, person, false);
     }
 
+    public PlanetaryConditions getCurrentPlanetaryConditions(Scenario scenario) {
+            PlanetaryConditions planetaryConditions = new PlanetaryConditions();
+            if (scenario instanceof AtBScenario atBScenario) {
+                if (getCampaignOptions().isUseLightConditions()) {
+                    planetaryConditions.setLight(atBScenario.getLight());
+                }
+                if (getCampaignOptions().isUseWeatherConditions()) {
+                    planetaryConditions.setWeather(atBScenario.getWeather());
+                    planetaryConditions.setWind(atBScenario.getWind());
+                    planetaryConditions.setFog(atBScenario.getFog());
+                    planetaryConditions.setEMI(atBScenario.getEMI());
+                    planetaryConditions.setBlowingSand(atBScenario.getBlowingSand());
+                    planetaryConditions.setTemperature(atBScenario.getModifiedTemperature());
+
+                }
+                if (getCampaignOptions().isUsePlanetaryConditions()) {
+                    planetaryConditions.setAtmosphere(atBScenario.getAtmosphere());
+                    planetaryConditions.setGravity(atBScenario.getGravity());
+                }
+            } else {
+                planetaryConditions = scenario.createPlanetaryConditions();
+            }
+
+            return planetaryConditions;
+
+    }
+
     /**
      * Determines the target roll required for successfully acquiring a specific part or unit based on various campaign
      * settings, the acquisition details, and the person attempting the acquisition.
@@ -9935,5 +9959,81 @@ public class Campaign implements ITechManager {
             }
         }
         return units;
+    }
+
+
+    /**
+     * Determines the appropriate starting planet for a new campaign.
+     *
+     * <p>This method first attempts to obtain the starting planet from the campaign's primary method. If no valid
+     * system is found, or if the result is "Terra" (which is the default value used when no system is set), it selects
+     * a fallback faction's starting planet using the following logic:</p>
+     *
+     * <ul>
+     *     <li>If the faction is "PIR", a random pirate faction (other than "PIR" itself) with an available starting
+     *     planet is chosen, if available.</li>
+     *     <li>If the faction is a clan, the generic "CLAN" faction is used as the fallback.</li>
+     *     <li>If the faction is mercenary, 75% of the time the campaign will begin on the mercenary faction
+     *     capital. Otherwise, they will begin on the capital of another playable faction.</li>
+     *     <li>Otherwise, the default faction (Mercenary) is used as the fallback.</li>
+     * </ul>
+     *
+     * <p>The returned result is always the system's primary planet.</p>
+     *
+     * @return the {@link Planet} object representing the new campaign's starting planet
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public Planet getNewCampaignStartingPlanet() {
+        Factions factions = Factions.getInstance();
+
+        PlanetarySystem startingSystem = faction.getStartingPlanet(this, currentDay);
+
+        if (startingSystem == null) {
+            Faction fallbackFaction = factions.getDefaultFaction();
+            startingSystem = fallbackFaction.getStartingPlanet(this, currentDay);
+        } else if (startingSystem.getId().equalsIgnoreCase("Terra")) {
+            Faction fallbackFaction = factions.getDefaultFaction();
+
+            if (faction.getShortName().equalsIgnoreCase("PIR")) {
+                List<Faction> pirateFactions = new ArrayList<>();
+                for (Faction activeFaction : factions.getActiveFactions(currentDay)) {
+                    if (activeFaction.isPirate() &&
+                              !activeFaction.getShortName().equalsIgnoreCase("PIR")) {
+                        pirateFactions.add(activeFaction);
+                    }
+                }
+
+                if (!pirateFactions.isEmpty()) {
+                    fallbackFaction = ObjectUtility.getRandomItem(pirateFactions);
+                }
+            } else if (faction.isClan()) {
+                fallbackFaction = factions.getFaction("CLAN");
+            } else if (faction.getShortName().equalsIgnoreCase("MERC")) {
+                // Most of the time, mercenary campaigns will begin on their faction capital (Galatea, etc.).
+                // However, there is a 25% chance they begin in another faction's territory
+                int roll = randomInt(4);
+
+                if (roll == 0) {
+                    fallbackFaction = factions.getFaction("MERC");
+                } else {
+                    List<Faction> recruitingFaction = new ArrayList<>();
+                    for (Faction activeFaction : factions.getActiveFactions(currentDay)) {
+                        if (activeFaction.isPlayable() && !activeFaction.isClan() && !activeFaction.isDeepPeriphery()) {
+                            recruitingFaction.add(activeFaction);
+                        }
+                    }
+
+                    if (!recruitingFaction.isEmpty()) {
+                        fallbackFaction = ObjectUtility.getRandomItem(recruitingFaction);
+                    }
+                }
+            }
+
+            startingSystem = fallbackFaction.getStartingPlanet(this, currentDay);
+        }
+
+        return startingSystem.getPrimaryPlanet();
     }
 }

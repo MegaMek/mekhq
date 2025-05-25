@@ -38,7 +38,7 @@ import static mekhq.campaign.mission.enums.MissionStatus.PARTIAL;
 import static mekhq.campaign.mission.enums.MissionStatus.SUCCESS;
 import static mekhq.campaign.mission.enums.ScenarioStatus.REFUSED_ENGAGEMENT;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
-import static mekhq.gui.dialog.reportDialogs.FactionStanding.SimulateMissionDialog.handleFactionRegardUpdates;
+import static mekhq.gui.dialog.reportDialogs.FactionStanding.manualMissionDialogs.SimulateMissionDialog.handleFactionRegardUpdates;
 import static mekhq.utilities.MHQInternationalization.getText;
 
 import java.awt.BorderLayout;
@@ -120,8 +120,8 @@ import mekhq.gui.dialog.MissionTypeDialog;
 import mekhq.gui.dialog.NewAtBContractDialog;
 import mekhq.gui.dialog.NewContractDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
-import mekhq.gui.dialog.reportDialogs.FactionStanding.ManualMissionDialog;
-import mekhq.gui.dialog.reportDialogs.FactionStanding.SimulateMissionDialog;
+import mekhq.gui.dialog.reportDialogs.FactionStanding.manualMissionDialogs.ManualMissionDialog;
+import mekhq.gui.dialog.reportDialogs.FactionStanding.manualMissionDialogs.SimulateMissionDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.ScenarioTableModel;
 import mekhq.gui.panels.TutorialHyperlinkPanel;
@@ -794,9 +794,9 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        if (scenario instanceof AtBScenario) {
+        if (scenario instanceof AtBScenario atBScenario) {
             // Also print off allied sheets
-            chosen.addAll(((AtBScenario) scenario).getAlliesPlayer());
+            chosen.addAll(atBScenario.getAlliesPlayer());
         }
 
         // add bot forces
@@ -945,7 +945,7 @@ public final class BriefingTab extends CampaignGuiTab {
         if (chosen.isEmpty()) {
             return;
         }
-        getCampaign().getApp().startAutoResolve((AtBScenario) scenario, chosen);
+        getCampaign().getApp().startAutoResolve(scenario, chosen);
     }
 
     private void runPrincessAutoResolve() {
@@ -1603,9 +1603,7 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         btnResolveScenario.setEnabled(canStartGame);
-        if (scenario instanceof AtBScenario) {
-            btnAutoResolveScenario.setEnabled(canStartGame);
-        }
+        btnAutoResolveScenario.setEnabled(canStartGame);
         btnPrintRS.setEnabled(canStartGame);
     }
 

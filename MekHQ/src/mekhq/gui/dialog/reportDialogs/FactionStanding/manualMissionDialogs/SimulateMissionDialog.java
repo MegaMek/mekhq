@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.dialog.reportDialogs.FactionStanding;
+package mekhq.gui.dialog.reportDialogs.FactionStanding.manualMissionDialogs;
 
 import static java.lang.Integer.MAX_VALUE;
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
@@ -226,7 +226,7 @@ public class SimulateMissionDialog extends JDialog {
 
         // Left box for campaign icon
         JPanel pnlLeft = buildLeftPanel();
-        pnlLeft.setBorder(new EmptyBorder(0, PADDING, 0, 0));
+        pnlLeft.setBorder(new EmptyBorder(PADDING, PADDING, PADDING, PADDING));
         constraints.gridx = gridx;
         constraints.gridy = 0;
         constraints.weightx = 1;
@@ -235,6 +235,7 @@ public class SimulateMissionDialog extends JDialog {
 
         // Center box for the message
         JPanel pnlCenter = populateCenterPanel();
+        pnlCenter.setBorder(new EmptyBorder(PADDING, PADDING, PADDING, PADDING));
         constraints.gridx = gridx;
         constraints.gridy = 0;
         constraints.weightx = 2;
@@ -527,7 +528,7 @@ public class SimulateMissionDialog extends JDialog {
                 setVisible(false);
             }
 
-            new ManualMissionRegardConfirmationDialog(this, campaignIcon, wasUpdated);
+            new StandingUpdateConfirmationDialog(this, campaignIcon, wasUpdated);
 
             if (!wasUpdated) {
                 setVisible(true); // This should always be present otherwise we can lock up the player's client
