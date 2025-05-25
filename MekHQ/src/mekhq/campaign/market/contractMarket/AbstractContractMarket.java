@@ -86,7 +86,7 @@ public abstract class AbstractContractMarket {
      * The portion of combat teams we expect to be performing combat actions. This is one in 'x' where 'x' is the value
      * set here.
      */
-    static final double COMBAT_FORCE_FACTOR_BASE = 0.7;
+    static final double BASE_VARIANCE_FACTOR = 0.7;
 
 
     protected List<Contract> contracts = new ArrayList<>();
@@ -318,17 +318,17 @@ public abstract class AbstractContractMarket {
      */
     private double calculateVarianceFactor(int roll) {
         return switch (roll) {
-            case 2 -> COMBAT_FORCE_FACTOR_BASE - 0.125;
-            case 3 -> COMBAT_FORCE_FACTOR_BASE - 0.1;
-            case 4 -> COMBAT_FORCE_FACTOR_BASE - 0.075;
-            case 5 -> COMBAT_FORCE_FACTOR_BASE - 0.05;
-            case 6 -> COMBAT_FORCE_FACTOR_BASE - 0.025;
-            case 8 -> COMBAT_FORCE_FACTOR_BASE + 0.025;
-            case 9 -> COMBAT_FORCE_FACTOR_BASE + 0.05;
-            case 10 -> COMBAT_FORCE_FACTOR_BASE + 0.075;
-            case 11 -> COMBAT_FORCE_FACTOR_BASE + 0.1;
-            case 12 -> COMBAT_FORCE_FACTOR_BASE + 0.125;
-            default -> COMBAT_FORCE_FACTOR_BASE; // 7
+            case 2 -> BASE_VARIANCE_FACTOR - 0.125;
+            case 3 -> BASE_VARIANCE_FACTOR - 0.1;
+            case 4 -> BASE_VARIANCE_FACTOR - 0.075;
+            case 5 -> BASE_VARIANCE_FACTOR - 0.05;
+            case 6 -> BASE_VARIANCE_FACTOR - 0.025;
+            case 8 -> BASE_VARIANCE_FACTOR + 0.025;
+            case 9 -> BASE_VARIANCE_FACTOR + 0.05;
+            case 10 -> BASE_VARIANCE_FACTOR + 0.075;
+            case 11 -> BASE_VARIANCE_FACTOR + 0.1;
+            case 12 -> BASE_VARIANCE_FACTOR + 0.125;
+            default -> BASE_VARIANCE_FACTOR; // 7
         };
     }
 

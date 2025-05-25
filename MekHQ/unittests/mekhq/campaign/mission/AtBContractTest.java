@@ -541,10 +541,6 @@ public class AtBContractTest {
 
             forceId = getNextForceId();
 
-            Vector<Object> allMockUnits = new Vector<>();
-            allMockUnits.addAll(mockUnits);
-            allMockUnits.addAll(mockUnits2);
-
             Vector<UUID> allMockUUIDs = new Vector<>();
             allMockUUIDs.addAll(mockUUIDs);
             allMockUUIDs.addAll(mockUUIDs2);

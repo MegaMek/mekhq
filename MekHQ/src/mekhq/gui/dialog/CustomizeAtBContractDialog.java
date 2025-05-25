@@ -389,6 +389,14 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.insets = new Insets(5, 5, 5, 5);
         leftPanel.add(lblRequiredLances, gbc);
 
+        lblRequiredLances.setText(resourceMap.getString("lblRequiredUnitsInCombatTeams.text"));
+        lblRequiredLances.setName("lblRequiredUnitsInCombatTeams");
+        gbc.gridx = 0;
+        gbc.gridy = y;
+        gbc.gridwidth = 1;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        leftPanel.add(lblRequiredLances, gbc);
+
         gbc.gridx = 1;
         gbc.gridy = y++;
         gbc.gridwidth = 1;
@@ -592,7 +600,6 @@ public class CustomizeAtBContractDialog extends JDialog {
         contract.setEnemySkill(comboEnemySkill.getSelectedItem());
         contract.setEnemyQuality(cbEnemyQuality.getSelectedIndex());
         contract.setRequiredCombatTeams((Integer) spnRequiredLances.getValue());
-        // TODO - Add spinner: contract.setRequiredUnitsInCombatTeams(foo.bar());
         contract.setMoraleLevel(comboEnemyMorale.getSelectedItem());
         contract.setContractScoreArbitraryModifier((Integer) spnContractScoreArbitraryModifier.getValue());
         contract.setBaseAmount(txtBasePay.getMoney());

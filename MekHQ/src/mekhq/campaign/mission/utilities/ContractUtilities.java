@@ -87,15 +87,7 @@ public class ContractUtilities {
      * <p>
      * This method iterates through all combat teams in the specified campaign, ignoring combat teams with the auxiliary
      * role. For each valid combat team, it retrieves the associated force and evaluates all units within that force.
-     * The unit contribution to the total is determined based on its type:
-     * <ul>
-     * <li><b>TANK, VTOL, NAVAL, CONV_FIGHTER, AEROSPACEFIGHTER:</b> Adds 1 for
-     * non-clan factions,
-     * and 0.5 for clan factions.</li>
-     * <li><b>PROTOMEK:</b> Adds 0.2 to the total.</li>
-     * <li><b>BATTLE_ARMOR, INFANTRY:</b> Adds 0 (excluded from the total).</li>
-     * <li><b>Other types:</b> Adds 1 to the total.</li>
-     * </ul>
+     * The unit contribution to the total is determined based on its type. See {@link CombatTeam#getSize(Campaign)}
      *
      * <p>
      * Units that aren’t associated with a valid combat team or can’t be fetched due
@@ -120,18 +112,7 @@ public class ContractUtilities {
             if (!force.isForceType(STANDARD)) {
                 continue;
             }
-
-            /*
-            for (UUID unitId : force.getAllUnits(true)) {
-                Entity entity = getEntityFromUnitId(campaign.getHangar(), unitId);
-
-                if (entity == null) {
-                    continue;
-                }
-
-                numUnits += getEffectiveUnitSize(entity.getUnitType(), campaign.getFaction());
-            }
-             */
+            
             numUnits += combatTeam.getSize(campaign);
         }
 
