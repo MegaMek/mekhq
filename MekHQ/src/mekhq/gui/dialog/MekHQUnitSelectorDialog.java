@@ -119,7 +119,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
     }
 
     /**
-     * This is the initialization function for all the buttons involved in ths panel.
+     * This is the initialization function for all the buttons involved in this panel.
      */
     @Override
     protected JPanel createButtonsPanel() {
@@ -302,6 +302,19 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         return selectedEntity;
     }
 
+    /**
+     * This function is to simplify logic in filterUnits. It runs a series of checks to determine if a unit is valid
+     * within the current filtering context.
+     *
+     * @param mek             The unit being evaluated.
+     * @param nClass          The current weight class selection
+     * @param tech            The current tech selection
+     * @param techLevelMatch  whether the current tech selection matches
+     * @param checkSupportVee Whether the special 'Support Vehicle' unit type was selected
+     * @param nUnit           Which unit type is currently selected
+     *
+     * @return true if the unit passes all filters and allowed, false otherwise
+     */
     private boolean isAllowedUnit(MekSummary mek, int nClass, ITechnology tech, boolean techLevelMatch,
           boolean checkSupportVee, int nUnit) {
         // If year limits are enabled, check that the mek is available now
