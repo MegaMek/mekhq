@@ -67,6 +67,7 @@ import megamek.common.Player;
 import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
 import megamek.common.planetaryconditions.PlanetaryConditions;
+import megamek.common.util.BoardUtilities;
 import megamek.logging.MMLogger;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.force.Force;
@@ -80,6 +81,7 @@ import mekhq.campaign.unit.ITransportAssignment;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQInternationalization;
 import mekhq.utilities.PotentialTransportsMap;
+import mekhq.utilities.ScenarioUtils;
 
 /**
  * Enhanced version of GameThread which imports settings and non-player units into the MM game
@@ -174,47 +176,7 @@ public class AtBGameThread extends GameThread {
                     Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
                 }
 
-                MapSettings mapSettings = MapSettings.getInstance();
-                mapSettings.setBoardSize(scenario.getMapX(), scenario.getMapY());
-                mapSettings.setMapSize(1, 1);
-                mapSettings.getBoardsSelectedVector().clear();
-
-                // if the scenario is taking place in space, do space settings instead
-                if (scenario.getBoardType() == Scenario.T_SPACE || scenario.getTerrainType().equals("Space")) {
-                    mapSettings.setMedium(MapSettings.MEDIUM_SPACE);
-                    mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
-                } else if (scenario.isUsingFixedMap()) {
-                    // TODO : remove inline file type
-                    String board = scenario.getMap().replace(".board", "");
-                    board = board.replace("\\", "/");
-                    mapSettings.getBoardsSelectedVector().add(board);
-
-                    if (scenario.getBoardType() == Scenario.T_ATMOSPHERE) {
-                        mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
-                    }
-                } else {
-                    // TODO : Remove inline file path
-                    File mapgenFile = new File("data/mapgen/" + scenario.getMap() + ".xml");
-                    try (InputStream is = new FileInputStream(mapgenFile)) {
-                        mapSettings = MapSettings.getInstance(is);
-                    } catch (FileNotFoundException ex) {
-                        Sentry.captureException(ex);
-                        // TODO: Remove inline file path
-                        logger.error(String.format("Could not load map file data/mapgen/%s.xml", scenario.getMap()),
-                              ex);
-                    }
-
-                    if (scenario.getBoardType() == Scenario.T_ATMOSPHERE) {
-                        mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
-                    }
-
-                    // duplicate code, but getting a new instance of map settings resets the size
-                    // parameters
-                    mapSettings.setBoardSize(scenario.getMapX(), scenario.getMapY());
-                    mapSettings.setMapSize(1, 1);
-                    mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
-                }
-
+                MapSettings mapSettings = ScenarioUtils.getMapSettings(scenario);
                 client.sendMapSettings(mapSettings);
                 Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
 

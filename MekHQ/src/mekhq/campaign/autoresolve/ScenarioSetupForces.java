@@ -1,14 +1,14 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
  *
- * This file is part of MekHQ.
+ * This file is part of MegaMek.
  *
- * MekHQ is free software: you can redistribute it and/or modify
+ * MegaMek is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License (GPL),
  * version 3 or (at your option) any later version,
  * as published by the Free Software Foundation.
  *
- * MekHQ is distributed in the hope that it will be useful,
+ * MegaMek is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
@@ -24,18 +24,18 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MegaMek was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
-
 package mekhq.campaign.autoresolve;
 
 import static megamek.common.force.Force.NO_FORCE;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
@@ -52,8 +52,6 @@ import megamek.common.Entity;
 import megamek.common.EntitySelector;
 import megamek.common.Game;
 import megamek.common.Infantry;
-import megamek.common.MapSettings;
-import megamek.common.Minefield;
 import megamek.common.Player;
 import megamek.common.ProtoMek;
 import megamek.common.UnitType;
@@ -61,38 +59,38 @@ import megamek.common.autoresolve.acar.SimulationContext;
 import megamek.common.autoresolve.converter.EntityAsUnit;
 import megamek.common.autoresolve.converter.ForceConsolidation;
 import megamek.common.autoresolve.converter.SetupForces;
+import megamek.common.enums.SkillLevel;
 import megamek.common.force.Forces;
 import megamek.common.options.OptionsConstants;
-import megamek.common.planetaryconditions.PlanetaryConditions;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.unit.Unit;
 
 /**
+ * This class is responsible for setting up the forces for a scenario
  * @author Luana Coppio
  */
-public class AtBSetupForces extends SetupForces {
-    private static final MMLogger logger = MMLogger.create(AtBSetupForces.class);
+public class ScenarioSetupForces<SCENARIO extends Scenario> extends SetupForces {
+    private static final MMLogger LOGGER = MMLogger.create(ScenarioSetupForces.class);
 
-    private final Campaign campaign;
-    private final List<Unit> units;
-    private final AtBScenario scenario;
+    protected final Campaign campaign;
+    protected final List<Unit> units;
+    private final SCENARIO scenario;
     private final ForceConsolidation forceConsolidationMethod;
     private final Set<Integer> teamIds = new HashSet<>();
     private final OrderFactory orderFactory;
     private final Game dummyGame;
 
-    public AtBSetupForces(Campaign campaign, List<Unit> units, AtBScenario scenario,
-            ForceConsolidation forceConsolidationMethod) {
+    public ScenarioSetupForces(Campaign campaign, List<Unit> units, SCENARIO scenario,
+                               ForceConsolidation forceConsolidationMethod) {
         this(campaign, units, scenario, forceConsolidationMethod, new OrderFactory(campaign, scenario));
     }
 
-    public AtBSetupForces(Campaign campaign, List<Unit> units, AtBScenario scenario,
-            ForceConsolidation forceConsolidationMethod, OrderFactory orderFactory) {
+    public ScenarioSetupForces(Campaign campaign, List<Unit> units, SCENARIO scenario,
+                               ForceConsolidation forceConsolidationMethod, OrderFactory orderFactory) {
         this.campaign = campaign;
         this.dummyGame = campaign.getGame();
         this.units = units;
@@ -100,6 +98,10 @@ public class AtBSetupForces extends SetupForces {
         this.forceConsolidationMethod = forceConsolidationMethod;
         this.orderFactory = orderFactory;
         setupTeamIds();
+    }
+
+    public SCENARIO getScenario() {
+        return scenario;
     }
 
     private void setupTeamIds() {
@@ -164,7 +166,7 @@ public class AtBSetupForces extends SetupForces {
                 Sentry.captureException(e);
                 var entities = game.getForces().getFullEntities(force).stream().filter(Entity.class::isInstance)
                         .map(Entity.class::cast).toList();
-                logger.error("Error converting force to formation {} - {}", force, entities, e);
+                LOGGER.error("Error converting force to formation {} - {}", force, entities, e);
                 throw new FailedToConvertForceToFormationException(e);
             }
         }
@@ -185,32 +187,12 @@ public class AtBSetupForces extends SetupForces {
         sendEntities(entities, game);
     }
 
-    /**
-     * Move the entity by copying it, this is used to break references to the original instance
-     * @param entity The entity to copy
-     * @return The copied entity
-     */
-    private Entity moveByCopy(Entity entity) {
-        try {
-            try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
-                try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream)) {
-                    // Serialize the entities
-                    objectOutputStream.writeObject(entity);
-                    objectOutputStream.flush();
-                    byte[] serializedData = byteArrayOutputStream.toByteArray();
+    protected SkillLevel getEnemySkillLevel() {
+        return SkillLevel.REGULAR;
+    }
 
-                    // Deserialize to create new instances
-                    try(ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(serializedData)) {
-                        try (ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream)) {
-                            return (Entity) objectInputStream.readObject();
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-            logger.error(e, "Failed to break references for entity {}", entity);
-            return null;
-        }
+    protected SkillLevel getAlliedSkillLevel() {
+        return SkillLevel.REGULAR;
     }
 
     /**
@@ -221,8 +203,9 @@ public class AtBSetupForces extends SetupForces {
      */
     private void setupBots(SimulationContext game) {
         var forbiddenColor = game.getPlayer(0).getColour();
-        var enemySkill = (scenario.getContract(campaign)).getEnemySkill();
-        var allySkill = (scenario.getContract(campaign)).getAllySkill();
+        SkillLevel enemySkill = getEnemySkillLevel();
+        SkillLevel allySkill = getAlliedSkillLevel();
+
         var localBots = new HashMap<String, Player>();
         for (int i = 0; i < scenario.getNumBots(); i++) {
             BotForce botForce = scenario.getBotForce(i);
@@ -258,7 +241,7 @@ public class AtBSetupForces extends SetupForces {
      *
      * @return The clean player object
      */
-    private Player getCleanPlayer() {
+    protected Player getCleanPlayer() {
         var campaignPlayer = campaign.getPlayer();
         var player = new Player(campaignPlayer.getId(), campaign.getName());
         player.setCamouflage(campaign.getCamouflage().clone());
@@ -271,10 +254,12 @@ public class AtBSetupForces extends SetupForces {
         player.setStartingAnySEx(scenario.getStartingAnySEx());
         player.setStartingAnySEy(scenario.getStartingAnySEy());
         player.setTeam(1);
-        player.setNbrMFActive(scenario.getNumPlayerMinefields(Minefield.TYPE_ACTIVE));
-        player.setNbrMFConventional(scenario.getNumPlayerMinefields(Minefield.TYPE_CONVENTIONAL));
-        player.setNbrMFInferno(scenario.getNumPlayerMinefields(Minefield.TYPE_INFERNO));
-        player.setNbrMFVibra(scenario.getNumPlayerMinefields(Minefield.TYPE_VIBRABOMB));
+
+        player.setNbrMFActive(0);
+        player.setNbrMFConventional(0);
+        player.setNbrMFInferno(0);
+        player.setNbrMFVibra(0);
+
         player.getTurnInitBonus();
         return player;
     }
@@ -288,9 +273,17 @@ public class AtBSetupForces extends SetupForces {
     private List<Entity> setupPlayerForces(Player player) {
         boolean useDropship = isUsingDropship();
         List<Entity> entities = new ArrayList<>();
-        entities.addAll(getCopyOfEntities(player, useDropship, new UnitEntitySource()));
-        entities.addAll(getCopyOfEntities(player, useDropship, new AllyEntitySource()));
+        entities.addAll(getCopyOfEntities(player, useDropship, getUnitEntitySource()));
+        entities.addAll(getCopyOfEntities(player, useDropship, getAllyEntitySource()));
         return entities;
+    }
+
+    protected EntitySource getUnitEntitySource() {
+        return new UnitEntitySource();
+    }
+
+    protected EntitySource getAllyEntitySource() {
+        return new AllyEntitySource();
     }
 
     private List<Entity> getCopyOfEntities(Player player, boolean useDropship, EntitySource entitySource) {
@@ -305,12 +298,12 @@ public class AtBSetupForces extends SetupForces {
         return entities;
     }
 
-    private interface EntitySource {
+    protected interface EntitySource {
         Iterable<?> getSources();
         Entity setupEntity(Player player, Object source, boolean useDropship);
     }
 
-    private class UnitEntitySource implements EntitySource {
+    protected class UnitEntitySource implements EntitySource {
         @Override
         public Iterable<?> getSources() {
             return units;
@@ -325,7 +318,8 @@ public class AtBSetupForces extends SetupForces {
     private class AllyEntitySource implements EntitySource {
         @Override
         public Iterable<?> getSources() {
-            return scenario.getAlliesPlayer();
+            return scenario.getBotForces().stream().filter(botForce -> botForce.getTeam() == 1)
+                         .map(botForce -> botForce.getFullEntityList(campaign)).flatMap(List::stream).toList();
         }
 
         @Override
@@ -334,10 +328,38 @@ public class AtBSetupForces extends SetupForces {
         }
     }
 
+    /**
+     * Move the entity by copying it, this is used to break references to the original instance
+     * @param entity The entity to copy
+     * @return The copied entity
+     */
+    protected Entity moveByCopy(Entity entity) {
+        try {
+            try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+                try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream)) {
+                    // Serialize the entities
+                    objectOutputStream.writeObject(entity);
+                    objectOutputStream.flush();
+                    byte[] serializedData = byteArrayOutputStream.toByteArray();
+
+                    // Deserialize to create new instances
+                    try(ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(serializedData)) {
+                        try (ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream)) {
+                            return (Entity) objectInputStream.readObject();
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.error(e, "Failed to break references for entity {}", entity);
+            return null;
+        }
+    }
+
     private Entity setupPlayerAllyEntity(Player player, Entity originalAllyEntity, boolean useDropship) {
         var entity = moveByCopy(originalAllyEntity);
         if (Objects.isNull(entity)) {
-            logger.error("Could not setup ally entity {}", originalAllyEntity);
+            LOGGER.error("Could not setup ally entity {}", originalAllyEntity);
             return null;
         }
 
@@ -353,11 +375,8 @@ public class AtBSetupForces extends SetupForces {
                     speed++;
                 }
             }
-            deploymentRound = Math.max(entity.getDeployRound(), scenario.getDeploymentDelay() - speed);
-            if (!useDropship
-                    && scenario.getCombatRole().isPatrol()
-                    && (scenario.getCombatTeamById(campaign) != null)
-                    && (scenario.getCombatTeamById(campaign).getForceId() == scenario.getCombatTeamId())) {
+            deploymentRound = entity.getDeployRound();
+            if (!useDropship) {
                 deploymentRound = Math.max(deploymentRound, 6 - speed);
             }
         }
@@ -369,7 +388,7 @@ public class AtBSetupForces extends SetupForces {
     private Entity setupPlayerEntityFromUnit(Player player, Unit unit, boolean useDropship) {
         var entity = moveByCopy(unit.getEntity());
         if (Objects.isNull(entity)) {
-            logger.error("Could not setup unit {} for player {}", unit, player);
+            LOGGER.error("Could not setup unit {} for player {}", unit, player);
             return null;
         }
         entity.setOwner(player);
@@ -383,27 +402,6 @@ public class AtBSetupForces extends SetupForces {
             entity.setNMarines(unit.getMarineCount());
         }
         // Calculate deployment round
-        int deploymentRound = entity.getDeployRound();
-        if (!(scenario instanceof AtBDynamicScenario)) {
-            int speed = entity.getWalkMP();
-            if (entity.getAnyTypeMaxJumpMP() > 0) {
-                if (entity instanceof Infantry) {
-                    speed = entity.getJumpMP();
-                } else {
-                    speed++;
-                }
-            }
-            // Set scenario type-specific delay
-            deploymentRound = Math.max(entity.getDeployRound(), scenario.getDeploymentDelay() - speed);
-            // Lances deployed in scout roles always deploy units in 6-walking speed turns
-            if (scenario.getCombatRole().isPatrol()
-                    && (scenario.getCombatTeamById(campaign) != null)
-                    && (scenario.getCombatTeamById(campaign).getForceId() == scenario.getCombatTeamId())
-                    && !useDropship) {
-                deploymentRound = Math.max(deploymentRound, 6 - speed);
-            }
-        }
-        entity.setDeployRound(deploymentRound);
         var force = campaign.getForceFor(unit);
         if (force != null) {
             entity.setForceString(force.getFullMMName());
@@ -419,68 +417,12 @@ public class AtBSetupForces extends SetupForces {
      * @return True if using dropships under specific conditions, false otherwise
      */
     private boolean isUsingDropship() {
-        if (scenario.getCombatRole().isPatrol()) {
-            for (Entity en : scenario.getAlliesPlayer()) {
-                if (en.getUnitType() == UnitType.DROPSHIP) {
-                    return true;
-                }
-            }
-            for (Unit unit : units) {
-                if (unit.getEntity().getUnitType() == UnitType.DROPSHIP) {
-                    return true;
-                }
+        for (Unit unit : units) {
+            if (unit.getEntity().getUnitType() == UnitType.DROPSHIP) {
+                return true;
             }
         }
         return false;
-    }
-
-    /**
-     * Setup the map settings for the game, not relevant at the moment, as the map
-     * settings are not used in the autoresolve currently
-     *
-     * @return The map settings object
-     */
-    private MapSettings setupMapSettings() {
-        MapSettings mapSettings = MapSettings.getInstance();
-        mapSettings.setBoardSize(scenario.getMapX(), scenario.getMapY());
-        mapSettings.setMapSize(1, 1);
-        mapSettings.getBoardsSelectedVector().clear();
-
-        // if the scenario is taking place in space, do space settings instead
-        if (scenario.getBoardType() == Scenario.T_SPACE
-                || scenario.getTerrainType().equals("Space")) {
-            mapSettings.setMedium(MapSettings.MEDIUM_SPACE);
-            mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
-        } else if (scenario.isUsingFixedMap()) {
-            String board = scenario.getMap().replace(".board", "");
-            board = board.replace("\\", "/");
-            mapSettings.getBoardsSelectedVector().add(board);
-
-            if (scenario.getBoardType() == Scenario.T_ATMOSPHERE) {
-                mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
-            }
-        } else {
-            File mapgenFile = new File("data/mapgen/" + scenario.getMap() + ".xml");
-            try (InputStream is = new FileInputStream(mapgenFile)) {
-                mapSettings = MapSettings.getInstance(is);
-            } catch (IOException ex) {
-                Sentry.captureException(ex);
-                logger.error(
-                        String.format("Could not load map file data/mapgen/%s.xml", scenario.getMap()),
-                        ex);
-            }
-
-            if (scenario.getBoardType() == Scenario.T_ATMOSPHERE) {
-                mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
-            }
-
-            // duplicate code, but getting a new instance of map settings resets the size
-            // parameters
-            mapSettings.setBoardSize(scenario.getMapX(), scenario.getMapY());
-            mapSettings.setMapSize(1, 1);
-            mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
-        }
-        return mapSettings;
     }
 
     public PlayerColour getNextColor(PlayerColour playerColour) {
@@ -530,7 +472,7 @@ public class AtBSetupForces extends SetupForces {
             var entity = moveByCopy(originalBotEntity);
 
             if (entity == null) {
-                logger.warn("Could not convert entity for bot {} - {}", bot.getName(), originalBotEntity);
+                LOGGER.warn("Could not convert entity for bot {} - {}", bot.getName(), originalBotEntity);
                 continue;
             }
 

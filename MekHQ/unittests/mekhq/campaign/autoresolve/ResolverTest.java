@@ -381,7 +381,7 @@ public class ResolverTest {
         when(botForce.getTeam()).thenReturn(2);
         when(botForce.getFullEntityList(any())).thenReturn(entities);
 
-        var resolver = Resolver.simulationRun(new AtBSetupForces(campaign, units, scenario, new FlattenForces()),
+        var resolver = Resolver.simulationRun(new StratconSetupForces(campaign, units, scenario, new FlattenForces()),
               SimulationOptions.empty(), new Board(30, 30), planetaryConditions);
         autoResolveConcludedEvent.accept(resolver.resolveSimulation());
     }

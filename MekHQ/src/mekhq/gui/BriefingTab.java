@@ -794,9 +794,9 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        if (scenario instanceof AtBScenario) {
+        if (scenario instanceof AtBScenario atBScenario) {
             // Also print off allied sheets
-            chosen.addAll(((AtBScenario) scenario).getAlliesPlayer());
+            chosen.addAll(atBScenario.getAlliesPlayer());
         }
 
         // add bot forces

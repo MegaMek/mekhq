@@ -32,6 +32,8 @@
  */
 package mekhq.utilities;
 
+import static mekhq.MHQConstants.MAPGEN_PATH;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -40,6 +42,7 @@ import java.io.InputStream;
 import io.sentry.Sentry;
 import megamek.common.Board;
 import megamek.common.MapSettings;
+import megamek.common.util.fileUtils.MegaMekFile;
 import megamek.logging.MMLogger;
 import megamek.server.ServerBoardHelper;
 import mekhq.campaign.mission.AtBScenario;
@@ -63,60 +66,42 @@ public class ScenarioUtils {
      */
     public static Board getBoardFor(Scenario scenario) {
         // Check for valid dimensions and map
+        MapSettings mapSettings = getMapSettings(scenario);
+        return ServerBoardHelper.getPossibleGameBoard(mapSettings, false);
+    }
+
+    public static MapSettings getMapSettings(Scenario scenario) {
         if (scenario instanceof AtBScenario atBScenario) {
-            return getStratconBoardFor(atBScenario);
+            return getStratconMapSettings(atBScenario);
+        } else {
+            return getNonStratconMapSettings(scenario);
         }
-        return getNonStratconBoardFor(scenario);
     }
 
-    private static Board getNonStratconBoardFor(Scenario scenario) {
-        if (scenario == null || scenario.getMap() == null ||
-                  scenario.getMapSizeX() <= 1 || scenario.getMapSizeY() <= 1) {
-            LOGGER.error("Invalid map settings provided for scenario {}",
-                  scenario != null ? scenario.getName() : "null");
-            return ServerBoardHelper.getPossibleGameBoard(MapSettings.getInstance(), false);
-        }
-
-        boolean isSpace = scenario.getBoardType() == Scenario.T_SPACE;
-        boolean isAtmosphere = scenario.getBoardType() == Scenario.T_ATMOSPHERE;
-
-        return createBoard(
-              scenario.getMapSizeX(),
-              scenario.getMapSizeY(),
-              scenario.getMap(),
-              scenario.isUsingFixedMap(),
-              isSpace,
-              isAtmosphere
-        );
+    private static MapSettings getNonStratconMapSettings(Scenario scenario) {
+        return getMapSettings(scenario.getMapSizeX(), scenario.getMapSizeY(), scenario.getMap(),
+              scenario.isUsingFixedMap(), scenario.getBoardType() == Scenario.T_SPACE,
+              scenario.getBoardType() == Scenario.T_ATMOSPHERE);
     }
 
-    private static Board getStratconBoardFor(AtBScenario scenario) {
-        // Check for valid dimensions and map
-        if (scenario == null || scenario.getMap() == null) {
-            LOGGER.error("Invalid AtBScenario provided");
-            return ServerBoardHelper.getPossibleGameBoard(MapSettings.getInstance(), false);
-        }
-
-        boolean isSpace = scenario.getBoardType() == Scenario.T_SPACE ||
-                                "Space".equals(scenario.getTerrainType());
-        boolean isAtmosphere = scenario.getBoardType() == Scenario.T_ATMOSPHERE;
-
-        return createBoard(
-              scenario.getMapX(),
+    private static MapSettings getStratconMapSettings(AtBScenario scenario) {
+        return getMapSettings(scenario.getMapX(),
               scenario.getMapY(),
               scenario.getMap(),
               scenario.isUsingFixedMap(),
-              isSpace,
-              isAtmosphere
-        );
+              scenario.getBoardType() == Scenario.T_SPACE || "Space".equals(scenario.getTerrainType()),
+              scenario.getBoardType() == Scenario.T_ATMOSPHERE);
     }
 
-    /**
-     * Creates a board based on the provided parameters
-     */
-    private static Board createBoard(int mapSizeX, int mapSizeY, String mapName,
-          boolean isUsingFixedMap, boolean isSpace, boolean isAtmosphere) {
+    public static MapSettings getMapSettings(int mapSizeX, int mapSizeY, String mapName, boolean isUsingFixedMap,
+          boolean isSpace, boolean isAtmosphere) {
         MapSettings mapSettings = MapSettings.getInstance();
+
+        if ((mapName == null) || (mapSizeX <= 1) || (mapSizeY <= 1)) {
+            LOGGER.error("Invalid map settings provided for scenario {}", mapName);
+            return mapSettings;
+        }
+
         mapSettings.setBoardSize(mapSizeX, mapSizeY);
         mapSettings.setMapSize(1, 1);
         mapSettings.getBoardsSelectedVector().clear();
@@ -132,7 +117,7 @@ public class ScenarioUtils {
                 mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
             }
         } else {
-            File mapgenFile = new File("data/mapgen/" + mapName + ".xml");
+            File mapgenFile = new MegaMekFile(new File(MAPGEN_PATH), mapName + ".xml").getFile();
             try (InputStream is = new FileInputStream(mapgenFile)) {
                 mapSettings = MapSettings.getInstance(is);
             } catch (IOException ex) {
@@ -149,7 +134,8 @@ public class ScenarioUtils {
             mapSettings.setMapSize(1, 1);
             mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
         }
+        return mapSettings;
 
-        return ServerBoardHelper.getPossibleGameBoard(mapSettings, false);
+
     }
 }
