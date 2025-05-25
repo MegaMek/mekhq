@@ -4760,61 +4760,23 @@ public class Campaign implements ITechManager {
             return 0;
         }
 
-        int total = -contract.getRequiredCombatTeams();
-        int role = -max(1, contract.getRequiredCombatTeams() / 2);
-        int minimumUnitCount = (int) ((double) getStandardForceSize(faction) / 2);
+        int total = -contract.getRequiredUnitsInCombatTeams();
+        int role = -max(1, contract.getRequiredUnitsInCombatTeams() / 2);
 
         final CombatRole requiredLanceRole = contract.getContractType().getRequiredCombatRole();
         for (CombatTeam combatTeam : combatTeams.values()) {
             CombatRole combatRole = combatTeam.getRole();
 
-            Force force;
-            int unitCount = 0;
-            try {
-                int forceId = combatTeam.getForceId();
-                force = getForce(forceId);
-
-                Vector<UUID> unitsInForce = force.getAllUnits(true);
-
-                for (UUID unitId : unitsInForce) {
-                    Unit unit = getUnit(unitId);
-                    if (unit != null && unit.isFullyCrewed() && !unit.isSalvage()) {
-                        unitCount++;
-                    }
-                }
-            } catch (Exception ignored) {
-                continue;
-            }
-
-            boolean isUnderStrength = unitCount < minimumUnitCount;
-            boolean reportUnderStrength = false;
-
             if (!combatRole.isReserve() && !combatRole.isAuxiliary()) {
                 if ((combatTeam.getMissionId() == contract.getId())) {
                     if (!combatRole.isTraining() || contract.getContractType().isCadreDuty()) {
-                        if (isUnderStrength) {
-                            reportUnderStrength = true;
-                        } else {
-                            total++;
-                        }
+                        total += combatTeam.getSize(this);
                     }
                 }
 
                 if (combatRole == requiredLanceRole) {
-                    if (isUnderStrength) {
-                        reportUnderStrength = true;
-                    } else {
-                        role++;
-                    }
+                    role += combatTeam.getSize(this);
                 }
-            }
-
-            if (reportUnderStrength) {
-                addReport(String.format(resources.getString("understrength.text"),
-                      force.getName(),
-                      spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
-                      CLOSING_SPAN_TAG,
-                      minimumUnitCount));
             }
         }
 

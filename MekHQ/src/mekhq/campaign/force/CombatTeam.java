@@ -203,6 +203,12 @@ public class CombatTeam {
         commanderId = findCommander(forceId, campaign);
     }
 
+    /**
+     * Effective size used when determining for many units this combat team is. Sometimes a unit may count as less
+     * than a unit, like a vehicle point in a Clan star (two vehicles would return a size of 1).
+     * @param campaign
+     * @return effective size of the combat team
+     */
     public int getSize(Campaign campaign) {
         if (campaign.getFaction().isClan()) {
             return (int) Math.ceil(getEffectivePoints(campaign));
@@ -225,7 +231,7 @@ public class CombatTeam {
         double armor = 0.0;
         double infantry = 0.0;
         double other = 0.0;
-        for (UUID id : campaign.getForce(forceId).getUnits()) {
+        for (UUID id : campaign.getForce(forceId).getAllUnits(true)) {
             Unit unit = campaign.getUnit(id);
             if (null != unit) {
                 Entity entity = unit.getEntity();

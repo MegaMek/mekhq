@@ -551,7 +551,7 @@ public class ContractSummaryPanel extends JPanel {
             gridBagConstraintsLabels.gridy = ++y;
             mainPanel.add(lblRequiredLances, gridBagConstraintsLabels);
 
-            JLabel txtRequiredLances = new JLabel(String.valueOf(((AtBContract) contract).getRequiredCombatTeams()));
+            JLabel txtRequiredLances = new JLabel(String.valueOf(((AtBContract) contract).getRequiredUnitsInCombatTeams()));
             txtRequiredLances.setName("txtRequiredLances");
             gridBagConstraintsText.gridy = y;
             mainPanel.add(txtRequiredLances, gridBagConstraintsText);

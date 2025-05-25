@@ -56,6 +56,7 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.ContractCommandRights;
+import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -85,7 +86,7 @@ public abstract class AbstractContractMarket {
      * The portion of combat teams we expect to be performing combat actions. This is one in 'x' where 'x' is the value
      * set here.
      */
-    static final double COMBAT_FORCE_DIVIDER = 2;
+    static final double COMBAT_FORCE_FACTOR_BASE = 0.7;
 
 
     protected List<Contract> contracts = new ArrayList<>();
@@ -266,16 +267,16 @@ public abstract class AbstractContractMarket {
      * @param contract       the contract that specifies details such as subcontract status
      * @param bypassVariance a flag indicating whether variance adjustments should be bypassed
      *
-     * @return the calculated number of required combat teams, ensuring it meets game rules and constraints
+     * @return the calculated number of required units in combat teams, ensuring it meets game rules and constraints
      */
-    public int calculateRequiredCombatTeams(Campaign campaign, AtBContract contract, boolean bypassVariance) {
+    public int calculateRequiredUnitsInCombatTeams(Campaign campaign, AtBContract contract, boolean bypassVariance) {
         // Return 1 combat team if the contract is a subcontract
         if (contract.isSubcontract()) {
             return 1;
         }
 
         // Calculate base formation size and effective unit force
-        int effectiveForces = AtBContract.calculateBaseNumberOfRequiredLances(campaign);
+        int effectiveForces = ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(campaign);
 
         // If bypassing variance, apply flat reduction (reduce force by 1/3)
         if (bypassVariance) {
@@ -287,7 +288,7 @@ public abstract class AbstractContractMarket {
         double varianceFactor = calculateVarianceFactor(varianceRoll);
 
         // Adjust available forces based on variance, ensuring minimum clamping
-        int adjustedForces = effectiveForces - (int) Math.floor((double) effectiveForces / varianceFactor);
+        int adjustedForces = (int) Math.floor((double) effectiveForces * varianceFactor);
 
         if (adjustedForces < 1) {
             adjustedForces = 1;
@@ -317,13 +318,17 @@ public abstract class AbstractContractMarket {
      */
     private double calculateVarianceFactor(int roll) {
         return switch (roll) {
-            case 2 -> COMBAT_FORCE_DIVIDER * 0.25;
-            case 3 -> COMBAT_FORCE_DIVIDER * 0.5;
-            case 4 -> COMBAT_FORCE_DIVIDER * 0.75;
-            case 10 -> COMBAT_FORCE_DIVIDER * 1.25;
-            case 11 -> COMBAT_FORCE_DIVIDER * 1.5;
-            case 12 -> COMBAT_FORCE_DIVIDER * 1.75;
-            default -> COMBAT_FORCE_DIVIDER; // 5-9
+            case 2 -> COMBAT_FORCE_FACTOR_BASE - 0.125;
+            case 3 -> COMBAT_FORCE_FACTOR_BASE - 0.1;
+            case 4 -> COMBAT_FORCE_FACTOR_BASE - 0.075;
+            case 5 -> COMBAT_FORCE_FACTOR_BASE - 0.05;
+            case 6 -> COMBAT_FORCE_FACTOR_BASE - 0.025;
+            case 8 -> COMBAT_FORCE_FACTOR_BASE + 0.025;
+            case 9 -> COMBAT_FORCE_FACTOR_BASE + 0.05;
+            case 10 -> COMBAT_FORCE_FACTOR_BASE + 0.075;
+            case 11 -> COMBAT_FORCE_FACTOR_BASE + 0.1;
+            case 12 -> COMBAT_FORCE_FACTOR_BASE + 0.125;
+            default -> COMBAT_FORCE_FACTOR_BASE; // 7
         };
     }
 

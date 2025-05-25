@@ -70,7 +70,6 @@ import static mekhq.campaign.rating.IUnitRating.DRAGOON_F;
 import static mekhq.campaign.stratcon.StratconContractDefinition.getContractDefinition;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.campaign.universe.fameAndInfamy.BatchallFactions.BATCHALL_FACTIONS;
-import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -107,7 +106,6 @@ import megamek.client.ratgenerator.UnitTable;
 import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.Entity;
 import megamek.common.TargetRoll;
-import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
@@ -118,13 +116,13 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.event.MissionChangedEvent;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.ScenarioStatus;
+import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
@@ -183,6 +181,7 @@ public class AtBContract extends Contract {
     protected int extensionLength;
 
     protected int requiredCombatTeams;
+    protected int requiredUnitsInCombatTeams;
     protected AtBMoraleLevel moraleLevel;
     protected LocalDate routEnd;
     protected int partsAvailabilityLevel;
@@ -274,9 +273,9 @@ public class AtBContract extends Contract {
         int companySize = getStandardForceSize(campaign.getFaction(), COMPANY.getDepth());
         int battalionSize = getStandardForceSize(campaign.getFaction(), BATTALION.getDepth());
 
-        if (getEffectiveNumUnits(campaign) <= companySize) {
+        if (ContractUtilities.getEffectiveNumUnits(campaign) <= companySize) {
             setOverheadComp(OH_FULL);
-        } else if (getEffectiveNumUnits(campaign) <= battalionSize) {
+        } else if (ContractUtilities.getEffectiveNumUnits(campaign) <= battalionSize) {
             setOverheadComp(OH_HALF);
         } else {
             setOverheadComp(OH_NONE);
@@ -434,47 +433,22 @@ public class AtBContract extends Contract {
     }
 
     /**
+     * @deprecated use {@link ContractUtilities#calculateBaseNumberOfRequiredLances(Campaign)}
+     *
      * Calculates the number of lances required for this contract, based on [campaign].
      *
      * @param campaign The campaign to reference.
      *
      * @return The number of lances required.
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public static int calculateBaseNumberOfRequiredLances(Campaign campaign) {
-        Faction campaignFaction = campaign.getFaction();
-
-        int lanceLevelFormationSize = getStandardForceSize(campaignFaction);
-        int effectiveNumUnits = getEffectiveNumUnits(campaign);
-
-        int formationSize = 0;
-        for (CombatTeam combatTeam : campaign.getAllCombatTeams()) {
-            Force force = combatTeam.getForce(campaign);
-
-            if (force == null) {
-                continue;
-            }
-
-            if (force.isForceType(STANDARD)) {
-                int depth = force.getFormationLevel().getDepth();
-                formationSize += getStandardForceSize(campaignFaction, depth);
-            }
-        }
-
-        // getStandardForceSize returns the total number of units, so we need to get rid of that portion of the
-        // calculation
-        int caclulatedForceSize = formationSize / lanceLevelFormationSize;
-
-        // If the player has no Combat Teams assign a minimum force size of 1.
-        if (caclulatedForceSize == 0) {
-            caclulatedForceSize = 1;
-        }
-
-        int baseRequiredLances = effectiveNumUnits / caclulatedForceSize;
-
-        return max(baseRequiredLances, 1);
+        return ContractUtilities.calculateBaseNumberOfRequiredLances(campaign);
     }
 
     /**
+     * @deprecated use {@link ContractUtilities#getEffectiveNumUnits(Campaign)}
+     *
      * Calculates the effective number of units available in the given campaign based on unit types and roles.
      *
      * <p>
@@ -501,37 +475,9 @@ public class AtBContract extends Contract {
      *
      * @return the effective number of units as an integer
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public static int getEffectiveNumUnits(Campaign campaign) {
-        double numUnits = 0;
-        for (CombatTeam combatTeam : campaign.getAllCombatTeams()) {
-            Force force = combatTeam.getForce(campaign);
-
-            if (force == null) {
-                continue;
-            }
-
-            if (!force.isForceType(STANDARD)) {
-                continue;
-            }
-
-            for (UUID unitId : force.getAllUnits(true)) {
-                Entity entity = getEntityFromUnitId(campaign.getHangar(), unitId);
-
-                if (entity == null) {
-                    continue;
-                }
-
-                numUnits += switch (entity.getUnitType()) {
-                    case TANK, UnitType.VTOL, UnitType.NAVAL, UnitType.CONV_FIGHTER, AEROSPACEFIGHTER ->
-                          campaign.getFaction().isClan() ? 0.5 : 1;
-                    case UnitType.PROTOMEK -> 0.2;
-                    case UnitType.BATTLE_ARMOR, UnitType.INFANTRY -> 0;
-                    default -> 1; // All other unit types
-                };
-            }
-        }
-
-        return (int) floor(numUnits);
+        return ContractUtilities.getEffectiveNumUnits(campaign);
     }
 
     /**
@@ -867,19 +813,19 @@ public class AtBContract extends Contract {
                     }
                 } else {
                     campaign.addReport("Bonus: Ronin");
-                    new RoninOffer(campaign, stratconCampaignState, requiredCombatTeams);
+                    new RoninOffer(campaign, stratconCampaignState, requiredUnitsInCombatTeams);
                 }
                 yield false;
             }
             case 2 -> {
                 campaign.addReport("Bonus: Ronin");
-                new RoninOffer(campaign, stratconCampaignState, requiredCombatTeams);
+                new RoninOffer(campaign, stratconCampaignState, requiredUnitsInCombatTeams);
                 yield false;
             }
             case 3 -> { // Resupply
                 if (campaignOptions.isUseAtB() && !campaignOptions.isUseStratCon()) {
                     campaign.addReport("Bonus: Ronin");
-                    new RoninOffer(campaign, stratconCampaignState, requiredCombatTeams);
+                    new RoninOffer(campaign, stratconCampaignState, requiredUnitsInCombatTeams);
                     yield false;
                 } else {
                     if (isPostScenario) {
@@ -892,15 +838,15 @@ public class AtBContract extends Contract {
                 }
             }
             case 4 -> {
-                new MercenaryAuction(campaign, requiredCombatTeams, stratconCampaignState, TANK);
+                new MercenaryAuction(campaign, requiredUnitsInCombatTeams, stratconCampaignState, TANK);
                 yield false;
             }
             case 5 -> {
-                new MercenaryAuction(campaign, requiredCombatTeams, stratconCampaignState, AEROSPACEFIGHTER);
+                new MercenaryAuction(campaign, requiredUnitsInCombatTeams, stratconCampaignState, AEROSPACEFIGHTER);
                 yield false;
             }
             case 6 -> {
-                new MercenaryAuction(campaign, requiredCombatTeams, stratconCampaignState, MEK);
+                new MercenaryAuction(campaign, requiredUnitsInCombatTeams, stratconCampaignState, MEK);
                 yield false;
             }
             default -> throw new IllegalStateException(
@@ -1218,6 +1164,7 @@ public class AtBContract extends Contract {
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enemyColour", getEnemyColour().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "requiredCombatTeams", getRequiredCombatTeams());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "requiredUnitsInCombatTeams", getRequiredUnitsInCombatTeams());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "moraleLevel", getMoraleLevel().name());
 
         if (routEnd != null) {
@@ -1308,6 +1255,8 @@ public class AtBContract extends Contract {
                 } else if (item.getNodeName().equalsIgnoreCase("requiredLances") ||
                                  item.getNodeName().equalsIgnoreCase("requiredCombatTeams")) {
                     requiredCombatTeams = Integer.parseInt(item.getTextContent());
+                } else if (item.getNodeName().equalsIgnoreCase("requiredUnitsInCombatTeams")) {
+                    requiredUnitsInCombatTeams = Integer.parseInt(item.getTextContent());
                 } else if (item.getNodeName().equalsIgnoreCase("moraleLevel")) {
                     setMoraleLevel(AtBMoraleLevel.parseFromString(item.getTextContent().trim()));
                 } else if (item.getNodeName().equalsIgnoreCase("routEnd")) {
@@ -1563,6 +1512,14 @@ public class AtBContract extends Contract {
         requiredCombatTeams = required;
     }
 
+    public int getRequiredUnitsInCombatTeams() {
+        return requiredUnitsInCombatTeams;
+    }
+
+    public void setRequiredUnitsInCombatTeams(int required) {
+        requiredUnitsInCombatTeams = required;
+    }
+
     public int getPartsAvailabilityLevel() {
         return partsAvailabilityLevel;
     }
@@ -1720,7 +1677,8 @@ public class AtBContract extends Contract {
             enemyCode = "REB";
         }
 
-        requiredCombatTeams = calculateBaseNumberOfRequiredLances(campaign);
+        setRequiredCombatTeams(ContractUtilities.calculateBaseNumberOfRequiredLances(campaign));
+        setRequiredUnitsInCombatTeams(ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(campaign));
 
         setPartsAvailabilityLevel(getContractType().calculatePartsAvailabilityLevel());
 

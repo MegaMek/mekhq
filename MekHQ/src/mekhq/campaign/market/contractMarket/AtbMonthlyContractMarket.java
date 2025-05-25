@@ -42,7 +42,6 @@ import static megamek.common.enums.SkillLevel.VETERAN;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
-import static mekhq.campaign.mission.AtBContract.getEffectiveNumUnits;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_NETWORKER;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
@@ -64,11 +63,11 @@ import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.ContractCommandRights;
+import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.rating.IUnitRating;
@@ -411,7 +410,8 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         contract.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
         setContractClauses(contract, unitRatingMod, campaign);
 
-        contract.setRequiredCombatTeams(calculateRequiredCombatTeams(campaign, contract, false));
+        contract.setRequiredCombatTeams(ContractUtilities.calculateBaseNumberOfRequiredLances(campaign));
+        contract.setRequiredUnitsInCombatTeams(calculateRequiredUnitsInCombatTeams(campaign, contract, false));
         contract.setMultiplier(calculatePaymentMultiplier(campaign, contract));
 
         contract.setPartsAvailabilityLevel(contract.getContractType().calculatePartsAvailabilityLevel());
@@ -508,7 +508,8 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         }
         contract.setTransportComp(100);
 
-        contract.setRequiredCombatTeams(calculateRequiredCombatTeams(campaign, contract, false));
+        contract.setRequiredCombatTeams(ContractUtilities.calculateBaseNumberOfRequiredLances(campaign));
+        contract.setRequiredUnitsInCombatTeams(calculateRequiredUnitsInCombatTeams(campaign, contract, false));
         contract.setMultiplier(calculatePaymentMultiplier(campaign, contract));
         contract.setPartsAvailabilityLevel(contract.getContractType().calculatePartsAvailabilityLevel());
         contract.calculateContract(campaign);
@@ -580,7 +581,8 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         followup.setAllyQuality(contract.getAllyQuality());
         followup.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
         setContractClauses(followup, campaign.getAtBUnitRatingMod(), campaign);
-        followup.setRequiredCombatTeams(calculateRequiredCombatTeams(campaign, followup, false));
+        followup.setRequiredCombatTeams(ContractUtilities.calculateBaseNumberOfRequiredLances(campaign));
+        contract.setRequiredUnitsInCombatTeams(calculateRequiredUnitsInCombatTeams(campaign, contract, false));
         followup.setMultiplier(calculatePaymentMultiplier(campaign, followup));
         followup.setPartsAvailabilityLevel(followup.getContractType().calculatePartsAvailabilityLevel());
         followup.initContractDetails(campaign);
@@ -758,7 +760,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
         if (campaign.getCampaignOptions().isMercSizeLimited() && campaign.getFaction().isMercenary()) {
             int max = (unitRatingMod + 1) * 12;
-            int numMods = (getEffectiveNumUnits(campaign) - max) / 2;
+            int numMods = (ContractUtilities.getEffectiveNumUnits(campaign) - max) / 2;
             while (numMods > 0) {
                 mods.mods[Compute.randomInt(4)]--;
                 numMods--;
