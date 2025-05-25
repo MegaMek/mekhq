@@ -794,9 +794,9 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        if (scenario instanceof AtBScenario) {
+        if (scenario instanceof AtBScenario atBScenario) {
             // Also print off allied sheets
-            chosen.addAll(((AtBScenario) scenario).getAlliesPlayer());
+            chosen.addAll(atBScenario.getAlliesPlayer());
         }
 
         // add bot forces
@@ -945,7 +945,7 @@ public final class BriefingTab extends CampaignGuiTab {
         if (chosen.isEmpty()) {
             return;
         }
-        getCampaign().getApp().startAutoResolve((AtBScenario) scenario, chosen);
+        getCampaign().getApp().startAutoResolve(scenario, chosen);
     }
 
     private void runPrincessAutoResolve() {
@@ -1603,9 +1603,7 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         btnResolveScenario.setEnabled(canStartGame);
-        if (scenario instanceof AtBScenario) {
-            btnAutoResolveScenario.setEnabled(canStartGame);
-        }
+        btnAutoResolveScenario.setEnabled(canStartGame);
         btnPrintRS.setEnabled(canStartGame);
     }
 
