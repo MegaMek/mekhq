@@ -75,12 +75,33 @@ class AcademyTests {
 
     @Test
     void testAcademyCreationAllFields() {
-        Academy academy = new Academy("MekWarrior", "MekWarrior Academy", "College", true,
-                false, true, "Top level MekWarrior Training", 20, true,
-                Arrays.asList("Sol", "Terra"), false, false,3045,
-                3089, 3099, 2000, 365, 10,
-                EducationLevel.EARLY_CHILDHOOD, EducationLevel.DOCTORATE, 18, 35, Arrays.asList("MekWarrior", "Leadership"),
-                Arrays.asList("Combat", "Strategy"), Arrays.asList(3050, 3055), 5, 101);
+        Academy academy = new Academy("MekWarrior",
+              "MekWarrior Academy",
+              "College",
+              true,
+              false,
+              true,
+              "Top level MekWarrior Training",
+              20,
+              true,
+              Arrays.asList("Sol", "Terra"),
+              false,
+              false,
+              3045,
+              3089,
+              3099,
+              2000,
+              365,
+              10,
+              EducationLevel.EARLY_CHILDHOOD,
+              EducationLevel.DOCTORATE,
+              18,
+              35,
+              Arrays.asList("MekWarrior", "Leadership"),
+              Arrays.asList("Combat", "Strategy"),
+              Arrays.asList(3050, 3055),
+              5,
+              101);
 
         assertEquals("MekWarrior Academy", academy.getName());
         assertEquals(AcademyType.COLLEGE, academy.getType());
@@ -90,7 +111,8 @@ class AcademyTests {
         assertEquals(Integer.valueOf(3089), academy.getDestructionYear());
     }
 
-    @Test void testCompareToSameID() {
+    @Test
+    void testCompareToSameID() {
         Academy academy1 = new Academy();
         Academy academy2 = new Academy();
         academy1.setId(100);
@@ -107,7 +129,8 @@ class AcademyTests {
         assertTrue(academy1.compareTo(academy2) < 0);
     }
 
-    @Test void testGetTuitionAdjustedLowEducationLevel() {
+    @Test
+    void testGetTuitionAdjustedLowEducationLevel() {
         Academy academy = new Academy();
         academy.setTuition(1000);
         academy.setEducationLevelMin(EducationLevel.EARLY_CHILDHOOD);
@@ -117,7 +140,8 @@ class AcademyTests {
         assertEquals(1000, academy.getTuitionAdjusted(person));
     }
 
-    @Test void testGetTuitionAdjustedHighEducationLevel() {
+    @Test
+    void testGetTuitionAdjustedHighEducationLevel() {
         Academy academy = new Academy();
         academy.setTuition(1000);
         academy.setEducationLevelMin(EducationLevel.HIGH_SCHOOL);
@@ -127,7 +151,8 @@ class AcademyTests {
         assertEquals(3000, academy.getTuitionAdjusted(person));
     }
 
-    @Test void testIsQualifiedTrue() {
+    @Test
+    void testIsQualifiedTrue() {
         Academy academy = new Academy();
         academy.setEducationLevelMin(EducationLevel.COLLEGE);
         Person person = Mockito.mock(Person.class);
@@ -144,7 +169,8 @@ class AcademyTests {
         assertFalse(academy.isQualified(person));
     }
 
-    @Test void testGetFactionDiscountAdjustedNotPresentInLocationSystems() {
+    @Test
+    void testGetFactionDiscountAdjustedNotPresentInLocationSystems() {
         Academy academy = new Academy();
         academy.setLocationSystems(List.of("Sol"));
         academy.setFactionDiscount(10);
@@ -174,14 +200,14 @@ class AcademyTests {
         assertEquals(SkillType.S_PILOT_SPACE, Academy.skillParser("piloting/spacecraft"));
         assertEquals(SkillType.S_GUN_SPACE, Academy.skillParser("gunnery/spacecraft"));
         assertEquals(SkillType.S_ARTILLERY, Academy.skillParser("artillery"));
-        assertEquals(SkillType.S_GUN_BA, Academy.skillParser("gunnery/battlesuit"));
+        assertEquals(SkillType.S_GUN_BA, Academy.skillParser("gunnery/battlearmor"));
         assertEquals(SkillType.S_GUN_PROTO, Academy.skillParser("gunnery/protomek"));
         assertEquals(SkillType.S_SMALL_ARMS, Academy.skillParser("small arms"));
         assertEquals(SkillType.S_ANTI_MEK, Academy.skillParser("anti-mek"));
         assertEquals(SkillType.S_TECH_MEK, Academy.skillParser("tech/mek"));
         assertEquals(SkillType.S_TECH_MECHANIC, Academy.skillParser("tech/mechanic"));
         assertEquals(SkillType.S_TECH_AERO, Academy.skillParser("tech/aero"));
-        assertEquals(SkillType.S_TECH_BA, Academy.skillParser("tech/ba"));
+        assertEquals(SkillType.S_TECH_BA, Academy.skillParser("tech/battlearmor"));
         assertEquals(SkillType.S_TECH_VESSEL, Academy.skillParser("tech/vessel"));
         assertEquals(SkillType.S_ASTECH, Academy.skillParser("astech"));
         assertEquals(SkillType.S_SURGERY, Academy.skillParser("doctor"));
@@ -192,7 +218,6 @@ class AcademyTests {
         assertEquals(SkillType.S_STRATEGY, Academy.skillParser("strategy"));
         assertEquals(SkillType.S_NEGOTIATION, Academy.skillParser("negotiation"));
         assertEquals(SkillType.S_LEADER, Academy.skillParser("leadership"));
-        assertEquals(SkillType.S_SCROUNGE, Academy.skillParser("scrounge"));
     }
 
     @Test

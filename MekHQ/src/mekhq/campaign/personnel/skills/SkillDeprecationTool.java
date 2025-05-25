@@ -28,8 +28,6 @@
 package mekhq.campaign.personnel.skills;
 
 import static java.lang.Math.round;
-import static mekhq.campaign.personnel.skills.SkillType.S_CLIMBING;
-import static mekhq.campaign.personnel.skills.SkillType.S_SCROUNGE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.List;
@@ -66,13 +64,12 @@ public class SkillDeprecationTool {
      * <p>These are skills that have been scheduled for removal.</p>
      *
      * <p>Once the skill is removed from this list, players will no longer be able to benefit from skill refund.
-     * This list should be updated following each Milestone release. If there are no skills in the list an empty array
+     * This list should be updated following each Milestone release. If there are no skills in the list, an empty array
      * MUST be left; otherwise we will run into NPEs during campaign loading.</p>
      *
-     * <p><b>Last Updated:</b> 50.06</p>
+     * <p><b>Last Updated:</b> 50.07</p>
      */
-    public static final List<SkillType> DEPRECATED_SKILLS = List.of(SkillType.getType(S_SCROUNGE),
-          SkillType.getType(S_CLIMBING));
+    public static final List<SkillType> DEPRECATED_SKILLS = List.of();
 
     private final Campaign campaign;
     private final Person person;
@@ -94,14 +91,6 @@ public class SkillDeprecationTool {
         this.refundAll = refundAll;
 
         checkForDeprecatedSkills(person);
-    }
-
-    /**
-     * @deprecated use {@link #SkillDeprecationTool(Campaign, Person, boolean)} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public SkillDeprecationTool(Campaign campaign, Person person) {
-        this(campaign, person, false);
     }
 
     public boolean isSkipAll() {

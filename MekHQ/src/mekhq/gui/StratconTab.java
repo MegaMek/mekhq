@@ -44,7 +44,6 @@ import java.awt.event.MouseEvent;
 import java.time.LocalDate;
 import java.util.Objects;
 import javax.swing.DefaultListModel;
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -64,6 +63,8 @@ import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.stratcon.StratconStrategicObjective;
 import mekhq.campaign.stratcon.StratconTrackState;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.stratcon.CampaignManagementDialog;
@@ -132,8 +133,10 @@ public class StratconTab extends CampaignGuiTab {
 
         stratconPanel = new StratconPanel(getCampaignGui(), infoPanelText);
         JScrollPane scrollPane = new JScrollPane(stratconPanel);
+        scrollPane.setBorder(RoundedLineBorder.createRoundedLineBorder());
         scrollPane.getHorizontalScrollBar().setUnitIncrement(StratconPanel.HEX_X_RADIUS);
         scrollPane.getVerticalScrollBar().setUnitIncrement(StratconPanel.HEX_Y_RADIUS);
+
         this.add(scrollPane, BorderLayout.CENTER);
 
         // TODO: lance role assignment UI here?
@@ -151,6 +154,7 @@ public class StratconTab extends CampaignGuiTab {
         cmd = new CampaignManagementDialog(this);
 
         JScrollPane infoScrollPane = new JScrollPaneWithSpeed(infoPanel);
+        infoScrollPane.setBorder(null);
         infoScrollPane.setMaximumSize(new Dimension(UIUtil.scaleForGUI(UIUtil.scaleForGUI(600), infoScrollPane.getHeight())));
         this.add(infoScrollPane, BorderLayout.EAST);
 
@@ -178,13 +182,15 @@ public class StratconTab extends CampaignGuiTab {
         infoPanel.add(campaignStatusText, constraints);
 
         // Add "Manage Campaign State" button
-        JButton btnManageCampaignState = new JButton("Manage SP/CVP");
+        RoundedJButton btnManageCampaignState = new RoundedJButton("Manage SP/CVP");
         btnManageCampaignState.addActionListener(this::showCampaignStateManagement);
         constraints.gridy = gridY++;
         infoPanel.add(btnManageCampaignState, constraints);
 
         // Add an expanded objective panel (scrollable)
         expandedObjectivePanel = new JScrollPaneWithSpeed(objectiveStatusText);
+        expandedObjectivePanel.setBorder(RoundedLineBorder.createRoundedLineBorder());
+        expandedObjectivePanel.setBorder(RoundedLineBorder.createRoundedLineBorder());
         expandedObjectivePanel.setPreferredSize(new Dimension(UIUtil.scaleForGUI(550, 300)));
         constraints.gridy = gridY++;
         constraints.fill = GridBagConstraints.HORIZONTAL;
@@ -209,6 +215,7 @@ public class StratconTab extends CampaignGuiTab {
         listCurrentTrack.addListSelectionListener(evt -> trackSelectionHandler());
 
         JScrollPane scrollPane = new JScrollPane(listCurrentTrack);
+        scrollPane.setBorder(RoundedLineBorder.createRoundedLineBorder());
         constraints.gridy = gridY++;
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.weightx = 1.0;

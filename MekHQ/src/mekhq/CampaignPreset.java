@@ -32,6 +32,7 @@
  */
 package mekhq;
 
+import static megamek.SuiteConstants.LAST_MILESTONE;
 import static mekhq.MHQConstants.CAMPAIGN_PRESET_DIRECTORY;
 
 import java.io.BufferedOutputStream;
@@ -55,6 +56,7 @@ import java.util.stream.Collectors;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import megamek.SuiteConstants;
 import megamek.Version;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.GameOptions;
@@ -91,7 +93,14 @@ import org.w3c.dom.NodeList;
  * @author Justin "Windchild" Bowen
  */
 public class CampaignPreset {
-    private static final Version LAST_COMPATIBLE_VERSION = new Version("0.50.02");
+
+    /**
+     * Represents the last version we accept presets from. Normally, this will just be the last milestone. Sometimes,
+     * however, major changes can require us to manually assign a specific version.
+     *
+     * @see SuiteConstants#LAST_MILESTONE
+     */
+    private static final Version LAST_COMPATIBLE_VERSION = LAST_MILESTONE;
 
     private static final MMLogger logger = MMLogger.create(CampaignPreset.class);
 
@@ -468,8 +477,7 @@ public class CampaignPreset {
             return null;
         }
 
-        // TODO Replace this with the Milestone Constant once we hit a Milestone after 49.19.1
-        if (version.isLowerThan(LAST_COMPATIBLE_VERSION)) {
+        if (version.isLowerThan(LAST_MILESTONE)) {
             logger.error("Campaign Presets from {} are incompatible with version {}.", version, MHQConstants.VERSION);
             return null;
         }

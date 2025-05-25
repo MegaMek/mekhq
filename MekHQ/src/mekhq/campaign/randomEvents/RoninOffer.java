@@ -117,7 +117,6 @@ public class RoninOffer {
         overrideSkills(false,
               false,
               false,
-              false,
               campaign.getCampaignOptions().isUseArtillery(),
               useExtraRandomness,
               ronin,
@@ -145,7 +144,7 @@ public class RoninOffer {
      * @param requiredCombatTeams The number of combat teams required for the recruitment.
      */
     private void displayAndProcessConversation(Campaign campaign, Person ronin, StratconCampaignState campaignState,
-                                               int requiredCombatTeams) {
+          int requiredCombatTeams) {
         String commanderAddress = campaign.getCommanderAddress(false);
         int response = displayInitialMessage(commanderAddress, ronin.getCallsign());
         if (response != ACCEPT_DIALOG_CHOICE_INDEX) {
@@ -223,7 +222,7 @@ public class RoninOffer {
      * @return An integer representing the player's choice from the dialog.
      */
     private int displayRoninMessage(Person ronin, String commanderAddress, boolean useFallbackHiringFee,
-                                    int requiredCombatTeams, @Nullable Integer availableSupportPoints) {
+          int requiredCombatTeams, @Nullable Integer availableSupportPoints) {
         String centerMessage = createRoninMessage(ronin, commanderAddress);
 
         List<String> buttonLabels = new ArrayList<>();
@@ -340,7 +339,7 @@ public class RoninOffer {
      * @return A {@link String} containing formatted out-of-character details for the player.
      */
     private String createRoninOutOfCharacterMessage(Person ronin, boolean useFallbackHiringFee, int requiredCombatTeams,
-                                                    @Nullable Integer availableSupportPoints) {
+          @Nullable Integer availableSupportPoints) {
         StringBuilder report = new StringBuilder();
 
         report.append(buildCostString(useFallbackHiringFee, requiredCombatTeams, availableSupportPoints));
@@ -397,7 +396,7 @@ public class RoninOffer {
      * @return A {@link String} containing the formatted cost information.
      */
     private String buildCostString(boolean useFallbackHiringFee, int requiredCombatTeams,
-                                   @Nullable Integer availableSupportPoints) {
+          @Nullable Integer availableSupportPoints) {
         String addendumKey = useFallbackHiringFee ? "message.ooc.cBills" : "message.ooc.supportPoints";
         String addendum = getFormattedTextAt(RESOURCE_BUNDLE, addendumKey);
 

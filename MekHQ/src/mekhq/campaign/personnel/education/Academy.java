@@ -183,12 +183,12 @@ public class Academy implements Comparable<Academy> {
      * @param id                      the id number of the academy, used for sorting academies in mhq
      */
     public Academy(String set, String name, String type, Boolean isMilitary, Boolean isReeducationCamp,
-                   Boolean isPrepSchool, String description, Integer factionDiscount, Boolean isFactionRestricted,
-                   List<String> locationSystems, Boolean isLocal, Boolean isHomeSchool, Integer constructionYear,
-                   Integer destructionYear, Integer closureYear, Integer tuition, Integer durationDays,
-                   Integer facultySkill, EducationLevel educationLevelMin, EducationLevel educationLevelMax,
-                   Integer ageMin, Integer ageMax, List<String> qualifications, List<String> curriculums,
-                   List<Integer> qualificationStartYears, Integer baseAcademicSkillLevel, Integer id) {
+          Boolean isPrepSchool, String description, Integer factionDiscount, Boolean isFactionRestricted,
+          List<String> locationSystems, Boolean isLocal, Boolean isHomeSchool, Integer constructionYear,
+          Integer destructionYear, Integer closureYear, Integer tuition, Integer durationDays, Integer facultySkill,
+          EducationLevel educationLevelMin, EducationLevel educationLevelMax, Integer ageMin, Integer ageMax,
+          List<String> qualifications, List<String> curriculums, List<Integer> qualificationStartYears,
+          Integer baseAcademicSkillLevel, Integer id) {
         this.set = set;
         this.name = name;
         this.type = type;
@@ -961,17 +961,6 @@ public class Academy implements Comparable<Academy> {
             case "strategy" -> SkillType.S_STRATEGY;
             case "negotiation" -> SkillType.S_NEGOTIATION;
             case "leadership" -> SkillType.S_LEADER;
-            case "scrounge" -> SkillType.S_SCROUNGE;
-
-            // <50.01 compatibility handlers
-            case "piloting/mech" -> SkillType.S_PILOT_MEK;
-            case "gunnery/mech" -> SkillType.S_GUN_MEK;
-            case "gunnery/battlesuit" -> SkillType.S_GUN_BA;
-            case "gunnery/protomech" -> SkillType.S_GUN_PROTO;
-            case "anti-mech" -> SkillType.S_ANTI_MEK;
-            case "tech/mech" -> SkillType.S_TECH_MEK;
-            case "tech/ba" -> SkillType.S_TECH_BA;
-
             default -> throw new IllegalStateException("Unexpected skill in skillParser(): " + skill);
         };
     }

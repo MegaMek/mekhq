@@ -59,9 +59,9 @@ import mekhq.campaign.personnel.skills.SkillType;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class SpacecraftEngine extends Part {
-    static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_ALL)
-            .setAdvancement(DATE_ES, DATE_ES, DATE_ES).setTechRating(RATING_D)
-            .setAvailability(RATING_C, RATING_D, RATING_C, RATING_C)
+    static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TechBase.ALL)
+            .setAdvancement(DATE_ES, DATE_ES, DATE_ES).setTechRating(TechRating.D)
+            .setAvailability(AvailabilityValue.C, AvailabilityValue.D, AvailabilityValue.C, AvailabilityValue.C)
             .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     double engineTonnage;

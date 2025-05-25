@@ -49,6 +49,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
 import megamek.common.*;
+import megamek.common.ITechnology.FactionAffiliation;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.verifier.*;
 import megamek.logging.MMLogger;
@@ -264,7 +265,7 @@ public class MekLabTab extends CampaignGuiTab {
         // options settings.
         CConfig.setParam(CConfig.TECH_EXTINCT, String.valueOf(campaignGUI.getCampaign().showExtinct()));
         CConfig.setParam(CConfig.TECH_PROGRESSION, String.valueOf(campaignGUI.getCampaign().useVariableTechLevel()));
-        CConfig.setParam(CConfig.TECH_SHOW_FACTION, String.valueOf(campaignGUI.getCampaign().getTechFaction() >= 0));
+        CConfig.setParam(CConfig.TECH_SHOW_FACTION, String.valueOf(campaignGUI.getCampaign().getTechFaction() != ITechnology.Faction.NONE));
         CConfig.setParam(CConfig.TECH_UNOFFICAL_NO_YEAR, String.valueOf(campaignGUI.getCampaign().unofficialNoYear()));
         CConfig.setParam(CConfig.TECH_USE_YEAR, String.valueOf(campaignGUI.getCampaign().getGameYear()));
         CConfig.setParam(CConfig.TECH_YEAR, String.valueOf(campaignGUI.getCampaign().getGameYear()));
@@ -528,7 +529,7 @@ public class MekLabTab extends CampaignGuiTab {
         @Override
         public abstract Entity getEntity();
 
-        abstract void setTechFaction(int techFaction);
+        abstract void setTechFaction(ITechnology.Faction techFaction);
 
         @Override
         public void scheduleRefresh() {
@@ -681,7 +682,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        void setTechFaction(int techFaction) {
+        void setTechFaction(ITechnology.Faction techFaction) {
             structureTab.setTechFaction(techFaction);
         }
 
@@ -812,7 +813,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        void setTechFaction(int techFaction) {
+        void setTechFaction(ITechnology.Faction techFaction) {
             structureTab.setTechFaction(techFaction);
         }
 
@@ -937,7 +938,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        void setTechFaction(int techFaction) {
+        void setTechFaction(ITechnology.Faction techFaction) {
             structureTab.setTechFaction(techFaction);
         }
     }
@@ -1061,7 +1062,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        void setTechFaction(int techFaction) {
+        void setTechFaction(ITechnology.Faction techFaction) {
             structureTab.setTechFaction(techFaction);
         }
     }
@@ -1197,7 +1198,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        void setTechFaction(int techFaction) {
+        void setTechFaction(ITechnology.Faction techFaction) {
             structureTab.setTechFaction(techFaction);
         }
     }
@@ -1317,7 +1318,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        void setTechFaction(int techFaction) {
+        void setTechFaction(ITechnology.Faction techFaction) {
             structureTab.setTechFaction(techFaction);
         }
     }
@@ -1429,7 +1430,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        void setTechFaction(int techFaction) {
+        void setTechFaction(ITechnology.Faction techFaction) {
             structureTab.setTechFaction(techFaction);
         }
     }
@@ -1556,7 +1557,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        void setTechFaction(int techFaction) {
+        void setTechFaction(ITechnology.Faction techFaction) {
             structureTab.setTechFaction(techFaction);
         }
     }
@@ -1686,7 +1687,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
 
         @Override
-        void setTechFaction(int techFaction) {
+        void setTechFaction(ITechnology.Faction techFaction) {
             structureTab.setTechFaction(techFaction);
         }
     }

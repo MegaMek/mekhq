@@ -51,10 +51,10 @@ import org.w3c.dom.Node;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class ProtoMekJumpJet extends Part {
-    static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_CLAN)
+    static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TechBase.CLAN)
             .setClanAdvancement(3055,3060,3060).setClanApproximate(true, false, false)
-            .setPrototypeFactions(F_CSJ).setProductionFactions(F_CSJ)
-            .setTechRating(RATING_D).setAvailability(RATING_X, RATING_X, RATING_C, RATING_C)
+            .setPrototypeFactions(Faction.CSJ).setProductionFactions(Faction.CSJ)
+            .setTechRating(TechRating.D).setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.C, AvailabilityValue.C)
             .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     public ProtoMekJumpJet() {
@@ -121,8 +121,8 @@ public class ProtoMekJumpJet extends Part {
     }
 
     @Override
-    public int getTechBase() {
-        return T_CLAN;
+    public TechBase getTechBase() {
+        return TechBase.CLAN;
     }
 
     @Override

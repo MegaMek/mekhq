@@ -151,6 +151,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.PersonnelTab;
 import mekhq.gui.control.EditLogControl.LogType;
@@ -209,11 +210,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_BUY_EDGE = "EDGE_BUY";
     private static final String CMD_SET_EDGE = "EDGE_SET";
     private static final String CMD_SET_XP = "XP_SET";
-    /**
-     * @deprecated use {@code CMD_ADD_XP} instead
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    private static final String CMD_ADD_1_XP = "XP_ADD_1";
     private static final String CMD_ADD_XP = "XP_ADD";
     private static final String CMD_EDIT_BIOGRAPHY = "BIOGRAPHY";
     private static final String CMD_EDIT_PORTRAIT = "PORTRAIT";
@@ -1734,7 +1730,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             if (person.isDoctor()) {
                 Skill skill = person.getSkill(S_SURGERY);
 
-                if (skill != null && skill.getFinalSkillValue(person.getOptions(), person.getATOWAttributes()) >=
+                if (skill != null &&
+                          skill.getFinalSkillValue(person.getOptions(), person.getATOWAttributes()) >=
                                 REPLACEMENT_LIMB_MINIMUM_SKILL_REQUIRED_TYPES_3_4_5) {
                     suitableDoctors.add(person);
                 }
@@ -1830,14 +1827,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     }
 
     /**
-     * @deprecated use {@link #processPrisonerResolutionCommand(Person[], String, String, boolean)} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    private void processPrisonerResolutionCommand(Person[] prisoners, String message, String title) {
-        processPrisonerResolutionCommand(prisoners, message, title);
-    }
-
-    /**
      * Processes a prisoner resolution command, allowing a user to confirm a specific action (e.g., releasing or
      * executing prisoners) via a dialog box. If confirmed, this method removes the selected prisoners from the campaign
      * and optionally triggers additional execution-specific logic.
@@ -1882,6 +1871,18 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         }
 
         if (isExecution) {
+            if (getCampaign().getCampaignOptions().isTrackFactionStanding()) {
+                FactionStandings factionStandings = getCampaign().getFactionStandings();
+
+                List<Person> listOfPrisoners = Arrays.asList(prisoners);
+                List<String> reports = factionStandings.executePrisonersOfWar(listOfPrisoners,
+                      getCampaign().getGameYear());
+
+                for (String report : reports) {
+                    getCampaign().addReport(report);
+                }
+            }
+
             processAdHocExecution(getCampaign(), prisoners.length);
         }
     }
@@ -2556,8 +2557,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                             int educationLevel = academy.getEducationLevel(person);
 
                                             String[] skillNames = academy.getCurriculums()
-                                                                    .get(person.getEduCourseIndex())
-                                                                    .split(",");
+                                                                        .get(person.getEduCourseIndex())
+                                                                        .split(",");
 
                                             skillNames = Arrays.stream(skillNames)
                                                                .map(String::trim)

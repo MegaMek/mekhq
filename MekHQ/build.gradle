@@ -2,7 +2,7 @@ import java.time.LocalDateTime
 
 plugins {
     id 'application'
-    id 'com.palantir.git-version' version '3.2.0'
+    id 'com.palantir.git-version' version '3.3.0'
     id 'edu.sc.seis.launch4j' version '3.0.6'
     id "io.sentry.jvm.gradle" version '5.5.0'
     id 'jacoco'
@@ -181,7 +181,7 @@ tasks.register('stageFiles', Copy) {
     include "${data}/images/awards/"
     include "${data}/images/force/"
     include "${data}/images/portraits/"
-    include "${data}/images/fluff/Mech/*.png"
+    include "${data}/images/fluff/Mek/*.png"
     include "${data}/images/misc/"
     include "${data}/images/stratcon/"
     include "${data}/images/universe/"
