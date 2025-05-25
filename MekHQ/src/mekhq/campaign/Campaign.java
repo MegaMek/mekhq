@@ -9971,8 +9971,7 @@ public class Campaign implements ITechManager {
             if (faction.getShortName().equalsIgnoreCase("PIR")) {
                 List<Faction> pirateFactions = new ArrayList<>();
                 for (Faction activeFaction : factions.getActiveFactions(currentDay)) {
-                    if (activeFaction.isPlayable() &&
-                              activeFaction.isPirate() &&
+                    if (activeFaction.isPirate() &&
                               !activeFaction.getShortName().equalsIgnoreCase("PIR")) {
                         pirateFactions.add(activeFaction);
                     }
