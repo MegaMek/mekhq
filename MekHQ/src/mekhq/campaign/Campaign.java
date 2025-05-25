@@ -107,10 +107,10 @@ import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
-import megamek.client.ratgenerator.AvailabilityRating;
 import megamek.client.ui.swing.util.PlayerColour;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
+import megamek.common.ITechnology.AvailabilityValue;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.equipment.BombMounted;
@@ -125,8 +125,6 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
 import megamek.common.util.BuildingBlock;
-import megamek.common.ITechnology.AvailabilityValue;
-import megamek.common.ITechnology.TechRating;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
@@ -264,8 +262,6 @@ import mekhq.service.IAutosaveService;
 import mekhq.service.mrms.MRMSService;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
-import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
-import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 
 /**
  * The main campaign class, keeps track of teams and units
@@ -9935,5 +9931,59 @@ public class Campaign implements ITechManager {
             }
         }
         return units;
+    }
+
+
+    /**
+     * Determines the appropriate starting planet for a new campaign.
+     *
+     * <p>This method first attempts to obtain the starting planet from the campaign's primary method. If no valid
+     * system is found, or if the result is "Terra" (which is the default value used when no system is set), it selects
+     * a fallback faction's starting planet using the following logic:</p>
+     *
+     * <ul>
+     *     <li>If the faction is "PIR", a random pirate faction (other than "PIR" itself) with an available starting
+     *     planet is chosen, if available.</li>
+     *     <li>If the faction is a clan, the generic "CLAN" faction is used as the fallback.</li>
+     *     <li>Otherwise, the default faction (Mercenary) is used as the fallback.</li>
+     * </ul>
+     *
+     * <p>The returned result is always the system's primary planet.</p>
+     *
+     * @return the {@link Planet} object representing the new campaign's starting planet
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public Planet getNewCampaignStartingPlanet() {
+        Factions factions = Factions.getInstance();
+
+        PlanetarySystem startingSystem = faction.getStartingPlanet(this, currentDay);
+
+        if (startingSystem == null) {
+            Faction fallbackFaction = factions.getDefaultFaction();
+            startingSystem = fallbackFaction.getStartingPlanet(this, currentDay);
+        } else if (startingSystem.getId().equalsIgnoreCase("Terra")) {
+            Faction fallbackFaction = factions.getDefaultFaction();
+
+            if (faction.getShortName().equalsIgnoreCase("PIR")) {
+                List<Faction> pirateFactions = new ArrayList<>();
+                for (Faction faction : factions.getActiveFactions(currentDay)) {
+                    if (faction.isPirate() && !faction.getShortName().equalsIgnoreCase("PIR")) {
+                        pirateFactions.add(faction);
+                    }
+                }
+
+                if (!pirateFactions.isEmpty()) {
+                    fallbackFaction = ObjectUtility.getRandomItem(pirateFactions);
+                }
+            } else if (faction.isClan()) {
+                fallbackFaction = factions.getFaction("CLAN");
+            }
+
+            startingSystem = fallbackFaction.getStartingPlanet(this, currentDay);
+        }
+
+        return startingSystem.getPrimaryPlanet();
     }
 }
