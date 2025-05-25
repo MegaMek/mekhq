@@ -68,6 +68,8 @@ public class BatchallFactions {
             return false;
         }
 
+        //        Faction faction = Faction.getFaction(factionCode);
+
         return BATCHALL_FACTIONS.contains(factionCode);
     }
 
@@ -111,14 +113,14 @@ public class BatchallFactions {
         int type;
 
         if (infamy == 5) {
-            greeting = resources.getString("greetingCLANLevel5Type0.text");
+            // greeting = resources.getString("greetingCLANLevel5Type0.text");
         } else {
             type = Compute.randomInt(3);
-            String greetingReference = String.format(resources.getString("greetingFormatBatchall.text"),
-                factionCode, version, infamy, type);
-            greeting = resources.getString(greetingReference);
+            // String greetingReference = String.format(resources.getString("greetingFormatBatchall.text"),
+            //                factionCode, version, infamy, type);
+            // greeting = resources.getString(greetingReference);
         }
 
-        return greeting + '"';
+        return "";
     }
 }

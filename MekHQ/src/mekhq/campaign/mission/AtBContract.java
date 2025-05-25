@@ -142,6 +142,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.factionStanding.BatchallFactions;
+import mekhq.campaign.universe.factionStanding.PerformBatchall;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -162,6 +163,7 @@ public class AtBContract extends Contract {
     /* hired by another mercenary unit on contract to a third-party employer */ boolean mercSubcontract;
 
     protected Person employerLiaison;
+    protected Person clanOpponent;
     protected String employerCode;
     protected String enemyCode;
     protected String enemyName;
@@ -236,6 +238,7 @@ public class AtBContract extends Contract {
     public AtBContract(String name) {
         super(name, "Independent");
         employerLiaison = null;
+        clanOpponent = null;
         employerCode = "IND";
         enemyCode = "IND";
         enemyName = "Independent";
@@ -734,6 +737,9 @@ public class AtBContract extends Contract {
         setEnemyBotName(enemyFaction.getFullName(today.getYear()));
         enemyName = ""; // wipe the old enemy name
         getEnemyName(today.getYear()); // we use this to update enemyName
+        if (enemyFaction.isClan()) {
+            createClanOpponent(campaign);
+        }
 
         // We have a check in getEnemyName that prevents rolling over mercenary names, so we add this extra step to
         // force a mercenary name re-roll, in the event one Mercenary faction is replaced with another.
@@ -747,7 +753,22 @@ public class AtBContract extends Contract {
         // Update the Batchall information
         batchallAccepted = true;
         if (campaign.getCampaignOptions().isUseGenericBattleValue() && BatchallFactions.usesBatchalls(enemyCode)) {
-            setBatchallAccepted(initiateBatchall(campaign));
+            Faction faction = getEnemy();
+            if (faction.performsBatchalls()) {
+                PerformBatchall batchallDialog = new PerformBatchall(campaign, clanOpponent, enemyCode);
+
+                batchallAccepted = batchallDialog.isBatchallAccepted();
+                setBatchallAccepted(batchallAccepted);
+
+                if (!batchallAccepted && campaign.getCampaignOptions().isTrackFactionStanding()) {
+                    List<String> reports = campaign.getFactionStandings()
+                                                 .processRefusedBatchall(enemyCode, campaign.getLocalDate().getYear());
+
+                    for (String report : reports) {
+                        campaign.addReport(report);
+                    }
+                }
+            }
         }
     }
 
@@ -1260,6 +1281,10 @@ public class AtBContract extends Contract {
             employerLiaison.writeToXML(pw, indent, campaign);
         }
 
+        if (clanOpponent != null) {
+            clanOpponent.writeToXML(pw, indent, campaign);
+        }
+
         return indent;
     }
 
@@ -1352,15 +1377,21 @@ public class AtBContract extends Contract {
                     this.setStratconCampaignState(stratconCampaignState);
                 } else if (item.getNodeName().equalsIgnoreCase("parentContractId")) {
                     parentContract = new AtBContractRef(Integer.parseInt(item.getTextContent()));
-                } else if (item.getNodeName().equalsIgnoreCase("person")) {
+                } else if (item.getNodeName().equalsIgnoreCase("employerLiaison")) {
                     employerLiaison = Person.generateInstanceFromXML(item, campaign, version);
-
-                    if (employerLiaison == null) {
-                        createEmployerLiaison(campaign);
-                    }
+                } else if (item.getNodeName().equalsIgnoreCase("clanOpponent")) {
+                    clanOpponent = Person.generateInstanceFromXML(item, campaign, version);
                 }
             } catch (Exception e) {
                 logger.error("", e);
+            }
+
+            if (employerLiaison == null) {
+                createEmployerLiaison(campaign);
+            }
+
+            if (clanOpponent == null && getEnemy().isClan()) {
+                createClanOpponent(campaign);
             }
         }
     }
@@ -1404,7 +1435,25 @@ public class AtBContract extends Contract {
     }
 
     public void createEmployerLiaison(Campaign campaign) {
-        employerLiaison = campaign.newPerson(PersonnelRole.ADMINISTRATOR_COMMAND, getEmployerCode(), Gender.RANDOMIZE);
+        employerLiaison = campaign.newPerson(PersonnelRole.MILITARY_LIAISON, getEmployerCode(), Gender.RANDOMIZE);
+    }
+
+    public Person getClanOpponent() {
+        return clanOpponent;
+    }
+
+    public void setClanOpponent(Person clanOpponent) {
+        this.clanOpponent = clanOpponent;
+    }
+
+    public void createClanOpponent(Campaign campaign) {
+        clanOpponent = campaign.newPerson(PersonnelRole.MEKWARRIOR, getEnemyCode(), Gender.RANDOMIZE);
+
+        Bloodname bloodname = Bloodname.randomBloodname(enemyCode, Phenotype.MEKWARRIOR, campaign.getGameYear());
+
+        if (bloodname != null) {
+            clanOpponent.setBloodname(bloodname.getName());
+        }
     }
 
     public String getEmployerCode() {
@@ -1770,7 +1819,7 @@ public class AtBContract extends Contract {
      *
      * @return {@code true} if the batchall is accepted, {@code false} otherwise.
      */
-    //
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public boolean initiateBatchall(Campaign campaign) {
         // Retrieves the title from the resources
         String title = resources.getString("incomingTransmission.title");
@@ -1832,6 +1881,7 @@ public class AtBContract extends Contract {
      *
      * @return {@code true} if the batchall is accepted, {@code false} otherwise
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     private boolean batchallDialog(Campaign campaign, JPanel panel, String title) {
         // We use a single-element array to store the result, because we need to modify it inside the action
         // listeners, which requires the variable to be effectively final
@@ -1906,6 +1956,7 @@ public class AtBContract extends Contract {
      *
      * @return {@code true} if the user accepts the refusal, {@code false} if the user cancels the refusal
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     private boolean refusalConfirmationDialog(Campaign campaign) {
         // Create modal JDialog
         JDialog dialog = new JDialog();
@@ -1963,6 +2014,7 @@ public class AtBContract extends Contract {
      * @param panel The panel to display in the dialog.
      * @param title The title of the dialog.
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     private void noBatchallOfferedDialog(JPanel panel, String title) {
         // Create a new JDialog
         JDialog dialog = new JDialog();

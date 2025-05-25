@@ -530,6 +530,10 @@ public class ContractMarketDialog extends JDialog {
                 }
 
                 contract.createEmployerLiaison(campaign);
+
+                if (contract.getEnemy().isClan()) {
+                    contract.createClanOpponent(campaign);
+                }
             }
 
             selectedContract.setName(contractView.getContractName());

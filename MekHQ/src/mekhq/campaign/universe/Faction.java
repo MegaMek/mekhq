@@ -28,6 +28,16 @@
  */
 package mekhq.campaign.universe;
 
+import static megamek.common.Compute.randomInt;
+import static mekhq.campaign.universe.enums.HonorRating.LIBERAL;
+import static mekhq.campaign.universe.enums.HonorRating.OPPORTUNISTIC;
+import static mekhq.campaign.universe.enums.HonorRating.STRICT;
+
+import java.awt.Color;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.Map.Entry;
+
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.Utilities;
@@ -37,17 +47,6 @@ import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import java.awt.*;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.*;
-import java.util.Map.Entry;
-
-import static megamek.common.Compute.randomInt;
-import static mekhq.campaign.universe.enums.HonorRating.LIBERAL;
-import static mekhq.campaign.universe.enums.HonorRating.OPPORTUNISTIC;
-import static mekhq.campaign.universe.enums.HonorRating.STRICT;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -573,5 +572,46 @@ public class Faction {
                 }
             }
         };
+    }
+
+    /**
+     * Determines whether this faction performs Batchalls based on its short name.
+     *
+     * <p>Batchalls are a tradition among specific factions - primarily various clans and related groups. This method
+     * checks if the faction's short name matches any of the known batchall-performing factions.</p>
+     *
+     * @return {@code true} if the faction performs Batchalls; {@code false} otherwise
+     */
+    public boolean performsBatchalls() {
+        List<String> batchallFactions = List.of("CBS",
+              "CB",
+              "CCC",
+              "CCO",
+              "CDS",
+              "CFM",
+              "CGB",
+              "CGS",
+              "CHH",
+              "CIH",
+              "CJF",
+              "CMG",
+              "CNC",
+              "CSJ",
+              "CSR",
+              "CSA",
+              "CSV",
+              "CSL",
+              "CWI",
+              "CW",
+              "CWE",
+              "CWIE",
+              "CEI",
+              "RD",
+              "RA",
+              "CP",
+              "AML",
+              "CLAN");
+
+        return batchallFactions.contains(shortName);
     }
 }
