@@ -33,6 +33,7 @@
 package mekhq.campaign.universe.factionStanding;
 
 import static megamek.codeUtilities.MathUtility.clamp;
+import static mekhq.gui.dialog.reportDialogs.FactionStanding.manualMissionDialogs.SimulateMissionDialog.handleFactionRegardUpdates;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -51,16 +52,21 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import javax.swing.ImageIcon;
 
 import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.FactionHints;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel;
+import mekhq.gui.dialog.reportDialogs.FactionStanding.manualMissionDialogs.ManualMissionDialog;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -454,19 +460,36 @@ public class FactionStandings {
     }
 
     /**
-     * Sets the regard value for the specified faction, directly assigning (or overwriting) the value.
+     * Sets the regard value for the specified faction, directly assigning (or overwriting) the value. If the faction
+     * code does not already exist, a new entry is created.
      *
-     * <p>If the faction code does not already exist, a new entry is created.</p>
+     * <p>The regard value is automatically clamped between {@code MINIMUM_REGARD} and {@code MAXIMUM_REGARD}.</p>
+     *
+     * <p>If {@code includeReport} is {@code true}, a report string describing the change is returned. Otherwise, an
+     * empty string is returned.</p>
      *
      * @param factionCode a unique code identifying the faction
-     * @param regard        the regard (standing) value to assign
+     * @param newRegard the regard (standing) value to assign
+     * @param gameYear  the current in-game year for reporting purposes
+     * @param includeReport  if {@code true}, no report string is returned; if {@code false}, a report of the change is generated
+     * @return a report string describing the change if {@code includeReport} is {@code true}; otherwise, an empty
+     * string
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public void setRegardForFaction(final String factionCode, final double regard) {
-        double regardValue = clamp(regard, MINIMUM_REGARD, MAXIMUM_REGARD);
+    public String setRegardForFaction(final String factionCode, final double newRegard, final int gameYear,
+          final boolean includeReport) {
+        double regardValue = clamp(newRegard, MINIMUM_REGARD, MAXIMUM_REGARD);
+        double currentRegard = getRegardForFaction(factionCode, false);
+
         factionRegard.put(factionCode, regardValue);
+
+        if (includeReport) {
+            return getRegardChangedReport(-currentRegard, gameYear, factionCode, regardValue, currentRegard);
+        }
+
+        return "";
     }
 
     /**
@@ -725,7 +748,7 @@ public class FactionStandings {
      * @author Illiani
      * @since 0.50.07
      */
-    public void wipeAllFactionStandings() {
+    public void resetAllFactionStandings() {
         factionRegard.clear();
     }
 
@@ -784,7 +807,7 @@ public class FactionStandings {
 
                 if ((currentRegard > DEFAULT_REGARD && newRegard < DEFAULT_REGARD) ||
                           (currentRegard < DEFAULT_REGARD && newRegard > DEFAULT_REGARD)) {
-                    setRegardForFaction(factionCode, DEFAULT_REGARD);
+                    setRegardForFaction(factionCode, DEFAULT_REGARD, gameYear, false);
                 }
 
                 if (!report.isBlank()) {
@@ -1168,5 +1191,92 @@ public class FactionStandings {
         }
 
         return regard;
+    }
+
+    public List<String> updateCampaignForPastMissions(List<Mission> missions, ImageIcon campaignIcon,
+          Faction campaignFaction, LocalDate today) {
+        List<String> reports = new ArrayList<>();
+
+        resetAllFactionStandings();
+
+        initializeStartingRegardValues(campaignFaction, today);
+
+        sortMissionsBasedOnStartDateAndClass(missions);
+
+        Map<Integer, List<Mission>> missionsByYear = new HashMap<>();
+        int currentYear = today.getYear();
+
+        for (Mission mission : missions) {
+            int missionYear = currentYear;
+            if (mission instanceof Contract contract) {
+                missionYear = contract.getStartDate().getYear();
+            }
+
+            missionsByYear.computeIfAbsent(missionYear, y -> new ArrayList<>()).add(mission);
+        }
+
+        List<Integer> sortedYears = new ArrayList<>(missionsByYear.keySet());
+        Collections.sort(sortedYears);
+
+        for (int year : sortedYears) {
+            List<Mission> missionsForYear = missionsByYear.get(year);
+            for (Mission mission : missionsForYear) {
+                MissionStatus missionStatus = mission.getStatus();
+
+                if (mission instanceof AtBContract atbContract) {
+                    reports.addAll(processContractAccept(atbContract.getEnemy(), today));
+
+                    if (missionStatus != MissionStatus.ACTIVE) {
+                        reports.addAll(processContractCompletion(atbContract.getEmployerFaction(),
+                              today,
+                              missionStatus));
+                    }
+                } else {
+                    // Non-AtB missions have their Standings updated when the contract concludes
+                    if (missionStatus != MissionStatus.ACTIVE) {
+                        ManualMissionDialog dialog = new ManualMissionDialog(null,
+                              campaignIcon,
+                              campaignFaction,
+                              today,
+                              missionStatus,
+                              mission.getName());
+
+                        Faction employerChoice = dialog.getEmployerChoice();
+                        Faction enemyChoice = dialog.getEnemyChoice();
+                        MissionStatus statusChoice = dialog.getStatusChoice();
+
+                        reports.addAll(handleFactionRegardUpdates(employerChoice,
+                              enemyChoice,
+                              statusChoice,
+                              today,
+                              this));
+                    }
+                }
+            }
+
+            // At the end of each processed year, simulate degradation (unless we're on the current year)
+            if (year != currentYear) {
+                reports.addAll(processRegardDegradation(year));
+            }
+        }
+
+        return reports;
+    }
+
+    private static void sortMissionsBasedOnStartDateAndClass(List<Mission> missions) {
+        missions.sort((mission1, mission2) -> {
+            boolean m1IsContract = mission1 instanceof Contract;
+            boolean m2IsContract = mission2 instanceof Contract;
+
+            if (m1IsContract && m2IsContract) {
+                return ((Contract) mission1).getStartDate().compareTo(((Contract) mission2).getStartDate());
+            } else if (m1IsContract) {
+                return -1; // mission1 comes before mission2
+            } else if (m2IsContract) {
+                return 1; // mission1 comes after mission2
+            } else {
+                return 0; // both are non-Contract, maintain relative order
+            }
+        });
     }
 }
