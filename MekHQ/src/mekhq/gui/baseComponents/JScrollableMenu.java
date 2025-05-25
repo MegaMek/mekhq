@@ -27,7 +27,7 @@
  */
 package mekhq.gui.baseComponents;
 
-import megamek.client.ui.swing.util.MenuScroller;
+import megamek.client.ui.util.MenuScroller;
 import mekhq.MekHQ;
 import mekhq.MHQConstants;
 

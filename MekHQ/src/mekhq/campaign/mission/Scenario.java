@@ -39,7 +39,7 @@ import java.util.UUID;
 import java.util.Vector;
 
 import megamek.Version;
-import megamek.client.ui.swing.lobby.LobbyUtility;
+import megamek.client.ui.panels.phaseDisplay.lobby.LobbyUtility;
 import megamek.common.Board;
 import megamek.common.Entity;
 import megamek.common.MapSettings;

@@ -47,12 +47,12 @@ import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
-import megamek.client.ui.swing.util.UIUtil;
-import megamek.client.ui.swing.widget.MegaMekButton;
-import megamek.client.ui.swing.widget.RawImagePanel;
-import megamek.client.ui.swing.widget.SkinSpecification;
-import megamek.client.ui.swing.widget.SkinSpecification.UIComponents;
-import megamek.client.ui.swing.widget.SkinXMLHandler;
+import megamek.client.ui.util.UIUtil;
+import megamek.client.ui.widget.MegaMekButton;
+import megamek.client.ui.widget.RawImagePanel;
+import megamek.client.ui.widget.SkinSpecification;
+import megamek.client.ui.widget.SkinSpecification.UIComponents;
+import megamek.client.ui.widget.SkinXMLHandler;
 import megamek.common.Configuration;
 import megamek.common.annotations.Nullable;
 import megamek.common.preference.PreferenceManager;

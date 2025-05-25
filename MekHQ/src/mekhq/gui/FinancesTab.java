@@ -32,7 +32,7 @@
  */
 package mekhq.gui;
 
-import static megamek.client.ui.swing.util.UIUtil.scaleForGUI;
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

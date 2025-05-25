@@ -32,7 +32,7 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
-import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
+import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.common.options.OptionsConstants.ALLOWED_YEAR;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createGroupLayout;
@@ -56,9 +56,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
-import megamek.client.ui.baseComponents.MMComboBox;
-import megamek.client.ui.dialogs.CamoChooserDialog;
-import megamek.client.ui.swing.util.UIUtil;
+import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.dialogs.iconChooser.CamoChooserDialog;
+import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
 import mekhq.MekHQ;

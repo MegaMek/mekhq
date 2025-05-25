@@ -50,7 +50,7 @@ import javax.swing.*;
 import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.JSpinner.NumberEditor;
 
-import megamek.client.ui.baseComponents.MMComboBox;
+import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.Compute;

@@ -61,7 +61,7 @@ import megamek.Version;
 import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
-import megamek.client.ui.swing.util.PlayerColour;
+import megamek.client.ui.util.PlayerColour;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.Entity;
 import megamek.common.EntityMovementMode;

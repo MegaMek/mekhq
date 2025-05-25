@@ -32,8 +32,8 @@
  */
 package mekhq.gui.dialog;
 
-import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
-import static megamek.client.ui.swing.util.UIUtil.scaleForGUI;
+import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.MHQConstants.FORCE_ICON_PATH;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 

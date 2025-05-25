@@ -62,9 +62,9 @@ import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 
-import megamek.client.ui.dialogs.BVDisplayDialog;
-import megamek.client.ui.dialogs.CamoChooserDialog;
-import megamek.client.ui.swing.UnitEditorDialog;
+import megamek.client.ui.dialogs.abstractDialogs.BVDisplayDialog;
+import megamek.client.ui.dialogs.iconChooser.CamoChooserDialog;
+import megamek.client.ui.dialogs.UnitEditorDialog;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;

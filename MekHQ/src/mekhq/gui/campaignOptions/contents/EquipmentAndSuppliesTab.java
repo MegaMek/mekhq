@@ -48,8 +48,8 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 
-import megamek.client.ui.baseComponents.MMComboBox;
-import megamek.client.ui.swing.util.UIUtil;
+import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.util.UIUtil;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import megamek.common.annotations.Nullable;

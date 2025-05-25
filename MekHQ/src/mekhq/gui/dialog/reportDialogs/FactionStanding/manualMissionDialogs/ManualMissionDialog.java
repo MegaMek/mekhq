@@ -36,7 +36,7 @@ import java.time.LocalDate;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
-import megamek.client.ui.baseComponents.MMComboBox;
+import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.universe.Faction;

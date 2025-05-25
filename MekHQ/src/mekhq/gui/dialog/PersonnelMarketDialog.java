@@ -60,7 +60,7 @@ import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.JToggleButtonPreference;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.client.ui.swing.MekViewPanel;
+import megamek.client.ui.dialogs.unitSelectorDialogs.MekViewPanel;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.Aero;
 import megamek.common.Compute;

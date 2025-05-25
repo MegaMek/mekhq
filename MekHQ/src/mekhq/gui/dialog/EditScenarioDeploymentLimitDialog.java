@@ -27,7 +27,7 @@
  */
 package mekhq.gui.dialog;
 
-import megamek.client.ui.baseComponents.MMComboBox;
+import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.common.UnitType;
 import mekhq.MekHQ;
 import mekhq.campaign.mission.ScenarioDeploymentLimit;

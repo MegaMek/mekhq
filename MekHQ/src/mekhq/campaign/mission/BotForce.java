@@ -41,7 +41,7 @@ import megamek.client.bot.princess.BehaviorSettings;
 import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.client.bot.princess.CardinalEdge;
 import megamek.client.bot.princess.PrincessException;
-import megamek.client.ui.swing.util.PlayerColour;
+import megamek.client.ui.util.PlayerColour;
 import megamek.common.Board;
 import megamek.common.Compute;
 import megamek.common.Entity;

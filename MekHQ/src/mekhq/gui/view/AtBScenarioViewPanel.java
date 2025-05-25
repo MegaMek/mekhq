@@ -60,8 +60,8 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
-import megamek.client.ui.dialogs.BotConfigDialog;
-import megamek.client.ui.swing.UnitEditorDialog;
+import megamek.client.ui.dialogs.buttonDialogs.BotConfigDialog;
+import megamek.client.ui.dialogs.UnitEditorDialog;
 import megamek.common.Entity;
 import megamek.common.IStartingPositions;
 import megamek.common.annotations.Nullable;

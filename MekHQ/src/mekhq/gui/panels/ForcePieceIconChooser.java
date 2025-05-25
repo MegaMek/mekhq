@@ -27,7 +27,7 @@
  */
 package mekhq.gui.panels;
 
-import megamek.client.ui.panels.AbstractIconChooser;
+import megamek.client.ui.panels.abstractPanels.abstractIconChooserPanel;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
 import megamek.common.util.fileUtils.AbstractDirectory;
@@ -52,7 +52,7 @@ import java.util.stream.Collectors;
  * It is designed to be used as part of creating a LayeredForceIcon, and not to be used as its
  * own chooser.
  * @see AbstractMHQIconChooser
- * @see AbstractIconChooser
+ * @see abstractIconChooserPanel
  */
 public class ForcePieceIconChooser extends AbstractMHQIconChooser {
     //region Variable Declarations

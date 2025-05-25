@@ -66,7 +66,7 @@ import megamek.client.bot.princess.BehaviorSettings;
 import megamek.client.bot.princess.PrincessException;
 import megamek.client.generator.ReconfigurationParameters;
 import megamek.client.generator.TeamLoadOutGenerator;
-import megamek.client.ui.baseComponents.MMComboBox;
+import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;

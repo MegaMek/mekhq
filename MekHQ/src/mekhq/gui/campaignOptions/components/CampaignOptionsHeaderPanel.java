@@ -33,7 +33,7 @@
 package mekhq.gui.campaignOptions.components;
 
 import static java.awt.Color.BLACK;
-import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
+import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.utilities.ImageUtilities.addTintToImageIcon;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
@@ -47,7 +47,7 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 
-import megamek.client.ui.swing.util.UIUtil;
+import megamek.client.ui.util.UIUtil;
 
 /**
  * A specialized {@link JPanel} designed for headers in the campaign options dialog.
