@@ -47,6 +47,7 @@ import megamek.common.Crew;
 import megamek.common.CrewType;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
+import megamek.common.MapSettings;
 import megamek.common.MekSummary;
 import megamek.common.autoresolve.Resolver;
 import megamek.common.autoresolve.acar.SimulationOptions;
@@ -63,6 +64,7 @@ import megamek.common.planetaryconditions.Light;
 import megamek.common.planetaryconditions.PlanetaryConditions;
 import megamek.common.planetaryconditions.Weather;
 import megamek.common.planetaryconditions.Wind;
+import megamek.common.util.BoardUtilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
@@ -119,6 +121,7 @@ public class ResolverTest {
     private static int team1 = 0;
     private static int team2 = 0;
     private static int draws = 0;
+    private static Board BOARD = BoardUtilities.generateRandom(MapSettings.getInstance());
 
     public enum TeamArrangement {
         BALANCED,
@@ -382,7 +385,7 @@ public class ResolverTest {
         when(botForce.getFullEntityList(any())).thenReturn(entities);
 
         var resolver = Resolver.simulationRun(new StratconSetupForces(campaign, units, scenario, new FlattenForces()),
-              SimulationOptions.empty(), new Board(30, 30), planetaryConditions);
+              SimulationOptions.empty(), BOARD, planetaryConditions);
         autoResolveConcludedEvent.accept(resolver.resolveSimulation());
     }
 
