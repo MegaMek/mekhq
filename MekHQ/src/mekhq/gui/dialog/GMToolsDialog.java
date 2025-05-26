@@ -54,9 +54,9 @@ import javax.swing.GroupLayout.Alignment;
 
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
-import megamek.client.ui.baseComponents.MMButton;
-import megamek.client.ui.baseComponents.MMComboBox;
-import megamek.client.ui.dialogs.EntityReadoutDialog;
+import megamek.client.ui.buttons.MMButton;
+import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.dialogs.unitSelectorDialogs.EntityReadoutDialog;
 import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
 import megamek.client.ui.preferences.JTabbedPanePreference;

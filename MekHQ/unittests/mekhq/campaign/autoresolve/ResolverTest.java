@@ -41,7 +41,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-import megamek.client.ui.swing.util.PlayerColour;
+import megamek.client.ui.util.PlayerColour;
 import megamek.common.Board;
 import megamek.common.Crew;
 import megamek.common.CrewType;

@@ -71,12 +71,12 @@ import javax.swing.*;
 
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
-import megamek.client.ui.baseComponents.MMComboBox;
+import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.client.ui.swing.DialogOptionComponent;
-import megamek.client.ui.swing.DialogOptionListener;
-import megamek.client.ui.swing.util.UIUtil;
+import megamek.client.ui.panels.DialogOptionComponentYPanel;
+import megamek.client.ui.clientGUI.DialogOptionListener;
+import megamek.client.ui.util.UIUtil;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.Crew;
 import megamek.common.Entity;
@@ -130,7 +130,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
     // region Variable declarations
     private Person person;
-    private List<DialogOptionComponent> optionComps = new ArrayList<>();
+    private List<DialogOptionComponentYPanel> optionComps = new ArrayList<>();
     private final Map<String, JSpinner> skillLevels = new Hashtable<>();
     private final Map<String, JSpinner> skillBonus = new Hashtable<>();
     private final Map<String, JLabel> skillValues = new Hashtable<>();
@@ -1671,7 +1671,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             }
         }
         IOption option;
-        for (final DialogOptionComponent newVar : optionComps) {
+        for (final DialogOptionComponentYPanel newVar : optionComps) {
             option = newVar.getOption();
             if ((newVar.getValue().equals("None"))) {
                 person.getOptions().getOption(option.getName()).setValue("None");
@@ -1729,7 +1729,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     }
 
     private void addOption(IOption option, GridBagLayout gridBag, GridBagConstraints c) {
-        DialogOptionComponent optionComp = new DialogOptionComponent(this, option, true);
+        DialogOptionComponentYPanel optionComp = new DialogOptionComponentYPanel(this, option, true);
 
         if (OptionsConstants.GUNNERY_WEAPON_SPECIALIST.equals(option.getName())) {
             optionComp.addValue(Crew.SPECIAL_NONE);
@@ -1795,7 +1795,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
     private void setOptions() {
         IOption option;
-        for (final DialogOptionComponent newVar : optionComps) {
+        for (final DialogOptionComponentYPanel newVar : optionComps) {
             option = newVar.getOption();
             if ((newVar.getValue().equals("None"))) {
                 person.getOptions().getOption(option.getName()).setValue("None");
@@ -1973,12 +1973,12 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     }
 
     @Override
-    public void optionClicked(DialogOptionComponent arg0, IOption arg1, boolean arg2) {
+    public void optionClicked(DialogOptionComponentYPanel arg0, IOption arg1, boolean arg2) {
 
     }
 
     @Override
-    public void optionSwitched(DialogOptionComponent comp, IOption option, int i) {
+    public void optionSwitched(DialogOptionComponentYPanel comp, IOption option, int i) {
 
     }
 }

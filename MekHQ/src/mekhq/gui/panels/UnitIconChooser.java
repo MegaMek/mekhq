@@ -29,7 +29,7 @@ package mekhq.gui.panels;
 
 import javax.swing.JFrame;
 
-import megamek.client.ui.panels.AbstractIconChooser;
+import megamek.client.ui.panels.abstractPanels.abstractIconChooserPanel;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
 import mekhq.campaign.icons.UnitIcon;
@@ -42,7 +42,7 @@ import mekhq.campaign.icons.UnitIcon;
  * methods to be for a UnitIcon instead of a StandardForceIcon.
  * @see StandardForceIconChooser
  * @see AbstractMHQIconChooser
- * @see AbstractIconChooser
+ * @see abstractIconChooserPanel
  */
 public class UnitIconChooser extends StandardForceIconChooser {
     //region Constructors

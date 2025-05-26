@@ -38,7 +38,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import java.awt.Dimension;
 import javax.swing.JPanel;
 
-import megamek.client.ui.swing.util.UIUtil;
+import megamek.client.ui.util.UIUtil;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
 /**

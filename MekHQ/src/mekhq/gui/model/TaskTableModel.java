@@ -43,7 +43,7 @@ import java.util.regex.Pattern;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
-import megamek.client.ui.swing.util.UIUtil;
+import megamek.client.ui.util.UIUtil;
 import megamek.common.TargetRoll;
 import mekhq.IconPackage;
 import mekhq.campaign.parts.MissingPart;

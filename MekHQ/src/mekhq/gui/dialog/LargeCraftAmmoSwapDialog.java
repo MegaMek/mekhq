@@ -42,7 +42,7 @@ import javax.swing.JPanel;
 
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.client.ui.swing.BayMunitionsChoicePanel;
+import megamek.client.ui.dialogs.customMek.BayMunitionsChoicePanel;
 import megamek.common.Mounted;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;

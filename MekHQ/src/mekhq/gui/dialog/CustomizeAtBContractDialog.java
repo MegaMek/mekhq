@@ -47,11 +47,11 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import javax.swing.*;
 
-import megamek.client.ui.baseComponents.MMComboBox;
-import megamek.client.ui.dialogs.CamoChooserDialog;
+import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.dialogs.iconChooser.CamoChooserDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.client.ui.swing.util.PlayerColour;
+import megamek.client.ui.util.PlayerColour;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
 import megamek.logging.MMLogger;

@@ -32,7 +32,7 @@
  */
 package mekhq.gui.dialog.reportDialogs.FactionStanding;
 
-import megamek.client.ui.swing.util.UIUtil;
+import megamek.client.ui.util.UIUtil;
 
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicSliderUI;

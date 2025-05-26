@@ -47,7 +47,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import io.sentry.Sentry;
-import megamek.client.ui.swing.util.PlayerColour;
+import megamek.client.ui.util.PlayerColour;
 import megamek.common.Entity;
 import megamek.common.EntitySelector;
 import megamek.common.Game;

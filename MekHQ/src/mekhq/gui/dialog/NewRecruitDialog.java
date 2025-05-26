@@ -54,7 +54,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import megamek.client.generator.RandomNameGenerator;
-import megamek.client.ui.dialogs.PortraitChooserDialog;
+import megamek.client.ui.dialogs.iconChooser.PortraitChooserDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.enums.Gender;

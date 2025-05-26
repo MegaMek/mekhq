@@ -27,7 +27,7 @@
  */
 package mekhq.gui.baseComponents;
 
-import megamek.client.ui.baseComponents.AbstractTabbedPane;
+import megamek.client.ui.dialogs.unitSelectorDialogs.AbstractTabbedPane;
 import mekhq.MekHQ;
 
 import javax.swing.*;

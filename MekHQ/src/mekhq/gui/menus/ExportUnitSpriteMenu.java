@@ -35,7 +35,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 
-import megamek.client.ui.dialogs.CamoChooserDialog;
+import megamek.client.ui.dialogs.iconChooser.CamoChooserDialog;
 import megamek.common.icons.Camouflage;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;

@@ -51,8 +51,8 @@ import javax.swing.border.TitledBorder;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
-import megamek.client.ui.swing.UnitLoadingDialog;
-import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
+import megamek.client.ui.dialogs.UnitLoadingDialog;
+import megamek.client.ui.dialogs.unitSelectorDialogs.AbstractUnitSelectorDialog;
 import megamek.common.MekSummaryCache;
 import megamek.common.event.Subscribe;
 import mekhq.MHQOptionsChangedEvent;
