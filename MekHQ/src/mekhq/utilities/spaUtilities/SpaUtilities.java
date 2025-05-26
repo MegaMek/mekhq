@@ -84,8 +84,10 @@ public class SpaUtilities {
      * <ul>
      *   <li>If the ability cost is -1, it is categorized as {@code CHARACTER_CREATION_ONLY}.</li>
      *   <li>Otherwise, if the cost is negative, it is a {@code CHARACTER_FLAW}.</li>
-     *   <li>If its required skills involve combat gunnery (not ProtoMech or BattleArmor), it is a {@code COMBAT_ABILITY}.</li>
-     *   <li>If its required skills involve piloting or certain gunnery types (ProtoMech or BattleArmor), it is a {@code MANEUVERING_ABILITY}.</li>
+     *   <li>If its required skills involve combat gunnery (not ProtoMek or BattleArmor), it is a {@code COMBAT_ABILITY}
+     *   .</li>
+     *   <li>If its required skills involve piloting or certain gunnery types (ProtoMek or BattleArmor), it is a
+     *   {@code MANEUVERING_ABILITY}.</li>
      *   <li>Otherwise, it is classified as a {@code UTILITY_ABILITY}.</li>
      * </ul>
      *

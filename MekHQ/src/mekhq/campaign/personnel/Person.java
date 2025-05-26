@@ -4688,7 +4688,7 @@ public class Person {
      * Determines whether the user possesses the necessary technical skills to service or repair the given entity.
      *
      * <p>The required technical skill depends on the entity type. This method checks for the appropriate technical
-     * skill based on whether the entity is a type of Mech, vessel, aerospace unit, battle armor, tank, or other
+     * skill based on whether the entity is a type of Mek, vessel, aerospace unit, battle armor, tank, or other
      * supported classes.</p>
      *
      * <p>Returns {@code true} if the user has the qualifying technical skill for the entity; {@code false} otherwise
