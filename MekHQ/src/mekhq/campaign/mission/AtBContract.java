@@ -142,6 +142,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.factionStanding.BatchallFactions;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.campaign.universe.factionStanding.PerformBatchall;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -752,22 +753,28 @@ public class AtBContract extends Contract {
 
         // Update the Batchall information
         batchallAccepted = true;
-        if (campaign.getCampaignOptions().isUseGenericBattleValue() && BatchallFactions.usesBatchalls(enemyCode)) {
-            Faction faction = getEnemy();
+        Faction faction = getEnemy();
+        if (campaign.getCampaignOptions().isUseGenericBattleValue() && faction.performsBatchalls()) {
+            boolean tracksStanding = campaign.getCampaignOptions().isTrackFactionStanding();
+            FactionStandings factionStandings = campaign.getFactionStandings();
+
             if (faction.performsBatchalls()) {
                 PerformBatchall batchallDialog = new PerformBatchall(campaign, clanOpponent, enemyCode);
 
                 batchallAccepted = batchallDialog.isBatchallAccepted();
-                setBatchallAccepted(batchallAccepted);
 
-                if (!batchallAccepted && campaign.getCampaignOptions().isTrackFactionStanding()) {
-                    List<String> reports = campaign.getFactionStandings()
-                                                 .processRefusedBatchall(enemyCode, campaign.getLocalDate().getYear());
+                if (!batchallAccepted && tracksStanding) {
+                    List<String> reports = factionStandings.processRefusedBatchall(enemyCode, today.getYear());
 
                     for (String report : reports) {
                         campaign.addReport(report);
                     }
                 }
+            }
+
+            if (tracksStanding) {
+                // Whenever we dynamically change the enemy faction, we update standing accordingly
+                factionStandings.processContractAccept(faction, today);
             }
         }
     }
@@ -1278,11 +1285,15 @@ public class AtBContract extends Contract {
         }
 
         if (employerLiaison != null) {
-            employerLiaison.writeToXML(pw, indent, campaign);
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "employerLiaison");
+            employerLiaison.writeToXMLHeadless(pw, indent, campaign);
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "employerLiaison");
         }
 
         if (clanOpponent != null) {
-            clanOpponent.writeToXML(pw, indent, campaign);
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "clanOpponent");
+            clanOpponent.writeToXMLHeadless(pw, indent, campaign);
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "clanOpponent");
         }
 
         return indent;

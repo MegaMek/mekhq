@@ -195,7 +195,7 @@ public class FactionStandings {
     /**
      * Regard decrease when accepting a contract against a Clan enemy.
      */
-    static final double REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_CLAN = -REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER_ALLY;
+    static final double REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_CLAN = REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER_ALLY / 2;
 
     /**
      * Regard decrease when accepting a contract for non-Clan factions allied with the enemy.
@@ -210,7 +210,7 @@ public class FactionStandings {
     /**
      * Regard penalty for refusing a batchall.
      */
-    static final double REGARD_DELTA_REFUSE_BATCHALL = REGARD_DELTA_CONTRACT_BREACH_EMPLOYER;
+    static final double REGARD_DELTA_REFUSE_BATCHALL = REGARD_DELTA_CONTRACT_BREACH_EMPLOYER * 2;
 
     /**
      * Regard penalty for refusing a batchall.
