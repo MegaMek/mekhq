@@ -123,7 +123,7 @@ public class RefitTest {
 
             lenient().when(mockCampaign.getGame()).thenReturn(mockGame);
             lenient().when(mockGame.getBoard()).thenReturn(mockBoard);
-            lenient().when(mockBoard.inSpace()).thenReturn(false);
+            lenient().when(mockBoard.isSpace()).thenReturn(false);
             lenient().when(mockGame.getOptions()).thenReturn(mockGameOptions);
             lenient().when(mockGameOptions.booleanOption(OptionsConstants.ADVAERORULES_SINGLE_NO_CAP))
                             .thenReturn(false);

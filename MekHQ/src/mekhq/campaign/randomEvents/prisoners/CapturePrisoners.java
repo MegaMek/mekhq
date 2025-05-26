@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.randomEvents.prisoners;
 
-import static megamek.common.Board.T_SPACE;
+import static java.lang.Math.round;
 import static megamek.common.MiscType.createBeagleActiveProbe;
 import static megamek.common.MiscType.createCLImprovedSensors;
 import static megamek.common.MiscType.createISImprovedSensors;
@@ -60,6 +60,7 @@ import java.util.Objects;
 import megamek.common.Compute;
 import megamek.common.ITechnology;
 import megamek.common.ITechnology.AvailabilityValue;
+import megamek.common.MapSettings;
 import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
@@ -154,7 +155,7 @@ public class CapturePrisoners {
             // if we can't get the tech faction, we just use the fallbacks already assigned.
         }
 
-        if (scenario.getBoardType() == T_SPACE) {
+        if (scenario.getBoardType() == MapSettings.MEDIUM_SPACE) {
             // It doesn't make sense for a character to 'go to ground' in space. Where are they
             // going to go when their air runs out?
             sarTargetNumber.addModifier(NOT_IN_PLANET_ORBIT, "Not in Planet Orbit");
