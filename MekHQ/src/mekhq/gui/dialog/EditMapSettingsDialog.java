@@ -54,7 +54,7 @@ import java.util.concurrent.TimeUnit;
 import javax.swing.*;
 
 import megamek.client.ui.panels.phaseDisplay.lobby.LobbyUtility;
-import megamek.client.ui.dialogs.minimap.Minimap;
+import megamek.client.ui.dialogs.minimap.MinimapPanel;
 import megamek.common.Board;
 import megamek.common.BoardDimensions;
 import megamek.common.Configuration;
@@ -456,7 +456,7 @@ public class EditMapSettingsDialog extends JDialog {
             if (zoom < 0) {
                 zoom = 0;
             }
-            BufferedImage bufImage = Minimap.getMinimapImage(board, zoom);
+            BufferedImage bufImage = MinimapPanel.getMinimapImage(board, zoom);
 
             // Add the board name label and the server-side board label if necessary
             String text = LobbyUtility.cleanBoardName(boardName, mapSettings);
