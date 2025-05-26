@@ -282,7 +282,7 @@ public class PerformBatchall {
      * @since 0.50.07
      */
     public List<String> getAreYouSureDialogOptions() {
-        return List.of(getTextAt(RESOURCE_BUNDLE, "performBatchall.areYouSure.button.confirm"),
-              getTextAt(RESOURCE_BUNDLE, "performBatchall.areYouSure.button.cancel"));
+        return List.of(getTextAt(RESOURCE_BUNDLE, "performBatchall.areYouSure.button.cancel"),
+                getTextAt(RESOURCE_BUNDLE, "performBatchall.areYouSure.button.confirm"));
     }
 }
