@@ -68,3 +68,6 @@ mhq-revision.txt
 
 /MekHQ/docs/OfficialUnitList.txt
 *.iml
+
+/MekHQ/docs/README.md
+/MekHQ/docs/LICENSE*
