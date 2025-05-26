@@ -200,7 +200,8 @@ public class FactionStandings {
     /**
      * Regard decrease when accepting a contract for non-Clan factions allied with the enemy.
      */
-    static final double REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_ALLY_NORMAL = REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_NORMAL / 2;
+    static final double REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_ALLY_NORMAL = -(REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_NORMAL /
+                                                                                 2);
 
     /**
      * Regard decrease when accepting a contract for Clan factions allied with the enemy.
