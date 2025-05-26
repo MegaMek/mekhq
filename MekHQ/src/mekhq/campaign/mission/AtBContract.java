@@ -130,6 +130,9 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.personnel.ranks.RankSystem;
+import mekhq.campaign.personnel.ranks.RankValidator;
+import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.randomEvents.MercenaryAuction;
 import mekhq.campaign.randomEvents.RoninOffer;
 import mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent;
@@ -1446,7 +1449,7 @@ public class AtBContract extends Contract {
     }
 
     public void createEmployerLiaison(Campaign campaign) {
-        employerLiaison = campaign.newPerson(PersonnelRole.MILITARY_LIAISON, getEmployerCode(), Gender.RANDOMIZE);
+        employerLiaison = campaign.newPerson(PersonnelRole.ADMINISTRATOR_COMMAND, getEmployerCode(), Gender.RANDOMIZE);
     }
 
     public Person getClanOpponent() {
@@ -1465,6 +1468,16 @@ public class AtBContract extends Contract {
         if (bloodname != null) {
             clanOpponent.setBloodname(bloodname.getName());
         }
+
+        final RankSystem rankSystem = Ranks.getRankSystemFromCode("CLAN");
+
+        final RankValidator rankValidator = new RankValidator();
+        if (!rankValidator.validate(rankSystem, false)) {
+            return;
+        }
+
+        clanOpponent.setRankSystem(rankValidator, rankSystem);
+        clanOpponent.setRank(38);
     }
 
     public String getEmployerCode() {
