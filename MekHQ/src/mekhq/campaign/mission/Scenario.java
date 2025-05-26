@@ -84,7 +84,7 @@ public class Scenario implements IPlayerSettings {
     public static final int T_ATMOSPHERE = 1;
     public static final int T_SPACE = 2;
     private static final String[] typeNames = { "Ground", "Low Atmosphere", "Space" };
-    private static final Logger log = LogManager.getLogger(Scenario.class);
+
     private int boardType = T_GROUND;
 
     private String name;
