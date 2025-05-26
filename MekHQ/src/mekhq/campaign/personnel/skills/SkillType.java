@@ -1147,6 +1147,7 @@ public class SkillType {
 
                     //Start <50.07 compatibility handler.
                     skillType.name = switch (name) {
+                        // CHECKSTYLE IGNORE ForbiddenWords FOR 1 LINES
                         case "anti-mech" -> S_ANTI_MEK;
                         case "medtech" -> S_MEDTECH;
                         case "communications (rp only)" -> S_COMMUNICATIONS;

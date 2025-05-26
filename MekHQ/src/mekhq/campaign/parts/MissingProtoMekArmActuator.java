@@ -60,6 +60,7 @@ public class MissingProtoMekArmActuator extends MissingPart {
 
     public MissingProtoMekArmActuator(int tonnage, int loc, Campaign c) {
         super(tonnage, c);
+        // CHECKSTYLE IGNORE ForbiddenWords FOR 1 LINES
         this.name = "ProtoMech Arm Actuator";
         this.location = loc;
     }
