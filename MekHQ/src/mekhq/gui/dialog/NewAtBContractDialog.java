@@ -46,7 +46,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import javax.swing.*;
 
-import megamek.client.ui.baseComponents.MMComboBox;
+import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.enums.SkillLevel;

@@ -39,8 +39,8 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.border.Border;
 
-import megamek.client.ui.swing.MMToggleButton;
-import megamek.client.ui.swing.util.UIUtil;
+import megamek.client.ui.buttons.MMToggleButton;
+import megamek.client.ui.util.UIUtil;
 
 /**
  * {@link RoundedMMToggleButton} is a custom {@link JButton} implementation that renders a button with rounded corners

@@ -54,7 +54,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 
-import megamek.client.ui.swing.util.UIUtil;
+import megamek.client.ui.util.UIUtil;
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
 import mekhq.campaign.CampaignOptions;

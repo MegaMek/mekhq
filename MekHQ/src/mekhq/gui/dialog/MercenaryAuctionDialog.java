@@ -40,8 +40,8 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkEvent.EventType;
 
-import megamek.client.ui.swing.MekViewPanel;
-import megamek.client.ui.swing.util.UIUtil;
+import megamek.client.ui.dialogs.unitSelectorDialogs.MekViewPanel;
+import megamek.client.ui.util.UIUtil;
 import megamek.common.Entity;
 import megamek.common.ViewFormatting;
 import megamek.common.annotations.Nullable;

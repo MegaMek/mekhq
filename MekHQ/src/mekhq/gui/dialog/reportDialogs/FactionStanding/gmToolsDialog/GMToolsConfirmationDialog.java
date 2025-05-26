@@ -44,8 +44,8 @@ import javax.swing.event.HyperlinkEvent;
 import java.awt.*;
 
 import static java.lang.Integer.MAX_VALUE;
-import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
-import static megamek.client.ui.swing.util.UIUtil.scaleForGUI;
+import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;

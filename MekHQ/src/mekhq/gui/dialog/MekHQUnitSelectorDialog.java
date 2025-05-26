@@ -49,9 +49,9 @@ import javax.swing.JPanel;
 import javax.swing.RowFilter;
 
 import megamek.client.ui.Messages;
-import megamek.client.ui.advancedsearch.MekSearchFilter;
-import megamek.client.ui.swing.UnitLoadingDialog;
-import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
+import megamek.client.ui.dialogs.advancedsearch.MekSearchFilter;
+import megamek.client.ui.dialogs.UnitLoadingDialog;
+import megamek.client.ui.dialogs.unitSelectorDialogs.AbstractUnitSelectorDialog;
 import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
 import megamek.common.ITechnology;

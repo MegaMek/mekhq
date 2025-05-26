@@ -39,7 +39,7 @@ import java.util.Map;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
-import megamek.client.ui.swing.CommonSettingsDialog;
+import megamek.client.ui.dialogs.buttonDialogs.CommonSettingsDialog;
 import megamek.common.preference.PreferenceManager;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;

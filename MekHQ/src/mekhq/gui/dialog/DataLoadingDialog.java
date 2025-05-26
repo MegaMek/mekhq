@@ -59,8 +59,8 @@ import javax.swing.SwingWorker;
 
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
-import megamek.client.ui.swing.util.UIUtil;
-import megamek.client.ui.swing.widget.RawImagePanel;
+import megamek.client.ui.util.UIUtil;
+import megamek.client.ui.widget.RawImagePanel;
 import megamek.common.Entity;
 import megamek.common.MekSummaryCache;
 import megamek.common.annotations.Nullable;

@@ -62,7 +62,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
-import megamek.client.ui.swing.util.UIUtil;
+import megamek.client.ui.util.UIUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.mission.AtBContract;

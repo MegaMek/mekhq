@@ -45,8 +45,8 @@ import java.awt.GridBagConstraints;
 import javax.swing.*;
 
 import megamek.Version;
-import megamek.client.ui.baseComponents.MMComboBox;
-import megamek.client.ui.swing.util.UIUtil;
+import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;

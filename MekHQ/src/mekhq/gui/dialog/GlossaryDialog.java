@@ -32,7 +32,7 @@
  */
 package mekhq.gui.dialog;
 
-import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
+import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 
@@ -46,7 +46,7 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent.EventType;
 
-import megamek.client.ui.swing.util.UIUtil;
+import megamek.client.ui.util.UIUtil;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;

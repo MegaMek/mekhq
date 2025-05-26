@@ -31,7 +31,7 @@ import static mekhq.MHQConstants.AWARDS_IMAGE_DIRECTORY_PATH;
 
 import java.io.File;
 
-import megamek.client.ui.swing.tileset.MMStaticDirectoryManager;
+import megamek.client.ui.tileset.MMStaticDirectoryManager;
 import megamek.common.annotations.Nullable;
 import megamek.common.preference.PreferenceManager;
 import megamek.common.util.fileUtils.AbstractDirectory;

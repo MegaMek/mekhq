@@ -43,13 +43,13 @@ import javax.swing.GroupLayout.Alignment;
 
 import megamek.MMConstants;
 import megamek.client.ui.Messages;
-import megamek.client.ui.baseComponents.MMComboBox;
+import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.comboBoxes.FontComboBox;
 import megamek.client.ui.displayWrappers.FontDisplay;
-import megamek.client.ui.swing.ColourSelectorButton;
-import megamek.client.ui.swing.CommonSettingsDialog;
-import megamek.client.ui.swing.GUIPreferences;
-import megamek.client.ui.swing.HelpDialog;
+import megamek.client.ui.buttons.ColourSelectorButton;
+import megamek.client.ui.dialogs.buttonDialogs.CommonSettingsDialog;
+import megamek.client.ui.clientGUI.GUIPreferences;
+import megamek.client.ui.dialogs.helpDialogs.HelpDialog;
 import megamek.common.preference.PreferenceManager;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;

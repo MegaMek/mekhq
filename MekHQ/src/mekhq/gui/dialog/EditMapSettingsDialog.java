@@ -53,8 +53,8 @@ import java.util.concurrent.TimeUnit;
 
 import javax.swing.*;
 
-import megamek.client.ui.swing.lobby.LobbyUtility;
-import megamek.client.ui.swing.minimap.Minimap;
+import megamek.client.ui.panels.phaseDisplay.lobby.LobbyUtility;
+import megamek.client.ui.dialogs.minimap.Minimap;
 import megamek.common.Board;
 import megamek.common.BoardDimensions;
 import megamek.common.Configuration;

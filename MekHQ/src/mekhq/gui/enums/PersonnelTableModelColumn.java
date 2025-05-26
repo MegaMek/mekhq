@@ -42,7 +42,7 @@ import javax.swing.JTable;
 import javax.swing.SortOrder;
 import javax.swing.SwingConstants;
 
-import megamek.client.ui.swing.util.UIUtil;
+import megamek.client.ui.util.UIUtil;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.Entity;
 import megamek.common.Jumpship;

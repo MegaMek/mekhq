@@ -65,7 +65,7 @@ import java.util.stream.Collectors;
 import javax.swing.UIManager;
 
 import megamek.Version;
-import megamek.client.ui.swing.tileset.EntityImage;
+import megamek.client.ui.tileset.EntityImage;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.*;
 import megamek.common.CrewType;

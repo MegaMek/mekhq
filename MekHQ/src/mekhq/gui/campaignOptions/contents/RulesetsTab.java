@@ -47,9 +47,9 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import megamek.client.ui.baseComponents.FileNameComboBoxModel;
-import megamek.client.ui.baseComponents.MMComboBox;
-import megamek.client.ui.swing.GUIPreferences;
+import megamek.client.ui.models.FileNameComboBoxModel;
+import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.clientGUI.GUIPreferences;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.CampaignOptions;

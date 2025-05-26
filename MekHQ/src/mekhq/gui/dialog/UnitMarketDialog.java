@@ -27,7 +27,7 @@
  */
 package mekhq.gui.dialog;
 
-import megamek.client.ui.baseComponents.MMButton;
+import megamek.client.ui.buttons.MMButton;
 import mekhq.campaign.Campaign;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 import mekhq.gui.panes.UnitMarketPane;

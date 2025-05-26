@@ -46,7 +46,7 @@ import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
-import megamek.client.ui.swing.util.UIUtil;
+import megamek.client.ui.util.UIUtil;
 import megamek.logging.MMLogger;
 import mekhq.CampaignPreset;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;

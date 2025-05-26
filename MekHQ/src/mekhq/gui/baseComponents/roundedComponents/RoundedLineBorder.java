@@ -44,7 +44,7 @@ import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.TitledBorder;
 
-import megamek.client.ui.swing.util.UIUtil;
+import megamek.client.ui.util.UIUtil;
 
 /**
  * {@code RoundedLineBorder} is a custom border implementation for Swing components that draws a rectangular border with
