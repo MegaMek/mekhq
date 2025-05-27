@@ -188,7 +188,7 @@ public class AtBContract extends Contract {
     protected int extensionLength;
 
     protected int requiredCombatTeams;
-    protected int requiredUnitsInCombatTeams;
+    protected int requiredCombatElements;
     protected AtBMoraleLevel moraleLevel;
     protected LocalDate routEnd;
     protected int partsAvailabilityLevel;
@@ -845,19 +845,19 @@ public class AtBContract extends Contract {
                     }
                 } else {
                     campaign.addReport("Bonus: Ronin");
-                    new RoninOffer(campaign, stratconCampaignState, requiredUnitsInCombatTeams);
+                    new RoninOffer(campaign, stratconCampaignState, requiredCombatElements);
                 }
                 yield false;
             }
             case 2 -> {
                 campaign.addReport("Bonus: Ronin");
-                new RoninOffer(campaign, stratconCampaignState, requiredUnitsInCombatTeams);
+                new RoninOffer(campaign, stratconCampaignState, requiredCombatElements);
                 yield false;
             }
             case 3 -> { // Resupply
                 if (campaignOptions.isUseAtB() && !campaignOptions.isUseStratCon()) {
                     campaign.addReport("Bonus: Ronin");
-                    new RoninOffer(campaign, stratconCampaignState, requiredUnitsInCombatTeams);
+                    new RoninOffer(campaign, stratconCampaignState, requiredCombatElements);
                     yield false;
                 } else {
                     if (isPostScenario) {
@@ -870,15 +870,15 @@ public class AtBContract extends Contract {
                 }
             }
             case 4 -> {
-                new MercenaryAuction(campaign, requiredUnitsInCombatTeams, stratconCampaignState, TANK);
+                new MercenaryAuction(campaign, requiredCombatElements, stratconCampaignState, TANK);
                 yield false;
             }
             case 5 -> {
-                new MercenaryAuction(campaign, requiredUnitsInCombatTeams, stratconCampaignState, AEROSPACEFIGHTER);
+                new MercenaryAuction(campaign, requiredCombatElements, stratconCampaignState, AEROSPACEFIGHTER);
                 yield false;
             }
             case 6 -> {
-                new MercenaryAuction(campaign, requiredUnitsInCombatTeams, stratconCampaignState, MEK);
+                new MercenaryAuction(campaign, requiredCombatElements, stratconCampaignState, MEK);
                 yield false;
             }
             default -> throw new IllegalStateException(
@@ -1196,7 +1196,7 @@ public class AtBContract extends Contract {
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enemyColour", getEnemyColour().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "requiredCombatTeams", getRequiredCombatTeams());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "requiredUnitsInCombatTeams", getRequiredUnitsInCombatTeams());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "requiredCombatElements", getRequiredCombatElements());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "moraleLevel", getMoraleLevel().name());
 
         if (routEnd != null) {
@@ -1293,8 +1293,8 @@ public class AtBContract extends Contract {
                     setEnemyColour(PlayerColour.parseFromString(item.getTextContent().trim()));
                 } else if (item.getNodeName().equalsIgnoreCase("requiredCombatTeams")) {
                     requiredCombatTeams = Integer.parseInt(item.getTextContent());
-                } else if (item.getNodeName().equalsIgnoreCase("requiredUnitsInCombatTeams")) {
-                    requiredUnitsInCombatTeams = Integer.parseInt(item.getTextContent());
+                } else if (item.getNodeName().equalsIgnoreCase("requiredCombatElements")) {
+                    requiredCombatElements = Integer.parseInt(item.getTextContent());
                 } else if (item.getNodeName().equalsIgnoreCase("moraleLevel")) {
                     setMoraleLevel(AtBMoraleLevel.parseFromString(item.getTextContent().trim()));
                 } else if (item.getNodeName().equalsIgnoreCase("routEnd")) {
@@ -1584,12 +1584,12 @@ public class AtBContract extends Contract {
         requiredCombatTeams = required;
     }
 
-    public int getRequiredUnitsInCombatTeams() {
-        return requiredUnitsInCombatTeams;
+    public int getRequiredCombatElements() {
+        return requiredCombatElements;
     }
 
-    public void setRequiredUnitsInCombatTeams(int required) {
-        requiredUnitsInCombatTeams = required;
+    public void setRequiredCombatElements(int required) {
+        requiredCombatElements = required;
     }
 
     public int getPartsAvailabilityLevel() {
@@ -1750,7 +1750,7 @@ public class AtBContract extends Contract {
         }
 
         setRequiredCombatTeams(ContractUtilities.calculateBaseNumberOfRequiredLances(campaign));
-        setRequiredUnitsInCombatTeams(ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(campaign));
+        setRequiredCombatElements(ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(campaign));
 
         setPartsAvailabilityLevel(getContractType().calculatePartsAvailabilityLevel());
 

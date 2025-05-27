@@ -248,20 +248,19 @@ public abstract class AbstractContractMarket {
     }
 
     /**
-     * Calculates the required number of combat teams for a contract based on campaign options, contract details, and
+     * Calculates the required number of combat elements for a contract based on campaign options, contract details, and
      * variance factors.
      *
      * <p>
-     * This method determines the number of combat teams needed to deploy, taking into account factors such as:
+     * This method determines the number of combat elements needed to deploy, taking into account factors such as:
      * <ul>
      *   <li>Whether the contract is a subcontract (returns 1 as a base case).</li>
-     *   <li>The base formation sizes (lance-level and company-level) and the effective unit forces.</li>
-     *   <li>The maximum deployable combat teams, adjusted based on campaign strategy options.</li>
+     *   <li>The effective unit forces.</li>
      *   <li>Whether variance bypass is enabled, applying a flat reduction to available forces.</li>
      *   <li>Variance adjustments applied through a dice roll, affecting the availability of forces.</li>
      * </ul>
      * The method ensures values are clamped to maintain a minimum deployment of at least 1 combat
-     * team while not exceeding the maximum deployable combat teams.
+     * element while not exceeding the maximum deployable combat elements.
      *
      * @param campaign       the campaign containing relevant options and faction information
      * @param contract       the contract that specifies details such as subcontract status
@@ -269,7 +268,7 @@ public abstract class AbstractContractMarket {
      *
      * @return the calculated number of required units in combat teams, ensuring it meets game rules and constraints
      */
-    public int calculateRequiredUnitsInCombatTeams(Campaign campaign, AtBContract contract, boolean bypassVariance) {
+    public int calculateRequiredCombatElements(Campaign campaign, AtBContract contract, boolean bypassVariance) {
         // Return 1 combat team if the contract is a subcontract
         if (contract.isSubcontract()) {
             return 1;
@@ -305,11 +304,17 @@ public abstract class AbstractContractMarket {
      * The variance factor is determined by applying a multiplier to the fixed formation size divisor. The multiplier
      * varies based on the roll value:
      * <ul>
-     *   <li><b>Roll 2:</b> Multiplier is 0.75.</li>
-     *   <li><b>Roll 3:</b> Multiplier is 0.5.</li>
-     *   <li><b>Roll 4:</b> Multiplier is 0.25.</li>
-     *   <li><b>Rolls 10, 11, 12:</b> Multipliers are 1.25, 1.5, and 1.75 respectively.</li>
-     *   <li><b>Rolls 5-9:</b> Default multiplier is 1.0 (no change).</li>
+     *   <li><b>Roll 2:</b> Multiplier is 0.575.</li>
+     *   <li><b>Roll 3:</b> Multiplier is 0.6.</li>
+     *   <li><b>Roll 4:</b> Multiplier is 0.625</li>
+     *   <li><b>Roll 5:</b> Multiplier is 0.65.</li>
+     *   <li><b>Roll 6:</b> Multiplier is 0.675.</li>
+     *   <li><b>Roll 7:</b> Multiplier is 0.7.</li>
+     *   <li><b>Roll 7:</b> Multiplier is 0.725.</li>
+     *   <li><b>Roll 7:</b> Multiplier is 0.75.</li>
+     *   <li><b>Roll 7:</b> Multiplier is 0.775.</li>
+     *   <li><b>Roll 7:</b> Multiplier is 0.8.</li>
+     *   <li><b>Roll 7:</b> Multiplier is 0.825.</li>
      * </ul>
      *
      * @param roll the roll value used to determine the multiplier

@@ -4765,8 +4765,8 @@ public class Campaign implements ITechManager {
             return 0;
         }
 
-        int total = -contract.getRequiredUnitsInCombatTeams();
-        int role = -max(1, contract.getRequiredUnitsInCombatTeams() / 2);
+        int total = -contract.getRequiredCombatElements();
+        int role = -max(1, contract.getRequiredCombatElements() / 2);
 
         final CombatRole requiredLanceRole = contract.getContractType().getRequiredCombatRole();
         for (CombatTeam combatTeam : combatTeams.values()) {

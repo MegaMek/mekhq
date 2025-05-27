@@ -571,11 +571,11 @@ public class NewAtBContractDialog extends NewContractDialog {
 
         AbstractContractMarket contractMarket = campaign.getContractMarket();
         if (contractMarket != null) {
-            contract.setRequiredUnitsInCombatTeams(contractMarket.calculateRequiredUnitsInCombatTeams(campaign,
+            contract.setRequiredCombatElements(contractMarket.calculateRequiredCombatElements(campaign,
                   contract,
                   false));
         } else {
-            contract.setRequiredUnitsInCombatTeams(0); // This shouldn't happen, but let's not crash if it does
+            contract.setRequiredCombatElements(0); // This shouldn't happen, but let's not crash if it does
         }
 
         contract.setEnemyCode(getCurrentEnemyCode());

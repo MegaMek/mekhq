@@ -557,16 +557,16 @@ public class ContractSummaryPanel extends JPanel {
             gridBagConstraintsText.gridy = y;
             mainPanel.add(txtRequiredLances, gridBagConstraintsText);
 
-            JLabel lblRequiredUnitsInCombatTeams = new JLabel(resourceMap.getString("lblRequiredUnitsInCombatTeams.text"));
-            lblRequiredUnitsInCombatTeams.setName("lblRequiredUnitsInCombatTeams");
+            JLabel lblRequiredCombatElements = new JLabel(resourceMap.getString("lblRequiredCombatElements.text"));
+            lblRequiredCombatElements.setName("lblRequiredCombatElements");
             gridBagConstraintsLabels.gridy = ++y;
-            mainPanel.add(lblRequiredUnitsInCombatTeams, gridBagConstraintsLabels);
+            mainPanel.add(lblRequiredCombatElements, gridBagConstraintsLabels);
 
-            JLabel txtRequiredUnitsInCombatTeams =
-                  new JLabel(String.valueOf(((AtBContract) contract).getRequiredUnitsInCombatTeams()));
-            txtRequiredUnitsInCombatTeams.setName("txtRequiredUnitsInCombatTeams");
+            JLabel txtRequiredCombatElements =
+                  new JLabel(String.valueOf(((AtBContract) contract).getRequiredCombatElements()));
+            txtRequiredCombatElements.setName("txtRequiredCombatElements");
             gridBagConstraintsText.gridy = y;
-            mainPanel.add(txtRequiredUnitsInCombatTeams, gridBagConstraintsText);
+            mainPanel.add(txtRequiredCombatElements, gridBagConstraintsText);
         }
 
         contractPaymentBreakdown.display(++y, 2);

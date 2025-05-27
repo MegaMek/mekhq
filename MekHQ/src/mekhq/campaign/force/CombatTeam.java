@@ -211,15 +211,15 @@ public class CombatTeam {
      * <p>
      *     This method iterates through all combat teams in the specified campaign, ignoring combat teams with the auxiliary
      *     role. For each valid combat team, it retrieves the associated force and evaluates all units within that force.
-     *     The unit contribution to the total is determined based on its type:
+     *     The unit contribution to the total is determined based on its type: </p>
      *     <ul>
      *         <li><b>TANK, VTOL, NAVAL, CONV_FIGHTER, AEROSPACEFIGHTER:</b> Adds 1 for non-clan factions, and 0.5
      *         for clan factions.</li>
      *         <li><b>PROTOMEK:</b> Adds 0.2 to the total.</li>
-     *         <li><b>BATTLE_ARMOR, INFANTRY:</b> Adds 0 (excluded from the total).</li>
+     *         <li><b>BATTLE_ARMOR, INFANTRY:</b> Adds 0 (excluded from the total, unless no other units).</li>
      *         <li><b>Other types:</b> Adds 1 to the total.</li>
-     *         </ul>
-     * </p>
+     *     </ul>
+     *
      * @param campaign
      * @return effective size of the combat team
      */
@@ -235,10 +235,10 @@ public class CombatTeam {
     }
 
     /**
-     * Effective size used when determining for many units this combat team is.
+     * Effective size used when determining for many combat elements this combat team is.
      * <p>
      *     Retrieves the associated force and evaluates all units within that force.
-     *     The unit contribution to the total is determined based on its type:
+     *     The unit contribution to the total is determined based on its type: </p>
      *     <ul>
      *         <li><b>TANK, VTOL, NAVAL, CONV_FIGHTER, AEROSPACEFIGHTER:</b> Adds 1 for non-clan factions, and 0.5
      *         for clan factions.</li>
@@ -248,7 +248,7 @@ public class CombatTeam {
      *         .</li>
      *         <li><b>Other types:</b> Adds 1 to the total.</li>
      *         </ul>
-     * </p>
+     *
      * @param campaign
      * @return effective size of the lance for calculating contract requirements
      */
@@ -282,7 +282,7 @@ public class CombatTeam {
                 case UnitType.PROTOMEK -> numUnits += 0.2;
                 case UnitType.BATTLE_ARMOR -> numInfantry += 1;
                 case UnitType.INFANTRY ->
-                      numInfantry += entity instanceof Infantry infantry && infantry.isSquad() ? 1.0 / 3 : 1;
+                      numInfantry += entity instanceof Infantry infantry && infantry.isSquad() ? 1.0 / 4 : 1;
                 default -> numUnits += 0; // All other unit types
             }
         }

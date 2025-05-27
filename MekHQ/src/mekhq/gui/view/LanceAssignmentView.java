@@ -362,10 +362,10 @@ class RequiredLancesTableModel extends DataTableModel {
                         t += combatTeam.getSize(campaign);
                     }
                 }
-                if (t < contract.getRequiredUnitsInCombatTeams()) {
-                    return t + "/" + contract.getRequiredUnitsInCombatTeams();
+                if (t < contract.getRequiredCombatElements()) {
+                    return t + "/" + contract.getRequiredCombatElements();
                 }
-                return Integer.toString(contract.getRequiredUnitsInCombatTeams());
+                return Integer.toString(contract.getRequiredCombatElements());
             } else if (contract.getContractType().getRequiredCombatRole().ordinal() == column - 2) {
                 int t = 0;
                 for (CombatTeam combatTeam : campaign.getAllCombatTeams()) {
@@ -376,7 +376,7 @@ class RequiredLancesTableModel extends DataTableModel {
                         t += combatTeam.getSize(campaign);
                     }
                 }
-                int required = Math.max(contract.getRequiredUnitsInCombatTeams() / 2, 1);
+                int required = Math.max(contract.getRequiredCombatElements() / 2, 1);
                 if (t < required) {
                     return t + "/" + required;
                 }

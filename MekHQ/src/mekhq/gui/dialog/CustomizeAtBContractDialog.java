@@ -205,7 +205,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         JLabel lblEnemyRating = new JLabel();
         JLabel lblRequiredLances = new JLabel();
 
-        int requiredLances = contract.getRequiredUnitsInCombatTeams() > 0 ? contract.getRequiredUnitsInCombatTeams() : 1;
+        int requiredLances = contract.getRequiredCombatElements() > 0 ? contract.getRequiredCombatElements() : 1;
 
         spnRequiredLances = new JSpinner(new SpinnerNumberModel(requiredLances, 1, null, 1));
         JLabel lblEnemyMorale = new JLabel();
@@ -389,8 +389,8 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.insets = new Insets(5, 5, 5, 5);
         leftPanel.add(lblRequiredLances, gbc);
 
-        lblRequiredLances.setText(resourceMap.getString("lblRequiredUnitsInCombatTeams.text"));
-        lblRequiredLances.setName("lblRequiredUnitsInCombatTeams");
+        lblRequiredLances.setText(resourceMap.getString("lblRequiredCombatElements.text"));
+        lblRequiredLances.setName("lblRequiredCombatElements");
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;

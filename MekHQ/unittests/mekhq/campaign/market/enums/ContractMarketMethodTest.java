@@ -124,7 +124,7 @@ public class ContractMarketMethodTest {
     }
 
     @Nested
-    class AbstractContractMarketCalculateRequiredUnitsInCombatTeams {
+    class AbstractContractMarketCalculateRequiredCombatElements {
 
         Faction mockFaction;
         Campaign mockCampaign;
@@ -154,7 +154,7 @@ public class ContractMarketMethodTest {
             // Arrange
 
             // Act
-            int teams = contractMarket.calculateRequiredUnitsInCombatTeams(mockCampaign, mockAtBContract, true);
+            int teams = contractMarket.calculateRequiredCombatElements(mockCampaign, mockAtBContract, true);
 
             // Assert
             assertEquals(1, teams);
@@ -173,7 +173,7 @@ public class ContractMarketMethodTest {
                 contractUtilities.when(() -> ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign))
                       .thenReturn(COMBAT_TEAMS);
                 // Act
-                teams = contractMarket.calculateRequiredUnitsInCombatTeams(mockCampaign, mockAtBContract, true);
+                teams = contractMarket.calculateRequiredCombatElements(mockCampaign, mockAtBContract, true);
             }
             // Assert
             assertEquals(24,
@@ -187,7 +187,7 @@ public class ContractMarketMethodTest {
             final int COMBAT_TEAMS = 1;
             final int UNITS_IN_COMBAT_TEAMS = 0;
 
-            testRequiredUnitsInCombatTeamsWithVariance(contractMarket, UNITS_IN_COMBAT_TEAMS, COMBAT_TEAMS);
+            testRequiredCombatElementsWithVariance(contractMarket, UNITS_IN_COMBAT_TEAMS, COMBAT_TEAMS);
         }
 
         @ParameterizedTest
@@ -196,7 +196,7 @@ public class ContractMarketMethodTest {
             final int COMBAT_TEAMS = 1;
             final int UNITS_IN_COMBAT_TEAMS = 1;
 
-            testRequiredUnitsInCombatTeamsWithVariance(contractMarket, UNITS_IN_COMBAT_TEAMS, COMBAT_TEAMS);
+            testRequiredCombatElementsWithVariance(contractMarket, UNITS_IN_COMBAT_TEAMS, COMBAT_TEAMS);
         }
 
         @ParameterizedTest
@@ -205,7 +205,7 @@ public class ContractMarketMethodTest {
             final int COMBAT_TEAMS = 1;
             final int UNITS_IN_COMBAT_TEAMS = 2;
 
-            testRequiredUnitsInCombatTeamsWithVariance(contractMarket, UNITS_IN_COMBAT_TEAMS, COMBAT_TEAMS);
+            testRequiredCombatElementsWithVariance(contractMarket, UNITS_IN_COMBAT_TEAMS, COMBAT_TEAMS);
         }
 
         @ParameterizedTest
@@ -214,7 +214,7 @@ public class ContractMarketMethodTest {
             final int COMBAT_TEAMS = 1;
             final int UNITS_IN_COMBAT_TEAMS = 4 * COMBAT_TEAMS;
 
-            testRequiredUnitsInCombatTeamsWithVariance(contractMarket, UNITS_IN_COMBAT_TEAMS, COMBAT_TEAMS);
+            testRequiredCombatElementsWithVariance(contractMarket, UNITS_IN_COMBAT_TEAMS, COMBAT_TEAMS);
         }
 
         @ParameterizedTest
@@ -223,7 +223,7 @@ public class ContractMarketMethodTest {
             final int COMBAT_TEAMS = 3;
             final int UNITS_IN_COMBAT_TEAMS = 4 * COMBAT_TEAMS;
 
-            testRequiredUnitsInCombatTeamsWithVariance(contractMarket, UNITS_IN_COMBAT_TEAMS, COMBAT_TEAMS);
+            testRequiredCombatElementsWithVariance(contractMarket, UNITS_IN_COMBAT_TEAMS, COMBAT_TEAMS);
         }
 
         @ParameterizedTest
@@ -232,10 +232,10 @@ public class ContractMarketMethodTest {
             final int COMBAT_TEAMS = 9;
             final int UNITS_IN_COMBAT_TEAMS = 4 * COMBAT_TEAMS;
 
-            testRequiredUnitsInCombatTeamsWithVariance(contractMarket, UNITS_IN_COMBAT_TEAMS, COMBAT_TEAMS);
+            testRequiredCombatElementsWithVariance(contractMarket, UNITS_IN_COMBAT_TEAMS, COMBAT_TEAMS);
         }
 
-        private void testRequiredUnitsInCombatTeamsWithVariance(AbstractContractMarket contractMarket,
+        private void testRequiredCombatElementsWithVariance(AbstractContractMarket contractMarket,
               int UNITS_IN_COMBAT_TEAMS, int COMBAT_TEAMS) {
             ArrayList<Integer> requiredUnitInCombatTeams = new ArrayList<>();
             // Arrange
@@ -252,14 +252,14 @@ public class ContractMarketMethodTest {
                         compute.when(() -> Compute.d6(anyInt())).thenReturn(varianceRoll);
 
                         // Act (this is the method we are testing!)
-                        requiredUnitInCombatTeams.add(contractMarket.calculateRequiredUnitsInCombatTeams(mockCampaign,
+                        requiredUnitInCombatTeams.add(contractMarket.calculateRequiredCombatElements(mockCampaign,
                               mockAtBContract,
                               false));
                     }
                 }
             }
             // Assert
-            assertRequiredUnitsInCombatTeamsResults(COMBAT_TEAMS, UNITS_IN_COMBAT_TEAMS, requiredUnitInCombatTeams);
+            assertRequiredCombatElementsResults(COMBAT_TEAMS, UNITS_IN_COMBAT_TEAMS, requiredUnitInCombatTeams);
         }
 
         /**
@@ -269,34 +269,34 @@ public class ContractMarketMethodTest {
          *
          * @param combatTeams                      how many combat teams?
          * @param unitsInCombatTeams               how many units are in those combat teams?
-         * @param requiredUnitsInCombatTeamsCounts ArrayList of Integers for the required count of units in combat teams
+         * @param requiredCombatElementsCounts  ArrayList of Integers for the required count of units in combat teams
          *                                         at each variance roll
          */
-        private void assertRequiredUnitsInCombatTeamsResults(int combatTeams, int unitsInCombatTeams,
-              ArrayList<Integer> requiredUnitsInCombatTeamsCounts) {
+        private void assertRequiredCombatElementsResults(int combatTeams, int unitsInCombatTeams,
+              ArrayList<Integer> requiredCombatElementsCounts) {
             int smallestValue = Integer.MAX_VALUE;
             int largestValue = Integer.MIN_VALUE;
 
-            for (int requiredUnitsInCombatTeamsCount : requiredUnitsInCombatTeamsCounts) {
+            for (int requiredCombatElementsCount : requiredCombatElementsCounts) {
                 // First, let's handle edge cases with unusual values.
                 // If there's no one or only one unit in combat teams, we expect a result of 1.
                 if (2 > unitsInCombatTeams) {
                     assertEquals(1,
-                          requiredUnitsInCombatTeamsCount,
+                          requiredCombatElementsCount,
                           "If there's no one or only one unit in combat teams, we expect a result of 1");
                     return;
                 }
 
                 // Next, let's get some safe assumptions out of the way.
-                assertTrue(unitsInCombatTeams >= requiredUnitsInCombatTeamsCount,
+                assertTrue(unitsInCombatTeams >= requiredCombatElementsCount,
                       "Required units should not be more than the units a player has in combat teams.");
 
                 // Finally let's compare some values to test later
-                if (requiredUnitsInCombatTeamsCount < smallestValue) {
-                    smallestValue = requiredUnitsInCombatTeamsCount;
+                if (requiredCombatElementsCount < smallestValue) {
+                    smallestValue = requiredCombatElementsCount;
                 }
-                if (requiredUnitsInCombatTeamsCount > largestValue) {
-                    largestValue = requiredUnitsInCombatTeamsCount;
+                if (requiredCombatElementsCount > largestValue) {
+                    largestValue = requiredCombatElementsCount;
                 }
             }
 

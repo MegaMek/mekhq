@@ -411,7 +411,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         setContractClauses(contract, unitRatingMod, campaign);
 
         contract.setRequiredCombatTeams(ContractUtilities.calculateBaseNumberOfRequiredLances(campaign));
-        contract.setRequiredUnitsInCombatTeams(calculateRequiredUnitsInCombatTeams(campaign, contract, false));
+        contract.setRequiredCombatElements(calculateRequiredCombatElements(campaign, contract, false));
         contract.setMultiplier(calculatePaymentMultiplier(campaign, contract));
 
         contract.setPartsAvailabilityLevel(contract.getContractType().calculatePartsAvailabilityLevel());
@@ -509,7 +509,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         contract.setTransportComp(100);
 
         contract.setRequiredCombatTeams(ContractUtilities.calculateBaseNumberOfRequiredLances(campaign));
-        contract.setRequiredUnitsInCombatTeams(calculateRequiredUnitsInCombatTeams(campaign, contract, false));
+        contract.setRequiredCombatElements(calculateRequiredCombatElements(campaign, contract, false));
         contract.setMultiplier(calculatePaymentMultiplier(campaign, contract));
         contract.setPartsAvailabilityLevel(contract.getContractType().calculatePartsAvailabilityLevel());
         contract.calculateContract(campaign);
@@ -582,7 +582,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         followup.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
         setContractClauses(followup, campaign.getAtBUnitRatingMod(), campaign);
         followup.setRequiredCombatTeams(ContractUtilities.calculateBaseNumberOfRequiredLances(campaign));
-        contract.setRequiredUnitsInCombatTeams(calculateRequiredUnitsInCombatTeams(campaign, contract, false));
+        contract.setRequiredCombatElements(calculateRequiredCombatElements(campaign, contract, false));
         followup.setMultiplier(calculatePaymentMultiplier(campaign, followup));
         followup.setPartsAvailabilityLevel(followup.getContractType().calculatePartsAvailabilityLevel());
         followup.initContractDetails(campaign);
