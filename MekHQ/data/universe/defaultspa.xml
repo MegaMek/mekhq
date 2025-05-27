@@ -1252,7 +1252,7 @@ If individual initiative is enabled, this bonus applies only to the pilot's unit
     </ability>
 
     <!-- Example entries corresponding to the examples in customspa.xml
-     See docs/custom_spa.txt
+     See docs/custom_spa.md
 
     <ability>
         <lookupName>tetris_master</lookupName>
