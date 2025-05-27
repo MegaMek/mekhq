@@ -59,9 +59,6 @@ import org.w3c.dom.NodeList;
 public class FameAndInfamyController {
     private Map<String, Double> trackingFactions;
 
-    private static final ResourceBundle resources = ResourceBundle.getBundle(
-        "mekhq.resources.FameAndInfamy",
-        MekHQ.getMHQOptions().getLocale());
 
     private final static MMLogger logger = MMLogger.create(FameAndInfamyController.class);
 
