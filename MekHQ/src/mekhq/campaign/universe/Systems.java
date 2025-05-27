@@ -81,7 +81,8 @@ public class Systems {
         systems = instance;
     }
 
-    private final ConcurrentMap<String, PlanetarySystem> systemList = new ConcurrentHashMap<>();
+    protected ConcurrentMap<String, PlanetarySystem> systemList = new ConcurrentHashMap<>();
+
     /**
      * Organizes systems into a grid of 30lyx30ly squares so we can find nearby systems without iterating through the
      * entire planet list.
@@ -92,7 +93,7 @@ public class Systems {
     private Collection<HPGLink> hpgNetworkCache = null;
     private LocalDate hpgNetworkCacheDate = null;
 
-    private Systems() {
+    protected Systems() {
     }
 
     private Set<PlanetarySystem> getSystemGrid(int x, int y) {

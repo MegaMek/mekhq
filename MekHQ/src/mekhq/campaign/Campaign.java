@@ -503,6 +503,14 @@ public class Campaign implements ITechManager {
     private final IAutosaveService autosaveService;
 
     public Campaign() {
+        this(Systems.getInstance());
+    }
+
+    public Campaign(Systems systems) {
+        this(systems.getInstance().getSystems().get("Galatea"));
+    }
+
+    public Campaign(PlanetarySystem startSystem) {
         id = UUID.randomUUID();
         game = new Game();
         player = new Player(0, "self");
@@ -520,8 +528,12 @@ public class Campaign implements ITechManager {
         techFaction = megamek.common.enums.Faction.MERC;
         CurrencyManager.getInstance().setCampaign(this);
         try {
-            location = new CurrentLocation(Systems.getInstance().getSystems().get("Galatea"), 0);
+            location = new CurrentLocation(startSystem, 0);
         } catch (Exception ex) {
+            String message = String.format(
+                  "Unable to set location to {}. If this wasn't during automated testing this must be investigated.",
+                  startSystem
+            );
             LOGGER.error("Unable to set location to default galatea system. If this wasn't during automated testing " +
                                "this must be investigated.", ex);
             PlanetarySystem fallbackSystem = new PlanetarySystem("Galatea");
