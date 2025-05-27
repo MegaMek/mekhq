@@ -61,11 +61,11 @@ import java.util.UUID;
 import javax.swing.*;
 
 import megamek.client.ui.Messages;
-import megamek.client.ui.dialogs.EntityReadoutDialog;
+import megamek.client.ui.dialogs.unitSelectorDialogs.EntityReadoutDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.client.ui.swing.UnitEditorDialog;
-import megamek.client.ui.swing.util.UIUtil;
+import megamek.client.ui.dialogs.UnitEditorDialog;
+import megamek.client.ui.util.UIUtil;
 import megamek.common.GunEmplacement;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;

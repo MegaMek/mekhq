@@ -33,8 +33,8 @@
 package mekhq.gui.dialog.reportDialogs.FactionStanding.gmToolsDialog;
 
 import static java.lang.Integer.MAX_VALUE;
-import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
-import static megamek.client.ui.swing.util.UIUtil.scaleForGUI;
+import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.campaign.universe.factionStanding.FactionStandings.getMaximumRegard;
 import static mekhq.campaign.universe.factionStanding.FactionStandings.getMinimumRegard;
@@ -58,7 +58,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.HyperlinkEvent;
 
-import megamek.client.ui.baseComponents.MMComboBox;
+import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.logging.MMLogger;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;

@@ -28,6 +28,7 @@
 package mekhq.campaign.randomEvents.prisoners;
 
 import megamek.common.ITechnology;
+import megamek.common.MapSettings;
 import megamek.common.ITechnology.AvailabilityValue;
 import megamek.common.ITechnology.TechRating;
 import mekhq.campaign.Campaign;
@@ -42,7 +43,6 @@ import java.time.LocalDate;
 import java.util.Set;
 
 import static java.lang.Math.round;
-import static megamek.common.Board.T_SPACE;
 import static megamek.common.MiscType.createBeagleActiveProbe;
 import static megamek.common.MiscType.createISImprovedSensors;
 import static mekhq.campaign.randomEvents.prisoners.CapturePrisoners.*;
@@ -158,7 +158,7 @@ class CapturePrisonersTest {
         Faction mockFaction = mock(Faction.class);
 
         Scenario scenario = new Scenario();
-        scenario.setBoardType(T_SPACE);
+        scenario.setBoardType(MapSettings.MEDIUM_SPACE);
 
         LocalDate today = LocalDate.of(3151, 1, 1);
         when(mockCampaign.getLocalDate()).thenReturn(today);

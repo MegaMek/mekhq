@@ -49,9 +49,6 @@ import mekhq.campaign.Campaign;
  * Therefore, all of its methods can be called directly on the class.
  */
 public class BatchallFactions {
-    private static final ResourceBundle resources = ResourceBundle.getBundle(
-        "mekhq.resources.FameAndInfamy",
-        MekHQ.getMHQOptions().getLocale());
 
     public static final List<String> BATCHALL_FACTIONS = List.of("CBS", "CB", "CCC", "CCO",
         "CDS", "CFM", "CGB", "CGS", "CHH", "CIH", "CJF", "CMG", "CNC", "CSJ", "CSR", "CSA", "CSV",
@@ -67,6 +64,8 @@ public class BatchallFactions {
         if (factionCode == null) {
             return false;
         }
+
+        //        Faction faction = Faction.getFaction(factionCode);
 
         return BATCHALL_FACTIONS.contains(factionCode);
     }
@@ -111,14 +110,14 @@ public class BatchallFactions {
         int type;
 
         if (infamy == 5) {
-            greeting = resources.getString("greetingCLANLevel5Type0.text");
+            // greeting = resources.getString("greetingCLANLevel5Type0.text");
         } else {
             type = Compute.randomInt(3);
-            String greetingReference = String.format(resources.getString("greetingFormatBatchall.text"),
-                factionCode, version, infamy, type);
-            greeting = resources.getString(greetingReference);
+            // String greetingReference = String.format(resources.getString("greetingFormatBatchall.text"),
+            //                factionCode, version, infamy, type);
+            // greeting = resources.getString(greetingReference);
         }
 
-        return greeting + '"';
+        return "";
     }
 }

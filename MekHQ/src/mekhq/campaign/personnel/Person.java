@@ -2414,6 +2414,11 @@ public class Person {
     // region File I/O
     public void writeToXML(final PrintWriter pw, int indent, final Campaign campaign) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "person", "id", id, "type", getClass());
+        indent = writeToXMLHeadless(pw, indent, campaign);
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "person");
+    }
+
+    public int writeToXMLHeadless(PrintWriter pw, int indent, Campaign campaign) {
         try {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "id", id.toString());
 
@@ -2453,8 +2458,7 @@ public class Person {
             // Always save the person's origin faction
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "faction", originFaction.getShortName());
             if (originPlanet != null) {
-                MHQXMLUtility.writeSimpleXMLAttributedTag(pw,
-                      indent,
+                MHQXMLUtility.writeSimpleXMLAttributedTag(pw, indent,
                       "planetId",
                       "systemId",
                       originPlanet.getParentSystem().getId(),
@@ -2597,23 +2601,20 @@ public class Person {
             }
 
             if (countOptions(PersonnelOptions.LVL3_ADVANTAGES) > 0) {
-                MHQXMLUtility.writeSimpleXMLTag(pw,
-                      indent,
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent,
                       "advantages",
                       getOptionList("::", PersonnelOptions.LVL3_ADVANTAGES));
             }
 
             if (countOptions(PersonnelOptions.EDGE_ADVANTAGES) > 0) {
-                MHQXMLUtility.writeSimpleXMLTag(pw,
-                      indent,
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent,
                       "edge",
                       getOptionList("::", PersonnelOptions.EDGE_ADVANTAGES));
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "edgeAvailable", getCurrentEdge());
             }
 
             if (countOptions(PersonnelOptions.MD_ADVANTAGES) > 0) {
-                MHQXMLUtility.writeSimpleXMLTag(pw,
-                      indent,
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent,
                       "implants",
                       getOptionList("::", PersonnelOptions.MD_ADVANTAGES));
             }
@@ -2786,8 +2787,7 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personalityQuirk", personalityQuirk.ordinal());
             }
 
-            MHQXMLUtility.writeSimpleXMLTag(pw,
-                  indent,
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent,
                   "personalityQuirkDescriptionIndex",
                   personalityQuirkDescriptionIndex);
 
@@ -2824,8 +2824,7 @@ public class Person {
             logger.error(ex, "Failed to write {} to the XML File", getFullName());
             throw ex; // we want to rethrow to ensure that the save fails
         }
-
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "person");
+        return indent;
     }
 
     public static Person generateInstanceFromXML(Node wn, Campaign campaign, Version version) {
@@ -4689,7 +4688,7 @@ public class Person {
      * Determines whether the user possesses the necessary technical skills to service or repair the given entity.
      *
      * <p>The required technical skill depends on the entity type. This method checks for the appropriate technical
-     * skill based on whether the entity is a type of Mech, vessel, aerospace unit, battle armor, tank, or other
+     * skill based on whether the entity is a type of Mek, vessel, aerospace unit, battle armor, tank, or other
      * supported classes.</p>
      *
      * <p>Returns {@code true} if the user has the qualifying technical skill for the entity; {@code false} otherwise

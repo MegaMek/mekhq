@@ -27,7 +27,7 @@
  */
 package mekhq.gui.dialog;
 
-import megamek.client.ui.dialogs.AbstractIconChooserDialog;
+import megamek.client.ui.dialogs.iconChooser.AbstractIconChooserDialog;
 import mekhq.MekHQ;
 import mekhq.gui.panels.AbstractMHQIconChooser;
 

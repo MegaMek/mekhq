@@ -38,7 +38,7 @@ import java.util.ResourceBundle;
 
 import javax.swing.*;
 
-import megamek.client.ui.baseComponents.MMComboBox;
+import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.common.OffBoardDirection;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;

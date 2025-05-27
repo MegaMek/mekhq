@@ -27,7 +27,7 @@
  */
 package mekhq.gui.control;
 
-import static megamek.client.ui.swing.util.UIUtil.scaleForGUI;
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.utilities.MHQInternationalization.getFormattedText;
 
 import java.awt.BorderLayout;

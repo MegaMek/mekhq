@@ -40,8 +40,8 @@ import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JSpinner.NumberEditor;
 
-import megamek.client.ui.baseComponents.JDisableablePanel;
-import megamek.client.ui.baseComponents.MMComboBox;
+import megamek.client.ui.panels.JDisableablePanel;
+import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.enums.ValidationState;
 import megamek.common.EntityWeightClass;
 import megamek.common.annotations.Nullable;

@@ -49,9 +49,9 @@ import javax.swing.JPanel;
 import javax.swing.RowFilter;
 
 import megamek.client.ui.Messages;
-import megamek.client.ui.advancedsearch.MekSearchFilter;
-import megamek.client.ui.swing.UnitLoadingDialog;
-import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
+import megamek.client.ui.dialogs.advancedsearch.MekSearchFilter;
+import megamek.client.ui.dialogs.UnitLoadingDialog;
+import megamek.client.ui.dialogs.unitSelectorDialogs.AbstractUnitSelectorDialog;
 import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
 import megamek.common.ITechnology;
@@ -124,9 +124,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
     @Override
     protected JPanel createButtonsPanel() {
         JPanel panelButtons = new JPanel(new GridBagLayout());
-        //These buttons aren't always present - they all need to be initialized here to be manipulated in the state
-        // machine below. They will be added to the panel only if they are present in the current view state.
-        // addToCampaign and isGM control the view state.
+
         buttonSelect = new JButton();
         buttonSelectClose = new JButton();
         buttonClose = new JButton();
@@ -143,15 +141,12 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
             panelButtons.add(buttonBuy, new GridBagConstraints());
 
             if (campaign.isGM()) {
-                // This is only displayed in GM mode.
                 buttonAddGM.setText(Messages.getString("MekSelectorDialog.AddGM"));
                 buttonAddGM.setName("buttonAddGM");
                 buttonAddGM.addActionListener(evt -> addGM());
                 buttonAddGM.setEnabled(false);
                 panelButtons.add(buttonAddGM, new GridBagConstraints());
             }
-
-            // This closes the dialog. Should always be around.
             buttonClose = new JButton(Messages.getString("Close"));
             buttonClose.setName("buttonClose");
             buttonClose.addActionListener(this);
@@ -159,12 +154,10 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
             // This branch is for adding units where they will not be going to the hanger.
             buttonSelect.setText(Messages.getString("MekSelectorDialog.Add"));
             buttonSelect.setName("buttonAdd");
-            //the actual work will be done by whatever called this
             buttonSelect.addActionListener(evt -> select(false));
             buttonSelect.setEnabled(true);
             panelButtons.add(buttonSelect, new GridBagConstraints());
 
-            // This also closes the dialog. Different name in this state, though.
             buttonClose.setText(Messages.getString("Cancel"));
             buttonClose.setName("buttonCancel");
             buttonClose.addActionListener(evt -> {
@@ -306,38 +299,32 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
      * This function is to simplify logic in filterUnits. It runs a series of checks to determine if a unit is valid
      * within the current filtering context.
      *
-     * @param mek             The unit being evaluated.
-     * @param nClass          The current weight class selection
+     * @param unitSummary  The unit being evaluated.
+     * @param weightClassSelectorIndex The current weight class selection
      * @param tech            The current tech selection
      * @param techLevelMatch  whether the current tech selection matches
      * @param checkSupportVee Whether the special 'Support Vehicle' unit type was selected
-     * @param nUnit           Which unit type is currently selected
+     * @param unitTypeSelectorIndex  Which unit type is currently selected (Depends on the combo box order!)
      *
      * @return true if the unit passes all filters and allowed, false otherwise
      */
-    private boolean isAllowedUnit(MekSummary mek, int nClass, ITechnology tech, boolean techLevelMatch,
-          boolean checkSupportVee, int nUnit) {
-        // If year limits are enabled, check that the mek is available now
-        if (enableYearLimits && (mek.getYear() > allowedYear)) {
+    private boolean isAllowedUnit(MekSummary unitSummary, int weightClassSelectorIndex, ITechnology tech, boolean techLevelMatch,
+          boolean checkSupportVee, int unitTypeSelectorIndex) {
+        if (enableYearLimits && (unitSummary.getYear() > allowedYear)) {
             return false;
         }
-        // If a Clan mek, check that Clan meks are allowed to be purchased
-        if (!(campaign.getCampaignOptions().isAllowClanPurchases()) && TechConstants.isClan(mek.getType())) {
+        if (!(campaign.getCampaignOptions().isAllowClanPurchases()) && TechConstants.isClan(unitSummary.getType())) {
             return false;
         }
-        // if an IS mek, check that IS meks are allowed to be purchased
-        if (!(campaign.getCampaignOptions().isAllowISPurchases()) && !TechConstants.isClan(mek.getType())) {
+        if (!(campaign.getCampaignOptions().isAllowISPurchases()) && !TechConstants.isClan(unitSummary.getType())) {
             return false;
         }
-        // If canonOnly is set, is this mech Canon?
-        if (canonOnly && !mek.isCanon()) {
+        if (canonOnly && !unitSummary.isCanon()) {
             return false;
         }
-        // Does weight match current weight class filter?
-        if ((nClass != mek.getWeightClass()) && nClass != EntityWeightClass.SIZE) {
+        if ((weightClassSelectorIndex != unitSummary.getWeightClass()) && weightClassSelectorIndex != EntityWeightClass.SIZE) {
             return false;
         }
-        // If the tech level is selected, does the selected tech level match?
         if ((tech == null) || !campaign.isLegal(tech)) {
             return false;
         }
@@ -345,33 +332,27 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
             return false;
         }
 
-        // Filter by unit type and support vehicles:
-        // If a specific unit type is requested in the Unit Type dropdown (nUnit != -1):
-        //     - if checkSupportVee then use "Support Vehicle" as this is not a default typeName from Megamek
-        //     - If support vehicles should *not* be included, the unit must exactly match the requested type.
-        //     - If support vehicles *should* be included, the unit must be a support vehicle (regardless of type).
-        if (nUnit != -1) {
-            String unitTypeName = checkSupportVee ? "Support Vehicle" : UnitType.getTypeName(nUnit);
-            boolean isCorrectType = mek.getUnitType().equals(unitTypeName);
-            boolean isSupport = mek.isSupport();
+        // Filter by unit type and support vehicles (if applicable)
+        if (unitTypeSelectorIndex != -1) {
+            String unitTypeName = checkSupportVee ? "Support Vehicle" : UnitType.getTypeName(unitTypeSelectorIndex);
+            boolean isCorrectType = unitSummary.getUnitType().equals(unitTypeName);
+            boolean isSupport = unitSummary.isSupport();
             if ((!checkSupportVee && !isCorrectType) || (checkSupportVee && !isSupport)) {
                 return false;
             }
         }
 
         // if we have an advanced filter set, does it match that filter?
-        if ((searchFilter != null) && !MekSearchFilter.isMatch(mek, searchFilter)) {
+        if ((searchFilter != null) && !MekSearchFilter.isMatch(unitSummary, searchFilter)) {
             return false;
         }
 
-        // If a string is in the text filter, does the name match?
         if (!textFilter.getText().isBlank()) {
             String text = textFilter.getText();
-            return mek.getName().toLowerCase().contains(text.toLowerCase());
+            return unitSummary.getName().toLowerCase().contains(text.toLowerCase());
         }
-        // If all tests passed, then include this unit
-        return true;
 
+        return true;
     }
 
     @Override
@@ -385,8 +366,8 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         final Integer[] nTypes = new Integer[techLevels.size()];
         techLevels.toArray(nTypes);
 
-        final int nClass = comboWeight.getSelectedIndex();
-        final int nUnit = comboUnitType.getSelectedIndex() - 1;
+        final int weightClassSelectorIndex = comboWeight.getSelectedIndex();
+        final int unitTypeSelectorIndex = comboUnitType.getSelectedIndex() - 1;
         final boolean checkSupportVee = Messages.getString("MekSelectorDialog.SupportVee")
                                               .equals(comboUnitType.getSelectedItem());
         // If the current expression doesn't parse, don't update.
@@ -405,7 +386,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
                             break;
                         }
                     }
-                    return isAllowedUnit(mek, nClass, tech, techLevelMatch, checkSupportVee, nUnit);
+                    return isAllowedUnit(mek, weightClassSelectorIndex, tech, techLevelMatch, checkSupportVee, unitTypeSelectorIndex);
                 }
             };
         } catch (PatternSyntaxException ignored) {

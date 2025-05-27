@@ -28,7 +28,6 @@
 
 package mekhq.campaign.unit.actions;
 
-import megamek.client.ui.swing.RecentBoardList;
 import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;

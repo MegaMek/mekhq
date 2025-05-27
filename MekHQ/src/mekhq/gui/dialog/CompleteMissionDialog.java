@@ -27,7 +27,7 @@
  */
 package mekhq.gui.dialog;
 
-import megamek.client.ui.baseComponents.MMComboBox;
+import megamek.client.ui.comboBoxes.MMComboBox;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 

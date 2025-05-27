@@ -43,8 +43,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
 
-import megamek.client.ui.swing.util.FluffImageHelper;
-import megamek.client.ui.swing.util.UIUtil;
+import megamek.client.ui.util.FluffImageHelper;
+import megamek.client.ui.util.UIUtil;
 import megamek.common.Entity;
 import megamek.common.MekView;
 import megamek.common.TechConstants;

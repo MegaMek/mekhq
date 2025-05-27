@@ -107,7 +107,7 @@ import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
-import megamek.client.ui.swing.util.PlayerColour;
+import megamek.client.ui.util.PlayerColour;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
 import megamek.common.ITechnology.AvailabilityValue;
@@ -243,8 +243,8 @@ import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.universe.eras.Era;
 import mekhq.campaign.universe.eras.Eras;
-import mekhq.campaign.universe.factionStanding.BatchallFactions;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
+import mekhq.campaign.universe.factionStanding.PerformBatchall;
 import mekhq.campaign.universe.fameAndInfamy.FameAndInfamyController;
 import mekhq.campaign.universe.selectors.factionSelectors.AbstractFactionSelector;
 import mekhq.campaign.universe.selectors.factionSelectors.DefaultFactionSelector;
@@ -404,7 +404,6 @@ public class Campaign implements ITechManager {
     private final CampaignSummary campaignSummary;
     private final Quartermaster quartermaster;
     private StoryArc storyArc;
-    private final FameAndInfamyController regardAndInfamy;
     private BehaviorSettings autoResolveBehaviorSettings;
     private List<UUID> automatedMothballUnits;
     private int temporaryPrisonerCapacity;
@@ -504,7 +503,6 @@ public class Campaign implements ITechManager {
         campaignSummary = new CampaignSummary(this);
         quartermaster = new Quartermaster(this);
         fieldKitchenWithinCapacity = false;
-        regardAndInfamy = new FameAndInfamyController();
         autoResolveBehaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR;
         automatedMothballUnits = new ArrayList<>();
         temporaryPrisonerCapacity = DEFAULT_TEMPORARY_CAPACITY;
@@ -5018,23 +5016,25 @@ public class Campaign implements ITechManager {
         processNewDayATBScenarios();
 
         for (AtBContract contract : getActiveAtBContracts()) {
-            if (campaignOptions.isUseGenericBattleValue()) {
-                if (contract.getStartDate().equals(currentDay)) {
-                    String factionCode = contract.getEnemyCode();
-                    if (BatchallFactions.usesBatchalls(factionCode)) {
-                        if (contract.initiateBatchall(this)) {
-                            contract.setBatchallAccepted(true);
-                        } else {
-                            contract.setBatchallAccepted(false);
+            if (campaignOptions.isUseGenericBattleValue() &&
+                      !contract.getContractType().isGarrisonType() &&
+                      contract.getStartDate().equals(currentDay)) {
+                Faction faction = contract.getEnemy();
+                String factionCode = contract.getEnemyCode();
+                if (faction.performsBatchalls()) {
+                    PerformBatchall batchallDialog = new PerformBatchall(this,
+                          contract.getClanOpponent(),
+                          contract.getEnemyCode());
 
-                            if (campaignOptions.isTrackFactionStanding()) {
-                                List<String> reports = factionStandings.processRefusedBatchall(factionCode,
-                                      currentDay.getYear());
+                    boolean batchallAccepted = batchallDialog.isBatchallAccepted();
+                    contract.setBatchallAccepted(batchallAccepted);
 
-                                for (String report : reports) {
-                                    addReport(report);
-                                }
-                            }
+                    if (!batchallAccepted && campaignOptions.isTrackFactionStanding()) {
+                        List<String> reports = factionStandings.processRefusedBatchall(factionCode,
+                              currentDay.getYear());
+
+                        for (String report : reports) {
+                            addReport(report);
                         }
                     }
                 }
@@ -6571,8 +6571,9 @@ public class Campaign implements ITechManager {
         return new ArrayList<>();
     }
 
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public FameAndInfamyController getFameAndInfamy() {
-        return regardAndInfamy;
+        return null;
     }
 
     /**
@@ -6765,11 +6766,6 @@ public class Campaign implements ITechManager {
         // current story arc
         if (null != storyArc) {
             storyArc.writeToXml(writer, indent);
-        }
-
-        // Regard and Infamy
-        if (regardAndInfamy != null) {
-            regardAndInfamy.writeToXml(writer, indent);
         }
 
         // Markets

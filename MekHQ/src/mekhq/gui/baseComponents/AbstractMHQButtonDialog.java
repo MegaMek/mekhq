@@ -27,7 +27,7 @@
  */
 package mekhq.gui.baseComponents;
 
-import megamek.client.ui.baseComponents.AbstractButtonDialog;
+import megamek.client.ui.dialogs.buttonDialogs.AbstractButtonDialog;
 import mekhq.MekHQ;
 
 import javax.swing.*;

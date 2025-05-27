@@ -32,7 +32,7 @@ import java.io.PrintWriter;
 
 import org.w3c.dom.Node;
 
-import megamek.client.ui.swing.tileset.MMStaticDirectoryManager;
+import megamek.client.ui.tileset.MMStaticDirectoryManager;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Portrait;
 import megamek.logging.MMLogger;

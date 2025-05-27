@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 
-import megamek.client.ui.baseComponents.MMComboBox;
+import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.enums.ValidationState;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;

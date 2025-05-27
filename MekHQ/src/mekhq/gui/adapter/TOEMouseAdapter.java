@@ -48,7 +48,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.tree.TreePath;
 
-import megamek.client.ui.dialogs.CamoChooserDialog;
+import megamek.client.ui.dialogs.iconChooser.CamoChooserDialog;
 import megamek.common.EntityWeightClass;
 import megamek.common.GunEmplacement;
 import megamek.common.UnitType;

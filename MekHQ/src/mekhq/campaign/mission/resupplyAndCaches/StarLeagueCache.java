@@ -66,7 +66,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import megamek.client.ui.swing.util.UIUtil;
+import megamek.client.ui.util.UIUtil;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.MekFileParser;

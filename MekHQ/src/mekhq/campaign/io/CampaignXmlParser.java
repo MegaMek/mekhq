@@ -61,7 +61,7 @@ import megamek.Version;
 import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
-import megamek.client.ui.swing.util.PlayerColour;
+import megamek.client.ui.util.PlayerColour;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
@@ -131,7 +131,6 @@ import mekhq.campaign.unit.cleanup.EquipmentUnscramblerResult;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
-import mekhq.campaign.universe.fameAndInfamy.FameAndInfamyController;
 import mekhq.io.idReferenceClasses.PersonIdReference;
 import mekhq.module.atb.AtBEventProcessor;
 import mekhq.utilities.MHQXMLUtility;
@@ -328,8 +327,6 @@ public class CampaignXmlParser {
                     processSpecialAbilityNodes(campaign, workingNode, version);
                 } else if (nodeName.equalsIgnoreCase("storyArc")) {
                     processStoryArcNodes(campaign, workingNode, version);
-                } else if (nodeName.equalsIgnoreCase("fameAndInfamy")) {
-                    processFameAndInfamyNodes(campaign, workingNode);
                 } else if (nodeName.equalsIgnoreCase("kills")) {
                     processKillNodes(campaign, workingNode, version);
                 } else if (nodeName.equalsIgnoreCase("shoppingList")) {
@@ -1056,11 +1053,6 @@ public class CampaignXmlParser {
         StoryArc storyArc = StoryArc.parseFromXML(wn.getChildNodes(), retVal, version);
         MekHQ.registerHandler(storyArc);
         retVal.useStoryArc(storyArc, false);
-    }
-
-    private static void processFameAndInfamyNodes(Campaign relativeValue, Node workingNode) {
-        logger.info("Loading Fame and Infamy Nodes from XML...");
-        FameAndInfamyController.parseFromXML(workingNode.getChildNodes(), relativeValue);
     }
 
     /**

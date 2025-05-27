@@ -30,7 +30,7 @@ package mekhq.gui.utilities;
 import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
 
-import megamek.client.ui.swing.util.MenuScroller;
+import megamek.client.ui.util.MenuScroller;
 import mekhq.MHQConstants;
 
 public class JMenuHelpers {

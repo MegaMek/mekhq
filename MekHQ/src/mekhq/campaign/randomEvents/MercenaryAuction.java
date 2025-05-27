@@ -65,7 +65,7 @@ public class MercenaryAuction {
      * of the auction, applying the results to the campaign accordingly.</p>
      *
      * @param campaign The current {@link Campaign} instance where the auction takes place.
-     * @param unitType The type of unit being auctioned (e.g., `MECH`, `VEHICLE`).
+     * @param unitType The type of unit being auctioned (e.g., `MEK`, `VEHICLE`).
      */
     public MercenaryAuction(Campaign campaign, int requiredCombatTeams, StratconCampaignState campaignState,
           int unitType) {

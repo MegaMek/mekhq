@@ -44,8 +44,8 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
 import megamek.client.ui.models.XTableColumnModel;
-import megamek.client.ui.panels.EntityImagePanel;
-import megamek.client.ui.panes.EntityViewPane;
+import megamek.client.ui.dialogs.iconChooser.EntityImagePanel;
+import megamek.client.ui.dialogs.unitSelectorDialogs.EntityViewPane;
 import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
 import megamek.client.ui.preferences.JTabbedPanePreference;
 import megamek.client.ui.preferences.JTablePreference;

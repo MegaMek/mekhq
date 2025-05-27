@@ -48,7 +48,6 @@ import megamek.codeUtilities.MathUtility;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.factionStanding.BatchallFactions;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Document;
@@ -60,9 +59,6 @@ import org.w3c.dom.NodeList;
 public class FameAndInfamyController {
     private Map<String, Double> trackingFactions;
 
-    private static final ResourceBundle resources = ResourceBundle.getBundle(
-        "mekhq.resources.FameAndInfamy",
-        MekHQ.getMHQOptions().getLocale());
 
     private final static MMLogger logger = MMLogger.create(FameAndInfamyController.class);
 
@@ -72,6 +68,7 @@ public class FameAndInfamyController {
      * If any factions are missing from the provided map, they will be added with a default fame
      * value of 3.0 (or 0.0 if the provided faction uses Batchalls).
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public FameAndInfamyController() {
         this.trackingFactions = new HashMap<>();
         for (String shortName : getAllFactionShortnames()) {
@@ -88,6 +85,7 @@ public class FameAndInfamyController {
      *
      * @return A list of faction shortnames.
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public List<String> getAllFactionShortnames() {
         List<String> shortnames = new ArrayList<>();
 
@@ -126,6 +124,7 @@ public class FameAndInfamyController {
      * @param factionCode the code of the faction
      * @return the fame value for the faction
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public double getFameForFaction(String factionCode) {
         return trackingFactions.get(factionCode);
     }
@@ -137,6 +136,7 @@ public class FameAndInfamyController {
      * @param factionCode The code of the faction.
      * @return The fame level of the faction.
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public int getFameLevelForFaction(String factionCode) {
         return (int) round(trackingFactions.get(factionCode));
     }
@@ -148,6 +148,7 @@ public class FameAndInfamyController {
      * @param isInfamy Specifies whether to retrieve the fame name for infamy or fame.
      * @return The name of the fame level for the faction.
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public String getFameName(String factionCode, boolean isInfamy) {
         final int level = getFameLevelForFaction(factionCode);
 
@@ -182,6 +183,7 @@ public class FameAndInfamyController {
      * @param factionCode The code representing the faction.
      * @param fame The fame value to be set for the faction.
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public void setFameForFaction(String factionCode, double fame) {
         fame = MathUtility.clamp(fame, 0.0, 5.0);
 
@@ -195,6 +197,7 @@ public class FameAndInfamyController {
      * @param campaign The current campaign.
      * @param adjustment  The adjustment to be made to the faction's fame.
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public void updateFameForFaction(Campaign campaign, String factionCode, double adjustment) {
         int originalFame = getFameLevelForFaction(factionCode);
 
@@ -207,8 +210,8 @@ public class FameAndInfamyController {
         int newFame = getFameLevelForFaction(factionCode);
 
         if (originalFame != newFame) {
-            campaign.addReport(String.format(resources.getString("fameChangeReportInfamy.text"),
-                newFame, Factions.getInstance().getFaction(factionCode).getFullName(campaign.getGameYear())));
+            //             campaign.addReport(String.format(resources.getString("fameChangeReportInfamy.text"),
+            //                   newFame, Factions.getInstance().getFaction(factionCode).getFullName(campaign.getGameYear())));
         }
     }
 
@@ -218,6 +221,7 @@ public class FameAndInfamyController {
      * @param printWriter The {@link PrintWriter} used to write to the XML file.
      * @param indent      The indent level for formatting the XML file.
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public void writeToXml(PrintWriter printWriter, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(printWriter, indent++, "fameAndInfamy");
         for (String trackedFaction : trackingFactions.keySet()) {
@@ -237,6 +241,7 @@ public class FameAndInfamyController {
      * @param nodeList  The XML {@link NodeList} containing the faction fame values.
      * @param campaign  The {@link Campaign} object to update with the parsed fame values.
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public static void parseFromXML(final NodeList nodeList, Campaign campaign) {
         FameAndInfamyController fameAndInfamy = campaign.getFameAndInfamy();
         try {
