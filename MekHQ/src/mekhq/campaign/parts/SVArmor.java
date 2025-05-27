@@ -35,6 +35,7 @@ import java.util.Objects;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
+import megamek.common.ITechnology.TechRating;
 import megamek.common.TechAdvancement;
 import megamek.common.equipment.ArmorType;
 import megamek.logging.MMLogger;
@@ -51,14 +52,14 @@ public class SVArmor extends Armor {
     private static final MMLogger logger = MMLogger.create(SVArmor.class);
 
     private int bar;
-    private int techRating;
+    private TechRating techRating;
 
     /**
      * Constructor used during campaign deserialization
      */
 
     public SVArmor() {
-        this(2, RATING_D, 0, Entity.LOC_NONE, null);
+        this(2, TechRating.D, 0, Entity.LOC_NONE, null);
     }
 
     /**
@@ -70,11 +71,11 @@ public class SVArmor extends Armor {
      * @param loc        The location on the unit
      * @param campaign   The campaign instance
      */
-    public SVArmor(int bar, int techRating, int points, int loc, Campaign campaign) {
+    public SVArmor(int bar, TechRating techRating, int points, int loc, Campaign campaign) {
         super(0, EquipmentType.T_ARMOR_STANDARD, points, loc, false, false, campaign);
         this.bar = bar;
         this.techRating = techRating;
-        this.name = String.format("BAR %d armor (%s)", bar, ITechnology.getRatingName(techRating));
+        this.name = String.format("BAR %d armor (%s)", bar, techRating.getName());
     }
 
     public int getBAR() {
@@ -82,7 +83,7 @@ public class SVArmor extends Armor {
     }
 
     @Override
-    public int getTechRating() {
+    public TechRating getTechRating() {
         return techRating;
     }
 
@@ -192,7 +193,7 @@ public class SVArmor extends Armor {
     @Override
     protected void writeToXMLEnd(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bar", bar);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techRating", ITechnology.getRatingName(techRating));
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techRating", techRating.getName());
         super.writeToXMLEnd(pw, indent);
     }
 
@@ -207,12 +208,7 @@ public class SVArmor extends Armor {
                         bar = Integer.parseInt(wn.getTextContent());
                         break;
                     case "techRating":
-                        for (int r = 0; r < ratingNames.length; r++) {
-                            if (ratingNames[r].equals(wn.getTextContent())) {
-                                techRating = r;
-                                break;
-                            }
-                        }
+                        techRating = TechRating.fromName(wn.getTextContent());
                         break;
                 }
             } catch (Exception e) {

@@ -35,6 +35,12 @@ package mekhq.campaign.unit;
 
 import static java.lang.Math.ceil;
 import static java.lang.Math.max;
+import static megamek.common.EntityWeightClass.WEIGHT_HEAVY;
+import static megamek.common.EntityWeightClass.WEIGHT_LIGHT;
+import static megamek.common.EntityWeightClass.WEIGHT_MEDIUM;
+import static megamek.common.EntityWeightClass.WEIGHT_MEDIUM_SUPPORT;
+import static megamek.common.EntityWeightClass.WEIGHT_SMALL_SUPPORT;
+import static megamek.common.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
 import static megamek.common.MiscType.F_CARGO;
 import static mekhq.campaign.enums.CampaignTransportType.SHIP_TRANSPORT;
 import static mekhq.campaign.enums.CampaignTransportType.TACTICAL_TRANSPORT;
@@ -59,7 +65,7 @@ import java.util.stream.Collectors;
 import javax.swing.UIManager;
 
 import megamek.Version;
-import megamek.client.ui.swing.tileset.EntityImage;
+import megamek.client.ui.tileset.EntityImage;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.*;
 import megamek.common.CrewType;
@@ -96,6 +102,7 @@ import mekhq.campaign.parts.equipment.*;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.enums.CrewAssignmentState;
 import mekhq.campaign.unit.enums.TransporterType;
@@ -458,7 +465,8 @@ public class Unit implements ITechnology {
      *
      * @return transported units summary of that type, or null
      */
-    public @Nullable AbstractTransportedUnitsSummary getTransportedUnitsSummary(CampaignTransportType campaignTransportType) {
+    public @Nullable AbstractTransportedUnitsSummary getTransportedUnitsSummary(
+          CampaignTransportType campaignTransportType) {
         for (AbstractTransportedUnitsSummary transportedUnitSummary : transportedUnitsSummaries) {
             if (transportedUnitSummary.getClass() == campaignTransportType.getTransportedUnitsSummaryType()) {
                 return transportedUnitSummary;
@@ -2697,9 +2705,6 @@ public class Unit implements ITechnology {
                     } else {
                         retVal.setTransportAssignment(campaignTransportType, new TransportAssignment(new UnitRef(id)));
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("tacticalTransportedUnitId")) {
-                    // Legacy support for 50.03 tactical transport saves
-                    retVal.addTacticalTransportedUnit(new UnitRef(UUID.fromString(wn2.getTextContent())));
                 } else if (wn2.getNodeName().equalsIgnoreCase("transportedUnit")) {
                     NamedNodeMap attributes = wn2.getAttributes();
                     CampaignTransportType campaignTransportType = CampaignTransportType.valueOf(attributes.getNamedItem(
@@ -4491,7 +4496,10 @@ public class Unit implements ITechnology {
             // Tactics command bonus. This should actually reflect the unit's commander
             if (null != commander && commander.hasSkill(SkillType.S_TACTICS)) {
                 entity.getCrew()
-                      .setCommandBonus(commander.getSkill(SkillType.S_TACTICS).getTotalSkillLevel());
+                      .setCommandBonus(commander.getSkill(SkillType.S_TACTICS)
+                                             .getTotalSkillLevel(commander.getOptions(),
+                                                   commander.getATOWAttributes(),
+                                                   0));
             }
         }
 
@@ -4702,11 +4710,12 @@ public class Unit implements ITechnology {
 
         for (Person person : drivers) {
             PersonnelOptions options = person.getOptions();
+            Attributes attributes = person.getATOWAttributes();
             if (person.getHits() > 0 && !usesSoloPilot()) {
                 continue;
             }
             if (person.hasSkill(driveType)) {
-                sumPiloting += person.getSkill(driveType).getFinalSkillValue(options);
+                sumPiloting += person.getSkill(driveType).getFinalSkillValue(options, attributes);
                 nDrivers++;
             } else if (entity instanceof Infantry) {
                 // For infantry, we need to assign an 8 if they have no anti-mek skill
@@ -4715,7 +4724,7 @@ public class Unit implements ITechnology {
             }
 
             if (entity instanceof Tank && Compute.getFullCrewSize(entity) == 1 && person.hasSkill(gunType)) {
-                sumGunnery += person.getSkill(gunType).getFinalSkillValue(options);
+                sumGunnery += person.getSkill(gunType).getFinalSkillValue(options, attributes);
                 nGunners++;
             }
             if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
@@ -4724,16 +4733,17 @@ public class Unit implements ITechnology {
         }
         for (Person person : gunners) {
             PersonnelOptions options = person.getOptions();
+            Attributes attributes = person.getATOWAttributes();
             if (person.getHits() > 0 && !usesSoloPilot()) {
                 continue;
             }
             if (person.hasSkill(gunType)) {
-                sumGunnery += person.getSkill(gunType).getFinalSkillValue(options);
+                sumGunnery += person.getSkill(gunType).getFinalSkillValue(options, attributes);
                 nGunners++;
             }
             if (person.hasSkill(SkillType.S_ARTILLERY) &&
-                      person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(options) < artillery) {
-                artillery = person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(options);
+                      person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(options, attributes) < artillery) {
+                artillery = person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(options, attributes);
             }
             if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
                 sumGunnery += person.getInjuryModifiers(false);
@@ -4861,20 +4871,21 @@ public class Unit implements ITechnology {
         int artillery = 13;
 
         PersonnelOptions options = pilot.getOptions();
+        Attributes attributes = pilot.getATOWAttributes();
         if (pilot.hasSkill(SkillType.S_PILOT_MEK)) {
-            pilotingMek = pilot.getSkill(SkillType.S_PILOT_MEK).getFinalSkillValue(options);
+            pilotingMek = pilot.getSkill(SkillType.S_PILOT_MEK).getFinalSkillValue(options, attributes);
         }
         if (pilot.hasSkill(SkillType.S_GUN_MEK)) {
-            gunneryMek = pilot.getSkill(SkillType.S_GUN_MEK).getFinalSkillValue(options);
+            gunneryMek = pilot.getSkill(SkillType.S_GUN_MEK).getFinalSkillValue(options, attributes);
         }
         if (pilot.hasSkill(SkillType.S_PILOT_AERO)) {
-            pilotingAero = pilot.getSkill(SkillType.S_PILOT_AERO).getFinalSkillValue(options);
+            pilotingAero = pilot.getSkill(SkillType.S_PILOT_AERO).getFinalSkillValue(options, attributes);
         }
         if (pilot.hasSkill(SkillType.S_GUN_AERO)) {
-            gunneryAero = pilot.getSkill(SkillType.S_GUN_AERO).getFinalSkillValue(options);
+            gunneryAero = pilot.getSkill(SkillType.S_GUN_AERO).getFinalSkillValue(options, attributes);
         }
         if (pilot.hasSkill(SkillType.S_ARTILLERY)) {
-            artillery = pilot.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(options);
+            artillery = pilot.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(options, attributes);
         }
 
         if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
@@ -4885,8 +4896,8 @@ public class Unit implements ITechnology {
             artillery += pilot.getInjuryModifiers(false);
         }
         LAMPilot crew = (LAMPilot) entity.getCrew();
-        crew.setPiloting(Math.min(max(pilotingMek, 0), 8));
-        crew.setGunnery(Math.min(max(gunneryMek, 0), 8));
+        crew.setPiloting(Math.min(max(pilotingMek, 0), 8), crew.getCrewType().getPilotPos());
+        crew.setGunnery(Math.min(max(gunneryMek, 0), 8), crew.getCrewType().getGunnerPos());
         crew.setPilotingAero(Math.min(max(pilotingAero, 0), 8));
         crew.setGunneryAero(Math.min(max(gunneryAero, 0), 8));
         entity.getCrew().setArtillery(Math.min(max(artillery, 0), 8), 0);
@@ -4904,6 +4915,7 @@ public class Unit implements ITechnology {
      */
     private void assignToCrewSlot(Person person, int slot, String gunType, String driveType) {
         PersonnelOptions options = person.getOptions();
+        Attributes attributes = person.getATOWAttributes();
         entity.getCrew().setName(person.getFullTitle(), slot);
         entity.getCrew().setNickname(person.getCallsign(), slot);
         entity.getCrew().setGender(person.getGender(), slot);
@@ -4914,17 +4926,17 @@ public class Unit implements ITechnology {
         int artillery = 7;
         int piloting = 8;
         if (person.hasSkill(gunType)) {
-            gunnery = person.getSkill(gunType).getFinalSkillValue(options);
+            gunnery = person.getSkill(gunType).getFinalSkillValue(options, attributes);
         }
         if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
             gunnery += person.getInjuryModifiers(false);
         }
         if (person.hasSkill(driveType)) {
-            piloting = person.getSkill(driveType).getFinalSkillValue(options);
+            piloting = person.getSkill(driveType).getFinalSkillValue(options, attributes);
         }
         if (person.hasSkill(SkillType.S_ARTILLERY) &&
-                  person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(options) < artillery) {
-            artillery = person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(options);
+                  person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(options, attributes) < artillery) {
+            artillery = person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(options, attributes);
         }
         entity.getCrew().setPiloting(Math.min(max(piloting, 0), 8), slot);
         entity.getCrew().setGunnery(Math.min(max(gunnery, 0), 8), slot);
@@ -5313,7 +5325,7 @@ public class Unit implements ITechnology {
     private void ensurePersonIsRegistered(final Person person) {
         Objects.requireNonNull(person);
         if (getCampaign().getPerson(person.getId()) == null) {
-            getCampaign().recruitPerson(person, person.getPrisonerStatus(), true, false);
+            getCampaign().recruitPerson(person, person.getPrisonerStatus(), true, false, true);
             logger.debug("The person {} added this unit {}, was not in the campaign.", person.getFullName(), getName());
         }
     }
@@ -5931,19 +5943,19 @@ public class Unit implements ITechnology {
         return null;
     }
 
-    public int getAvailability(int era) {
+    public AvailabilityValue getAvailability(int era) {
         // take the highest availability of all parts
-        int availability = EquipmentType.RATING_A;
+        AvailabilityValue availability = AvailabilityValue.A;
         for (Part p : parts) {
-            int newAvailability = p.getAvailability();
+            AvailabilityValue newAvailability = p.getAvailability();
             // Taharqa: it's not clear whether a unit should really be considered extinct when its parts are extinct
             // as many probably outlive the production of parts it would be better to just use the unit extinction
             // date itself, but given that there are no canon extinction/re-intro dates for units, we will use this
             // instead
             if (p.isExtinct(getCampaign().getGameYear(), getCampaign().getFaction().isClan())) {
-                newAvailability = EquipmentType.RATING_X;
+                newAvailability = AvailabilityValue.X;
             }
-            if (newAvailability > availability) {
+            if (newAvailability.isBetterThan(availability)) {
                 availability = newAvailability;
             }
         }
@@ -5973,59 +5985,125 @@ public class Unit implements ITechnology {
         return daysToArrival == 0;
     }
 
+    /**
+     * Calculates the maintenance time required for the associated entity, factoring in its type, weight class, and the
+     * maintenance multiplier.
+     *
+     * <p>The method determines the time in minutes needed for maintenance based on the specific class of the entity
+     * (such as Mek, ProtoMek, BattleArmor, Tank, SmallCraft, etc.) and applies a multiplier for any necessary
+     * adjustments. Entity types not specifically handled by this method are considered self-maintaining and return 0.
+     * </p>
+     *
+     * @return the total maintenance time in minutes required per day, or 0 if no maintenance is needed
+     */
     public int getMaintenanceTime() {
-        int retVal = 0;
-
-        if (getEntity() instanceof Mek) {
-            retVal = switch (getEntity().getWeightClass()) {
-                case EntityWeightClass.WEIGHT_ULTRA_LIGHT -> 30;
-                case EntityWeightClass.WEIGHT_LIGHT -> 45;
-                case EntityWeightClass.WEIGHT_MEDIUM -> 60;
-                case EntityWeightClass.WEIGHT_HEAVY -> 75;
-                default -> 90;
-            };
-        } else if (getEntity() instanceof ProtoMek) {
-            retVal = 20;
-        } else if (getEntity() instanceof BattleArmor) {
-            retVal = 10;
-        } else if (getEntity() instanceof ConvFighter) {
-            retVal = 45;
-        } else if (getEntity() instanceof SmallCraft && !(getEntity() instanceof Dropship)) {
-            retVal = 90;
-        } else if (getEntity() instanceof Aero &&
-                         !(getEntity() instanceof Dropship) &&
-                         !(getEntity() instanceof Jumpship)) {
-            retVal = switch (getEntity().getWeightClass()) {
-                case EntityWeightClass.WEIGHT_LIGHT -> 45;
-                case EntityWeightClass.WEIGHT_MEDIUM -> 60;
-                default -> 75;
-            };
-        } else if (getEntity() instanceof SupportTank) {
-            retVal = switch (getEntity().getWeightClass()) {
-                case EntityWeightClass.WEIGHT_SMALL_SUPPORT -> 20;
-                case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT -> 35;
-                default -> 100;
-            };
-        } else if (getEntity() instanceof SupportVTOL) {
-            retVal = switch (getEntity().getWeightClass()) {
-                case EntityWeightClass.WEIGHT_SMALL_SUPPORT -> 20;
-                case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT -> 35;
-                default -> 100;
-            };
-        } else if (getEntity() instanceof Tank) {
-            retVal = switch (getEntity().getWeightClass()) {
-                case EntityWeightClass.WEIGHT_LIGHT -> 30;
-                case EntityWeightClass.WEIGHT_MEDIUM -> 50;
-                case EntityWeightClass.WEIGHT_HEAVY -> 75;
-                case EntityWeightClass.WEIGHT_ASSAULT -> 90;
-                default -> 120;
+        if (entity instanceof Mek) {
+            return switch (entity.getWeightClass()) {
+                case WEIGHT_ULTRA_LIGHT -> 30 * maintenanceMultiplier;
+                case WEIGHT_LIGHT -> 45 * maintenanceMultiplier;
+                case WEIGHT_MEDIUM -> 60 * maintenanceMultiplier;
+                case WEIGHT_HEAVY -> 75 * maintenanceMultiplier;
+                default -> 90 * maintenanceMultiplier;
             };
         }
 
-        // default value for retVal is zero, so anything that didn't fall into one of
-        // the
-        // above classifications is self-maintaining, meaning zero.
-        return retVal * getMaintenanceMultiplier();
+        if (entity instanceof ProtoMek) {
+            return 20 * maintenanceMultiplier;
+        }
+
+        if (entity instanceof BattleArmor battleArmor) {
+            return 10 * battleArmor.getSquadSize() * maintenanceMultiplier;
+        }
+
+        if (entity instanceof Infantry) {
+            return 0;
+        }
+
+        // This should remain commented out until we have implemented infantry-as-techs
+        //        if (entity instanceof Infantry infantry) {
+        //            if (infantry.getMovementMode().isJumpInfantry()) {
+        //                return 30 * maintenanceMultiplier;
+        //            }
+        //
+        //            if (infantry.getMovementMode().isTrackedWheeledOrHover()) {
+        //                return 30 * maintenanceMultiplier;
+        //            }
+        //
+        //            if (infantry.getMovementMode().isMotorizedInfantry()) {
+        //                return 20 * maintenanceMultiplier;
+        //            }
+        //
+        //            if (infantry.getMovementMode().isVTOL()) {
+        //                return 40 * maintenanceMultiplier;
+        //            }
+        //
+        //            if (infantry.getMovementMode().isSubmarine()) {
+        //                return 20 * maintenanceMultiplier;
+        //            }
+        //
+        //            return 10 * maintenanceMultiplier;
+        //        }
+
+        if (entity instanceof SupportTank || entity instanceof SupportVTOL) {
+            return switch (entity.getWeightClass()) {
+                case WEIGHT_SMALL_SUPPORT -> 20 * maintenanceMultiplier;
+                case WEIGHT_MEDIUM_SUPPORT -> 35 * maintenanceMultiplier;
+                default -> 100 * maintenanceMultiplier;
+            };
+        }
+
+        if (entity instanceof Tank) {
+            return switch (entity.getWeightClass()) {
+                case WEIGHT_LIGHT -> 30 * maintenanceMultiplier;
+                case WEIGHT_MEDIUM -> 50 * maintenanceMultiplier;
+                case WEIGHT_HEAVY -> 75 * maintenanceMultiplier;
+                case EntityWeightClass.WEIGHT_ASSAULT -> 90 * maintenanceMultiplier;
+                default -> 120 * maintenanceMultiplier;
+            };
+        }
+
+        if (entity instanceof ConvFighter) {
+            return 45 * maintenanceMultiplier;
+        }
+
+        if (entity instanceof AeroSpaceFighter) {
+            return switch (entity.getWeightClass()) {
+                case WEIGHT_LIGHT -> 45 * maintenanceMultiplier;
+                case WEIGHT_MEDIUM -> 60 * maintenanceMultiplier;
+                default -> 75 * maintenanceMultiplier;
+            };
+        }
+
+        if (entity instanceof Dropship) {
+            return 180 * maintenanceMultiplier;
+        }
+
+        if (entity instanceof SmallCraft) {
+            return 90 * maintenanceMultiplier;
+        }
+
+        if (entity instanceof Warship || entity instanceof SpaceStation) {
+            return 480 * maintenanceMultiplier;
+        }
+
+        // At time of writing current maintenance errata states that maintenance time is only deducted on the day in
+        // which maintenance takes place. However, these two unit times have maintenance time requirements that
+        // exceed the maximum of 480 minutes a team has in a single day. Making these maintenance times impossible.
+        // While we wait for rules confirmation we have instead set the time deduction to be 480 minutes, or a full day.
+        //        if (entity instanceof SpaceStation) {
+        //            return 1140 * maintenanceMultiplier;
+        //        }
+        //
+        //        if (entity instanceof Warship) {
+        //            return 1440 * maintenanceMultiplier;
+        //        }
+
+        if (entity instanceof Jumpship) {
+            return 360 * maintenanceMultiplier;
+        }
+
+        // Anything that didn't fall into one of the above classifications is self-maintaining, meaning zero.
+        return 0;
     }
 
     public void incrementDaysSinceMaintenance(Campaign campaign, boolean maintained, int astechs) {
@@ -6334,17 +6412,17 @@ public class Unit implements ITechnology {
         if (getCampaign().getCampaignOptions().isUseExtendedPartsModifier()) {
             Engine engine = entity.getEngine();
             int currentYear = getCampaign().getGameYear();
-            int rating = getTechRating();
+            TechRating rating = getTechRating();
             if (((currentYear > 2859) && (currentYear < 3040)) &&
                       (!getCampaign().getFaction().isClan() && !getCampaign().getFaction().isComStar())) {
-                if (rating > EquipmentType.RATING_D) {
+                if (rating.isBetterThan(TechRating.D)) {
                     partsCost = partsCost.multipliedBy(5.0);
                 }
             }
 
-            if (rating == EquipmentType.RATING_E) {
+            if (rating.equals(TechRating.E)) {
                 partsCost = partsCost.multipliedBy(1.1);
-            } else if (rating == EquipmentType.RATING_F) {
+            } else if (rating.equals(TechRating.F)) {
                 partsCost = partsCost.multipliedBy(1.25);
             }
 
@@ -6544,9 +6622,9 @@ public class Unit implements ITechnology {
         return getTechProgression(getCampaign().getTechFaction());
     }
 
-    private ITechnology getTechProgression(int techFaction) {
+    private ITechnology getTechProgression(ITechnology.Faction techFaction) {
         // If useFactionIntroDate is false, use the base data that was calculated for the Entity when it was loaded.
-        if (techFaction < 0) {
+        if (techFaction.equals(ITechnology.Faction.NONE)) {
             return getEntity();
         }
         // First check whether it has already been calculated for this faction, but don't wait if it hasn't.
@@ -6569,7 +6647,7 @@ public class Unit implements ITechnology {
     }
 
     @Override
-    public int getTechBase() {
+    public TechBase getTechBase() {
         return getTechProgression().getTechBase();
     }
 
@@ -6604,37 +6682,37 @@ public class Unit implements ITechnology {
     }
 
     @Override
-    public int getTechRating() {
+    public TechRating getTechRating() {
         return getTechProgression().getTechRating();
     }
 
     @Override
-    public int getBaseAvailability(int era) {
+    public AvailabilityValue getBaseAvailability(Era era) {
         return getTechProgression().getBaseAvailability(era);
     }
 
     @Override
-    public int getIntroductionDate(boolean clan, int faction) {
+    public int getIntroductionDate(boolean clan, ITechnology.Faction faction) {
         return getTechProgression(faction).getIntroductionDate(clan, faction);
     }
 
     @Override
-    public int getPrototypeDate(boolean clan, int faction) {
+    public int getPrototypeDate(boolean clan, ITechnology.Faction faction) {
         return getTechProgression(faction).getPrototypeDate(clan, faction);
     }
 
     @Override
-    public int getProductionDate(boolean clan, int faction) {
+    public int getProductionDate(boolean clan, ITechnology.Faction faction) {
         return getTechProgression(faction).getProductionDate(clan, faction);
     }
 
     @Override
-    public int getExtinctionDate(boolean clan, int faction) {
+    public int getExtinctionDate(boolean clan, ITechnology.Faction faction) {
         return getTechProgression(faction).getExtinctionDate(clan, faction);
     }
 
     @Override
-    public int getReintroductionDate(boolean clan, int faction) {
+    public int getReintroductionDate(boolean clan, ITechnology.Faction faction) {
         return getTechProgression(faction).getReintroductionDate(clan, faction);
     }
 
@@ -6654,7 +6732,7 @@ public class Unit implements ITechnology {
         }
     }
 
-    public SimpleTechLevel getSimpleTechLevel(int year, boolean clan, int faction) {
+    public SimpleTechLevel getSimpleTechLevel(int year, boolean clan, ITechnology.Faction faction) {
         if (getCampaign().useVariableTechLevel()) {
             return getSimpleLevel(year, clan, faction);
         } else {
@@ -6668,7 +6746,7 @@ public class Unit implements ITechnology {
     }
 
     @Override
-    public int calcYearAvailability(int year, boolean clan, int faction) {
+    public AvailabilityValue calcYearAvailability(int year, boolean clan, ITechnology.Faction faction) {
         return getTechProgression(faction).calcYearAvailability(year, clan);
     }
 

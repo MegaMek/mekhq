@@ -47,13 +47,14 @@ import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.swing.*;
 
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
-import megamek.client.ui.baseComponents.MMComboBox;
-import megamek.client.ui.swing.util.UIUtil;
+import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
@@ -62,6 +63,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.AgeGroup;
 import mekhq.campaign.personnel.enums.FamilialRelationshipDisplayLevel;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.PersonnelRoleSubType;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
@@ -195,6 +197,7 @@ public class BiographyTab {
 
     private CampaignOptionsHeaderPanel nameAndPortraitGenerationHeader;
     private JPanel pnlRandomPortrait;
+    private List<PersonnelRole> personnelRoles;
     private JCheckBox[] chkUsePortrait;
     private JButton btnEnableAllPortraits;
     private JButton btnDisableAllPortraits;
@@ -261,7 +264,9 @@ public class BiographyTab {
         chkAllowDuplicatePortraits = new JCheckBox();
 
         pnlRandomPortrait = new JPanel();
-        chkUsePortrait = new JCheckBox[1]; // We're going to properly initialize this later
+        personnelRoles = PersonnelRole.getCombatRoles();
+        personnelRoles.addAll(PersonnelRole.getSupportRoles());
+        chkUsePortrait = new JCheckBox[personnelRoles.size() + 1]; // We're going to properly initialize this later
         btnEnableAllPortraits = new JButton();
         btnDisableAllPortraits = new JButton();
     }
@@ -1366,9 +1371,7 @@ public class BiographyTab {
      */
     private JPanel createRandomPortraitPanel() {
         // Contents
-        final PersonnelRole[] personnelRoles = PersonnelRole.values();
-
-        chkUsePortrait = new JCheckBox[personnelRoles.length];
+        chkUsePortrait = new JCheckBox[personnelRoles.size() + 1];
 
         btnEnableAllPortraits = new CampaignOptionsButton("EnableAllPortraits");
         btnEnableAllPortraits.addActionListener(evt -> {
@@ -1389,7 +1392,7 @@ public class BiographyTab {
               "DisableAllPortraits"));
 
         // Layout the Panel
-        JPanel panel = new JPanel(new GridLayout((int) Math.ceil((personnelRoles.length + 2) / 5.0), 5));
+        JPanel panel = new JPanel(new GridLayout((int) Math.ceil((personnelRoles.size() + 3) / 5.0), 5));
         panel.setBorder(BorderFactory.createTitledBorder(String.format(String.format("<html>%s</html>",
               getTextAt(getCampaignOptionsResourceBundle(), "lblRandomPortraitPanel.text")))));
 
@@ -1398,7 +1401,7 @@ public class BiographyTab {
 
         // Add remaining checkboxes
         JCheckBox jCheckBox;
-        for (final PersonnelRole role : PersonnelRole.values()) {
+        for (final PersonnelRole role : personnelRoles) {
             jCheckBox = new JCheckBox(role.toString());
             jCheckBox.addMouseListener(createTipPanelUpdater(nameAndPortraitGenerationHeader,
                   null,
@@ -1406,6 +1409,13 @@ public class BiographyTab {
             panel.add(jCheckBox);
             chkUsePortrait[role.ordinal()] = jCheckBox;
         }
+
+        jCheckBox = new JCheckBox(PersonnelRoleSubType.CIVILIAN.toString());
+        jCheckBox.addMouseListener(createTipPanelUpdater(nameAndPortraitGenerationHeader,
+              null,
+              getTextAt(getCampaignOptionsResourceBundle(), "lblCivilian.tooltip")));
+        panel.add(jCheckBox);
+        chkUsePortrait[personnelRoles.size()] = jCheckBox;
 
         return panel;
     }
@@ -1642,7 +1652,14 @@ public class BiographyTab {
         options.setAssignPortraitOnRoleChange(chkAssignPortraitOnRoleChange.isSelected());
         options.setAllowDuplicatePortraits(chkAllowDuplicatePortraits.isSelected());
         RandomNameGenerator.getInstance().setChosenFaction(comboFactionNames.getSelectedItem());
+
         for (int i = 0; i < chkUsePortrait.length; i++) {
+            if (i == chkUsePortrait.length - 1) {
+                for (PersonnelRole role : PersonnelRole.getCivilianRoles()) {
+                    options.setUsePortraitForRole(role.ordinal(), chkUsePortrait[i].isSelected());
+                }
+                continue;
+            }
             options.setUsePortraitForRole(i, chkUsePortrait[i].isSelected());
         }
 

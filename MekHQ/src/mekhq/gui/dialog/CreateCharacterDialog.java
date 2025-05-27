@@ -46,6 +46,8 @@ import static mekhq.campaign.personnel.Person.MINIMUM_WEALTH;
 import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
 import static mekhq.campaign.personnel.skills.Skill.getCountDownMaxValue;
 import static mekhq.campaign.personnel.skills.Skill.getCountUpMaxValue;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeInterviewersNotes;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
 import static mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk.personalityQuirksSortedAlphabetically;
 
 import java.awt.BorderLayout;
@@ -71,12 +73,12 @@ import javax.swing.*;
 
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
-import megamek.client.ui.baseComponents.MMComboBox;
-import megamek.client.ui.dialogs.PortraitChooserDialog;
+import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.dialogs.iconChooser.PortraitChooserDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.client.ui.swing.DialogOptionComponent;
-import megamek.client.ui.swing.DialogOptionListener;
+import megamek.client.ui.panels.DialogOptionComponentYPanel;
+import megamek.client.ui.clientGUI.DialogOptionListener;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.Crew;
 import megamek.common.EquipmentType;
@@ -97,7 +99,6 @@ import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.randomEvents.personalities.PersonalityController;
 import mekhq.campaign.randomEvents.personalities.enums.Aggression;
 import mekhq.campaign.randomEvents.personalities.enums.Ambition;
 import mekhq.campaign.randomEvents.personalities.enums.Greed;
@@ -135,7 +136,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
     private Portrait portrait;
 
-    private List<DialogOptionComponent> optionComps = new ArrayList<>();
+    private List<DialogOptionComponentYPanel> optionComps = new ArrayList<>();
     private final Map<String, JSpinner> skillLvls = new Hashtable<>();
     private final Map<String, JSpinner> skillBonus = new Hashtable<>();
     private final Map<String, JLabel> skillValues = new Hashtable<>();
@@ -1052,8 +1053,8 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
                 // Allow factions between the person's birthday
                 // and when they were recruited, or now if we're
                 // not tracking recruitment.
-                int endYear = person.getRecruitment() != null ?
-                                    Math.min(person.getRecruitment().getYear(), year) :
+                int endYear = person.getJoinedCampaign() != null ?
+                                    Math.min(person.getJoinedCampaign().getYear(), year) :
                                     year;
                 if (faction.validBetween(person.getDateOfBirth().getYear(), endYear)) {
                     factionsModel.addElement(faction);
@@ -1168,7 +1169,10 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             lblName = new JLabel(type);
             lblValue = new JLabel();
             if (person.hasSkill(type)) {
-                lblValue.setText(person.getSkill(type).toString(person.getOptions(), person.getReputation()));
+                lblValue.setText(person.getSkill(type)
+                                       .toString(person.getOptions(),
+                                             person.getATOWAttributes(),
+                                             person.getReputation()));
             } else {
                 lblValue.setText("-");
             }
@@ -1288,7 +1292,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             }
         }
         IOption option;
-        for (final DialogOptionComponent newVar : optionComps) {
+        for (final DialogOptionComponentYPanel newVar : optionComps) {
             option = newVar.getOption();
             if ((newVar.getValue().equals("None"))) {
                 person.getOptions().getOption(option.getName()).setValue("None");
@@ -1350,7 +1354,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
     }
 
     private void addOption(IOption option, GridBagLayout gridBag, GridBagConstraints c) {
-        DialogOptionComponent optionComp = new DialogOptionComponent(this, option, true);
+        DialogOptionComponentYPanel optionComp = new DialogOptionComponentYPanel(this, option, true);
 
         if (OptionsConstants.GUNNERY_WEAPON_SPECIALIST.equals(option.getName())) {
             optionComp.addValue(Crew.SPECIAL_NONE);
@@ -1408,7 +1412,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
     private void setOptions() {
         IOption option;
-        for (final DialogOptionComponent newVar : optionComps) {
+        for (final DialogOptionComponentYPanel newVar : optionComps) {
             option = newVar.getOption();
             if ((newVar.getValue().equals("None"))) {
                 person.getOptions().getOption(option.getName()).setValue("None");
@@ -1432,7 +1436,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         }
 
         //now figure out SPA costs
-        for (final DialogOptionComponent newVar : optionComps) {
+        for (final DialogOptionComponentYPanel newVar : optionComps) {
             if (!newVar.isDefaultValue()) {
                 SpecialAbility spa = SpecialAbility.getOption(newVar.getOption().getName());
                 totalCost = totalCost + spa.getCost();
@@ -1475,12 +1479,12 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
     //region Listeners
     @Override
-    public void optionClicked(DialogOptionComponent arg0, IOption arg1, boolean arg2) {
+    public void optionClicked(DialogOptionComponentYPanel arg0, IOption arg1, boolean arg2) {
         refreshXpSpent();
     }
 
     @Override
-    public void optionSwitched(DialogOptionComponent comp, IOption option, int i) {
+    public void optionSwitched(DialogOptionComponentYPanel comp, IOption option, int i) {
         refreshXpSpent();
     }
 
@@ -1680,7 +1684,8 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             person.setSocial(comboSocial.getSelectedItem());
             person.setPersonalityQuirk(comboPersonalityQuirk.getSelectedItem());
             person.setReasoning(comboReasoning.getSelectedItem());
-            PersonalityController.writePersonalityDescription(person);
+            writePersonalityDescription(person);
+            writeInterviewersNotes(person);
         }
 
         person.setPortrait(portrait);

@@ -54,13 +54,18 @@ import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
-import megamek.client.ui.baseComponents.MMComboBox;
+import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketMethod;
+import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
+import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
+import mekhq.campaign.market.personnelMarket.markets.PersonnelMarketCamOpsRevised;
+import mekhq.campaign.market.personnelMarket.markets.PersonnelMarketCamOpsStrict;
+import mekhq.campaign.market.personnelMarket.markets.PersonnelMarketMekHQ;
 import mekhq.campaign.personnel.skills.Skills;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
@@ -96,15 +101,24 @@ public class MarketsTab {
     //start Personnel Market
     private CampaignOptionsHeaderPanel personnelMarketHeader;
     private JPanel pnlPersonnelMarketGeneralOptions;
-    private JLabel lblPersonnelMarketType;
-    private MMComboBox<String> comboPersonnelMarketType;
+    private JLabel lblPersonnelMarketStyle;
+    private MMComboBox<PersonnelMarketStyle> comboPersonnelMarketStyle;
     private JCheckBox chkPersonnelMarketReportRefresh;
     private JCheckBox chkUsePersonnelHireHiringHallOnly;
+    @Deprecated(since = "0.50.06", forRemoval = false)
+    private JLabel lblPersonnelMarketType;
+    @Deprecated(since = "0.50.06", forRemoval = false)
+    private MMComboBox<String> comboPersonnelMarketType;
 
+    @Deprecated(since = "0.50.06", forRemoval = false)
     private JPanel pnlRemovalTargets;
+    @Deprecated(since = "0.50.06", forRemoval = false)
     private JLabel lblPersonnelMarketDylansWeight;
+    @Deprecated(since = "0.50.06", forRemoval = false)
     private JSpinner spnPersonnelMarketDylansWeight;
+    @Deprecated(since = "0.50.06", forRemoval = false)
     private Map<SkillLevel, JLabel> lblPersonnelMarketRandomRemovalTargets;
+    @Deprecated(since = "0.50.06", forRemoval = false)
     private Map<SkillLevel, JSpinner> spnPersonnelMarketRandomRemovalTargets;
     //end Personnel Market
 
@@ -192,6 +206,8 @@ public class MarketsTab {
         pnlPersonnelMarketGeneralOptions = new JPanel();
         lblPersonnelMarketType = new JLabel();
         comboPersonnelMarketType = new MMComboBox<>("comboPersonnelMarketType", getPersonnelMarketTypeOptions());
+        lblPersonnelMarketStyle = new JLabel();
+        comboPersonnelMarketStyle = new MMComboBox<>("comboPersonnelMarketStyle", PersonnelMarketStyle.values());
         chkPersonnelMarketReportRefresh = new JCheckBox();
         chkUsePersonnelHireHiringHallOnly = new JCheckBox();
 
@@ -210,6 +226,7 @@ public class MarketsTab {
      *
      * @return A {@link DefaultComboBoxModel} containing the personnel market type options.
      */
+    @Deprecated(since = "0.50.06", forRemoval = false)
     private static DefaultComboBoxModel<String> getPersonnelMarketTypeOptions() {
         final DefaultComboBoxModel<String> personnelMarketTypeModel = new DefaultComboBoxModel<>();
         for (final PersonnelMarketMethod method : PersonnelMarketServiceManager.getInstance().getAllServices(true)) {
@@ -265,6 +282,8 @@ public class MarketsTab {
      */
     private JPanel createPersonnelMarketGeneralOptionsPanel() {
         // Contents
+        lblPersonnelMarketStyle = new CampaignOptionsLabel("PersonnelMarketStyle");
+
         lblPersonnelMarketType = new CampaignOptionsLabel("PersonnelMarketType");
         lblPersonnelMarketType.addMouseListener(createTipPanelUpdater(personnelMarketHeader, "PersonnelMarketType"));
         comboPersonnelMarketType = new MMComboBox<>("comboPersonnelMarketType", getPersonnelMarketTypeOptions());
@@ -292,6 +311,12 @@ public class MarketsTab {
         layout.gridx = 0;
         layout.gridy = 0;
         layout.gridwidth = 1;
+        panel.add(lblPersonnelMarketStyle, layout);
+        layout.gridx++;
+        panel.add(comboPersonnelMarketStyle, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
         panel.add(lblPersonnelMarketType, layout);
         layout.gridx++;
         panel.add(comboPersonnelMarketType, layout);
@@ -832,6 +857,7 @@ public class MarketsTab {
         }
 
         // Personnel Market
+        comboPersonnelMarketStyle.setSelectedItem(options.getPersonnelMarketStyle());
         comboPersonnelMarketType.setSelectedItem(options.getPersonnelMarketName());
         chkPersonnelMarketReportRefresh.setSelected(options.isPersonnelMarketReportRefresh());
         chkUsePersonnelHireHiringHallOnly.setSelected(options.isUsePersonnelHireHiringHallOnly());
@@ -880,6 +906,21 @@ public class MarketsTab {
         }
 
         // Personnel Market
+        PersonnelMarketStyle selectedPersonnelMarketStyle = comboPersonnelMarketStyle.getSelectedItem();
+        if (selectedPersonnelMarketStyle != null) {
+            PersonnelMarketStyle originalPersonnelMarketStyle = options.getPersonnelMarketStyle();
+            if (selectedPersonnelMarketStyle != originalPersonnelMarketStyle) {
+                NewPersonnelMarket replacementMarket = switch (selectedPersonnelMarketStyle) {
+                    case PERSONNEL_MARKET_DISABLED -> new NewPersonnelMarket(campaign);
+                    case MEKHQ -> new PersonnelMarketMekHQ(campaign);
+                    case CAMPAIGN_OPERATIONS_REVISED -> new PersonnelMarketCamOpsRevised(campaign);
+                    case CAMPAIGN_OPERATIONS_STRICT -> new PersonnelMarketCamOpsStrict(campaign);
+                };
+                campaign.setNewPersonnelMarket(replacementMarket);
+            }
+            options.setPersonnelMarketStyle(comboPersonnelMarketStyle.getSelectedItem());
+        }
+
         options.setPersonnelMarketName(comboPersonnelMarketType.getSelectedItem());
         if (Objects.equals(comboPersonnelMarketType.getSelectedItem(), "Campaign Ops")) {
             campaign.getPersonnelMarket().setPaidRecruitment(false);

@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.IntStream;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
@@ -53,6 +54,7 @@ import mekhq.campaign.universe.Factions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 
 class PersonnelRoleTest {
@@ -628,10 +630,10 @@ class PersonnelRoleTest {
     // region Static Methods
     @Test
     void testGetMarketableRoles() {
-        final List<PersonnelRole> militaryRoles = PersonnelRole.getMarketableRoles();
-        assertEquals(roles.length - 2, militaryRoles.size());
-        assertFalse(militaryRoles.contains(PersonnelRole.DEPENDENT));
-        assertFalse(militaryRoles.contains(PersonnelRole.NONE));
+        int marketableRoles = PersonnelRole.getMarketableRoles().size();
+        int combatRoles = PersonnelRole.getCombatRoles().size();
+        int supportRoles = PersonnelRole.getSupportRoles().size();
+        assertEquals(combatRoles + supportRoles, marketableRoles);
     }
 
     @Test
@@ -648,10 +650,6 @@ class PersonnelRoleTest {
         // Valid inputs with Clan variance
         assertEquals(BATTLE_ARMOUR, PersonnelRole.fromString("elemental"));
         assertEquals(BATTLE_ARMOUR, PersonnelRole.fromString("Battle Armor Pilot"));
-
-        // Deprecated names
-        assertEquals(PersonnelRole.MEKWARRIOR, PersonnelRole.fromString("MechWarrior"));
-        assertEquals(PersonnelRole.PROTOMEK_PILOT, PersonnelRole.fromString("protomek PILOT"));
 
         // Index input
         assertEquals(BATTLE_ARMOUR, PersonnelRole.fromString(BATTLE_ARMOUR.ordinal() + ""));
@@ -703,8 +701,13 @@ class PersonnelRoleTest {
 
     @Test
     void testGetCivilianCount() {
-        // Civilian Roles: Dependent and None
-        assertEquals(2, PersonnelRole.getCivilianCount());
+        int civilianCount = 0;
+        for (PersonnelRole personnelRole : roles) {
+            if (personnelRole.isCivilian()) {
+                civilianCount++;
+            }
+        }
+        assertEquals(civilianCount, PersonnelRole.getCivilianCount());
     }
     // endregion Static Methods
 
@@ -759,5 +762,126 @@ class PersonnelRoleTest {
 
         // Assert
         assertTrue(isResourceKeyValid(description), "Role does not have a Clan description: " + role.name());
+    }
+
+    /**
+     * Generates a stream of integers representing the range of days from 0 to the total number of days in 18 years,
+     * accounting for leap years.
+     *
+     * <p><b>Dev Note:</b> it might seem paranoid that we check every day, and it is, but it's better to have
+     * the peace of mind that an underage character will never be eligible for this profession. Especially given the
+     * fallout were we to accidentally allow underage sex workers.</p>
+     */
+    @ParameterizedTest
+    @MethodSource(value = "seventeenToEighteenYearsOld")
+    void testAdultEntertain_ageLimit(int daysOld) {
+        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        when(mockCampaign.getFaction()).thenReturn(Factions.getInstance().getFaction("MERC"));
+
+        LocalDate today = LocalDate.of(3000, 1, 1);
+        when(mockCampaign.getLocalDate()).thenReturn(today);
+
+        Person person = new Person(mockCampaign);
+        person.setDateOfBirth(today.minusDays(daysOld));
+        SkillType.initializeTypes();
+
+        PersonnelRole role = PersonnelRole.ADULT_ENTERTAINER;
+
+        for (String skillName : role.getSkillsForProfession()) {
+            person.addSkill(skillName, 3, 0);
+        }
+
+        assertFalse(person.canPerformRole(today, role, true),
+              "Underage character (" + daysOld + " days old) is incorrectly able to have the ADULT_ENTERTAINER role.");
+    }
+
+    static IntStream seventeenToEighteenYearsOld() {
+        LocalDate today = LocalDate.of(3000, 1, 1);
+
+        // 17th birthday
+        LocalDate seventeen = today.minusYears(17);
+
+        // 18th birthday
+        LocalDate eighteen = today.minusYears(18);
+
+        // All days from the 17th birthday up to but not including the 18th birthday (should be 365 or 366 days depending on leap year)
+        long days = java.time.temporal.ChronoUnit.DAYS.between(eighteen, seventeen);
+        // Stream days from 0 (17th birthday) up to (but not including) the 18th birthday
+        return IntStream.range(0, (int) days);
+    }
+
+    @Test
+    void testAdultEntertainer_atAgeLimit() {
+        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        when(mockCampaign.getFaction()).thenReturn(Factions.getInstance().getFaction("MERC"));
+
+        LocalDate today = LocalDate.of(3030, 1, 1);
+        when(mockCampaign.getLocalDate()).thenReturn(today.minusYears(19));
+
+        Person person = new Person(mockCampaign);
+        person.setDateOfBirth(today.minusYears(18));
+        SkillType.initializeTypes();
+
+        PersonnelRole role = PersonnelRole.ADULT_ENTERTAINER;
+
+        for (String skillName : role.getSkillsForProfession()) {
+            person.addSkill(skillName, 3, 0);
+        }
+
+        assertTrue(person.canPerformRole(today, role, true),
+              "18 year old character is ineligible for the ADULT ENTERTAINER role but should be.");
+    }
+
+    /**
+     * Generates a stream of integers representing the range of days from 0 to the total number of days in 18 years,
+     * accounting for leap years.
+     *
+     * <p><b>Dev Note:</b> it might seem paranoid that we check every day, and it is, but it's better to have
+     * the peace of mind that an underage character will never be eligible for this profession. Especially given the
+     * fallout were we to accidentally allow underage sex workers.</p>
+     */
+    @ParameterizedTest
+    @MethodSource(value = "seventeenToEighteenYearsOld")
+    void testLuxuryCompanion_ageLimit(int daysOld) {
+        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        when(mockCampaign.getFaction()).thenReturn(Factions.getInstance().getFaction("MERC"));
+
+        LocalDate today = LocalDate.of(3000, 1, 1);
+        when(mockCampaign.getLocalDate()).thenReturn(today);
+
+        Person person = new Person(mockCampaign);
+        person.setDateOfBirth(today.minusDays(daysOld));
+        SkillType.initializeTypes();
+
+        PersonnelRole role = PersonnelRole.LUXURY_COMPANION;
+
+        for (String skillName : role.getSkillsForProfession()) {
+            person.addSkill(skillName, 3, 0);
+        }
+
+        assertFalse(person.canPerformRole(today, role, true),
+              "Underage character (" + daysOld + " days old) is incorrectly able to have the LUXURY_COMPANION role.");
+    }
+
+    @Test
+    void testLuxuryCompanion_atAgeLimit() {
+        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        when(mockCampaign.getFaction()).thenReturn(Factions.getInstance().getFaction("MERC"));
+
+        LocalDate today = LocalDate.of(3030, 1, 1);
+        when(mockCampaign.getLocalDate()).thenReturn(today.minusYears(19));
+
+        Person person = new Person(mockCampaign);
+        person.setDateOfBirth(today.minusYears(18));
+        SkillType.initializeTypes();
+
+        PersonnelRole role = PersonnelRole.LUXURY_COMPANION;
+
+        for (String skillName : role.getSkillsForProfession()) {
+            person.addSkill(skillName, 3, 0);
+        }
+
+        assertTrue(person.canPerformRole(today, role, true),
+              "18 year old character is ineligible for the LUXURY_COMPANION role but should be.");
     }
 }

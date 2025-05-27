@@ -58,8 +58,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -72,6 +70,8 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
@@ -149,12 +149,7 @@ public class SkillsTab {
         lblEdgeCost = new JLabel();
         spnEdgeCost = new JSpinner();
     }
-
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public JPanel createSkillsTab(boolean isCombatTab) {
-        return createSkillsTab(isCombatTab ? COMBAT_GUNNERY : SUPPORT);
-    }
-
+    
     /**
      * Creates the main panel for the SkillsTab UI based on the provided {@link SkillSubType} category.
      *
@@ -242,7 +237,8 @@ public class SkillsTab {
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         // Create a button to toggle the table
-        JButton hideAllButton = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "btnHideAll.text"));
+        RoundedJButton hideAllButton = new RoundedJButton(getTextAt(getCampaignOptionsResourceBundle(),
+              "btnHideAll.text"));
         hideAllButton.addActionListener(e -> {
             setVisibleForAll(false);
 
@@ -251,7 +247,8 @@ public class SkillsTab {
         });
 
         // Create a button to toggle the table
-        JButton showAllButton = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "btnDisplayAll.text"));
+        RoundedJButton showAllButton = new RoundedJButton(getTextAt(getCampaignOptionsResourceBundle(),
+              "btnDisplayAll.text"));
         showAllButton.addActionListener(e -> {
             setVisibleForAll(true);
 
@@ -414,7 +411,7 @@ public class SkillsTab {
         allSkillCosts.put(skill.getName(), skillCosts);
         allSkillMilestones.put(skill.getName(), skillMilestones);
 
-        JButton copyButton = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "btnCopy.text"));
+        RoundedJButton copyButton = new RoundedJButton(getTextAt(getCampaignOptionsResourceBundle(), "btnCopy.text"));
         copyButton.addActionListener(e -> {
             storedTargetNumber = (Integer) spnTargetNumber.getValue();
 
@@ -427,7 +424,7 @@ public class SkillsTab {
             }
         });
 
-        JButton pasteButton = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "btnPaste.text"));
+        RoundedJButton pasteButton = new RoundedJButton(getTextAt(getCampaignOptionsResourceBundle(), "btnPaste.text"));
         pasteButton.addActionListener(e -> {
             spnTargetNumber.setValue(storedTargetNumber);
 
@@ -438,12 +435,12 @@ public class SkillsTab {
         });
 
         final JPanel panel = new CampaignOptionsStandardPanel(panelName);
-        panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(),
-              String.format(skill.getName())));
+        panel.setBorder(RoundedLineBorder.createRoundedLineBorder(skill.getName()));
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         // Create a button to toggle the table
-        JButton toggleButton = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "btnToggle.text"));
+        RoundedJButton toggleButton = new RoundedJButton(getTextAt(getCampaignOptionsResourceBundle(),
+              "btnToggle.text"));
         toggleButton.addActionListener(e -> {
             for (JLabel label : labels) {
                 label.setVisible(!label.isVisible());

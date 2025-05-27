@@ -277,18 +277,9 @@ public abstract class AbstractContractMarket {
         // Calculate base formation size and effective unit force
         int effectiveForces = AtBContract.calculateBaseNumberOfRequiredLances(campaign);
 
-        // Calculate maximum deployed forces based on strategy options
-        int maxDeployableCombatTeams = effectiveForces;
-        if (campaign.getCampaignOptions().isUseStrategy()) {
-            maxDeployableCombatTeams = Math.max(calculateMaxDeployableCombatTeams(campaign), 1);
-        }
-
-        // Clamp available forces to the max deployable limit
-        int availableForces = Math.min(effectiveForces, maxDeployableCombatTeams);
-
         // If bypassing variance, apply flat reduction (reduce force by 1/3)
         if (bypassVariance) {
-            return Math.max(availableForces - calculateBypassVarianceReduction(availableForces), 1);
+            return Math.max(effectiveForces - calculateBypassVarianceReduction(effectiveForces), 1);
         }
 
         // Apply variance based on a die roll
@@ -296,14 +287,14 @@ public abstract class AbstractContractMarket {
         double varianceFactor = calculateVarianceFactor(varianceRoll);
 
         // Adjust available forces based on variance, ensuring minimum clamping
-        int adjustedForces = availableForces - (int) Math.floor((double) availableForces / varianceFactor);
+        int adjustedForces = effectiveForces - (int) Math.floor((double) effectiveForces / varianceFactor);
 
         if (adjustedForces < 1) {
             adjustedForces = 1;
         }
 
         // Return the clamped value, ensuring it does not exceed max-deployable forces
-        return Math.min(adjustedForces, maxDeployableCombatTeams);
+        return Math.min(adjustedForces, effectiveForces);
     }
 
     /**
@@ -353,17 +344,9 @@ public abstract class AbstractContractMarket {
     }
 
     /**
-     * Calculates the maximum number of deployable combat teams based on the given campaign's options.
-     *
-     * <p>
-     * This method retrieves campaign options and calculates the total deployable combat teams using the base strategy
-     * deployment, additional strategy deployment, and the campaign's commander strategy.
-     * </p>
-     *
-     * @param campaign the campaign object containing the necessary data to perform the calculation
-     *
-     * @return the total number of deployable combat teams
+     * @deprecated unused.
      */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public int calculateMaxDeployableCombatTeams(Campaign campaign) {
         CampaignOptions options = campaign.getCampaignOptions();
         int baseStrategyDeployment = options.getBaseStrategyDeployment();
@@ -397,14 +380,6 @@ public abstract class AbstractContractMarket {
         } else {
             return IUnitRating.DRAGOON_A;
         }
-    }
-
-    /**
-     * @deprecated use {@link #rollCommandClause(Contract, int, boolean)} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    protected void rollCommandClause(final Contract contract, final int modifier) {
-        rollCommandClause(contract, modifier, true);
     }
 
     /**
@@ -592,14 +567,6 @@ public abstract class AbstractContractMarket {
     }
 
     /**
-     * @deprecated use {@link #setAllyRating(AtBContract, int, SkillLevel)} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    protected void setAllyRating(AtBContract contract, int year) {
-        setAllyRating(contract, year, REGULAR);
-    }
-
-    /**
      * Calculates and sets the ally skill and quality ratings for the given contract.
      *
      * <p>The ally rating is influenced by multiple factors:</p>
@@ -661,14 +628,6 @@ public abstract class AbstractContractMarket {
 
         // Assign ally quality rating
         contract.setAllyQuality(getQualityRating(d6(2) + mod));
-    }
-
-    /**
-     * @deprecated use {@link #setEnemyRating(AtBContract, int, SkillLevel)} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    protected void setEnemyRating(AtBContract contract, int year) {
-        setEnemyRating(contract, year, REGULAR);
     }
 
     /**

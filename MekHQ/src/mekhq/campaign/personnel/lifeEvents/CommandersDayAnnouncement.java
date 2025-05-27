@@ -27,7 +27,7 @@
  */
 package mekhq.campaign.personnel.lifeEvents;
 
-import static megamek.client.ui.swing.util.UIUtil.scaleForGUI;
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;

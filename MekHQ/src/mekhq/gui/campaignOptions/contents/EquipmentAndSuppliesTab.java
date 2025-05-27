@@ -46,11 +46,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
 
-import megamek.client.ui.baseComponents.MMComboBox;
-import megamek.client.ui.swing.util.UIUtil;
-import megamek.common.EquipmentType;
-import megamek.common.ITechnology;
+import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.util.UIUtil;
+import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
+import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
@@ -64,20 +65,20 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
 
 /**
- * The {@code EquipmentAndSuppliesTab} class represents a graphical user interface (GUI)
- * tab containing various options and settings related to equipment and supplies in a campaign simulation.
- * This class is responsible for building and managing multiple sub-tabs and panels for customization purposes,
- * including acquisition settings, delivery settings, planetary acquisition settings, and more.
- * It also provides methods to initialize, create, and manage these different components.
+ * The {@code EquipmentAndSuppliesTab} class represents a graphical user interface (GUI) tab containing various options
+ * and settings related to equipment and supplies in a campaign simulation. This class is responsible for building and
+ * managing multiple sub-tabs and panels for customization purposes, including acquisition settings, delivery settings,
+ * planetary acquisition settings, and more. It also provides methods to initialize, create, and manage these different
+ * components.
  * <p>
- * Fields in this class include labels, spinners, combo boxes, checkboxes, and panels used for displaying
- * and managing options in the tab. They allow the user to configure various parameters like transit times,
- * penalties, acquisition limits, faction-specific settings, and modifiers to influence game mechanics.
- * Multiple constants are defined for units of time, representing days, weeks, and months, among others.
+ * Fields in this class include labels, spinners, combo boxes, checkboxes, and panels used for displaying and managing
+ * options in the tab. They allow the user to configure various parameters like transit times, penalties, acquisition
+ * limits, faction-specific settings, and modifiers to influence game mechanics. Multiple constants are defined for
+ * units of time, representing days, weeks, and months, among others.
  * <p>
- * The class includes initialization methods for different sections of the tab, as well as methods
- * to create panels for specific functionality. Utility methods are also provided for configuring spinners
- * and combo boxes or formatting options and labels.
+ * The class includes initialization methods for different sections of the tab, as well as methods to create panels for
+ * specific functionality. Utility methods are also provided for configuring spinners and combo boxes or formatting
+ * options and labels.
  */
 public class EquipmentAndSuppliesTab {
     private CampaignOptions campaignOptions;
@@ -152,11 +153,9 @@ public class EquipmentAndSuppliesTab {
     private JSpinner[] spnPlanetAcquireTechBonus;
 
     private JPanel pnlIndustryModifiers;
-    private JLabel[] lblPlanetAcquireIndustryBonus;
     private JSpinner[] spnPlanetAcquireIndustryBonus;
 
     private JPanel pnlOutputModifiers;
-    private JLabel[] lblPlanetAcquireOutputBonus;
     private JSpinner[] spnPlanetAcquireOutputBonus;
     //end Planetary Acquisition Tab
 
@@ -177,8 +176,7 @@ public class EquipmentAndSuppliesTab {
     /**
      * Constructs the EquipmentAndSuppliesTab with the given campaign options.
      *
-     * @param campaignOptions the {@link CampaignOptions} object containing
-     *                        configuration settings for the campaign
+     * @param campaignOptions the {@link CampaignOptions} object containing configuration settings for the campaign
      */
     public EquipmentAndSuppliesTab(CampaignOptions campaignOptions) {
         this.campaignOptions = campaignOptions;
@@ -187,9 +185,8 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Initializes the EquipmentAndSuppliesTab by configuring its various components and panels.
-     * This includes setting up the acquisitions tab, delivery tab, planetary acquisitions tab,
-     * and tech limits tab.
+     * Initializes the EquipmentAndSuppliesTab by configuring its various components and panels. This includes setting
+     * up the acquisitions tab, delivery tab, planetary acquisitions tab, and tech limits tab.
      */
     void initialize() {
         initializeAcquisitionTab();
@@ -200,15 +197,15 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Initializes the components and configurations for the Planetary Acquisitions tab in the
-     * EquipmentAndSuppliesTab. This includes setting up options, labels, spinners, combo boxes,
-     * checkboxes, and panels related to planetary acquisitions.
+     * Initializes the components and configurations for the Planetary Acquisitions tab in the EquipmentAndSuppliesTab.
+     * This includes setting up options, labels, spinners, combo boxes, checkboxes, and panels related to planetary
+     * acquisitions.
      * <p>
      * The method sets up the following:
      * <li> Configuration options for planetary acquisitions such as enabling/disabling planetary acquisitions,
-     *   setting faction limits, and managing clan/Inner Sphere specific rules.</li>
+     * setting faction limits, and managing clan/Inner Sphere specific rules.</li>
      * <li> Panels and components for modifiers, including technology bonuses, industry bonuses,
-     *   and output bonuses.</li>
+     * and output bonuses.</li>
      */
     private void initializePlanetaryAcquisitionsTab() {
         // Options
@@ -219,7 +216,7 @@ public class EquipmentAndSuppliesTab {
 
         lblPlanetaryAcquisitionsFactionLimits = new JLabel();
         comboPlanetaryAcquisitionsFactionLimits = new MMComboBox<>("comboPlanetaryAcquisitionsFactionLimits",
-            PlanetaryAcquisitionFactionLimit.values());
+              PlanetaryAcquisitionFactionLimit.values());
 
         disallowPlanetaryAcquisitionClanCrossover = new JCheckBox();
 
@@ -232,22 +229,20 @@ public class EquipmentAndSuppliesTab {
 
         // Modifiers
         pnlTechModifiers = new JPanel();
-        lblPlanetAcquireTechBonus = new JLabel[6];
-        spnPlanetAcquireTechBonus = new JSpinner[6];
+        lblPlanetAcquireTechBonus = new JLabel[PlanetarySophistication.values().length];
+        spnPlanetAcquireTechBonus = new JSpinner[PlanetarySophistication.values().length];
 
         pnlIndustryModifiers = new JPanel();
-        lblPlanetAcquireIndustryBonus = new JLabel[6];
-        spnPlanetAcquireIndustryBonus = new JSpinner[6];
+        spnPlanetAcquireIndustryBonus = new JSpinner[PlanetaryRating.values().length];
 
         pnlOutputModifiers = new JPanel();
-        lblPlanetAcquireOutputBonus = new JLabel[6];
-        spnPlanetAcquireOutputBonus = new JSpinner[6];
+        spnPlanetAcquireOutputBonus = new JSpinner[PlanetaryRating.values().length];
     }
 
     /**
-     * Initializes the components and configurations for the delivery tab within the
-     * EquipmentAndSuppliesTab. This method sets up panels, labels, spinners, and combo boxes required
-     * for managing delivery-related settings and options.
+     * Initializes the components and configurations for the delivery tab within the EquipmentAndSuppliesTab. This
+     * method sets up panels, labels, spinners, and combo boxes required for managing delivery-related settings and
+     * options.
      * <p>
      * The setup includes:
      * <li> The main delivery panel.</li>
@@ -261,9 +256,9 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Initializes the components and settings for the acquisitions tab in the EquipmentAndSuppliesTab.
-     * This method sets up the GUI components required for configuring acquisition-related options,
-     * including panels, labels, spinners, combo boxes, and checkboxes.
+     * Initializes the components and settings for the acquisitions tab in the EquipmentAndSuppliesTab. This method sets
+     * up the GUI components required for configuring acquisition-related options, including panels, labels, spinners,
+     * combo boxes, and checkboxes.
      */
     private void initializeAcquisitionTab() {
         pnlAcquisitions = new JPanel();
@@ -288,9 +283,9 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Initializes the components and settings for the autoLogistics tab in the EquipmentAndSuppliesTab.
-     * This method sets up the GUI components required for configuring acquisition-related options,
-     * including panels, labels, spinners, combo boxes, and checkboxes.
+     * Initializes the components and settings for the autoLogistics tab in the EquipmentAndSuppliesTab. This method
+     * sets up the GUI components required for configuring acquisition-related options, including panels, labels,
+     * spinners, combo boxes, and checkboxes.
      */
     private void initializeAutoLogisticsTab() {
         pnlAutoLogistics = new JPanel();
@@ -319,9 +314,8 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Initializes the components and settings for the Tech Limits tab in the EquipmentAndSuppliesTab.
-     * This method sets up a series of checkboxes, labels, and combo boxes to configure technology-related
-     * limits and options.
+     * Initializes the components and settings for the Tech Limits tab in the EquipmentAndSuppliesTab. This method sets
+     * up a series of checkboxes, labels, and combo boxes to configure technology-related limits and options.
      */
     private void initializeTechLimitsTab() {
         limitByYearBox = new JCheckBox();
@@ -337,9 +331,8 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Creates and configures the acquisition tab panel for the user interface.
-     * This method initializes and organizes the components such as the header,
-     * acquisition panel, and delivery panel, and then returns the fully constructed
+     * Creates and configures the acquisition tab panel for the user interface. This method initializes and organizes
+     * the components such as the header, acquisition panel, and delivery panel, and then returns the fully constructed
      * acquisition tab panel.
      *
      * @return A {@code JPanel} instance representing the complete acquisition tab.
@@ -347,7 +340,8 @@ public class EquipmentAndSuppliesTab {
     public JPanel createAcquisitionTab() {
         // Header
         acquisitionHeader = new CampaignOptionsHeaderPanel("AcquisitionTab",
-              getImageDirectory() + "logo_clan_cloud_cobra.png", 4);
+              getImageDirectory() + "logo_clan_cloud_cobra.png",
+              4);
 
         pnlAcquisitions = createAcquisitionPanel();
         pnlAutoLogistics = createAutoLogisticsPanel();
@@ -374,10 +368,9 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Creates and returns a {@code JPanel} for configuring acquisition-related options.
-     * This panel includes various components such as labels, checkboxes, and
-     * spinners to allow users to set values for acquisition settings, including
-     * penalties, waiting periods, maximum acquisitions, and stock percentages.
+     * Creates and returns a {@code JPanel} for configuring acquisition-related options. This panel includes various
+     * components such as labels, checkboxes, and spinners to allow users to set values for acquisition settings,
+     * including penalties, waiting periods, maximum acquisitions, and stock percentages.
      *
      * @return A {@code JPanel} populated with acquisition configuration components and their layout.
      */
@@ -392,26 +385,22 @@ public class EquipmentAndSuppliesTab {
 
         lblAcquireClanPenalty = new CampaignOptionsLabel("AcquireClanPenalty");
         lblAcquireClanPenalty.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AcquireClanPenalty"));
-        spnAcquireClanPenalty = new CampaignOptionsSpinner("AcquireClanPenalty",
-            0, 0, 13, 1);
+        spnAcquireClanPenalty = new CampaignOptionsSpinner("AcquireClanPenalty", 0, 0, 13, 1);
         spnAcquireClanPenalty.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AcquireClanPenalty"));
 
         lblAcquireIsPenalty = new CampaignOptionsLabel("AcquireISPenalty");
         lblAcquireIsPenalty.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AcquireISPenalty"));
-        spnAcquireIsPenalty = new CampaignOptionsSpinner("AcquireISPenalty",
-            0, 0, 13, 1);
+        spnAcquireIsPenalty = new CampaignOptionsSpinner("AcquireISPenalty", 0, 0, 13, 1);
         spnAcquireIsPenalty.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AcquireISPenalty"));
 
         lblAcquireWaitingPeriod = new CampaignOptionsLabel("AcquireWaitingPeriod");
         lblAcquireWaitingPeriod.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AcquireWaitingPeriod"));
-        spnAcquireWaitingPeriod = new CampaignOptionsSpinner("AcquireWaitingPeriod",
-            1, 1, 365, 1);
+        spnAcquireWaitingPeriod = new CampaignOptionsSpinner("AcquireWaitingPeriod", 1, 1, 365, 1);
         spnAcquireWaitingPeriod.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AcquireWaitingPeriod"));
 
         lblMaxAcquisitions = new CampaignOptionsLabel("MaxAcquisitions");
         lblMaxAcquisitions.addMouseListener(createTipPanelUpdater(acquisitionHeader, "MaxAcquisitions"));
-        spnMaxAcquisitions = new CampaignOptionsSpinner("MaxAcquisitions",
-            0,0, 100, 1);
+        spnMaxAcquisitions = new CampaignOptionsSpinner("MaxAcquisitions", 0, 0, 100, 1);
         spnMaxAcquisitions.addMouseListener(createTipPanelUpdater(acquisitionHeader, "MaxAcquisitions"));
 
         lblTransitTimeUnits = new CampaignOptionsLabel("TransitTimeUnits");
@@ -419,8 +408,7 @@ public class EquipmentAndSuppliesTab {
         choiceTransitTimeUnits.addMouseListener(createTipPanelUpdater(acquisitionHeader, "TransitTimeUnits"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("AcquisitionPanel", true,
-            "AcquisitionPanel");
+        final JPanel panel = new CampaignOptionsStandardPanel("AcquisitionPanel", true, "AcquisitionPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridy = 0;
@@ -471,10 +459,9 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Creates and returns a {@code JPanel} for configuring autoLogistics-related options.
-     * This panel includes various components such as labels, checkboxes, and
-     * spinners to allow users to set values for acquisition settings, including
-     * penalties, waiting periods, maximum acquisitions, and stock percentages.
+     * Creates and returns a {@code JPanel} for configuring autoLogistics-related options. This panel includes various
+     * components such as labels, checkboxes, and spinners to allow users to set values for acquisition settings,
+     * including penalties, waiting periods, maximum acquisitions, and stock percentages.
      *
      * @return A {@code JPanel} populated with autoLogistics configuration components and their layout.
      */
@@ -482,15 +469,13 @@ public class EquipmentAndSuppliesTab {
         // Content
         lblAutoLogisticsMekHead = new CampaignOptionsLabel("AutoLogisticsMekHead");
         lblAutoLogisticsMekHead.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AutoLogisticsMekHead"));
-        spnAutoLogisticsMekHead = new CampaignOptionsSpinner("AutoLogisticsMekHead",
-            200, 0, 10000, 1);
+        spnAutoLogisticsMekHead = new CampaignOptionsSpinner("AutoLogisticsMekHead", 200, 0, 10000, 1);
         spnAutoLogisticsMekHead.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AutoLogisticsMekHead"));
 
         lblAutoLogisticsMekLocation = new CampaignOptionsLabel("AutoLogisticsMekLocation");
         lblAutoLogisticsMekLocation.addMouseListener(createTipPanelUpdater(acquisitionHeader,
               "AutoLogisticsMekLocation"));
-        spnAutoLogisticsMekLocation = new CampaignOptionsSpinner("AutoLogisticsMekLocation",
-            100, 0, 10000, 1);
+        spnAutoLogisticsMekLocation = new CampaignOptionsSpinner("AutoLogisticsMekLocation", 100, 0, 10000, 1);
         spnAutoLogisticsMekLocation.addMouseListener(createTipPanelUpdater(acquisitionHeader,
               "AutoLogisticsMekLocation"));
 
@@ -498,63 +483,57 @@ public class EquipmentAndSuppliesTab {
         lblAutoLogisticsNonRepairableLocation.addMouseListener(createTipPanelUpdater(acquisitionHeader,
               "AutoLogisticsNonRepairableLocation"));
         spnAutoLogisticsNonRepairableLocation = new CampaignOptionsSpinner("AutoLogisticsNonRepairableLocation",
-            0, 0, 10000, 1);
+              0,
+              0,
+              10000,
+              1);
         spnAutoLogisticsNonRepairableLocation.addMouseListener(createTipPanelUpdater(acquisitionHeader,
               "AutoLogisticsNonRepairableLocation"));
 
         lblAutoLogisticsArmor = new CampaignOptionsLabel("AutoLogisticsArmor");
         lblAutoLogisticsArmor.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AutoLogisticsArmor"));
-        spnAutoLogisticsArmor = new CampaignOptionsSpinner("AutoLogisticsArmor",
-            500, 0, 10000, 1);
+        spnAutoLogisticsArmor = new CampaignOptionsSpinner("AutoLogisticsArmor", 500, 0, 10000, 1);
         spnAutoLogisticsArmor.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AutoLogisticsArmor"));
 
         lblAutoLogisticsAmmunition = new CampaignOptionsLabel("AutoLogisticsAmmunition");
         lblAutoLogisticsAmmunition.addMouseListener(createTipPanelUpdater(acquisitionHeader,
               "AutoLogisticsAmmunition"));
-        spnAutoLogisticsAmmunition = new CampaignOptionsSpinner("AutoLogisticsAmmunition",
-            500, 0, 10000, 1);
+        spnAutoLogisticsAmmunition = new CampaignOptionsSpinner("AutoLogisticsAmmunition", 500, 0, 10000, 1);
         spnAutoLogisticsAmmunition.addMouseListener(createTipPanelUpdater(acquisitionHeader,
               "AutoLogisticsAmmunition"));
 
         lblAutoLogisticsHeatSink = new CampaignOptionsLabel("AutoLogisticsHeatSink");
         lblAutoLogisticsHeatSink.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AutoLogisticsHeatSink"));
-        spnAutoLogisticsHeatSink = new CampaignOptionsSpinner("AutoLogisticsHeatSink",
-            250, 0, 10000, 1);
+        spnAutoLogisticsHeatSink = new CampaignOptionsSpinner("AutoLogisticsHeatSink", 250, 0, 10000, 1);
         spnAutoLogisticsHeatSink.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AutoLogisticsHeatSink"));
 
         lblAutoLogisticsWeapons = new CampaignOptionsLabel("AutoLogisticsWeapons");
         lblAutoLogisticsWeapons.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AutoLogisticsWeapons"));
-        spnAutoLogisticsWeapons = new CampaignOptionsSpinner("AutoLogisticsWeapons",
-              50, 0, 10000, 1);
+        spnAutoLogisticsWeapons = new CampaignOptionsSpinner("AutoLogisticsWeapons", 50, 0, 10000, 1);
         spnAutoLogisticsWeapons.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AutoLogisticsWeapons"));
 
         lblAutoLogisticsActuators = new CampaignOptionsLabel("AutoLogisticsActuators");
         lblAutoLogisticsActuators.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AutoLogisticsActuators"));
-        spnAutoLogisticsActuators = new CampaignOptionsSpinner("AutoLogisticsActuators",
-            250, 0, 10000, 1);
+        spnAutoLogisticsActuators = new CampaignOptionsSpinner("AutoLogisticsActuators", 250, 0, 10000, 1);
         spnAutoLogisticsActuators.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AutoLogisticsActuators"));
 
         lblAutoLogisticsJumpJets = new CampaignOptionsLabel("AutoLogisticsJumpJets");
         lblAutoLogisticsJumpJets.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AutoLogisticsJumpJets"));
-        spnAutoLogisticsJumpJets = new CampaignOptionsSpinner("AutoLogisticsJumpJets",
-            250, 0, 10000, 1);
+        spnAutoLogisticsJumpJets = new CampaignOptionsSpinner("AutoLogisticsJumpJets", 250, 0, 10000, 1);
         spnAutoLogisticsJumpJets.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AutoLogisticsJumpJets"));
 
         lblAutoLogisticsEngines = new CampaignOptionsLabel("AutoLogisticsEngines");
         lblAutoLogisticsEngines.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AutoLogisticsEngines"));
-        spnAutoLogisticsEngines = new CampaignOptionsSpinner("AutoLogisticsEngines",
-            250, 0, 10000, 1);
+        spnAutoLogisticsEngines = new CampaignOptionsSpinner("AutoLogisticsEngines", 250, 0, 10000, 1);
         spnAutoLogisticsEngines.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AutoLogisticsEngines"));
 
         lblAutoLogisticsOther = new CampaignOptionsLabel("AutoLogisticsOther");
         lblAutoLogisticsOther.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AutoLogisticsOther"));
-        spnAutoLogisticsOther = new CampaignOptionsSpinner("AutoLogisticsOther",
-            50, 0, 10000, 1);
+        spnAutoLogisticsOther = new CampaignOptionsSpinner("AutoLogisticsOther", 50, 0, 10000, 1);
         spnAutoLogisticsOther.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AutoLogisticsOther"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("AutoLogisticsPanel", true,
-            "AutoLogisticsPanel");
+        final JPanel panel = new CampaignOptionsStandardPanel("AutoLogisticsPanel", true, "AutoLogisticsPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridy = 0;
@@ -584,16 +563,18 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Creates and configures the planetary acquisition tab panel in a campaign options interface.
-     * The panel includes a header, options, and modifiers section, arranged using
-     * layout constraints. Once configured, it is wrapped within a parent panel and returned.
+     * Creates and configures the planetary acquisition tab panel in a campaign options interface. The panel includes a
+     * header, options, and modifiers section, arranged using layout constraints. Once configured, it is wrapped within
+     * a parent panel and returned.
      *
-     * @return a {@code JPanel} object representing the planetary acquisition tab with its configured components and layout.
+     * @return a {@code JPanel} object representing the planetary acquisition tab with its configured components and
+     *       layout.
      */
     public JPanel createPlanetaryAcquisitionTab() {
         // Header
         planetaryAcquisitionHeader = new CampaignOptionsHeaderPanel("PlanetaryAcquisitionTab",
-              getImageDirectory() + "logo_rim_worlds_republic.png", 14);
+              getImageDirectory() + "logo_rim_worlds_republic.png",
+              14);
 
         // Sub-Panels
         JPanel options = createOptionsPanel();
@@ -621,10 +602,9 @@ public class EquipmentAndSuppliesTab {
 
 
     /**
-     * Creates and returns a {@code JPanel} containing the components necessary
-     * for configuring campaign options related to planetary acquisitions.
-     * This panel includes various labels, checkboxes, and spinners
-     * for setting and adjusting relevant options.
+     * Creates and returns a {@code JPanel} containing the components necessary for configuring campaign options related
+     * to planetary acquisitions. This panel includes various labels, checkboxes, and spinners for setting and adjusting
+     * relevant options.
      *
      * @return a {@code JPanel} containing the campaign options panel for planetary acquisitions.
      */
@@ -636,8 +616,7 @@ public class EquipmentAndSuppliesTab {
         lblMaxJumpPlanetaryAcquisitions = new CampaignOptionsLabel("MaxJumpPlanetaryAcquisitions");
         lblMaxJumpPlanetaryAcquisitions.addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
               "MaxJumpPlanetaryAcquisitions"));
-        spnMaxJumpPlanetaryAcquisitions = new CampaignOptionsSpinner("MaxJumpPlanetaryAcquisitions",
-            2, 0, 5, 1);
+        spnMaxJumpPlanetaryAcquisitions = new CampaignOptionsSpinner("MaxJumpPlanetaryAcquisitions", 2, 0, 5, 1);
         spnMaxJumpPlanetaryAcquisitions.addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
               "MaxJumpPlanetaryAcquisitions"));
 
@@ -645,7 +624,8 @@ public class EquipmentAndSuppliesTab {
         lblPlanetaryAcquisitionsFactionLimits.addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
               "PlanetaryAcquisitionsFactionLimits"));
 
-        disallowPlanetaryAcquisitionClanCrossover = new CampaignOptionsCheckBox("DisallowPlanetaryAcquisitionClanCrossover");
+        disallowPlanetaryAcquisitionClanCrossover = new CampaignOptionsCheckBox(
+              "DisallowPlanetaryAcquisitionClanCrossover");
         disallowPlanetaryAcquisitionClanCrossover.addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
               "DisallowPlanetaryAcquisitionClanCrossover"));
 
@@ -656,8 +636,7 @@ public class EquipmentAndSuppliesTab {
         lblPenaltyClanPartsFromIS = new CampaignOptionsLabel("PenaltyClanPartsFromIS");
         lblPenaltyClanPartsFromIS.addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
               "PenaltyClanPartsFromIS"));
-        spnPenaltyClanPartsFromIS = new CampaignOptionsSpinner("PenaltyClanPartsFromIS",
-            0, 0, 12, 1);
+        spnPenaltyClanPartsFromIS = new CampaignOptionsSpinner("PenaltyClanPartsFromIS", 0, 0, 12, 1);
         spnPenaltyClanPartsFromIS.addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
               "PenaltyClanPartsFromIS"));
 
@@ -706,68 +685,64 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Creates and returns a panel that organizes and displays the planetary acquisition
-     * modifiers for technology, industry, and output. This method sets up spinners and
-     * labels for each equipment type rating (A through F) to adjust acquisition bonuses.
+     * Creates and returns a panel that organizes and displays the planetary acquisition modifiers for technology,
+     * industry, and output. This method sets up spinners and labels for each equipment type rating (A through F) to
+     * adjust acquisition bonuses.
      * <p>
-     * The method initializes modifier spinners for technology, industry, and output
-     * acquisition bonuses, creates separate panels for each category, and combines them
-     * into a single panel using a grid layout.
+     * The method initializes modifier spinners for technology, industry, and output acquisition bonuses, creates
+     * separate panels for each category, and combines them into a single panel using a grid layout.
      *
-     * @return a {@code JPanel} representing the planetary acquisition modifiers panel, including
-     *         elements for adjusting technology, industry, and output modifiers.
+     * @return a {@code JPanel} representing the planetary acquisition modifiers panel, including elements for adjusting
+     *       technology, industry, and output modifiers.
      */
     private JPanel createModifiersPanel() {
         // Modifier Spinners
-        for (int i = EquipmentType.RATING_A; i <= EquipmentType.RATING_F; i++) {
-            String modifierLabel = getModifierLabel(i);
-
+        int i = 0;
+        for (PlanetarySophistication sophistication : PlanetarySophistication.values()) {
+            String techModifierLabel = sophistication.getName();
             lblPlanetAcquireTechBonus[i] = new JLabel(String.format("<html>%s</html>",
-                modifierLabel));
+                techModifierLabel));
+            lblPlanetAcquireTechBonus[i].setHorizontalAlignment(SwingConstants.RIGHT);
             lblPlanetAcquireTechBonus[i].addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
                   "TechLabel"));
-            spnPlanetAcquireTechBonus[i] = new JSpinner(new SpinnerNumberModel(
-                0, -12, 12, 1));
+            spnPlanetAcquireTechBonus[i] = new JSpinner(new SpinnerNumberModel(0, -12, 12, 1));
             spnPlanetAcquireTechBonus[i].addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
                   "TechLabel"));
             setSpinnerWidth(spnPlanetAcquireTechBonus[i]);
-
-            lblPlanetAcquireIndustryBonus[i] = new JLabel(String.format("<html>%s</html>",
-                modifierLabel));
-            lblPlanetAcquireIndustryBonus[i].addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
-                  "IndustryLabel"));
+            i++;
+        }
+        i = 0;
+        for (PlanetaryRating rating : PlanetaryRating.values()) {
+            String modifierLabel = rating.getName();
             spnPlanetAcquireIndustryBonus[i] = new JSpinner(new SpinnerNumberModel(
                 0, -12, 12, 1));
             spnPlanetAcquireIndustryBonus[i].addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
                   "IndustryLabel"));
             setSpinnerWidth(spnPlanetAcquireIndustryBonus[i]);
-
-            lblPlanetAcquireOutputBonus[i] = new JLabel(String.format("<html>%s</html>",
-                modifierLabel));
-            lblPlanetAcquireOutputBonus[i].addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
-                  "OutputLabel"));
             spnPlanetAcquireOutputBonus[i] = new JSpinner(new SpinnerNumberModel(
                 0, -12, 12, 1));
             spnPlanetAcquireOutputBonus[i].addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
                   "OutputLabel"));
             setSpinnerWidth(spnPlanetAcquireOutputBonus[i]);
+            i++;
         }
-
         // Panels
-        pnlIndustryModifiers = createIndustryModifiersPanel();
         pnlTechModifiers = createTechModifiersPanel();
+        pnlIndustryModifiers = createIndustryModifiersPanel();
         pnlOutputModifiers = createOutputModifiersPanel();
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PlanetaryAcquisitionTabModifiers",
-            true, "ModifiersPanel");
+              true,
+              "ModifiersPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
+        layout.anchor = GridBagConstraints.NORTH;
         layout.gridx = 0;
         layout.gridy = 0;
-        panel.add(pnlIndustryModifiers, layout);
-        layout.gridx++;
         panel.add(pnlTechModifiers, layout);
+        layout.gridx++;
+        panel.add(pnlIndustryModifiers, layout);
         layout.gridx++;
         panel.add(pnlOutputModifiers, layout);
 
@@ -775,17 +750,16 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Creates and returns a {@code JPanel} layout containing components for configuring
-     * technology-related modifiers in a campaign setting. The panel includes
-     * labels and corresponding input components (spinners) arranged in a
-     * grid layout.
+     * Creates and returns a {@code JPanel} layout containing components for configuring technology-related modifiers in
+     * a campaign setting. The panel includes labels and corresponding input components (spinners) arranged in a grid
+     * layout.
      *
      * @return a {@code JPanel} containing the layout for technology modifiers configuration
      */
     private JPanel createTechModifiersPanel() {
         JLabel techLabel = new CampaignOptionsLabel("TechLabel");
+        techLabel.setHorizontalAlignment(SwingConstants.CENTER);
         techLabel.addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader, "TechLabel"));
-
 
 
         // Layout the Panel
@@ -800,35 +774,42 @@ public class EquipmentAndSuppliesTab {
         panel.add(techLabel, layout);
 
         // Add the other elements
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < PlanetarySophistication.values().length; i++) {
             layout.gridx = 0;
             layout.gridy = i + 1;
             layout.gridwidth = 1;
             layout.weightx = 0;
             layout.anchor = GridBagConstraints.WEST;
             panel.add(lblPlanetAcquireTechBonus[i], layout);
-            lblPlanetAcquireTechBonus[i].addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
-                  "TechLabel"));
 
             layout.gridx++;
             panel.add(spnPlanetAcquireTechBonus[i], layout);
-            spnPlanetAcquireTechBonus[i].addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
-                  "TechLabel"));
         }
 
         return panel;
     }
 
+    private int getSpinnerHeight() {
+        int spinnerHeight = 0;
+        if (spnPlanetAcquireIndustryBonus != null && spnPlanetAcquireIndustryBonus.length > 0 && spnPlanetAcquireIndustryBonus[0] != null) {
+            spinnerHeight = spnPlanetAcquireIndustryBonus[0].getPreferredSize().height;
+        } else {
+            //fallback
+            spinnerHeight = new JSpinner().getPreferredSize().height; 
+        }
+        return spinnerHeight;
+    }
+
     /**
-     * Creates and configures a {@code JPanel} that serves as the Industry Modifiers Panel.
-     * The panel contains labels and spinners arranged in a grid layout to display
-     * and allow modification of industry bonuses.
+     * Creates and configures a {@code JPanel} that serves as the Industry Modifiers Panel. The panel contains labels
+     * and spinners arranged in a grid layout to display and allow modification of industry bonuses.
      *
-     * @return a {@code JPanel} component configured as the Industry Modifiers Panel with
-     *         labels and spinners for industry adjustment.
+     * @return a {@code JPanel} component configured as the Industry Modifiers Panel with labels and spinners for
+     *       industry adjustment.
      */
     private JPanel createIndustryModifiersPanel() {
         JLabel industryLabel = new CampaignOptionsLabel("IndustryLabel");
+        industryLabel.setHorizontalAlignment(SwingConstants.CENTER);
         industryLabel.addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader, "IndustryLabel"));
 
         // Layout the Panel
@@ -838,68 +819,85 @@ public class EquipmentAndSuppliesTab {
         // Add the label
         layout.gridx = 0;
         layout.gridy = 0;
-        layout.gridwidth = 2;
+        layout.gridwidth = 1;
         layout.weightx = 1.0;
         panel.add(industryLabel, layout);
-
+        layout.gridx = 0;
+        layout.gridy = 1;
+        layout.gridwidth = 1;
+        layout.weightx = 0;
+        layout.anchor = GridBagConstraints.WEST;
+        JPanel spacer = new JPanel();
+        spacer.setPreferredSize(new Dimension(1, getSpinnerHeight()));
+        panel.add(spacer, layout);
         // Add the other elements
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < PlanetaryRating.values().length; i++) {
             layout.gridx = 0;
-            layout.gridy = i + 1;
+            layout.gridy = i + 2;
             layout.gridwidth = 1;
             layout.weightx = 0;
             layout.anchor = GridBagConstraints.WEST;
-            panel.add(lblPlanetAcquireIndustryBonus[i], layout);
-            lblPlanetAcquireTechBonus[i].addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
-                  "IndustryLabel"));
-
-            layout.gridx++;
             panel.add(spnPlanetAcquireIndustryBonus[i], layout);
-            lblPlanetAcquireTechBonus[i].addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
-                  "IndustryLabel"));
         }
+
+        // Filler
+        layout.gridx = 0;
+        layout.gridy = PlanetaryRating.values().length + 2;
+        layout.gridwidth = 1;
+        JPanel bottomSpacer = new JPanel();
+        bottomSpacer.setPreferredSize(new Dimension(1, getSpinnerHeight()));
+        panel.add(bottomSpacer, layout);
 
         return panel;
     }
 
     /**
-     * Creates and configures a {@code JPanel} for displaying and adjusting output modifiers.
-     * The panel includes labels and corresponding spinner components to modify
-     * planet acquisition output bonuses.
+     * Creates and configures a {@code JPanel} for displaying and adjusting output modifiers. The panel includes labels
+     * and corresponding spinner components to modify planet acquisition output bonuses.
      *
      * @return a {@code JPanel} configured with labels and spinners for planet output modifiers
      */
     private JPanel createOutputModifiersPanel() {
         JLabel outputLabel = new CampaignOptionsLabel("OutputLabel");
+        outputLabel.setHorizontalAlignment(SwingConstants.CENTER);
         outputLabel.addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader, "OutputLabel"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("OutputModifiersPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
         // Add the label
         layout.gridx = 0;
         layout.gridy = 0;
-        layout.gridwidth = 2;
+        layout.gridwidth = 1;
         layout.weightx = 1.0;
         panel.add(outputLabel, layout);
 
+        layout.gridx = 0;
+        layout.gridy = 1;
+        layout.gridwidth = 1;
+        layout.weightx = 0;
+        layout.anchor = GridBagConstraints.WEST;
+        JPanel spacer = new JPanel();
+        spacer.setPreferredSize(new Dimension(1, getSpinnerHeight()));
+        panel.add(spacer, layout);
+
         // Add the other elements
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < PlanetaryRating.values().length; i++) {
             layout.gridx = 0;
-            layout.gridy = i + 1;
+            layout.gridy = i + 2;
             layout.gridwidth = 1;
             layout.weightx = 0;
             layout.anchor = GridBagConstraints.WEST;
-            panel.add(lblPlanetAcquireOutputBonus[i], layout);
-            lblPlanetAcquireOutputBonus[i].addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
-                  "OutputLabel"));
-
-            layout.gridx++;
             panel.add(spnPlanetAcquireOutputBonus[i], layout);
-            spnPlanetAcquireOutputBonus[i].addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
-                  "OutputLabel"));
         }
+
+        // Filler
+        layout.gridx = 0;
+        layout.gridy = PlanetaryRating.values().length + 2;
+        layout.gridwidth = 1;
+        JPanel bottomSpacer = new JPanel();
+        bottomSpacer.setPreferredSize(new Dimension(1, getSpinnerHeight()));
+        panel.add(bottomSpacer, layout);
 
         return panel;
     }
@@ -912,26 +910,6 @@ public class EquipmentAndSuppliesTab {
     private void setSpinnerWidth(JSpinner spinner) {
         Dimension size = spinner.getPreferredSize();
         spinner.setMinimumSize(UIUtil.scaleForGUI(size.width, size.height));
-    }
-
-    /**
-     * Determines the modifier label based on the provided quality rating.
-     *
-     * @param quality the integer representing the quality rating, corresponding to predefined
-     *               constants in EquipmentType.
-     * @return the string label associated with the provided quality rating. Returns "A" for RATING_A,
-     * "B" for RATING_B, etc., or "ERROR" if the quality does not match any predefined ratings.
-     */
-    private String getModifierLabel(int quality) {
-        return switch (quality) {
-            case EquipmentType.RATING_A -> "A";
-            case EquipmentType.RATING_B -> "B";
-            case EquipmentType.RATING_C -> "C";
-            case EquipmentType.RATING_D -> "D";
-            case EquipmentType.RATING_E -> "E";
-            case EquipmentType.RATING_F -> "F";
-            default -> "ERROR";
-        };
     }
 
     /**
@@ -952,6 +930,7 @@ public class EquipmentAndSuppliesTab {
      * Retrieves the name of the transit unit based on the provided unit value.
      *
      * @param unit the integer value representing the transit unit (e.g., day, week, month)
+     *
      * @return the name of the transit unit as a string, or "ERROR" if the unit is not recognized
      */
     private static String getTransitUnitName(final int unit) {
@@ -964,9 +943,8 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Builds a DefaultComboBoxModel containing a predefined set of skill options
-     * that can be acquired. The options include technical, administrative,
-     * scrounge, negotiation, and auto skills.
+     * Builds a DefaultComboBoxModel containing a predefined set of skill options that can be acquired. The options
+     * include technical, administrative, negotiation, and auto skills.
      *
      * @return a DefaultComboBoxModel containing the skill options as string elements.
      */
@@ -975,7 +953,6 @@ public class EquipmentAndSuppliesTab {
 
         acquireSkillModel.addElement(CampaignOptions.S_TECH);
         acquireSkillModel.addElement(SkillType.S_ADMIN);
-        acquireSkillModel.addElement(SkillType.S_SCROUNGE);
         acquireSkillModel.addElement(SkillType.S_NEGOTIATION);
         acquireSkillModel.addElement(CampaignOptions.S_AUTO);
 
@@ -1006,18 +983,18 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Creates and initializes the "Tech Limits" tab panel within a user interface.
-     * The tab includes various settings and options related to technical limitations,
-     * such as limiting by year, disallowing extinct technologies, allowing faction-specific purchases,
-     * enabling canon-only restrictions, setting maximum tech levels, and more.
-     * The method arranges the components in a structured layout and constructs the required parent panel.
+     * Creates and initializes the "Tech Limits" tab panel within a user interface. The tab includes various settings
+     * and options related to technical limitations, such as limiting by year, disallowing extinct technologies,
+     * allowing faction-specific purchases, enabling canon-only restrictions, setting maximum tech levels, and more. The
+     * method arranges the components in a structured layout and constructs the required parent panel.
      *
      * @return the {@code JPanel} representing the "Tech Limits" tab, fully configured with its components and layout.
      */
     public JPanel createTechLimitsTab() {
         // Header
         techLimitsHeader = new CampaignOptionsHeaderPanel("TechLimitsTab",
-              getImageDirectory() + "logo_clan_ghost_bear.png", 3);
+              getImageDirectory() + "logo_clan_ghost_bear.png",
+              3);
 
         limitByYearBox = new CampaignOptionsCheckBox("LimitByYearBox");
         limitByYearBox.addMouseListener(createTipPanelUpdater(techLimitsHeader, "LimitByYearBox"));
@@ -1097,12 +1074,10 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Creates and returns a DefaultComboBoxModel containing the available
-     * options for maximum technology levels.
+     * Creates and returns a DefaultComboBoxModel containing the available options for maximum technology levels.
      *
-     * @return A DefaultComboBoxModel<String> populated with the list of
-     *         technology level names corresponding to the defined constants
-     *         in CampaignOptions (e.g., TECH_INTRO, TECH_STANDARD, etc.).
+     * @return A DefaultComboBoxModel<String> populated with the list of technology level names corresponding to the
+     *       defined constants in CampaignOptions (e.g., TECH_INTRO, TECH_STANDARD, etc.).
      */
     private static DefaultComboBoxModel<String> getMaximumTechLevelOptions() {
         DefaultComboBoxModel<String> maximumTechLevelModel = new DefaultComboBoxModel<>();
@@ -1117,12 +1092,11 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Applies the given campaign options to the campaign or uses default options if none are provided.
-     * This method updates the campaign settings for acquisitions, deliveries, planetary acquisitions,
-     * and technological limits to customize campaign behavior.
+     * Applies the given campaign options to the campaign or uses default options if none are provided. This method
+     * updates the campaign settings for acquisitions, deliveries, planetary acquisitions, and technological limits to
+     * customize campaign behavior.
      *
-     * @param presetCampaignOptions the campaign options to apply; if null, default campaign options
-     *                              are used instead
+     * @param presetCampaignOptions the campaign options to apply; if null, default campaign options are used instead
      */
     public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
@@ -1162,12 +1136,17 @@ public class EquipmentAndSuppliesTab {
         options.setDisallowClanPartsFromIS(disallowClanPartsFromIS.isSelected());
         options.setPenaltyClanPartsFromIS((int) spnPenaltyClanPartsFromIS.getValue());
         options.setPlanetAcquisitionVerboseReporting(usePlanetaryAcquisitionsVerbose.isSelected());
-        for (int i = ITechnology.RATING_A; i <= ITechnology.RATING_F; i++) {
-            options.setPlanetTechAcquisitionBonus((int) spnPlanetAcquireTechBonus[i].getValue(), i);
-            options.setPlanetIndustryAcquisitionBonus(
-                (int) spnPlanetAcquireIndustryBonus[i].getValue(), i);
-            options.setPlanetOutputAcquisitionBonus((int) spnPlanetAcquireOutputBonus[i].getValue(),
-                i);
+        
+        int i = 0;
+        for (PlanetarySophistication sophistication : PlanetarySophistication.values()) {
+            options.setPlanetTechAcquisitionBonus((int) spnPlanetAcquireTechBonus[i].getValue(), sophistication);
+            i++;
+        }
+        i = 0;
+        for (PlanetaryRating rating : PlanetaryRating.values()) {
+            options.setPlanetIndustryAcquisitionBonus((int) spnPlanetAcquireIndustryBonus[i].getValue(), rating);
+            options.setPlanetOutputAcquisitionBonus((int) spnPlanetAcquireOutputBonus[i].getValue(), rating);
+            i++;
         }
 
         // Tech Limits
@@ -1183,23 +1162,22 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Loads values from the campaign options. This method serves as a convenience
-     * method that calls the overloaded version of {@code loadValuesFromCampaignOptions}
-     * with a {@code null} parameter.
+     * Loads values from the campaign options. This method serves as a convenience method that calls the overloaded
+     * version of {@code loadValuesFromCampaignOptions} with a {@code null} parameter.
      * <p>
-     * This method is typically used to initialize or update certain settings or
-     * configurations based on the campaign options when no specific options are provided.
+     * This method is typically used to initialize or update certain settings or configurations based on the campaign
+     * options when no specific options are provided.
      */
     public void loadValuesFromCampaignOptions() {
         loadValuesFromCampaignOptions(null);
     }
 
     /**
-     * Loads values from the provided CampaignOptions instance into the UI components.
-     * If the provided CampaignOptions instance is null, it defaults to using the internal campaignOptions instance.
+     * Loads values from the provided CampaignOptions instance into the UI components. If the provided CampaignOptions
+     * instance is null, it defaults to using the internal campaignOptions instance.
      *
-     * @param presetCampaignOptions the CampaignOptions instance containing the preset values to load,
-     *                               or null to use the default internal campaignOptions.
+     * @param presetCampaignOptions the CampaignOptions instance containing the preset values to load, or null to use
+     *                              the default internal campaignOptions.
      */
     public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
@@ -1239,10 +1217,17 @@ public class EquipmentAndSuppliesTab {
         disallowClanPartsFromIS.setSelected(options.isNoClanPartsFromIS());
         spnPenaltyClanPartsFromIS.setValue(options.getPenaltyClanPartsFromIS());
         usePlanetaryAcquisitionsVerbose.setSelected(options.isPlanetAcquisitionVerbose());
-        for (int i = EquipmentType.RATING_A; i <= EquipmentType.RATING_F; i++) {
-            spnPlanetAcquireTechBonus[i].setValue(options.getPlanetTechAcquisitionBonus(i));
-            spnPlanetAcquireIndustryBonus[i].setValue(options.getPlanetIndustryAcquisitionBonus(i));
-            spnPlanetAcquireOutputBonus[i].setValue(options.getPlanetOutputAcquisitionBonus(i));
+        
+        int i = 0;
+        for (PlanetarySophistication sophistication : PlanetarySophistication.values()) {
+            spnPlanetAcquireTechBonus[i].setValue(options.getPlanetTechAcquisitionBonus(sophistication));
+            i++;
+        }
+        i = 0;
+        for (PlanetaryRating rating : PlanetaryRating.values()) {
+            spnPlanetAcquireIndustryBonus[i].setValue(options.getPlanetIndustryAcquisitionBonus(rating));
+            spnPlanetAcquireOutputBonus[i].setValue(options.getPlanetOutputAcquisitionBonus(rating));
+            i++;
         }
 
         // Tech Limits

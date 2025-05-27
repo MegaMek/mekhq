@@ -29,18 +29,18 @@ package mekhq.gui.panels;
 
 import javax.swing.JFrame;
 
-import megamek.client.ui.panels.AbstractIconChooser;
+import megamek.client.ui.panels.abstractPanels.abstractIconChooserPanel;
 import megamek.client.ui.trees.AbstractIconChooserTree;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
 import mekhq.MekHQ;
 
 /**
- * AbstractMHQIconChooser is an extension of AbstractIconChooser that moves the preferences to
+ * AbstractMHQIconChooser is an extension of abstractIconChooserPanel that moves the preferences to
  * MekHQ.
- * @see AbstractIconChooser
+ * @see abstractIconChooserPanel
  */
-public abstract class AbstractMHQIconChooser extends AbstractIconChooser {
+public abstract class AbstractMHQIconChooser extends abstractIconChooserPanel {
     //region Constructors
     protected AbstractMHQIconChooser(final JFrame frame, final String name,
                                      final AbstractIconChooserTree tree,

@@ -245,14 +245,6 @@ public class Skill {
     }
 
     /**
-     * @deprecated use {@link #getFinalSkillValue(PersonnelOptions, Attributes, int)} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public int getFinalSkillValue() {
-        return getFinalSkillValue(new PersonnelOptions(), new Attributes(), 0);
-    }
-
-    /**
      * @deprecated use {@link #getFinalSkillValue(PersonnelOptions, Attributes)} instead.
      */
     @Deprecated(since = "0.50.06", forRemoval = true)
@@ -287,8 +279,8 @@ public class Skill {
     }
 
     /**
-     * Calculates the final skill value for a character by applying progression rules, attribute modifiers,
-     * SPA (Special Pilot Abilities) modifiers, and reputation, then clamps the value within the legal range for the skill type.
+     * Calculates the final skill value for a character by applying progression rules, attribute modifiers, SPA (Special
+     * Pilot Abilities) modifiers, and reputation, then clamps the value within the legal range for the skill type.
      *
      * <p>The calculation sequence is as follows:</p>
      * <ul>
@@ -303,6 +295,7 @@ public class Skill {
      * @param characterOptions the {@link PersonnelOptions} that define modifiers and SPA specifics for the character
      * @param attributes       the {@link Attributes} object providing attribute values for the character
      * @param reputation       a numeric value influencing the skill, positive to improve or negative to penalize it
+     *
      * @return the calculated final skill value, after applying all modifiers and bounds
      */
     public int getFinalSkillValue(PersonnelOptions characterOptions, Attributes attributes, int reputation) {
@@ -326,6 +319,12 @@ public class Skill {
      */
     public int getSPAModifiers(PersonnelOptions characterOptions, int reputation) {
         int modifier = 0;
+
+        if (characterOptions == null) {
+            logger.warn("Character options are null. Cannot calculate SPA Modifiers.", new Exception());
+            return modifier;
+        }
+
 
         String name = type.getName();
         // Reputation and Alternate ID

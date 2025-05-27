@@ -120,17 +120,14 @@ public abstract class AbstractSkillGenerator {
         }
     }
 
-    /**
-     * @deprecated use {@link #generateRoleplaySkills(Person)} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public void generateRoleplaySkills(final Person person, int experienceLevel) {
-        generateRoleplaySkills(person);
-    }
-
     public void generateRoleplaySkills(final Person person) {
         for (SkillType skillType : getRoleplaySkills()) {
             if (DEPRECATED_SKILLS.contains(skillType)) {
+                continue;
+            }
+
+            // No double-dipping
+            if (person.hasSkill(skillType.getName())) {
                 continue;
             }
 

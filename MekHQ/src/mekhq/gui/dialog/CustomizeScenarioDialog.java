@@ -55,7 +55,7 @@ import javax.swing.table.TableColumn;
 
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.client.ui.swing.PlanetaryConditionsDialog;
+import megamek.client.ui.dialogs.clientDialogs.PlanetaryConditionsDialog;
 import megamek.common.Player;
 import megamek.common.planetaryconditions.PlanetaryConditions;
 import megamek.logging.MMLogger;

@@ -69,7 +69,7 @@ public enum Phenotype {
 
     // region Variable Declarations
     private static final MMLogger logger = MMLogger.create(Phenotype.class);
-    private static final String RESOURCE_BUNDLE = "mekhq.resources." + Phenotype.class.getSimpleName();
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Phenotype";
 
     private final boolean isTrueborn;
     private final boolean external;
@@ -113,30 +113,6 @@ public enum Phenotype {
      */
     public int getAttributeCap(SkillAttribute attribute) {
         return attributeCaps.getAttributeScore(attribute);
-    }
-
-    /**
-     * @deprecated use {@link #getLabel()} instead
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public String getName() {
-        return getLabel();
-    }
-
-    /**
-     * @deprecated use {@link #getLabel()} instead
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public String getGroupingName() {
-        return getLabel();
-    }
-
-    /**
-     * @deprecated use {@link #getTooltip()} instead
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public String getToolTipText() {
-        return getTooltip();
     }
 
     /**
@@ -347,15 +323,7 @@ public enum Phenotype {
     }
 
     // region File I/O
-
-    /**
-     * @deprecated use {@link #fromString(String)} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public static Phenotype parseFromString(final String phenotype) {
-        return fromString(phenotype);
-    }
-
+    // CHECKSTYLE IGNORE ForbiddenWords FOR 32 LINES
     /**
      * Converts a string representation to a corresponding {@link Phenotype} value.
      *
@@ -409,13 +377,6 @@ public enum Phenotype {
                 }
             }
         } catch (Exception ignored) {
-        }
-
-        // <50.1 compatibility
-        if (text.equalsIgnoreCase("MECHWARRIOR")) {
-            return MEKWARRIOR;
-        } else if (text.equalsIgnoreCase("PROTOMECH")) {
-            return PROTOMEK;
         }
 
         // Parse from ordinal

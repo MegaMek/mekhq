@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.resupplyAndCaches;
 
@@ -49,7 +54,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import megamek.client.ui.swing.util.UIUtil;
+import megamek.client.ui.util.UIUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
@@ -224,8 +229,7 @@ public class DialogResupplyFocus extends JDialog {
         // OOC panel (to be added below the button panel)
         JPanel infoPanel = new JPanel(new BorderLayout());
         JLabel lblInfo = new JLabel(String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-              RIGHT_WIDTH + LEFT_WIDTH,
-              getFormattedTextAt(RESOURCE_BUNDLE, "focusDescription.ooc")));
+              RIGHT_WIDTH + LEFT_WIDTH, getFormattedTextAt(RESOURCE_BUNDLE, "outOfCharacter.focus")));
         lblInfo.setHorizontalAlignment(SwingConstants.CENTER);
         infoPanel.add(lblInfo, BorderLayout.CENTER);
         infoPanel.setBorder(BorderFactory.createEtchedBorder());

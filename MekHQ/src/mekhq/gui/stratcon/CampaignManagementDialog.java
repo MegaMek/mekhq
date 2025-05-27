@@ -28,7 +28,7 @@
 
 package mekhq.gui.stratcon;
 
-import megamek.client.ui.swing.util.UIUtil;
+import megamek.client.ui.util.UIUtil;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.stratcon.StratconCampaignState;

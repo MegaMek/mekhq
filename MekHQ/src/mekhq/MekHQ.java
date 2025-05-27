@@ -64,23 +64,25 @@ import megamek.SuiteConstants;
 import megamek.client.Client;
 import megamek.client.HeadlessClient;
 import megamek.client.bot.princess.BehaviorSettings;
-import megamek.client.ui.dialogs.AutoResolveChanceDialog;
-import megamek.client.ui.dialogs.AutoResolveProgressDialog;
-import megamek.client.ui.dialogs.AutoResolveSimulationLogDialog;
+import megamek.client.ui.dialogs.abstractDialogs.AutoResolveChanceDialog;
+import megamek.client.ui.dialogs.abstractDialogs.AutoResolveProgressDialog;
+import megamek.client.ui.dialogs.helpDialogs.AutoResolveSimulationLogDialog;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.preferences.SuitePreferences;
-import megamek.client.ui.swing.GUIPreferences;
-import megamek.client.ui.swing.gameConnectionDialogs.ConnectDialog;
-import megamek.client.ui.swing.gameConnectionDialogs.HostDialog;
-import megamek.client.ui.swing.util.UIUtil;
+import megamek.client.ui.clientGUI.GUIPreferences;
+import megamek.client.ui.dialogs.gameConnectionDialogs.ConnectDialog;
+import megamek.client.ui.dialogs.gameConnectionDialogs.HostDialog;
+import megamek.client.ui.util.UIUtil;
 import megamek.common.Board;
 import megamek.common.annotations.Nullable;
 import megamek.common.autoresolve.acar.SimulatedClient;
+import megamek.common.autoresolve.converter.SetupForces;
 import megamek.common.autoresolve.converter.SingletonForces;
 import megamek.common.autoresolve.event.AutoResolveConcludedEvent;
 import megamek.common.event.*;
 import megamek.common.internationalization.I18n;
 import megamek.common.net.marshalling.SanityInputFilter;
+import megamek.common.planetaryconditions.PlanetaryConditions;
 import megamek.logging.MMLogger;
 import megamek.server.Server;
 import megamek.server.totalwarfare.TWGameManager;
@@ -88,7 +90,8 @@ import megameklab.MegaMekLab;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
 import mekhq.campaign.ResolveScenarioTracker;
-import mekhq.campaign.autoresolve.AtBSetupForces;
+import mekhq.campaign.autoresolve.MekHQSetupForces;
+import mekhq.campaign.autoresolve.StratconSetupForces;
 import mekhq.campaign.handler.PostScenarioDialogHandler;
 import mekhq.campaign.handler.XPHandler;
 import mekhq.campaign.mission.AtBDynamicScenario;
@@ -108,6 +111,7 @@ import mekhq.gui.utilities.ObservableString;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
 import mekhq.utilities.MHQInternationalization;
+import mekhq.utilities.ScenarioUtils;
 
 /**
  * The main class of the application.
@@ -749,30 +753,42 @@ public class MekHQ implements GameListener {
         return iconPackage;
     }
 
+    private SetupForces getSetupForces(Scenario scenario, List<Unit> units) {
+        if (scenario instanceof AtBScenario atBScenario) {
+            return new StratconSetupForces(getCampaign(), units, atBScenario, new SingletonForces());
+        }
+        return new MekHQSetupForces(getCampaign(), units, scenario, new SingletonForces());
+    }
+
     /**
      * This method is called when the player wants to auto resolve the scenario using ACAR method
      *
      * @param units The list of player units involved in the scenario
      */
-    public void startAutoResolve(AtBScenario scenario, List<Unit> units) {
-
+    public void startAutoResolve(Scenario scenario, List<Unit> units) {
         this.autosaveService.requestBeforeScenarioAutosave(getCampaign());
 
+        Board board = ScenarioUtils.getBoardFor(scenario);
+        SetupForces setupForces = getSetupForces(scenario, units);
+
+        PlanetaryConditions planetaryConditions = getCampaign().getCurrentPlanetaryConditions(scenario);
         if (getCampaign().getCampaignOptions().isAutoResolveVictoryChanceEnabled()) {
+
             var proceed = AutoResolveChanceDialog.showDialog(campaignGUI.getFrame(),
                   getCampaign().getCampaignOptions().getAutoResolveNumberOfScenarios(),
                   Runtime.getRuntime().availableProcessors(),
                   1,
-                  new AtBSetupForces(getCampaign(), units, scenario, new SingletonForces()),
-                  new Board(scenario.getBaseMapX(), scenario.getBaseMapY())) == JOptionPane.YES_OPTION;
+                  setupForces,
+                  board,
+                  planetaryConditions) == JOptionPane.YES_OPTION;
             if (!proceed) {
                 return;
             }
         }
 
         var event = AutoResolveProgressDialog.showDialog(campaignGUI.getFrame(),
-              new AtBSetupForces(getCampaign(), units, scenario, new SingletonForces()),
-              new Board(scenario.getBaseMapX(), scenario.getBaseMapY()));
+              setupForces,
+              board, planetaryConditions);
 
         var autoResolveBattleReport = new AutoResolveSimulationLogDialog(campaignGUI.getFrame(), event.getLogFile());
         autoResolveBattleReport.setModal(true);
@@ -786,7 +802,7 @@ public class MekHQ implements GameListener {
      *
      * @param autoResolveConcludedEvent The event that contains the results of the auto resolve game.
      */
-    public void autoResolveConcluded(AutoResolveConcludedEvent autoResolveConcludedEvent, AtBScenario scenario) {
+    public void autoResolveConcluded(AutoResolveConcludedEvent autoResolveConcludedEvent, Scenario scenario) {
         try {
             String victoryMessage = autoResolveConcludedEvent.controlledScenario() ?
                                           MHQInternationalization.getText("AutoResolveDialog.message.victory") :
@@ -794,8 +810,8 @@ public class MekHQ implements GameListener {
 
             String decisionMessage = MHQInternationalization.getText("ResolveDialog.control.message");
 
-            if (scenario instanceof AtBDynamicScenario) {
-                ScenarioTemplate template = ((AtBDynamicScenario) scenario).getTemplate();
+            if (scenario instanceof AtBDynamicScenario atBDynamicScenario) {
+                ScenarioTemplate template = atBDynamicScenario.getTemplate();
 
                 if (template != null) {
                     BattlefieldControlType battlefieldControl = template.getBattlefieldControl();
@@ -835,7 +851,7 @@ public class MekHQ implements GameListener {
         }
     }
 
-    private void postAbortedAutoResolve(AutoResolveConcludedEvent autoResolveConcludedEvent, AtBScenario scenario,
+    private void postAbortedAutoResolve(AutoResolveConcludedEvent autoResolveConcludedEvent, Scenario scenario,
           ResolveScenarioTracker tracker) {
         try {
             resetPersonsHits(tracker);

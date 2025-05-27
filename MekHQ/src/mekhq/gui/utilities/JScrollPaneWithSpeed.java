@@ -32,7 +32,7 @@ import java.awt.Component;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import megamek.client.ui.swing.GUIPreferences;
+import megamek.client.ui.clientGUI.GUIPreferences;
 
 /**
  * It's a JScrollPane that manages its scroll speed based on the UI scale

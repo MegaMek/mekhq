@@ -33,7 +33,7 @@
 package mekhq.gui.campaignOptions.components;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
-import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
+import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;

@@ -42,11 +42,11 @@ import megamek.common.Entity;
 import megamek.common.MiscType;
 import megamek.common.enums.SkillLevel;
 import megamek.common.equipment.MiscMounted;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * The {@code Fatigue} class provides utility methods for managing and processing
@@ -59,7 +59,7 @@ import mekhq.campaign.unit.Unit;
  * based on campaign settings and personnel conditions.</p>
  */
 public class Fatigue {
-    final private static String RESOURCE_BUNDLE = "mekhq.resources." + Fatigue.class.getSimpleName();
+    final private static String RESOURCE_BUNDLE = "mekhq.resources.Fatigue";
 
     static final private int FATIGUE_RECOVERY_RATE = 1;
 
@@ -173,28 +173,28 @@ public class Fatigue {
         if ((effectiveFatigue >= 5) && (effectiveFatigue < 9)) {
             campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "fatigueTired.text",
                   person.getHyperlinkedFullTitle(),
-                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor()),
+                  spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
                   CLOSING_SPAN_TAG));
 
             person.setIsRecoveringFromFatigue(true);
         } else if ((effectiveFatigue >= 9) && (effectiveFatigue < 12)) {
             campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "fatigueFatigued.text",
                   person.getHyperlinkedFullTitle(),
-                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor()),
+                  spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
                   CLOSING_SPAN_TAG));
 
             person.setIsRecoveringFromFatigue(true);
         } else if ((effectiveFatigue >= 12) && (effectiveFatigue < 16)) {
             campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "fatigueExhausted.text",
                   person.getHyperlinkedFullTitle(),
-                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   CLOSING_SPAN_TAG));
 
             person.setIsRecoveringFromFatigue(true);
         } else if (effectiveFatigue >= 17) {
             campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "fatigueCritical.text",
                   person.getHyperlinkedFullTitle(),
-                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   CLOSING_SPAN_TAG));
 
             person.setIsRecoveringFromFatigue(true);
@@ -282,7 +282,7 @@ public class Fatigue {
                 if (person.getFatigue() <= 0) {
                     campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "fatigueRecovered.text",
                           person.getHyperlinkedFullTitle(),
-                          spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                          spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                           CLOSING_SPAN_TAG));
 
                     person.setIsRecoveringFromFatigue(false);

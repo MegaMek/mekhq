@@ -28,8 +28,8 @@
 package mekhq.gui.dialog;
 
 import megamek.client.ui.GBC;
-import megamek.client.ui.swing.util.UIUtil;
-import megamek.client.ui.swing.util.UIUtil.TipButton;
+import megamek.client.ui.util.UIUtil;
+import megamek.client.ui.util.UIUtil.TipButton;
 import megamek.common.IStartingPositions;
 import megamek.common.Player;
 import mekhq.MekHQ;
@@ -43,7 +43,7 @@ import java.awt.event.ActionListener;
 import java.text.NumberFormat;
 import java.util.ResourceBundle;
 
-import static megamek.client.ui.swing.util.UIUtil.*;
+import static megamek.client.ui.util.UIUtil.*;
 
 public class EditDeploymentDialog extends JDialog {
 

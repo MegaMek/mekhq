@@ -52,7 +52,7 @@ import mekhq.gui.dialog.MercenaryAuctionDialog;
 public class MercenaryAuction {
     private static final MMLogger logger = MMLogger.create(MercenaryAuction.class);
 
-    private static final String RESOURCE_BUNDLE = "mekhq.resources." + MercenaryAuctionDialog.class.getSimpleName();
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.MercenaryAuctionDialog";
 
     private static final int AUCTION_TIER_SUCCESS_PERCENT = 20;
     private static final int DECLINE_AUCTION_OPTION = 0;
@@ -65,7 +65,7 @@ public class MercenaryAuction {
      * of the auction, applying the results to the campaign accordingly.</p>
      *
      * @param campaign The current {@link Campaign} instance where the auction takes place.
-     * @param unitType The type of unit being auctioned (e.g., `MECH`, `VEHICLE`).
+     * @param unitType The type of unit being auctioned (e.g., `MEK`, `VEHICLE`).
      */
     public MercenaryAuction(Campaign campaign, int requiredCombatTeams, StratconCampaignState campaignState,
           int unitType) {

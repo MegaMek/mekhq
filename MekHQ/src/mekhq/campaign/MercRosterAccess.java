@@ -54,6 +54,7 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.personnel.ranks.Rank;
+import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -655,6 +656,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                 preparedStatement.executeUpdate();
                 // write out skills to skills table
                 PersonnelOptions options = person.getOptions();
+                Attributes attributes = person.getATOWAttributes();
                 int reputation = person.getReputation();
                 for (int i = 0; i < SkillType.skillList.length; i++) {
                     if (person.hasSkill(SkillType.skillList[i])) {
@@ -664,7 +666,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                                                                            ".skills (person, skill, value) VALUES (?, ?, ?)");
                         preparedStatement.setInt(1, id);
                         preparedStatement.setInt(2, i + 1);
-                        preparedStatement.setInt(3, skill.getFinalSkillValue(options, reputation));
+                        preparedStatement.setInt(3, skill.getFinalSkillValue(options, attributes, reputation));
                         preparedStatement.executeUpdate();
                     }
                 }

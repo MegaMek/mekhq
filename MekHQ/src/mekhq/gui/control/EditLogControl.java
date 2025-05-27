@@ -27,7 +27,7 @@
  */
 package mekhq.gui.control;
 
-import static megamek.client.ui.swing.util.UIUtil.scaleForGUI;
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.utilities.MHQInternationalization.getFormattedText;
 
 import java.awt.BorderLayout;
@@ -106,21 +106,7 @@ public class EditLogControl extends JPanel {
          */
         PERFORMANCE_LOG
     }
-
-    /**
-     * @deprecated use {@link EditLogControl#EditLogControl(JFrame, Person, LocalDate, LogType)} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public EditLogControl(JFrame parent, Person person, LocalDate today) {
-        this.parent = parent;
-        this.person = person;
-        this.today = today;
-        this.logType = LogType.PERSONAL_LOG;
-        this.logModel = new LogTableModel(person.getPersonalLog());
-
-        initComponents();
-    }
-
+    
     /**
      * Constructs a new control panel for editing a person's log.
      *

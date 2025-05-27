@@ -48,13 +48,11 @@ public class SkillAwards {
     private static final MMLogger logger = MMLogger.create(SkillAwards.class);
 
     /**
-     * This function loops through Skill Awards, checking whether the person is
-     * eligible to receive each type of award
+     * This function loops through Skill Awards, checking whether the person is eligible to receive each type of award
      *
      * @param campaign the current campaign
      * @param person   the person to check award eligibility for
-     * @param awards   the awards to be processed (should only include awards where
-     *                 item == Skill)
+     * @param awards   the awards to be processed (should only include awards where item == Skill)
      */
     public static Map<Integer, List<Object>> SkillAwardsProcessor(Campaign campaign, UUID person, List<Award> awards) {
         int requiredSkillLevel;
@@ -65,7 +63,9 @@ public class SkillAwards {
                 requiredSkillLevel = award.getQty();
             } catch (Exception e) {
                 logger.warn("Award {} from the {} set has an invalid qty value {}",
-                        award.getName(), award.getSet(), award.getQty());
+                      award.getName(),
+                      award.getSet(),
+                      award.getQty());
                 continue;
             }
 
@@ -75,9 +75,7 @@ public class SkillAwards {
                 // if the user puts two ',' next to each other (creating an empty skill) the
                 // system will just treat it as an invalid
                 // skill and break the current loop iteration
-                List<String> skills = Arrays.asList(award.getRange()
-                        .replaceAll("\\s", "")
-                        .split(","));
+                List<String> skills = Arrays.asList(award.getRange().replaceAll("\\s", "").split(","));
 
                 boolean hasRequiredSkillLevel = true;
 
@@ -116,14 +114,26 @@ public class SkillAwards {
             // These first couple of cases are for those instances where the users want to
             // check against multiple skills, but only needs one passing grade
             case "piloting":
-                relevantSkills = Arrays.asList(SkillType.S_PILOT_MEK, SkillType.S_PILOT_AERO, SkillType.S_PILOT_GVEE,
-                        SkillType.S_PILOT_VTOL, SkillType.S_PILOT_NVEE, SkillType.S_PILOT_JET, SkillType.S_PILOT_SPACE);
+                relevantSkills = Arrays.asList(SkillType.S_PILOT_MEK,
+                      SkillType.S_PILOT_AERO,
+                      SkillType.S_PILOT_GVEE,
+                      SkillType.S_PILOT_VTOL,
+                      SkillType.S_PILOT_NVEE,
+                      SkillType.S_PILOT_JET,
+                      SkillType.S_PILOT_SPACE);
                 break;
 
             case "accuracy":
-                relevantSkills = Arrays.asList(SkillType.S_GUN_MEK, SkillType.S_GUN_AERO, SkillType.S_GUN_VEE,
-                        SkillType.S_GUN_JET, SkillType.S_GUN_SPACE, SkillType.S_GUN_BA, SkillType.S_GUN_PROTO,
-                        SkillType.S_ARTILLERY, SkillType.S_SMALL_ARMS, SkillType.S_ANTI_MEK);
+                relevantSkills = Arrays.asList(SkillType.S_GUN_MEK,
+                      SkillType.S_GUN_AERO,
+                      SkillType.S_GUN_VEE,
+                      SkillType.S_GUN_JET,
+                      SkillType.S_GUN_SPACE,
+                      SkillType.S_GUN_BA,
+                      SkillType.S_GUN_PROTO,
+                      SkillType.S_ARTILLERY,
+                      SkillType.S_SMALL_ARMS,
+                      SkillType.S_ANTI_MEK);
                 break;
 
             case "command":
@@ -131,21 +141,27 @@ public class SkillAwards {
                 break;
 
             case "admin":
-                relevantSkills = Arrays.asList(SkillType.S_ADMIN, SkillType.S_NEGOTIATION, SkillType.S_SCROUNGE);
+                relevantSkills = Arrays.asList(SkillType.S_ADMIN, SkillType.S_NEGOTIATION);
                 break;
 
             case "techwithmedical":
-                relevantSkills = Arrays.asList(SkillType.S_TECH_MEK, SkillType.S_TECH_AERO, SkillType.S_TECH_MECHANIC,
+                relevantSkills = Arrays.asList(SkillType.S_TECH_MEK,
+                      SkillType.S_TECH_AERO,
+                      SkillType.S_TECH_MECHANIC,
                       SkillType.S_TECH_VESSEL,
                       SkillType.S_TECH_BA,
                       SkillType.S_ASTECH,
                       SkillType.S_SURGERY,
-                        SkillType.S_MEDTECH);
+                      SkillType.S_MEDTECH);
                 break;
 
             case "tech":
-                relevantSkills = Arrays.asList(SkillType.S_TECH_MEK, SkillType.S_TECH_AERO, SkillType.S_TECH_MECHANIC,
-                        SkillType.S_TECH_VESSEL, SkillType.S_TECH_BA, SkillType.S_ASTECH);
+                relevantSkills = Arrays.asList(SkillType.S_TECH_MEK,
+                      SkillType.S_TECH_AERO,
+                      SkillType.S_TECH_MECHANIC,
+                      SkillType.S_TECH_VESSEL,
+                      SkillType.S_TECH_BA,
+                      SkillType.S_ASTECH);
                 break;
 
             case "medical":
@@ -156,7 +172,6 @@ public class SkillAwards {
                 relevantSkills = Arrays.asList(SkillType.S_ASTECH, SkillType.S_MEDTECH);
                 break;
 
-            case "piloting/mech": // Remove below after Milestone Release post 0.49.19
             case "piloting/mek":
                 relevantSkills = List.of(SkillType.S_PILOT_MEK);
                 break;
@@ -185,7 +200,6 @@ public class SkillAwards {
                 relevantSkills = List.of(SkillType.S_PILOT_SPACE);
                 break;
 
-            case "gunnery/mech": // Remove below after Milestone Release post 0.49.19
             case "gunnery/mek":
                 relevantSkills = List.of(SkillType.S_GUN_MEK);
                 break;
@@ -210,12 +224,10 @@ public class SkillAwards {
                 relevantSkills = List.of(SkillType.S_GUN_BA);
                 break;
 
-            case "gunnery/protomech": // Remove below after Milestone Release post 0.49.19
             case "gunnery/protomek":
                 relevantSkills = List.of(SkillType.S_GUN_PROTO);
                 break;
 
-            case "tech/mech": // Remove below after Milestone Release post 0.49.19
             case "tech/mek":
                 relevantSkills = List.of(SkillType.S_TECH_MEK);
                 break;
@@ -244,7 +256,6 @@ public class SkillAwards {
                 relevantSkills = List.of(SkillType.S_SMALL_ARMS);
                 break;
 
-            case "antimech": // Remove below after Milestone Release post 0.49.19
             case "antimek":
                 relevantSkills = List.of(SkillType.S_ANTI_MEK);
                 break;
@@ -284,13 +295,8 @@ public class SkillAwards {
                 relevantSkills = List.of(SkillType.S_LEADER);
                 break;
 
-            case "scrounge":
-                relevantSkills = List.of(SkillType.S_SCROUNGE);
-                break;
-
             default:
-                logger.warn("Award {} from the {} set has invalid skill {}", award.getName(),
-                        award.getSet(), skill);
+                logger.warn("Award {} from the {} set has invalid skill {}", award.getName(), award.getSet(), skill);
 
                 // this treats the malformed Skill as if a Person was untrained
                 return -1;
@@ -300,9 +306,8 @@ public class SkillAwards {
     }
 
     /**
-     * This function loops through all relevant skills, calculating the max skill
-     * level.
-     * If all skills are untrained, the function will default to -1.
+     * This function loops through all relevant skills, calculating the max skill level. If all skills are untrained,
+     * the function will default to -1.
      *
      * @param campaign       the current campaign
      * @param relevantSkills the list of Skills to check

@@ -128,7 +128,11 @@ public class PersonnelStatusTest {
               BONDSREF,
               SEPPUKU);
         List<PersonnelStatus> validStatuses = List.of(RETIRED, RESIGNED, SACKED, DESERTED,
-            DEFECTED, MISSING, LEFT, ENEMY_BONDSMAN);
+              DEFECTED,
+              MISSING,
+              LEFT,
+              ENEMY_BONDSMAN,
+              BACKGROUND_CHARACTER);
 
         for (PersonnelStatus status : PersonnelStatus.values()) {
             boolean hasDepartedUnit = validStatuses.contains(status) || deadStatuses.contains(status);

@@ -48,11 +48,15 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import megamek.client.ui.swing.util.UIUtil;
+import megamek.client.ui.util.UIUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.personnel.Person;
 
+/**
+ * @deprecated Unused
+ */
+@Deprecated(since = "0.50.06", forRemoval = true)
 public class ContractAutomationDialog extends JDialog {
     final int LEFT_WIDTH = UIUtil.scaleForGUI(200);
     final int RIGHT_WIDTH = UIUtil.scaleForGUI(400);

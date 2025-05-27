@@ -27,7 +27,7 @@
  */
 package mekhq.gui.dialog;
 
-import megamek.client.ui.baseComponents.MMButton;
+import megamek.client.ui.buttons.MMButton;
 import megamek.client.ui.enums.ValidationState;
 import megamek.common.Entity;
 import megamek.common.annotations.Nullable;

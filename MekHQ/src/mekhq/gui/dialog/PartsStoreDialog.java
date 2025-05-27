@@ -413,10 +413,10 @@ public class PartsStoreDialog extends JDialog {
                           !part.getName().toLowerCase().contains(txtFilter.getText().toLowerCase()) &&
                           !part.getDetails().toLowerCase().contains(txtFilter.getText().toLowerCase())) {
                     return false;
-                } else if (((part.getTechBase() == Part.T_CLAN) || part.isClan()) &&
+                } else if (((part.getTechBase() == Part.TechBase.CLAN) || part.isClan()) &&
                                  !campaign.getCampaignOptions().isAllowClanPurchases()) {
                     return false;
-                } else if ((part.getTechBase() == Part.T_IS) &&
+                } else if ((part.getTechBase() == Part.TechBase.IS) &&
                                  !campaign.getCampaignOptions().isAllowISPurchases()
                                  // Hack to allow Clan access to SL tech but not post-Exodus tech
                                  // until 3050.

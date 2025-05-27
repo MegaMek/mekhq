@@ -55,7 +55,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
-import megamek.client.ui.swing.util.UIUtil;
+import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;

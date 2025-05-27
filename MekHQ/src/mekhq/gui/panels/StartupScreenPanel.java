@@ -47,11 +47,12 @@ import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
-import megamek.client.ui.swing.util.UIUtil;
-import megamek.client.ui.swing.widget.MegaMekButton;
-import megamek.client.ui.swing.widget.SkinSpecification;
-import megamek.client.ui.swing.widget.SkinSpecification.UIComponents;
-import megamek.client.ui.swing.widget.SkinXMLHandler;
+import megamek.client.ui.util.UIUtil;
+import megamek.client.ui.widget.MegaMekButton;
+import megamek.client.ui.widget.RawImagePanel;
+import megamek.client.ui.widget.SkinSpecification;
+import megamek.client.ui.widget.SkinSpecification.UIComponents;
+import megamek.client.ui.widget.SkinXMLHandler;
 import megamek.common.Configuration;
 import megamek.common.annotations.Nullable;
 import megamek.common.preference.PreferenceManager;
@@ -112,7 +113,7 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         setBackground(UIManager.getColor("controlHighlight"));
 
         Dimension scaledMonitorSize = UIUtil.getScaledScreenSize(getFrame());
-        JLabel splash = UIUtil.createSplashComponent(app.getIconPackage().getStartupScreenImagesScreenImages(),
+        RawImagePanel splash = UIUtil.createSplashComponent(app.getIconPackage().getStartupScreenImagesScreenImages(),
               getFrame());
         add(splash, BorderLayout.CENTER);
 
@@ -259,9 +260,7 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         GridBagConstraints c = new GridBagConstraints();
         // Left Column
         c.anchor = GridBagConstraints.WEST;
-        c.insets = new Insets(10, 5, 10, 10);
-        c.ipadx = 10;
-        c.ipady = 5;
+        c.insets = new Insets(0, 0, 0, 10);
         c.gridx = 0;
         c.gridy = 0;
         c.fill = GridBagConstraints.NONE;

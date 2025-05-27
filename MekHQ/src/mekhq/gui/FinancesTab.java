@@ -24,10 +24,15 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui;
 
-import static megamek.client.ui.swing.util.UIUtil.scaleForGUI;
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -41,7 +46,15 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.ResourceBundle;
-import javax.swing.*;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.JTextArea;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
@@ -57,6 +70,8 @@ import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.Contract;
 import mekhq.gui.adapter.FinanceTableMouseAdapter;
 import mekhq.gui.adapter.LoanTableMouseAdapter;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.AddFundsDialog;
 import mekhq.gui.dialog.ManageAssetsDialog;
 import mekhq.gui.dialog.NewLoanDialog;
@@ -88,8 +103,8 @@ public final class FinancesTab extends CampaignGuiTab {
     private JTable financeTable;
     private JTable loanTable;
     private JTextArea areaNetWorth;
-    private JButton btnAddFunds;
-    private JButton btnManageAssets;
+    private RoundedJButton btnAddFunds;
+    private RoundedJButton btnManageAssets;
 
     private FinanceTableModel financeModel;
     private LoanTableModel loanModel;
@@ -153,6 +168,7 @@ public final class FinancesTab extends CampaignGuiTab {
         loanTable.setIntercellSpacing(new Dimension(0, 0));
         loanTable.setShowGrid(false);
         JScrollPane scrollLoanTable = new JScrollPaneWithSpeed(loanTable);
+        scrollLoanTable.setBorder(null);
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -162,9 +178,11 @@ public final class FinancesTab extends CampaignGuiTab {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         JPanel panBalance = new JPanel(new GridBagLayout());
-        panBalance.add(new JScrollPaneWithSpeed(financeTable), gridBagConstraints);
+        JScrollPane scrollFinanceTable = new JScrollPaneWithSpeed(financeTable);
+        scrollFinanceTable.setBorder(null);
+        panBalance.add(scrollFinanceTable, gridBagConstraints);
         panBalance.setMinimumSize(new Dimension(350, 100));
-        panBalance.setBorder(BorderFactory.createTitledBorder("Balance Sheet"));
+        panBalance.setBorder(RoundedLineBorder.createRoundedLineBorder("Balance Sheet"));
         JPanel panLoan = new JPanel(new GridBagLayout());
         panLoan.add(scrollLoanTable, gridBagConstraints);
 
@@ -194,15 +212,15 @@ public final class FinancesTab extends CampaignGuiTab {
         JPanel panelFinanceRight = new JPanel(new BorderLayout());
 
         JPanel pnlFinanceBtns = new JPanel(new GridLayout(2, 2));
-        btnAddFunds = new JButton("Add Transaction (GM)");
+        btnAddFunds = new RoundedJButton("Add Transaction (GM)");
         btnAddFunds.addActionListener(ev -> addFundsActionPerformed());
         btnAddFunds.setEnabled(getCampaign().isGM());
         pnlFinanceBtns.add(btnAddFunds);
-        JButton btnGetLoan = new JButton("Get Loan");
+        RoundedJButton btnGetLoan = new RoundedJButton("Get Loan");
         btnGetLoan.addActionListener(e -> showNewLoanDialog());
         pnlFinanceBtns.add(btnGetLoan);
 
-        btnManageAssets = new JButton("Manage Assets (GM)");
+        btnManageAssets = new RoundedJButton("Manage Assets (GM)");
         btnManageAssets.addActionListener(e -> manageAssets());
         btnManageAssets.setEnabled(getCampaign().isGM());
         pnlFinanceBtns.add(btnManageAssets);
@@ -217,6 +235,7 @@ public final class FinancesTab extends CampaignGuiTab {
         areaNetWorth.setEditable(false);
 
         JScrollPane descriptionScroll = new JScrollPaneWithSpeed(areaNetWorth);
+        descriptionScroll.setBorder(RoundedLineBorder.createRoundedLineBorder());
         panelFinanceRight.add(descriptionScroll, BorderLayout.CENTER);
         areaNetWorth.setCaretPosition(0);
         descriptionScroll.setMinimumSize(scaleForGUI(400, 200));

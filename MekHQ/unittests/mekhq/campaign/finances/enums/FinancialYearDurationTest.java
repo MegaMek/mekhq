@@ -34,25 +34,24 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.time.LocalDate;
 import java.util.ResourceBundle;
 
-import org.junit.jupiter.api.Test;
-
 import mekhq.MekHQ;
+import org.junit.jupiter.api.Test;
 
 class FinancialYearDurationTest {
     // region Variable Declarations
     private static final FinancialYearDuration[] durations = FinancialYearDuration.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Finances",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
     // endregion Variable Declarations
 
     // region Getters
     @Test
     void testGetToolTipText() {
         assertEquals(resources.getString("FinancialYearDuration.SEMIANNUAL.toolTipText"),
-                FinancialYearDuration.SEMIANNUAL.getToolTipText());
+              FinancialYearDuration.SEMIANNUAL.getToolTipText());
         assertEquals(resources.getString("FinancialYearDuration.DECENNIAL.toolTipText"),
-                FinancialYearDuration.DECENNIAL.getToolTipText());
+              FinancialYearDuration.DECENNIAL.getToolTipText());
     }
     // endregion Getters
 
@@ -151,47 +150,33 @@ class FinancialYearDurationTest {
     }
 
     /**
-     * This is only called when the above test returns true, so the date provided
-     * will always be valid
+     * This is only called when the above test returns true, so the date provided will always be valid
      */
     @Test
     void testGetExportFilenameDateString() {
         assertEquals("3025 Jan - Jun",
-                FinancialYearDuration.SEMIANNUAL.getExportFilenameDateString(LocalDate.of(3025, 7, 1)));
+              FinancialYearDuration.SEMIANNUAL.getExportFilenameDateString(LocalDate.of(3025, 7, 1)));
         assertEquals("3025 Jul - Dec",
-                FinancialYearDuration.SEMIANNUAL.getExportFilenameDateString(LocalDate.ofYearDay(3026, 1)));
+              FinancialYearDuration.SEMIANNUAL.getExportFilenameDateString(LocalDate.ofYearDay(3026, 1)));
 
         assertEquals("3024", FinancialYearDuration.ANNUAL.getExportFilenameDateString(LocalDate.ofYearDay(3025, 1)));
         assertEquals("3025", FinancialYearDuration.ANNUAL.getExportFilenameDateString(LocalDate.ofYearDay(3026, 1)));
 
         assertEquals("3024 - 3025",
-                FinancialYearDuration.BIENNIAL.getExportFilenameDateString(LocalDate.ofYearDay(3026, 1)));
+              FinancialYearDuration.BIENNIAL.getExportFilenameDateString(LocalDate.ofYearDay(3026, 1)));
         assertEquals("3026 - 3027",
-                FinancialYearDuration.BIENNIAL.getExportFilenameDateString(LocalDate.ofYearDay(3028, 1)));
+              FinancialYearDuration.BIENNIAL.getExportFilenameDateString(LocalDate.ofYearDay(3028, 1)));
 
         assertEquals("3020 - 3024",
-                FinancialYearDuration.QUINQUENNIAL.getExportFilenameDateString(LocalDate.ofYearDay(3025, 1)));
+              FinancialYearDuration.QUINQUENNIAL.getExportFilenameDateString(LocalDate.ofYearDay(3025, 1)));
         assertEquals("3025 - 3029",
-                FinancialYearDuration.QUINQUENNIAL.getExportFilenameDateString(LocalDate.ofYearDay(3030, 1)));
+              FinancialYearDuration.QUINQUENNIAL.getExportFilenameDateString(LocalDate.ofYearDay(3030, 1)));
 
         assertEquals("3020 - 3029",
-                FinancialYearDuration.DECENNIAL.getExportFilenameDateString(LocalDate.ofYearDay(3030, 1)));
+              FinancialYearDuration.DECENNIAL.getExportFilenameDateString(LocalDate.ofYearDay(3030, 1)));
         assertEquals("3030 - 3039",
-                FinancialYearDuration.DECENNIAL.getExportFilenameDateString(LocalDate.ofYearDay(3040, 1)));
+              FinancialYearDuration.DECENNIAL.getExportFilenameDateString(LocalDate.ofYearDay(3040, 1)));
     }
-
-    // region File I/O
-    @Test
-    void testParseFromString() {
-        // Enum.valueOf Testing
-        assertEquals(FinancialYearDuration.ANNUAL, FinancialYearDuration.parseFromString("ANNUAL"));
-        assertEquals(FinancialYearDuration.BIENNIAL, FinancialYearDuration.parseFromString("BIENNIAL"));
-        assertEquals(FinancialYearDuration.FOREVER, FinancialYearDuration.parseFromString("FOREVER"));
-
-        // Failure Testing
-        assertEquals(FinancialYearDuration.ANNUAL, FinancialYearDuration.parseFromString("failureFailsFake"));
-    }
-    // endregion File I/O
 
     /**
      * Testing to ensure the toString Override is working as intended
@@ -200,8 +185,8 @@ class FinancialYearDurationTest {
     void testToStringOverride() {
         assertEquals(resources.getString("FinancialYearDuration.ANNUAL.text"), FinancialYearDuration.ANNUAL.toString());
         assertEquals(resources.getString("FinancialYearDuration.DECENNIAL.text"),
-                FinancialYearDuration.DECENNIAL.toString());
+              FinancialYearDuration.DECENNIAL.toString());
         assertEquals(resources.getString("FinancialYearDuration.FOREVER.text"),
-                FinancialYearDuration.FOREVER.toString());
+              FinancialYearDuration.FOREVER.toString());
     }
 }

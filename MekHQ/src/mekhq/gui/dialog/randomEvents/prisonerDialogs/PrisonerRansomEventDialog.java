@@ -38,13 +38,9 @@ import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 
 /**
- * Represents a dialog triggered when the enemy offers a ransom deal for prisoners.
- *
- * <p>This dialog is displayed in scenarios where the enemy proposes a prisoner exchange or ransom:
- * either to ransom back captured enemy personnel held by the player, or to offer the release of friendly personnel
- * captured by the enemy. It provides immersive, context-specific messaging and allows the player to accept or decline
- * the offer.</p>
+ * @deprecated Unused
  */
+@Deprecated(since = "0.50.06", forRemoval = true)
 public class PrisonerRansomEventDialog extends ImmersiveDialogCore {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
 
@@ -67,7 +63,8 @@ public class PrisonerRansomEventDialog extends ImmersiveDialogCore {
               null,
               false,
               null,
-              null, true);
+              null,
+              true);
     }
 
     /**
@@ -109,7 +106,7 @@ public class PrisonerRansomEventDialog extends ImmersiveDialogCore {
      * @return A formatted HTML string containing the narrative in-character message for the dialog.
      */
     private static String createInCharacterMessage(Campaign campaign, Money payment, List<Person> prisoners,
-                                                   boolean isFriendlyPOWs) {
+          boolean isFriendlyPOWs) {
         String commanderAddress = campaign.getCommanderAddress(false);
         StringBuilder message = new StringBuilder();
         String key = isFriendlyPOWs ? "pows" : "prisoners";

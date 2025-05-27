@@ -44,15 +44,16 @@ import megamek.client.Client;
 import megamek.client.CloseClientListener;
 import megamek.client.bot.BotClient;
 import megamek.client.bot.princess.Princess;
-import megamek.client.ui.swing.ClientGUI;
-import megamek.client.ui.swing.IClientGUI;
-import megamek.client.ui.swing.IDisconnectSilently;
-import megamek.client.ui.swing.ILocalBots;
-import megamek.client.ui.swing.MegaMekGUI;
-import megamek.client.ui.swing.util.MegaMekController;
+import megamek.client.ui.clientGUI.ClientGUI;
+import megamek.client.ui.clientGUI.IClientGUI;
+import megamek.client.ui.clientGUI.IDisconnectSilently;
+import megamek.client.ui.clientGUI.ILocalBots;
+import megamek.client.ui.clientGUI.MegaMekGUI;
+import megamek.client.ui.util.MegaMekController;
 import megamek.common.Entity;
 import megamek.common.MapSettings;
 import megamek.common.WeaponOrderHandler;
+import megamek.common.planetaryconditions.PlanetaryConditions;
 import megamek.common.preference.PreferenceManager;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -60,6 +61,7 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.unit.Unit;
+import mekhq.utilities.ScenarioUtils;
 
 class GameThread extends Thread implements CloseClientListener {
     private static final MMLogger logger = MMLogger.create(GameThread.class);
@@ -207,56 +209,11 @@ class GameThread extends Thread implements CloseClientListener {
                     Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
                 }
 
-                MapSettings mapSettings = MapSettings.getInstance();
-
-                // check that we have valid conditions for setting the mapSettings
-                if ((scenario.getMapSizeX() > 1) && (scenario.getMapSizeY() > 1) && (null != scenario.getMap())) {
-
-                    mapSettings.setBoardSize(scenario.getMapSizeX(), scenario.getMapSizeY());
-                    mapSettings.setMapSize(1, 1);
-                    mapSettings.getBoardsSelectedVector().clear();
-
-                    // if the scenario is taking place in space, do space settings instead
-                    if (scenario.getBoardType() == Scenario.T_SPACE) {
-                        mapSettings.setMedium(MapSettings.MEDIUM_SPACE);
-                        mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
-                    } else if (scenario.isUsingFixedMap()) {
-                        String board = scenario.getMap().replace(".board", ""); // TODO : remove inline file type
-                        board = board.replace("\\", "/");
-                        mapSettings.getBoardsSelectedVector().add(board);
-
-                        if (scenario.getBoardType() == Scenario.T_ATMOSPHERE) {
-                            mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
-                        }
-                    } else {
-                        File mapgenFile = new File("data/mapgen/" + scenario.getMap() + ".xml"); // TODO : remove inline
-                        // file path
-                        try (InputStream is = new FileInputStream(mapgenFile)) {
-                            mapSettings = MapSettings.getInstance(is);
-                        } catch (FileNotFoundException ex) {
-                            logger.error(String.format("Could not load map file data/mapgen/%s.xml", scenario.getMap()),
-                                  ex);
-                            // TODO: remove inline file path
-                        }
-
-                        if (scenario.getBoardType() == Scenario.T_ATMOSPHERE) {
-                            mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
-                        }
-
-                        // duplicate code, but getting a new instance of map settings resets the size
-                        // parameters
-                        mapSettings.setBoardSize(scenario.getMapSizeX(), scenario.getMapSizeY());
-                        mapSettings.setMapSize(1, 1);
-                        mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
-                    }
-                } else {
-                    logger.error(String.format("invalid map settings provided for scenario %s", scenario.getName()));
-                }
-
+                MapSettings mapSettings = ScenarioUtils.getMapSettings(scenario);
                 client.sendMapSettings(mapSettings);
                 Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
 
-                client.sendPlanetaryConditions(scenario.createPlanetaryConditions());
+                client.sendPlanetaryConditions(getPlanetaryConditions());
                 Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
 
                 // set player deployment
@@ -401,6 +358,10 @@ class GameThread extends Thread implements CloseClientListener {
         }
 
         return entities;
+    }
+
+    protected PlanetaryConditions getPlanetaryConditions() {
+        return campaign.getCurrentPlanetaryConditions(scenario);
     }
 
     /*

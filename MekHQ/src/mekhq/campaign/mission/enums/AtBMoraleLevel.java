@@ -180,35 +180,7 @@ public enum AtBMoraleLevel {
             }
         } catch (Exception ignored) {
         }
-
-        //start <50.01 compatibility handler, replace it after post-40.10.1 Milestone
-        switch (moraleLevel) {
-            case "BROKEN", "ROUT" -> {
-                return ROUTED;
-            }
-            case "VERY_LOW" -> {
-                return CRITICAL;
-            }
-            case "LOW" -> {
-                return WEAKENED;
-            }
-            case "NORMAL" -> {
-                return STALEMATE;
-            }
-            case "HIGH" -> {
-                return ADVANCING;
-            }
-            case "VERY_HIGH" -> {
-                return DOMINATING;
-            }
-            case "UNBREAKABLE" -> {
-                return OVERWHELMING;
-            }
-            default -> {
-            }
-        }
-        //end <50.01 compatibility handler
-
+        
         MMLogger.create(AtBMoraleLevel.class)
               .error("Unable to parse {} into an AtBMoraleLevel. Returning STALEMATE.", moraleLevel);
         return STALEMATE;

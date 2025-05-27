@@ -34,6 +34,7 @@ package mekhq.gui;
 
 import static java.lang.Math.round;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -48,14 +49,14 @@ import javax.swing.RowSorter.SortKey;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
-import megamek.client.ui.baseComponents.MMComboBox;
+import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.JToggleButtonPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.client.ui.swing.GUIPreferences;
-import megamek.client.ui.swing.util.UIUtil;
+import megamek.client.ui.clientGUI.GUIPreferences;
+import megamek.client.ui.util.UIUtil;
 import megamek.common.event.Subscribe;
 import megamek.common.preference.IPreferenceChangeListener;
 import megamek.logging.MMLogger;
@@ -64,11 +65,13 @@ import mekhq.MekHQ;
 import mekhq.campaign.event.*;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.adapter.PersonnelTableMouseAdapter;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.enums.PersonnelTabView;
 import mekhq.gui.enums.PersonnelTableModelColumn;
 import mekhq.gui.model.PersonnelTableModel;
+import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.view.PersonViewPanel;
 
@@ -225,13 +228,22 @@ public final class PersonnelTab extends CampaignGuiTab {
         personnelTable.getSelectionModel().addListSelectionListener(ev -> refreshPersonnelView());
 
         scrollPersonnelView = new JScrollPaneWithSpeed();
+        scrollPersonnelView.setBorder(RoundedLineBorder.createRoundedLineBorder());
         scrollPersonnelView.setMinimumSize(new Dimension((int) round(PERSONNEL_VIEW_WIDTH * 0.9), 600));
         scrollPersonnelView.setPreferredSize(new Dimension(PERSONNEL_VIEW_WIDTH, 600));
         scrollPersonnelView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPersonnelView.setViewportView(null);
 
         JScrollPane scrollPersonnelTable = new JScrollPaneWithSpeed(personnelTable);
-        splitPersonnel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollPersonnelTable, scrollPersonnelView);
+        scrollPersonnelTable.setBorder(RoundedLineBorder.createRoundedLineBorder());
+
+        JPanel tableAndInfoPanel = new JPanel(new BorderLayout());
+        tableAndInfoPanel.add(scrollPersonnelTable, BorderLayout.CENTER);
+
+        JPanel pnlTutorial = new TutorialHyperlinkPanel("personnelTab");
+        tableAndInfoPanel.add(pnlTutorial, BorderLayout.SOUTH);
+
+        splitPersonnel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, tableAndInfoPanel, scrollPersonnelView);
         splitPersonnel.setOneTouchExpandable(true);
         splitPersonnel.setResizeWeight(1.0);
         splitPersonnel.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, ev -> refreshPersonnelView());

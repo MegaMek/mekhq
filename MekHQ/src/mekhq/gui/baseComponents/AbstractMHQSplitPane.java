@@ -27,7 +27,7 @@
  */
 package mekhq.gui.baseComponents;
 
-import megamek.client.ui.baseComponents.AbstractSplitPane;
+import megamek.client.ui.panes.AbstractSplitPane;
 import mekhq.MekHQ;
 
 import javax.swing.*;

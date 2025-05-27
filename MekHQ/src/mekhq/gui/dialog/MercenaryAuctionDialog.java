@@ -40,8 +40,8 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkEvent.EventType;
 
-import megamek.client.ui.swing.MekViewPanel;
-import megamek.client.ui.swing.util.UIUtil;
+import megamek.client.ui.dialogs.unitSelectorDialogs.MekViewPanel;
+import megamek.client.ui.util.UIUtil;
 import megamek.common.Entity;
 import megamek.common.ViewFormatting;
 import megamek.common.annotations.Nullable;
@@ -58,7 +58,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
  * (TRO View) are available.</p>
  */
 public class MercenaryAuctionDialog extends ImmersiveDialogCore {
-    private static final String RESOURCE_BUNDLE = "mekhq.resources." + MercenaryAuctionDialog.class.getSimpleName();
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.MercenaryAuctionDialog";
 
     private Entity entity;
 

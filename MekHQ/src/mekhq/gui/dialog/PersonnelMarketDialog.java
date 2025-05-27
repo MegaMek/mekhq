@@ -60,7 +60,7 @@ import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.JToggleButtonPreference;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.client.ui.swing.MekViewPanel;
+import megamek.client.ui.dialogs.unitSelectorDialogs.MekViewPanel;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.Aero;
 import megamek.common.Compute;
@@ -85,10 +85,12 @@ import mekhq.gui.enums.PersonnelTableModelColumn;
 import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.view.PersonViewPanel;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com) (code borrowed heavily from MegaMekLab UnitSelectorDialog
  */
+@Deprecated(since = "0.50.06", forRemoval = false)
 public class PersonnelMarketDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(PersonnelMarketDialog.class);
 
@@ -385,7 +387,7 @@ public class PersonnelMarketDialog extends JDialog {
                                          selectedPerson.getSalary(campaign).multipliedBy(2) :
                                          Money.zero()).plus(unitCost))) {
                 campaign.addReport("<font color='" +
-                                         MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                                         ReportingUtilities.getNegativeColor() +
                                          "'><b>Insufficient funds. Transaction cancelled</b>.</font>");
             } else {
                 /*
@@ -412,7 +414,7 @@ public class PersonnelMarketDialog extends JDialog {
             Entity en = personnelMarket.getAttachedEntity(selectedPerson);
             UUID pid = selectedPerson.getId();
 
-            if (campaign.recruitPerson(selectedPerson, true)) {
+            if (campaign.recruitPerson(selectedPerson, true, true)) {
                 addUnit(en, false);
                 personnelMarket.removePerson(selectedPerson);
                 personnelModel.setData(personnelMarket.getPersonnel());

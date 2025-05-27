@@ -31,10 +31,10 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-
 package mekhq.gui.dialog;
 
 import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.RESUPPLY_LOOT_BOX_NAME;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeInterviewersNotes;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
@@ -61,11 +61,11 @@ import java.util.UUID;
 import javax.swing.*;
 
 import megamek.client.ui.Messages;
-import megamek.client.ui.dialogs.EntityReadoutDialog;
+import megamek.client.ui.dialogs.unitSelectorDialogs.EntityReadoutDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.client.ui.swing.UnitEditorDialog;
-import megamek.client.ui.swing.util.UIUtil;
+import megamek.client.ui.dialogs.UnitEditorDialog;
+import megamek.client.ui.util.UIUtil;
 import megamek.common.GunEmplacement;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -267,8 +267,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
         String report = resourceMap.getString("txtInstructions.text.salvage");
         if (tracker.isEmployerEvokingSpecialClause()) {
-            String colorOpenWarning = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
-            String colorOpenNegative = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor());
+            String colorOpenWarning = spanOpeningWithCustomColor(ReportingUtilities.getWarningColor());
+            String colorOpenNegative = spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
             campaign.addReport(String.format(resourceMap.getString("txtInstructions.text.salvage.special"),
                   colorOpenWarning,
                   CLOSING_SPAN_TAG,
@@ -864,15 +864,14 @@ public class ResolveScenarioWizardDialog extends JDialog {
             }
 
             // When generating NPC personnel, we use placeholder characters and then later
-            // re-assign
-            // their details to match expected values.
+            // re-assign their details to match expected values.
             // This causes a disconnect between their name, at point of creation, and the
-            // name
-            // presented to the user.
+            // name presented to the user.
             // We therefore need to re-generate the personality description at this point,
             // as this is the earliest point in which that description is visible to the
             // user
             writePersonalityDescription(status.getPerson());
+            writeInterviewersNotes(status.getPerson());
             prisonerIndex++;
         }
 

@@ -92,17 +92,6 @@ public class OptimizeInfirmaryAssignments {
     }
 
     /**
-     * @deprecated Use {@link #assignDoctors(boolean, int, int, List, List)} instead.
-     *
-     *       <p>When this method is removed, the {@link List} params can be dropped from the linked method.</p>
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    private static void assignDoctors(final int maximumPatients, final int healingWaitingPeriod,
-                                      final List<Person> patients, List<Person> doctors) {
-        assignDoctors(false, maximumPatients, healingWaitingPeriod, patients, doctors);
-    }
-
-    /**
      * Assigns doctors to patients within the specified constraints while considering their capacities and healing
      * period.
      *
@@ -123,8 +112,7 @@ public class OptimizeInfirmaryAssignments {
      *                                   suitability). Doctors higher on the list are assigned first.
      */
     private static void assignDoctors(final boolean isDoctorsUseAdministration, final int maximumPatients,
-                                      final int healingWaitingPeriod, final List<Person> patients,
-                                      List<Person> doctors) {
+          final int healingWaitingPeriod, final List<Person> patients, List<Person> doctors) {
         int patientCounter = 0;
         int doctorCapacity = 0;
 

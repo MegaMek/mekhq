@@ -37,13 +37,9 @@ import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 
 /**
- * Represents a dialog created when a prisoner wants to defect to the player's force.
- *
- * <p>This dialog is displayed to inform the player about the defection offer and provide
- * immersive narrative description about the defection. Depending on whether the prisoner is a standard defector or a
- * bondsman (specific to Clan campaigns and personnel), the dialog customizes the in-character and out-of-character
- * messages for the player.</p>
+ * @deprecated Unused
  */
+@Deprecated(since = "0.50.06", forRemoval = true)
 public class DefectionOffer extends ImmersiveDialogCore {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
 
