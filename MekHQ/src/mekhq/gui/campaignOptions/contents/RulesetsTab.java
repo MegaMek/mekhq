@@ -100,6 +100,11 @@ public class RulesetsTab {
     private JLabel lblOpForLanceTypeVehicle;
     private JSpinner spnOpForLanceTypeVehicles;
 
+    private JCheckBox chkAutoGenerateOpForCallsigns;
+    private JLabel lblMinimumCallsignSkillLevel;
+    private MMComboBox<SkillLevel> comboMinimumCallsignSkillLevel;
+
+
     private JCheckBox chkUseDropShips;
     private JCheckBox chkOpForUsesVTOLs;
 
@@ -211,6 +216,11 @@ public class RulesetsTab {
         comboSkillLevel = new MMComboBox<>("comboSkillLevel", getSkillLevelOptions());
         pnlScenarioGenerationPanel = new JPanel();
 
+        // Callsigns
+        chkAutoGenerateOpForCallsigns = new JCheckBox();
+        lblMinimumCallsignSkillLevel = new JLabel();
+        comboMinimumCallsignSkillLevel = new MMComboBox<>("comboMinimumCallsignSkillLevel", getSkillLevelOptions());
+
         // OpFor Generation
         pnlUnitRatioPanel = new JPanel();
         lblOpForLanceTypeMeks = new JLabel();
@@ -280,6 +290,10 @@ public class RulesetsTab {
     private void substantializeUniversalOptions() {
         // General
         lblSkillLevel = new CampaignOptionsLabel("SkillLevel");
+        
+        // Callsigns
+        chkAutoGenerateOpForCallsigns = new CampaignOptionsCheckBox("AutoGenerateOpForCallsigns");
+        lblMinimumCallsignSkillLevel = new CampaignOptionsLabel("MinimumCallsignSkillLevel");
 
         // OpFor Generation
         pnlUnitRatioPanel = createUniversalUnitRatioPanel();
@@ -446,7 +460,7 @@ public class RulesetsTab {
         lblOpForLanceTypeVehicle = new CampaignOptionsLabel("OpForLanceTypeVehicle");
         spnOpForLanceTypeVehicles = new CampaignOptionsSpinner("OpForLanceTypeVehicle",
             0, 0, 10, 1);
-
+        
         // Layout the panel
         final JPanel panel = new CampaignOptionsStandardPanel("UniversalUnitRatioPanel", true,
             "UniversalUnitRatioPanel");
@@ -668,6 +682,9 @@ public class RulesetsTab {
         spnScenarioModBV.addMouseListener(createTipPanelUpdater(stratConHeader, "ScenarioModBV"));
         lblSkillLevel.addMouseListener(createTipPanelUpdater(stratConHeader, "SkillLevel"));
         comboSkillLevel.addMouseListener(createTipPanelUpdater(stratConHeader, "SkillLevel"));
+        chkAutoGenerateOpForCallsigns.addMouseListener(createTipPanelUpdater(stratConHeader, "AutoGenerateOpForCallsigns"));
+        lblMinimumCallsignSkillLevel.addMouseListener(createTipPanelUpdater(stratConHeader,"MinimumCallsignSkillLevel"));
+        comboMinimumCallsignSkillLevel.addMouseListener(createTipPanelUpdater(stratConHeader, "MinimumCallsignSkillLevel"));
         chkUseDropShips.addMouseListener(createTipPanelUpdater(stratConHeader, "UseDropShips"));
         chkOpForUsesVTOLs.addMouseListener(createTipPanelUpdater(stratConHeader, "OpForUsesVTOLs"));
         chkClanVehicles.addMouseListener(createTipPanelUpdater(stratConHeader, "ClanVehicles"));
@@ -708,6 +725,14 @@ public class RulesetsTab {
         panel.add(chkUseGenericBattleValue, layout);
         layout.gridx++;
         panel.add(chkUseVerboseBidding, layout);
+        // Callsigns
+        layout.gridy++;
+        panel.add(chkAutoGenerateOpForCallsigns, layout);
+        layout.gridy++;
+        panel.add(lblMinimumCallsignSkillLevel, layout);
+        layout.gridx++;
+        panel.add(comboMinimumCallsignSkillLevel, layout);
+        
 
         layout.gridwidth = 2;
         layout.gridx = 0;
@@ -1054,6 +1079,8 @@ public class RulesetsTab {
         options.setOpForLanceTypeMeks((int) spnOpForLanceTypeMeks.getValue());
         options.setOpForLanceTypeMixed((int) spnOpForLanceTypeMixed.getValue());
         options.setOpForLanceTypeVehicles((int) spnOpForLanceTypeVehicles.getValue());
+        options.setAutoGenerateOpForCallsigns(chkAutoGenerateOpForCallsigns.isSelected());
+        options.setMinimumCallsignSkillLevel(comboMinimumCallsignSkillLevel.getSelectedItem());
         options.setUseDropShips(chkUseDropShips.isSelected());
         options.setOpForUsesVTOLs(chkOpForUsesVTOLs.isSelected());
         options.setClanVehicles(chkClanVehicles.isSelected());
@@ -1124,6 +1151,8 @@ public class RulesetsTab {
         spnOpForLanceTypeMeks.setValue(options.getOpForLanceTypeMeks());
         spnOpForLanceTypeMixed.setValue(options.getOpForLanceTypeMixed());
         spnOpForLanceTypeVehicles.setValue(options.getOpForLanceTypeVehicles());
+        chkAutoGenerateOpForCallsigns.setSelected(options.isAutoGenerateOpForCallsigns());
+        comboMinimumCallsignSkillLevel.setSelectedItem(options.getMinimumCallsignSkillLevel());
         chkUseDropShips.setSelected(options.isUseDropShips());
         chkOpForUsesVTOLs.setSelected(options.isOpForUsesVTOLs());
         chkClanVehicles.setSelected(options.isClanVehicles());

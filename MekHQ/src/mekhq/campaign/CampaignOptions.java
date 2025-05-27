@@ -642,6 +642,8 @@ public class CampaignOptions {
     private boolean autoResolveVictoryChanceEnabled;
     private int autoResolveNumberOfScenarios;
     private boolean autoResolveExperimentalPacarGuiEnabled;
+    private boolean autoGenerateOpForCallsigns;
+    private SkillLevel minimumCallsignSkillLevel;
     // endregion Against the Bot Tab
 
     // start region Faction Standing
@@ -1274,6 +1276,8 @@ public class CampaignOptions {
         setScenarioModMax(3);
         setScenarioModChance(25);
         setScenarioModBV(50);
+        autoGenerateOpForCallsigns = true;
+        minimumCallsignSkillLevel = SkillLevel.NONE;
         // endregion Against the Bot Tab
     }
     // endregion Constructors
@@ -6915,6 +6919,22 @@ public class CampaignOptions {
 
     public void setTrackFactionStanding(boolean trackFactionStanding) {
         this.trackFactionStanding = trackFactionStanding;
+    }
+    
+    public boolean isAutoGenerateOpForCallsigns() {
+        return autoGenerateOpForCallsigns;
+    }
+    
+    public void setAutoGenerateOpForCallsigns(boolean autoGenerateOpForCallsigns) {
+        this.autoGenerateOpForCallsigns = autoGenerateOpForCallsigns;
+    }
+    
+    public SkillLevel getMinimumCallsignSkillLevel() {
+        return minimumCallsignSkillLevel;
+    }
+    
+    public void setMinimumCallsignSkillLevel(SkillLevel skillLevel) {
+        this.minimumCallsignSkillLevel = skillLevel;
     }
 
     /**
