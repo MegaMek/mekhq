@@ -49,9 +49,6 @@ import mekhq.campaign.Campaign;
  * Therefore, all of its methods can be called directly on the class.
  */
 public class BatchallFactions {
-    private static final ResourceBundle resources = ResourceBundle.getBundle(
-        "mekhq.resources.FameAndInfamy",
-        MekHQ.getMHQOptions().getLocale());
 
     public static final List<String> BATCHALL_FACTIONS = List.of("CBS", "CB", "CCC", "CCO",
         "CDS", "CFM", "CGB", "CGS", "CHH", "CIH", "CJF", "CMG", "CNC", "CSJ", "CSR", "CSA", "CSV",
