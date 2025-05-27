@@ -319,8 +319,8 @@ public class Finances {
 
     public void newDay(final Campaign campaign, final LocalDate yesterday, final LocalDate today) {
         // Getting frequently used variables to simplify later statements
-        CampaignOptions campaignOpts = campaign.getCampaignOptions();
-        boolean isNewYear = campaignOpts.getFinancialYearDuration().isEndOfFinancialYear(today);
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean isNewYear = campaignOptions.getFinancialYearDuration().isEndOfFinancialYear(today);
         boolean isNewMonth = (today.getDayOfMonth() == 1);
         Accountant accountant = campaign.getAccountant();
         // check for a new fiscal year
@@ -334,7 +334,7 @@ public class Finances {
             newFiscalYear(campaign);
 
             // pay taxes
-            if ((campaignOpts.isUseTaxes()) && (!profits.isZero())) {
+            if ((campaignOptions.isUseTaxes()) && (!profits.isZero())) {
                 payTaxes(campaign, profits);
             }
         }
@@ -359,8 +359,8 @@ public class Finances {
 
         // Handle peacetime operating expenses, payroll, and loan payments
         if (isNewMonth) {
-            if (campaignOpts.isUsePeacetimeCost()) {
-                if (!campaignOpts.isShowPeacetimeCost()) {
+            if (campaignOptions.isUsePeacetimeCost()) {
+                if (!campaignOptions.isShowPeacetimeCost()) {
                     // Do not include salaries as that will be tracked below
                     Money peacetimeCost = accountant.getPeacetimeCost(false);
 
@@ -410,7 +410,7 @@ public class Finances {
                 }
             }
 
-            if (campaignOpts.isPayForSalaries()) {
+            if (campaignOptions.isPayForSalaries()) {
 
                 Money payRollCost = accountant.getPayRoll();
 
@@ -419,14 +419,14 @@ public class Finances {
                       payRollCost,
                       resourceMap.getString("Salaries.title"),
                       accountant.getPayRollSummary(),
-                      campaignOpts.isTrackTotalEarnings())) {
+                      campaignOptions.isTrackTotalEarnings())) {
                     campaign.addReport(String.format(resourceMap.getString("Salaries.text"),
                           payRollCost.toAmountAndSymbolString()));
 
                 } else {
                     addReportInsufficientFunds(campaign, resourceMap.getString("Payroll.text"));
 
-                    if (campaignOpts.isUseLoyaltyModifiers()) {
+                    if (campaignOptions.isUseLoyaltyModifiers()) {
                         for (Person person : campaign.getPersonnel()) {
                             if (person.getStatus().isDepartedUnit()) {
                                 continue;
@@ -450,7 +450,7 @@ public class Finances {
             }
 
             // Handle overhead expenses
-            if (campaignOpts.isPayForOverhead()) {
+            if (campaignOptions.isPayForOverhead()) {
                 Money overheadCost = accountant.getOverheadExpenses();
 
                 if (debit(TransactionType.OVERHEAD, today, overheadCost, resourceMap.getString("Overhead.title"))) {
@@ -554,7 +554,7 @@ public class Finances {
                      * contract payment that has just been made.
                      */
                     campaign.addReport("<font color='" +
-                                             MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                                             ReportingUtilities.getNegativeColor() +
                                              "'>" +
                                              resourceMap.getString("InsufficientFunds.text"),
                           resourceMap.getString("Shares.text"),
