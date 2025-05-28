@@ -1277,7 +1277,7 @@ public class CampaignOptions {
         setScenarioModChance(25);
         setScenarioModBV(50);
         autoGenerateOpForCallsigns = true;
-        minimumCallsignSkillLevel = SkillLevel.NONE;
+        minimumCallsignSkillLevel = SkillLevel.VETERAN;
         // endregion Against the Bot Tab
     }
     // endregion Constructors
@@ -5470,6 +5470,8 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioModChance", scenarioModChance);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioModBV", scenarioModBV);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoConfigMunitions", autoConfigMunitions);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoGenerateOpForCallsigns", autoGenerateOpForCallsigns);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "minimumCallsignSkillLevel", getMinimumCallsignSkillLevel().name());
 
         String planetTechAcquisitionBonusString = Arrays.stream(PlanetarySophistication.values())
                         .map(sophistication -> planetTechAcquisitionBonus.getOrDefault(sophistication, 0).toString())
@@ -6563,8 +6565,12 @@ public class CampaignOptions {
                     campaignOptions.setScenarioModChance(Integer.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("scenarioModBV")) {
                     campaignOptions.setScenarioModBV(Integer.parseInt(nodeContents));
-                } else if (nodeName.equalsIgnoreCase("autoconfigMunitions")) {
+                } else if (nodeName.equalsIgnoreCase("autoConfigMunitions")) {
                     campaignOptions.setAutoConfigMunitions(Boolean.parseBoolean(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("autoGenerateOpForCallsigns")) {
+                    campaignOptions.setAutoGenerateOpForCallsigns(Boolean.parseBoolean(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("minimumCallsignSkillLevel")) {
+                    campaignOptions.setMinimumCallsignSkillLevel(SkillLevel.parseFromString(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("trackFactionStanding")) {
                     campaignOptions.setTrackFactionStanding(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useFactionStandingNegotiation")) {
