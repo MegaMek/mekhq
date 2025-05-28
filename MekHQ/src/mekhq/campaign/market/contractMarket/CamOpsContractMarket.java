@@ -56,6 +56,7 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.ContractCommandRights;
+import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -270,7 +271,8 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         // Step 6: Determine the initial contract clauses
         setContractClauses(contract, contractTerms);
         // Step 7: Determine the number of required lances (Not CamOps RAW)
-        contract.setRequiredCombatTeams(calculateRequiredCombatTeams(campaign, contract, false));
+        contract.setRequiredCombatTeams(ContractUtilities.calculateBaseNumberOfRequiredLances(campaign));
+        contract.setRequiredCombatElements(calculateRequiredCombatElements(campaign, contract, false));
         // Step 8: Calculate the payment
         contract.setMultiplier(calculatePaymentMultiplier(campaign, contract));
         // Step 9: Determine parts availability

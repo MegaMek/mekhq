@@ -556,6 +556,17 @@ public class ContractSummaryPanel extends JPanel {
             txtRequiredLances.setName("txtRequiredLances");
             gridBagConstraintsText.gridy = y;
             mainPanel.add(txtRequiredLances, gridBagConstraintsText);
+
+            JLabel lblRequiredCombatElements = new JLabel(resourceMap.getString("lblRequiredCombatElements.text"));
+            lblRequiredCombatElements.setName("lblRequiredCombatElements");
+            gridBagConstraintsLabels.gridy = ++y;
+            mainPanel.add(lblRequiredCombatElements, gridBagConstraintsLabels);
+
+            JLabel txtRequiredCombatElements =
+                  new JLabel(String.valueOf(((AtBContract) contract).getRequiredCombatElements()));
+            txtRequiredCombatElements.setName("txtRequiredCombatElements");
+            gridBagConstraintsText.gridy = y;
+            mainPanel.add(txtRequiredCombatElements, gridBagConstraintsText);
         }
 
         contractPaymentBreakdown.display(++y, 2);

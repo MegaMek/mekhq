@@ -54,6 +54,7 @@ import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
 import megamek.common.Infantry;
+import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -68,6 +69,7 @@ import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
+import mekhq.utilities.EntityUtilities;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -203,18 +205,95 @@ public class CombatTeam {
         commanderId = findCommander(forceId, campaign);
     }
 
+    /**
+     * Effective size used when determining for many units this combat team is. Sometimes a unit may count as less
+     * than a unit, like a vehicle point in a Clan star (two vehicles would return a size of 1).
+     * <p>
+     *     This method iterates through all combat teams in the specified campaign, ignoring combat teams with the auxiliary
+     *     role. For each valid combat team, it retrieves the associated force and evaluates all units within that force.
+     *     The unit contribution to the total is determined based on its type: </p>
+     *     <ul>
+     *         <li><b>TANK, VTOL, NAVAL, CONV_FIGHTER, AEROSPACEFIGHTER:</b> Adds 1 for non-clan factions, and 0.5
+     *         for clan factions.</li>
+     *         <li><b>PROTOMEK:</b> Adds 0.2 to the total.</li>
+     *         <li><b>BATTLE_ARMOR, INFANTRY:</b> Adds 0 (excluded from the total, unless no other units).</li>
+     *         <li><b>Other types:</b> Adds 1 to the total.</li>
+     *     </ul>
+     *
+     * @param campaign
+     * @return effective size of the combat team
+     */
     public int getSize(Campaign campaign) {
         if (campaign.getFaction().isClan()) {
             return (int) Math.ceil(getEffectivePoints(campaign));
         }
         if (campaign.getForce(forceId) != null) {
-            return campaign.getForce(forceId).getUnits().size();
+            return (int) Math.ceil(getEffectiveLanceSize(campaign));
         } else {
             return 0;
         }
     }
 
-    public double getEffectivePoints(Campaign campaign) {
+    /**
+     * Effective size used when determining for many combat elements this combat team is.
+     * <p>
+     *     Retrieves the associated force and evaluates all units within that force.
+     *     The unit contribution to the total is determined based on its type: </p>
+     *     <ul>
+     *         <li><b>TANK, VTOL, NAVAL, CONV_FIGHTER, AEROSPACEFIGHTER:</b> Adds 1 for non-clan factions, and 0.5
+     *         for clan factions.</li>
+     *         <li><b>PROTOMEK:</b> Adds 0.2 to the total.</li>
+     *         <li><b>BATTLE_ARMOR, INFANTRY:</b> Adds 1. Infantry squads add 1/3. (excluded from the total if count
+     *         of infantry is less than the count of everything else)
+     *         .</li>
+     *         <li><b>Other types:</b> Adds 1 to the total.</li>
+     *         </ul>
+     *
+     * @param campaign
+     * @return effective size of the lance for calculating contract requirements
+     */
+    private double getEffectiveLanceSize(Campaign campaign) {
+        double numUnits = 0;
+        double numInfantry = 0;
+        Force force = getForce(campaign);
+
+        if (force == null) {
+            return numUnits;
+        }
+
+        if (!force.isForceType(STANDARD)) {
+            return numUnits;
+        }
+
+        for (UUID unitId : force.getAllUnits(true)) {
+            Entity entity = EntityUtilities.getEntityFromUnitId(campaign.getHangar(), unitId);
+
+            if (entity == null) {
+                continue;
+            }
+
+            switch (entity.getUnitType()) {
+                case UnitType.TANK,
+                     UnitType.VTOL,
+                     UnitType.NAVAL,
+                     UnitType.CONV_FIGHTER,
+                     UnitType.AEROSPACEFIGHTER,
+                     UnitType.MEK -> numUnits += 1;
+                case UnitType.PROTOMEK -> numUnits += 0.2;
+                case UnitType.BATTLE_ARMOR -> numInfantry += 1;
+                case UnitType.INFANTRY ->
+                      numInfantry += entity instanceof Infantry infantry && infantry.isSquad() ? 1.0 / 4 : 1;
+                default -> numUnits += 0; // All other unit types
+            }
+        }
+
+        if (numInfantry > numUnits) {
+            return (int) Math.floor(numInfantry);
+        }
+        return (int) Math.floor(numUnits);
+    }
+
+    private double getEffectivePoints(Campaign campaign) {
         /*
          * Used to check against force size limits; for this purpose we
          * consider a 'Mek and a Point of BA to be a single Point so that
@@ -225,7 +304,7 @@ public class CombatTeam {
         double armor = 0.0;
         double infantry = 0.0;
         double other = 0.0;
-        for (UUID id : campaign.getForce(forceId).getUnits()) {
+        for (UUID id : campaign.getForce(forceId).getAllUnits(true)) {
             Unit unit = campaign.getUnit(id);
             if (null != unit) {
                 Entity entity = unit.getEntity();

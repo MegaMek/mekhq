@@ -38,22 +38,35 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
+import java.util.UUID;
+import java.util.Vector;
 import java.util.stream.Stream;
 
 import megamek.client.generator.RandomCallsignGenerator;
+import megamek.common.Entity;
 import megamek.common.EquipmentType;
+import megamek.common.UnitType;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.Hangar;
+import mekhq.campaign.force.CombatTeam;
+import mekhq.campaign.force.Force;
+import mekhq.campaign.force.ForceType;
+import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.mission.AtBContract.AtBContractRef;
 import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.backgrounds.RandomCompanyNameGenerator;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Systems;
 import org.apache.logging.log4j.LogManager;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -292,5 +305,380 @@ public class AtBContractTest {
         contract.setEmployerCode(employerCode, year);
         contract.setMercSubcontract(isMercSubcontract);
         assertEquals(fullName, contract.getEmployerName(year));
+    }
+
+    @Nested
+    class AtBContractCalculateRequiredLancesTests {
+        int nextForceId;
+
+        Faction mockFaction;
+        Campaign mockCampaign;
+
+        Hangar hangar;
+
+        public static Stream<Arguments> getFormationSizesForTests() {
+            return Stream.of(
+                  //Arguments.of(3), //Society?
+                  Arguments.of(CombatTeam.LANCE_SIZE),
+                  Arguments.of(CombatTeam.STAR_SIZE),
+                  Arguments.of(CombatTeam.LEVEL_II_SIZE)
+            );
+        }
+
+        @BeforeEach
+        void beforeEach() {
+            nextForceId = 0;
+            hangar = new Hangar();
+
+            mockFaction = mock(Faction.class);
+            mockCampaign = mock(Campaign.class);
+
+            when(mockCampaign.getFaction()).thenReturn(mockFaction);
+            when(mockCampaign.getHangar()).thenReturn(hangar);
+        }
+
+        @ParameterizedTest
+        @MethodSource(value="getFormationSizesForTests")
+        void testNoForces(int formationSize) {
+            // Arrange
+            ArrayList<CombatTeam> mockedCombatTeams = new ArrayList<>();
+
+            when(mockCampaign.getAllCombatTeams()).thenReturn(mockedCombatTeams);
+
+            // Act
+            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign);
+            int requiredUnits = ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(mockCampaign);
+            // Assert
+            assertEquals(1, teams);
+            assertEquals(1, requiredUnits);
+        }
+
+        @ParameterizedTest
+        @MethodSource(value="getFormationSizesForTests")
+        void testOneLance(int formationSize) {
+            // Arrange
+            ArrayList<CombatTeam> mockedCombatTeams = new ArrayList<>();
+            mockedCombatTeams.add(getMockLanceCombatTeam(formationSize));
+
+            when(mockCampaign.getAllCombatTeams()).thenReturn(mockedCombatTeams);
+
+            // Act
+            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign);
+            int requiredUnits = ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(mockCampaign);
+            // Assert
+            assertEquals(1, teams);
+            assertEquals(formationSize, requiredUnits);
+        }
+
+        @ParameterizedTest
+        @MethodSource(value="getFormationSizesForTests")
+        void testThreeLances(int formationSize) {
+            // Arrange
+            ArrayList<CombatTeam> mockedCombatTeams = new ArrayList<>();
+            for (int i = 0; i < 3; i++) {
+                mockedCombatTeams.add(getMockLanceCombatTeam(formationSize));
+            }
+
+            when(mockCampaign.getAllCombatTeams()).thenReturn(mockedCombatTeams);
+
+            // Act
+            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign);
+            int requiredUnits = ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(mockCampaign);
+            // Assert
+            assertEquals(3, teams);
+            assertEquals(3 * formationSize, requiredUnits);
+        }
+
+        @ParameterizedTest
+        @MethodSource(value="getFormationSizesForTests")
+        void testNineLances(int formationSize) {
+            // Arrange
+            ArrayList<CombatTeam> mockedCombatTeams = new ArrayList<>();
+            for (int i = 0; i < 9; i++) {
+                mockedCombatTeams.add(getMockLanceCombatTeam(formationSize));
+            }
+
+            when(mockCampaign.getAllCombatTeams()).thenReturn(mockedCombatTeams);
+
+            // Act
+            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign);
+            int requiredUnits = ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(mockCampaign);
+            // Assert
+            assertEquals(9, teams);
+            assertEquals(9 * formationSize, requiredUnits);
+        }
+
+        @ParameterizedTest
+        @MethodSource(value="getFormationSizesForTests")
+        void testOneCompany(int formationSize) {
+            // Arrange
+            ArrayList<CombatTeam> mockedCombatTeams = new ArrayList<>();
+            mockedCombatTeams.add(getMockCompanyCombatTeam(formationSize));
+
+            when(mockCampaign.getAllCombatTeams()).thenReturn(mockedCombatTeams);
+
+            // Act
+            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign);
+            int requiredUnits = ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(mockCampaign);
+            // Assert
+            assertEquals(1, teams);
+            assertEquals(3 * formationSize, requiredUnits);
+        }
+
+        @ParameterizedTest
+        @MethodSource(value="getFormationSizesForTests")
+        void testThreeCompanies(int formationSize) {
+            // Arrange
+            ArrayList<CombatTeam> mockedCombatTeams = new ArrayList<>();
+            for (int i = 0; i < 3; i++) {
+                mockedCombatTeams.add(getMockCompanyCombatTeam(formationSize));
+            }
+
+            when(mockCampaign.getAllCombatTeams()).thenReturn(mockedCombatTeams);
+
+            // Act
+            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign);
+            int requiredUnits = ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(mockCampaign);
+            // Assert
+            assertEquals(3, teams);
+            assertEquals(3 * 3 * formationSize, requiredUnits);
+        }
+
+        @ParameterizedTest
+        @MethodSource(value="getFormationSizesForTests")
+        void testNineCompanies(int formationSize) {
+            // Arrange
+            ArrayList<CombatTeam> mockedCombatTeams = new ArrayList<>();
+            for (int i = 0; i < 9; i++) {
+                mockedCombatTeams.add(getMockCompanyCombatTeam(formationSize));
+            }
+
+            when(mockCampaign.getAllCombatTeams()).thenReturn(mockedCombatTeams);
+
+            // Act
+            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign);
+            int requiredUnits = ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(mockCampaign);
+            // Assert
+            assertEquals(9, teams);
+            assertEquals(9 * 3 * formationSize, requiredUnits);
+        }
+
+        @ParameterizedTest
+        @MethodSource(value="getFormationSizesForTests")
+        void testOneLanceAndOneCompany(int formationSize) {
+            // Arrange
+            ArrayList<CombatTeam> mockedCombatTeams = new ArrayList<>();
+            mockedCombatTeams.add(getMockLanceCombatTeam(formationSize));
+            mockedCombatTeams.add(getMockCompanyCombatTeam(formationSize));
+
+            when(mockCampaign.getAllCombatTeams()).thenReturn(mockedCombatTeams);
+
+            // Act
+            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign);
+            int requiredUnits = ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(mockCampaign);
+            // Assert
+            assertEquals(2, teams);
+            assertEquals(4 * formationSize, requiredUnits);
+        }
+
+        @ParameterizedTest
+        @MethodSource(value="getFormationSizesForTests")
+        void testThreeLanceAndOneCompany(int formationSize) {
+            // Arrange
+            ArrayList<CombatTeam> mockedCombatTeams = new ArrayList<>();
+            for (int i = 0; i < 3; i++) {
+                mockedCombatTeams.add(getMockLanceCombatTeam(formationSize));
+            }
+            mockedCombatTeams.add(getMockCompanyCombatTeam(formationSize));
+
+            when(mockCampaign.getAllCombatTeams()).thenReturn(mockedCombatTeams);
+
+            // Act
+            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign);
+            int requiredUnits = ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(mockCampaign);
+            // Assert
+            assertEquals(4, teams);
+            assertEquals(6 * formationSize, requiredUnits);
+        }
+
+        @ParameterizedTest
+        @MethodSource(value="getFormationSizesForTests")
+        void testLancesWithTeams(int formationSize) {
+            // Arrange
+            int forceId = getNextForceId();
+
+            Vector<Object> mockUnits = new Vector<>();
+            Vector<UUID> mockUUIDs = new Vector<>();
+            for (int i = 0; i < 2; i++) {
+                Unit mockUnit = getMockUnit(UnitType.MEK);
+                mockUnits.add(mockUnit);
+                mockUUIDs.add(mockUnit.getId());
+            }
+
+            Force mockForce = mock(Force.class);
+            when(mockForce.getId()).thenReturn(forceId);
+            when(mockForce.isForceType(ForceType.STANDARD)).thenReturn(true);
+            when(mockForce.getFormationLevel()).thenReturn(FormationLevel.INVALID);
+            when(mockForce.getAllChildren(mockCampaign)).thenReturn(mockUnits);
+            when(mockForce.getAllUnits(anyBoolean())).thenReturn(mockUUIDs);
+
+            forceId = getNextForceId();
+
+            Vector<Object> mockUnits2 = new Vector<>();
+            Vector<UUID> mockUUIDs2 = new Vector<>();
+            for (int i = 0; i < 2; i++) {
+                Unit mockUnit = getMockUnit(UnitType.MEK);
+                mockUnits2.add(mockUnit);
+                mockUUIDs2.add(mockUnit.getId());
+            }
+
+            Force mockForce2 = mock(Force.class);
+            when(mockForce2.getId()).thenReturn(forceId);
+            when(mockForce2.isForceType(ForceType.STANDARD)).thenReturn(true);
+            when(mockForce2.getFormationLevel()).thenReturn(FormationLevel.INVALID);
+            when(mockForce2.getAllChildren(mockCampaign)).thenReturn(mockUnits2);
+            when(mockForce2.getAllUnits(anyBoolean())).thenReturn(mockUUIDs2);
+
+            forceId = getNextForceId();
+
+            Vector<UUID> allMockUUIDs = new Vector<>();
+            allMockUUIDs.addAll(mockUUIDs);
+            allMockUUIDs.addAll(mockUUIDs2);
+
+            Vector<Object> allForces = new Vector<>();
+            allForces.add(mockForce);
+            allForces.add(mockForce2);
+
+            Force finalForce = mock(Force.class);
+            when(finalForce.getId()).thenReturn(forceId);
+            when(finalForce.isForceType(ForceType.STANDARD)).thenReturn(true);
+            when(finalForce.getFormationLevel()).thenReturn(FormationLevel.LANCE);
+            when(finalForce.getAllChildren(mockCampaign)).thenReturn(allForces);
+            when(finalForce.getAllUnits(anyBoolean())).thenReturn(allMockUUIDs);
+
+            forceId = getNextForceId();
+
+            CombatTeam mockLanceCombatTeam = mock(CombatTeam.class);
+            when(mockLanceCombatTeam.getSize(mockCampaign)).thenReturn(4);
+            when(mockLanceCombatTeam.getForce(mockCampaign)).thenReturn(finalForce);
+            when(mockLanceCombatTeam.getForceId()).thenReturn(forceId);
+
+            ArrayList<CombatTeam> mockedCombatTeams = new ArrayList<>();
+            mockedCombatTeams.add(mockLanceCombatTeam);
+
+            when(mockCampaign.getAllCombatTeams()).thenReturn(mockedCombatTeams);
+
+            // Act
+            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign);
+            int requiredUnits = ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(mockCampaign);
+            // Assert
+            assertEquals(1, teams);
+            assertEquals(4, requiredUnits);
+        }
+
+
+
+        /**
+         * Lance-level formation, not necessarily a lance
+         * @param formationSize number of units in the formation
+         * @return A mocked CombatTeam of the desired size
+         */
+        private CombatTeam getMockLanceCombatTeam(int formationSize) {
+            Force mockForce = getMockLanceForce(formationSize);
+            int forceId = mockForce.getId();
+
+            CombatTeam mockLance = mock(CombatTeam.class);
+            when(mockLance.getSize(mockCampaign)).thenReturn(formationSize);
+            when(mockLance.getForce(mockCampaign)).thenReturn(mockForce);
+            when(mockLance.getForceId()).thenReturn(forceId);
+            return mockLance;
+        }
+
+        /**
+         * Lance-level formation, not necessarily a lance
+         * @param formationSize number of units in the formation
+         * @return A mocked Force of the desired size
+         */
+        private Force getMockLanceForce(int formationSize) {
+            int forceId = getNextForceId();
+
+            Vector<Object> mockUnits = new Vector<>();
+            Vector<UUID> mockUUIDs = new Vector<>();
+            for (int i = 0; i < formationSize; i++) {
+                Unit mockUnit = getMockUnit(UnitType.MEK);
+                mockUnits.add(mockUnit);
+                mockUUIDs.add(mockUnit.getId());
+            }
+
+            Force mockForce = mock(Force.class);
+            when(mockForce.getId()).thenReturn(forceId);
+            when(mockForce.isForceType(ForceType.STANDARD)).thenReturn(true);
+            when(mockForce.getFormationLevel()).thenReturn(FormationLevel.LANCE);
+            when(mockForce.getAllChildren(mockCampaign)).thenReturn(mockUnits);
+            when(mockForce.getAllUnits(anyBoolean())).thenReturn(mockUUIDs);
+            return mockForce;
+        }
+
+        private CombatTeam getMockCompanyCombatTeam(int formationSize) {
+            Force mockForce = getMockCompanyForce(formationSize);
+            int forceId = mockForce.getId();
+            CombatTeam mockCompany = mock(CombatTeam.class);
+
+            when(mockCompany.getSize(mockCampaign)).thenReturn(formationSize * 3);
+            when(mockCompany.getForce(mockCampaign)).thenReturn(mockForce);
+            when(mockCompany.getForceId()).thenReturn(forceId);
+
+            return mockCompany;
+        }
+
+        private Force getMockCompanyForce(int formationSize) {
+            int forceId = getNextForceId();
+            Force mockCompany = mock(Force.class);
+
+            Vector<Object> subforces = new Vector<>();
+            subforces.add(getMockLanceForce(formationSize));
+            subforces.add(getMockLanceForce(formationSize));
+            subforces.add(getMockLanceForce(formationSize));
+
+            Vector<UUID> mockUUIDs = new Vector<>();
+            for (Object subforce : subforces) {
+                if (subforce instanceof Force force) {
+                    mockUUIDs.addAll(force.getAllUnits(true));
+                }
+            }
+
+            when(mockCompany.getId()).thenReturn(forceId);
+            when(mockCompany.isForceType(ForceType.STANDARD)).thenReturn(true);
+            when(mockCompany.getFormationLevel()).thenReturn(FormationLevel.COMPANY);
+            when(mockCompany.getAllChildren(mockCampaign)).thenReturn(subforces);
+            when(mockCompany.getAllUnits(anyBoolean())).thenReturn(mockUUIDs);
+
+            return mockCompany;
+        }
+
+        private Unit getMockUnit(int unitType) {
+            Entity mockEntity = getMockEntity(unitType);
+
+            UUID uuid = UUID.randomUUID();
+
+            Unit mockUnit = mock(Unit.class);
+            when(mockUnit.getEntity()).thenReturn(mockEntity);
+            when(mockUnit.getId()).thenReturn(uuid);
+
+            hangar.addUnit(mockUnit);
+
+            return mockUnit;
+        }
+
+        private Entity getMockEntity(int unitType) {
+            Entity mockEntity = mock(Entity.class);
+            when(mockEntity.getUnitType()).thenReturn(unitType);
+
+            return mockEntity;
+        }
+
+        private int getNextForceId() {
+            return ++nextForceId;
+        }
     }
 }

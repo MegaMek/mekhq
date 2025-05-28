@@ -54,8 +54,10 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.stratcon.StratconContractDefinition;
 import mekhq.campaign.stratcon.StratconContractInitializer;
 import mekhq.campaign.universe.Factions;
@@ -565,7 +567,16 @@ public class NewAtBContractDialog extends NewContractDialog {
         contract.setDesc(txtDesc.getText());
         contract.setCommandRights(choiceCommand.getSelectedItem());
 
-        contract.setRequiredCombatTeams(AtBContract.calculateBaseNumberOfRequiredLances(campaign));
+        contract.setRequiredCombatTeams(ContractUtilities.calculateBaseNumberOfRequiredLances(campaign));
+
+        AbstractContractMarket contractMarket = campaign.getContractMarket();
+        if (contractMarket != null) {
+            contract.setRequiredCombatElements(contractMarket.calculateRequiredCombatElements(campaign,
+                  contract,
+                  false));
+        } else {
+            contract.setRequiredCombatElements(0); // This shouldn't happen, but let's not crash if it does
+        }
 
         contract.setEnemyCode(getCurrentEnemyCode());
         contract.setAllySkill(comboAllySkill.getSelectedItem());
