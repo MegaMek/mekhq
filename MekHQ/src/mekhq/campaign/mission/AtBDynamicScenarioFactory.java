@@ -2825,13 +2825,17 @@ public class AtBDynamicScenarioFactory {
               gender,
               faction.isClan(), extraData);
 
-        // Assign a callsign to the unit commander
-        entityCrew.setNickname(RandomCallsignGenerator.getInstance().generate(), 0);
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        
+        // Optionally assign a callsign to the unit commander if enabled and skill at or above minimum level
+        if (campaignOptions.isAutoGenerateOpForCallsigns() && 
+                  (skill.equalsOrGreaterThan(campaignOptions.getMinimumCallsignSkillLevel()))) {
+            entityCrew.setNickname(RandomCallsignGenerator.getInstance().generate(), 0);
+        }
 
         // Assign the crew to the unit
         entity.setCrew(entityCrew);
 
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
         if (campaignOptions.isUseTactics() || campaignOptions.isUseInitiativeBonus()) {
             entity.getCrew().setCommandBonus(getTacticsModifier(skill, campaign.getRandomSkillPreferences(), faction));
         }
