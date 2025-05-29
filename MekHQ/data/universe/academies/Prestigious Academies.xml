@@ -441,7 +441,7 @@
         <name>Allison MechWarrior Institute</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The Allison MechWarrior Institute stands as a premier training facility for MekWarriors, adjacent to the Lloyd Marik-Stanley Aerospace School. Producing 375 MekWarrior graduates annually, the institute fosters a spirited rivalry with neighboring aerospace cadets, characterized by athletic contests and pranks that occasionally escalate into conflicts. Admission is highly competitive, influenced by political considerations, with a portion of spots reserved for families of Dispossessed Mechwarriors to uphold loyalty.</description>
+        <description>The Allison MechWarrior Institute stands as a premier training facility for MekWarriors, adjacent to the Lloyd Marik-Stanley Aerospace School. Producing 375 MekWarrior graduates annually, the institute fosters a spirited rivalry with neighboring aerospace cadets, characterized by athletic contests and pranks that occasionally escalate into conflicts. Admission is highly competitive, influenced by political considerations, with a portion of spots reserved for families of Dispossessed MekWarriors to uphold loyalty.</description>
         <locationSystem>New Olympia</locationSystem>
         <constructionYear>2465</constructionYear>
         <tuition>5250</tuition>
@@ -459,7 +459,7 @@
         <name>Allison MechWarrior Institute (Officer)</name>
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The Allison MechWarrior Institute stands as a premier training facility for MekWarriors, adjacent to the Lloyd Marik-Stanley Aerospace School. Producing 375 MekWarrior graduates annually, the institute fosters a spirited rivalry with neighboring aerospace cadets, characterized by athletic contests and pranks that occasionally escalate into conflicts. Admission is highly competitive, influenced by political considerations, with a portion of spots reserved for families of Dispossessed Mechwarriors to uphold loyalty.</description>
+        <description>The Allison MechWarrior Institute stands as a premier training facility for MekWarriors, adjacent to the Lloyd Marik-Stanley Aerospace School. Producing 375 MekWarrior graduates annually, the institute fosters a spirited rivalry with neighboring aerospace cadets, characterized by athletic contests and pranks that occasionally escalate into conflicts. Admission is highly competitive, influenced by political considerations, with a portion of spots reserved for families of Dispossessed MekWarriors to uphold loyalty.</description>
         <locationSystem>New Olympia</locationSystem>
         <constructionYear>2465</constructionYear>
         <tuition>13125</tuition>
@@ -1412,7 +1412,7 @@
         <name>Coventry Military Academy</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>Originally focused solely on training MekWarriors, its ties to Coventry Metal Works drew criticism, but it persisted as a crucial training ground. During the Clan Invasion, cadets and instructors valiantly defended against Clan Jade Falcon, sacrificing parts of the academy to protect Coventry. Reborn as the Coventry Military Academy in 3060 under Lyran Alliance patronage, it flourishes with modern facilities and OmniMech training.</description>
+        <description>Originally focused solely on training MekWarriors, its ties to Coventry Metal Works drew criticism, but it persisted as a crucial training ground. During the Clan Invasion, cadets and instructors valiantly defended against Clan Jade Falcon, sacrificing parts of the academy to protect Coventry. Reborn as the Coventry Military Academy in 3060 under Lyran Alliance patronage, it flourishes with modern facilities and OmniMek training.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Coventry</locationSystem>
@@ -1435,7 +1435,7 @@
         <name>Coventry Military Academy (Officer)</name>
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
-        <description>Originally focused solely on training MekWarriors, its ties to Coventry Metal Works drew criticism, but it persisted as a crucial training ground. During the Clan Invasion, cadets and instructors valiantly defended against Clan Jade Falcon, sacrificing parts of the academy to protect Coventry. Reborn as the Coventry Military Academy in 3060 under Lyran Alliance patronage, it flourishes with modern facilities and OmniMech training.</description>
+        <description>Originally focused solely on training MekWarriors, its ties to Coventry Metal Works drew criticism, but it persisted as a crucial training ground. During the Clan Invasion, cadets and instructors valiantly defended against Clan Jade Falcon, sacrificing parts of the academy to protect Coventry. Reborn as the Coventry Military Academy in 3060 under Lyran Alliance patronage, it flourishes with modern facilities and OmniMek training.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Coventry</locationSystem>
@@ -1605,7 +1605,7 @@
         <name>Ecole Militaire</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The École Militaire stands as the most renowned academy in the Taurian Concordat, offering courses covering almost every form of modern warfare. Renowned for producing elite MekWarriors, armor, and infantry units, the academy admits foreign applicants with a preference for Taurians. </description>
+        <description>The École Militaire stands as the most renowned academy in the Taurian Concordat, offering courses covering almost every form of modern warfare. Renowned for producing elite MekWarriors, armor, and infantry units, the academy admits foreign applicants with a preference for Taurians.</description>
         <locationSystem>Taurus</locationSystem>
         <constructionYear>2500</constructionYear>
         <destructionYear>3078</destructionYear>
@@ -3397,7 +3397,7 @@
         <name>Liao Conservatory of Military Arts [3135]</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>In 3062, the Liao Conservatory of Military Arts opened in Chang-an, the capital of Liao, aiming to train elite soldiers. Students managed their own studies, balancing learning, practice, and chosen fields, with the expectation of joining veteran or elite commands upon graduation. Briefly renamed the Republic Conservatory, it became a focal point during the Capellan Confederation's 3134 invasion. </description>
+        <description>In 3062, the Liao Conservatory of Military Arts opened in Chang-an, the capital of Liao, aiming to train elite soldiers. Students managed their own studies, balancing learning, practice, and chosen fields, with the expectation of joining veteran or elite commands upon graduation. Briefly renamed the Republic Conservatory, it became a focal point during the Capellan Confederation's 3134 invasion.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Liao (Cynthiana 2202-)</locationSystem>
@@ -3438,7 +3438,7 @@
         <name>Liao Conservatory of Military Arts [3135] (Officer)</name>
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
-        <description>In 3062, the Liao Conservatory of Military Arts opened in Chang-an, the capital of Liao, aiming to train elite soldiers. Students managed their own studies, balancing learning, practice, and chosen fields, with the expectation of joining veteran or elite commands upon graduation. Briefly renamed the Republic Conservatory, it became a focal point during the Capellan Confederation's 3134 invasion. </description>
+        <description>In 3062, the Liao Conservatory of Military Arts opened in Chang-an, the capital of Liao, aiming to train elite soldiers. Students managed their own studies, balancing learning, practice, and chosen fields, with the expectation of joining veteran or elite commands upon graduation. Briefly renamed the Republic Conservatory, it became a focal point during the Capellan Confederation's 3134 invasion.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Liao (Cynthiana 2202-)</locationSystem>
@@ -4574,8 +4574,8 @@
         <qualification>The College of Biology/Medicine</qualification>
         <curriculum>Doctor, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>The College of Engineering (BattleMech)</qualification>
-        <curriculum>Tech/Mech</curriculum>
+        <qualification>The College of Engineering (BattleMek)</qualification>
+        <curriculum>Tech/Mek, Administration</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>The College of Engineering (Mechanics)</qualification>
         <curriculum>Tech/Mechanic, Administration</curriculum>
@@ -4584,7 +4584,7 @@
         <curriculum>Tech/Aero, Administration</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>The College of engineering (BA)</qualification>
-        <curriculum>Tech/BA</curriculum>
+        <curriculum>Tech/BattleArmor</curriculum>
         <qualificationStartYear>3058</qualificationStartYear>
         <qualification>The College of Engineering (Vessels)</qualification>
         <curriculum>Tech/Vessel, Administration</curriculum>
@@ -4611,8 +4611,8 @@
         <qualification>The College of Biology/Medicine</qualification>
         <curriculum>Doctor, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>The College of Engineering (BattleMech)</qualification>
-        <curriculum>Tech/Mech</curriculum>
+        <qualification>The College of Engineering (BattleMek)</qualification>
+        <curriculum>Tech/Mek, Administration</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>The College of Engineering (Mechanics)</qualification>
         <curriculum>Tech/Mechanic, Administration</curriculum>
@@ -4621,7 +4621,7 @@
         <curriculum>Tech/Aero, Administration</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>The College of engineering (BA)</qualification>
-        <curriculum>Tech/BA</curriculum>
+        <curriculum>Tech/BattleArmor</curriculum>
         <qualificationStartYear>3058</qualificationStartYear>
         <qualification>The College of Engineering (Vessels)</qualification>
         <curriculum>Tech/Vessel, Administration</curriculum>
