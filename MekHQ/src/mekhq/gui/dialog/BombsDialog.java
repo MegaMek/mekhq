@@ -49,6 +49,7 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.dialogs.customMek.BombChoicePanel;
 import megamek.common.AmmoType;
 import megamek.common.BombType;
+import megamek.common.BombType.BombTypeEnum;
 import megamek.common.EquipmentType;
 import megamek.common.IBomber;
 import megamek.logging.MMLogger;
@@ -71,9 +72,9 @@ public class BombsDialog extends JDialog implements ActionListener {
     private final Campaign campaign;
 
     private final int[] bombChoices;
-    private final int[] bombCatalog = new int[BombType.B_NUM];
-    private final int[] availBombs = new int[BombType.B_NUM];
-    private final int[] typeMax = new int[BombType.B_NUM];
+    private final int[] bombCatalog = new int[BombTypeEnum.NUM];
+    private final int[] availBombs = new int[BombTypeEnum.NUM];
+    private final int[] typeMax = new int[BombTypeEnum.NUM];
 
     private JButton okayButton;
     private JButton cancelButton;
@@ -98,14 +99,14 @@ public class BombsDialog extends JDialog implements ActionListener {
             if ((spare instanceof AmmoStorage) &&
                       (((EquipmentPart) spare).getType() instanceof BombType) &&
                       spare.isPresent()) {
-                int bombType = (BombType.getBombTypeFromInternalName(((AmmoStorage) spare).getType()
+                BombTypeEnum bombType = (BombTypeEnum.fromInternalName(((AmmoStorage) spare).getType()
                                                                            .getInternalName()));
                 bombCatalog[bombType] = spare.getId();
                 availBombs[bombType] = ((AmmoStorage) spare).getShots();
             }
         });
 
-        for (int type = 0; type < BombType.B_NUM; type++) {
+        for (int type = 0; type < BombTypeEnum.NUM; type++) {
             typeMax[type] = availBombs[type] + bombChoices[type];
         }
 
@@ -157,7 +158,7 @@ public class BombsDialog extends JDialog implements ActionListener {
             int[] newLoadout = bombPanel.getChoice();
 
             // Get difference between starting bomb load and new bomb load
-            for (int type = 0; type < BombType.B_NUM; type++) {
+            for (int type = 0; type < BombTypeEnum.NUM; type++) {
                 if (bombChoices[type] != newLoadout[type]) {
                     newLoadout[type] = bombChoices[type] - newLoadout[type];
                 } else {
@@ -165,7 +166,7 @@ public class BombsDialog extends JDialog implements ActionListener {
                 }
             }
 
-            for (int type = 0; type < BombType.B_NUM; type++) {
+            for (int type = 0; type < BombTypeEnum.NUM; type++) {
                 if (newLoadout[type] != 0) {
                     // IF there are bombs of this TYPE in the warehouse
                     if (bombCatalog[type] > 0) {
@@ -178,7 +179,7 @@ public class BombsDialog extends JDialog implements ActionListener {
                         // In this case newLoadout should always be greater than 0, but check to be sure
                     } else if (bombCatalog[type] == 0 && newLoadout[type] > 0) {
                         AmmoStorage excessBombs = new AmmoStorage(0,
-                              (AmmoType) EquipmentType.get(BombType.getBombInternalName(type)),
+                              (AmmoType) EquipmentType.get(type.getInternalName()),
                               newLoadout[type],
                               campaign);
                         campaign.getQuartermaster().addPart(excessBombs, 0);
