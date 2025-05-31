@@ -8340,9 +8340,9 @@ public class Campaign implements ITechManager {
                 for (BombMounted m : mountedBombs) {
                     if (m.getBaseShotsLeft() == 1) {
                         if (m.isInternalBomb()) {
-                            intBombChoices[BombTypeEnum.fromInternalName(m.getType().getInternalName())] += 1;
+                            intBombChoices.addBombs(m.getType().getBombType(), 1);
                         } else {
-                            extBombChoices[BombTypeEnum.fromInternalName(m.getType().getInternalName())] += 1;
+                            extBombChoices.addBombs(m.getType().getBombType(), 1);
                         }
                     }
                 }
