@@ -106,7 +106,7 @@ public class Lease {
      *
      * @param today The LocalDate to check with. No corrections done.
      */
-    public boolean isLeaseFirstMonth(LocalDate today) {
+    private boolean isLeaseFirstMonth(LocalDate today) {
         return (today.getYear() == acquisitionDate.getYear() && today.getMonth() == acquisitionDate.getMonth());
     }
 
