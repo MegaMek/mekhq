@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq;
 
@@ -132,6 +137,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String FATIGUED_BACKGROUND = "fatiguedBackground";
     public static final String STRATCON_HEX_COORD_FOREGROUND = "stratconHexCoordForeground";
     public static final String FONT_COLOR_NEGATIVE = "fontColorNegative";
+    public static final String FONT_COLOR_AMAZING = "fontColorAmazing";
     public static final String FONT_COLOR_POSITIVE = "fontColorPositive";
     public static final String FONT_COLOR_WARNING = "fontColorWarning";
     public static final String FONT_COLOR_SKILL_ULTRAGREEN = "fontColorSkillUltraGreen";
@@ -153,11 +159,6 @@ public final class MHQConstants extends SuiteConstants {
     public static final String SAVE_WEEKLY_KEY = "saveWeekly";
     public static final String SAVE_MONTHLY_KEY = "saveMonthly";
     public static final String SAVE_YEARLY_KEY = "saveYearly";
-    /**
-     * @deprecated use {@link #SAVE_BEFORE_SCENARIOS_KEY} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public static final String SAVE_BEFORE_MISSIONS_KEY = "saveBeforeMissions";
     public static final String SAVE_BEFORE_SCENARIOS_KEY = "saveBeforeScenarios";
     public static final String SAVE_BEFORE_MISSION_END = "saveBeforeMissionEnd";
     public static final String MAXIMUM_NUMBER_SAVES_KEY = "maximumNumberAutoSaves";
@@ -275,6 +276,8 @@ public final class MHQConstants extends SuiteConstants {
     public static final String STRATCON_MUL_FILES_DIRECTORY = "data/scenariotemplates/fixedmuls/";
     public static final String PLANETARY_SYSTEM_DIRECTORY_PATH = "data/universe/planetary_systems";
     public static final String FORCE_ICON_PATH = "data/images/force";
+    public static final String PERSONNEL_MARKET_DIRECTORY_PATH = "data/universe/markets/personnelMarket/";
+    public static final String MAPGEN_PATH = "data/mapgen";
 
     // region StratCon
     public static final String STRATCON_REQUIRED_HOSTILE_FACILITY_MODS = "./data/scenariomodifiers/requiredHostileFacilityModifiers.xml";

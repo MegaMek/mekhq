@@ -46,9 +46,11 @@ import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
-import megamek.client.ui.swing.util.UIUtil;
+import megamek.client.ui.util.UIUtil;
 import megamek.logging.MMLogger;
 import mekhq.CampaignPreset;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
 
 /**
@@ -156,7 +158,7 @@ public class SelectPresetDialog extends JDialog {
         outerPanel.add(centerPanel, gbc);
 
         JPanel bottomPanel = new JPanel();
-        bottomPanel.setBorder(BorderFactory.createEtchedBorder());
+        bottomPanel.setBorder(RoundedLineBorder.createRoundedLineBorder());
         JLabel newLabel = new JLabel();
         newLabel.setHorizontalAlignment(JLabel.CENTER);
         bottomPanel.add(newLabel);
@@ -201,7 +203,7 @@ public class SelectPresetDialog extends JDialog {
 
         JPanel buttonPanel = new JPanel();
 
-        JButton buttonSelect = new CampaignOptionsButton("PresetDialogSelect");
+        RoundedJButton buttonSelect = new CampaignOptionsButton("PresetDialogSelect");
         buttonSelect.addActionListener(e -> {
             selectedPreset = (CampaignPreset) comboBox.getSelectedItem();
             returnState = PRESET_SELECTION_SELECT;
@@ -210,7 +212,7 @@ public class SelectPresetDialog extends JDialog {
         buttonSelect.setEnabled(includePresetSelectOption);
         buttonPanel.add(buttonSelect);
 
-        JButton buttonCustomize = new CampaignOptionsButton("PresetDialogCustomize");
+        RoundedJButton buttonCustomize = new CampaignOptionsButton("PresetDialogCustomize");
         buttonCustomize.addActionListener(e -> {
             selectedPreset = (CampaignPreset) comboBox.getSelectedItem();
             returnState = PRESET_SELECTION_CUSTOMIZE;
@@ -219,7 +221,7 @@ public class SelectPresetDialog extends JDialog {
         buttonCustomize.setEnabled(includeCustomizePresetOption);
         buttonPanel.add(buttonCustomize);
 
-        JButton buttonCancel = new CampaignOptionsButton("PresetDialogCancel");
+        RoundedJButton buttonCancel = new CampaignOptionsButton("PresetDialogCancel");
         buttonCancel.addActionListener(e -> {
             returnState = PRESET_SELECTION_CANCELLED;
             dispose();

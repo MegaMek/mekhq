@@ -29,8 +29,8 @@ package mekhq.gui.dialog;
 
 import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.client.bot.princess.PrincessException;
-import megamek.client.ui.baseComponents.MMButton;
-import megamek.client.ui.dialogs.BotConfigDialog;
+import megamek.client.ui.buttons.MMButton;
+import megamek.client.ui.dialogs.buttonDialogs.BotConfigDialog;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;

@@ -24,90 +24,86 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.randomEvents.personalities.enums;
 
-import megamek.common.enums.Gender;
-import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Factions;
-import org.junit.jupiter.api.Test;
-
-import static mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR_HR;
 import static mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR;
-import static mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk.CHRONIC_LATENESS;
-import static mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk.MAXIMUM_VARIATIONS;
 import static mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk.NONE;
-import static mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk.OBJECT;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Arrays;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
+import megamek.common.enums.Gender;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
+
 public class PersonalityQuirkTest {
-    @Test
-    public void testFromString_ValidStatus() {
-        PersonalityQuirk status = PersonalityQuirk.fromString(OBJECT.name());
-        assertEquals(OBJECT, status);
-    }
-
-    @Test
-    public void testFromString_InvalidStatus() {
-        PersonalityQuirk status = PersonalityQuirk.fromString("INVALID_STATUS");
-
-        assertEquals(NONE, status);
-    }
-
-    @Test
-    public void testFromString_NullStatus() {
-        PersonalityQuirk status = PersonalityQuirk.fromString(null);
-
-        assertEquals(NONE, status);
-    }
-
-    @Test
-    public void testFromString_EmptyString() {
-        PersonalityQuirk status = PersonalityQuirk.fromString("");
-
-        assertEquals(NONE, status);
-    }
-
-    @Test
-    public void testFromString_Ordinal() {
-        PersonalityQuirk status = PersonalityQuirk.fromString(CHRONIC_LATENESS.ordinal() + "");
-
-        assertEquals(CHRONIC_LATENESS, status);
-    }
-
-    @Test
-    public void testGetDescription_notInvalid_Combatant() {
-        Faction originFaction = Factions.getInstance().getFaction("MERC");
-        for (PersonalityQuirk trait : PersonalityQuirk.values()) {
-            for (int i = 0; i < 3; i++) {
-                String description = trait.getDescription(MEKWARRIOR, i, Gender.MALE, originFaction, "Barry");
-                assertTrue(isResourceKeyValid(description));
-            }
+    @ParameterizedTest
+    @CsvSource(value = { "ADJUSTS_CLOTHES,ADJUSTS_CLOTHES", "INVALID_STATUS,NONE", "'',NONE", "'null',NONE",
+                         "1,ADJUSTS_CLOTHES" })
+    void testFromStringVariousInputs(String input, PersonalityQuirk expected) {
+        if ("null".equals(input)) {
+            input = null;
         }
+        PersonalityQuirk result = PersonalityQuirk.fromString(input);
+        assertEquals(expected, result);
     }
 
-    @Test
-    public void testGetDescription_notInvalid_Support() {
-        Faction originFaction = Factions.getInstance().getFaction("MERC");
-        for (PersonalityQuirk trait : PersonalityQuirk.values()) {
-            for (int i = 0; i < 3; i++) {
-                String description = trait.getDescription(ADMINISTRATOR_HR, i, Gender.MALE, originFaction,
-                    "Barry");
-
-                assertTrue(isResourceKeyValid(description));
-            }
-        }
+    @ParameterizedTest
+    @EnumSource(value = PersonalityQuirk.class)
+    void testFromString_Ordinal_All(PersonalityQuirk quirk) {
+        String ordinalString = String.valueOf(quirk.ordinal());
+        assertEquals(quirk, PersonalityQuirk.fromString(ordinalString));
     }
 
-    @Test
-    public void testGetDescription_InvalidDescriptionIndex() {
+    static Stream<Arguments> provideTraitsAndRoles() {
         Faction originFaction = Factions.getInstance().getFaction("MERC");
+        return Arrays.stream(PersonalityQuirk.values())
+                     .flatMap(trait -> IntStream.range(0, 3)
+                                             .mapToObj(i -> Arguments.of(trait,
+                                                   MEKWARRIOR,
+                                                   i,
+                                                   Gender.MALE,
+                                                   originFaction,
+                                                   "Barry")));
+    }
 
-        String description = NONE.getDescription(MEKWARRIOR, MAXIMUM_VARIATIONS, Gender.MALE, originFaction,
-            "Barry");
+    @ParameterizedTest
+    @MethodSource(value = "provideTraitsAndRoles")
+    void testGetDescription_notInvalid(PersonalityQuirk trait, PersonnelRole role, int validIndex, Gender gender,
+          Faction faction, String name) {
+        String description = trait.getDescription(role, validIndex, gender, faction, name);
+        assertTrue(isResourceKeyValid(description));
+    }
 
+    @ParameterizedTest
+    @EnumSource(value = PersonalityQuirk.class)
+    void testGetPersonalityTraitTypeLabel_notInvalid(PersonalityQuirk status) {
+        String label = status.getPersonalityTraitTypeLabel();
+        assertTrue(isResourceKeyValid(label));
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = { "-1", "999", "1000000", "2147483647" })
+        // example edge cases
+    void testGetDescription_InvalidDescriptionIndex(int invalidIndex) {
+        Faction originFaction = Factions.getInstance().getFaction("MERC");
+        String description = NONE.getDescription(MEKWARRIOR, invalidIndex, Gender.MALE, originFaction, "Barry");
         assertTrue(isResourceKeyValid(description));
     }
 }

@@ -41,12 +41,13 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-import megamek.client.ui.swing.util.PlayerColour;
+import megamek.client.ui.util.PlayerColour;
 import megamek.common.Board;
 import megamek.common.Crew;
 import megamek.common.CrewType;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
+import megamek.common.MapSettings;
 import megamek.common.MekSummary;
 import megamek.common.autoresolve.Resolver;
 import megamek.common.autoresolve.acar.SimulationOptions;
@@ -60,8 +61,10 @@ import megamek.common.planetaryconditions.BlowingSand;
 import megamek.common.planetaryconditions.EMI;
 import megamek.common.planetaryconditions.Fog;
 import megamek.common.planetaryconditions.Light;
+import megamek.common.planetaryconditions.PlanetaryConditions;
 import megamek.common.planetaryconditions.Weather;
 import megamek.common.planetaryconditions.Wind;
+import megamek.common.util.BoardUtilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
@@ -118,6 +121,7 @@ public class ResolverTest {
     private static int team1 = 0;
     private static int team2 = 0;
     private static int draws = 0;
+    private static Board BOARD = BoardUtilities.generateRandom(MapSettings.getInstance());
 
     public enum TeamArrangement {
         BALANCED,
@@ -372,6 +376,7 @@ public class ResolverTest {
         var units = getUnits(campaign, teamArrangement);
         var scenario = createScenario(campaign);
         var entities = getEntities(teamArrangement);
+        var planetaryConditions = new PlanetaryConditions();
 
         when(botForce.getCamouflage()).thenReturn(Camouflage.of(PlayerColour.MAROON));
         when(botForce.getColour()).thenReturn(PlayerColour.MAROON);
@@ -379,7 +384,8 @@ public class ResolverTest {
         when(botForce.getTeam()).thenReturn(2);
         when(botForce.getFullEntityList(any())).thenReturn(entities);
 
-        var resolver = Resolver.simulationRun(new AtBSetupForces(campaign, units, scenario, new FlattenForces()), SimulationOptions.empty(), new Board(30, 30));
+        var resolver = Resolver.simulationRun(new StratconSetupForces(campaign, units, scenario, new FlattenForces()),
+              SimulationOptions.empty(), BOARD, planetaryConditions);
         autoResolveConcludedEvent.accept(resolver.resolveSimulation());
     }
 

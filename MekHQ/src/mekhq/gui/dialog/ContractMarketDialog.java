@@ -34,15 +34,13 @@
 package mekhq.gui.dialog;
 
 import static mekhq.campaign.market.contractMarket.ContractAutomation.contractStartPrompt;
-import static mekhq.campaign.universe.Factions.getFactionLogo;
+import static mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR_HR;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -57,7 +55,7 @@ import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.JToggleButtonPreference;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.client.ui.swing.util.UIUtil;
+import megamek.common.enums.Gender;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -67,8 +65,13 @@ import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.FactionComboBox;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.dialog.resupplyAndCaches.DialogContractStart;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.IntegerStringSorter;
@@ -527,6 +530,10 @@ public class ContractMarketDialog extends JDialog {
                 }
 
                 contract.createEmployerLiaison(campaign);
+
+                if (contract.getEnemy().isClan()) {
+                    contract.createClanOpponent(campaign);
+                }
             }
 
             selectedContract.setName(contractView.getContractName());
@@ -539,6 +546,27 @@ public class ContractMarketDialog extends JDialog {
             // must be invoked after campaign.addMission to ensure presence of mission ID
             selectedContract.acceptContract(campaign);
             contractStartPrompt(campaign, selectedContract);
+
+            // Process Faction Standings Changes
+            if (campaign.getCampaignOptions().isTrackFactionStanding()) {
+                Faction enemy = null;
+                boolean isGarrisonType = false;
+                if (selectedContract instanceof AtBContract contract) {
+                    enemy = contract.getEnemy();
+                    isGarrisonType = contract.getContractType().isGarrisonType();
+                }
+
+                // Garrison Type contracts have a dynamic enemy. We update Standing whenever a new enemy is chosen.
+                if (!isGarrisonType) {
+                    FactionStandings factionStandings = campaign.getFactionStandings();
+                    List<String> standingsReports = factionStandings.processContractAccept(enemy,
+                          campaign.getLocalDate());
+
+                    for (String standingReport : standingsReports) {
+                        campaign.addReport(standingReport);
+                    }
+                }
+            }
 
             contractMarket.removeContract(selectedContract);
             ((DefaultTableModel) tableContracts.getModel()).removeRow(tableContracts.convertRowIndexToModel(
@@ -553,110 +581,61 @@ public class ContractMarketDialog extends JDialog {
      * @return {@code true} if the accept button is clicked, {@code false} if the refuse button is clicked
      */
     private boolean triggerConfirmationDialog() {
-        final boolean[] result = new boolean[] { true };
-
-        int difficulty = ((AtBContract) selectedContract).calculateContractDifficulty(campaign);
-
-        // Retrieves the title from the resources
-        String title = resourceMap.getString("incomingTransmission.title");
-
-        // An ImageIcon to hold the faction icon
-        ImageIcon icon = getFactionLogo(campaign.getGameYear(), ((AtBContract) selectedContract).getEmployerCode());
+        int difficulty = ((AtBContract) selectedContract).getDifficulty();
 
         // Get the resource string
-        String resourceKey = "";
+        String inCharacterResourceKey = "";
+        String outOfCharacterResourceKey = null;
 
-        if (difficulty == -99) {
-            resourceKey = "messageChallengeUnknown.text";
-        } else if (difficulty <= 2) {
-            resourceKey = "messageChallengeVeryEasy.text";
-        } else if (difficulty > 8) {
-            resourceKey = "messageChallengeVeryHard.text";
-        } else if (difficulty > 6) {
-            resourceKey = "messageChallengeHard.text";
-        }
 
-        if (((AtBContract) selectedContract).getContractType().isGarrisonDuty()) {
-            resourceKey = "messageChallengeGarrison.text";
+        AtBContractType contractType = ((AtBContract) selectedContract).getContractType();
+        if (contractType.isGarrisonDuty()) {
+            inCharacterResourceKey = "messageChallengeGarrison.inCharacter";
+            outOfCharacterResourceKey = "messageChallengeGarrison.outOfCharacter";
+        } else if (contractType.isGuerrillaWarfare()) {
+            inCharacterResourceKey = "messageChallengeGuerrilla.inCharacter";
+            outOfCharacterResourceKey = "messageChallengeGuerrilla.outOfCharacter";
+        } else {
+            if (difficulty == -99) {
+                inCharacterResourceKey = "messageChallengeUnknown.inCharacter";
+                outOfCharacterResourceKey = "messageChallengeUnknown.outOfCharacter";
+            } else if (difficulty <= 2) {
+                inCharacterResourceKey = "messageChallengeVeryEasy.inCharacter";
+                outOfCharacterResourceKey = "messageChallengeVeryEasy.outOfCharacter";
+            } else if (difficulty > 8) {
+                inCharacterResourceKey = "messageChallengeVeryHard.inCharacter";
+                outOfCharacterResourceKey = "messageChallengeVeryHard.outOfCharacter";
+            } else if (difficulty > 6) {
+                inCharacterResourceKey = "messageChallengeHard.inCharacter";
+                outOfCharacterResourceKey = "messageChallengeHard.outOfCharacter";
+            }
         }
 
         // If resourceKey is not found, just return true, acting as if the player had
         // accepted the mission
-        if (resourceKey.isEmpty()) {
+        if (inCharacterResourceKey.isBlank()) {
             return true;
         }
 
-        String messageResource = resourceMap.getString(resourceKey);
+        Person speaker = campaign.newPerson(ADMINISTRATOR_HR,
+              ((AtBContract) selectedContract).getEmployerCode(),
+              Gender.RANDOMIZE);
 
-        // Format the HTML message
-        String message = String.format("<html><i><div style='width: %s; text-align:center;'>%s</div></i></html>",
-              UIUtil.scaleForGUI(500),
-              messageResource);
+        String inCharacterMessage = resourceMap.getString(inCharacterResourceKey);
+        String outOfCharacterMessage = resourceMap.getString(outOfCharacterResourceKey);
 
-        // If no message for provided difficulty, act as if the player had accepted the
-        // mission.
-        if (message.isBlank()) {
-            return true;
-        }
+        List<String> options = List.of(resourceMap.getString("button.cancel"), resourceMap.getString("button.accept"));
 
-        // Create a text pane to display the message
-        JTextPane textPane = new JTextPane();
-        textPane.setContentType("text/html");
-        textPane.setText(message);
-        textPane.setEditable(false);
+        ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
+              speaker,
+              null,
+              inCharacterMessage,
+              options,
+              outOfCharacterMessage,
+              null,
+              false);
 
-        // Create a panel to display the icon and the message
-        JPanel panel = new JPanel(new BorderLayout());
-        JLabel imageLabel = new JLabel(icon);
-        panel.add(imageLabel, BorderLayout.CENTER);
-        panel.add(textPane, BorderLayout.SOUTH);
-
-        // Create a custom dialog
-        JDialog dialog = new JDialog();
-        dialog.setTitle(title);
-        dialog.setLayout(new BorderLayout());
-
-        // Create an accept button and add its action listener.
-        // When clicked, it will set the result to true and close the dialog
-        JButton acceptButton = new JButton(resourceMap.getString("responseAccept.text"));
-        acceptButton.addActionListener(e -> {
-            result[0] = true;
-            dialog.dispose();
-        });
-
-        // Create a refuse button and add its action listener.
-        // When clicked, it will trigger a refusal confirmation dialog
-        String refusalOption = resourceMap.getString("responseReturn.text");
-        JButton refuseButton = new JButton(refusalOption);
-        refuseButton.addActionListener(e -> {
-            result[0] = false;
-            dialog.dispose();
-        });
-
-        // Attach a window listener
-        dialog.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                result[0] = false;
-                dialog.dispose();
-            }
-        });
-
-        // Create a panel for buttons and add buttons to it
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.add(acceptButton);
-        buttonPanel.add(refuseButton);
-
-        // Add the original panel and button panel to the dialog
-        dialog.add(panel, BorderLayout.CENTER);
-        dialog.add(buttonPanel, BorderLayout.SOUTH);
-
-        dialog.pack(); // Size the dialog to fit the preferred size and layouts of its components
-        dialog.setLocationRelativeTo(null); // Center the dialog on the screen
-        dialog.setModal(true); // Make the dialog block user input to other top-level windows
-        dialog.setVisible(true);
-
-        return result[0];
+        return dialog.getDialogChoice() != 0;
     }
 
     private void btnCloseActionPerformed(ActionEvent evt) {

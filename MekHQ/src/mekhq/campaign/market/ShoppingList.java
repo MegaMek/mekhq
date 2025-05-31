@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.market;
 
@@ -47,6 +52,7 @@ import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.utilities.MHQXMLUtility;
+import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -155,7 +161,7 @@ public class ShoppingList {
                       campaign.getCampaignOptions().isUsePlanetaryAcquisition() &&
                       !campaign.getCampaignOptions().isPlanetAcquisitionVerbose()) {
                 campaign.addReport("<font color='" +
-                                         MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                                         ReportingUtilities.getNegativeColor() +
                                          "'><b>You failed to find " +
                                          newWork.getAcquisitionName() +
                                          " within " +

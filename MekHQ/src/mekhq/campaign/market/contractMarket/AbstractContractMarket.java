@@ -56,6 +56,7 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.ContractCommandRights;
+import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -85,7 +86,7 @@ public abstract class AbstractContractMarket {
      * The portion of combat teams we expect to be performing combat actions. This is one in 'x' where 'x' is the value
      * set here.
      */
-    static final double COMBAT_FORCE_DIVIDER = 2;
+    static final double BASE_VARIANCE_FACTOR = 0.7;
 
 
     protected List<Contract> contracts = new ArrayList<>();
@@ -247,48 +248,38 @@ public abstract class AbstractContractMarket {
     }
 
     /**
-     * Calculates the required number of combat teams for a contract based on campaign options, contract details, and
+     * Calculates the required number of combat elements for a contract based on campaign options, contract details, and
      * variance factors.
      *
      * <p>
-     * This method determines the number of combat teams needed to deploy, taking into account factors such as:
+     * This method determines the number of combat elements needed to deploy, taking into account factors such as:
      * <ul>
      *   <li>Whether the contract is a subcontract (returns 1 as a base case).</li>
-     *   <li>The base formation sizes (lance-level and company-level) and the effective unit forces.</li>
-     *   <li>The maximum deployable combat teams, adjusted based on campaign strategy options.</li>
+     *   <li>The effective unit forces.</li>
      *   <li>Whether variance bypass is enabled, applying a flat reduction to available forces.</li>
      *   <li>Variance adjustments applied through a dice roll, affecting the availability of forces.</li>
      * </ul>
      * The method ensures values are clamped to maintain a minimum deployment of at least 1 combat
-     * team while not exceeding the maximum deployable combat teams.
+     * element while not exceeding the maximum deployable combat elements.
      *
      * @param campaign       the campaign containing relevant options and faction information
      * @param contract       the contract that specifies details such as subcontract status
      * @param bypassVariance a flag indicating whether variance adjustments should be bypassed
      *
-     * @return the calculated number of required combat teams, ensuring it meets game rules and constraints
+     * @return the calculated number of required units in combat teams, ensuring it meets game rules and constraints
      */
-    public int calculateRequiredCombatTeams(Campaign campaign, AtBContract contract, boolean bypassVariance) {
+    public int calculateRequiredCombatElements(Campaign campaign, AtBContract contract, boolean bypassVariance) {
         // Return 1 combat team if the contract is a subcontract
         if (contract.isSubcontract()) {
             return 1;
         }
 
         // Calculate base formation size and effective unit force
-        int effectiveForces = AtBContract.calculateBaseNumberOfRequiredLances(campaign);
-
-        // Calculate maximum deployed forces based on strategy options
-        int maxDeployableCombatTeams = effectiveForces;
-        if (campaign.getCampaignOptions().isUseStrategy()) {
-            maxDeployableCombatTeams = Math.max(calculateMaxDeployableCombatTeams(campaign), 1);
-        }
-
-        // Clamp available forces to the max deployable limit
-        int availableForces = Math.min(effectiveForces, maxDeployableCombatTeams);
+        int effectiveForces = ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(campaign);
 
         // If bypassing variance, apply flat reduction (reduce force by 1/3)
         if (bypassVariance) {
-            return Math.max(availableForces - calculateBypassVarianceReduction(availableForces), 1);
+            return Math.max(effectiveForces - calculateBypassVarianceReduction(effectiveForces), 1);
         }
 
         // Apply variance based on a die roll
@@ -296,14 +287,14 @@ public abstract class AbstractContractMarket {
         double varianceFactor = calculateVarianceFactor(varianceRoll);
 
         // Adjust available forces based on variance, ensuring minimum clamping
-        int adjustedForces = availableForces - (int) Math.floor((double) availableForces / varianceFactor);
+        int adjustedForces = (int) Math.floor((double) effectiveForces * varianceFactor);
 
         if (adjustedForces < 1) {
             adjustedForces = 1;
         }
 
         // Return the clamped value, ensuring it does not exceed max-deployable forces
-        return Math.min(adjustedForces, maxDeployableCombatTeams);
+        return Math.min(adjustedForces, effectiveForces);
     }
 
     /**
@@ -313,11 +304,17 @@ public abstract class AbstractContractMarket {
      * The variance factor is determined by applying a multiplier to the fixed formation size divisor. The multiplier
      * varies based on the roll value:
      * <ul>
-     *   <li><b>Roll 2:</b> Multiplier is 0.75.</li>
-     *   <li><b>Roll 3:</b> Multiplier is 0.5.</li>
-     *   <li><b>Roll 4:</b> Multiplier is 0.25.</li>
-     *   <li><b>Rolls 10, 11, 12:</b> Multipliers are 1.25, 1.5, and 1.75 respectively.</li>
-     *   <li><b>Rolls 5-9:</b> Default multiplier is 1.0 (no change).</li>
+     *   <li><b>Roll 2:</b> Multiplier is 0.575.</li>
+     *   <li><b>Roll 3:</b> Multiplier is 0.6.</li>
+     *   <li><b>Roll 4:</b> Multiplier is 0.625</li>
+     *   <li><b>Roll 5:</b> Multiplier is 0.65.</li>
+     *   <li><b>Roll 6:</b> Multiplier is 0.675.</li>
+     *   <li><b>Roll 7:</b> Multiplier is 0.7.</li>
+     *   <li><b>Roll 7:</b> Multiplier is 0.725.</li>
+     *   <li><b>Roll 7:</b> Multiplier is 0.75.</li>
+     *   <li><b>Roll 7:</b> Multiplier is 0.775.</li>
+     *   <li><b>Roll 7:</b> Multiplier is 0.8.</li>
+     *   <li><b>Roll 7:</b> Multiplier is 0.825.</li>
      * </ul>
      *
      * @param roll the roll value used to determine the multiplier
@@ -326,13 +323,17 @@ public abstract class AbstractContractMarket {
      */
     private double calculateVarianceFactor(int roll) {
         return switch (roll) {
-            case 2 -> COMBAT_FORCE_DIVIDER * 0.25;
-            case 3 -> COMBAT_FORCE_DIVIDER * 0.5;
-            case 4 -> COMBAT_FORCE_DIVIDER * 0.75;
-            case 10 -> COMBAT_FORCE_DIVIDER * 1.25;
-            case 11 -> COMBAT_FORCE_DIVIDER * 1.5;
-            case 12 -> COMBAT_FORCE_DIVIDER * 1.75;
-            default -> COMBAT_FORCE_DIVIDER; // 5-9
+            case 2 -> BASE_VARIANCE_FACTOR - 0.125;
+            case 3 -> BASE_VARIANCE_FACTOR - 0.1;
+            case 4 -> BASE_VARIANCE_FACTOR - 0.075;
+            case 5 -> BASE_VARIANCE_FACTOR - 0.05;
+            case 6 -> BASE_VARIANCE_FACTOR - 0.025;
+            case 8 -> BASE_VARIANCE_FACTOR + 0.025;
+            case 9 -> BASE_VARIANCE_FACTOR + 0.05;
+            case 10 -> BASE_VARIANCE_FACTOR + 0.075;
+            case 11 -> BASE_VARIANCE_FACTOR + 0.1;
+            case 12 -> BASE_VARIANCE_FACTOR + 0.125;
+            default -> BASE_VARIANCE_FACTOR; // 7
         };
     }
 
@@ -353,17 +354,9 @@ public abstract class AbstractContractMarket {
     }
 
     /**
-     * Calculates the maximum number of deployable combat teams based on the given campaign's options.
-     *
-     * <p>
-     * This method retrieves campaign options and calculates the total deployable combat teams using the base strategy
-     * deployment, additional strategy deployment, and the campaign's commander strategy.
-     * </p>
-     *
-     * @param campaign the campaign object containing the necessary data to perform the calculation
-     *
-     * @return the total number of deployable combat teams
+     * @deprecated unused.
      */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public int calculateMaxDeployableCombatTeams(Campaign campaign) {
         CampaignOptions options = campaign.getCampaignOptions();
         int baseStrategyDeployment = options.getBaseStrategyDeployment();
@@ -397,14 +390,6 @@ public abstract class AbstractContractMarket {
         } else {
             return IUnitRating.DRAGOON_A;
         }
-    }
-
-    /**
-     * @deprecated use {@link #rollCommandClause(Contract, int, boolean)} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    protected void rollCommandClause(final Contract contract, final int modifier) {
-        rollCommandClause(contract, modifier, true);
     }
 
     /**
@@ -592,14 +577,6 @@ public abstract class AbstractContractMarket {
     }
 
     /**
-     * @deprecated use {@link #setAllyRating(AtBContract, int, SkillLevel)} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    protected void setAllyRating(AtBContract contract, int year) {
-        setAllyRating(contract, year, REGULAR);
-    }
-
-    /**
      * Calculates and sets the ally skill and quality ratings for the given contract.
      *
      * <p>The ally rating is influenced by multiple factors:</p>
@@ -661,14 +638,6 @@ public abstract class AbstractContractMarket {
 
         // Assign ally quality rating
         contract.setAllyQuality(getQualityRating(d6(2) + mod));
-    }
-
-    /**
-     * @deprecated use {@link #setEnemyRating(AtBContract, int, SkillLevel)} instead.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    protected void setEnemyRating(AtBContract contract, int year) {
-        setEnemyRating(contract, year, REGULAR);
     }
 
     /**

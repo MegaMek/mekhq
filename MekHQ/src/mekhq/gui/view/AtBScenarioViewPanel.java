@@ -34,6 +34,8 @@
 package mekhq.gui.view;
 
 import static megamek.common.Entity.getEntityMajorTypeName;
+import static megamek.common.options.OptionsConstants.BASE_BLIND_DROP;
+import static megamek.common.options.OptionsConstants.BASE_REAL_BLIND_DROP;
 
 import java.awt.Component;
 import java.awt.GridBagConstraints;
@@ -58,8 +60,8 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
-import megamek.client.ui.dialogs.BotConfigDialog;
-import megamek.client.ui.swing.UnitEditorDialog;
+import megamek.client.ui.dialogs.buttonDialogs.BotConfigDialog;
+import megamek.client.ui.dialogs.UnitEditorDialog;
 import megamek.common.Entity;
 import megamek.common.IStartingPositions;
 import megamek.common.annotations.Nullable;
@@ -276,9 +278,9 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             panStats.add(tree, gridBagConstraints);
         }
 
-        boolean isBlindDrop = campaign.getGameOptions().getOption("blind_drop").booleanValue();
-        boolean isTrueBlindDrop = campaign.getGameOptions().getOption("real_blind_drop").booleanValue();
-
+        boolean isBlindDrop = campaign.getGameOptions().getOption(BASE_BLIND_DROP).booleanValue();
+        boolean isTrueBlindDrop = campaign.getGameOptions().getOption(BASE_REAL_BLIND_DROP).booleanValue();
+        boolean isCurrent = scenario.getStatus().isCurrent();
         for (int i = 0; i < botStubs.size(); i++) {
             BotForceStub botStub = botStubs.get(i);
             if (botStub == null) {
@@ -286,18 +288,14 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             }
 
             int team = botStub.getTeam();
-            DefaultMutableTreeNode top = new DefaultMutableTreeNode(botStub.getName());
             List<String> allEntries = botStub.getEntityList();
+            DefaultMutableTreeNode top = new DefaultMutableTreeNode(botStubs.get(i).getName());
 
-            // Process entries only for current scenarios to avoid exceptions or irrelevant processing
-            if (scenario.getStatus().isCurrent()) {
-                for (String entry : allEntries) {
-                    if ((team != 1) && isTrueBlindDrop) {
-                        continue;
-                    }
-
-                    if ((team != 1) && isBlindDrop) {
-                        int unitIndex = allEntries.indexOf(entry);
+            if (!(isTrueBlindDrop && (team != 1))) {
+                boolean hideInformation = isCurrent && isBlindDrop && (team != 1);
+                for (String entityString : allEntries) {
+                    if (hideInformation) {
+                        int unitIndex = allEntries.indexOf(entityString);
                         Entity entity = scenario.getBotForce(i).getFullEntityList(campaign).get(unitIndex);
 
                         if (entity == null) {
@@ -313,12 +311,12 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
                         String label = weightClass + ' ' + unitType;
                         top.add(new DefaultMutableTreeNode(label));
                         continue;
+                    } else {
+                        top.add(new DefaultMutableTreeNode(entityString));
                     }
-
-                    top.add(new DefaultMutableTreeNode(entry));
-
                 }
             }
+
             JTree tree = new JTree(top);
             tree.collapsePath(new TreePath(top));
             tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
@@ -536,8 +534,8 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
      * Worker function that generates UI elements appropriate for planet-side scenarios
      *
      * @param gridBagConstraints Current grid bag constraints in use
-     * @param resourceMap        Text resource
-     * @param y                  current row in the parent UI element
+     * @param resourceMap Text resource
+     * @param y current row in the parent UI element
      *
      * @return the row at which we wind up after doing all this
      */
@@ -765,8 +763,8 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
      * Worker function that generates UI elements appropriate for space scenarios
      *
      * @param gridBagConstraints Current grid bag constraints in use
-     * @param resourceMap        Text resource
-     * @param y                  current row in the parent UI element
+     * @param resourceMap Text resource
+     * @param y current row in the parent UI element
      *
      * @return the row at which we wind up after doing all this
      */
@@ -810,8 +808,8 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
      * Worker function that generates UI elements appropriate for low atmosphere scenarios
      *
      * @param gridBagConstraints Current grid bag constraints in use
-     * @param resourceMap        Text resource
-     * @param y                  current row in the parent UI element
+     * @param resourceMap Text resource
+     * @param y current row in the parent UI element
      *
      * @return the row at which we wind up after doing all this
      */
@@ -985,7 +983,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
 
         @Override
         public Component getTreeCellRendererComponent(final JTree tree, final Object value, final boolean selected,
-                                                      final boolean expanded, final boolean leaf, final int row,
+              final boolean expanded, final boolean leaf, final int row,
                                                       final boolean hasFocus) {
             super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
             setIcon(getIcon(value));
@@ -1048,7 +1046,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         }
 
         private void maybeShowPopup(MouseEvent e) {
-            final boolean isBlindDrop = campaign.getGameOptions().getOption("blind_drop").booleanValue();
+            final boolean isBlindDrop = campaign.getGameOptions().getOption(BASE_BLIND_DROP).booleanValue();
             final JPopupMenu popup = new JPopupMenu();
             if (e.isPopupTrigger()) {
                 final TreePath path = tree.getPathForLocation(e.getX(), e.getY());

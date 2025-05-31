@@ -34,6 +34,9 @@ package mekhq.campaign.market.contractMarket;
 
 import static megamek.common.Compute.d6;
 import static megamek.common.enums.SkillLevel.REGULAR;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
+import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_NETWORKER;
+import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 
 import java.time.format.DateTimeFormatter;
@@ -53,7 +56,9 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.ContractCommandRights;
+import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.rating.IUnitRating;
@@ -113,8 +118,18 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         int ratingMod = campaign.getReputation().getReputationModifier();
         HiringHallModifiers hiringHallModifiers = getHiringHallModifiers(campaign);
         int negotiationSkill = findNegotiationSkill(campaign);
+
+        Person negotiator = campaign.getSeniorAdminPerson(COMMAND);
+        int negotiatorModifier = 0;
+        if (negotiator != null) {
+            PersonnelOptions options = negotiator.getOptions();
+            if (options.booleanOption(ADMIN_NETWORKER)) {
+                negotiatorModifier++;
+            }
+        }
+
         int numOffers = getNumberOfOffers(rollNegotiation(negotiationSkill, ratingMod + hiringHallModifiers.offersMod) -
-                                                BASE_NEGOTIATION_TARGET);
+                BASE_NEGOTIATION_TARGET) + negotiatorModifier;
 
         if (isGrayMonday) {
             for (int i = 0; i < numOffers; i++) {
@@ -187,7 +202,10 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         if (negotiator == null) {
             return 0;
         }
-        return negotiator.getSkillLevel(SkillType.S_NEGOTIATION);
+        return negotiator.getSkillLevel(S_NEGOTIATION,
+              campaign.getCampaignOptions().isUseAgeEffects(),
+              campaign.isClanCampaign(),
+              campaign.getLocalDate());
     }
 
     private int rollNegotiation(int skill, int modifiers) {
@@ -253,7 +271,8 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         // Step 6: Determine the initial contract clauses
         setContractClauses(contract, contractTerms);
         // Step 7: Determine the number of required lances (Not CamOps RAW)
-        contract.setRequiredCombatTeams(calculateRequiredCombatTeams(campaign, contract, false));
+        contract.setRequiredCombatTeams(ContractUtilities.calculateBaseNumberOfRequiredLances(campaign));
+        contract.setRequiredCombatElements(calculateRequiredCombatElements(campaign, contract, false));
         // Step 8: Calculate the payment
         contract.setMultiplier(calculatePaymentMultiplier(campaign, contract));
         // Step 9: Determine parts availability

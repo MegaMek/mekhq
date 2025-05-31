@@ -25,14 +25,19 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign;
 
 import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
-import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.TRANSIT_DISORIENTATION_SYNDROME;
 import static mekhq.campaign.personnel.BodyLocation.INTERNAL;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_TRANSIT_DISORIENTATION_SYNDROME;
+import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.TRANSIT_DISORIENTATION_SYNDROME;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.io.PrintWriter;
@@ -45,6 +50,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.event.LocationChangedEvent;
 import mekhq.campaign.event.TransitCompleteEvent;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.personnel.Injury;
@@ -54,6 +60,7 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.utilities.MHQXMLUtility;
+import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -67,7 +74,7 @@ import org.w3c.dom.NodeList;
 public class CurrentLocation {
     private static final MMLogger logger = MMLogger.create(CurrentLocation.class);
 
-    private static final String RESOURCE_BUNDLE = "mekhq.resources." + CurrentLocation.class.getSimpleName();
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.CurrentLocation";
 
     private PlanetarySystem currentSystem;
     // keep track of jump path
@@ -151,10 +158,9 @@ public class CurrentLocation {
         return randomInt(2) == 1;
     }
 
-    public String getReport(LocalDate date) {
+    public String getReport(LocalDate date, Money jumpCost) {
         StringBuilder sb = new StringBuilder();
-        sb.append("<html><b>Current Location</b><br>")
-
+        sb.append("<html>")
               // First Line
               .append("In ").append(currentSystem.getPrintableName(date)).append(' ');
 
@@ -194,6 +200,11 @@ public class CurrentLocation {
         } else {
             sb.append("Not traveling");
         }
+
+        sb.append("<br/>");
+
+        // Third Line
+        sb.append("Estimated Jump Cost: ").append(jumpCost.toAmountString()).append(" C-Bills<br><br>");
 
         sb.append("</html>");
         return sb.toString();
@@ -277,7 +288,7 @@ public class CurrentLocation {
                                            " to " +
                                            jumpPath.get(1).getName(campaign.getLocalDate()))) {
                         campaign.addReport("<font color='" +
-                                                 MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                                                 ReportingUtilities.getNegativeColor() +
                                                  "'><b>You cannot afford to make the jump!</b></font>");
                         return;
                     }

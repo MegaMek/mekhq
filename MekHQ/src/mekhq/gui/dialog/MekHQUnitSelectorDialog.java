@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -44,9 +49,9 @@ import javax.swing.JPanel;
 import javax.swing.RowFilter;
 
 import megamek.client.ui.Messages;
-import megamek.client.ui.advancedsearch.MekSearchFilter;
-import megamek.client.ui.swing.UnitLoadingDialog;
-import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
+import megamek.client.ui.dialogs.advancedsearch.MekSearchFilter;
+import megamek.client.ui.dialogs.UnitLoadingDialog;
+import megamek.client.ui.dialogs.unitSelectorDialogs.AbstractUnitSelectorDialog;
 import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
 import megamek.common.ITechnology;
@@ -54,6 +59,7 @@ import megamek.common.MekSummary;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
 import megamek.common.UnitType;
+import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Lease;
@@ -63,18 +69,30 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.unit.UnitTechProgression;
 import mekhq.utilities.MHQInternationalization;
+import mekhq.utilities.ReportingUtilities;
 
 public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
-    //region Variable Declarations
     private Campaign campaign;
     private boolean addToCampaign;
     private UnitOrder selectedUnit = null;
+    private JButton buttonBuy;
+    private JButton buttonAddGM;
+
     protected JButton buttonLease;
     protected JButton buttonLeaseGM;
 
     private static final String TARGET_UNKNOWN = "--";
-    //endregion Variable Declarations
 
+    /**
+     * This constructor creates the unit selector dialog for MekHQ. It loads the unit selector dialog in single-select
+     * mode. These selectors are used for: Adding units to the campaign from the Purchase Unit dialog. Adding units to
+     * the campaign from the 'Find Unit' dialog. Adding units to post-battle loot.
+     *
+     * @param frame             The frame to load the unit dialog into.
+     * @param unitLoadingDialog Display this frame instead while the unit dialog is loading (in case load is slow)
+     * @param campaign          Used to fetch state variables from the campaign
+     * @param addToCampaign     Used to determine if dialog should be in 'Buy/Add' or in 'Select for loot' mode
+     */
     public MekHQUnitSelectorDialog(JFrame frame, UnitLoadingDialog unitLoadingDialog, Campaign campaign,
           boolean addToCampaign) {
         super(frame, unitLoadingDialog);
@@ -129,18 +147,28 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         }
     }
 
-    //region Button Methods
+    /**
+     * This is the initialization function for all the buttons involved in this panel.
+     */
     @Override
     protected JPanel createButtonsPanel() {
         JPanel panelButtons = new JPanel(new GridBagLayout());
 
+        buttonSelect = new JButton();
+        buttonSelectClose = new JButton();
+        buttonClose = new JButton();
+        buttonBuy = new JButton();
+        buttonAddGM = new JButton();
+        buttonShowBV = new JButton();
+        buttonLeaseGM = new JButton();
+
         if (addToCampaign) {
-            // This is used for the buy command in MekHQ, named buttonSelect because of how it is used elsewhere
-            buttonSelect = new JButton(Messages.getString("MekSelectorDialog.Buy", TARGET_UNKNOWN));
-            buttonSelect.setName("buttonBuy");
-            buttonSelect.addActionListener(this);
-            buttonSelect.setEnabled(false);
-            panelButtons.add(buttonSelect, new GridBagConstraints());
+            //This branch is for purchases and adding to the hanger directly.
+            buttonBuy.setText(Messages.getString("MekSelectorDialog.Buy", TARGET_UNKNOWN));
+            buttonBuy.setName("buttonBuy");
+            buttonBuy.addActionListener(evt -> buyUnit());
+            buttonBuy.setEnabled(false);
+            panelButtons.add(buttonBuy, new GridBagConstraints());
 
             if (campaign.getCampaignOptions().isTrackLeases()) {
                 buttonLease = new JButton(Messages.getString("MekSelectorDialog.Lease", TARGET_UNKNOWN));
@@ -151,45 +179,43 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
             }
 
             if (campaign.isGM()) {
-                // This is used as a GM add, the name is because of how it is used in MegaMek and MegaMekLab
-                buttonSelectClose = new JButton(Messages.getString("MekSelectorDialog.AddGM"));
-                buttonSelectClose.setName("buttonAddGM");
-                buttonSelectClose.addActionListener(this);
-                buttonSelectClose.setEnabled(false);
-                panelButtons.add(buttonSelectClose, new GridBagConstraints());
+                buttonAddGM.setText(Messages.getString("MekSelectorDialog.AddGM"));
+                buttonAddGM.setName("buttonAddGM");
+                buttonAddGM.addActionListener(evt -> addGM());
+                buttonAddGM.setEnabled(false);
+
+                panelButtons.add(buttonAddGM, new GridBagConstraints());
                 if (campaign.getCampaignOptions().isTrackLeases()) {
-                    buttonLeaseGM = new JButton(Messages.getString("MekSelectorDialog.LeaseGM", TARGET_UNKNOWN));
+                    buttonLeaseGM.setText = Messages.getString("MekSelectorDialog.LeaseGM", TARGET_UNKNOWN);
                     buttonLeaseGM.setName("buttonLeaseGM");
                     buttonLeaseGM.addActionListener(e -> leaseButtonHandler(true));
                     panelButtons.add(buttonLeaseGM, new GridBagConstraints());
                     buttonLeaseGM.setEnabled(false);
                 }
-
             }
-
-            // This closes the dialog
             buttonClose = new JButton(Messages.getString("Close"));
             buttonClose.setName("buttonClose");
             buttonClose.addActionListener(this);
         } else {
-            buttonSelectClose = new JButton(Messages.getString("MekSelectorDialog.Add"));
-            buttonSelectClose.setName("buttonAdd");
-            //the actual work will be done by whatever called this
-            buttonSelectClose.addActionListener(evt -> setVisible(false));
-            panelButtons.add(buttonSelectClose, new GridBagConstraints());
+            // This branch is for adding units where they will not be going to the hanger.
+            buttonSelect.setText(Messages.getString("MekSelectorDialog.Add"));
+            buttonSelect.setName("buttonAdd");
+            buttonSelect.addActionListener(evt -> select(false));
+            buttonSelect.setEnabled(true);
+            panelButtons.add(buttonSelect, new GridBagConstraints());
 
-            // This closes the dialog
-            buttonClose = new JButton(Messages.getString("Cancel"));
+            buttonClose.setText(Messages.getString("Cancel"));
             buttonClose.setName("buttonCancel");
             buttonClose.addActionListener(evt -> {
                 selectedUnit = null;
                 setVisible(false);
             });
         }
+        buttonClose.setEnabled(true);
         panelButtons.add(buttonClose, new GridBagConstraints());
 
-        // This displays the BV of the selected unit
-        buttonShowBV = new JButton(Messages.getString("MekSelectorDialog.BV"));
+        // This displays the BV of the selected unit.
+        buttonShowBV.setText(Messages.getString("MekSelectorDialog.BV"));
         buttonShowBV.setName("buttonShowBV");
         buttonShowBV.addActionListener(this);
         panelButtons.add(buttonShowBV, new GridBagConstraints());
@@ -197,12 +223,14 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         return panelButtons;
     }
 
-    @Override
-    protected void select(boolean isGM) {
+    /**
+     * This function checks to see if this unit is invalid to add to the campaign.
+     *
+     * @return boolean True if invalid, false if valid.
+     */
+    private boolean isBadSelection() {
         if (getSelectedEntity() != null) {
-            // Block the purchase if the unit type is unsupported
             Entity entity = selectedUnit.getEntity();
-
             if (entity == null || isUnsupportedEntity(entity)) {
                 final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
                       MekHQ.getMHQOptions().getLocale());
@@ -218,46 +246,73 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
                     reason = MHQInternationalization.getTextAt(resources.getBaseBundleName(),
                           "mekSelectorDialog.unsupported.droneOs");
                 }
-
                 campaign.addReport(String.format(reason,
-                      spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                      spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                       CLOSING_SPAN_TAG));
 
-                dispose();
-                return;
+                return true;
             }
-
-            if (isGM) {
-                PartQuality quality = PartQuality.QUALITY_D;
-
-                if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
-                    quality = UnitOrder.getRandomUnitQuality(0);
-                }
-
-                campaign.addNewUnit(selectedUnit.getEntity(), false, 0, quality);
-            } else {
-                campaign.getShoppingList().addShoppingItem(selectedUnit, 1, campaign);
-            }
+            return false;
         }
+        // In this case, getSelectedEntity() == null, and this selection is bad
+        return true;
     }
-    //endregion Button Methods
+
+    /**
+     * Processes the event from the buy button.
+     */
+    private void buyUnit() {
+        if (isBadSelection()) {
+            return;
+        }
+        campaign.getShoppingList().addShoppingItem(selectedUnit, 1, campaign);
+    }
+
+    /**
+     * This function processes the Add GM button's functions.
+     */
+    private void addGM() {
+
+        if (isBadSelection()) {
+            return;
+        }
+
+        PartQuality quality = PartQuality.QUALITY_D;
+        if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
+            quality = UnitOrder.getRandomUnitQuality(0);
+        }
+
+        campaign.addNewUnit(selectedUnit.getEntity(), false, 0, quality);
+    }
+
+    /**
+     * Select processes the select button. This overrides a function in the AbstractUnitSelectorDialog.
+     */
+    @Override
+    protected void select(boolean NoOP) {
+        // No actions are needed in the case for the loot dialog to function, which is the only location this is
+        // now called.
+    }
 
     /**
      * We need to override this to add some MekHQ specific functionality, namely changing button names when the selected
-     * entity is chosen
+     * entity is selected or unselected
      *
      * @return selectedEntity, or null if there isn't one
      */
+    @Nullable
     @Override
     public Entity getSelectedEntity() {
         Entity entity = super.getSelectedEntity();
         if (entity == null) {
             selectedUnit = null;
+            // If we are currently in the Purchase Unit dialog, we need to update the state of the Buy and AddGM
+            // buttons to be disabled when no unit is selected.
             if (addToCampaign) {
-                buttonSelect.setEnabled(false);
-                buttonSelect.setText(Messages.getString("MekSelectorDialog.Buy", TARGET_UNKNOWN));
-                buttonSelect.setToolTipText(null);
-                buttonSelectClose.setEnabled(false);
+                buttonBuy.setEnabled(false);
+                buttonBuy.setText(Messages.getString("MekSelectorDialog.Buy", TARGET_UNKNOWN));
+                buttonBuy.setToolTipText(null);
+                buttonAddGM.setEnabled(false);
                 if (campaign.getCampaignOptions().isTrackLeases()) {
                     buttonLease.setEnabled(false);
                     buttonLease.setText(Messages.getString("MekSelectorDialog.Lease", TARGET_UNKNOWN));
@@ -269,12 +324,13 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
             }
         } else {
             selectedUnit = new UnitOrder(entity, campaign);
+            // Here also, we need to update the Buy and AddGM buttons  when a unit is selected.
             if (addToCampaign) {
-                buttonSelect.setEnabled(true);
+                buttonBuy.setEnabled(true);
                 final TargetRoll target = campaign.getTargetForAcquisition(selectedUnit);
-                buttonSelect.setText(Messages.getString("MekSelectorDialog.Buy", target.getValueAsString()));
-                buttonSelect.setToolTipText(target.getDesc());
-                buttonSelectClose.setEnabled(true);
+                buttonBuy.setText(Messages.getString("MekSelectorDialog.Buy", target.getValueAsString()));
+                buttonBuy.setToolTipText(target.getDesc());
+                buttonAddGM.setEnabled(true);
                 if (campaign.getCampaignOptions().isTrackLeases() && (Lease.isLeasable(entity))) {
                     buttonLease.setEnabled(true);
                     buttonLeaseGM.setEnabled(true);
@@ -301,6 +357,66 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         return selectedEntity;
     }
 
+    /**
+     * This function is to simplify logic in filterUnits. It runs a series of checks to determine if a unit is valid
+     * within the current filtering context.
+     *
+     * @param unitSummary  The unit being evaluated.
+     * @param weightClassSelectorIndex The current weight class selection
+     * @param tech            The current tech selection
+     * @param techLevelMatch  whether the current tech selection matches
+     * @param checkSupportVee Whether the special 'Support Vehicle' unit type was selected
+     * @param unitTypeSelectorIndex  Which unit type is currently selected (Depends on the combo box order!)
+     *
+     * @return true if the unit passes all filters and allowed, false otherwise
+     */
+    private boolean isAllowedUnit(MekSummary unitSummary, int weightClassSelectorIndex, ITechnology tech, boolean techLevelMatch,
+          boolean checkSupportVee, int unitTypeSelectorIndex) {
+        if (enableYearLimits && (unitSummary.getYear() > allowedYear)) {
+            return false;
+        }
+        if (!(campaign.getCampaignOptions().isAllowClanPurchases()) && TechConstants.isClan(unitSummary.getType())) {
+            return false;
+        }
+        if (!(campaign.getCampaignOptions().isAllowISPurchases()) && !TechConstants.isClan(unitSummary.getType())) {
+            return false;
+        }
+        if (canonOnly && !unitSummary.isCanon()) {
+            return false;
+        }
+        if ((weightClassSelectorIndex != unitSummary.getWeightClass()) && weightClassSelectorIndex != EntityWeightClass.SIZE) {
+            return false;
+        }
+        if ((tech == null) || !campaign.isLegal(tech)) {
+            return false;
+        }
+        if (!techLevelMatch) {
+            return false;
+        }
+
+        // Filter by unit type and support vehicles (if applicable)
+        if (unitTypeSelectorIndex != -1) {
+            String unitTypeName = checkSupportVee ? "Support Vehicle" : UnitType.getTypeName(unitTypeSelectorIndex);
+            boolean isCorrectType = unitSummary.getUnitType().equals(unitTypeName);
+            boolean isSupport = unitSummary.isSupport();
+            if ((!checkSupportVee && !isCorrectType) || (checkSupportVee && !isSupport)) {
+                return false;
+            }
+        }
+
+        // if we have an advanced filter set, does it match that filter?
+        if ((searchFilter != null) && !MekSearchFilter.isMatch(unitSummary, searchFilter)) {
+            return false;
+        }
+
+        if (!textFilter.getText().isBlank()) {
+            String text = textFilter.getText();
+            return unitSummary.getName().toLowerCase().contains(text.toLowerCase());
+        }
+
+        return true;
+    }
+
     @Override
     protected void filterUnits() {
         RowFilter<MekTableModel, Integer> unitTypeFilter;
@@ -312,8 +428,8 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         final Integer[] nTypes = new Integer[techLevels.size()];
         techLevels.toArray(nTypes);
 
-        final int nClass = comboWeight.getSelectedIndex();
-        final int nUnit = comboUnitType.getSelectedIndex() - 1;
+        final int weightClassSelectorIndex = comboWeight.getSelectedIndex();
+        final int unitTypeSelectorIndex = comboUnitType.getSelectedIndex() - 1;
         final boolean checkSupportVee = Messages.getString("MekSelectorDialog.SupportVee")
                                               .equals(comboUnitType.getSelectedItem());
         // If the current expression doesn't parse, don't update.
@@ -332,35 +448,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
                             break;
                         }
                     }
-
-                    if (
-                        /* year limits */
-                          (!enableYearLimits || (mek.getYear() <= allowedYear))
-                                /* Clan/IS limits */ &&
-                                (campaign.getCampaignOptions().isAllowClanPurchases() ||
-                                       !TechConstants.isClan(mek.getType())) &&
-                                (campaign.getCampaignOptions().isAllowISPurchases() ||
-                                       TechConstants.isClan(mek.getType()))
-                                /* Canon */ &&
-                                (!canonOnly || mek.isCanon())
-                                /* Weight */ &&
-                                ((nClass == mek.getWeightClass()) || (nClass == EntityWeightClass.SIZE))
-                                /* Technology Level */ &&
-                                ((null != tech) && campaign.isLegal(tech)) &&
-                                (techLevelMatch)
-                                /* Support Vehicles */ &&
-                                ((nUnit == -1) ||
-                                       (!checkSupportVee && mek.getUnitType().equals(UnitType.getTypeName(nUnit))) ||
-                                       (checkSupportVee && mek.isSupport()))
-                                /* Advanced Search */ &&
-                                ((searchFilter == null) || MekSearchFilter.isMatch(mek, searchFilter))) {
-                        if (!textFilter.getText().isBlank()) {
-                            String text = textFilter.getText();
-                            return mek.getName().toLowerCase().contains(text.toLowerCase());
-                        }
-                        return true;
-                    }
-                    return false;
+                    return isAllowedUnit(mek, weightClassSelectorIndex, tech, techLevelMatch, checkSupportVee, unitTypeSelectorIndex);
                 }
             };
         } catch (PatternSyntaxException ignored) {

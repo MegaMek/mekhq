@@ -46,7 +46,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
-import megamek.client.ui.swing.util.UIUtil;
+import megamek.client.ui.util.UIUtil;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
@@ -407,22 +407,12 @@ public class ReputationController {
               transportationRequirements.get("asfCount"),
               transportationCapacities.get("asfBays")));
 
-        // <50.01 compatibility handler
-        try {
-            description.append(String.format("<tr><td><b>%s%s:</b></td> <td style=\"text-align:center;\">" +
-                                                   "%d</td> <td style=\"text-align:center;\">%d</td></tr>",
-                  indent,
-                  resources.getString("battleMeks.text"),
-                  transportationRequirements.get("mekCount"),
-                  transportationCapacities.get("mekBays")));
-        } catch (Exception e) {
-            description.append(String.format("<tr><td><b>%s%s:</b></td> <td style=\"text-align:center;\">" +
-                                                   "%d</td> <td style=\"text-align:center;\">%d</td></tr>",
-                  indent,
-                  resources.getString("battleMeks.text"),
-                  transportationRequirements.get("mechCount"),
-                  transportationCapacities.get("mechBays")));
-        }
+        description.append(String.format("<tr><td><b>%s%s:</b></td> <td style=\"text-align:center;\">" +
+                                               "%d</td> <td style=\"text-align:center;\">%d</td></tr>",
+              indent,
+              resources.getString("battleMeks.text"),
+              transportationRequirements.get("mekCount"),
+              transportationCapacities.get("mekBays")));
 
         description.append(String.format("<tr><td><b>%s%s:*</b></td> <td style=\"text-align:center;\">" +
                                                "%d</td> <td style=\"text-align:center;\">%d</td></tr>",
@@ -445,22 +435,12 @@ public class ReputationController {
               transportationRequirements.get("lightVehicleCount"),
               transportationCapacities.get("lightVehicleBays")));
 
-        // <50.01 compatibility handler
-        try {
-            description.append(String.format("<tr><td><b>%s%s:</b></td> <td style=\"text-align:center;\">" +
-                                                   "%d</td> <td style=\"text-align:center;\">%d</td></tr>",
-                  indent,
-                  resources.getString("protoMeks.text"),
-                  transportationRequirements.get("protoMekCount"),
-                  transportationCapacities.get("protoMekBays")));
-        } catch (Exception e) {
-            description.append(String.format("<tr><td><b>%s%s:</b></td> <td style=\"text-align:center;\">" +
-                                                   "%d</td> <td style=\"text-align:center;\">%d</td></tr>",
-                  indent,
-                  resources.getString("protoMeks.text"),
-                  transportationRequirements.get("protoMechCount"),
-                  transportationCapacities.get("protoMechBays")));
-        }
+        description.append(String.format("<tr><td><b>%s%s:</b></td> <td style=\"text-align:center;\">" +
+                                               "%d</td> <td style=\"text-align:center;\">%d</td></tr>",
+              indent,
+              resources.getString("protoMeks.text"),
+              transportationRequirements.get("protoMekCount"),
+              transportationCapacities.get("protoMekBays")));
 
         description.append(String.format("<tr><td><b>%s%s:</b></td> <td style=\"text-align:center;\">" +
                                                "%d</td> <td style=\"text-align:center;\">%d</td></tr>",
@@ -523,22 +503,12 @@ public class ReputationController {
               administrationRequirements.get("personnelCount"),
               administrationRequirements.get("administratorCount")));
 
-        // <50.01 compatibility handler
-        try {
-            description.append(String.format("<tr><td><b>%s%s:</b></td> <td style=\"text-align:center;\">" +
-                                                   "%d</td> <td style=\"text-align:center;\">%d</td></tr>",
-                  indent,
-                  resources.getString("battleMeksAndProtoMeks.text"),
-                  technicianRequirements.get("mek").get(0),
-                  technicianRequirements.get("mek").get(1)));
-        } catch (Exception e) {
-            description.append(String.format("<tr><td><b>%s%s:</b></td> <td style=\"text-align:center;\">" +
-                                                   "%d</td> <td style=\"text-align:center;\">%d</td></tr>",
-                  indent,
-                  resources.getString("battleMeksAndProtoMeks.text"),
-                  technicianRequirements.get("mech").get(0),
-                  technicianRequirements.get("mech").get(1)));
-        }
+        description.append(String.format("<tr><td><b>%s%s:</b></td> <td style=\"text-align:center;\">" +
+                                               "%d</td> <td style=\"text-align:center;\">%d</td></tr>",
+              indent,
+              resources.getString("battleMeksAndProtoMeks.text"),
+              technicianRequirements.get("mek").get(0),
+              technicianRequirements.get("mek").get(1)));
 
         description.append(String.format("<tr><td><b>%s%s:</b></td> <td style=\"text-align:center;\">" +
                                                "%d</td> <td style=\"text-align:center;\">%d</td></tr>",

@@ -33,8 +33,8 @@
 package mekhq.gui.view;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
-import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
-import static megamek.client.ui.swing.util.UIUtil.scaleForGUI;
+import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.estimateCargoRequirements;
 
 import java.awt.BorderLayout;
@@ -55,8 +55,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
-import javax.swing.border.EtchedBorder;
 
+import megamek.client.ui.util.UIUtil;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
@@ -64,9 +64,11 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.JScrollablePanel;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.MarkdownRenderer;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * A custom panel that gets filled in with goodies from a scenario object
@@ -148,8 +150,9 @@ public class MissionViewPanel extends JScrollablePanel {
 
         setLayout(new GridBagLayout());
 
+        pnlStats.setMaximumSize(UIUtil.scaleForGUI(200, Integer.MAX_VALUE));
         pnlStats.setName("pnlStats");
-        pnlStats.setBorder(BorderFactory.createTitledBorder(mission.getName()));
+        pnlStats.setBorder(RoundedLineBorder.createRoundedLineBorder(mission.getName()));
         fillStats();
 
         gridBagConstraints = new GridBagConstraints();
@@ -164,7 +167,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
         if (mission instanceof AtBContract) {
             pnlStats.setName("pnlTutorial");
-            pnlStats.setBorder(BorderFactory.createTitledBorder(mission.getName()));
+            pnlStats.setBorder(RoundedLineBorder.createRoundedLineBorder(mission.getName()));
             fillTutorial();
 
             gridBagConstraints = new GridBagConstraints();
@@ -570,7 +573,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
             String lead = "<html><font>";
             if (currentSalvagePct > maxSalvagePct) {
-                lead = "<html><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>";
+                lead = "<html><font color='" + ReportingUtilities.getNegativeColor() + "'>";
             }
             lblSalvagePct2.setText(lead + currentSalvagePct + "%</font> <span>(max " + maxSalvagePct + "%)</span></html>");
         }
@@ -1140,7 +1143,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
         pnlTutorial = new JPanel(new BorderLayout());
 
-        pnlTutorial.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+        pnlTutorial.setBorder(RoundedLineBorder.createRoundedLineBorder());
         pnlTutorial.setPreferredSize(new Dimension(800, 0));
         pnlTutorial.add(scrollPane, BorderLayout.CENTER);
     }

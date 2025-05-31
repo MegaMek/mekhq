@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.view;
 
@@ -54,7 +59,7 @@ import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.CombatRole;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.model.DataTableModel;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
@@ -201,23 +206,14 @@ public class LanceAssignmentView extends JPanel {
 
         panRequiredLances = new JPanel();
         panRequiredLances.setLayout(new BoxLayout(panRequiredLances, BoxLayout.Y_AXIS));
-        panRequiredLances.setBorder(BorderFactory.createTitledBorder("Deployment Requirements"));
+        panRequiredLances.setBorder(RoundedLineBorder.createRoundedLineBorder("Deployment Requirements"));
         panRequiredLances.add(tblRequiredLances.getTableHeader());
         panRequiredLances.add(tblRequiredLances);
         add(panRequiredLances);
 
-        int cmdrStrategy = 0;
-        if ((campaign.getFlaggedCommander() != null) &&
-                  (campaign.getFlaggedCommander().getSkill(SkillType.S_STRATEGY) != null)) {
-            cmdrStrategy = campaign.getFlaggedCommander().getSkill(SkillType.S_STRATEGY).getLevel();
-        }
-        int maxDeployedLances = campaign.getCampaignOptions().getBaseStrategyDeployment() +
-                                      campaign.getCampaignOptions().getAdditionalStrategyDeployment() * cmdrStrategy;
-        add(new JLabel("Maximum Deployed Forces: " + maxDeployedLances));
-
         panAssignments = new JPanel();
         panAssignments.setLayout(new BoxLayout(panAssignments, BoxLayout.Y_AXIS));
-        panAssignments.setBorder(BorderFactory.createTitledBorder("Current Assignments"));
+        panAssignments.setBorder(RoundedLineBorder.createRoundedLineBorder("Current Assignments"));
         panAssignments.add(tblAssignments.getTableHeader());
         panAssignments.add(tblAssignments);
         add(panAssignments);
@@ -363,13 +359,13 @@ class RequiredLancesTableModel extends DataTableModel {
                     boolean isDeploymentEligible = combatTeam.isEligible(campaign);
 
                     if ((data.get(row).equals(assignedContract)) && isRoleSuitable && isDeploymentEligible) {
-                        t++;
+                        t += combatTeam.getSize(campaign);
                     }
                 }
-                if (t < contract.getRequiredCombatTeams()) {
-                    return t + "/" + contract.getRequiredCombatTeams();
+                if (t < contract.getRequiredCombatElements()) {
+                    return t + "/" + contract.getRequiredCombatElements();
                 }
-                return Integer.toString(contract.getRequiredCombatTeams());
+                return Integer.toString(contract.getRequiredCombatElements());
             } else if (contract.getContractType().getRequiredCombatRole().ordinal() == column - 2) {
                 int t = 0;
                 for (CombatTeam combatTeam : campaign.getAllCombatTeams()) {
@@ -377,10 +373,10 @@ class RequiredLancesTableModel extends DataTableModel {
                               (combatTeam.getRole() ==
                                      combatTeam.getContract(campaign).getContractType().getRequiredCombatRole()) &&
                               combatTeam.isEligible(campaign)) {
-                        t++;
+                        t += combatTeam.getSize(campaign);
                     }
                 }
-                int required = Math.max(contract.getRequiredCombatTeams() / 2, 1);
+                int required = Math.max(contract.getRequiredCombatElements() / 2, 1);
                 if (t < required) {
                     return t + "/" + required;
                 }

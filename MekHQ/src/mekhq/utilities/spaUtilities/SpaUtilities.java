@@ -32,7 +32,7 @@
  */
 package mekhq.utilities.spaUtilities;
 
-import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
 import static mekhq.campaign.personnel.skills.SkillType.S_GUN_BA;
 import static mekhq.campaign.personnel.skills.SkillType.S_GUN_PROTO;
 import static mekhq.campaign.personnel.skills.SkillType.getExperienceLevelName;
@@ -84,8 +84,10 @@ public class SpaUtilities {
      * <ul>
      *   <li>If the ability cost is -1, it is categorized as {@code CHARACTER_CREATION_ONLY}.</li>
      *   <li>Otherwise, if the cost is negative, it is a {@code CHARACTER_FLAW}.</li>
-     *   <li>If its required skills involve combat gunnery (not ProtoMech or BattleArmor), it is a {@code COMBAT_ABILITY}.</li>
-     *   <li>If its required skills involve piloting or certain gunnery types (ProtoMech or BattleArmor), it is a {@code MANEUVERING_ABILITY}.</li>
+     *   <li>If its required skills involve combat gunnery (not ProtoMek or BattleArmor), it is a {@code COMBAT_ABILITY}
+     *   .</li>
+     *   <li>If its required skills involve piloting or certain gunnery types (ProtoMek or BattleArmor), it is a
+     *   {@code MANEUVERING_ABILITY}.</li>
      *   <li>Otherwise, it is classified as a {@code UTILITY_ABILITY}.</li>
      * </ul>
      *
@@ -123,7 +125,7 @@ public class SpaUtilities {
             skillPerquisiteString = orPattern.matcher(skillPerquisiteString).replaceAll("");
 
             // Step 2: remove experience levels
-            for (int i = 0; i < EXP_ELITE; i++) {
+            for (int i = 0; i < EXP_LEGENDARY; i++) {
                 skillPerquisiteString = skillPerquisiteString.replaceAll(getExperienceLevelName(i) + ' ', "");
             }
 

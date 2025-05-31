@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -351,6 +356,17 @@ public final class BatchXPDialog extends JDialog {
         }
     }
 
+    /**
+     * Improves the selected skill for all personnel currently shown in the personnel table and deducts the
+     * corresponding XP cost for each person.
+     *
+     * <p>This method retrieves the chosen skill, calculates the XP cost (with applicable multipliers and campaign
+     * options), upgrades the skill for each listed person, deducts the XP, logs the improvements, and updates campaign
+     * data. After each round of improvements, the personnel table is refreshed to reflect any updated entries, and the
+     * operation continues until there are no more eligible personnel remaining.</p>
+     *
+     * <p>At the end, a report is added to summarize the improved skill and affected personnel count.</p>
+     */
     private void spendXP() {
         String skillName = (String) choiceSkill.getSelectedItem();
         if (choiceNoSkill.equals(skillName) || (skillName == null)) {
@@ -373,11 +389,18 @@ public final class BatchXPDialog extends JDialog {
                 // Improve the skill and deduce the cost
                 person.improveSkill(skillName);
                 person.spendXP(cost);
+
+                int adjustedReputation = person.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
+                      campaign.isClanCampaign(),
+                      campaign.getLocalDate(),
+                      person.getRankLevel());
+
                 PerformanceLogger.improvedSkill(campaign,
                       person,
                       campaign.getLocalDate(),
                       person.getSkill(skillName).getType().getName(),
-                      person.getSkill(skillName).toString());
+                      person.getSkill(skillName)
+                            .toString(person.getOptions(), person.getATOWAttributes(), adjustedReputation));
                 campaign.personUpdated(person);
             }
 
@@ -459,14 +482,6 @@ public final class BatchXPDialog extends JDialog {
 
         public void setNoOfficers(boolean noOfficers) {
             this.noOfficers = noOfficers;
-        }
-
-        /**
-         * @deprecated Use {@link #setSkillName(String)} instead.
-         */
-        @Deprecated(since = "0.50.05", forRemoval = true)
-        public void setSkill(String skill) {
-            this.skillName = skill;
         }
 
         /**

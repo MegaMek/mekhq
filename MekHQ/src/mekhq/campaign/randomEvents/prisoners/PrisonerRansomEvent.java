@@ -24,22 +24,28 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.randomEvents.prisoners;
 
-import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.personnel.Person;
-import mekhq.gui.dialog.randomEvents.prisonerDialogs.PrisonerRansomEventDialog;
+import static java.lang.Math.max;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
+import static mekhq.campaign.personnel.enums.PersonnelStatus.ACTIVE;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import static java.lang.Math.max;
-import static mekhq.campaign.personnel.enums.PersonnelStatus.ACTIVE;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.personnel.Person;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
 /**
  * Handles ransom events for prisoners of war (POWs) within the campaign.
@@ -104,13 +110,98 @@ public class PrisonerRansomEvent {
         }
 
         // Launch ransom dialog to ask for the player's decision
-        PrisonerRansomEventDialog eventDialog = new PrisonerRansomEventDialog(campaign, ransomList,
-            totalRansom, isFriendlyPOWs);
-        int choice = eventDialog.getDialogChoice();
+        int choice = getChoiceIndex(campaign, isFriendlyPOWs, totalRansom, ransomList);
 
         if (choice == ACCEPTED) {
             handleRansomOutcome(campaign, ransomList, totalRansom, isFriendlyPOWs);
         }
+    }
+
+    /**
+     * Presents a dialog to the player for making a decision regarding a ransom event involving prisoners or friendly
+     * POWs.
+     *
+     * <p>
+     * Builds an in-character message and displays a dialog with options to accept or decline the ransom offer. The
+     * dialog content and options are customized based on whether the event involves friendly POWs or enemy prisoners.
+     * Returns the index of the player's chosen response.
+     * </p>
+     *
+     * @param campaign       the current {@link Campaign} context
+     * @param isFriendlyPOWs {@code true} if the ransom offer concerns friendly POWs, {@code false} for enemy prisoners
+     * @param totalRansom    the total {@link Money} amount required for the ransom transaction
+     * @param ransomList     the list of {@link Person} objects affected by the ransom event
+     *
+     * @return the index of the chosen response option in the dialog (e.g., 0 for decline, 1 for accept)
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    private static int getChoiceIndex(Campaign campaign, boolean isFriendlyPOWs, Money totalRansom,
+          List<Person> ransomList) {
+        String inCharacterMessage = createInCharacterMessage(campaign.getCommanderAddress(false),
+              totalRansom,
+              ransomList,
+              isFriendlyPOWs);
+
+        List<String> options = List.of(getFormattedTextAt(RESOURCE_BUNDLE, "decline.button"),
+              getFormattedTextAt(RESOURCE_BUNDLE, "accept.button"));
+
+        String key = isFriendlyPOWs ? "pows" : "prisoners";
+        String outOfCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, key + ".ooc");
+
+        ImmersiveDialogSimple eventDialog = new ImmersiveDialogSimple(campaign,
+              campaign.getSeniorAdminPerson(COMMAND),
+              null,
+              inCharacterMessage,
+              options,
+              outOfCharacterMessage,
+              null,
+              false);
+
+        return eventDialog.getDialogChoice();
+    }
+
+    /**
+     * Creates the immersive in-character message for the dialog.
+     *
+     * <p>The generated message is tailored to whether the offer involves friendly or enemy prisoners.
+     * It includes details about the ransom amount, the list of prisoners, and addresses the player in their in-universe
+     * title. The prisoners are listed in a structured table format for clarity and immersion.</p>
+     *
+     * @param commanderAddress The term used to address the campaign commander.
+     * @param payment          The ransom amount offered for the prisoners.
+     * @param prisoners        The list of prisoners involved in the transaction.
+     * @param isFriendlyPOWs   {@code true} if the ransom is for friendly prisoners captured by the enemy, {@code false}
+     *                         if it involves enemy prisoners held by the player.
+     *
+     * @return A formatted HTML string containing the narrative in-character message for the dialog.
+     */
+    private static String createInCharacterMessage(String commanderAddress, Money payment, List<Person> prisoners,
+          boolean isFriendlyPOWs) {
+        StringBuilder message = new StringBuilder();
+        String key = isFriendlyPOWs ? "pows" : "prisoners";
+        message.append(getFormattedTextAt(RESOURCE_BUNDLE, key + ".message", commanderAddress, payment));
+
+        // Create a table to hold the personnel
+        message.append("<br><table style='width:100%; text-align:left;'>");
+
+        for (int i = 0; i < prisoners.size(); i++) {
+            if (i % 2 == 0) {
+                message.append("<tr>");
+            }
+
+            // Add the person in a column
+            Person person = prisoners.get(i);
+            message.append("<td>- ").append(person.getHyperlinkedFullTitle()).append("</td>");
+
+            if ((i + 1) % 2 == 0 || i == prisoners.size() - 1) {
+                message.append("</tr>");
+            }
+        }
+
+        message.append("</table>");
+        return message.toString();
     }
 
     /**

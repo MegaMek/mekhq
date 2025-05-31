@@ -46,7 +46,7 @@ import javax.swing.JScrollPane;
 
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.client.ui.swing.BombChoicePanel;
+import megamek.client.ui.dialogs.customMek.BombChoicePanel;
 import megamek.common.AmmoType;
 import megamek.common.BombType;
 import megamek.common.EquipmentType;

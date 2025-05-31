@@ -38,6 +38,7 @@ import static megamek.common.enums.SkillLevel.GREEN;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.enums.SkillLevel.ULTRA_GREEN;
 import static megamek.common.enums.SkillLevel.VETERAN;
+import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
 import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
 
 import java.awt.event.ActionEvent;
@@ -61,9 +62,9 @@ import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 
-import megamek.client.ui.dialogs.BVDisplayDialog;
-import megamek.client.ui.dialogs.CamoChooserDialog;
-import megamek.client.ui.swing.UnitEditorDialog;
+import megamek.client.ui.dialogs.abstractDialogs.BVDisplayDialog;
+import megamek.client.ui.dialogs.iconChooser.CamoChooserDialog;
+import megamek.client.ui.dialogs.UnitEditorDialog;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
@@ -430,7 +431,6 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
                         // We don't care about admin, doctor or tech settings, as they're not going to spawn here
                         overrideSkills(false,
-                              false,
                               false,
                               false,
                               campaign.getCampaignOptions().isUseArtillery(),
@@ -1059,11 +1059,13 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             }
 
             // fill with personnel
-            if (oneAvailableUnitBelowMaxCrew) {
-                menuItem = new JMenuItem(resources.getString("hireMinimumComplement.text"));
-                menuItem.setActionCommand(COMMAND_HIRE_FULL);
-                menuItem.addActionListener(this);
-                popup.add(menuItem);
+            if (gui.getCampaign().getCampaignOptions().getPersonnelMarketStyle() != MEKHQ) {
+                if (oneAvailableUnitBelowMaxCrew) {
+                    menuItem = new JMenuItem(resources.getString("hireMinimumComplement.text"));
+                    menuItem.setActionCommand(COMMAND_HIRE_FULL);
+                    menuItem.addActionListener(this);
+                    popup.add(menuItem);
+                }
             }
 
             if (Stream.of(units).allMatch(u -> u.getCamouflage().equals(units[0].getCamouflage()))) {

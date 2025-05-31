@@ -224,16 +224,6 @@ public enum TransactionType {
 
         }
 
-        // 0.49.8 Migration
-        if ("CARRYOVER".equals(text)) {
-            return FINANCIAL_TERM_END_CARRYOVER;
-        }
-
-        // < 0.50.05 compatibility handler
-        if ("RETIREMENT".equalsIgnoreCase(text)) {
-            return PAYOUT;
-        }
-
         try {
             switch (Integer.parseInt(text)) {
                 case 0:

@@ -32,8 +32,10 @@
  */
 package mekhq.campaign.io;
 
+import static megamek.common.UnitType.DROPSHIP;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.force.Force.FORCE_NONE;
+import static mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket.generatePersonnelMarketDataFromXML;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.statusValidator;
 import static mekhq.campaign.personnel.skills.SkillDeprecationTool.DEPRECATED_SKILLS;
 import static org.apache.commons.lang3.ObjectUtils.firstNonNull;
@@ -48,7 +50,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +61,8 @@ import megamek.Version;
 import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
-import megamek.client.ui.swing.util.PlayerColour;
+import megamek.client.ui.util.PlayerColour;
+import megamek.codeUtilities.MathUtility;
 import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
 import megamek.common.Jumpship;
@@ -114,7 +116,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.education.EducationController;
-import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -129,7 +130,7 @@ import mekhq.campaign.unit.cleanup.EquipmentUnscrambler;
 import mekhq.campaign.unit.cleanup.EquipmentUnscramblerResult;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
-import mekhq.campaign.universe.fameAndInfamy.FameAndInfamyController;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.io.idReferenceClasses.PersonIdReference;
 import mekhq.module.atb.AtBEventProcessor;
 import mekhq.utilities.MHQXMLUtility;
@@ -283,97 +284,100 @@ public class CampaignXmlParser {
 
         // Okay, lets iterate through the children, eh?
         for (int x = 0; x < nl.getLength(); x++) {
-            Node wn = nl.item(x);
+            Node workingNode = nl.item(x);
 
-            if (!wn.getParentNode().equals(campaignEle)) {
+            if (!workingNode.getParentNode().equals(campaignEle)) {
                 continue;
             }
 
-            int xc = wn.getNodeType();
+            int xc = workingNode.getNodeType();
 
             if (xc == Node.ELEMENT_NODE) {
                 // This is what we really care about.
-                // All the meat of our document is in this node type, at this
-                // level.
+                // All the meat of our document is in this node type, at this level.
                 // Okay, so what element is it?
-                String xn = wn.getNodeName();
+                String nodeName = workingNode.getNodeName();
 
-                if (xn.equalsIgnoreCase("randomSkillPreferences")) {
-                    campaign.setRandomSkillPreferences(RandomSkillPreferences.generateRandomSkillPreferencesFromXml(wn,
+                if (nodeName.equalsIgnoreCase("randomSkillPreferences")) {
+                    campaign.setRandomSkillPreferences(RandomSkillPreferences.generateRandomSkillPreferencesFromXml(
+                          workingNode,
                           version));
-                } else if (xn.equalsIgnoreCase("parts")) {
-                    processPartNodes(campaign, wn, version);
-                } else if (xn.equalsIgnoreCase("personnel")) {
+                } else if (nodeName.equalsIgnoreCase("parts")) {
+                    processPartNodes(campaign, workingNode, version);
+                } else if (nodeName.equalsIgnoreCase("personnel")) {
                     // TODO: Make this depending on campaign options
                     // TODO: hoist registerAll out of this
                     InjuryTypes.registerAll();
-                    processPersonnelNodes(campaign, wn, version);
-                } else if (xn.equalsIgnoreCase("units")) {
-                    processUnitNodes(campaign, wn, version);
-                } else if (xn.equalsIgnoreCase("missions")) {
-                    processMissionNodes(campaign, wn, version);
-                } else if (xn.equalsIgnoreCase("forces")) {
-                    processForces(campaign, wn, version);
-                } else if (xn.equalsIgnoreCase("finances")) {
-                    processFinances(campaign, wn);
-                } else if (xn.equalsIgnoreCase("location")) {
-                    campaign.setLocation(CurrentLocation.generateInstanceFromXML(wn, campaign));
-                } else if (xn.equalsIgnoreCase("isAvoidingEmptySystems")) {
-                    campaign.setIsAvoidingEmptySystems(Boolean.parseBoolean(wn.getTextContent().trim()));
-                } else if (xn.equalsIgnoreCase("skillTypes")) {
-                    processSkillTypeNodes(wn, version);
-                } else if (xn.equalsIgnoreCase("specialAbilities")) {
-                    processSpecialAbilityNodes(campaign, wn, version);
-                } else if (xn.equalsIgnoreCase("storyArc")) {
-                    processStoryArcNodes(campaign, wn, version);
-                } else if (xn.equalsIgnoreCase("fameAndInfamy")) {
-                    processFameAndInfamyNodes(campaign, wn);
-                } else if (xn.equalsIgnoreCase("kills")) {
-                    processKillNodes(campaign, wn, version);
-                } else if (xn.equalsIgnoreCase("shoppingList")) {
-                    campaign.setShoppingList(ShoppingList.generateInstanceFromXML(wn, campaign, version));
-                } else if (xn.equalsIgnoreCase("personnelMarket")) {
-                    campaign.setPersonnelMarket(PersonnelMarket.generateInstanceFromXML(wn, campaign, version));
+                    processPersonnelNodes(campaign, workingNode, version);
+                } else if (nodeName.equalsIgnoreCase("units")) {
+                    processUnitNodes(campaign, workingNode, version);
+                } else if (nodeName.equalsIgnoreCase("missions")) {
+                    processMissionNodes(campaign, workingNode, version);
+                } else if (nodeName.equalsIgnoreCase("forces")) {
+                    processForces(campaign, workingNode, version);
+                } else if (nodeName.equalsIgnoreCase("finances")) {
+                    processFinances(campaign, workingNode);
+                } else if (nodeName.equalsIgnoreCase("location")) {
+                    campaign.setLocation(CurrentLocation.generateInstanceFromXML(workingNode, campaign));
+                } else if (nodeName.equalsIgnoreCase("isAvoidingEmptySystems")) {
+                    campaign.setIsAvoidingEmptySystems(Boolean.parseBoolean(workingNode.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("skillTypes")) {
+                    processSkillTypeNodes(workingNode, version);
+                } else if (nodeName.equalsIgnoreCase("specialAbilities")) {
+                    processSpecialAbilityNodes(campaign, workingNode, version);
+                } else if (nodeName.equalsIgnoreCase("storyArc")) {
+                    processStoryArcNodes(campaign, workingNode, version);
+                } else if (nodeName.equalsIgnoreCase("kills")) {
+                    processKillNodes(campaign, workingNode, version);
+                } else if (nodeName.equalsIgnoreCase("shoppingList")) {
+                    campaign.setShoppingList(ShoppingList.generateInstanceFromXML(workingNode, campaign, version));
+                } else if (nodeName.equalsIgnoreCase("personnelMarket")) {
+                    campaign.setPersonnelMarket(PersonnelMarket.generateInstanceFromXML(workingNode,
+                          campaign,
+                          version));
                     foundPersonnelMarket = true;
-                } else if (xn.equalsIgnoreCase("contractMarket")) {
+                } else if (nodeName.equalsIgnoreCase("contractMarket")) {
                     // CAW: implicit DEPENDS-ON to the <missions> node
-                    campaign.setContractMarket(AbstractContractMarket.generateInstanceFromXML(wn, campaign, version));
+                    campaign.setContractMarket(AbstractContractMarket.generateInstanceFromXML(workingNode,
+                          campaign,
+                          version));
                     foundContractMarket = true;
-                } else if (xn.equalsIgnoreCase("unitMarket")) {
+                } else if (nodeName.equalsIgnoreCase("unitMarket")) {
                     // Windchild: implicit DEPENDS ON to the <campaignOptions> nodes
                     campaign.setUnitMarket(campaign.getCampaignOptions().getUnitMarketMethod().getUnitMarket());
-                    campaign.getUnitMarket().fillFromXML(wn, campaign, version);
+                    campaign.getUnitMarket().fillFromXML(workingNode, campaign, version);
                     foundUnitMarket = true;
-                } else if (xn.equalsIgnoreCase("lances") || xn.equalsIgnoreCase("combatTeams")) {
-                    processCombatTeamNodes(campaign, wn);
-                } else if (xn.equalsIgnoreCase("retirementDefectionTracker")) {
-                    campaign.setRetirementDefectionTracker(RetirementDefectionTracker.generateInstanceFromXML(wn,
+                } else if (nodeName.equalsIgnoreCase("lances") || nodeName.equalsIgnoreCase("combatTeams")) {
+                    processCombatTeamNodes(campaign, workingNode);
+                } else if (nodeName.equalsIgnoreCase("retirementDefectionTracker")) {
+                    campaign.setRetirementDefectionTracker(RetirementDefectionTracker.generateInstanceFromXML(
+                          workingNode,
                           campaign));
-                } else if (xn.equalsIgnoreCase("personnelWhoAdvancedInXP")) {
-                    campaign.setPersonnelWhoAdvancedInXP(processPersonnelWhoAdvancedInXP(wn, campaign));
-                } else if (xn.equalsIgnoreCase("automatedMothballUnits")) {
-                    campaign.setAutomatedMothballUnits(processAutomatedMothballNodes(wn));
-                } else if (xn.equalsIgnoreCase("shipSearchStart")) {
-                    campaign.setShipSearchStart(MHQXMLUtility.parseDate(wn.getTextContent().trim()));
-                } else if (xn.equalsIgnoreCase("shipSearchType")) {
-                    campaign.setShipSearchType(Integer.parseInt(wn.getTextContent()));
-                } else if (xn.equalsIgnoreCase("shipSearchResult")) {
-                    campaign.setShipSearchResult(wn.getTextContent());
-                } else if (xn.equalsIgnoreCase("shipSearchExpiration")) {
-                    campaign.setShipSearchExpiration(MHQXMLUtility.parseDate(wn.getTextContent().trim()));
-                } else if (xn.equalsIgnoreCase("autoResolveBehaviorSettings")) {
+                } else if (nodeName.equalsIgnoreCase("personnelWhoAdvancedInXP")) {
+                    campaign.setPersonnelWhoAdvancedInXP(processPersonnelWhoAdvancedInXP(workingNode, campaign));
+                } else if (nodeName.equalsIgnoreCase("automatedMothballUnits")) {
+                    campaign.setAutomatedMothballUnits(processAutomatedMothballNodes(workingNode));
+                } else if (nodeName.equalsIgnoreCase("shipSearchStart")) {
+                    campaign.setShipSearchStart(MHQXMLUtility.parseDate(workingNode.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("shipSearchType")) {
+                    campaign.setShipSearchType(MathUtility.parseInt(workingNode.getTextContent(), DROPSHIP));
+                } else if (nodeName.equalsIgnoreCase("shipSearchResult")) {
+                    campaign.setShipSearchResult(workingNode.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("shipSearchExpiration")) {
+                    campaign.setShipSearchExpiration(MHQXMLUtility.parseDate(workingNode.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("autoResolveBehaviorSettings")) {
                     campaign.setAutoResolveBehaviorSettings(firstNonNull(BehaviorSettingsFactory.getInstance()
-                                                                               .getBehavior(wn.getTextContent()),
+                                                                               .getBehavior(workingNode.getTextContent()),
                           BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR));
-                } else if (xn.equalsIgnoreCase("customPlanetaryEvents")) {
+                } else if (nodeName.equalsIgnoreCase("customPlanetaryEvents")) {
                     //TODO: deal with this
-                    updatePlanetaryEventsFromXML(wn);
-                } else if (xn.equalsIgnoreCase("partsInUse")) {
-                    processPartsInUse(campaign, wn);
-                } else if (xn.equalsIgnoreCase("temporaryPrisonerCapacity")) {
-                    campaign.setTemporaryPrisonerCapacity(Integer.parseInt(wn.getTextContent().trim()));
-                } else if (xn.equalsIgnoreCase("processProcurement")) {
-                    campaign.setProcessProcurement(Boolean.parseBoolean(wn.getTextContent().trim()));
+                    updatePlanetaryEventsFromXML(workingNode);
+                } else if (nodeName.equalsIgnoreCase("partsInUse")) {
+                    processPartsInUse(campaign, workingNode);
+                } else if (nodeName.equalsIgnoreCase("temporaryPrisonerCapacity")) {
+                    campaign.setTemporaryPrisonerCapacity(MathUtility.parseInt(workingNode.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("processProcurement")) {
+                    campaign.setProcessProcurement(Boolean.parseBoolean(workingNode.getTextContent().trim()));
                 }
             } else {
                 // If it's a text node or attribute or whatever at this level,
@@ -670,6 +674,9 @@ public class CampaignXmlParser {
             }
         });
 
+        // Reset Random Death to match current campaign options
+        campaign.resetRandomDeath();
+
         logger.info("Load of campaign file complete!");
 
         return campaign;
@@ -707,142 +714,148 @@ public class CampaignXmlParser {
     /**
      * Pulled out purely for encapsulation. Makes the code neater and easier to read.
      *
-     * @param retVal The Campaign object that is being populated.
-     * @param wni    The XML node we're working from.
+     * @param campaign   The Campaign object that is being populated.
+     * @param parentNode The XML node we're working from.
      *
      * @throws DOMException
      */
-    private static void processInfoNode(Campaign retVal, Node wni, Version version) throws DOMException {
-        NodeList nl = wni.getChildNodes();
+    private static void processInfoNode(Campaign campaign, Node parentNode, Version version) throws DOMException {
+        NodeList childNodes = parentNode.getChildNodes();
 
         // Okay, lets iterate through the children, eh?
-        for (int x = 0; x < nl.getLength(); x++) {
-            Node wn = nl.item(x);
-            int xc = wn.getNodeType();
+        for (int x = 0; x < childNodes.getLength(); x++) {
+            Node childNode = childNodes.item(x);
+            int nodeType = childNode.getNodeType();
 
             // If it's not an element, again, we're ignoring it.
-            if (xc != Node.ELEMENT_NODE) {
+            if (nodeType != Node.ELEMENT_NODE) {
                 continue;
             }
-            String xn = wn.getNodeName();
+            String nodeName = childNode.getNodeName();
 
             try {
-                if (xn.equalsIgnoreCase("calendar")) {
-                    retVal.setLocalDate(MHQXMLUtility.parseDate(wn.getTextContent().trim()));
-                } else if (xn.equalsIgnoreCase(Camouflage.XML_TAG)) {
-                    retVal.setCamouflage(Camouflage.parseFromXML(wn));
-                } else if (xn.equalsIgnoreCase("camoCategory")) {
-                    String val = wn.getTextContent().trim();
+                if (nodeName.equalsIgnoreCase("calendar")) {
+                    campaign.setLocalDate(MHQXMLUtility.parseDate(childNode.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase(Camouflage.XML_TAG)) {
+                    campaign.setCamouflage(Camouflage.parseFromXML(childNode));
+                } else if (nodeName.equalsIgnoreCase("camoCategory")) {
+                    String val = childNode.getTextContent().trim();
 
                     if (!val.equals("null")) {
-                        retVal.getCamouflage().setCategory(val);
+                        campaign.getCamouflage().setCategory(val);
                     }
-                } else if (xn.equalsIgnoreCase("camoFileName")) {
-                    String val = wn.getTextContent().trim();
+                } else if (nodeName.equalsIgnoreCase("camoFileName")) {
+                    String val = childNode.getTextContent().trim();
 
                     if (!val.equals("null")) {
-                        retVal.getCamouflage().setFilename(val);
+                        campaign.getCamouflage().setFilename(val);
                     }
-                } else if (xn.equalsIgnoreCase("colour")) {
-                    retVal.setColour(PlayerColour.parseFromString(wn.getTextContent().trim()));
-                } else if (xn.equalsIgnoreCase(UnitIcon.XML_TAG)) {
-                    retVal.setUnitIcon(UnitIcon.parseFromXML(wn));
-                } else if (xn.equalsIgnoreCase("nameGen")) {
+                } else if (nodeName.equalsIgnoreCase("colour")) {
+                    campaign.setColour(PlayerColour.parseFromString(childNode.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase(UnitIcon.XML_TAG)) {
+                    campaign.setUnitIcon(UnitIcon.parseFromXML(childNode));
+                } else if (nodeName.equalsIgnoreCase("nameGen")) {
                     // First, get all the child nodes;
-                    NodeList nl2 = wn.getChildNodes();
+                    NodeList nl2 = childNode.getChildNodes();
                     for (int x2 = 0; x2 < nl2.getLength(); x2++) {
                         Node wn2 = nl2.item(x2);
-                        if (wn2.getParentNode() != wn) {
+                        if (wn2.getParentNode() != childNode) {
                             continue;
                         }
                         if (wn2.getNodeName().equalsIgnoreCase("faction")) {
                             RandomNameGenerator.getInstance().setChosenFaction(wn2.getTextContent().trim());
                         } else if (wn2.getNodeName().equalsIgnoreCase("percentFemale")) {
-                            RandomGenderGenerator.setPercentFemale(Integer.parseInt(wn2.getTextContent().trim()));
+                            RandomGenderGenerator.setPercentFemale(MathUtility.parseInt(wn2.getTextContent().trim(),
+                                  50));
                         }
                     }
-                } else if (xn.equalsIgnoreCase("currentReport")) {
+                } else if (nodeName.equalsIgnoreCase("currentReport")) {
                     // First, get all the child nodes;
-                    NodeList nl2 = wn.getChildNodes();
+                    NodeList nl2 = childNode.getChildNodes();
 
                     // Then, make sure the report is empty. *just* in case.
                     // ...That is, creating a new campaign throws in a date line
                     // for us...
                     // So make sure it's cleared out.
-                    retVal.getCurrentReport().clear();
+                    campaign.getCurrentReport().clear();
 
                     for (int x2 = 0; x2 < nl2.getLength(); x2++) {
                         Node wn2 = nl2.item(x2);
 
-                        if (wn2.getParentNode() != wn) {
+                        if (wn2.getParentNode() != childNode) {
                             continue;
                         }
 
                         if (wn2.getNodeName().equalsIgnoreCase("reportLine")) {
-                            retVal.getCurrentReport().add(wn2.getTextContent());
+                            campaign.getCurrentReport().add(wn2.getTextContent());
                         }
                     }
-                } else if (xn.equalsIgnoreCase("faction")) {
-                    Faction faction = Factions.getInstance().getFaction(wn.getTextContent());
-                    retVal.setFaction(faction);
-                } else if (xn.equalsIgnoreCase("retainerEmployerCode")) {
-                    retVal.setRetainerEmployerCode(wn.getTextContent());
-                } else if (xn.equalsIgnoreCase("retainerStartDate")) {
-                    retVal.setRetainerStartDate(LocalDate.parse(wn.getTextContent()));
-                } else if (xn.equalsIgnoreCase("crimeRating")) {
-                    retVal.setCrimeRating(Integer.parseInt(wn.getTextContent()));
-                } else if (xn.equalsIgnoreCase("initiativeBonus")) {
-                    retVal.setInitiativeBonus(Integer.parseInt(wn.getTextContent()));
-                } else if (xn.equalsIgnoreCase("initiativeMaxBonus")) {
-                    retVal.setInitiativeMaxBonus(Integer.parseInt(wn.getTextContent()));
-                } else if (xn.equalsIgnoreCase("crimePirateModifier")) {
-                    retVal.setCrimePirateModifier(Integer.parseInt(wn.getTextContent()));
-                } else if (xn.equalsIgnoreCase("dateOfLastCrime")) {
-                    retVal.setDateOfLastCrime(LocalDate.parse(wn.getTextContent()));
-                } else if (xn.equalsIgnoreCase("reputation")) {
-                    retVal.setReputation(new ReputationController().generateInstanceFromXML(wn));
-                } else if (xn.equalsIgnoreCase("rankSystem")) {
-                    if (!wn.hasChildNodes()) { // we need there to be child nodes to parse from
+                } else if (nodeName.equalsIgnoreCase("faction")) {
+                    Faction faction = Factions.getInstance().getFaction(childNode.getTextContent());
+                    campaign.setFaction(faction);
+                } else if (nodeName.equalsIgnoreCase("retainerEmployerCode")) {
+                    campaign.setRetainerEmployerCode(childNode.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("retainerStartDate")) {
+                    campaign.setRetainerStartDate(LocalDate.parse(childNode.getTextContent()));
+                } else if (nodeName.equalsIgnoreCase("crimeRating")) {
+                    campaign.setCrimeRating(MathUtility.parseInt(childNode.getTextContent()));
+                } else if (nodeName.equalsIgnoreCase("initiativeBonus")) {
+                    campaign.setInitiativeBonus(MathUtility.parseInt(childNode.getTextContent()));
+                } else if (nodeName.equalsIgnoreCase("initiativeMaxBonus")) {
+                    campaign.setInitiativeMaxBonus(MathUtility.parseInt(childNode.getTextContent(), 1));
+                } else if (nodeName.equalsIgnoreCase("crimePirateModifier")) {
+                    campaign.setCrimePirateModifier(MathUtility.parseInt(childNode.getTextContent()));
+                } else if (nodeName.equalsIgnoreCase("dateOfLastCrime")) {
+                    campaign.setDateOfLastCrime(LocalDate.parse(childNode.getTextContent()));
+                } else if (nodeName.equalsIgnoreCase("reputation")) {
+                    campaign.setReputation(new ReputationController().generateInstanceFromXML(childNode));
+                } else if (nodeName.equalsIgnoreCase("newPersonnelMarket")) {
+                    campaign.setNewPersonnelMarket(generatePersonnelMarketDataFromXML(campaign, childNode, version));
+                } else if (nodeName.equalsIgnoreCase("factionStandings")) {
+                    campaign.setFactionStandings(FactionStandings.generateInstanceFromXML(childNode));
+                } else if (nodeName.equalsIgnoreCase("rankSystem")) {
+                    if (!childNode.hasChildNodes()) { // we need there to be child nodes to parse from
                         continue;
                     }
-                    final RankSystem rankSystem = RankSystem.generateInstanceFromXML(wn.getChildNodes(), version);
+                    final RankSystem rankSystem = RankSystem.generateInstanceFromXML(childNode.getChildNodes(),
+                          version);
                     // If the system is valid (either not campaign or validates), set it. Otherwise,
                     // keep the default
                     if (!rankSystem.getType().isCampaign() || new RankValidator().validate(rankSystem, true)) {
-                        retVal.setRankSystemDirect(rankSystem);
+                        campaign.setRankSystemDirect(rankSystem);
                     }
-                } else if (xn.equalsIgnoreCase("gmMode")) {
-                    retVal.setGMMode(Boolean.parseBoolean(wn.getTextContent().trim()));
-                } else if (xn.equalsIgnoreCase("showOverview")) {
-                    retVal.setOverviewLoadingValue(Boolean.parseBoolean(wn.getTextContent().trim()));
-                } else if (xn.equalsIgnoreCase("name")) {
-                    String val = wn.getTextContent().trim();
+                } else if (nodeName.equalsIgnoreCase("gmMode")) {
+                    campaign.setGMMode(Boolean.parseBoolean(childNode.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("showOverview")) {
+                    campaign.setOverviewLoadingValue(Boolean.parseBoolean(childNode.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("name")) {
+                    String val = childNode.getTextContent().trim();
 
                     if (val.equals("null")) {
-                        retVal.setName(null);
+                        campaign.setName(null);
                     } else {
-                        retVal.setName(val);
+                        campaign.setName(val);
                     }
-                } else if (xn.equalsIgnoreCase("campaignStartDate")) {
-                    String campaignStartDate = wn.getTextContent().trim();
+                } else if (nodeName.equalsIgnoreCase("campaignStartDate")) {
+                    String campaignStartDate = childNode.getTextContent().trim();
 
                     if (campaignStartDate.equals("null")) {
-                        retVal.setCampaignStartDate(null);
+                        campaign.setCampaignStartDate(null);
                     } else {
-                        retVal.setCampaignStartDate(LocalDate.parse(campaignStartDate));
+                        campaign.setCampaignStartDate(LocalDate.parse(campaignStartDate));
                     }
-                } else if (xn.equalsIgnoreCase("overtime")) {
-                    retVal.setOvertime(Boolean.parseBoolean(wn.getTextContent().trim()));
-                } else if (xn.equalsIgnoreCase("astechPool")) {
-                    retVal.setAstechPool(Integer.parseInt(wn.getTextContent().trim()));
-                } else if (xn.equalsIgnoreCase("astechPoolMinutes")) {
-                    retVal.setAstechPoolMinutes(Integer.parseInt(wn.getTextContent().trim()));
-                } else if (xn.equalsIgnoreCase("astechPoolOvertime")) {
-                    retVal.setAstechPoolOvertime(Integer.parseInt(wn.getTextContent().trim()));
-                } else if (xn.equalsIgnoreCase("medicPool")) {
-                    retVal.setMedicPool(Integer.parseInt(wn.getTextContent().trim()));
-                } else if (xn.equalsIgnoreCase("id")) {
-                    retVal.setId(UUID.fromString(wn.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("overtime")) {
+                    campaign.setOvertime(Boolean.parseBoolean(childNode.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("astechPool")) {
+                    campaign.setAstechPool(MathUtility.parseInt(childNode.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("astechPoolMinutes")) {
+                    campaign.setAstechPoolMinutes(MathUtility.parseInt(childNode.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("astechPoolOvertime")) {
+                    campaign.setAstechPoolOvertime(MathUtility.parseInt(childNode.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("medicPool")) {
+                    campaign.setMedicPool(MathUtility.parseInt(childNode.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("id")) {
+                    campaign.setId(UUID.fromString(childNode.getTextContent().trim()));
                 }
             } catch (Exception e) {
                 logger.error("", e);
@@ -850,12 +863,12 @@ public class CampaignXmlParser {
         }
 
         // TODO: this could probably be better
-        retVal.setCurrentReportHTML(Utilities.combineString(retVal.getCurrentReport(), Campaign.REPORT_LINEBREAK));
+        campaign.setCurrentReportHTML(Utilities.combineString(campaign.getCurrentReport(), Campaign.REPORT_LINEBREAK));
 
         // Everything's new
-        List<String> newReports = new ArrayList<>(retVal.getCurrentReport().size() * 2);
+        List<String> newReports = new ArrayList<>(campaign.getCurrentReport().size() * 2);
         boolean firstReport = true;
-        for (String report : retVal.getCurrentReport()) {
+        for (String report : campaign.getCurrentReport()) {
             if (firstReport) {
                 firstReport = false;
             } else {
@@ -863,7 +876,7 @@ public class CampaignXmlParser {
             }
             newReports.add(report);
         }
-        retVal.setNewReports(newReports);
+        campaign.setNewReports(newReports);
     }
 
     private static void processCombatTeamNodes(Campaign campaign, Node workingNode) {
@@ -1040,11 +1053,6 @@ public class CampaignXmlParser {
         StoryArc storyArc = StoryArc.parseFromXML(wn.getChildNodes(), retVal, version);
         MekHQ.registerHandler(storyArc);
         retVal.useStoryArc(storyArc, false);
-    }
-
-    private static void processFameAndInfamyNodes(Campaign relativeValue, Node workingNode) {
-        logger.info("Loading Fame and Infamy Nodes from XML...");
-        FameAndInfamyController.parseFromXML(workingNode.getChildNodes(), relativeValue);
     }
 
     /**
@@ -1608,7 +1616,7 @@ public class CampaignXmlParser {
             }
 
             // clan flag might not have been properly set in early versions
-            if ((prt instanceof EnginePart) && prt.getName().contains("(Clan") && (prt.getTechBase() != Part.T_CLAN)) {
+            if ((prt instanceof EnginePart) && prt.getName().contains("(Clan") && (prt.getTechBase() != Part.TechBase.CLAN)) {
                 ((EnginePart) prt).fixClanFlag();
             }
             if ((prt instanceof MissingEnginePart) && (null != u) && (u.getEntity() instanceof Tank)) {
@@ -1617,7 +1625,7 @@ public class CampaignXmlParser {
             }
             if ((prt instanceof MissingEnginePart) &&
                       prt.getName().contains("(Clan") &&
-                      (prt.getTechBase() != Part.T_CLAN)) {
+                      (prt.getTechBase() != Part.TechBase.CLAN)) {
                 ((MissingEnginePart) prt).fixClanFlag();
             }
 
@@ -1748,85 +1756,6 @@ public class CampaignXmlParser {
     //region Ancestry Migration
     private static final Map<UUID, List<Person>> ancestryMigrationMap = new HashMap<>();
 
-    /**
-     * This method is used to add people to the ancestry migration map that is used to migrate from the old Ancestors
-     * setup to {@link mekhq.campaign.personnel.familyTree.Genealogy} starting from 0.47.8
-     *
-     * @param ancestorsId the Person's Ancestor Id
-     * @param person      the person to add the the above HashMap
-     */
-    public static void addToAncestryMigrationMap(UUID ancestorsId, Person person) {
-        ancestryMigrationMap.putIfAbsent(ancestorsId, new ArrayList<>());
-        ancestryMigrationMap.get(ancestorsId).add(person);
-    }
-
-    /**
-     * This method is used to migrate from Ancestry nodes to {@link mekhq.campaign.personnel.familyTree.Genealogy} since
-     * the swap-over in 0.47.8
-     *
-     * @param wn the node containing the saved ancestry
-     */
-    private static void migrateAncestorNodes(Campaign campaign, Node wn) {
-        NodeList wList = wn.getChildNodes();
-
-        for (int x = 0; x < wList.getLength(); x++) {
-            // First, we determine the node values
-            UUID id = null;
-            Person father = null;
-            Person mother = null;
-            Node wn2 = wList.item(x);
-
-            if ((wn2.getNodeType() != Node.ELEMENT_NODE) || !wn2.getNodeName().equalsIgnoreCase("ancestor")) {
-                continue;
-            }
-
-            NodeList nl = wn2.getChildNodes();
-            for (int y = 0; y < nl.getLength(); y++) {
-                Node wn3 = nl.item(y);
-                if (wn3.getNodeName().equalsIgnoreCase("id")) {
-                    id = UUID.fromString(wn3.getTextContent().trim());
-                } else if (wn3.getNodeName().equalsIgnoreCase("fatherId")) {
-                    father = campaign.getPerson(UUID.fromString(wn3.getTextContent().trim()));
-                } else if (wn3.getNodeName().equalsIgnoreCase("motherId")) {
-                    mother = campaign.getPerson(UUID.fromString(wn3.getTextContent().trim()));
-                }
-            }
-
-            // We skip the Person if they are null or cannot be migrated
-            if ((id == null) || !ancestryMigrationMap.containsKey(id)) {
-                continue;
-            }
-
-            // Finally, we migrate the individual person data
-            Iterator<Person> people = ancestryMigrationMap.get(id).iterator();
-            while (people.hasNext()) {
-                Person person = people.next();
-                people.remove();
-
-                if (father == null) {
-                    logger.warn("Unknown father does not exist, skipping adding Genealogy for them.");
-                } else if (father.getId() != null) {
-                    person.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, father);
-                    father.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, person);
-                } else {
-                    logger.warn("Person with id " +
-                                      father.getId() +
-                                      "does not exist, skipping adding Genealogy for them.");
-                }
-
-                if (mother == null) {
-                    logger.warn("Unknown mother does not exist, skipping adding Genealogy for them.");
-                } else if (mother.getId() != null) {
-                    person.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, mother);
-                    mother.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, person);
-                } else {
-                    logger.warn("Person with id " +
-                                      mother.getId() +
-                                      " does not exist, skipping adding Genealogy for them.");
-                }
-            }
-        }
-    }
     // endregion Ancestry Migration
     // endregion Migration Methods
 }

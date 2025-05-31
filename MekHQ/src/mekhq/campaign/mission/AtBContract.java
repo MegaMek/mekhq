@@ -40,7 +40,7 @@ import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.client.ratgenerator.ModelRecord.NETWORK_NONE;
 import static megamek.client.ratgenerator.UnitTable.findTable;
-import static megamek.client.ui.swing.util.UIUtil.scaleForGUI;
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
@@ -69,7 +69,7 @@ import static mekhq.campaign.rating.IUnitRating.DRAGOON_C;
 import static mekhq.campaign.rating.IUnitRating.DRAGOON_F;
 import static mekhq.campaign.stratcon.StratconContractDefinition.getContractDefinition;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
-import static mekhq.campaign.universe.fameAndInfamy.BatchallFactions.BATCHALL_FACTIONS;
+import static mekhq.campaign.universe.factionStanding.BatchallFactions.BATCHALL_FACTIONS;
 import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
 
 import java.awt.BorderLayout;
@@ -104,10 +104,9 @@ import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ratgenerator.FactionRecord;
 import megamek.client.ratgenerator.RATGenerator;
 import megamek.client.ratgenerator.UnitTable;
-import megamek.client.ui.swing.util.PlayerColour;
+import megamek.client.ui.util.PlayerColour;
 import megamek.common.Entity;
 import megamek.common.TargetRoll;
-import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
@@ -118,18 +117,21 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.event.MissionChangedEvent;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.ScenarioStatus;
+import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.personnel.ranks.RankSystem;
+import mekhq.campaign.personnel.ranks.RankValidator;
+import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.randomEvents.MercenaryAuction;
 import mekhq.campaign.randomEvents.RoninOffer;
 import mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent;
@@ -141,7 +143,9 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RandomFactionGenerator;
-import mekhq.campaign.universe.fameAndInfamy.BatchallFactions;
+import mekhq.campaign.universe.factionStanding.BatchallFactions;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
+import mekhq.campaign.universe.factionStanding.PerformBatchall;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -162,9 +166,12 @@ public class AtBContract extends Contract {
     /* hired by another mercenary unit on contract to a third-party employer */ boolean mercSubcontract;
 
     protected Person employerLiaison;
+    protected Person clanOpponent;
     protected String employerCode;
     protected String enemyCode;
     protected String enemyName;
+
+    protected int difficulty;
 
     protected AtBContractType contractType;
     protected SkillLevel allySkill;
@@ -181,6 +188,7 @@ public class AtBContract extends Contract {
     protected int extensionLength;
 
     protected int requiredCombatTeams;
+    protected int requiredCombatElements;
     protected AtBMoraleLevel moraleLevel;
     protected LocalDate routEnd;
     protected int partsAvailabilityLevel;
@@ -234,9 +242,12 @@ public class AtBContract extends Contract {
     public AtBContract(String name) {
         super(name, "Independent");
         employerLiaison = null;
+        clanOpponent = null;
         employerCode = "IND";
         enemyCode = "IND";
         enemyName = "Independent";
+
+        difficulty = Integer.MIN_VALUE;
 
         parentContract = null;
         mercSubcontract = false;
@@ -270,9 +281,9 @@ public class AtBContract extends Contract {
         int companySize = getStandardForceSize(campaign.getFaction(), COMPANY.getDepth());
         int battalionSize = getStandardForceSize(campaign.getFaction(), BATTALION.getDepth());
 
-        if (getEffectiveNumUnits(campaign) <= companySize) {
+        if (ContractUtilities.getEffectiveNumUnits(campaign) <= companySize) {
             setOverheadComp(OH_FULL);
-        } else if (getEffectiveNumUnits(campaign) <= battalionSize) {
+        } else if (ContractUtilities.getEffectiveNumUnits(campaign) <= battalionSize) {
             setOverheadComp(OH_HALF);
         } else {
             setOverheadComp(OH_NONE);
@@ -430,47 +441,22 @@ public class AtBContract extends Contract {
     }
 
     /**
+     * @deprecated use {@link ContractUtilities#calculateBaseNumberOfRequiredLances(Campaign)}
+     *
      * Calculates the number of lances required for this contract, based on [campaign].
      *
      * @param campaign The campaign to reference.
      *
      * @return The number of lances required.
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public static int calculateBaseNumberOfRequiredLances(Campaign campaign) {
-        Faction campaignFaction = campaign.getFaction();
-
-        int lanceLevelFormationSize = getStandardForceSize(campaignFaction);
-        int effectiveNumUnits = getEffectiveNumUnits(campaign);
-
-        int formationSize = 0;
-        for (CombatTeam combatTeam : campaign.getAllCombatTeams()) {
-            Force force = combatTeam.getForce(campaign);
-
-            if (force == null) {
-                continue;
-            }
-
-            if (force.isForceType(STANDARD)) {
-                int depth = force.getFormationLevel().getDepth();
-                formationSize += getStandardForceSize(campaignFaction, depth);
-            }
-        }
-
-        // getStandardForceSize returns the total number of units, so we need to get rid of that portion of the
-        // calculation
-        int caclulatedForceSize = formationSize / lanceLevelFormationSize;
-
-        // If the player has no Combat Teams assign a minimum force size of 1.
-        if (caclulatedForceSize == 0) {
-            caclulatedForceSize = 1;
-        }
-
-        int baseRequiredLances = effectiveNumUnits / caclulatedForceSize;
-
-        return max(baseRequiredLances, 1);
+        return ContractUtilities.calculateBaseNumberOfRequiredLances(campaign);
     }
 
     /**
+     * @deprecated use {@link ContractUtilities#getEffectiveNumUnits(Campaign)}
+     *
      * Calculates the effective number of units available in the given campaign based on unit types and roles.
      *
      * <p>
@@ -497,37 +483,9 @@ public class AtBContract extends Contract {
      *
      * @return the effective number of units as an integer
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public static int getEffectiveNumUnits(Campaign campaign) {
-        double numUnits = 0;
-        for (CombatTeam combatTeam : campaign.getAllCombatTeams()) {
-            Force force = combatTeam.getForce(campaign);
-
-            if (force == null) {
-                continue;
-            }
-
-            if (!force.isForceType(STANDARD)) {
-                continue;
-            }
-
-            for (UUID unitId : force.getAllUnits(true)) {
-                Entity entity = getEntityFromUnitId(campaign.getHangar(), unitId);
-
-                if (entity == null) {
-                    continue;
-                }
-
-                numUnits += switch (entity.getUnitType()) {
-                    case TANK, UnitType.VTOL, UnitType.NAVAL, UnitType.CONV_FIGHTER, AEROSPACEFIGHTER ->
-                          campaign.getFaction().isClan() ? 0.5 : 1;
-                    case UnitType.PROTOMEK -> 0.2;
-                    case UnitType.BATTLE_ARMOR, UnitType.INFANTRY -> 0;
-                    default -> 1; // All other unit types
-                };
-            }
-        }
-
-        return (int) floor(numUnits);
+        return ContractUtilities.getEffectiveNumUnits(campaign);
     }
 
     /**
@@ -730,6 +688,9 @@ public class AtBContract extends Contract {
         setEnemyBotName(enemyFaction.getFullName(today.getYear()));
         enemyName = ""; // wipe the old enemy name
         getEnemyName(today.getYear()); // we use this to update enemyName
+        if (enemyFaction.isClan()) {
+            createClanOpponent(campaign);
+        }
 
         // We have a check in getEnemyName that prevents rolling over mercenary names, so we add this extra step to
         // force a mercenary name re-roll, in the event one Mercenary faction is replaced with another.
@@ -742,8 +703,29 @@ public class AtBContract extends Contract {
 
         // Update the Batchall information
         batchallAccepted = true;
-        if (campaign.getCampaignOptions().isUseGenericBattleValue() && BatchallFactions.usesBatchalls(enemyCode)) {
-            setBatchallAccepted(initiateBatchall(campaign));
+        Faction faction = getEnemy();
+        if (campaign.getCampaignOptions().isUseGenericBattleValue() && faction.performsBatchalls()) {
+            boolean tracksStanding = campaign.getCampaignOptions().isTrackFactionStanding();
+            FactionStandings factionStandings = campaign.getFactionStandings();
+
+            if (faction.performsBatchalls()) {
+                PerformBatchall batchallDialog = new PerformBatchall(campaign, clanOpponent, enemyCode);
+
+                batchallAccepted = batchallDialog.isBatchallAccepted();
+
+                if (!batchallAccepted && tracksStanding) {
+                    List<String> reports = factionStandings.processRefusedBatchall(enemyCode, today.getYear());
+
+                    for (String report : reports) {
+                        campaign.addReport(report);
+                    }
+                }
+            }
+
+            if (tracksStanding) {
+                // Whenever we dynamically change the enemy faction, we update standing accordingly
+                factionStandings.processContractAccept(faction, today);
+            }
         }
     }
 
@@ -863,19 +845,19 @@ public class AtBContract extends Contract {
                     }
                 } else {
                     campaign.addReport("Bonus: Ronin");
-                    new RoninOffer(campaign, stratconCampaignState, requiredCombatTeams);
+                    new RoninOffer(campaign, stratconCampaignState, requiredCombatElements);
                 }
                 yield false;
             }
             case 2 -> {
                 campaign.addReport("Bonus: Ronin");
-                new RoninOffer(campaign, stratconCampaignState, requiredCombatTeams);
+                new RoninOffer(campaign, stratconCampaignState, requiredCombatElements);
                 yield false;
             }
             case 3 -> { // Resupply
                 if (campaignOptions.isUseAtB() && !campaignOptions.isUseStratCon()) {
                     campaign.addReport("Bonus: Ronin");
-                    new RoninOffer(campaign, stratconCampaignState, requiredCombatTeams);
+                    new RoninOffer(campaign, stratconCampaignState, requiredCombatElements);
                     yield false;
                 } else {
                     if (isPostScenario) {
@@ -888,15 +870,15 @@ public class AtBContract extends Contract {
                 }
             }
             case 4 -> {
-                new MercenaryAuction(campaign, requiredCombatTeams, stratconCampaignState, TANK);
+                new MercenaryAuction(campaign, requiredCombatElements, stratconCampaignState, TANK);
                 yield false;
             }
             case 5 -> {
-                new MercenaryAuction(campaign, requiredCombatTeams, stratconCampaignState, AEROSPACEFIGHTER);
+                new MercenaryAuction(campaign, requiredCombatElements, stratconCampaignState, AEROSPACEFIGHTER);
                 yield false;
             }
             case 6 -> {
-                new MercenaryAuction(campaign, requiredCombatTeams, stratconCampaignState, MEK);
+                new MercenaryAuction(campaign, requiredCombatElements, stratconCampaignState, MEK);
                 yield false;
             }
             default -> throw new IllegalStateException(
@@ -1190,6 +1172,7 @@ public class AtBContract extends Contract {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allyQuality", getAllyQuality());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enemySkill", getEnemySkill().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enemyQuality", getEnemyQuality());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "difficulty", getDifficulty());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allyBotName", getAllyBotName());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enemyBotName", getEnemyBotName());
 
@@ -1213,6 +1196,7 @@ public class AtBContract extends Contract {
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enemyColour", getEnemyColour().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "requiredCombatTeams", getRequiredCombatTeams());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "requiredCombatElements", getRequiredCombatElements());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "moraleLevel", getMoraleLevel().name());
 
         if (routEnd != null) {
@@ -1252,7 +1236,15 @@ public class AtBContract extends Contract {
         }
 
         if (employerLiaison != null) {
-            employerLiaison.writeToXML(pw, indent, campaign);
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "employerLiaison");
+            employerLiaison.writeToXMLHeadless(pw, indent, campaign);
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "employerLiaison");
+        }
+
+        if (clanOpponent != null) {
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "clanOpponent");
+            clanOpponent.writeToXMLHeadless(pw, indent, campaign);
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "clanOpponent");
         }
 
         return indent;
@@ -1281,6 +1273,8 @@ public class AtBContract extends Contract {
                     setEnemySkill(parseFromString(item.getTextContent().trim()));
                 } else if (item.getNodeName().equalsIgnoreCase("enemyQuality")) {
                     enemyQuality = Integer.parseInt(item.getTextContent());
+                } else if (item.getNodeName().equalsIgnoreCase("difficulty")) {
+                    difficulty = Integer.parseInt(item.getTextContent());
                 } else if (item.getNodeName().equalsIgnoreCase("allyBotName")) {
                     allyBotName = item.getTextContent();
                 } else if (item.getNodeName().equalsIgnoreCase("enemyBotName")) {
@@ -1297,10 +1291,10 @@ public class AtBContract extends Contract {
                     getEnemyCamouflage().setFilename(item.getTextContent().trim());
                 } else if (item.getTextContent().equalsIgnoreCase("enemyColour")) {
                     setEnemyColour(PlayerColour.parseFromString(item.getTextContent().trim()));
-                    // <50.03 compatibility handler
-                } else if (item.getNodeName().equalsIgnoreCase("requiredLances") ||
-                                 item.getNodeName().equalsIgnoreCase("requiredCombatTeams")) {
+                } else if (item.getNodeName().equalsIgnoreCase("requiredCombatTeams")) {
                     requiredCombatTeams = Integer.parseInt(item.getTextContent());
+                } else if (item.getNodeName().equalsIgnoreCase("requiredCombatElements")) {
+                    requiredCombatElements = Integer.parseInt(item.getTextContent());
                 } else if (item.getNodeName().equalsIgnoreCase("moraleLevel")) {
                     setMoraleLevel(AtBMoraleLevel.parseFromString(item.getTextContent().trim()));
                 } else if (item.getNodeName().equalsIgnoreCase("routEnd")) {
@@ -1347,15 +1341,21 @@ public class AtBContract extends Contract {
                     this.setStratconCampaignState(stratconCampaignState);
                 } else if (item.getNodeName().equalsIgnoreCase("parentContractId")) {
                     parentContract = new AtBContractRef(Integer.parseInt(item.getTextContent()));
-                } else if (item.getNodeName().equalsIgnoreCase("person")) {
+                } else if (item.getNodeName().equalsIgnoreCase("employerLiaison")) {
                     employerLiaison = Person.generateInstanceFromXML(item, campaign, version);
-
-                    if (employerLiaison == null) {
-                        createEmployerLiaison(campaign);
-                    }
+                } else if (item.getNodeName().equalsIgnoreCase("clanOpponent")) {
+                    clanOpponent = Person.generateInstanceFromXML(item, campaign, version);
                 }
             } catch (Exception e) {
                 logger.error("", e);
+            }
+
+            if (employerLiaison == null) {
+                createEmployerLiaison(campaign);
+            }
+
+            if (clanOpponent == null && getEnemy().isClan()) {
+                createClanOpponent(campaign);
             }
         }
     }
@@ -1400,6 +1400,34 @@ public class AtBContract extends Contract {
 
     public void createEmployerLiaison(Campaign campaign) {
         employerLiaison = campaign.newPerson(PersonnelRole.ADMINISTRATOR_COMMAND, getEmployerCode(), Gender.RANDOMIZE);
+    }
+
+    public Person getClanOpponent() {
+        return clanOpponent;
+    }
+
+    public void setClanOpponent(Person clanOpponent) {
+        this.clanOpponent = clanOpponent;
+    }
+
+    public void createClanOpponent(Campaign campaign) {
+        clanOpponent = campaign.newPerson(PersonnelRole.MEKWARRIOR, getEnemyCode(), Gender.RANDOMIZE);
+
+        Bloodname bloodname = Bloodname.randomBloodname(enemyCode, Phenotype.MEKWARRIOR, campaign.getGameYear());
+
+        if (bloodname != null) {
+            clanOpponent.setBloodname(bloodname.getName());
+        }
+
+        final RankSystem rankSystem = Ranks.getRankSystemFromCode("CLAN");
+
+        final RankValidator rankValidator = new RankValidator();
+        if (!rankValidator.validate(rankSystem, false)) {
+            return;
+        }
+
+        clanOpponent.setRankSystem(rankValidator, rankSystem);
+        clanOpponent.setRank(38);
     }
 
     public String getEmployerCode() {
@@ -1449,6 +1477,14 @@ public class AtBContract extends Contract {
 
     public void setEnemyCode(String enemyCode) {
         this.enemyCode = enemyCode;
+    }
+
+    public int getDifficulty() {
+        return difficulty;
+    }
+
+    public void setDifficulty(int difficulty) {
+        this.difficulty = difficulty;
     }
 
     public AtBContractType getContractType() {
@@ -1548,6 +1584,14 @@ public class AtBContract extends Contract {
         requiredCombatTeams = required;
     }
 
+    public int getRequiredCombatElements() {
+        return requiredCombatElements;
+    }
+
+    public void setRequiredCombatElements(int required) {
+        requiredCombatElements = required;
+    }
+
     public int getPartsAvailabilityLevel() {
         return partsAvailabilityLevel;
     }
@@ -1632,58 +1676,58 @@ public class AtBContract extends Contract {
         }
     }
 
-    public AtBContract(Contract c, Campaign campaign) {
-        this(c.getName());
+    public AtBContract(Contract contract, Campaign campaign) {
+        this(contract.getName());
 
-        setType(c.getType());
-        setSystemId(c.getSystemId());
-        setDesc(c.getDescription());
-        setStatus(c.getStatus());
-        for (Scenario s : c.getScenarios()) {
+        setType(contract.getType());
+        setSystemId(contract.getSystemId());
+        setDesc(contract.getDescription());
+        setStatus(contract.getStatus());
+        for (Scenario s : contract.getScenarios()) {
             addScenario(s);
         }
-        setId(c.getId());
-        setLength(c.getLength());
-        setStartDate(c.getStartDate());
+        setId(contract.getId());
+        setLength(contract.getLength());
+        setStartDate(contract.getStartDate());
         /*
          * Set ending date; the other calculated values will be replaced
          * from the original contract
          */
         calculateContract(campaign);
-        setMultiplier(c.getMultiplier());
-        setTransportComp(c.getTransportComp());
-        setStraightSupport(c.getStraightSupport());
-        setOverheadComp(c.getOverheadComp());
-        setCommandRights(c.getCommandRights());
-        setBattleLossComp(c.getBattleLossComp());
-        setSalvagePct(c.getSalvagePct());
-        setSalvageExchange(c.isSalvageExchange());
-        setSalvagedByUnit(c.getSalvagedByUnit());
-        setSalvagedByEmployer(c.getSalvagedByEmployer());
-        setSigningBonusPct(c.getSigningBonusPct());
-        setAdvancePct(c.getAdvancePct());
-        setMRBCFee(c.payMRBCFee());
-        setAdvanceAmount(c.getAdvanceAmount());
-        setFeeAmount(c.getFeeAmount());
-        setBaseAmount(c.getBaseAmount());
-        setOverheadAmount(c.getOverheadAmount());
-        setSupportAmount(c.getSupportAmount());
-        setTransportAmount(c.getTransportAmount());
-        setSigningBonusAmount(c.getSigningBonusAmount());
+        setMultiplier(contract.getMultiplier());
+        setTransportComp(contract.getTransportComp());
+        setStraightSupport(contract.getStraightSupport());
+        setOverheadComp(contract.getOverheadComp());
+        setCommandRights(contract.getCommandRights());
+        setBattleLossComp(contract.getBattleLossComp());
+        setSalvagePct(contract.getSalvagePct());
+        setSalvageExchange(contract.isSalvageExchange());
+        setSalvagedByUnit(contract.getSalvagedByUnit());
+        setSalvagedByEmployer(contract.getSalvagedByEmployer());
+        setSigningBonusPct(contract.getSigningBonusPct());
+        setAdvancePct(contract.getAdvancePct());
+        setMRBCFee(contract.payMRBCFee());
+        setAdvanceAmount(contract.getAdvanceAmount());
+        setFeeAmount(contract.getFeeAmount());
+        setBaseAmount(contract.getBaseAmount());
+        setOverheadAmount(contract.getOverheadAmount());
+        setSupportAmount(contract.getSupportAmount());
+        setTransportAmount(contract.getTransportAmount());
+        setSigningBonusAmount(contract.getSigningBonusAmount());
 
         /* Guess at AtBContract values */
         AtBContractType contractType = null;
         for (final AtBContractType type : AtBContractType.values()) {
-            if (type.toString().equalsIgnoreCase(c.getType())) {
+            if (type.toString().equalsIgnoreCase(contract.getType())) {
                 contractType = type;
                 break;
             }
         }
         /* Make a rough guess */
         if (contractType == null) {
-            if (c.getLength() <= 3) {
+            if (contract.getLength() <= 3) {
                 contractType = AtBContractType.OBJECTIVE_RAID;
-            } else if (c.getLength() < 12) {
+            } else if (contract.getLength() < 12) {
                 contractType = AtBContractType.GARRISON_DUTY;
             } else {
                 contractType = AtBContractType.PLANETARY_ASSAULT;
@@ -1691,7 +1735,8 @@ public class AtBContract extends Contract {
         }
         setContractType(contractType);
 
-        Faction f = Factions.getInstance().getFactionFromFullNameAndYear(c.getEmployer(), campaign.getGameYear());
+        Faction f = Factions.getInstance()
+                          .getFactionFromFullNameAndYear(contract.getEmployer(), campaign.getGameYear());
         if (null == f) {
             employerCode = "IND";
         } else {
@@ -1704,7 +1749,8 @@ public class AtBContract extends Contract {
             enemyCode = "REB";
         }
 
-        requiredCombatTeams = calculateBaseNumberOfRequiredLances(campaign);
+        setRequiredCombatTeams(ContractUtilities.calculateBaseNumberOfRequiredLances(campaign));
+        setRequiredCombatElements(ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(campaign));
 
         setPartsAvailabilityLevel(getContractType().calculatePartsAvailabilityLevel());
 
@@ -1714,6 +1760,10 @@ public class AtBContract extends Contract {
 
         enemyBotName = getEnemyName(currentYear);
         enemyCamouflage = pickRandomCamouflage(currentYear, enemyCode);
+
+        difficulty = calculateContractDifficulty(contract.getStartDate().getYear(),
+              true,
+              campaign.getAllCombatEntities());
 
         clanTechSalvageOverride();
     }
@@ -1752,7 +1802,7 @@ public class AtBContract extends Contract {
      *
      * @return {@code true} if the batchall is accepted, {@code false} otherwise.
      */
-    //
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public boolean initiateBatchall(Campaign campaign) {
         // Retrieves the title from the resources
         String title = resources.getString("incomingTransmission.title");
@@ -1814,6 +1864,7 @@ public class AtBContract extends Contract {
      *
      * @return {@code true} if the batchall is accepted, {@code false} otherwise
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     private boolean batchallDialog(Campaign campaign, JPanel panel, String title) {
         // We use a single-element array to store the result, because we need to modify it inside the action
         // listeners, which requires the variable to be effectively final
@@ -1888,6 +1939,7 @@ public class AtBContract extends Contract {
      *
      * @return {@code true} if the user accepts the refusal, {@code false} if the user cancels the refusal
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     private boolean refusalConfirmationDialog(Campaign campaign) {
         // Create modal JDialog
         JDialog dialog = new JDialog();
@@ -1945,6 +1997,7 @@ public class AtBContract extends Contract {
      * @param panel The panel to display in the dialog.
      * @param title The title of the dialog.
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     private void noBatchallOfferedDialog(JPanel panel, String title) {
         // Create a new JDialog
         JDialog dialog = new JDialog();
@@ -1977,15 +2030,20 @@ public class AtBContract extends Contract {
     }
 
     /**
+     * @deprecated use {@link #getContractDifficultySkulls()} instead
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
+    public JPanel getContractDifficultySkulls(Campaign campaign) {
+        return getContractDifficultySkulls();
+    }
+
+    /**
      * This method returns a {@link JPanel} that represents the difficulty skulls for a given mission.
-     *
-     * @param campaign the campaign for which the difficulty skulls are calculated
      *
      * @return a {@link JPanel} with the difficulty skulls displayed
      */
-    public JPanel getContractDifficultySkulls(Campaign campaign) {
+    public JPanel getContractDifficultySkulls() {
         final int ERROR = -99;
-        int difficulty = calculateContractDifficulty(campaign);
 
         // Create a new JFrame
         JFrame frame = new JFrame();
@@ -2028,10 +2086,13 @@ public class AtBContract extends Contract {
      * Creates and returns a {@link JPanel} containing the belligerent factions' logos for the specified game year.
      *
      * <p>This panel displays the employer and enemy faction logos side by side, separated by a styled divider.
-     * The logos are determined based on the provided game year and faction codes, scaled appropriately for the GUI.</p>
+     * The logos are determined based on the provided game year and faction codes, scaled appropriately for the
+     * GUI.</p>
      *
      * @param gameYear the year used to determine which faction logos to display
+     *
      * @return a {@link JPanel} with the employer and enemy faction logos, with a divider in between
+     *
      * @author Illiani
      * @since 0.50.06
      */

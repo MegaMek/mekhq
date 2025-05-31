@@ -38,12 +38,9 @@ import mekhq.campaign.randomEvents.prisoners.enums.PrisonerEvent;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 
 /**
- * Represents a dialog triggered after a random prisoner event to communicate its results to the player.
- *
- * <p>This dialog displays the outcome of a prisoner-related random event, based on the player’s choices
- * and whether the event was successful or not. The message provides an immersive, in-character narrative describing the
- * results and optionally includes an event report for further context.</p>
+ * @deprecated Unused
  */
+@Deprecated(since = "0.50.06", forRemoval = true)
 public class PrisonerEventResultsDialog extends ImmersiveDialogCore {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
 
@@ -63,7 +60,7 @@ public class PrisonerEventResultsDialog extends ImmersiveDialogCore {
      * @param eventReport  A detailed report of the event's outcome, presented out-of-character for additional clarity.
      */
     public PrisonerEventResultsDialog(Campaign campaign, @Nullable Person speaker, PrisonerEvent event, int choiceIndex,
-                                      boolean isSuccessful, String eventReport) {
+          boolean isSuccessful, String eventReport) {
         super(campaign,
               speaker,
               null,
@@ -111,7 +108,7 @@ public class PrisonerEventResultsDialog extends ImmersiveDialogCore {
      * @return A formatted string containing the in-character message describing the event results.
      */
     private static String createInCharacterMessage(Campaign campaign, PrisonerEvent event, int choiceIndex,
-                                                   boolean isSuccessful) {
+          boolean isSuccessful) {
         String suffix = isSuccessful ? SUFFIX_SUCCESS : SUFFIX_FAILURE;
         String commanderAddress = campaign.getCommanderAddress(false);
         return getFormattedTextAt(RESOURCE_BUNDLE,

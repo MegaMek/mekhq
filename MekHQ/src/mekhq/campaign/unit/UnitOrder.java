@@ -25,10 +25,20 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.unit;
 
 import java.io.PrintWriter;
+
+import mekhq.utilities.ReportingUtilities;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import megamek.common.*;
 import megamek.common.loaders.EntityLoadingException;
@@ -193,23 +203,18 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
     public String find(int transitDays) {
         // TODO: probably get a duplicate entity
         if (getCampaign().getQuartermaster().buyUnit((Entity) getNewEquipment(), transitDays)) {
-            return "<font color='" +
-                         MekHQ.getMHQOptions().getFontColorPositiveHexColor() +
-                         "'><b> unit found</b>.</font> It will be delivered in " +
-                         transitDays +
-                         " days.";
+            return "<font color='" + ReportingUtilities.getPositiveColor()
+                    + "'><b> unit found</b>.</font> It will be delivered in " + transitDays + " days.";
         } else {
-            return "<font color='" +
-                         MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
-                         "'><b> You cannot afford this unit. Transaction cancelled</b>.</font>";
+            return "<font color='" + ReportingUtilities.getNegativeColor()
+                    + "'><b> You cannot afford this unit. Transaction cancelled</b>.</font>";
         }
     }
 
     @Override
     public String failToFind() {
-        return "<font color='" +
-                     MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
-                     "'><b> unit not found</b>.</font>";
+        return "<font color='" + ReportingUtilities.getNegativeColor()
+                + "'><b> unit not found</b>.</font>";
     }
 
     @Override
@@ -385,19 +390,18 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
             target.addModifier(+1, "ProtoMek");
         }
         // parts need to be initialized for this to work
-        int avail = getAvailability();
+        AvailabilityValue avail = getAvailability();
         if (this.isExtinctIn(getCampaign().getGameYear())) {
-            avail = EquipmentType.RATING_X;
+            avail = AvailabilityValue.X;
         }
         int availabilityMod = Availability.getAvailabilityModifier(avail);
-        target.addModifier(availabilityMod, "availability (" + ITechnology.getRatingName(avail) + ")");
+        target.addModifier(availabilityMod, "availability (" + avail.getName() + ")");
         return target;
     }
 
     @Override
-    public int getAvailability() {
-        return calcYearAvailability(getCampaign().getGameYear(),
-              getCampaign().useClanTechBase(),
+    public AvailabilityValue getAvailability() {
+        return calcYearAvailability(getCampaign().getGameYear(), getCampaign().useClanTechBase(),
               getCampaign().getTechFaction());
     }
 
@@ -461,12 +465,12 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
     }
 
     @Override
-    public boolean isIntroducedBy(int year, boolean clan, int techFaction) {
+    public boolean isIntroducedBy(int year, boolean clan, ITechnology.Faction techFaction) {
         return getIntroductionDate(clan, techFaction) <= year;
     }
 
     @Override
-    public boolean isExtinctIn(int year, boolean clan, int techFaction) {
+    public boolean isExtinctIn(int year, boolean clan, ITechnology.Faction techFaction) {
         return isExtinct(year, clan, techFaction);
     }
 

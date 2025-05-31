@@ -8,7 +8,7 @@ env:
   GRADLE_OPTS: "-Dscan.link.VCS=${{ github.event.pull_request.html_url }}"
 
 jobs:
-  ci_cd:
+  pr_ci:
     runs-on: ${{ matrix.os }}
 
     outputs:
@@ -21,7 +21,7 @@ jobs:
       matrix:
         os: [ ubuntu-latest ]
         java-distribution: [ temurin ]
-        java-version: [ 17 ]
+        java-version: [ 17, 21 ]
       fail-fast: false
 
     steps:
@@ -109,7 +109,7 @@ jobs:
       - name: "Output branch information to Version file"
         run: |
           echo "branch=PR-${{ github.event.number }}" >> megamek/megamek/resources/extraVersion.properties
-          echo "gitHash=${{ env.COMMIT_SHORT_SHA }}" >> megamek/megamek/resources/extraVersion.properties 
+          echo "gitHash=${{ env.COMMIT_SHORT_SHA }}" >> megamek/megamek/resources/extraVersion.properties
 
       - name: Add MHQRevision file
         run: |

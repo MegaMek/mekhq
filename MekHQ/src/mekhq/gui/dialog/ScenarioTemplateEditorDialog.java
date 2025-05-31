@@ -52,7 +52,7 @@ import javax.swing.*;
 import javax.swing.border.LineBorder;
 
 import megamek.client.bot.princess.CardinalEdge;
-import megamek.client.ui.baseComponents.AbstractScrollablePanel;
+import megamek.client.ui.panels.abstractPanels.AbstractScrollablePanel;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.EntityWeightClass;

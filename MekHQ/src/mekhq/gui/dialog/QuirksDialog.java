@@ -47,9 +47,9 @@ import javax.swing.JScrollPane;
 
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.client.ui.swing.DialogOptionComponent;
-import megamek.client.ui.swing.DialogOptionListener;
-import megamek.client.ui.swing.QuirksPanel;
+import megamek.client.ui.panels.DialogOptionComponentYPanel;
+import megamek.client.ui.clientGUI.DialogOptionListener;
+import megamek.client.ui.dialogs.customMek.QuirksPanel;
 import megamek.common.Entity;
 import megamek.common.Mounted;
 import megamek.common.options.IOption;
@@ -135,13 +135,13 @@ public class QuirksDialog extends JDialog implements DialogOptionListener, Actio
     }
 
     @Override
-    public void optionClicked(DialogOptionComponent dialogOptionComponent, IOption iOption, boolean b) {
+    public void optionClicked(DialogOptionComponentYPanel DialogOptionComponentYPanel, IOption iOption, boolean b) {
         // Not Used Included because QuirksPanel requires a DialogOptionListener
         // interface.
     }
 
     @Override
-    public void optionSwitched(DialogOptionComponent comp, IOption option, int i) {
+    public void optionSwitched(DialogOptionComponentYPanel comp, IOption option, int i) {
 
     }
 

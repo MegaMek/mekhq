@@ -49,7 +49,7 @@ import java.util.ResourceBundle;
 import javax.swing.*;
 import javax.swing.event.ChangeListener;
 
-import megamek.client.ui.baseComponents.MMComboBox;
+import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.logging.MMLogger;

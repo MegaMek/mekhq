@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.view;
 
@@ -33,20 +38,22 @@ import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.util.ResourceBundle;
-import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
 
-import megamek.client.ui.swing.util.FluffImageHelper;
+import megamek.client.ui.util.FluffImageHelper;
+import megamek.client.ui.util.UIUtil;
 import megamek.common.Entity;
 import megamek.common.MekView;
 import megamek.common.TechConstants;
+import megamek.utilities.ImageUtilities;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollablePanel;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.utilities.ImgLabel;
 import mekhq.gui.utilities.MarkdownRenderer;
 
@@ -117,6 +124,7 @@ public class UnitViewPanel extends JScrollablePanel {
             image = unit.getImage(lblImage);
             if (null != image) {
                 ImageIcon icon = new ImageIcon(image);
+                icon = ImageUtilities.scaleImageIcon(icon, UIUtil.scaleForGUI(150), true);
                 lblImage.setIcon(icon);
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 1;
@@ -130,7 +138,7 @@ public class UnitViewPanel extends JScrollablePanel {
         }
 
         pnlStats.setName("pnlBasic");
-        pnlStats.setBorder(BorderFactory.createTitledBorder(unit.getName()));
+        pnlStats.setBorder(RoundedLineBorder.createRoundedLineBorder(unit.getName()));
         fillStats(resourceMap);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -147,13 +155,8 @@ public class UnitViewPanel extends JScrollablePanel {
         txtReadout.setContentType(resourceMap.getString("txtReadout.contentType"));
         txtReadout.setEditable(false);
         txtReadout.setFont(Font.decode(resourceMap.getString("txtReadout.font")));
-        txtReadout.setText("<div style='font: 12pt monospaced'>" +
-                                 mview.getMekReadoutBasic() +
-                                 "<br>" +
-                                 mview.getMekReadoutLoadout() +
-                                 "</div>");
-        txtReadout.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Technical Readout"),
-              BorderFactory.createEmptyBorder(0, 2, 2, 2)));
+        txtReadout.setText("<div style='font: 12pt monospaced'>" + mview.getMekReadoutBasic() + "<br>" + mview.getMekReadoutLoadout() + "</div>");
+        txtReadout.setBorder(RoundedLineBorder.createRoundedLineBorder("Technical Readout"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -172,8 +175,7 @@ public class UnitViewPanel extends JScrollablePanel {
             txtFluff.setEditable(false);
             txtFluff.setContentType("text/html");
             txtFluff.setText(MarkdownRenderer.getRenderedHtml(unit.getHistory()));
-            txtFluff.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Unit History"),
-                  BorderFactory.createEmptyBorder(0, 2, 2, 2)));
+            txtFluff.setBorder(RoundedLineBorder.createRoundedLineBorder("Unit History"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = 2;

@@ -27,8 +27,8 @@
  */
 package mekhq.gui.panes;
 
-import megamek.client.ui.baseComponents.MMButton;
-import megamek.client.ui.baseComponents.MMComboBox;
+import megamek.client.ui.buttons.MMButton;
+import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.baseComponents.SpinnerCellEditor;
 import megamek.common.annotations.Nullable;
 import megamek.common.util.sorter.NaturalOrderComparator;

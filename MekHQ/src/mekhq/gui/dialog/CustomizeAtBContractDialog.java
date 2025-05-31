@@ -47,11 +47,11 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import javax.swing.*;
 
-import megamek.client.ui.baseComponents.MMComboBox;
-import megamek.client.ui.dialogs.CamoChooserDialog;
+import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.dialogs.iconChooser.CamoChooserDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.client.ui.swing.util.PlayerColour;
+import megamek.client.ui.util.PlayerColour;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
 import megamek.logging.MMLogger;
@@ -205,7 +205,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         JLabel lblEnemyRating = new JLabel();
         JLabel lblRequiredLances = new JLabel();
 
-        int requiredLances = contract.getRequiredCombatTeams() > 0 ? contract.getRequiredCombatTeams() : 1;
+        int requiredLances = contract.getRequiredCombatElements() > 0 ? contract.getRequiredCombatElements() : 1;
 
         spnRequiredLances = new JSpinner(new SpinnerNumberModel(requiredLances, 1, null, 1));
         JLabel lblEnemyMorale = new JLabel();
@@ -383,6 +383,14 @@ public class CustomizeAtBContractDialog extends JDialog {
 
         lblRequiredLances.setText(resourceMap.getString("lblRequiredLances.text"));
         lblRequiredLances.setName("lblRequiredLances");
+        gbc.gridx = 0;
+        gbc.gridy = y;
+        gbc.gridwidth = 1;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        leftPanel.add(lblRequiredLances, gbc);
+
+        lblRequiredLances.setText(resourceMap.getString("lblRequiredCombatElements.text"));
+        lblRequiredLances.setName("lblRequiredCombatElements");
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;
