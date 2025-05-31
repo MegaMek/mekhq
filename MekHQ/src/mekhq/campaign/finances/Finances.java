@@ -495,7 +495,9 @@ public class Finances {
         }
 
         // Leases - on the 1st, go get the cost of units in the hanger looking for leases. Charge money if possible.
-        if (today.getDayOfMonth() == 1 && (campaign.getCampaignOptions().isTrackLeases())) {
+        if (isNewMonth &&
+                  (campaign.getCampaignOptions().isTrackLeases()) &&
+                  !(Money.zero().equals(campaign.getAccountant().getLeaseCosts()))) {
             Money leaseCosts = campaign.getAccountant().getLeaseCosts();
             if (debit(TransactionType.LEASE_PAYMENT, today, leaseCosts, resourceMap.getString("LeaseCosts.title"))) {
                 campaign.addReport(String.format(resourceMap.getString("LeaseCosts.text"),

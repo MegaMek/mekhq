@@ -49,8 +49,8 @@ import javax.swing.JPanel;
 import javax.swing.RowFilter;
 
 import megamek.client.ui.Messages;
-import megamek.client.ui.dialogs.advancedsearch.MekSearchFilter;
 import megamek.client.ui.dialogs.UnitLoadingDialog;
+import megamek.client.ui.dialogs.advancedsearch.MekSearchFilter;
 import megamek.client.ui.dialogs.unitSelectorDialogs.AbstractUnitSelectorDialog;
 import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
@@ -160,6 +160,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         buttonBuy = new JButton();
         buttonAddGM = new JButton();
         buttonShowBV = new JButton();
+        buttonLease = new JButton();
         buttonLeaseGM = new JButton();
 
         if (addToCampaign) {
@@ -171,7 +172,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
             panelButtons.add(buttonBuy, new GridBagConstraints());
 
             if (campaign.getCampaignOptions().isTrackLeases()) {
-                buttonLease = new JButton(Messages.getString("MekSelectorDialog.Lease", TARGET_UNKNOWN));
+                buttonLease.setText(Messages.getString("MekSelectorDialog.Lease", TARGET_UNKNOWN));
                 buttonLease.setName("buttonLease");
                 buttonLease.addActionListener(e -> leaseButtonHandler(false));
                 panelButtons.add(buttonLease, new GridBagConstraints());
@@ -186,7 +187,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
 
                 panelButtons.add(buttonAddGM, new GridBagConstraints());
                 if (campaign.getCampaignOptions().isTrackLeases()) {
-                    buttonLeaseGM.setText = Messages.getString("MekSelectorDialog.LeaseGM", TARGET_UNKNOWN);
+                    buttonLeaseGM.setText(Messages.getString("MekSelectorDialog.LeaseGM", TARGET_UNKNOWN));
                     buttonLeaseGM.setName("buttonLeaseGM");
                     buttonLeaseGM.addActionListener(e -> leaseButtonHandler(true));
                     panelButtons.add(buttonLeaseGM, new GridBagConstraints());
@@ -361,17 +362,17 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
      * This function is to simplify logic in filterUnits. It runs a series of checks to determine if a unit is valid
      * within the current filtering context.
      *
-     * @param unitSummary  The unit being evaluated.
+     * @param unitSummary              The unit being evaluated.
      * @param weightClassSelectorIndex The current weight class selection
-     * @param tech            The current tech selection
-     * @param techLevelMatch  whether the current tech selection matches
-     * @param checkSupportVee Whether the special 'Support Vehicle' unit type was selected
-     * @param unitTypeSelectorIndex  Which unit type is currently selected (Depends on the combo box order!)
+     * @param tech                     The current tech selection
+     * @param techLevelMatch           whether the current tech selection matches
+     * @param checkSupportVee          Whether the special 'Support Vehicle' unit type was selected
+     * @param unitTypeSelectorIndex    Which unit type is currently selected (Depends on the combo box order!)
      *
      * @return true if the unit passes all filters and allowed, false otherwise
      */
-    private boolean isAllowedUnit(MekSummary unitSummary, int weightClassSelectorIndex, ITechnology tech, boolean techLevelMatch,
-          boolean checkSupportVee, int unitTypeSelectorIndex) {
+    private boolean isAllowedUnit(MekSummary unitSummary, int weightClassSelectorIndex, ITechnology tech,
+          boolean techLevelMatch, boolean checkSupportVee, int unitTypeSelectorIndex) {
         if (enableYearLimits && (unitSummary.getYear() > allowedYear)) {
             return false;
         }
@@ -384,7 +385,8 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         if (canonOnly && !unitSummary.isCanon()) {
             return false;
         }
-        if ((weightClassSelectorIndex != unitSummary.getWeightClass()) && weightClassSelectorIndex != EntityWeightClass.SIZE) {
+        if ((weightClassSelectorIndex != unitSummary.getWeightClass()) &&
+                  weightClassSelectorIndex != EntityWeightClass.SIZE) {
             return false;
         }
         if ((tech == null) || !campaign.isLegal(tech)) {
@@ -448,7 +450,12 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
                             break;
                         }
                     }
-                    return isAllowedUnit(mek, weightClassSelectorIndex, tech, techLevelMatch, checkSupportVee, unitTypeSelectorIndex);
+                    return isAllowedUnit(mek,
+                          weightClassSelectorIndex,
+                          tech,
+                          techLevelMatch,
+                          checkSupportVee,
+                          unitTypeSelectorIndex);
                 }
             };
         } catch (PatternSyntaxException ignored) {
