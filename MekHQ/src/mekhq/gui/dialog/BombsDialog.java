@@ -38,6 +38,10 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -48,6 +52,7 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.dialogs.customMek.BombChoicePanel;
 import megamek.common.AmmoType;
+import megamek.common.BombLoadout;
 import megamek.common.BombType;
 import megamek.common.BombType.BombTypeEnum;
 import megamek.common.EquipmentType;
@@ -71,10 +76,12 @@ public class BombsDialog extends JDialog implements ActionListener {
     private final IBomber bomber;
     private final Campaign campaign;
 
-    private final int[] bombChoices;
-    private final int[] bombCatalog = new int[BombTypeEnum.NUM];
-    private final int[] availBombs = new int[BombTypeEnum.NUM];
-    private final int[] typeMax = new int[BombTypeEnum.NUM];
+    private final BombLoadout initialBombChoices;
+    private final BombLoadout availableBombs = new BombLoadout();
+    private final BombLoadout maxAvailable = new BombLoadout();
+
+    // Maps bomb types to warehouse part IDs
+    private final EnumMap<BombTypeEnum, Integer> bombCatalog = new EnumMap<>(BombTypeEnum.class);
 
     private JButton okayButton;
     private JButton cancelButton;
@@ -83,7 +90,7 @@ public class BombsDialog extends JDialog implements ActionListener {
         super(parent, "Select Bombs", true);
         this.bomber = iBomber;
         this.campaign = campaign;
-        bombChoices = bomber.getBombChoices();
+        this.initialBombChoices = new BombLoadout(bomber.getBombChoices());
 
         initGUI();
         validate();
@@ -93,25 +100,16 @@ public class BombsDialog extends JDialog implements ActionListener {
     }
 
     private void initGUI() {
-        // Using bombCatalog to store the part ID's of the bombs so don't have to keep full spare list in memory and
-        // for ease of access later
-        campaign.getWarehouse().forEachSparePart(spare -> {
-            if ((spare instanceof AmmoStorage) &&
-                      (((EquipmentPart) spare).getType() instanceof BombType) &&
-                      spare.isPresent()) {
-                BombTypeEnum bombType = (BombTypeEnum.fromInternalName(((AmmoStorage) spare).getType()
-                                                                           .getInternalName()));
-                bombCatalog[bombType] = spare.getId();
-                availBombs[bombType] = ((AmmoStorage) spare).getShots();
-            }
-        });
-
-        for (int type = 0; type < BombTypeEnum.NUM; type++) {
-            typeMax[type] = availBombs[type] + bombChoices[type];
-        }
+        buildBombInventory();
+        calculateMaxAvailable();
 
         // BombChoicePanel takes care of managing internal and external stores, so we don't need to here.
-        bombPanel = new BombChoicePanel(bomber, campaign.getGameOptions().booleanOption("at2_nukes"), true, typeMax);
+        bombPanel = new BombChoicePanel(
+            bomber, 
+            campaign.getGameOptions().booleanOption("at2_nukes"),
+            true, 
+            maxAvailable
+        );
 
         // Set up the display of this dialog.
         JScrollPane scroller = new JScrollPaneWithSpeed(bombPanel);
@@ -119,6 +117,59 @@ public class BombsDialog extends JDialog implements ActionListener {
         setLayout(new BorderLayout());
         add(scroller, BorderLayout.CENTER);
         add(buildButtonPanel(), BorderLayout.SOUTH);
+    }
+
+    /**
+     * Scans warehouse for available bombs and builds the catalog.
+     */
+    private void buildBombInventory() {
+        // Clear existing data
+        bombCatalog.clear();
+        availableBombs.clear();
+        
+        campaign.getWarehouse().forEachSparePart(spare -> {
+            if (isBombAmmoStorage(spare)) {
+                AmmoStorage ammoStorage = (AmmoStorage) spare;
+                BombTypeEnum bombType = BombTypeEnum.fromInternalName(
+                    ammoStorage.getType().getInternalName()
+                );
+                
+                if ((bombType != null) && (bombType != BombTypeEnum.NONE)) {
+                    // Using bombCatalog to store the part ID's of the bombs so don't have to keep full spare list in memory and
+                    // for ease of access later
+                    bombCatalog.put(bombType, spare.getId());
+                    availableBombs.put(bombType, ammoStorage.getShots());
+                }
+            }
+        });
+    }
+
+    /**
+     * Checks if a spare part is bomb ammunition storage.
+     */
+    private boolean isBombAmmoStorage(Object spare) {
+        return (spare instanceof AmmoStorage) &&
+               (((EquipmentPart) spare).getType() instanceof BombType) &&
+               ((AmmoStorage) spare).isPresent();
+    }
+
+    /**
+     * Calculates maximum available bombs (warehouse + current loadout).
+     */
+    private void calculateMaxAvailable() {
+        maxAvailable.clear();
+        
+        // Start with available bombs from warehouse
+        for (Map.Entry<BombTypeEnum, Integer> entry : availableBombs.entrySet()) {
+            maxAvailable.put(entry.getKey(), entry.getValue());
+        }
+        
+        // Add current bomb choices to maximums
+        for (Map.Entry<BombTypeEnum, Integer> entry : initialBombChoices.entrySet()) {
+            BombTypeEnum bombType = entry.getKey();
+            int count = entry.getValue();
+            maxAvailable.addBombs(bombType, count);
+        }
     }
 
     private JPanel buildButtonPanel() {
@@ -153,43 +204,120 @@ public class BombsDialog extends JDialog implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (okayButton.equals(e.getSource())) {
-            // internal and external choices are applied by bombPanel; here we only care about the totals.
-            bombPanel.applyChoice();
-            int[] newLoadout = bombPanel.getChoice();
-
-            // Get difference between starting bomb load and new bomb load
-            for (int type = 0; type < BombTypeEnum.NUM; type++) {
-                if (bombChoices[type] != newLoadout[type]) {
-                    newLoadout[type] = bombChoices[type] - newLoadout[type];
-                } else {
-                    newLoadout[type] = 0;
-                }
-            }
-
-            for (int type = 0; type < BombTypeEnum.NUM; type++) {
-                if (newLoadout[type] != 0) {
-                    // IF there are bombs of this TYPE in the warehouse
-                    if (bombCatalog[type] > 0) {
-                        AmmoStorage storedBombs = (AmmoStorage) campaign.getWarehouse().getPart(bombCatalog[type]);
-                        storedBombs.changeShots(newLoadout[type]);
-                        if (storedBombs.getShots() == 0) {
-                            campaign.getWarehouse().removePart(storedBombs);
-                        }
-                        // No bombs of this type in warehouse, add bombs
-                        // In this case newLoadout should always be greater than 0, but check to be sure
-                    } else if (bombCatalog[type] == 0 && newLoadout[type] > 0) {
-                        AmmoStorage excessBombs = new AmmoStorage(0,
-                              (AmmoType) EquipmentType.get(type.getInternalName()),
-                              newLoadout[type],
-                              campaign);
-                        campaign.getQuartermaster().addPart(excessBombs, 0);
-                    }
-                }
-            }
-
-            setVisible(false);
+            handleOkayAction();
         } else if (cancelButton.equals(e.getSource())) {
             setVisible(false);
+        }
+    }
+
+    /**
+     * Handles the okay button action - applies bomb choices and updates warehouse.
+     */
+    private void handleOkayAction() {
+        // Apply the bomb panel choices to the bomber
+        bombPanel.applyChoice();
+        BombLoadout newLoadout = bombPanel.getChoice();
+        
+        if (newLoadout == null) {
+            newLoadout = new BombLoadout();
+        }
+
+        // Calculate the difference between initial and new loadouts
+        Map<BombTypeEnum, Integer> warehouseDelta = calculateWarehouseDelta(initialBombChoices, newLoadout);
+        
+        // Update warehouse based on the delta
+        updateWarehouse(warehouseDelta);
+        
+        setVisible(false);
+    }
+
+    /**
+     * Calculates the change in warehouse inventory needed.
+     * Positive values mean bombs are being returned to warehouse.
+     * Negative values mean bombs are being taken from warehouse.
+     */
+    private Map<BombTypeEnum, Integer> calculateWarehouseDelta(BombLoadout initial, BombLoadout newLoadout) {
+        // Create a map to hold the delta of bomb counts
+        // We don't use a BombLoadout here because it wouldn't handle negative counts
+        Map<BombTypeEnum, Integer> delta = new HashMap<>();
+        
+        // Check all bomb types that exist in either loadout
+        for (BombTypeEnum bombType : BombTypeEnum.values()) {
+            if (bombType == BombTypeEnum.NONE) continue;
+            
+            int initialCount = initial.getCount(bombType);
+            int newCount = newLoadout.getCount(bombType);
+            int difference = initialCount - newCount;
+            
+            if (difference != 0) {
+                delta.put(bombType, difference);
+            }
+        }
+        
+        return delta;
+    }
+
+    /**
+     * Updates warehouse inventory based on bomb loadout changes.
+     */
+    private void updateWarehouse(Map<BombTypeEnum, Integer> delta) {
+        for (Map.Entry<BombTypeEnum, Integer> entry : delta.entrySet()) {
+            BombTypeEnum bombType = entry.getKey();
+            int deltaCount = entry.getValue();
+            
+            if (deltaCount == 0) continue;
+            
+            updateWarehouseBombType(bombType, deltaCount);
+        }
+    }
+
+    /**
+     * Updates warehouse for a specific bomb type.
+     */
+    private void updateWarehouseBombType(BombTypeEnum bombType, int deltaCount) {
+        Integer partId = bombCatalog.get(bombType);
+        
+        if (partId != null && partId > 0) {
+            // Existing warehouse entry
+            updateExistingWarehouseEntry(partId, deltaCount);
+        } else if (deltaCount > 0) {
+            // No existing entry but adding bombs - create new warehouse entry
+            createNewWarehouseEntry(bombType, deltaCount);
+        } else {
+            // No existing entry and removing bombs - do nothing
+            // (deltaCount < 0 with no existing partId means we can't remove anything)
+            logger.warn("Attempted to remove bombs of type {} with no existing warehouse entry.", bombType);
+        }
+    }
+
+    /**
+     * Updates an existing warehouse entry.
+     */
+    private void updateExistingWarehouseEntry(int partId, int deltaCount) {
+        AmmoStorage storedBombs = (AmmoStorage) campaign.getWarehouse().getPart(partId);
+        if (storedBombs != null) {
+            storedBombs.changeShots(deltaCount);
+            
+            if (storedBombs.getShots() <= 0) {
+                campaign.getWarehouse().removePart(storedBombs);
+            }
+        }
+    }
+
+    /**
+     * Creates a new warehouse entry for excess bombs.
+     */
+    private void createNewWarehouseEntry(BombTypeEnum bombType, int count) {
+        try {
+            AmmoType ammoType = (AmmoType) EquipmentType.get(bombType.getInternalName());
+            if (ammoType != null) {
+                AmmoStorage excessBombs = new AmmoStorage(0, ammoType, count, campaign);
+                campaign.getQuartermaster().addPart(excessBombs, 0);
+            } else {
+                logger.error("Could not find AmmoType for bomb: {}", bombType.getInternalName());
+            }
+        } catch (Exception ex) {
+            logger.error("Failed to create warehouse entry for bomb type: {}", bombType.getInternalName(), ex);
         }
     }
 }
