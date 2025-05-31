@@ -2883,18 +2883,18 @@ public class Campaign implements ITechManager {
             return null;
         }
         // Skip out on "not armor" (as in 0 point armer on men or field guns)
-        if ((part instanceof Armor) && ((Armor) part).getType() == EquipmentType.T_ARMOR_UNKNOWN) {
+        if ((part instanceof Armor armor) && (armor.getType() == EquipmentType.T_ARMOR_UNKNOWN)) {
             return null;
         }
         // Makes no sense buying those separately from the chasis
-        if ((part instanceof EquipmentPart) &&
-                  ((EquipmentPart) part).getType() != null &&
-                  (((EquipmentPart) part).getType().hasFlag(MiscType.F_CHASSIS_MODIFICATION))) {
+        if ((part instanceof EquipmentPart equipmentPart) &&
+                  (equipmentPart.getType() instanceof MiscType miscType) &&
+                  (miscType.hasFlag(MiscType.F_CHASSIS_MODIFICATION))) {
             return null;
         }
         // Replace a "missing" part with a corresponding "new" one.
-        if (part instanceof MissingPart) {
-            part = ((MissingPart) part).getNewPart();
+        if (part instanceof MissingPart missingPart) {
+            part = missingPart.getNewPart();
         }
         PartInUse result = new PartInUse(part);
         result.setRequestedStock(getDefaultStockPercent(part));
