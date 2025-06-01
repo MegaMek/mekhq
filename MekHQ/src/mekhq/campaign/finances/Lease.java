@@ -35,6 +35,7 @@ package mekhq.campaign.finances;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
+import java.util.ResourceBundle;
 
 import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
@@ -47,6 +48,7 @@ import org.w3c.dom.NodeList;
 
 public class Lease {
     private static final MMLogger LOGGER = MMLogger.create(UnitOrder.class);
+    final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.Lease.properties");
 
     private Money leaseCost;
     private LocalDate acquisitionDate;
@@ -55,9 +57,9 @@ public class Lease {
      * Leases are nominally attached to units while they are in the hanger.
      */
     public Lease(LocalDate currentDay, Unit unit) {
+        float multiplier = Float.parseFloat(resourceMap.getString("Lease.multiplier"));
         acquisitionDate = currentDay;
-        // Campaign Operations 4th., p43
-        leaseCost = unit.getSellValue().multipliedBy(0.005);
+        leaseCost = unit.getSellValue().multipliedBy(multiplier);
     }
 
     /**
