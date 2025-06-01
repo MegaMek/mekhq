@@ -40,13 +40,12 @@ import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.unit.UnitOrder;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class Lease {
-    private static final MMLogger LOGGER = MMLogger.create(UnitOrder.class);
+    private static final MMLogger LOGGER = MMLogger.create(Lease.class);
     private Money leaseCost;
     private LocalDate acquisitionDate;
 
