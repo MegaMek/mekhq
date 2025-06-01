@@ -155,7 +155,11 @@ public class UnitViewPanel extends JScrollablePanel {
         txtReadout.setContentType(resourceMap.getString("txtReadout.contentType"));
         txtReadout.setEditable(false);
         txtReadout.setFont(Font.decode(resourceMap.getString("txtReadout.font")));
-        txtReadout.setText("<div style='font: 12pt monospaced'>" + mview.getMekReadoutBasic() + "<br>" + mview.getMekReadoutLoadout() + "</div>");
+        txtReadout.setText("<div style='font: 12pt monospaced'>" +
+                                 mview.getMekReadoutBasic() +
+                                 "<br>" +
+                                 mview.getMekReadoutLoadout() +
+                                 "</div>");
         txtReadout.setBorder(RoundedLineBorder.createRoundedLineBorder("Technical Readout"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -293,7 +297,9 @@ public class UnitViewPanel extends JScrollablePanel {
 
         txtCost.setName("lblCost2");
         if (unit.hasLease()) {
-            txtCost.setText(unit.getUnitLease().getLeaseCost().toAmountAndSymbolString() + " (Monthly Lease)");
+            txtCost.setText(unit.getUnitLease().getLeaseCost().toAmountAndSymbolString() +
+                                  " " +
+                                  resourceMap.getString("lblLease.text"));
         } else {
             txtCost.setText(unit.getSellValue().toAmountAndSymbolString());
         }

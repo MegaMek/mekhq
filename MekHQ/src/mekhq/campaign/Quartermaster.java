@@ -588,11 +588,11 @@ public class Quartermaster {
      */
     public boolean createLeasedUnit(Entity leaseEntity, int days) {
         if (leaseEntity == null) {
-            LOGGER.error(new NullPointerException(), "null unit passed into createLeasedUnit");
+            LOGGER.debug("null unit passed into createLeasedUnit - no unit created");
             return false;
         }
         if (!campaign.getCampaignOptions().isTrackLeases()) {
-            LOGGER.error("attempted to call createLeasedUnit in a campaign where isTrackLeases is disabled");
+            LOGGER.debug("attempted to createLeasedUnit where isTrackLeases is disabled - no unit created");
             return false;
         }
         PartQuality quality = PartQuality.QUALITY_D;
@@ -602,7 +602,7 @@ public class Quartermaster {
         }
         //We don't want to start the new lease until the unit arrives.
         LocalDate leaseStart = campaign.getLocalDate().plusDays(days);
-        Unit newUnit = getCampaign().addNewUnit(leaseEntity, false, days, quality);
+        Unit newUnit = getCampaign().addNewUnit(leaseEntity, false, days, quality, false);
         newUnit.addLease(new Lease(leaseStart, newUnit));
         return true;
     }
@@ -631,13 +631,11 @@ public class Quartermaster {
      */
     public void cancelUnitLease(Unit unit) {
         if (unit == null) {
-            LOGGER.error(new NullPointerException(), "null unit passed into cancelUnitLease");
+            LOGGER.debug("null unit passed into cancelUnitLease");
             return;
         }
         if (unit.getUnitLease() == null) {
-            LOGGER.error(new NullPointerException(),
-                  "Unit {} with no lease passed into cancelUnitLease",
-                  unit.getName());
+            LOGGER.debug("Unit {} with no lease passed into cancelUnitLease", unit.getName());
             return;
         }
         LocalDate thisDate = getCampaign().getLocalDate();

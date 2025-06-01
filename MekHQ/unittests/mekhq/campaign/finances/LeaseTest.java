@@ -45,11 +45,9 @@ import megamek.common.Dropship;
 import megamek.common.Mek;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-@Nested
 public class LeaseTest {
 
     Unit mockUnit;
@@ -66,7 +64,7 @@ public class LeaseTest {
     }
 
     @Test
-    void getLeaseCost_WhenSetUp_hasValidBaseLeaseCost() {
+    void getLeaseCost_whenSetUp_hasValidBaseLeaseCost() {
         //Act
         Money testCost = mockUnit.getUnitLease().getLeaseCost();
 
@@ -75,7 +73,7 @@ public class LeaseTest {
     }
 
     @Test
-    void getLeaseCostNow_WhenFullMonthCost_CalculatesBaseLeaseCostCorrectly() {
+    void getLeaseCostNow_whenFullMonthCost_calculatesBaseLeaseCostCorrectly() {
         //Arrange
         LocalDate testDate = LocalDate.parse("3025-05-01");
 
@@ -87,7 +85,7 @@ public class LeaseTest {
     }
 
     @Test
-    void getLeaseCostNow_WhenLeaseHasNotStarted_EqualsZeroCost() {
+    void getLeaseCostNow_whenLeaseHasNotStarted_equalsZeroCost() {
         //Arrange
         LocalDate testDate = LocalDate.parse("3025-03-01");
 
@@ -99,7 +97,7 @@ public class LeaseTest {
     }
 
     @Test
-    void getLeaseCostNow_WhenNotThe1st_ReturnsNull() {
+    void getLeaseCostNow_whenNotThe1st_returnsNull() {
         //Arrange
         LocalDate testDate = LocalDate.parse("3025-03-02");
 
@@ -111,7 +109,7 @@ public class LeaseTest {
     }
 
     @Test
-    void getFirstLeaseCost_WhenInFirstMonth_ShouldGivePartialLeaseAmount() {
+    void getFirstLeaseCost_whenInFirstMonth_shouldGivePartialLeaseAmount() {
         LocalDate date = LocalDate.parse("3025-04-01");
 
         //Act
@@ -119,11 +117,12 @@ public class LeaseTest {
 
         //Assert
         assertEquals(Math.round(Money.of(3000.00 / 31).getAmount().doubleValue()),
-              Math.round(testCost.getAmount().doubleValue())); // This should be a single day's lease
+              Math.round(testCost.getAmount().doubleValue()),
+              "This should be a single day's lease");
     }
 
     @Test
-    void getFirstLeaseCost_WhenNotThe1st_ReturnsNull() {
+    void getFirstLeaseCost_whenNotThe1st_returnsNull() {
         LocalDate date = LocalDate.parse("3025-04-02");
 
         //Act
@@ -134,7 +133,7 @@ public class LeaseTest {
     }
 
     @Test
-    void getLeaseStart_WhenInstantiated_ShouldReturnStartDate() {
+    void getLeaseStart_whenInstantiated_shouldReturnStartDate() {
         //Arrange
         LocalDate testDate = LocalDate.parse("3025-03-31");
 
@@ -146,7 +145,7 @@ public class LeaseTest {
     }
 
     @Test
-    void getFinalLeaseCost_WhenCalled_ShouldProrateLeaseCostUsedInMonth() {
+    void getFinalLeaseCost_whenCalled_shouldProrateLeaseCostUsedInMonth() {
         //Arrange
         LocalDate testDate = LocalDate.parse("3025-06-05");
 
@@ -162,7 +161,7 @@ public class LeaseTest {
     }
 
     @Test
-    void isLeaseable_WhenUnitIsDropship_shouldReturnTrue() {
+    void isLeaseable_whenUnitIsDropship_shouldReturnTrue() {
         //Arrange
         Dropship mockDropship = mock(Dropship.class);
         Mockito.doReturn(true).when(mockDropship).isDropShip();
@@ -175,7 +174,7 @@ public class LeaseTest {
     }
 
     @Test
-    void isLeaseable_WhenUnitIsMek_shouldReturnFalse() {
+    void isLeaseable_whenUnitIsMek_shouldReturnFalse() {
         //Arrange
         Mek mockMek = mock(Mek.class);
         Mockito.doReturn(false).when(mockMek).isDropShip();

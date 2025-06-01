@@ -33,6 +33,11 @@
 
 package mekhq.campaign.finances;
 
+import static mekhq.utilities.ReportingUtilities.getPositiveColor;
+import static mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColor;
+
+import java.io.PrintWriter;
+
 import megamek.common.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -41,8 +46,6 @@ import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
 
 public class LeaseOrder extends UnitOrder {
     private static final MMLogger LOGGER = MMLogger.create(LeaseOrder.class);
@@ -63,16 +66,14 @@ public class LeaseOrder extends UnitOrder {
      * to acquire things in the Acquisition panel.
      *
      * @param transitDays How long it takes for the unit to arrive.
+     *
      * @return The string for a successful find report.
      */
     @Override
     public String find(int transitDays) {
-        super.getCampaign().getQuartermaster().createLeasedUnit((megamek.common.Entity) getNewEquipment(), transitDays);
-        return "<font color='" +
-                mekhq.MekHQ.getMHQOptions().getFontColorPositiveHexColor() +
-                "'><b> unit found for leasing</b>.</font> It will be delivered in " +
-                transitDays +
-                " days.";
+        this.getCampaign().getQuartermaster().createLeasedUnit((megamek.common.Entity) getNewEquipment(), transitDays);
+        return messageSurroundedBySpanWithColor(getPositiveColor(),
+              " unit found for leasing. It will be delivered in " + transitDays + " days.");
     }
 
     /**
