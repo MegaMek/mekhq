@@ -35,6 +35,7 @@ package mekhq.campaign.finances;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
@@ -98,6 +99,18 @@ public class LeaseTest {
     }
 
     @Test
+    void getLeaseCostNow_WhenNotThe1st_ReturnsNull() {
+        //Arrange
+        LocalDate testDate = LocalDate.parse("3025-03-02");
+
+        //Act
+        Money testCost = mockUnit.getUnitLease().getLeaseCostNow(testDate);
+
+        //Assert
+        assertNull(testCost);
+    }
+
+    @Test
     void getFirstLeaseCost_WhenInFirstMonth_ShouldGivePartialLeaseAmount() {
         LocalDate date = LocalDate.parse("3025-04-01");
 
@@ -107,6 +120,17 @@ public class LeaseTest {
         //Assert
         assertEquals(Math.round(Money.of(3000.00 / 31).getAmount().doubleValue()),
               Math.round(testCost.getAmount().doubleValue())); // This should be a single day's lease
+    }
+
+    @Test
+    void getFirstLeaseCost_WhenNotThe1st_ReturnsNull() {
+        LocalDate date = LocalDate.parse("3025-04-02");
+
+        //Act
+        Money testCost = mockUnit.getUnitLease().getFirstLeaseCost(date);
+
+        //Assert
+        assertNull(testCost);
     }
 
     @Test

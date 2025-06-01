@@ -33,16 +33,17 @@
 
 package mekhq.campaign.finances;
 
+import java.io.PrintWriter;
+import java.time.LocalDate;
+
 import megamek.common.Entity;
+import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.time.LocalDate;
 
 public class Lease {
     private static final MMLogger LOGGER = MMLogger.create(UnitOrder.class);
@@ -72,6 +73,7 @@ public class Lease {
      *
      * @param time The current campaign LocalDate
      */
+    @Nullable
     public Money getLeaseCostNow(LocalDate time) {
         if (time.getDayOfMonth() == 1) {
             if (getLeaseStart().isBefore(time)) {
@@ -134,6 +136,7 @@ public class Lease {
      *
      * @return Money Prorated first payment of lease
      */
+    @Nullable
     public Money getFirstLeaseCost(LocalDate today) {
         if (today.getDayOfMonth() == 1) {
             int startDay = acquisitionDate.getDayOfMonth();
@@ -165,6 +168,7 @@ public class Lease {
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "lease");
     }
 
+    @Nullable
     public static Lease generateInstanceFromXML(Node writerNode, Unit parseUnit) {
         Lease savedLease = new Lease();
         NodeList childNodeList = writerNode.getChildNodes();
