@@ -123,23 +123,15 @@ public class ContractMarketDialog extends JDialog {
         this.campaign = campaign;
         contractMarket = campaign.getContractMarket();
         possibleRetainerContracts = new ArrayList<>();
-        if (campaign.getFaction().isMercenary()) {
-            countSuccessfulContracts();
+        if (campaign.getFaction().isMercenary()) {\
+            List<String> retainers = getPossibleRetainerContracts(campaign);
+            for (String key : retainers) {
+                possibleRetainerContracts.add(key);
+            }
         }
         initComponents();
         setLocationRelativeTo(frame);
         setUserPreferences();
-    }
-
-    /*
-     * A balance of six or more successful contracts with the same
-     * employer results in the offer of a retainer contract.
-     */
-    private void countSuccessfulContracts() {
-        List<String> retainers = getPossibleRetainerContracts(campaign);
-        for (String key : retainers) {
-            possibleRetainerContracts.add(key);
-        }
     }
 
     /**
