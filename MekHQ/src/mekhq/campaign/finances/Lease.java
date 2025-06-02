@@ -49,15 +49,16 @@ public class Lease {
     private Money leaseCost;
     private LocalDate acquisitionDate;
 
-    //Multiplier for unit cost for leases, see CamOps p43
-    private final double leaseMultiplier = 0.005;
+    //Multiplier for unit cost for leases is 0.5%, see CamOps p43
+    //Using divisor instead for floating point accuracy
+    private final int leaseDivisor = 200;
 
     /**
      * Leases are nominally attached to units while they are in the hanger.
      */
     public Lease(LocalDate currentDay, Unit unit) {
         acquisitionDate = currentDay;
-        leaseCost = unit.getSellValue().multipliedBy(leaseMultiplier);
+        leaseCost = unit.getSellValue().dividedBy(leaseDivisor);
     }
 
     /**

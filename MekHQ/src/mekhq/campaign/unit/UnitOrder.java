@@ -35,21 +35,16 @@ package mekhq.campaign.unit;
 
 import java.io.PrintWriter;
 
-import mekhq.utilities.ReportingUtilities;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.*;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Availability;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.utilities.MHQXMLUtility;
+import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -203,18 +198,47 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
     public String find(int transitDays) {
         // TODO: probably get a duplicate entity
         if (getCampaign().getQuartermaster().buyUnit((Entity) getNewEquipment(), transitDays)) {
-            return "<font color='" + ReportingUtilities.getPositiveColor()
-                    + "'><b> unit found</b>.</font> It will be delivered in " + transitDays + " days.";
+            return "<font color='" +
+                         ReportingUtilities.getPositiveColor() +
+                         "'><b> unit found</b>.</font> It will be delivered in " +
+                         transitDays +
+                         " days.";
         } else {
-            return "<font color='" + ReportingUtilities.getNegativeColor()
-                    + "'><b> You cannot afford this unit. Transaction cancelled</b>.</font>";
+            return "<font color='" +
+                         ReportingUtilities.getNegativeColor() +
+                         "'><b> You cannot afford this unit. Transaction cancelled</b>.</font>";
         }
     }
 
     @Override
     public String failToFind() {
-        return "<font color='" + ReportingUtilities.getNegativeColor()
-                + "'><b> unit not found</b>.</font>";
+        return "<font color='" + ReportingUtilities.getNegativeColor() + "'><b> unit not found</b>.</font>";
+    }
+
+    private int getDropshipEraAcquisitionModifier(int year) {
+        int dropshipModifier = 0;
+        if (year > 3084) {
+            dropshipModifier = 0;
+        } else if (year > 3068) {
+            dropshipModifier = -2;
+        } else if (year > 3050) {
+            dropshipModifier = -1;
+        } else if (year > 2901) {
+            dropshipModifier = +0;
+        } else if (year > 2821) {
+            dropshipModifier = -2;
+        } else if (year > 2751) {
+            dropshipModifier = -6;
+        } else if (year > 2651) {
+            dropshipModifier = -6;
+        } else if (year > 2571) {
+            dropshipModifier = -5;
+        } else if (year > 2412) {
+            dropshipModifier = -4;
+        } else {
+            dropshipModifier = -3;
+        }
+        return dropshipModifier;
     }
 
     @Override
@@ -249,27 +273,9 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
                 target.addModifier((int) Math.ceil(entity.getCost(false) / 100000000) + collars - 6, "Jumpship Base");
             }
 
-            // Since the actual rules are ambiguous, I'm using the tech level as a stand-in for 'uniqueness'
-            // 1 is 'common' and 5 is 'experimental' according to enums
-            int techLevel = entity.getTechLevel(getCampaign().getGameYear());
-            switch (techLevel) {
-                case 1:
-                    target.addModifier(-1, "Common");
-                    break;
-                case 2:
-                    target.addModifier(0, "Average");
-                    break;
-                case 3:
-                    target.addModifier(3, "Rare");
-                    break;
-                case 4:
-                    target.addModifier(6, "Very Rare");
-                    break;
-                case 5:
-                default:
-                    target.addModifier(10, "Unique");
+            // Since the actual rules are ambiguous, we're ignoring 'uniqueness' until someone can come up with a table
+            // counting how many dropships/jumpships of which types exist in each particular era.
 
-            }
             // Other Misc Mods
             if (getCampaign().isClanCampaign()) {
                 target.addModifier(-4, "Clan Force");
@@ -283,27 +289,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
 
             //Eras
             int year = getCampaign().getGameYear();
-            if (year > 3084) {
-                target.addModifier(0, "Era");
-            } else if (year > 3068) {
-                target.addModifier(-2, "Era");
-            } else if (year > 3050) {
-                target.addModifier(-1, "Era");
-            } else if (year > 2901) {
-                target.addModifier(+0, "Era");
-            } else if (year > 2821) {
-                target.addModifier(-2, "Era");
-            } else if (year > 2751) {
-                target.addModifier(-6, "Era");
-            } else if (year > 2651) {
-                target.addModifier(-6, "Era");
-            } else if (year > 2571) {
-                target.addModifier(-5, "Era");
-            } else if (year > 2412) {
-                target.addModifier(-4, "Era");
-            } else {
-                target.addModifier(-3, "Era");
-            }
+            target.addModifier(getDropshipEraAcquisitionModifier(year), "Era");
             return target;
         }
         // TODO: support vehicles
@@ -401,7 +387,8 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
 
     @Override
     public AvailabilityValue getAvailability() {
-        return calcYearAvailability(getCampaign().getGameYear(), getCampaign().useClanTechBase(),
+        return calcYearAvailability(getCampaign().getGameYear(),
+              getCampaign().useClanTechBase(),
               getCampaign().getTechFaction());
     }
 
