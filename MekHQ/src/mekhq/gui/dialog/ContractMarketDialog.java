@@ -44,6 +44,7 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Vector;
 import javax.swing.*;
@@ -135,7 +136,23 @@ public class ContractMarketDialog extends JDialog {
      * employer results in the offer of a retainer contract.
      */
     private void countSuccessfulContracts() {
+        List<String> retainers = getPossibleRetainerContracts(campaign);
+        for (String key : retainers) {
+            possibleRetainerContracts.add(key);
+        }
+    }
+
+    /**
+     * Returns the list of possible retainer contracts for a mercenary faction.
+     * A retainer contract becomes available when a faction has 6 or more
+     * successful contracts with the same employer.
+     *
+     * @param campaign the campaign to check retainer contracts for
+     * @return the number of available retainer contracts
+     */
+    private static List<String> getPossibleRetainerContracts(Campaign campaign) {
         HashMap<String, Integer> successfulContracts = new HashMap<>();
+        List<String> retainers = new ArrayList<>();
         for (AtBContract contract : campaign.getCompletedAtBContracts()) {
             if (contract.getEmployerCode().equals(campaign.getRetainerEmployerCode())) {
                 continue;
@@ -145,9 +162,10 @@ public class ContractMarketDialog extends JDialog {
         }
         for (String key : successfulContracts.keySet()) {
             if (successfulContracts.get(key) >= 6) {
-                possibleRetainerContracts.add(key);
+                retainers.add(key);
             }
         }
+        return retainers;
     }
 
     /**
@@ -169,43 +187,10 @@ public class ContractMarketDialog extends JDialog {
         
         // Add retainer contracts if faction is mercenary
         if (campaign.getFaction().isMercenary()) {
-            contractCount += countAvailableRetainerContracts(campaign);
+            contractCount += getPossibleRetainerContracts(campaign).size();
         }
         
         return contractCount;
-    }
-
-    /**
-     * Counts the number of available retainer contracts for a mercenary faction.
-     * A retainer contract becomes available when a faction has 6 or more
-     * successful contracts with the same employer.
-     *
-     * @param campaign the campaign to check retainer contracts for
-     * @return the number of available retainer contracts
-     */
-    private static int countAvailableRetainerContracts(Campaign campaign) {
-        // Don't count retainer contracts if already in a retainer
-        if (campaign.getRetainerEmployerCode() != null) {
-            return 0;
-        }
-        
-        HashMap<String, Integer> successfulContracts = new HashMap<>();
-        for (AtBContract contract : campaign.getCompletedAtBContracts()) {
-            if (contract.getEmployerCode().equals(campaign.getRetainerEmployerCode())) {
-                continue;
-            }
-            int num = successfulContracts.getOrDefault(contract.getEmployerCode(), 0);
-            successfulContracts.put(contract.getEmployerCode(), num + (contract.getStatus().isSuccess() ? 1 : -1));
-        }
-        
-        int availableRetainers = 0;
-        for (String key : successfulContracts.keySet()) {
-            if (successfulContracts.get(key) >= 6) {
-                availableRetainers++;
-            }
-        }
-        
-        return availableRetainers;
     }
 
     private void initComponents() {
