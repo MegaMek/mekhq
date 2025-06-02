@@ -150,6 +150,64 @@ public class ContractMarketDialog extends JDialog {
         }
     }
 
+    /**
+     * Returns the total number of contracts available for the given campaign.
+     * This includes regular contracts from the contract market and potential
+     * retainer contracts for mercenary factions.
+     *
+     * @param campaign the campaign to check contracts for
+     * @return the total number of available contracts
+     */
+    public static int getAvailableContractsCount(Campaign campaign) {
+        int contractCount = 0;
+        
+        // Add regular contracts from the contract market
+        AbstractContractMarket contractMarket = campaign.getContractMarket();
+        if (contractMarket != null) {
+            contractCount += contractMarket.getContracts().size();
+        }
+        
+        // Add retainer contracts if faction is mercenary
+        if (campaign.getFaction().isMercenary()) {
+            contractCount += countAvailableRetainerContracts(campaign);
+        }
+        
+        return contractCount;
+    }
+
+    /**
+     * Counts the number of available retainer contracts for a mercenary faction.
+     * A retainer contract becomes available when a faction has 6 or more
+     * successful contracts with the same employer.
+     *
+     * @param campaign the campaign to check retainer contracts for
+     * @return the number of available retainer contracts
+     */
+    private static int countAvailableRetainerContracts(Campaign campaign) {
+        // Don't count retainer contracts if already in a retainer
+        if (campaign.getRetainerEmployerCode() != null) {
+            return 0;
+        }
+        
+        HashMap<String, Integer> successfulContracts = new HashMap<>();
+        for (AtBContract contract : campaign.getCompletedAtBContracts()) {
+            if (contract.getEmployerCode().equals(campaign.getRetainerEmployerCode())) {
+                continue;
+            }
+            int num = successfulContracts.getOrDefault(contract.getEmployerCode(), 0);
+            successfulContracts.put(contract.getEmployerCode(), num + (contract.getStatus().isSuccess() ? 1 : -1));
+        }
+        
+        int availableRetainers = 0;
+        for (String key : successfulContracts.keySet()) {
+            if (successfulContracts.get(key) >= 6) {
+                availableRetainers++;
+            }
+        }
+        
+        return availableRetainers;
+    }
+
     private void initComponents() {
         JScrollPane scrollTableContracts = new JScrollPaneWithSpeed();
         scrollContractView = new JScrollPaneWithSpeed();

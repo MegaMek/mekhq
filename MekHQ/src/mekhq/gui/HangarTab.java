@@ -178,6 +178,19 @@ public final class HangarTab extends CampaignGuiTab {
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         add(choiceUnitView, gridBagConstraints);
 
+        JButton btnUnitMarket = new JButton(resourceMap.getString("miUnitMarket.text"));
+        btnUnitMarket.addActionListener(e -> getCampaignGui().showUnitMarket());
+        btnUnitMarket.setVisible(!getCampaign().getUnitMarket().getMethod().isNone());
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.anchor = GridBagConstraints.EAST;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 5);
+        add(btnUnitMarket, gridBagConstraints);
+
         unitModel = new UnitTableModel(getCampaign());
         unitTable = new JTable(unitModel);
         unitTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);

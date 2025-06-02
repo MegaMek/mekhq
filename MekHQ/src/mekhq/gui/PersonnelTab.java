@@ -203,6 +203,19 @@ public final class PersonnelTab extends CampaignGuiTab {
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         add(chkGroupByUnit, gridBagConstraints);
 
+        JButton btnPersonnelMarket = new JButton(resourceMap.getString("miPersonnelMarket.text"));
+        btnPersonnelMarket.addActionListener(e -> getCampaignGui().hirePersonMarket());
+        btnPersonnelMarket.setVisible(!getCampaign().getPersonnelMarket().isNone());
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.anchor = GridBagConstraints.EAST;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 5);
+        add(btnPersonnelMarket, gridBagConstraints);
+
         personModel = new PersonnelTableModel(getCampaign());
         personnelTable = new JTable(personModel);
         personnelTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -249,7 +262,7 @@ public final class PersonnelTab extends CampaignGuiTab {
         splitPersonnel.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, ev -> refreshPersonnelView());
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 5;
+        gridBagConstraints.gridwidth = 6;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
