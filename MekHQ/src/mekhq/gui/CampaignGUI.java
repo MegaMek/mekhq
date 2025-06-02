@@ -1195,10 +1195,12 @@ public class CampaignGUI extends JPanel {
         JPanel pnlButton = new JPanel(new GridBagLayout());
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         
-        btnContractMarket = new JButton(resourceMap.getString("miContractMarket.text"));
+        btnContractMarket = new JButton(resourceMap.getString("btnContractMarket.text"));
         btnContractMarket.addActionListener(e -> showContractMarket());
         btnContractMarket.setVisible(getCampaign().getCampaignOptions().isUseAtB()
             && (ContractMarketDialog.getAvailableContractsCount(getCampaign()) > 0));
+        btnContractMarket.setHorizontalTextPosition(SwingConstants.CENTER);
+        btnContractMarket.setVerticalTextPosition(SwingConstants.CENTER);
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
