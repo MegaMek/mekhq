@@ -373,7 +373,7 @@ public final class HangarTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUIRKS), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_RSTATUS), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_SHIP_TRANSPORT), false);
-            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COl_TAC_TRANSPORT), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TAC_TRANSPORT), false);
         } else if (view == UV_GENERAL) {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_NAME), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TYPE), true);
@@ -398,7 +398,7 @@ public final class HangarTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUIRKS), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_RSTATUS), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_SHIP_TRANSPORT), false);
-            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COl_TAC_TRANSPORT), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TAC_TRANSPORT), false);
         } else if (view == UV_DETAILS) {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_NAME), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TYPE), true);
@@ -424,7 +424,7 @@ public final class HangarTab extends CampaignGuiTab {
                   getCampaign().getCampaignOptions().isUseQuirks());
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_RSTATUS), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_SHIP_TRANSPORT), false);
-            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COl_TAC_TRANSPORT), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TAC_TRANSPORT), false);
         } else if (view == UV_STATUS) {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_NAME), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TYPE), true);
@@ -451,7 +451,7 @@ public final class HangarTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUIRKS), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_RSTATUS), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_SHIP_TRANSPORT), false);
-            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COl_TAC_TRANSPORT), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TAC_TRANSPORT), false);
         } else if (view == UV_TRANSPORT) {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_NAME), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TYPE), true);
@@ -476,7 +476,7 @@ public final class HangarTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUIRKS), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_RSTATUS), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_SHIP_TRANSPORT), true);
-            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COl_TAC_TRANSPORT), true);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TAC_TRANSPORT), true);
         }
     }
 
