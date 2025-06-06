@@ -70,6 +70,7 @@ import megamek.client.ui.dialogs.UnitLoadingDialog;
 import megamek.client.ui.dialogs.unitSelectorDialogs.AbstractUnitSelectorDialog;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.Dropship;
+import megamek.common.EnhancedTabbedPane;
 import megamek.common.Entity;
 import megamek.common.Jumpship;
 import megamek.common.MULParser;
@@ -164,7 +165,7 @@ public class CampaignGUI extends JPanel {
           MekHQ.getMHQOptions().getLocale());
 
     /* for the main panel */
-    private JTabbedPane tabMain;
+    private EnhancedTabbedPane tabMain;
 
     /* For the menu bar */
     private JMenuBar menuBar;
@@ -239,7 +240,7 @@ public class CampaignGUI extends JPanel {
         return resourceMap;
     }
 
-    public JTabbedPane getTabMain() {
+    public EnhancedTabbedPane getTabMain() {
         return tabMain;
     }
 
@@ -264,7 +265,7 @@ public class CampaignGUI extends JPanel {
         frame = new JFrame("MekHQ");
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
-        tabMain = new JTabbedPane();
+        tabMain = new EnhancedTabbedPane(true, true);
         tabMain.setToolTipText("");
         tabMain.setMinimumSize(new Dimension(600, 200));
         tabMain.setPreferredSize(new Dimension(900, 300));
