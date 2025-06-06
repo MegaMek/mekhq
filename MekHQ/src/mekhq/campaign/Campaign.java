@@ -41,7 +41,6 @@ import static mekhq.campaign.CampaignOptions.S_AUTO;
 import static mekhq.campaign.CampaignOptions.S_TECH;
 import static mekhq.campaign.CampaignOptions.TRANSIT_UNIT_MONTH;
 import static mekhq.campaign.CampaignOptions.TRANSIT_UNIT_WEEK;
-import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.force.Force.FORCE_NONE;
 import static mekhq.campaign.force.Force.FORCE_ORIGIN;
@@ -1795,6 +1794,10 @@ public class Campaign implements ITechManager {
      * @throws IllegalArgumentException If the quality is not within the valid range (0-5)
      */
     public Unit addNewUnit(Entity en, boolean allowNewPilots, int days, PartQuality quality) {
+        return addNewUnit(en, allowNewPilots, days, quality, true);
+    }
+
+    public Unit addNewUnit(Entity en, boolean allowNewPilots, int days, PartQuality quality, boolean startMothballed) {
         Unit unit = new Unit(en, this);
         unit.setMaintenanceMultiplier(getCampaignOptions().getDefaultMaintenanceTime());
         getHangar().addUnit(unit);
@@ -1815,7 +1818,7 @@ public class Campaign implements ITechManager {
 
         unit.setDaysToArrival(days);
 
-        if (days > 0) {
+        if (days > 0 && startMothballed) {
             unit.setMothballed(campaignOptions.isMothballUnitMarketDeliveries());
         }
 
@@ -2167,8 +2170,7 @@ public class Campaign implements ITechManager {
             personnel.put(person.getId(), person);
 
             if (getCampaignOptions().isUseSimulatedRelationships()) {
-                if ((prisonerStatus.isFree()) &&
-                          (!person.getOriginFaction().isClan()) &&
+                if ((prisonerStatus.isFree()) && (!person.getOriginFaction().isClan()) &&
                           // We don't simulate for civilians, otherwise MekHQ will try to simulate the entire
                           // relationship history of everyone the recruit has ever married or birthed. This will
                           // cause a StackOverflow. -- Illiani, May/21/2025
@@ -7696,29 +7698,29 @@ public class Campaign implements ITechManager {
     }
 
     public PlanetaryConditions getCurrentPlanetaryConditions(Scenario scenario) {
-            PlanetaryConditions planetaryConditions = new PlanetaryConditions();
-            if (scenario instanceof AtBScenario atBScenario) {
-                if (getCampaignOptions().isUseLightConditions()) {
-                    planetaryConditions.setLight(atBScenario.getLight());
-                }
-                if (getCampaignOptions().isUseWeatherConditions()) {
-                    planetaryConditions.setWeather(atBScenario.getWeather());
-                    planetaryConditions.setWind(atBScenario.getWind());
-                    planetaryConditions.setFog(atBScenario.getFog());
-                    planetaryConditions.setEMI(atBScenario.getEMI());
-                    planetaryConditions.setBlowingSand(atBScenario.getBlowingSand());
-                    planetaryConditions.setTemperature(atBScenario.getModifiedTemperature());
-
-                }
-                if (getCampaignOptions().isUsePlanetaryConditions()) {
-                    planetaryConditions.setAtmosphere(atBScenario.getAtmosphere());
-                    planetaryConditions.setGravity(atBScenario.getGravity());
-                }
-            } else {
-                planetaryConditions = scenario.createPlanetaryConditions();
+        PlanetaryConditions planetaryConditions = new PlanetaryConditions();
+        if (scenario instanceof AtBScenario atBScenario) {
+            if (getCampaignOptions().isUseLightConditions()) {
+                planetaryConditions.setLight(atBScenario.getLight());
             }
+            if (getCampaignOptions().isUseWeatherConditions()) {
+                planetaryConditions.setWeather(atBScenario.getWeather());
+                planetaryConditions.setWind(atBScenario.getWind());
+                planetaryConditions.setFog(atBScenario.getFog());
+                planetaryConditions.setEMI(atBScenario.getEMI());
+                planetaryConditions.setBlowingSand(atBScenario.getBlowingSand());
+                planetaryConditions.setTemperature(atBScenario.getModifiedTemperature());
 
-            return planetaryConditions;
+            }
+            if (getCampaignOptions().isUsePlanetaryConditions()) {
+                planetaryConditions.setAtmosphere(atBScenario.getAtmosphere());
+                planetaryConditions.setGravity(atBScenario.getGravity());
+            }
+        } else {
+            planetaryConditions = scenario.createPlanetaryConditions();
+        }
+
+        return planetaryConditions;
 
     }
 
@@ -8851,6 +8853,7 @@ public class Campaign implements ITechManager {
 
         return Math.toIntExact(ChronoUnit.DAYS.between(getLocalDate(), arrivalDate));
     }
+
     /**
      * Calculates the transit time for the arrival of parts or supplies based on the availability of the item, a random
      * roll, and campaign-specific transit time settings.
@@ -9957,8 +9960,7 @@ public class Campaign implements ITechManager {
             if (faction.getShortName().equalsIgnoreCase("PIR")) {
                 List<Faction> pirateFactions = new ArrayList<>();
                 for (Faction activeFaction : factions.getActiveFactions(currentDay)) {
-                    if (activeFaction.isPirate() &&
-                              !activeFaction.getShortName().equalsIgnoreCase("PIR")) {
+                    if (activeFaction.isPirate() && !activeFaction.getShortName().equalsIgnoreCase("PIR")) {
                         pirateFactions.add(activeFaction);
                     }
                 }

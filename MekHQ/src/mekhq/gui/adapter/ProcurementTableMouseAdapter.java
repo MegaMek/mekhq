@@ -45,9 +45,11 @@ import megamek.common.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.event.ProcurementEvent;
+import mekhq.campaign.finances.LeaseOrder;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.model.ProcurementTableModel;
@@ -176,8 +178,20 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
         return Optional.of(popup);
     }
 
+    private boolean tryProcureEntity(IAcquisitionWork acquisition, int transitTime) {
+        boolean success;
+        final Object equipment = acquisition.getNewEquipment();
+        if (acquisition instanceof LeaseOrder) {
+            success = gui.getCampaign().getQuartermaster().createLeasedUnit((Entity) equipment, transitTime);
+        } else {
+            success = gui.getCampaign().getQuartermaster().buyUnit((Entity) equipment, transitTime);
+        }
+        return success;
+    }
+
     /**
      * @param acquisition the
+     *
      * @return whether the procurement attempt succeeded or not
      */
     private boolean tryProcureOneItem(final IAcquisitionWork acquisition) {
@@ -190,8 +204,8 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
         final boolean success;
         if (equipment instanceof Part) {
             success = gui.getCampaign().getQuartermaster().buyPart((Part) equipment, transitTime);
-        } else if (equipment instanceof Entity) {
-            success = gui.getCampaign().getQuartermaster().buyUnit((Entity) equipment, transitTime);
+        } else if (acquisition instanceof UnitOrder) {
+            success = tryProcureEntity((UnitOrder) acquisition, transitTime);
         } else {
             logger.error("Attempted to acquire unknown equipment of {}", acquisition.getAcquisitionName());
             return false;
@@ -207,14 +221,14 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
                     + String.format(
                             resources.getString("ProcurementTableMouseAdapter.CannotAffordToPurchaseItem.report")
                                     + "</font>",
-                            acquisition.getAcquisitionName()));
+                                         acquisition.getAcquisitionName()));
         }
         return success;
     }
 
     /**
-     * Processes the acquisition of a single item, adding it to the campaign as either a part or a unit,
-     * or logging an error if the acquisition type is unrecognized.
+     * Processes the acquisition of a single item, adding it to the campaign as either a part or a unit, or logging an
+     * error if the acquisition type is unrecognized.
      *
      * <p>The method performs the following steps:</p>
      * <ul>
@@ -234,6 +248,7 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
      * </ul>
      *
      * @param acquisition The acquisition work containing the item and metadata to process. Must not be {@code null}.
+     *
      * @throws NullPointerException If {@code acquisition} is {@code null}.
      */
     private void addOneItem(final IAcquisitionWork acquisition) {

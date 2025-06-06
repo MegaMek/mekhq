@@ -90,6 +90,7 @@ import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.event.PersonCrewAssignmentEvent;
 import mekhq.campaign.event.PersonTechAssignmentEvent;
 import mekhq.campaign.event.UnitArrivedEvent;
+import mekhq.campaign.finances.Lease;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.log.AssignmentLogger;
@@ -195,6 +196,8 @@ public class Unit implements ITechnology {
     protected int daysToArrival;
 
     private MothballInfo mothballInfo;
+
+    private Lease unitLease;
 
     public Unit() {
         this(null, null);
@@ -1391,8 +1394,11 @@ public class Unit implements ITechnology {
     }
 
     public Money getSellValue() {
-        Money partsValue = Money.zero();
+        if (this.hasLease()) {
+            return Money.zero();
+        } // don't count leased vehicles
 
+        Money partsValue = Money.zero();
         partsValue = partsValue.plus(parts.stream()
                                            .map(x -> x.getActualValue().multipliedBy(x.getQuantity()))
                                            .collect(Collectors.toList()));
@@ -2515,6 +2521,11 @@ public class Unit implements ITechnology {
         }
 
         // END new transports
+        //Leases
+        if (hasLease()) {
+            unitLease.writeToXML(pw, indent);
+        }
+
         // Salvage status
         if (salvaged) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvaged", true);
@@ -2731,6 +2742,9 @@ public class Unit implements ITechnology {
                     retVal.lastMaintenanceReport = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("mothballInfo")) {
                     retVal.mothballInfo = MothballInfo.generateInstanceFromXML(wn2, version);
+                } else if (wn2.getNodeName().equalsIgnoreCase("lease")) {
+                    // Leases
+                    retVal.unitLease = Lease.generateInstanceFromXML(wn2, retVal);
                 }
                 // Set up bay space values after we've loaded everything from the unit record
                 // Used for older campaign
@@ -6882,4 +6896,22 @@ public class Unit implements ITechnology {
                   "Unexpected value in mekhq/campaign/unit/Unit.java/getRandomUnitQuality: " + roll);
         };
     }
+
+    public void addLease(Lease lease) {
+        unitLease = lease;
+    }
+
+    public void removeLease() {
+        unitLease = null;
+    }
+
+    public boolean hasLease() {
+        return (unitLease != null);
+    }
+
+    @Nullable
+    public Lease getUnitLease() {
+        return unitLease;
+    }
+
 }

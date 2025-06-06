@@ -35,21 +35,19 @@ package mekhq.campaign.unit;
 
 import java.io.PrintWriter;
 
-import mekhq.utilities.ReportingUtilities;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.*;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Availability;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.utilities.MHQXMLUtility;
+import mekhq.utilities.ReportingUtilities;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * We use an extension of unit to create a unit order acquisition work
@@ -59,8 +57,8 @@ import mekhq.utilities.MHQXMLUtility;
 public class UnitOrder extends Unit implements IAcquisitionWork {
     private static final MMLogger logger = MMLogger.create(UnitOrder.class);
 
-    int quantity;
-    int daysToWait;
+    protected int quantity;
+    protected int daysToWait;
 
     public UnitOrder() {
         super(null, null);
@@ -120,6 +118,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
 
     /**
      * @param quantity - the number of parts of this type
+     *
      * @return a string that gives a grammatical correct name based on the quantity
      */
     @Override
@@ -199,18 +198,47 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
     public String find(int transitDays) {
         // TODO: probably get a duplicate entity
         if (getCampaign().getQuartermaster().buyUnit((Entity) getNewEquipment(), transitDays)) {
-            return "<font color='" + ReportingUtilities.getPositiveColor()
-                    + "'><b> unit found</b>.</font> It will be delivered in " + transitDays + " days.";
+            return "<font color='" +
+                         ReportingUtilities.getPositiveColor() +
+                         "'><b> unit found</b>.</font> It will be delivered in " +
+                         transitDays +
+                         " days.";
         } else {
-            return "<font color='" + ReportingUtilities.getNegativeColor()
-                    + "'><b> You cannot afford this unit. Transaction cancelled</b>.</font>";
+            return "<font color='" +
+                         ReportingUtilities.getNegativeColor() +
+                         "'><b> You cannot afford this unit. Transaction cancelled</b>.</font>";
         }
     }
 
     @Override
     public String failToFind() {
-        return "<font color='" + ReportingUtilities.getNegativeColor()
-                + "'><b> unit not found</b>.</font>";
+        return "<font color='" + ReportingUtilities.getNegativeColor() + "'><b> unit not found</b>.</font>";
+    }
+
+    private int getDropshipEraAcquisitionModifier(int year) {
+        int dropshipModifier = 0;
+        if (year > 3084) {
+            dropshipModifier = 0;
+        } else if (year > 3068) {
+            dropshipModifier = -2;
+        } else if (year > 3050) {
+            dropshipModifier = -1;
+        } else if (year > 2901) {
+            dropshipModifier = +0;
+        } else if (year > 2821) {
+            dropshipModifier = -2;
+        } else if (year > 2751) {
+            dropshipModifier = -6;
+        } else if (year > 2651) {
+            dropshipModifier = -6;
+        } else if (year > 2571) {
+            dropshipModifier = -5;
+        } else if (year > 2412) {
+            dropshipModifier = -4;
+        } else {
+            dropshipModifier = -3;
+        }
+        return dropshipModifier;
     }
 
     @Override
@@ -225,7 +253,45 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
             target.addModifier(getCampaign().getCampaignOptions().getIsAcquisitionPenalty(), "Inner Sphere tech");
         }
         // TODO: Fix weight classes
-        // TODO: aero large craft
+        if (entity instanceof Dropship || entity instanceof Jumpship) {
+            //FIXME ?
+            /* In theory, these should be the base target numbers of these vehicles. The base TNs in the book are
+             * static and don't adjust for Admin skill or anything. Instead, we're going to just kind of assume
+             * a base TN of 6 and adjust for windage.
+             *
+             */
+            if (entity instanceof SpaceStation) {
+                target.addModifier((int) Math.ceil(entity.getCost(false) / 50000000) + 5 - 6, "Spacestation Base");
+            } else if (entity instanceof Warship) {
+                double collars = ((Warship) entity).getDockingCollars().size();
+                target.addModifier((int) (Math.ceil(Math.sqrt(entity.getWeight() / 5000)) +
+                                                Math.ceil(Math.sqrt(collars))) - 6, "Warship Base");
+            } else if (entity instanceof Dropship) {
+                target.addModifier((int) Math.ceil(entity.getCost(false) / 50000000) + 5 - 6, "Dropship Base");
+            } else {
+                int collars = ((Jumpship) entity).getDockingCollars().size();
+                target.addModifier((int) Math.ceil(entity.getCost(false) / 100000000) + collars - 6, "Jumpship Base");
+            }
+
+            // Since the actual rules are ambiguous, we're ignoring 'uniqueness' until someone can come up with a table
+            // counting how many dropships/jumpships of which types exist in each particular era.
+
+            // Other Misc Mods
+            if (getCampaign().isClanCampaign()) {
+                target.addModifier(-4, "Clan Force");
+            } else if (getCampaign().getFaction().isGovernment()) {
+                target.addModifier(-2, "Government");
+            }
+            if (entity.isMilitary()) {
+                target.addModifier(1, "Military Vessel");
+            }
+            //Don't believe anyone recorded which faction manufacturers which dropship/jumpship.
+
+            //Eras
+            int year = getCampaign().getGameYear();
+            target.addModifier(getDropshipEraAcquisitionModifier(year), "Era");
+            return target;
+        }
         // TODO: support vehicles
         // see EntityWeightClass.java in megamek for weight classes
         if (entity instanceof Mek) {
@@ -321,8 +387,9 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
 
     @Override
     public AvailabilityValue getAvailability() {
-        return calcYearAvailability(getCampaign().getGameYear(), getCampaign().useClanTechBase(),
-                getCampaign().getTechFaction());
+        return calcYearAvailability(getCampaign().getGameYear(),
+              getCampaign().useClanTechBase(),
+              getCampaign().getTechFaction());
     }
 
     @Override
