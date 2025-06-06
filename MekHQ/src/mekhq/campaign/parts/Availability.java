@@ -36,6 +36,8 @@ import megamek.logging.MMLogger;
 import megamek.common.ITechnology.AvailabilityValue;
 import megamek.common.ITechnology.TechRating;
 
+import java.util.Arrays;
+
 /**
  * Helper functions for determining part availability and tech base
  * and the associated modifiers. A lot of this code is borrowed from
@@ -47,20 +49,19 @@ public class Availability {
     private static final MMLogger logger = MMLogger.create(Availability.class);
 
     public static int getAvailabilityModifier(AvailabilityValue availability) {
-        switch (availability) {
-            case A:
-                return -4;
-            case B:
-                return -3;
-            case C:
-                return -2;
-            case D:
-                return -1;
-            case E:
-                return 0;
-            case F:
-                return 2;
-            case X:
+        if (availability == null) {
+            // We don't know why we got a null availability, but it shouldn't raise.
+            return 999;
+        }
+        
+        return switch (availability) {
+            case A -> -4;
+            case B -> -3;
+            case C -> -2;
+            case D -> -1;
+            case E -> 0;
+            case F -> 2;
+            case X ->
                 // FIXME : Per IO, any IS equipment with a base SW availability of E-F that goes
                 // FIXME : extinct during the SW has it increased by 1 with F+1 meaning that
                 // there
@@ -69,11 +70,12 @@ public class Availability {
                 // FIXME : rules in StratOps, so for now I'm considering it equivalent to X,
                 // which
                 // FIXME : gives a +5.
-                return 5;
-            default:
+                  5;
+            default -> {
                 logger.error("Attempting to get availability modifier for unknown rating of " + availability);
-                return 999;
-        }
+                yield 999;
+            }
+        };
     }
 
     public static int getTechModifier(TechRating tech) {

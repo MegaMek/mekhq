@@ -34,6 +34,8 @@
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
+import java.text.MessageFormat;
+import java.util.Arrays;
 
 import megamek.common.ITechnology;
 import megamek.common.TargetRoll;
@@ -314,6 +316,16 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
         }
         //availability mod
         AvailabilityValue avail = getAvailability();
+        if (avail == null) {
+            target.addModifier(
+                  TargetRoll.IMPOSSIBLE, 
+                  MessageFormat.format(
+                        "Attempting to get availability modifier for null availability: {0}", 
+                        getPartName()
+                  )
+            );
+            return target;
+        }
         int availabilityMod = Availability.getAvailabilityModifier(avail);
         target.addModifier(availabilityMod, "availability (" + avail.getName() + ')');
 
