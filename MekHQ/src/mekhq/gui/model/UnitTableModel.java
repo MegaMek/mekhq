@@ -85,7 +85,9 @@ public class UnitTableModel extends DataTableModel {
     public static final int COL_SITE = 19;
     public static final int COL_QUIRKS = 20;
     public static final int COL_RSTATUS = 21;
-    public static final int N_COL = 22;
+    public static final int COL_SHIP_TRANSPORT = 22;
+    public static final int COL_TAC_TRANSPORT = 23;
+    public static final int N_COL = 24;
 
     private Campaign campaign;
     //endregion Variable Declarations
@@ -130,6 +132,8 @@ public class UnitTableModel extends DataTableModel {
             case COL_SITE -> "Site";
             case COL_QUIRKS -> "Quirks";
             case COL_RSTATUS -> "Mode";
+            case COL_SHIP_TRANSPORT -> "Ship Transport";
+            case COL_TAC_TRANSPORT -> "Tactical Transport";
             default -> "?";
         };
     }
@@ -318,6 +322,10 @@ public class UnitTableModel extends DataTableModel {
             case COL_SITE -> Unit.getSiteName(unit.getSite());
             case COL_QUIRKS -> entity.countQuirks();
             case COL_RSTATUS -> unit.isSalvage() ? "Strip" : "Repair";
+            case COL_SHIP_TRANSPORT -> (unit.getTransportShipAssignment() != null) ?
+                                             unit.getTransportShipAssignment().getTransportShip().getName() : "-";
+            case COL_TAC_TRANSPORT -> (unit.getTacticalTransportAssignment() != null) ?
+                                            unit.getTacticalTransportAssignment().getTransport().getName() : "-";
             default -> "?";
         };
     }
