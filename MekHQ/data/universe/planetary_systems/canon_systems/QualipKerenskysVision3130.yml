@@ -89,9 +89,7 @@ planet:
     event:
       - date: '2597-06-05'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 55525.0
         socioIndustrial: C-D-A-F-B
       - date: '2600-01-01'
@@ -169,30 +167,19 @@ planet:
         population: 20454.0
       - date: '2925-12-02'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
       - date: '3145-12-12'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         hpg: A
         population: 48487.0
         socioIndustrial: B-C-A-D-A
       - date: '3151-10-12'
         faction:
-          source: canon
-          value:
-            - NTamP
-      - date: '2108-12-05'
-        name: Qualip
-      - date: '3130-01-01'
-        name: Kerensky's Vision
-        message: Qualip renamed to Kerensky's Vision
+          - NTamP
   - name: Bin Mukhtar
     type: TERRESTRIAL
     orbitalDist: 3.64

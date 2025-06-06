@@ -75,9 +75,7 @@ planet:
     event:
       - date: '2314-04-27'
         faction:
-          source: canon
-          value:
-            - PD
+          - PD
         population: 62772.0
         socioIndustrial: D-D-A-D-F
       - date: '2320-01-01'
@@ -86,9 +84,9 @@ planet:
         population: 529462.0
       - date: '2340-01-01'
         population: 1554998.0
-      - date: '2341-04-15'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2350-01-01'
@@ -243,15 +241,15 @@ planet:
         population: 423617696.0
       - date: '3027-01-01'
         socioIndustrial: C-D-B-C-F
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 426607674.0
       - date: '3040-01-01'
         population: 431541980.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3048-01-01'
         socioIndustrial:
           source: canon
@@ -260,20 +258,20 @@ planet:
         population: 436751680.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
         population: 441185223.0
       - date: '3064-07-15'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FC
             - LA
       - date: '3064-07-30'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - LA
       - date: '3070-01-01'
@@ -299,9 +297,7 @@ planet:
         population: 496192916.0
       - date: '3145-01-05'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 499378735.0
   - name: V1 Belt
     type: ASTEROID_BELT

@@ -121,9 +121,7 @@ planet:
     event:
       - date: '2259-03-31'
         faction:
-          source: canon
-          value:
-            - SCon
+          - SCon
         population: 40621.0
         socioIndustrial: D-D-B-D-C
       - date: '2260-01-01'
@@ -136,9 +134,7 @@ planet:
         population: 344653.0
       - date: '2293-12-26'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2300-01-01'
         population: 581883.0
       - date: '2310-01-01'
@@ -326,16 +322,12 @@ planet:
         population: 22070513.0
       - date: '3079-05-09'
         faction:
-          source: canon
-          value:
-            - SC
+          - SC
       - date: '3080-01-01'
         population: 22453409.0
       - date: '3082-10-17'
         faction:
-          source: canon
-          value:
-            - MSC
+          - MSC
       - date: '3090-01-01'
         population: 22852087.0
       - date: '3091-01-01'
@@ -356,15 +348,11 @@ planet:
         population: 25044205.0
       - date: '3145-12-05'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 25270620.0
       - date: '3151-08-13'
         faction:
-          source: canon
-          value:
-            - CP
+          - CP
   - name: Colón's Belt
     type: ASTEROID_BELT
     orbitalDist: 1.96

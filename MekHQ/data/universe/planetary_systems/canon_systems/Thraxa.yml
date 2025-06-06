@@ -76,9 +76,7 @@ planet:
     event:
       - date: '2682-06-06'
         faction:
-          source: canon
-          value:
-            - MOC
+          - MOC
         population: 49106.0
         socioIndustrial: C-D-B-D-D
       - date: '2686-01-01'
@@ -136,9 +134,7 @@ planet:
         population: 12462684.0
       - date: '2900-04-18'
         faction:
-          source: canon
-          value:
-            - MOC
+          - MOC
         population: 12462020.0
       - date: '2910-01-01'
         population: 12413659.0
@@ -201,9 +197,7 @@ planet:
         population: 20595824.0
       - date: '3130-03-27'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 20715627.0
       - date: '3140-01-01'
         population: 20823629.0
@@ -211,7 +205,7 @@ planet:
         population: 20877841.0
       - date: '3150-02-14'
         faction:
-          source: canon
+          source: Shattered Fortress
           value:
             - MH
   - name: Serrano's Belt

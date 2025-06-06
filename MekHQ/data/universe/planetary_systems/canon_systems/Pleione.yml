@@ -110,9 +110,7 @@ planet:
     event:
       - date: '2243-06-10'
         faction:
-          source: canon
-          value:
-            - TGU
+          - TGU
         population: 46838.0
         socioIndustrial: D-D-B-D-D
       - date: '2250-01-01'
@@ -141,7 +139,7 @@ planet:
         population: 187199933.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -290,92 +288,61 @@ planet:
         population: 784841590.0
       - date: '3028-08-29'
         faction:
-          source: canon
-          value:
-            - CC
-            - FS
+          - CC
+          - FC
       - date: '3028-09-26'
         faction:
-          source: canon
-          value:
-            - FS
+          - FC
       - date: '3030-01-01'
         population: 787311833.0
       - date: '3030-02-28'
         faction:
-          source: canon
-          value:
-            - LA
+          - FC
       - date: '3040-01-01'
         population: 796338542.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3049-01-01'
         socioIndustrial: D-D-C-F-C
       - date: '3050-01-01'
         population: 805146622.0
       - date: '3057-11-01'
         faction:
-          source: canon
-          value:
-            - CM
+          - CM
       - date: '3060-01-01'
         population: 813807946.0
       - date: '3062-06-06'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '3070-01-01'
         population: 821165276.0
       - date: '3072-02-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3075-07-27'
         faction:
-          source: canon
-          value:
-            - CC
-            - WOB
+          - CC
+          - WOB
       - date: '3075-08-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3078-05-02'
         faction:
-          source: canon
-          value:
-            - CC
-            - WOB
+          - CC
+          - WOB
       - date: '3078-05-03'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3078-05-30'
         faction:
-          source: canon
-          value:
-            - CC
-            - WOB
+          - CC
+          - WOB
       - date: '3078-06-10'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '3080-01-01'
         population: 835411485.0
       - date: '3085-07-19'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 851095548.0
       - date: '3095-01-01'
@@ -392,16 +359,12 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 911347615.0
       - date: '3145-06-20'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 918667637.0
   - name: Sturculinus
     type: TERRESTRIAL

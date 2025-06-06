@@ -124,9 +124,7 @@ planet:
     event:
       - date: '2341-02-07'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 45391.0
         socioIndustrial: D-F-A-D-F
       - date: '2350-01-01'
@@ -226,9 +224,7 @@ planet:
         population: 172693261.0
       - date: '2779-01-22'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2780-01-01'
         population: 172658180.0
       - date: '2790-01-01'
@@ -283,6 +279,11 @@ planet:
         population: 156665064.0
       - date: '3020-01-01'
         population: 155353134.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 155356826.0
       - date: '3034-01-01'
@@ -291,18 +292,13 @@ planet:
         socioIndustrial: D-D-B-F-D
       - date: '3040-01-01'
         population: 156479431.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3044-01-01'
         socioIndustrial: C-D-A-D-D
       - date: '3050-01-01'
         population: 157484111.0
       - date: '3050-03-09'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
       - date: '3060-01-01'
@@ -311,23 +307,17 @@ planet:
         population: 160232289.0
       - date: '3071-06-01'
         faction:
-          source: canon
-          value:
-            - CIH
+          - CIH
       - date: '3071-12-01'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3080-01-01'
         population: 161680889.0
       - date: '3090-01-01'
         population: 162556327.0
       - date: '3100-02-22'
         faction:
-          source: canon
-          value:
-            - CHH
+          - CHH
         population: 162881765.0
       - date: '3107-01-01'
         socioIndustrial: C-C-A-D-D
@@ -345,8 +335,6 @@ planet:
         population: 163894769.0
       - date: '3145-01-01'
         population: 164190046.0
-      - date: '2108-12-05'
-      - date: '2863-01-01'
   - name: Honey Creek
     type: ICE_GIANT
     orbitalDist: 5.2

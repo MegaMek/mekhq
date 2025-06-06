@@ -131,9 +131,7 @@ planet:
     event:
       - date: '2319-07-03'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 42936.0
         socioIndustrial: D-D-A-D-F
       - date: '2320-01-01'
@@ -182,9 +180,7 @@ planet:
         population: 2153094975.0
       - date: '2540-02-11'
         faction:
-          source: canon
-          value:
-            - MOC
+          - MOC
         population: 2278928969.0
       - date: '2550-01-01'
         population: 2391188503.0
@@ -196,24 +192,18 @@ planet:
         population: 2584810998.0
       - date: '2579-04-02'
         faction:
-          source: canon
-          value:
-            - MOC
-            - SL
+          - MOC
+          - SL
       - date: '2579-09-19'
         faction:
-          source: canon
-          value:
-            - SL
+          - SL
       - date: '2580-01-01'
         population: 2663700540.0
       - date: '2590-01-01'
         population: 2731064823.0
       - date: '2597-03-04'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2600-01-01'
         population: 2808359254.0
       - date: '2610-01-01'
@@ -330,9 +320,7 @@ planet:
         population: 227277475.0
       - date: '3081-09-30'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 228097149.0
       - date: '3100-01-01'
@@ -355,12 +343,7 @@ planet:
         population: 240079863.0
       - date: '3148-03-01'
         faction:
-          source: canon
-          value:
-            - DA
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - DA
   - name: Pushan

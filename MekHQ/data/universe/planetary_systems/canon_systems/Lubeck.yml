@@ -35,9 +35,7 @@ planet:
     event:
       - date: '2891-03-09'
         faction:
-          source: canon
-          value:
-            - HL
+          - HL
         population: 53227.0
         socioIndustrial: C-D-A-F-F
       - date: '2892-11-29'
@@ -102,9 +100,7 @@ planet:
         population: 139732.0
       - date: '3140-04-03'
         faction:
-          source: canon
-          value:
-            - CEI
+          - CEI
       - date: '3145-01-01'
         population: 140208.0
   - name: Bohland

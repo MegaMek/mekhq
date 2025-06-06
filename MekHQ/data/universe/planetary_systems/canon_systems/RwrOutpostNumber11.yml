@@ -82,17 +82,13 @@ planet:
     event:
       - date: '2765-10-10'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         hpg: X
         population: 1643.12382895244
         socioIndustrial: C-D-A-D-D
       - date: '2779-11-11'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population:
           source: canon

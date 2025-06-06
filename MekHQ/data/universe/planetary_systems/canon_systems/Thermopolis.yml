@@ -45,9 +45,7 @@ planet:
     event:
       - date: '2268-03-05'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 47356.0
         socioIndustrial: D-D-A-F-B
       - date: '2270-01-01'
@@ -66,9 +64,7 @@ planet:
         population: 10188043.0
       - date: '2332-11-17'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2340-01-01'
         population: 16879269.0
       - date: '2350-01-01'
@@ -233,29 +229,21 @@ planet:
         population: 407962173.0
       - date: '3068-03-30'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '3070-07-07'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 412062261.0
       - date: '3080-01-01'
         population: 414293416.0
       - date: '3081-07-05'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 416203555.0
       - date: '3100-05-09'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 420050296.0
       - date: '3110-01-01'
         population: 424866268.0
@@ -271,9 +259,7 @@ planet:
         population: 446471004.0
       - date: '3145-01-13'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 450417287.0
   - name: Olufon
     type: ICE_GIANT

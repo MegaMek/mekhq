@@ -59,9 +59,7 @@ planet:
     event:
       - date: '2227-11-24'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 56131.0
         socioIndustrial: D-D-C-D-D
       - date: '2230-01-01'
@@ -86,9 +84,7 @@ planet:
         population: 77984237.0
       - date: '2320-03-02'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
         population: 119953959.0
       - date: '2330-01-01'
         population: 175241248.0
@@ -184,23 +180,17 @@ planet:
         population: 1653162092.0
       - date: '2767-11-25'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2770-01-01'
         population: 1646392271.0
       - date: '2779-12-13'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-01-01'
         population: 1622228531.0
       - date: '2786-08-16'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2790-01-01'
         population: 1598419437.0
       - date: '2800-01-01'
@@ -252,16 +242,16 @@ planet:
         population: 1178022591.0
       - date: '3020-01-01'
         population: 1155927726.0
-      - date: '3029-12-20'
+      - date: '3029-03-03'
         faction:
-          source: canon
+          source: NAIS 4th SW Atlas Volume 2, p. 16–17
           value:
             - TFR
       - date: '3030-01-01'
         population: 1156528596.0
-      - date: '3032-09-21'
+      - date: '3031-09-15'
         faction:
-          source: canon
+          source: 20 Year Update, p. 12
           value:
             - FC
       - date: '3040-01-01'
@@ -272,36 +262,26 @@ planet:
         population: 1183318677.0
       - date: '3057-11-01'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3060-01-01'
         population: 1195569844.0
       - date: '3070-01-01'
         population: 1210124115.0
       - date: '3072-02-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3077-05-21'
         faction:
-          source: canon
-          value:
-            - Stone
-            - WOB
+          - Stone
+          - WOB
       - date: '3077-05-26'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 1220820201.0
       - date: '3081-02-10'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1232103571.0
       - date: '3100-01-01'
@@ -318,28 +298,19 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3139-11-16'
         faction:
-          source: canon
-          value:
-            - AA
+          - AA
       - date: '3140-01-01'
         population: 1250724432.0
       - date: '3145-01-01'
         population: 1249974222.0
       - date: '3149-02-01'
         faction:
-          source: canon
+          source: Shattered Fortress
           value:
             - ROS
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Kutcha
     type: GIANT_TERRESTRIAL
     orbitalDist: 1.6

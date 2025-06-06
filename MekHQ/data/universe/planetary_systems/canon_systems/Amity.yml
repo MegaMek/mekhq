@@ -83,9 +83,7 @@ planet:
     event:
       - date: '2250-10-06'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 55318.0
         socioIndustrial: D-C-B-F-D
       - date: '2260-01-01'
@@ -98,9 +96,7 @@ planet:
         population: 6501181.0
       - date: '2300-12-28'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 14643024.0
       - date: '2310-01-01'
         population: 29645161.0
@@ -118,9 +114,7 @@ planet:
         population: 309255242.0
       - date: '2367-10-05'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2370-01-01'
         population: 419789790.0
       - date: '2380-01-01'
@@ -133,9 +127,7 @@ planet:
         population: 989757485.0
       - date: '2418-12-09'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2420-01-01'
         population: 1145209373.0
       - date: '2430-01-01'
@@ -230,9 +222,7 @@ planet:
         population: 2661731656.0
       - date: '2837-12-23'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2840-01-01'
         population: 2665824571.0
       - date: '2850-01-01'
@@ -243,9 +233,7 @@ planet:
         population: 2646700532.0
       - date: '2868-01-26'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2870-01-01'
         population: 2638232186.0
       - date: '2880-01-01'
@@ -271,15 +259,11 @@ planet:
         population: 2431582955.0
       - date: '2980-09-22'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 2422207339.0
       - date: '2982-08-01'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2990-01-01'
         population: 2409692203.0
       - date: '3000-01-01'
@@ -310,16 +294,12 @@ planet:
         population: 956479971.0
       - date: '3079-06-28'
         faction:
-          source: canon
-          value:
-            - SHC
+          - SHC
       - date: '3080-01-01'
         population: 963969687.0
       - date: '3085-02-19'
         faction:
-          source: canon
-          value:
-            - MSC
+          - MSC
       - date: '3090-01-01'
         population: 975802148.0
       - date: '3094-01-01'
@@ -340,15 +320,11 @@ planet:
         population: 1037801538.0
       - date: '3145-12-24'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 1039879218.0
       - date: '3151-08-01'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
   - name: IG3
     type: TERRESTRIAL
     orbitalDist: 0.4

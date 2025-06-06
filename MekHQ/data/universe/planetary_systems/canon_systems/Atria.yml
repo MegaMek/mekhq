@@ -166,9 +166,7 @@ planet:
     event:
       - date: '2242-06-30'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 40801.0
         socioIndustrial: D-F-B-D-F
       - date: '2250-01-01'
@@ -189,9 +187,7 @@ planet:
         population: 36918616.0
       - date: '2320-03-30'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
         population: 64202910.0
       - date: '2330-01-01'
         population: 103651303.0
@@ -289,23 +285,17 @@ planet:
         population: 2397876990.0
       - date: '2767-08-24'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2770-01-01'
         population: 2398276379.0
       - date: '2779-11-06'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-01-01'
         population: 2365019791.0
       - date: '2790-10-18'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 2318787235.0
       - date: '2800-04-25'
         hpg: X
@@ -324,9 +314,7 @@ planet:
         socioIndustrial: B-C-C-B-C
       - date: '2850-04-02'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 2098204428.0
       - date: '2860-01-01'
         population: 2073297616.0
@@ -338,9 +326,7 @@ planet:
         population: 1961422446.0
       - date: '2900-08-15'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 1919748930.0
       - date: '2906-01-01'
         socioIndustrial: C-C-D-C-C
@@ -370,50 +356,37 @@ planet:
         population: 1768522375.0
       - date: '3030-10-27'
         faction:
-          source: canon
-          value:
-            - LA
+          - FC
         population: 1774992401.0
       - date: '3033-01-01'
         socioIndustrial: B-C-C-C-C
       - date: '3040-01-01'
         population: 1790323163.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3046-01-01'
         socioIndustrial: A-B-B-B-C
       - date: '3050-01-01'
         population: 1800917292.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3057-11-01'
         faction:
-          source: canon
-          value:
-            - DC
-            - LA
+          - DC
+          - LA
       - date: '3060-01-01'
         population: 1811574110.0
       - date: '3062-08-07'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '3070-01-01'
         population: 1828134671.0
       - date: '3080-01-01'
         population: 1851314897.0
       - date: '3081-07-18'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1873289809.0
       - date: '3097-01-01'
@@ -430,27 +403,21 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 1869546974.0
       - date: '3145-09-17'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
         population: 1871791777.0
       - date: '3149-02-01'
         faction:
-          source: canon
+          source: Shattered Fortress
           value:
             - ROS
       - date: '3151-04-14'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
   - name: Duryodhana
     type: DWARF_TERRESTRIAL
     orbitalDist: 3.64

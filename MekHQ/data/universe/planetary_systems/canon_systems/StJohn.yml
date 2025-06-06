@@ -53,9 +53,7 @@ planet:
     event:
       - date: '2358-08-23'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 47671.0
         socioIndustrial: D-C-B-D-B
       - date: '2360-01-01'
@@ -68,9 +66,7 @@ planet:
         population: 4789749.0
       - date: '2400-07-02'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 12698154.0
       - date: '2407-01-01'
         socioIndustrial: C-C-B-C-B
@@ -78,9 +74,7 @@ planet:
         population: 28619925.0
       - date: '2414-02-07'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2420-01-01'
         population: 56544050.0
       - date: '2430-02-18'
@@ -216,7 +210,7 @@ planet:
         population: 1594114876.0
       - date: '3034-03-13'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FRR
       - date: '3036-01-01'
@@ -229,13 +223,13 @@ planet:
         population: 1639053016.0
       - date: '3050-04-01'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CW
             - FRR
       - date: '3050-04-14'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CW
       - date: '3060-01-01'
@@ -244,9 +238,7 @@ planet:
         population: 1679705777.0
       - date: '3071-05-01'
         faction:
-          source: canon
-          value:
-            - CHH
+          - CHH
       - date: '3080-01-01'
         population: 1702365315.0
       - date: '3090-01-01'
@@ -261,9 +253,7 @@ planet:
         population: 1762298011.0
       - date: '3130-02-13'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
         population: 1766885948.0
       - date: '3132-08-07'
         hpg: X
@@ -273,12 +263,7 @@ planet:
         population: 1764766956.0
       - date: '3147-04-07'
         faction:
-          source: canon
-          value:
-            - CHH
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - CHH
   - name: Martin's Harvest

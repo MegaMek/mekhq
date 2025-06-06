@@ -36,9 +36,7 @@ planet:
     event:
       - date: '2624-10-26'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 44910.0
         socioIndustrial: C-D-A-D-C
       - date: '2630-01-01'
@@ -77,9 +75,7 @@ planet:
         population: 4153134.0
       - date: '2779-04-22'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2780-01-01'
         population: 498647.0
       - date: '2790-01-01'
@@ -90,9 +86,7 @@ planet:
         population: 282.0
       - date: '2812-02-20'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X

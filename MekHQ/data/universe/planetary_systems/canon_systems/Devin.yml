@@ -32,9 +32,7 @@ planet:
     event:
       - date: '2637-11-27'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 54931.0
         socioIndustrial: C-D-A-D-F
       - date: '2640-01-01'
@@ -127,22 +125,22 @@ planet:
         population: 259978969.0
       - date: '3028-01-01'
         socioIndustrial: C-D-B-C-F
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 260836845.0
       - date: '3040-01-01'
         population: 262800476.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3043-01-01'
         socioIndustrial: C-D-A-C-F
       - date: '3050-01-01'
         population: 264408458.0
       - date: '3050-08-04'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
       - date: '3060-01-01'
@@ -171,9 +169,7 @@ planet:
         population: 299883809.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
   - name: Chalupnik's Rift
     type: GIANT_TERRESTRIAL
     orbitalDist: 0.07

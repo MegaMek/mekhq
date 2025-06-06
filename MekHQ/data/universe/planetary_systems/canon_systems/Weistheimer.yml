@@ -35,9 +35,7 @@ planet:
     event:
       - date: '2723-03-25'
         faction:
-          source: canon
-          value:
-            - MOC
+          - MOC
         population: 45674.0
         socioIndustrial: C-D-B-D-D
       - date: '2730-12-07'
@@ -77,9 +75,7 @@ planet:
         population: 323431.0
       - date: '2900-08-14'
         faction:
-          source: canon
-          value:
-            - MOC
+          - MOC
         population: 274556.0
       - date: '2910-01-01'
         population: 238792.0
@@ -105,17 +101,13 @@ planet:
         population: 14649.0
       - date: '3019-09-19'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
       - date: '3040-10-01'
         faction:
-          source: canon
-          value:
-            - MOC
+          - MOC
         population: 49605.0
         socioIndustrial: B-D-B-C-C
       - date: '3041-05-15'
@@ -144,11 +136,6 @@ planet:
         population: 43910544.0
       - date: '3145-01-01'
         population: 43945686.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN
   - name: Asgård
     type: GIANT_TERRESTRIAL
     orbitalDist: 0.35

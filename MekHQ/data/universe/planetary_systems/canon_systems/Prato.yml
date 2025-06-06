@@ -49,9 +49,7 @@ planet:
     event:
       - date: '2630-06-11'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 46612.0
         socioIndustrial: C-D-C-D-C
       - date: '2640-01-01'
@@ -159,9 +157,7 @@ planet:
         population: 128805228.0
       - date: '3081-03-29'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 130699579.0
       - date: '3100-01-01'
@@ -182,9 +178,7 @@ planet:
         population: 133179974.0
       - date: '3145-05-14'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 133339886.0
   - name: Coatlicue Belt 1
     type: ASTEROID_BELT

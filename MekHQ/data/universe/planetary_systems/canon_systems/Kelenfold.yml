@@ -117,9 +117,7 @@ planet:
     event:
       - date: '2166-03-02'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 62545.0
         socioIndustrial: D-F-B-F-C
       - date: '2170-01-01'
@@ -140,9 +138,7 @@ planet:
         population: 20857710.0
       - date: '2235-12-10'
         faction:
-          source: canon
-          value:
-            - TamP
+          - TamP
       - date: '2240-01-01'
         population: 36406874.0
       - date: '2250-01-01'
@@ -167,9 +163,9 @@ planet:
         population: 642790857.0
       - date: '2340-01-01'
         population: 757763929.0
-      - date: '2341-01-07'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2350-01-01'
@@ -320,15 +316,15 @@ planet:
         population: 1492059909.0
       - date: '3020-01-01'
         population: 1463073876.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 1452522702.0
       - date: '3040-01-01'
         population: 1467707764.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3047-01-01'
         socioIndustrial:
           source: canon
@@ -337,7 +333,7 @@ planet:
         population: 1486169255.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -346,9 +342,7 @@ planet:
         population: 1520291115.0
       - date: '3070-01-18'
         faction:
-          source: canon
-          value:
-            - CW
+          - CW
       - date: '3079-01-01'
         population:
           source: canon
@@ -368,17 +362,13 @@ planet:
         population: 1608821365.0
       - date: '3140-11-25'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 1635096525.0
       - date: '3145-01-01'
         population: 1648559439.0
       - date: '3151-08-13'
         faction:
-          source: canon
-          value:
-            - NTamP
+          - NTamP
   - name: Karvonen
     type: GAS_GIANT
     orbitalDist: 7.8

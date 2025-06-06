@@ -72,9 +72,7 @@ planet:
     event:
       - date: '2699-08-30'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 51690.0
         socioIndustrial: C-D-A-D-D
       - date: '2700-01-01'
@@ -155,22 +153,22 @@ planet:
         population: 206344165.0
       - date: '3026-01-01'
         socioIndustrial: D-C-B-D-D
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 207167506.0
       - date: '3040-01-01'
         population: 208956829.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3046-01-01'
         socioIndustrial: C-C-A-D-C
       - date: '3050-01-01'
         population: 210761608.0
       - date: '3050-07-02'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
       - date: '3060-01-01'
@@ -199,9 +197,7 @@ planet:
         population: 226133984.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
   - name: F51 Belt
     type: ASTEROID_BELT
     orbitalDist: 3.64

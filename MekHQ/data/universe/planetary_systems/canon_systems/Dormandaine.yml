@@ -108,9 +108,7 @@ planet:
     event:
       - date: '3025-03-06'
         faction:
-          source: canon
-          value:
-            - OA
+          - OA
         population:
           source: canon
           value: 10000.0
@@ -135,9 +133,7 @@ planet:
         population: 5163271.0
       - date: '3083-01-25'
         faction:
-          source: canon
-          value:
-            - RA
+          - RA
       - date: '3090-01-01'
         population: 5233971.0
       - date: '3100-01-01'

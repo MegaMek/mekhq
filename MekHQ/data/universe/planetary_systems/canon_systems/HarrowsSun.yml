@@ -95,9 +95,7 @@ planet:
     event:
       - date: '2169-08-05'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 50860.0
         socioIndustrial: D-D-D-D-C
       - date: '2170-01-01'
@@ -118,9 +116,7 @@ planet:
         population: 23476046.0
       - date: '2242-01-31'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 38877939.0
       - date: '2260-01-01'
@@ -147,9 +143,7 @@ planet:
         population: 712185482.0
       - date: '2365-12-06'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2370-01-01'
         population: 790535052.0
       - date: '2380-01-01'
@@ -260,9 +254,7 @@ planet:
         population: 1628496398.0
       - date: '2864-11-15'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2870-01-01'
         population: 1628685399.0
       - date: '2871-01-01'
@@ -273,9 +265,7 @@ planet:
         population: 1624532444.0
       - date: '2900-09-09'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 1620766221.0
       - date: '2907-01-01'
         socioIndustrial: D-D-F-D-C
@@ -307,11 +297,14 @@ planet:
         population:
           source: canon
           value: 1458330000.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-05-02'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 1171147228.0
       - date: '3040-01-01'
         population: 801352713.0
@@ -333,10 +326,8 @@ planet:
         population: 352691224.0
       - date: '3104-07-01'
         faction:
-          source: canon
-          value:
-            - DC
-            - FS
+          - DC
+          - FS
       - date: '3110-01-01'
         population: 358738229.0
       - date: '3120-01-01'
@@ -353,9 +344,7 @@ planet:
         socioIndustrial: C-C-D-B-A
       - date: '3145-08-14'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 379248990.0
   - name: Gray's World
     type: GIANT_TERRESTRIAL

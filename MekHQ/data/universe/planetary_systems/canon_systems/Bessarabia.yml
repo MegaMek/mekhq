@@ -51,9 +51,7 @@ planet:
     event:
       - date: '2673-05-09'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 48782.0
         socioIndustrial: D-D-A-D-D
       - date: '2674-01-13'
@@ -77,9 +75,7 @@ planet:
         population: 207528627.0
       - date: '2750-02-23'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 219225956.0
       - date: '2760-01-01'
         population: 226377798.0
@@ -141,15 +137,15 @@ planet:
         population: 185783315.0
       - date: '3020-01-01'
         population: 185507348.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 186797300.0
       - date: '3040-01-01'
         population: 188901189.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3047-01-01'
         socioIndustrial: D-C-B-F-D
       - date: '3049-01-01'
@@ -158,34 +154,28 @@ planet:
         population: 191105202.0
       - date: '3051-12-03'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CW
             - FC
       - date: '3051-12-06'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CW
       - date: '3059-03-08'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3060-01-01'
         population: 193122378.0
       - date: '3069-03-08'
         faction:
-          source: canon
-          value:
-            - CW
+          - CW
       - date: '3070-01-01'
         population: 195102307.0
       - date: '3075-10-24'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3080-01-01'
         population: 196826783.0
       - date: '3090-01-01'
@@ -200,17 +190,13 @@ planet:
         population: 205762804.0
       - date: '3130-04-12'
         faction:
-          source: canon
-          value:
-            - CW
+          - CW
         population: 207872325.0
       - date: '3132-08-07'
         hpg: X
       - date: '3140-06-26'
         faction:
-          source: canon
-          value:
-            - CHH
+          - CHH
         population: 209625807.0
       - date: '3145-01-01'
         population: 209877509.0

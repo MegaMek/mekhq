@@ -108,7 +108,7 @@ planet:
     event:
       - date: '3052-06-23'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CSJ
         hpg: A
@@ -116,47 +116,32 @@ planet:
         socioIndustrial: A-X-X-X-X
       - date: '3062-02-04'
         faction:
-          source: canon
-          value:
-            - CSR
+          - CSR
         hpg: A
         population: 6252.0
         socioIndustrial: A-X-X-X-X
       - date: '3072-04-03'
         faction:
-          source: canon
-          value:
-            - CB
+          - CB
         hpg: A
         population: 6402.0
         socioIndustrial: A-X-X-X-X
       - date: '3075-02-03'
         faction:
-          source: canon
-          value:
-            - CSR
+          - CSR
         hpg: A
         population: 829.0
         socioIndustrial: A-X-X-X-X
       - date: '3080-11-12'
         faction:
-          source: canon
-          value:
-            - OA
+          - OA
         population: 1301.0
         socioIndustrial: B-X-X-X-X
       - date: '3083-05-08'
         faction:
-          source: canon
-          value:
-            - RA
+          - RA
         population: 896.0
         socioIndustrial: B-X-X-X-X
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN
   - name: DAD-5
     type: TERRESTRIAL
     orbitalDist: 2.8

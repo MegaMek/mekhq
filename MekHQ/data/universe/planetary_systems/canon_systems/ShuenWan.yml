@@ -38,9 +38,7 @@ planet:
     event:
       - date: '2250-04-05'
         faction:
-          source: canon
-          value:
-            - SIS
+          - SIS
         population: 53952.0
         socioIndustrial: D-D-B-C-F
       - date: '2260-01-01'
@@ -69,7 +67,7 @@ planet:
         population: 126867870.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -172,9 +170,7 @@ planet:
         population: 881135392.0
       - date: '2821-03-12'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2830-01-01'
         population: 857636289.0
       - date: '2840-01-01'
@@ -185,9 +181,7 @@ planet:
         population: 830687360.0
       - date: '2864-02-02'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '2870-01-01'
         population: 819971856.0
       - date: '2873-01-01'
@@ -200,9 +194,7 @@ planet:
         socioIndustrial: C-D-C-D-D
       - date: '2900-11-17'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 735154765.0
       - date: '2910-01-01'
         population: 708275640.0
@@ -230,9 +222,7 @@ planet:
         population: 598146194.0
       - date: '3025-02-11'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3030-01-01'
         population: 594840317.0
       - date: '3040-01-01'
@@ -249,23 +239,17 @@ planet:
         population: 627530952.0
       - date: '3081-03-19'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3086-04-09'
         faction:
-          source: canon
-          value:
-            - OP
+          - OP
       - date: '3090-01-01'
         population: 635869272.0
       - date: '3100-01-01'
         population: 646900823.0
       - date: '3105-09-14'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '3110-01-01'
         population: 656677477.0
       - date: '3120-01-01'

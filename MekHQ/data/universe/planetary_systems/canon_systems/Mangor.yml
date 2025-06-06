@@ -73,18 +73,14 @@ planet:
       - name: Selomirah
       - name: Alisjahbana
     event:
-      - date: '2596-12-30'
-        faction:
-          source: canon
-          value:
-            - FWL
-        population: 49275.0
-        socioIndustrial: C-F-A-F-D
       - date: '2596-09-22'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
+      - date: '2596-12-30'
+        faction:
+          - FWL
+        population: 49275.0
+        socioIndustrial: C-F-A-F-D
       - date: '2600-09-27'
         population: 155294.0
         socioIndustrial: C-F-A-D-D
@@ -160,9 +156,7 @@ planet:
         population: 52127.0
       - date: '2922-12-08'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X

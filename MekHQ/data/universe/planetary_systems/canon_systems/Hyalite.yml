@@ -116,9 +116,7 @@ planet:
     event:
       - date: '2335-05-06'
         faction:
-          source: canon
-          value:
-            - TC
+          - TC
         population: 52494.0
         socioIndustrial: D-F-A-C-D
       - date: '2340-01-01'
@@ -177,22 +175,16 @@ planet:
         population: 132575654.0
       - date: '2587-04-16'
         faction:
-          source: canon
-          value:
-            - SL
-            - TC
+          - SL
+          - TC
       - date: '2587-09-01'
         faction:
-          source: canon
-          value:
-            - SL
+          - SL
       - date: '2590-01-01'
         population: 136097091.0
       - date: '2596-02-05'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2600-01-01'
         population: 139164559.0
       - date: '2610-01-01'
@@ -231,9 +223,7 @@ planet:
         population: 155594772.0
       - date: '2750-08-28'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 155937627.0
       - date: '2760-01-01'
         population: 156118489.0
@@ -294,15 +284,15 @@ planet:
         population: 132479943.0
       - date: '3027-01-01'
         socioIndustrial: D-C-B-C-D
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 133269540.0
       - date: '3040-01-01'
         population: 134353407.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3044-01-01'
         socioIndustrial: C-C-A-C-C
       - date: '3050-01-01'
@@ -311,33 +301,25 @@ planet:
         population: 135948168.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
         population: 136957915.0
       - date: '3074-06-27'
         faction:
-          source: canon
-          value:
-            - TC
+          - TC
       - date: '3075-02-01'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '3075-05-03'
         faction:
-          source: canon
-          value:
-            - TC
+          - TC
       - date: '3080-01-01'
         population: 137369406.0
       - date: '3080-06-01'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '3090-01-01'
         population: 137341935.0
       - date: '3098-01-01'

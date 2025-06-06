@@ -185,9 +185,7 @@ planet:
     event:
       - date: '2240-07-20'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 38425.0
         socioIndustrial: C-D-B-C-D
       - date: '2250-01-01'
@@ -206,9 +204,7 @@ planet:
         population: 25065932.0
       - date: '2315-09-16'
         faction:
-          source: canon
-          value:
-            - DoL
+          - DoL
       - date: '2320-01-01'
         population: 41272664.0
       - date: '2330-01-01'
@@ -221,7 +217,7 @@ planet:
         population: 171139083.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -270,9 +266,7 @@ planet:
         population: 1040378852.0
       - date: '2571-10-12'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2580-01-01'
         population: 1064012447.0
       - date: '2590-01-01'
@@ -321,23 +315,17 @@ planet:
         population: 1264137262.0
       - date: '2767-04-09'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2770-01-01'
         population: 1264097628.0
       - date: '2779-09-28'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-01-01'
         population: 1244034074.0
       - date: '2790-11-13'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 1222030946.0
       - date: '2800-01-01'
         population: 1201248286.0
@@ -395,54 +383,37 @@ planet:
           value: 964000000.0
       - date: '3030-03-28'
         faction:
-          source: canon
-          value:
-            - FS
+          - FC
         population: 965318707.0
       - date: '3040-01-01'
         population: 979120065.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3047-01-01'
         socioIndustrial: A-C-C-A-C
       - date: '3050-01-01'
         population: 990615544.0
       - date: '3057-11-01'
         faction:
-          source: canon
-          value:
-            - ST
+          - ST
       - date: '3060-01-01'
         population: 1001613837.0
       - date: '3067-12-30'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3070-01-01'
         population: 1010960866.0
       - date: '3078-02-24'
         faction:
-          source: canon
-          value:
-            - Stone
-            - DC
-            - WOB
+          - Stone
+          - DC
+          - WOB
       - date: '3078-02-26'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 1024189155.0
       - date: '3081-05-01'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1040707980.0
       - date: '3091-01-01'
@@ -461,21 +432,15 @@ planet:
           value: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3136-10-01'
         faction:
-          source: canon
-          value:
-            - TTU
+          - TTU
       - date: '3140-01-01'
         population: 1120417329.0
       - date: '3145-05-05'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 1131451398.0
   - name: Patterson's Madness
     type: GIANT_TERRESTRIAL

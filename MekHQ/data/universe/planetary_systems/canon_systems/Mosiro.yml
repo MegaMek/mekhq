@@ -78,9 +78,7 @@ planet:
     event:
       - date: '2325-10-06'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 63137.0
         socioIndustrial: D-F-B-D-F
       - date: '2330-01-01'
@@ -135,9 +133,7 @@ planet:
         population: 5348835613.0
       - date: '2571-04-01'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '2580-01-01'
         population: 5450941093.0
       - date: '2582-01-01'
@@ -197,9 +193,7 @@ planet:
         population: 5984370979.0
       - date: '2790-07-22'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 5873509072.0
       - date: '2800-01-01'
         population: 5737071142.0
@@ -268,9 +262,7 @@ planet:
         population: 217345484.0
       - date: '3079-11-03'
         faction:
-          source: canon
-          value:
-            - DA
+          - DA
       - date: '3080-01-01'
         population: 219003603.0
       - date: '3090-01-01'
@@ -293,18 +285,11 @@ planet:
         population: 229680263.0
       - date: '3145-12-08'
         faction:
-          source: canon
-          value:
-            - OP
+          - OP
         population: 230785378.0
       - date: '3146-08-28'
         faction:
-          source: canon
-          value:
-            - DA
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - DA
   - name: Holness's Patch

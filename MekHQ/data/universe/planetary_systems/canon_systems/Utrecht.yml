@@ -52,9 +52,7 @@ planet:
     event:
       - date: '2235-03-26'
         faction:
-          source: canon
-          value:
-            - TamP
+          - TamP
         population: 45119.0
         socioIndustrial: D-D-B-D-F
       - date: '2240-01-01'
@@ -79,9 +77,9 @@ planet:
         population: 67797476.0
       - date: '2340-01-01'
         population: 96073222.0
-      - date: '2341-08-04'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2350-01-01'
@@ -132,9 +130,7 @@ planet:
         population: 1001871595.0
       - date: '2571-05-17'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2580-01-01'
         population: 1017348922.0
       - date: '2590-01-01'
@@ -192,9 +188,7 @@ planet:
         population: 1076625318.0
       - date: '2821-07-04'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2830-01-01'
         population: 1034669220.0
       - date: '2840-01-01'
@@ -215,9 +209,7 @@ planet:
         socioIndustrial: C-D-C-D-D
       - date: '2900-08-11'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 773736993.0
       - date: '2910-01-01'
         population: 751436080.0
@@ -245,13 +237,11 @@ planet:
         population: 724237865.0
       - date: '3030-07-12'
         faction:
-          source: canon
-          value:
-            - LA
+          - FC
         population: 719894138.0
       - date: '3034-03-13'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FRR
       - date: '3040-01-01'
@@ -262,7 +252,7 @@ planet:
         population: 737159414.0
       - date: '3052-03-01'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CGB
       - date: '3060-01-01'
@@ -277,9 +267,7 @@ planet:
         population: 776505846.0
       - date: '3103-03-13'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
       - date: '3110-01-01'
         population: 776350560.0
       - date: '3120-01-01'

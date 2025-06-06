@@ -44,9 +44,7 @@ planet:
     event:
       - date: '2478-01-09'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 48655.0
         socioIndustrial: C-D-C-D-F
       - date: '2480-01-01'
@@ -187,16 +185,12 @@ planet:
         population: 130702565.0
       - date: '3078-05-01'
         faction:
-          source: canon
-          value:
-            - PR
+          - PR
       - date: '3080-01-01'
         population: 131200180.0
       - date: '3086-02-01'
         faction:
-          source: canon
-          value:
-            - RF
+          - RF
       - date: '3090-01-01'
         population: 132545270.0
       - date: '3100-01-01'
@@ -217,12 +211,7 @@ planet:
         population: 135331084.0
       - date: '3148-07-07'
         faction:
-          source: canon
-          value:
-            - FWL
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - FWL
   - name: Hoffman's End

@@ -88,9 +88,7 @@ planet:
     event:
       - date: '2259-11-12'
         faction:
-          source: canon
-          value:
-            - SCon
+          - SCon
         population: 56053.0
         socioIndustrial: D-D-C-C-D
       - date: '2260-01-01'
@@ -103,9 +101,7 @@ planet:
         population: 2323593.0
       - date: '2293-07-05'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2300-01-01'
         population: 5618735.0
       - date: '2310-01-01'
@@ -282,16 +278,12 @@ planet:
         population: 1597519355.0
       - date: '3079-04-25'
         faction:
-          source: canon
-          value:
-            - SC
+          - SC
       - date: '3080-01-01'
         population: 1619717940.0
       - date: '3082-02-15'
         faction:
-          source: canon
-          value:
-            - MSC
+          - MSC
       - date: '3090-01-01'
         population: 1638288375.0
       - date: '3091-01-01'
@@ -310,15 +302,11 @@ planet:
         population: 1740638540.0
       - date: '3145-11-16'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 1745170089.0
       - date: '3151-12-30'
         faction:
-          source: canon
-          value:
-            - CP
+          - CP
   - name: Krios
     type: ICE_GIANT
     orbitalDist: 3.08

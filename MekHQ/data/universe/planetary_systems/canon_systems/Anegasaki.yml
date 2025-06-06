@@ -38,9 +38,7 @@ planet:
     event:
       - date: '2187-02-19'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 33211.0
         socioIndustrial: C-D-B-C-B
       - date: '2190-01-01'
@@ -59,9 +57,7 @@ planet:
         population: 3568096.0
       - date: '2250-12-17'
         faction:
-          source: canon
-          value:
-            - SIS
+          - SIS
         population: 6442009.0
       - date: '2260-01-01'
         population: 10840479.0
@@ -87,7 +83,7 @@ planet:
         population: 179197008.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -209,9 +205,7 @@ planet:
         socioIndustrial: B-B-C-D-C
       - date: '2900-01-02'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 700882539.0
       - date: '2910-01-01'
         population: 700553070.0
@@ -239,9 +233,7 @@ planet:
         population: 689074510.0
       - date: '3025-07-25'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3030-01-01'
         population: 691586648.0
       - date: '3040-02-14'
@@ -257,16 +249,12 @@ planet:
         population: 725302238.0
       - date: '3079-05-07'
         faction:
-          source: canon
-          value:
-            - DO
+          - DO
       - date: '3080-01-01'
         population: 728063629.0
       - date: '3086-11-04'
         faction:
-          source: canon
-          value:
-            - OP
+          - OP
       - date: '3090-01-01'
         population: 729959058.0
       - date: '3099-01-01'
@@ -285,11 +273,6 @@ planet:
         population: 740250356.0
       - date: '3145-01-01'
         population: 742177511.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Gōtsuchō
     type: DWARF_TERRESTRIAL
     orbitalDist: 0.07

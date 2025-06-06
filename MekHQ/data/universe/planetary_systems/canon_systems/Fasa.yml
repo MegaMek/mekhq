@@ -32,16 +32,12 @@ planet:
     event:
       - date: '2821-06-18'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 51624.0
         socioIndustrial: C-D-B-D-F
       - date: '2822-10-13'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population:
           source: canon

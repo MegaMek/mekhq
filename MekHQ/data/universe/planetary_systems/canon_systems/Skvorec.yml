@@ -72,9 +72,7 @@ planet:
     event:
       - date: '2625-01-11'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 48933.0
         socioIndustrial: D-D-C-D-C
       - date: '2630-01-01'
@@ -183,9 +181,7 @@ planet:
         population: 233355670.0
       - date: '3081-05-10'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 237261704.0
       - date: '3100-01-01'
@@ -206,12 +202,7 @@ planet:
         population: 250977620.0
       - date: '3148-03-01'
         faction:
-          source: canon
-          value:
-            - DA
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - DA
   - name: Horní Blatná

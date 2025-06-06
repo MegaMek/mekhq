@@ -49,18 +49,14 @@ planet:
     event:
       - date: '2310-10-22'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 54735.0
         socioIndustrial: C-D-C-D-C
       - date: '2320-01-01'
         population: 286340.0
       - date: '2326-06-05'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2330-01-01'
         population: 1179598.0
       - date: '2340-01-01'
@@ -239,10 +235,8 @@ planet:
         population: 3377686641.0
       - date: '3130-09-16'
         faction:
-          source: canon
-          value:
-            - DC
-            - FS
+          - DC
+          - FS
         population: 3404135613.0
       - date: '3132-08-07'
         hpg: X
@@ -250,9 +244,7 @@ planet:
         population: 3434224202.0
       - date: '3145-10-04'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 3456273720.0
   - name: Bi's Redoubt
     type: ICE_GIANT

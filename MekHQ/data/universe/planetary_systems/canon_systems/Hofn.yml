@@ -133,9 +133,7 @@ planet:
     event:
       - date: '2504-08-04'
         faction:
-          source: canon
-          value:
-            - JF
+          - JF
         population: 45849.0
         socioIndustrial: C-D-D-C-C
       - date: '2510-01-01'

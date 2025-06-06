@@ -102,9 +102,7 @@ planet:
     event:
       - date: '2393-01-13'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 51240.0
         socioIndustrial: C-D-B-D-C
       - date: '2400-01-01'
@@ -220,9 +218,7 @@ planet:
         socioIndustrial: F-F-C-D-D
       - date: '2900-08-16'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 538632339.0
       - date: '2910-01-01'
         population: 536848068.0
@@ -269,9 +265,7 @@ planet:
         population: 551682511.0
       - date: '3079-02-06'
         faction:
-          source: canon
-          value:
-            - DTA
+          - DTA
       - date: '3080-01-01'
         population: 559572288.0
       - date: '3090-01-01'
@@ -284,9 +278,7 @@ planet:
         population: 584509317.0
       - date: '3120-10-26'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 595006732.0
       - date: '3130-01-01'
         population: 605935000.0
@@ -298,15 +290,8 @@ planet:
         population: 614232008.0
       - date: '3145-10-29'
         faction:
-          source: canon
-          value:
-            - DTA
+          - DTA
         population: 619165572.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Sedan
     type: TERRESTRIAL
     orbitalDist: 1.1

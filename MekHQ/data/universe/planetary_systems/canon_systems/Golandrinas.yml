@@ -49,9 +49,7 @@ planet:
     event:
       - date: '2341-04-14'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 44465.0
         socioIndustrial: D-D-A-D-C
       - date: '2350-01-01'
@@ -150,9 +148,7 @@ planet:
         population: 100874123.0
       - date: '2779-03-12'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2780-01-01'
         population: 101014037.0
       - date: '2790-01-01'
@@ -207,24 +203,24 @@ planet:
         population: 102577857.0
       - date: '3020-01-01'
         population: 103038199.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 103803060.0
       - date: '3039-01-01'
         socioIndustrial: D-C-B-D-B
       - date: '3040-01-01'
         population: 105014187.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3046-01-01'
         socioIndustrial: C-C-A-C-A
       - date: '3050-01-01'
         population: 106430847.0
       - date: '3050-05-11'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
       - date: '3060-01-01'
@@ -233,14 +229,10 @@ planet:
         population: 108722140.0
       - date: '3071-06-03'
         faction:
-          source: canon
-          value:
-            - CIH
+          - CIH
       - date: '3071-07-03'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3080-01-01'
         population: 109223414.0
       - date: '3090-01-01'
@@ -263,9 +255,7 @@ planet:
         population: 113817405.0
       - date: '3151-11-15'
         faction:
-          source: canon
-          value:
-            - CHH
+          - CHH
   - name: Cook
     type: TERRESTRIAL
     orbitalDist: 0.8

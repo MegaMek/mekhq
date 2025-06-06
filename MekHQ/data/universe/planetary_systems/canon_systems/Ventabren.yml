@@ -33,9 +33,7 @@ planet:
     event:
       - date: '2215-01-07'
         faction:
-          source: canon
-          value:
-            - SSUP
+          - SSUP
         population: 44580.0
         socioIndustrial: D-D-A-D-F
       - date: '2220-01-01'
@@ -72,7 +70,7 @@ planet:
         population: 305600374.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -192,9 +190,7 @@ planet:
         socioIndustrial: C-D-C-D-D
       - date: '2900-12-19'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 1223582737.0
       - date: '2910-01-01'
         population: 1188455745.0
@@ -220,21 +216,15 @@ planet:
         population: 931532227.0
       - date: '3014-08-01'
         faction:
-          source: canon
-          value:
-            - FWLR
+          - FWLR
       - date: '3015-03-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3020-01-01'
         population: 914522966.0
       - date: '3025-10-29'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3030-05-20'
         population: 910536805.0
         socioIndustrial: C-D-B-D-D
@@ -249,9 +239,7 @@ planet:
         population: 937610223.0
       - date: '3079-11-26'
         faction:
-          source: canon
-          value:
-            - OZP
+          - OZP
       - date: '3080-01-01'
         population: 951209490.0
       - date: '3090-01-01'
@@ -266,9 +254,7 @@ planet:
         population: 991812742.0
       - date: '3130-09-23'
         faction:
-          source: canon
-          value:
-            - OP
+          - OP
         population: 992805051.0
       - date: '3132-08-07'
         hpg: X
@@ -276,11 +262,6 @@ planet:
         population: 993400913.0
       - date: '3145-01-01'
         population: 994394811.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Decima
     type: DWARF_TERRESTRIAL
     orbitalDist: 1.0

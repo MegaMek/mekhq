@@ -96,12 +96,13 @@ planet:
         icon: rock9
     event:
       - date: '2317-03-09'
-        faction:
-          source: canon
-          value:
-            - FS
         population: 44288.0
         socioIndustrial: D-D-A-D-B
+      - date: '2317-06-26'
+        faction:
+          source: 'Handbook: House Davion'
+          value:
+            - FS
       - date: '2320-01-01'
         population: 68514.0
       - date: '2322-01-01'
@@ -256,17 +257,17 @@ planet:
         population: 592403049.0
       - date: '3020-01-01'
         population: 594175949.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 598405769.0
       - date: '3037-01-01'
         socioIndustrial: B-D-B-D-B
       - date: '3040-01-01'
         population: 605448235.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3046-01-01'
         socioIndustrial: A-C-A-C-A
       - date: '3050-01-01'
@@ -275,7 +276,7 @@ planet:
         population: 622204656.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'

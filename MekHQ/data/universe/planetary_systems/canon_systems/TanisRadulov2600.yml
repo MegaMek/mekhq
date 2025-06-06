@@ -81,9 +81,7 @@ planet:
     event:
       - date: '2749-09-04'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 1115211.0
         socioIndustrial: B-C-D-B-D
       - date: '2750-01-01'
@@ -146,9 +144,7 @@ planet:
         population: 33469.0
       - date: '3025-09-25'
         faction:
-          source: canon
-          value:
-            - CLAN
+          - CLAN
       - date: '3030-01-01'
         population: 27313.0
       - date: '3040-01-01'
@@ -159,63 +155,42 @@ planet:
         population: 19593.0
       - date: '3059-12-12'
         faction:
-          source: canon
-          value:
-            - CCC
+          - CCC
       - date: '3060-01-01'
         population: 15206.0
       - date: '3067-12-20'
         faction:
-          source: canon
-          value:
-            - CSA
-            - CCC
+          - CSA
+          - CCC
       - date: '3070-01-01'
         population: 12436.0
-      - date: '3072-12-31'
-        faction:
-          source: canon
-          value:
-            - CB
       - date: '3072-02-04'
         faction:
-          source: canon
-          value:
-            - CB
-            - SOC
+          - CB
+          - SOC
+      - date: '3072-12-31'
+        faction:
+          - CB
       - date: '3073-11-05'
         faction:
-          source: canon
-          value:
-            - CB
-            - SOC
-            - CCC
+          - CB
+          - SOC
+          - CCC
       - date: '3073-11-18'
         faction:
-          source: canon
-          value:
-            - CB
-            - SOC
+          - CB
+          - SOC
       - date: '3074-12-17'
         faction:
-          source: canon
-          value:
-            - CB
-            - SOC
-            - CCC
-            - CSA
+          - CB
+          - SOC
+          - CCC
+          - CSA
       - date: '3075-04-25'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         population: 0.0
         socioIndustrial: X-X-X-X-X
-      - date: '2108-12-05'
-        name: Radulov
-      - date: '2600-01-01'
-        name: Tanis
-        message: Radulov renamed to Tanis
   - name: Ross
     type: GIANT_TERRESTRIAL
     orbitalDist: 2.08

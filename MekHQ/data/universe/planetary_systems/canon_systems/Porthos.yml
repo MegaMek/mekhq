@@ -51,9 +51,7 @@ planet:
     event:
       - date: '2900-09-28'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 47973.0
         socioIndustrial: D-D-B-D-F
       - date: '2903-01-16'
@@ -86,14 +84,10 @@ planet:
         population: 3637953.0
       - date: '3025-04-19'
         faction:
-          source: canon
-          value:
-            - EF
+          - EF
       - date: '3028-01-08'
         faction:
-          source: canon
-          value:
-            - EF
+          - EF
       - date: '3030-01-01'
         population: 3711644.0
       - date: '3040-01-01'
@@ -102,7 +96,7 @@ planet:
         socioIndustrial: F-F-A-D-F
       - date: '3049-09-05'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CGB
       - date: '3050-01-01'
@@ -119,9 +113,7 @@ planet:
         population: 4033986.0
       - date: '3100-02-07'
         faction:
-          source: canon
-          value:
-            - TB
+          - TB
       - date: '3110-01-01'
         population: 4049344.0
       - date: '3114-01-01'
@@ -134,11 +126,6 @@ planet:
         population: 4113832.0
       - date: '3145-01-01'
         population: 4124542.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - THa
   - name: Diapaga
     type: TERRESTRIAL
     orbitalDist: 0.8

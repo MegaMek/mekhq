@@ -62,9 +62,7 @@ planet:
     event:
       - date: '2822-06-04'
         faction:
-          source: canon
-          value:
-            - LL
+          - LL
         population: 54980.0
         socioIndustrial: C-D-A-C-F
       - date: '2830-01-05'
@@ -120,9 +118,7 @@ planet:
         population: 82232761.0
       - date: '3055-11-09'
         faction:
-          source: canon
-          value:
-            - MH
+          - MH
       - date: '3060-01-01'
         population: 81772373.0
       - date: '3070-01-01'
@@ -141,9 +137,7 @@ planet:
         population: 84194198.0
       - date: '3130-03-08'
         faction:
-          source: canon
-          value:
-            - LL
+          - LL
         population: 84295292.0
       - date: '3140-01-01'
         population: 84227883.0

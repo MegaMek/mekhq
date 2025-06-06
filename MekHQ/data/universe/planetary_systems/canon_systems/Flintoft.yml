@@ -55,9 +55,7 @@ planet:
     event:
       - date: '2342-05-12'
         faction:
-          source: canon
-          value:
-            - TC
+          - TC
         population: 46951.0
         socioIndustrial: D-D-C-D-F
       - date: '2350-01-01'
@@ -113,22 +111,16 @@ planet:
         population: 18009460.0
       - date: '2581-03-15'
         faction:
-          source: canon
-          value:
-            - SL
-            - TC
+          - SL
+          - TC
       - date: '2582-06-01'
         faction:
-          source: canon
-          value:
-            - SL
+          - SL
       - date: '2590-01-01'
         population: 18484660.0
       - date: '2596-09-22'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2600-01-01'
         population: 18962313.0
       - date: '2610-01-01'
@@ -223,39 +215,35 @@ planet:
         population: 8817674.0
       - date: '3020-01-01'
         population: 8042559.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 7795740.0
       - date: '3040-12-22'
         population: 7872514.0
         socioIndustrial: B-C-B-B-F
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3050-01-01'
         population: 7947659.0
       - date: '3060-01-01'
         population: 8005889.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
         population: 8055680.0
       - date: '3075-05-03'
         faction:
-          source: canon
-          value:
-            - TC
+          - TC
       - date: '3080-01-01'
         population: 8078267.0
       - date: '3080-05-05'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '3090-01-01'
         population: 8097679.0
       - date: '3098-01-01'

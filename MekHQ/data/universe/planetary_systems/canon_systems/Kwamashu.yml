@@ -66,9 +66,7 @@ planet:
     event:
       - date: '2330-06-27'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 48556.0
         socioIndustrial: D-D-A-D-D
       - date: '2340-01-01'
@@ -125,9 +123,7 @@ planet:
         population: 2086385003.0
       - date: '2571-01-29'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '2580-01-01'
         population: 2165525242.0
       - date: '2590-01-01'
@@ -184,9 +180,7 @@ planet:
         population: 2741125523.0
       - date: '2821-02-24'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2830-01-01'
         population: 2707263476.0
       - date: '2840-01-01'
@@ -231,14 +225,10 @@ planet:
         population: 2429199764.0
       - date: '3014-03-22'
         faction:
-          source: canon
-          value:
-            - FWLR
+          - FWLR
       - date: '3015-03-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3020-01-01'
         population: 2408645679.0
       - date: '3030-01-01'
@@ -259,9 +249,7 @@ planet:
         population: 2531975532.0
       - date: '3081-07-07'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 2541615344.0
       - date: '3100-01-01'
@@ -274,9 +262,7 @@ planet:
         population: 2603872711.0
       - date: '3130-03-27'
         faction:
-          source: canon
-          value:
-            - DA
+          - DA
         population: 2617971656.0
       - date: '3132-08-07'
         hpg: X
@@ -284,15 +270,8 @@ planet:
         population: 2615354993.0
       - date: '3145-02-01'
         faction:
-          source: canon
-          value:
-            - OP
+          - OP
         population: 2618495303.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Kuweza's Land
     type: DWARF_TERRESTRIAL
     orbitalDist: 2.4

@@ -141,9 +141,7 @@ planet:
     event:
       - date: '2299-01-25'
         faction:
-          source: canon
-          value:
-            - FoS
+          - FoS
         population: 50345.0
         socioIndustrial: D-D-C-D-F
       - date: '2300-01-01'
@@ -156,9 +154,9 @@ planet:
         population: 5454183.0
       - date: '2340-01-01'
         population: 16025012.0
-      - date: '2341-04-18'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2349-01-01'
@@ -286,9 +284,7 @@ planet:
         socioIndustrial: F-C-C-C-F
       - date: '2900-06-21'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 7117670396.0
       - date: '2910-01-01'
         population: 6855271940.0
@@ -332,9 +328,7 @@ planet:
         population: 4840817743.0
       - date: '3081-01-28'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3082-01-01'
         socioIndustrial: C-B-C-B-D
       - date: '3090-01-01'
@@ -353,16 +347,12 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 5129887153.0
       - date: '3145-02-23'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
         population: 5146329085.0
   - name: Klawis
     type: GIANT_TERRESTRIAL

@@ -41,9 +41,7 @@ planet:
     event:
       - date: '2269-08-02'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 69290.0
         socioIndustrial: F-D-B-D-C
       - date: '2270-01-01'
@@ -64,9 +62,7 @@ planet:
         socioIndustrial: D-D-B-D-C
       - date: '2335-10-07'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2340-01-01'
         population: 18680677.0
       - date: '2350-01-01'
@@ -231,9 +227,7 @@ planet:
         population: 351999401.0
       - date: '3081-11-25'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 355537053.0
       - date: '3099-01-01'
@@ -254,12 +248,7 @@ planet:
         population: 370046796.0
       - date: '3148-03-01'
         faction:
-          source: canon
-          value:
-            - DA
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - DA
   - name: Ramírez's Belt

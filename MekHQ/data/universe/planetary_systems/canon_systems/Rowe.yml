@@ -30,9 +30,7 @@ planet:
     event:
       - date: '2158-09-07'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 52493.0
         socioIndustrial: C-C-C-D-D
       - date: '2160-01-01'
@@ -55,9 +53,7 @@ planet:
         population: 17710668.0
       - date: '2242-03-22'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 26113634.0
       - date: '2260-01-01'
@@ -86,9 +82,7 @@ planet:
         socioIndustrial: C-D-C-C-D
       - date: '2360-04-30'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 253400288.0
       - date: '2370-01-01'
         population: 277494777.0
@@ -192,18 +186,14 @@ planet:
         population: 520108017.0
       - date: '2846-07-01'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2850-01-01'
         population: 503448015.0
       - date: '2853-01-01'
         socioIndustrial: C-F-C-C-F
       - date: '2860-11-11'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 488349995.0
       - date: '2870-01-01'
         population: 469727369.0
@@ -239,15 +229,15 @@ planet:
         population: 348053326.0
       - date: '3020-01-01'
         population: 347971816.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 347942475.0
       - date: '3040-01-01'
         population: 350561854.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3044-01-01'
         socioIndustrial: C-D-C-C-D
       - date: '3050-01-01'
@@ -256,7 +246,7 @@ planet:
         population: 355824333.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -281,9 +271,7 @@ planet:
         population: 367688887.0
       - date: '3145-01-17'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 369162587.0
   - name: Edison's Rock
     type: GIANT_TERRESTRIAL

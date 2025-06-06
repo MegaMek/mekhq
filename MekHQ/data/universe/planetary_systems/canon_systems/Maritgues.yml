@@ -37,9 +37,7 @@ planet:
     event:
       - date: '2745-06-22'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         hpg: B
         population: 45574.0
         socioIndustrial: C-D-A-D-B
@@ -115,16 +113,12 @@ planet:
         population: 386649795.0
       - date: '3079-02-08'
         faction:
-          source: canon
-          value:
-            - DO
+          - DO
       - date: '3080-01-01'
         population: 391317543.0
       - date: '3086-09-03'
         faction:
-          source: canon
-          value:
-            - OP
+          - OP
       - date: '3090-01-01'
         population: 397390475.0
       - date: '3100-01-01'
@@ -142,11 +136,6 @@ planet:
         population: 424672957.0
       - date: '3145-01-01'
         population: 426801639.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Carldwen
     type: TERRESTRIAL
     orbitalDist: 0.3

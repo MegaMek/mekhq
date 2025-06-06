@@ -65,9 +65,7 @@ planet:
     event:
       - date: '2786-08-14'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 52749.0
         socioIndustrial: C-D-B-F-F
       - date: '2790-01-01'

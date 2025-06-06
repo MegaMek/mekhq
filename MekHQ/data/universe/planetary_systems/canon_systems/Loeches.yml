@@ -43,9 +43,7 @@ planet:
     event:
       - date: '2241-06-08'
         faction:
-          source: canon
-          value:
-            - DO
+          - DO
         population: 58399.0
         socioIndustrial: D-D-D-D-B
       - date: '2250-01-01'
@@ -58,7 +56,7 @@ planet:
         population: 1499699.0
       - date: '2271-06-01'
         faction:
-          source: canon
+          source: 'Handbook: House Marik'
           value:
             - FWL
       - date: '2280-01-01'
@@ -234,16 +232,12 @@ planet:
         population: 697581539.0
       - date: '3079-12-28'
         faction:
-          source: canon
-          value:
-            - DO
+          - DO
       - date: '3080-01-01'
         population: 706002944.0
       - date: '3086-09-14'
         faction:
-          source: canon
-          value:
-            - OP
+          - OP
       - date: '3090-01-01'
         population: 712670661.0
       - date: '3092-01-01'
@@ -260,11 +254,6 @@ planet:
         population: 765109842.0
       - date: '3145-01-01'
         population: 770792655.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Tilloy-lès-Mofflaines
     type: GAS_GIANT
     orbitalDist: 0.6
