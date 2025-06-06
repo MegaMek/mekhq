@@ -187,6 +187,7 @@ public class CampaignGUI extends JPanel {
     private JLabel lblTempAstechs;
     private JLabel lblTempMedics;
     private JLabel lblPartsAvailabilityRating;
+    private JButton btnContractMarket = null;
 
     /* for the top button panel */
     private JPanel pnlTop;
@@ -1161,20 +1162,61 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 1;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.gridheight = 2;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(0, 0, 0, 5);
+        pnlTop.add(lblLocation, gridBagConstraints);
+
+
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.VERTICAL;
+        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.gridheight = 2;
         gridBagConstraints.anchor = GridBagConstraints.SOUTHWEST;
-        pnlTop.add(lblLocation, gridBagConstraints);
+        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
+        pnlTop.add(getDynamicButtonsPanel(), gridBagConstraints);
 
-        gridBagConstraints.gridx = 0;
+
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 1;
+        gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.gridheight = 2;
         gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
+        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         pnlTop.add(getButtonPanel(), gridBagConstraints);
+    }
+
+    private JPanel getDynamicButtonsPanel() {
+        JPanel pnlButton = new JPanel(new GridBagLayout());
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        
+        btnContractMarket = new JButton(resourceMap.getString("btnContractMarket.text"));
+        btnContractMarket.addActionListener(e -> showContractMarket());
+        btnContractMarket.setVisible(getCampaign().getCampaignOptions().isUseAtB()
+            && (ContractMarketDialog.getAvailableContractsCount(getCampaign()) > 0));
+        btnContractMarket.setHorizontalTextPosition(SwingConstants.CENTER);
+        btnContractMarket.setVerticalTextPosition(SwingConstants.CENTER);
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new Insets(3, 3, 3, 3);
+        pnlButton.add(btnContractMarket, gridBagConstraints);
+        return pnlButton;
+    }
+    
+    public void refreshDynamicButtons() {
+        if (btnContractMarket != null) {
+            btnContractMarket.setVisible(getCampaign().getCampaignOptions().isUseAtB()
+                && (ContractMarketDialog.getAvailableContractsCount(getCampaign()) > 0));
+        }
     }
 
     private JPanel getButtonPanel() {
@@ -2894,6 +2936,7 @@ public class CampaignGUI extends JPanel {
         refreshLocation();
         refreshFunds();
         refreshPartsAvailability();
+        refreshDynamicButtons();
 
         refreshAllTabs();
     }
