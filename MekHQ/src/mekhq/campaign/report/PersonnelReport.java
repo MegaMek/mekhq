@@ -108,6 +108,8 @@ public class PersonnelReport extends AbstractReport {
             }
         }
 
+        sb.append(getSecondaryCombatPersonnelDetails());
+
         sb.append('\n')
               .append(String.format("%-30s        %4s\n", "Injured Combat Personnel", countInjured))
               .append(String.format("%-30s        %4s\n", "MIA Combat Personnel", countMIA))
@@ -171,7 +173,6 @@ public class PersonnelReport extends AbstractReport {
             } else if (primarySupport && person.getStatus().isStudent()) {
                 countStudents++;
             }
-
             if (person.getPrimaryRole().isDependent() &&
                       !person.getStatus().isDepartedUnit() &&
                       person.getPrisonerStatus().isFree()) {
@@ -217,6 +218,8 @@ public class PersonnelReport extends AbstractReport {
         sb.append(String.format("    %-30s    %4s\n", "Temp Medics", getCampaign().getMedicPool()));
         sb.append(String.format("    %-30s    %4s\n", "Temp Astechs", getCampaign().getAstechPool()));
 
+        sb.append(getSecondarySupportPersonnelDetails());
+
         sb.append('\n')
               .append(String.format("%-30s        %4s\n", "Injured Support Personnel", countInjured))
               .append(String.format("%-30s        %4s\n", "MIA Support Personnel", countMIA))
@@ -236,6 +239,64 @@ public class PersonnelReport extends AbstractReport {
               .append(civilianSalaries.toAmountAndSymbolString())
               .append(String.format("\nYou have " + prisoners + " prisoner%s", prisoners == 1 ? "" : "s"))
               .append(String.format("\nYou have " + bondsmen + " %s", (bondsmen == 1) ? "bondsman" : "bondsmen"));
+
+        return sb.toString();
+    }
+
+    public String getSecondarySupportPersonnelDetails() {
+        final PersonnelRole[] personnelRoles = PersonnelRole.values();
+        int[] countPersonByType = new int[personnelRoles.length];
+        int countSecondary = 0;
+        for (Person person : getCampaign().getPersonnel()) {
+            // Add them to the total count
+            final boolean secondarySupport = person.getSecondaryRole().isSupport(true);
+
+            if (secondarySupport && person.getPrisonerStatus().isFree() && person.getStatus().isActive()) {
+                countPersonByType[person.getSecondaryRole().ordinal()]++;
+                countSecondary++;
+                }
+            }
+
+        StringBuilder sb = new StringBuilder("\nSecondary Role Support Personnel\n\n");
+
+        sb.append(String.format("%-30s%4s\n", "Total Secondary Role Support Personnel", countSecondary));
+
+        for (PersonnelRole role : personnelRoles) {
+            if (role.isSupport(true)) {
+                sb.append(String.format("    %-30s    %4s\n",
+                      role.getLabel(getCampaign().getFaction().isClan()),
+                      countPersonByType[role.ordinal()]));
+            }
+        }
+
+        return sb.toString();
+    }
+
+    public String getSecondaryCombatPersonnelDetails() {
+        final PersonnelRole[] personnelRoles = PersonnelRole.values();
+        int[] countPersonByType = new int[personnelRoles.length];
+        int countSecondary = 0;
+        for (Person person : getCampaign().getPersonnel()) {
+            // Add them to the total count
+            final boolean secondaryCombat = person.getSecondaryRole().isCombat();
+
+            if (secondaryCombat && person.getPrisonerStatus().isFree() && person.getStatus().isActive()) {
+                countPersonByType[person.getSecondaryRole().ordinal()]++;
+                countSecondary++;
+            }
+        }
+
+        StringBuilder sb = new StringBuilder("\nSecondary Role Combat Personnel\n\n");
+
+        sb.append(String.format("%-30s %4s\n", "Total Secondary Role Combat Personnel", countSecondary));
+
+        for (PersonnelRole role : personnelRoles) {
+            if (role.isCombat()) {
+                sb.append(String.format("    %-30s    %4s\n",
+                      role.getLabel(getCampaign().getFaction().isClan()),
+                      countPersonByType[role.ordinal()]));
+            }
+        }
 
         return sb.toString();
     }
