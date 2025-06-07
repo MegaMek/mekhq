@@ -24,28 +24,23 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
- *
- * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
- * Microsoft's "Game Content Usage Rules"
- * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
- * affiliated with Microsoft.
  */
 package mekhq.campaign.randomEvents.prisoners;
 
 import megamek.common.ITechnology;
-import megamek.common.ITechnology.AvailabilityValue;
 import megamek.common.MapSettings;
+import megamek.common.ITechnology.AvailabilityValue;
+import megamek.common.ITechnology.TechRating;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Factions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
+import mekhq.campaign.universe.Faction.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 import static java.lang.Math.round;
 import static megamek.common.MiscType.createBeagleActiveProbe;
@@ -54,9 +49,13 @@ import static mekhq.campaign.randomEvents.prisoners.CapturePrisoners.*;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.BECOMING_BONDSMAN;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.PRISONER;
 import static mekhq.campaign.rating.IUnitRating.DRAGOON_C;
-import static mekhq.campaign.utilities.TestableCampaign.initializeCampaignForTesting;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 /**
  * The {@link CapturePrisonersTest} class is a test suite for validating the functionality of the
@@ -69,49 +68,21 @@ import static org.mockito.Mockito.spy;
  * prisoner defection are also tested for various factions and conditions.</p>
  */
 class CapturePrisonersTest {
-    static Campaign campaign;
-    static Faction campaignFaction;
-    static Scenario scenario;
-
-    static final LocalDate TODAY = LocalDate.of(3151, 1, 1);
-    static Faction innerSphereFaction;
-    static Faction mercenaryFaction;
-    static Faction clanFaction;
-
-    @BeforeAll
-    static void beforeAll() {
-        campaign = initializeCampaignForTesting(true);
-        campaign.setLocalDate(TODAY);
-
-        try {
-            Factions.setInstance(Factions.loadDefault());
-        } catch (Exception e) {
-            fail("Failed to create default faction set: " + e.getMessage());
-        }
-
-        Factions factions = Factions.getInstance();
-        innerSphereFaction = factions.getFaction("LA");
-        mercenaryFaction = factions.getFaction("MERC");
-        clanFaction = factions.getFaction("CJF");
-    }
-
-    @BeforeEach
-    void beforeEach() {
-        scenario = new Scenario();
-
-        campaign.setFaction(innerSphereFaction);
-        campaignFaction = innerSphereFaction;
-    }
-
     @Test
     void testCapturePrisoners_Ground() {
         // Setup
-        AvailabilityValue activeProbeAvailability = getPartAvailability(TODAY, true);
-        AvailabilityValue improvedSensorsAvailability = getPartAvailability(TODAY, false);
+        Campaign mockCampaign = mock(Campaign.class);
+        Faction mockFaction = mock(Faction.class);
+        Scenario scenario = new Scenario();
+        LocalDate today = LocalDate.of(3151, 1, 1);
+        when(mockCampaign.getLocalDate()).thenReturn(today);
+
+        AvailabilityValue activeProbeAvailability = getPartAvailability(today, true);
+        AvailabilityValue improvedSensorsAvailability = getPartAvailability(today, false);
 
         // Act
         int quality = -1;
-        CapturePrisoners capturePrisoners = new CapturePrisoners(campaign, campaignFaction, scenario, quality);
+        CapturePrisoners capturePrisoners = new CapturePrisoners(mockCampaign, mockFaction, scenario, quality);
 
         // Assert
         int expectedTargetNumber = BASE_TARGET_NUMBER
@@ -129,12 +100,17 @@ class CapturePrisonersTest {
     @Test
     void testCapturePrisoners_Ground_ActiveProbe() {
         // Setup
-        AvailabilityValue activeProbeAvailability = getPartAvailability(TODAY, true);
-        AvailabilityValue improvedSensorsAvailability = getPartAvailability(TODAY, false);
+        Campaign mockCampaign = mock(Campaign.class);
+        Faction mockFaction = mock(Faction.class);
+        Scenario scenario = new Scenario();
+        LocalDate today = LocalDate.of(3151, 1, 1);
+        when(mockCampaign.getLocalDate()).thenReturn(today);
+
+        AvailabilityValue activeProbeAvailability = getPartAvailability(today, true);
+        AvailabilityValue improvedSensorsAvailability = getPartAvailability(today, false);
 
         // Act
-        CapturePrisoners capturePrisoners = new CapturePrisoners(campaign, campaignFaction, scenario,
-              activeProbeAvailability.getIndex());
+        CapturePrisoners capturePrisoners = new CapturePrisoners(mockCampaign, mockFaction, scenario, activeProbeAvailability.getIndex());
 
         // Assert
         int expectedTargetNumber = BASE_TARGET_NUMBER
@@ -151,12 +127,17 @@ class CapturePrisonersTest {
     @Test
     void testCapturePrisoners_Ground_ImprovedSensors() {
         // Setup
-        AvailabilityValue activeProbeAvailability = getPartAvailability(TODAY, true);
-        AvailabilityValue improvedSensorsAvailability = getPartAvailability(TODAY, false);
+        Campaign mockCampaign = mock(Campaign.class);
+        Faction mockFaction = mock(Faction.class);
+        Scenario scenario = new Scenario();
+        LocalDate today = LocalDate.of(3151, 1, 1);
+        when(mockCampaign.getLocalDate()).thenReturn(today);
+
+        AvailabilityValue activeProbeAvailability = getPartAvailability(today, true);
+        AvailabilityValue improvedSensorsAvailability = getPartAvailability(today, false);
 
         // Act
-        CapturePrisoners capturePrisoners = new CapturePrisoners(campaign, campaignFaction, scenario,
-              improvedSensorsAvailability.getIndex());
+        CapturePrisoners capturePrisoners = new CapturePrisoners(mockCampaign, mockFaction, scenario, improvedSensorsAvailability.getIndex());
 
         // Assert
         int expectedTargetNumber = BASE_TARGET_NUMBER
@@ -173,10 +154,17 @@ class CapturePrisonersTest {
     @Test
     void testCapturePrisoners_Space() {
         // Setup
+        Campaign mockCampaign = mock(Campaign.class);
+        Faction mockFaction = mock(Faction.class);
+
+        Scenario scenario = new Scenario();
         scenario.setBoardType(MapSettings.MEDIUM_SPACE);
 
+        LocalDate today = LocalDate.of(3151, 1, 1);
+        when(mockCampaign.getLocalDate()).thenReturn(today);
+
         // Act
-        CapturePrisoners capturePrisoners = new CapturePrisoners(campaign, campaignFaction, scenario, DRAGOON_C);
+        CapturePrisoners capturePrisoners = new CapturePrisoners(mockCampaign, mockFaction, scenario, DRAGOON_C);
 
         // Assert
         int expectedTargetNumber = BASE_TARGET_NUMBER
@@ -190,8 +178,17 @@ class CapturePrisonersTest {
 
     @Test
     void testAttemptCaptureOfNPC_PickedUp() {
+        // Setup
+        Campaign mockCampaign = mock(Campaign.class);
+        Faction mockFaction = mock(Faction.class);
+
+        Scenario scenario = new Scenario();
+
+        LocalDate today = LocalDate.of(3151, 1, 1);
+        when(mockCampaign.getLocalDate()).thenReturn(today);
+
         // Act
-        CapturePrisoners capturePrisoners = new CapturePrisoners(campaign, campaignFaction, scenario, DRAGOON_C);
+        CapturePrisoners capturePrisoners = new CapturePrisoners(mockCampaign, mockFaction, scenario, DRAGOON_C);
 
         // Assert
         assertTrue(capturePrisoners.attemptCaptureOfNPC(true));
@@ -200,7 +197,15 @@ class CapturePrisonersTest {
     @Test
     void testAttemptCaptureOfNPC_NotPickedUp_Captured() {
         // Setup
-        CapturePrisoners realCapturePrisoners = new CapturePrisoners(campaign, campaignFaction, scenario, DRAGOON_C) {
+        Campaign mockCampaign = mock(Campaign.class);
+        Faction mockFaction = mock(Faction.class);
+
+        Scenario scenario = new Scenario();
+
+        LocalDate today = LocalDate.of(3151, 1, 1);
+        when(mockCampaign.getLocalDate()).thenReturn(today);
+
+        CapturePrisoners realCapturePrisoners = new CapturePrisoners(mockCampaign, mockFaction, scenario, DRAGOON_C) {
             @Override
             protected int d6(int dice) {
                 return this.getSarTargetNumber().getValue(); // Whatever value goes here will be the value rolled
@@ -217,7 +222,15 @@ class CapturePrisonersTest {
     @Test
     void testAttemptCaptureOfNPC_NotPickedUp_Escaped() {
         // Setup
-        CapturePrisoners realCapturePrisoners = new CapturePrisoners(campaign, campaignFaction, scenario, DRAGOON_C) {
+        Campaign mockCampaign = mock(Campaign.class);
+        Faction mockFaction = mock(Faction.class);
+
+        Scenario scenario = new Scenario();
+
+        LocalDate today = LocalDate.of(3151, 1, 1);
+        when(mockCampaign.getLocalDate()).thenReturn(today);
+
+        CapturePrisoners realCapturePrisoners = new CapturePrisoners(mockCampaign, mockFaction, scenario, DRAGOON_C) {
             @Override
             protected int d6(int dice) {
                 return this.getSarTargetNumber().getValue() - 1; // Whatever value goes here will be the value rolled
@@ -234,9 +247,19 @@ class CapturePrisonersTest {
     @Test
     void testProcessPrisoner_CampaignOperations_InnerSphereFaction() {
         // Setup
-        Person prisoner = new Person(campaign);
+        Campaign mockCampaign = mock(Campaign.class);
 
-        CapturePrisoners realCapturePrisoners = new CapturePrisoners(campaign, campaignFaction, scenario, DRAGOON_C) {
+        LocalDate today = LocalDate.of(3151, 1, 1);
+        when(mockCampaign.getLocalDate()).thenReturn(today);
+
+        Faction mockFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+
+        Scenario scenario = new Scenario();
+
+        Person prisoner = new Person(mockCampaign);
+
+        CapturePrisoners realCapturePrisoners = new CapturePrisoners(mockCampaign, mockFaction, scenario, DRAGOON_C) {
             @Override
             protected int d6(int dice) {
                 return 5; // Whatever value goes here will be the value rolled
@@ -245,7 +268,7 @@ class CapturePrisonersTest {
 
         // Act
         CapturePrisoners capturePrisoners = spy(realCapturePrisoners);
-        capturePrisoners.processPrisoner(prisoner, campaignFaction, false, true);
+        capturePrisoners.processPrisoner(prisoner, mockFaction, false, true);
 
         // Assert
         PrisonerStatus expectedStatus = PRISONER;
@@ -257,15 +280,23 @@ class CapturePrisonersTest {
     @Test
     void testProcessPrisoner_CampaignOperations_ClanFaction_TakenAsPrisoner() {
         // Setup
-        campaign.setFaction(clanFaction);
-        campaignFaction = clanFaction;
+        Campaign mockCampaign = mock(Campaign.class);
 
-        Person prisoner = new Person(campaign);
+        LocalDate today = LocalDate.of(3151, 1, 1);
+        when(mockCampaign.getLocalDate()).thenReturn(today);
 
-        CapturePrisoners realCapturePrisoners = new CapturePrisoners(campaign, campaignFaction, scenario, DRAGOON_C) {
+        Faction campaignFaction = new Faction();
+        campaignFaction.setTags(Set.of(Tag.CLAN));
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+
+        Scenario scenario = new Scenario();
+
+        Person prisoner = new Person(mockCampaign);
+
+        CapturePrisoners realCapturePrisoners = new CapturePrisoners(mockCampaign, campaignFaction, scenario, DRAGOON_C) {
             @Override
             protected int d6(int dice) {
-                return prisoner.getOriginFaction().getHonorRating(campaign).getBondsmanTargetNumber() - 1;
+                return prisoner.getOriginFaction().getHonorRating(mockCampaign).getBondsmanTargetNumber() - 1;
             }
         };
 
@@ -283,16 +314,26 @@ class CapturePrisonersTest {
     @Test
     void testProcessPrisoner_CampaignOperations_ClanFaction_TakenAsBondsman() {
         // Setup
-        campaign.setFaction(clanFaction);
-        campaignFaction = clanFaction;
+        Campaign mockCampaign = mock(Campaign.class);
 
-        Person prisoner = new Person(campaign);
-        prisoner.setOriginFaction(clanFaction);
+        LocalDate today = LocalDate.of(3151, 1, 1);
+        when(mockCampaign.getLocalDate()).thenReturn(today);
 
-        CapturePrisoners realCapturePrisoners = new CapturePrisoners(campaign, campaignFaction, scenario, DRAGOON_C) {
+        Faction campaignFaction = new Faction();
+        campaignFaction.setTags(Set.of(Tag.CLAN));
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+
+        Scenario scenario = new Scenario();
+
+        Person prisoner = new Person(mockCampaign);
+        Faction prisonerFaction = new Faction();
+        campaignFaction.setTags(Set.of(Tag.CLAN));
+        prisoner.setOriginFaction(prisonerFaction);
+
+        CapturePrisoners realCapturePrisoners = new CapturePrisoners(mockCampaign, campaignFaction, scenario, DRAGOON_C) {
             @Override
             protected int d6(int dice) {
-                return prisoner.getOriginFaction().getHonorRating(campaign).getBondsmanTargetNumber() + 1;
+                return prisoner.getOriginFaction().getHonorRating(mockCampaign).getBondsmanTargetNumber() + 1;
             }
         };
 
@@ -310,9 +351,19 @@ class CapturePrisonersTest {
     @Test
     void testProcessPrisoner_MekHQ_InnerSphereFaction() {
         // Setup
-        Person prisoner = new Person(campaign);
+        Campaign mockCampaign = mock(Campaign.class);
 
-        CapturePrisoners realCapturePrisoners = new CapturePrisoners(campaign, campaignFaction, scenario, DRAGOON_C) {
+        LocalDate today = LocalDate.of(3151, 1, 1);
+        when(mockCampaign.getLocalDate()).thenReturn(today);
+
+        Faction mockFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+
+        Scenario scenario = new Scenario();
+
+        Person prisoner = new Person(mockCampaign);
+
+        CapturePrisoners realCapturePrisoners = new CapturePrisoners(mockCampaign, mockFaction, scenario, DRAGOON_C) {
             @Override
             protected int d6(int dice) {
                 return 5; // Whatever value goes here will be the value rolled
@@ -321,7 +372,7 @@ class CapturePrisonersTest {
 
         // Act
         CapturePrisoners capturePrisoners = spy(realCapturePrisoners);
-        capturePrisoners.processPrisoner(prisoner, campaignFaction, true, true);
+        capturePrisoners.processPrisoner(prisoner, mockFaction, true, true);
 
         // Assert
         PrisonerStatus expectedStatus = PRISONER;
@@ -333,15 +384,23 @@ class CapturePrisonersTest {
     @Test
     void testProcessPrisoner_MekHQ_ClanFaction_TakenAsPrisoner() {
         // Setup
-        campaign.setFaction(clanFaction);
-        campaignFaction = clanFaction;
+        Campaign mockCampaign = mock(Campaign.class);
 
-        Person prisoner = new Person(campaign);
+        LocalDate today = LocalDate.of(3151, 1, 1);
+        when(mockCampaign.getLocalDate()).thenReturn(today);
 
-        CapturePrisoners realCapturePrisoners = new CapturePrisoners(campaign, campaignFaction, scenario, DRAGOON_C) {
+        Faction campaignFaction = new Faction();
+        campaignFaction.setTags(Set.of(Tag.CLAN));
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+
+        Scenario scenario = new Scenario();
+
+        Person prisoner = new Person(mockCampaign);
+
+        CapturePrisoners realCapturePrisoners = new CapturePrisoners(mockCampaign, campaignFaction, scenario, DRAGOON_C) {
             @Override
             protected int d6(int dice) {
-                return prisoner.getOriginFaction().getHonorRating(campaign).getBondsmanTargetNumber() - 1;
+                return prisoner.getOriginFaction().getHonorRating(mockCampaign).getBondsmanTargetNumber() - 1;
             }
         };
 
@@ -359,16 +418,25 @@ class CapturePrisonersTest {
     @Test
     void testProcessPrisoner_MekHQ_ClanFaction_TakenAsBondsman() {
         // Setup
-        campaign.setFaction(clanFaction);
-        campaignFaction = clanFaction;
+        Campaign mockCampaign = mock(Campaign.class);
 
-        Person prisoner = new Person(campaign);
-        prisoner.setOriginFaction(innerSphereFaction);
+        LocalDate today = LocalDate.of(3151, 1, 1);
+        when(mockCampaign.getLocalDate()).thenReturn(today);
 
-        CapturePrisoners realCapturePrisoners = new CapturePrisoners(campaign, campaignFaction, scenario, DRAGOON_C) {
+        Faction campaignFaction = new Faction();
+        campaignFaction.setTags(Set.of(Tag.CLAN));
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+
+        Scenario scenario = new Scenario();
+
+        Person prisoner = new Person(mockCampaign);
+        Faction prisonerFaction = new Faction();
+        prisoner.setOriginFaction(prisonerFaction);
+
+        CapturePrisoners realCapturePrisoners = new CapturePrisoners(mockCampaign, campaignFaction, scenario, DRAGOON_C) {
             @Override
             protected int d6(int dice) {
-                return prisoner.getOriginFaction().getHonorRating(campaign).getBondsmanTargetNumber() + 1;
+                return prisoner.getOriginFaction().getHonorRating(mockCampaign).getBondsmanTargetNumber() + 1;
             }
         };
 
@@ -386,10 +454,20 @@ class CapturePrisonersTest {
     @Test
     void testDetermineDefectionChance() {
         // Setup
-        Person prisoner = new Person(campaign);
+        Campaign mockCampaign = mock(Campaign.class);
+
+        LocalDate today = LocalDate.of(3151, 1, 1);
+        when(mockCampaign.getLocalDate()).thenReturn(today);
+
+        Faction campaignFaction = new Faction();
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+
+        Scenario scenario = new Scenario();
+
+        Person prisoner = new Person(mockCampaign);
 
         // Act
-        CapturePrisoners capturePrisoners = new CapturePrisoners(campaign, campaignFaction, scenario, DRAGOON_C);
+        CapturePrisoners capturePrisoners = new CapturePrisoners(mockCampaign, campaignFaction, scenario, DRAGOON_C);
         capturePrisoners.determineDefectionChance(prisoner, true);
         int defectionChance = capturePrisoners.determineDefectionChance(prisoner, true);
 
@@ -403,11 +481,23 @@ class CapturePrisonersTest {
     @Test
     void testDetermineDefection_Chance_MercenaryPrisoner() {
         // Setup
-        Person prisoner = new Person(campaign);
-        prisoner.setOriginFaction(mercenaryFaction);
+        Campaign mockCampaign = mock(Campaign.class);
+
+        LocalDate today = LocalDate.of(3151, 1, 1);
+        when(mockCampaign.getLocalDate()).thenReturn(today);
+
+        Faction campaignFaction = new Faction();
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+
+        Scenario scenario = new Scenario();
+
+        Person prisoner = new Person(mockCampaign);
+        Faction prisonerFaction = new Faction();
+        prisonerFaction.setTags(Set.of(Tag.MERC));
+        prisoner.setOriginFaction(prisonerFaction);
 
         // Act
-        CapturePrisoners capturePrisoners = new CapturePrisoners(campaign, campaignFaction, scenario, DRAGOON_C);
+        CapturePrisoners capturePrisoners = new CapturePrisoners(mockCampaign, campaignFaction, scenario, DRAGOON_C);
         capturePrisoners.determineDefectionChance(prisoner, true);
         int defectionChance = capturePrisoners.determineDefectionChance(prisoner, true);
 
@@ -421,14 +511,22 @@ class CapturePrisonersTest {
     @Test
     void testDetermineDefection_Chance_ClanPrisoner_NotDezgraFaction() {
         // Setup
-        campaign.setFaction(clanFaction);
-        campaignFaction = clanFaction;
+        Campaign mockCampaign = mock(Campaign.class);
 
-        Person prisoner = new Person(campaign);
+        LocalDate today = LocalDate.of(3151, 1, 1);
+        when(mockCampaign.getLocalDate()).thenReturn(today);
+
+        Faction campaignFaction = new Faction();
+        campaignFaction.setTags(Set.of(Tag.CLAN));
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+
+        Scenario scenario = new Scenario();
+
+        Person prisoner = new Person(mockCampaign);
         prisoner.setClanPersonnel(true);
 
         // Act
-        CapturePrisoners capturePrisoners = new CapturePrisoners(campaign, campaignFaction, scenario, DRAGOON_C);
+        CapturePrisoners capturePrisoners = new CapturePrisoners(mockCampaign, campaignFaction, scenario, DRAGOON_C);
         capturePrisoners.determineDefectionChance(prisoner, true);
         int defectionChance = capturePrisoners.determineDefectionChance(prisoner, true);
 
@@ -442,14 +540,22 @@ class CapturePrisonersTest {
     @Test
     void testDetermineDefection_Chance_ClanPrisoner_DezgraFaction() {
         // Setup
-        campaign.setFaction(mercenaryFaction);
+        Campaign mockCampaign = mock(Campaign.class);
 
-        Person prisoner = new Person(campaign);
-        prisoner.setOriginFaction(clanFaction);
+        LocalDate today = LocalDate.of(3151, 1, 1);
+        when(mockCampaign.getLocalDate()).thenReturn(today);
+
+        Faction campaignFaction = new Faction();
+        campaignFaction.setTags(Set.of(Tag.MERC));
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+
+        Scenario scenario = new Scenario();
+
+        Person prisoner = new Person(mockCampaign);
         prisoner.setClanPersonnel(true);
 
         // Act
-        CapturePrisoners capturePrisoners = new CapturePrisoners(campaign, campaignFaction, scenario, DRAGOON_C);
+        CapturePrisoners capturePrisoners = new CapturePrisoners(mockCampaign, campaignFaction, scenario, DRAGOON_C);
         int defectionChance = capturePrisoners.determineDefectionChance(prisoner, true);
 
         // Assert
