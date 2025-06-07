@@ -34,6 +34,7 @@
 package mekhq.campaign.report;
 
 import java.time.LocalDate;
+import java.util.EnumMap;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -244,15 +245,15 @@ public class PersonnelReport extends AbstractReport {
     }
 
     public String getSecondarySupportPersonnelDetails() {
-        final PersonnelRole[] personnelRoles = PersonnelRole.values();
-        int[] countPersonByType = new int[personnelRoles.length];
+        EnumMap<PersonnelRole, Integer> countPersonByType = new EnumMap<>(PersonnelRole.class);
         int countSecondary = 0;
         for (Person person : getCampaign().getPersonnel()) {
             // Add them to the total count
             final boolean secondarySupport = person.getSecondaryRole().isSupport(true);
 
             if (secondarySupport && person.getPrisonerStatus().isFree() && person.getStatus().isActive()) {
-                countPersonByType[person.getSecondaryRole().ordinal()]++;
+                countPersonByType.put(person.getSecondaryRole(),
+                      (countPersonByType.getOrDefault(person.getSecondaryRole(), 0) + 1));
                 countSecondary++;
                 }
             }
@@ -261,27 +262,28 @@ public class PersonnelReport extends AbstractReport {
 
         sb.append(String.format("%-30s%4s\n", "Total Secondary Role Support Personnel", countSecondary));
 
-        for (PersonnelRole role : personnelRoles) {
-            if (role.isSupport(true)) {
+        countPersonByType.forEach((role, value) ->
+            {if (role.isSupport(true) && value >= 0){
                 sb.append(String.format("    %-30s    %4s\n",
-                      role.getLabel(getCampaign().getFaction().isClan()),
-                      countPersonByType[role.ordinal()]));
+                     role.getLabel(getCampaign().getFaction().isClan()),
+                      value));
             }
-        }
+        });
 
         return sb.toString();
     }
 
     public String getSecondaryCombatPersonnelDetails() {
-        final PersonnelRole[] personnelRoles = PersonnelRole.values();
-        int[] countPersonByType = new int[personnelRoles.length];
+        EnumMap<PersonnelRole, Integer> countPersonByType = new EnumMap<>(PersonnelRole.class);
+
         int countSecondary = 0;
         for (Person person : getCampaign().getPersonnel()) {
             // Add them to the total count
             final boolean secondaryCombat = person.getSecondaryRole().isCombat();
 
             if (secondaryCombat && person.getPrisonerStatus().isFree() && person.getStatus().isActive()) {
-                countPersonByType[person.getSecondaryRole().ordinal()]++;
+                countPersonByType.put(person.getSecondaryRole(),
+                      (countPersonByType.getOrDefault(person.getSecondaryRole(), 0) + 1));
                 countSecondary++;
             }
         }
@@ -290,13 +292,13 @@ public class PersonnelReport extends AbstractReport {
 
         sb.append(String.format("%-30s %4s\n", "Total Secondary Role Combat Personnel", countSecondary));
 
-        for (PersonnelRole role : personnelRoles) {
-            if (role.isCombat()) {
-                sb.append(String.format("    %-30s    %4s\n",
-                      role.getLabel(getCampaign().getFaction().isClan()),
-                      countPersonByType[role.ordinal()]));
-            }
+        countPersonByType.forEach((role, value) ->
+        {if (role.isCombat() && value >= 0){
+            sb.append(String.format("    %-30s    %4s\n",
+                  role.getLabel(getCampaign().getFaction().isClan()),
+                  value));
         }
+        });
 
         return sb.toString();
     }
