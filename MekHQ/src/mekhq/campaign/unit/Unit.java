@@ -3465,7 +3465,7 @@ public class Unit implements ITechnology {
                               getCampaign());
                         ((LargeCraftAmmoBin) apart).setBay(entity.getBayByAmmo((AmmoMounted) m));
                     } else if (entity.isSupportVehicle() &&
-                                     (((AmmoType) m.getType()).getAmmoType() == AmmoType.T_INFANTRY)) {
+                                     (((AmmoType) m.getType()).getAmmoType() == AmmoType.AmmoTypeEnum.INFANTRY)) {
                         Mounted<?> weapon = m.getLinkedBy();
                         while (weapon.getType() instanceof AmmoType) {
                             weapon = weapon.getLinkedBy();

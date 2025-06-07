@@ -1550,7 +1550,7 @@ public abstract class AbstractCompanyGenerator {
      */
     private boolean ammoBinIsMachineGun(final AmmoBin ammoBin) {
         return switch (ammoBin.getType().getAmmoType()) {
-            case AmmoType.T_MG, AmmoType.T_MG_HEAVY, AmmoType.T_MG_LIGHT -> true;
+            case MG, MG_HEAVY, MG_LIGHT -> true;
             default -> false;
         };
     }

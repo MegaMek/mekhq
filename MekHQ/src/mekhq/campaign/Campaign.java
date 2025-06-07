@@ -110,6 +110,7 @@ import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.util.PlayerColour;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
+import megamek.common.BombType.BombTypeEnum;
 import megamek.common.ITechnology.AvailabilityValue;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
@@ -8334,14 +8335,14 @@ public class Campaign implements ITechManager {
             List<BombMounted> mountedBombs = bomber.getBombs();
             if (!mountedBombs.isEmpty()) {
                 // These should return an int[] filled with 0's
-                int[] intBombChoices = bomber.getIntBombChoices();
-                int[] extBombChoices = bomber.getExtBombChoices();
+                BombLoadout intBombChoices = bomber.getIntBombChoices();
+                BombLoadout extBombChoices = bomber.getExtBombChoices();
                 for (BombMounted m : mountedBombs) {
                     if (m.getBaseShotsLeft() == 1) {
                         if (m.isInternalBomb()) {
-                            intBombChoices[BombType.getBombTypeFromInternalName(m.getType().getInternalName())] += 1;
+                            intBombChoices.addBombs(m.getType().getBombType(), 1);
                         } else {
-                            extBombChoices[BombType.getBombTypeFromInternalName(m.getType().getInternalName())] += 1;
+                            extBombChoices.addBombs(m.getType().getBombType(), 1);
                         }
                     }
                 }

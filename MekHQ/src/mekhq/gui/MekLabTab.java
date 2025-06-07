@@ -472,23 +472,23 @@ public class MekLabTab extends CampaignGuiTab {
             }
 
             // one shot weapons count 1/4
-            if ((wtype.getAmmoType() == AmmoType.T_ROCKET_LAUNCHER) || wtype.hasFlag(WeaponType.F_ONESHOT)) {
+            if ((wtype.getAmmoType() == AmmoType.AmmoTypeEnum.ROCKET_LAUNCHER) || wtype.hasFlag(WeaponType.F_ONESHOT)) {
                 weaponHeat *= 0.25;
             }
 
             // double heat for ultras
-            if ((wtype.getAmmoType() == AmmoType.T_AC_ULTRA) || (wtype.getAmmoType() == AmmoType.T_AC_ULTRA_THB)) {
+            if ((wtype.getAmmoType() == AmmoType.AmmoTypeEnum.AC_ULTRA) || (wtype.getAmmoType() == AmmoType.AmmoTypeEnum.AC_ULTRA_THB)) {
                 weaponHeat *= 2;
             }
 
             // Six times heat for RAC
-            if (wtype.getAmmoType() == AmmoType.T_AC_ROTARY) {
+            if (wtype.getAmmoType() == AmmoType.AmmoTypeEnum.AC_ROTARY) {
                 weaponHeat *= 6;
             }
 
             // half heat for streaks
-            if ((wtype.getAmmoType() == AmmoType.T_SRM_STREAK)
-                    || (wtype.getAmmoType() == AmmoType.T_LRM_STREAK)) {
+            if ((wtype.getAmmoType() == AmmoType.AmmoTypeEnum.SRM_STREAK)
+                    || (wtype.getAmmoType() == AmmoType.AmmoTypeEnum.LRM_STREAK)) {
                 weaponHeat *= 0.5;
             }
             heat += weaponHeat;
