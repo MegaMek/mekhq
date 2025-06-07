@@ -130,12 +130,14 @@ public class ScenarioUtils {
             }
 
             // Reset size parameters after getting new instance
+            // Note that the side effect of "setMapSize" is to fill the boardsSelectedVector
+            // with null entries!
+            // We know we are only using a single map so replace the null 0th entry
             mapSettings.setBoardSize(mapSizeX, mapSizeY);
             mapSettings.setMapSize(1, 1);
-            mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
+            mapSettings.getBoardsSelectedVector().set(0, MapSettings.BOARD_GENERATED);
         }
+
         return mapSettings;
-
-
     }
 }
