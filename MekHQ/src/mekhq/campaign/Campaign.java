@@ -7872,7 +7872,7 @@ public class Campaign implements ITechManager {
     }
 
     public int getAstechNeed() {
-        return (Math.toIntExact(getActivePersonnel(true).stream().filter(Person::isTech).count()) * 6) -
+        return (Math.toIntExact(getActivePersonnel(true).stream().filter(Person::isTech).count()) * MHQConstants.ASTECH_TEAM_SIZE) -
                      getNumberAstechs();
     }
 
