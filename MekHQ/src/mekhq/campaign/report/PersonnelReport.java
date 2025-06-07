@@ -36,10 +36,14 @@ package mekhq.campaign.report;
 import java.time.LocalDate;
 import java.util.EnumMap;
 
+import megamek.common.internationalization.I18n;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+
+import static mekhq.utilities.MHQInternationalization.getFormattedText;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
  * @author Jay Lawson
@@ -270,7 +274,7 @@ public class PersonnelReport extends AbstractReport {
             }
         });
 
-        return sb.toString();
+        return getFormattedTextAt("mekhq.resources.PersonnelReport", "secondary.support", sb.toString());
     }
 
     public String getSecondaryCombatPersonnelDetails() {
@@ -300,6 +304,6 @@ public class PersonnelReport extends AbstractReport {
         }
         });
 
-        return sb.toString();
+        return getFormattedTextAt("mekhq.resources.PersonnelReport", "secondary.combat", sb.toString());
     }
 }
