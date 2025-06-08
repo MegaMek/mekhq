@@ -30,6 +30,7 @@ package mekhq.utilities;
 import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.StringJoiner;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -42,6 +43,7 @@ import org.w3c.dom.Node;
 
 import megamek.codeUtilities.StringUtility;
 import megamek.common.*;
+import megamek.common.BombType.BombTypeEnum;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import megamek.utilities.xml.MMXMLUtility;
@@ -282,31 +284,33 @@ public class MHQXMLUtility extends MMXMLUtility {
         return retVal.toString();
     }
 
-    private static void compileBombChoices(int[] bombChoices, StringBuilder retVal, int indentLvl, boolean isInternal) {
-        if (bombChoices.length > 0) {
-            retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("<" + MULParser.ELE_BOMBS + ">\n");
-            for (int type = 0; type < BombType.B_NUM; type++) {
-                if (bombChoices[type] > 0) {
-                    String typeName = BombType.getBombInternalName(type);
-                    retVal.append(MHQXMLUtility.indentStr(indentLvl + 2))
-                            .append("<" + MULParser.ELE_BOMB + " " + MULParser.ATTR_TYPE + "=\"");
-                    retVal.append(typeName);
-                    retVal.append("\" " + MULParser.ATTR_LOAD + "=\"");
-                    retVal.append(bombChoices[type]);
-                    retVal.append((isInternal) ? "\" " + MULParser.ATTR_INTERNAL + "=\"true"
-                            : "\" " + MULParser.ATTR_INTERNAL + "=\"false");
-                    retVal.append("\"/>\n");
-                }
-            }
-            retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("</" + MULParser.ELE_BOMBS + ">\n");
+    private static void compileBombChoices(BombLoadout bombChoices, StringBuilder retVal, int indentLvl, boolean isInternal) {
+        if (bombChoices == null || bombChoices.isEmpty()) {
+            return;
         }
-
+        retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("<" + MULParser.ELE_BOMBS + ">\n");
+        for (Map.Entry<BombTypeEnum, Integer> entry : bombChoices.entrySet()) {
+            BombTypeEnum bombType = entry.getKey();
+            int count = entry.getValue();
+            
+            if (count > 0) {
+                retVal.append(MHQXMLUtility.indentStr(indentLvl + 2))
+                        .append("<" + MULParser.ELE_BOMB + " " + MULParser.ATTR_TYPE + "=\"")
+                        .append(bombType.getInternalName())
+                        .append("\" " + MULParser.ATTR_LOAD + "=\"")
+                        .append(count)
+                        .append("\" " + MULParser.ATTR_INTERNAL + "=\"")
+                        .append(isInternal)
+                        .append("\"/>\n");
+            }
+        }
+        retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("</" + MULParser.ELE_BOMBS + ">\n");
     }
 
     private static String getBombChoiceString(IBomber bomber, int indentLvl) {
         StringBuilder retVal = new StringBuilder();
 
-        int[] bombChoices = bomber.getIntBombChoices();
+        BombLoadout bombChoices = bomber.getIntBombChoices();
         compileBombChoices(bombChoices, retVal, indentLvl, true);
         bombChoices = bomber.getExtBombChoices();
         compileBombChoices(bombChoices, retVal, indentLvl, false);

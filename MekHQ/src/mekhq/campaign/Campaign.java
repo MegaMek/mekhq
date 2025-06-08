@@ -110,6 +110,7 @@ import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.util.PlayerColour;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
+import megamek.common.BombType.BombTypeEnum;
 import megamek.common.ITechnology.AvailabilityValue;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
@@ -6414,13 +6415,13 @@ public class Campaign implements ITechManager {
     }
 
     private void addInMemoryLogHistory(LogEntry le) {
-        if (!inMemoryLogHistory.isEmpty()) {
-            while (ChronoUnit.DAYS.between(inMemoryLogHistory.get(0).getDate(), le.getDate()) >
-                         MHQConstants.MAX_HISTORICAL_LOG_DAYS) {
-                // we've hit the max size for the in-memory based on the UI display limit prune
-                // the oldest entry
-                inMemoryLogHistory.remove(0);
-            }
+        Iterator<LogEntry> iterator = inMemoryLogHistory.iterator();
+        while (iterator.hasNext() &&
+              ChronoUnit.DAYS.between(iterator.next().getDate(), le.getDate()) >
+                     MHQConstants.MAX_HISTORICAL_LOG_DAYS) {
+            // we've hit the max size for the in-memory based on the UI display limit prune
+            // the oldest entry
+            iterator.remove();
         }
         inMemoryLogHistory.add(le);
     }
@@ -7872,7 +7873,7 @@ public class Campaign implements ITechManager {
     }
 
     public int getAstechNeed() {
-        return (Math.toIntExact(getActivePersonnel(true).stream().filter(Person::isTech).count()) * 6) -
+        return (Math.toIntExact(getActivePersonnel(true).stream().filter(Person::isTech).count()) * MHQConstants.ASTECH_TEAM_SIZE) -
                      getNumberAstechs();
     }
 
@@ -8334,14 +8335,14 @@ public class Campaign implements ITechManager {
             List<BombMounted> mountedBombs = bomber.getBombs();
             if (!mountedBombs.isEmpty()) {
                 // These should return an int[] filled with 0's
-                int[] intBombChoices = bomber.getIntBombChoices();
-                int[] extBombChoices = bomber.getExtBombChoices();
+                BombLoadout intBombChoices = bomber.getIntBombChoices();
+                BombLoadout extBombChoices = bomber.getExtBombChoices();
                 for (BombMounted m : mountedBombs) {
                     if (m.getBaseShotsLeft() == 1) {
                         if (m.isInternalBomb()) {
-                            intBombChoices[BombType.getBombTypeFromInternalName(m.getType().getInternalName())] += 1;
+                            intBombChoices.addBombs(m.getType().getBombType(), 1);
                         } else {
-                            extBombChoices[BombType.getBombTypeFromInternalName(m.getType().getInternalName())] += 1;
+                            extBombChoices.addBombs(m.getType().getBombType(), 1);
                         }
                     }
                 }

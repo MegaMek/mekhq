@@ -88,7 +88,9 @@ public final class HangarTab extends CampaignGuiTab {
     private static final int UV_GENERAL = 1;
     private static final int UV_DETAILS = 2;
     private static final int UV_STATUS = 3;
-    private static final int UV_NUM = 4;
+    private static final int UV_TRANSPORT = 4;
+    private static final int UV_NUM = 5;
+
 
     private JSplitPane splitUnit;
     private JTable unitTable;
@@ -177,6 +179,19 @@ public final class HangarTab extends CampaignGuiTab {
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         add(choiceUnitView, gridBagConstraints);
+
+        JButton btnUnitMarket = new JButton(resourceMap.getString("miUnitMarket.text"));
+        btnUnitMarket.addActionListener(e -> getCampaignGui().showUnitMarket());
+        btnUnitMarket.setVisible(!getCampaign().getUnitMarket().getMethod().isNone());
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.anchor = GridBagConstraints.EAST;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 5);
+        add(btnUnitMarket, gridBagConstraints);
 
         unitModel = new UnitTableModel(getCampaign());
         unitTable = new JTable(unitModel);
@@ -320,6 +335,7 @@ public final class HangarTab extends CampaignGuiTab {
             case UV_GENERAL -> "General";
             case UV_DETAILS -> "Details";
             case UV_STATUS -> "Status";
+            case UV_TRANSPORT -> "Transport";
             default -> "?";
         };
     }
@@ -369,6 +385,8 @@ public final class HangarTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_SITE), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUIRKS), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_RSTATUS), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_SHIP_TRANSPORT), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TAC_TRANSPORT), false);
         } else if (view == UV_GENERAL) {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_NAME), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TYPE), true);
@@ -392,6 +410,8 @@ public final class HangarTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_SITE), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUIRKS), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_RSTATUS), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_SHIP_TRANSPORT), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TAC_TRANSPORT), false);
         } else if (view == UV_DETAILS) {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_NAME), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TYPE), true);
@@ -416,6 +436,8 @@ public final class HangarTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUIRKS),
                   getCampaign().getCampaignOptions().isUseQuirks());
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_RSTATUS), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_SHIP_TRANSPORT), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TAC_TRANSPORT), false);
         } else if (view == UV_STATUS) {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_NAME), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TYPE), true);
@@ -441,6 +463,33 @@ public final class HangarTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_SITE), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUIRKS), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_RSTATUS), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_SHIP_TRANSPORT), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TAC_TRANSPORT), false);
+        } else if (view == UV_TRANSPORT) {
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_NAME), true);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TYPE), true);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_WCLASS), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TECH), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_WEIGHT), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_COST), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_STATUS), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_CONDITION), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_CREW_STATE), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUALITY), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PILOT), true);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_FORCE), true);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_CREW), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TECH_CRW), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_MAINTAIN), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_MAINTAIN_CYCLE), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_BV), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_REPAIR), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PARTS), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_SITE), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUIRKS), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_RSTATUS), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_SHIP_TRANSPORT), true);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TAC_TRANSPORT), true);
         }
     }
 

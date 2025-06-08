@@ -70,6 +70,7 @@ import megamek.client.ui.dialogs.UnitLoadingDialog;
 import megamek.client.ui.dialogs.unitSelectorDialogs.AbstractUnitSelectorDialog;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.Dropship;
+import megamek.common.EnhancedTabbedPane;
 import megamek.common.Entity;
 import megamek.common.Jumpship;
 import megamek.common.MULParser;
@@ -164,7 +165,7 @@ public class CampaignGUI extends JPanel {
           MekHQ.getMHQOptions().getLocale());
 
     /* for the main panel */
-    private JTabbedPane tabMain;
+    private EnhancedTabbedPane tabMain;
 
     /* For the menu bar */
     private JMenuBar menuBar;
@@ -186,6 +187,7 @@ public class CampaignGUI extends JPanel {
     private JLabel lblTempAstechs;
     private JLabel lblTempMedics;
     private JLabel lblPartsAvailabilityRating;
+    private JButton btnContractMarket = null;
 
     /* for the top button panel */
     private JPanel pnlTop;
@@ -239,7 +241,7 @@ public class CampaignGUI extends JPanel {
         return resourceMap;
     }
 
-    public JTabbedPane getTabMain() {
+    public EnhancedTabbedPane getTabMain() {
         return tabMain;
     }
 
@@ -264,7 +266,7 @@ public class CampaignGUI extends JPanel {
         frame = new JFrame("MekHQ");
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
-        tabMain = new JTabbedPane();
+        tabMain = new EnhancedTabbedPane(true, true);
         tabMain.setToolTipText("");
         tabMain.setMinimumSize(new Dimension(600, 200));
         tabMain.setPreferredSize(new Dimension(900, 300));
@@ -1160,20 +1162,61 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 1;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.gridheight = 2;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(0, 0, 0, 5);
+        pnlTop.add(lblLocation, gridBagConstraints);
+
+
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.VERTICAL;
+        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.gridheight = 2;
         gridBagConstraints.anchor = GridBagConstraints.SOUTHWEST;
-        pnlTop.add(lblLocation, gridBagConstraints);
+        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
+        pnlTop.add(getDynamicButtonsPanel(), gridBagConstraints);
 
-        gridBagConstraints.gridx = 0;
+
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 1;
+        gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.gridheight = 2;
         gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
+        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         pnlTop.add(getButtonPanel(), gridBagConstraints);
+    }
+
+    private JPanel getDynamicButtonsPanel() {
+        JPanel pnlButton = new JPanel(new GridBagLayout());
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        
+        btnContractMarket = new JButton(resourceMap.getString("btnContractMarket.text"));
+        btnContractMarket.addActionListener(e -> showContractMarket());
+        btnContractMarket.setVisible(getCampaign().getCampaignOptions().isUseAtB()
+            && (ContractMarketDialog.getAvailableContractsCount(getCampaign()) > 0));
+        btnContractMarket.setHorizontalTextPosition(SwingConstants.CENTER);
+        btnContractMarket.setVerticalTextPosition(SwingConstants.CENTER);
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new Insets(3, 3, 3, 3);
+        pnlButton.add(btnContractMarket, gridBagConstraints);
+        return pnlButton;
+    }
+    
+    public void refreshDynamicButtons() {
+        if (btnContractMarket != null) {
+            btnContractMarket.setVisible(getCampaign().getCampaignOptions().isUseAtB()
+                && (ContractMarketDialog.getAvailableContractsCount(getCampaign()) > 0));
+        }
     }
 
     private JPanel getButtonPanel() {
@@ -2893,6 +2936,7 @@ public class CampaignGUI extends JPanel {
         refreshLocation();
         refreshFunds();
         refreshPartsAvailability();
+        refreshDynamicButtons();
 
         refreshAllTabs();
     }
