@@ -4,7 +4,7 @@ plugins {
     id 'application'
     id 'com.palantir.git-version' version '3.3.0'
     id 'edu.sc.seis.launch4j' version '3.0.6'
-    id "io.sentry.jvm.gradle" version '5.5.0'
+    id "io.sentry.jvm.gradle" version '5.7.0'
     id 'jacoco'
     id 'java'
     id 'checkstyle'
@@ -83,7 +83,7 @@ dependencies {
 
     implementation 'org.commonmark:commonmark:0.24.0'
 
-    implementation 'org.jfree:jfreechart:1.5.5'
+    implementation 'org.jfree:jfreechart:1.5.6'
 
     implementation 'com.fasterxml.jackson.core:jackson-core:2.19.0'
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.19.0'
@@ -94,11 +94,11 @@ dependencies {
     // Required for mml printing scaled vector graphics (SVG) - Eclipse IDE Compatibility.
     runtimeOnly 'xml-apis:xml-apis-ext:1.3.04'
 
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.12.2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.13.0'
 
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.12.2'
-    testImplementation 'org.mockito:mockito-core:5.17.0'
-    testImplementation 'org.mockito:mockito-junit-jupiter:5.17.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.13.0'
+    testImplementation 'org.mockito:mockito-core:5.18.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.18.0'
 }
 
 application {
@@ -132,7 +132,7 @@ jar {
 }
 
 checkstyle {
-    toolVersion = '10.24.0'
+    toolVersion = '10.25.0'
     configFile = file("${rootDir}/config/checkstyle/checkstyle.xml")
     configProperties = [
             'suppressionFile': file("${rootDir}/config/checkstyle/checkstyle-suppressions.xml")
@@ -178,8 +178,19 @@ tasks.register('connectorSystemZip', Zip) {
     outputs.dir "${fileStagingDir}/${data}/universe/planetary_systems"
 }
 
-tasks.register("copyLicenseFiles", Exec) {
-    commandLine "cp", "../LICENSE", "../LICENSE.code", "../LICENSE.assets", "../README.md", "docs"
+tasks.register("copyLicenseFiles", Sync) {
+    description = "Copy the license files to the root of the folder."
+    group = 'build'
+    from "../"
+    into fileStagingDir
+
+    includes = [
+            'LICENSE',
+            'LICENSE.code',
+            'LICENSE.assets',
+            'README.md'
+    ]
+
 }
 
 tasks.register('stageFiles', Copy) {
