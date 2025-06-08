@@ -272,7 +272,7 @@ public class PersonnelReport extends AbstractReport {
 
         StringBuilder sb = new StringBuilder("\n" + resources.getString("secondary.support.header.text")+"\n\n");
 
-        sb.append(String.format("%-30s %4s\n", resources.getString("secondary.support.text"), countSecondary));
+        sb.append(String.format("%-30s%4s\n", resources.getString("secondary.support.text"), countSecondary));
 
         countPersonByType.forEach((role, value) ->
             {if (role.isSupport(true) && value >= 0){
