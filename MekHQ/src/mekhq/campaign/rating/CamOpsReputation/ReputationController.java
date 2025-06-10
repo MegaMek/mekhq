@@ -527,7 +527,7 @@ public class ReputationController {
         description.append(String.format("<tr><td><b>%s%s:</b></td> <td style=\"text-align:center;\">" +
                                                "%d</td> <td style=\"text-align:center;\">%d</td></tr>",
               indent,
-              resources.getString("battleArmor.text"),
+              resources.getString("battleArmorTechs.text"),
               technicianRequirements.get("battleArmor").get(0),
               technicianRequirements.get("battleArmor").get(1)));
         description.append("</table><br>");
