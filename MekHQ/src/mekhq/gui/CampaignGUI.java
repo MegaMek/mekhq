@@ -1259,29 +1259,21 @@ public class CampaignGUI extends JPanel {
 
     public void refreshMarketButtonLabels() {
         CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
-        if (btnContractMarket != null) {
-            String labelKey = campaignOptions.getContractMarketMethod().isNone()
-                  ? "manual" : "market";
-            String label = resourceMap.getString("btnContractMarket." + labelKey);
+        String labelKey = campaignOptions.getContractMarketMethod().isNone()
+              ? "manual" : "market";
+        String label = resourceMap.getString("btnContractMarket." + labelKey);
 
-            btnContractMarket.setText(label);
-        }
+        btnContractMarket.setText(label);
 
         PersonnelMarketStyle marketStyle = campaignOptions.getPersonnelMarketStyle();
-        if (btnPersonnelMarket != null) {
-            String labelKey = (marketStyle == PERSONNEL_MARKET_DISABLED && getCampaign().getPersonnelMarket().isNone())
-                  ? "manual" : "market";
-            String label = resourceMap.getString("btnPersonnelMarket." + labelKey);
+        labelKey = (marketStyle == PERSONNEL_MARKET_DISABLED && getCampaign().getPersonnelMarket().isNone())
+              ? "manual" : "market";
+        label = resourceMap.getString("btnPersonnelMarket." + labelKey);
+        btnPersonnelMarket.setText(label);
 
-            btnPersonnelMarket.setText(label);
-        }
-
-        if (btnUnitMarket != null) {
-            String labelKey = getCampaign().getUnitMarket().getMethod().isNone() ? "manual" : "market";
-            String label = resourceMap.getString("btnUnitMarket." + labelKey);
-
-            btnUnitMarket.setText(label);
-        }
+        labelKey = getCampaign().getUnitMarket().getMethod().isNone() ? "manual" : "market";
+        label = resourceMap.getString("btnUnitMarket." + labelKey);
+        btnUnitMarket.setText(label);
     }
 
     private JPanel getButtonPanel() {
