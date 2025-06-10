@@ -34,9 +34,7 @@ planet:
     event:
       - date: '2241-02-21'
         faction:
-          source: canon
-          value:
-            - MCM
+          - MCM
         population: 57277.0
         socioIndustrial: D-D-C-D-C
       - date: '2250-01-01'
@@ -47,7 +45,7 @@ planet:
         population: 1537242.0
       - date: '2271-06-01'
         faction:
-          source: canon
+          source: 'Handbook: House Marik'
           value:
             - FWL
       - date: '2280-01-01'
@@ -230,9 +228,7 @@ planet:
         population: 772080501.0
       - date: '3079-07-30'
         faction:
-          source: canon
-          value:
-            - MSC
+          - MSC
       - date: '3080-01-01'
         population: 777037662.0
       - date: '3090-01-01'
@@ -251,9 +247,7 @@ planet:
         population: 823438463.0
       - date: '3145-11-05'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 826738813.0
   - name: Ásgarðr
     type: ICE_GIANT

@@ -45,9 +45,7 @@ planet:
     event:
       - date: '2238-11-08'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 35548.0
         socioIndustrial: D-F-C-D-A
       - date: '2240-01-01'
@@ -64,9 +62,7 @@ planet:
         population: 1354970.0
       - date: '2280-06-24'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 3162009.0
       - date: '2290-01-01'
         population: 6641821.0
@@ -243,14 +239,10 @@ planet:
         population: 1277199142.0
       - date: '3081-08-15'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3082-08-09'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1286942835.0
       - date: '3099-01-01'
@@ -267,23 +259,14 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3137-10-01'
         faction:
-          source: canon
-          value:
-            - CvW
+          - CvW
       - date: '3140-01-01'
         population: 1301958293.0
       - date: '3145-01-01'
         population: 1302479180.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Varaha Belt
     type: ASTEROID_BELT
     orbitalDist: 0.07

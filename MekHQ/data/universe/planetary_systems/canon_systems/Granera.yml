@@ -34,9 +34,7 @@ planet:
     event:
       - date: '2500-05-04'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 44334.0
         socioIndustrial: C-D-A-D-C
       - date: '2510-01-01'
@@ -55,15 +53,11 @@ planet:
         population: 92111958.0
       - date: '2578-01-09'
         faction:
-          source: canon
-          value:
-            - FWL
-            - MOC
+          - FWL
+          - MOC
       - date: '2578-01-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2579-01-01'
         socioIndustrial: C-C-A-C-C
       - date: '2580-01-01'
@@ -185,9 +179,7 @@ planet:
         population: 404636246.0
       - date: '3081-10-06'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 406827192.0
       - date: '3100-01-01'
@@ -200,9 +192,7 @@ planet:
         population: 424362696.0
       - date: '3130-12-14'
         faction:
-          source: canon
-          value:
-            - DA
+          - DA
         population: 430603841.0
       - date: '3132-08-07'
         hpg: X

@@ -114,9 +114,7 @@ planet:
     event:
       - date: '2139-05-24'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 48964.0
         socioIndustrial: D-D-A-D-D
       - date: '2140-01-01'
@@ -143,9 +141,7 @@ planet:
         population: 62227109.0
       - date: '2242-05-23'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 88560869.0
       - date: '2260-01-01'
@@ -166,9 +162,7 @@ planet:
         population: 470869475.0
       - date: '2340-03-06'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 528689463.0
       - date: '2350-01-01'
         population: 586940267.0
@@ -312,18 +306,14 @@ planet:
         population: 1127806681.0
       - date: '2996-10-10'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '3000-01-01'
         population: 1086067222.0
       - date: '3010-01-01'
         population: 1044825919.0
       - date: '3020-08-01'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 1004144828.0
       - date: '3030-01-01'
         population: 997591705.0
@@ -331,11 +321,6 @@ planet:
         socioIndustrial: B-B-B-C-F
       - date: '3040-01-01'
         population: 1007113985.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3041-01-01'
         socioIndustrial: A-A-A-B-D
       - date: '3050-01-01'
@@ -344,7 +329,7 @@ planet:
         population: 1020393972.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -353,9 +338,7 @@ planet:
         population: 1037577636.0
       - date: '3081-02-16'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1052416344.0
       - date: '3100-01-01'
@@ -372,16 +355,12 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 1139613079.0
       - date: '3145-03-01'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 1141894586.0
   - name: Sibyls
     type: TERRESTRIAL

@@ -32,9 +32,7 @@ planet:
     event:
       - date: '2301-07-09'
         faction:
-          source: canon
-          value:
-            - THW
+          - THW
         population: 52243.0
         socioIndustrial: D-D-D-D-B
       - date: '2310-01-01'
@@ -45,9 +43,7 @@ planet:
         population: 929172.0
       - date: '2335-12-19'
         faction:
-          source: canon
-          value:
-            - TC
+          - TC
       - date: '2340-01-01'
         population: 1938000.0
       - date: '2350-01-01'
@@ -106,14 +102,10 @@ planet:
         population: 140181507.0
       - date: '2596-09-22'
         faction:
-          source: canon
-          value:
-            - SL
+          - SL
       - date: '2597-03-21'
         faction:
-          source: canon
-          value:
-            - TC
+          - TC
       - date: '2600-01-01'
         population: 141864416.0
       - date: '2610-01-01'

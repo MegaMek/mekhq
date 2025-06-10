@@ -37,9 +37,7 @@ planet:
     event:
       - date: '2255-01-15'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 55941.0
         socioIndustrial: D-D-A-D-B
       - date: '2260-01-01'
@@ -60,9 +58,7 @@ planet:
         population: 30438298.0
       - date: '2335-05-12'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2337-01-01'
         socioIndustrial: C-D-A-D-B
       - date: '2340-01-01'
@@ -189,9 +185,7 @@ planet:
         socioIndustrial: C-D-B-D-C
       - date: '2900-07-03'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 668113781.0
       - date: '2910-01-01'
         population: 668341101.0
@@ -230,20 +224,14 @@ planet:
         population: 686195195.0
       - date: '3068-03-10'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '3070-04-23'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 693646266.0
       - date: '3079-09-01'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '3080-01-01'
         population: 701599079.0
       - date: '3090-01-01'
@@ -264,9 +252,7 @@ planet:
         population: 760337283.0
       - date: '3145-12-09'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 763079430.0
   - name: New North Haven
     type: GAS_GIANT

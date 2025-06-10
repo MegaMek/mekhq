@@ -82,9 +82,7 @@ planet:
     event:
       - date: '2168-03-23'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 40378.0
         socioIndustrial: D-D-A-D-D
       - date: '2170-01-01'
@@ -107,9 +105,7 @@ planet:
         population: 7221010.0
       - date: '2242-08-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 11136680.0
       - date: '2260-01-01'
@@ -136,9 +132,7 @@ planet:
         population: 132767114.0
       - date: '2360-07-09'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2370-01-01'
         population: 147449950.0
       - date: '2380-01-01'
@@ -239,16 +233,12 @@ planet:
         population: 377256613.0
       - date: '2830-09-13'
         faction:
-          source: canon
-          value:
-            - FS
-            - DC
+          - FS
+          - DC
         population: 377315196.0
       - date: '2831-04-28'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2840-01-01'
         population: 377373788.0
       - date: '2850-01-01'
@@ -291,17 +281,17 @@ planet:
         population: 340087236.0
       - date: '3020-01-01'
         population: 334016469.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 332249315.0
       - date: '3031-01-01'
         socioIndustrial: B-B-A-C-C
       - date: '3040-01-01'
         population: 336327584.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3045-01-01'
         socioIndustrial:
           source: canon
@@ -312,7 +302,7 @@ planet:
         population: 343636920.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -339,20 +329,11 @@ planet:
         population: 379549733.0
       - date: '3145-09-05'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 383057702.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FS
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
   - name: Sakhara II
     type: TERRESTRIAL
     orbitalDist: 0.49

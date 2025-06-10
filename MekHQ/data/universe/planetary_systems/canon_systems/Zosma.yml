@@ -92,9 +92,7 @@ planet:
     event:
       - date: '2242-07-12'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 61775.0
         socioIndustrial: F-F-C-D-F
       - date: '2250-01-01'
@@ -115,9 +113,7 @@ planet:
         population: 15668426.0
       - date: '2316-11-07'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2320-01-01'
         population: 24479085.0
       - date: '2323-01-01'
@@ -218,23 +214,17 @@ planet:
         population: 402297240.0
       - date: '2767-10-10'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2770-01-01'
         population: 399928607.0
       - date: '2779-02-02'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-01-01'
         population: 388729819.0
       - date: '2790-09-09'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 380224275.0
       - date: '2800-01-01'
         population: 371238318.0
@@ -244,9 +234,7 @@ planet:
         population: 358048939.0
       - date: '2821-09-28'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2830-01-01'
         population: 350371791.0
       - date: '2840-01-01'
@@ -277,9 +265,7 @@ planet:
         population: 272847263.0
       - date: '2950-12-04'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 269281630.0
       - date: '2960-01-01'
         population: 268277192.0
@@ -297,19 +283,12 @@ planet:
         population: 277080691.0
       - date: '3030-02-03'
         faction:
-          source: canon
-          value:
-            - LA
+          - FC
         population: 278193252.0
       - date: '3031-01-01'
         socioIndustrial: C-C-D-C-D
       - date: '3040-01-01'
         population: 282087138.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3041-01-01'
         socioIndustrial:
           source: canon
@@ -318,9 +297,7 @@ planet:
         population: 285892545.0
       - date: '3057-10-01'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3060-01-01'
         population: 289314990.0
       - date: '3067-01-01'
@@ -331,27 +308,19 @@ planet:
         population: 292954124.0
       - date: '3070-06-26'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3078-01-12'
         faction:
-          source: canon
-          value:
-            - Stone
-            - WOB
+          - Stone
+          - WOB
       - date: '3078-01-20'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 295307157.0
       - date: '3081-09-07'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 297381559.0
       - date: '3100-01-01'
@@ -370,21 +339,15 @@ planet:
           value: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3135-11-01'
         faction:
-          source: canon
-          value:
-            - RR
+          - RR
       - date: '3140-01-01'
         population: 315896941.0
       - date: '3145-08-02'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 317353414.0
   - name: Saule
     type: GIANT_TERRESTRIAL

@@ -132,9 +132,7 @@ planet:
     event:
       - date: '2269-08-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 46857.0
         socioIndustrial: D-F-B-D-D
       - date: '2270-01-01'
@@ -159,9 +157,7 @@ planet:
         population: 21526942.0
       - date: '2355-03-13'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2360-01-01'
         population: 31292786.0
       - date: '2370-01-01'
@@ -333,9 +329,7 @@ planet:
         population: 275441998.0
       - date: '3079-05-20'
         faction:
-          source: canon
-          value:
-            - DTA
+          - DTA
       - date: '3080-01-01'
         population: 277099618.0
       - date: '3090-01-01'
@@ -358,11 +352,6 @@ planet:
         population: 279492952.0
       - date: '3145-01-01'
         population: 279772584.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Davies
     type: TERRESTRIAL
     orbitalDist: 5.72

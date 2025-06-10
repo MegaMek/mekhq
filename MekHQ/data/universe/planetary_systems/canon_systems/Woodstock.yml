@@ -134,9 +134,7 @@ planet:
     event:
       - date: '2265-11-22'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 41013.0
         socioIndustrial: D-D-C-F-D
       - date: '2268-01-01'
@@ -153,9 +151,7 @@ planet:
         population: 7664393.0
       - date: '2315-09-19'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2320-01-01'
         population: 16150695.0
       - date: '2330-01-01'
@@ -255,23 +251,17 @@ planet:
         population: 1922460059.0
       - date: '2767-02-05'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2770-01-01'
         population: 1927965456.0
       - date: '2779-03-25'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-01-01'
         population: 1915974266.0
       - date: '2790-05-04'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 1922327621.0
       - date: '2800-01-01'
         population: 1932389206.0
@@ -325,19 +315,12 @@ planet:
         population: 1358065066.0
       - date: '3030-05-09'
         faction:
-          source: canon
-          value:
-            - FS
+          - FC
         population: 1361066323.0
       - date: '3033-01-01'
         socioIndustrial: B-C-D-B-D
       - date: '3040-01-01'
         population: 1380669399.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3043-01-01'
         socioIndustrial: A-B-C-A-C
       - date: '3050-01-01'
@@ -346,34 +329,26 @@ planet:
         population: 1416329199.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3069-12-13'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3070-01-01'
         population: 1428419307.0
       - date: '3077-08-21'
         faction:
-          source: canon
-          value:
-            - Stone
-            - WOB
+          - Stone
+          - WOB
       - date: '3077-08-24'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 1438165658.0
       - date: '3081-07-28'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1440180500.0
       - date: '3100-01-01'
@@ -390,16 +365,12 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 1449137357.0
       - date: '3145-03-24'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 1450007100.0
   - name: Melksham Without
     type: GIANT_TERRESTRIAL

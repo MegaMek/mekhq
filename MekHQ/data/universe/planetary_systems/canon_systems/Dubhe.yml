@@ -157,9 +157,7 @@ planet:
     event:
       - date: '2255-01-17'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 47158.0
         socioIndustrial: D-D-D-D-F
       - date: '2260-01-01'
@@ -184,9 +182,7 @@ planet:
         population: 286873567.0
       - date: '2350-09-05'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 455752661.0
       - date: '2360-01-01'
         population: 676515938.0
@@ -238,9 +234,7 @@ planet:
         population: 6687354462.0
       - date: '2600-05-04'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
         population: 6718538127.0
       - date: '2610-01-01'
         population: 6771018396.0
@@ -282,23 +276,17 @@ planet:
         population: 7777534579.0
       - date: '2767-01-15'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2770-01-01'
         population: 7803657998.0
       - date: '2771-05-20'
         hpg: X
       - date: '2779-11-01'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2780-01-29'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         hpg: B
         population: 7787142755.0
       - date: '2790-01-01'
@@ -371,27 +359,19 @@ planet:
         population: 6444776260.0
       - date: '3070-08-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3078-01-12'
         faction:
-          source: canon
-          value:
-            - Stone
-            - WOB
+          - Stone
+          - WOB
       - date: '3078-01-20'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 6540868276.0
       - date: '3081-11-20'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 6647693288.0
       - date: '3100-01-01'
@@ -408,33 +388,20 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3135-11-01'
         faction:
-          source: canon
-          value:
-            - RR
+          - RR
       - date: '3140-01-01'
         population: 6935616318.0
       - date: '3145-01-01'
         population: 6938391120.0
       - date: '3151-07-09'
         faction:
-          source: canon
-          value:
-            - CWE
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - CWE
+          - CWE
       - date: '3151-10-20'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
   - name: Roughton Belt 1
     type: ASTEROID_BELT
     orbitalDist: 31.36

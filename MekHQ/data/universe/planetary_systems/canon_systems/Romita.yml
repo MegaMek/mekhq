@@ -39,9 +39,7 @@ planet:
     event:
       - date: '2722-02-18'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 39509.0
         socioIndustrial: C-F-A-D-D
       - date: '2723-04-17'
@@ -127,9 +125,7 @@ planet:
         population: 87100844.0
       - date: '3081-05-16'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 87853141.0
       - date: '3097-01-01'
@@ -142,9 +138,7 @@ planet:
         population: 89735510.0
       - date: '3130-09-30'
         faction:
-          source: canon
-          value:
-            - RCM
+          - RCM
         population: 90239439.0
       - date: '3132-08-07'
         hpg: X
@@ -152,11 +146,6 @@ planet:
         population: 90637367.0
       - date: '3145-01-01'
         population: 91164591.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Gómez's Rock
     type: TERRESTRIAL
     orbitalDist: 0.42

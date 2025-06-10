@@ -78,9 +78,7 @@ planet:
     event:
       - date: '2273-01-02'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 57598.0
         socioIndustrial: D-D-C-D-D
       - date: '2280-01-01'
@@ -91,9 +89,7 @@ planet:
         population: 1021433.0
       - date: '2310-09-12'
         faction:
-          source: canon
-          value:
-            - CCom
+          - CCom
         population: 2302417.0
       - date: '2320-01-01'
         population: 4670041.0
@@ -107,7 +103,7 @@ planet:
         population: 33179176.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -225,9 +221,7 @@ planet:
         population: 339194368.0
       - date: '2864-03-02'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2870-01-01'
         population: 340489856.0
       - date: '2880-01-01'
@@ -238,9 +232,7 @@ planet:
         socioIndustrial: B-C-C-C-D
       - date: '2900-03-04'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 339162832.0
       - date: '2910-01-01'
         population: 339888894.0
@@ -266,17 +258,17 @@ planet:
         population: 290385573.0
       - date: '3020-01-01'
         population: 285460004.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 283880520.0
       - date: '3039-01-01'
         socioIndustrial: B-C-C-B-D
       - date: '3040-01-01'
         population: 286561578.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3048-01-01'
         socioIndustrial: A-B-C-A-C
       - date: '3050-01-01'
@@ -285,7 +277,7 @@ planet:
         population: 291125209.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'

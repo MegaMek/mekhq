@@ -114,9 +114,7 @@ planet:
     event:
       - date: '2248-01-04'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 59139.0
         socioIndustrial: D-D-A-D-F
       - date: '2250-01-01'
@@ -133,9 +131,7 @@ planet:
         population: 10514010.0
       - date: '2310-03-29'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 19826452.0
       - date: '2320-01-01'
         population: 34468916.0
@@ -311,9 +307,7 @@ planet:
         population: 1061225879.0
       - date: '3081-06-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 1075542010.0
       - date: '3100-01-01'
@@ -334,15 +328,11 @@ planet:
         population: 1148922711.0
       - date: '3145-01-20'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 1153066286.0
       - date: '3151-11-07'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
   - name: Clinch
     type: GIANT_TERRESTRIAL
     orbitalDist: 0.84

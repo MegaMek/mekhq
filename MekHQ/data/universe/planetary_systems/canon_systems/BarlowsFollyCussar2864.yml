@@ -40,9 +40,7 @@ planet:
     event:
       - date: '2166-06-02'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 40394.0
         socioIndustrial: D-D-D-D-C
       - date: '2170-01-01'
@@ -63,9 +61,7 @@ planet:
         population: 37921916.0
       - date: '2242-02-15'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 64054774.0
       - date: '2260-01-01'
@@ -94,9 +90,7 @@ planet:
         population: 1361996039.0
       - date: '2365-06-01'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2370-01-01'
         population: 1542123565.0
       - date: '2380-01-01'
@@ -190,25 +184,19 @@ planet:
         population: 4631196799.0
       - date: '2796-04-28'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2800-01-01'
         population: 4652333170.0
       - date: '2808-08-28'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2810-01-01'
         population: 4663685197.0
       - date: '2820-01-01'
         population: 4667874502.0
       - date: '2821-10-19'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2830-01-01'
         population: 4677914191.0
       - date: '2840-01-01'
@@ -287,11 +275,6 @@ planet:
         population: 6024499114.0
       - date: '3145-01-01'
         population: 6052275647.0
-      - date: '2108-12-05'
-        name: Cussar
-      - date: '2864-01-01'
-        name: Barlow's Folly
-        message: Cussar renamed to Barlow's Folly
   - name: Yhel
     type: ICE_GIANT
     orbitalDist: 0.21

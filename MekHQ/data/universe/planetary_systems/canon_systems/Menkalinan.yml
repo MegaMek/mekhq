@@ -59,9 +59,7 @@ planet:
     event:
       - date: '2222-10-16'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 57334.0
         socioIndustrial: D-D-C-D-F
       - date: '2230-01-01'
@@ -84,9 +82,7 @@ planet:
         population: 96452109.0
       - date: '2315-01-08'
         faction:
-          source: canon
-          value:
-            - DoL
+          - DoL
       - date: '2320-01-01'
         population: 144388272.0
       - date: '2330-01-01'
@@ -99,7 +95,7 @@ planet:
         population: 449516582.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -149,9 +145,7 @@ planet:
         population: 2063304573.0
       - date: '2571-11-11'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2580-01-01'
         population: 2082151142.0
       - date: '2590-01-01'
@@ -196,23 +190,17 @@ planet:
         population: 1941971676.0
       - date: '2767-11-04'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2770-01-01'
         population: 1923437928.0
       - date: '2779-08-01'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-01-01'
         population: 1887230105.0
       - date: '2790-07-30'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 1841076067.0
       - date: '2800-01-01'
         population: 1795066460.0
@@ -258,9 +246,7 @@ planet:
         population: 1459908644.0
       - date: '2990-04-24'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 1461777228.0
       - date: '3000-01-01'
         population: 1460042035.0
@@ -270,15 +256,11 @@ planet:
         population: 1458175669.0
       - date: '3028-05-29'
         faction:
-          source: canon
-          value:
-            - CC
-            - FWL
+          - CC
+          - FWL
       - date: '3029-04-12'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3030-01-01'
         population: 1464669012.0
       - date: '3040-01-01'
@@ -295,27 +277,19 @@ planet:
         population: 1532850826.0
       - date: '3072-02-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3077-01-10'
         faction:
-          source: canon
-          value:
-            - Stone
-            - WOB
+          - Stone
+          - WOB
       - date: '3077-01-12'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 1554772584.0
       - date: '3081-11-07'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1574171791.0
       - date: '3100-01-01'
@@ -330,21 +304,15 @@ planet:
         population: 1632853809.0
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3136-10-01'
         faction:
-          source: canon
-          value:
-            - TTU
+          - TTU
       - date: '3140-01-01'
         population: 1633833815.0
       - date: '3145-01-02'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 1633833815.0
   - name: God S
     type: ICE_GIANT

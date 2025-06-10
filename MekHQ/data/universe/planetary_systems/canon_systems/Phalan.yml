@@ -90,9 +90,7 @@ planet:
     event:
       - date: '2141-08-15'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 51423.0
         socioIndustrial: D-D-C-C-D
       - date: '2150-01-01'
@@ -117,9 +115,7 @@ planet:
         population: 63502104.0
       - date: '2242-12-22'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 90921705.0
       - date: '2260-01-01'
@@ -132,9 +128,7 @@ planet:
         population: 267881586.0
       - date: '2299-10-23'
         faction:
-          source: canon
-          value:
-            - FoS
+          - FoS
       - date: '2300-01-01'
         population: 329923067.0
       - date: '2310-01-01'
@@ -145,9 +139,9 @@ planet:
         population: 543676002.0
       - date: '2340-01-01'
         population: 620854283.0
-      - date: '2341-02-06'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2350-01-01'
@@ -272,9 +266,7 @@ planet:
         population: 1483876724.0
       - date: '2891-03-11'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         socioIndustrial: B-C-D-C-D
       - date: '2900-01-01'
         population: 1490406926.0
@@ -290,9 +282,7 @@ planet:
         population: 1385632429.0
       - date: '2952-08-18'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2960-01-01'
         population: 1349433003.0
       - date: '2970-01-01'
@@ -307,24 +297,24 @@ planet:
         population: 1218731565.0
       - date: '3020-01-01'
         population: 1188680640.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 1186037834.0
       - date: '3033-01-01'
         socioIndustrial: B-C-D-B-D
       - date: '3040-01-01'
         population: 1194966559.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3043-01-01'
         socioIndustrial: A-B-C-A-C
       - date: '3050-01-01'
         population: 1203120022.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -351,9 +341,7 @@ planet:
         population: 1303324361.0
       - date: '3145-08-10'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
         population: 1307763205.0
   - name: Tai Yi
     type: DWARF_TERRESTRIAL

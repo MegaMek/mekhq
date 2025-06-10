@@ -31,9 +31,7 @@ planet:
     event:
       - date: '2283-05-02'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 43637.0
         socioIndustrial: F-D-B-D-D
       - date: '2290-01-01'
@@ -48,9 +46,7 @@ planet:
         population: 3609203.0
       - date: '2340-03-08'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 6641585.0
       - date: '2350-01-01'
         population: 11171019.0
@@ -201,15 +197,15 @@ planet:
         population: 259434400.0
       - date: '3020-01-01'
         population: 255695095.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 254562942.0
       - date: '3040-01-01'
         population: 257945448.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3049-01-01'
         socioIndustrial: B-C-B-C-B
       - date: '3050-01-01'
@@ -218,7 +214,7 @@ planet:
         population: 265243460.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -245,7 +241,7 @@ planet:
         population: 297420845.0
       - date: '3149-09-01'
         faction:
-          source: canon
+          source: Shattered Fortress
           value:
             - FS
   - name: Russalki Belt I

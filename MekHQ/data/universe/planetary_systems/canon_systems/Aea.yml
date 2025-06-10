@@ -33,9 +33,7 @@ planet:
     event:
       - date: '2735-02-28'
         faction:
-          source: canon
-          value:
-            - SL
+          - SL
         hpg: B
         population: 51376.0
         socioIndustrial: B-F-B-D-F
@@ -47,25 +45,17 @@ planet:
         population: 53962.0
       - date: '3021-01-01'
         faction:
-          source: canon
-          value:
-            - ARC
+          - ARC
       - date: '3022-01-01'
         faction:
-          source: canon
-          value:
-            - ARD
+          - ARD
       - date: '3026-01-01'
         faction:
-          source: canon
-          value:
-            - ARC
+          - ARC
         population: 48806.0
       - date: '3030-05-01'
         faction:
-          source: canon
-          value:
-            - TC
+          - TC
         population: 60376.0
         socioIndustrial: C-C-B-D-F
       - date: '3039-01-01'
@@ -82,9 +72,7 @@ planet:
         population: 131293.0
       - date: '3075-09-15'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X

@@ -87,9 +87,7 @@ planet:
     event:
       - date: '2257-11-22'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 43759.0
         socioIndustrial: D-D-B-F-D
       - date: '2260-01-01'
@@ -110,9 +108,7 @@ planet:
         population: 72669408.0
       - date: '2340-01-06'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 123502994.0
       - date: '2350-01-01'
         population: 193528003.0
@@ -236,9 +232,7 @@ planet:
         population: 3422187897.0
       - date: '2900-06-19'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 3426491804.0
       - date: '2903-01-01'
         socioIndustrial: C-C-D-F-C
@@ -288,9 +282,7 @@ planet:
         population: 501368823.0
       - date: '3081-02-11'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 504285211.0
       - date: '3100-01-01'
@@ -303,9 +295,7 @@ planet:
         population: 514266700.0
       - date: '3130-12-19'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 523083969.0
       - date: '3132-08-07'
         hpg:
@@ -315,15 +305,11 @@ planet:
         population: 532584731.0
       - date: '3145-06-28'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 536218648.0
       - date: '3152-03-17'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
   - name: Milburn
     type: GIANT_TERRESTRIAL
     orbitalDist: 0.9

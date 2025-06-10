@@ -82,9 +82,7 @@ planet:
     event:
       - date: '2211-05-31'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 50093.0
         socioIndustrial: D-F-C-D-F
       - date: '2220-01-01'
@@ -111,9 +109,7 @@ planet:
         population: 109200446.0
       - date: '2315-12-20'
         faction:
-          source: canon
-          value:
-            - DoL
+          - DoL
       - date: '2320-01-01'
         population: 154614788.0
       - date: '2330-01-01'
@@ -126,7 +122,7 @@ planet:
         population: 411393122.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -158,9 +154,7 @@ planet:
         population: 1254047067.0
       - date: '2500-08-11'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 1305036652.0
       - date: '2510-01-01'
         population: 1354075214.0
@@ -274,14 +268,10 @@ planet:
         population: 1281975249.0
       - date: '3014-03-22'
         faction:
-          source: canon
-          value:
-            - FWLR
+          - FWLR
       - date: '3015-03-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3020-01-01'
         population: 1258733758.0
       - date: '3029-01-01'
@@ -302,9 +292,7 @@ planet:
         population: 1292562373.0
       - date: '3081-02-13'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 1299301204.0
       - date: '3095-01-01'
@@ -323,9 +311,7 @@ planet:
         population: 1306075167.0
       - date: '3145-01-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 1306859047.0
   - name: Baal Belt
     type: ASTEROID_BELT

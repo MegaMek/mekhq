@@ -73,9 +73,7 @@ planet:
     event:
       - date: '2621-05-20'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 47572.0
         socioIndustrial: C-D-B-C-F
       - date: '2625-01-01'
@@ -132,9 +130,7 @@ planet:
         population: 62529.0
       - date: '2858-03-01'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         population: 0.0
         socioIndustrial: X-X-X-X-X
   - name:
@@ -170,9 +166,7 @@ planet:
     event:
       - date: '2621-01-31'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 54188.0
         socioIndustrial: C-D-B-D-B
       - date: '2630-01-01'
@@ -228,9 +222,7 @@ planet:
         socioIndustrial: C-D-C-D-B
       - date: '2858-10-30'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X

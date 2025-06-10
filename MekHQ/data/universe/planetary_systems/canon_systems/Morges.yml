@@ -66,9 +66,7 @@ planet:
     event:
       - date: '2299-01-02'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 43891.0
         socioIndustrial: D-D-A-D-B
       - date: '2300-01-01'
@@ -91,9 +89,7 @@ planet:
         population: 11007335.0
       - date: '2365-07-29'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2370-01-01'
         population: 18167148.0
       - date: '2380-01-01'
@@ -239,40 +235,34 @@ planet:
         population: 354615155.0
       - date: '3020-01-01'
         population: 350540015.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 350624495.0
       - date: '3031-01-01'
         socioIndustrial: C-C-C-F-B
       - date: '3040-01-01'
         population: 354609022.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3045-01-01'
         socioIndustrial: B-B-B-D-A
       - date: '3050-01-01'
         population: 357314317.0
       - date: '3057-12-01'
         faction:
-          source: canon
-          value:
-            - ARDC
+          - ARDC
       - date: '3060-01-01'
         population: 359500596.0
       - date: '3067-04-24'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '3070-01-01'
         population: 362424376.0
       - date: '3071-02-08'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3080-01-01'
         population: 364313891.0
       - date: '3090-01-01'
@@ -287,27 +277,21 @@ planet:
         population: 373760731.0
       - date: '3130-04-24'
         faction:
-          source: canon
-          value:
-            - CJF
-            - LA
+          - CJF
+          - LA
         population: 377064340.0
       - date: '3132-08-07'
         hpg: X
       - date: '3135-11-23'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3140-01-01'
         population: 379333527.0
       - date: '3145-01-01'
         population: 379864965.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
   - name: Nuit
     type: DWARF_TERRESTRIAL
     orbitalDist: 1.44

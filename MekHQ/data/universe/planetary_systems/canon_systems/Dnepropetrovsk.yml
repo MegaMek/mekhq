@@ -53,9 +53,7 @@ planet:
     event:
       - date: '2165-01-31'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 40217.0
         socioIndustrial: C-D-A-D-D
       - date: '2170-01-01'
@@ -76,9 +74,7 @@ planet:
         population: 6317321.0
       - date: '2242-11-13'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 9381183.0
       - date: '2260-01-01'
@@ -93,14 +89,12 @@ planet:
         population: 37662031.0
       - date: '2302-03-21'
         faction:
-          source: canon
-          value:
-            - AG
+          - AG
       - date: '2310-01-01'
         population: 45964337.0
-      - date: '2319-10-23'
+      - date: '2319-11-15'
         faction:
-          source: canon
+          source: 'Handbook: House Kurita'
           value:
             - DC
       - date: '2320-01-01'
@@ -111,9 +105,7 @@ planet:
         population: 72890526.0
       - date: '2341-01-23'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2350-01-01'
         population: 82180846.0
       - date: '2360-01-01'

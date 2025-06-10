@@ -105,9 +105,7 @@ planet:
     event:
       - date: '2300-04-27'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 51444.0
         socioIndustrial: D-D-B-D-F
       - date: '2310-01-01'
@@ -118,9 +116,7 @@ planet:
         population: 1504429.0
       - date: '2340-10-17'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 3388343.0
       - date: '2350-01-01'
         population: 6780470.0
@@ -285,9 +281,7 @@ planet:
         population: 408462605.0
       - date: '3081-07-30'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 416047888.0
       - date: '3093-01-01'
@@ -304,16 +298,12 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 451782274.0
       - date: '3145-01-16'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 456140268.0
   - name: Fellanin III
     type: TERRESTRIAL

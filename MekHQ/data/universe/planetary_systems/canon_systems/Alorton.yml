@@ -32,9 +32,7 @@ planet:
     event:
       - date: '2471-01-02'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 55199.0
         socioIndustrial: C-C-A-D-F
       - date: '2480-01-01'
@@ -108,9 +106,7 @@ planet:
         population: 383790754.0
       - date: '2790-10-17'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 380695284.0
       - date: '2800-01-01'
         population: 377216847.0
@@ -178,9 +174,7 @@ planet:
         population: 313866888.0
       - date: '3079-12-23'
         faction:
-          source: canon
-          value:
-            - DTA
+          - DTA
       - date: '3080-01-01'
         population: 318546663.0
       - date: '3090-01-01'
@@ -201,11 +195,6 @@ planet:
         population: 352612236.0
       - date: '3145-01-01'
         population: 354167148.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Toeris
     type: TERRESTRIAL
     orbitalDist: 0.49

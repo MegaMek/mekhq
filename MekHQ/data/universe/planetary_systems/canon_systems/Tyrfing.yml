@@ -89,9 +89,7 @@ planet:
     event:
       - date: '2225-06-27'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 40129.0
         socioIndustrial: C-C-A-D-C
       - date: '2230-01-01'
@@ -100,18 +98,14 @@ planet:
         population: 265826.0
       - date: '2242-08-15'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 194670.0
       - date: '2260-01-01'
         population: 35967.0
       - date: '2262-06-28'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         population: 0.0
         socioIndustrial: X-X-X-X-X
   - name:
@@ -180,9 +174,7 @@ planet:
     event:
       - date: '2225-08-30'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 38818.0
         socioIndustrial: F-D-B-C-C
       - date: '2230-01-01'
@@ -191,18 +183,14 @@ planet:
         population: 148220.0
       - date: '2242-03-12'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 42257.0
       - date: '2260-01-01'
         population: 9347.0
       - date: '2262-12-04'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg:
           source: canon
           value: X
@@ -210,9 +198,7 @@ planet:
         socioIndustrial: X-X-X-X-X
       - date: '2350-07-16'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
         population: 51004.0
         socioIndustrial: D-D-A-D-C
       - date: '2360-01-01'
@@ -307,23 +293,17 @@ planet:
         population: 2045966713.0
       - date: '2767-02-27'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2770-01-01'
         population: 2037125869.0
       - date: '2779-09-13'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-01-01'
         population: 2027502698.0
       - date: '2786-05-17'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2790-01-01'
         population: 2020795796.0
       - date: '2800-01-01'
@@ -336,17 +316,13 @@ planet:
         population: 21694.0
       - date: '2824-06-06'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
       - date: '3095-11-23'
         faction:
-          source: canon
-          value:
-            - IE
+          - IE
         population: 568.0
         socioIndustrial: B-X-X-X-X
   - name: Maeve

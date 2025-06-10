@@ -93,9 +93,7 @@ planet:
     event:
       - date: '2645-05-30'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 46979.0
         socioIndustrial: B-C-A-D-F
       - date: '2646-03-30'
@@ -182,14 +180,10 @@ planet:
         population: 68165312.0
       - date: '3014-03-22'
         faction:
-          source: canon
-          value:
-            - FWLR
+          - FWLR
       - date: '3015-03-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3020-01-01'
         population: 67485020.0
       - date: '3030-01-01'
@@ -209,9 +203,7 @@ planet:
         population: 71127162.0
       - date: '3081-04-30'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 72535006.0
       - date: '3100-01-01'
@@ -230,9 +222,7 @@ planet:
         population: 79191525.0
       - date: '3145-12-24'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 79875509.0
   - name: Altmann
     type: DWARF_TERRESTRIAL

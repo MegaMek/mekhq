@@ -46,9 +46,7 @@ planet:
     event:
       - date: '2660-04-30'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 48839.0
         socioIndustrial: C-F-A-D-D
       - date: '2663-01-01'
@@ -99,17 +97,10 @@ planet:
         population: 3194.0
       - date: '2855-11-21'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
-      - date: '2108-12-05'
-        name: Murris
-      - date: '2822-01-01'
-        name: Kalindam
-        message: Murris renamed to Kalindam
   - name: Mishaxhi's Belt
     type: ASTEROID_BELT
     orbitalDist: 0.49

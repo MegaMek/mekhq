@@ -36,9 +36,7 @@ planet:
     event:
       - date: '2273-10-23'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 58786.0
         socioIndustrial: D-D-B-C-D
       - date: '2280-01-01'
@@ -61,9 +59,7 @@ planet:
         population: 251849966.0
       - date: '2363-05-29'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2370-01-01'
         population: 386441851.0
       - date: '2380-01-01'
@@ -165,9 +161,7 @@ planet:
         population: 4289989393.0
       - date: '2821-03-31'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2830-01-01'
         population: 4274745401.0
       - date: '2840-01-01'
@@ -186,9 +180,7 @@ planet:
         population: 4008558634.0
       - date: '2900-11-25'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 3986487603.0
       - date: '2905-01-01'
         socioIndustrial: C-B-C-C-D
@@ -229,9 +221,7 @@ planet:
         population: 3714011636.0
       - date: '3079-09-01'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '3080-01-01'
         population: 3771650092.0
       - date: '3090-01-01'
@@ -252,9 +242,7 @@ planet:
         population: 4152508444.0
       - date: '3145-11-24'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 4172488398.0
   - name: Bella II
     type: GIANT_TERRESTRIAL

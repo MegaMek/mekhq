@@ -38,9 +38,7 @@ planet:
     event:
       - date: '2900-07-26'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 48841.0
         socioIndustrial: C-D-B-D-F
       - date: '2906-03-21'
@@ -77,7 +75,7 @@ planet:
         population: 54749.0
       - date: '3049-10-27'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
         socioIndustrial: F-F-B-F-F
@@ -95,9 +93,7 @@ planet:
         population: 11528.0
       - date: '3110-02-22'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X

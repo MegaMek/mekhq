@@ -37,9 +37,7 @@ planet:
     event:
       - date: '2701-10-31'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         hpg: B
         population: 45976.0
         socioIndustrial: C-D-C-D-F
@@ -109,28 +107,28 @@ planet:
         population: 170662383.0
       - date: '3020-01-01'
         population: 172022123.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 173646671.0
       - date: '3040-01-01'
         population: 175349964.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3042-01-01'
         socioIndustrial: B-B-C-C-C
       - date: '3050-01-01'
         population: 176370457.0
       - date: '3050-08-12'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
             - FC
       - date: '3050-08-15'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
       - date: '3060-01-01'
@@ -139,20 +137,14 @@ planet:
         population: 179732311.0
       - date: '3073-07-23'
         faction:
-          source: canon
-          value:
-            - SOC
+          - SOC
       - date: '3073-09-12'
         faction:
-          source: canon
-          value:
-            - SOC
-            - CJF
+          - SOC
+          - CJF
       - date: '3073-11-17'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3080-01-01'
         population: 181974867.0
       - date: '3090-01-01'
@@ -173,9 +165,7 @@ planet:
         population: 185873918.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
   - name: Nu
     type: ICE_GIANT
     orbitalDist: 0.42

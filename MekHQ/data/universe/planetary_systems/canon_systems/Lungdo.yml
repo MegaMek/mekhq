@@ -63,18 +63,14 @@ planet:
     event:
       - date: '2268-03-13'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 61099.0
         socioIndustrial: C-D-D-D-D
       - date: '2270-01-01'
         population: 85807.0
       - date: '2280-11-26'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 407384.0
       - date: '2288-01-01'
         socioIndustrial: C-D-D-C-D
@@ -252,9 +248,7 @@ planet:
         population: 3833353894.0
       - date: '3081-10-18'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 3880407253.0
       - date: '3099-01-01'
@@ -273,15 +267,8 @@ planet:
         population: 4160104151.0
       - date: '3145-02-20'
         faction:
-          source: canon
-          value:
-            - OP
+          - OP
         population: 4198553706.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Dimos Makrakomi
     type: TERRESTRIAL
     orbitalDist: 0.8
@@ -309,18 +296,14 @@ planet:
     event:
       - date: '2268-06-23'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 41351.0
         socioIndustrial: D-C-B-D-D
       - date: '2270-01-01'
         population: 55040.0
       - date: '2280-12-05'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 204595.0
       - date: '2290-01-01'
         population: 637346.0
@@ -498,9 +481,7 @@ planet:
         population: 1030616592.0
       - date: '3081-09-24'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 1040350063.0
       - date: '3093-01-01'
@@ -517,15 +498,8 @@ planet:
         population: 1133553349.0
       - date: '3145-11-04'
         faction:
-          source: canon
-          value:
-            - OP
+          - OP
         population: 1143115301.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Hailijin
     type: GAS_GIANT
     orbitalDist: 2.24

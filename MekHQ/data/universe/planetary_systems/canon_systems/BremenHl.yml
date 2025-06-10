@@ -110,9 +110,7 @@ planet:
     event:
       - date: '2891-11-09'
         faction:
-          source: canon
-          value:
-            - HL
+          - HL
         population: 5226.0
         socioIndustrial: C-D-D-D-C
       - date: '2892-03-05'
@@ -177,9 +175,7 @@ planet:
         population: 6338.0
       - date: '3140-10-12'
         faction:
-          source: canon
-          value:
-            - CEI
+          - CEI
       - date: '3145-01-01'
         population: 6351.0
   - name: Fassbinder

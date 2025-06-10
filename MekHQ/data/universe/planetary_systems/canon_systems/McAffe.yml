@@ -100,9 +100,7 @@ planet:
     event:
       - date: '2215-07-07'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 39602.0
         socioIndustrial: D-D-A-C-B
       - date: '2220-01-01'
@@ -129,9 +127,7 @@ planet:
         population: 64992837.0
       - date: '2330-12-19'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 88598053.0
       - date: '2340-01-01'
         population: 116463789.0
@@ -290,15 +286,11 @@ planet:
         population: 697541913.0
       - date: '3036-05-16'
         faction:
-          source: canon
-          value:
-            - LA
-            - FWL
+          - FC
+          - FWL
       - date: '3036-05-28'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3040-01-01'
         population: 702652600.0
       - date: '3041-01-01'
@@ -313,9 +305,7 @@ planet:
         population: 719072798.0
       - date: '3081-06-28'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 718641484.0
       - date: '3097-01-01'
@@ -326,9 +316,7 @@ planet:
         population: 726299600.0
       - date: '3120-10-02'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 736833980.0
       - date: '3130-01-01'
         population: 750817492.0
@@ -336,9 +324,7 @@ planet:
         population: 761098361.0
       - date: '3145-12-25'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 765525558.0
   - name: Morrighan
     type: GIANT_TERRESTRIAL

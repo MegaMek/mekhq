@@ -95,9 +95,7 @@ planet:
     event:
       - date: '2700-09-02'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 47975.0
         socioIndustrial: C-D-C-D-D
       - date: '2708-05-04'
@@ -171,22 +169,22 @@ planet:
         population: 211845952.0
       - date: '3020-01-01'
         population: 210387188.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 211043451.0
       - date: '3040-01-01'
         population: 212398461.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3047-01-01'
         socioIndustrial: C-C-C-B-B
       - date: '3050-01-01'
         population: 214576012.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -215,12 +213,12 @@ planet:
         population: 239071828.0
       - date: '3146-09-01'
         faction:
-          source: canon
+          source: Shattered Fortress
           value:
             - BC
       - date: '3148-01-30'
         faction:
-          source: canon
+          source: Shattered Fortress
           value:
             - LA
   - name: Réez-Fosse-Martin

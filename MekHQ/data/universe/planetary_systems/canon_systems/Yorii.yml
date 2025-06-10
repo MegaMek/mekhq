@@ -103,9 +103,7 @@ planet:
     event:
       - date: '2269-06-05'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 47622.0
         socioIndustrial: C-D-B-D-C
       - date: '2270-01-01'
@@ -120,14 +118,10 @@ planet:
         population: 5941016.0
       - date: '2316-02-17'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2317-01-23'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2320-01-01'
         population: 13130376.0
       - date: '2330-01-01'
@@ -228,23 +222,17 @@ planet:
         population: 1538516566.0
       - date: '2767-04-19'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2770-01-01'
         population: 1522895280.0
       - date: '2779-10-15'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-01-01'
         population: 1505687456.0
       - date: '2790-12-18'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 1488244043.0
       - date: '2800-01-01'
         population: 1458729625.0
@@ -254,9 +242,7 @@ planet:
         population: 1412011909.0
       - date: '2821-06-20'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2830-01-01'
         population: 1391627384.0
       - date: '2840-01-01'
@@ -303,66 +289,47 @@ planet:
         population: 1157592930.0
       - date: '3030-01-27'
         faction:
-          source: canon
-          value:
-            - LA
+          - FC
         population: 1152697801.0
       - date: '3032-01-01'
         socioIndustrial: B-D-C-B-D
       - date: '3040-01-01'
         population: 1162886305.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3042-01-01'
         socioIndustrial: A-C-B-B-C
       - date: '3050-01-01'
         population: 1173282186.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3057-11-01'
         faction:
-          source: canon
-          value:
-            - DC
-            - LA
+          - DC
+          - LA
       - date: '3060-01-01'
         population: 1180579133.0
       - date: '3062-09-17'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '3068-06-19'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3070-01-01'
         population: 1190894981.0
       - date: '3076-11-01'
         faction:
-          source: canon
-          value:
-            - Stone
-            - WOB
+          - Stone
+          - WOB
       - date: '3076-11-10'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 1195428991.0
       - date: '3081-06-15'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1200700467.0
       - date: '3094-01-01'
@@ -383,9 +350,7 @@ planet:
         population: 1217384992.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
   - name: Susano
     type: TERRESTRIAL
     orbitalDist: 0.91

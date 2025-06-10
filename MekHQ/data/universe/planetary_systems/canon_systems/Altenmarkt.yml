@@ -68,9 +68,7 @@ planet:
     event:
       - date: '2235-07-15'
         faction:
-          source: canon
-          value:
-            - TamP
+          - TamP
         population: 39825.0
         socioIndustrial: D-D-A-D-B
       - date: '2240-01-01'
@@ -95,9 +93,9 @@ planet:
         population: 40434571.0
       - date: '2340-01-01'
         population: 56440864.0
-      - date: '2341-05-29'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2350-01-01'
@@ -223,9 +221,7 @@ planet:
         socioIndustrial: C-C-C-D-B
       - date: '2900-07-25'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 585134104.0
       - date: '2910-01-01'
         population: 585468746.0
@@ -255,13 +251,11 @@ planet:
         socioIndustrial: C-C-B-D-B
       - date: '3030-01-11'
         faction:
-          source: canon
-          value:
-            - LA
+          - FC
         population: 497747031.0
       - date: '3034-03-13'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FRR
       - date: '3040-01-01'
@@ -272,22 +266,20 @@ planet:
         population: 509429757.0
       - date: '3052-02-22'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CW
             - FRR
       - date: '3052-02-28'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CW
       - date: '3060-01-01'
         population: 516611932.0
       - date: '3062-08-13'
         faction:
-          source: canon
-          value:
-            - CGB
+          - CGB
       - date: '3070-01-01'
         population: 523790595.0
       - date: '3080-01-01'
@@ -298,9 +290,7 @@ planet:
         population: 544077651.0
       - date: '3103-03-13'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
       - date: '3108-01-01'
         socioIndustrial: B-C-A-D-A
       - date: '3110-01-01'

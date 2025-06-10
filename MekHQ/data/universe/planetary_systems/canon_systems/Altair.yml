@@ -144,9 +144,7 @@ planet:
     event:
       - date: '2242-07-25'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 49685.0
         socioIndustrial: D-D-D-D-D
       - date: '2250-01-01'
@@ -163,23 +161,19 @@ planet:
         population: 32808916.0
       - date: '2309-05-21'
         faction:
-          source: canon
-          value:
-            - AG
+          - AG
       - date: '2310-01-01'
         population: 63327623.0
-      - date: '2319-06-22'
+      - date: '2319-11-15'
         faction:
-          source: canon
+          source: 'Handbook: House Kurita'
           value:
             - DC
       - date: '2320-01-01'
         population: 111207039.0
       - date: '2321-05-03'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2330-01-01'
         population: 181325557.0
       - date: '2340-01-01'
@@ -279,23 +273,17 @@ planet:
         population: 4262854953.0
       - date: '2767-06-12'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2770-01-01'
         population: 4290084188.0
       - date: '2779-08-29'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-01-01'
         population: 4262155738.0
       - date: '2790-08-23'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 4241271547.0
       - date: '2800-01-01'
         population: 4246540285.0
@@ -305,9 +293,7 @@ planet:
         population: 4277828612.0
       - date: '2821-11-15'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2830-01-01'
         population: 4285224011.0
       - date: '2840-01-01'
@@ -369,29 +355,21 @@ planet:
         population: 3178793605.0
       - date: '3068-06-21'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3070-01-01'
         population: 3103701486.0
       - date: '3079-06-10'
         faction:
-          source: canon
-          value:
-            - Stone
-            - WOB
+          - Stone
+          - WOB
       - date: '3079-06-14'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 3155021867.0
       - date: '3081-06-21'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 3200142778.0
       - date: '3100-01-01'
@@ -412,11 +390,6 @@ planet:
         population: 3482656717.0
       - date: '3145-01-01'
         population: 3512736723.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - DC
   - name: Cummings
     type: GIANT_TERRESTRIAL
     orbitalDist: 6.76

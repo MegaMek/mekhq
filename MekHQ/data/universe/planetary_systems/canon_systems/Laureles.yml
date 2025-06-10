@@ -76,9 +76,7 @@ planet:
     event:
       - date: '2241-10-18'
         faction:
-          source: canon
-          value:
-            - MCM
+          - MCM
         population: 43549.0
         socioIndustrial: D-D-B-D-D
       - date: '2250-01-01'
@@ -89,7 +87,7 @@ planet:
         population: 920581.0
       - date: '2271-06-01'
         faction:
-          source: canon
+          source: 'Handbook: House Marik'
           value:
             - FWL
       - date: '2280-01-01'
@@ -273,9 +271,7 @@ planet:
         population: 456203602.0
       - date: '3079-12-31'
         faction:
-          source: canon
-          value:
-            - MSC
+          - MSC
       - date: '3080-01-01'
         population: 458857271.0
       - date: '3090-01-01'
@@ -296,9 +292,7 @@ planet:
         population: 464954339.0
       - date: '3145-03-20'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 467098056.0
   - name: Ombues De Lavalle
     type: DWARF_TERRESTRIAL

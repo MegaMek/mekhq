@@ -41,9 +41,7 @@ planet:
     event:
       - date: '2611-05-05'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 46194.0
         socioIndustrial: B-D-B-D-C
       - date: '2614-01-01'
@@ -129,9 +127,7 @@ planet:
         population: 225646202.0
       - date: '2960-07-20'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 218760998.0
       - date: '2970-01-01'
         population: 213399530.0
@@ -145,6 +141,11 @@ planet:
         population: 197660817.0
       - date: '3020-01-01'
         population: 194077338.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-06-12'
         population: 192733328.0
         socioIndustrial: D-C-C-D-D
@@ -152,11 +153,6 @@ planet:
         socioIndustrial: D-C-C-D-C
       - date: '3040-01-01'
         population: 194397982.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3041-01-01'
         socioIndustrial: D-C-C-D-B
       - date: '3050-01-01'
@@ -165,7 +161,7 @@ planet:
         population: 199219556.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -190,9 +186,7 @@ planet:
         population: 211962106.0
       - date: '3145-01-19'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 212386454.0
   - name: Montgomery's Heights
     type: DWARF_TERRESTRIAL

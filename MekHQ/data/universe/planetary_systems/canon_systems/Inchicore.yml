@@ -74,9 +74,7 @@ planet:
     event:
       - date: '2492-07-20'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 47028.0
         socioIndustrial: C-D-A-D-F
       - date: '2500-01-01'
@@ -197,21 +195,21 @@ planet:
         population: 6375941.0
       - date: '3020-01-01'
         population: 6432739.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 6474952.0
       - date: '3040-01-19'
         population: 6532836.0
         socioIndustrial: F-F-B-F-D
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3050-01-01'
         population: 6608398.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -240,12 +238,12 @@ planet:
         population: 6966697.0
       - date: '3146-09-01'
         faction:
-          source: canon
+          source: Shattered Fortress
           value:
             - BC
       - date: '3148-01-30'
         faction:
-          source: canon
+          source: Shattered Fortress
           value:
             - LA
   - name: The Dark Fairy

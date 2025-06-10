@@ -197,9 +197,7 @@ planet:
     event:
       - date: '2232-08-31'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 58317.0
         socioIndustrial: D-D-B-D-C
       - date: '2240-01-01'
@@ -223,14 +221,10 @@ planet:
         population: 58571151.0
       - date: '2315-12-25'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2317-06-01'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2320-01-01'
         population: 91257853.0
       - date: '2330-01-01'
@@ -328,16 +322,12 @@ planet:
         population: 1600253261.0
       - date: '2767-06-10'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2770-01-01'
         population: 1606650954.0
       - date: '2779-07-18'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-01-01'
         population: 1588551460.0
       - date: '2783-11-02'
@@ -350,9 +340,7 @@ planet:
           value: A
       - date: '2790-12-25'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 1565498228.0
       - date: '2800-01-01'
         population: 1544048677.0
@@ -362,9 +350,7 @@ planet:
         population: 1505737084.0
       - date: '2821-04-09'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2830-01-01'
         population: 1473752255.0
       - date: '2840-01-01'
@@ -377,9 +363,7 @@ planet:
         population: 1384470664.0
       - date: '2864-05-11'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2870-01-01'
         population: 1358781034.0
       - date: '2880-01-01'
@@ -413,20 +397,18 @@ planet:
         population: 1203195408.0
       - date: '3020-01-01'
         population: 1205396023.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 1212459979.0
       - date: '3037-01-01'
         socioIndustrial: C-B-B-B-C
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3040-12-25'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 1224645404.0
       - date: '3044-01-01'
         socioIndustrial:
@@ -440,27 +422,19 @@ planet:
         population: 1268901209.0
       - date: '3072-02-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3077-05-10'
         faction:
-          source: canon
-          value:
-            - Stone
-            - WOB
+          - Stone
+          - WOB
       - date: '3077-07-24'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 1271187288.0
       - date: '3081-05-14'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1267125990.0
       - date: '3100-01-01'
@@ -479,16 +453,12 @@ planet:
         socioIndustrial: B-B-B-B-C
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 1303106900.0
       - date: '3145-07-06'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 1313310878.0
   - name: Hankins's Grove
     type: ICE_GIANT

@@ -59,9 +59,7 @@ planet:
     event:
       - date: '2322-05-03'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 45182.0
         socioIndustrial: D-D-C-D-C
       - date: '2330-01-01'
@@ -237,9 +235,7 @@ planet:
         population: 300359241.0
       - date: '3081-07-24'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 304411142.0
       - date: '3093-01-01'
@@ -260,9 +256,7 @@ planet:
         population: 322782664.0
       - date: '3151-01-01'
         faction:
-          source: canon
-          value:
-            - DA
+          - DA
   - name: Fujimi-machi
     type: DWARF_TERRESTRIAL
     orbitalDist: 1.0

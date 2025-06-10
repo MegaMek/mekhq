@@ -59,9 +59,7 @@ planet:
     event:
       - date: '2711-08-24'
         faction:
-          source: canon
-          value:
-            - MOC
+          - MOC
         hpg: B
         population: 48305.0
         socioIndustrial: C-D-A-D-D

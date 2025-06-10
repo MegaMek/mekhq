@@ -56,9 +56,7 @@ planet:
     event:
       - date: '2708-01-25'
         faction:
-          source: canon
-          value:
-            - TC
+          - TC
         population: 47433.0
         socioIndustrial: D-D-B-D-D
       - date: '2710-01-01'
@@ -86,9 +84,7 @@ planet:
         population: 6194569.0
       - date: '2814-02-28'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2820-01-01'
         population: 3582007.0
       - date: '2830-01-01'
@@ -105,24 +101,13 @@ planet:
         population: 101830.0
       - date: '3018-01-01'
         faction:
-          source: canon
-          value:
-            - ARC
+          - ARC
       - date: '3022-01-01'
         faction:
-          source: canon
-          value:
-            - ARD
+          - ARD
       - date: '3026-01-01'
         faction:
-          source: canon
-          value:
-            - ARC
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN
+          - ARC
   - name: 3IJ1 Belt
     type: ASTEROID_BELT
     orbitalDist: 0.7

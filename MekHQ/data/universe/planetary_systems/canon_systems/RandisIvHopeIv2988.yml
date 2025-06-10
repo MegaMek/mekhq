@@ -134,9 +134,7 @@ planet:
     event:
       - date: '2654-10-19'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 54462.0
         socioIndustrial: C-D-B-D-C
       - date: '2660-01-01'
@@ -219,9 +217,7 @@ planet:
         population: 15974446.0
       - date: '2989-07-10'
         faction:
-          source: canon
-          value:
-            - FOR
+          - FOR
       - date: '2990-01-01'
         population: 15976068.0
       - date: '3000-01-01'
@@ -264,13 +260,6 @@ planet:
         population: 18569766.0
       - date: '3145-01-01'
         population: 18644193.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - IND
-      - date: '2108-12-05'
-      - date: '2988-01-01'
   - name: Hope V
     type: TERRESTRIAL
     orbitalDist: 1.4

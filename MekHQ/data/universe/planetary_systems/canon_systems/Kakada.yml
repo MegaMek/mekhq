@@ -84,9 +84,7 @@ planet:
     event:
       - date: '2262-12-31'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 57818.0
         socioIndustrial: C-D-B-D-B
       - date: '2270-01-01'
@@ -109,9 +107,7 @@ planet:
         population: 23568500.0
       - date: '2355-10-16'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2360-01-01'
         population: 32460050.0
       - date: '2370-01-01'
@@ -271,9 +267,7 @@ planet:
         population: 251383519.0
       - date: '3081-12-15'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 252239678.0
       - date: '3100-01-01'
@@ -292,9 +286,7 @@ planet:
         population: 260858924.0
       - date: '3145-09-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 262638809.0
   - name: GU-1 Belt
     type: ASTEROID_BELT

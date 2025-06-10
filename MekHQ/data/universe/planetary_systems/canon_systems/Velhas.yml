@@ -91,9 +91,7 @@ planet:
     event:
       - date: '2646-08-09'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 52044.0
         socioIndustrial: C-D-B-D-F
       - date: '2647-01-01'
@@ -158,9 +156,7 @@ planet:
         socioIndustrial: F-F-C-D-D
       - date: '2900-03-31'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 549852402.0
       - date: '2910-01-01'
         population: 530065440.0
@@ -188,9 +184,12 @@ planet:
         population: 353141640.0
       - date: '3025-03-26'
         faction:
-          source: canon
+          - FS
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
           value:
-            - FS
+            - FC
       - date: '3030-01-01'
         population: 353112974.0
       - date: '3032-01-01'
@@ -199,11 +198,6 @@ planet:
         socioIndustrial: D-F-C-D-F
       - date: '3040-01-01'
         population: 356626154.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3044-01-01'
         socioIndustrial: C-D-B-D-F
       - date: '3050-01-01'
@@ -212,19 +206,19 @@ planet:
         population: 366349592.0
       - date: '3063-04-04'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FC
             - LA
       - date: '3063-04-14'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FC
             - LA
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -239,9 +233,7 @@ planet:
         population: 385903773.0
       - date: '3105-06-02'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '3110-01-01'
         population: 391500991.0
       - date: '3120-01-01'

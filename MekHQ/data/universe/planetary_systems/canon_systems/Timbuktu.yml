@@ -73,9 +73,7 @@ planet:
     event:
       - date: '2509-06-17'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 48850.0
         socioIndustrial: C-D-B-D-F
       - date: '2510-01-01'
@@ -142,9 +140,7 @@ planet:
         population: 983726072.0
       - date: '2779-02-15'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2780-01-01'
         population: 982795864.0
       - date: '2790-01-01'
@@ -198,15 +194,15 @@ planet:
         population: 929714091.0
       - date: '3020-01-01'
         population: 922796170.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 924157230.0
       - date: '3040-01-01'
         population: 934192219.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3043-01-01'
         socioIndustrial:
           source: canon
@@ -215,7 +211,7 @@ planet:
         population: 942920731.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -244,16 +240,6 @@ planet:
         population: 1050984076.0
       - date: '3145-01-01'
         population: 1059001984.0
-      - date: '3148-06-24'
-        faction:
-          source: sucs
-          value:
-            - TiC
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - TiC
   - name: Buck
     type: GIANT_TERRESTRIAL
     orbitalDist: 0.8

@@ -52,9 +52,7 @@ planet:
     event:
       - date: '2614-09-01'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 51277.0
         socioIndustrial: C-D-A-D-C
       - date: '2620-01-01'
@@ -149,14 +147,10 @@ planet:
         population: 210084475.0
       - date: '3014-03-22'
         faction:
-          source: canon
-          value:
-            - FWLR
+          - FWLR
       - date: '3015-03-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3020-01-01'
         population: 208839097.0
       - date: '3030-01-01'
@@ -175,9 +169,7 @@ planet:
         population: 217497843.0
       - date: '3081-02-25'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 218194951.0
       - date: '3096-01-01'
@@ -190,9 +182,7 @@ planet:
         population: 222113593.0
       - date: '3130-05-13'
         faction:
-          source: canon
-          value:
-            - DTA
+          - DTA
         population: 224211305.0
       - date: '3132-08-07'
         hpg: X
@@ -200,11 +190,6 @@ planet:
         population: 225425321.0
       - date: '3145-01-01'
         population: 226283567.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Al Kharj
     type: TERRESTRIAL
     orbitalDist: 2.24

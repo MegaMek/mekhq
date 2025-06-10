@@ -99,9 +99,7 @@ planet:
     event:
       - date: '2318-04-07'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 51014.0
         socioIndustrial: C-C-B-D-D
       - date: '2320-01-01'
@@ -255,14 +253,10 @@ planet:
         population: 1269840525.0
       - date: '3014-03-22'
         faction:
-          source: canon
-          value:
-            - FWLR
+          - FWLR
       - date: '3015-03-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3020-01-01'
         population: 1264913308.0
       - date: '3030-01-01'
@@ -282,9 +276,7 @@ planet:
         population: 1334259389.0
       - date: '3079-11-09'
         faction:
-          source: canon
-          value:
-            - TP
+          - TP
       - date: '3080-01-01'
         population: 1343363271.0
       - date: '3090-01-01'
@@ -297,9 +289,7 @@ planet:
         population: 1360124682.0
       - date: '3130-08-04'
         faction:
-          source: canon
-          value:
-            - OP
+          - OP
         population: 1362030190.0
       - date: '3132-08-07'
         hpg: X
@@ -309,11 +299,6 @@ planet:
         population: 1361485487.0
       - date: '3145-01-01'
         population: 1360941001.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Torrecilla sobre Alesanco
     type: TERRESTRIAL
     orbitalDist: 4.48

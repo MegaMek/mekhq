@@ -98,9 +98,7 @@ planet:
     event:
       - date: '2189-03-18'
         faction:
-          source: canon
-          value:
-            - LR
+          - LR
         population: 58997.0
         socioIndustrial: D-D-B-D-A
       - date: '2190-01-01'
@@ -131,9 +129,7 @@ planet:
         population: 309290558.0
       - date: '2315-06-19'
         faction:
-          source: canon
-          value:
-            - DoL
+          - DoL
       - date: '2320-01-01'
         population: 404420668.0
       - date: '2330-01-01'
@@ -146,7 +142,7 @@ planet:
         population: 886352821.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -197,9 +193,7 @@ planet:
         population: 2465547796.0
       - date: '2571-11-22'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '2580-01-01'
         population: 2481164101.0
       - date: '2590-01-01'
@@ -304,29 +298,18 @@ planet:
         socioIndustrial: C-C-C-F-B
       - date: '3028-08-25'
         faction:
-          source: canon
-          value:
-            - CC
-            - FS
+          - CC
+          - FC
       - date: '3028-09-25'
         faction:
-          source: canon
-          value:
-            - FS
+          - FC
       - date: '3030-01-01'
         population: 2038676616.0
       - date: '3030-02-28'
         faction:
-          source: canon
-          value:
-            - LA
+          - FC
       - date: '3040-01-01'
         population: 2050330254.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3043-01-01'
         socioIndustrial:
           source: canon
@@ -335,9 +318,7 @@ planet:
         population: 2068245947.0
       - date: '3057-10-01'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '3060-01-01'
         population: 2084649800.0
       - date: '3070-01-01'
@@ -346,9 +327,7 @@ planet:
         population: 2125061790.0
       - date: '3085-10-30'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 2134859592.0
       - date: '3097-01-01'
@@ -367,15 +346,11 @@ planet:
           value: X
       - date: '3134-07-01'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '3140-01-01'
         population: 2264153321.0
       - date: '3145-01-01'
         population: 2276412820.0
-      - date: '2108-12-05'
-      - date: '2202-01-01'
   - name: Ned Er Tcher
     type: TERRESTRIAL
     orbitalDist: 0.96
