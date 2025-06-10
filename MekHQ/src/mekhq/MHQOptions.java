@@ -32,16 +32,16 @@
  */
 package mekhq;
 
-import java.awt.Color;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import javax.swing.UIManager;
-
 import megamek.SuiteOptions;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 import mekhq.gui.enums.ForceIconOperationalStatusStyle;
 import mekhq.gui.enums.PersonnelFilterStyle;
+
+import javax.swing.UIManager;
+import java.awt.Color;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public final class MHQOptions extends SuiteOptions {
     // region Display Tab
@@ -112,11 +112,13 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     // region Command Center Tab
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public boolean getCommandCenterUseUnitMarket() {
         return userPreferences.node(MHQConstants.DISPLAY_NODE)
                      .getBoolean(MHQConstants.COMMAND_CENTER_USE_UNIT_MARKET, true);
     }
 
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public void setCommandCenterUseUnitMarket(boolean value) {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.COMMAND_CENTER_USE_UNIT_MARKET, value);
     }
@@ -786,7 +788,7 @@ public final class MHQOptions extends SuiteOptions {
     public void setAutosaveYearlyValue(boolean value) {
         userPreferences.node(MHQConstants.AUTOSAVE_NODE).putBoolean(MHQConstants.SAVE_YEARLY_KEY, value);
     }
-    
+
     public boolean getAutosaveBeforeScenariosValue() {
         return userPreferences.node(MHQConstants.AUTOSAVE_NODE)
                      .getBoolean(MHQConstants.SAVE_BEFORE_SCENARIOS_KEY, true);

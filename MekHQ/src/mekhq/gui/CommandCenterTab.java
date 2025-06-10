@@ -32,28 +32,6 @@
  */
 package mekhq.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.ResourceBundle;
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-
-import megamek.client.ui.dialogs.UnitLoadingDialog;
-import megamek.client.ui.dialogs.unitSelectorDialogs.AbstractUnitSelectorDialog;
-import megamek.common.MekSummaryCache;
 import megamek.common.event.Subscribe;
 import mekhq.MHQOptionsChangedEvent;
 import mekhq.MekHQ;
@@ -77,11 +55,7 @@ import mekhq.gui.adapter.ProcurementTableMouseAdapter;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.AcquisitionsDialog;
-import mekhq.gui.dialog.MRMSDialog;
-import mekhq.gui.dialog.MekHQUnitSelectorDialog;
 import mekhq.gui.dialog.PartsReportDialog;
-import mekhq.gui.dialog.PartsStoreDialog;
-import mekhq.gui.dialog.UnitMarketDialog;
 import mekhq.gui.dialog.reportDialogs.CargoReportDialog;
 import mekhq.gui.dialog.reportDialogs.FactionStanding.FactionStandingReport;
 import mekhq.gui.dialog.reportDialogs.HangarReportDialog;
@@ -95,9 +69,26 @@ import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.TargetSorter;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
-import mekhq.service.enums.MRMSMode;
-import mekhq.service.mrms.MRMSService;
 import mekhq.utilities.ReportingUtilities;
+
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.ResourceBundle;
 
 /**
  * Collates important information about the campaign and displays it, along with some actionable buttons
@@ -446,16 +437,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
         JPanel panProcurementButtons = new JPanel(new GridLayout(8, 1, 0, 5));
         panProcurementButtons.getAccessibleContext().setAccessibleName("Procurement Actions");
 
-        btnGetUnit = new RoundedJButton(resourceMap.getString("btnGetUnit.text"));
-        btnGetUnit.setToolTipText(resourceMap.getString("btnGetUnit.toolTipText"));
-        btnGetUnit.addActionListener(evt -> getUnit());
-        panProcurementButtons.add(btnGetUnit);
-
-        btnGetParts = new RoundedJButton(resourceMap.getString("btnGetParts.text"));
-        btnGetParts.setToolTipText(resourceMap.getString("btnGetParts.toolTipText"));
-        btnGetParts.addActionListener(evt -> getParts());
-        panProcurementButtons.add(btnGetParts);
-
         btnNeededParts = new RoundedJButton(resourceMap.getString("btnNeededParts.text"));
         btnNeededParts.setToolTipText(resourceMap.getString("btnNeededParts.toolTipText"));
         btnNeededParts.addActionListener(evt -> new AcquisitionsDialog(getFrame(), true, getCampaignGui()).setVisible(
@@ -484,31 +465,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
         });
         btnResumeProcurement.setEnabled(!getCampaign().isProcessProcurement());
         panProcurementButtons.add(btnResumeProcurement);
-
-        btnMRMSDialog = new RoundedJButton(resourceMap.getString("btnMRMSDialog.text"));
-        btnMRMSDialog.setToolTipText(resourceMap.getString("btnMRMSDialog.toolTipText"));
-        btnMRMSDialog.setName("btnMRMSDialog");
-        btnMRMSDialog.addActionListener(evt -> new MRMSDialog(getFrame(),
-              true,
-              getCampaignGui(),
-              null,
-              MRMSMode.UNITS).setVisible(true));
-        btnMRMSDialog.setVisible(MekHQ.getMHQOptions().getCommandCenterMRMS());
-        panProcurementButtons.add(btnMRMSDialog);
-
-        btnMRMSInstant = new RoundedJButton(resourceMap.getString("btnMRMSInstant.text"));
-        btnMRMSInstant.setToolTipText(resourceMap.getString("btnMRMSInstant.toolTipText"));
-        btnMRMSInstant.setName("btnMRMSInstant");
-        btnMRMSInstant.addActionListener(evt -> {
-            MRMSService.mrmsAllUnits(getCampaign());
-            JOptionPane.showMessageDialog(getCampaignGui().getFrame(),
-                  "Mass Repair/Salvage complete.",
-                  "Complete",
-                  JOptionPane.INFORMATION_MESSAGE);
-        });
-        btnMRMSInstant.setVisible(MekHQ.getMHQOptions().getCommandCenterMRMS());
-        panProcurementButtons.add(btnMRMSInstant);
-
         /* shopping table */
         procurementTotalCostLabel = new JLabel();
         refreshProcurmentTotalCost();
@@ -837,35 +793,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
      */
     synchronized private void refreshLog() {
         panLog.appendLog(getCampaign().fetchAndClearNewReports());
-    }
-
-    /**
-     * brings up the {@link AbstractUnitSelectorDialog} or {@link UnitMarketDialog}, depending on the currently selected
-     * options
-     */
-    private void getUnit() {
-        if (MekHQ.getMHQOptions().getCommandCenterUseUnitMarket() &&
-                  !getCampaign().getUnitMarket().getMethod().isNone()) {
-            new UnitMarketDialog(getFrame(), getCampaign()).showDialog();
-        } else {
-            UnitLoadingDialog unitLoadingDialog = new UnitLoadingDialog(getFrame());
-            if (!MekSummaryCache.getInstance().isInitialized()) {
-                unitLoadingDialog.setVisible(true);
-            }
-            AbstractUnitSelectorDialog usd = new MekHQUnitSelectorDialog(getFrame(),
-                  unitLoadingDialog,
-                  getCampaign(),
-                  true);
-            usd.setVisible(true);
-        }
-    }
-
-    /**
-     * brings up the {@link PartsStoreDialog}
-     */
-    private void getParts() {
-        PartsStoreDialog psd = new PartsStoreDialog(true, getCampaignGui());
-        psd.setVisible(true);
     }
 
     private ActionScheduler procurementListScheduler = new ActionScheduler(this::refreshProcurementList);

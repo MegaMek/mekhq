@@ -32,25 +32,11 @@
  */
 package mekhq.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.UUID;
-import javax.swing.*;
-import javax.swing.RowSorter.SortKey;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-
+import megamek.client.ui.clientGUI.GUIPreferences;
 import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.client.ui.clientGUI.GUIPreferences;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.Entity;
 import megamek.common.UnitType;
@@ -74,6 +60,20 @@ import mekhq.gui.sorter.UnitTypeSorter;
 import mekhq.gui.sorter.WeightClassSorter;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.view.UnitViewPanel;
+
+import javax.swing.*;
+import javax.swing.RowSorter.SortKey;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.UUID;
 
 /**
  * Displays a table of all units in the force.
@@ -179,19 +179,6 @@ public final class HangarTab extends CampaignGuiTab {
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         add(choiceUnitView, gridBagConstraints);
-
-        JButton btnUnitMarket = new JButton(resourceMap.getString("miUnitMarket.text"));
-        btnUnitMarket.addActionListener(e -> getCampaignGui().showUnitMarket());
-        btnUnitMarket.setVisible(!getCampaign().getUnitMarket().getMethod().isNone());
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 5;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(5, 5, 0, 5);
-        add(btnUnitMarket, gridBagConstraints);
 
         unitModel = new UnitTableModel(getCampaign());
         unitTable = new JTable(unitModel);
