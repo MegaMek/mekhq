@@ -33,41 +33,14 @@
  */
 package mekhq.gui;
 
-import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
-import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
-import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
-import static mekhq.campaign.personnel.skills.SkillType.getExperienceLevelName;
-import static mekhq.gui.dialog.nagDialogs.NagController.triggerDailyNags;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
-import static mekhq.utilities.MHQInternationalization.getText;
-
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.List;
-import java.util.stream.IntStream;
-import java.util.zip.GZIPOutputStream;
-import javax.swing.*;
-import javax.swing.UIManager.LookAndFeelInfo;
-import javax.xml.parsers.DocumentBuilder;
-
 import megamek.Version;
 import megamek.client.generator.RandomUnitGenerator;
+import megamek.client.ui.clientGUI.GUIPreferences;
+import megamek.client.ui.dialogs.UnitLoadingDialog;
+import megamek.client.ui.dialogs.buttonDialogs.GameOptionsDialog;
+import megamek.client.ui.dialogs.unitSelectorDialogs.AbstractUnitSelectorDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.client.ui.clientGUI.GUIPreferences;
-import megamek.client.ui.dialogs.buttonDialogs.GameOptionsDialog;
-import megamek.client.ui.dialogs.UnitLoadingDialog;
-import megamek.client.ui.dialogs.unitSelectorDialogs.AbstractUnitSelectorDialog;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.Dropship;
 import megamek.common.EnhancedTabbedPane;
@@ -143,6 +116,33 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import javax.swing.*;
+import javax.swing.UIManager.LookAndFeelInfo;
+import javax.xml.parsers.DocumentBuilder;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.List;
+import java.util.stream.IntStream;
+import java.util.zip.GZIPOutputStream;
+
+import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
+import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
+import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
+import static mekhq.campaign.personnel.skills.SkillType.getExperienceLevelName;
+import static mekhq.gui.dialog.nagDialogs.NagController.triggerDailyNags;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getText;
+
 /**
  * The application's main frame.
  */
@@ -187,7 +187,6 @@ public class CampaignGUI extends JPanel {
     private JLabel lblTempAstechs;
     private JLabel lblTempMedics;
     private JLabel lblPartsAvailabilityRating;
-    private JButton btnContractMarket = null;
 
     /* for the top button panel */
     private JPanel pnlTop;
@@ -197,6 +196,12 @@ public class CampaignGUI extends JPanel {
     private final RoundedMMToggleButton btnGMMode = new RoundedMMToggleButton(resourceMap.getString("btnGMMode.text"));
     private final RoundedMMToggleButton btnOvertime = new RoundedMMToggleButton(resourceMap.getString("btnOvertime.text"));
     private final RoundedJButton btnGlossary = new RoundedJButton(resourceMap.getString("btnGlossary.text"));
+    private final RoundedJButton btnContractMarket =
+          new RoundedJButton(resourceMap.getString("btnContractMarket.market"));
+    private final RoundedJButton btnPersonnelMarket =
+          new RoundedJButton(resourceMap.getString("btnPersonnelMarket.market"));
+    private final RoundedJButton btnUnitMarket = new RoundedJButton(resourceMap.getString("btnUnitMarket.market"));
+    private final RoundedJButton btnPartsMarket = new RoundedJButton(resourceMap.getString("btnPartsMarket.manual"));
 
     ReportHyperlinkListener reportHLL;
 
@@ -1178,7 +1183,7 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.gridheight = 2;
         gridBagConstraints.anchor = GridBagConstraints.SOUTHWEST;
         gridBagConstraints.insets = new Insets(0, 0, 0, 0);
-        pnlTop.add(getDynamicButtonsPanel(), gridBagConstraints);
+        pnlTop.add(getMarketButtons(), gridBagConstraints);
 
 
         gridBagConstraints.gridx = 2;
@@ -1192,14 +1197,13 @@ public class CampaignGUI extends JPanel {
         pnlTop.add(getButtonPanel(), gridBagConstraints);
     }
 
-    private JPanel getDynamicButtonsPanel() {
+    private JPanel getMarketButtons() {
         JPanel pnlButton = new JPanel(new GridBagLayout());
+        pnlButton.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("lblMarkets.title")));
+
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        
-        btnContractMarket = new JButton(resourceMap.getString("btnContractMarket.text"));
+
         btnContractMarket.addActionListener(e -> showContractMarket());
-        btnContractMarket.setVisible(getCampaign().getCampaignOptions().isUseAtB()
-            && (ContractMarketDialog.getAvailableContractsCount(getCampaign()) > 0));
         btnContractMarket.setHorizontalTextPosition(SwingConstants.CENTER);
         btnContractMarket.setVerticalTextPosition(SwingConstants.CENTER);
         gridBagConstraints.gridx = 0;
@@ -1209,14 +1213,67 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new Insets(3, 3, 3, 3);
         pnlButton.add(btnContractMarket, gridBagConstraints);
+
+        btnPersonnelMarket.addActionListener(e -> hirePersonMarket());
+        btnPersonnelMarket.setHorizontalTextPosition(SwingConstants.CENTER);
+        btnPersonnelMarket.setVerticalTextPosition(SwingConstants.CENTER);
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new Insets(3, 3, 3, 3);
+        pnlButton.add(btnPersonnelMarket, gridBagConstraints);
+
+        btnUnitMarket.addActionListener(e -> showUnitMarket());
+        btnUnitMarket.setHorizontalTextPosition(SwingConstants.CENTER);
+        btnUnitMarket.setVerticalTextPosition(SwingConstants.CENTER);
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new Insets(3, 3, 3, 3);
+        pnlButton.add(btnUnitMarket, gridBagConstraints);
+
+        btnPartsMarket.addActionListener(e -> showPartsMarket());
+        btnPartsMarket.setHorizontalTextPosition(SwingConstants.CENTER);
+        btnPartsMarket.setVerticalTextPosition(SwingConstants.CENTER);
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new Insets(3, 3, 3, 3);
+        pnlButton.add(btnPartsMarket, gridBagConstraints);
+
+        refreshMarketButtonLabels();
+
         return pnlButton;
     }
-    
+
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public void refreshDynamicButtons() {
-        if (btnContractMarket != null) {
-            btnContractMarket.setVisible(getCampaign().getCampaignOptions().isUseAtB()
-                && (ContractMarketDialog.getAvailableContractsCount(getCampaign()) > 0));
-        }
+        refreshMarketButtonLabels();
+    }
+
+    public void refreshMarketButtonLabels() {
+        CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
+        String labelKey = campaignOptions.getContractMarketMethod().isNone()
+              ? "manual" : "market";
+        String label = resourceMap.getString("btnContractMarket." + labelKey);
+
+        btnContractMarket.setText(label);
+
+        PersonnelMarketStyle marketStyle = campaignOptions.getPersonnelMarketStyle();
+        labelKey = (marketStyle == PERSONNEL_MARKET_DISABLED && getCampaign().getPersonnelMarket().isNone())
+              ? "manual" : "market";
+        label = resourceMap.getString("btnPersonnelMarket." + labelKey);
+        btnPersonnelMarket.setText(label);
+
+        labelKey = getCampaign().getUnitMarket().getMethod().isNone() ? "manual" : "market";
+        label = resourceMap.getString("btnUnitMarket." + labelKey);
+        btnUnitMarket.setText(label);
     }
 
     private JPanel getButtonPanel() {
@@ -1585,33 +1642,73 @@ public class CampaignGUI extends JPanel {
      * <p>If the personnel market is disabled in the campaign options, a deprecated {@link PersonnelMarketDialog} is
      * displayed. Otherwise, the new personnel market dialog is shown according to the campaign's current market
      * style.</p>
+     *
+     * <p>If no personnel market is enabled display the bulk hiring dialog, instead.</p>
      */
     public void hirePersonMarket() {
-        PersonnelMarketStyle marketStyle = getCampaign().getCampaignOptions().getPersonnelMarketStyle();
-        if (marketStyle == PERSONNEL_MARKET_DISABLED) {
-            PersonnelMarketDialog pmd = new PersonnelMarketDialog(getFrame(), this, getCampaign());
-            pmd.setVisible(true);
+        CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
+        PersonnelMarketStyle marketStyle = campaignOptions.getPersonnelMarketStyle();
+
+        if (marketStyle != PERSONNEL_MARKET_DISABLED || !getCampaign().getPersonnelMarket().isNone()) {
+            if (marketStyle == PERSONNEL_MARKET_DISABLED) {
+                PersonnelMarketDialog personnelMarketDialog =
+                      new PersonnelMarketDialog(getFrame(), this, getCampaign());
+                personnelMarketDialog.setVisible(true);
+            } else {
+                getCampaign().getNewPersonnelMarket().showPersonnelMarketDialog();
+            }
         } else {
-            getCampaign().getNewPersonnelMarket().showPersonnelMarketDialog();
+            hireBulkPersonnel();
         }
     }
 
     private void hireBulkPersonnel() {
-        HireBulkPersonnelDialog hbpd = new HireBulkPersonnelDialog(getFrame(), true, getCampaign());
-        hbpd.setVisible(true);
+        HireBulkPersonnelDialog hireBulkPersonnelDialog = new HireBulkPersonnelDialog(getFrame(), true, getCampaign());
+        hireBulkPersonnelDialog.setVisible(true);
     }
 
     public void showContractMarket() {
-        ContractMarketDialog cmd = new ContractMarketDialog(getFrame(), getCampaign());
-        cmd.setVisible(true);
+        CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
+
+        if (campaignOptions.getContractMarketMethod().isNone()) {
+            MissionTypeDialog missionTypeDialog = new MissionTypeDialog(getFrame(), true);
+            missionTypeDialog.setVisible(true);
+
+            if (missionTypeDialog.isContract()) {
+                NewContractDialog newContractDialog = campaignOptions.isUseAtB() ?
+                      new NewAtBContractDialog(getFrame(), true, getCampaign()) :
+                      new NewContractDialog(getFrame(), true, getCampaign());
+                newContractDialog.setVisible(true);
+            }
+
+            if (missionTypeDialog.isMission()) {
+                CustomizeMissionDialog customizeMissionDialog =
+                      new CustomizeMissionDialog(getFrame(), true, null, getCampaign());
+                customizeMissionDialog.setVisible(true);
+            }
+        } else {
+            ContractMarketDialog contractMarketDialog = new ContractMarketDialog(getFrame(), getCampaign());
+            contractMarketDialog.setVisible(true);
+        }
     }
 
     public void showUnitMarket() {
-        if (getCampaign().getUnitMarket().getMethod().isNone()) {
-            logger.error("Attempted to show the unit market while it is disabled");
-        } else {
+        if (!getCampaign().getUnitMarket().getMethod().isNone()) {
             new UnitMarketDialog(getFrame(), getCampaign()).showDialog();
+        } else {
+            UnitLoadingDialog unitLoadingDialog = new UnitLoadingDialog(getFrame());
+            if (!MekSummaryCache.getInstance().isInitialized()) {
+                unitLoadingDialog.setVisible(true);
+            }
+            AbstractUnitSelectorDialog mekHQUnitSelectorDialog = new MekHQUnitSelectorDialog(getFrame(),
+                  unitLoadingDialog, getCampaign(), true);
+            mekHQUnitSelectorDialog.setVisible(true);
         }
+    }
+
+    public void showPartsMarket() {
+        PartsStoreDialog store = new PartsStoreDialog(true, this);
+        store.setVisible(true);
     }
 
     public boolean saveCampaign(ActionEvent evt) {
@@ -1784,13 +1881,10 @@ public class CampaignGUI extends JPanel {
                   .forEach(person -> getCampaign().getProcreation().removePregnancy(person));
         }
 
-        miPersonnelMarket.setVisible(!getCampaign().getPersonnelMarket().isNone());
-
         final AbstractUnitMarket unitMarket = getCampaign().getUnitMarket();
         if (unitMarket.getMethod() != newOptions.getUnitMarketMethod()) {
             getCampaign().setUnitMarket(newOptions.getUnitMarketMethod().getUnitMarket());
             getCampaign().getUnitMarket().setOffers(unitMarket.getOffers());
-            miUnitMarket.setVisible(!getCampaign().getUnitMarket().getMethod().isNone());
         }
 
         AbstractContractMarket contractMarket = getCampaign().getContractMarket();
@@ -1804,7 +1898,6 @@ public class CampaignGUI extends JPanel {
                 // refresh lance assignment table
                 MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign(), getCampaign().getForces()));
             }
-            miContractMarket.setVisible(newOptions.isUseAtB());
             miShipSearch.setVisible(newOptions.isUseAtB());
             if (newOptions.isUseAtB()) {
                 int loops = 0;
@@ -2936,7 +3029,7 @@ public class CampaignGUI extends JPanel {
         refreshLocation();
         refreshFunds();
         refreshPartsAvailability();
-        refreshDynamicButtons();
+        refreshMarketButtonLabels();
 
         refreshAllTabs();
     }
@@ -2965,7 +3058,6 @@ public class CampaignGUI extends JPanel {
 
         miRetirementDefectionDialog.setVisible(optionsChangedEvent.getOptions().isUseRandomRetirement());
         miAwardEligibilityDialog.setVisible((optionsChangedEvent.getOptions().isEnableAutoAwards()));
-        miUnitMarket.setVisible(!optionsChangedEvent.getOptions().getUnitMarketMethod().isNone());
     }
 
     /**

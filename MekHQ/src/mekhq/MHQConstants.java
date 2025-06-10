@@ -32,11 +32,11 @@
  */
 package mekhq;
 
+import megamek.SuiteConstants;
+
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.Month;
-
-import megamek.SuiteConstants;
 
 /**
  * These are constants that hold across MekHQ.
@@ -77,6 +77,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String SHOW_UNIT_PICTURES_ON_TOE = "showUnitPicturesOnTOE";
 
     // region Command Center Tab
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public static final String COMMAND_CENTER_USE_UNIT_MARKET = "commandCenterUseUnitMarket";
     public static final String COMMAND_CENTER_MRMS = "commandCenterMRMS";
     // endregion Command Center Tab

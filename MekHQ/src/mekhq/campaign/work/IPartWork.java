@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MegaMek was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.work;
 
@@ -157,7 +162,7 @@ public interface IPartWork extends IWork {
     }
 
     static PartRepairType findCorrectMRMSType(IPartWork part) {
-        if ((part instanceof EquipmentPart) && (((EquipmentPart) part).getType() instanceof WeaponType)) {
+        if ((part instanceof EquipmentPart equipmentPart) && (equipmentPart.getType() instanceof WeaponType)) {
             return PartRepairType.WEAPON;
         } else {
             return part.getMRMSOptionType();
@@ -165,11 +170,13 @@ public interface IPartWork extends IWork {
     }
 
     static PartRepairType findCorrectRepairType(IPartWork part) {
-        if (((part instanceof EquipmentPart) && (((EquipmentPart) part).getType() instanceof WeaponType)) ||
-                  ((part instanceof MissingEquipmentPart) &&
-                         (((MissingEquipmentPart) part).getType() instanceof WeaponType))) {
+        if (((part instanceof EquipmentPart equipmentPart) && (equipmentPart.getType() instanceof WeaponType)) ||
+              ((part instanceof MissingEquipmentPart missingEquipmentPart) &&
+                     (missingEquipmentPart.getType() instanceof WeaponType))) {
             return PartRepairType.WEAPON;
-        } else if ((part instanceof EquipmentPart) && (((EquipmentPart) part).getType().hasFlag(MiscType.F_CLUB))) {
+        } else if ((part instanceof EquipmentPart equipmentPart) &&
+              (equipmentPart.getType() instanceof MiscType miscType) &&
+              miscType.hasFlag(MiscType.F_CLUB)) {
             return PartRepairType.PHYSICAL_WEAPON;
         } else {
             return part.getRepairPartType();
@@ -182,14 +189,14 @@ public interface IPartWork extends IWork {
      *
      * @return the part's sticker price
      */
-    public abstract Money getStickerPrice();
+    Money getStickerPrice();
 
     /**
      * This is the value of the part that may be affected by characteristics and campaign options
      *
      * @return the part's actual value
      */
-    public abstract Money getActualValue();
+    Money getActualValue();
 
     /**
      * This is the value of the part that may be affected by characteristics and campaign options but not affected by
@@ -197,8 +204,8 @@ public interface IPartWork extends IWork {
      *
      * @return the part's actual value if it wasn't damaged
      */
-    public abstract Money getUndamagedValue();
+    Money getUndamagedValue();
 
 
-    public abstract boolean isPriceAdjustedForAmount();
+    boolean isPriceAdjustedForAmount();
 }
