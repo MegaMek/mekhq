@@ -178,11 +178,11 @@ tasks.register('connectorSystemZip', Zip) {
     outputs.dir "${fileStagingDir}/${data}/universe/planetary_systems"
 }
 
-tasks.register("copyLicenseFiles", Sync) {
-    description = "Copy the license files to the root of the folder."
+tasks.register("stageLicenseFiles", Sync) {
+    description = "Copy the license files to the build folder."
     group = 'build'
     from "../"
-    into fileStagingDir
+    into "${layout.buildDirectory.get()}/licenses"
 
     includes = [
             'LICENSE',
@@ -191,6 +191,16 @@ tasks.register("copyLicenseFiles", Sync) {
             'README.md'
     ]
 
+}
+
+tasks.register("copyLicenseFiles", Copy) {
+    description "Copies from the build folder to the staging folder"
+    group = 'build'
+
+    dependsOn stageLicenseFiles
+
+    from "${layout.buildDirectory.get()}/licenses"
+    into fileStagingDir
 }
 
 tasks.register('stageFiles', Copy) {
