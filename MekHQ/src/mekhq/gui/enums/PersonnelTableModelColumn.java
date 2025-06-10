@@ -160,7 +160,9 @@ public enum PersonnelTableModelColumn {
     DEXTERITY("PersonnelTableModelColumn.DEXTERITY.text"),
     INTELLIGENCE("PersonnelTableModelColumn.INTELLIGENCE.text"),
     WILLPOWER("PersonnelTableModelColumn.WILLPOWER.text"),
-    CHARISMA("PersonnelTableModelColumn.CHARISMA.text");
+    CHARISMA("PersonnelTableModelColumn.CHARISMA.text"),
+    SHIP_TRANSPORT("PersonnelTableModelColumn.SHIP_TRANSPORT.text"),
+    TACTICAL_TRANSPORT("PersonnelTableModelColumn.TACTICAL_TRANSPORT.text");
 
     // endregion Enum Declarations
 
@@ -511,6 +513,10 @@ public enum PersonnelTableModelColumn {
         return this == CHARISMA;
     }
 
+    public boolean isShipTransport() { return this == SHIP_TRANSPORT; }
+
+    public boolean isTacticalTransport() { return this == TACTICAL_TRANSPORT; }
+
     public boolean isATOWAttribute() {
         return isStrength() ||
                      isBody() ||
@@ -668,6 +674,34 @@ public enum PersonnelTableModelColumn {
                 // Final fallback return of nothing
                 return "-";
             }
+            case SHIP_TRANSPORT:
+                if (person.getUnit() !=null){
+                    if (person.getUnit().getTransportShipAssignment() !=null ) {
+                        return person.getUnit().getTransportShipAssignment().getTransportShip().getName();
+                    }
+                }
+                if (!person.getTechUnits().isEmpty()) {
+                        Unit unit = person.getTechUnits().get(0);
+                        if (unit.getTransportShipAssignment() !=null ) {
+                            return unit.getTransportShipAssignment().getTransportShip().getName();
+                        }else return "-";
+                }
+                return "-";
+
+            case TACTICAL_TRANSPORT:
+                if (person.getUnit() !=null) {
+                    if (person.getUnit().getTacticalTransportAssignment() != null) {
+                        return person.getUnit().getTacticalTransportAssignment().getTransport().getName();
+                    }
+                }
+                if (!person.getTechUnits().isEmpty()) {
+                    Unit unit = person.getTechUnits().get(0);
+                    if (unit.getTacticalTransportAssignment() !=null ) {
+                        return person.getTechUnits().get(0).getTacticalTransportAssignment().getTransport().getName();
+                    } else return "-";
+                }
+                return  "-";
+
             case FORCE:
                 final Force force = campaign.getForceFor(person);
                 return (force == null) ? "-" : force.getName();
@@ -1086,6 +1120,17 @@ public enum PersonnelTableModelColumn {
             };
             case ADMINISTRATIVE_SKILLS -> switch (this) {
                 case RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, ADMINISTRATION, NEGOTIATION -> true;
+                default -> false;
+            };
+            case TRANSPORT -> switch (this) {
+                case RANK,
+                     FIRST_NAME,
+                     LAST_NAME,
+                     SKILL_LEVEL,
+                     PERSONNEL_ROLE,
+                     UNIT_ASSIGNMENT,
+                     SHIP_TRANSPORT,
+                     TACTICAL_TRANSPORT-> true;
                 default -> false;
             };
             case BIOGRAPHICAL -> switch (this) {
