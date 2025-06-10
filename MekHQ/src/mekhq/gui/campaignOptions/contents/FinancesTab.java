@@ -75,6 +75,7 @@ public class FinancesTab {
     private CampaignOptionsHeaderPanel financesGeneralOptions;
     private JPanel pnlGeneralOptions;
     private JCheckBox useLoanLimitsBox;
+    private JCheckBox trackLeasesBox;
     private JCheckBox usePercentageMaintenanceBox;
     private JCheckBox useExtendedPartsModifierBox;
     private JCheckBox usePeacetimeCostBox;
@@ -181,6 +182,7 @@ public class FinancesTab {
         // General Options
         pnlGeneralOptions = new JPanel();
         useLoanLimitsBox = new JCheckBox();
+        trackLeasesBox = new JCheckBox();
         usePercentageMaintenanceBox = new JCheckBox();
         useExtendedPartsModifierBox = new JCheckBox();
         usePeacetimeCostBox = new JCheckBox();
@@ -236,7 +238,8 @@ public class FinancesTab {
     public JPanel createFinancesGeneralOptionsTab() {
         // Header
         financesGeneralOptions = new CampaignOptionsHeaderPanel("FinancesGeneralTab",
-              getImageDirectory() + "logo_star_league.png", 6);
+              getImageDirectory() + "logo_star_league.png",
+              6);
 
         // Contents
         pnlGeneralOptions = createGeneralOptionsPanel();
@@ -385,6 +388,8 @@ public class FinancesTab {
         // Contents
         useLoanLimitsBox = new CampaignOptionsCheckBox("UseLoanLimitsBox");
         useLoanLimitsBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "UseLoanLimitsBox"));
+        trackLeasesBox = new CampaignOptionsCheckBox("TrackLeasesBox");
+        trackLeasesBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "UseTrackLeasesBox"));
         usePercentageMaintenanceBox = new CampaignOptionsCheckBox("UsePercentageMaintenanceBox");
         usePercentageMaintenanceBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
               "UsePercentageMaintenanceBox"));
@@ -420,6 +425,9 @@ public class FinancesTab {
         layout.gridy = 0;
         layout.gridwidth = 2;
         panel.add(useLoanLimitsBox, layout);
+
+        layout.gridy++;
+        panel.add(trackLeasesBox, layout);
 
         layout.gridy++;
         panel.add(usePercentageMaintenanceBox, layout);
@@ -592,7 +600,10 @@ public class FinancesTab {
     public JPanel createPriceMultipliersTab() {
         // Header
         priceMultipliersHeader = new CampaignOptionsHeaderPanel("PriceMultipliersTab",
-              getImageDirectory() + "logo_clan_stone_lion.png", true, true, 2);
+              getImageDirectory() + "logo_clan_stone_lion.png",
+              true,
+              true,
+              2);
 
         // Contents
         pnlGeneralMultipliers = createGeneralMultipliersPanel();
@@ -857,6 +868,7 @@ public class FinancesTab {
 
         // General Options
         options.setLoanLimits(useLoanLimitsBox.isSelected());
+        options.setTrackLeases(trackLeasesBox.isSelected());
         options.setUsePercentageMaint(usePercentageMaintenanceBox.isSelected());
         options.setUseExtendedPartsModifier(useExtendedPartsModifierBox.isSelected());
         options.setUsePeacetimeCost(usePeacetimeCostBox.isSelected());
@@ -925,6 +937,7 @@ public class FinancesTab {
 
         // General Options
         useLoanLimitsBox.setSelected(options.isUseLoanLimits());
+        trackLeasesBox.setSelected(options.isTrackLeases());
         usePercentageMaintenanceBox.setSelected(options.isUsePercentageMaint());
         useExtendedPartsModifierBox.setSelected(options.isUseExtendedPartsModifier());
         usePeacetimeCostBox.setSelected(options.isUsePeacetimeCost());

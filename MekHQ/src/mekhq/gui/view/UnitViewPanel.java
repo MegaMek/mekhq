@@ -59,7 +59,8 @@ import mekhq.gui.utilities.MarkdownRenderer;
 
 /**
  * A custom panel that gets filled in with goodies from a unit record
- * @author  Jay Lawson (jaylawson39 at yahoo.com)
+ *
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class UnitViewPanel extends JScrollablePanel {
     private Unit unit;
@@ -98,7 +99,7 @@ public class UnitViewPanel extends JScrollablePanel {
         pnlStats = new JPanel();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitViewPanel",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
 
         setLayout(new GridBagLayout());
 
@@ -106,7 +107,7 @@ public class UnitViewPanel extends JScrollablePanel {
         Image image = FluffImageHelper.getFluffImage(entity);
         if (null != image) {
             // fluff image exists so use custom ImgLabel to get full mek porn
-            lblImage = new  ImgLabel(image);
+            lblImage = new ImgLabel(image);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = 0;
@@ -154,7 +155,11 @@ public class UnitViewPanel extends JScrollablePanel {
         txtReadout.setContentType(resourceMap.getString("txtReadout.contentType"));
         txtReadout.setEditable(false);
         txtReadout.setFont(Font.decode(resourceMap.getString("txtReadout.font")));
-        txtReadout.setText("<div style='font: 12pt monospaced'>" + mview.getMekReadoutBasic() + "<br>" + mview.getMekReadoutLoadout() + "</div>");
+        txtReadout.setText("<div style='font: 12pt monospaced'>" +
+                                 mview.getMekReadoutBasic() +
+                                 "<br>" +
+                                 mview.getMekReadoutLoadout() +
+                                 "</div>");
         txtReadout.setBorder(RoundedLineBorder.createRoundedLineBorder("Technical Readout"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -291,7 +296,13 @@ public class UnitViewPanel extends JScrollablePanel {
         pnlStats.add(lblCost, gridBagConstraints);
 
         txtCost.setName("lblCost2");
-        txtCost.setText(unit.getSellValue().toAmountAndSymbolString());
+        if (unit.hasLease()) {
+            txtCost.setText(unit.getUnitLease().getLeaseCost().toAmountAndSymbolString() +
+                                  " " +
+                                  resourceMap.getString("lblLease.text"));
+        } else {
+            txtCost.setText(unit.getSellValue().toAmountAndSymbolString());
+        }
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;

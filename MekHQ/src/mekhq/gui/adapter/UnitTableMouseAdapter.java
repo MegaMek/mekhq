@@ -151,6 +151,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     public static final String COMMAND_HIRE_FULL = "HIRE_FULL";
     public static final String COMMAND_DISBAND = "DISBAND";
     public static final String COMMAND_SELL = "SELL";
+    public static final String COMMAND_UNLEASE = "CANCEL_LEASE";
     public static final String COMMAND_LOSS = "LOSS";
     public static final String COMMAND_MAINTENANCE_REPORT = "MAINTENANCE_REPORT";
     public static final String COMMAND_QUIRKS = "QUIRKS";
@@ -276,6 +277,20 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                                     "Sell Unit?",
                                     JOptionPane.YES_NO_OPTION)) {
                         gui.getCampaign().getQuartermaster().sellUnit(unit);
+                    }
+                }
+            }
+        } else if (command.equals(COMMAND_UNLEASE)) {
+            for (Unit unit : units) {
+                if (!unit.isDeployed() && unit.hasLease()) {
+                    Money unleaseValue = unit.getUnitLease().getFinalLeaseCost(unit.getCampaign().getLocalDate());
+                    String text = unleaseValue.toAmountAndSymbolString();
+                    if (0 ==
+                              JOptionPane.showConfirmDialog(null,
+                                    "Do you really want to cancel the lease on " + unit.getName() + " for " + text,
+                                    "Cancel Unit Lease?",
+                                    JOptionPane.YES_NO_OPTION)) {
+                        gui.getCampaign().getQuartermaster().cancelUnitLease(unit);
                     }
                 }
             }
@@ -1109,10 +1124,19 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             }
 
             // sell unit
-            if (!allDeployed && gui.getCampaign().getCampaignOptions().isSellUnits()) {
+            if (!allDeployed && gui.getCampaign().getCampaignOptions().isSellUnits() && !unit.hasLease()) {
                 popup.addSeparator();
                 menuItem = new JMenuItem("Sell Unit");
                 menuItem.setActionCommand(COMMAND_SELL);
+                menuItem.addActionListener(this);
+                popup.add(menuItem);
+            }
+
+            // cancel lease
+            if (!allDeployed && gui.getCampaign().getCampaignOptions().isSellUnits() && unit.hasLease()) {
+                popup.addSeparator();
+                menuItem = new JMenuItem("Cancel Lease");
+                menuItem.setActionCommand(COMMAND_UNLEASE);
                 menuItem.addActionListener(this);
                 popup.add(menuItem);
             }

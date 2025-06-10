@@ -468,6 +468,7 @@ public class CampaignOptions {
     private boolean payForOverhead;
     private boolean payForMaintain;
     private boolean payForTransport;
+    private boolean trackLeases;
     private boolean sellUnits;
     private boolean sellParts;
     private boolean payForRecruitment;
@@ -1088,6 +1089,7 @@ public class CampaignOptions {
         payForOverhead = false;
         payForMaintain = false;
         payForTransport = false;
+        trackLeases = false;
         sellUnits = false;
         sellParts = false;
         payForRecruitment = false;
@@ -3294,6 +3296,14 @@ public class CampaignOptions {
         this.payForTransport = payForTransport;
     }
 
+    public boolean isTrackLeases() {
+        return trackLeases;
+    }
+
+    public void setTrackLeases(final boolean trackLeases) {
+        this.trackLeases = trackLeases;
+    }
+
     public boolean isSellUnits() {
         return sellUnits;
     }
@@ -5317,6 +5327,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForOverhead", payForOverhead);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForMaintain", payForMaintain);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForTransport", payForTransport);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "trackLeases", trackLeases);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sellUnits", sellUnits);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sellParts", sellParts);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForRecruitment", payForRecruitment);
@@ -6313,6 +6324,8 @@ public class CampaignOptions {
                     campaignOptions.payForMaintain = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("payForTransport")) {
                     campaignOptions.payForTransport = Boolean.parseBoolean(nodeContents);
+                } else if (nodeName.equalsIgnoreCase("trackLeases")) {
+                    campaignOptions.trackLeases = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("sellUnits")) {
                     campaignOptions.sellUnits = Boolean.parseBoolean(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("sellParts")) {
@@ -6926,19 +6939,19 @@ public class CampaignOptions {
     public void setTrackFactionStanding(boolean trackFactionStanding) {
         this.trackFactionStanding = trackFactionStanding;
     }
-    
+
     public boolean isAutoGenerateOpForCallsigns() {
         return autoGenerateOpForCallsigns;
     }
-    
+
     public void setAutoGenerateOpForCallsigns(boolean autoGenerateOpForCallsigns) {
         this.autoGenerateOpForCallsigns = autoGenerateOpForCallsigns;
     }
-    
+
     public SkillLevel getMinimumCallsignSkillLevel() {
         return minimumCallsignSkillLevel;
     }
-    
+
     public void setMinimumCallsignSkillLevel(SkillLevel skillLevel) {
         this.minimumCallsignSkillLevel = skillLevel;
     }
