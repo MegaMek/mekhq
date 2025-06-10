@@ -24,9 +24,36 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
+import megamek.MMConstants;
+import megamek.client.ui.Messages;
+import megamek.client.ui.buttons.ColourSelectorButton;
+import megamek.client.ui.clientGUI.GUIPreferences;
+import megamek.client.ui.comboBoxes.FontComboBox;
+import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.dialogs.buttonDialogs.CommonSettingsDialog;
+import megamek.client.ui.dialogs.helpDialogs.HelpDialog;
+import megamek.client.ui.displayWrappers.FontDisplay;
+import megamek.common.preference.PreferenceManager;
+import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
+import mekhq.MHQOptionsChangedEvent;
+import mekhq.MekHQ;
+import mekhq.campaign.universe.enums.CompanyGenerationMethod;
+import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
+import mekhq.gui.enums.ForceIconOperationalStatusStyle;
+import mekhq.gui.enums.PersonnelFilterStyle;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
+
+import javax.swing.*;
+import javax.swing.GroupLayout.Alignment;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.FlowLayout;
@@ -38,28 +65,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Hashtable;
 import java.util.Objects;
-import javax.swing.*;
-import javax.swing.GroupLayout.Alignment;
-
-import megamek.MMConstants;
-import megamek.client.ui.Messages;
-import megamek.client.ui.comboBoxes.MMComboBox;
-import megamek.client.ui.comboBoxes.FontComboBox;
-import megamek.client.ui.displayWrappers.FontDisplay;
-import megamek.client.ui.buttons.ColourSelectorButton;
-import megamek.client.ui.dialogs.buttonDialogs.CommonSettingsDialog;
-import megamek.client.ui.clientGUI.GUIPreferences;
-import megamek.client.ui.dialogs.helpDialogs.HelpDialog;
-import megamek.common.preference.PreferenceManager;
-import megamek.logging.MMLogger;
-import mekhq.MHQConstants;
-import mekhq.MHQOptionsChangedEvent;
-import mekhq.MekHQ;
-import mekhq.campaign.universe.enums.CompanyGenerationMethod;
-import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
-import mekhq.gui.enums.ForceIconOperationalStatusStyle;
-import mekhq.gui.enums.PersonnelFilterStyle;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * MHQOptionsDialog is a dialog that allows the user to configure various options in MegaMekHQ. It extends the
@@ -88,7 +93,6 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private JCheckBox chkShowUnitPicturesOnTOE;
 
     // region Command Center Tab
-    private JCheckBox optionCommandCenterUseUnitMarket;
     private JCheckBox optionCommandCenterMRMS;
     // endregion Command Center Tab
 
@@ -319,10 +323,6 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         // region Command Center Tab
         JLabel labelCommandCenterDisplay = new JLabel(resources.getString("labelCommandCenterDisplay.text"));
 
-        optionCommandCenterUseUnitMarket = new JCheckBox(resources.getString("optionCommandCenterUseUnitMarket.text"));
-        optionCommandCenterUseUnitMarket.setToolTipText(resources.getString(
-              "optionCommandCenterUseUnitMarket.toolTipText"));
-
         optionCommandCenterMRMS = new JCheckBox(resources.getString("optionCommandCenterMRMS.text"));
         optionCommandCenterMRMS.setToolTipText(resources.getString("optionCommandCenterMRMS.toolTipText"));
         // endregion Command Center Tab
@@ -467,7 +467,6 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                       .addComponent(chkShowCompanyGenerator)
                                       .addComponent(chkShowUnitPicturesOnTOE)
                                       .addComponent(labelCommandCenterDisplay)
-                                      .addComponent(optionCommandCenterUseUnitMarket)
                                       .addComponent(optionCommandCenterMRMS)
                                       .addComponent(lblInterstellarMapTab)
                                       .addComponent(chkInterstellarMapShowJumpRadius)
@@ -510,7 +509,6 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                         .addComponent(chkShowCompanyGenerator)
                                         .addComponent(chkShowUnitPicturesOnTOE)
                                         .addComponent(labelCommandCenterDisplay)
-                                        .addComponent(optionCommandCenterUseUnitMarket)
                                         .addComponent(optionCommandCenterMRMS)
                                         .addComponent(lblInterstellarMapTab)
                                         .addComponent(chkInterstellarMapShowJumpRadius)
@@ -1194,7 +1192,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
             URL helpFile = new File(MMConstants.USER_DIR_README_FILE).toURI().toURL();
             userDirHelp.addActionListener(e -> new HelpDialog(helpTitle, helpFile, getFrame()).setVisible(true));
         } catch (MalformedURLException e) {
-            logger.error("Could not find the user data directory readme file at " + MMConstants.USER_DIR_README_FILE);
+            logger.error("Could not find the user data directory readme file at {}", MMConstants.USER_DIR_README_FILE);
         }
 
         final JLabel lblStartGameDelay = new JLabel(resources.getString("lblStartGameDelay.text"));
@@ -1359,7 +1357,6 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMHQOptions().setShowUnitPicturesOnTOE(chkShowUnitPicturesOnTOE.isSelected());
 
         // Command Center Tab
-        MekHQ.getMHQOptions().setCommandCenterUseUnitMarket(optionCommandCenterUseUnitMarket.isSelected());
         MekHQ.getMHQOptions().setCommandCenterMRMS(optionCommandCenterMRMS.isSelected());
 
         // Interstellar Map Tab
@@ -1517,7 +1514,6 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         chkShowUnitPicturesOnTOE.setSelected(MekHQ.getMHQOptions().getShowUnitPicturesOnTOE());
 
         // Command Center Tab
-        optionCommandCenterUseUnitMarket.setSelected(MekHQ.getMHQOptions().getCommandCenterUseUnitMarket());
         optionCommandCenterMRMS.setSelected(MekHQ.getMHQOptions().getCommandCenterMRMS());
 
         // Interstellar Map Tab

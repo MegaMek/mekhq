@@ -32,30 +32,13 @@
  */
 package mekhq.gui;
 
-import static java.lang.Math.round;
-
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.ResourceBundle;
-import java.util.UUID;
-import javax.swing.*;
-import javax.swing.RowSorter.SortKey;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-
+import megamek.client.ui.clientGUI.GUIPreferences;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.JToggleButtonPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.client.ui.clientGUI.GUIPreferences;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.event.Subscribe;
 import megamek.common.preference.IPreferenceChangeListener;
@@ -74,6 +57,23 @@ import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.view.PersonViewPanel;
+
+import javax.swing.*;
+import javax.swing.RowSorter.SortKey;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.ResourceBundle;
+import java.util.UUID;
+
+import static java.lang.Math.round;
 
 /**
  * Tab for interacting with all personnel
@@ -202,19 +202,6 @@ public final class PersonnelTab extends CampaignGuiTab {
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         add(chkGroupByUnit, gridBagConstraints);
-
-        JButton btnPersonnelMarket = new JButton(resourceMap.getString("miPersonnelMarket.text"));
-        btnPersonnelMarket.addActionListener(e -> getCampaignGui().hirePersonMarket());
-        btnPersonnelMarket.setVisible(!getCampaign().getPersonnelMarket().isNone());
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 5;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(5, 5, 0, 5);
-        add(btnPersonnelMarket, gridBagConstraints);
 
         personModel = new PersonnelTableModel(getCampaign());
         personnelTable = new JTable(personModel);
