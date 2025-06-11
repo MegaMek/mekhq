@@ -51,17 +51,17 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
-import mekhq.campaign.personnel.SkillPerquisite;
+import mekhq.campaign.personnel.SkillPrerequisite;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * @author Taharqa
  */
-public class EditSkillPerquisiteDialog extends JDialog {
-    private static final MMLogger logger = MMLogger.create(EditSkillPerquisiteDialog.class);
+public class EditSkillPreRequisiteDialog extends JDialog {
+    private static final MMLogger logger = MMLogger.create(EditSkillPreRequisiteDialog.class);
 
-    private SkillPerquisite prereq;
+    private SkillPrerequisite prereq;
 
     private JButton btnClose;
     private JButton btnOK;
@@ -70,7 +70,7 @@ public class EditSkillPerquisiteDialog extends JDialog {
     private final Hashtable<String, JComboBox<SkillLevel>> skillLevels = new Hashtable<>();
     private final Hashtable<String, JCheckBox> skillChks = new Hashtable<>();
 
-    public EditSkillPerquisiteDialog(final JFrame frame, final SkillPerquisite pre) {
+    public EditSkillPreRequisiteDialog(final JFrame frame, final SkillPrerequisite pre) {
         super(frame, true);
         cancelled = false;
         prereq = pre;
@@ -138,7 +138,7 @@ public class EditSkillPerquisiteDialog extends JDialog {
      */
     private void setUserPreferences() {
         try {
-            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditSkillPerquisiteDialog.class);
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditSkillPreRequisiteDialog.class);
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
@@ -147,7 +147,7 @@ public class EditSkillPerquisiteDialog extends JDialog {
     }
 
     private void done() {
-        prereq = new SkillPerquisite();
+        prereq = new SkillPrerequisite();
         for (String type : SkillType.skillList) {
             if (skillChks.get(type).isSelected()) {
                 prereq.addPrereq(type, skillLevels.get(type).getSelectedIndex());
@@ -156,7 +156,7 @@ public class EditSkillPerquisiteDialog extends JDialog {
         this.setVisible(false);
     }
 
-    public SkillPerquisite getPrereq() {
+    public SkillPrerequisite getPrereq() {
         return prereq;
     }
 

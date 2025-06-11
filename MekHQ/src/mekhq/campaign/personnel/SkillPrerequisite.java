@@ -36,6 +36,7 @@ package mekhq.campaign.personnel;
 import java.io.PrintWriter;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Map;
 
 import megamek.common.UnitType;
 import megamek.logging.MMLogger;
@@ -69,19 +70,17 @@ import org.w3c.dom.NodeList;
  *
  * @author Jay Lawson
  */
-public class SkillPerquisite {
-    private static final MMLogger logger = MMLogger.create(SkillPerquisite.class);
-    private Hashtable<String, Integer> skillSet;
+public class SkillPrerequisite {
+    private static final MMLogger logger = MMLogger.create(SkillPrerequisite.class);
+    private final Hashtable<String, Integer> skillSet = new Hashtable<>();
 
-    public SkillPerquisite() {
-        skillSet = new Hashtable<>();
+    public SkillPrerequisite() {
     }
 
     @Override
-    @SuppressWarnings("unchecked") // FIXME: Broken Java with it's Object clones
-    public SkillPerquisite clone() {
-        SkillPerquisite clone = new SkillPerquisite();
-        clone.skillSet = (Hashtable<String, Integer>) this.skillSet.clone();
+    public SkillPrerequisite clone() {
+        SkillPrerequisite clone = new SkillPrerequisite();
+        clone.skillSet.putAll(Map.copyOf(this.skillSet));
         return clone;
     }
 
@@ -125,42 +124,34 @@ public class SkillPerquisite {
      *
      * @param unitType the type of unit that is being checked
      *
-     * @return
+     * @return true if unit type qualifies as the expected type
      */
     public boolean qualifies(int unitType) {
-        switch (unitType) {
-            case UnitType.AERO:
-            case UnitType.AEROSPACEFIGHTER:
-                return skillSet.containsKey(SkillType.S_PILOT_AERO) || skillSet.containsKey(SkillType.S_GUN_AERO);
-            case UnitType.BATTLE_ARMOR:
-                return skillSet.containsKey(SkillType.S_GUN_BA) || skillSet.containsKey(SkillType.S_ANTI_MEK);
-            case UnitType.CONV_FIGHTER:
-                return skillSet.containsKey(SkillType.S_GUN_JET) || skillSet.containsKey(SkillType.S_PILOT_JET);
-            case UnitType.DROPSHIP:
-            case UnitType.JUMPSHIP:
-            case UnitType.WARSHIP:
-            case UnitType.SPACE_STATION:
-            case UnitType.SMALL_CRAFT:
-                return skillSet.containsKey(SkillType.S_PILOT_SPACE) ||
-                             skillSet.containsKey(SkillType.S_GUN_SPACE) ||
-                             skillSet.containsKey(SkillType.S_TECH_VESSEL) ||
-                             skillSet.containsKey(SkillType.S_NAVIGATION);
-            case UnitType.GUN_EMPLACEMENT:
-            case UnitType.TANK:
-                return skillSet.containsKey(SkillType.S_PILOT_GVEE) || skillSet.containsKey(SkillType.S_GUN_VEE);
-            case UnitType.INFANTRY:
-                return skillSet.containsKey(SkillType.S_SMALL_ARMS) || skillSet.containsKey(SkillType.S_ANTI_MEK);
-            case UnitType.NAVAL:
-                return skillSet.containsKey(SkillType.S_PILOT_NVEE) || skillSet.containsKey(SkillType.S_GUN_VEE);
-            case UnitType.PROTOMEK:
-                return skillSet.containsKey(SkillType.S_GUN_PROTO);
-            case UnitType.VTOL:
-                return skillSet.containsKey(SkillType.S_PILOT_VTOL) || skillSet.containsKey(SkillType.S_GUN_VEE);
-            case UnitType.MEK:
-                return skillSet.containsKey(SkillType.S_PILOT_MEK) || skillSet.containsKey(SkillType.S_GUN_MEK);
-            default:
-                return false;
-        }
+        return switch (unitType) {
+            case UnitType.AERO, UnitType.AEROSPACEFIGHTER ->
+                  skillSet.containsKey(SkillType.S_PILOT_AERO) || skillSet.containsKey(SkillType.S_GUN_AERO);
+            case UnitType.BATTLE_ARMOR ->
+                  skillSet.containsKey(SkillType.S_GUN_BA) || skillSet.containsKey(SkillType.S_ANTI_MEK);
+            case UnitType.CONV_FIGHTER ->
+                  skillSet.containsKey(SkillType.S_GUN_JET) || skillSet.containsKey(SkillType.S_PILOT_JET);
+            case UnitType.DROPSHIP, UnitType.JUMPSHIP, UnitType.WARSHIP, UnitType.SPACE_STATION, UnitType.SMALL_CRAFT ->
+                  skillSet.containsKey(SkillType.S_PILOT_SPACE) ||
+                        skillSet.containsKey(SkillType.S_GUN_SPACE) ||
+                        skillSet.containsKey(SkillType.S_TECH_VESSEL) ||
+                        skillSet.containsKey(SkillType.S_NAVIGATION);
+            case UnitType.GUN_EMPLACEMENT, UnitType.TANK ->
+                  skillSet.containsKey(SkillType.S_PILOT_GVEE) || skillSet.containsKey(SkillType.S_GUN_VEE);
+            case UnitType.INFANTRY ->
+                  skillSet.containsKey(SkillType.S_SMALL_ARMS) || skillSet.containsKey(SkillType.S_ANTI_MEK);
+            case UnitType.NAVAL ->
+                  skillSet.containsKey(SkillType.S_PILOT_NVEE) || skillSet.containsKey(SkillType.S_GUN_VEE);
+            case UnitType.PROTOMEK -> skillSet.containsKey(SkillType.S_GUN_PROTO);
+            case UnitType.VTOL ->
+                  skillSet.containsKey(SkillType.S_PILOT_VTOL) || skillSet.containsKey(SkillType.S_GUN_VEE);
+            case UnitType.MEK ->
+                  skillSet.containsKey(SkillType.S_PILOT_MEK) || skillSet.containsKey(SkillType.S_GUN_MEK);
+            default -> false;
+        };
     }
 
     public int getSkillLevel(String skillName) {
@@ -176,7 +167,7 @@ public class SkillPerquisite {
 
     @Override
     public String toString() {
-        String toReturn = "";
+        StringBuilder toReturn = new StringBuilder();
         Enumeration<String> enumKeys = skillSet.keys();
         while (enumKeys.hasMoreElements()) {
             String key = enumKeys.nextElement();
@@ -185,12 +176,14 @@ public class SkillPerquisite {
             if (lvl >= SkillType.EXP_GREEN) {
                 skillLvl = SkillType.getExperienceLevelName(lvl) + ' ';
             }
-            toReturn += skillLvl + SkillType.getType(key).getName();
+            if (SkillType.getType(key) != null) {
+                toReturn.append(skillLvl).append(SkillType.getType(key).getName());
+            }
             if (enumKeys.hasMoreElements()) {
-                toReturn += "<br>OR ";
+                toReturn.append("<br>OR ");
             }
         }
-        return '{' + toReturn + '}';
+        return '{' + toReturn.toString() + '}';
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {
@@ -209,11 +202,11 @@ public class SkillPerquisite {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "skillPrereq");
     }
 
-    public static SkillPerquisite generateInstanceFromXML(Node wn) {
-        SkillPerquisite retVal = null;
+    public static SkillPrerequisite generateInstanceFromXML(Node wn) {
+        SkillPrerequisite retVal = null;
 
         try {
-            retVal = new SkillPerquisite();
+            retVal = new SkillPrerequisite();
             NodeList nl = wn.getChildNodes();
 
             for (int x = 0; x < nl.getLength(); x++) {
@@ -247,18 +240,13 @@ public class SkillPerquisite {
         if (temp.length < 2) {
             return 0;
         } else {
-            switch (temp[1].substring(0, 1)) {
-                case "G":
-                    return 1;
-                case "R":
-                    return 2;
-                case "V":
-                    return 3;
-                case "E":
-                    return 4;
-                default:
-                    return 0;
-            }
+            return switch (temp[1].substring(0, 1)) {
+                case "G" -> 1;
+                case "R" -> 2;
+                case "V" -> 3;
+                case "E" -> 4;
+                default -> 0;
+            };
         }
     }
 }

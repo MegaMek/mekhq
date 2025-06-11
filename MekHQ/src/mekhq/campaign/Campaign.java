@@ -9501,22 +9501,6 @@ public class Campaign implements ITechManager {
         atbEventProcessor.shutdown();
     }
 
-    @Deprecated(forRemoval = true, since = "0.50.05")
-    public boolean checkOverDueLoans() {
-        Money overdueAmount = getFinances().checkOverdueLoanPayments(this);
-        if (overdueAmount.isPositive()) {
-            // FIXME : Localize
-            JOptionPane.showMessageDialog(null,
-                  "You have overdue loan payments totaling " +
-                        overdueAmount.toAmountAndSymbolString() +
-                        "\nYou must deal with these payments before advancing the day.\nHere are some options:\n  - Sell off equipment to generate funds.\n  - Pay off the collateral on the loan.\n  - Default on the loan.\n  - Just cheat and remove the loan via GM mode.",
-                  "Overdue Loan Payments",
-                  JOptionPane.WARNING_MESSAGE);
-            return true;
-        }
-        return false;
-    }
-
     /**
      * Checks if an employee turnover prompt should be displayed based on campaign options, current date, and other
      * conditions (like transit status and campaign start date).
