@@ -689,7 +689,7 @@ public enum PersonnelTableModelColumn {
                 return "-";
 
             case TACTICAL_TRANSPORT:
-                if (person.getUnit() !=null) {
+                if (person.getUnit() != null) {
                     if (person.getUnit().getTacticalTransportAssignment() != null) {
                         return person.getUnit().getTacticalTransportAssignment().getTransport().getName();
                     }
