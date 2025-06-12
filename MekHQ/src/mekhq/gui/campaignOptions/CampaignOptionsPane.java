@@ -32,6 +32,32 @@
  */
 package mekhq.gui.campaignOptions;
 
+import static java.lang.Math.round;
+import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_GUNNERY;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_PILOTING;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_GENERAL;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT;
+import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.ABRIDGED;
+import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP_ABRIDGED;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createSubTabs;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.spaUtilities.enums.AbilityCategory.CHARACTER_CREATION_ONLY;
+import static mekhq.utilities.spaUtilities.enums.AbilityCategory.CHARACTER_FLAW;
+import static mekhq.utilities.spaUtilities.enums.AbilityCategory.COMBAT_ABILITY;
+import static mekhq.utilities.spaUtilities.enums.AbilityCategory.MANEUVERING_ABILITY;
+import static mekhq.utilities.spaUtilities.enums.AbilityCategory.UTILITY_ABILITY;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+
 import megamek.common.annotations.Nullable;
 import mekhq.CampaignPreset;
 import mekhq.MekHQ;
@@ -46,25 +72,6 @@ import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 import mekhq.gui.campaignOptions.contents.*;
 import mekhq.gui.dialog.reportDialogs.FactionStanding.CampaignOptionsChangedConfirmationDialog;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-
-import static java.lang.Math.round;
-import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.*;
-import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.ABRIDGED;
-import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP_ABRIDGED;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createSubTabs;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
-import static mekhq.utilities.spaUtilities.enums.AbilityCategory.*;
 
 /**
  * The {@code CampaignOptionsPane} class represents a tabbed pane used for displaying and managing various campaign
@@ -549,7 +556,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         campaign.resetRandomDeath();
 
-        campaign.getApp().getCampaigngui().refreshMarketButtonLabels();
+        if(!isStartUp){
+            campaign.getApp().getCampaigngui().refreshMarketButtonLabels();
+        }
     }
 
     /**
