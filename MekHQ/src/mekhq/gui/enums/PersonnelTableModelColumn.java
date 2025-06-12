@@ -682,7 +682,7 @@ public enum PersonnelTableModelColumn {
                 }
                 if (!person.getTechUnits().isEmpty()) {
                         Unit unit = person.getTechUnits().get(0);
-                        if (unit.getTransportShipAssignment() !=null ) {
+                        if (unit.getTransportShipAssignment() != null) {
                             return unit.getTransportShipAssignment().getTransportShip().getName();
                         }else return "-";
                 }
