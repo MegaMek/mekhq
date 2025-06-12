@@ -675,7 +675,7 @@ public enum PersonnelTableModelColumn {
                 return "-";
             }
             case SHIP_TRANSPORT:
-                if (person.getUnit() !=null){
+                if (person.getUnit() != null){
                     if (person.getUnit().getTransportShipAssignment() != null) {
                         return person.getUnit().getTransportShipAssignment().getTransportShip().getName();
                     }
