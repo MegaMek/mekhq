@@ -27,30 +27,34 @@
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
-import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.stratcon.StratconScenario;
-import mekhq.campaign.stratcon.StratconTrackState;
+import static mekhq.campaign.stratcon.StratconCampaignState.getStratconScenarioFromAtBScenario;
+import static mekhq.campaign.stratcon.StratconScenario.ScenarioState.UNRESOLVED;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.time.LocalDate;
 import java.util.List;
 
-import static mekhq.campaign.stratcon.StratconCampaignState.getStratconScenarioFromAtBScenario;
-import static mekhq.campaign.stratcon.StratconScenario.ScenarioState.UNRESOLVED;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBDynamicScenario;
+import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.stratcon.StratconScenario;
+import mekhq.campaign.stratcon.StratconTrackState;
 
 public class OutstandingScenariosNagLogic {
+    final static String RESOURCE_BUNDLE = "mekhq.resources.NagDialogs";
+
     /**
      * Checks if there are any outstanding scenarios in the campaign.
      *
      * <p>
-     * This method evaluates whether the {@code outstandingScenarios} string is blank or not.
-     * If the string is not blank, it indicates that there are outstanding scenarios
-     * that need to be addressed.
+     * This method evaluates whether the {@code outstandingScenarios} string is blank or not. If the string is not
+     * blank, it indicates that there are outstanding scenarios that need to be addressed.
      * </p>
      *
-     * @return {@code true} if {@code outstandingScenarios} is not blank, indicating there are
-     * outstanding scenarios; {@code false} otherwise.
+     * @return {@code true} if {@code outstandingScenarios} is not blank, indicating there are outstanding scenarios;
+     *       {@code false} otherwise.
      */
     public static boolean hasOutStandingScenarios(Campaign campaign) {
         String outstandingScenarios = getOutstandingScenarios(campaign);
@@ -61,8 +65,8 @@ public class OutstandingScenariosNagLogic {
      * Retrieves and processes the list of outstanding scenarios for the current campaign.
      *
      * <p>
-     * This method iterates through all active contracts and their associated AtB scenarios,
-     * identifying scenarios that are outstanding based on the following conditions:
+     * This method iterates through all active contracts and their associated AtB scenarios, identifying scenarios that
+     * are outstanding based on the following conditions:
      * <ul>
      *     <li>Whether the scenario's date matches the current campaign date.</li>
      *     <li>If the scenario is part of StratCon and is unresolved or critical.</li>
@@ -98,33 +102,42 @@ public class OutstandingScenariosNagLogic {
                             continue;
                         }
 
+                        AtBDynamicScenario backingScenario = stratconScenario.getBackingScenario();
+
+                        // Determine if the scenario is special or a turning point
+                        boolean isCrisis = backingScenario != null &&
+                                                 backingScenario.getStratConScenarioType().isSpecial();
+                        boolean isTurningPoint = stratconScenario.isTurningPoint();
+
+                        // Define the addendum text based on StratCon scenario type
+                        String addendum;
+                        if (isCrisis) {
+                            addendum = getTextAt(RESOURCE_BUNDLE, "UnresolvedStratConContactsNagDialog.crisis");
+                        } else if (isTurningPoint) {
+                            addendum = getTextAt(RESOURCE_BUNDLE, "UnresolvedStratConContactsNagDialog.turningPoint");
+                        } else {
+                            addendum = ""; // No additional label if neither condition is true
+                        }
+
                         StratconTrackState track = stratconScenario.getTrackForScenario(campaign, null);
 
-                        if (track != null) {
-                            activeScenarios.append("<br>- ")
-                                .append(scenario.getName())
-                                .append(", ").append(contract.getName())
-                                .append(", ").append(track.getDisplayableName())
-                                .append('-').append(stratconScenario.getCoords().toBTString());
-
-                            if (scenario.getStratConScenarioType().isSpecial()) {
-                                activeScenarios.append(" (Crisis)");
-                                continue;
-                            }
-
-                            if (stratconScenario.isTurningPoint()) {
-                                activeScenarios.append(" (Turning Point)");
-                            }
-
-                            continue;
-                        }
+                        // Append formatted unresolved scenario information
+                        activeScenarios.append(getFormattedTextAt(RESOURCE_BUNDLE,
+                              "UnresolvedStratConContactsNagDialog.report",
+                              scenario.getHyperlinkedName(),
+                              contract.getHyperlinkedName(),
+                              track == null ? "" : track.getDisplayableName(),
+                              stratconScenario.getCoords().toBTString(),
+                              addendum));
                     }
+                } else {
+                    // Add non-track scenarios
+                    activeScenarios.append("<p>- ")
+                          .append("<b>")
+                          .append(scenario.getHyperlinkedName())
+                          .append("</b>, ")
+                          .append(contract.getHyperlinkedName());
                 }
-
-                // Add non-track scenarios
-                activeScenarios.append("<br>- ")
-                    .append(scenario.getName())
-                    .append(", ").append(contract.getName());
             }
         }
 

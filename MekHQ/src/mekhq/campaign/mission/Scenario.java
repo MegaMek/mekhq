@@ -28,13 +28,30 @@
  */
 package mekhq.campaign.mission;
 
+import java.io.PrintWriter;
+import java.text.ParseException;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.Vector;
+
 import megamek.Version;
-import megamek.client.ui.swing.lobby.LobbyUtility;
+import megamek.client.ui.panels.phaseDisplay.lobby.LobbyUtility;
 import megamek.common.Board;
 import megamek.common.Entity;
 import megamek.common.MapSettings;
 import megamek.common.annotations.Nullable;
-import megamek.common.planetaryconditions.*;
+import megamek.common.planetaryconditions.Atmosphere;
+import megamek.common.planetaryconditions.BlowingSand;
+import megamek.common.planetaryconditions.EMI;
+import megamek.common.planetaryconditions.Fog;
+import megamek.common.planetaryconditions.Light;
+import megamek.common.planetaryconditions.PlanetaryConditions;
+import megamek.common.planetaryconditions.Weather;
+import megamek.common.planetaryconditions.Wind;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -47,14 +64,11 @@ import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.mission.enums.ScenarioType;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.text.ParseException;
-import java.time.LocalDate;
-import java.util.*;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -70,6 +84,7 @@ public class Scenario implements IPlayerSettings {
     public static final int T_ATMOSPHERE = 1;
     public static final int T_SPACE = 2;
     private static final String[] typeNames = { "Ground", "Low Atmosphere", "Space" };
+
     private int boardType = T_GROUND;
 
     private String name;
@@ -188,6 +203,22 @@ public class Scenario implements IPlayerSettings {
 
     public String getName() {
         return name;
+    }
+
+    /**
+     * Returns the name of this object as an HTML hyperlink.
+     *
+     * <p>The hyperlink is formatted with a "SCENARIO:" protocol prefix followed by the object's ID. This allows UI
+     * components that support HTML to render the name as a clickable link, which can be used to navigate to or focus on
+     * this specific object when clicked.</p>
+     *
+     * @return An HTML formatted string containing the object's name as a hyperlink with its ID
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public String getHyperlinkedName() {
+        return String.format("<a href='SCENARIO:%s'>%s</a>", getId(), getName());
     }
 
     public void setName(String n) {
@@ -513,9 +544,8 @@ public class Scenario implements IPlayerSettings {
     }
 
     /**
-     * Read the values from a PlanetaryConditions object into the Scenario variables
-     * for planetary conditions.
-     * This is necessary because MekHQ has XML and MegaMek doesn't.
+     * Read the values from a PlanetaryConditions object into the Scenario variables for planetary conditions. This is
+     * necessary because MekHQ has XML and MegaMek doesn't.
      *
      * @param planetaryConditions A PlanetaryConditions object
      */
@@ -720,11 +750,11 @@ public class Scenario implements IPlayerSettings {
     }
 
     /**
-     * Get a List of all traitor Units in this scenario. This function just combines
-     * the results from
+     * Get a List of all traitor Units in this scenario. This function just combines the results from
      * BotForce#getTraitorUnits across all BotForces.
      *
      * @param c - A Campaign pointer
+     *
      * @return a List of traitor Units
      */
     public List<Unit> getTraitorUnits(Campaign c) {
@@ -736,15 +766,13 @@ public class Scenario implements IPlayerSettings {
     }
 
     /**
-     * Tests whether a given entity is a traitor in this Scenario by checking
-     * external id values. This should
-     * also be usable against entities that are ejected pilots from the original
-     * traitor entity.
+     * Tests whether a given entity is a traitor in this Scenario by checking external id values. This should also be
+     * usable against entities that are ejected pilots from the original traitor entity.
      *
      * @param en a MegaMek Entity
      * @param c  a Campaign pointer
-     * @return a boolean indicating whether this entity is a traitor in this
-     *         Scenario.
+     *
+     * @return a boolean indicating whether this entity is a traitor in this Scenario.
      */
     public boolean isTraitor(Entity en, Campaign c) {
         if ("-1".equals(en.getExternalIdAsString())) {
@@ -758,15 +786,16 @@ public class Scenario implements IPlayerSettings {
         }
         // also make sure that the crew's external id does not match a traitor in
         // case of ejected pilots
-        return (null != en.getCrew())
-            && !"-1".equals(en.getCrew().getExternalIdAsString())
-            && isTraitor(UUID.fromString(en.getCrew().getExternalIdAsString()));
+        return (null != en.getCrew()) &&
+                     !"-1".equals(en.getCrew().getExternalIdAsString()) &&
+                     isTraitor(UUID.fromString(en.getCrew().getExternalIdAsString()));
     }
 
     /**
      * Given a Person's id, is that person a traitor in this Scenario
      *
      * @param personId - a UUID giving a person's id in the campaign
+     *
      * @return a boolean indicating if this person is a traitor in the Scenario
      */
     public boolean isTraitor(UUID personId) {
@@ -787,14 +816,13 @@ public class Scenario implements IPlayerSettings {
     }
 
     /**
-     * Determines whether a unit is eligible to deploy to the scenario. If a
-     * ScenarioDeploymentLimit is present
-     * the unit type will be checked to make sure it is valid. The function also
-     * checks to see if the unit is
-     * a traitor unit which will disallow deployment.
+     * Determines whether a unit is eligible to deploy to the scenario. If a ScenarioDeploymentLimit is present the unit
+     * type will be checked to make sure it is valid. The function also checks to see if the unit is a traitor unit
+     * which will disallow deployment.
      *
      * @param unit     - The Unit to be deployed
      * @param campaign - a pointer to the Campaign
+     *
      * @return true if the unit is eligible, otherwise false
      */
     public boolean canDeploy(Unit unit, Campaign campaign) {
@@ -816,6 +844,7 @@ public class Scenario implements IPlayerSettings {
      *
      * @param units    - a Vector made up of Units to be deployed
      * @param campaign - a pointer to the Campaign
+     *
      * @return true if all units in the list are eligible, otherwise false
      */
     public boolean canDeployUnits(Vector<Unit> units, Campaign campaign) {
@@ -829,7 +858,8 @@ public class Scenario implements IPlayerSettings {
             }
         }
         if (null != deploymentLimit) {
-            return (deploymentLimit.getCurrentQuantity(this, campaign) + additionalQuantity) <= deploymentLimit.getQuantityCap(campaign);
+            return (deploymentLimit.getCurrentQuantity(this, campaign) + additionalQuantity) <=
+                         deploymentLimit.getQuantityCap(campaign);
         }
         return true;
     }
@@ -839,8 +869,8 @@ public class Scenario implements IPlayerSettings {
      *
      * @param forces list of forces
      * @param c      the campaign that the forces are part of
-     * @return true if all units in all forces in the list are eligible, otherwise
-     *         false
+     *
+     * @return true if all units in all forces in the list are eligible, otherwise false
      */
     public boolean canDeployForces(Vector<Force> forces, Campaign c) {
         int additionalQuantity = 0;
@@ -856,7 +886,8 @@ public class Scenario implements IPlayerSettings {
             }
         }
         if (null != deploymentLimit) {
-            return (deploymentLimit.getCurrentQuantity(this, c) + additionalQuantity) <= deploymentLimit.getQuantityCap(c);
+            return (deploymentLimit.getCurrentQuantity(this, c) + additionalQuantity) <=
+                         deploymentLimit.getQuantityCap(c);
         }
         return true;
     }
@@ -884,7 +915,7 @@ public class Scenario implements IPlayerSettings {
         if (!getStatus().isCurrent()) {
             return false;
         }
-        if (getForces(c).getAllUnits(true).isEmpty()) {
+        if (getForces(c).getAllUnits(false).isEmpty()) {
             return false;
         }
         if (!includesRequiredPersonnel(c)) {
@@ -981,7 +1012,7 @@ public class Scenario implements IPlayerSettings {
     }
 
     protected void loadFieldsFromXmlNode(final Node wn, final Version version, final Campaign campaign)
-            throws ParseException {
+          throws ParseException {
         // Do nothing
     }
 
@@ -1078,7 +1109,17 @@ public class Scenario implements IPlayerSettings {
                 } else if (wn2.getNodeName().equalsIgnoreCase("botForceStub")) {
                     String name = MHQXMLUtility.unEscape(wn2.getAttributes().getNamedItem("name").getTextContent());
                     List<String> stub = getEntityStub(wn2);
-                    retVal.botForcesStubs.add(new BotForceStub(name, stub));
+                    int teamValue = 1;
+                    Node team = wn2.getAttributes().getNamedItem("team");
+                    if (team != null) {
+                        teamValue = Integer.parseInt(MHQXMLUtility.unEscape(team.getTextContent()));
+                    } else if (retVal.getStatus().isCurrent()) {
+                        // Campaigns <50.05 won't have 'team' recorded, so we need to use a fallback value.
+                        // The value is equal to 'Allied' which means the scenario will inherit the pre-change behavior
+                        logger.info("Scenario {} predates Blind Drop changes. Using fallback team of 1.",
+                              retVal.getName());
+                    }
+                    retVal.botForcesStubs.add(new BotForceStub(name, stub, teamValue));
                 } else if (wn2.getNodeName().equalsIgnoreCase("botForce")) {
                     BotForce bf = new BotForce();
                     try {
@@ -1105,8 +1146,8 @@ public class Scenario implements IPlayerSettings {
                     retVal.mapSizeY = Integer.parseInt(xy[1]);
                 } else if (wn2.getNodeName().equalsIgnoreCase("map")) {
                     retVal.map = wn2.getTextContent().trim();
-                } else if (wn2.getNodeName().equalsIgnoreCase("start")
-                        || wn2.getNodeName().equalsIgnoreCase("startingPos")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("start") ||
+                                 wn2.getNodeName().equalsIgnoreCase("startingPos")) {
                     retVal.startingPos = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("startOffset")) {
                     retVal.startOffset = Integer.parseInt(wn2.getTextContent());
@@ -1138,8 +1179,9 @@ public class Scenario implements IPlayerSettings {
                     EMI emi = Boolean.parseBoolean(wn2.getTextContent()) ? EMI.EMI : EMI.EMI_NONE;
                     retVal.emi = emi;
                 } else if (wn2.getNodeName().equalsIgnoreCase("blowingSand")) {
-                    BlowingSand blowingSand = Boolean.parseBoolean(wn2.getTextContent()) ? BlowingSand.BLOWING_SAND
-                            : BlowingSand.BLOWING_SAND_NONE;
+                    BlowingSand blowingSand = Boolean.parseBoolean(wn2.getTextContent()) ?
+                                                    BlowingSand.BLOWING_SAND :
+                                                    BlowingSand.BLOWING_SAND_NONE;
                     retVal.blowingSand = blowingSand;
                 } else if (wn2.getNodeName().equalsIgnoreCase("shiftWindDirection")) {
                     retVal.shiftWindDirection = Boolean.parseBoolean(wn2.getTextContent());
@@ -1184,8 +1226,9 @@ public class Scenario implements IPlayerSettings {
     }
 
     public boolean isFriendlyUnit(Entity entity, Campaign campaign) {
-        return getForces(campaign).getUnits().stream()
-                .anyMatch(unitID -> unitID.equals(UUID.fromString(entity.getExternalIdAsString())));
+        return getForces(campaign).getUnits()
+                     .stream()
+                     .anyMatch(unitID -> unitID.equals(UUID.fromString(entity.getExternalIdAsString())));
     }
 
     public boolean getHasTrack() {

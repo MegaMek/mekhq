@@ -29,7 +29,7 @@ package mekhq.gui.dialog.iconDialogs;
 
 import javax.swing.JFrame;
 
-import megamek.client.ui.dialogs.AbstractIconChooserDialog;
+import megamek.client.ui.dialogs.iconChooser.AbstractIconChooserDialog;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
 import mekhq.campaign.icons.StandardForceIcon;

@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -55,7 +60,7 @@ import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.JToggleButtonPreference;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.client.ui.swing.MekViewPanel;
+import megamek.client.ui.dialogs.unitSelectorDialogs.MekViewPanel;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.Aero;
 import megamek.common.Compute;
@@ -80,35 +85,37 @@ import mekhq.gui.enums.PersonnelTableModelColumn;
 import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.view.PersonViewPanel;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com) (code borrowed heavily from MegaMekLab UnitSelectorDialog
  */
+@Deprecated(since = "0.50.06", forRemoval = false)
 public class PersonnelMarketDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(PersonnelMarketDialog.class);
 
     // region Variable Declarations
     private PersonnelTableModel personnelModel;
-    private Campaign            campaign;
-    private CampaignGUI         hqView;
-    private PersonnelMarket     personnelMarket;
-    private Person              selectedPerson = null;
-    private Money               unitCost       = Money.zero();
+    private Campaign campaign;
+    private CampaignGUI hqView;
+    private PersonnelMarket personnelMarket;
+    private Person selectedPerson = null;
+    private Money unitCost = Money.zero();
 
-    private JComboBox<PersonnelFilter>          comboPersonType;
-    private JLabel                              lblPersonChoice;
-    private JRadioButton                        radioNormalRoll;
-    private JRadioButton                        radioPaidRecruitment;
-    private JComboBox<PersonnelRole>            comboRecruitRole;
-    private JPanel                              panelOKBtns;
-    private JPanel                              panelMain;
-    private JPanel                              panelFilterBtns;
-    private JTable                              tablePersonnel;
-    private JLabel                              lblUnitCost;
-    private JScrollPane                         scrollTablePersonnel;
-    private JScrollPane                         scrollPersonnelView;
+    private JComboBox<PersonnelFilter> comboPersonType;
+    private JLabel lblPersonChoice;
+    private JRadioButton radioNormalRoll;
+    private JRadioButton radioPaidRecruitment;
+    private JComboBox<PersonnelRole> comboRecruitRole;
+    private JPanel panelOKBtns;
+    private JPanel panelMain;
+    private JPanel panelFilterBtns;
+    private JTable tablePersonnel;
+    private JLabel lblUnitCost;
+    private JScrollPane scrollTablePersonnel;
+    private JScrollPane scrollPersonnelView;
     private TableRowSorter<PersonnelTableModel> sorter;
-    private JSplitPane                          splitMain;
+    private JSplitPane splitMain;
 
     private final List<PersonnelTableModelColumn> personnelMarketColumns = List.of(PersonnelTableModelColumn.FIRST_NAME,
           PersonnelTableModelColumn.LAST_NAME,
@@ -125,10 +132,10 @@ public class PersonnelMarketDialog extends JDialog {
 
     public PersonnelMarketDialog(final JFrame frame, final CampaignGUI view, final Campaign campaign) {
         super(frame, true);
-        hqView          = view;
-        this.campaign   = campaign;
+        hqView = view;
+        this.campaign = campaign;
         personnelMarket = campaign.getPersonnelMarket();
-        personnelModel  = new PersonnelTableModel(campaign);
+        personnelModel = new PersonnelTableModel(campaign);
         personnelModel.setData(personnelMarket.getPersonnel());
         personnelModel.loadAssignmentFromMarket(personnelMarket);
         initComponents();
@@ -139,17 +146,17 @@ public class PersonnelMarketDialog extends JDialog {
 
     private void initComponents() {
         scrollTablePersonnel = new JScrollPaneWithSpeed();
-        scrollPersonnelView  = new JScrollPaneWithSpeed();
-        tablePersonnel       = new JTable();
-        panelMain            = new JPanel();
-        panelFilterBtns      = new JPanel();
-        comboPersonType      = new JComboBox<>();
-        radioNormalRoll      = new JRadioButton();
+        scrollPersonnelView = new JScrollPaneWithSpeed();
+        tablePersonnel = new JTable();
+        panelMain = new JPanel();
+        panelFilterBtns = new JPanel();
+        comboPersonType = new JComboBox<>();
+        radioNormalRoll = new JRadioButton();
         radioPaidRecruitment = new JRadioButton();
-        lblUnitCost          = new JLabel();
-        panelOKBtns          = new JPanel();
-        lblPersonChoice      = new JLabel();
-        comboRecruitRole     = new JComboBox<>(PersonnelRole.values());
+        lblUnitCost = new JLabel();
+        panelOKBtns = new JPanel();
+        lblPersonChoice = new JLabel();
+        comboRecruitRole = new JComboBox<>(PersonnelRole.values());
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Personnel Market");
@@ -168,11 +175,11 @@ public class PersonnelMarketDialog extends JDialog {
         lblPersonChoice.setText("Personnel Type:");
         lblPersonChoice.setName("lblPersonChoice");
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx   = 0;
-        gridBagConstraints.gridy   = 0;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.anchor  = GridBagConstraints.WEST;
-        gridBagConstraints.insets  = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panelFilterBtns.add(lblPersonChoice, gridBagConstraints);
 
         DefaultComboBoxModel<PersonnelFilter> personTypeModel = new DefaultComboBoxModel<>();
@@ -185,28 +192,28 @@ public class PersonnelMarketDialog extends JDialog {
         comboPersonType.setName("comboUnitType");
         comboPersonType.setPreferredSize(new Dimension(200, 27));
         comboPersonType.addActionListener(evt -> filterPersonnel());
-        gridBagConstraints        = new GridBagConstraints();
-        gridBagConstraints.gridx  = 1;
-        gridBagConstraints.gridy  = 0;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         panelFilterBtns.add(comboPersonType, gridBagConstraints);
 
-        boolean atbOutofContract   = campaign.getCampaignOptions().isUseAtB() && !campaign.hasActiveContract();
+        boolean atbOutofContract = campaign.getCampaignOptions().isUseAtB() && !campaign.hasActiveContract();
         boolean usingCamOpsMarkets = campaign.getCampaignOptions().getPersonnelMarketName().equals("Campaign Ops");
         if (atbOutofContract && !usingCamOpsMarkets) {
             // Paid recruitment is available
             radioNormalRoll.setText("Make normal roll next week");
-            gridBagConstraints.gridx     = 0;
-            gridBagConstraints.gridy     = 1;
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 1;
             gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.anchor    = GridBagConstraints.WEST;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
             panelFilterBtns.add(radioNormalRoll, gridBagConstraints);
 
             radioPaidRecruitment.setText("Make paid recruitment roll next week (100,000 C-bills)");
-            gridBagConstraints.gridx     = 0;
-            gridBagConstraints.gridy     = 2;
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 2;
             gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.anchor    = GridBagConstraints.WEST;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
             panelFilterBtns.add(radioPaidRecruitment, gridBagConstraints);
 
             ButtonGroup group = new ButtonGroup();
@@ -221,18 +228,19 @@ public class PersonnelMarketDialog extends JDialog {
             final boolean isClan = campaign.getFaction().isClan();
             comboRecruitRole.setRenderer(new DefaultListCellRenderer() {
                 @Override
-                public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                      boolean isSelected, boolean cellHasFocus) {
                     return super.getListCellRendererComponent(list,
-                          (value instanceof PersonnelRole) ? ((PersonnelRole) value).getName(isClan) : value,
+                          (value instanceof PersonnelRole) ? ((PersonnelRole) value).getLabel(isClan) : value,
                           index,
                           isSelected,
                           cellHasFocus);
                 }
             });
-            gridBagConstraints.gridx     = 2;
-            gridBagConstraints.gridy     = 2;
+            gridBagConstraints.gridx = 2;
+            gridBagConstraints.gridy = 2;
             gridBagConstraints.gridwidth = 1;
-            gridBagConstraints.anchor    = GridBagConstraints.WEST;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
             panelFilterBtns.add(comboRecruitRole, gridBagConstraints);
 
             if (personnelMarket.getPaidRecruitment()) {
@@ -261,8 +269,8 @@ public class PersonnelMarketDialog extends JDialog {
 
         sorter = new TableRowSorter<>(personnelModel);
 
-        final XTableColumnModel  columnModel = (XTableColumnModel) tablePersonnel.getColumnModel();
-        final ArrayList<SortKey> sortKeys    = new ArrayList<>();
+        final XTableColumnModel columnModel = (XTableColumnModel) tablePersonnel.getColumnModel();
+        final ArrayList<SortKey> sortKeys = new ArrayList<>();
         for (final PersonnelTableModelColumn column : PersonnelTableModel.PERSONNEL_COLUMNS) {
             final TableColumn tableColumn = columnModel.getColumnByModelIndex(column.ordinal());
             if (!personnelMarketColumns.contains(column)) {
@@ -341,11 +349,7 @@ public class PersonnelMarketDialog extends JDialog {
 
     /**
      * These need to be migrated to the Suite Constants / Suite Options Setup
-     *
-     * @since 0.50.04
-     * @deprecated Move to Suite Constants / Suite Options Setup
      */
-    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(PersonnelMarketDialog.class);
@@ -383,8 +387,8 @@ public class PersonnelMarketDialog extends JDialog {
                                          selectedPerson.getSalary(campaign).multipliedBy(2) :
                                          Money.zero()).plus(unitCost))) {
                 campaign.addReport("<font color='" +
-                                   MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
-                                   "'><b>Insufficient funds. Transaction cancelled</b>.</font>");
+                                         ReportingUtilities.getNegativeColor() +
+                                         "'><b>Insufficient funds. Transaction cancelled</b>.</font>");
             } else {
                 /*
                  * Adding person to campaign changes pid; grab the old one to
@@ -407,10 +411,10 @@ public class PersonnelMarketDialog extends JDialog {
 
     private void addPerson() {
         if (selectedPerson != null) {
-            Entity en  = personnelMarket.getAttachedEntity(selectedPerson);
-            UUID   pid = selectedPerson.getId();
+            Entity en = personnelMarket.getAttachedEntity(selectedPerson);
+            UUID pid = selectedPerson.getId();
 
-            if (campaign.recruitPerson(selectedPerson, true)) {
+            if (campaign.recruitPerson(selectedPerson, true, true)) {
                 addUnit(en, false);
                 personnelMarket.removePerson(selectedPerson);
                 personnelModel.setData(personnelMarket.getPersonnel());
@@ -426,11 +430,11 @@ public class PersonnelMarketDialog extends JDialog {
         }
 
         if (pay &&
-            !campaign.getFinances()
-                   .debit(TransactionType.UNIT_PURCHASE,
-                         campaign.getLocalDate(),
-                         unitCost,
-                         "Purchased " + en.getShortName())) {
+                  !campaign.getFinances()
+                         .debit(TransactionType.UNIT_PURCHASE,
+                               campaign.getLocalDate(),
+                               unitCost,
+                               "Purchased " + en.getShortName())) {
             return;
         }
 
@@ -513,7 +517,7 @@ public class PersonnelMarketDialog extends JDialog {
             unitCost = Money.zero();
         } else {
             if (!campaign.getCampaignOptions().isUseShareSystem() &&
-                ((en instanceof Mek) || (en instanceof Tank) || (en instanceof Aero))) {
+                      ((en instanceof Mek) || (en instanceof Tank) || (en instanceof Aero))) {
                 unitCost = Money.of(en.getCost(false)).dividedBy(2.0);
             } else {
                 unitCost = Money.zero();
@@ -532,7 +536,7 @@ public class PersonnelMarketDialog extends JDialog {
             return;
         }
 
-        Entity en       = personnelMarket.getAttachedEntity(selectedPerson);
+        Entity en = personnelMarket.getAttachedEntity(selectedPerson);
         String unitText = "";
         if (unitCost.isPositive()) {
             unitText = "Unit cost: " + unitCost.toAmountAndSymbolString();
@@ -552,7 +556,7 @@ public class PersonnelMarketDialog extends JDialog {
 
         if (null != en) {
             JTabbedPane tabUnit = new JTabbedPane();
-            String      name    = "Commander";
+            String name = "Commander";
             if (Compute.getFullCrewSize(en) == 1) {
                 name = "Pilot";
             }

@@ -27,46 +27,42 @@
  */
 package mekhq.gui.dialog.randomEvents.prisonerDialogs;
 
-import megamek.common.annotations.Nullable;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Person;
-import mekhq.gui.baseComponents.MHQDialogImmersive;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.List;
 
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import megamek.common.annotations.Nullable;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Person;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 
 /**
- * Represents a dialog prompted when the player has dangerously low prisoner capacity, risking a
- * negative event.
- *
- * <p>
- * This dialog is shown when the player's prisoner capacity is critically low, prompting them
- * to take an action to avoid potential consequences. The player may choose to ignore the issue,
- * free prisoners to alleviate capacity issues, or execute prisoners to free up space.
- * The dialog provides in-character messaging alongside optional out-of-character information
- * for context and guidance.
- * </p>
+ * @deprecated Unused
  */
-public class PrisonerWarningDialog extends MHQDialogImmersive {
+@Deprecated(since = "0.50.06", forRemoval = true)
+public class PrisonerWarningDialog extends ImmersiveDialogCore {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
 
     /**
      * Creates a dialog to warn the player about low prisoner capacity and provide options to resolve it.
      *
-     * @param campaign     The current campaign instance, which provides relevant context for the
-     *                    dialog.
-     * @param speaker      The in-universe speaker addressing the player, or {@code null} if no
-     *                    speaker is present.
-     * @param executeCount The number of prisoners that would be executed if the player chooses to
-     *                    execute prisoners.
-     * @param freeCount    The number of prisoners that would be freed if the player chooses to
-     *                    free prisoners.
+     * @param campaign     The current campaign instance, which provides relevant context for the dialog.
+     * @param speaker      The in-universe speaker addressing the player, or {@code null} if no speaker is present.
+     * @param executeCount The number of prisoners that would be executed if the player chooses to execute prisoners.
+     * @param freeCount    The number of prisoners that would be freed if the player chooses to free prisoners.
      */
     public PrisonerWarningDialog(Campaign campaign, @Nullable Person speaker, int executeCount, int freeCount) {
-        super(campaign, speaker, null, createInCharacterMessage(campaign),
-            createButtons( executeCount, freeCount), createOutOfCharacterMessage(),
-            null, true, null, true);
+        super(campaign,
+              speaker,
+              null,
+              createInCharacterMessage(campaign),
+              createButtons(executeCount, freeCount),
+              createOutOfCharacterMessage(),
+              null,
+              true,
+              null,
+              null,
+              true);
     }
 
     /**
@@ -80,19 +76,21 @@ public class PrisonerWarningDialog extends MHQDialogImmersive {
      * </ul>
      * Each button includes a label and tooltip for clarity.
      *
-     * @param executeCount The number of prisoners affected if choosing execution, or {@code null}
-     *                    if not applicable.
-     * @param freeCount    The number of prisoners affected if choosing to free prisoners, or
-     * {@code null} if not applicable.
+     * @param executeCount The number of prisoners affected if choosing execution, or {@code null} if not applicable.
+     * @param freeCount    The number of prisoners affected if choosing to free prisoners, or {@code null} if not
+     *                     applicable.
+     *
      * @return A list of action buttons with labels and tooltips.
      */
     private static List<ButtonLabelTooltipPair> createButtons(int executeCount, int freeCount) {
-        ButtonLabelTooltipPair btnDoNothing = new ButtonLabelTooltipPair(
-            getFormattedTextAt(RESOURCE_BUNDLE, "btnDoNothing.button"), null);
-        ButtonLabelTooltipPair btnFree = new ButtonLabelTooltipPair(
-            getFormattedTextAt(RESOURCE_BUNDLE, "free.button", freeCount), null);
-        ButtonLabelTooltipPair btnExecute = new ButtonLabelTooltipPair(
-            getFormattedTextAt(RESOURCE_BUNDLE, "execute.button", executeCount), null);
+        ButtonLabelTooltipPair btnDoNothing = new ButtonLabelTooltipPair(getFormattedTextAt(RESOURCE_BUNDLE,
+              "btnDoNothing.button"), null);
+        ButtonLabelTooltipPair btnFree = new ButtonLabelTooltipPair(getFormattedTextAt(RESOURCE_BUNDLE,
+              "free.button",
+              freeCount), null);
+        ButtonLabelTooltipPair btnExecute = new ButtonLabelTooltipPair(getFormattedTextAt(RESOURCE_BUNDLE,
+              "execute.button",
+              executeCount), null);
 
         return List.of(btnDoNothing, btnFree, btnExecute);
     }
@@ -101,10 +99,11 @@ public class PrisonerWarningDialog extends MHQDialogImmersive {
      * Generates the in-character message to display in the dialog.
      *
      * <p>The message is tailored to the current situation, warning the player (commander)
-     * about dangerously low prisoner capacity and urging immediate resolution. It uses
-     * the player's in-game title for immersion.</p>
+     * about dangerously low prisoner capacity and urging immediate resolution. It uses the player's in-game title for
+     * immersion.</p>
      *
      * @param campaign The current campaign context, from which player-specific information is derived.
+     *
      * @return A formatted string containing the narrative in-character message for the dialog.
      */
     private static String createInCharacterMessage(Campaign campaign) {
@@ -116,8 +115,7 @@ public class PrisonerWarningDialog extends MHQDialogImmersive {
      * Generates an out-of-character (OOC) message for the dialog.
      *
      * <p>The OOC message explains the mechanics of the situation and provides additional
-     * guidance to help the player make an informed decision about how to handle the prisoner
-     * capacity issue.</p>
+     * guidance to help the player make an informed decision about how to handle the prisoner capacity issue.</p>
      *
      * @return A formatted string containing the out-of-character message.
      */

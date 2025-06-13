@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq;
 
@@ -33,8 +38,8 @@ import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 import mekhq.gui.enums.ForceIconOperationalStatusStyle;
 import mekhq.gui.enums.PersonnelFilterStyle;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.UIManager;
+import java.awt.Color;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -45,9 +50,9 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public String getDisplayFormattedDate(final @Nullable LocalDate date) {
-        return (date != null)
-                ? date.format(DateTimeFormatter.ofPattern(getDisplayDateFormat()).withLocale(getDateLocale()))
-                : "";
+        return (date != null) ?
+                     date.format(DateTimeFormatter.ofPattern(getDisplayDateFormat()).withLocale(getDateLocale())) :
+                     "";
     }
 
     public void setDisplayDateFormat(String value) {
@@ -59,14 +64,14 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public String getLongDisplayDateFormat() {
-        return userPreferences.node(MHQConstants.DISPLAY_NODE).get(MHQConstants.LONG_DISPLAY_DATE_FORMAT,
-                "EEEE, MMMM d, yyyy");
+        return userPreferences.node(MHQConstants.DISPLAY_NODE)
+                     .get(MHQConstants.LONG_DISPLAY_DATE_FORMAT, "EEEE, MMMM d, yyyy");
     }
 
     public String getLongDisplayFormattedDate(LocalDate date) {
-        return (date != null)
-                ? date.format(DateTimeFormatter.ofPattern(getLongDisplayDateFormat()).withLocale(getDateLocale()))
-                : "";
+        return (date != null) ?
+                     date.format(DateTimeFormatter.ofPattern(getLongDisplayDateFormat()).withLocale(getDateLocale())) :
+                     "";
     }
 
     public void setLongDisplayDateFormat(String value) {
@@ -82,8 +87,8 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public boolean getCompanyGeneratorStartup() {
-        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.COMPANY_GENERATOR_STARTUP,
-                false);
+        return userPreferences.node(MHQConstants.DISPLAY_NODE)
+                     .getBoolean(MHQConstants.COMPANY_GENERATOR_STARTUP, false);
     }
 
     public void setCompanyGeneratorStartup(final boolean value) {
@@ -107,11 +112,13 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     // region Command Center Tab
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public boolean getCommandCenterUseUnitMarket() {
-        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.COMMAND_CENTER_USE_UNIT_MARKET,
-                true);
+        return userPreferences.node(MHQConstants.DISPLAY_NODE)
+                     .getBoolean(MHQConstants.COMMAND_CENTER_USE_UNIT_MARKET, true);
     }
 
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public void setCommandCenterUseUnitMarket(boolean value) {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.COMMAND_CENTER_USE_UNIT_MARKET, value);
     }
@@ -128,89 +135,90 @@ public final class MHQOptions extends SuiteOptions {
     // region Interstellar Map Tab
     public boolean getInterstellarMapShowJumpRadius() {
         return userPreferences.node(MHQConstants.DISPLAY_NODE)
-                .getBoolean(MHQConstants.INTERSTELLAR_MAP_SHOW_JUMP_RADIUS, true);
+                     .getBoolean(MHQConstants.INTERSTELLAR_MAP_SHOW_JUMP_RADIUS, true);
     }
 
     public void setInterstellarMapShowJumpRadius(final boolean value) {
-        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.INTERSTELLAR_MAP_SHOW_JUMP_RADIUS,
-                value);
+        userPreferences.node(MHQConstants.DISPLAY_NODE)
+              .putBoolean(MHQConstants.INTERSTELLAR_MAP_SHOW_JUMP_RADIUS, value);
     }
 
     public double getInterstellarMapShowJumpRadiusMinimumZoom() {
         return userPreferences.node(MHQConstants.DISPLAY_NODE)
-                .getDouble(MHQConstants.INTERSTELLAR_MAP_SHOW_JUMP_RADIUS_MINIMUM_ZOOM, 3d);
+                     .getDouble(MHQConstants.INTERSTELLAR_MAP_SHOW_JUMP_RADIUS_MINIMUM_ZOOM, 3d);
     }
 
     public void setInterstellarMapShowJumpRadiusMinimumZoom(final double value) {
         userPreferences.node(MHQConstants.DISPLAY_NODE)
-                .putDouble(MHQConstants.INTERSTELLAR_MAP_SHOW_JUMP_RADIUS_MINIMUM_ZOOM, value);
+              .putDouble(MHQConstants.INTERSTELLAR_MAP_SHOW_JUMP_RADIUS_MINIMUM_ZOOM, value);
     }
 
     public Color getInterstellarMapJumpRadiusColour() {
         return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
-                .getInt(MHQConstants.INTERSTELLAR_MAP_JUMP_RADIUS_COLOUR, Color.DARK_GRAY.getRGB()));
+                               .getInt(MHQConstants.INTERSTELLAR_MAP_JUMP_RADIUS_COLOUR, Color.DARK_GRAY.getRGB()));
     }
 
     public void setInterstellarMapJumpRadiusColour(final Color value) {
-        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.INTERSTELLAR_MAP_JUMP_RADIUS_COLOUR,
-                value.getRGB());
+        userPreferences.node(MHQConstants.DISPLAY_NODE)
+              .putInt(MHQConstants.INTERSTELLAR_MAP_JUMP_RADIUS_COLOUR, value.getRGB());
     }
 
     public boolean getInterstellarMapShowPlanetaryAcquisitionRadius() {
         return userPreferences.node(MHQConstants.DISPLAY_NODE)
-                .getBoolean(MHQConstants.INTERSTELLAR_MAP_SHOW_PLANETARY_ACQUISITION_RADIUS, false);
+                     .getBoolean(MHQConstants.INTERSTELLAR_MAP_SHOW_PLANETARY_ACQUISITION_RADIUS, false);
     }
 
     public void setInterstellarMapShowPlanetaryAcquisitionRadius(final boolean value) {
         userPreferences.node(MHQConstants.DISPLAY_NODE)
-                .putBoolean(MHQConstants.INTERSTELLAR_MAP_SHOW_PLANETARY_ACQUISITION_RADIUS, value);
+              .putBoolean(MHQConstants.INTERSTELLAR_MAP_SHOW_PLANETARY_ACQUISITION_RADIUS, value);
     }
 
     public double getInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom() {
         return userPreferences.node(MHQConstants.DISPLAY_NODE)
-                .getDouble(MHQConstants.INTERSTELLAR_MAP_SHOW_PLANETARY_ACQUISITION_RADIUS_MINIMUM_ZOOM, 2d);
+                     .getDouble(MHQConstants.INTERSTELLAR_MAP_SHOW_PLANETARY_ACQUISITION_RADIUS_MINIMUM_ZOOM, 2d);
     }
 
     public void setInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom(final double value) {
         userPreferences.node(MHQConstants.DISPLAY_NODE)
-                .putDouble(MHQConstants.INTERSTELLAR_MAP_SHOW_PLANETARY_ACQUISITION_RADIUS_MINIMUM_ZOOM, value);
+              .putDouble(MHQConstants.INTERSTELLAR_MAP_SHOW_PLANETARY_ACQUISITION_RADIUS_MINIMUM_ZOOM, value);
     }
 
     public Color getInterstellarMapPlanetaryAcquisitionRadiusColour() {
         return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
-                .getInt(MHQConstants.INTERSTELLAR_MAP_PLANETARY_ACQUISITION_RADIUS_COLOUR, 0xFF505050));
+                               .getInt(MHQConstants.INTERSTELLAR_MAP_PLANETARY_ACQUISITION_RADIUS_COLOUR, 0xFF505050));
     }
 
     public void setInterstellarMapPlanetaryAcquisitionRadiusColour(final Color value) {
         userPreferences.node(MHQConstants.DISPLAY_NODE)
-                .putInt(MHQConstants.INTERSTELLAR_MAP_PLANETARY_ACQUISITION_RADIUS_COLOUR, value.getRGB());
+              .putInt(MHQConstants.INTERSTELLAR_MAP_PLANETARY_ACQUISITION_RADIUS_COLOUR, value.getRGB());
     }
 
     public boolean getInterstellarMapShowContractSearchRadius() {
         return userPreferences.node(MHQConstants.DISPLAY_NODE)
-                .getBoolean(MHQConstants.INTERSTELLAR_MAP_SHOW_CONTRACT_SEARCH_RADIUS, false);
+                     .getBoolean(MHQConstants.INTERSTELLAR_MAP_SHOW_CONTRACT_SEARCH_RADIUS, false);
     }
 
     public void setInterstellarMapShowContractSearchRadius(final boolean value) {
         userPreferences.node(MHQConstants.DISPLAY_NODE)
-                .putBoolean(MHQConstants.INTERSTELLAR_MAP_SHOW_CONTRACT_SEARCH_RADIUS, value);
+              .putBoolean(MHQConstants.INTERSTELLAR_MAP_SHOW_CONTRACT_SEARCH_RADIUS, value);
     }
 
     public Color getInterstellarMapContractSearchRadiusColour() {
         return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
-                .getInt(MHQConstants.INTERSTELLAR_MAP_CONTRACT_SEARCH_RADIUS_COLOUR, 0xFF606060));
+                               .getInt(MHQConstants.INTERSTELLAR_MAP_CONTRACT_SEARCH_RADIUS_COLOUR, 0xFF606060));
     }
 
     public void setInterstellarMapContractSearchRadiusColour(final Color value) {
         userPreferences.node(MHQConstants.DISPLAY_NODE)
-                .putInt(MHQConstants.INTERSTELLAR_MAP_CONTRACT_SEARCH_RADIUS_COLOUR, value.getRGB());
+              .putInt(MHQConstants.INTERSTELLAR_MAP_CONTRACT_SEARCH_RADIUS_COLOUR, value.getRGB());
     }
     // endregion Interstellar Map Tab
 
     // region Personnel Tab
     public PersonnelFilterStyle getPersonnelFilterStyle() {
         return PersonnelFilterStyle.valueOf(userPreferences.node(MHQConstants.DISPLAY_NODE)
-                .get(MHQConstants.PERSONNEL_FILTER_STYLE, PersonnelFilterStyle.STANDARD.name()));
+                                                  .get(MHQConstants.PERSONNEL_FILTER_STYLE,
+                                                        PersonnelFilterStyle.STANDARD.name()));
     }
 
     public void setPersonnelFilterStyle(PersonnelFilterStyle value) {
@@ -218,21 +226,21 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public boolean getPersonnelFilterOnPrimaryRole() {
-        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.PERSONNEL_FILTER_ON_PRIMARY_ROLE,
-                false);
+        return userPreferences.node(MHQConstants.DISPLAY_NODE)
+                     .getBoolean(MHQConstants.PERSONNEL_FILTER_ON_PRIMARY_ROLE, false);
     }
 
     public void setPersonnelFilterOnPrimaryRole(boolean value) {
-        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.PERSONNEL_FILTER_ON_PRIMARY_ROLE,
-                value);
+        userPreferences.node(MHQConstants.DISPLAY_NODE)
+              .putBoolean(MHQConstants.PERSONNEL_FILTER_ON_PRIMARY_ROLE, value);
     }
     // endregion Personnel Tab
     // endregion Display Tab
 
     // region Colours
     public Color getDeployedForeground() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.DEPLOYED_FOREGROUND,
-                Color.BLACK.getRGB()));
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.DEPLOYED_FOREGROUND, Color.BLACK.getRGB()));
     }
 
     public void setDeployedForeground(Color value) {
@@ -240,8 +248,8 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getDeployedBackground() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.DEPLOYED_BACKGROUND,
-                Color.LIGHT_GRAY.getRGB()));
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.DEPLOYED_BACKGROUND, Color.LIGHT_GRAY.getRGB()));
     }
 
     public void setDeployedBackground(Color value) {
@@ -250,27 +258,28 @@ public final class MHQOptions extends SuiteOptions {
 
     public Color getBelowContractMinimumForeground() {
         return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
-                .getInt(MHQConstants.BELOW_CONTRACT_MINIMUM_FOREGROUND, Color.RED.getRGB()));
+                               .getInt(MHQConstants.BELOW_CONTRACT_MINIMUM_FOREGROUND, Color.RED.getRGB()));
     }
 
     public void setBelowContractMinimumForeground(Color value) {
-        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.BELOW_CONTRACT_MINIMUM_FOREGROUND,
-                value.getRGB());
+        userPreferences.node(MHQConstants.DISPLAY_NODE)
+              .putInt(MHQConstants.BELOW_CONTRACT_MINIMUM_FOREGROUND, value.getRGB());
     }
 
     public Color getBelowContractMinimumBackground() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(
-                MHQConstants.BELOW_CONTRACT_MINIMUM_BACKGROUND, UIManager.getColor("Table.background").getRGB()));
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.BELOW_CONTRACT_MINIMUM_BACKGROUND,
+                                     UIManager.getColor("Table.background").getRGB()));
     }
 
     public void setBelowContractMinimumBackground(Color value) {
-        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.BELOW_CONTRACT_MINIMUM_BACKGROUND,
-                value.getRGB());
+        userPreferences.node(MHQConstants.DISPLAY_NODE)
+              .putInt(MHQConstants.BELOW_CONTRACT_MINIMUM_BACKGROUND, value.getRGB());
     }
 
     public Color getInTransitForeground() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.IN_TRANSIT_FOREGROUND,
-                Color.BLACK.getRGB()));
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.IN_TRANSIT_FOREGROUND, Color.BLACK.getRGB()));
     }
 
     public void setInTransitForeground(Color value) {
@@ -278,8 +287,8 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getInTransitBackground() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.IN_TRANSIT_BACKGROUND,
-                Color.MAGENTA.getRGB()));
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.IN_TRANSIT_BACKGROUND, Color.MAGENTA.getRGB()));
     }
 
     public void setInTransitBackground(Color value) {
@@ -287,8 +296,8 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getRefittingForeground() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.REFITTING_FOREGROUND,
-                Color.BLACK.getRGB()));
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.REFITTING_FOREGROUND, Color.BLACK.getRGB()));
     }
 
     public void setRefittingForeground(Color value) {
@@ -296,8 +305,8 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getRefittingBackground() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.REFITTING_BACKGROUND,
-                Color.CYAN.getRGB()));
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.REFITTING_BACKGROUND, Color.CYAN.getRGB()));
     }
 
     public void setRefittingBackground(Color value) {
@@ -305,8 +314,8 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getMothballingForeground() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.MOTHBALLING_FOREGROUND,
-                Color.BLACK.getRGB()));
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.MOTHBALLING_FOREGROUND, Color.BLACK.getRGB()));
     }
 
     public void setMothballingForeground(Color value) {
@@ -314,8 +323,8 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getMothballingBackground() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.MOTHBALLING_BACKGROUND,
-                0xFF9999FF));
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.MOTHBALLING_BACKGROUND, 0xFF9999FF));
     }
 
     public void setMothballingBackground(Color value) {
@@ -323,8 +332,8 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getMothballedForeground() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.MOTHBALLED_FOREGROUND,
-                Color.BLACK.getRGB()));
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.MOTHBALLED_FOREGROUND, Color.BLACK.getRGB()));
     }
 
     public void setMothballedForeground(Color value) {
@@ -332,8 +341,8 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getMothballedBackground() {
-        return new Color(
-                userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.MOTHBALLED_BACKGROUND, 0xFFCCCCFF));
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.MOTHBALLED_BACKGROUND, 0xFFCCCCFF));
     }
 
     public void setMothballedBackground(Color value) {
@@ -341,8 +350,8 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getNotRepairableForeground() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.NOT_REPAIRABLE_FOREGROUND,
-                Color.BLACK.getRGB()));
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.NOT_REPAIRABLE_FOREGROUND, Color.BLACK.getRGB()));
     }
 
     public void setNotRepairableForeground(Color value) {
@@ -350,8 +359,8 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getNotRepairableBackground() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.NOT_REPAIRABLE_BACKGROUND,
-                0xFFBE9637));
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.NOT_REPAIRABLE_BACKGROUND, 0xFFBE9637));
     }
 
     public void setNotRepairableBackground(Color value) {
@@ -359,8 +368,8 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getNonFunctionalForeground() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.NON_FUNCTIONAL_FOREGROUND,
-                Color.BLACK.getRGB()));
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.NON_FUNCTIONAL_FOREGROUND, Color.BLACK.getRGB()));
     }
 
     public void setNonFunctionalForeground(Color value) {
@@ -368,8 +377,8 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getNonFunctionalBackground() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.NON_FUNCTIONAL_BACKGROUND,
-                0xFFCD5C5C));
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.NON_FUNCTIONAL_BACKGROUND, 0xFFCD5C5C));
     }
 
     public void setNonFunctionalBackground(Color value) {
@@ -378,27 +387,27 @@ public final class MHQOptions extends SuiteOptions {
 
     public Color getNeedsPartsFixedForeground() {
         return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
-                .getInt(MHQConstants.NEEDS_PARTS_FIXED_FOREGROUND, Color.BLACK.getRGB()));
+                               .getInt(MHQConstants.NEEDS_PARTS_FIXED_FOREGROUND, Color.BLACK.getRGB()));
     }
 
     public void setNeedsPartsFixedForeground(Color value) {
-        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.NEEDS_PARTS_FIXED_FOREGROUND,
-                value.getRGB());
+        userPreferences.node(MHQConstants.DISPLAY_NODE)
+              .putInt(MHQConstants.NEEDS_PARTS_FIXED_FOREGROUND, value.getRGB());
     }
 
     public Color getNeedsPartsFixedBackground() {
         return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
-                .getInt(MHQConstants.NEEDS_PARTS_FIXED_BACKGROUND, 0xFFEEEE00));
+                               .getInt(MHQConstants.NEEDS_PARTS_FIXED_BACKGROUND, 0xFFEEEE00));
     }
 
     public void setNeedsPartsFixedBackground(Color value) {
-        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.NEEDS_PARTS_FIXED_BACKGROUND,
-                value.getRGB());
+        userPreferences.node(MHQConstants.DISPLAY_NODE)
+              .putInt(MHQConstants.NEEDS_PARTS_FIXED_BACKGROUND, value.getRGB());
     }
 
     public Color getUnmaintainedForeground() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.UNMAINTAINED_FOREGROUND,
-                Color.BLACK.getRGB()));
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.UNMAINTAINED_FOREGROUND, Color.BLACK.getRGB()));
     }
 
     public void setUnmaintainedForeground(Color value) {
@@ -406,8 +415,8 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getUnmaintainedBackground() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.UNMAINTAINED_BACKGROUND,
-                Color.ORANGE.getRGB()));
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.UNMAINTAINED_BACKGROUND, Color.ORANGE.getRGB()));
     }
 
     public void setUnmaintainedBackground(Color value) {
@@ -415,8 +424,8 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getUncrewedForeground() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.UNCREWED_FOREGROUND,
-                Color.BLACK.getRGB()));
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.UNCREWED_FOREGROUND, Color.BLACK.getRGB()));
     }
 
     public void setUncrewedForeground(Color value) {
@@ -424,8 +433,8 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getUncrewedBackground() {
-        return new Color(
-                userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.UNCREWED_BACKGROUND, 0xFFDA82FF));
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.UNCREWED_BACKGROUND, 0xFFDA82FF));
     }
 
     public void setUncrewedBackground(Color value) {
@@ -433,8 +442,8 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getLoanOverdueForeground() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.LOAN_OVERDUE_FOREGROUND,
-                Color.BLACK.getRGB()));
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.LOAN_OVERDUE_FOREGROUND, Color.BLACK.getRGB()));
     }
 
     public void setLoanOverdueForeground(Color value) {
@@ -442,8 +451,8 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getLoanOverdueBackground() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.LOAN_OVERDUE_BACKGROUND,
-                Color.RED.getRGB()));
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.LOAN_OVERDUE_BACKGROUND, Color.RED.getRGB()));
     }
 
     public void setLoanOverdueBackground(Color value) {
@@ -451,8 +460,8 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getInjuredForeground() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.INJURED_FOREGROUND,
-                Color.BLACK.getRGB()));
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.INJURED_FOREGROUND, Color.BLACK.getRGB()));
     }
 
     public void setInjuredForeground(Color value) {
@@ -460,8 +469,8 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getInjuredBackground() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.INJURED_BACKGROUND,
-                Color.RED.getRGB()));
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.INJURED_BACKGROUND, Color.RED.getRGB()));
     }
 
     public void setInjuredBackground(Color value) {
@@ -469,8 +478,8 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getHealedInjuriesForeground() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.HEALED_INJURIES_FOREGROUND,
-                Color.BLACK.getRGB()));
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.HEALED_INJURIES_FOREGROUND, Color.BLACK.getRGB()));
     }
 
     public void setHealedInjuriesForeground(Color value) {
@@ -478,8 +487,8 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getHealedInjuriesBackground() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.HEALED_INJURIES_BACKGROUND,
-                0xEE9A00));
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.HEALED_INJURIES_BACKGROUND, 0xEE9A00));
     }
 
     public void setHealedInjuriesBackground(Color value) {
@@ -487,8 +496,8 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getPregnantForeground() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.PREGNANT_FOREGROUND,
-                Color.BLACK.getRGB()));
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.PREGNANT_FOREGROUND, Color.BLACK.getRGB()));
     }
 
     public void setPregnantForeground(Color value) {
@@ -496,8 +505,8 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getPregnantBackground() {
-        return new Color(
-                userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.PREGNANT_BACKGROUND, 0X2BAD43));
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.PREGNANT_BACKGROUND, 0X2BAD43));
     }
 
     public void setPregnantBackground(Color value) {
@@ -505,8 +514,8 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getGoneForeground() {
-        return new Color(
-                userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.GONE_FOREGROUND, 0xffffff));
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.GONE_FOREGROUND, 0xffffff));
     }
 
     public void setGoneForeground(Color value) {
@@ -514,8 +523,8 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getGoneBackground() {
-        return new Color(
-                userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.GONE_BACKGROUND, 0x222222));
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.GONE_BACKGROUND, 0x222222));
     }
 
     public void setGoneBackground(Color value) {
@@ -523,8 +532,8 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getAbsentForeground() {
-        return new Color(
-                userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.ABSENT_FOREGROUND, 0x000000));
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.ABSENT_FOREGROUND, 0x000000));
     }
 
     public void setAbsentForeground(Color value) {
@@ -532,8 +541,8 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getAbsentBackground() {
-        return new Color(
-                userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.ABSENT_BACKGROUND, 0xffffff));
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.ABSENT_BACKGROUND, 0xffffff));
     }
 
     public void setAbsentBackground(Color value) {
@@ -541,8 +550,8 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getFatiguedForeground() {
-        return new Color(
-                userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.FATIGUED_FOREGROUND, 0x000000));
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.FATIGUED_FOREGROUND, 0x000000));
     }
 
     public void setFatiguedForeground(Color value) {
@@ -550,8 +559,8 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getFatiguedBackground() {
-        return new Color(
-                userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.FATIGUED_BACKGROUND, 0xeeee00));
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.FATIGUED_BACKGROUND, 0xeeee00));
     }
 
     public void setFatiguedBackground(Color value) {
@@ -560,17 +569,17 @@ public final class MHQOptions extends SuiteOptions {
 
     public Color getStratConHexCoordForeground() {
         return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
-                .getInt(MHQConstants.STRATCON_HEX_COORD_FOREGROUND, Color.GREEN.getRGB()));
+                               .getInt(MHQConstants.STRATCON_HEX_COORD_FOREGROUND, Color.GREEN.getRGB()));
     }
 
     public void setStratConHexCoordForeground(Color value) {
-        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.STRATCON_HEX_COORD_FOREGROUND,
-                value.getRGB());
+        userPreferences.node(MHQConstants.DISPLAY_NODE)
+              .putInt(MHQConstants.STRATCON_HEX_COORD_FOREGROUND, value.getRGB());
     }
 
     public Color getFontColorNegative() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.FONT_COLOR_NEGATIVE,
-                Color.RED.getRGB()));
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.FONT_COLOR_NEGATIVE, 0xDF5341));
     }
 
     /**
@@ -584,9 +593,22 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.FONT_COLOR_NEGATIVE, value.getRGB());
     }
 
+    public Color getFontColorAmazing() {
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.FONT_COLOR_AMAZING, 0xC344C3));
+    }
+
+    public String getFontColorAmazingHexColor() {
+        return convertFontColorToHexColor(getFontColorAmazing());
+    }
+
+    public void setFontColorAmazing(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.FONT_COLOR_AMAZING, value.getRGB());
+    }
+
     public Color getFontColorPositive() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.FONT_COLOR_POSITIVE,
-                Color.GREEN.getRGB()));
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.FONT_COLOR_POSITIVE, 0x7FCF43));
     }
 
     /**
@@ -601,8 +623,8 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getFontColorWarning() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.FONT_COLOR_WARNING,
-                Color.ORANGE.getRGB()));
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.FONT_COLOR_WARNING, 0xEE9A00));
     }
 
     /**
@@ -618,8 +640,8 @@ public final class MHQOptions extends SuiteOptions {
 
 
     public Color getFontColorSkillUltraGreen() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.FONT_COLOR_SKILL_ULTRAGREEN,
-                0xDF5341));
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.FONT_COLOR_SKILL_ULTRAGREEN, 0xDF5341));
     }
 
     /**
@@ -630,12 +652,13 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public void setFontColorSkillUltraGreen(Color value) {
-        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.FONT_COLOR_SKILL_ULTRAGREEN, value.getRGB());
+        userPreferences.node(MHQConstants.DISPLAY_NODE)
+              .putInt(MHQConstants.FONT_COLOR_SKILL_ULTRAGREEN, value.getRGB());
     }
 
     public Color getFontColorSkillGreen() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.FONT_COLOR_SKILL_GREEN,
-                0xCFAB43));
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.FONT_COLOR_SKILL_GREEN, 0xCFAB43));
     }
 
     /**
@@ -650,8 +673,8 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getFontColorSkillRegular() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.FONT_COLOR_SKILL_REGULAR,
-                0x7FCF43));
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.FONT_COLOR_SKILL_REGULAR, 0x7FCF43));
     }
 
     /**
@@ -666,8 +689,8 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getFontColorSkillVeteran() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.FONT_COLOR_SKILL_VETERAN,
-                0x5CE8E0));
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.FONT_COLOR_SKILL_VETERAN, 0x5CE8E0));
     }
 
     /**
@@ -682,8 +705,8 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getFontColorSkillElite() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.FONT_COLOR_SKILL_ELITE,
-                0xC344C3));
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.FONT_COLOR_SKILL_ELITE, 0xC344C3));
     }
 
     /**
@@ -702,6 +725,7 @@ public final class MHQOptions extends SuiteOptions {
      * Converts the font color to a hexadecimal color representation.
      *
      * @param color the font color to convert
+     *
      * @return the hexadecimal color representation of the font color
      */
     public String convertFontColorToHexColor(Color color) {
@@ -715,8 +739,8 @@ public final class MHQOptions extends SuiteOptions {
 
     // region Fonts
     public String getMedicalViewDialogHandwritingFont() {
-        return userPreferences.node(MHQConstants.FONTS_NODE).get(MHQConstants.MEDICAL_VIEW_DIALOG_HANDWRITING_FONT,
-                "Angelina");
+        return userPreferences.node(MHQConstants.FONTS_NODE)
+                     .get(MHQConstants.MEDICAL_VIEW_DIALOG_HANDWRITING_FONT, "Angelina");
     }
 
     public void setMedicalViewDialogHandwritingFont(final String value) {
@@ -765,18 +789,26 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.AUTOSAVE_NODE).putBoolean(MHQConstants.SAVE_YEARLY_KEY, value);
     }
 
-    public boolean getAutosaveBeforeMissionsValue() {
-        return userPreferences.node(MHQConstants.AUTOSAVE_NODE).getBoolean(MHQConstants.SAVE_BEFORE_MISSIONS_KEY,
-                true);
+    public boolean getAutosaveBeforeScenariosValue() {
+        return userPreferences.node(MHQConstants.AUTOSAVE_NODE)
+                     .getBoolean(MHQConstants.SAVE_BEFORE_SCENARIOS_KEY, true);
     }
 
-    public void setAutosaveBeforeMissionsValue(boolean value) {
-        userPreferences.node(MHQConstants.AUTOSAVE_NODE).putBoolean(MHQConstants.SAVE_BEFORE_MISSIONS_KEY, value);
+    public void setAutosaveBeforeScenariosValue(boolean value) {
+        userPreferences.node(MHQConstants.AUTOSAVE_NODE).putBoolean(MHQConstants.SAVE_BEFORE_SCENARIOS_KEY, value);
+    }
+
+    public boolean getAutosaveBeforeMissionEndValue() {
+        return userPreferences.node(MHQConstants.AUTOSAVE_NODE).getBoolean(MHQConstants.SAVE_BEFORE_MISSION_END, false);
+    }
+
+    public void setAutosaveBeforeMissionEndValue(boolean value) {
+        userPreferences.node(MHQConstants.AUTOSAVE_NODE).putBoolean(MHQConstants.SAVE_BEFORE_MISSION_END, value);
     }
 
     public int getMaximumNumberOfAutosavesValue() {
-        return userPreferences.node(MHQConstants.AUTOSAVE_NODE).getInt(MHQConstants.MAXIMUM_NUMBER_SAVES_KEY,
-                MHQConstants.DEFAULT_NUMBER_SAVES);
+        return userPreferences.node(MHQConstants.AUTOSAVE_NODE)
+                     .getInt(MHQConstants.MAXIMUM_NUMBER_SAVES_KEY, MHQConstants.DEFAULT_NUMBER_SAVES);
     }
 
     public void setMaximumNumberOfAutosavesValue(int value) {
@@ -810,52 +842,52 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public boolean getNewDayOptimizeMedicalAssignments() {
-        return userPreferences.node(MHQConstants.NEW_DAY_NODE).getBoolean(MHQConstants.NEW_DAY_OPTIMIZE_MEDICAL_ASSIGNMENTS, false);
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE)
+                     .getBoolean(MHQConstants.NEW_DAY_OPTIMIZE_MEDICAL_ASSIGNMENTS, false);
     }
 
     public void setNewDayOptimizeMedicalAssignments(final boolean value) {
-        userPreferences.node(MHQConstants.NEW_DAY_NODE).putBoolean(MHQConstants.NEW_DAY_OPTIMIZE_MEDICAL_ASSIGNMENTS, value);
+        userPreferences.node(MHQConstants.NEW_DAY_NODE)
+              .putBoolean(MHQConstants.NEW_DAY_OPTIMIZE_MEDICAL_ASSIGNMENTS, value);
     }
 
     public boolean getNewDayForceIconOperationalStatus() {
         return userPreferences.node(MHQConstants.NEW_DAY_NODE)
-                .getBoolean(MHQConstants.NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS, true);
+                     .getBoolean(MHQConstants.NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS, true);
     }
 
     public void setNewDayForceIconOperationalStatus(final boolean value) {
-        userPreferences.node(MHQConstants.NEW_DAY_NODE).putBoolean(MHQConstants.NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS,
-                value);
+        userPreferences.node(MHQConstants.NEW_DAY_NODE)
+              .putBoolean(MHQConstants.NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS, value);
     }
 
     public ForceIconOperationalStatusStyle getNewDayForceIconOperationalStatusStyle() {
-        return ForceIconOperationalStatusStyle.valueOf(userPreferences.node(MHQConstants.NEW_DAY_NODE).get(
-                MHQConstants.NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS_STYLE,
-                ForceIconOperationalStatusStyle.BORDER.name()));
+        return ForceIconOperationalStatusStyle.valueOf(userPreferences.node(MHQConstants.NEW_DAY_NODE)
+                                                             .get(MHQConstants.NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS_STYLE,
+                                                                   ForceIconOperationalStatusStyle.BORDER.name()));
     }
 
     public void setNewDayForceIconOperationalStatusStyle(final ForceIconOperationalStatusStyle value) {
-        userPreferences.node(MHQConstants.NEW_DAY_NODE).put(MHQConstants.NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS_STYLE,
-                value.name());
+        userPreferences.node(MHQConstants.NEW_DAY_NODE)
+              .put(MHQConstants.NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS_STYLE, value.name());
     }
     // endregion New Day
 
     // region Campaign XML Save Options
+
     /**
-     * @return A value indicating if the campaign should be written to a gzipped
-     *         file, if possible.
+     * @return A value indicating if the campaign should be written to a gzipped file, if possible.
      */
     public boolean getPreferGzippedOutput() {
-        return userPreferences.node(MHQConstants.XML_SAVES_NODE).getBoolean(MHQConstants.PREFER_GZIPPED_CAMPAIGN_FILE,
-                true);
+        return userPreferences.node(MHQConstants.XML_SAVES_NODE)
+                     .getBoolean(MHQConstants.PREFER_GZIPPED_CAMPAIGN_FILE, true);
     }
 
     /**
-     * Sets a hint indicating that the campaign should be gzipped, if possible.
-     * This allows the Save dialog to present the user with the correct file
-     * type on subsequent saves.
+     * Sets a hint indicating that the campaign should be gzipped, if possible. This allows the Save dialog to present
+     * the user with the correct file type on subsequent saves.
      *
-     * @param value A value indicating whether or not the campaign should be gzipped
-     *              if possible.
+     * @param value A value indicating whether or not the campaign should be gzipped if possible.
      */
     public void setPreferGzippedOutput(boolean value) {
         userPreferences.node(MHQConstants.XML_SAVES_NODE).putBoolean(MHQConstants.PREFER_GZIPPED_CAMPAIGN_FILE, value);
@@ -879,61 +911,55 @@ public final class MHQOptions extends SuiteOptions {
     // endregion Campaign XML Save Options
 
     // region File Paths
+
     /**
-     * @return the path of the folder to load when loading or saving bulk rank
-     *         systems
+     * @return the path of the folder to load when loading or saving bulk rank systems
      */
     public String getRankSystemsPath() {
-        return userPreferences.node(MHQConstants.FILE_PATH_NODE).get(MHQConstants.RANK_SYSTEMS_DIRECTORY_PATH,
-                "userdata/data/universe/");
+        return userPreferences.node(MHQConstants.FILE_PATH_NODE)
+                     .get(MHQConstants.RANK_SYSTEMS_DIRECTORY_PATH, "userdata/data/universe/");
     }
 
     /**
-     * This sets the path where one saves or loads their rank systems from, as this
-     * is not required
-     * for any data but improves UX.
+     * This sets the path where one saves or loads their rank systems from, as this is not required for any data but
+     * improves UX.
      *
-     * @param value the path where the person saved their last bulk rank system
-     *              export
+     * @param value the path where the person saved their last bulk rank system export
      */
     public void setRankSystemsPath(final String value) {
         userPreferences.node(MHQConstants.FILE_PATH_NODE).put(MHQConstants.RANK_SYSTEMS_DIRECTORY_PATH, value);
     }
 
     /**
-     * @return the path of the folder to load when loading or saving an individual
-     *         rank system
+     * @return the path of the folder to load when loading or saving an individual rank system
      */
     public String getIndividualRankSystemPath() {
-        return userPreferences.node(MHQConstants.FILE_PATH_NODE).get(MHQConstants.INDIVIDUAL_RANK_SYSTEM_DIRECTORY_PATH,
-                "userdata/data/universe/");
+        return userPreferences.node(MHQConstants.FILE_PATH_NODE)
+                     .get(MHQConstants.INDIVIDUAL_RANK_SYSTEM_DIRECTORY_PATH, "userdata/data/universe/");
     }
 
     /**
-     * This sets the path where one saves or loads their individual rank system, as
-     * this is not
-     * required for any data but improves UX.
+     * This sets the path where one saves or loads their individual rank system, as this is not required for any data
+     * but improves UX.
      *
-     * @param value the path where the person saved their last individual rank
-     *              system.
+     * @param value the path where the person saved their last individual rank system.
      */
     public void setIndividualRankSystemPath(final String value) {
-        userPreferences.node(MHQConstants.FILE_PATH_NODE).put(MHQConstants.INDIVIDUAL_RANK_SYSTEM_DIRECTORY_PATH,
-                value);
+        userPreferences.node(MHQConstants.FILE_PATH_NODE)
+              .put(MHQConstants.INDIVIDUAL_RANK_SYSTEM_DIRECTORY_PATH, value);
     }
 
     /**
      * @return the path of the folder to load when exporting a unit sprite
      */
     public String getUnitSpriteExportPath() {
-        return userPreferences.node(MHQConstants.FILE_PATH_NODE).get(MHQConstants.UNIT_SPRITE_EXPORT_DIRECTORY_PATH,
-                "");
+        return userPreferences.node(MHQConstants.FILE_PATH_NODE)
+                     .get(MHQConstants.UNIT_SPRITE_EXPORT_DIRECTORY_PATH, "");
     }
 
     /**
-     * This sets the path where one saves their unit sprite during export, as this
-     * is not
-     * required for any data but improves UX.
+     * This sets the path where one saves their unit sprite during export, as this is not required for any data but
+     * improves UX.
      *
      * @param value the path where the person saved their last unit sprite export
      */
@@ -945,25 +971,23 @@ public final class MHQOptions extends SuiteOptions {
      * @return the path of the folder to load when exporting a layered force icon
      */
     public String getLayeredForceIconPath() {
-        return userPreferences.node(MHQConstants.FILE_PATH_NODE).get(MHQConstants.LAYERED_FORCE_ICON_DIRECTORY_PATH,
-                "userdata/data/images/force/");
+        return userPreferences.node(MHQConstants.FILE_PATH_NODE)
+                     .get(MHQConstants.LAYERED_FORCE_ICON_DIRECTORY_PATH, "userdata/data/images/force/");
     }
 
     /**
-     * This sets the path where one saves their layered force icon during export, as
-     * this is not
-     * required for any data but improves UX.
+     * This sets the path where one saves their layered force icon during export, as this is not required for any data
+     * but improves UX.
      *
-     * @param value the path where the person saved their last layered force icon
-     *              export
+     * @param value the path where the person saved their last layered force icon export
      */
     public void setLayeredForceIconPath(final String value) {
         userPreferences.node(MHQConstants.FILE_PATH_NODE).put(MHQConstants.LAYERED_FORCE_ICON_DIRECTORY_PATH, value);
     }
 
     public String getCompanyGenerationDirectoryPath() {
-        return userPreferences.node(MHQConstants.FILE_PATH_NODE).get(MHQConstants.COMPANY_GENERATION_DIRECTORY_PATH,
-                "mmconf/mhqCompanyGenerationPresets/");
+        return userPreferences.node(MHQConstants.FILE_PATH_NODE)
+                     .get(MHQConstants.COMPANY_GENERATION_DIRECTORY_PATH, "mmconf/mhqCompanyGenerationPresets/");
     }
 
     public void setCompanyGenerationDirectoryPath(final String value) {
@@ -995,48 +1019,49 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public void setStartGameClientDelay(final int startGameClientDelay) {
-        userPreferences.node(MHQConstants.MISCELLANEOUS_NODE).putInt(MHQConstants.START_GAME_CLIENT_DELAY,
-                startGameClientDelay);
+        userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
+              .putInt(MHQConstants.START_GAME_CLIENT_DELAY, startGameClientDelay);
     }
 
     public int getStartGameClientRetryCount() {
-        return userPreferences.node(MHQConstants.MISCELLANEOUS_NODE).getInt(MHQConstants.START_GAME_CLIENT_RETRY_COUNT,
-                1000);
+        return userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
+                     .getInt(MHQConstants.START_GAME_CLIENT_RETRY_COUNT, 1000);
     }
 
     public void setStartGameClientRetryCount(final int startGameClientRetryCount) {
-        userPreferences.node(MHQConstants.MISCELLANEOUS_NODE).putInt(MHQConstants.START_GAME_CLIENT_RETRY_COUNT,
-                startGameClientRetryCount);
+        userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
+              .putInt(MHQConstants.START_GAME_CLIENT_RETRY_COUNT, startGameClientRetryCount);
     }
 
     public int getStartGameBotClientDelay() {
-        return userPreferences.node(MHQConstants.MISCELLANEOUS_NODE).getInt(MHQConstants.START_GAME_BOT_CLIENT_DELAY,
-                50);
+        return userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
+                     .getInt(MHQConstants.START_GAME_BOT_CLIENT_DELAY, 50);
     }
 
     public void setStartGameBotClientDelay(final int startGameBotClientDelay) {
-        userPreferences.node(MHQConstants.MISCELLANEOUS_NODE).putInt(MHQConstants.START_GAME_BOT_CLIENT_DELAY,
-                startGameBotClientDelay);
+        userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
+              .putInt(MHQConstants.START_GAME_BOT_CLIENT_DELAY, startGameBotClientDelay);
     }
 
     public int getStartGameBotClientRetryCount() {
         return userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
-                .getInt(MHQConstants.START_GAME_BOT_CLIENT_RETRY_COUNT, 250);
+                     .getInt(MHQConstants.START_GAME_BOT_CLIENT_RETRY_COUNT, 250);
     }
 
     public void setStartGameBotClientRetryCount(final int startGameBotClientRetryCount) {
-        userPreferences.node(MHQConstants.MISCELLANEOUS_NODE).putInt(MHQConstants.START_GAME_BOT_CLIENT_RETRY_COUNT,
-                startGameBotClientRetryCount);
+        userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
+              .putInt(MHQConstants.START_GAME_BOT_CLIENT_RETRY_COUNT, startGameBotClientRetryCount);
     }
 
     public CompanyGenerationMethod getDefaultCompanyGenerationMethod() {
         return CompanyGenerationMethod.valueOf(userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
-                .get(MHQConstants.DEFAULT_COMPANY_GENERATION_METHOD, CompanyGenerationMethod.WINDCHILD.name()));
+                                                     .get(MHQConstants.DEFAULT_COMPANY_GENERATION_METHOD,
+                                                           CompanyGenerationMethod.WINDCHILD.name()));
     }
 
     public void setDefaultCompanyGenerationMethod(final CompanyGenerationMethod value) {
-        userPreferences.node(MHQConstants.MISCELLANEOUS_NODE).put(MHQConstants.DEFAULT_COMPANY_GENERATION_METHOD,
-                value.name());
+        userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
+              .put(MHQConstants.DEFAULT_COMPANY_GENERATION_METHOD, value.name());
     }
     // endregion Miscellaneous Options
 }

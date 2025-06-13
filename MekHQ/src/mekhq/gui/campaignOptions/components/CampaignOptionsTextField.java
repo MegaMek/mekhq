@@ -24,17 +24,24 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.campaignOptions.components;
 
-import megamek.common.annotations.Nullable;
-
-import javax.swing.*;
-import java.util.ResourceBundle;
-
 import static megamek.client.ui.WrapLayout.wordWrap;
-import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
+import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.processWrapSize;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
+
+import javax.swing.JTextField;
+
+import megamek.common.annotations.Nullable;
 
 /**
  * A specialized {@link JTextField} component designed for use in campaign options dialogs.
@@ -44,17 +51,6 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.processWrapSize
  * maintaining consistent UI scaling.
  */
 public class CampaignOptionsTextField extends JTextField {
-
-    /**
-     * The path to the resource bundle that contains tooltip text for the text field.
-     */
-    private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
-
-    /**
-     * The {@link ResourceBundle} used to fetch localized tooltip and other properties.
-     */
-    static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
-
     /**
      * Constructs a {@link CampaignOptionsTextField} with a default tooltip wrap size.
      * <p>
@@ -83,10 +79,10 @@ public class CampaignOptionsTextField extends JTextField {
         super();
 
         // Set the tooltip text with word wrapping
-        setToolTipText(wordWrap(
-            resources.getString("lbl" + name + ".tooltip"),
-            processWrapSize(customWrapSize)
-        ));
+        String tooltipText = getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".tooltip");
+        if (isResourceKeyValid(tooltipText) && !tooltipText.isEmpty()) {
+            setToolTipText(wordWrap(tooltipText, processWrapSize(customWrapSize)));
+        }
 
         // Set the component name
         setName("lbl" + name);

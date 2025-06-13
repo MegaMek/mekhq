@@ -28,38 +28,12 @@
 
 package mekhq.campaign.autoresolve;
 
-import megamek.client.ui.swing.util.PlayerColour;
-import megamek.common.*;
-import megamek.common.autoresolve.Resolver;
-import megamek.common.autoresolve.acar.SimulationOptions;
-import megamek.common.autoresolve.converter.FlattenForces;
-import megamek.common.autoresolve.event.AutoResolveConcludedEvent;
-import megamek.common.enums.Gender;
-import megamek.common.enums.SkillLevel;
-import megamek.common.icons.Camouflage;
-import megamek.common.planetaryconditions.*;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.RandomSkillPreferences;
-import mekhq.campaign.force.Force;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.BotForce;
-import mekhq.campaign.mission.enums.CombatRole;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.generator.AbstractSkillGenerator;
-import mekhq.campaign.personnel.generator.DefaultSkillGenerator;
-import mekhq.campaign.personnel.ranks.Ranks;
-import mekhq.campaign.rating.CamOpsReputation.ReputationController;
-import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.Systems;
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
-import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -67,10 +41,57 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import megamek.client.ui.util.PlayerColour;
+import megamek.common.Board;
+import megamek.common.Crew;
+import megamek.common.CrewType;
+import megamek.common.Entity;
+import megamek.common.EquipmentType;
+import megamek.common.MapSettings;
+import megamek.common.MekSummary;
+import megamek.common.autoresolve.Resolver;
+import megamek.common.autoresolve.acar.SimulationOptions;
+import megamek.common.autoresolve.converter.FlattenForces;
+import megamek.common.autoresolve.event.AutoResolveConcludedEvent;
+import megamek.common.enums.Gender;
+import megamek.common.enums.SkillLevel;
+import megamek.common.icons.Camouflage;
+import megamek.common.planetaryconditions.Atmosphere;
+import megamek.common.planetaryconditions.BlowingSand;
+import megamek.common.planetaryconditions.EMI;
+import megamek.common.planetaryconditions.Fog;
+import megamek.common.planetaryconditions.Light;
+import megamek.common.planetaryconditions.PlanetaryConditions;
+import megamek.common.planetaryconditions.Weather;
+import megamek.common.planetaryconditions.Wind;
+import megamek.common.util.BoardUtilities;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.force.Force;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBDynamicScenario;
+import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.BotForce;
+import mekhq.campaign.mission.enums.CombatRole;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.generator.AbstractSkillGenerator;
+import mekhq.campaign.personnel.generator.DefaultSkillGenerator;
+import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.personnel.skills.RandomSkillPreferences;
+import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.rating.CamOpsReputation.ReputationController;
+import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Systems;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.RepeatedTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 
 /**
@@ -100,6 +121,7 @@ public class ResolverTest {
     private static int team1 = 0;
     private static int team2 = 0;
     private static int draws = 0;
+    private static Board BOARD = BoardUtilities.generateRandom(MapSettings.getInstance());
 
     public enum TeamArrangement {
         BALANCED,
@@ -354,6 +376,7 @@ public class ResolverTest {
         var units = getUnits(campaign, teamArrangement);
         var scenario = createScenario(campaign);
         var entities = getEntities(teamArrangement);
+        var planetaryConditions = new PlanetaryConditions();
 
         when(botForce.getCamouflage()).thenReturn(Camouflage.of(PlayerColour.MAROON));
         when(botForce.getColour()).thenReturn(PlayerColour.MAROON);
@@ -361,7 +384,8 @@ public class ResolverTest {
         when(botForce.getTeam()).thenReturn(2);
         when(botForce.getFullEntityList(any())).thenReturn(entities);
 
-        var resolver = Resolver.simulationRun(new AtBSetupForces(campaign, units, scenario, new FlattenForces()), SimulationOptions.empty(), new Board(30, 30));
+        var resolver = Resolver.simulationRun(new StratconSetupForces(campaign, units, scenario, new FlattenForces()),
+              SimulationOptions.empty(), BOARD, planetaryConditions);
         autoResolveConcludedEvent.accept(resolver.resolveSimulation());
     }
 

@@ -24,34 +24,40 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.campaignOptions;
 
-import megamek.client.ui.swing.util.UIUtil;
-import megamek.logging.MMLogger;
-import mekhq.CampaignPreset;
-import mekhq.MekHQ;
-import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
+import static megamek.utilities.ImageUtilities.scaleImageIcon;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createGroupLayout;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
-import java.awt.*;
-import java.util.ResourceBundle;
 
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createGroupLayout;
-import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
+import megamek.client.ui.util.UIUtil;
+import megamek.logging.MMLogger;
+import mekhq.CampaignPreset;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
 
 /**
- * A dialog for selecting campaign presets. Extends {@link JDialog}.
- * Keeps track of the selected preset and return state.
- * Provides options to select a preset, customize a preset, or cancel the operation.
+ * A dialog for selecting campaign presets. Extends {@link JDialog}. Keeps track of the selected preset and return
+ * state. Provides options to select a preset, customize a preset, or cancel the operation.
  */
 public class SelectPresetDialog extends JDialog {
-    private static String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
-    private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE,
-        MekHQ.getMHQOptions().getLocale());
-
     private static final MMLogger logger = MMLogger.create(SelectPresetDialog.class);
 
     private int returnState;
@@ -82,12 +88,12 @@ public class SelectPresetDialog extends JDialog {
     /**
      * Constructs a dialog window for selecting a campaign preset.
      *
-     * @param frame                     the parent {@link JFrame} for the dialog
-     * @param includePresetSelectOption whether to include the option to select a preset
+     * @param frame                        the parent {@link JFrame} for the dialog
+     * @param includePresetSelectOption    whether to include the option to select a preset
      * @param includeCustomizePresetOption whether to include the option to customize a preset
      */
     public SelectPresetDialog(JFrame frame, boolean includePresetSelectOption, boolean includeCustomizePresetOption) {
-        super(frame, resources.getString("presetDialog.title"), true);
+        super(frame, getTextAt(getCampaignOptionsResourceBundle(), "presetDialog.title"), true);
         final int DIALOG_WIDTH = UIUtil.scaleForGUI(400);
         final int INSERT_SIZE = UIUtil.scaleForGUI(10);
         returnState = PRESET_SELECTION_CANCELLED;
@@ -95,7 +101,7 @@ public class SelectPresetDialog extends JDialog {
         setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 
         ImageIcon imageIcon = new ImageIcon("data/images/misc/megamek-splash.png");
-        imageIcon = scaleImageIconToWidth(imageIcon, UIUtil.scaleForGUI(400));
+        imageIcon = scaleImageIcon(imageIcon, 400, true);
 
         JLabel imageLabel = new JLabel(imageIcon);
         add(imageLabel, BorderLayout.NORTH);
@@ -105,14 +111,14 @@ public class SelectPresetDialog extends JDialog {
         centerPanel.setLayout(layout);
 
         JLabel descriptionLabel = new JLabel(String.format(
-            "<html><body><div style='width:%spx;'><center>%s</center></div></body></html>",
-            DIALOG_WIDTH, resources.getString("presetDialog.description")));
+              "<html><body><div style='width:%spx;'><center>%s</center></div></body></html>",
+              DIALOG_WIDTH, getTextAt(getCampaignOptionsResourceBundle(), "presetDialog.description")));
 
         final DefaultListModel<CampaignPreset> campaignPresets = new DefaultListModel<>();
         campaignPresets.addAll(CampaignPreset.getCampaignPresets());
 
         if (campaignPresets.isEmpty()) {
-            logger.error("No campaign presets found", "Error");
+            logger.errorDialog("Error", "No campaign presets found");
         }
 
         JComboBox<CampaignPreset> comboBox = new JComboBox<>();
@@ -120,9 +126,8 @@ public class SelectPresetDialog extends JDialog {
 
         DefaultListCellRenderer listRenderer = new DefaultListCellRenderer() {
             @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value,
-                                                          int index, boolean isSelected,
-                                                          boolean cellHasFocus) {
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
+                  boolean cellHasFocus) {
                 if (value instanceof CampaignPreset preset) {
                     setText(preset.getTitle());
                 }
@@ -135,18 +140,14 @@ public class SelectPresetDialog extends JDialog {
         };
         comboBox.setRenderer(listRenderer);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(descriptionLabel)
-                .addPreferredGap(ComponentPlacement.UNRELATED, INSERT_SIZE, INSERT_SIZE)
-                .addComponent(comboBox)
-        );
+        layout.setVerticalGroup(layout.createSequentialGroup()
+                                      .addComponent(descriptionLabel)
+                                      .addPreferredGap(ComponentPlacement.UNRELATED, INSERT_SIZE, INSERT_SIZE)
+                                      .addComponent(comboBox));
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.CENTER)
-                .addComponent(descriptionLabel)
-                .addComponent(comboBox)
-        );
+        layout.setHorizontalGroup(layout.createParallelGroup(Alignment.CENTER)
+                                        .addComponent(descriptionLabel)
+                                        .addComponent(comboBox));
 
         JPanel outerPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -157,7 +158,7 @@ public class SelectPresetDialog extends JDialog {
         outerPanel.add(centerPanel, gbc);
 
         JPanel bottomPanel = new JPanel();
-        bottomPanel.setBorder(BorderFactory.createEtchedBorder());
+        bottomPanel.setBorder(RoundedLineBorder.createRoundedLineBorder());
         JLabel newLabel = new JLabel();
         newLabel.setHorizontalAlignment(JLabel.CENTER);
         bottomPanel.add(newLabel);
@@ -171,14 +172,14 @@ public class SelectPresetDialog extends JDialog {
             Object selectedItem = comboBox.getSelectedItem();
             if (selectedItem instanceof CampaignPreset preset) {
                 newLabel.setText(String.format(
-                    "<html><body><div style='width:%spx;'><center>%s</center></div></body></html>",
-                    DIALOG_WIDTH * 0.9,
-                    preset.getDescription()));
+                      "<html><body><div style='width:%spx;'><center>%s</center></div></body></html>",
+                      DIALOG_WIDTH * 0.9,
+                      preset.getDescription()));
             } else {
                 newLabel.setText(String.format(
-                    "<html><body><div style='width:%spx;'><center>%s</center></div></body></html>",
-                    DIALOG_WIDTH * 0.9,
-                    "No description available."));
+                      "<html><body><div style='width:%spx;'><center>%s</center></div></body></html>",
+                      DIALOG_WIDTH * 0.9,
+                      "No description available."));
             }
             revalidate();
             repaint();
@@ -188,21 +189,21 @@ public class SelectPresetDialog extends JDialog {
         Object initialItem = comboBox.getSelectedItem();
         if (initialItem instanceof CampaignPreset preset) {
             newLabel.setText(String.format(
-                "<html><body><div style='width:%spx;'><center>%s</center></div></body></html>",
-                DIALOG_WIDTH * 0.9,
-                preset.getDescription()));
+                  "<html><body><div style='width:%spx;'><center>%s</center></div></body></html>",
+                  DIALOG_WIDTH * 0.9,
+                  preset.getDescription()));
         } else {
             newLabel.setText(String.format(
-                "<html><body><div style='width:%spx;'><center>%s</center></div></body></html>",
-                DIALOG_WIDTH * 0.9,
-                "No description available."));
+                  "<html><body><div style='width:%spx;'><center>%s</center></div></body></html>",
+                  DIALOG_WIDTH * 0.9,
+                  "No description available."));
         }
 
         add(outerPanel, BorderLayout.CENTER);
 
         JPanel buttonPanel = new JPanel();
 
-        JButton buttonSelect = new CampaignOptionsButton("PresetDialogSelect");
+        RoundedJButton buttonSelect = new CampaignOptionsButton("PresetDialogSelect");
         buttonSelect.addActionListener(e -> {
             selectedPreset = (CampaignPreset) comboBox.getSelectedItem();
             returnState = PRESET_SELECTION_SELECT;
@@ -211,7 +212,7 @@ public class SelectPresetDialog extends JDialog {
         buttonSelect.setEnabled(includePresetSelectOption);
         buttonPanel.add(buttonSelect);
 
-        JButton buttonCustomize = new CampaignOptionsButton("PresetDialogCustomize");
+        RoundedJButton buttonCustomize = new CampaignOptionsButton("PresetDialogCustomize");
         buttonCustomize.addActionListener(e -> {
             selectedPreset = (CampaignPreset) comboBox.getSelectedItem();
             returnState = PRESET_SELECTION_CUSTOMIZE;
@@ -220,7 +221,7 @@ public class SelectPresetDialog extends JDialog {
         buttonCustomize.setEnabled(includeCustomizePresetOption);
         buttonPanel.add(buttonCustomize);
 
-        JButton buttonCancel = new CampaignOptionsButton("PresetDialogCancel");
+        RoundedJButton buttonCancel = new CampaignOptionsButton("PresetDialogCancel");
         buttonCancel.addActionListener(e -> {
             returnState = PRESET_SELECTION_CANCELLED;
             dispose();
@@ -240,10 +241,11 @@ public class SelectPresetDialog extends JDialog {
      * Converts a {@link DefaultListModel} of {@link CampaignPreset} objects to a {@link DefaultComboBoxModel}.
      *
      * @param listModel The {@link DefaultListModel} to convert.
+     *
      * @return The converted {@link DefaultComboBoxModel}.
      */
     private DefaultComboBoxModel<CampaignPreset> convertPresetListModelToComboBoxModel(
-        DefaultListModel<CampaignPreset> listModel) {
+          DefaultListModel<CampaignPreset> listModel) {
 
         // Create a new DefaultComboBoxModel
         DefaultComboBoxModel<CampaignPreset> comboBoxModel = new DefaultComboBoxModel<>();

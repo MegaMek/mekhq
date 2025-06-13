@@ -99,7 +99,7 @@ public class StratconCoords extends Coords {
     }
 
     /**
-     * Returns a tabletop battletech-like coordinate string
+     * Returns a tabletop bt-like coordinate string
      */
     public String toBTString() {
         return String.format("%02d%02d", getX(), getY());

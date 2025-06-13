@@ -42,7 +42,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static mekhq.campaign.market.procurement.Procurement.getFactionTechCode;
+import static mekhq.campaign.market.procurement.Procurement.getTechFaction;
 
 /**
  * Utility class for managing and facilitating dialog-related operations
@@ -85,7 +85,7 @@ public class ResupplyDialogUtilities {
                 String append = part.isClan() ? " (Clan)" : "";
                 append = part.isMixedTech() ? " (Mixed)" : append;
                 append += " (" + quality + ')';
-                append += part.isExtinct(year, originFaction.isClan(), getFactionTechCode(originFaction)) ?
+                append += part.isExtinct(year, originFaction.isClan(), getTechFaction(originFaction)) ?
                     " (<b>EXTINCT!</b>)" : "";
 
                 if (part instanceof AmmoBin) {

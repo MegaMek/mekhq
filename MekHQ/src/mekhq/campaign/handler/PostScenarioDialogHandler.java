@@ -28,8 +28,15 @@
 
 package mekhq.campaign.handler;
 
+import java.io.File;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Stream;
+
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
@@ -43,16 +50,11 @@ import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.RetirementDefectionDialog;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Stream;
-
 /**
  * @author Luana Coppio
  */
 public class PostScenarioDialogHandler {
+    private static final MMLogger LOGGER = MMLogger.create(PostScenarioDialogHandler.class);
 
     /**
      * Handles post-game resolution checks, dialogs, and actions after a scenario is completed.
@@ -93,7 +95,17 @@ public class PostScenarioDialogHandler {
         cleanupTempImageFiles();
         // we need to trigger ScenarioResolvedEvent before stopping the thread or
         // currentScenario may become null
-        MekHQ.triggerEvent(new ScenarioResolvedEvent(currentScenario));
+        try {
+            MekHQ.triggerEvent(new ScenarioResolvedEvent(currentScenario));
+        } catch (Exception e) {
+            LOGGER.error(e, "An error occurred during scenario resolution: {}", e.getMessage());
+            LOGGER.errorDialog(
+                  e,
+                  "A critical error has occurred during the scenario resolution. This issue is under investigation." +
+                        "\n\nPlease open an issue report and include your MekHQ log file for further assessment.",
+                  "Critical Error"
+            );
+        }
     }
 
     private static void restartRats(Campaign campaign) {
@@ -107,14 +119,10 @@ public class PostScenarioDialogHandler {
         final File tempImageDirectory = new File("data/images/temp");
         if (tempImageDirectory.isDirectory()) {
             var listFiles = tempImageDirectory.listFiles();
-            if (listFiles == null) {
-                // This may happen if the directory is not accessible or if someone creates a file which the name collides
-                // with the folder
-                return;
+            if (listFiles != null) {
+                Stream.of(listFiles).filter(file -> file.getName().endsWith(".png"))
+                      .forEach(File::delete);
             }
-            // This can't be null because of the above
-            Stream.of(listFiles).filter(file -> file.getName().endsWith(".png"))
-                .forEach(File::delete);
         }
     }
 

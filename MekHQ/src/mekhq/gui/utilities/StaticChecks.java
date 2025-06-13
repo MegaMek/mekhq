@@ -24,15 +24,15 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.utilities;
 
-import megamek.common.UnitType;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.Profession;
-import mekhq.campaign.unit.Unit;
+import static mekhq.campaign.force.ForceType.STANDARD;
 
 import java.util.Arrays;
 import java.util.List;
@@ -41,7 +41,12 @@ import java.util.StringJoiner;
 import java.util.Vector;
 import java.util.stream.Stream;
 
-import static mekhq.campaign.force.ForceType.STANDARD;
+import megamek.common.UnitType;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.force.Force;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.Profession;
+import mekhq.campaign.unit.Unit;
 
 public class StaticChecks {
 
@@ -318,6 +323,33 @@ public class StaticChecks {
         return Arrays.stream(people).allMatch(p -> p.getStatus().isActive());
     }
 
+    public static boolean areAnyActive(Person... people) {
+        return Stream.of(people).anyMatch(p -> p.getStatus().isActive());
+    }
+
+    /**
+     * Determines whether all specified people are currently employed and have not departed their unit.
+     *
+     * @param people one or more {@link Person} objects to check; must not be {@code null}
+     *
+     * @return {@code true} if all people are employed and have not departed their unit; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public static boolean areAllEmployed(Person... people) {
+        for (Person person : people) {
+            if (person.getStatus().isDepartedUnit()) {
+                return false;
+            }
+
+            if (!person.isEmployed()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public static boolean areAllStudents(Person... people) {
         return Arrays.stream(people).allMatch(p -> p.getStatus().isStudent());
     }
@@ -348,6 +380,10 @@ public class StaticChecks {
 
     public static boolean areAnyFree(Person... people) {
         return Stream.of(people).anyMatch(p -> p.getPrisonerStatus().isFree());
+    }
+
+    public static boolean areAnyFreeOrBondsman(Person... people) {
+        return Stream.of(people).anyMatch(p -> p.getPrisonerStatus().isFreeOrBondsman());
     }
 
     public static boolean areAllPrisoners(Person... people) {

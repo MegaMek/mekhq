@@ -25,18 +25,44 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.againstTheBot;
 
-import megamek.common.*;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_ULTRA_GREEN;
+import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.function.Function;
+import javax.xml.parsers.DocumentBuilder;
+
+import megamek.common.Compute;
+import megamek.common.EntityWeightClass;
+import megamek.common.MekSummary;
+import megamek.common.MekSummaryCache;
+import megamek.common.TargetRoll;
+import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
 import mekhq.utilities.MHQXMLUtility;
@@ -44,14 +70,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import javax.xml.parsers.DocumentBuilder;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.function.Function;
 
 /**
  * @author Neoancient
@@ -323,6 +341,19 @@ public class AtBConfiguration {
         };
     }
 
+    /**
+     * Calculates and returns the {@link TargetRoll} required to successfully search for a ship of the given unit type
+     * within the specified campaign.
+     *
+     * <p>The target number is based on the unit type's base search difficulty, which may be adjusted by the experience
+     * level of the best available logistics administrator and the campaign's unit rating. If no base target number is
+     * available for the provided unit type, an impossible {@code TargetRoll} is returned.</p>
+     *
+     * @param unitType the {@link Integer} constant representing the type of unit (ship) being searched for
+     * @param campaign the {@link Campaign} in which the ship search is being performed
+     *
+     * @return the {@link TargetRoll} representing the modified search difficulty for the requested ship/unit type
+     */
     public TargetRoll shipSearchTargetRoll(int unitType, Campaign campaign) {
         final Integer baseShipSearchTarget = shipSearchTargetBase(unitType);
         if (baseShipSearchTarget == null) {
@@ -330,13 +361,16 @@ public class AtBConfiguration {
         }
 
         TargetRoll target = new TargetRoll(baseShipSearchTarget, "Base");
-        Person adminLog = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_LOGISTICS, SkillType.S_ADMIN);
-        int adminLogExp = (adminLog == null) ? SkillType.EXP_ULTRA_GREEN
-                : adminLog.getSkill(SkillType.S_ADMIN).getExperienceLevel();
+        Person logisticsAdmin = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_LOGISTICS, SkillType.S_ADMIN);
 
-        target.addModifier(SkillType.EXP_REGULAR - adminLogExp, "Admin/Logistics");
-        target.addModifier(IUnitRating.DRAGOON_C - campaign.getAtBUnitRatingMod(),
-                "Unit Rating");
+        int experienceLevel = EXP_ULTRA_GREEN;
+        if (logisticsAdmin != null && logisticsAdmin.hasSkill(S_ADMIN)) {
+            Skill skill = logisticsAdmin.getSkill(S_ADMIN);
+            experienceLevel = skill.getExperienceLevel(logisticsAdmin.getOptions(), logisticsAdmin.getATOWAttributes());
+        }
+
+        target.addModifier(SkillType.EXP_REGULAR - experienceLevel, "Admin/Logistics");
+        target.addModifier(IUnitRating.DRAGOON_C - campaign.getAtBUnitRatingMod(), "Unit Rating");
         return target;
     }
 

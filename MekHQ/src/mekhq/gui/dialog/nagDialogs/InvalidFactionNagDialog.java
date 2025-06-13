@@ -27,52 +27,39 @@
  */
 package mekhq.gui.dialog.nagDialogs;
 
-import mekhq.MHQConstants;
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.universe.Faction;
-import mekhq.gui.baseComponents.AbstractMHQNagDialog;
+import static mekhq.MHQConstants.NAG_INVALID_FACTION;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.InvalidFactionNagLogic.isFactionInvalid;
 
 import java.time.LocalDate;
 
-import static mekhq.gui.dialog.nagDialogs.nagLogic.InvalidFactionNagLogic.isFactionInvalid;
+import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.universe.Faction;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
 
 /**
- * A dialog used to notify the user about an invalid faction in the current campaign.
+ * A dialog class used to notify players about an invalid faction in their campaign.
  *
- * <p>
- * This nag dialog is triggered when the campaign's selected faction is determined to be invalid
- * for the current campaign date. It evaluates the validity of the faction based on the campaign
- * date and displays a localized message warning the user about the issue.
- * </p>
- *
- * <strong>Features:</strong>
- * <ul>
- *   <li>Checks whether the campaign's faction is valid based on the current in-game date.</li>
- *   <li>Displays a warning dialog to alert the user when an invalid faction is detected.</li>
- *   <li>Extends {@link AbstractMHQNagDialog} to ensure consistent behavior with other nag dialogs.</li>
- * </ul>
+ * <p>The {@code InvalidFactionNagDialog} extends {@link ImmersiveDialogNag} and provides a specialized dialog
+ * designed to alert players when an invalid or unexpected faction is encountered during campaign operations. It uses
+ * predefined values, including the {@code NAG_INVALID_FACTION} constant, and does not include a specific speaker
+ * specialization, relying on a default fallback mechanism instead.</p>
  */
-public class InvalidFactionNagDialog extends AbstractMHQNagDialog {
+public class InvalidFactionNagDialog extends ImmersiveDialogNag {
+
     /**
-     * Constructs an {@code InvalidFactionNagDialog} for the given campaign.
+     * Constructs a new {@code InvalidFactionNagDialog} instance to display the invalid faction nag dialog.
      *
-     * <p>
-     * This dialog initializes with the campaign information and sets a localized
-     * message to notify the user about the potential issue involving an invalid faction.
-     * The message includes the commander's address for better clarity.
-     * </p>
+     * <p>This constructor initializes the dialog with preconfigured parameters, such as the
+     * {@code NAG_INVALID_FACTION} constant for managing dialog suppression and the {@code "InvalidFactionNagDialog"}
+     * message key for retrieving localized dialog content. No specific speaker is provided, triggering fallback logic
+     * to determine a suitable speaker for the dialog.</p>
      *
-     * @param campaign The {@link Campaign} associated with this nag dialog.
-     *                 The campaign provides the faction and other details for evaluation.
+     * @param campaign The {@link Campaign} instance associated with this dialog. Provides access to campaign data and
+     *                 settings required for constructing the dialog.
      */
     public InvalidFactionNagDialog(final Campaign campaign) {
-        super(campaign, MHQConstants.NAG_INVALID_FACTION);
-
-        final String DIALOG_BODY = "InvalidFactionNagDialog.text";
-        setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
-            campaign.getCommanderAddress(false)));
-        showDialog();
+        super(campaign, null, NAG_INVALID_FACTION, "InvalidFactionNagDialog");
     }
 
     /**
@@ -86,12 +73,12 @@ public class InvalidFactionNagDialog extends AbstractMHQNagDialog {
      *
      * @param campaignFaction The {@link Faction} associated with the campaign to be checked.
      * @param today           The {@link LocalDate} representing the current in-game date.
+     *
      * @return {@code true} if the nag dialog should be displayed, {@code false} otherwise.
      */
     public static boolean checkNag(Faction campaignFaction, LocalDate today) {
-        final String NAG_KEY = MHQConstants.NAG_INVALID_FACTION;
+        final String NAG_KEY = NAG_INVALID_FACTION;
 
-        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && (isFactionInvalid(campaignFaction, today));
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY) && (isFactionInvalid(campaignFaction, today));
     }
 }

@@ -30,9 +30,6 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.Aero;
 import megamek.common.CriticalSlot;
 import megamek.common.Engine;
@@ -48,6 +45,8 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -239,7 +238,7 @@ public class MissingEnginePart extends MissingPart {
 
     @Override
     public String getAcquisitionName() {
-        return getPartName() + ",  " + getTonnage() + " tons";
+        return getPartName() + ",  " + getUnitTonnage() + " tons";
     }
 
     @Override

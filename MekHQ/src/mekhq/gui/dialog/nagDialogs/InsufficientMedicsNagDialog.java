@@ -27,54 +27,134 @@
  */
 package mekhq.gui.dialog.nagDialogs;
 
-import mekhq.MHQConstants;
+import static mekhq.MHQConstants.NAG_INSUFFICIENT_MEDICS;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.InsufficientMedicsNagLogic.hasMedicsNeeded;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
+import java.util.List;
+
+import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.gui.baseComponents.AbstractMHQNagDialog;
-
-import static mekhq.gui.dialog.nagDialogs.nagLogic.InsufficientMedicsNagLogic.hasMedicsNeeded;
+import mekhq.campaign.Campaign.AdministratorSpecialization;
+import mekhq.campaign.personnel.Person;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
 
 /**
- * A dialog used to notify the user about insufficient medics required to meet the medical needs of the campaign.
+ * A dialog class used to notify players about an insufficient number of medics in their campaign.
  *
- * <p>
- * This nag dialog is triggered when the count of available medics in the campaign falls short of
- * the total number required for handling the current medical workload. It displays a localized
- * message for the user with specifics about the deficit, and optionally allows the user to dismiss
- * or ignore future warnings.
- * </p>
- *
- * <strong>Features:</strong>
- * <ul>
- *   <li>Calculates the number of medics required for a campaign using {@link Campaign#getMedicsNeed()}.</li>
- *   <li>Displays a dialog to warn the user if the required number of medics exceeds the available count.</li>
- *   <li>Extends {@link AbstractMHQNagDialog} to provide consistent behavior with other nag dialogs.</li>
- * </ul>
+ * <p>The {@code InsufficientMedicsNagDialog} extends {@link ImmersiveDialogNag} and provides a specialized dialog
+ * designed to alert players when there is a shortage of medics required for effective campaign operations. It uses
+ * predefined values, including the {@code NAG_INSUFFICIENT_MEDICS} constant, and does not provide a specific speaker
+ * specialization, relying instead on a default fallback mechanism.</p>
  */
-public class InsufficientMedicsNagDialog extends AbstractMHQNagDialog {
+public class InsufficientMedicsNagDialog extends ImmersiveDialogNag {
     /**
-     * Constructs an {@code InsufficientMedicsNagDialog} for the given campaign.
+     * Constructs a new {@code InsufficientMedicsNagDialog} instance to display the insufficient medics nag dialog.
      *
-     * <p>
-     * This dialog calculates the number of medics required and uses a localized
-     * message to notify the user about the shortage. The message includes the
-     * commander's address, the medic deficit, and a pluralized suffix based on the deficit count.
-     * </p>
+     * <p>This constructor initializes the dialog with preconfigured parameters, such as the
+     * {@code NAG_INSUFFICIENT_MEDICS} constant for managing dialog suppression and the
+     * {@code "InsufficientMedicsNagDialog"} message key for retrieving localized dialog content. No specific speaker is
+     * provided, triggering fallback logic to determine the appropriate speaker for the dialog.</p>
      *
-     * @param campaign The {@link Campaign} associated with this nag dialog.
-     *                 The campaign provides the medical requirements for the calculation.
+     * @param campaign The {@link Campaign} instance associated with this dialog. Provides access to campaign data and
+     *                 settings required for constructing the dialog.
      */
     public InsufficientMedicsNagDialog(final Campaign campaign) {
-        super(campaign, MHQConstants.NAG_INSUFFICIENT_MEDICS);
+        super(campaign, null, NAG_INSUFFICIENT_MEDICS, "InsufficientMedicsNagDialog");
+    }
 
-        int medicsRequired =  campaign.getMedicsNeed();
+    /**
+     * Retrieves the appropriate speaker for a campaign dialog based on personnel specialization and rank.
+     *
+     * <p>This method evaluates the active personnel within the campaign to determine the most suitable speaker.
+     * It prioritizes personnel with doctor roles, using rank and skills to select the optimal candidate. If no medical
+     * specialist is available, the method falls back to senior administrators with the "HR" or "COMMAND"
+     * specialization, ensuring a valid speaker is selected whenever possible.</p>
+     *
+     * <p>If the campaign instance is {@code null} or there are no active personnel available, a fallback mechanism is
+     * employed to determine the speaker based on senior administrators.</p>
+     *
+     * @param campaign       The {@link Campaign} instance providing access to personnel and administrator data.
+     * @param specialization The {@link AdministratorSpecialization} used as a criterion for selecting the speaker.
+     *
+     * @return The {@link Person} designated as the speaker, prioritizing medical specialists, then senior
+     *       administrators with "HR" or "COMMAND" specializations. Returns {@code null} if no suitable speaker can be
+     *       found.
+     */
+    @Override
+    protected @Nullable Person getSpeaker(@Nullable Campaign campaign, @Nullable AdministratorSpecialization specialization) {
+        if (campaign == null) {
+            return null;
+        }
 
-        String pluralizer = (medicsRequired > 1) ? "s" : "";
+        List<Person> potentialSpeakers = campaign.getActivePersonnel(false);
 
-        final String DIALOG_BODY = "InsufficientMedicsNagDialog.text";
-        setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
-            campaign.getCommanderAddress(false), medicsRequired, pluralizer));
-        showDialog();
+        if (potentialSpeakers.isEmpty()) {
+            return getFallbackSpeaker(campaign);
+        }
+
+        Person speaker = null;
+
+        for (Person person : potentialSpeakers) {
+            if (!person.isDoctor()) {
+                continue;
+            }
+
+            if (speaker == null) {
+                speaker = person;
+                continue;
+            }
+
+            if (person.outRanksUsingSkillTiebreaker(campaign, speaker)) {
+                speaker = person;
+            }
+        }
+
+        // First fallback
+        if (speaker == null) {
+            return getFallbackSpeaker(campaign);
+        } else {
+            return speaker;
+        }
+    }
+
+    /**
+     * Retrieves a fallback speaker based on senior administrators within the campaign.
+     *
+     * <p>This method attempts to retrieve a senior administrator with the "HR" specialization first.
+     * If no such administrator is available, it falls back to one with the "COMMAND" specialization.</p>
+     *
+     * @param campaign The {@link Campaign} instance providing access to administrator data.
+     *
+     * @return The {@link Person} designated as the fallback speaker. Returns {@code null} if no suitable administrator
+     *       is available.
+     */
+    private @Nullable Person getFallbackSpeaker(Campaign campaign) {
+        Person speaker = campaign.getSeniorAdminPerson(HR);
+
+        if (speaker == null) {
+            speaker = campaign.getSeniorAdminPerson(COMMAND);
+        } else {
+            return speaker;
+        }
+
+        return speaker;
+    }
+
+    @Override
+    protected String getInCharacterMessage(@Nullable Campaign campaign, String key, String commanderAddress) {
+        final String RESOURCE_BUNDLE = "mekhq.resources.NagDialogs";
+
+        int count = 0;
+
+        if (campaign != null) {
+            count = campaign.getMedicsNeed();
+        }
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, key + ".ic", commanderAddress, count);
     }
 
     /**
@@ -87,13 +167,12 @@ public class InsufficientMedicsNagDialog extends AbstractMHQNagDialog {
      * </ul>
      *
      * @param medicsRequired The number of additional medics required to meet the campaign's needs.
-     * @return {@code true} if the nag dialog should be displayed due to insufficient medics,
-     *         {@code false} otherwise.
+     *
+     * @return {@code true} if the nag dialog should be displayed due to insufficient medics, {@code false} otherwise.
      */
     public static boolean checkNag(int medicsRequired) {
-        final String NAG_KEY = MHQConstants.NAG_INSUFFICIENT_MEDICS;
+        final String NAG_KEY = NAG_INSUFFICIENT_MEDICS;
 
-        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-              && hasMedicsNeeded(medicsRequired);
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY) && hasMedicsNeeded(medicsRequired);
     }
 }

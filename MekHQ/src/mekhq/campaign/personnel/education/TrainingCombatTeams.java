@@ -24,8 +24,23 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.education;
+
+import static java.lang.Math.round;
+import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
+import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_GREEN;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
+
+import java.time.LocalDate;
+import java.util.*;
 
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -35,27 +50,19 @@ import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.Skill;
+import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.unit.Unit;
-
-import java.time.LocalDate;
-import java.util.*;
-
-import static java.lang.Math.round;
-import static mekhq.campaign.personnel.SkillType.EXP_GREEN;
-import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
-import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * Handles the training of combat teams within the campaign.
  *
  * <p>This class is responsible for managing the process of skill improvement and education for
- * training combat teams and their associated personnel. It identifies eligible combat teams,
- * validates their contracts and current conditions, and processes training for each team member.</p>
+ * training combat teams and their associated personnel. It identifies eligible combat teams, validates their contracts
+ * and current conditions, and processes training for each team member.</p>
  *
  * <p>Key functionality includes tracking education time for trainees, determining skills eligible
- * for training, generating skill improvement reports, and handling both individual and group
- * training scenarios.</p>
+ * for training, generating skill improvement reports, and handling both individual and group training scenarios.</p>
  *
  * <p>Main methods:
  * <ul>
@@ -78,20 +85,12 @@ public class TrainingCombatTeams {
     private static ResourceBundle resources = ResourceBundle.getBundle(BUNDLE_NAME, MekHQ.getMHQOptions().getLocale());
 
     /**
-     * Represents the fatigue gained by combat team members during training.
-     *
-     * <p>This is currently set to 3 which, when factoring in fatigue recovery, will result in a
-     * gain of 2 Fatigue per week.</p>
-     */
-    private final static int FATIGUE_GAIN = 2;
-
-    /**
      * Processes all training combat teams in the campaign.
      *
      * <p>This method iterates through all combat teams in the campaign and processes training for
-     * those whose role includes training. It ensures that combat teams are eligible for training
-     * by checking that their contracts are active and valid on the current date. If StratCon is
-     * used, it also verifies that the teams are deployed in their appropriate sectors.</p>
+     * those whose role includes training. It ensures that combat teams are eligible for training by checking that their
+     * contracts are active and valid on the current date. If StratCon is used, it also verifies that the teams are
+     * deployed in their appropriate sectors.</p>
      *
      * @param campaign the {@link Campaign} instance managing the combat teams and their operations
      */
@@ -109,8 +108,8 @@ public class TrainingCombatTeams {
                 continue;
             }
 
-            if (campaign.getCampaignOptions().isUseStratCon()
-                && !contract.getStratconCampaignState().isForceDeployedHere(combatTeam.getForceId())) {
+            if (campaign.getCampaignOptions().isUseStratCon() &&
+                      !contract.getStratconCampaignState().isForceDeployedHere(combatTeam.getForceId())) {
                 continue;
             }
 
@@ -122,9 +121,9 @@ public class TrainingCombatTeams {
      * Handles the training progression for an individual combat team.
      *
      * <p>This method identifies the combat team's commander and educators within the unit,
-     * collects their skills, and compares them to the skills of the trainees in the team. Eligible
-     * trainees undergo training to improve their skills, which is simulated through education
-     * time tracking and skill level progression.</p>
+     * collects their skills, and compares them to the skills of the trainees in the team. Eligible trainees undergo
+     * training to improve their skills, which is simulated through education time tracking and skill level
+     * progression.</p>
      *
      * <p>If educators or trainees lack eligible skills, appropriate reports are generated.
      * Training updates for skills and progression are logged within the campaign.</p>
@@ -138,8 +137,7 @@ public class TrainingCombatTeams {
         Person commander = combatTeam.getCommander(campaign);
 
         if (commander == null) {
-            logger.info(String.format("Failed to fetch commander for Combat Team: %s",
-                    combatTeam.getForceId()));
+            logger.info(String.format("Failed to fetch commander for Combat Team: %s", combatTeam.getForceId()));
             return;
         }
 
@@ -160,8 +158,8 @@ public class TrainingCombatTeams {
      * Handles training for all trainees within a force.
      *
      * <p>This method iterates over each unit in the specified force and processes training
-     * for all active personnel within each unit. Eligible skills are identified by comparing
-     * the educator's abilities to those of the trainees, and skill improvement is simulated.</p>
+     * for all active personnel within each unit. Eligible skills are identified by comparing the educator's abilities
+     * to those of the trainees, and skill improvement is simulated.</p>
      *
      * @param campaign       the current {@link Campaign}
      * @param force          the {@link Force} containing the units to train
@@ -169,7 +167,7 @@ public class TrainingCombatTeams {
      * @param educatorSkills a map of skills and their experience levels available for teaching
      */
     private static void performTraining(Campaign campaign, Force force, Person commander,
-                                        Map<String, Integer> educatorSkills) {
+          Map<String, Integer> educatorSkills) {
         for (UUID unitId : force.getAllUnits(true)) {
             Unit unit = campaign.getUnit(unitId);
 
@@ -179,8 +177,19 @@ public class TrainingCombatTeams {
 
             for (Person trainee : unit.getActiveCrew()) {
                 if (campaign.getCampaignOptions().isUseFatigue()) {
+                    int fatigueChangeRate = campaign.getCampaignOptions().getFatigueRate() * 2;
 
-                    trainee.changeFatigue(FATIGUE_GAIN);
+                    boolean hasGlassJaw = trainee.getOptions().booleanOption(FLAW_GLASS_JAW);
+                    boolean hasToughness = trainee.getOptions().booleanOption(ATOW_TOUGHNESS);
+                    boolean hasGlassJawAndToughness = hasGlassJaw && hasToughness;
+
+                    if (hasGlassJaw && !hasGlassJawAndToughness) {
+                        fatigueChangeRate = fatigueChangeRate * 2;
+                    } else if (hasToughness && !hasGlassJawAndToughness) {
+                        fatigueChangeRate = (int) round(fatigueChangeRate * 0.5);
+                    }
+
+                    trainee.changeFatigue(fatigueChangeRate * (hasGlassJaw ? 4 : 2));
                 }
 
                 if (commander.getUnit().getActiveCrew().contains(trainee)) {
@@ -192,7 +201,8 @@ public class TrainingCombatTeams {
                     Skill traineeSkill = trainee.getSkill(commanderSkill);
 
                     if (traineeSkill != null) {
-                        int traineeExperienceLevel = traineeSkill.getExperienceLevel();
+                        int skillLevel = traineeSkill.getLevel();
+                        int traineeExperienceLevel = traineeSkill.getType().getExperienceLevel(skillLevel);
 
                         if (traineeExperienceLevel > EXP_GREEN) {
                             continue;
@@ -208,9 +218,10 @@ public class TrainingCombatTeams {
 
                 if (educatorSkills.isEmpty() || skillsBeingTrained.isEmpty()) {
                     campaign.addReport(String.format(resources.getString("notLearningAnything.text"),
-                            trainee.getHyperlinkedFullTitle(), commander.getFullTitle(),
-                            spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
-                            CLOSING_SPAN_TAG));
+                          trainee.getHyperlinkedFullTitle(),
+                          commander.getFullTitle(),
+                          spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
+                          CLOSING_SPAN_TAG));
                     trainee.setEduAcademyName("");
                     trainee.setEduEducationTime(0);
                     continue;
@@ -227,20 +238,20 @@ public class TrainingCombatTeams {
      * Progresses a trainee's education time and improves skills if the required threshold is met.
      *
      * <p>This method calculates the education time required for the next experience level and compares
-     * it with the trainee's accumulated education time. If the required time is met or exceeded, the
-     * skill level is increased, and education time is reset or reduced as needed.</p>
+     * it with the trainee's accumulated education time. If the required time is met or exceeded, the skill level is
+     * increased, and education time is reset or reduced as needed.</p>
      *
-     * @param campaign          the current {@link Campaign}
-     * @param commander         the {@link Person} acting as the educator for the trainee
-     * @param trainee           the {@link Person} receiving training
+     * @param campaign           the current {@link Campaign}
+     * @param commander          the {@link Person} acting as the educator for the trainee
+     * @param trainee            the {@link Person} receiving training
      * @param skillsBeingTrained a list of eligible {@link Skill} objects for training
      */
-    private static void processEducationTime(Campaign campaign, Person commander,
-                                             Person trainee, List<Skill> skillsBeingTrained) {
+    private static void processEducationTime(Campaign campaign, Person commander, Person trainee,
+          List<Skill> skillsBeingTrained) {
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
         final String EDUCATION_STRING = "TRAINING_COMBAT_TEAM"; // Never change this
         final int WEEK_DURATION = 7; // days
-        final int EDUCATION_TIME_MULTIPLIER = 28; // days
+        final int EDUCATION_TIME_MULTIPLIER = 35; // days
 
         if (!Objects.equals(trainee.getEduAcademyName(), EDUCATION_STRING)) {
             trainee.setEduAcademyName(EDUCATION_STRING);
@@ -254,27 +265,33 @@ public class TrainingCombatTeams {
             }
 
             // The lowest skill is improved first
-            skillsBeingTrained.sort(Comparator.comparingInt(Skill::getExperienceLevel));
+            skillsBeingTrained.sort(Comparator.comparingInt(Skill::getLevel));
             Skill targetSkill = skillsBeingTrained.get(0);
             // The +1 is to account for the next experience level to be gained
-            int currentExperienceLevel = targetSkill.getExperienceLevel() + 1;
+
+            int currentSkillLevel = targetSkill.getLevel();
+            int currentExperienceLevel = targetSkill.getType().getExperienceLevel(currentSkillLevel + 1);
 
             int perExperienceLevelMultiplier = EDUCATION_TIME_MULTIPLIER;
             double experienceMultiplier = campaignOptions.getXpCostMultiplier();
-            double intelligenceCostMultiplier = trainee.getIntelligenceXpCostMultiplier(campaignOptions);
+            double reasoningCostMultiplier = trainee.getReasoningXpCostMultiplier(campaignOptions.isUseReasoningXpMultiplier());
 
-            perExperienceLevelMultiplier = (int) round(perExperienceLevelMultiplier * experienceMultiplier * intelligenceCostMultiplier);
+            // Reasoning cost changes should always take place before global changes
+            perExperienceLevelMultiplier = (int) round(perExperienceLevelMultiplier * experienceMultiplier);
+            perExperienceLevelMultiplier = (int) round(perExperienceLevelMultiplier * reasoningCostMultiplier);
 
             int educationTimeReduction = currentExperienceLevel * perExperienceLevelMultiplier;
             if (newEducationTime >= educationTimeReduction) {
                 trainee.setEduEducationTime(newEducationTime - educationTimeReduction);
-                targetSkill.setLevel(targetSkill.getLevel() + 1);
-
+                targetSkill.setLevel(currentSkillLevel + 1);
 
                 campaign.addReport(String.format(resources.getString("learnedNewSkill.text"),
-                        commander.getFullTitle(), trainee.getHyperlinkedFullTitle(),
-                        spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                        CLOSING_SPAN_TAG, targetSkill.getType().getName(), targetSkill.getFinalSkillValue()));
+                      commander.getFullTitle(),
+                      trainee.getHyperlinkedFullTitle(),
+                      spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
+                      CLOSING_SPAN_TAG,
+                      targetSkill.getType().getName(),
+                      targetSkill.getFinalSkillValue(trainee.getOptions(), trainee.getATOWAttributes())));
             }
         }
     }
@@ -287,8 +304,8 @@ public class TrainingCombatTeams {
      *
      * @param campaign  the current {@link Campaign}
      * @param educators a {@link Set} of {@link Person} objects acting as educators
-     * @return a {@link Map} of skill names to experience levels representing the available skills
-     * for teaching
+     *
+     * @return a {@link Map} of skill names to experience levels representing the available skills for teaching
      */
     private static Map<String, Integer> createSkillsList(Campaign campaign, Set<Person> educators) {
         Map<String, Integer> educatorSkills = new HashMap<>();
@@ -310,12 +327,12 @@ public class TrainingCombatTeams {
 
                 if (skill != null) {
                     if (!educatorSkills.containsKey(professionSkill)) {
-                        educatorSkills.put(professionSkill, skill.getExperienceLevel());
+                        educatorSkills.put(professionSkill, skill.getLevel());
                     } else {
                         int educatorSkillLevel = educatorSkills.get(professionSkill);
 
-                        if (educatorSkillLevel < skill.getExperienceLevel()) {
-                            educatorSkills.put(professionSkill, skill.getExperienceLevel());
+                        if (educatorSkillLevel < skill.getLevel()) {
+                            educatorSkills.put(professionSkill, skill.getLevel());
                         }
                     }
                 }

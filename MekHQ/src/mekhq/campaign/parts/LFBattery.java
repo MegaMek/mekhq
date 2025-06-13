@@ -30,9 +30,6 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.util.StringJoiner;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.Compute;
 import megamek.common.Jumpship;
 import megamek.common.SimpleTechLevel;
@@ -41,8 +38,10 @@ import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * @author MKerensky
@@ -51,10 +50,10 @@ public class LFBattery extends Part {
     private static final MMLogger logger = MMLogger.create(LFBattery.class);
 
     // Not specified in IO - use SO p158
-    public static final TechAdvancement TA_LF_BATTERY = new TechAdvancement(TECH_BASE_ALL)
-            .setAdvancement(2519, 2529, 2600).setPrototypeFactions(F_TH)
-            .setProductionFactions(F_TH).setTechRating(RATING_D)
-            .setAvailability(RATING_E, RATING_F, RATING_E, RATING_E)
+    public static final TechAdvancement TA_LF_BATTERY = new TechAdvancement(TechBase.ALL)
+            .setAdvancement(2519, 2529, 2600).setPrototypeFactions(Faction.TH)
+            .setProductionFactions(Faction.TH).setTechRating(TechRating.D)
+            .setAvailability(AvailabilityValue.E, AvailabilityValue.F, AvailabilityValue.E, AvailabilityValue.E)
             .setStaticTechLevel(SimpleTechLevel.ADVANCED);
 
     // Standard, primitive, compact, subcompact...

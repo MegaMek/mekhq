@@ -24,11 +24,39 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe.generators.companyGenerators;
 
+import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
+import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
+import static mekhq.campaign.personnel.skills.SkillType.S_STRATEGY;
+import static mekhq.campaign.personnel.skills.SkillType.S_TACTICS;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.ResourceBundle;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
 import megamek.client.generator.RandomCallsignGenerator;
-import megamek.common.*;
+import megamek.common.AmmoType;
+import megamek.common.Entity;
+import megamek.common.EntityWeightClass;
+import megamek.common.MekFileParser;
+import megamek.common.MekSummary;
+import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.OptionsConstants;
 import megamek.logging.MMLogger;
@@ -52,11 +80,11 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.Skill;
-import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.ranks.Rank;
+import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.companyGeneration.AtBRandomMekParameters;
@@ -74,16 +102,6 @@ import mekhq.campaign.universe.selectors.planetSelectors.AbstractPlanetSelector;
 import mekhq.campaign.universe.selectors.planetSelectors.DefaultPlanetSelector;
 import mekhq.campaign.universe.selectors.planetSelectors.RangedPlanetSelector;
 import mekhq.campaign.work.WorkTime;
-
-import java.time.LocalDate;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-
-import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
 
 /**
  * Startup:
@@ -265,16 +283,29 @@ public abstract class AbstractCompanyGenerator {
             personnelSorter = Comparator
                     .comparing(t -> t.getPerson().getOptions().booleanOption(OptionsConstants.MISC_TACTICAL_GENIUS));
 
+            boolean isUseAgingEffects = campaign.getCampaignOptions().isUseAgeEffects();
+            boolean isClanCampaign = campaign.isClanCampaign();
+            LocalDate today = campaign.getLocalDate();
+
             // Then prioritize either combat or command skills based on the selected option
             if (getOptions().isPrioritizeCompanyCommanderCombatSkills()) {
                 personnelSorter = personnelSorter
                         .thenComparingInt(t -> t.getPerson().getExperienceLevel(campaign, false))
-                        .thenComparingInt(t -> Stream.of(SkillType.S_LEADER, SkillType.S_STRATEGY, SkillType.S_TACTICS)
-                                .mapToInt(s -> t.getPerson().getSkillLevel(s)).sum());
+                                          .thenComparingInt(t -> Stream.of(S_LEADER, S_STRATEGY, S_TACTICS)
+                                                                         .mapToInt(s -> t.getPerson()
+                                                                                                .getSkillLevel(s,
+                                                                                                        isUseAgingEffects,
+                                                                                                        isClanCampaign,
+                                                                                                        today))
+                                                                         .sum());
             } else {
-                personnelSorter = personnelSorter
-                        .thenComparingInt(t -> Stream.of(SkillType.S_LEADER, SkillType.S_STRATEGY, SkillType.S_TACTICS)
-                                .mapToInt(s -> t.getPerson().getSkillLevel(s)).sum())
+                personnelSorter = personnelSorter.thenComparingInt(t -> Stream.of(S_LEADER, S_STRATEGY, S_TACTICS)
+                                                                                .mapToInt(s -> t.getPerson()
+                                                                                                       .getSkillLevel(s,
+                                                                                                               isUseAgingEffects,
+                                                                                                               isClanCampaign,
+                                                                                                               today))
+                                                                                .sum())
                         .thenComparingInt(t -> t.getPerson().getExperienceLevel(campaign, false));
             }
             // Always need to reverse it at the end
@@ -295,16 +326,30 @@ public abstract class AbstractCompanyGenerator {
             // Tactical Genius makes for the best officers
             personnelSorter = Comparator
                     .comparing(t -> t.getPerson().getOptions().booleanOption(OptionsConstants.MISC_TACTICAL_GENIUS));
+
+            boolean isUseAgingEffects = campaign.getCampaignOptions().isUseAgeEffects();
+            boolean isClanCampaign = campaign.isClanCampaign();
+            LocalDate today = campaign.getLocalDate();
+
             // Then prioritize either combat or command skills based on the selected option
             if (getOptions().isPrioritizeOfficerCombatSkills()) {
                 personnelSorter = personnelSorter
                         .thenComparingInt(t -> t.getPerson().getExperienceLevel(campaign, false))
-                        .thenComparingInt(t -> Stream.of(SkillType.S_LEADER, SkillType.S_STRATEGY, SkillType.S_TACTICS)
-                                .mapToInt(s -> t.getPerson().getSkillLevel(s)).sum());
+                                          .thenComparingInt(t -> Stream.of(S_LEADER, S_STRATEGY, S_TACTICS)
+                                                                         .mapToInt(s -> t.getPerson()
+                                                                                                .getSkillLevel(s,
+                                                                                                        isUseAgingEffects,
+                                                                                                        isClanCampaign,
+                                                                                                        today))
+                                                                         .sum());
             } else {
-                personnelSorter = personnelSorter
-                        .thenComparingInt(t -> Stream.of(SkillType.S_LEADER, SkillType.S_STRATEGY, SkillType.S_TACTICS)
-                                .mapToInt(s -> t.getPerson().getSkillLevel(s)).sum())
+                personnelSorter = personnelSorter.thenComparingInt(t -> Stream.of(S_LEADER, S_STRATEGY, S_TACTICS)
+                                                                                .mapToInt(s -> t.getPerson()
+                                                                                                       .getSkillLevel(s,
+                                                                                                               isUseAgingEffects,
+                                                                                                               isClanCampaign,
+                                                                                                               today))
+                                                                                .sum())
                         .thenComparingInt(t -> t.getPerson().getExperienceLevel(campaign, false));
             }
             // Always need to reverse it at the end
@@ -485,21 +530,21 @@ public abstract class AbstractCompanyGenerator {
         for (int i = 0; i < boosts; i++) {
             switch (Utilities.dice(1, 3)) {
                 case 1:
-                    tracker.getPerson().improveSkill(SkillType.S_LEADER);
-                    if (tracker.getPerson().getSkillLevel(SkillType.S_LEADER) == 0) {
-                        tracker.getPerson().improveSkill(SkillType.S_LEADER);
+                    tracker.getPerson().improveSkill(S_LEADER);
+                    if (tracker.getPerson().getSkill(S_LEADER).getLevel() == 0) {
+                        tracker.getPerson().improveSkill(S_LEADER);
                     }
                     break;
                 case 2:
-                    tracker.getPerson().improveSkill(SkillType.S_STRATEGY);
-                    if (tracker.getPerson().getSkillLevel(SkillType.S_STRATEGY) == 0) {
-                        tracker.getPerson().improveSkill(SkillType.S_STRATEGY);
+                    tracker.getPerson().improveSkill(S_STRATEGY);
+                    if (tracker.getPerson().getSkill(S_STRATEGY).getLevel() == 0) {
+                        tracker.getPerson().improveSkill(S_STRATEGY);
                     }
                     break;
                 case 3:
-                    tracker.getPerson().improveSkill(SkillType.S_TACTICS);
-                    if (tracker.getPerson().getSkillLevel(SkillType.S_TACTICS) == 0) {
-                        tracker.getPerson().improveSkill(SkillType.S_TACTICS);
+                    tracker.getPerson().improveSkill(S_TACTICS);
+                    if (tracker.getPerson().getSkill(S_TACTICS).getLevel() == 0) {
+                        tracker.getPerson().improveSkill(S_TACTICS);
                     }
                     break;
                 default:
@@ -640,7 +685,7 @@ public abstract class AbstractCompanyGenerator {
         // Recruit all the personnel, GM-style so that the initial hiring cost is
         // calculated as part
         // of the financial model
-        trackers.forEach(t -> campaign.recruitPerson(t.getPerson(), true));
+        trackers.forEach(t -> campaign.recruitPerson(t.getPerson(), true, true));
 
         // Now that they are recruited, we can simulate backwards a few years and
         // generate marriages and children
@@ -1505,7 +1550,7 @@ public abstract class AbstractCompanyGenerator {
      */
     private boolean ammoBinIsMachineGun(final AmmoBin ammoBin) {
         return switch (ammoBin.getType().getAmmoType()) {
-            case AmmoType.T_MG, AmmoType.T_MG_HEAVY, AmmoType.T_MG_LIGHT -> true;
+            case MG, MG_HEAVY, MG_LIGHT -> true;
             default -> false;
         };
     }

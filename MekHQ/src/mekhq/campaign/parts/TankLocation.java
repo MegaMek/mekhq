@@ -30,9 +30,6 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.CriticalSlot;
 import megamek.common.IArmorState;
 import megamek.common.ILocationExposureStatus;
@@ -47,8 +44,10 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -56,11 +55,13 @@ import mekhq.utilities.MHQXMLUtility;
 public class TankLocation extends Part {
     private static final MMLogger logger = MMLogger.create(TankLocation.class);
 
-    static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_ALL)
-            .setAdvancement(2460, 2470, 2510).setApproximate(true, false, false)
-            .setPrototypeFactions(F_TH).setProductionFactions(F_TH)
-            .setTechRating(RATING_D).setAvailability(RATING_A, RATING_A, RATING_A, RATING_A)
-            .setStaticTechLevel(SimpleTechLevel.STANDARD);
+    static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TechBase.ALL).setAdvancement(2460, 2470, 2510)
+                                                          .setApproximate(true, false, false)
+                                                          .setPrototypeFactions(Faction.TH)
+                                                          .setProductionFactions(Faction.TH)
+                                                          .setTechRating(TechRating.D)
+                                                          .setAvailability(AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A)
+                                                          .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     protected int loc;
     protected int damage;
@@ -113,9 +114,9 @@ public class TankLocation extends Part {
 
     @Override
     public boolean isSamePartType(Part part) {
-        return part instanceof TankLocation
-                && getLoc() == ((TankLocation) part).getLoc()
-                && getUnitTonnage() == part.getUnitTonnage();
+        return part instanceof TankLocation &&
+                     getLoc() == ((TankLocation) part).getLoc() &&
+                     getUnitTonnage() == part.getUnitTonnage();
     }
 
     @Override
@@ -258,10 +259,7 @@ public class TankLocation extends Part {
             if (isBreached()) {
                 toReturn.append(", Breached");
             } else if (damage > 0) {
-                toReturn.append(", ")
-                    .append(damage)
-                    .append(damage == 1 ? " point" : " points")
-                    .append(" of damage");
+                toReturn.append(", ").append(damage).append(damage == 1 ? " point" : " points").append(" of damage");
             }
         }
 
@@ -295,14 +293,25 @@ public class TankLocation extends Part {
 
     @Override
     public double getTonnage() {
-        // TODO Auto-generated method stub
-        return 0;
+        // Technically weight of the location structure for consistency with MekLocation
+        // Cannot have endo steel etc.
+        // Turrets are handled separately
+        double tonnage = getUnitTonnage() * 0.1 / 4;
+        return (tonnage);
     }
 
     @Override
     public Money getStickerPrice() {
-        // TODO Auto-generated method stub
-        return Money.zero();
+        // Chassis prices are returned here
+        double totalCost = 0;
+        double structureCost = 0;
+        double controlsCost = 0;
+        // Tech Manual, 1st printing, p279-280
+        structureCost += 10000 * getTonnage(); // True for SVs as well?
+        controlsCost += 10000 * getTonnage() / 2;
+        //TODO: Support vehicles have chassis structure multipliers
+        totalCost = structureCost + controlsCost;
+        return Money.of(totalCost);
     }
 
     @Override

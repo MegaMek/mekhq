@@ -28,15 +28,16 @@
  */
 package mekhq.gui;
 
+import java.util.UUID;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkEvent.EventType;
+import javax.swing.event.HyperlinkListener;
+
+import megamek.codeUtilities.MathUtility;
 import megamek.logging.MMLogger;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.dialog.VocationalExperienceAwardDialog;
 import mekhq.gui.dialog.reportDialogs.MaintenanceReportDialog;
-
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkEvent.EventType;
-import javax.swing.event.HyperlinkListener;
-import java.util.UUID;
 
 public class ReportHyperlinkListener implements HyperlinkListener {
     private static final MMLogger logger = MMLogger.create(ReportHyperlinkListener.class);
@@ -53,6 +54,8 @@ public class ReportHyperlinkListener implements HyperlinkListener {
     public static final String CONTRACT_MARKET = "CONTRACT_MARKET";
     public static final String UNIT_MARKET = "UNIT_MARKET";
     public static final String PERSONNEL_ADVANCEMENT = "PERSONNEL_ADVANCEMENT";
+    public static final String SCENARIO = "SCENARIO";
+    public static final String MISSION = "MISSION";
     // endregion Variable Declarations
 
     // region Constructors
@@ -63,9 +66,20 @@ public class ReportHyperlinkListener implements HyperlinkListener {
 
     @Override
     public void hyperlinkUpdate(final HyperlinkEvent evt) {
+        if (evt == null) {
+            logger.error("(hyperlinkUpdate) Null HyperlinkEvent.", new IllegalArgumentException());
+            return;
+        }
+
+        if (evt.getDescription() == null || evt.getDescription().isBlank()) {
+            logger.error("(hyperlinkUpdate) Null or Blank HyperlinkEvent description.",
+                  new IllegalArgumentException());
+            return;
+        }
+
         if (evt.getEventType() == EventType.ACTIVATED) {
             if (evt.getDescription().startsWith(UNIT_MARKET)) { // Must come before UNIT since it starts with UNIT as
-                                                                // well
+                // well
                 campaignGUI.showUnitMarket();
             } else if (evt.getDescription().startsWith(UNIT)) {
                 try {
@@ -74,8 +88,22 @@ public class ReportHyperlinkListener implements HyperlinkListener {
                 } catch (Exception e) {
                     logger.error("", e);
                 }
+            } else if (evt.getDescription().startsWith(SCENARIO)) {
+                try {
+                    final int id = MathUtility.parseInt(evt.getDescription().split(":")[1]);
+                    campaignGUI.focusOnScenario(id);
+                } catch (Exception e) {
+                    logger.error("", e);
+                }
+            } else if (evt.getDescription().startsWith(MISSION)) {
+                try {
+                    final int id = MathUtility.parseInt(evt.getDescription().split(":")[1]);
+                    campaignGUI.focusOnMission(id);
+                } catch (Exception e) {
+                    logger.error("", e);
+                }
             } else if (evt.getDescription().startsWith(PERSONNEL_MARKET)) { // Must come before PERSON since it starts
-                                                                            // with PERSON as well
+                // with PERSON as well
                 campaignGUI.hirePersonMarket();
             } else if (evt.getDescription().startsWith(NEWS)) {
                 try {
@@ -105,8 +133,9 @@ public class ReportHyperlinkListener implements HyperlinkListener {
                 }
             } else if (evt.getDescription().startsWith(CONTRACT_MARKET)) {
                 campaignGUI.showContractMarket();
-            } else if (evt.getDescription().startsWith(PERSONNEL_ADVANCEMENT)) { // Must come before PERSON since it starts
-                                                                                 // with PERSON as well
+            } else if (evt.getDescription()
+                             .startsWith(PERSONNEL_ADVANCEMENT)) { // Must come before PERSON since it starts
+                // with PERSON as well
                 try {
                     new VocationalExperienceAwardDialog(campaignGUI.getCampaign());
                 } catch (Exception e) {

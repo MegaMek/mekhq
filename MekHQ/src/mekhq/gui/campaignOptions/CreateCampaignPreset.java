@@ -24,16 +24,34 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.campaignOptions;
 
-import megamek.client.ui.baseComponents.MMButton;
-import megamek.client.ui.baseComponents.MMComboBox;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.time.LocalDate;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.stream.Collectors;
+import javax.swing.*;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
+import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.enums.ValidationState;
 import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
 import megamek.client.ui.preferences.JToggleButtonPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.client.ui.swing.GameOptionsDialog;
+import megamek.client.ui.dialogs.buttonDialogs.GameOptionsDialog;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.GameOptions;
 import megamek.common.util.sorter.NaturalOrderComparator;
@@ -41,11 +59,11 @@ import mekhq.CampaignPreset;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.RandomSkillPreferences;
-import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.personnel.skills.RandomSkillPreferences;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
@@ -53,20 +71,10 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
 import mekhq.gui.baseComponents.AbstractMHQValidationButtonDialog;
 import mekhq.gui.baseComponents.SortedComboBoxModel;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.dialog.CompanyGenerationOptionsDialog;
 import mekhq.gui.dialog.DateChooser;
 import mekhq.gui.displayWrappers.FactionDisplay;
-
-import javax.swing.*;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.border.TitledBorder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import java.awt.*;
-import java.time.LocalDate;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @author Justin "Windchild" Bowen
@@ -382,7 +390,7 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
 
     private JPanel createStartupPanel() {
         // Initialize Components Used in ActionListeners
-        final JButton btnDate = new JButton(MekHQ.getMHQOptions().getDisplayFormattedDate(getDate()));
+        final RoundedJButton btnDate = new RoundedJButton(MekHQ.getMHQOptions().getDisplayFormattedDate(getDate()));
 
         // Create Panel Components
         setChkSpecifyDate(new JCheckBox(resources.getString("chkSpecifyDate.text")));
@@ -521,11 +529,14 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         getChkSpecifyCompanyGenerationOptions().setToolTipText(resources.getString("chkSpecifyCompanyGenerationOptions.toolTipText"));
         getChkSpecifyCompanyGenerationOptions().setName("chkSpecifyCompanyGenerationOptions");
 
-        final JButton btnCompanyGenerationOptions = new MMButton("btnCompanyGenerationOptions",
-                resources, "btnCompanyGenerationOptions.text",
-                "btnCompanyGenerationOptions.toolTipText", evt -> setCompanyGenerationOptions(
-                        new CompanyGenerationOptionsDialog(getFrame(), getCampaign(),
-                                getCompanyGenerationOptions()).getSelectedItem()));
+        final RoundedJButton btnCompanyGenerationOptions = new RoundedJButton(resources.getString(
+              "btnCompanyGenerationOptions.text"));
+        btnCompanyGenerationOptions.setName("btnCompanyGenerationOptions");
+        btnCompanyGenerationOptions.setToolTipText(resources.getString("btnCompanyGenerationOptions.toolTipText"));
+        btnCompanyGenerationOptions.addActionListener(evt -> setCompanyGenerationOptions(new CompanyGenerationOptionsDialog(
+              getFrame(),
+              getCampaign(),
+              getCompanyGenerationOptions()).getSelectedItem()));
 
         // Disable Panel Portions by Default
         getChkSpecifyDate().setSelected(true);
@@ -609,8 +620,10 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         getChkSpecifyGameOptions().setToolTipText(resources.getString("chkSpecifyGameOptions.toolTipText"));
         getChkSpecifyGameOptions().setName("chkSpecifyGameOptions");
 
-        final JButton btnGameOptions = new MMButton("btnGameOptions", resources,
-                "btnGameOptions.text", "btnGameOptions.toolTipText", evt -> {
+        final RoundedJButton btnGameOptions = new RoundedJButton(resources.getString("btnGameOptions.text"));
+        btnGameOptions.setName("btnGameOptions");
+        btnGameOptions.setToolTipText(resources.getString("btnGameOptions.toolTipText"));
+        btnGameOptions.addActionListener(evt -> {
             final GameOptionsDialog gameOptionsDialog = new GameOptionsDialog(getFrame(), getGameOptions(), false);
             gameOptionsDialog.refreshOptions();
             gameOptionsDialog.setEditable(false);

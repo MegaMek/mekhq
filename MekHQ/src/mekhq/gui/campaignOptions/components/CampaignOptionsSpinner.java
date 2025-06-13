@@ -24,18 +24,25 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.campaignOptions.components;
 
-import megamek.common.annotations.Nullable;
-
-import javax.swing.*;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
-
 import static megamek.client.ui.WrapLayout.wordWrap;
-import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.processWrapSize;
+import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
+
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
+
+import megamek.common.annotations.Nullable;
 
 /**
  * A specialized {@link JSpinner} component for use in campaign options dialogs.
@@ -46,17 +53,6 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.processWrapSize
  * appearance in the UI.
  */
 public class CampaignOptionsSpinner extends JSpinner {
-
-    /**
-     * The path to the resource bundle containing text and tooltip information for the spinner.
-     */
-    private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
-
-    /**
-     * The {@link ResourceBundle} used to load localized tooltip text for the spinner.
-     */
-    static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
-
     /**
      * Creates a {@link CampaignOptionsSpinner} with fully configurable numeric values and tooltip settings.
      * <p>
@@ -79,7 +75,10 @@ public class CampaignOptionsSpinner extends JSpinner {
         super(createSpinnerModel(defaultValue, minimum, maximum, stepSize));
 
         if (!noTooltip) {
-            setToolTipText(wordWrap(getTooltipText(name), processWrapSize(customWrapSize)));
+            String tooltipText = getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".tooltip");
+            if (isResourceKeyValid(tooltipText) && !tooltipText.isEmpty()) {
+                setToolTipText(wordWrap(tooltipText));
+            }
         }
 
         configureSpinner(name);
@@ -157,21 +156,5 @@ public class CampaignOptionsSpinner extends JSpinner {
         // Align text in the spinner editor to the left
         DefaultEditor editor = (DefaultEditor) this.getEditor();
         editor.getTextField().setHorizontalAlignment(JTextField.LEFT);
-    }
-
-    /**
-     * Fetches the tooltip text for the spinner from the resource bundle.
-     * If the resource key is not found, an empty string is returned as the tooltip.
-     *
-     * @param name the name of the spinner, used to construct the resource bundle key for the tooltip
-     * @return the tooltip text for the spinner, or an empty string if the key does not exist
-     */
-    private String getTooltipText(String name) {
-        try {
-            return resources.getString("lbl" + name + ".tooltip");
-        } catch (MissingResourceException e) {
-            // Return an empty string if the resource is missing
-            return "";
-        }
     }
 }

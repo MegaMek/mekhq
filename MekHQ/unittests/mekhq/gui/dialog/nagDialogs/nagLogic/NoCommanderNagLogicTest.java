@@ -27,20 +27,22 @@
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
-import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Person;
-import mekhq.gui.dialog.nagDialogs.NoCommanderNagDialog;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import static mekhq.gui.dialog.nagDialogs.nagLogic.NoCommanderNagLogic.hasNoCommander;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.universe.Faction;
+import mekhq.gui.dialog.nagDialogs.NoCommanderNagDialog;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
- * This class is a test class for the {@link NoCommanderNagDialog} class.
- * It contains test methods for various scenarios related to commander assignment.
+ * This class is a test class for the {@link NoCommanderNagDialog} class. It contains test methods for various scenarios
+ * related to commander assignment.
  */
 class NoCommanderNagLogicTest {
     // Mock objects for the tests
@@ -49,13 +51,19 @@ class NoCommanderNagLogicTest {
     private Person commanderNull;
 
     /**
-     * Test setup for each test, runs before each test.
-     * Initializes the mock objects and sets up the necessary mock behaviors.
+     * Test setup for each test, runs before each test. Initializes the mock objects and sets up the necessary mock
+     * behaviors.
      */
     @BeforeEach
     void init() {
         // Initialize the mock objects
         campaign = mock(Campaign.class);
+
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(campaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
+
         commander = new Person(campaign);
         commanderNull = null;
     }

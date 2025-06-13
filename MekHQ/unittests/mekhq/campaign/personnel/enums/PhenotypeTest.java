@@ -27,163 +27,69 @@
  */
 package mekhq.campaign.personnel.enums;
 
+import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 
-import mekhq.MekHQ;
-
 class PhenotypeTest {
-    // region Variable Declarations
     private static final Phenotype[] phenotypes = Phenotype.values();
 
-    private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            MekHQ.getMHQOptions().getLocale());
-    // endregion Variable Declarations
-
-    // region Getters
     @Test
-    void testGetName() {
-        assertEquals(resources.getString("Phenotype.AEROSPACE.text"), Phenotype.AEROSPACE.getName());
-        assertEquals(resources.getString("Phenotype.NONE.text"), Phenotype.NONE.getName());
+    void testFromString() {
+        // Valid inputs
+        assertEquals(Phenotype.MEKWARRIOR, Phenotype.fromString("MEKWARRIOR"));
+        assertEquals(Phenotype.ELEMENTAL, Phenotype.fromString("Elemental"));
+        assertEquals(Phenotype.AEROSPACE, Phenotype.fromString("aerospace"));
+        assertEquals(Phenotype.GENERAL, Phenotype.fromString("GENERAL"));
+
+        // Index input
+        assertEquals(Phenotype.VEHICLE, Phenotype.fromString("3"));
+
+        // Invalid inputs
+        assertEquals(Phenotype.NONE, Phenotype.fromString("test"));
+        assertEquals(Phenotype.NONE, Phenotype.fromString(""));
+        assertEquals(Phenotype.NONE, Phenotype.fromString(null));
     }
 
     @Test
-    void testGetToolTipText() {
-        assertEquals(resources.getString("Phenotype.NAVAL.toolTipText"),
-                Phenotype.NAVAL.getToolTipText());
-        assertEquals(resources.getString("Phenotype.NONE.toolTipText"),
-                Phenotype.NONE.getToolTipText());
-    }
-    // endregion Getters
-
-    // region Boolean Comparison Methods
-    @Test
-    void testIsMekWarrior() {
+    void testGetLabel() {
         for (final Phenotype phenotype : phenotypes) {
-            if (phenotype == Phenotype.MEKWARRIOR) {
-                assertTrue(phenotype.isMekWarrior());
-            } else {
-                assertFalse(phenotype.isMekWarrior());
-            }
+            String label = phenotype.getLabel();
+            boolean isValid = isResourceKeyValid(label);
+            assertTrue(isValid, "Invalid resource key: " + label);
         }
     }
 
     @Test
-    void testIsElemental() {
+    void testGetTooltip() {
         for (final Phenotype phenotype : phenotypes) {
-            if (phenotype == Phenotype.ELEMENTAL) {
-                assertTrue(phenotype.isElemental());
-            } else {
-                assertFalse(phenotype.isElemental());
-            }
+            String tooltip = phenotype.getTooltip();
+            boolean isValid = isResourceKeyValid(tooltip);
+            assertTrue(isValid, "Invalid resource key: " + tooltip);
         }
     }
 
     @Test
-    void testIsAerospace() {
+    void testGetShortName() {
         for (final Phenotype phenotype : phenotypes) {
-            if (phenotype == Phenotype.AEROSPACE) {
-                assertTrue(phenotype.isAerospace());
-            } else {
-                assertFalse(phenotype.isAerospace());
-            }
+            String shortName = phenotype.getShortName();
+            boolean isValid = isResourceKeyValid(shortName);
+            assertTrue(isValid, "Invalid resource key: " + shortName);
         }
     }
-
-    @Test
-    void testIsVehicle() {
-        for (final Phenotype phenotype : phenotypes) {
-            if (phenotype == Phenotype.VEHICLE) {
-                assertTrue(phenotype.isVehicle());
-            } else {
-                assertFalse(phenotype.isVehicle());
-            }
-        }
-    }
-
-    @Test
-    void testIsProtoMek() {
-        for (final Phenotype phenotype : phenotypes) {
-            if (phenotype == Phenotype.PROTOMEK) {
-                assertTrue(phenotype.isProtoMek());
-            } else {
-                assertFalse(phenotype.isProtoMek());
-            }
-        }
-    }
-
-    @Test
-    void testIsNaval() {
-        for (final Phenotype phenotype : phenotypes) {
-            if (phenotype == Phenotype.NAVAL) {
-                assertTrue(phenotype.isNaval());
-            } else {
-                assertFalse(phenotype.isNaval());
-            }
-        }
-    }
-
-    @Test
-    void testIsNone() {
-        for (final Phenotype phenotype : phenotypes) {
-            if (phenotype == Phenotype.NONE) {
-                assertTrue(phenotype.isNone());
-            } else {
-                assertFalse(phenotype.isNone());
-            }
-        }
-    }
-
-    @Test
-    void testIsGeneral() {
-        for (final Phenotype phenotype : phenotypes) {
-            if (phenotype == Phenotype.GENERAL) {
-                assertTrue(phenotype.isGeneral());
-            } else {
-                assertFalse(phenotype.isGeneral());
-            }
-        }
-    }
-    // endregion Boolean Comparison Methods
 
     @Test
     void testGetExternalPhenotypes() {
         final List<Phenotype> expected = Arrays.stream(phenotypes)
-                .filter(phenotype -> (phenotype != Phenotype.NONE) && (phenotype != Phenotype.GENERAL))
-                .collect(Collectors.toList());
+                                               .filter(phenotype -> (phenotype != Phenotype.NONE) &&
+                                                                          (phenotype != Phenotype.GENERAL))
+                                               .collect(Collectors.toList());
         assertEquals(expected, Phenotype.getExternalPhenotypes());
-    }
-
-    // region File I/O
-    @Test
-    void testParseFromString() {
-        // Normal Parsing
-        assertEquals(Phenotype.NONE, Phenotype.parseFromString("NONE"));
-        assertEquals(Phenotype.NAVAL, Phenotype.parseFromString("NAVAL"));
-
-        // Error Case
-        assertEquals(Phenotype.NONE, Phenotype.parseFromString("5"));
-        assertEquals(Phenotype.NONE, Phenotype.parseFromString("blah"));
-    }
-    // endregion File I/O
-
-    @Test
-    void testToStringOverride() {
-        assertEquals(resources.getString("Freeborn.text"), Phenotype.NONE.toString());
-        assertEquals(resources.getString("Trueborn.text"), Phenotype.GENERAL.toString());
-        assertEquals(resources.getString("Trueborn.text") + ' ' + resources.getString("Phenotype.MEKWARRIOR.text"),
-                Phenotype.MEKWARRIOR.toString());
-        assertEquals(
-                resources.getString("Trueborn.text") + ' '
-                        + resources.getString("Phenotype.AEROSPACE.groupingNameText"),
-                Phenotype.AEROSPACE.toString());
     }
 }

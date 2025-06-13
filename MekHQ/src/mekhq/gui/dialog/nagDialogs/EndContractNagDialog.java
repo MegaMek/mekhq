@@ -27,52 +27,40 @@
  */
 package mekhq.gui.dialog.nagDialogs;
 
-import mekhq.MHQConstants;
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.gui.baseComponents.AbstractMHQNagDialog;
+import static mekhq.MHQConstants.NAG_CONTRACT_ENDED;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.EndContractNagLogic.isContractEnded;
 
 import java.time.LocalDate;
 import java.util.List;
 
-import static mekhq.gui.dialog.nagDialogs.nagLogic.EndContractNagLogic.isContractEnded;
+import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
 
 /**
- * A dialog used to notify the user about the end date of a contract in the campaign.
+ * A dialog class used to notify players when a contract has ended in their campaign.
  *
- * <p>
- * This nag dialog is triggered when a contract in the campaign is flagged as ending on the current date
- * and the user has not opted to ignore such notifications. It shows relevant details about the situation
- * and allows the user to take action or dismiss the dialog.
- * </p>
- *
- * <strong>Features:</strong>
- * <ul>
- *   <li>Handles notifications for contract end dates in the campaign.</li>
- *   <li>Uses a localized message with context-specific details from the campaign.</li>
- *   <li>Extends the {@link AbstractMHQNagDialog} to reuse base nag dialog functionality.</li>
- * </ul>
+ * <p>The {@code EndContractNagDialog} extends {@link ImmersiveDialogNag} and provides
+ * a specialized nag dialog to alert players about the conclusion of a contract. It leverages predefined parameters,
+ * such as the {@code NAG_CONTRACT_ENDED} constant, and uses no specific specialization, relying on a fallback
+ * speaker.</p>
  */
-public class EndContractNagDialog extends AbstractMHQNagDialog {
+public class EndContractNagDialog extends ImmersiveDialogNag {
+
     /**
-     * Constructs an {@code EndContractNagDialog} for the given campaign.
+     * Constructs a new {@code EndContractNagDialog} instance to display the end-of-contract nag dialog.
      *
-     * <p>
-     * This dialog uses the localization key {@code "EndContractNagDialog.text"} to provide
-     * a message that includes additional information, such as the commander's address.
-     * It is specifically tailored to show when a contract is reaching its end date.
-     * </p>
+     * <p>This constructor initializes the nag dialog without a specific specialization, enabling
+     * the fallback mechanism to determine the appropriate speaker. The {@code NAG_CONTRACT_ENDED} constant is used to
+     * manage dialog suppression, and the {@code "EndContractNagDialog"} message key is utilized to fetch localized
+     * message content.</p>
      *
-     * @param campaign The {@link Campaign} that the nag dialog is tied to.
+     * @param campaign The {@link Campaign} instance associated with this dialog. Provides access to campaign data and
+     *                 settings required for dialog construction.
      */
     public EndContractNagDialog(final Campaign campaign) {
-        super(campaign, MHQConstants.NAG_CONTRACT_ENDED);
-
-        final String DIALOG_BODY = "EndContractNagDialog.text";
-        setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
-            campaign.getCommanderAddress(false)));
-        showDialog();
+        super(campaign, null, NAG_CONTRACT_ENDED, "EndContractNagDialog");
     }
 
     /**
@@ -84,15 +72,14 @@ public class EndContractNagDialog extends AbstractMHQNagDialog {
      *     <li>A contract in the campaign has ended, as determined by {@code #isContractEnded}.</li>
      * </ul>
      *
-     * @param today The current local date used to check against the contracts' ending dates.
+     * @param today           The current local date used to check against the contracts' ending dates.
      * @param activeContracts A list of {@link AtBContract} objects representing the campaign's active contracts.
      *
      * @return {@code true} if the nag dialog should be displayed; {@code false} otherwise.
      */
     public static boolean checkNag(LocalDate today, List<AtBContract> activeContracts) {
-        final String NAG_KEY = MHQConstants.NAG_CONTRACT_ENDED;
+        final String NAG_KEY = NAG_CONTRACT_ENDED;
 
-        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-              && isContractEnded(today, activeContracts);
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY) && isContractEnded(today, activeContracts);
     }
 }

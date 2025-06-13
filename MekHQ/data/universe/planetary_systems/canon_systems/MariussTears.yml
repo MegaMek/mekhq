@@ -7,7 +7,7 @@ primarySlot: 1
 planet:
   - name:
       source: canon
-      value: Marius's Tears
+      value: Herculaneum
     type: TERRESTRIAL
     orbitalDist: 0.28
     sysPos: 1
@@ -55,6 +55,9 @@ planet:
         population: 2985363.0
       - date: '3043-01-01'
         socioIndustrial: D-C-B-C-D
+      - date: '3048-01-01'
+        name: Marius's Tears
+        message: Herculaneum renamed to Marius's Tears in honor of the late Imperator Marius O'Reilly
       - date: '3050-01-01'
         population: 3139003.0
       - date: '3060-01-01'

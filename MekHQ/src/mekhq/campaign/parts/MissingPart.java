@@ -25,8 +25,17 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
+
+import java.io.PrintWriter;
+import java.text.MessageFormat;
+import java.util.Arrays;
 
 import megamek.common.ITechnology;
 import megamek.common.TargetRoll;
@@ -35,17 +44,15 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.equipment.MissingAmmoBin;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.WorkTime;
 import mekhq.utilities.ReportingUtilities;
 
-import java.io.PrintWriter;
-
 /**
- * A missing part is a placeholder on a unit to indicate that a replacement
- * task needs to be performed
+ * A missing part is a placeholder on a unit to indicate that a replacement task needs to be performed
+ *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public abstract class MissingPart extends Part implements IAcquisitionWork {
@@ -93,32 +100,26 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
     @Override
     public String getDesc() {
         StringBuilder toReturn = new StringBuilder();
-        toReturn.append("<html><b>Replace ")
-                .append(getName());
-            if(isUnitTonnageMatters()) {
-                toReturn.append(" (")
-                    .append(getUnitTonnage())
-                    .append(" ton)");
-            }
-            toReturn.append(" - ")
-            .append(ReportingUtilities.messageSurroundedBySpanWithColor(
-                SkillType.getExperienceLevelColor(getSkillMin()),
-                SkillType.getExperienceLevelName(getSkillMin()) + "+"))
-            .append("</b><br/>")
-            .append(getDetails())
-            .append("<br/>");
+        toReturn.append("<html><b>Replace ").append(getName());
+        if (isUnitTonnageMatters()) {
+            toReturn.append(" (").append(getUnitTonnage()).append(" ton)");
+        }
+        toReturn.append(" - ")
+              .append(ReportingUtilities.messageSurroundedBySpanWithColor(SkillType.getExperienceLevelColor(getSkillMin()),
+                    SkillType.getExperienceLevelName(getSkillMin()) + "+"))
+              .append("</b><br/>")
+              .append(getDetails())
+              .append("<br/>");
 
-        if (getSkillMin() <= SkillType.EXP_ELITE) {
+        if (getSkillMin() <= SkillType.EXP_LEGENDARY) {
             toReturn.append(getTimeLeft())
-                .append(" minutes")
-                .append(null != getTech() ? " (scheduled)" : "")
-                .append(" <b>TN:</b> ")
-                .append(getAllMods(null).getValue() > -1 ? "+" : "")
-                .append(getAllMods(null).getValueAsString());
+                  .append(" minutes")
+                  .append(null != getTech() ? " (scheduled)" : "")
+                  .append(" <b>TN:</b> ")
+                  .append(getAllMods(null).getValue() > -1 ? "+" : "")
+                  .append(getAllMods(null).getValueAsString());
             if (getMode() != WorkTime.NORMAL) {
-                toReturn.append(" <i>")
-                    .append(getCurrentModeName())
-                    .append( "</i>");
+                toReturn.append(" <i>").append(getCurrentModeName()).append("</i>");
             }
         }
         toReturn.append("</html>");
@@ -128,9 +129,8 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
     @Override
     public String succeed() {
         fix();
-        return ReportingUtilities.messageSurroundedBySpanWithColor(
-                MekHQ.getMHQOptions().getFontColorPositiveHexColor(),
-                " <b>replaced</b>.");
+        return ReportingUtilities.messageSurroundedBySpanWithColor(ReportingUtilities.getPositiveColor(),
+              " <b>replaced</b>.");
     }
 
     @Override
@@ -181,30 +181,35 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
         }
 
         // don't just return with the first part if it is damaged
-        return campaign.getWarehouse().streamSpareParts()
-            .filter(MissingPart::isAvailableAsReplacement)
-            .filter(p -> !p.isUsedForRefitPlanning() || !refit)
-            .reduce(null, (bestPart, part) -> {
-                if (isAcceptableReplacement(part, refit)) {
-                    if (bestPart == null) {
-                        return part;
-                    } else if (bestPart.needsFixing() && !part.needsFixing()) {
-                        return part;
-                    } else if (bestPart.getQuality().toNumeric() < part.getQuality().toNumeric()) {
-                        return part;
-                    }
-                }
-                return bestPart;
-            });
+        return campaign.getWarehouse()
+                     .streamSpareParts()
+                     .filter(MissingPart::isAvailableAsReplacement)
+                     .filter(p -> !p.isUsedForRefitPlanning() || !refit)
+                     .reduce(null, (bestPart, part) -> {
+                         if (isAcceptableReplacement(part, refit)) {
+                             if (bestPart == null) {
+                                 return part;
+                             } else if (bestPart.needsFixing() && !part.needsFixing()) {
+                                 return part;
+                             } else if (bestPart.getQuality().toNumeric() < part.getQuality().toNumeric()) {
+                                 return part;
+                             }
+                         }
+                         return bestPart;
+                     });
     }
 
     /**
-     * Gets a value indicating whether or not a part is available
-     * as a replacement.
+     * Gets a value indicating whether or not a part is available as a replacement.
+     *
      * @param part The part being considered as a replacement.
      */
     public static boolean isAvailableAsReplacement(Part part) {
-        return !(part.isReservedForRefit() || part.isBeingWorkedOn() || part.isReservedForReplacement() || !part.isPresent() || part.hasParentPart());
+        return !(part.isReservedForRefit() ||
+                       part.isBeingWorkedOn() ||
+                       part.isReservedForReplacement() ||
+                       !part.isPresent() ||
+                       part.hasParentPart());
     }
 
     public boolean isReplacementAvailable() {
@@ -226,27 +231,24 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
 
         if (!(this instanceof MissingAmmoBin)) {
             // Ammo bins don't require/have stock replacements.
-            if(!superDetails.isEmpty()) {
+            if (!superDetails.isEmpty()) {
                 toReturn.append(", ");
             }
             if (isReplacementAvailable()) {
-                toReturn.append(inventories.getSupply())
-                    .append(" in stock");
+                toReturn.append(inventories.getSupply()).append(" in stock");
             } else {
                 toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
-                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(), "None in stock"));
+                    ReportingUtilities.getNegativeColor(), "None in stock"));
             }
 
             String incoming = inventories.getTransitOrderedDetails();
             if (!incoming.isEmpty()) {
                 StringBuilder incomingSB = new StringBuilder();
 
-                incomingSB.append(" (")
-                    .append(incoming)
-                    .append(")");
+                incomingSB.append(" (").append(incoming).append(")");
 
                 toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
-                    MekHQ.getMHQOptions().getFontColorWarningHexColor(), incomingSB.toString()));
+                    ReportingUtilities.getWarningColor(), incomingSB.toString()));
             }
         }
         return toReturn.toString();
@@ -277,19 +279,19 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
         skillMin = ++rating;
         timeSpent = 0;
         shorthandedMod = 0;
-        if (skillMin > SkillType.EXP_ELITE) {
+        if (skillMin > SkillType.EXP_LEGENDARY) {
             Part part = findReplacement(false);
             if (null != part) {
                 part.decrementQuantity();
                 skillMin = SkillType.EXP_GREEN;
             }
             return ReportingUtilities.messageSurroundedBySpanWithColor(
-                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
-                    "<b> failed and part destroyed</b>") + ".";
+                    ReportingUtilities.getNegativeColor(),
+                    "<b> failed and part destroyed</b>") + '.';
         } else {
             return ReportingUtilities.messageSurroundedBySpanWithColor(
-                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
-                    "<b> failed</b>") + ".";
+                    ReportingUtilities.getNegativeColor(),
+                    "<b> failed</b>") + '.';
         }
     }
 
@@ -301,20 +303,31 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
     @Override
     public TargetRoll getAllAcquisitionMods() {
         TargetRoll target = new TargetRoll();
-        if (getTechBase() == T_CLAN && campaign.getCampaignOptions().getClanAcquisitionPenalty() > 0) {
+        if (getTechBase() == TechBase.CLAN && campaign.getCampaignOptions().getClanAcquisitionPenalty() > 0) {
             target.addModifier(campaign.getCampaignOptions().getClanAcquisitionPenalty(), "clan-tech");
-        } else if (getTechBase() == T_IS && campaign.getCampaignOptions().getIsAcquisitionPenalty() > 0) {
+        } else if (getTechBase() == TechBase.IS && campaign.getCampaignOptions().getIsAcquisitionPenalty() > 0) {
             target.addModifier(campaign.getCampaignOptions().getIsAcquisitionPenalty(), "Inner Sphere tech");
-        } else if (getTechBase() == T_BOTH) {
-            int penalty = Math.min(campaign.getCampaignOptions().getClanAcquisitionPenalty(), campaign.getCampaignOptions().getIsAcquisitionPenalty());
+        } else if (getTechBase() == TechBase.ALL) {
+            int penalty = Math.min(campaign.getCampaignOptions().getClanAcquisitionPenalty(),
+                  campaign.getCampaignOptions().getIsAcquisitionPenalty());
             if (penalty > 0) {
                 target.addModifier(penalty, "tech limit");
             }
         }
         //availability mod
-        int avail = getAvailability();
+        AvailabilityValue avail = getAvailability();
+        if (avail == null) {
+            target.addModifier(
+                  TargetRoll.IMPOSSIBLE, 
+                  MessageFormat.format(
+                        "Attempting to get availability modifier for null availability: {0}", 
+                        getPartName()
+                  )
+            );
+            return target;
+        }
         int availabilityMod = Availability.getAvailabilityModifier(avail);
-        target.addModifier(availabilityMod, "availability (" + ITechnology.getRatingName(avail) + ')');
+        target.addModifier(availabilityMod, "availability (" + avail.getName() + ')');
 
         return target;
     }
@@ -376,13 +389,13 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
         StringBuilder toReturn = new StringBuilder();
         if (campaign.getQuartermaster().buyPart(newPart, transitDays)) {
             toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
-                MekHQ.getMHQOptions().getFontColorPositiveHexColor(), "<b> part found</b>"))
+                ReportingUtilities.getPositiveColor(), "<b> part found</b>"))
                 .append(". It will be delivered in ")
                 .append(transitDays)
                 .append(" days.");
         } else {
             toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
-                MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
+                ReportingUtilities.getNegativeColor(),
                 "<b> You cannot afford this part. Transaction cancelled</b>"));
         }
         return toReturn.toString();
@@ -399,7 +412,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
     public String failToFind() {
         // TODO: Move me to live with procurment functions?
         return ReportingUtilities.messageSurroundedBySpanWithColor(
-            MekHQ.getMHQOptions().getFontColorNegativeHexColor(), "<b> part not found</b>") + ".";
+            ReportingUtilities.getNegativeColor(), "<b> part not found</b>") + ".";
     }
 
     @Override
@@ -437,9 +450,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
 
         String details = getNewPart().getDetails();
         if (!details.isEmpty()) {
-            toReturn.append(" (")
-                .append(details)
-                .append(')');
+            toReturn.append(" (").append(details).append(')');
         }
         return toReturn.toString();
     }
@@ -494,12 +505,12 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
     }
 
     @Override
-    public boolean isIntroducedBy(int year, boolean clan, int techFaction) {
+    public boolean isIntroducedBy(int year, boolean clan, ITechnology.Faction techFaction) {
         return getIntroductionDate(clan, techFaction) <= year;
     }
 
     @Override
-    public boolean isExtinctIn(int year, boolean clan, int techFaction) {
+    public boolean isExtinctIn(int year, boolean clan, ITechnology.Faction techFaction) {
         return isExtinct(year, clan, techFaction);
     }
 }

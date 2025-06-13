@@ -24,38 +24,47 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.generator;
+
+import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
+import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
+
+import java.util.Objects;
 
 import megamek.common.Compute;
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.RandomSkillPreferences;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.randomEvents.personalities.PersonalityController;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.selectors.factionSelectors.AbstractFactionSelector;
 import mekhq.campaign.universe.selectors.planetSelectors.AbstractPlanetSelector;
 
-import java.util.Objects;
-
-import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
-
 /**
  * Creates {@link Person} instances using the default MekHQ algorithm.
  */
 public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
+
 
     private final AbstractFactionSelector factionSelector;
     private final AbstractPlanetSelector planetSelector;
 
     /**
      * Creates a new DefaultPersonGenerator with a faction selector.
+     *
      * @param factionSelector The faction selector to use with all generated persons.
      */
     public DefaultPersonnelGenerator(AbstractFactionSelector factionSelector, AbstractPlanetSelector planetSelector) {
@@ -84,6 +93,7 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
 
     @Override
     public Person generate(Campaign campaign, PersonnelRole primaryRole, PersonnelRole secondaryRole, Gender gender) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
         Person person = createPerson(campaign);
 
         person.setPrimaryRoleDirect(primaryRole);
@@ -99,6 +109,8 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
 
         AbstractSkillGenerator skillGenerator = new DefaultSkillGenerator(getSkillPreferences());
         skillGenerator.generateSkills(campaign, person, expLvl);
+        skillGenerator.generateAttributes(person);
+        skillGenerator.generateTraits(person);
 
         // Limit skills by age for children and adolescents
         int age = person.getAge(campaign.getLocalDate());
@@ -107,6 +119,7 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
             person.removeAllSkills();
             // regenerate expLvl to factor in skill changes from age
             expLvl = generateExperienceLevel(person);
+            person.setPrimaryRole(campaign, PersonnelRole.DEPENDENT);
         } else if (age < 18) {
             person.limitSkills(1);
 
@@ -121,10 +134,11 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
         }
 
         // set interest in marriage and children flags
-        int interestInMarriageDiceSize = campaign.getCampaignOptions().getNoInterestInMarriageDiceSize();
-        person.setMarriageable(((interestInMarriageDiceSize != 0) && (Compute.randomInt(interestInMarriageDiceSize)) != 0));
+        int interestInMarriageDiceSize = campaignOptions.getNoInterestInMarriageDiceSize();
+        person.setMarriageable(((interestInMarriageDiceSize != 0) &&
+                                      (Compute.randomInt(interestInMarriageDiceSize)) != 0));
 
-        int interestInChildren = campaign.getCampaignOptions().getNoInterestInChildrenDiceSize();
+        int interestInChildren = campaignOptions.getNoInterestInChildrenDiceSize();
         person.setTryingToConceive(((interestInChildren != 0) && (Compute.randomInt(interestInChildren)) != 0));
 
         // Do naming at the end, to ensure the keys are set
@@ -133,16 +147,16 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
         //check for Bloodname
         campaign.checkBloodnameAdd(person, false);
 
-        if (person.getOriginFaction().isClan()
-              && campaign.getCampaignOptions().isUseAbilities()
-              && !(person.getPrimaryRole().isSoldierOrBattleArmour() || person.getPrimaryRole().isProtoMekPilot())) {
+        if (person.getOriginFaction().isClan() &&
+                  campaignOptions.isUseAbilities() &&
+                  !(person.getPrimaryRole().isSoldierOrBattleArmour() || person.getPrimaryRole().isProtoMekPilot())) {
             if (SpecialAbility.getSpecialAbilities().containsKey("clan_pilot_training")) {
                 PersonnelOptions personnelOptions = person.getOptions();
                 personnelOptions.acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, "clan_pilot_training", true);
             }
         }
 
-        person.setDaysToWaitForHealing(campaign.getCampaignOptions().getNaturalHealingWaitingPeriod());
+        person.setDaysToWaitForHealing(campaignOptions.getNaturalHealingWaitingPeriod());
 
         // set loyalty
         if (expLvl <= 0) {
@@ -160,7 +174,12 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
         BackgroundsController.generateBackground(campaign, person);
 
         // generate personality
-        PersonalityController.generatePersonality(person);
+        PersonalityController.generatePersonality(person, false);
+
+        // update skill age modifiers
+        if (campaignOptions.isUseAgeEffects()) {
+            updateAllSkillAgeModifiers(campaign.getLocalDate(), person);
+        }
 
         return person;
     }

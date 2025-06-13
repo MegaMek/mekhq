@@ -29,9 +29,6 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.Aero;
 import megamek.common.Engine;
 import megamek.common.Entity;
@@ -45,8 +42,10 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Engine for a support vehicle. An identical support vehicle engine will have
@@ -60,7 +59,7 @@ public class SVEnginePart extends Part {
 
     private double engineTonnage;
     private int etype;
-    private int techRating;
+    private TechRating techRating;
     private FuelType fuelType;
 
     private TechAdvancement techAdvancement;
@@ -70,7 +69,7 @@ public class SVEnginePart extends Part {
      */
 
     public SVEnginePart() {
-        this(0, 0.0, Engine.COMBUSTION_ENGINE, RATING_D, FuelType.PETROCHEMICALS, null);
+        this(0, 0.0, Engine.COMBUSTION_ENGINE, TechRating.D, FuelType.PETROCHEMICALS, null);
     }
 
     /**
@@ -80,13 +79,13 @@ public class SVEnginePart extends Part {
      *                      tons.
      * @param engineTonnage The mass of the engine
      * @param etype         An {@link Engine} type constant
-     * @param techRating    The engine's tech rating, {@code RATING_A} through
-     *                      {@code RATING_F}
+     * @param techRating    The engine's tech rating, {@code TechRating.A} through
+     *                      {@code TechRating.F}
      * @param fuelType      Needed to distinguish different types of internal
      *                      combustion engines.
      * @param campaign      The campaign instance
      */
-    public SVEnginePart(int unitTonnage, double engineTonnage, int etype, int techRating,
+    public SVEnginePart(int unitTonnage, double engineTonnage, int etype, TechRating techRating,
             FuelType fuelType, Campaign campaign) {
         super(unitTonnage, campaign);
         this.engineTonnage = unitTonnage;
@@ -96,7 +95,7 @@ public class SVEnginePart extends Part {
 
         Engine engine = new Engine(10, etype, Engine.SUPPORT_VEE_ENGINE);
         techAdvancement = engine.getTechAdvancement();
-        name = String.format("%s (%s) Engine", engine.getEngineName(), ITechnology.getRatingName(techRating));
+        name = String.format("%s (%s) Engine", engine.getEngineName(), techRating.getName());
     }
 
     /**
@@ -114,7 +113,7 @@ public class SVEnginePart extends Part {
     }
 
     @Override
-    public int getTechRating() {
+    public TechRating getTechRating() {
         return techRating;
     }
 
@@ -169,7 +168,7 @@ public class SVEnginePart extends Part {
         indent = writeToXMLBegin(pw, indent);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, NODE_ENGINE_TONNAGE, engineTonnage);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, NODE_ETYPE, etype);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, NODE_TECH_RATING, ITechnology.getRatingName(techRating));
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, NODE_TECH_RATING, techRating.getName());
         if (etype == Engine.COMBUSTION_ENGINE) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, NODE_FUEL_TYPE, fuelType.name());
         }
@@ -190,12 +189,7 @@ public class SVEnginePart extends Part {
                         etype = Integer.parseInt(wn.getTextContent());
                         break;
                     case NODE_TECH_RATING:
-                        for (int i = 0; i < ratingNames.length; i++) {
-                            if (ratingNames[i].equals(wn.getTextContent())) {
-                                techRating = i;
-                                break;
-                            }
-                        }
+                        techRating = TechRating.fromName(wn.getTextContent());
                         break;
                     case NODE_FUEL_TYPE:
                         fuelType = FuelType.valueOf(wn.getTextContent());

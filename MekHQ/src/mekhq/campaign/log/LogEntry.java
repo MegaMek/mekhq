@@ -24,15 +24,20 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.log;
-
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.personnel.Person;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.Objects;
+
+import mekhq.campaign.personnel.Person;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -78,18 +83,16 @@ public class LogEntry implements Cloneable {
         this.type = type;
     }
 
-    public void writeToXML(PrintWriter pw, int indent) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(MHQXMLUtility.indentStr(indent)).append("<logEntry>");
+    public void writeToXML(PrintWriter printWriter, int indent) {
+        printWriter.println(MHQXMLUtility.indentStr(indent) + "<logEntry>");
         if (date != null) {
-            sb.append("<date>").append(MHQXMLUtility.saveFormattedDate(date)).append("</date>");
+            printWriter.println(MHQXMLUtility.indentStr(indent + 1) + "<date><![CDATA[" + date + "]]></date>");
         }
-        sb.append("<desc>").append(MHQXMLUtility.escape(desc)).append("</desc>");
+        printWriter.println(MHQXMLUtility.indentStr(indent + 1) + "<desc><![CDATA[" + desc + "]]></desc>");
         if (type != null) {
-            sb.append("<type>").append(MHQXMLUtility.escape(type.toString())).append("</type>");
+            printWriter.println(MHQXMLUtility.indentStr(indent + 1) + "<type><![CDATA[" + type + "]]></type>");
         }
-        sb.append("</logEntry>");
-        pw.println(sb);
+        printWriter.println(MHQXMLUtility.indentStr(indent) + "</logEntry>");
     }
 
     @Override
@@ -126,20 +129,20 @@ public class LogEntry implements Cloneable {
         }
 
         LogEntry other = (LogEntry) obj;
-        return Objects.equals(date, other.date)
-            && desc.equals(other.desc)
-            && Objects.equals(type, other.type);
+        return Objects.equals(date, other.date) && desc.equals(other.desc) && Objects.equals(type, other.type);
     }
 
     /**
      * This method is called when the log entry is edited via UI
+     *
      * @param originalDate the original date of the log entry
-     * @param newDate the new date of the log entry
+     * @param newDate      the new date of the log entry
      * @param originalDesc the original description of the log entry
-     * @param newDesc the new description of the log entry
-     * @param person whose person this log entry belongs
+     * @param newDesc      the new description of the log entry
+     * @param person       whose person this log entry belongs
      */
-    public void onLogEntryEdited(LocalDate originalDate, LocalDate newDate, String originalDesc, String newDesc, Person person) {
+    public void onLogEntryEdited(LocalDate originalDate, LocalDate newDate, String originalDesc, String newDesc,
+          Person person) {
 
     }
 }

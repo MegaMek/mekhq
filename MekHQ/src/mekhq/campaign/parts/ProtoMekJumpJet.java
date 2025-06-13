@@ -30,17 +30,20 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.annotations.Nullable;
-import mekhq.campaign.finances.Money;
-import org.w3c.dom.Node;
-
 import megamek.common.CriticalSlot;
 import megamek.common.ProtoMek;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
 import megamek.common.TechConstants;
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.personnel.skills.SkillType;
+import org.w3c.dom.Node;
+import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.personnel.skills.SkillType;
+import org.w3c.dom.Node;
 
 /**
  * Legacy part that represents standard ProtoMek jump jets.
@@ -48,10 +51,10 @@ import mekhq.campaign.personnel.SkillType;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class ProtoMekJumpJet extends Part {
-    static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_CLAN)
+    static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TechBase.CLAN)
             .setClanAdvancement(3055,3060,3060).setClanApproximate(true, false, false)
-            .setPrototypeFactions(F_CSJ).setProductionFactions(F_CSJ)
-            .setTechRating(RATING_D).setAvailability(RATING_X, RATING_X, RATING_C, RATING_C)
+            .setPrototypeFactions(Faction.CSJ).setProductionFactions(Faction.CSJ)
+            .setTechRating(TechRating.D).setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.C, AvailabilityValue.C)
             .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     public ProtoMekJumpJet() {
@@ -118,8 +121,8 @@ public class ProtoMekJumpJet extends Part {
     }
 
     @Override
-    public int getTechBase() {
-        return T_CLAN;
+    public TechBase getTechBase() {
+        return TechBase.CLAN;
     }
 
     @Override

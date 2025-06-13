@@ -29,7 +29,6 @@ package mekhq.gui.adapter;
 
 import java.awt.event.ActionEvent;
 import java.util.Optional;
-
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -38,6 +37,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 
 import megamek.common.TargetRoll;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.event.PartModeChangedEvent;
@@ -55,6 +55,7 @@ import mekhq.gui.model.PartsTableModel;
 import mekhq.service.enums.MRMSMode;
 
 public class PartsTableMouseAdapter extends JPopupMenuAdapter {
+    private static final MMLogger logger = MMLogger.create(PartsTableMouseAdapter.class);
 
     private CampaignGUI gui;
     private JTable partsTable;
@@ -67,8 +68,7 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
     }
 
     public static void connect(CampaignGUI gui, JTable partsTable, PartsTableModel partsModel) {
-        new PartsTableMouseAdapter(gui, partsTable, partsModel)
-                .connect(partsTable);
+        new PartsTableMouseAdapter(gui, partsTable, partsModel).connect(partsTable);
     }
 
     @Override
@@ -105,8 +105,12 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
                 if (selectedPart instanceof Armor) {
                     n = ((Armor) selectedPart).getAmount();
                 }
-                PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(gui.getFrame(), true,
-                        "Sell How Many " + selectedPart.getName() + "s?", 1, 1, n);
+                PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(gui.getFrame(),
+                      true,
+                      "Sell How Many " + selectedPart.getName() + "s?",
+                      0,
+                      0,
+                      n);
                 pvcd.setVisible(true);
                 if (pvcd.getValue() < 0) {
                     return;
@@ -118,14 +122,20 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
             Money refundAmount = Money.zero();
             for (Part p : parts) {
                 if (null != p) {
-                    refundAmount = refundAmount.plus(p.getActualValue().multipliedBy(p.getQuantity())
-                            .multipliedBy(gui.getCampaign().getCampaignOptions().getCancelledOrderRefundMultiplier()));
+                    refundAmount = refundAmount.plus(p.getActualValue()
+                                                           .multipliedBy(p.getQuantity())
+                                                           .multipliedBy(gui.getCampaign()
+                                                                               .getCampaignOptions()
+                                                                               .getCancelledOrderRefundMultiplier()));
                     gui.getCampaign().getWarehouse().removePart(p);
                 }
             }
-            gui.getCampaign().getFinances().credit(TransactionType.EQUIPMENT_PURCHASE,
-                    gui.getCampaign().getLocalDate(), refundAmount,
-                    "refund for cancelled equipment sale");
+            gui.getCampaign()
+                  .getFinances()
+                  .credit(TransactionType.EQUIPMENT_PURCHASE,
+                        gui.getCampaign().getLocalDate(),
+                        refundAmount,
+                        "refund for cancelled equipment sale");
         } else if (command.equalsIgnoreCase("ARRIVE")) {
             for (Part p : parts) {
                 if (null != p) {
@@ -138,25 +148,83 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
                     gui.getCampaign().getWarehouse().removePart(p);
                 }
             }
+        } else if (command.equalsIgnoreCase("REMOVE_N")) {
+            if (null != selectedPart) {
+                int n = selectedPart.getQuantity();
+                if (selectedPart instanceof AmmoStorage) {
+                    n = ((AmmoStorage) selectedPart).getShots();
+                }
+                if (selectedPart instanceof Armor) {
+                    n = ((Armor) selectedPart).getAmount();
+                }
+                PopupValueChoiceDialog dialog = new PopupValueChoiceDialog(gui.getFrame(),
+                      true,
+                      "Remove How Many " + selectedPart.getName() + "s?",
+                      0,
+                      0,
+                      n);
+                dialog.setVisible(true);
+                if (dialog.getValue() < 0) {
+                    return;
+                }
+                int quantity = dialog.getValue();
+                gui.getCampaign().getWarehouse().removePart(selectedPart, quantity);
+            }
+        } else if (command.equalsIgnoreCase("ADD_N")) {
+            if (null != selectedPart) {
+                PopupValueChoiceDialog dialog = new PopupValueChoiceDialog(gui.getFrame(),
+                      true,
+                      "Add How Many " + selectedPart.getName() + "s?",
+                      0,
+                      0,
+                      9999999);
+                dialog.setVisible(true);
+                if (dialog.getValue() < 0) {
+                    return;
+                }
+
+                int quantity = dialog.getValue();
+                Part clonedPart = selectedPart.clone();
+
+                if (selectedPart instanceof AmmoStorage) {
+                    ((AmmoStorage) clonedPart).setShots(quantity);
+                } else if (selectedPart instanceof Armor) {
+                    ((Armor) clonedPart).setAmount(quantity);
+                } else {
+                    clonedPart.setQuantity(quantity);
+                }
+
+                gui.getCampaign().getWarehouse().addPart(clonedPart, true);
+            }
         } else if (command.contains("SET_QUALITY")) {
             boolean reverse = gui.getCampaign().getCampaignOptions().isReverseQualityNames();
-            Object[] possibilities = {
-                    PartQuality.QUALITY_A.toName(reverse),
-                    PartQuality.QUALITY_B.toName(reverse),
-                    PartQuality.QUALITY_C.toName(reverse),
-                    PartQuality.QUALITY_D.toName(reverse),
-                    PartQuality.QUALITY_E.toName(reverse),
-                    PartQuality.QUALITY_F.toName(reverse)
-            };
-            String quality = (String) JOptionPane.showInputDialog(gui.getFrame(), "Choose the new quality level",
-                    "Set Quality", JOptionPane.PLAIN_MESSAGE, null, possibilities,
-                    PartQuality.QUALITY_D.toName(reverse));
+            Object[] possibilities = { PartQuality.QUALITY_A.toName(reverse), PartQuality.QUALITY_B.toName(reverse),
+                                       PartQuality.QUALITY_C.toName(reverse), PartQuality.QUALITY_D.toName(reverse),
+                                       PartQuality.QUALITY_E.toName(reverse), PartQuality.QUALITY_F.toName(reverse) };
 
-            PartQuality q = PartQuality.fromName(quality, reverse);
-            for (Part p : parts) {
-                if (null != p) {
-                    p.setQuality(q);
-                    MekHQ.triggerEvent(new PartChangedEvent(p));
+            String quality = (String) JOptionPane.showInputDialog(gui.getFrame(),
+                  "Choose the new quality level",
+                  "Set Quality",
+                  JOptionPane.PLAIN_MESSAGE,
+                  null,
+                  possibilities,
+                  PartQuality.QUALITY_D.toName(reverse));
+
+            if (quality != null) {
+                PartQuality partQuality = PartQuality.fromName(quality, reverse);
+
+                for (Part part : parts) {
+                    if (part != null) {
+                        part.setQuality(partQuality);
+                        MekHQ.triggerEvent(new PartChangedEvent(part));
+                    }
+                }
+            }
+        } else if (command.contains("SWITCH_NEWNESS")) {
+            for (Part part : parts) {
+                if (part != null) {
+                    part.setBrandNew(!part.isBrandNew());
+                    MekHQ.triggerEvent(new PartChangedEvent(part));
                 }
             }
         } else if (command.contains("CHANGE_MODE")) {
@@ -184,8 +252,12 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
         } else if (command.equalsIgnoreCase("DEPOD_N")) {
             if (null != selectedPart) {
                 int n = selectedPart.getQuantity();
-                PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(gui.getFrame(), true,
-                        "Remove How Many Pods" + selectedPart.getName() + "s?", 1, 1, n);
+                PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(gui.getFrame(),
+                      true,
+                      "Remove How Many Pods" + selectedPart.getName() + "s?",
+                      1,
+                      1,
+                      n);
                 pvcd.setVisible(true);
                 if (pvcd.getValue() < 0) {
                     return;
@@ -201,15 +273,19 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
             }
         } else if (command.equalsIgnoreCase("BUY_N")) {
             if (null != selectedPart) {
-                PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(gui.getFrame(), true,
-                        "Buy How Much " + selectedPart.getName(), 1, 1);
+                PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(gui.getFrame(),
+                      true,
+                      "Buy How Much " + selectedPart.getName(),
+                      1,
+                      1);
                 pvcd.setVisible(true);
                 if (pvcd.getValue() < 1) {
                     return;
                 }
                 int q = pvcd.getValue();
-                gui.getCampaign().getShoppingList().addShoppingItem(selectedPart.getAcquisitionWork(), q,
-                        gui.getCampaign());
+                gui.getCampaign()
+                      .getShoppingList()
+                      .addShoppingItem(selectedPart.getAcquisitionWork(), q, gui.getCampaign());
             }
         }
     }
@@ -420,14 +496,29 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
                 menuItem.addActionListener(this);
                 menu.add(menuItem);
             }
-            // remove part
+            // add parts
+            menuItem = new JMenuItem("Add Parts...");
+            menuItem.setActionCommand("ADD_N");
+            menuItem.addActionListener(this);
+            menu.add(menuItem);
+            // remove parts
             menuItem = new JMenuItem("Remove Part");
             menuItem.setActionCommand("REMOVE");
+            menuItem.addActionListener(this);
+            menu.add(menuItem);
+
+            menuItem = new JMenuItem("Remove Parts...");
+            menuItem.setActionCommand("REMOVE_N");
             menuItem.addActionListener(this);
             menu.add(menuItem);
             // set part quality
             menuItem = new JMenuItem("Set Quality...");
             menuItem.setActionCommand("SET_QUALITY");
+            menuItem.addActionListener(this);
+            menu.add(menuItem);
+            // set part newness
+            menuItem = new JMenuItem("Switch Newness");
+            menuItem.setActionCommand("SWITCH_NEWNESS");
             menuItem.addActionListener(this);
             menu.add(menuItem);
             // end

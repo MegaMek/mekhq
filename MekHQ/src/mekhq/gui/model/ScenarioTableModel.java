@@ -24,8 +24,22 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.model;
+
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
+
+import java.awt.Component;
+import java.util.ArrayList;
+import java.util.ResourceBundle;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -38,14 +52,7 @@ import mekhq.campaign.stratcon.StratconCoords;
 import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.ResourceBundle;
-
-import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
-import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * A table model for displaying scenarios
@@ -134,9 +141,9 @@ public class ScenarioTableModel extends DataTableModel {
                     // Set the opening span color based on scenario type (Crisis or Turning Point)
                     String openingSpan = "";
                     if (isCrisis) {
-                        openingSpan = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor());
+                        openingSpan = spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
                     } else if (isTurningPoint) {
-                        openingSpan = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
+                        openingSpan = spanOpeningWithCustomColor(ReportingUtilities.getWarningColor());
                     }
 
                     // Add appropriate label for Crisis or Turning Point
@@ -151,8 +158,7 @@ public class ScenarioTableModel extends DataTableModel {
 
                     // Wrap in HTML and include bold formatting for accessibility
                     return String.format(
-                          "<html>%s%s<b>%s</b>%s</html>",
-                          scenario.getStatus(),
+                          "<html>%s%s<b>%s</b>%s</html>", scenario.getStatus().toString(),
                           openingSpan,
                           turningPointText,
                           closingSpan
@@ -160,7 +166,7 @@ public class ScenarioTableModel extends DataTableModel {
                 }
             }
 
-            return scenario.getStatus();
+            return scenario.getStatus().toString();
         } else if (col == COL_DATE) {
             if (scenario.getDate() == null) {
                 return "-";

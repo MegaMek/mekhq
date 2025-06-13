@@ -27,9 +27,11 @@
  */
 package mekhq;
 
+import static mekhq.MHQConstants.AWARDS_IMAGE_DIRECTORY_PATH;
+
 import java.io.File;
 
-import megamek.client.ui.swing.tileset.MMStaticDirectoryManager;
+import megamek.client.ui.tileset.MMStaticDirectoryManager;
 import megamek.common.annotations.Nullable;
 import megamek.common.preference.PreferenceManager;
 import megamek.common.util.fileUtils.AbstractDirectory;
@@ -67,6 +69,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
     // endregion Constructors
 
     // region Initialization
+
     /**
      * This initializes all of the directories under this manager
      */
@@ -90,8 +93,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
             // something fails
             parseForceIconDirectory = false;
             try {
-                forceIconDirectory = new DirectoryItems(new File(MHQConstants.FORCE_ICON_PATH),
-                        new ImageFileFactory());
+                forceIconDirectory = new DirectoryItems(new File(MHQConstants.FORCE_ICON_PATH), new ImageFileFactory());
 
                 String userDir = PreferenceManager.getClientPreferences().getUserDir();
                 File forceIconUserDir = new File(userDir + "/" + MHQConstants.FORCE_ICON_PATH);
@@ -119,9 +121,14 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
             // something fails
             parseAwardIconDirectory = false;
             try {
-                awardIconDirectory = new DirectoryItems(new File("data/images/awards"), // TODO : Remove inline file
-                                                                                        // path
-                        new AwardFileFactory());
+                awardIconDirectory = new DirectoryItems(new File(AWARDS_IMAGE_DIRECTORY_PATH), new AwardFileFactory());
+
+                String userDirectory = PreferenceManager.getClientPreferences().getUserDir();
+                File iconUserDirectory = new File(userDirectory + '/' + AWARDS_IMAGE_DIRECTORY_PATH);
+                if (!userDirectory.isBlank() && iconUserDirectory.isDirectory()) {
+                    DirectoryItems userAwardIcons = new DirectoryItems(iconUserDirectory, new AwardFileFactory());
+                    awardIconDirectory.merge(userAwardIcons);
+                }
             } catch (Exception e) {
                 logger.error("Could not parse the award icon directory!", e);
             }
@@ -129,8 +136,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
     }
 
     /**
-     * Parses MekHQ's storyarcs icon folder when first called or when it was
-     * refreshed.
+     * Parses MekHQ's storyarcs icon folder when first called or when it was refreshed.
      *
      * @see #refreshStorySplash()
      */
@@ -153,9 +159,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
     }
 
     /**
-     * Parses the user's Story Arc portraits directory when first called or when it
-     * was refreshed
-     *
+     * Parses the user's Story Arc portraits directory when first called or when it was refreshed
      */
     public static void initializeUserStoryPortraits(String path) {
         // Read in and parse MekHQ's force icon folder only when first called or when
@@ -176,9 +180,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
     }
 
     /**
-     * Parses the user's Story Arc storyarcs directory when first called or when it
-     * was refreshed
-     *
+     * Parses the user's Story Arc storyarcs directory when first called or when it was refreshed
      */
     public static void initializeUserStorySplash(String path) {
         // Read in and parse MekHQ's force icon folder only when first called or when
@@ -200,14 +202,12 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
     // endregion Initialization
 
     // region Getters
+
     /**
-     * Returns an AbstractDirectory object containing all force icon filenames found
-     * in MekHQ's
-     * force icon folder.
+     * Returns an AbstractDirectory object containing all force icon filenames found in MekHQ's force icon folder.
      *
-     * @return an AbstractDirectory object with the force icon folders and
-     *         filenames.
-     *         May be null if the directory cannot be parsed.
+     * @return an AbstractDirectory object with the force icon folders and filenames. May be null if the directory
+     *       cannot be parsed.
      */
     public static @Nullable AbstractDirectory getForceIcons() {
         initializeForceIcons();
@@ -215,13 +215,10 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
     }
 
     /**
-     * Returns an AbstractDirectory object containing all award icon filenames found
-     * in MekHQ's
-     * award icon folder.
+     * Returns an AbstractDirectory object containing all award icon filenames found in MekHQ's award icon folder.
      *
-     * @return an AbstractDirectory object with the award icon folders and
-     *         filenames.
-     *         May be null if the directory cannot be parsed.
+     * @return an AbstractDirectory object with the award icon folders and filenames. May be null if the directory
+     *       cannot be parsed.
      */
     public static @Nullable AbstractDirectory getAwardIcons() {
         initializeAwardIcons();
@@ -229,13 +226,10 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
     }
 
     /**
-     * Returns an AbstractDirectory object containing all story icon filenames found
-     * in MekHQ's
-     * storyarc icon folder.
+     * Returns an AbstractDirectory object containing all story icon filenames found in MekHQ's storyarc icon folder.
      *
-     * @return an AbstractDirectory object with the story icon folders and
-     *         filenames.
-     *         May be null if the directory cannot be parsed.
+     * @return an AbstractDirectory object with the story icon folders and filenames. May be null if the directory
+     *       cannot be parsed.
      */
     public static @Nullable AbstractDirectory getStorySplash() {
         initializeStorySplash();
@@ -243,13 +237,11 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
     }
 
     /**
-     * Returns an AbstractDirectory object containing all story portrait filenames
-     * found in the user's
-     * storyarc portraits folder.
+     * Returns an AbstractDirectory object containing all story portrait filenames found in the user's storyarc
+     * portraits folder.
      *
-     * @return an AbstractDirectory object with the story portrait folders and
-     *         filenames.
-     *         May be null if the directory cannot be parsed.
+     * @return an AbstractDirectory object with the story portrait folders and filenames. May be null if the directory
+     *       cannot be parsed.
      */
     public static @Nullable AbstractDirectory getUserStoryPortraits() {
         // we do not initialize here because initialization requires a specific path
@@ -257,13 +249,11 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
     }
 
     /**
-     * Returns an AbstractDirectory object containing all story arc image filenames
-     * found in the user's
-     * storyarc folder.
+     * Returns an AbstractDirectory object containing all story arc image filenames found in the user's storyarc
+     * folder.
      *
-     * @return an AbstractDirectory object with the story portrait folders and
-     *         filenames.
-     *         May be null if the directory cannot be parsed.
+     * @return an AbstractDirectory object with the story portrait folders and filenames. May be null if the directory
+     *       cannot be parsed.
      */
     public static @Nullable AbstractDirectory getUserStorySplash() {
         // we do not initialize here because initialization requires a specific path
@@ -272,12 +262,11 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
     // endregion Getters
 
     // region Refreshers
+
     /**
-     * Re-reads MekHQ's force icon folder and returns the updated AbstractDirectory
-     * object. This
-     * will update the AbstractDirectory object with changes to the force icons
-     * (like added image
-     * files and folders) while MekHQ is running.
+     * Re-reads MekHQ's force icon folder and returns the updated AbstractDirectory object. This will update the
+     * AbstractDirectory object with changes to the force icons (like added image files and folders) while MekHQ is
+     * running.
      *
      * @see #getForceIcons()
      */
@@ -287,11 +276,9 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
     }
 
     /**
-     * Re-reads MekHQ's award icon folder and returns the updated AbstractDirectory
-     * object. This
-     * will update the AbstractDirectory object with changes to the award icons
-     * (like added image
-     * files and folders) while MekHQ is running.
+     * Re-reads MekHQ's award icon folder and returns the updated AbstractDirectory object. This will update the
+     * AbstractDirectory object with changes to the award icons (like added image files and folders) while MekHQ is
+     * running.
      *
      * @see #getAwardIcons()
      */
@@ -301,11 +288,9 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
     }
 
     /**
-     * Re-reads MekHQ's story icon folder and returns the updated AbstractDirectory
-     * object. This
-     * will update the AbstractDirectory object with changes to the story icons
-     * (like added image
-     * files and folders) while MekHQ is running.
+     * Re-reads MekHQ's story icon folder and returns the updated AbstractDirectory object. This will update the
+     * AbstractDirectory object with changes to the story icons (like added image files and folders) while MekHQ is
+     * running.
      *
      * @see #getStorySplash()
      */

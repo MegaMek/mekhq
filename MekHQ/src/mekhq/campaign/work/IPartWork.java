@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MegaMek was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.work;
 
@@ -47,13 +52,21 @@ public interface IPartWork extends IWork {
     int getSkillMin();
 
     int getBaseTime();
+
     int getActualTime();
+
     int getTimeSpent();
+
     int getTimeLeft();
+
     void addTimeSpent(int time);
+
     void resetTimeSpent();
+
     void resetOvertime();
+
     boolean isRightTechType(String skillType);
+
     default boolean canChangeWorkMode() {
         return false;
     }
@@ -63,45 +76,52 @@ public interface IPartWork extends IWork {
     void setTech(@Nullable Person tech);
 
     boolean hasWorkedOvertime();
+
     void setWorkedOvertime(boolean b);
+
     int getShorthandedMod();
+
     void setShorthandedMod(int i);
 
     void updateConditionFromEntity(boolean checkForDestruction);
+
     void updateConditionFromPart();
+
     void fix();
+
     void remove(boolean salvage);
+
     MissingPart getMissingPart();
 
     String getDesc();
 
     /**
-     * Gets a string containing details regarding the part,
-     * e.g. OmniPod or how many hits it has taken and its
-     * repair cost.
+     * Gets a string containing details regarding the part, e.g. OmniPod or how many hits it has taken and its repair
+     * cost.
+     *
      * @return A string containing details regarding the part.
      */
     String getDetails();
 
     /**
-     * Gets a string containing details regarding the part,
-     * and optionally include information on its repair
-     * status.
-     * @param includeRepairDetails {@code true} if the details
-     *        should include information such as the number of
-     *        hits or how much it would cost to repair the
-     *        part.
+     * Gets a string containing details regarding the part, and optionally include information on its repair status.
+     *
+     * @param includeRepairDetails {@code true} if the details should include information such as the number of hits or
+     *                             how much it would cost to repair the part.
+     *
      * @return A string containing details regarding the part.
      */
     String getDetails(boolean includeRepairDetails);
 
     int getLocation();
 
-    @Nullable Unit getUnit();
+    @Nullable
+    Unit getUnit();
 
     boolean isSalvaging();
 
-    @Nullable String checkFixable();
+    @Nullable
+    String checkFixable();
 
     void reservePart();
 
@@ -113,8 +133,36 @@ public interface IPartWork extends IWork {
 
     PartRepairType getRepairPartType();
 
+    /**
+     * Cancels the current assignment, resets associated properties, and optionally resets time-related values.
+     *
+     * <p>The method performs the following actions:</p>
+     * <ul>
+     *     <li>Removes the assigned technician by setting it to {@code null}.</li>
+     *     <li>Resets the shorthand modifier to 0 using {@code setShorthandedMod(0)}.</li>
+     *     <li>Cancels any existing reservations via {@code cancelReservation()}.</li>
+     *     <li>If {@code resetTime} is {@code true}, resets time-related properties by calling
+     *         {@code resetOvertime()} and {@code resetTimeSpent()}.</li>
+     * </ul>
+     *
+     * @param resetTime {@code true} if time-related values should be reset; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    default void cancelAssignment(boolean resetTime) {
+        setTech(null);
+        setShorthandedMod(0);
+        cancelReservation();
+
+        if (resetTime) {
+            resetOvertime();
+            resetTimeSpent();
+        }
+    }
+
     static PartRepairType findCorrectMRMSType(IPartWork part) {
-        if ((part instanceof EquipmentPart) && (((EquipmentPart) part).getType() instanceof WeaponType)) {
+        if ((part instanceof EquipmentPart equipmentPart) && (equipmentPart.getType() instanceof WeaponType)) {
             return PartRepairType.WEAPON;
         } else {
             return part.getMRMSOptionType();
@@ -122,10 +170,13 @@ public interface IPartWork extends IWork {
     }
 
     static PartRepairType findCorrectRepairType(IPartWork part) {
-        if (((part instanceof EquipmentPart) && (((EquipmentPart) part).getType() instanceof WeaponType))
-                || ((part instanceof MissingEquipmentPart) && (((MissingEquipmentPart) part).getType() instanceof WeaponType))) {
+        if (((part instanceof EquipmentPart equipmentPart) && (equipmentPart.getType() instanceof WeaponType)) ||
+              ((part instanceof MissingEquipmentPart missingEquipmentPart) &&
+                     (missingEquipmentPart.getType() instanceof WeaponType))) {
             return PartRepairType.WEAPON;
-        } else if ((part instanceof EquipmentPart) && (((EquipmentPart) part).getType().hasFlag(MiscType.F_CLUB))) {
+        } else if ((part instanceof EquipmentPart equipmentPart) &&
+              (equipmentPart.getType() instanceof MiscType miscType) &&
+              miscType.hasFlag(MiscType.F_CLUB)) {
             return PartRepairType.PHYSICAL_WEAPON;
         } else {
             return part.getRepairPartType();
@@ -135,23 +186,26 @@ public interface IPartWork extends IWork {
 
     /**
      * Sticker price is the value of the part according to the rulebooks
+     *
      * @return the part's sticker price
      */
-    public abstract Money getStickerPrice();
+    Money getStickerPrice();
 
     /**
      * This is the value of the part that may be affected by characteristics and campaign options
+     *
      * @return the part's actual value
      */
-    public abstract Money getActualValue();
+    Money getActualValue();
 
     /**
-     * This is the value of the part that may be affected by characteristics and campaign options
-     * but not affected by part damage
+     * This is the value of the part that may be affected by characteristics and campaign options but not affected by
+     * part damage
+     *
      * @return the part's actual value if it wasn't damaged
      */
-    public abstract Money getUndamagedValue();
+    Money getUndamagedValue();
 
 
-    public abstract boolean isPriceAdjustedForAmount();
+    boolean isPriceAdjustedForAmount();
 }

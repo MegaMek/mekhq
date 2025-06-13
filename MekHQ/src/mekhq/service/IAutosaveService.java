@@ -30,8 +30,7 @@ package mekhq.service;
 import mekhq.campaign.Campaign;
 
 /**
- * Handles the possible auto-save situations
- * in MekHQ.
+ * Handles the possible auto-save situations in MekHQ.
  */
 public interface IAutosaveService {
     /**
@@ -40,11 +39,18 @@ public interface IAutosaveService {
      * @param campaign Campaign to save
      */
     void requestDayAdvanceAutosave(Campaign campaign);
-
+    
     /**
-     * Handles auto-saving before a mission starts.
+     * Handles auto-saving before a scenario starts.
      *
      * @param campaign Campaign to save
      */
-    void requestBeforeMissionAutosave(Campaign campaign);
+    void requestBeforeScenarioAutosave(Campaign campaign);
+
+    /**
+     * Handles auto-saving before a mission or contract ends.
+     *
+     * @param campaign Campaign to save
+     */
+    void requestBeforeMissionEndAutosave(Campaign campaign);
 }

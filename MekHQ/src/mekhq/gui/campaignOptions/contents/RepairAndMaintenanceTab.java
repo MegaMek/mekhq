@@ -24,18 +24,32 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.campaignOptions.contents;
 
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+
+import java.awt.GridBagConstraints;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.CampaignOptions;
-import mekhq.gui.campaignOptions.components.*;
-
-import javax.swing.*;
-import java.awt.*;
-
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
+import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
+import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
+import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 
 /**
  * Represents a tab in the campaign options UI used to configure settings related to
@@ -58,6 +72,8 @@ public class RepairAndMaintenanceTab {
     private final CampaignOptions campaignOptions;
 
     //start Repair Tab
+    private CampaignOptionsHeaderPanel repairHeader;
+    private JCheckBox chkTechsUseAdministration;
     private JCheckBox useEraModsCheckBox;
     private JCheckBox assignedTechFirstCheckBox;
     private JCheckBox resetToFirstTechCheckBox;
@@ -71,6 +87,7 @@ public class RepairAndMaintenanceTab {
     //end Repair Tab
 
     //start Maintenance Tab
+    private CampaignOptionsHeaderPanel maintenanceHeader;
     private JCheckBox checkMaintenance;
     private JLabel lblMaintenanceDays;
     private JSpinner spnMaintenanceDays;
@@ -115,6 +132,7 @@ public class RepairAndMaintenanceTab {
      * </p>
      */
     private void initializeRepairTab() {
+        chkTechsUseAdministration = new JCheckBox();
         useEraModsCheckBox = new JCheckBox();
 
         assignedTechFirstCheckBox = new JCheckBox();
@@ -176,34 +194,40 @@ public class RepairAndMaintenanceTab {
      */
     public JPanel createRepairTab() {
         // Header
-        JPanel headerPanel = new CampaignOptionsHeaderPanel("RepairTab",
-            getImageDirectory() + "logo_clan_burrock.png");
+        repairHeader = new CampaignOptionsHeaderPanel("RepairTab",
+              getImageDirectory() + "logo_clan_burrock.png", 3);
 
-        // Era Mods
-            useEraModsCheckBox = new CampaignOptionsCheckBox("UseEraModsCheckBox");
+        chkTechsUseAdministration = new CampaignOptionsCheckBox("TechsUseAdministration");
+        chkTechsUseAdministration.addMouseListener(createTipPanelUpdater(repairHeader, "TechsUseAdministration"));
 
-        // Tech Placement
+        useEraModsCheckBox = new CampaignOptionsCheckBox("UseEraModsCheckBox");
+        useEraModsCheckBox.addMouseListener(createTipPanelUpdater(repairHeader, "UseEraModsCheckBox"));
+
         assignedTechFirstCheckBox = new CampaignOptionsCheckBox("AssignedTechFirstCheckBox");
+        assignedTechFirstCheckBox.addMouseListener(createTipPanelUpdater(repairHeader, "AssignedTechFirstCheckBox"));
         resetToFirstTechCheckBox = new CampaignOptionsCheckBox("ResetToFirstTechCheckBox");
+        resetToFirstTechCheckBox.addMouseListener(createTipPanelUpdater(repairHeader, "ResetToFirstTechCheckBox"));
 
-        // Use Quirks
         useQuirksBox = new CampaignOptionsCheckBox("UseQuirksBox");
+        useQuirksBox.addMouseListener(createTipPanelUpdater(repairHeader, "UseQuirksBox"));
 
-        // Aero System Damage
         useAeroSystemHitsBox = new CampaignOptionsCheckBox("UseAeroSystemHitsBox");
+        useAeroSystemHitsBox.addMouseListener(createTipPanelUpdater(repairHeader, "UseAeroSystemHitsBox"));
 
-        // Damage by Margin
         useDamageMargin = new CampaignOptionsCheckBox("UseDamageMargin");
-        useDamageMargin.addActionListener(evt -> spnDamageMargin.setEnabled(useDamageMargin.isSelected()));
+        useDamageMargin.addMouseListener(createTipPanelUpdater(repairHeader, "UseDamageMargin"));
 
         lblDamageMargin = new CampaignOptionsLabel("DamageMargin");
+        lblDamageMargin.addMouseListener(createTipPanelUpdater(repairHeader, "DamageMargin"));
         spnDamageMargin = new CampaignOptionsSpinner("DamageMargin",
             1, 1, 20, 1);
+        spnDamageMargin.addMouseListener(createTipPanelUpdater(repairHeader, "DamageMargin"));
 
-        // Equipment Survival
         lblDestroyPartTarget = new CampaignOptionsLabel("DestroyPartTarget");
+        lblDestroyPartTarget.addMouseListener(createTipPanelUpdater(repairHeader, "DestroyPartTarget"));
         spnDestroyPartTarget = new CampaignOptionsSpinner("DestroyPartTarget",
             2, 2, 13, 1);
+        spnDestroyPartTarget.addMouseListener(createTipPanelUpdater(repairHeader, "DestroyPartTarget"));
 
         // Layout the Panel
         final JPanel panelLeft = new CampaignOptionsStandardPanel("repairTabLeft");
@@ -212,6 +236,9 @@ public class RepairAndMaintenanceTab {
         layoutLeft.gridx = 0;
         layoutLeft.gridy = 0;
         layoutLeft.gridwidth = 1;
+        panelLeft.add(chkTechsUseAdministration, layoutLeft);
+
+        layoutLeft.gridy++;
         panelLeft.add(useEraModsCheckBox, layoutLeft);
 
         layoutLeft.gridy++;
@@ -253,7 +280,7 @@ public class RepairAndMaintenanceTab {
         layoutParent.gridwidth = 5;
         layoutParent.gridx = 0;
         layoutParent.gridy = 0;
-        panelParent.add(headerPanel, layoutParent);
+        panelParent.add(repairHeader, layoutParent);
 
         layoutParent.gridy++;
         layoutParent.gridwidth = 1;
@@ -277,35 +304,48 @@ public class RepairAndMaintenanceTab {
      */
     public JPanel createMaintenanceTab() {
         // Header
-        JPanel headerPanel = new CampaignOptionsHeaderPanel("MaintenanceTab",
-            getImageDirectory() + "logo_magistracy_of_canopus.png");
+        maintenanceHeader = new CampaignOptionsHeaderPanel("MaintenanceTab",
+              getImageDirectory() + "logo_magistracy_of_canopus.png", 6);
 
         // Contents
         checkMaintenance = new CampaignOptionsCheckBox("CheckMaintenance");
+        checkMaintenance.addMouseListener(createTipPanelUpdater(maintenanceHeader, "CheckMaintenance"));
 
         lblMaintenanceDays = new CampaignOptionsLabel("MaintenanceDays");
+        lblMaintenanceDays.addMouseListener(createTipPanelUpdater(maintenanceHeader, "MaintenanceDays"));
         spnMaintenanceDays = new CampaignOptionsSpinner("MaintenanceDays",
             7, 1, 365, 1);
+        spnMaintenanceDays.addMouseListener(createTipPanelUpdater(maintenanceHeader, "MaintenanceDays"));
 
         lblMaintenanceBonus = new CampaignOptionsLabel("MaintenanceBonus");
+        lblMaintenanceBonus.addMouseListener(createTipPanelUpdater(maintenanceHeader, "MaintenanceBonus"));
         spnMaintenanceBonus = new CampaignOptionsSpinner("MaintenanceBonus",
             0, -13, 13, 1);
+        spnMaintenanceBonus.addMouseListener(createTipPanelUpdater(maintenanceHeader, "MaintenanceBonus"));
 
         lblDefaultMaintenanceTime = new CampaignOptionsLabel("DefaultMaintenanceTime");
+        lblDefaultMaintenanceTime.addMouseListener(createTipPanelUpdater(maintenanceHeader, "DefaultMaintenanceTime"));
         spnDefaultMaintenanceTime = new CampaignOptionsSpinner("DefaultMaintenanceTime",
             1, 1, 4, 1);
+        spnDefaultMaintenanceTime.addMouseListener(createTipPanelUpdater(maintenanceHeader, "DefaultMaintenanceTime"));
 
         useQualityMaintenance = new CampaignOptionsCheckBox("UseQualityMaintenance");
+        useQualityMaintenance.addMouseListener(createTipPanelUpdater(maintenanceHeader, "UseQualityMaintenance"));
 
         reverseQualityNames = new CampaignOptionsCheckBox("ReverseQualityNames");
+        reverseQualityNames.addMouseListener(createTipPanelUpdater(maintenanceHeader, "ReverseQualityNames"));
 
         chkUseRandomUnitQualities = new CampaignOptionsCheckBox("UseRandomUnitQualities");
+        chkUseRandomUnitQualities.addMouseListener(createTipPanelUpdater(maintenanceHeader, "UseRandomUnitQualities"));
 
         chkUsePlanetaryModifiers = new CampaignOptionsCheckBox("UsePlanetaryModifiers");
+        chkUsePlanetaryModifiers.addMouseListener(createTipPanelUpdater(maintenanceHeader, "UsePlanetaryModifiers"));
 
         useUnofficialMaintenance = new CampaignOptionsCheckBox("UseUnofficialMaintenance");
+        useUnofficialMaintenance.addMouseListener(createTipPanelUpdater(maintenanceHeader, "UseUnofficialMaintenance"));
 
         logMaintenance = new CampaignOptionsCheckBox("LogMaintenance");
+        logMaintenance.addMouseListener(createTipPanelUpdater(maintenanceHeader, "LogMaintenance"));
 
         // Layout the Panel
         final JPanel panelLeft = new CampaignOptionsStandardPanel("repairTabLeft");
@@ -366,7 +406,7 @@ public class RepairAndMaintenanceTab {
 
         layoutParent.gridwidth = 5;
         layoutParent.gridy = 0;
-        panelParent.add(headerPanel, layoutParent);
+        panelParent.add(maintenanceHeader, layoutParent);
 
         layoutParent.gridx = 0;
         layoutParent.gridy++;
@@ -397,6 +437,7 @@ public class RepairAndMaintenanceTab {
         }
 
         // Repair
+        options.setTechsUseAdministration(chkTechsUseAdministration.isSelected());
         options.setEraMods(useEraModsCheckBox.isSelected());
         options.setAssignedTechFirst(assignedTechFirstCheckBox.isSelected());
         options.setResetToFirstTech(resetToFirstTechCheckBox.isSelected());
@@ -445,6 +486,7 @@ public class RepairAndMaintenanceTab {
         }
 
         // Repair
+        chkTechsUseAdministration.setSelected(options.isTechsUseAdministration());
         useEraModsCheckBox.setSelected(options.isUseEraMods());
         assignedTechFirstCheckBox.setSelected(options.isAssignedTechFirst());
         resetToFirstTechCheckBox.setSelected(options.isResetToFirstTech());

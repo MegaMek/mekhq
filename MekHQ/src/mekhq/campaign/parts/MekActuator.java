@@ -28,27 +28,34 @@
  */
 package mekhq.campaign.parts;
 
-import megamek.common.*;
+import java.io.PrintWriter;
+
+import megamek.common.BipedMek;
+import megamek.common.Compute;
+import megamek.common.CriticalSlot;
+import megamek.common.Mek;
+import megamek.common.SimpleTechLevel;
+import megamek.common.TechAdvancement;
+import megamek.common.TechConstants;
 import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.utilities.MHQXMLUtility;
+import mekhq.campaign.personnel.skills.SkillType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MekActuator extends Part {
-    static final TechAdvancement TA_STANDARD = new TechAdvancement(TECH_BASE_ALL).setAdvancement(2300, 2350, 2505)
-            .setApproximate(true, false, false).setPrototypeFactions(F_TA).setProductionFactions(F_TH)
+    static final TechAdvancement TA_STANDARD = new TechAdvancement(TechBase.ALL).setAdvancement(2300, 2350, 2505)
+            .setApproximate(true, false, false).setPrototypeFactions(Faction.TA).setProductionFactions(Faction.TH)
             .setStaticTechLevel(SimpleTechLevel.INTRO);
-    static final TechAdvancement TA_SUPERHEAVY = new TechAdvancement(TECH_BASE_IS).setAdvancement(2905, 2940, 3076)
-            .setApproximate(true, false, false).setPrototypeFactions(F_FW).setProductionFactions(F_FW)
+    static final TechAdvancement TA_SUPERHEAVY = new TechAdvancement(TechBase.IS).setAdvancement(2905, 2940, 3076)
+            .setApproximate(true, false, false).setPrototypeFactions(Faction.FW).setProductionFactions(Faction.FW)
             .setStaticTechLevel(SimpleTechLevel.ADVANCED);
 
     protected int type;

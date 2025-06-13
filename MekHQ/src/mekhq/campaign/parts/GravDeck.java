@@ -29,9 +29,6 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.Jumpship;
@@ -41,8 +38,10 @@ import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * @author MKerensky
@@ -50,10 +49,10 @@ import mekhq.utilities.MHQXMLUtility;
 public class GravDeck extends Part {
     private static final MMLogger logger = MMLogger.create(GravDeck.class);
 
-    static final TechAdvancement TA_GRAV_DECK = new TechAdvancement(TECH_BASE_ALL)
+    static final TechAdvancement TA_GRAV_DECK = new TechAdvancement(TechBase.ALL)
             .setAdvancement(DATE_ES, DATE_ES, DATE_ES)
-            .setTechRating(RATING_B)
-            .setAvailability(RATING_C, RATING_C, RATING_C, RATING_C)
+            .setTechRating(TechRating.B)
+            .setAvailability(AvailabilityValue.C, AvailabilityValue.C, AvailabilityValue.C, AvailabilityValue.C)
             .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     private int deckType;

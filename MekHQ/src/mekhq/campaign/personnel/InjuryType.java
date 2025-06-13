@@ -27,6 +27,10 @@
  */
 package mekhq.campaign.personnel;
 
+import static mekhq.campaign.personnel.PersonnelOptions.MUTATION_EXCEPTIONAL_IMMUNE_SYSTEM;
+
+import java.util.*;
+
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import megamek.codeUtilities.ObjectUtility;
@@ -37,12 +41,10 @@ import mekhq.campaign.GameEffect;
 import mekhq.campaign.personnel.InjuryType.XMLAdapter;
 import mekhq.campaign.personnel.enums.InjuryLevel;
 
-import java.util.*;
-
 /**
- * Flyweight design pattern implementation. InjuryType instances should be singletons and never
- * hold any data related to specific injuries. Use the {@link Injury} data for that, in particular
- * it's <code>extraData</code> data structure for generic type-safe data storage.
+ * Flyweight design pattern implementation. InjuryType instances should be singletons and never hold any data related to
+ * specific injuries. Use the {@link Injury} data for that, in particular it's <code>extraData</code> data structure for
+ * generic type-safe data storage.
  */
 @XmlJavaTypeAdapter(value = XMLAdapter.class)
 public class InjuryType {
@@ -73,7 +75,7 @@ public class InjuryType {
 
     public static void register(int id, String key, InjuryType injType) {
         Objects.requireNonNull(injType);
-        if  (id >= 0) {
+        if (id >= 0) {
             if (ID_REGISTRY.containsKey(id)) {
                 throw new IllegalArgumentException("Injury type ID " + id + " is already registered.");
             }
@@ -114,6 +116,7 @@ public class InjuryType {
 
     /** Default injury type: reduction in hit points */
     public static InjuryType BAD_HEALTH = new InjuryType();
+
     static {
         BAD_HEALTH.recoveryTime = 7;
         BAD_HEALTH.fluffText = "Damaged health";
@@ -204,13 +207,18 @@ public class InjuryType {
         return level;
     }
 
-    public Injury newInjury(Campaign c, Person p, BodyLocation loc, int severity) {
-        if (!isValidInLocation(loc)) {
+    public Injury newInjury(Campaign campaign, Person person, BodyLocation bodyLocation, int severity) {
+        if (!isValidInLocation(bodyLocation)) {
             return null;
         }
-        final int recoveryTime = getRecoveryTime(severity);
-        final String fluff = getFluffText(loc, severity, p.getGender());
-        Injury result = new Injury(recoveryTime, fluff, loc, this, severity, c.getLocalDate(), false);
+
+        int recoveryTime = getRecoveryTime(severity);
+        if (person.getOptions().booleanOption(MUTATION_EXCEPTIONAL_IMMUNE_SYSTEM)) {
+            recoveryTime = recoveryTime / 2;
+        }
+
+        final String fluff = getFluffText(bodyLocation, severity, person.getGender());
+        Injury result = new Injury(recoveryTime, fluff, bodyLocation, this, severity, campaign.getLocalDate(), false);
         result.setVersion(Injury.VERSION);
         return result;
     }
@@ -220,12 +228,11 @@ public class InjuryType {
     }
 
     /**
-     * Return a function which will generate a list of effects combat and similar stressful
-     * situation while injured would have on the person in question given the random integer source.
-     * Descriptions should be something like "50% chance of losing a leg" and similar.
+     * Return a function which will generate a list of effects combat and similar stressful situation while injured
+     * would have on the person in question given the random integer source. Descriptions should be something like "50%
+     * chance of losing a leg" and similar.
      * <p>
-     * Note that specific systems aren't required to use this generator. They are free to
-     * implement their own.
+     * Note that specific systems aren't required to use this generator. They are free to implement their own.
      */
     public List<GameEffect> genStressEffect(Campaign c, Person p, Injury i, int hits) {
         return Collections.emptyList();
@@ -234,8 +241,7 @@ public class InjuryType {
     // Standard actions generators
 
     protected GameEffect newResetRecoveryTimeAction(Injury i) {
-        return new GameEffect(i.getFluff() + ": recovery timer reset",
-                rnd -> i.setTime(i.getOriginalTime()));
+        return new GameEffect(i.getFluff() + ": recovery timer reset", rnd -> i.setTime(i.getOriginalTime()));
     }
 
     // Helper classes and interfaces

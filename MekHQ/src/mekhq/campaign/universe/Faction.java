@@ -25,8 +25,23 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe;
+
+import static megamek.common.Compute.randomInt;
+import static mekhq.campaign.universe.enums.HonorRating.LIBERAL;
+import static mekhq.campaign.universe.enums.HonorRating.OPPORTUNISTIC;
+import static mekhq.campaign.universe.enums.HonorRating.STRICT;
+
+import java.awt.Color;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.Map.Entry;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.universe.Faction2;
@@ -491,5 +506,46 @@ public class Faction {
      */
     public int getFormationGrouping() {
         return faction2.getFormationGrouping();
+    }
+
+    /**
+     * Determines whether this faction performs Batchalls based on its short name.
+     *
+     * <p>Batchalls are a tradition among specific factions - primarily various clans and related groups. This method
+     * checks if the faction's short name matches any of the known batchall-performing factions.</p>
+     *
+     * @return {@code true} if the faction performs Batchalls; {@code false} otherwise
+     */
+    public boolean performsBatchalls() {
+        List<String> batchallFactions = List.of("CBS",
+              "CB",
+              "CCC",
+              "CCO",
+              "CDS",
+              "CFM",
+              "CGB",
+              "CGS",
+              "CHH",
+              "CIH",
+              "CJF",
+              "CMG",
+              "CNC",
+              "CSJ",
+              "CSR",
+              "CSA",
+              "CSV",
+              "CSL",
+              "CWI",
+              "CW",
+              "CWE",
+              "CWIE",
+              "CEI",
+              "RD",
+              "RA",
+              "CP",
+              "AML",
+              "CLAN");
+
+        return batchallFactions.contains(shortName);
     }
 }

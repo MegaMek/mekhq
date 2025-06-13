@@ -29,9 +29,6 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.Compute;
 import megamek.common.Dropship;
 import megamek.common.Entity;
@@ -41,8 +38,10 @@ import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * @author MKerensky
@@ -50,15 +49,15 @@ import mekhq.utilities.MHQXMLUtility;
 public class KfBoom extends Part {
     private static final MMLogger logger = MMLogger.create(KfBoom.class);
 
-    static final TechAdvancement TA_KFBOOM = new TechAdvancement(TECH_BASE_ALL)
-            .setAdvancement(2458, 2470, 2500).setPrototypeFactions(F_TH)
-            .setProductionFactions(F_TH).setTechRating(RATING_C)
-            .setAvailability(RATING_D, RATING_C, RATING_C, RATING_C)
+    static final TechAdvancement TA_KFBOOM = new TechAdvancement(TechBase.ALL)
+            .setAdvancement(2458, 2470, 2500).setPrototypeFactions(Faction.TH)
+            .setProductionFactions(Faction.TH).setTechRating(TechRating.C)
+            .setAvailability(AvailabilityValue.D, AvailabilityValue.C, AvailabilityValue.C, AvailabilityValue.C)
             .setStaticTechLevel(SimpleTechLevel.STANDARD);
-    static final TechAdvancement TA_PROTOTYPE_KF_BOOM = new TechAdvancement(TECH_BASE_ALL)
-            .setAdvancement(2458, 2470, 2500).setPrototypeFactions(F_TH)
-            .setProductionFactions(F_TH).setTechRating(RATING_C)
-            .setAvailability(RATING_F, RATING_X, RATING_X, RATING_X)
+    static final TechAdvancement TA_PROTOTYPE_KF_BOOM = new TechAdvancement(TechBase.ALL)
+            .setAdvancement(2458, 2470, 2500).setPrototypeFactions(Faction.TH)
+            .setProductionFactions(Faction.TH).setTechRating(TechRating.C)
+            .setAvailability(AvailabilityValue.F, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X)
             .setStaticTechLevel(SimpleTechLevel.ADVANCED);
 
     private int boomType = Dropship.BOOM_STANDARD;

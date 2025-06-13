@@ -24,10 +24,37 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.education;
 
+import static megamek.common.Compute.d6;
+import static megamek.common.Compute.randomInt;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_VETERAN;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.PERSONALITY_QUIRK_CHANCE;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.generateAndApplyPersonalityQuirk;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeInterviewersNotes;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
+
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.UUID;
+
 import megamek.common.Compute;
+import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -41,25 +68,13 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.Genealogy;
-import mekhq.campaign.randomEvents.personalities.enums.Intelligence;
+import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.utilities.ReportingUtilities;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.util.*;
-
-import static megamek.common.Compute.d6;
-import static megamek.common.Compute.randomInt;
-import static mekhq.campaign.personnel.SkillType.EXP_REGULAR;
-import static mekhq.campaign.personnel.SkillType.EXP_VETERAN;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.PERSONALITY_QUIRK_CHANCE;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.generateAndApplyPersonalityQuirk;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
-
 /**
- * The EducationController class is responsible for managing the education
- * process. It provides methods to begin the education process, calculate
- * education level, and enroll a person into an academy.
+ * The EducationController class is responsible for managing the education process. It provides methods to begin the
+ * education process, calculate education level, and enroll a person into an academy.
  */
 public class EducationController {
     private static final MMLogger logger = MMLogger.create(EducationController.class);
@@ -70,18 +85,53 @@ public class EducationController {
         // Just here to remove warning.
     }
 
+
+    /**
+     * Determines whether the specified student is currently being homeschooled.
+     *
+     * <p>This method checks if the student has an associated academy set and retrieves the relevant academy using
+     * the student's academy name. If an academy is found, it returns {@code true} only if that academy indicates
+     * homeschooling.</p>
+     *
+     * <p><b>Usage:</b> the primary use of this is to ensure that homeschooled personnel are still being paid their
+     * salaries, as they will not appear in a list of active personnel.</p>
+     *
+     * @param student the {@link Person} whose schooling status is to be checked
+     *
+     * @return {@code true} if the student is being homeschooled; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public static boolean isBeingHomeSchooled(Person student) {
+        if (!student.getStatus().isStudent()) {
+            return false;
+        }
+
+        if (student.getEduAcademySet() == null) {
+            return false;
+        }
+
+        Academy academy = getAcademy(student.getEduAcademySet(), student.getEduAcademyNameInSet());
+        if (academy == null) {
+            return false;
+        }
+
+        return academy.isHomeSchool();
+    }
+
     /**
      * Checks eligibility for enrollment in an academy.
      *
      * @param campaign         the current options
      * @param person           the person applying for enrollment
-     * @param academySet       the set of academies to search for the desired
-     *                         academy
+     * @param academySet       the set of academies to search for the desired academy
      * @param academyNameInSet the name of the desired academy within the set
+     *
      * @return true if the person is eligible for enrollment, false otherwise
      */
     public static boolean makeEnrollmentCheck(Campaign campaign, Person person, String academySet,
-            String academyNameInSet) {
+          String academyNameInSet) {
         ResourceBundle resources = ResourceBundle.getBundle(BUNDLE_NAME, MekHQ.getMHQOptions().getLocale());
 
         Academy academy = findAcademyInSet(academySet, academyNameInSet);
@@ -99,19 +149,19 @@ public class EducationController {
         // has the character already failed to apply to this academy?
         if (person.getEduFailedApplications().contains(academyNameInSet + "::" + academy.getEducationLevel(person))) {
             campaign.addReport(String.format(resources.getString("secondApplication.text"),
-                    person.getHyperlinkedFullTitle(),
-                    academyNameInSet,
-                    ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
-                    ReportingUtilities.CLOSING_SPAN_TAG));
+                  person.getHyperlinkedFullTitle(),
+                  academyNameInSet,
+                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
+                  CLOSING_SPAN_TAG));
             return false;
         }
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
 
-        // Calculate the roll based on Intelligence if necessary
+        // Calculate the roll based on Reasoning if necessary
         int roll = d6(2);
         if (campaignOptions.isUseRandomPersonalities()) {
-            roll += (person.getIntelligence().getIntelligenceScore() / 4);
+            roll += (person.getReasoning().getReasoningScore() / 4);
         }
 
         // Calculate target number based on base target number and faculty skill
@@ -125,12 +175,12 @@ public class EducationController {
             person.addEduFailedApplications(academyNameInSet + "::" + academy.getEducationLevel(person));
 
             campaign.addReport(String.format(resources.getString("applicationFailure.text"),
-                person.getHyperlinkedFullTitle(),
-                ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
-                ReportingUtilities.CLOSING_SPAN_TAG,
-                academyNameInSet,
-                roll,
-                targetNumber));
+                  person.getHyperlinkedFullTitle(),
+                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
+                  CLOSING_SPAN_TAG,
+                  academyNameInSet,
+                  roll,
+                  targetNumber));
 
             ServiceLogger.eduFailedApplication(person, campaign.getLocalDate(), academyNameInSet);
 
@@ -143,6 +193,7 @@ public class EducationController {
      *
      * @param academySet       The academy set to search in.
      * @param academyNameInSet The name of the academy to find.
+     *
      * @return The academy with the given name, or null if not found.
      */
     private static Academy findAcademyInSet(String academySet, String academyNameInSet) {
@@ -159,20 +210,17 @@ public class EducationController {
     /**
      * Begins the education process for a Person in a Campaign.
      *
-     * @param campaign         The Campaign in which the education process is taking
-     *                         place.
+     * @param campaign         The Campaign in which the education process is taking place.
      * @param person           The Person who is enrolling for education.
      * @param academySet       The set name of the academy.
      * @param academyNameInSet The name of the academy within the set.
      * @param courseIndex      The index of the course in the academy.
-     * @param campus           The campus location (can be null if the academy is
-     *                         local).
+     * @param campus           The campus location (can be null if the academy is local).
      * @param faction          The faction of the person.
      * @param isReEnrollment   Whether the person is being re-enrolled.
      */
     public static void performEducationPreEnrollmentActions(Campaign campaign, Person person, String academySet,
-            String academyNameInSet, int courseIndex,
-            String campus, String faction, boolean isReEnrollment) {
+          String academyNameInSet, int courseIndex, String campus, String faction, boolean isReEnrollment) {
         ResourceBundle resources = ResourceBundle.getBundle(BUNDLE_NAME, MekHQ.getMHQOptions().getLocale());
 
         Academy academy = findAcademyInSet(academySet, academyNameInSet);
@@ -187,17 +235,18 @@ public class EducationController {
         if (tuition > 0) {
             if (campaign.getFinances().getBalance().isLessThan(Money.of(tuition))) {
                 String insufficientFundsMessage = String.format(resources.getString("insufficientFunds.text"),
-                        person.getFullTitle());
-                String reportMessage = ReportingUtilities.messageSurroundedBySpanWithColor(
-                        MekHQ.getMHQOptions().getFontColorNegativeHexColor(), insufficientFundsMessage);
+                      person.getFullTitle());
+                String reportMessage = ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
+                                                                                                 .getFontColorNegativeHexColor(),
+                      insufficientFundsMessage);
                 campaign.addReport(reportMessage);
                 return;
             } else {
-                campaign.getFinances().debit(TransactionType.EDUCATION,
-                        campaign.getLocalDate(),
-                        Money.of(tuition),
-                        String.format(resources.getString("payment.text"),
-                                person.getFullTitle()));
+                campaign.getFinances()
+                      .debit(TransactionType.EDUCATION,
+                            campaign.getLocalDate(),
+                            Money.of(tuition),
+                            String.format(resources.getString("payment.text"), person.getFullTitle()));
             }
         }
 
@@ -210,32 +259,37 @@ public class EducationController {
         }
 
         // notify the user
-        if (academy.isHomeSchool()) {
-            campaign.addReport(String.format(resources.getString("homeSchool.text"),
-                    person.getHyperlinkedFullTitle()));
+        if (person.getPrisonerStatus().isCurrentPrisoner()) {
+            campaign.addReport(String.format(resources.getString("prisonerEscape.text"),
+                  person.getEduAcademyName(),
+                  person.getFullTitle(),
+                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
+                  CLOSING_SPAN_TAG));
+            campaign.removePerson(person);
+        } else if (academy.isHomeSchool()) {
+            campaign.addReport(String.format(resources.getString("homeSchool.text"), person.getHyperlinkedFullTitle()));
         } else {
             campaign.addReport(String.format(resources.getString("offToSchool.text"),
-                    person.getHyperlinkedFullTitle(),
-                    person.getEduAcademyName(),
-                    person.getEduJourneyTime()));
+                  person.getHyperlinkedFullTitle(),
+                  person.getEduAcademyName(),
+                  person.getEduJourneyTime()));
         }
     }
 
     /**
-     * Enrolls a person into an academy and assigns them to a campus.
-     * Sets the person's various education-related properties.
+     * Enrolls a person into an academy and assigns them to a campus. Sets the person's various education-related
+     * properties.
      *
      * @param campaign    The campaign the person is being enrolled in.
      * @param person      The person being enrolled.
      * @param academy     The academy the person is being enrolled into.
-     * @param campus      The campus where the person will be assigned.
-     *                    This parameter can be null if the academy is local.
-     * @param faction     The faction of the academy the person is being enrolled
-     *                    into.
+     * @param campus      The campus where the person will be assigned. This parameter can be null if the academy is
+     *                    local.
+     * @param faction     The faction of the academy the person is being enrolled into.
      * @param courseIndex The index of the course being taken.
      */
     public static void enrollPerson(Campaign campaign, Person person, Academy academy, String campus, String faction,
-            Integer courseIndex) {
+          Integer courseIndex) {
         // change status will wipe the academic information, so must always precede the
         // setters
         person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.STUDENT);
@@ -298,15 +352,19 @@ public class EducationController {
         } else if (academy.isLocal()) {
             person.setEduAcademyName(generateName(academy, campus));
         } else {
-            person.setEduAcademyName(person.getEduAcademyNameInSet() + " ("
-                    + campaign.getSystemById(campus).getName(campaign.getLocalDate()) + ')');
+            person.setEduAcademyName(person.getEduAcademyNameInSet() +
+                                           " (" +
+                                           campaign.getSystemById(campus).getName(campaign.getLocalDate()) +
+                                           ')');
         }
 
         // we have this all the way at the bottom as a bit of insurance. when
         // troubleshooting, if the log isn't getting entered, we know something
         // went wrong when enrolling.
-        ServiceLogger.eduEnrolled(person, campaign.getLocalDate(), person.getEduAcademyName(),
-                academy.getQualifications().get(person.getEduCourseIndex()));
+        ServiceLogger.eduEnrolled(person,
+              campaign.getLocalDate(),
+              person.getEduAcademyName(),
+              academy.getQualifications().get(person.getEduCourseIndex()));
     }
 
     /**
@@ -341,8 +399,10 @@ public class EducationController {
         // we have this all the way at the bottom as a bit of insurance. when
         // troubleshooting, if the log isn't getting entered, we know something
         // went wrong when enrolling.
-        ServiceLogger.eduReEnrolled(person, campaign.getLocalDate(), person.getEduAcademyName(),
-                academy.getQualifications().get(person.getEduCourseIndex()));
+        ServiceLogger.eduReEnrolled(person,
+              campaign.getLocalDate(),
+              person.getEduAcademyName(),
+              academy.getQualifications().get(person.getEduCourseIndex()));
         MekHQ.triggerEvent(new PersonChangedEvent(person));
     }
 
@@ -351,16 +411,21 @@ public class EducationController {
      *
      * @param academy The academy to which the person is applying.
      * @param campus  The campus of the academy.
+     *
      * @return The generated name.
      */
     public static String generateName(Academy academy, String campus) {
-        ResourceBundle resources = ResourceBundle.getBundle(BUNDLE_NAME,
-                MekHQ.getMHQOptions().getLocale());
+        ResourceBundle resources = ResourceBundle.getBundle(BUNDLE_NAME, MekHQ.getMHQOptions().getLocale());
 
         if (academy.isPrepSchool()) {
             if (d6(1) <= 3) {
-                return campus + ' ' + generateTypeChild(resources) + ' ' + resources.getString("conjoinerOf.text") + ' '
-                        + generateSuffix(resources);
+                return campus +
+                             ' ' +
+                             generateTypeChild(resources) +
+                             ' ' +
+                             resources.getString("conjoinerOf.text") +
+                             ' ' +
+                             generateSuffix(resources);
             } else {
                 return generateTypeChild(resources) + ' ' + resources.getString("conjoinerOf.text") + ' ' + campus;
             }
@@ -368,16 +433,33 @@ public class EducationController {
 
         if (d6(1) <= 3) {
             if (academy.isMilitary()) {
-                return campus + ' ' + generateMilitaryPrefix(resources) + ' ' + generateTypeAdult(resources) + ' '
-                        + resources.getString("conjoinerOf.text") + ' ' + generateSuffix(resources);
+                return campus +
+                             ' ' +
+                             generateMilitaryPrefix(resources) +
+                             ' ' +
+                             generateTypeAdult(resources) +
+                             ' ' +
+                             resources.getString("conjoinerOf.text") +
+                             ' ' +
+                             generateSuffix(resources);
             } else {
-                return campus + ' ' + generateTypeAdult(resources) + ' ' + resources.getString("conjoinerOf.text") + ' '
-                        + generateSuffix(resources);
+                return campus +
+                             ' ' +
+                             generateTypeAdult(resources) +
+                             ' ' +
+                             resources.getString("conjoinerOf.text") +
+                             ' ' +
+                             generateSuffix(resources);
             }
         } else {
             if (academy.isMilitary()) {
-                return generateMilitaryPrefix(resources) + ' ' + generateTypeAdult(resources) + ' '
-                        + resources.getString("conjoinerOf.text") + ' ' + campus;
+                return generateMilitaryPrefix(resources) +
+                             ' ' +
+                             generateTypeAdult(resources) +
+                             ' ' +
+                             resources.getString("conjoinerOf.text") +
+                             ' ' +
+                             campus;
             } else {
                 return generateTypeAdult(resources) + ' ' + resources.getString("conjoinerOf.text") + ' ' + campus;
             }
@@ -385,11 +467,12 @@ public class EducationController {
     }
 
     /**
-     * Generates a military academy prefix randomly selected from the resource
-     * bundle.
+     * Generates a military academy prefix randomly selected from the resource bundle.
      *
      * @param resources the resource bundle containing the military prefix texts
+     *
      * @return a randomly generated military prefix
+     *
      * @throws IllegalStateException if an unexpected roll occurs
      */
     private static String generateMilitaryPrefix(ResourceBundle resources) {
@@ -408,7 +491,9 @@ public class EducationController {
      * This method generates an academy suffix based on a random roll.
      *
      * @param resources The ResourceBundle containing the suffix texts.
+     *
      * @return The generated suffix.
+     *
      * @throws IllegalStateException if the random roll is unexpected.
      */
     private static String generateSuffix(ResourceBundle resources) {
@@ -424,12 +509,12 @@ public class EducationController {
     }
 
     /**
-     * Generates a random educational institution type from the provided
-     * ResourceBundle.
+     * Generates a random educational institution type from the provided ResourceBundle.
      *
-     * @param resources the ResourceBundle containing the localized strings for the
-     *                  educational institution types
+     * @param resources the ResourceBundle containing the localized strings for the educational institution types
+     *
      * @return a randomly selected educational institution type
+     *
      * @throws IllegalStateException if the generated roll is unexpected
      */
     private static String generateTypeAdult(ResourceBundle resources) {
@@ -445,12 +530,12 @@ public class EducationController {
     }
 
     /**
-     * Generates a random educational institution type from the provided
-     * ResourceBundle.
+     * Generates a random educational institution type from the provided ResourceBundle.
      *
-     * @param resources the ResourceBundle containing the localized strings for the
-     *                  educational institution types
+     * @param resources the ResourceBundle containing the localized strings for the educational institution types
+     *
      * @return a randomly selected educational institution type
+     *
      * @throws IllegalStateException if the generated roll is unexpected
      */
     private static String generateTypeChild(ResourceBundle resources) {
@@ -470,13 +555,18 @@ public class EducationController {
      *
      * @param campaign  the campaign in which the person is participating
      * @param person    the person for whom the new day is being processed
-     * @param ageBypass a flag indicating whether graduation age restrictions should
-     *                  be bypassed
+     * @param ageBypass a flag indicating whether graduation age restrictions should be bypassed
+     *
      * @return true if the new day was successfully processed, false otherwise
      */
     public static boolean processNewDay(Campaign campaign, Person person, boolean ageBypass) {
         ResourceBundle resources = ResourceBundle.getBundle(BUNDLE_NAME, MekHQ.getMHQOptions().getLocale());
         Academy academy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
+
+        if (academy == null) {
+            logger.debug("Found null academy for {} skipping", person.getFullTitle());
+            return false;
+        }
 
         EducationStage educationStage = person.getEduEducationStage();
 
@@ -530,14 +620,14 @@ public class EducationController {
      * Processes a person's ongoing education.
      *
      * @param campaign  The campaign the person is part of.
-     * @param person    The person for whom the days of education are being
-     *                  processed.
+     * @param person    The person for whom the days of education are being processed.
      * @param academy   the academy the person is attending.
      * @param resources The resource bundle containing localized strings.
+     *
      * @return The remaining days of education for the person.
      */
     private static boolean ongoingEducation(Campaign campaign, Person person, Academy academy, boolean ageBypass,
-            ResourceBundle resources) {
+          ResourceBundle resources) {
         int daysOfEducation = person.getEduEducationTime();
 
         if (academy.isPrepSchool()) {
@@ -589,17 +679,17 @@ public class EducationController {
     }
 
     /**
-     * Picks the appropriate graduation method based on the given campaign, person,
-     * academy, and resources.
+     * Picks the appropriate graduation method based on the given campaign, person, academy, and resources.
      *
      * @param campaign  the campaign to use for calculations
      * @param person    the person to determine graduation for
      * @param academy   the academy to determine graduation from
      * @param resources the resources to use for graduation
+     *
      * @return true, if the person successfully graduates, otherwise, false
      */
     private static boolean graduationPicker(Campaign campaign, Person person, Academy academy,
-            ResourceBundle resources) {
+          ResourceBundle resources) {
         if (academy.isPrepSchool()) {
             graduateChild(campaign, person, academy, resources);
             return true;
@@ -625,10 +715,11 @@ public class EducationController {
         }
 
         int travelTime = Math.max(2,
-                campaign.getSimplifiedTravelTime(campaign.getSystemById(person.getEduAcademySystem())));
+              campaign.getSimplifiedTravelTime(campaign.getSystemById(person.getEduAcademySystem())));
 
         campaign.addReport(String.format(resources.getString("returningFromSchool.text"),
-                person.getHyperlinkedFullTitle(), travelTime));
+              person.getHyperlinkedFullTitle(),
+              travelTime));
 
         person.setEduJourneyTime(travelTime);
         person.setEduDaysOfTravel(0);
@@ -644,7 +735,7 @@ public class EducationController {
     private static void processJourneyHome(Campaign campaign, Person person) {
         // has the journey time changed?
         int travelTime = Math.max(2,
-                campaign.getSimplifiedTravelTime(campaign.getSystemById(person.getEduAcademySystem())));
+              campaign.getSimplifiedTravelTime(campaign.getSystemById(person.getEduAcademySystem())));
 
         // if so, update the journey time
         if (travelTime != person.getEduJourneyTime()) {
@@ -668,18 +759,20 @@ public class EducationController {
      *
      * @param academySetName   The academy set name to match.
      * @param academyNameInSet The academy name in the set to match.
-     * @return The Academy that matches the provided parameters or null if no match
-     *         is found.
+     *
+     * @return The Academy that matches the provided parameters or null if no match is found.
      */
-    public static Academy getAcademy(String academySetName, String academyNameInSet) {
+    public static @Nullable Academy getAcademy(String academySetName, String academyNameInSet) {
 
         List<String> setNames = AcademyFactory.getInstance().getAllSetNames();
 
         return setNames.stream()
-                .filter(set -> set.equals(academySetName))
-                .map(set -> AcademyFactory.getInstance().getAllAcademiesForSet(set))
-                .flatMap(Collection::stream)
-                .filter(academy -> academy.getName().equals(academyNameInSet)).findFirst().orElse(null);
+                     .filter(set -> set.equals(academySetName))
+                     .map(set -> AcademyFactory.getInstance().getAllAcademiesForSet(set))
+                     .flatMap(Collection::stream)
+                     .filter(academy -> academy.getName().equals(academyNameInSet))
+                     .findFirst()
+                     .orElse(null);
     }
 
     /**
@@ -691,7 +784,7 @@ public class EducationController {
      * @param resources The resource bundle used for localized strings.
      */
     private static void processNewWeekChecks(Campaign campaign, Academy academy, Person person,
-            ResourceBundle resources) {
+          ResourceBundle resources) {
         if (!academy.isHomeSchool()) {
             // has the system been depopulated? Nominally similar to destruction, but here
             // we use actual system data, so it's more dynamic.
@@ -728,7 +821,7 @@ public class EducationController {
      * @param resources The resource bundle used for localized strings.
      */
     private static void processNewYearChecks(Campaign campaign, Academy academy, Person person,
-            ResourceBundle resources) {
+          ResourceBundle resources) {
         if (academy.isHomeSchool()) {
             return;
         }
@@ -756,7 +849,7 @@ public class EducationController {
      * @param resources the resource bundle for getting localized strings
      */
     private static void checkForTrainingAccidents(Campaign campaign, Academy academy, Person person,
-            ResourceBundle resources) {
+          ResourceBundle resources) {
         if (academy.isMilitary()) {
             int militaryDiceSize = campaign.getCampaignOptions().getMilitaryAcademyAccidents();
             int roll;
@@ -781,13 +874,12 @@ public class EducationController {
                         processTrainingInjury(campaign, academy, person, resources);
                     } else {
                         String resultString = String.format(resources.getString("eventTrainingAccidentKilled.text"),
-                                ReportingUtilities.spanOpeningWithCustomColor(
-                                        MekHQ.getMHQOptions().getFontColorWarningHexColor()),
-                                ReportingUtilities.CLOSING_SPAN_TAG);
+                              spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
+                              CLOSING_SPAN_TAG);
 
                         String reportMessage = String.format(resources.getString("eventTrainingAccident.text"),
-                                person.getHyperlinkedFullTitle(),
-                                resultString);
+                              person.getHyperlinkedFullTitle(),
+                              resultString);
 
                         campaign.addReport(reportMessage);
 
@@ -809,17 +901,17 @@ public class EducationController {
      * @param resources the ResourceBundle for localized strings
      */
     private static void processTrainingInjury(Campaign campaign, Academy academy, Person person,
-            ResourceBundle resources) {
+          ResourceBundle resources) {
         int roll = d6(3);
 
         String resultString = String.format(resources.getString("eventTrainingAccidentWounded.text"),
-                ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor()),
-                ReportingUtilities.CLOSING_SPAN_TAG,
-                roll);
+              spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
+              CLOSING_SPAN_TAG,
+              roll);
 
         String reportMessage = String.format(resources.getString("eventTrainingAccident.text"),
-                person.getHyperlinkedFullTitle(),
-                resultString);
+              person.getHyperlinkedFullTitle(),
+              resultString);
 
         campaign.addReport(reportMessage);
 
@@ -829,17 +921,17 @@ public class EducationController {
     }
 
     /**
-     * Checks if a person should drop out of an education campaign based on their
-     * characteristics and chance factors.
+     * Checks if a person should drop out of an education campaign based on their characteristics and chance factors.
      *
      * @param campaign  The campaign the person is enrolled in.
      * @param academy   The academy the person is attending.
      * @param person    The person being evaluated.
      * @param resources The resource bundle containing localization strings.
+     *
      * @return true if the person should drop out, false otherwise.
      */
     private static boolean checkForDropout(Campaign campaign, Academy academy, Person person,
-            ResourceBundle resources) {
+          ResourceBundle resources) {
         int roll;
         int diceSize;
 
@@ -876,17 +968,18 @@ public class EducationController {
                     } else {
                         reportDropOut(campaign, person, academy, resources);
 
-                        ServiceLogger.eduFailed(person, campaign.getLocalDate(), person.getEduAcademyName(),
-                                academy.getQualifications().get(person.getEduCourseIndex()));
+                        ServiceLogger.eduFailed(person,
+                              campaign.getLocalDate(),
+                              person.getEduAcademyName(),
+                              academy.getQualifications().get(person.getEduCourseIndex()));
                         person.setEduEducationStage(EducationStage.DROPPING_OUT);
                         addFacultyXp(campaign, person, academy, 0);
                     }
                 } else {
                     String reportMessage = String.format(resources.getString("dropOutRejected.text"),
-                            person.getHyperlinkedFullTitle(),
-                            ReportingUtilities
-                                    .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor()),
-                            ReportingUtilities.CLOSING_SPAN_TAG);
+                          person.getHyperlinkedFullTitle(),
+                          spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
+                          CLOSING_SPAN_TAG);
 
                     campaign.addReport(reportMessage);
                 }
@@ -895,10 +988,9 @@ public class EducationController {
             } else if ((roll < (diceSize / 20)) && (!academy.isPrepSchool())) {
                 // might as well scare the player
                 String reportMessage = String.format(resources.getString("dropOutRejected.text"),
-                        person.getHyperlinkedFullTitle(),
-                        ReportingUtilities
-                                .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor()),
-                        ReportingUtilities.CLOSING_SPAN_TAG);
+                      person.getHyperlinkedFullTitle(),
+                      spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
+                      CLOSING_SPAN_TAG);
 
                 campaign.addReport(reportMessage);
                 return true;
@@ -915,13 +1007,14 @@ public class EducationController {
      * @param academy  the academy where the person was studying
      */
     public static void processForcedDropOut(Campaign campaign, Person person, Academy academy) {
-        ResourceBundle resources = ResourceBundle.getBundle(BUNDLE_NAME,
-                MekHQ.getMHQOptions().getLocale());
+        ResourceBundle resources = ResourceBundle.getBundle(BUNDLE_NAME, MekHQ.getMHQOptions().getLocale());
 
         reportDropOut(campaign, person, academy, resources);
 
-        ServiceLogger.eduFailed(person, campaign.getLocalDate(), person.getEduAcademyName(),
-                academy.getQualifications().get(person.getEduCourseIndex()));
+        ServiceLogger.eduFailed(person,
+              campaign.getLocalDate(),
+              person.getEduAcademyName(),
+              academy.getQualifications().get(person.getEduCourseIndex()));
         person.setEduEducationStage(EducationStage.DROPPING_OUT);
 
         addFacultyXp(campaign, person, academy, 0);
@@ -937,12 +1030,12 @@ public class EducationController {
      */
     private static void reportDropOut(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
         String personTitle = person.getHyperlinkedFullTitle();
-        String negativeHexColor = MekHQ.getMHQOptions().getFontColorNegativeHexColor();
+        String negativeHexColor = ReportingUtilities.getNegativeColor();
 
         String reportText = academy.isHomeSchool() ? "dropOutHomeSchooled.text" : "dropOut.text";
 
         String coloredOpen = String.format("<span color='%s'>", negativeHexColor);
-        String coloredClose = ReportingUtilities.CLOSING_SPAN_TAG;
+        String coloredClose = CLOSING_SPAN_TAG;
 
         String report = String.format(resources.getString(reportText), personTitle, coloredOpen, coloredClose);
 
@@ -956,15 +1049,16 @@ public class EducationController {
      * @param academy   the academy for which the conflict is being checked
      * @param person    the person whose faction is being tested for conflict
      * @param resources the resource bundle for localized strings
+     *
      * @return true if a faction conflict is found and resolved, false otherwise
      */
     private static boolean checkForAcademyFactionConflict(Campaign campaign, Academy academy, Person person,
-            ResourceBundle resources) {
+          ResourceBundle resources) {
         if (academy.isFactionConflict(campaign, person)) {
             String reportMessage = String.format(resources.getString("eventWarExpelled.text"),
-                    person.getHyperlinkedFullTitle(),
-                    ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
-                    ReportingUtilities.CLOSING_SPAN_TAG);
+                  person.getHyperlinkedFullTitle(),
+                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
+                  CLOSING_SPAN_TAG);
 
             campaign.addReport(reportMessage);
 
@@ -984,12 +1078,12 @@ public class EducationController {
      * @param resources the resource bundle for localization.
      */
     private static void checkForAcademyClosure(Campaign campaign, Academy academy, Person person,
-            ResourceBundle resources) {
+          ResourceBundle resources) {
         if (campaign.getLocalDate().getYear() >= academy.getClosureYear()) {
             String reportMessage = String.format(resources.getString("eventClosure.text"),
-                    person.getHyperlinkedFullTitle(),
-                    ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
-                    ReportingUtilities.CLOSING_SPAN_TAG);
+                  person.getHyperlinkedFullTitle(),
+                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
+                  CLOSING_SPAN_TAG);
 
             campaign.addReport(reportMessage);
             person.setEduEducationStage(EducationStage.DROPPING_OUT);
@@ -1003,14 +1097,15 @@ public class EducationController {
      * @param academy   the academy being checked for destruction
      * @param person    the person enrolled in the academy
      * @param resources the resource bundle containing localized text
+     *
      * @return true if the academy has been destroyed, false otherwise
      */
     private static boolean checkForAcademyDestruction(Campaign campaign, Academy academy, Person person,
-            ResourceBundle resources) {
+          ResourceBundle resources) {
         // we assume that if the system's population has been depleted, the academy has
         // been destroyed too.
-        if ((campaign.getLocalDate().getYear() >= academy.getDestructionYear())
-                || (campaign.getSystemById(person.getEduAcademySystem()).getPopulation(campaign.getLocalDate()) == 0)) {
+        if ((campaign.getLocalDate().getYear() >= academy.getDestructionYear()) ||
+                  (campaign.getSystemById(person.getEduAcademySystem()).getPopulation(campaign.getLocalDate()) == 0)) {
 
             // We use the 'use18' clause here because we don't want to upset players by having
             // children killed when their academy is attacked unless the player has explicitly
@@ -1019,26 +1114,22 @@ public class EducationController {
             if ((!person.isChild(campaign.getLocalDate(), true)) || (campaign.getCampaignOptions().isAllAges())) {
                 if (d6(2) >= 5) {
                     String reportMessage = String.format(resources.getString("eventDestruction.text"),
-                            person.getHyperlinkedFullTitle(),
-                            ReportingUtilities
-                                    .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
-                            ReportingUtilities.CLOSING_SPAN_TAG,
-                            ReportingUtilities
-                                    .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                            ReportingUtilities.CLOSING_SPAN_TAG);
+                          person.getHyperlinkedFullTitle(),
+                          spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
+                          CLOSING_SPAN_TAG,
+                          spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
+                          CLOSING_SPAN_TAG);
 
                     campaign.addReport(reportMessage);
 
                     person.setEduEducationStage(EducationStage.DROPPING_OUT);
                 } else {
                     String reportMessage = String.format(resources.getString("eventDestructionKilled.text"),
-                            person.getHyperlinkedFullTitle(),
-                            ReportingUtilities
-                                    .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
-                            ReportingUtilities.CLOSING_SPAN_TAG,
-                            ReportingUtilities
-                                    .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
-                            ReportingUtilities.CLOSING_SPAN_TAG);
+                          person.getHyperlinkedFullTitle(),
+                          spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
+                          CLOSING_SPAN_TAG,
+                          spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
+                          CLOSING_SPAN_TAG);
 
                     campaign.addReport(reportMessage);
 
@@ -1046,13 +1137,11 @@ public class EducationController {
                 }
             } else {
                 String reportMessage = String.format(resources.getString("eventDestruction.text"),
-                        person.getHyperlinkedFullTitle(),
-                        ReportingUtilities
-                                .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
-                        ReportingUtilities.CLOSING_SPAN_TAG,
-                        ReportingUtilities
-                                .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                        ReportingUtilities.CLOSING_SPAN_TAG);
+                      person.getHyperlinkedFullTitle(),
+                      spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
+                      CLOSING_SPAN_TAG,
+                      spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
+                      CLOSING_SPAN_TAG);
 
                 campaign.addReport(reportMessage);
 
@@ -1071,6 +1160,7 @@ public class EducationController {
      * @param person    the person who is graduating
      * @param academy   the academy from which the person is graduating
      * @param resources the ResourceBundle containing localized messages
+     *
      * @return true if the person completed their education, false otherwise
      */
     private static boolean graduateAdult(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
@@ -1090,31 +1180,31 @@ public class EducationController {
         }
 
         if (campaign.getCampaignOptions().isUseRandomPersonalities()) {
-            graduationRoll += person.getIntelligence().getIntelligenceScore();
+            graduationRoll += person.getReasoning().getReasoningScore();
         }
 
         // qualification failed
         if (graduationRoll < 5) {
             if (academy.isHomeSchool()) {
                 String reportMessage = String.format(resources.getString("graduatedFailedHomeSchooled.text"),
-                        person.getHyperlinkedFullTitle(),
-                        ReportingUtilities
-                                .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
-                        ReportingUtilities.CLOSING_SPAN_TAG);
+                      person.getHyperlinkedFullTitle(),
+                      spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
+                      CLOSING_SPAN_TAG);
 
                 campaign.addReport(reportMessage);
             } else {
                 String reportMessage = String.format(resources.getString("graduatedFailed.text"),
-                        person.getHyperlinkedFullTitle(),
-                        ReportingUtilities
-                                .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
-                        ReportingUtilities.CLOSING_SPAN_TAG);
+                      person.getHyperlinkedFullTitle(),
+                      spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
+                      CLOSING_SPAN_TAG);
 
                 campaign.addReport(reportMessage);
             }
 
-            ServiceLogger.eduFailed(person, campaign.getLocalDate(), person.getEduAcademyName(),
-                    academy.getQualifications().get(person.getEduCourseIndex()));
+            ServiceLogger.eduFailed(person,
+                  campaign.getLocalDate(),
+                  person.getEduAcademyName(),
+                  academy.getQualifications().get(person.getEduCourseIndex()));
 
             improveSkills(campaign, person, academy, false);
             addFacultyXp(campaign, person, academy, 0);
@@ -1129,10 +1219,10 @@ public class EducationController {
             roll = d6(3);
 
             String reportMessage = String.format(resources.getString("graduatedClassNeeded.text"),
-                    person.getHyperlinkedFullTitle(),
-                    ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor()),
-                    ReportingUtilities.CLOSING_SPAN_TAG,
-                    roll);
+                  person.getHyperlinkedFullTitle(),
+                  spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
+                  CLOSING_SPAN_TAG,
+                  roll);
 
             campaign.addReport(reportMessage);
 
@@ -1145,52 +1235,48 @@ public class EducationController {
             if (d6(1) >= 5) {
                 if (academy.isHomeSchool()) {
                     String reportMessage = String.format(resources.getString("graduatedHomeSchooled.text"),
-                            person.getHyperlinkedFullTitle(),
-                            ReportingUtilities
-                                    .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                            ReportingUtilities.CLOSING_SPAN_TAG);
+                          person.getHyperlinkedFullTitle(),
+                          spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
+                          CLOSING_SPAN_TAG);
 
                     campaign.addReport(reportMessage);
                 } else {
                     String reportMessage = String.format(resources.getString("graduatedTop.text"),
-                            person.getHyperlinkedFullTitle(),
-                            ReportingUtilities
-                                    .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                            ReportingUtilities.CLOSING_SPAN_TAG,
-                            ' ' + resources.getString(graduationEventPicker()),
-                            ReportingUtilities
-                                    .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                            ReportingUtilities.CLOSING_SPAN_TAG);
+                          person.getHyperlinkedFullTitle(),
+                          spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
+                          CLOSING_SPAN_TAG,
+                          ' ' + resources.getString(graduationEventPicker()),
+                          spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
+                          CLOSING_SPAN_TAG);
 
                     campaign.addReport(reportMessage);
                 }
             } else {
                 if (academy.isHomeSchool()) {
                     String reportMessage = String.format(resources.getString("graduatedHomeSchooled.text"),
-                            person.getHyperlinkedFullTitle(),
-                            ReportingUtilities
-                                    .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                            ReportingUtilities.CLOSING_SPAN_TAG);
+                          person.getHyperlinkedFullTitle(),
+                          spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
+                          CLOSING_SPAN_TAG);
 
                     campaign.addReport(reportMessage);
                 } else {
                     String reportMessage = String.format(resources.getString("graduatedTop.text"),
-                            person.getHyperlinkedFullTitle(),
-                            ReportingUtilities
-                                    .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                            ReportingUtilities.CLOSING_SPAN_TAG,
-                            "",
-                            ReportingUtilities
-                                    .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                            ReportingUtilities.CLOSING_SPAN_TAG);
+                          person.getHyperlinkedFullTitle(),
+                          spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
+                          CLOSING_SPAN_TAG,
+                          "",
+                          spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
+                          CLOSING_SPAN_TAG);
 
                     campaign.addReport(reportMessage);
                 }
             }
 
-            ServiceLogger.eduGraduatedPlus(person, campaign.getLocalDate(),
-                    resources.getString("graduatedTopLog.text"), person.getEduAcademyName(),
-                    academy.getQualifications().get(person.getEduCourseIndex()));
+            ServiceLogger.eduGraduatedPlus(person,
+                  campaign.getLocalDate(),
+                  resources.getString("graduatedTopLog.text"),
+                  person.getEduAcademyName(),
+                  academy.getQualifications().get(person.getEduCourseIndex()));
 
             processGraduation(campaign, person, academy, 2, resources);
 
@@ -1207,52 +1293,48 @@ public class EducationController {
 
                 if (academy.isHomeSchool()) {
                     String reportMessage = String.format(resources.getString("graduatedHomeSchooled.text"),
-                            person.getHyperlinkedFullTitle(),
-                            ReportingUtilities
-                                    .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                            ReportingUtilities.CLOSING_SPAN_TAG);
+                          person.getHyperlinkedFullTitle(),
+                          spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
+                          CLOSING_SPAN_TAG);
 
                     campaign.addReport(reportMessage);
                 } else {
                     String reportMessage = String.format(resources.getString("graduatedHonors.text"),
-                            person.getHyperlinkedFullTitle(),
-                            ReportingUtilities
-                                    .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                            ReportingUtilities.CLOSING_SPAN_TAG,
-                            ' ' + resources.getString(graduationEventPicker()),
-                            ReportingUtilities
-                                    .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                            ReportingUtilities.CLOSING_SPAN_TAG);
+                          person.getHyperlinkedFullTitle(),
+                          spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
+                          CLOSING_SPAN_TAG,
+                          ' ' + resources.getString(graduationEventPicker()),
+                          spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
+                          CLOSING_SPAN_TAG);
 
                     campaign.addReport(reportMessage);
                 }
             } else {
                 if (academy.isHomeSchool()) {
                     String reportMessage = String.format(resources.getString("graduatedHomeSchooled.text"),
-                            person.getHyperlinkedFullTitle(),
-                            ReportingUtilities
-                                    .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                            ReportingUtilities.CLOSING_SPAN_TAG);
+                          person.getHyperlinkedFullTitle(),
+                          spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
+                          CLOSING_SPAN_TAG);
 
                     campaign.addReport(reportMessage);
                 } else {
                     String reportMessage = String.format(resources.getString("graduatedHonors.text"),
-                            person.getHyperlinkedFullTitle(),
-                            ReportingUtilities
-                                    .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                            ReportingUtilities.CLOSING_SPAN_TAG,
-                            "",
-                            ReportingUtilities
-                                    .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                            ReportingUtilities.CLOSING_SPAN_TAG);
+                          person.getHyperlinkedFullTitle(),
+                          spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
+                          CLOSING_SPAN_TAG,
+                          "",
+                          spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
+                          CLOSING_SPAN_TAG);
 
                     campaign.addReport(reportMessage);
                 }
             }
 
-            ServiceLogger.eduGraduatedPlus(person, campaign.getLocalDate(),
-                    resources.getString("graduatedHonorsLog.text"), person.getEduAcademyName(),
-                    academy.getQualifications().get(person.getEduCourseIndex()));
+            ServiceLogger.eduGraduatedPlus(person,
+                  campaign.getLocalDate(),
+                  resources.getString("graduatedHonorsLog.text"),
+                  person.getEduAcademyName(),
+                  academy.getQualifications().get(person.getEduCourseIndex()));
 
             processGraduation(campaign, person, academy, 1, resources);
 
@@ -1267,45 +1349,43 @@ public class EducationController {
         if (d6(1) >= 5) {
             if (academy.isHomeSchool()) {
                 String reportMessage = String.format(resources.getString("graduatedHomeSchooled.text"),
-                        person.getHyperlinkedFullTitle(),
-                        ReportingUtilities
-                                .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                        ReportingUtilities.CLOSING_SPAN_TAG);
+                      person.getHyperlinkedFullTitle(),
+                      spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
+                      CLOSING_SPAN_TAG);
 
                 campaign.addReport(reportMessage);
             } else {
                 String reportMessage = String.format(resources.getString("graduated.text"),
-                        person.getHyperlinkedFullTitle(),
-                        ReportingUtilities
-                                .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                        ReportingUtilities.CLOSING_SPAN_TAG,
-                        ' ' + resources.getString(graduationEventPicker()));
+                      person.getHyperlinkedFullTitle(),
+                      spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
+                      CLOSING_SPAN_TAG,
+                      ' ' + resources.getString(graduationEventPicker()));
 
                 campaign.addReport(reportMessage);
             }
         } else {
             if (academy.isHomeSchool()) {
                 String reportMessage = String.format(resources.getString("graduatedHomeSchooled.text"),
-                        person.getHyperlinkedFullTitle(),
-                        ReportingUtilities
-                                .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                        ReportingUtilities.CLOSING_SPAN_TAG);
+                      person.getHyperlinkedFullTitle(),
+                      spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
+                      CLOSING_SPAN_TAG);
 
                 campaign.addReport(reportMessage);
             } else {
                 String reportMessage = String.format(resources.getString("graduated.text"),
-                        person.getHyperlinkedFullTitle(),
-                        ReportingUtilities
-                                .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                        ReportingUtilities.CLOSING_SPAN_TAG,
-                        "");
+                      person.getHyperlinkedFullTitle(),
+                      spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
+                      CLOSING_SPAN_TAG,
+                      "");
 
                 campaign.addReport(reportMessage);
             }
         }
 
-        ServiceLogger.eduGraduated(person, campaign.getLocalDate(), person.getEduAcademyName(),
-                academy.getQualifications().get(person.getEduCourseIndex()));
+        ServiceLogger.eduGraduated(person,
+              campaign.getLocalDate(),
+              person.getEduAcademyName(),
+              academy.getQualifications().get(person.getEduCourseIndex()));
 
         processGraduation(campaign, person, academy, 0, resources);
 
@@ -1317,70 +1397,64 @@ public class EducationController {
     }
 
     /**
-     * This method generates a report for individuals who have completed either a
-     * Master's or Doctorate degree.
+     * This method generates a report for individuals who have completed either a Master's or Doctorate degree.
      *
      * @param campaign  the campaign to add the report to
      * @param person    the person who completed the degree
      * @param education the education level taught by the academy
      * @param resources the resource bundle containing localized strings
      */
-    private static void reportMastersOrDoctorateGain(Campaign campaign, Person person, Academy academy,
-            int education, ResourceBundle resources) {
-        EducationLevel educationLevel = EducationLevel.parseFromInt(education);
+    private static void reportMastersOrDoctorateGain(Campaign campaign, Person person, Academy academy, int education,
+          ResourceBundle resources) {
+        EducationLevel educationLevel = EducationLevel.fromString(String.valueOf(education));
 
         String qualification = academy.getQualifications().get(person.getEduCourseIndex());
         String personName = person.getHyperlinkedFullTitle();
 
         if (educationLevel.isPostGraduate()) {
-            ServiceLogger.eduGraduatedMasters(
-                    person,
-                    campaign.getLocalDate(),
-                    person.getEduAcademyName(),
-                    qualification);
+            ServiceLogger.eduGraduatedMasters(person,
+                  campaign.getLocalDate(),
+                  person.getEduAcademyName(),
+                  qualification);
 
-            generatePostGradGraduationReport(
-                    campaign,
-                    personName,
-                    resources.getString("graduatedMasters.text"),
-                    qualification,
-                    resources);
+            generatePostGradGraduationReport(campaign,
+                  personName,
+                  resources.getString("graduatedMasters.text"),
+                  qualification,
+                  resources);
 
         } else if (educationLevel.isDoctorate()) {
-            ServiceLogger.eduGraduatedDoctorate(
-                    person,
-                    campaign.getLocalDate(),
-                    person.getEduAcademyName(),
-                    qualification);
+            ServiceLogger.eduGraduatedDoctorate(person,
+                  campaign.getLocalDate(),
+                  person.getEduAcademyName(),
+                  qualification);
 
             person.setPreNominal("Dr");
 
-            generatePostGradGraduationReport(
-                    campaign,
-                    personName,
-                    resources.getString("graduatedDoctorate.text"),
-                    qualification,
-                    resources);
+            generatePostGradGraduationReport(campaign,
+                  personName,
+                  resources.getString("graduatedDoctorate.text"),
+                  qualification,
+                  resources);
         }
     }
 
     /**
-     * Generates a post-graduate graduation report and publishes it to the daily
-     * report.
+     * Generates a post-graduate graduation report and publishes it to the daily report.
      *
      * @param campaign       The campaign to which the report will be added.
      * @param personName     The person's name (normally hyperlinked full title)
      * @param graduationText The text to be included in the graduation report.
      * @param qualification  The qualification just completed
      */
-    private static void generatePostGradGraduationReport(Campaign campaign, String personName,
-            String graduationText, String qualification, ResourceBundle resources) {
+    private static void generatePostGradGraduationReport(Campaign campaign, String personName, String graduationText,
+          String qualification, ResourceBundle resources) {
         campaign.addReport(String.format(resources.getString("graduatedPostGradReport.text"),
-                personName,
-                ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                graduationText,
-                ReportingUtilities.CLOSING_SPAN_TAG,
-                qualification));
+              personName,
+              spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
+              graduationText,
+              CLOSING_SPAN_TAG,
+              qualification));
     }
 
     /**
@@ -1402,7 +1476,7 @@ public class EducationController {
         }
 
         if (campaign.getCampaignOptions().isUseRandomPersonalities()) {
-            graduationRoll += person.getIntelligence().ordinal() - 12;
+            graduationRoll += person.getReasoning().ordinal() - 12;
         }
 
         // We don't process the granularity of graduation events for very young children.
@@ -1413,51 +1487,48 @@ public class EducationController {
         if (graduationRoll < 30) {
             if (academy.isHomeSchool()) {
                 String reportMessage = String.format(resources.getString("graduatedBarelyHomeSchooled.text"),
-                        person.getHyperlinkedFullTitle(),
-                        ReportingUtilities
-                                .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor()),
-                        ReportingUtilities.CLOSING_SPAN_TAG);
+                      person.getHyperlinkedFullTitle(),
+                      spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
+                      CLOSING_SPAN_TAG);
 
                 campaign.addReport(reportMessage);
             } else {
                 String reportMessage = String.format(resources.getString("graduatedBarely.text"),
-                        person.getHyperlinkedFullTitle(),
-                        ReportingUtilities
-                                .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor()),
-                        ReportingUtilities.CLOSING_SPAN_TAG);
+                      person.getHyperlinkedFullTitle(),
+                      spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
+                      CLOSING_SPAN_TAG);
 
                 campaign.addReport(reportMessage);
             }
         } else {
             if (academy.isHomeSchool()) {
                 String reportMessage = String.format(resources.getString("graduatedHomeSchooled.text"),
-                        person.getHyperlinkedFullTitle(),
-                        ReportingUtilities
-                                .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                        ReportingUtilities.CLOSING_SPAN_TAG);
+                      person.getHyperlinkedFullTitle(),
+                      spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
+                      CLOSING_SPAN_TAG);
 
                 campaign.addReport(reportMessage);
             } else {
                 String reportMessage = String.format(resources.getString("graduatedChild.text"),
-                        person.getHyperlinkedFullTitle(),
-                        ReportingUtilities
-                                .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                        ReportingUtilities.CLOSING_SPAN_TAG);
+                      person.getHyperlinkedFullTitle(),
+                      spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
+                      CLOSING_SPAN_TAG);
 
                 campaign.addReport(reportMessage);
             }
         }
 
-        ServiceLogger.eduGraduated(person, campaign.getLocalDate(), person.getEduAcademyName(),
-                academy.getQualifications().get(person.getEduCourseIndex()));
+        ServiceLogger.eduGraduated(person,
+              campaign.getLocalDate(),
+              person.getEduAcademyName(),
+              academy.getQualifications().get(person.getEduCourseIndex()));
 
         processGraduation(campaign, person, academy, 0, resources);
     }
 
     /**
-     * Adjusts the loyalty of a person based on a random roll.
-     * If the roll is 1, the loyalty is decreased by 1.
-     * If the roll is 4 or greater, the loyalty is increased by 1.
+     * Adjusts the loyalty of a person based on a random roll. If the roll is 1, the loyalty is decreased by 1. If the
+     * roll is 4 or greater, the loyalty is increased by 1.
      *
      * @param person the person whose loyalty is to be adjusted
      */
@@ -1481,7 +1552,7 @@ public class EducationController {
      * @param resources  the resource bundle for retrieving localized messages
      */
     private static void processGraduation(Campaign campaign, Person person, Academy academy, Integer bonusCount,
-            ResourceBundle resources) {
+          ResourceBundle resources) {
         improveSkills(campaign, person, academy, true);
 
         addFacultyXp(campaign, person, academy, bonusCount);
@@ -1493,7 +1564,7 @@ public class EducationController {
         int educationLevel = academy.getEducationLevel(person);
 
         if (EducationLevel.parseToInt(person.getEduHighestEducation()) < educationLevel) {
-            person.setEduHighestEducation(EducationLevel.parseFromInt(educationLevel));
+            person.setEduHighestEducation(EducationLevel.fromString(String.valueOf(educationLevel)));
         }
 
         if (academy.isReeducationCamp()) {
@@ -1506,6 +1577,7 @@ public class EducationController {
                 if (randomInt(PERSONALITY_QUIRK_CHANCE / 2) == 0) {
                     generateAndApplyPersonalityQuirk(person);
                     writePersonalityDescription(person);
+                    writeInterviewersNotes(person);
                 }
             }
 
@@ -1530,21 +1602,19 @@ public class EducationController {
     }
 
     /**
-     * Improves the skills of a given person based on the curriculum of the course
-     * they are attending.
+     * Improves the skills of a given person based on the curriculum of the course they are attending.
      *
      * @param person       The Person whose skills are being improved.
      * @param academy      The academy the person is attending.
-     * @param isGraduating A boolean value indicating whether the person is
-     *                     graduating from the academy or not.
+     * @param isGraduating A boolean value indicating whether the person is graduating from the academy or not.
      */
     private static void improveSkills(Campaign campaign, Person person, Academy academy, Boolean isGraduating) {
         String[] curriculum = Arrays.stream(academy.getCurriculums().get(person.getEduCourseIndex()).split(","))
-                .map(String::trim)
-                .toArray(String[]::new);
+                                    .map(String::trim)
+                                    .toArray(String[]::new);
 
-        int educationLevel = Math
-                .min(Math.max(academy.getEducationLevel(person) + academy.getBaseAcademicSkillLevel(), 0), 5);
+        int educationLevel = Math.min(Math.max(academy.getEducationLevel(person) + academy.getBaseAcademicSkillLevel(),
+              0), 5);
 
         if (!isGraduating) {
             educationLevel--;
@@ -1595,10 +1665,22 @@ public class EducationController {
      * @param bonus       The bonus to apply when increasing the skill level.
      */
     private static void adjustSkillLevel(Person person, String skillParsed, int targetLevel, int bonus) {
-        int skillLevel = 0;
+        boolean underTarget = true;
+        while (underTarget) {
+            Skill skill = person.getSkill(skillParsed);
+            if (skill == null) {
+                logger.error("Skill {} not found for person {}", skillParsed, person.getFullTitle());
+                underTarget = false;
+                continue;
+            }
 
-        while (person.getSkill(skillParsed).getExperienceLevel() < targetLevel) {
-            person.addSkill(skillParsed, skillLevel++, bonus);
+            int skillLevel = skill.getLevel();
+            int experienceLevel = skill.getType().getExperienceLevel(skillLevel);
+
+            underTarget = experienceLevel <= targetLevel;
+            if (underTarget) {
+                person.addSkill(skillParsed, skillLevel + 1, bonus);
+            }
         }
     }
 
@@ -1608,8 +1690,7 @@ public class EducationController {
      * @param campaign   the campaign the person is participating in
      * @param person     the person receiving the bonus XP
      * @param academy    the academy attended by the person
-     * @param bonusCount the number of extra bonus XP to be added (based on
-     *                   graduation level)
+     * @param bonusCount the number of extra bonus XP to be added (based on graduation level)
      */
     private static void addFacultyXp(Campaign campaign, Person person, Academy academy, Integer bonusCount) {
         int academyDuration;
@@ -1644,12 +1725,10 @@ public class EducationController {
      * @param resources  The resource bundle used for getting localized strings
      */
     private static void addBonus(Campaign campaign, Person person, Academy academy, int bonusCount,
-            ResourceBundle resources) {
+          ResourceBundle resources) {
         List<String> curriculum = Arrays.asList(academy.getCurriculums().get(person.getEduCourseIndex()).split(","));
 
-        curriculum = curriculum.stream()
-                .map(String::trim)
-                .toList();
+        curriculum = curriculum.stream().map(String::trim).toList();
 
         for (int i = 0; i < bonusCount; i++) {
             int roll = Compute.randomInt(curriculum.size());
@@ -1664,14 +1743,13 @@ public class EducationController {
 
                     person.addSkill(skillParsed, skillLevel, bonus);
 
-                    campaign.addReport(String.format(resources.getString("bonusAdded.text"),
-                            person.getFirstName()));
+                    campaign.addReport(String.format(resources.getString("bonusAdded.text"), person.getFirstName()));
                 } else {
                     person.awardXP(campaign, campaign.getCampaignOptions().getCurriculumXpRate());
 
                     campaign.addReport(String.format(resources.getString("bonusXp.text"),
-                            person.getFirstName(),
-                            campaign.getCampaignOptions().getCurriculumXpRate()));
+                          person.getFirstName(),
+                          campaign.getCampaignOptions().getCurriculumXpRate()));
                 }
             } catch (Exception e) {
                 // if we get this, it means the 'skill' was XP or None
@@ -1679,8 +1757,8 @@ public class EducationController {
                     person.awardXP(campaign, campaign.getCampaignOptions().getCurriculumXpRate());
 
                     campaign.addReport(String.format(resources.getString("bonusXp.text"),
-                            person.getFirstName(),
-                            campaign.getCampaignOptions().getCurriculumXpRate()));
+                          person.getFirstName(),
+                          campaign.getCampaignOptions().getCurriculumXpRate()));
                 }
             }
         }
@@ -1699,256 +1777,256 @@ public class EducationController {
     }
 
     /**
-     * Returns a list of graduation event table entries. The list contains various
-     * graduation event table entries such as addresses, admirer
-     * messages, events, gifts, pet costumes, recognitions, speeches, and surprises.
+     * Returns a list of graduation event table entries. The list contains various graduation event table entries such
+     * as addresses, admirer messages, events, gifts, pet costumes, recognitions, speeches, and surprises.
      *
      * @return a list of graduation event table entries
      */
     private static List<String> graduationEventTable() {
         return Arrays.asList(
-                // the events
-                "addressEncouragement.text",
-                "addressFriendship.text",
-                "addressFuturism.text",
-                "addressGrowth.text",
-                "addressHope.text",
-                "addressHumorous.text",
-                "addressLegacy.text",
-                "addressResilience.text",
-                "addressUncertain.text",
-                "addressWisdom.text",
-                "addressWisdomCelebrity.text",
-                "addressWisdomElder.text",
-                "addressWisdomFigure.text",
-                "addressWisdomVeteran.text",
-                "admirerArtwork.text",
-                "admirerLetter.text",
-                "admirerPoem.text",
-                "admirerSpecial.text",
-                "eventAccident.text",
-                "eventAirRaid.text",
-                "eventAlumni.text",
-                "eventAngryParent.text",
-                "eventArrest.text",
-                "eventAudioIssues.text",
-                "eventBagCheckProcedure.text",
-                "eventBalloons.text",
-                "eventBells.text",
-                "eventBillboard.text",
-                "eventBonfire.text",
-                "eventBooing.text",
-                "eventCancellations.text",
-                "eventCandles.text",
-                "eventCatererDelay.text",
-                "eventCellPhoneRing.text",
-                "eventChaos.text",
-                "eventCheerName.text",
-                "eventCheerStage.text",
-                "eventCoins.text",
-                "eventComplaints.text",
-                "eventConflict.text",
-                "eventCrowdedRestrooms.text",
-                "eventCulturalPerformance.text",
-                "eventDanceFlashMob.text",
-                "eventDanceRoutine.text",
-                "eventDanceTraditional.text",
-                "eventDelayedStart.text",
-                "eventDisappointment.text",
-                "eventDisorganization.text",
-                "eventDoves.text",
-                "eventElevatorMalfunction.text",
-                "eventEmbarrassment.text",
-                "eventEquipmentAdjustment.text",
-                "eventEquipmentFailure.text",
-                "eventEvacuation.text",
-                "eventFailure.text",
-                "eventFainting.text",
-                "eventFighting.text",
-                "eventFireAlarm.text",
-                "eventFireDance.text",
-                "eventFireworks.text",
-                "eventFoodPoisoning.text",
-                "eventFoodShortage.text",
-                "eventFoodTruck.text",
-                "eventForgottenSpeech.text",
-                "eventFundraiser.text",
-                "eventGlitter.text",
-                "eventGuestLateArrival.text",
-                "eventGuestSpeakerCue.text",
-                "eventHandshake.text",
-                "eventHealthEmergency.text",
-                "eventInadequateSeating.text",
-                "eventInjury.text",
-                "eventKaraoke.text",
-                "eventLackluster.text",
-                "eventLateProgramDistribution.text",
-                "eventLateSpeaker.text",
-                "eventLateVendorSetup.text",
-                "eventLeak.text",
-                "eventLegalIssue.text",
-                "eventLetter.text",
-                "eventLightingAdjustment.text",
-                "eventLiveMusic.text",
-                "eventLogisticalNightmare.text",
-                "eventLostAndFound.text",
-                "eventLostDirections.text",
-                "eventMenuChange.text",
-                "eventMessage.text",
-                "eventMiscommunication.text",
-                "eventMissingEquipment.text",
-                "eventNoShow.text",
-                "eventOutburst.text",
-                "eventOutdoorGames.text",
-                "eventOvercrowding.text",
-                "eventOverflowParking.text",
-                "eventOversight.text",
-                "eventParkingDirection.text",
-                "eventParkingIssues.text",
-                "eventPassingTorch.text",
-                "eventPhotographerDelay.text",
-                "eventPhotographerObstruction.text",
-                "eventPoorAttendance.text",
-                "eventPowerOutage.text",
-                "eventPowerStruggle.text",
-                "eventPresentationGlitch.text",
-                "eventProcession.text",
-                "eventProgramMisprint.text",
-                "eventProtest.text",
-                "eventPublicAddress.text",
-                "eventPublicTransportDelay.text",
-                "eventRain.text",
-                "eventRoast.text",
-                "eventScheduleAdjustment.text",
-                "eventSecurityBreach.text",
-                "eventSecurityCheckDelay.text",
-                "eventSecurityConcern.text",
-                "eventSkywriting.text",
-                "eventSmokingViolation.text",
-                "eventSpeakerIntroductionDelay.text",
-                "eventSpeakerPreparation.text",
-                "eventStagingError.text",
-                "eventTechnicalAdjustments.text",
-                "eventTechnicalFailure.text",
-                "eventTechnicalGlitch.text",
-                "eventTechnicalSupport.text",
-                "eventTemperatureAdjustment.text",
-                "eventTheft.text",
-                "eventTicketMixUp.text",
-                "eventTicketScanningDelay.text",
-                "eventTimeCapsule.text",
-                "eventTraffic.text",
-                "eventTrafficControl.text",
-                "eventTrafficJam.text",
-                "eventTransportationIssue.text",
-                "eventTransportationLogistics.text",
-                "eventUnexpectedBreak.text",
-                "eventUnexpectedGuest.text",
-                "eventUnexpectedSpeaker.text",
-                "eventUnplanned.text",
-                "eventUnprepared.text",
-                "eventUpset.text",
-                "eventVandalism.text",
-                "eventVenueChange.text",
-                "eventVenueCleanup.text",
-                "eventVenueNavigation.text",
-                "eventVenueNoise.text",
-                "eventVIPArrival.text",
-                "eventVolunteerShortage.text",
-                "eventVr.text",
-                "eventWardrobeMalfunction.text",
-                "eventWeatherDisruption.text",
-                "eventWeatherForecastError.text",
-                "giftAward.text",
-                "giftCompass.text",
-                "giftKeepsake.text",
-                "giftLetter.text",
-                "giftManual.text",
-                "giftPersonalized.text",
-                "giftPlantSapling.text",
-                "giftPortrait.text",
-                "giftRecommendation.text",
-                "giftScrapbook.text",
-                "giftSpecial.text",
-                "giftSymbolic.text",
-                "giftTravelVoucher.text",
-                "giftWristwatch.text",
-                "petCostume.text",
-                "petGeneral.text",
-                "petGown",
-                "recognitionAcademic.text",
-                "recognitionContributions.text",
-                "recognitionCreativity.text",
-                "recognitionDedication.text",
-                "recognitionExtracurricular.text",
-                "recognitionInnovation.text",
-                "recognitionLeadership.text",
-                "recognitionPublicOrder.text",
-                "recognitionTalents.text",
-                "speechAchievement.text",
-                "speechApology.text",
-                "speechBlunder.text",
-                "speechCommunityInvolvement.text",
-                "speechControversial.text",
-                "speechDisrespectful.text",
-                "speechEmotional.text",
-                "speechHumility.text",
-                "speechHumorous.text",
-                "speechInsensitive.text",
-                "speechInspiration.text",
-                "speechMekCommander.text",
-                "speechMispronunciation.text",
-                "speechMotivation.text",
-                "speechPromotion.text",
-                "speechRant.text",
-                "speechReflection.text",
-                "speechRejection.text",
-                "speechTriumph.text",
-                "speechUninspiring.text",
-                "surpriseArgument.text",
-                "surpriseArtist.text",
-                "surpriseAwardsCeremony.text",
-                "surpriseBand.text",
-                "surpriseBandLocal.text",
-                "surpriseChoir.text",
-                "surpriseCommander.text",
-                "surpriseDanceBattle.text",
-                "surpriseMascot.text",
-                "surpriseMotivationalSpeaker.text",
-                "surprisePoet.text",
-                "surpriseScholarship.text",
-                "surpriseScholarshipAward.text",
-                "surpriseSpeaker.text",
-                "surpriseStandard.text",
-                "surpriseCancellation.text",
-                "surpriseDisappointment.text",
-                "surpriseEmbarrassment.text",
-                "surpriseFailure.text",
-                "surpriseInjury.text",
-                "surpriseLaser.text",
-                "surpriseMishap.text",
-                "surpriseMisunderstanding.text",
-                "surpriseRejection.text");
+              // the events
+              "addressEncouragement.text",
+              "addressFriendship.text",
+              "addressFuturism.text",
+              "addressGrowth.text",
+              "addressHope.text",
+              "addressHumorous.text",
+              "addressLegacy.text",
+              "addressResilience.text",
+              "addressUncertain.text",
+              "addressWisdom.text",
+              "addressWisdomCelebrity.text",
+              "addressWisdomElder.text",
+              "addressWisdomFigure.text",
+              "addressWisdomVeteran.text",
+              "admirerArtwork.text",
+              "admirerLetter.text",
+              "admirerPoem.text",
+              "admirerSpecial.text",
+              "eventAccident.text",
+              "eventAirRaid.text",
+              "eventAlumni.text",
+              "eventAngryParent.text",
+              "eventArrest.text",
+              "eventAudioIssues.text",
+              "eventBagCheckProcedure.text",
+              "eventBalloons.text",
+              "eventBells.text",
+              "eventBillboard.text",
+              "eventBonfire.text",
+              "eventBooing.text",
+              "eventCancellations.text",
+              "eventCandles.text",
+              "eventCatererDelay.text",
+              "eventCellPhoneRing.text",
+              "eventChaos.text",
+              "eventCheerName.text",
+              "eventCheerStage.text",
+              "eventCoins.text",
+              "eventComplaints.text",
+              "eventConflict.text",
+              "eventCrowdedRestrooms.text",
+              "eventCulturalPerformance.text",
+              "eventDanceFlashMob.text",
+              "eventDanceRoutine.text",
+              "eventDanceTraditional.text",
+              "eventDelayedStart.text",
+              "eventDisappointment.text",
+              "eventDisorganization.text",
+              "eventDoves.text",
+              "eventElevatorMalfunction.text",
+              "eventEmbarrassment.text",
+              "eventEquipmentAdjustment.text",
+              "eventEquipmentFailure.text",
+              "eventEvacuation.text",
+              "eventFailure.text",
+              "eventFainting.text",
+              "eventFighting.text",
+              "eventFireAlarm.text",
+              "eventFireDance.text",
+              "eventFireworks.text",
+              "eventFoodPoisoning.text",
+              "eventFoodShortage.text",
+              "eventFoodTruck.text",
+              "eventForgottenSpeech.text",
+              "eventFundraiser.text",
+              "eventGlitter.text",
+              "eventGuestLateArrival.text",
+              "eventGuestSpeakerCue.text",
+              "eventHandshake.text",
+              "eventHealthEmergency.text",
+              "eventInadequateSeating.text",
+              "eventInjury.text",
+              "eventKaraoke.text",
+              "eventLackluster.text",
+              "eventLateProgramDistribution.text",
+              "eventLateSpeaker.text",
+              "eventLateVendorSetup.text",
+              "eventLeak.text",
+              "eventLegalIssue.text",
+              "eventLetter.text",
+              "eventLightingAdjustment.text",
+              "eventLiveMusic.text",
+              "eventLogisticalNightmare.text",
+              "eventLostAndFound.text",
+              "eventLostDirections.text",
+              "eventMenuChange.text",
+              "eventMessage.text",
+              "eventMiscommunication.text",
+              "eventMissingEquipment.text",
+              "eventNoShow.text",
+              "eventOutburst.text",
+              "eventOutdoorGames.text",
+              "eventOvercrowding.text",
+              "eventOverflowParking.text",
+              "eventOversight.text",
+              "eventParkingDirection.text",
+              "eventParkingIssues.text",
+              "eventPassingTorch.text",
+              "eventPhotographerDelay.text",
+              "eventPhotographerObstruction.text",
+              "eventPoorAttendance.text",
+              "eventPowerOutage.text",
+              "eventPowerStruggle.text",
+              "eventPresentationGlitch.text",
+              "eventProcession.text",
+              "eventProgramMisprint.text",
+              "eventProtest.text",
+              "eventPublicAddress.text",
+              "eventPublicTransportDelay.text",
+              "eventRain.text",
+              "eventRoast.text",
+              "eventScheduleAdjustment.text",
+              "eventSecurityBreach.text",
+              "eventSecurityCheckDelay.text",
+              "eventSecurityConcern.text",
+              "eventSkywriting.text",
+              "eventSmokingViolation.text",
+              "eventSpeakerIntroductionDelay.text",
+              "eventSpeakerPreparation.text",
+              "eventStagingError.text",
+              "eventTechnicalAdjustments.text",
+              "eventTechnicalFailure.text",
+              "eventTechnicalGlitch.text",
+              "eventTechnicalSupport.text",
+              "eventTemperatureAdjustment.text",
+              "eventTheft.text",
+              "eventTicketMixUp.text",
+              "eventTicketScanningDelay.text",
+              "eventTimeCapsule.text",
+              "eventTraffic.text",
+              "eventTrafficControl.text",
+              "eventTrafficJam.text",
+              "eventTransportationIssue.text",
+              "eventTransportationLogistics.text",
+              "eventUnexpectedBreak.text",
+              "eventUnexpectedGuest.text",
+              "eventUnexpectedSpeaker.text",
+              "eventUnplanned.text",
+              "eventUnprepared.text",
+              "eventUpset.text",
+              "eventVandalism.text",
+              "eventVenueChange.text",
+              "eventVenueCleanup.text",
+              "eventVenueNavigation.text",
+              "eventVenueNoise.text",
+              "eventVIPArrival.text",
+              "eventVolunteerShortage.text",
+              "eventVr.text",
+              "eventWardrobeMalfunction.text",
+              "eventWeatherDisruption.text",
+              "eventWeatherForecastError.text",
+              "giftAward.text",
+              "giftCompass.text",
+              "giftKeepsake.text",
+              "giftLetter.text",
+              "giftManual.text",
+              "giftPersonalized.text",
+              "giftPlantSapling.text",
+              "giftPortrait.text",
+              "giftRecommendation.text",
+              "giftScrapbook.text",
+              "giftSpecial.text",
+              "giftSymbolic.text",
+              "giftTravelVoucher.text",
+              "giftWristwatch.text",
+              "petCostume.text",
+              "petGeneral.text",
+              "petGown",
+              "recognitionAcademic.text",
+              "recognitionContributions.text",
+              "recognitionCreativity.text",
+              "recognitionDedication.text",
+              "recognitionExtracurricular.text",
+              "recognitionInnovation.text",
+              "recognitionLeadership.text",
+              "recognitionPublicOrder.text",
+              "recognitionTalents.text",
+              "speechAchievement.text",
+              "speechApology.text",
+              "speechBlunder.text",
+              "speechCommunityInvolvement.text",
+              "speechControversial.text",
+              "speechDisrespectful.text",
+              "speechEmotional.text",
+              "speechHumility.text",
+              "speechHumorous.text",
+              "speechInsensitive.text",
+              "speechInspiration.text",
+              "speechMekCommander.text",
+              "speechMispronunciation.text",
+              "speechMotivation.text",
+              "speechPromotion.text",
+              "speechRant.text",
+              "speechReflection.text",
+              "speechRejection.text",
+              "speechTriumph.text",
+              "speechUninspiring.text",
+              "surpriseArgument.text",
+              "surpriseArtist.text",
+              "surpriseAwardsCeremony.text",
+              "surpriseBand.text",
+              "surpriseBandLocal.text",
+              "surpriseChoir.text",
+              "surpriseCommander.text",
+              "surpriseDanceBattle.text",
+              "surpriseMascot.text",
+              "surpriseMotivationalSpeaker.text",
+              "surprisePoet.text",
+              "surpriseScholarship.text",
+              "surpriseScholarshipAward.text",
+              "surpriseSpeaker.text",
+              "surpriseStandard.text",
+              "surpriseCancellation.text",
+              "surpriseDisappointment.text",
+              "surpriseEmbarrassment.text",
+              "surpriseFailure.text",
+              "surpriseInjury.text",
+              "surpriseLaser.text",
+              "surpriseMishap.text",
+              "surpriseMisunderstanding.text",
+              "surpriseRejection.text");
     }
 
     /**
-     * Sets the initial education level for a person based on their age, experience level, intelligence,
-     * a random pass/fail system, and their primary role.
-     * Additionally, assigns a pre-nominal ("Dr") for individuals who achieve a doctorate-level education.
+     * Sets the initial education level for a person based on their age, experience level, reasoning, a random pass/fail
+     * system, and their primary role. Additionally, assigns a pre-nominal ("Dr") for individuals who achieve a
+     * doctorate-level education.
      *
      * <p>The method applies the following rules:</p>
      * <ul>
      *   <li>Persons younger than 16 are automatically assigned the "Early Childhood" education level.</li>
-     *   <li>For individuals aged 16 or older, a pass/fail rate (based on intelligence and default thresholds)
+     *   <li>For individuals aged 16 or older, a pass/fail rate (based on reasoning and default thresholds)
      *   determines whether they flunk or succeed at further education.</li>
      *   <li>The assigned education level depends on their experience level and whether they have a combat or non-combat role.</li>
      *   <li>If the person's education reaches the doctorate level, they are granted the pre-nominal "Dr".</li>
      * </ul>
      *
      * <p>The pass rate is influenced by the campaign's settings. When using random personalities, the person's
-     * intelligence modifies the base pass rate (defaulting to average intelligence if personalities are disabled).</p>
+     * reasoning modifies the base pass rate (defaulting to average reasoning if personalities are disabled).</p>
      *
-     * @param campaign the campaign context, used to retrieve the current date, options, and calculate the person's experience.
+     * @param campaign the campaign context, used to retrieve the current date, options, and calculate the person's
+     *                 experience.
      * @param person   the person whose initial education level is being set.
      */
     public static void setInitialEducationLevel(final Campaign campaign, final Person person) {
@@ -1967,11 +2045,11 @@ public class EducationController {
         final boolean isCombatRole = person.getPrimaryRole().isCombat();
 
         // We base passRate on US averages
-        int passRate = 60 - (Intelligence.values().length / 2);
-        final int intelligenceModifier = campaign.getCampaignOptions().isUseRandomPersonalities()
-            ? person.getIntelligence().getIntelligenceScore()
-            : Intelligence.values().length / 2;
-        passRate += intelligenceModifier;
+        int passRate = 60 - (Reasoning.values().length / 2);
+        final int reasoningModifier = campaign.getCampaignOptions().isUseRandomPersonalities() ?
+                                            person.getReasoning().getReasoningScore() :
+                                            Reasoning.values().length / 2;
+        passRate += reasoningModifier;
 
         final boolean flunked = Compute.randomInt(100) <= passRate;
 
@@ -1994,8 +2072,8 @@ public class EducationController {
     }
 
     /**
-     * Determines the education level for individuals in combat roles based on their experience level,
-     * intelligence-based pass/fail rate, and whether they flunked previously.
+     * Determines the education level for individuals in combat roles based on their experience level, reasoning-based
+     * pass/fail rate, and whether they flunked previously.
      *
      * <p>The following rules are applied:</p>
      * <ul>
@@ -2009,10 +2087,12 @@ public class EducationController {
      *
      * @param experienceLevel the person's experience level (e.g., below regular, regular, or higher).
      * @param flunked         whether the person initially flunked based on the pass rate.
-     * @param passRate        the calculated pass rate based on default thresholds and intelligence modifiers.
+     * @param passRate        the calculated pass rate based on default thresholds and reasoning modifiers.
+     *
      * @return the appropriate {@link EducationLevel} based on the person's experience level and final success status.
      */
-    private static EducationLevel getCombatEducationLevel(final int experienceLevel, boolean flunked, final int passRate) {
+    private static EducationLevel getCombatEducationLevel(final int experienceLevel, boolean flunked,
+          final int passRate) {
         if (experienceLevel < EXP_REGULAR) {
             // Second-chance roll for High School
             if (flunked) {
@@ -2026,7 +2106,7 @@ public class EducationController {
 
     /**
      * Determines the education level for individuals in non-combat roles based on their experience level,
-     * intelligence-based pass/fail rate, and whether they flunked previously.
+     * reasoning-based pass/fail rate, and whether they flunked previously.
      *
      * <p>The following rules are applied:</p>
      * <ul>
@@ -2046,11 +2126,12 @@ public class EducationController {
      *
      * @param experienceLevel the person's experience level (e.g., below regular, regular, veteran, or higher).
      * @param flunked         whether the person initially flunked based on the pass rate.
-     * @param passRate        the calculated pass rate based on default thresholds and intelligence modifiers.
+     * @param passRate        the calculated pass rate based on default thresholds and reasoning modifiers.
+     *
      * @return the appropriate {@link EducationLevel} based on the person's experience level and final success status.
      */
-    private static EducationLevel getNonCombatEducationLevel(final int experienceLevel,
-                                                             boolean flunked, final int passRate) {
+    private static EducationLevel getNonCombatEducationLevel(final int experienceLevel, boolean flunked,
+          final int passRate) {
         if (experienceLevel < EXP_REGULAR) {
             // Second-chance roll for High School
             if (flunked) {

@@ -25,33 +25,13 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.randomEvents;
-
-import megamek.client.generator.RandomCallsignGenerator;
-import megamek.codeUtilities.ObjectUtility;
-import megamek.common.annotations.Nullable;
-import megamek.common.enums.SkillLevel;
-import megamek.common.options.IOption;
-import mekhq.Utilities;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.RandomSkillPreferences;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.Skill;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.randomEvents.personalities.PersonalityController.PersonalityTraitType;
-import mekhq.campaign.randomEvents.personalities.enums.Aggression;
-import mekhq.campaign.randomEvents.personalities.enums.Ambition;
-import mekhq.campaign.randomEvents.personalities.enums.Greed;
-import mekhq.campaign.randomEvents.personalities.enums.Social;
-import mekhq.campaign.stratcon.StratconCampaignState;
-import mekhq.gui.dialog.GenericImmersiveMessageDialog;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
 
 import static megamek.common.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.VETERAN;
@@ -63,24 +43,48 @@ import static mekhq.campaign.personnel.PersonUtility.reRollAdvantages;
 import static mekhq.campaign.personnel.PersonUtility.reRollLoyalty;
 import static mekhq.campaign.personnel.enums.PersonnelRole.AEROSPACE_PILOT;
 import static mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.PersonalityTraitType.AGGRESSION;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.PersonalityTraitType.AMBITION;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.PersonalityTraitType.GREED;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.PersonalityTraitType.SOCIAL;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.generateBigPersonality;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.generatePersonality;
+import static mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType.AGGRESSION;
+import static mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType.AMBITION;
+import static mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType.GREED;
+import static mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType.SOCIAL;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
+
+import megamek.client.generator.RandomCallsignGenerator;
+import megamek.codeUtilities.ObjectUtility;
+import megamek.common.annotations.Nullable;
+import megamek.common.enums.SkillLevel;
+import megamek.common.options.IOption;
+import mekhq.Utilities;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.skills.RandomSkillPreferences;
+import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.randomEvents.personalities.enums.Aggression;
+import mekhq.campaign.randomEvents.personalities.enums.Ambition;
+import mekhq.campaign.randomEvents.personalities.enums.Greed;
+import mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType;
+import mekhq.campaign.randomEvents.personalities.enums.Social;
+import mekhq.campaign.stratcon.StratconCampaignState;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+
 /**
- * Represents a dialog and associated logic for presenting the player with a Ronin offer. The Ronin
- * offer involves hiring a new character (a 'Ronin') with specific skills and attributes. The decision
- * to hire the Ronin depends on offering C-Bills or Support Points, depending on whether StratCon is
- * enabled.
+ * Represents a dialog and associated logic for presenting the player with a Ronin offer. The Ronin offer involves
+ * hiring a new character (a 'Ronin') with specific skills and attributes. The decision to hire the Ronin depends on
+ * offering C-Bills or Support Points, depending on whether StratCon is enabled.
  *
  * <p>This class handles the creation of the Ronin character, the dialog interactions, and the recruitment
  * process based on the player’s choices.</p>
  */
 public class RoninOffer {
-    private static final String RESOURCE_BUNDLE = "mekhq.resources." + RoninOffer.class.getSimpleName();
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.RoninOffer";
 
     private final Campaign campaign;
 
@@ -89,13 +93,13 @@ public class RoninOffer {
     private static final Money FALLBACK_HIRING_FEE = Money.of(500000);
 
     /**
-     * Creates a new instance of the {@code RoninOffer} dialog for handling a Ronin hiring event.
-     * This creates a Ronin character, randomizes their attributes and abilities, and initiates the
-     * dialog process where the player can choose whether to recruit them.
+     * Creates a new instance of the {@code RoninOffer} dialog for handling a Ronin hiring event. This creates a Ronin
+     * character, randomizes their attributes and abilities, and initiates the dialog process where the player can
+     * choose whether to recruit them.
      *
      * @param campaign            The current {@link Campaign} instance associated with the game.
-     * @param campaignState       The optional {@link StratconCampaignState}. If {@code null} we will
-     *                           use a fallback C-Bill cost, instead or Support Points.
+     * @param campaignState       The optional {@link StratconCampaignState}. If {@code null} we will use a fallback
+     *                            C-Bill cost, instead or Support Points.
      * @param requiredCombatTeams The number of combat teams needed, affecting the cost of hiring.
      */
     public RoninOffer(Campaign campaign, @Nullable StratconCampaignState campaignState, int requiredCombatTeams) {
@@ -109,11 +113,17 @@ public class RoninOffer {
         RandomSkillPreferences randomSkillPreferences = campaign.getRandomSkillPreferences();
         boolean useExtraRandomness = randomSkillPreferences.randomizeSkill();
 
-        // We don't care about admin settings, as we're not going to have an admin here
-        overrideSkills(false, false, useExtraRandomness,
-              ronin, role, VETERAN);
+        // We don't care about admin, doctor or tech settings, as they're not going to spawn here
+        overrideSkills(false,
+              false,
+              false,
+              campaign.getCampaignOptions().isUseArtillery(),
+              useExtraRandomness,
+              ronin,
+              role,
+              VETERAN);
 
-        generateBigPersonality(ronin);
+        generatePersonality(ronin, true);
 
         SkillLevel skillLevel = ronin.getSkillLevel(campaign, false);
         reRollLoyalty(ronin, skillLevel);
@@ -125,25 +135,27 @@ public class RoninOffer {
     }
 
     /**
-     * Displays the Ronin offer dialog and processes the player's choices throughout the interaction.
-     * This method progresses through different message dialogs and updates the campaign if the Ronin
-     * is recruited.
+     * Displays the Ronin offer dialog and processes the player's choices throughout the interaction. This method
+     * progresses through different message dialogs and updates the campaign if the Ronin is recruited.
      *
      * @param campaign            The active {@link Campaign} instance.
      * @param ronin               The Ronin {@link Person} being offered for recruitment.
      * @param campaignState       The optional {@link StratconCampaignState} providing strategic information.
      * @param requiredCombatTeams The number of combat teams required for the recruitment.
      */
-    private void displayAndProcessConversation(Campaign campaign, Person ronin,
-                                               StratconCampaignState campaignState, int requiredCombatTeams) {
+    private void displayAndProcessConversation(Campaign campaign, Person ronin, StratconCampaignState campaignState,
+          int requiredCombatTeams) {
         String commanderAddress = campaign.getCommanderAddress(false);
         int response = displayInitialMessage(commanderAddress, ronin.getCallsign());
         if (response != ACCEPT_DIALOG_CHOICE_INDEX) {
             return;
         }
 
-        response = displayRoninMessage(ronin, commanderAddress, campaignState == null,
-              requiredCombatTeams, campaignState == null ? null : campaignState.getSupportPoints());
+        response = displayRoninMessage(ronin,
+              commanderAddress,
+              campaignState == null,
+              requiredCombatTeams,
+              campaignState == null ? null : campaignState.getSupportPoints());
         if (response != ACCEPT_DIALOG_CHOICE_INDEX) {
             return;
         }
@@ -152,27 +164,30 @@ public class RoninOffer {
         if (campaignState == null) {
             // This and the Support Point cost are designed to scale with campaign size.
             // The larger the campaign, the more resources they have to toss around.
-            campaign.getFinances().debit(RECRUITMENT, campaign.getLocalDate(),
-                  FALLBACK_HIRING_FEE.multipliedBy(requiredCombatTeams),
-                  getFormattedTextAt(RESOURCE_BUNDLE, "message.hiring", ronin.getFullName()));
+            campaign.getFinances()
+                  .debit(RECRUITMENT,
+                        campaign.getLocalDate(),
+                        FALLBACK_HIRING_FEE.multipliedBy(requiredCombatTeams),
+                        getFormattedTextAt(RESOURCE_BUNDLE, "message.hiring", ronin.getFullName()));
         } else {
             campaignState.changeSupportPoints(-requiredCombatTeams);
         }
 
-        campaign.recruitPerson(ronin, true);
+        campaign.recruitPerson(ronin, true, true);
     }
 
 
     /**
-     * Displays the initial message of the Ronin hiring process, giving the player multiple response
-     * options. This is the first step in the interaction flow.
+     * Displays the initial message of the Ronin hiring process, giving the player multiple response options. This is
+     * the first step in the interaction flow.
      *
-     * @return An integer representing the player's choice. Used to determine whether the process
-     * continues.
+     * @return An integer representing the player's choice. Used to determine whether the process continues.
      */
     private int displayInitialMessage(String commanderAddress, String roninCallSign) {
-        String centerMessage = getFormattedTextAt(RESOURCE_BUNDLE, "message.ic.fromHR",
-              commanderAddress, roninCallSign);
+        String centerMessage = getFormattedTextAt(RESOURCE_BUNDLE,
+              "message.ic.fromHR",
+              commanderAddress,
+              roninCallSign);
 
         List<String> buttonLabels = new ArrayList<>();
         buttonLabels.add(getFormattedTextAt(RESOURCE_BUNDLE, "button.fromHR.accept"));
@@ -180,28 +195,34 @@ public class RoninOffer {
         buttonLabels.add(getFormattedTextAt(RESOURCE_BUNDLE, "button.fromHR.decline.neutral"));
         buttonLabels.add(getFormattedTextAt(RESOURCE_BUNDLE, "button.fromHR.decline.rude", roninCallSign));
 
-        GenericImmersiveMessageDialog initialMessage = new GenericImmersiveMessageDialog(campaign,
-              campaign.getSeniorAdminPerson(HR), null, centerMessage, buttonLabels,
-              null, true);
+        ImmersiveDialogSimple initialMessage = new ImmersiveDialogSimple(campaign,
+              campaign.getSeniorAdminPerson(HR),
+              null,
+              centerMessage,
+              buttonLabels,
+              null,
+              null,
+              true);
 
         return initialMessage.getDialogChoice();
     }
 
     /**
-     * Displays the main Ronin message dialog, including immersive text and out-of-character
-     * information such as skills, abilities, and hiring costs.
+     * Displays the main Ronin message dialog, including immersive text and out-of-character information such as skills,
+     * abilities, and hiring costs.
      *
-     * @param ronin               The Ronin {@link Person} being offered for recruitment.
-     * @param commanderAddress    The in-game address of the commander used in immersive text.
-     * @param useFallbackHiringFee Indicates if the fallback hiring fee (C-Bills) should be used
-     *                            instead of support points.
-     * @param requiredCombatTeams The number of combat teams required for the recruitment cost calculation.
-     * @param availableSupportPoints The support points available in the current campaign, if applicable;
-     *                              can be {@code null} if using the fallback hiring fee.
+     * @param ronin                  The Ronin {@link Person} being offered for recruitment.
+     * @param commanderAddress       The in-game address of the commander used in immersive text.
+     * @param useFallbackHiringFee   Indicates if the fallback hiring fee (C-Bills) should be used instead of support
+     *                               points.
+     * @param requiredCombatTeams    The number of combat teams required for the recruitment cost calculation.
+     * @param availableSupportPoints The support points available in the current campaign, if applicable; can be
+     *                               {@code null} if using the fallback hiring fee.
+     *
      * @return An integer representing the player's choice from the dialog.
      */
     private int displayRoninMessage(Person ronin, String commanderAddress, boolean useFallbackHiringFee,
-                                    int requiredCombatTeams, @Nullable Integer availableSupportPoints) {
+          int requiredCombatTeams, @Nullable Integer availableSupportPoints) {
         String centerMessage = createRoninMessage(ronin, commanderAddress);
 
         List<String> buttonLabels = new ArrayList<>();
@@ -210,21 +231,30 @@ public class RoninOffer {
         buttonLabels.add(getFormattedTextAt(RESOURCE_BUNDLE, "button.fromRonin.decline.neutral"));
         buttonLabels.add(getFormattedTextAt(RESOURCE_BUNDLE, "button.fromRonin.decline.rude"));
 
-        String outOfCharacterMessage = createRoninOutOfCharacterMessage(ronin, useFallbackHiringFee,
-              requiredCombatTeams, availableSupportPoints);
+        String outOfCharacterMessage = createRoninOutOfCharacterMessage(ronin,
+              useFallbackHiringFee,
+              requiredCombatTeams,
+              availableSupportPoints);
 
-        GenericImmersiveMessageDialog initialMessage = new GenericImmersiveMessageDialog(campaign,
-              null, ronin, centerMessage, buttonLabels, outOfCharacterMessage, true);
+        ImmersiveDialogSimple initialMessage = new ImmersiveDialogSimple(campaign,
+              null,
+              ronin,
+              centerMessage,
+              buttonLabels,
+              outOfCharacterMessage,
+              null,
+              true);
 
         return initialMessage.getDialogChoice();
     }
 
     /**
-     * Builds the immersive message shown to the player from the Ronin's perspective.
-     * The content of the message will vary based on the Ronin's personality traits.
+     * Builds the immersive message shown to the player from the Ronin's perspective. The content of the message will
+     * vary based on the Ronin's personality traits.
      *
      * @param ronin            The Ronin {@link Person} being offered for recruitment.
      * @param commanderAddress The in-game address of the commander used in immersive text.
+     *
      * @return A {@link String} containing the message content from the Ronin's perspective.
      */
     private static String createRoninMessage(Person ronin, String commanderAddress) {
@@ -267,7 +297,7 @@ public class RoninOffer {
             }
         }
 
-        PersonalityTraitType chosenTrait = null;
+        mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType chosenTrait = null;
 
         if (!majorTraits.isEmpty()) {
             chosenTrait = ObjectUtility.getRandomItem(majorTraits);
@@ -296,20 +326,20 @@ public class RoninOffer {
     }
 
     /**
-     * Constructs the out-of-character message to be displayed alongside the immersive Ronin message.
-     * This includes skill details, abilities, and a breakdown of the hiring cost.
+     * Constructs the out-of-character message to be displayed alongside the immersive Ronin message. This includes
+     * skill details, abilities, and a breakdown of the hiring cost.
      *
-     * @param ronin               The Ronin {@link Person} being offered for recruitment.
-     * @param useFallbackHiringFee Indicates if the fallback hiring fee (C-Bills) should be used
-     *                            instead of support points.
-     * @param requiredCombatTeams The number of combat teams required for the recruitment cost calculation.
-     * @param availableSupportPoints The support points available in the current campaign, if applicable;
-     *                              can be {@code null} if using the fallback hiring fee.
+     * @param ronin                  The Ronin {@link Person} being offered for recruitment.
+     * @param useFallbackHiringFee   Indicates if the fallback hiring fee (C-Bills) should be used instead of support
+     *                               points.
+     * @param requiredCombatTeams    The number of combat teams required for the recruitment cost calculation.
+     * @param availableSupportPoints The support points available in the current campaign, if applicable; can be
+     *                               {@code null} if using the fallback hiring fee.
+     *
      * @return A {@link String} containing formatted out-of-character details for the player.
      */
-    private String createRoninOutOfCharacterMessage(Person ronin, boolean useFallbackHiringFee,
-                                                           int requiredCombatTeams,
-                                                           @Nullable Integer availableSupportPoints) {
+    private String createRoninOutOfCharacterMessage(Person ronin, boolean useFallbackHiringFee, int requiredCombatTeams,
+          @Nullable Integer availableSupportPoints) {
         StringBuilder report = new StringBuilder();
 
         report.append(buildCostString(useFallbackHiringFee, requiredCombatTeams, availableSupportPoints));
@@ -335,7 +365,7 @@ public class RoninOffer {
               .append(getFormattedTextAt(RESOURCE_BUNDLE, "message.ooc.abilities"))
               .append("</b><br>");
         boolean hasAbilities = false;
-        for (Enumeration<IOption> i = ronin.getOptions(LVL3_ADVANTAGES); i.hasMoreElements();) {
+        for (Enumeration<IOption> i = ronin.getOptions(LVL3_ADVANTAGES); i.hasMoreElements(); ) {
             final IOption ability = i.nextElement();
             if (ability.booleanValue()) {
                 report.append(Utilities.getOptionDisplayName(ability)).append("<br>");
@@ -354,31 +384,30 @@ public class RoninOffer {
     }
 
     /**
-     * Builds a formatted string describing the cost of recruiting the Ronin based on their hiring type
-     * (C-Bills or support points), the number of combat teams required, and currently available
-     * resources.
+     * Builds a formatted string describing the cost of recruiting the Ronin based on their hiring type (C-Bills or
+     * support points), the number of combat teams required, and currently available resources.
      *
-     * @param useFallbackHiringFee Indicates if the fallback hiring fee (C-Bills) should be used
-     *                            instead of support points.
-     * @param requiredCombatTeams  The number of combat teams required for the recruitment cost calculation.
-     * @param availableSupportPoints The support points available in the current campaign, if applicable;
-     *                              can be {@code null} if using the fallback hiring fee.
+     * @param useFallbackHiringFee   Indicates if the fallback hiring fee (C-Bills) should be used instead of support
+     *                               points.
+     * @param requiredCombatTeams    The number of combat teams required for the recruitment cost calculation.
+     * @param availableSupportPoints The support points available in the current campaign, if applicable; can be
+     *                               {@code null} if using the fallback hiring fee.
+     *
      * @return A {@link String} containing the formatted cost information.
      */
     private String buildCostString(boolean useFallbackHiringFee, int requiredCombatTeams,
-                                   @Nullable Integer availableSupportPoints) {
+          @Nullable Integer availableSupportPoints) {
         String addendumKey = useFallbackHiringFee ? "message.ooc.cBills" : "message.ooc.supportPoints";
         String addendum = getFormattedTextAt(RESOURCE_BUNDLE, addendumKey);
 
-        String cost = useFallbackHiringFee
-              ? FALLBACK_HIRING_FEE.multipliedBy(requiredCombatTeams).toAmountString()
-              : requiredCombatTeams + "";
+        String cost = useFallbackHiringFee ?
+                            FALLBACK_HIRING_FEE.multipliedBy(requiredCombatTeams).toAmountString() :
+                            requiredCombatTeams + "";
 
-        String availableResources = useFallbackHiringFee
-              ? campaign.getFunds().toAmountString()
-              : availableSupportPoints + "";
+        String availableResources = useFallbackHiringFee ?
+                                          campaign.getFunds().toAmountString() :
+                                          availableSupportPoints + "";
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, "message.ooc.cost", cost, addendum,
-              availableResources, addendum);
+        return getFormattedTextAt(RESOURCE_BUNDLE, "message.ooc.cost", cost, addendum, availableResources, addendum);
     }
 }

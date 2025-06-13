@@ -41,7 +41,7 @@ import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
 
 /**
@@ -99,8 +99,8 @@ public class VeeStabilizer extends Part {
     }
 
     @Override
-    public int getBaseAvailability(int era) {
-        return EquipmentType.RATING_B;
+    public AvailabilityValue getBaseAvailability(Era era) {
+        return AvailabilityValue.B;
     }
 
     @Override

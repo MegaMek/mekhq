@@ -28,7 +28,9 @@
 
 package mekhq.campaign.unit.actions;
 
+import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -37,6 +39,7 @@ import mekhq.campaign.unit.Unit;
  * Activates a unit.
  */
 public class ActivateUnitAction implements IUnitAction {
+    private static final MMLogger logger = MMLogger.create(ActivateUnitAction.class);
 
     private final Person tech;
     private final boolean isGM;
@@ -57,10 +60,30 @@ public class ActivateUnitAction implements IUnitAction {
     public void execute(Campaign campaign, Unit unit) {
         if (isGM) {
             unit.startActivating(null, true);
-        }
-        else {
-            if (!unit.isSelfCrewed() && (null == tech)) {
+        } else {
+            if (!unit.isConventionalInfantry() && (null == tech)) {
                 return;
+            }
+
+            Entity entity = unit.getEntity();
+
+            if (entity == null) {
+                logger.error("Unit has no entity: {}", unit.getName());
+                return;
+            }
+
+            if (tech != null && entity.isLargeCraft() && !unit.getCrew().contains(tech)) {
+                if (!tech.isTechLargeVessel()) {
+                    logger.error("{} is not a vessel tech", tech.getFullTitle());
+                    return;
+                }
+
+                if (!unit.canTakeMoreVesselCrew()) {
+                    logger.warn("Unit has too many vessel crew members: {}", unit.getName());
+                    return;
+                }
+
+                unit.addVesselCrew(tech, true);
             }
 
             unit.startActivating(tech);

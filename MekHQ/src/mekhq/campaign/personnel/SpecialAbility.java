@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Vector;
 
+import mekhq.campaign.personnel.skills.Skills;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -63,20 +64,19 @@ import megamek.logging.MMLogger;
 import mekhq.Utilities;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.skills.Skills;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
- * This object will serve as a wrapper for a specific pilot special ability. In
- * the actual
- * person object we will use PersonnelOptions, so these objects will not get
- * written to actual
- * personnel. Instead, we will keep track of a full static hash of SPAs that
- * will contain important
- * information on XP costs and pre-reqs that can be looked up to see if a person
- * is eligible for a
- * particular option. All of this will be customizable via an external XML file
- * that can be user
- * selected in the campaign options (and possibly user editable).
+ * This object will serve as a wrapper for a specific pilot special ability. In the actual person object we will use
+ * PersonnelOptions, so these objects will not get written to actual personnel. Instead, we will keep track of a full
+ * static hash of SPAs that will contain important information on XP costs and pre-reqs that can be looked up to see if
+ * a person is eligible for a particular option. All of this will be customizable via an external XML file that can be
+ * user selected in the campaign options (and possibly user editable).
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
@@ -175,8 +175,8 @@ public class SpecialAbility {
             }
         }
 
-        return !prereqMisc.containsKey(PREREQ_MISC_CLANPILOT)
-                || (p.isClanPersonnel() == Boolean.parseBoolean(prereqMisc.get(PREREQ_MISC_CLANPILOT)));
+        return !prereqMisc.containsKey(PREREQ_MISC_CLANPILOT) ||
+                     (p.isClanPersonnel() == Boolean.parseBoolean(prereqMisc.get(PREREQ_MISC_CLANPILOT)));
     }
 
     public boolean isEligible(boolean isClanPilot, Skills skills, PersonnelOptions options) {
@@ -200,8 +200,8 @@ public class SpecialAbility {
             }
         }
 
-        return !prereqMisc.containsKey(PREREQ_MISC_CLANPILOT)
-                || (isClanPilot == Boolean.parseBoolean(prereqMisc.get(PREREQ_MISC_CLANPILOT)));
+        return !prereqMisc.containsKey(PREREQ_MISC_CLANPILOT) ||
+                     (isClanPilot == Boolean.parseBoolean(prereqMisc.get(PREREQ_MISC_CLANPILOT)));
     }
 
     public boolean isEligible(int unitType) {
@@ -280,8 +280,10 @@ public class SpecialAbility {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "xpCost", xpCost);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "weight", weight);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prereqAbilities", Utilities.combineString(prereqAbilities, "::"));
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "invalidAbilities",
-                Utilities.combineString(invalidAbilities, "::"));
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "invalidAbilities",
+              Utilities.combineString(invalidAbilities, "::"));
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "removeAbilities", Utilities.combineString(removeAbilities, "::"));
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "choiceValues", Utilities.combineString(choiceValues, "::"));
         for (SkillPerquisite skillpre : prereqSkills) {
@@ -351,7 +353,7 @@ public class SpecialAbility {
     }
 
     public static void generateSeparateInstanceFromXML(Node wn, Map<String, SpecialAbility> spHash,
-            PersonnelOptions options) {
+                                                       PersonnelOptions options) {
         try {
             SpecialAbility retVal = new SpecialAbility();
             NodeList nl = wn.getChildNodes();
@@ -474,21 +476,19 @@ public class SpecialAbility {
     }
 
     /**
-     * This return a random weapon to specialize in, selected based on weightings.
-     * Introtech
-     * weaponry is weighted at 50, standard weaponry at 25, advanced weaponry at 5,
-     * while experimental
-     * and unofficial weaponry are both weighted at 1.
+     * This return a random weapon to specialize in, selected based on weightings. Introtech weaponry is weighted at 50,
+     * standard weaponry at 25, advanced weaponry at 5, while experimental and unofficial weaponry are both weighted at
+     * 1.
      *
      * @param person      the person to generate the weapon specialization for
      * @param techLevel   the maximum tech level to generate a weapon for
      * @param year        the year to generate the specialization for
      * @param clusterOnly whether to only consider cluster weapons or not
-     * @return the name of the selected weapon, or null if there are no weapons that
-     *         can be selected
+     *
+     * @return the name of the selected weapon, or null if there are no weapons that can be selected
      */
-    public static @Nullable String chooseWeaponSpecialization(final Person person, final int techLevel,
-            final int year, final boolean clusterOnly) {
+    public static @Nullable String chooseWeaponSpecialization(final Person person, final int techLevel, final int year,
+                                                              final boolean clusterOnly) {
         final WeightedIntMap<EquipmentType> weapons = new WeightedIntMap<>();
         // First try to generate based on the person's unit
         if ((person.getUnit() != null) && (person.getUnit().getEntity() != null)) {
@@ -499,7 +499,7 @@ public class SpecialAbility {
 
         // If that doesn't generate a valid weapon, then turn to the wider list
         if (weapons.isEmpty()) {
-            for (Enumeration<EquipmentType> e = EquipmentType.getAllTypes(); e.hasMoreElements();) {
+            for (Enumeration<EquipmentType> e = EquipmentType.getAllTypes(); e.hasMoreElements(); ) {
                 final EquipmentType equipmentType = e.nextElement();
                 addValidWeaponryToMap(equipmentType, person, techLevel, year, clusterOnly, weapons);
             }
@@ -508,27 +508,24 @@ public class SpecialAbility {
     }
 
     /**
-     * This is a worker method to add any valid weaponry to the weighted map used to
-     * generate a
-     * random weapon specialization
+     * This is a worker method to add any valid weaponry to the weighted map used to generate a random weapon
+     * specialization
      *
      * @param equipmentType the equipment type to test for validity
      * @param person        the person to generate the weapon specialization for
      * @param techLevel     the maximum tech level to generate a weapon for
      * @param year          the year to generate the specialization for
      * @param clusterOnly   whether to only consider cluster weapons or not
-     * @param weapons       the weighted map of weaponry to add the equipmentType to
-     *                      if valid
+     * @param weapons       the weighted map of weaponry to add the equipmentType to if valid
      */
-    private static void addValidWeaponryToMap(final EquipmentType equipmentType,
-            final Person person, final int techLevel,
-            final int year, final boolean clusterOnly,
-            final WeightedIntMap<EquipmentType> weapons) {
+    private static void addValidWeaponryToMap(final EquipmentType equipmentType, final Person person,
+                                              final int techLevel, final int year, final boolean clusterOnly,
+                                              final WeightedIntMap<EquipmentType> weapons) {
         // Ensure it is a weapon eligible for the SPA in question, and the tech level is
         // IS for
         // IS personnel and Clan for Clan personnel
-        if (!isWeaponEligibleForSPA(equipmentType, person.getPrimaryRole(), clusterOnly)
-                || (TechConstants.isClan(equipmentType.getTechLevel(year)) != person.isClanPersonnel())) {
+        if (!isWeaponEligibleForSPA(equipmentType, person.getPrimaryRole(), clusterOnly) ||
+                  (TechConstants.isClan(equipmentType.getTechLevel(year)) != person.isClanPersonnel())) {
             return;
         }
 
@@ -545,61 +542,58 @@ public class SpecialAbility {
         }
 
         // Determine the weight based on the tech level
-        final int weight = (weaponTechLevel < CampaignOptions.TECH_STANDARD) ? 50
-                : (weaponTechLevel < CampaignOptions.TECH_ADVANCED) ? 25
-                        : (weaponTechLevel < CampaignOptions.TECH_EXPERIMENTAL) ? 5
-                                : 1;
+        final int weight = (weaponTechLevel < CampaignOptions.TECH_STANDARD) ?
+                                 50 :
+                                 (weaponTechLevel < CampaignOptions.TECH_ADVANCED) ?
+                                       25 :
+                                       (weaponTechLevel < CampaignOptions.TECH_EXPERIMENTAL) ? 5 : 1;
         weapons.add(weight, equipmentType);
     }
 
     /**
-     * Worker function that determines if a piece of equipment is eligible for being
-     * selected for an SPA.
+     * Worker function that determines if a piece of equipment is eligible for being selected for an SPA.
      *
      * @param et          Equipment type to check
-     * @param role        Person's primary role. This check is ignored if
-     *                    PersonnelRole.NONE is passed in.
-     * @param clusterOnly All weapon types or just ones that do rolls on the cluster
-     *                    table
+     * @param role        Person's primary role. This check is ignored if PersonnelRole.NONE is passed in.
+     * @param clusterOnly All weapon types or just ones that do rolls on the cluster table
      */
     public static boolean isWeaponEligibleForSPA(EquipmentType et, PersonnelRole role, boolean clusterOnly) {
         if (!(et instanceof WeaponType)) {
             return false;
-        } else if ((et instanceof InfantryWeapon)
-                || (et instanceof BayWeapon)
-                || (et instanceof InfantryAttack)) {
+        } else if ((et instanceof InfantryWeapon) || (et instanceof BayWeapon) || (et instanceof InfantryAttack)) {
             return false;
         }
         WeaponType wt = (WeaponType) et;
-        if (wt.isCapital()
-                || wt.isSubCapital()
-                || wt.hasFlag(WeaponType.F_INFANTRY)
-                || wt.hasFlag(WeaponType.F_ONESHOT)
-                || wt.hasFlag(WeaponType.F_PROTOTYPE)) {
+        if (wt.isCapital() ||
+                  wt.isSubCapital() ||
+                  wt.hasFlag(WeaponType.F_INFANTRY) ||
+                  wt.hasFlag(WeaponType.F_ONESHOT) ||
+                  wt.hasFlag(WeaponType.F_PROTOTYPE)) {
             return false;
         }
 
-        if (!role.isCivilian()
-                && !((wt.hasFlag(WeaponType.F_MEK_WEAPON) && !role.isMekWarrior())
-                        || (wt.hasFlag(WeaponType.F_AERO_WEAPON) && !role.isAerospacePilot())
-                        || (wt.hasFlag(WeaponType.F_TANK_WEAPON) && !role.isVehicleCrewMember())
-                        || (wt.hasFlag(WeaponType.F_BA_WEAPON) && !role.isBattleArmour())
-                        || (wt.hasFlag(WeaponType.F_PROTO_WEAPON) && !role.isProtoMekPilot()))) {
+        if (!role.isCivilian() &&
+                  !((wt.hasFlag(WeaponType.F_MEK_WEAPON) && !role.isMekWarrior()) ||
+                          (wt.hasFlag(WeaponType.F_AERO_WEAPON) && !role.isAerospacePilot()) ||
+                          (wt.hasFlag(WeaponType.F_TANK_WEAPON) && !role.isVehicleCrewMember()) ||
+                          (wt.hasFlag(WeaponType.F_BA_WEAPON) && !role.isBattleArmour()) ||
+                          (wt.hasFlag(WeaponType.F_PROTO_WEAPON) && !role.isProtoMekPilot()))) {
             return false;
         }
 
         // Should only apply to Large Ship-mounted weapons
         if (wt.getAtClass() == WeaponType.CLASS_NONE ||
-                wt.getAtClass() == WeaponType.CLASS_POINT_DEFENSE ||
-                (wt.getAtClass() >= WeaponType.CLASS_CAPITAL_LASER
-                        && wt.getAtClass() <= WeaponType.CLASS_TELE_MISSILE)) {
+                  wt.getAtClass() == WeaponType.CLASS_POINT_DEFENSE ||
+                  (wt.getAtClass() >= WeaponType.CLASS_CAPITAL_LASER &&
+                         wt.getAtClass() <= WeaponType.CLASS_TELE_MISSILE)) {
             return false;
         }
 
-        if (clusterOnly && !((wt.getDamage() == WeaponType.DAMAGE_BY_CLUSTERTABLE) ||
-                (wt instanceof ACWeapon) ||
-                (wt instanceof UACWeapon) ||
-                (wt instanceof LBXACWeapon))) {
+        if (clusterOnly &&
+                  !((wt.getDamage() == WeaponType.DAMAGE_BY_CLUSTERTABLE) ||
+                          (wt instanceof ACWeapon) ||
+                          (wt instanceof UACWeapon) ||
+                          (wt instanceof LBXACWeapon))) {
             return false;
         }
 

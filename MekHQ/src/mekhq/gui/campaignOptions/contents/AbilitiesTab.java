@@ -24,69 +24,84 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.campaignOptions.contents;
 
-import megamek.client.ui.swing.util.UIUtil;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.spaUtilities.SpaUtilities.getSpaCategory;
+import static mekhq.utilities.spaUtilities.enums.AbilityCategory.CHARACTER_CREATION_ONLY;
+import static mekhq.utilities.spaUtilities.enums.AbilityCategory.CHARACTER_FLAW;
+import static mekhq.utilities.spaUtilities.enums.AbilityCategory.COMBAT_ABILITY;
+import static mekhq.utilities.spaUtilities.enums.AbilityCategory.MANEUVERING_ABILITY;
+import static mekhq.utilities.spaUtilities.enums.AbilityCategory.UTILITY_ABILITY;
+
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+
+import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import mekhq.CampaignPreset;
 import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.SkillPerquisite;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo;
-import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory;
 import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 import mekhq.gui.dialog.EditSpecialAbilityDialog;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.regex.Pattern;
-import java.util.stream.Stream;
-
-import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.COMBAT_ABILITY;
-import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.MANEUVERING_ABILITY;
-import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.UTILITY_ABILITY;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+import mekhq.utilities.spaUtilities.enums.AbilityCategory;
 
 /**
- * The {@code AbilitiesTab} class represents a GUI tab for configuring and managing
- * special abilities in a campaign. This class handles the initialization, categorization,
- * and display of abilities, providing functionality for enabling, disabling, and customizing
- * abilities within the combat, maneuvering, and utility categories.
+ * The {@code AbilitiesTab} class represents a GUI tab for configuring and managing special abilities in a campaign.
+ * This class handles the initialization, categorization, and display of abilities, providing functionality for
+ * enabling, disabling, and customizing abilities within the combat, maneuvering, and utility categories.
  * <p>
  * This tab is used as part of the MekHQ campaign options UI for managing personnel-related abilities.
  */
 public class AbilitiesTab {
-    private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
-    private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
-
     private ArrayList<String> level3Abilities;
     private Map<String, CampaignOptionsAbilityInfo> allAbilityInfo;
     private JPanel combatTab;
     private JPanel maneuveringTab;
     private JPanel utilityTab;
+    private JPanel characterFlawsTab;
+    private JPanel characterCreationOnlyTab;
 
     /**
-     * Constructor for the {@code AbilitiesTab} class.
-     * Initializes the tab by creating containers for ability categories and populating
-     * them with related ability information.
+     * Constructor for the {@code AbilitiesTab} class. Initializes the tab by creating containers for ability categories
+     * and populating them with related ability information.
      */
     public AbilitiesTab() {
         initialize();
     }
 
     /**
-     * Initializes the internal data structures and UI components for managing abilities.
-     * Prepares the containers for each ability category (combat, maneuvering, utility)
-     * and populates the {@code allAbilityInfo} map by processing an initial set of abilities.
+     * Initializes the internal data structures and UI components for managing abilities. Prepares the containers for
+     * each ability category (combat, maneuvering, utility) and populates the {@code allAbilityInfo} map by processing
+     * an initial set of abilities.
      */
     private void initialize() {
         allAbilityInfo = new HashMap<>();
@@ -94,13 +109,14 @@ public class AbilitiesTab {
         combatTab = new JPanel();
         maneuveringTab = new JPanel();
         utilityTab = new JPanel();
+        characterFlawsTab = new JPanel();
+        characterCreationOnlyTab = new JPanel();
         buildAllAbilityInfo(SpecialAbility.getSpecialAbilities());
     }
 
     /**
-     * Builds and initializes the {@code allAbilityInfo} map, which holds information about
-     * abilities categorized into combat, maneuvering, and utility abilities. Ensures missing
-     * abilities are also included and updates the display.
+     * Builds and initializes the {@code allAbilityInfo} map, which holds information about abilities categorized into
+     * combat, maneuvering, and utility abilities. Ensures missing abilities are also included and updates the display.
      *
      * @param abilities A map of active special abilities keyed by name.
      */
@@ -111,14 +127,14 @@ public class AbilitiesTab {
 
         // Build list of Level 3 abilities
         PersonnelOptions personnelOptions = new PersonnelOptions();
-        for (final Enumeration<IOptionGroup> i = personnelOptions.getGroups(); i.hasMoreElements();) {
+        for (final Enumeration<IOptionGroup> i = personnelOptions.getGroups(); i.hasMoreElements(); ) {
             IOptionGroup group = i.nextElement();
 
             if (!group.getKey().equalsIgnoreCase(PersonnelOptions.LVL3_ADVANTAGES)) {
                 continue;
             }
 
-            for (final Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
+            for (final Enumeration<IOption> j = group.getOptions(); j.hasMoreElements(); ) {
                 IOption option = j.nextElement();
                 level3Abilities.add(option.getName());
             }
@@ -145,18 +161,19 @@ public class AbilitiesTab {
     }
 
     /**
-     * Refreshes and updates all tabs related to abilities by clearing their contents
-     * and reloading the data.
+     * Refreshes and updates all tabs related to abilities by clearing their contents and reloading the data.
      */
     private void refreshAll() {
-        refreshTabContents(combatTab, AbilityCategory.COMBAT_ABILITY);
-        refreshTabContents(maneuveringTab, AbilityCategory.MANEUVERING_ABILITY);
-        refreshTabContents(utilityTab, AbilityCategory.UTILITY_ABILITY);
+        refreshTabContents(combatTab, COMBAT_ABILITY);
+        refreshTabContents(maneuveringTab, MANEUVERING_ABILITY);
+        refreshTabContents(utilityTab, UTILITY_ABILITY);
+        refreshTabContents(characterFlawsTab, CHARACTER_FLAW);
+        refreshTabContents(characterCreationOnlyTab, CHARACTER_CREATION_ONLY);
     }
 
     /**
-     * Updates the contents of a specific ability category tab by rebuilding its layout
-     * and content based on the category.
+     * Updates the contents of a specific ability category tab by rebuilding its layout and content based on the
+     * category.
      *
      * @param tab      The {@code JPanel} representing the tab to be refreshed.
      * @param category The ability category associated with the tab.
@@ -174,86 +191,53 @@ public class AbilitiesTab {
     }
 
     /**
-     * Populates the {@code allAbilityInfo} map with special ability information and
-     * categorizes abilities based on their type (combat, maneuvering, utility).
+     * Populates the {@code allAbilityInfo} map with special ability information and categorizes abilities based on
+     * their type (combat, maneuvering, utility).
      *
      * @param abilities A map of abilities to be processed.
-     * @param isEnabled {@code true} if these abilities should start as enabled;
-     *                  otherwise, {@code false}.
+     * @param isEnabled {@code true} if these abilities should start as enabled; otherwise, {@code false}.
      */
     private void buildAbilityInfo(Map<String, SpecialAbility> abilities, boolean isEnabled) {
         for (Entry<String, SpecialAbility> entry : abilities.entrySet()) {
             SpecialAbility clonedAbility = entry.getValue().clone();
             String abilityName = clonedAbility.getName();
-            AbilityCategory category = getCategory(clonedAbility);
+            AbilityCategory category = getSpaCategory(clonedAbility);
 
             if (!level3Abilities.contains(abilityName)) {
                 continue;
             }
 
             // Mark the ability as active
-            allAbilityInfo.put(abilityName, new CampaignOptionsAbilityInfo(abilityName,
-                clonedAbility, isEnabled, category));
+            allAbilityInfo.put(abilityName,
+                  new CampaignOptionsAbilityInfo(abilityName, clonedAbility, isEnabled, category));
         }
     }
 
     /**
-     * Determines the {@code AbilityCategory} for the given special ability based on
-     * skill prerequisites such as "Gunnery", "Piloting", etc.
-     *
-     * @param ability The {@code SpecialAbility} for which the category will be identified.
-     * @return The {@code AbilityCategory} for the specified ability.
-     */
-    private AbilityCategory getCategory(SpecialAbility ability) {
-        for (SkillPerquisite skillPerquisite : ability.getPrereqSkills()) {
-            // Is the ability classified as a Combat Ability?
-            boolean isCombatAbility = Stream.of("Gunnery", "Artillery", "Small Arms")
-                .anyMatch(word -> Pattern.compile("\\b" + word)
-                    .matcher(skillPerquisite.toString())
-                    .find());
-
-            if (isCombatAbility) {
-                return COMBAT_ABILITY;
-            }
-
-            // Is the ability classified as a Maneuvering Ability?
-            boolean isManeuveringAbility = Stream.of("Piloting", "Anti-Mek")
-                .anyMatch(word -> Pattern.compile("\\b" + word)
-                    .matcher(skillPerquisite.toString())
-                    .find());
-
-            if (isManeuveringAbility) {
-                return MANEUVERING_ABILITY;
-            }
-        }
-
-        // If it isn't a Combat or Maneuvering ability, it's a utility ability
-        return UTILITY_ABILITY;
-    }
-
-    /**
-     * Creates a new abilities configuration tab for a specific category.
-     * This includes adding controls, headers, and listed abilities.
+     * Creates a new abilities configuration tab for a specific category. This includes adding controls, headers, and
+     * listed abilities.
      *
      * @param abilityCategory The {@code AbilityCategory} to generate a tab for.
+     *
      * @return A {@code JPanel} representing the generated abilities tab.
      */
     public JPanel createAbilitiesTab(AbilityCategory abilityCategory) {
         // Header
-        JPanel headerPanel = switch (abilityCategory) {
-            case COMBAT_ABILITY ->
-                new CampaignOptionsHeaderPanel("CombatAbilitiesTab",
-                    getImageDirectory() + "logo_aurigan_coalition.png");
-            case MANEUVERING_ABILITY ->
-                new CampaignOptionsHeaderPanel("ManeuveringAbilitiesTab",
-                    getImageDirectory() + "logo_clan_hells_horses.png");
-            case UTILITY_ABILITY ->
-                new CampaignOptionsHeaderPanel("UtilityAbilitiesTab",
-                    getImageDirectory() + "logo_circinus_federation.png");
+        CampaignOptionsHeaderPanel headerPanel = switch (abilityCategory) {
+            case COMBAT_ABILITY -> new CampaignOptionsHeaderPanel("CombatAbilitiesTab",
+                  getImageDirectory() + "logo_aurigan_coalition.png");
+            case MANEUVERING_ABILITY -> new CampaignOptionsHeaderPanel("ManeuveringAbilitiesTab",
+                  getImageDirectory() + "logo_clan_hells_horses.png");
+            case UTILITY_ABILITY -> new CampaignOptionsHeaderPanel("UtilityAbilitiesTab",
+                  getImageDirectory() + "logo_circinus_federation.png");
+            case CHARACTER_FLAW -> new CampaignOptionsHeaderPanel("CharacterFlawsTab",
+                  getImageDirectory() + "logo_word_of_blake.png");
+            case CHARACTER_CREATION_ONLY -> new CampaignOptionsHeaderPanel("CharacterCreationOnlyTab",
+                  getImageDirectory() + "logo_tortuga_dominions.png");
         };
 
         // Contents
-        JButton btnEnableAll = new CampaignOptionsButton("AddAll");
+        RoundedJButton btnEnableAll = new CampaignOptionsButton("AddAll");
         btnEnableAll.addActionListener(e -> {
             for (CampaignOptionsAbilityInfo abilityInfo : allAbilityInfo.values()) {
                 abilityInfo.setEnabled(true);
@@ -262,7 +246,7 @@ public class AbilitiesTab {
             refreshAll();
         });
 
-        JButton btnRemoveAll = new CampaignOptionsButton("RemoveAll");
+        RoundedJButton btnRemoveAll = new CampaignOptionsButton("RemoveAll");
         btnRemoveAll.addActionListener(e -> {
             for (CampaignOptionsAbilityInfo abilityInfo : allAbilityInfo.values()) {
                 abilityInfo.setEnabled(false);
@@ -324,15 +308,23 @@ public class AbilitiesTab {
                 utilityTab = parentPanel;
                 yield utilityTab;
             }
+            case CHARACTER_FLAW -> {
+                characterFlawsTab = parentPanel;
+                yield characterFlawsTab;
+            }
+            case CHARACTER_CREATION_ONLY -> {
+                characterCreationOnlyTab = parentPanel;
+                yield characterCreationOnlyTab;
+            }
         };
     }
 
     /**
-     * Creates a panel for rendering a single ability within the tab, enabling users
-     * to customize or enable/disable the ability.
+     * Creates a panel for rendering a single ability within the tab, enabling users to customize or enable/disable the
+     * ability.
      *
-     * @param abilityInfo The {@code CampaignOptionsAbilityInfo} containing details
-     *                    about a specific ability.
+     * @param abilityInfo The {@code CampaignOptionsAbilityInfo} containing details about a specific ability.
+     *
      * @return A {@code JPanel} containing the UI elements related to the ability.
      */
     private JPanel createSPAPanel(CampaignOptionsAbilityInfo abilityInfo) {
@@ -341,43 +333,47 @@ public class AbilitiesTab {
         // Initialization
         final JPanel panel = new AbilitiesTabStandardPanel(ability);
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel,
-            GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL);
+              GridBagConstraints.NORTHWEST,
+              GridBagConstraints.HORIZONTAL);
 
         // Contents
-        JCheckBox chkAbility = new JCheckBox(resources.getString("abilityEnable.text"));
+        JCheckBox chkAbility = new JCheckBox(getTextAt(getCampaignOptionsResourceBundle(), "abilityEnable.text"));
         chkAbility.setSelected(abilityInfo.isEnabled());
         chkAbility.addActionListener(e -> abilityInfo.setEnabled(chkAbility.isSelected()));
 
-        JLabel lblCost = new JLabel(String.format(resources.getString("abilityCost.text"),
-            ability.getCost()));
+        JLabel lblCost = new JLabel(String.format(getTextAt(getCampaignOptionsResourceBundle(), "abilityCost.text"),
+              ability.getCost()));
 
         JLabel lblDescription = new JLabel();
         lblDescription.setText(String.format("<html><div style='width: %s; text-align:justify;'><i>%s</i></div></html>",
-            UIUtil.scaleForGUI(400), ability.getDescription()));
+              UIUtil.scaleForGUI(400),
+              ability.getDescription()));
 
         JLabel lblPrerequisites = createAbilityLabel("prerequisites.text", ability.getAllPrereqDesc());
         JLabel lblIncompatible = createAbilityLabel("incompatible.text", ability.getInvalidDesc());
         JLabel lblRemoves = createAbilityLabel("removes.text", ability.getRemovedDesc());
 
-        JButton btnCustomizeAbility = new CampaignOptionsButton("CustomizeAbility", null);
+        RoundedJButton btnCustomizeAbility = new CampaignOptionsButton("CustomizeAbility", null);
         btnCustomizeAbility.addActionListener(e -> {
             if (editSPA(ability)) {
                 // This will run on the SWT thread
                 SwingUtilities.invokeLater(() -> {
                     // Update components with new values
-                    lblCost.setText(String.format(resources.getString("abilityCost.text"),
-                        ability.getCost()));
+                    lblCost.setText(String.format(getTextAt(getCampaignOptionsResourceBundle(), "abilityCost.text"),
+                          ability.getCost()));
 
-                    String prerequisitesDescription = resources.getString("prerequisites.text")
-                        + ability.getAllPrereqDesc();
+                    String prerequisitesDescription = getTextAt(getCampaignOptionsResourceBundle(),
+                          "prerequisites.text") +
+                                                            ability.getAllPrereqDesc();
                     lblPrerequisites.setText(buildAbilityDescription(prerequisitesDescription));
 
-                    String incompatibleDescription = resources.getString("incompatible.text")
-                        + ability.getInvalidDesc();
+                    String incompatibleDescription = getTextAt(getCampaignOptionsResourceBundle(),
+                          "incompatible.text") +
+                                                           ability.getInvalidDesc();
                     lblIncompatible.setText(buildAbilityDescription(incompatibleDescription));
 
-                    String removesDescription = resources.getString("removes.text")
-                        + ability.getRemovedDesc();
+                    String removesDescription = getTextAt(getCampaignOptionsResourceBundle(), "removes.text") +
+                                                      ability.getRemovedDesc();
                     lblRemoves.setText(buildAbilityDescription(removesDescription));
                 });
             }
@@ -417,8 +413,8 @@ public class AbilitiesTab {
      * Opens a dialog to edit the details of the specified special ability.
      *
      * @param ability The {@code SpecialAbility} instance to be edited.
-     * @return {@code true} if the user confirmed the changes; {@code false} if the operation
-     *         was canceled.
+     *
+     * @return {@code true} if the user confirmed the changes; {@code false} if the operation was canceled.
      */
     private boolean editSPA(SpecialAbility ability) {
         Map<String, SpecialAbility> temporaryMap = new HashMap<>();
@@ -427,22 +423,20 @@ public class AbilitiesTab {
             temporaryMap.put(info.getKey(), info.getValue().getAbility());
         }
 
-        EditSpecialAbilityDialog dialog = new EditSpecialAbilityDialog(null, ability,
-              temporaryMap);
+        EditSpecialAbilityDialog dialog = new EditSpecialAbilityDialog(null, ability, temporaryMap);
         dialog.setVisible(true);
 
         return !dialog.wasCancelled();
     }
 
     /**
-     * A custom {@code JPanel} implementation for displaying abilities configured in the tab.
-     * Displays the ability's name in a bordered, titled panel and scales the panel size appropriately
-     * for the UI.
+     * A custom {@code JPanel} implementation for displaying abilities configured in the tab. Displays the ability's
+     * name in a bordered, titled panel and scales the panel size appropriately for the UI.
      */
     static class AbilitiesTabStandardPanel extends JPanel {
         /**
-         * Constructs a panel representing an individual ability with a styled header based
-         * on the name of the given {@code SpecialAbility}.
+         * Constructs a panel representing an individual ability with a styled header based on the name of the given
+         * {@code SpecialAbility}.
          *
          * @param ability The {@code SpecialAbility} used to configure the layout and title of this panel.
          */
@@ -457,22 +451,22 @@ public class AbilitiesTab {
                 }
             };
 
-            setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(),
-                    String.format("<html>%s</html>", name)));
+            setBorder(RoundedLineBorder.createRoundedLineBorder(name));
             setName("pnl" + name);
         }
     }
 
     /**
-     * Creates a label with a description for a specific attribute of the ability. For example,
-     * prerequisites, incompatible abilities, or removed abilities.
+     * Creates a label with a description for a specific attribute of the ability. For example, prerequisites,
+     * incompatible abilities, or removed abilities.
      *
      * @param resourceKey            The key used to retrieve the label text from resources.
      * @param descriptionFromAbility The description related to the ability attribute.
+     *
      * @return A {@code JLabel} with the generated description.
      */
     private JLabel createAbilityLabel(String resourceKey, String descriptionFromAbility) {
-        String description = resources.getString(resourceKey) + descriptionFromAbility;
+        String description = getTextAt(getCampaignOptionsResourceBundle(), resourceKey) + descriptionFromAbility;
         return new JLabel(buildAbilityDescription(description));
     }
 
@@ -480,20 +474,19 @@ public class AbilitiesTab {
      * Builds the HTML-formatted description for a specific ability or attribute for display in the UI.
      *
      * @param description The plain text description to be formatted.
+     *
      * @return A string containing the HTML-formatted description.
      */
     private static String buildAbilityDescription(String description) {
-        return ("<html>" + description + "</html>")
-            .replaceAll("\\{", "")
-            .replaceAll("}", "");
+        return ("<html>" + description + "</html>").replaceAll("\\{", "").replaceAll("}", "");
     }
 
     /**
-     * Applies the current campaign options to a specified {@code CampaignPreset}.
-     * Enabled abilities are added to the preset or globally updated within the campaign.
+     * Applies the current campaign options to a specified {@code CampaignPreset}. Enabled abilities are added to the
+     * preset or globally updated within the campaign.
      *
-     * @param preset The {@code CampaignPreset} to apply abilities to, or {@code null}
-     *               for directly setting them in the campaign.
+     * @param preset The {@code CampaignPreset} to apply abilities to, or {@code null} for directly setting them in the
+     *               campaign.
      */
     public void applyCampaignOptionsToCampaign(@Nullable CampaignPreset preset) {
         Map<String, SpecialAbility> enabledAbilities = new HashMap<>();

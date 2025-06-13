@@ -24,14 +24,22 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.campaignOptions.components;
 
-import megamek.client.ui.swing.util.UIUtil;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import javax.swing.*;
-import java.awt.*;
-import java.util.ResourceBundle;
+import java.awt.Dimension;
+import javax.swing.JPanel;
+
+import megamek.client.ui.util.UIUtil;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
 /**
  * A specialized {@link JPanel} tailored for use in campaign options dialogs.
@@ -41,16 +49,6 @@ import java.util.ResourceBundle;
  * assigned based on the provided {@code name} parameter.
  */
 public class CampaignOptionsStandardPanel extends JPanel {
-
-    /**
-     * The path to the resource bundle containing localized strings for border titles.
-     */
-    private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
-
-    /**
-     * The {@link ResourceBundle} used to fetch localized strings for titles and labels.
-     */
-    static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
 
     /**
      * Constructs a {@link CampaignOptionsStandardPanel} without a border.
@@ -91,7 +89,9 @@ public class CampaignOptionsStandardPanel extends JPanel {
      * @param borderTitle   the resource bundle key for the border's title; an empty string indicates no title
      */
     public CampaignOptionsStandardPanel(String name, boolean includeBorder, String borderTitle) {
-        borderTitle = borderTitle.isBlank() ? "" : resources.getString("lbl" + borderTitle + ".text");
+        borderTitle = borderTitle.isBlank() ?
+                            "" :
+                            getTextAt(getCampaignOptionsResourceBundle(), "lbl" + borderTitle + ".text");
 
         // Set a standardized panel behavior and preferred size scaling
         new JPanel() {
@@ -105,12 +105,10 @@ public class CampaignOptionsStandardPanel extends JPanel {
         if (includeBorder) {
             if (borderTitle.isBlank()) {
                 // Add an untitled etched border
-                setBorder(BorderFactory.createEtchedBorder());
+                setBorder(RoundedLineBorder.createRoundedLineBorder());
             } else {
                 // Add a titled border with localized title
-                setBorder(BorderFactory.createTitledBorder(
-                        BorderFactory.createEtchedBorder(),
-                        String.format("<html>%s</html>", borderTitle)));
+                setBorder(RoundedLineBorder.createRoundedLineBorder(borderTitle));
             }
         }
 

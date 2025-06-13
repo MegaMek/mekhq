@@ -24,8 +24,21 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui;
+
+import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_NONE;
+
+import java.awt.Component;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JTree;
+import javax.swing.tree.DefaultTreeCellRenderer;
 
 import megamek.client.ui.Messages;
 import megamek.common.Entity;
@@ -38,12 +51,6 @@ import mekhq.campaign.force.ForceType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.ReportingUtilities;
-
-import javax.swing.*;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import java.awt.*;
-
-import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_NONE;
 
 public class ForceRenderer extends DefaultTreeCellRenderer {
     private static final MMLogger logger = MMLogger.create(ForceRenderer.class);
@@ -63,7 +70,7 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
 
         if (value instanceof Unit unit) {
             String name = ReportingUtilities.messageSurroundedBySpanWithColor(
-                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(), "No Crew");
+                    ReportingUtilities.getNegativeColor(), "No Crew");
             if (unit.getEntity() instanceof GunEmplacement) {
                 name = "AutoTurret";
             }
@@ -76,13 +83,13 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                         + unit.getEntity().getCrew().getPiloting() + ')';
                 if (person.needsFixing() || (unit.getEntity().getCrew().getHits() > 0)) {
                     name = ReportingUtilities.messageSurroundedBySpanWithColor(
-                            MekHQ.getMHQOptions().getFontColorNegativeHexColor(), name);
+                            ReportingUtilities.getNegativeColor(), name);
                 }
             }
             String unitName = "<i>" + unit.getName() + "</i>";
             if (unit.isDamaged()) {
                 unitName = ReportingUtilities.messageSurroundedBySpanWithColor(
-                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(), unitName);
+                    ReportingUtilities.getNegativeColor(), unitName);
             }
 
             Entity entity = unit.getEntity();
@@ -135,12 +142,12 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
             }
 
             if (unit.hasTransportShipAssignment()) {
-                transport.append("<br>Transported by: ")
+                transport.append("<br>Transported (Ship) by: ")
                         .append(unit.getTransportShipAssignment().getTransportShip().getName());
             }
             String tacticalTransport = "";
             if (unit.hasTacticalTransportAssignment()) {
-                transport.append("<br>Transported by: ")
+                transport.append("<br>Transported (Tactical) by: ")
                     .append(unit.getTacticalTransportAssignment().getTransport().getName());
             }
             String towTransport = "";
@@ -174,12 +181,13 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
             ForceType forceType = force.getForceType();
             String typeKey = forceType.getSymbol();
 
-            String formattedForceName = String.format("<html>%s%s%s%s%s%s</html>",
-                force.isCombatTeam() ? "<b>" : "",
-                force.getOverrideCombatTeam() != COMBAT_TEAM_OVERRIDE_NONE ? "<u>" : "",
-                force.getName(),
-                force.isCombatTeam() ? "</b>" : "",
-                force.getOverrideCombatTeam() != COMBAT_TEAM_OVERRIDE_NONE ? "</u>" : "",
+            String formattedForceName = String.format("<html>%s%s%s%s%s%s%s</html>",
+                  force.isCombatTeam() ? "<b>" : "",
+                  force.getOverrideCombatTeam() != COMBAT_TEAM_OVERRIDE_NONE ? "<u>" : "",
+                  force.getName(),
+                  force.isCombatTeam() ? "</b>" : "",
+                  force.getOverrideCombatTeam() != COMBAT_TEAM_OVERRIDE_NONE ? "</u>" : "",
+                  force.isCombatTeam() ? " <s>c</s>" : "",
                 typeKey);
 
             setText(formattedForceName);

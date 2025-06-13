@@ -119,19 +119,19 @@
         <ageMin>10</ageMin>
         <ageMax>16</ageMax>
         <qualification>MechTech Apprenticeship</qualification>
-        <curriculum>Astech, Tech/Mek</curriculum>
+        <curriculum>Astech, Tech/Mek, Administration</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Mechanic Apprenticeship</qualification>
-        <curriculum>Astech, Tech/Mechanic</curriculum>
+        <curriculum>Astech, Tech/Mechanic, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>AeroTek Apprenticeship</qualification>
-        <curriculum>Astech, Tech/Aero</curriculum>
+        <curriculum>Astech, Tech/Aero, Administration</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Battle Armor Technician Apprenticeship</qualification>
-        <curriculum>Astech, Tech/BattleArmor</curriculum>
+        <curriculum>Astech, Tech/BattleArmor, Administration</curriculum>
         <qualificationStartYear>3058</qualificationStartYear>
         <qualification>Black Naval Apprenticeship</qualification>
-        <curriculum>Astech, Tech/Vessel</curriculum>
+        <curriculum>Astech, Tech/Vessel, Administration</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
         <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
     </academy>
@@ -218,19 +218,19 @@
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Advanced BattleMek Technologies</qualification>
-        <curriculum>Tech/Mek</curriculum>
+        <curriculum>Tech/Mek, Administration</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Advanced Technology &amp; Development</qualification>
-        <curriculum>Tech/Mechanic</curriculum>
+        <curriculum>Tech/Mechanic, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced AeroSpace Technologies</qualification>
-        <curriculum>Tech/Aero</curriculum>
+        <curriculum>Tech/Aero, Administration</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Battle Armor Technology &amp; Development</qualification>
-        <curriculum>Tech/BattleArmor</curriculum>
+        <curriculum>Tech/BattleArmor, Administration</curriculum>
         <qualificationStartYear>3058</qualificationStartYear>
         <qualification>Black Naval Technologies</qualification>
-        <curriculum>Tech/Vessel</curriculum>
+        <curriculum>Tech/Vessel, Administration</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
     </academy>
     <academy>
@@ -248,7 +248,7 @@
         <curriculum>Administration, Negotiation</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Vocational Logistician</qualification>
-        <curriculum>Administration, Scrounge</curriculum>
+        <curriculum>Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Nursing School</qualification>
         <curriculum>MedTech</curriculum>
@@ -268,28 +268,28 @@
         <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Advanced BattleMek Technologies</qualification>
-        <curriculum>Tech/Mek</curriculum>
+        <curriculum>Tech/Mek, Administration</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Advanced Technology &amp; Development</qualification>
-        <curriculum>Tech/Mechanic</curriculum>
+        <curriculum>Tech/Mechanic, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced AeroSpace Technologies</qualification>
-        <curriculum>Tech/Aero</curriculum>
+        <curriculum>Tech/Aero, Administration</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Battle Armor Technology &amp; Development</qualification>
-        <curriculum>Tech/BattleArmor</curriculum>
+        <curriculum>Tech/BattleArmor, Administration</curriculum>
         <qualificationStartYear>3058</qualificationStartYear>
         <qualification>Black Naval Technologies</qualification>
-        <curriculum>Tech/Vessel</curriculum>
+        <curriculum>Tech/Vessel, Administration</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Advanced Systems &amp; Technology</qualification>
         <curriculum>Administration, Negotiation</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Applied Economics</qualification>
-        <curriculum>Administration, Scrounge</curriculum>
+        <curriculum>Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Medicine</qualification>
-        <curriculum>Doctor</curriculum>
+        <curriculum>Doctor, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Applied Astrophysics</qualification>
         <curriculum>Hyperspace Navigation</curriculum>

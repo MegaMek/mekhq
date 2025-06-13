@@ -24,34 +24,54 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.randomEvents;
+
+import static megamek.utilities.ImageUtilities.scaleImageIcon;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
+import static mekhq.campaign.randomEvents.GrayMonday.EVENT_DATE_GRAY_MONDAY;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
+import java.awt.Component;
+import java.awt.Dimension;
+import java.time.LocalDate;
+import java.util.List;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Factions;
-import mekhq.gui.baseComponents.MHQDialogImmersive;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 
-import javax.swing.*;
-import java.awt.*;
-import java.time.LocalDate;
-import java.util.List;
-
-import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
-import static mekhq.campaign.randomEvents.GrayMonday.EVENT_DATE_GRAY_MONDAY;
-import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
-
-public class GrayMondayDialog extends MHQDialogImmersive {
+/**
+ * @deprecated unused
+ */
+@Deprecated(since = "0.50.06", forRemoval = true)
+public class GrayMondayDialog extends ImmersiveDialogCore {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.GrayMonday";
 
     public GrayMondayDialog(Campaign campaign, Person speaker, boolean isClarionNote, int eventIndex) {
-        super(campaign, speaker, null,
-            createInCharacterMessage(campaign, isClarionNote, eventIndex),
-            createButtons(), createOutOfCharacterMessage(), null, false,
-              null, true);
+        super(campaign,
+              speaker,
+              null,
+              createInCharacterMessage(campaign, isClarionNote, eventIndex),
+              createButtons(),
+              createOutOfCharacterMessage(),
+              null,
+              false,
+              null,
+              null,
+              true);
     }
 
     /**
@@ -63,8 +83,8 @@ public class GrayMondayDialog extends MHQDialogImmersive {
      * @return a list of {@link ButtonLabelTooltipPair} representing the dialog's buttons
      */
     private static List<ButtonLabelTooltipPair> createButtons() {
-        ButtonLabelTooltipPair btnConfirm = new ButtonLabelTooltipPair(
-            getFormattedTextAt(RESOURCE_BUNDLE, "confirm.button"), null);
+        ButtonLabelTooltipPair btnConfirm = new ButtonLabelTooltipPair(getFormattedTextAt(RESOURCE_BUNDLE,
+              "confirm.button"), null);
 
         return List.of(btnConfirm);
     }
@@ -76,6 +96,7 @@ public class GrayMondayDialog extends MHQDialogImmersive {
      * specialization within the campaign. If no such person exists, this method returns {@code null}.</p>
      *
      * @param campaign the {@link Campaign} containing personnel data
+     *
      * @return a {@link Person} representing the left speaker, or {@code null} if no suitable speaker is available
      */
     private static @Nullable Person getSpeaker(Campaign campaign) {
@@ -86,8 +107,7 @@ public class GrayMondayDialog extends MHQDialogImmersive {
         String commanderAddress = campaign.getCommanderAddress(false);
         String eventType = isClarionNote ? "clarionNote" : "grayMonday";
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, eventType + "Event" + eventIndex + ".message",
-            commanderAddress);
+        return getFormattedTextAt(RESOURCE_BUNDLE, eventType + "Event" + eventIndex + ".message", commanderAddress);
     }
 
 
@@ -125,12 +145,12 @@ public class GrayMondayDialog extends MHQDialogImmersive {
         if (campaign.getLocalDate().equals(EVENT_DATE_GRAY_MONDAY.plusDays(3))) {
             if (chosenContract != null) {
                 String employerCode = chosenContract.getEmployerCode();
-                speakerIcon = Factions.getFactionLogo(campaign, employerCode, true);
+                speakerIcon = Factions.getFactionLogo(campaign.getGameYear(), employerCode);
             }
         }
 
         if (speakerIcon != null) {
-            speakerIcon = scaleImageIconToWidth(speakerIcon, IMAGE_WIDTH);
+            speakerIcon = scaleImageIcon(speakerIcon, IMAGE_WIDTH, true);
         }
         JLabel imageLabel = new JLabel();
         imageLabel.setIcon(speakerIcon);
@@ -138,9 +158,10 @@ public class GrayMondayDialog extends MHQDialogImmersive {
 
         // Speaker description (below the icon)
         StringBuilder speakerDescription = getSpeakerDescription(campaign, speaker, speakerName);
-        JLabel leftDescription = new JLabel(
-            String.format("<html><div style='width:%dpx; text-align:center;'>%s</div></html>",
-                IMAGE_WIDTH, speakerDescription));
+        JLabel leftDescription = new JLabel(String.format(
+              "<html><div style='width:%dpx; text-align:center;'>%s</div></html>",
+              IMAGE_WIDTH,
+              speakerDescription));
         leftDescription.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Add the image and description to the speakerBox

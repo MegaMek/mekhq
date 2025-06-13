@@ -24,12 +24,16 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.model;
 
 import java.awt.Component;
 import java.util.ArrayList;
-
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
@@ -37,12 +41,13 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.Skill;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.work.IPartWork;
 import mekhq.gui.BasicInfo;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.ITechWorkPanel;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * A table model for displaying work items
@@ -98,7 +103,7 @@ public class TechTableModel extends DataTableModel {
             setOpaque(true);
             Person tech = getTechAt(actualRow);
             setImage(tech.getPortrait().getImage(54));
-            setHtmlText(getTechDesc(tech, getCampaign().isOvertimeAllowed(), panel.getSelectedTask()));
+            setHtmlText(getTechDescription(tech, getCampaign().isOvertimeAllowed(), panel.getSelectedTask()));
             if (isSelected) {
                 highlightBorder();
             } else {
@@ -110,11 +115,34 @@ public class TechTableModel extends DataTableModel {
         }
     }
 
+    /**
+     * @deprecated Use {@link #getTechDescription(Person, boolean, IPartWork)} instead.
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public String getTechDesc(Person tech, boolean overtimeAllowed, IPartWork part) {
+        return getTechDescription(tech, overtimeAllowed, part);
+    }
+
+    /**
+     * Generates an HTML-formatted description of a technician, summarizing key professional information and status.
+     *
+     * <p>The description includes the technician's full title (with possible color highlighting), primary skills and
+     * their experience levels, total experience points, edge (if applicable), available and overtime minutes, and
+     * special technician traits or flaws. If a specific part is provided and associated with a unit the technician can
+     * service, the name may be highlighted.</p>
+     *
+     * @param tech            the {@link Person} representing the technician
+     * @param overtimeAllowed whether overtime is permitted for this technician
+     * @param part            the {@link IPartWork} part or repair task being considered, or {@code null} if not
+     *                        applicable
+     *
+     * @return a formatted HTML {@link String} describing the technician's skills, time availability, and special traits
+     */
+    public String getTechDescription(Person tech, boolean overtimeAllowed, IPartWork part) {
         StringBuilder toReturn = new StringBuilder(128);
         toReturn.append("<html><font");
         if ((null != part) && (null != part.getUnit()) && tech.getTechUnits().contains(part.getUnit())) {
-            toReturn.append(" color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'><b>@");
+            toReturn.append(" color='" + ReportingUtilities.getPositiveColor() + "'><b>@");
         } else {
             toReturn.append("><b>");
         }
@@ -129,24 +157,25 @@ public class TechTableModel extends DataTableModel {
                 toReturn.append("; ");
             }
 
+            int experienceLevel = skill.getExperienceLevel(tech.getOptions(), tech.getATOWAttributes());
+
             toReturn.append("<b>")
-                .append(SkillType.getColoredExperienceLevelName(skill.getExperienceLevel()))
-                .append("</b> ").append(skillName);
+                    .append(SkillType.getColoredExperienceLevelName(experienceLevel))
+                    .append("</b> ").append(skillName);
             first = false;
         }
 
         toReturn.append(String.format(" (%d XP", tech.getXP()));
         // if Edge usage is allowed for techs, display remaining edge in the dialogue
-        if (getCampaign().getCampaignOptions().isUseSupportEdge()
-                && tech.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_BREAK_PART)) {
+        if (getCampaign().getCampaignOptions().isUseSupportEdge() && tech.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_BREAK_PART)) {
             toReturn.append(String.format(", %d Edge)", tech.getCurrentEdge()));
         } else {
-            toReturn.append(")");
+            toReturn.append(')');
         }
         toReturn.append("<br/>");
 
         toReturn.append(String.format("%d/%d minutes left", tech.getMinutesLeft(),
-                tech.getDailyAvailableTechTime()));
+              tech.getDailyAvailableTechTime(getCampaign().getCampaignOptions().isTechsUseAdministration())));
 
         if (overtimeAllowed) {
             toReturn.append(String.format(" + (%d overtime)", tech.getOvertimeLeft()));
@@ -169,6 +198,12 @@ public class TechTableModel extends DataTableModel {
         }
         if (tech.getOptions().booleanOption(PersonnelOptions.TECH_WEAPON_SPECIALIST)) {
             toReturn.append(", <i>Weapon Specialist</i>");
+        }
+        if (tech.getOptions().booleanOption(PersonnelOptions.FLAW_GREMLINS)) {
+            toReturn.append(", <i>Gremlins</i>");
+        }
+        if (tech.getOptions().booleanOption(PersonnelOptions.FLAW_GREMLINS)) {
+            toReturn.append(", <i>Tech Empathy</i>");
         }
 
         toReturn.append("</font></html>");

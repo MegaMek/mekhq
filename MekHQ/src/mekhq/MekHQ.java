@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq;
 
@@ -39,12 +44,15 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.ObjectInputFilter.Config;
 import java.lang.management.ManagementFactory;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import javax.swing.InputMap;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.text.DefaultEditorKit;
@@ -56,22 +64,25 @@ import megamek.SuiteConstants;
 import megamek.client.Client;
 import megamek.client.HeadlessClient;
 import megamek.client.bot.princess.BehaviorSettings;
-import megamek.client.ui.dialogs.AutoResolveChanceDialog;
-import megamek.client.ui.dialogs.AutoResolveProgressDialog;
-import megamek.client.ui.dialogs.AutoResolveSimulationLogDialog;
+import megamek.client.ui.dialogs.abstractDialogs.AutoResolveChanceDialog;
+import megamek.client.ui.dialogs.abstractDialogs.AutoResolveProgressDialog;
+import megamek.client.ui.dialogs.helpDialogs.AutoResolveSimulationLogDialog;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.preferences.SuitePreferences;
-import megamek.client.ui.swing.GUIPreferences;
-import megamek.client.ui.swing.gameConnectionDialogs.ConnectDialog;
-import megamek.client.ui.swing.gameConnectionDialogs.HostDialog;
-import megamek.client.ui.swing.util.UIUtil;
+import megamek.client.ui.clientGUI.GUIPreferences;
+import megamek.client.ui.dialogs.gameConnectionDialogs.ConnectDialog;
+import megamek.client.ui.dialogs.gameConnectionDialogs.HostDialog;
+import megamek.client.ui.util.UIUtil;
 import megamek.common.Board;
 import megamek.common.annotations.Nullable;
 import megamek.common.autoresolve.acar.SimulatedClient;
+import megamek.common.autoresolve.converter.SetupForces;
 import megamek.common.autoresolve.converter.SingletonForces;
 import megamek.common.autoresolve.event.AutoResolveConcludedEvent;
 import megamek.common.event.*;
+import megamek.common.internationalization.I18n;
 import megamek.common.net.marshalling.SanityInputFilter;
+import megamek.common.planetaryconditions.PlanetaryConditions;
 import megamek.logging.MMLogger;
 import megamek.server.Server;
 import megamek.server.totalwarfare.TWGameManager;
@@ -79,7 +90,8 @@ import megameklab.MegaMekLab;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
 import mekhq.campaign.ResolveScenarioTracker;
-import mekhq.campaign.autoresolve.AtBSetupForces;
+import mekhq.campaign.autoresolve.MekHQSetupForces;
+import mekhq.campaign.autoresolve.StratconSetupForces;
 import mekhq.campaign.handler.PostScenarioDialogHandler;
 import mekhq.campaign.handler.XPHandler;
 import mekhq.campaign.mission.AtBDynamicScenario;
@@ -99,17 +111,18 @@ import mekhq.gui.utilities.ObservableString;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
 import mekhq.utilities.MHQInternationalization;
+import mekhq.utilities.ScenarioUtils;
 
 /**
  * The main class of the application.
  */
 public class MekHQ implements GameListener {
-    private static final MMLogger logger = MMLogger.create(MekHQ.class);
+    private static final MMLogger LOGGER = MMLogger.create(MekHQ.class);
 
     // region Variable Declarations
     private static final SuitePreferences mhqPreferences = new SuitePreferences();
-    private static final MHQOptions       mhqOptions     = new MHQOptions();
-    private static final EventBus         EVENT_BUS      = new EventBus();
+    private static final MHQOptions mhqOptions = new MHQOptions();
+    private static final EventBus EVENT_BUS = new EventBus();
 
     private static ObservableString selectedTheme;
 
@@ -124,21 +137,21 @@ public class MekHQ implements GameListener {
     private static ObservableString financesDirectory;
 
     // stuff related to MM games
-    private Server     myServer        = null;
-    private GameThread gameThread      = null;
-    private Scenario   currentScenario = null;
-    private Client     client          = null;
+    private Server myServer = null;
+    private GameThread gameThread = null;
+    private Scenario currentScenario = null;
+    private Client client = null;
 
     // the actual campaign - this is where the good stuff is
     private CampaignController campaignController;
-    private CampaignGUI        campaignGUI;
+    private CampaignGUI campaignGUI;
 
     private final IconPackage iconPackage = new IconPackage();
 
-    private final        IAutosaveService  autosaveService;
+    private final IAutosaveService autosaveService;
     // endregion Variable Declarations
     private static final SanityInputFilter sanityInputFilter = new SanityInputFilter();
-    private static final String            defaultTheme      = "com.formdev.flatlaf.FlatDarculaLaf";
+    private static final String defaultTheme = "com.formdev.flatlaf.FlatDarculaLaf";
 
     public static SuitePreferences getMHQPreferences() {
         return mhqPreferences;
@@ -203,10 +216,29 @@ public class MekHQ implements GameListener {
 
         setUserPreferences();
         updateGuiScaling(); // also sets the look-and-feel
+        setTooltipSettings();
 
         initEventHandlers();
         // create a start-up frame and display it
         new StartupScreenPanel(this).getFrame().setVisible(true);
+    }
+
+    /**
+     * Configures the global tooltip display settings to show tooltips immediately and keep them visible.
+     *
+     * <p>This method sets three tooltip behaviors:</p>
+     * <ul>
+     *     <li>Initial Delay: 0 ms (tooltips appear instantly when hovering)</li>
+     *     <li>Dismiss Delay: Maximum integer value (tooltips stay visible indefinitely)</li>
+     *     <li>Reshow Delay: 0 ms (tooltips reappear instantly when moving between components)</li>
+     * </ul>
+     * <p>
+     * These settings affect all tooltips application-wide through the shared ToolTipManager instance.
+     */
+    private static void setTooltipSettings() {
+        ToolTipManager tooltipManager = ToolTipManager.sharedInstance();
+        tooltipManager.setDismissDelay(Integer.MAX_VALUE);
+        tooltipManager.setReshowDelay(0);
     }
 
     /**
@@ -223,12 +255,20 @@ public class MekHQ implements GameListener {
     }
 
     /**
-     * These need to be migrated to the Suite Constants / Suite Options Setup
+     * Retrieves the autosave service instance associated with this instance of {@link MekHQ}.
      *
-     * @since 50.04
-     * @deprecated - Migrate and remove.
+     * <p>This service is responsible for handling autosave operations, such as saving the current state
+     * of the campaign or mission. It provides an interface to manage autosave requests.</p>
+     *
+     * @return the {@link IAutosaveService} instance responsible for managing autosave operations.
      */
-    @Deprecated(since = "0.50.04")
+    public IAutosaveService getAutosaveService() {
+        return autosaveService;
+    }
+
+    /**
+     * These need to be migrated to the Suite Constants / Suite Options Setup
+     */
     private static void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(MekHQ.class);
@@ -262,7 +302,7 @@ public class MekHQ implements GameListener {
             financesDirectory = new ObservableString("financesDirectory", ".");
             preferences.manage(new StringPreference(financesDirectory));
         } catch (Exception ex) {
-            logger.error(ex, "Failed to set user preferences");
+            LOGGER.error(ex, "Failed to set user preferences");
         }
     }
 
@@ -310,7 +350,9 @@ public class MekHQ implements GameListener {
             options.setEnableExternalConfiguration(true);
             options.setDsn("https://a05b2064798e2b8d46ac620b4497a072@sentry.tapenvy.us/10");
             options.setEnvironment("production");
-            options.setTracesSampleRate(0.2);
+            options.setTracesSampleRate(1.0);
+            options.setProfilesSampleRate(1.0);
+            options.setEnableAppStartProfiling(true);
             options.setDebug(true);
             options.setServerName("MekHQClient");
             options.setRelease(SuiteConstants.VERSION.toString());
@@ -318,10 +360,10 @@ public class MekHQ implements GameListener {
 
         // First, create a global default exception handler
         Thread.setDefaultUncaughtExceptionHandler((thread, t) -> {
-            final String name    = t.getClass().getName();
+            final String name = t.getClass().getName();
             final String message = String.format(MMLoggingConstants.UNHANDLED_EXCEPTION, name);
-            final String title   = String.format(MMLoggingConstants.UNHANDLED_EXCEPTION_TITLE, name);
-            logger.errorDialog(t, message, title);
+            final String title = String.format(MMLoggingConstants.UNHANDLED_EXCEPTION_TITLE, name);
+            LOGGER.errorDialog(t, message, title);
         });
 
         // Second, let's handle logging
@@ -336,11 +378,11 @@ public class MekHQ implements GameListener {
         SwingUtilities.invokeLater(() -> MekHQ.getInstance().startup());
 
         // log jvm parameters
-        logger.info(ManagementFactory.getRuntimeMXBean().getInputArguments());
+        LOGGER.info(ManagementFactory.getRuntimeMXBean().getInputArguments());
     }
 
     public static void initializeLogging(final String originProject) {
-        logger.info(getUnderlyingInformation(originProject));
+        LOGGER.info(getUnderlyingInformation(originProject));
     }
 
     /**
@@ -376,10 +418,10 @@ public class MekHQ implements GameListener {
     }
 
     /**
-     * @param campaigngui the {@link CampaignGUI} to set
+     * @param campaignGUI the {@link CampaignGUI} to set
      */
-    public void setCampaigngui(CampaignGUI campaigngui) {
-        this.campaignGUI = campaigngui;
+    public void setCampaigngui(CampaignGUI campaignGUI) {
+        this.campaignGUI = campaignGUI;
     }
 
     public void joinGame(Scenario scenario, List<Unit> meks) {
@@ -390,15 +432,15 @@ public class MekHQ implements GameListener {
             return;
         }
 
-        final String playerName    = joinGameDialog.getPlayerName();
+        final String playerName = joinGameDialog.getPlayerName();
         final String serverAddress = joinGameDialog.getServerAddress();
-        final int    port          = joinGameDialog.getPort();
+        final int port = joinGameDialog.getPort();
         joinGameDialog.dispose();
 
         try {
             client = new Client(playerName, serverAddress, port);
         } catch (Exception ex) {
-            logger.error(ex, "Failed to connect to server properly");
+            LOGGER.error(ex, "Failed to connect to server properly");
             return;
         }
 
@@ -415,11 +457,11 @@ public class MekHQ implements GameListener {
      * connect to it.
      *
      * @param scenario     The scenario to host
-     * @param loadSavegame Whether to load a savegame
+     * @param loadSaveGame Whether to load a save game
      * @param meks         The units you want to use in the scenario
      */
-    public void startHost(Scenario scenario, boolean loadSavegame, List<Unit> meks) {
-        startHost(scenario, loadSavegame, meks, null);
+    public void startHost(Scenario scenario, boolean loadSaveGame, List<Unit> meks) {
+        startHost(scenario, loadSaveGame, meks, null);
     }
 
     /**
@@ -427,12 +469,13 @@ public class MekHQ implements GameListener {
      * connect to it.
      *
      * @param scenario                    The scenario to host
-     * @param loadSavegame                Whether to load a savegame
+     * @param loadSaveGame                Whether to load a save game
      * @param meks                        The units you want to use in the scenario
      * @param autoResolveBehaviorSettings The auto resolve behavior settings to use if running an AtB scenario and auto
      *                                    resolve is wanted
      */
-    public void startHost(Scenario scenario, boolean loadSavegame, List<Unit> meks, @Nullable BehaviorSettings autoResolveBehaviorSettings) {
+    public void startHost(Scenario scenario, boolean loadSaveGame, List<Unit> meks,
+          @Nullable BehaviorSettings autoResolveBehaviorSettings) {
         HostDialog hostDialog = new HostDialog(campaignGUI.getFrame(), getCampaign().getName());
         hostDialog.setVisible(true);
 
@@ -441,29 +484,29 @@ public class MekHQ implements GameListener {
             return;
         }
 
-        this.autosaveService.requestBeforeMissionAutosave(getCampaign());
+        this.autosaveService.requestBeforeScenarioAutosave(getCampaign());
 
-        final String  playerName = hostDialog.getPlayerName();
-        final String  password   = hostDialog.getServerPass();
-        final int     port       = hostDialog.getPort();
-        final boolean register   = hostDialog.isRegister();
-        final String  metaserver = register ? hostDialog.getMetaserver() : "";
+        final String playerName = hostDialog.getPlayerName();
+        final String password = hostDialog.getServerPass();
+        final int port = hostDialog.getPort();
+        final boolean register = hostDialog.isRegister();
+        final String metaServer = register ? hostDialog.getMetaserver() : "";
 
         // Force cleanup of the current modal, since we are (possibly) about to display a new one and macOS seems to
         // struggle with that (see https://github.com/MegaMek/mekhq/issues/953)
         hostDialog.dispose();
 
         try {
-            myServer = new Server(password, port, new TWGameManager(), register, metaserver);
-            if (loadSavegame) {
-                FileDialog f = new FileDialog(campaignGUI.getFrame(), "Load Savegame");
+            myServer = new Server(password, port, new TWGameManager(), register, metaServer);
+            if (loadSaveGame) {
+                FileDialog f = new FileDialog(campaignGUI.getFrame(), "Load Save Game");
                 f.setDirectory(System.getProperty("user.dir") + "/savegames");
                 f.setVisible(true);
                 if (null != f.getFile()) {
                     getMyServer().loadGame(new File(f.getDirectory(), f.getFile()));
                 } else {
                     stopHost();
-                    return; // exceptions as flow control? no thanks.
+                    return; // exceptions as flow control? no, thanks.
                 }
             }
         } catch (FileNotFoundException ex) {
@@ -471,7 +514,7 @@ public class MekHQ implements GameListener {
             stopHost();
             return;
         } catch (Exception ex) {
-            logger.error(ex, "Failed to start up server");
+            LOGGER.error(ex, "Failed to start up server");
             stopHost();
             return;
         }
@@ -583,7 +626,7 @@ public class MekHQ implements GameListener {
                     BattlefieldControlType battlefieldControl = template.getBattlefieldControl();
 
                     String controlMessage = MHQInternationalization.getText("ResolveDialog.control." +
-                                                                            battlefieldControl.name());
+                                                                                  battlefieldControl.name());
 
                     victoryMessage = String.format("%s\n\n%s", controlMessage, victoryMessage);
                 }
@@ -601,15 +644,14 @@ public class MekHQ implements GameListener {
                   true,
                   tracker);
             resolveDialog.setVisible(true);
+            resolveDialog.dispose();
 
-            if (resolveDialog.wasAborted()) {
-                return;
+            if (!resolveDialog.wasAborted()) {
+                PostScenarioDialogHandler.handle(campaignGUI, getCampaign(), currentScenario, tracker);
             }
 
-            PostScenarioDialogHandler.handle(campaignGUI, getCampaign(), currentScenario, tracker);
-
         } catch (Exception ex) {
-            logger.error(ex, "gameVictory()");
+            LOGGER.error(ex, "gameVictory()");
         } finally {
             gameThread.requestStop();
         }
@@ -632,7 +674,7 @@ public class MekHQ implements GameListener {
                 BattlefieldControlType battlefieldControl = template.getBattlefieldControl();
 
                 String controlMessage = MHQInternationalization.getText("ResolveDialog.control." +
-                                                                        battlefieldControl.name());
+                                                                              battlefieldControl.name());
 
                 victoryMessage = String.format("%s\n\n%s", controlMessage, victoryMessage);
             }
@@ -711,30 +753,42 @@ public class MekHQ implements GameListener {
         return iconPackage;
     }
 
+    private SetupForces getSetupForces(Scenario scenario, List<Unit> units) {
+        if (scenario instanceof AtBScenario atBScenario) {
+            return new StratconSetupForces(getCampaign(), units, atBScenario, new SingletonForces());
+        }
+        return new MekHQSetupForces(getCampaign(), units, scenario, new SingletonForces());
+    }
+
     /**
      * This method is called when the player wants to auto resolve the scenario using ACAR method
      *
      * @param units The list of player units involved in the scenario
      */
-    public void startAutoResolve(AtBScenario scenario, List<Unit> units) {
+    public void startAutoResolve(Scenario scenario, List<Unit> units) {
+        this.autosaveService.requestBeforeScenarioAutosave(getCampaign());
 
-        this.autosaveService.requestBeforeMissionAutosave(getCampaign());
+        Board board = ScenarioUtils.getBoardFor(scenario);
+        SetupForces setupForces = getSetupForces(scenario, units);
 
+        PlanetaryConditions planetaryConditions = getCampaign().getCurrentPlanetaryConditions(scenario);
         if (getCampaign().getCampaignOptions().isAutoResolveVictoryChanceEnabled()) {
+
             var proceed = AutoResolveChanceDialog.showDialog(campaignGUI.getFrame(),
                   getCampaign().getCampaignOptions().getAutoResolveNumberOfScenarios(),
                   Runtime.getRuntime().availableProcessors(),
                   1,
-                  new AtBSetupForces(getCampaign(), units, scenario, new SingletonForces()),
-                  new Board(scenario.getBaseMapX(), scenario.getBaseMapY())) == JOptionPane.YES_OPTION;
+                  setupForces,
+                  board,
+                  planetaryConditions) == JOptionPane.YES_OPTION;
             if (!proceed) {
                 return;
             }
         }
 
         var event = AutoResolveProgressDialog.showDialog(campaignGUI.getFrame(),
-              new AtBSetupForces(getCampaign(), units, scenario, new SingletonForces()),
-              new Board(scenario.getBaseMapX(), scenario.getBaseMapY()));
+              setupForces,
+              board, planetaryConditions);
 
         var autoResolveBattleReport = new AutoResolveSimulationLogDialog(campaignGUI.getFrame(), event.getLogFile());
         autoResolveBattleReport.setModal(true);
@@ -748,7 +802,7 @@ public class MekHQ implements GameListener {
      *
      * @param autoResolveConcludedEvent The event that contains the results of the auto resolve game.
      */
-    public void autoResolveConcluded(AutoResolveConcludedEvent autoResolveConcludedEvent, AtBScenario scenario) {
+    public void autoResolveConcluded(AutoResolveConcludedEvent autoResolveConcludedEvent, Scenario scenario) {
         try {
             String victoryMessage = autoResolveConcludedEvent.controlledScenario() ?
                                           MHQInternationalization.getText("AutoResolveDialog.message.victory") :
@@ -756,14 +810,14 @@ public class MekHQ implements GameListener {
 
             String decisionMessage = MHQInternationalization.getText("ResolveDialog.control.message");
 
-            if (scenario instanceof AtBDynamicScenario) {
-                ScenarioTemplate template = ((AtBDynamicScenario) scenario).getTemplate();
+            if (scenario instanceof AtBDynamicScenario atBDynamicScenario) {
+                ScenarioTemplate template = atBDynamicScenario.getTemplate();
 
                 if (template != null) {
                     BattlefieldControlType battlefieldControl = template.getBattlefieldControl();
 
                     String controlMessage = MHQInternationalization.getText("ResolveDialog.control." +
-                                                                            battlefieldControl.name());
+                                                                                  battlefieldControl.name());
 
                     victoryMessage = String.format("%s\n\n%s\n\n%s", controlMessage, victoryMessage, decisionMessage);
                 }
@@ -784,19 +838,54 @@ public class MekHQ implements GameListener {
                   true,
                   tracker);
             resolveDialog.setVisible(true);
+            resolveDialog.dispose();
+
             if (resolveDialog.wasAborted()) {
-                for (UUID personId : tracker.getPeopleStatus().keySet()) {
-                    Person person = getCampaign().getPerson(personId);
-                    person.setHits(person.getHitsPrior());
-                }
-                return;
+                postAbortedAutoResolve(autoResolveConcludedEvent, scenario, tracker);
+            } else {
+                // If the autoresolve is not aborted, follow with the PostScenario Handler as normal
+                PostScenarioDialogHandler.handle(campaignGUI, getCampaign(), scenario, tracker);
             }
-            PostScenarioDialogHandler.handle(campaignGUI, getCampaign(), scenario, tracker);
         } catch (Exception ex) {
-            logger.error("Error during auto resolve concluded", ex);
+            LOGGER.error("Error during auto resolve concluded", ex);
         }
     }
 
+    private void postAbortedAutoResolve(AutoResolveConcludedEvent autoResolveConcludedEvent, Scenario scenario,
+          ResolveScenarioTracker tracker) {
+        try {
+            resetPersonsHits(tracker);
+        } catch (NullPointerException ex) {
+            LOGGER.error(ex,
+                  "Error during auto resolve concluded, dumping stack trace and events, " +
+                        "AtbScenario {}, AutoResolveConcludedEvent {}", scenario, autoResolveConcludedEvent);
+            LOGGER.errorDialog(
+                  I18n.getTextAt("AbortingResolveScenarioWizard",
+                        Sentry.isEnabled() ? "errorMessage.withSentry": "errorMessage.withoutSentry"),
+                  I18n.getTextAt("AbortingResolveScenarioWizard",
+                        "errorMessage.title"));
+        }
+    }
+
+    private void resetPersonsHits(ResolveScenarioTracker tracker) {
+        var peopleStatus = tracker.getPeopleStatus();
+        Objects.requireNonNull(peopleStatus, "getPeopleStatus() returned null");
+        Objects.requireNonNull(getCampaign(), "getCampaign() returned null");
+        List<Throwable> errors = new ArrayList<>();
+        for (var entry : peopleStatus.entrySet()) {
+            try {
+                Person person = getCampaign().getPerson(entry.getKey());
+                Objects.requireNonNull(person, "getPerson() returned null for Person ID=" + entry.getKey() + ".");
+                person.setHits(person.getHitsPrior());
+            } catch (Throwable ex) {
+                errors.add(ex);
+            }
+        }
+        if (!errors.isEmpty()) {
+            String errorMessage = errors.stream().map(Throwable::getMessage).collect(Collectors.joining("\n"));
+            throw new NullPointerException(errorMessage);
+        }
+    }
     /*
      * Access methods for event bus.
      */
@@ -844,7 +933,7 @@ public class MekHQ implements GameListener {
                            InstantiationException |
                            IllegalAccessException |
                            UnsupportedLookAndFeelException e) {
-                logger.error(e, "setLookAndFeel()");
+                LOGGER.error(e, "setLookAndFeel() with exception {}", e.getMessage());
             }
             try {
                 UIManager.setLookAndFeel(defaultTheme);
@@ -862,7 +951,7 @@ public class MekHQ implements GameListener {
                            InstantiationException |
                            IllegalAccessException |
                            UnsupportedLookAndFeelException e) {
-                logger.error(e, "setLookAndFeel()");
+                LOGGER.error(e, "setLookAndFeel()");
             }
         };
         SwingUtilities.invokeLater(runnable);

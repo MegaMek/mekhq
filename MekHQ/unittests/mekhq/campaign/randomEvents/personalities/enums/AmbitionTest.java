@@ -24,93 +24,78 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.randomEvents.personalities.enums;
 
-import megamek.common.enums.Gender;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Person;
-import org.junit.jupiter.api.Test;
-
-import static mekhq.campaign.randomEvents.personalities.enums.Ambition.ASPIRING;
-import static mekhq.campaign.randomEvents.personalities.enums.Ambition.CONNIVING;
-import static mekhq.campaign.randomEvents.personalities.enums.Ambition.MAXIMUM_VARIATIONS;
-import static mekhq.campaign.randomEvents.personalities.enums.Ambition.NONE;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
+
+import java.util.Arrays;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
+import megamek.common.enums.Gender;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
 public class AmbitionTest {
-    @Test
-    public void testFromString_ValidStatus() {
-        Ambition status = Ambition.fromString(ASPIRING.name());
-        assertEquals(ASPIRING, status);
-    }
-
-    @Test
-    public void testFromString_InvalidStatus() {
-        Ambition status = Ambition.fromString("INVALID_STATUS");
-
-        assertEquals(NONE, status);
-    }
-
-    @Test
-    public void testFromString_NullStatus() {
-        Ambition status = Ambition.fromString(null);
-
-        assertEquals(NONE, status);
-    }
-
-    @Test
-    public void testFromString_EmptyString() {
-        Ambition status = Ambition.fromString("");
-
-        assertEquals(NONE, status);
-    }
-
-    @Test
-    public void testFromString_FromOrdinal() {
-        Ambition status = Ambition.fromString(CONNIVING.ordinal() + "");
-
-        assertEquals(CONNIVING, status);
-    }
-
-    @Test
-    public void testGetLabel_notInvalid() {
-        for (Ambition status : Ambition.values()) {
-            String label = status.getLabel();
-            assertTrue(isResourceKeyValid(label));
+    @ParameterizedTest
+    @CsvSource(value = { "AMBITIOUS,AMBITIOUS", "INVALID_STATUS,NONE", "'',NONE", "'null',NONE", "1,AMBITIOUS" })
+    void testFromStringVariousInputs(String input, Ambition expected) {
+        if ("null".equals(input)) {
+            input = null;
         }
+        Ambition result = Ambition.fromString(input);
+        assertEquals(expected, result);
     }
 
-    @Test
-    public void testGetDescription_notInvalid() {
-        Campaign campaign = mock(Campaign.class);
-        Person person = new Person(campaign);
-
-        for (Ambition trait : Ambition.values()) {
-            for (int i = 0; i < MAXIMUM_VARIATIONS; i++) {
-                person.setAmbitionDescriptionIndex(i);
-                String description = trait.getDescription(i, Gender.MALE, "Barry");
-                assertTrue(isResourceKeyValid(description));
-            }
-        }
+    @ParameterizedTest
+    @EnumSource(value = Ambition.class)
+    void testFromString_Ordinal_All(Ambition value) {
+        Ambition result = Ambition.fromString(String.valueOf(value.ordinal()));
+        assertEquals(value, result);
     }
 
-    @Test
-    public void testGetDescription_InvalidDescriptionIndex() {
-        String description = NONE.getDescription(MAXIMUM_VARIATIONS, Gender.MALE, "Barry");
+    @ParameterizedTest
+    @EnumSource(value = Ambition.class)
+    void testGetLabel_notInvalid(Ambition status) {
+        String label = status.getLabel();
+        assertTrue(isResourceKeyValid(label));
+    }
+
+    static Stream<Arguments> provideAmbitionsAndIndices() {
+        return Arrays.stream(Ambition.values())
+                     .flatMap(trait -> IntStream.range(0, Ambition.MAXIMUM_VARIATIONS)
+                                             .mapToObj(i -> Arguments.of(trait, i)));
+    }
+
+    @ParameterizedTest
+    @MethodSource(value = "provideAmbitionsAndIndices")
+    void testGetDescription_notInvalid(Ambition trait, int i) {
+        String description = trait.getDescription(i, Gender.MALE, "Barry");
         assertTrue(isResourceKeyValid(description));
     }
 
-    @Test
-    public void testGetRoninMessage_notInvalid() {
-        for (Ambition trait : Ambition.values()) {
-            for (int i = 0; i < Ambition.MAXIMUM_VARIATIONS; i++) {
-                String description = trait.getRoninMessage("Commander");
-                assertTrue(isResourceKeyValid(description));
-            }
-        }
+    @ParameterizedTest
+    @CsvSource(value = { "99", "1000", "-1" })
+    void testGetDescription_InvalidDescriptionIndex(int invalidIndex) {
+        String description = Ambition.NONE.getDescription(invalidIndex, Gender.MALE, "Barry");
+        assertTrue(isResourceKeyValid(description));
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = Ambition.class)
+    void testGetRoninMessage_notInvalid(Ambition trait) {
+        String description = trait.getRoninMessage("Commander");
+        assertTrue(isResourceKeyValid(description));
     }
 }

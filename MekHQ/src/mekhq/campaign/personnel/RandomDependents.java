@@ -24,18 +24,13 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel;
-
-import megamek.common.Compute;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.personnel.familyTree.Genealogy;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
@@ -45,6 +40,16 @@ import static megamek.common.enums.Gender.RANDOMIZE;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.LEFT;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.FREE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import megamek.common.Compute;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.personnel.familyTree.Genealogy;
 
 /**
  * The {@link RandomDependents} class manages the random addition and removal of dependent personnel
@@ -261,10 +266,11 @@ public class RandomDependents {
                 if (roll == 0) {
                     final Person dependent = campaign.newDependent(RANDOMIZE);
 
-                    campaign.recruitPerson(dependent, FREE, true, false);
+                    campaign.recruitPerson(dependent, FREE, true, false, false);
 
                     campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "dependentJoinsForce.report",
-                        dependent.getFullName()));
+                          dependent.getFullName(),
+                          dependent.getPrimaryRole().getLabel(dependent.isClanPersonnel())));
 
                     dependentCount++;
                 }

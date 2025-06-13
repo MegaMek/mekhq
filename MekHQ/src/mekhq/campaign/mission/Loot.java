@@ -25,8 +25,28 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission;
+
+import static mekhq.campaign.mission.resupplyAndCaches.GenerateResupplyContents.RESUPPLY_MINIMUM_PART_WEIGHT;
+import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_AMMO_TONNAGE;
+import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_ARMOR_TONNAGE;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
+
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.UUID;
 
 import megamek.Version;
 import megamek.common.Entity;
@@ -48,17 +68,9 @@ import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
+import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.util.*;
-
-import static mekhq.campaign.mission.resupplyAndCaches.GenerateResupplyContents.RESUPPLY_MINIMUM_PART_WEIGHT;
-import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_AMMO_TONNAGE;
-import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_ARMOR_TONNAGE;
-import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
-import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -156,22 +168,20 @@ public class Loot {
     }
 
     /**
-     * Handles the looting process after a scenario is completed by adding loot to the campaign.
-     * The loot can include cash rewards, salvageable parts, and units, along with handling
-     * special scenarios like resupply interception.
+     * Handles the looting process after a scenario is completed by adding loot to the campaign. The loot can include
+     * cash rewards, salvageable parts, and units, along with handling special scenarios like resupply interception.
      *
      * <p>This method evaluates the loot based on the scenario type and unit statuses,
      * ensuring that captured, lost, or excess loot is appropriately managed.</p>
      *
-     * @param campaign              the campaign to which the looted resources (e.g., cash, parts, units) are added
-     * @param scenario              the specific scenario during which the loot was acquired
-     * @param unitsStatuses         a mapping of unit IDs to their respective status after the scenario
-     *                              (e.g., whether units are lost, captured, or operational)
+     * @param campaign      the campaign to which the looted resources (e.g., cash, parts, units) are added
+     * @param scenario      the specific scenario during which the loot was acquired
+     * @param unitsStatuses a mapping of unit IDs to their respective status after the scenario (e.g., whether units are
+     *                      lost, captured, or operational)
      */
-    public void getLoot(Campaign campaign, Scenario scenario,
-                        Hashtable<UUID, UnitStatus> unitsStatuses) {
+    public void getLoot(Campaign campaign, Scenario scenario, Hashtable<UUID, UnitStatus> unitsStatuses) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Loot",
-            MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
 
         boolean isResupply = scenario.getStratConScenarioType() == ScenarioType.SPECIAL_RESUPPLY;
         double cargo = 0;
@@ -179,8 +189,7 @@ public class Loot {
         // If we're looting as the result of a StratCon Emergency Convoy Defence scenario,
         // we need to determine how much of the convoy survived
         if (isResupply) {
-            List<UUID> allUnitIds = new ArrayList<>(
-                scenario.getForces(campaign).getAllUnits(false));
+            List<UUID> allUnitIds = new ArrayList<>(scenario.getForces(campaign).getAllUnits(false));
 
             for (UUID unitId : allUnitIds) {
                 Unit unit = campaign.getUnit(unitId);
@@ -207,13 +216,16 @@ public class Loot {
         if (cash.isPositive()) {
             logger.debug("Looting cash: {}", cash);
 
-            campaign.getFinances().credit(TransactionType.MISCELLANEOUS, campaign.getLocalDate(), cash,
-                    "Reward for " + getName() + " during " + scenario.getName());
+            campaign.getFinances()
+                  .credit(TransactionType.MISCELLANEOUS,
+                        campaign.getLocalDate(),
+                        cash,
+                        "Reward for " + getName() + " during " + scenario.getName());
 
             campaign.addReport(String.format(resources.getString("looted.cash"),
-                cash.toAmountAndSymbolString(),
-                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                CLOSING_SPAN_TAG));
+                  cash.toAmountAndSymbolString(),
+                  spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
+                  CLOSING_SPAN_TAG));
         }
 
         List<String> abandonedParts = new ArrayList<>();
@@ -244,59 +256,56 @@ public class Loot {
             logger.debug("Looting part: {}", part.getName());
 
             lootedParts.add("<br>- " + part.getName() + " (" + partWeight + " tons)");
-            campaign.getQuartermaster().addPart(part, 0);
+            campaign.getQuartermaster().addPart(part, 0, true);
 
             logger.debug("Looting parts complete");
         }
 
         if (!lootedParts.isEmpty()) {
-            String lootedPartsReport = lootedParts.toString()
-                .replace("[", "")
-                .replace("]", "");
+            String lootedPartsReport = lootedParts.toString().replace("[", "").replace("]", "");
             campaign.addReport(String.format(resources.getString("looted.successful.parts"),
-                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                CLOSING_SPAN_TAG, lootedPartsReport));
+                  spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
+                  CLOSING_SPAN_TAG,
+                  lootedPartsReport));
         }
 
         if (!abandonedParts.isEmpty()) {
-            String abandonedPartsReport = abandonedParts.toString()
-                .replace("[", "")
-                .replace("]", "");
+            String abandonedPartsReport = abandonedParts.toString().replace("[", "").replace("]", "");
             campaign.addReport(String.format(resources.getString("looted.failed.parts"),
-                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
-                CLOSING_SPAN_TAG, abandonedPartsReport));
+                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
+                  CLOSING_SPAN_TAG,
+                  abandonedPartsReport));
         }
 
         // This only needs to be done once, so we do it outside the 'loot units' loop
         // for efficiency
-        HashMap<String, Integer> qualityAndModifier = getQualityAndModifier(
-                campaign.getMission(scenario.getMissionId()));
+        HashMap<String, Integer> qualityAndModifier = getQualityAndModifier(campaign.getMission(scenario.getMissionId()));
 
         for (Entity entity : units) {
             logger.debug("Looting unit: {}", entity.getDisplayName());
 
             if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
                 qualityAndModifier.put("quality",
-                    Unit.getRandomUnitQuality(qualityAndModifier.get("modifier")).toNumeric());
+                      Unit.getRandomUnitQuality(qualityAndModifier.get("modifier")).toNumeric());
             }
 
-            campaign.addNewUnit(entity, false, 0,
-                PartQuality.fromNumeric(qualityAndModifier.get("quality")));
+            campaign.addNewUnit(entity, false, 0, PartQuality.fromNumeric(qualityAndModifier.get("quality")));
 
             logger.debug("Looting units complete");
         }
     }
 
     /**
-     * Returns fixed quality values, and modifiers (for dynamic quality) used to
-     * generate a new unit
-     * with quality based on the equipment quality of the contract OpFor.
-     * If the contract isn't an instance of AtBContract we use fixed values.
+     * Returns fixed quality values, and modifiers (for dynamic quality) used to generate a new unit with quality based
+     * on the equipment quality of the contract OpFor. If the contract isn't an instance of AtBContract we use fixed
+     * values.
      *
      * @param contract the mission contract
+     *
      * @return a HashMap containing quality and modifier as key-value pairs:
-     * @throws IllegalStateException if the contract is an instance of AtBContract
-     *                               and the enemy quality is not recognized
+     *
+     * @throws IllegalStateException if the contract is an instance of AtBContract and the enemy quality is not
+     *                               recognized
      */
     private static HashMap<String, Integer> getQualityAndModifier(Mission contract) {
         HashMap<String, Integer> qualityAndModifier = new HashMap<>();
@@ -326,8 +335,8 @@ public class Loot {
                     break;
                 default:
                     throw new IllegalStateException(
-                            "Unexpected value in mekhq/campaign/mission/Loot.java/getQualityAndModifier: "
-                                    + ((AtBContract) contract).getEnemyQuality());
+                          "Unexpected value in mekhq/campaign/mission/Loot.java/getQualityAndModifier: " +
+                                ((AtBContract) contract).getEnemyQuality());
             }
         } else {
             qualityAndModifier.put("quality", PartQuality.QUALITY_D.toNumeric());

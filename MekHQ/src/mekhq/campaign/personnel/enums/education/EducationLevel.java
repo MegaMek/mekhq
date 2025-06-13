@@ -30,6 +30,7 @@ package mekhq.campaign.personnel.enums.education;
 import java.util.ResourceBundle;
 
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 
 public enum EducationLevel {
@@ -49,7 +50,7 @@ public enum EducationLevel {
     // region Constructors
     EducationLevel(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
@@ -85,56 +86,59 @@ public enum EducationLevel {
     // endregion Boolean Comparison Methods
 
     // region File I/O
-    /**
-     * Parses a given string and returns the corresponding AcademyType.
-     * Accepts either the ENUM ordinal value or its name
-     *
-     * @param educationLevel the string to be parsed
-     * @return the AcademyType object that corresponds to the given string
-     * @throws IllegalStateException if the given string does not match any valid
-     *                               AcademyType
-     */
-    public static EducationLevel parseFromString(final String educationLevel) {
-        return switch (educationLevel) {
-            case "None", "Early Childhood" -> EARLY_CHILDHOOD;
-            case "High School" -> HIGH_SCHOOL;
-            case "College" -> COLLEGE;
-            case "Post-Graduate" -> POST_GRADUATE;
-            case "Doctorate" -> DOCTORATE;
-            default ->
-                throw new IllegalStateException(
-                        "Unexpected value in mekhq/campaign/personnel/enums/education/EducationLevel.java/parseFromString: "
-                                + educationLevel);
-        };
-    }
 
     /**
-     * Parses an integer value into an EducationLevel enum.
+     * Converts a string to its corresponding {@link EducationLevel} enum constant, if possible.
      *
-     * @param educationLevel the integer value representing the education level
-     * @return the corresponding EducationLevel enum value
-     * @throws IllegalStateException if the integer value does not correspond to any
-     *                               valid EducationLevel enum value
+     * <p>This method attempts to map the input string to an {@link EducationLevel} in multiple ways:</p>
+     * <ul>
+     *   <li>First, it checks if the string matches an enum name exactly.</li>
+     *   <li>Next, it attempts to parse the string as an integer and map it to the ordinal of the enum.</li>
+     *   <li>Finally, it checks for a case-insensitive match against the enum names.</li>
+     * </ul>
+     *
+     * <p>If no match is found, a default value of {@code EARLY_CHILDHOOD} is returned, and an error is logged to
+     * indicate the invalid input.</p>
+     *
+     * @param text the input string to be converted to an {@link EducationLevel}.
+     *
+     * @return the {@link EducationLevel} corresponding to the input text, or {@link EducationLevel#EARLY_CHILDHOOD} if
+     *       the input is invalid.
      */
-    public static EducationLevel parseFromInt(final int educationLevel) {
-        return switch (educationLevel) {
-            case 0 -> EARLY_CHILDHOOD;
-            case 1 -> HIGH_SCHOOL;
-            case 2 -> COLLEGE;
-            case 3 -> POST_GRADUATE;
-            case 4 -> DOCTORATE;
-            default ->
-                throw new IllegalStateException(
-                        "Unexpected value in mekhq/campaign/personnel/enums/education/EducationLevel.java/parseFromInt: "
-                                + educationLevel);
-        };
+    public static EducationLevel fromString(String text) {
+        try {
+            return EducationLevel.valueOf(text);
+        } catch (Exception ignored) {
+        }
+
+        try {
+            return EducationLevel.values()[Integer.parseInt(text)];
+        } catch (Exception ignored) {
+        }
+
+        try {
+            for (EducationLevel educationLevel : EducationLevel.values()) {
+                if (educationLevel.toString().equalsIgnoreCase(text)) {
+                    return educationLevel;
+                }
+            }
+        } catch (Exception ignored) {
+        }
+
+
+        MMLogger logger = MMLogger.create(EducationLevel.class);
+        logger.error("Unknown EducationLevel ordinal: {} - returning {}.", text, EARLY_CHILDHOOD);
+
+        return EARLY_CHILDHOOD;
     }
 
     /**
      * Parses the given EducationLevel enum value to an integer.
      *
      * @param educationLevel the EducationLevel enum value to be parsed
+     *
      * @return the integer value representing the parsed EducationLevel
+     *
      * @throws IllegalStateException if the given EducationLevel is unexpected
      */
     public static int parseToInt(final EducationLevel educationLevel) {
@@ -152,7 +156,7 @@ public enum EducationLevel {
     public static class Adapter extends XmlAdapter<String, EducationLevel> {
         @Override
         public EducationLevel unmarshal(String educationLevel) {
-            return EducationLevel.parseFromString(educationLevel);
+            return EducationLevel.fromString(educationLevel);
         }
 
         @Override

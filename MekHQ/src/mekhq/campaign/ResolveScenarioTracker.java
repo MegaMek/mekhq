@@ -25,8 +25,23 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign;
+
+import static java.lang.Math.ceil;
+import static mekhq.campaign.mission.Scenario.T_SPACE;
+import static mekhq.campaign.parts.enums.PartQuality.QUALITY_D;
+import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
+import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
+
+import java.io.File;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import megamek.client.IClient;
 import megamek.common.*;
@@ -36,13 +51,20 @@ import megamek.common.event.PostGameResolution;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.OptionsConstants;
 import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.event.PersonBattleFinishedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.log.ServiceLogger;
-import mekhq.campaign.mission.*;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.BotForce;
+import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.Loot;
+import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
@@ -55,17 +77,10 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.AdjustLargeCraftAmmoAction;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.FileDialogs;
-
-import java.io.File;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static mekhq.campaign.mission.Scenario.T_SPACE;
-import static mekhq.campaign.parts.enums.PartQuality.QUALITY_D;
+import mekhq.utilities.ReportingUtilities;
 
 /**
- * This object will be the main workhorse for the scenario
- * resolution wizard. It will keep track of information and be
+ * This object will be the main workhorse for the scenario resolution wizard. It will keep track of information and be
  * fed back and forth between the various wizards
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -94,8 +109,7 @@ public class ResolveScenarioTracker {
     Hashtable<UUID, EjectedCrew> ejections;
     Hashtable<UUID, EjectedCrew> enemyEjections;
 
-    /* AtB */
-    int contractBreaches = 0;
+    /* AtB */ int contractBreaches = 0;
     int bonusRolls = 0;
 
     Campaign campaign;
@@ -219,7 +233,7 @@ public class ResolveScenarioTracker {
         int playerId = client.getLocalPlayer().getId();
         int team = client.getLocalPlayer().getTeam();
 
-        for (Enumeration<Entity> entityIterator = victoryEvent.getEntities(); entityIterator.hasMoreElements();) {
+        for (Enumeration<Entity> entityIterator = victoryEvent.getEntities(); entityIterator.hasMoreElements(); ) {
             Entity entity = entityIterator.nextElement();
             if (!entity.getSubEntities().isEmpty()) {
                 // Sub-entities have their own entry in the VictoryEvent data
@@ -231,7 +245,9 @@ public class ResolveScenarioTracker {
             idMap.put(entity.getId(), UUID.fromString(entity.getExternalIdAsString()));
 
             checkForLostLimbs(entity, control);
-            if ((entity.getOwnerId() == playerId) || (entity.getOwner().getTeam() == team) || scenario.isTraitor(entity, campaign)) {
+            if ((entity.getOwnerId() == playerId) ||
+                      (entity.getOwner().getTeam() == team) ||
+                      scenario.isTraitor(entity, campaign)) {
                 if (!"-1".equals(entity.getExternalIdAsString())) {
                     UnitStatus status = unitsStatus.get(UUID.fromString(entity.getExternalIdAsString()));
                     if (null == status && scenario instanceof AtBScenario) {
@@ -239,8 +255,8 @@ public class ResolveScenarioTracker {
                     }
 
                     if (null != status) {
-                        boolean lost = (!entity.canEscape() && !control)
-                                || entity.getRemovalCondition() == IEntityRemovalConditions.REMOVE_DEVASTATED;
+                        boolean lost = (!entity.canEscape() && !control) ||
+                                             entity.getRemovalCondition() == IEntityRemovalConditions.REMOVE_DEVASTATED;
                         status.assignFoundEntity(entity, lost);
                     }
                 }
@@ -250,14 +266,16 @@ public class ResolveScenarioTracker {
                             pilots.put(UUID.fromString(entity.getCrew().getExternalIdAsString()), entity.getCrew());
                         }
                         if (entity instanceof EjectedCrew) {
-                            ejections.put(UUID.fromString(entity.getCrew().getExternalIdAsString()), (EjectedCrew) entity);
+                            ejections.put(UUID.fromString(entity.getCrew().getExternalIdAsString()),
+                                  (EjectedCrew) entity);
                         }
                     }
                 }
             } else if (entity.getOwner().isEnemyOf(client.getLocalPlayer())) {
                 if (control) {
                     if (entity instanceof EjectedCrew) {
-                        enemyEjections.put(UUID.fromString(entity.getCrew().getExternalIdAsString()), (EjectedCrew) entity);
+                        enemyEjections.put(UUID.fromString(entity.getCrew().getExternalIdAsString()),
+                              (EjectedCrew) entity);
                         continue;
                     }
 
@@ -282,7 +300,7 @@ public class ResolveScenarioTracker {
         }
 
         // If any units ended the game with others loaded in its bays, map those out
-        for (Enumeration<Entity> entityIterator = victoryEvent.getEntities(); entityIterator.hasMoreElements();) {
+        for (Enumeration<Entity> entityIterator = victoryEvent.getEntities(); entityIterator.hasMoreElements(); ) {
             Entity entity = entityIterator.nextElement();
             if (!entity.getBayLoadedUnitIds().isEmpty()) {
                 List<Entity> cargo = new ArrayList<>();
@@ -297,7 +315,8 @@ public class ResolveScenarioTracker {
         }
 
         // Utterly destroyed entities
-        for (Enumeration<Entity> entityIterator = victoryEvent.getDevastatedEntities(); entityIterator.hasMoreElements();) {
+        for (Enumeration<Entity> entityIterator = victoryEvent.getDevastatedEntities();
+              entityIterator.hasMoreElements(); ) {
             Entity entity = entityIterator.nextElement();
             if (!entity.getSubEntities().isEmpty()) {
                 // Sub-entities have their own entry in the VictoryEvent data
@@ -306,7 +325,9 @@ public class ResolveScenarioTracker {
 
             entities.put(UUID.fromString(entity.getExternalIdAsString()), entity);
 
-            if ((entity.getOwnerId() == playerId) || (entity.getOwner().getTeam() == team) || scenario.isTraitor(entity, campaign)) {
+            if ((entity.getOwnerId() == playerId) ||
+                      (entity.getOwner().getTeam() == team) ||
+                      scenario.isTraitor(entity, campaign)) {
                 if (!"-1".equals(entity.getExternalIdAsString())) {
                     UnitStatus status = unitsStatus.get(UUID.fromString(entity.getExternalIdAsString()));
 
@@ -324,7 +345,8 @@ public class ResolveScenarioTracker {
         }
 
         // add retreated units
-        for (Enumeration<Entity> entityIterator = victoryEvent.getRetreatedEntities(); entityIterator.hasMoreElements();) {
+        for (Enumeration<Entity> entityIterator = victoryEvent.getRetreatedEntities();
+              entityIterator.hasMoreElements(); ) {
             Entity entity = entityIterator.nextElement();
             if (!entity.getSubEntities().isEmpty()) {
                 // Sub-entities have their own entry in the VictoryEvent data
@@ -334,7 +356,9 @@ public class ResolveScenarioTracker {
             entities.put(UUID.fromString(entity.getExternalIdAsString()), entity);
 
             checkForLostLimbs(entity, control);
-            if ((entity.getOwnerId() == playerId) || (entity.getOwner().getTeam() == team) || scenario.isTraitor(entity, campaign)) {
+            if ((entity.getOwnerId() == playerId) ||
+                      (entity.getOwner().getTeam() == team) ||
+                      scenario.isTraitor(entity, campaign)) {
                 if (!"-1".equals(entity.getExternalIdAsString())) {
                     UnitStatus status = unitsStatus.get(UUID.fromString(entity.getExternalIdAsString()));
                     if (null == status && scenario instanceof AtBScenario) {
@@ -349,7 +373,8 @@ public class ResolveScenarioTracker {
                     if (!"-1".equals(entity.getCrew().getExternalIdAsString())) {
                         pilots.put(UUID.fromString(entity.getCrew().getExternalIdAsString()), entity.getCrew());
                         if (entity instanceof EjectedCrew) {
-                            ejections.put(UUID.fromString(entity.getCrew().getExternalIdAsString()), (EjectedCrew) entity);
+                            ejections.put(UUID.fromString(entity.getCrew().getExternalIdAsString()),
+                                  (EjectedCrew) entity);
                         }
                     }
                 }
@@ -368,7 +393,9 @@ public class ResolveScenarioTracker {
             idMap.put(wreck.getId(), UUID.fromString(wreck.getExternalIdAsString()));
 
             checkForLostLimbs(wreck, control);
-            if ((wreck.getOwnerId() == playerId) || (wreck.getOwner().getTeam() == team) || scenario.isTraitor(wreck, campaign)) {
+            if ((wreck.getOwnerId() == playerId) ||
+                      (wreck.getOwner().getTeam() == team) ||
+                      scenario.isTraitor(wreck, campaign)) {
                 if (!"-1".equals(wreck.getExternalIdAsString())) {
                     UnitStatus status = unitsStatus.get(UUID.fromString(wreck.getExternalIdAsString()));
 
@@ -386,7 +413,8 @@ public class ResolveScenarioTracker {
                 if (null != wreck.getCrew()) {
                     if (!"-1".equals(wreck.getCrew().getExternalIdAsString())) {
                         if (wreck instanceof EjectedCrew) {
-                            ejections.put(UUID.fromString(wreck.getCrew().getExternalIdAsString()), (EjectedCrew) wreck);
+                            ejections.put(UUID.fromString(wreck.getCrew().getExternalIdAsString()),
+                                  (EjectedCrew) wreck);
                         }
                         if (!wreck.getCrew().isEjected() || wreck instanceof EjectedCrew) {
                             if (control) {
@@ -398,19 +426,13 @@ public class ResolveScenarioTracker {
                     }
                 }
             } else if (wreck.getOwner().isEnemyOf(client.getLocalPlayer())) {
-                // MekHQ doesn't support gun emplacements, so we don't want the player salvaging them
-                if (wreck instanceof GunEmplacement) {
-                    appendKillCredit(wreck);
-                    continue;
-                }
-
                 if (wreck.isDropShip() && scenario.getBoardType() != T_SPACE) {
-                    double dropShipBonusPercentage =
-                        (double) campaign.getCampaignOptions().getDropShipBonusPercentage() / 100;
+                    double dropShipBonusPercentage = (double) campaign.getCampaignOptions()
+                                                                    .getDropShipBonusPercentage() / 100;
 
                     if (dropShipBonusPercentage > 0) {
-                        dropShipBonus = dropShipBonus.plus(
-                            generateNewTestUnit(wreck).getSellValue().multipliedBy(dropShipBonusPercentage));
+                        dropShipBonus = dropShipBonus.plus(generateNewTestUnit(wreck).getSellValue()
+                                                                 .multipliedBy(dropShipBonusPercentage));
                     }
                     appendKillCredit(wreck);
                     continue;
@@ -432,7 +454,8 @@ public class ResolveScenarioTracker {
             appendKillCredit(wreck);
         }
         // If a unit in a bay was destroyed, add it. We still need to deal with the crew
-        for (Enumeration<Entity> entityIterator = victoryEvent.getGraveyardEntities(); entityIterator.hasMoreElements();) {
+        for (Enumeration<Entity> entityIterator = victoryEvent.getGraveyardEntities();
+              entityIterator.hasMoreElements(); ) {
             Entity entity = entityIterator.nextElement();
             if (entity.getTransportId() != Entity.NONE) {
                 UUID trnId = idMap.get(entity.getTransportId());
@@ -450,8 +473,7 @@ public class ResolveScenarioTracker {
     }
 
     /**
-     * Worker function that, where appropriate, appends kill credit to the local
-     * killCredits tracker
+     * Worker function that, where appropriate, appends kill credit to the local killCredits tracker
      */
     private void appendKillCredit(Entity e) {
         // no need to add kill credits for player or allied units
@@ -478,13 +500,11 @@ public class ResolveScenarioTracker {
     }
 
     /**
-     * This checks whether an entity has any blown off limbs. If the battlefield
-     * was not controlled it marks the limb as destroyed. if the battlefield was
-     * controlled it clears the missing status from any equipment.
-     *
-     * This method should be run the first time an entity is loaded into the
-     * tracker,
-     * either from the game or from a MUL file.
+     * This checks whether an entity has any blown off limbs. If the battlefield was not controlled it marks the limb as
+     * destroyed. if the battlefield was controlled it clears the missing status from any equipment.
+     * <p>
+     * This method should be run the first time an entity is loaded into the tracker, either from the game or from a MUL
+     * file.
      *
      * @param en
      * @param controlsField
@@ -547,14 +567,18 @@ public class ResolveScenarioTracker {
                         if (null == status) {
                             // this shouldn't happen so report
                             logger.error("A null person status was found for person id {} when trying to assign kills",
-                                    p.getId().toString());
+                                  p.getId().toString());
                             continue;
                         }
 
-                        status.addKill(
-                                new Kill(p.getId(), killed, u.getEntity().getShortNameRaw(), campaign.getLocalDate(),
-                                        getMissionId(), getScenarioId(), p.getUnit().getForceId(),
-                                        u.getEntity().getEntityType()));
+                        status.addKill(new Kill(p.getId(),
+                              killed,
+                              u.getEntity().getShortNameRaw(),
+                              campaign.getLocalDate(),
+                              getMissionId(),
+                              getScenarioId(),
+                              p.getUnit().getForceId(),
+                              u.getEntity().getEntityType()));
                     }
                 }
             }
@@ -647,8 +671,10 @@ public class ResolveScenarioTracker {
                     missingCrew = true;
                 }
                 for (Person p : crew) {
-                    PersonStatus status = new PersonStatus(p.getFullName(), u.getEntity().getDisplayName(),
-                            p.getHits(), p.getId());
+                    PersonStatus status = new PersonStatus(p.getFullName(),
+                          u.getEntity().getDisplayName(),
+                          p.getHits(),
+                          p.getId());
                     status.setMissing(missingCrew);
                     // if the pilot was not found in either the pilot or mia vector
                     // then the unit was devastated and no one ejected, so they should be dead,
@@ -699,8 +725,7 @@ public class ResolveScenarioTracker {
                                     status.setHits(6);
                                     status.setDead(true);
                                 }
-                            } else if (((Tank) en).isCommanderHit() && (u.isCommander(p)
-                                    || u.isTechOfficer(p))) {
+                            } else if (((Tank) en).isCommanderHit() && (u.isCommander(p) || u.isTechOfficer(p))) {
                                 // If there is a command console, the commander hit flag is set on the second
                                 // such critical,
                                 // which means both commanders have been hit.
@@ -731,8 +756,8 @@ public class ResolveScenarioTracker {
                         }
                         if (wounded) {
                             int hits = campaign.getCampaignOptions().getMinimumHitsForVehicles();
-                            if (campaign.getCampaignOptions().isUseAdvancedMedical()
-                                    || campaign.getCampaignOptions().isUseRandomHitsForVehicles()) {
+                            if (campaign.getCampaignOptions().isUseAdvancedMedical() ||
+                                      campaign.getCampaignOptions().isUseRandomHitsForVehicles()) {
                                 int range = 6 - hits;
                                 hits = hits + Compute.randomInt(range);
                             }
@@ -754,18 +779,15 @@ public class ResolveScenarioTracker {
     }
 
     /**
-     * Helper function that handles crew and passengers ejected from a large
-     * spacecraft,
-     * which may be scattered about on numerous other entities
+     * Helper function that handles crew and passengers ejected from a large spacecraft, which may be scattered about on
+     * numerous other entities
      *
      * @param ship       The large craft unit we're currently processing
      * @param en         The entity associated with the unit Ship
-     * @param personnel  The list of persons assigned to the ship as crew and
-     *                   marines
+     * @param personnel  The list of persons assigned to the ship as crew and marines
      * @param unitStatus The post-battle status of en
      */
-    private void processLargeCraft(Unit ship, Entity en, List<Person> personnel,
-            UnitStatus unitStatus) {
+    private void processLargeCraft(Unit ship, Entity en, List<Person> personnel, UnitStatus unitStatus) {
         // The entity must be an Aero for us to get here
         Aero aero = (Aero) en;
         // Find out if this large craft ejected or was in the process of ejecting,
@@ -822,14 +844,16 @@ public class ResolveScenarioTracker {
             currentHits = 6;
         }
         int newHits = Math.max(0, currentHits - existingHits);
-        casualties = (int) Math.ceil(Compute.getFullCrewSize(en) * (newHits / 6.0));
+        casualties = (int) ceil(Compute.getFullCrewSize(en) * (newHits / 6.0));
         // Now reduce the casualties if some "hits" were caused by ejection
         casualties = Math.max(0, casualties - rescuedCrew);
 
         // And assign the casualties and experience amongst the crew and marines
         for (Person p : personnel) {
             PersonStatus status = new PersonStatus(p.getFullName(),
-                    ship.getEntity().getDisplayName(), p.getHits(), p.getId());
+                  ship.getEntity().getDisplayName(),
+                  p.getHits(),
+                  p.getId());
             boolean wounded = false;
             if (casualtiesAssigned < casualties) {
                 casualtiesAssigned++;
@@ -843,8 +867,8 @@ public class ResolveScenarioTracker {
 
             if (wounded) {
                 int hits = campaign.getCampaignOptions().getMinimumHitsForVehicles();
-                if (campaign.getCampaignOptions().isUseAdvancedMedical()
-                        || campaign.getCampaignOptions().isUseRandomHitsForVehicles()) {
+                if (campaign.getCampaignOptions().isUseAdvancedMedical() ||
+                          campaign.getCampaignOptions().isUseRandomHitsForVehicles()) {
                     int range = 6 - hits;
                     hits = hits + Compute.randomInt(range);
                 }
@@ -859,7 +883,7 @@ public class ResolveScenarioTracker {
         // We'll assume that if units in transport bays were hit, their crews and techs
         // might also have been
         Set<PersonStatus> allPassengersStatus = new HashSet<>(); // Use this to keep track of ejected passengers for the
-                                                                 // next step
+        // next step
         List<Entity> cargo = bayLoadedEntities.get(UUID.fromString(en.getExternalIdAsString()));
         if (cargo != null) {
             for (Entity e : cargo) {
@@ -871,7 +895,9 @@ public class ResolveScenarioTracker {
                     cargoCrew = shuffleCrew(cargoCrew);
                     for (Person p : cargoCrew) {
                         PersonStatus status = new PersonStatus(p.getFullName(),
-                                u.getEntity().getDisplayName(), p.getHits(), p.getId());
+                              u.getEntity().getDisplayName(),
+                              p.getHits(),
+                              p.getId());
                         boolean wounded = false;
                         // The lore says bay crews have pressurized sleeping alcoves in the corners of
                         // each bay
@@ -888,8 +914,8 @@ public class ResolveScenarioTracker {
 
                             if (wounded) {
                                 int hits = campaign.getCampaignOptions().getMinimumHitsForVehicles();
-                                if (campaign.getCampaignOptions().isUseAdvancedMedical()
-                                        || campaign.getCampaignOptions().isUseRandomHitsForVehicles()) {
+                                if (campaign.getCampaignOptions().isUseAdvancedMedical() ||
+                                          campaign.getCampaignOptions().isUseRandomHitsForVehicles()) {
                                     int range = 6 - hits;
                                     hits = hits + Compute.randomInt(range);
                                 }
@@ -942,13 +968,11 @@ public class ResolveScenarioTracker {
     }
 
     /**
-     * Helper function that contains the logic for processing prisoner capture.
-     * Copy and pasted from checkStatusOfPersonnel, so the internal logic is kind of
-     * opaque.
+     * Helper function that contains the logic for processing prisoner capture. Copy and pasted from
+     * checkStatusOfPersonnel, so the internal logic is kind of opaque.
      *
-     * @param unitsToProcess The list of TestUnit entities to process. Note that
-     *                       in order to be processed, a unit must be in the
-     *                       salvageStatus hashtable.
+     * @param unitsToProcess The list of TestUnit entities to process. Note that in order to be processed, a unit must
+     *                       be in the salvageStatus hashtable.
      */
     private void processPrisonerCapture(List<TestUnit> unitsToProcess) {
         Mission currentMission = campaign.getMission(scenario.getMissionId());
@@ -983,22 +1007,27 @@ public class ResolveScenarioTracker {
                 entity = ejected;
             }
             // check if this ejection was picked up by a player's unit
-            boolean pickedUp = entity instanceof MekWarrior
-                    && !((MekWarrior) entity).getPickedUpByExternalIdAsString().equals("-1")
-                    && null != unitsStatus.get(UUID.fromString(((MekWarrior) entity).getPickedUpByExternalIdAsString()));
+            boolean pickedUp = entity instanceof MekWarrior &&
+                                     !((MekWarrior) entity).getPickedUpByExternalIdAsString().equals("-1") &&
+                                     null !=
+                                           unitsStatus.get(UUID.fromString(((MekWarrior) entity).getPickedUpByExternalIdAsString()));
             // if the crew ejected from this unit, then skip it because we should find them
             // elsewhere
             // if they are alive
-            if (!(entity instanceof EjectedCrew)
-                    && null != entity.getCrew()
-                    && (entity.getCrew().isEjected() && !campaign.getGameOptions()
-                            .booleanOption(OptionsConstants.ADVGRNDMOV_EJECTED_PILOTS_FLEE))) {
+            if (!(entity instanceof EjectedCrew) &&
+                      null != entity.getCrew() &&
+                      (entity.getCrew().isEjected() &&
+                             !campaign.getGameOptions()
+                                    .booleanOption(OptionsConstants.ADVGRNDMOV_EJECTED_PILOTS_FLEE))) {
                 continue;
             }
             // shuffling the crew ensures that casualties are randomly assigned in
             // multi-crew units
-            List<Person> crew = Utilities.genRandomCrewWithCombinedSkill(campaign, unit, enemyCode).values().stream()
-                    .flatMap(Collection::stream).collect(Collectors.toList());
+            List<Person> crew = Utilities.genRandomCrewWithCombinedSkill(campaign, unit, enemyCode)
+                                      .values()
+                                      .stream()
+                                      .flatMap(Collection::stream)
+                                      .collect(Collectors.toList());
             crew = shuffleCrew(crew);
 
             // For vees we may need to know the commander or driver, which aren't assigned
@@ -1011,9 +1040,9 @@ public class ResolveScenarioTracker {
                 for (Person p : crew) {
                     if (p.getPrimaryRole().isVehicleGunner()) {
                         commander = p;
-                    } else if (p.getPrimaryRole().isGroundVehicleDriver()
-                            || p.getPrimaryRole().isNavalVehicleDriver()
-                            || p.getPrimaryRole().isVTOLPilot()) {
+                    } else if (p.getPrimaryRole().isGroundVehicleDriver() ||
+                                     p.getPrimaryRole().isNavalVehicleDriver() ||
+                                     p.getPrimaryRole().isVTOLPilot()) {
                         driver = p;
                     }
                 }
@@ -1053,16 +1082,17 @@ public class ResolveScenarioTracker {
                     currentHits = entity.getCrew().getHits();
                 }
                 int newHits = Math.max(0, currentHits - existingHits);
-                casualties = (int) Math.ceil(Compute.getFullCrewSize(entity) * (newHits / 6.0));
+                casualties = (int) ceil(Compute.getFullCrewSize(entity) * (newHits / 6.0));
             }
 
             for (Person person : crew) {
                 OppositionPersonnelStatus status = new OppositionPersonnelStatus(person.getFullName(),
-                        unit.getEntity().getDisplayName(), person);
-                if (entity instanceof Mek
-                        || entity instanceof ProtoMek
-                        || entity.isFighter()
-                        || entity instanceof MekWarrior) {
+                      unit.getEntity().getDisplayName(),
+                      person);
+                if (entity instanceof Mek ||
+                          entity instanceof ProtoMek ||
+                          entity.isFighter() ||
+                          entity instanceof MekWarrior) {
                     Crew pilot = entity.getCrew();
                     if (null == pilot) {
                         continue;
@@ -1104,7 +1134,8 @@ public class ResolveScenarioTracker {
                                 status.setHits(6);
                                 status.setDead(true);
                             }
-                        } else if (((Tank) entity).isCommanderHit() && (person.equals(commander) || person.equals(console))) {
+                        } else if (((Tank) entity).isCommanderHit() &&
+                                         (person.equals(commander) || person.equals(console))) {
                             // If there is a command console, the commander hit flag does not
                             // get set until after the second such critical, which means that
                             // both commanders have been hit.
@@ -1137,8 +1168,8 @@ public class ResolveScenarioTracker {
                     }
                     if (wounded) {
                         int hits = campaign.getCampaignOptions().getMinimumHitsForVehicles();
-                        if (campaign.getCampaignOptions().isUseAdvancedMedical()
-                                || campaign.getCampaignOptions().isUseRandomHitsForVehicles()) {
+                        if (campaign.getCampaignOptions().isUseAdvancedMedical() ||
+                                  campaign.getCampaignOptions().isUseRandomHitsForVehicles()) {
                             int range = 6 - hits;
                             hits = hits + Compute.randomInt(range);
                         }
@@ -1212,8 +1243,8 @@ public class ResolveScenarioTracker {
                 }
 
                 if (null != status) {
-                    boolean lost = (!e.canEscape() && !control)
-                            || e.getRemovalCondition() == IEntityRemovalConditions.REMOVE_DEVASTATED;
+                    boolean lost = (!e.canEscape() && !control) ||
+                                         e.getRemovalCondition() == IEntityRemovalConditions.REMOVE_DEVASTATED;
                     status.assignFoundEntity(e, lost);
                 }
             }
@@ -1241,8 +1272,8 @@ public class ResolveScenarioTracker {
                 }
 
                 if (null != status) {
-                    boolean lost = (!e.canEscape() && !control)
-                            || e.getRemovalCondition() == IEntityRemovalConditions.REMOVE_DEVASTATED;
+                    boolean lost = (!e.canEscape() && !control) ||
+                                         e.getRemovalCondition() == IEntityRemovalConditions.REMOVE_DEVASTATED;
                     status.assignFoundEntity(e, lost);
                 }
             }
@@ -1317,8 +1348,9 @@ public class ResolveScenarioTracker {
                 }
             } else {
                 // Enemy crew/pilot entity is actually in the salvage list
-                if ((e instanceof EjectedCrew) && (null != e.getCrew()) &&
-                        !"-1".equals(e.getCrew().getExternalIdAsString())) {
+                if ((e instanceof EjectedCrew) &&
+                          (null != e.getCrew()) &&
+                          !"-1".equals(e.getCrew().getExternalIdAsString())) {
                     // check for possible traitors
                     if (scenario.isTraitor(UUID.fromString(e.getCrew().getExternalIdAsString()))) {
                         pilots.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
@@ -1373,9 +1405,8 @@ public class ResolveScenarioTracker {
     }
 
     /**
-     * When resolving the battle manually without a resolution file (such as MekHQ +
-     * tabletop),
-     * set initial status of units and crew as pre-battle.
+     * When resolving the battle manually without a resolution file (such as MekHQ + tabletop), set initial status of
+     * units and crew as pre-battle.
      */
     private void initUnitsAndPilotsWithoutBattle() {
         for (Unit u : units) {
@@ -1515,20 +1546,41 @@ public class ResolveScenarioTracker {
             }
 
             MekHQ.triggerEvent(new PersonBattleFinishedEvent(person, status));
+            int fatigueRate = campaign.getCampaignOptions().getFatigueRate();
             if (status.getHits() > person.getHits()) {
-                if (campaign.getCampaignOptions().isUseInjuryFatigue()) {
-                    person.changeFatigue(
-                            campaign.getCampaignOptions().getFatigueRate() * (status.getHits() - person.getHits()));
+                int statusHits = status.getHits();
+                int priorHits = person.getHits();
+                int newHits = statusHits - priorHits;
+                int adjustedHits = 0;
+
+                boolean hasGlassJaw = person.getOptions().booleanOption(FLAW_GLASS_JAW);
+                boolean hasToughness = person.getOptions().booleanOption(ATOW_TOUGHNESS);
+                boolean hasGlassJawAndToughness = hasGlassJaw && hasToughness;
+
+                if (hasGlassJaw && !hasGlassJawAndToughness) {
+                    adjustedHits = newHits * 2;
+                } else if (hasToughness && !hasGlassJawAndToughness) {
+                    adjustedHits = (int) ceil(newHits * 0.75);
                 }
 
-                person.setHitsPrior(person.getHits());
-                person.setHits(status.getHits());
+                if (campaign.getCampaignOptions().isUseInjuryFatigue()) {
+                    int fatigueIncrease = fatigueRate * newHits;
+
+                    person.changeFatigue(fatigueIncrease);
+
+                    // The status update from this instance of changeFatigue is handled later
+                }
+
+                person.setHitsPrior(priorHits);
+                person.setHits(statusHits + adjustedHits);
             }
 
             if (status.wasDeployed()) {
                 person.awardXP(campaign, status.getXP());
-                ServiceLogger.participatedInScenarioDuringMission(person, campaign.getLocalDate(),
-                        scenario.getName(), mission.getName());
+                ServiceLogger.participatedInScenarioDuringMission(person,
+                      campaign.getLocalDate(),
+                      scenario.getName(),
+                      mission.getName());
             }
 
             for (Kill k : status.getKills()) {
@@ -1544,12 +1596,12 @@ public class ResolveScenarioTracker {
                 }
             } else if (status.isDead()) {
                 person.changeStatus(getCampaign(), getCampaign().getLocalDate(), PersonnelStatus.KIA);
-                getCampaign().getRetirementDefectionTracker().removeFromCampaign(person,
-                        true, false, getCampaign(), mission);
+                getCampaign().getRetirementDefectionTracker()
+                      .removeFromCampaign(person, true, false, getCampaign(), mission);
             }
 
             if (!status.isDead()) {
-                person.changeFatigue(campaign.getCampaignOptions().getFatigueRate());
+                person.changeFatigue(fatigueRate);
 
                 if (campaign.getCampaignOptions().isUseFatigue()) {
                     Fatigue.processFatigueActions(campaign, person);
@@ -1584,8 +1636,10 @@ public class ResolveScenarioTracker {
                     person.diagnose(getCampaign(), status.getHits());
                 }
 
-                ServiceLogger.capturedInScenarioDuringMission(person, campaign.getLocalDate(), scenario.getName(),
-                    mission.getName());
+                ServiceLogger.capturedInScenarioDuringMission(person,
+                      campaign.getLocalDate(),
+                      scenario.getName(),
+                      mission.getName());
             }
         }
         // endregion Prisoners
@@ -1607,11 +1661,15 @@ public class ResolveScenarioTracker {
                 // missing unit
                 if (blc > 0) {
                     Money value = unitValue.multipliedBy(blc);
-                    campaign.getFinances().credit(TransactionType.BATTLE_LOSS_COMPENSATION,
-                            getCampaign().getLocalDate(), value,
-                            "Battle loss compensation for " + unit.getName());
-                    campaign.addReport(value.toAmountAndSymbolString() + " in battle loss compensation for "
-                            + unit.getName() + " has been credited to your account.");
+                    campaign.getFinances()
+                          .credit(TransactionType.BATTLE_LOSS_COMPENSATION,
+                                getCampaign().getLocalDate(),
+                                value,
+                                "Battle loss compensation for " + unit.getName());
+                    campaign.addReport(value.toAmountAndSymbolString() +
+                                             " in battle loss compensation for " +
+                                             unit.getName() +
+                                             " has been credited to your account.");
                 }
                 campaign.removeUnit(unit.getId());
             } else {
@@ -1653,11 +1711,15 @@ public class ResolveScenarioTracker {
                 blcValue = blcValue.plus(repairBLC);
                 if ((blc > 0) && blcValue.isPositive()) {
                     Money finalValue = blcValue.multipliedBy(blc);
-                    getCampaign().getFinances().credit(TransactionType.BATTLE_LOSS_COMPENSATION,
-                            getCampaign().getLocalDate(), finalValue,
-                            blcString.substring(0, 1).toUpperCase() + blcString.substring(1));
-                    campaign.addReport(finalValue.toAmountAndSymbolString() + " in " + blcString
-                            + " has been credited to your account.");
+                    getCampaign().getFinances()
+                          .credit(TransactionType.BATTLE_LOSS_COMPENSATION,
+                                getCampaign().getLocalDate(),
+                                finalValue,
+                                blcString.substring(0, 1).toUpperCase() + blcString.substring(1));
+                    campaign.addReport(finalValue.toAmountAndSymbolString() +
+                                             " in " +
+                                             blcString +
+                                             " has been credited to your account.");
                 }
             }
         }
@@ -1684,11 +1746,15 @@ public class ResolveScenarioTracker {
             }
 
             if (unitRansoms.isGreaterThan(Money.zero())) {
-                getCampaign().getFinances().credit(TransactionType.SALVAGE, getCampaign().getLocalDate(),
-                        unitRansoms, "Unit sales for " + getScenario().getName());
-                getCampaign().addReport(unitRansoms.toAmountAndSymbolString()
-                        + " has been credited to your account from unit salvage sold following "
-                        + getScenario().getName() + '.');
+                getCampaign().getFinances()
+                      .credit(TransactionType.SALVAGE,
+                            getCampaign().getLocalDate(),
+                            unitRansoms,
+                            "Unit sales for " + getScenario().getName());
+                getCampaign().addReport(unitRansoms.toAmountAndSymbolString() +
+                                              " has been credited to your account from unit salvage sold following " +
+                                              getScenario().getHyperlinkedName() +
+                                              '.');
                 if (isContract) {
                     ((Contract) mission).addSalvageByUnit(unitRansoms);
                 }
@@ -1700,12 +1766,15 @@ public class ResolveScenarioTracker {
             for (Unit salvageUnit : getLeftoverSalvage()) {
                 value = value.plus(salvageUnit.getSellValue());
             }
-            if (((Contract) mission).isSalvageExchange()) {
+            if (usesSalvageExchange()) {
                 value = value.multipliedBy(((Contract) mission).getSalvagePct()).dividedBy(100);
-                campaign.getFinances().credit(TransactionType.SALVAGE_EXCHANGE, getCampaign().getLocalDate(),
-                        value, "Salvage exchange for " + scenario.getName());
-                campaign.addReport(
-                        value.toAmountAndSymbolString() + " have been credited to your account for salvage exchange.");
+                campaign.getFinances()
+                      .credit(TransactionType.SALVAGE_EXCHANGE,
+                            getCampaign().getLocalDate(),
+                            value,
+                            "Salvage exchange for " + scenario.getName());
+                campaign.addReport(value.toAmountAndSymbolString() +
+                                         " have been credited to your account for salvage exchange.");
             } else {
                 ((Contract) mission).addSalvageByEmployer(value);
             }
@@ -1833,17 +1902,44 @@ public class ResolveScenarioTracker {
         return toReturn;
     }
 
+    /**
+     * Determines whether a salvage exchange is used based on the current contract's conditions.
+     *
+     * <p>This method checks the type of the mission and evaluates specific conditions to determine if a salvage
+     * exchange approach applies. For AtB (Against the Bot) contracts, it evaluates if the enemy and employer's factions
+     * are Clan and if the date is before the Battle of Tukayyid. If these conditions are met, it returns true.</p>
+     *
+     * <p>Additionally, in general contracts, it checks if the salvage exchange is explicitly enabled.</p>
+     *
+     * @return {@code true} if the current mission uses a salvage exchange, {@code false} otherwise.
+     */
     public boolean usesSalvageExchange() {
-        return (getMission() instanceof Contract) && ((Contract) getMission()).isSalvageExchange();
+        if (getMission() instanceof Contract contract) {
+            if (contract.isSalvageExchange()) {
+                return true;
+            }
+        }
+
+        return isEmployerEvokingSpecialClause();
+    }
+
+    public boolean isEmployerEvokingSpecialClause() {
+        if (getMission() instanceof AtBContract atbContract) {
+            boolean enemyIsClan = atbContract.getEnemy().isClan();
+            boolean employerIsClan = atbContract.getEmployerFaction().isClan();
+            boolean isBeforeTukayyid = campaign.getLocalDate().isBefore(MHQConstants.BATTLE_OF_TUKAYYID);
+
+            return enemyIsClan && !employerIsClan && isBeforeTukayyid;
+        }
+
+        return false;
     }
 
     /**
-     * This object is used to track the status of a particular personnel. At the
-     * present,
-     * we track the person's missing status, hits, and XP
+     * This object is used to track the status of a particular personnel. At the present, we track the person's missing
+     * status, hits, and XP
      *
      * @author Jay Lawson
-     *
      */
     public static class PersonStatus implements Comparable<PersonStatus> {
         private final String name;
@@ -1969,12 +2065,10 @@ public class ResolveScenarioTracker {
     }
 
     /**
-     * This object is used to track the status of a opposition personnel. We need to
-     * actually put the whole
-     * person object here because we are not already tracking it on the campaign
+     * This object is used to track the status of a opposition personnel. We need to actually put the whole person
+     * object here because we are not already tracking it on the campaign
      *
      * @author Jay Lawson
-     *
      */
     public static class OppositionPersonnelStatus extends PersonStatus {
         // for prisoners we have to track a whole person
@@ -2003,7 +2097,6 @@ public class ResolveScenarioTracker {
      * This object is used to track the status of a particular unit.
      *
      * @author Jay Lawson
-     *
      */
     public static class UnitStatus {
         private final String name;
@@ -2025,9 +2118,9 @@ public class ResolveScenarioTracker {
             MekSummary summary = MekSummaryCache.getInstance().getMek(getLookupName());
             if (null != summary) {
                 try {
-                    entity = unit.getEntity() == null
-                            ? new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity()
-                            : unit.getEntity();
+                    entity = unit.getEntity() == null ?
+                                   new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity() :
+                                   unit.getEntity();
                     baseEntity = new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
                 } catch (EntityLoadingException e) {
                     logger.error("", e);
@@ -2097,17 +2190,24 @@ public class ResolveScenarioTracker {
                 status = "Inoperable";
             } else {
                 color = switch (entity.getDamageLevel(false)) {
-                    case Entity.DMG_LIGHT -> MekHQ.getMHQOptions().getFontColorPositiveHexColor();
+                    case Entity.DMG_LIGHT -> ReportingUtilities.getPositiveColor();
                     case Entity.DMG_MODERATE -> "yellow";
-                    case Entity.DMG_HEAVY -> MekHQ.getMHQOptions().getFontColorWarningHexColor();
-                    case Entity.DMG_CRIPPLED -> MekHQ.getMHQOptions().getFontColorNegativeHexColor();
+                    case Entity.DMG_HEAVY -> ReportingUtilities.getWarningColor();
+                    case Entity.DMG_CRIPPLED -> ReportingUtilities.getNegativeColor();
                     default -> color;
                 };
             }
 
             if (printSellValue) {
-                return "<html><b>" + getName() + "</b><br> (" + unit.getSellValue().toAmountAndSymbolString()
-                        + ") <font color='" + color + "'>" + status + "</font></html>";
+                return "<html><b>" +
+                             getName() +
+                             "</b><br> (" +
+                             unit.getSellValue().toAmountAndSymbolString() +
+                             ") <font color='" +
+                             color +
+                             "'>" +
+                             status +
+                             "</font></html>";
             } else {
                 return "<html><b>" + getName() + "</b><br><font color='" + color + "'>" + status + "</font></html>";
             }

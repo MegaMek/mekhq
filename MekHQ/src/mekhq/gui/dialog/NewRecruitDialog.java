@@ -24,8 +24,17 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
+
+import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeInterviewersNotes;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -45,15 +54,15 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import megamek.client.generator.RandomNameGenerator;
-import megamek.client.ui.dialogs.PortraitChooserDialog;
+import megamek.client.ui.dialogs.iconChooser.PortraitChooserDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.Profession;
-import mekhq.campaign.randomEvents.personalities.PersonalityController;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.displayWrappers.RankDisplay;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
@@ -83,15 +92,19 @@ public class NewRecruitDialog extends JDialog {
         setUserPreferences();
     }
 
+    private Campaign getCampaign() {
+        return hqView.getCampaign();
+    }
+
     private void refreshView() {
-        scrollView.setViewportView(new PersonViewPanel(person, hqView.getCampaign(), hqView));
+        scrollView.setViewportView(new PersonViewPanel(person, getCampaign(), hqView));
         // This odd code is to make sure that the scrollbar stays at the top I can't just call it here, because it
         // ends up getting reset somewhere later
         SwingUtilities.invokeLater(() -> scrollView.getVerticalScrollBar().setValue(0));
     }
 
     private void initComponents() {
-        scrollView  = new JScrollPaneWithSpeed();
+        scrollView = new JScrollPaneWithSpeed();
         choiceRanks = new JComboBox<>();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewRecruitDialog",
@@ -129,14 +142,14 @@ public class NewRecruitDialog extends JDialog {
         button.setName("btnOk");
         button.addActionListener(e -> hire());
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx  = 0;
-        gridBagConstraints.gridy  = 0;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
 
         panButtons.add(button, gridBagConstraints);
         gridBagConstraints.gridx++;
 
-        if (hqView.getCampaign().isGM()) {
+        if (getCampaign().isGM()) {
             button = new JButton(resourceMap.getString("btnAddGM.text"));
             button.setName("btnGM");
             button.addActionListener(e -> addGM());
@@ -154,10 +167,7 @@ public class NewRecruitDialog extends JDialog {
     }
 
     private JPanel createSidebar(ResourceBundle resourceMap) {
-        boolean randomizeOrigin = hqView.getCampaign()
-                                        .getCampaignOptions()
-                                        .getRandomOriginOptions()
-                                        .isRandomizeOrigin();
+        boolean randomizeOrigin = getCampaign().getCampaignOptions().getRandomOriginOptions().isRandomizeOrigin();
 
         JPanel panSidebar = new JPanel();
         panSidebar.setName("panButtons");
@@ -193,13 +203,13 @@ public class NewRecruitDialog extends JDialog {
         button = new JButton(resourceMap.getString("btnEditPerson.text"));
         button.setName("btnEditPerson");
         button.addActionListener(e -> editPerson());
-        button.setEnabled(hqView.getCampaign().isGM());
+        button.setEnabled(getCampaign().isGM());
         panSidebar.add(button);
 
         button = new JButton(resourceMap.getString("btnRegenerate.text"));
         button.setName("btnRegenerate");
         button.addActionListener(e -> regenerate());
-        button.setEnabled(hqView.getCampaign().isGM());
+        button.setEnabled(getCampaign().isGM());
         panSidebar.add(button);
 
         return panSidebar;
@@ -207,11 +217,7 @@ public class NewRecruitDialog extends JDialog {
 
     /**
      * These need to be migrated to the Suite Constants / Suite Options Setup
-     *
-     * @since 0.50.04
-     * @deprecated Move to Suite Constants / Suite Options Setup
      */
-    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(NewRecruitDialog.class);
@@ -223,27 +229,27 @@ public class NewRecruitDialog extends JDialog {
     }
 
     private void hire() {
-        if (hqView.getCampaign().recruitPerson(person, false)) {
+        if (getCampaign().recruitPerson(person, false, true)) {
             createNewRecruit();
         }
         refreshView();
     }
 
     private void addGM() {
-        if (hqView.getCampaign().recruitPerson(person, true)) {
+        if (getCampaign().recruitPerson(person, true, true)) {
             createNewRecruit();
         }
         refreshView();
     }
 
     private void createNewRecruit() {
-        person = hqView.getCampaign().newPerson(person.getPrimaryRole());
+        person = getCampaign().newPerson(person.getPrimaryRole());
         refreshRanksCombo();
         person.setRank(((RankDisplay) Objects.requireNonNull(choiceRanks.getSelectedItem())).getRankNumeric());
     }
 
     private void randomName() {
-        String factionCode = hqView.getCampaign().getCampaignOptions().isUseOriginFactionForNames() ?
+        String factionCode = getCampaign().getCampaignOptions().isUseOriginFactionForNames() ?
                                    person.getOriginFaction().getShortName() :
                                    RandomNameGenerator.getInstance().getChosenFaction();
 
@@ -251,17 +257,18 @@ public class NewRecruitDialog extends JDialog {
                               .generateGivenNameSurnameSplit(person.getGender(), person.isClanPersonnel(), factionCode);
         person.setGivenName(name[0]);
         person.setSurname(name[1]);
-        PersonalityController.writePersonalityDescription(person);
+        writePersonalityDescription(person);
+        writeInterviewersNotes(person);
         refreshView();
     }
 
     private void randomPortrait() {
-        hqView.getCampaign().assignRandomPortraitFor(person);
+        getCampaign().assignRandomPortraitFor(person);
         refreshView();
     }
 
     private void randomOrigin() {
-        hqView.getCampaign().assignRandomOriginFor(person);
+        getCampaign().assignRandomOriginFor(person);
         refreshView();
     }
 
@@ -274,18 +281,21 @@ public class NewRecruitDialog extends JDialog {
     }
 
     private void editPerson() {
-        Gender                gender = person.getGender();
-        CustomizePersonDialog npd    = new CustomizePersonDialog(hqView.getFrame(), true, person, hqView.getCampaign());
+        Gender gender = person.getGender();
+        CustomizePersonDialog npd = new CustomizePersonDialog(hqView.getFrame(), true, person, getCampaign());
         npd.setVisible(true);
         if (gender != person.getGender()) {
             randomPortrait();
         }
         refreshRanksCombo();
+        if (getCampaign().getCampaignOptions().isUseAgeEffects()) {
+            updateAllSkillAgeModifiers(getCampaign().getLocalDate(), person);
+        }
         refreshView();
     }
 
     private void regenerate() {
-        person = hqView.getCampaign().newPerson(person.getPrimaryRole(), person.getSecondaryRole());
+        person = getCampaign().newPerson(person.getPrimaryRole(), person.getSecondaryRole());
         refreshRanksCombo();
         refreshView();
     }

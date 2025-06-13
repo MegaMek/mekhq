@@ -27,13 +27,27 @@
  */
 package mekhq.campaign.mission;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 import megamek.Version;
 import megamek.client.bot.princess.BehaviorSettings;
 import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.client.bot.princess.CardinalEdge;
 import megamek.client.bot.princess.PrincessException;
-import megamek.client.ui.swing.util.PlayerColour;
-import megamek.common.*;
+import megamek.client.ui.util.PlayerColour;
+import megamek.common.Board;
+import megamek.common.Compute;
+import megamek.common.Entity;
+import megamek.common.EntityListFile;
+import megamek.common.IStartingPositions;
+import megamek.common.UnitNameTracker;
 import megamek.common.icons.Camouflage;
 import megamek.logging.MMLogger;
 import mekhq.Utilities;
@@ -44,11 +58,6 @@ import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class BotForce implements IPlayerSettings {
     private static final MMLogger logger = MMLogger.create(BotForce.class);
@@ -87,19 +96,27 @@ public class BotForce implements IPlayerSettings {
     }
 
     public BotForce(String name, int team, int start, List<Entity> entityList) {
-        this(name, team, start, start, entityList,
-                new Camouflage(Camouflage.COLOUR_CAMOUFLAGE, PlayerColour.BLUE.name()),
-                PlayerColour.BLUE);
+        this(name,
+              team,
+              start,
+              start,
+              entityList,
+              new Camouflage(Camouflage.COLOUR_CAMOUFLAGE, PlayerColour.BLUE.name()),
+              PlayerColour.BLUE);
     }
 
     public BotForce(String name, int team, int start, int home, List<Entity> entityList) {
-        this(name, team, start, home, entityList,
-                new Camouflage(Camouflage.COLOUR_CAMOUFLAGE, PlayerColour.BLUE.name()),
-                PlayerColour.BLUE);
+        this(name,
+              team,
+              start,
+              home,
+              entityList,
+              new Camouflage(Camouflage.COLOUR_CAMOUFLAGE, PlayerColour.BLUE.name()),
+              PlayerColour.BLUE);
     }
 
-    public BotForce(String name, int team, int start, int home, List<Entity> entityList,
-            Camouflage camouflage, PlayerColour colour) {
+    public BotForce(String name, int team, int start, int home, List<Entity> entityList, Camouflage camouflage,
+                    PlayerColour colour) {
         this.name = name;
         this.team = team;
         this.startingPos = start;
@@ -351,7 +368,7 @@ public class BotForce implements IPlayerSettings {
         for (Entity entity : getFullEntityList(c)) {
             if (entity == null) {
                 logger.error(
-                        "Null entity when calculating the BV a bot force, we should never find a null here. Please investigate");
+                      "Null entity when calculating the BV a bot force, we should never find a null here. Please investigate");
             } else {
                 bv += entity.calculateBattleValue(true, false);
             }
@@ -365,7 +382,7 @@ public class BotForce implements IPlayerSettings {
         for (Entity entity : getFixedEntityList()) {
             if (entity == null) {
                 logger.error(
-                        "Null entity when calculating the BV a bot force, we should never find a null here. Please investigate");
+                      "Null entity when calculating the BV a bot force, we should never find a null here. Please investigate");
             } else {
                 bv += entity.calculateBattleValue(true, false);
             }
@@ -447,11 +464,11 @@ public class BotForce implements IPlayerSettings {
     }
 
     /**
-     * Checks to see if a given unit has a crew member among the traitor personnel
-     * IDs. This is used
-     * primarily to determine if a unit can be deployed to a scenario.
+     * Checks to see if a given unit has a crew member among the traitor personnel IDs. This is used primarily to
+     * determine if a unit can be deployed to a scenario.
      *
      * @param unit
+     *
      * @return a boolean indicating whether this unit is a traitor
      */
     public boolean isTraitor(Unit unit) {
@@ -466,12 +483,18 @@ public class BotForce implements IPlayerSettings {
     public BotForceStub generateStub(Campaign c) {
         List<String> stubs = Utilities.generateEntityStub(getFullEntityList(c));
         return new BotForceStub("<html>" +
-                getName() + " <i>" +
-                ((getTeam() == 1) ? "Allied" : "Enemy") + "</i>" +
-                " Start: " + IStartingPositions.START_LOCATION_NAMES[getStartingPos()] +
-                " BV: " + getTotalBV(c) +
-                ((null == getBotForceRandomizer()) ? "" : "<br>Random: " + getBotForceRandomizer().getDescription(c)) +
-                "</html>", stubs);
+                                      getName() +
+                                      " <i>" +
+                                      ((getTeam() == 1) ? "Allied" : "Enemy") +
+                                      "</i>" +
+                                      " Start: " +
+                                      IStartingPositions.START_LOCATION_NAMES[getStartingPos()] +
+                                      " BV: " +
+                                      getTotalBV(c) +
+                                      ((null == getBotForceRandomizer()) ?
+                                             "" :
+                                             "<br>Random: " + getBotForceRandomizer().getDescription(c)) +
+                                      "</html>", stubs, getTeam());
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {
@@ -507,8 +530,10 @@ public class BotForce implements IPlayerSettings {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "behaviorSettings");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "forcedWithdrawal", behaviorSettings.isForcedWithdrawal());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoFlee", behaviorSettings.shouldAutoFlee());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "selfPreservationIndex",
-                behaviorSettings.getSelfPreservationIndex());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "selfPreservationIndex",
+              behaviorSettings.getSelfPreservationIndex());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fallShameIndex", behaviorSettings.getFallShameIndex());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hyperAggressionIndex", behaviorSettings.getHyperAggressionIndex());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "destinationEdge", behaviorSettings.getDestinationEdge().ordinal());
@@ -551,8 +576,9 @@ public class BotForce implements IPlayerSettings {
                 } else if (wn2.getNodeName().equalsIgnoreCase("traitor")) {
                     traitors.add(UUID.fromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("botForceRandomizer")) {
-                    BotForceRandomizer bfRandomizer = BotForceRandomizer.generateInstanceFromXML(wn2, campaign,
-                            version);
+                    BotForceRandomizer bfRandomizer = BotForceRandomizer.generateInstanceFromXML(wn2,
+                          campaign,
+                          version);
                     setBotForceRandomizer(bfRandomizer);
                 } else if (wn2.getNodeName().equalsIgnoreCase("entities")) {
                     NodeList nl2 = wn2.getChildNodes();

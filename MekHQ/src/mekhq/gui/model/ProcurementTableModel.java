@@ -27,6 +27,14 @@
  */
 package mekhq.gui.model;
 
+import java.awt.Component;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import java.util.stream.IntStream;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableCellRenderer;
+
 import megamek.common.TargetRoll;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -34,32 +42,25 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.work.IAcquisitionWork;
 
-import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
-import java.awt.*;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.stream.IntStream;
-
 /**
- * A table model for displaying acquisitions. Unlike the other table models here, this one
- * can apply to multiple tables and so we have to be more careful in its design
+ * A table model for displaying acquisitions. Unlike the other table models here, this one can apply to multiple tables
+ * and so we have to be more careful in its design
  */
 public class ProcurementTableModel extends DataTableModel {
     //region Variable Declarations
     private final Campaign campaign;
 
-    public static final int COL_NAME    =    0;
-    public static final int COL_TYPE     =   1;
-    public static final int COL_COST     =   2;
+    public static final int COL_NAME = 0;
+    public static final int COL_TYPE = 1;
+    public static final int COL_COST = 2;
     public static final int COL_TOTAL_COST = 3;
-    public static final int COL_TARGET    =  4;
-    public static final int COL_NEXT      =  5;
-    public static final int COL_QUEUE     =  6;
-    public static final int N_COL          = 7;
+    public static final int COL_TARGET = 4;
+    public static final int COL_NEXT = 5;
+    public static final int COL_QUEUE = 6;
+    public static final int N_COL = 7;
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Constructors
@@ -83,11 +84,13 @@ public class ProcurementTableModel extends DataTableModel {
     public void incrementItem(final int row) {
         getAcquisition(row).ifPresent(IAcquisitionWork::incrementQuantity);
         fireTableCellUpdated(row, COL_QUEUE);
+        fireTableCellUpdated(row, COL_TOTAL_COST);
     }
 
     public void decrementItem(final int row) {
         getAcquisition(row).ifPresent(IAcquisitionWork::decrementQuantity);
         fireTableCellUpdated(row, COL_QUEUE);
+        fireTableCellUpdated(row, COL_TOTAL_COST);
     }
 
     public void removeRow(final IAcquisitionWork acquisition) {
@@ -114,12 +117,12 @@ public class ProcurementTableModel extends DataTableModel {
             case COL_COST:
                 return shoppingItem.getBuyCost().toAmountAndSymbolString();
             case COL_TOTAL_COST:
-                return shoppingItem.getBuyCost().multipliedBy(shoppingItem.getQuantity()).toAmountAndSymbolString();
+                return shoppingItem.getTotalBuyCost().toAmountAndSymbolString();
             case COL_TARGET:
                 final TargetRoll target = getCampaign().getTargetForAcquisition(shoppingItem);
                 String value = target.getValueAsString();
                 if (IntStream.of(TargetRoll.IMPOSSIBLE, TargetRoll.AUTOMATIC_SUCCESS, TargetRoll.AUTOMATIC_FAIL)
-                        .allMatch(i -> (target.getValue() != i))) {
+                          .allMatch(i -> (target.getValue() != i))) {
                     value += "+";
                 }
                 return value;
@@ -145,8 +148,7 @@ public class ProcurementTableModel extends DataTableModel {
     }
 
     public Optional<IAcquisitionWork> getAcquisition(final int row) {
-        return ((row >= 0) && (row < data.size())) ? Optional.of((IAcquisitionWork) data.get(row))
-                : Optional.empty();
+        return ((row >= 0) && (row < data.size())) ? Optional.of((IAcquisitionWork) data.get(row)) : Optional.empty();
     }
 
     public int getColumnWidth(final int column) {
@@ -201,9 +203,8 @@ public class ProcurementTableModel extends DataTableModel {
 
     public class Renderer extends DefaultTableCellRenderer {
         @Override
-        public Component getTableCellRendererComponent(final JTable table, final Object value,
-                                                       final boolean isSelected, final boolean hasFocus,
-                                                       final int row, final int column) {
+        public Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected,
+              final boolean hasFocus, final int row, final int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             setOpaque(true);
             final int actualCol = table.convertColumnIndexToModel(column);

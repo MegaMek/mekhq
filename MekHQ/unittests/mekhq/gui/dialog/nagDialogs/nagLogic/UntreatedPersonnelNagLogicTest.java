@@ -24,15 +24,21 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
-import static mekhq.campaign.personnel.SkillType.S_DOCTOR;
 import static mekhq.campaign.personnel.enums.PersonnelRole.DOCTOR;
+import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.UntreatedPersonnelNagLogic.campaignHasUntreatedInjuries;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 
@@ -41,8 +47,9 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Systems;
 import mekhq.gui.dialog.nagDialogs.UntreatedPersonnelNagDialog;
 import org.junit.jupiter.api.BeforeAll;
@@ -50,9 +57,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * This class contains test methods for the {@link UntreatedPersonnelNagDialog} class.
- * It tests the different combinations of untreated personnel and verifies the behavior of the
- * {@code isUntreatedInjury()} method.
+ * This class contains test methods for the {@link UntreatedPersonnelNagDialog} class. It tests the different
+ * combinations of untreated personnel and verifies the behavior of the {@code isUntreatedInjury()} method.
  */
 class UntreatedPersonnelNagLogicTest {
     Campaign campaign;
@@ -76,17 +82,23 @@ class UntreatedPersonnelNagLogicTest {
     }
 
     /**
-     * Initializes the campaign and creates a new person with the specified personnel role.
-     * This person is assigned one hit.
+     * Initializes the campaign and creates a new person with the specified personnel role. This person is assigned one
+     * hit.
      */
     @BeforeEach
     public void init() {
         campaign = mock(Campaign.class);
+
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(campaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
+
         injuredPerson = new Person(campaign);
         injuredPerson.setHits(1);
         uninjuredPerson = new Person(campaign);
         doctor = new Person(campaign);
-        doctor.addSkill(S_DOCTOR, 5, 0);
+        doctor.addSkill(S_SURGERY, 5, 0);
         doctor.setPrimaryRole(campaign, DOCTOR);
     }
 

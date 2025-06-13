@@ -27,9 +27,15 @@
  */
 package mekhq.campaign.parts;
 
+import static megamek.common.EquipmentType.T_ARMOR_SV_BAR_2;
+
+import java.io.PrintWriter;
+import java.util.Objects;
+
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
+import megamek.common.ITechnology.TechRating;
 import megamek.common.TechAdvancement;
 import megamek.common.equipment.ArmorType;
 import megamek.logging.MMLogger;
@@ -39,11 +45,6 @@ import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 
-import java.io.PrintWriter;
-import java.util.Objects;
-
-import static megamek.common.EquipmentType.T_ARMOR_SV_BAR_2;
-
 /**
  * Standard support vehicle armor, which can differ by BAR and tech rating.
  */
@@ -51,14 +52,14 @@ public class SVArmor extends Armor {
     private static final MMLogger logger = MMLogger.create(SVArmor.class);
 
     private int bar;
-    private int techRating;
+    private TechRating techRating;
 
     /**
      * Constructor used during campaign deserialization
      */
 
     public SVArmor() {
-        this(2, RATING_D, 0, Entity.LOC_NONE, null);
+        this(2, TechRating.D, 0, Entity.LOC_NONE, null);
     }
 
     /**
@@ -70,11 +71,11 @@ public class SVArmor extends Armor {
      * @param loc        The location on the unit
      * @param campaign   The campaign instance
      */
-    public SVArmor(int bar, int techRating, int points, int loc, Campaign campaign) {
+    public SVArmor(int bar, TechRating techRating, int points, int loc, Campaign campaign) {
         super(0, EquipmentType.T_ARMOR_STANDARD, points, loc, false, false, campaign);
         this.bar = bar;
         this.techRating = techRating;
-        this.name = String.format("BAR %d armor (%s)", bar, ITechnology.getRatingName(techRating));
+        this.name = String.format("BAR %d armor (%s)", bar, techRating.getName());
     }
 
     public int getBAR() {
@@ -82,7 +83,7 @@ public class SVArmor extends Armor {
     }
 
     @Override
-    public int getTechRating() {
+    public TechRating getTechRating() {
         return techRating;
     }
 
@@ -157,38 +158,42 @@ public class SVArmor extends Armor {
     }
 
     @Override
-    public int getAmountAvailable() {
-        SVArmor a = (SVArmor) campaign.getWarehouse().findSparePart(part -> {
-            return isSamePartType(part)
-                    && part.isPresent()
-                    && !part.isReservedForRefit();
-        });
-
-        return a != null ? a.getAmount() : 0;
+    public TechAdvancement getTechAdvancement() {
+        return ArmorType.svArmor(bar).getTechAdvancement();
     }
 
     @Override
-    public void changeAmountAvailable(int amount) {
-        SVArmor a = (SVArmor) campaign.getWarehouse().findSparePart(part -> {
-            return isSamePartType(part)
-                    && part.isPresent()
-                    && Objects.equals(getRefitUnit(), part.getRefitUnit());
+    public int getAmountAvailable() {
+        return campaign.getWarehouse()
+                     .streamSpareParts()
+                     .filter(this::isSameSVArmorPart)
+                     .mapToInt(part -> ((SVArmor) part).getAmount())
+                     .sum();
+    }
+
+    @Override
+    protected int changeAmountAvailableSingle(int amount) {
+        SVArmor armor = (SVArmor) campaign.getWarehouse().findSparePart(part -> {
+            return isSamePartType(part) && part.isPresent() && Objects.equals(getRefitUnit(), part.getRefitUnit());
         });
 
-        if (null != a) {
-            a.setAmount(a.getAmount() + amount);
-            if (a.getAmount() <= 0) {
-                campaign.getWarehouse().removePart(a);
+        if (null != armor) {
+            int amountRemaining = armor.getAmount() + amount;
+            armor.setAmount(amountRemaining);
+            if (armor.getAmount() <= 0) {
+                campaign.getWarehouse().removePart(armor);
+                return Math.min(0, amountRemaining);
             }
         } else if (amount > 0) {
-            campaign.getQuartermaster().addPart(new SVArmor(bar, techRating, amount, -1, campaign), 0);
+            campaign.getQuartermaster().addPart(new SVArmor(bar, techRating, amount, -1, campaign), 0, false);
         }
+        return 0;
     }
 
     @Override
     protected void writeToXMLEnd(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bar", bar);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techRating", ITechnology.getRatingName(techRating));
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techRating", techRating.getName());
         super.writeToXMLEnd(pw, indent);
     }
 
@@ -203,12 +208,7 @@ public class SVArmor extends Armor {
                         bar = Integer.parseInt(wn.getTextContent());
                         break;
                     case "techRating":
-                        for (int r = 0; r < ratingNames.length; r++) {
-                            if (ratingNames[r].equals(wn.getTextContent())) {
-                                techRating = r;
-                                break;
-                            }
-                        }
+                        techRating = TechRating.fromName(wn.getTextContent());
                         break;
                 }
             } catch (Exception e) {
@@ -217,8 +217,16 @@ public class SVArmor extends Armor {
         }
     }
 
-    @Override
-    public TechAdvancement getTechAdvancement() {
-        return ArmorType.svArmor(bar).getTechAdvancement();
+    /**
+     * Not sure how true this title is, it was used in {@link SVArmor#getAmountAvailable}
+     * @param part is this part the same
+     * @return true if the two parts are the same, at least as far as {@link SVArmor#getAmountAvailable} is concerned
+     */
+    private boolean isSameSVArmorPart(Part part) {
+        return (part instanceof SVArmor armor) &&
+                     armor.isPresent() &&
+                     !armor.isReservedForRefit() &&
+                     isClanTechBase() == part.isClanTechBase() &&
+                     isSamePartType(armor);
     }
 }

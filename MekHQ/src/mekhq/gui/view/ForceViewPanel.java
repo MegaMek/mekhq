@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.view;
 
@@ -36,7 +41,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.UUID;
-import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -52,9 +56,10 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.ForceType;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollablePanel;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.utilities.ReportingUtilities;
 
@@ -73,6 +78,7 @@ public class ForceViewPanel extends JScrollablePanel {
         super();
         this.force = f;
         this.campaign = c;
+        this.setBorder(null);
         initComponents();
     }
 
@@ -98,7 +104,7 @@ public class ForceViewPanel extends JScrollablePanel {
         add(lblIcon, gridBagConstraints);
 
         pnlStats.setName("pnlStats");
-        pnlStats.setBorder(BorderFactory.createTitledBorder(force.getName()));
+        pnlStats.setBorder(RoundedLineBorder.createRoundedLineBorder(force.getName()));
         fillStats();
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -128,9 +134,7 @@ public class ForceViewPanel extends JScrollablePanel {
             txtDesc.setEditable(false);
             txtDesc.setContentType("text/html");
             txtDesc.setText(MarkdownRenderer.getRenderedHtml(force.getDescription()));
-            txtDesc.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createTitledBorder("Description"),
-                    BorderFactory.createEmptyBorder(0,2,2,2)));
+            txtDesc.setBorder(RoundedLineBorder.createRoundedLineBorder("Description"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = 2;
@@ -182,16 +186,16 @@ public class ForceViewPanel extends JScrollablePanel {
         }
 
         for (UUID uid : force.getAllUnits(false)) {
-            bv = force.getTotalBV(campaign, true);
-
-            Unit u = campaign.getUnit(uid);
-            if (null != u) {
-                cost = cost.plus(u.getEntity().getCost(true));
-                ton += u.getEntity().getWeight();
-                String utype = UnitType.getTypeDisplayableName(u.getEntity().getUnitType());
+            Unit unit = campaign.getUnit(uid);
+            if (null != unit) {
+                // Never factor in C3 in this check. It will cause the TO&E to lock up for large campaigns.
+                bv += unit.getEntity().calculateBattleValue(true, !unit.hasPilot());
+                cost = cost.plus(unit.getEntity().getCost(true));
+                ton += unit.getEntity().getWeight();
+                String unitTypeName = UnitType.getTypeDisplayableName(unit.getEntity().getUnitType());
                 if (null == type) {
-                    type = utype;
-                } else if (!utype.equals(type)) {
+                    type = unitTypeName;
+                } else if (!unitTypeName.equals(type)) {
                     type = resourceMap.getString("mixed");
                 }
             }
@@ -514,7 +518,7 @@ public class ForceViewPanel extends JScrollablePanel {
                 String injuriesMessage = " " + injuryCount + (injuryCount == 1 ? " injury" : " injuries");
 
                 toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
-                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(), injuriesMessage));
+                    ReportingUtilities.getNegativeColor(), injuriesMessage));
             }
 
         } else {
@@ -526,7 +530,7 @@ public class ForceViewPanel extends JScrollablePanel {
                 String hitsMessage = " " + hitCount + (hitCount == 1 ? " hit" : " hits");
 
                 toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
-                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(), hitsMessage));
+                    ReportingUtilities.getNegativeColor(), hitsMessage));
             }
         }
 
@@ -542,7 +546,7 @@ public class ForceViewPanel extends JScrollablePanel {
             String fatigueMessage = effectiveFatigue + " fatigue";
 
             toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
-                MekHQ.getMHQOptions().getFontColorWarningHexColor(), fatigueMessage));
+                ReportingUtilities.getWarningColor(), fatigueMessage));
         }
 
         if (!(isInjured || isFatigued)) {
@@ -555,7 +559,11 @@ public class ForceViewPanel extends JScrollablePanel {
 
     public String getForceSummary(Unit unit) {
         String toReturn = "<html><font size='4'><b>" + unit.getName() + "</b></font><br/>";
-        toReturn += "<font><b>BV:</b> " + unit.getEntity().calculateBattleValue() + "<br/>";
+
+        // Never factor in C3 in this check. It will cause the TO&E to lock up for large campaigns.
+        toReturn += "<font><b>BV:</b> " +
+                          unit.getEntity().calculateBattleValue(true, null == unit.getEntity().getCrew()) +
+                          "<br/>";
         toReturn += unit.getStatus();
         Entity entity = unit.getEntity();
         if (entity.hasNavalC3()) {
@@ -584,7 +592,7 @@ public class ForceViewPanel extends JScrollablePanel {
             toReturn += "</i>";
         }
         if (unit.hasTransportShipAssignment()) {
-            toReturn += "<br><i>" + "Transported by: ";
+            toReturn += "<br><i>" + "Transported (Ship) by: ";
             toReturn += unit.getTransportShipAssignment().getTransportShip().getName();
             toReturn += "</i>";
         }
@@ -613,7 +621,7 @@ public class ForceViewPanel extends JScrollablePanel {
         }
         //Let's get preferred transport too
         if (unit.hasTacticalTransportAssignment()) {
-            toReturn += "<br><i>" + "Transported by: ";
+            toReturn += "<br><i>" + "Transported (Tactical) by: ";
             toReturn += unit.getTacticalTransportAssignment().getTransport().getName();
             toReturn += "</i>";
         }

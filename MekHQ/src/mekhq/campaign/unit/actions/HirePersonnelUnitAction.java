@@ -24,19 +24,24 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.unit.actions;
+
+import java.util.Set;
 
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.generator.DefaultSkillGenerator;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
-
-import java.util.Set;
 
 /**
  * Hires a full complement of personnel for a unit.
@@ -56,104 +61,104 @@ public class HirePersonnelUnitAction implements IUnitAction {
     @Override
     public void execute(Campaign campaign, Unit unit) {
         while (unit.canTakeMoreDrivers()) {
-            Person p = null;
+            Person person = null;
             if (unit.getEntity() instanceof LandAirMek) {
-                p = campaign.newPerson(PersonnelRole.LAM_PILOT);
+                person = campaign.newPerson(PersonnelRole.LAM_PILOT);
             } else if (unit.getEntity() instanceof Mek) {
-                p = campaign.newPerson(PersonnelRole.MEKWARRIOR);
+                person = campaign.newPerson(PersonnelRole.MEKWARRIOR);
             } else if (unit.getEntity() instanceof SmallCraft
                     || unit.getEntity() instanceof Jumpship) {
-                p = campaign.newPerson(PersonnelRole.VESSEL_PILOT);
+                person = campaign.newPerson(PersonnelRole.VESSEL_PILOT);
             } else if (unit.getEntity() instanceof ConvFighter) {
-                p = campaign.newPerson(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT);
+                person = campaign.newPerson(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT);
             } else if (unit.getEntity() instanceof Aero) {
-                p = campaign.newPerson(PersonnelRole.AEROSPACE_PILOT);
+                person = campaign.newPerson(PersonnelRole.AEROSPACE_PILOT);
             } else if (unit.getEntity() instanceof Tank) {
                 switch (unit.getEntity().getMovementMode()) {
                     case VTOL:
-                        p = campaign.newPerson(PersonnelRole.VTOL_PILOT);
+                        person = campaign.newPerson(PersonnelRole.VTOL_PILOT);
                         break;
                     case NAVAL:
                     case HYDROFOIL:
                     case SUBMARINE:
-                        p = campaign.newPerson(PersonnelRole.NAVAL_VEHICLE_DRIVER);
+                        person = campaign.newPerson(PersonnelRole.NAVAL_VEHICLE_DRIVER);
                         break;
                     default:
-                        p = campaign.newPerson(PersonnelRole.GROUND_VEHICLE_DRIVER);
+                        person = campaign.newPerson(PersonnelRole.GROUND_VEHICLE_DRIVER);
                 }
             } else if (unit.getEntity() instanceof ProtoMek) {
-                p = campaign.newPerson(PersonnelRole.PROTOMEK_PILOT);
+                person = campaign.newPerson(PersonnelRole.PROTOMEK_PILOT);
             } else if (unit.getEntity() instanceof BattleArmor) {
-                p = campaign.newPerson(PersonnelRole.BATTLE_ARMOUR);
+                person = campaign.newPerson(PersonnelRole.BATTLE_ARMOUR);
             } else if (unit.getEntity() instanceof Infantry) {
-                p = campaign.newPerson(PersonnelRole.SOLDIER);
+                person = campaign.newPerson(PersonnelRole.SOLDIER);
             }
-            if (p == null) {
+            if (person == null) {
                 break;
             }
 
-            if (!campaign.recruitPerson(p, isGM)) {
+            if (!campaign.recruitPerson(person, isGM, true)) {
                 return;
             }
 
             if (unit.usesSoloPilot() || unit.usesSoldiers()) {
-                unit.addPilotOrSoldier(p);
+                unit.addPilotOrSoldier(person);
             } else {
-                unit.addDriver(p);
+                unit.addDriver(person);
             }
         }
 
         while (unit.canTakeMoreGunners()) {
-            Person p = null;
+            Person person = null;
             if (unit.getEntity() instanceof Tank) {
-                p = campaign.newPerson(PersonnelRole.VEHICLE_GUNNER);
+                person = campaign.newPerson(PersonnelRole.VEHICLE_GUNNER);
             } else if (unit.getEntity() instanceof SmallCraft
                     || unit.getEntity() instanceof Jumpship) {
-                p = campaign.newPerson(PersonnelRole.VESSEL_GUNNER);
+                person = campaign.newPerson(PersonnelRole.VESSEL_GUNNER);
             } else if (unit.getEntity() instanceof Mek) {
-                p = campaign.newPerson(PersonnelRole.MEKWARRIOR);
+                person = campaign.newPerson(PersonnelRole.MEKWARRIOR);
             }
-            if (p == null) {
+            if (person == null) {
                 break;
             }
-            if (!campaign.recruitPerson(p, isGM)) {
+            if (!campaign.recruitPerson(person, isGM, true)) {
                 return;
             }
-            unit.addGunner(p);
+            unit.addGunner(person);
         }
 
         while (unit.canTakeMoreVesselCrew()) {
-            Person p = campaign.newPerson(unit.getEntity().isSupportVehicle()
+            Person person = campaign.newPerson(unit.getEntity().isSupportVehicle()
                     ? PersonnelRole.VEHICLE_CREW : PersonnelRole.VESSEL_CREW);
-            if (p == null) {
+            if (person == null) {
                 break;
             }
-            if (!campaign.recruitPerson(p, isGM)) {
+            if (!campaign.recruitPerson(person, isGM, true)) {
                 return;
             }
-            unit.addVesselCrew(p);
+            unit.addVesselCrew(person);
         }
 
         if (unit.canTakeNavigator()) {
-            Person p = campaign.newPerson(PersonnelRole.VESSEL_NAVIGATOR);
-            if (!campaign.recruitPerson(p, isGM)) {
+            Person person = campaign.newPerson(PersonnelRole.VESSEL_NAVIGATOR);
+            if (!campaign.recruitPerson(person, isGM, true)) {
                 return;
             }
-            unit.setNavigator(p);
+            unit.setNavigator(person);
         }
 
         if (unit.canTakeTechOfficer()) {
-            Person p;
+            Person person;
             //For vehicle command console we will default to gunner
             if (unit.getEntity() instanceof Tank) {
-                p = campaign.newPerson(PersonnelRole.VEHICLE_GUNNER);
+                person = campaign.newPerson(PersonnelRole.VEHICLE_GUNNER);
             } else {
-                p = campaign.newPerson(PersonnelRole.MEKWARRIOR);
+                person = campaign.newPerson(PersonnelRole.MEKWARRIOR);
             }
-            if (!campaign.recruitPerson(p, isGM)) {
+            if (!campaign.recruitPerson(person, isGM, true)) {
                 return;
             }
-            unit.setTechOfficer(p);
+            unit.setTechOfficer(person);
         }
 
         // Ensure we generate at least one person with the artillery skill if using that skill and

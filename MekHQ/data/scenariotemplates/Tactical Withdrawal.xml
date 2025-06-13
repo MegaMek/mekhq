@@ -2,17 +2,17 @@
 <ScenarioTemplate>
     <name>Tactical Withdrawal</name>
     <shortBriefing>Escape superior enemy force.</shortBriefing>
-    <detailedBriefing>A superior enemy force is in pursuit, intent on overwhelming and eliminating your units before they can escape. Your mission is to break free and reach the opposite edge of the engagement zone with at least 50% of your forces intact. Survival and mobility are your priorities—this is not a battle of attrition.
+    <detailedBriefing><![CDATA[A superior enemy force is in pursuit, intent on overwhelming and eliminating your units before they can escape. Your mission is to break free and reach the opposite edge of the engagement zone with at least 50% of your forces intact. Survival and mobility are your priorities—this is not a battle of attrition.
 
 Expect the enemy to use speed, encirclement tactics, and suppression fire to slow your advance. They have the numbers, but you have the initiative—use terrain, evasive maneuvers, and covering fire to outmaneuver them. If they manage to pin you down, your escape will become far more difficult. Keep moving and do not allow them to dictate the fight.
 
-The enemy will control the battlefield at the end of the engagement, meaning there will be no chance to recover fallen assets. This is a fight for survival—get clear, regroup, and live to fight another day.</detailedBriefing>
+The enemy will control the battlefield at the end of the engagement, meaning there will be no chance to recover fallen assets. This is a fight for survival—get clear, regroup, and live to fight another day.]]></detailedBriefing>
     <battlefieldControl>ENEMY</battlefieldControl>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>
         <allowedTerrainTypes />
-        <allowRotation>true</allowRotation>
+        <allowRotation>false</allowRotation>
         <baseHeight>70</baseHeight>
         <baseWidth>17</baseWidth>
         <heightScalingIncrement>0</heightScalingIncrement>
@@ -36,7 +36,7 @@ The enemy will control the battlefield at the end of the engagement, meaning the
                 <deploymentZones>
                     <deploymentZone>6</deploymentZone>
                 </deploymentZones>
-                <destinationZone>2</destinationZone>
+                <destinationZone>6</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>0</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
@@ -78,36 +78,6 @@ The enemy will control the battlefield at the end of the engagement, meaning the
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>SameEdge</syncDeploymentType>
-                <syncedForceName>Player</syncedForceName>
-                <useArtillery>false</useArtillery>
-            </value>
-        </entry>
-        <entry>
-            <key>Reinforcements</key>
-            <value>
-                <actualDeploymentZone>-1</actualDeploymentZone>
-                <allowAeroBombs>false</allowAeroBombs>
-                <allowedUnitType>-2</allowedUnitType>
-                <arrivalTurn>-3</arrivalTurn>
-                <canReinforceLinked>true</canReinforceLinked>
-                <contributesToBV>false</contributesToBV>
-                <contributesToMapSize>true</contributesToMapSize>
-                <contributesToUnitCount>false</contributesToUnitCount>
-                <deployOffboard>false</deployOffboard>
-                <deploymentZones />
-                <destinationZone>5</destinationZone>
-                <fixedUnitCount>0</fixedUnitCount>
-                <forceAlignment>0</forceAlignment>
-                <forceMultiplier>1.0</forceMultiplier>
-                <forceName>Reinforcements</forceName>
-                <generationMethod>0</generationMethod>
-                <generationOrder>1</generationOrder>
-                <maxWeightClass>4</maxWeightClass>
-                <minWeightClass>1</minWeightClass>
-                <objectiveLinkedForces />
-                <retreatThreshold>50</retreatThreshold>
-                <startingAltitude>0</startingAltitude>
-                <syncDeploymentType>OppositeEdge</syncDeploymentType>
                 <syncedForceName>Player</syncedForceName>
                 <useArtillery>false</useArtillery>
             </value>

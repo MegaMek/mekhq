@@ -25,36 +25,13 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.force;
-
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.EntityWeightClass;
-import megamek.common.Infantry;
-import megamek.common.annotations.Nullable;
-import megamek.logging.MMLogger;
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.event.OrganizationChangedEvent;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.atb.AtBScenarioFactory;
-import mekhq.campaign.mission.enums.AtBMoraleLevel;
-import mekhq.campaign.mission.enums.CombatRole;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.Faction;
-import mekhq.utilities.MHQXMLUtility;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.time.LocalDate;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.UUID;
 
 import static megamek.common.Entity.ETYPE_AEROSPACEFIGHTER;
 import static megamek.common.Entity.ETYPE_MEK;
@@ -66,11 +43,41 @@ import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_TRUE;
 import static mekhq.campaign.force.ForceType.STANDARD;
 import static mekhq.campaign.force.FormationLevel.LANCE;
 
+import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.UUID;
+
+import megamek.codeUtilities.MathUtility;
+import megamek.common.Compute;
+import megamek.common.Entity;
+import megamek.common.EntityWeightClass;
+import megamek.common.Infantry;
+import megamek.common.UnitType;
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.event.OrganizationChangedEvent;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.atb.AtBScenarioFactory;
+import mekhq.campaign.mission.enums.AtBMoraleLevel;
+import mekhq.campaign.mission.enums.CombatRole;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Faction;
+import mekhq.utilities.EntityUtilities;
+import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 /**
- * Used by Against the Bot &amp; StratCon to track additional information about each force
- * on the TO&amp;E that has at least one unit assigned. Extra info includes whether
- * the force counts as a Combat Team eligible for assignment to a scenario role
- * and what the assignment is on which contract.
+ * Used by Against the Bot &amp; StratCon to track additional information about each force on the TO&amp;E that has at
+ * least one unit assigned. Extra info includes whether the force counts as a Combat Team eligible for assignment to a
+ * scenario role and what the assignment is on which contract.
  *
  * @author Neoancient
  */
@@ -90,11 +97,11 @@ public class CombatTeam {
     private UUID commanderId;
 
     /**
-     * Determines the standard size for a given faction. The size varies depending on whether the
-     * faction is a Clan, ComStar/WoB, or others (Inner Sphere). This overloaded method defaults to
-     * Lance/Star/Level II
+     * Determines the standard size for a given faction. The size varies depending on whether the faction is a Clan,
+     * ComStar/WoB, or others (Inner Sphere). This overloaded method defaults to Lance/Star/Level II
      *
      * @param faction The {@link Faction} object for which the standard force size is to be calculated.
+     *
      * @return The standard force size, at the provided formation level, for the provided faction
      */
     public static int getStandardForceSize(Faction faction) {
@@ -102,12 +109,13 @@ public class CombatTeam {
     }
 
     /**
-     * Determines the standard size for a given faction. The size varies depending on whether the
-     * faction is a Clan, ComStar/WoB, or others (Inner Sphere).
+     * Determines the standard size for a given faction. The size varies depending on whether the faction is a Clan,
+     * ComStar/WoB, or others (Inner Sphere).
      *
-     * @param faction The {@link Faction} object for which the standard force size is to be calculated.
-     * @param formationLevelDepth The {@link FormationLevel} {@code Depth} from which the standard
-     *                           force size is to be calculated.
+     * @param faction             The {@link Faction} object for which the standard force size is to be calculated.
+     * @param formationLevelDepth The {@link FormationLevel} {@code Depth} from which the standard force size is to be
+     *                            calculated.
+     *
      * @return The standard force size, at the provided formation level, for the provided faction
      */
     public static int getStandardForceSize(Faction faction, int formationLevelDepth) {
@@ -121,16 +129,15 @@ public class CombatTeam {
     /**
      * Default constructor
      */
-    public CombatTeam() {}
+    public CombatTeam() {
+    }
 
     public CombatTeam(int forceId, Campaign campaign) {
         this.forceId = forceId;
         role = CombatRole.RESERVE;
         missionId = -1;
         for (AtBContract contract : campaign.getActiveAtBContracts()) {
-            missionId = ((contract.getParentContract() == null)
-                    ? contract
-                    : contract.getParentContract()).getId();
+            missionId = ((contract.getParentContract() == null) ? contract : contract.getParentContract()).getId();
         }
         commanderId = findCommander(this.forceId, campaign);
     }
@@ -163,11 +170,11 @@ public class CombatTeam {
         this.role = role;
     }
 
-    public UUID getCommanderId() {
+    public @Nullable UUID getCommanderId() {
         return commanderId;
     }
 
-    public Person getCommander(Campaign campaign) {
+    public @Nullable Person getCommander(Campaign campaign) {
         return campaign.getPerson(commanderId);
     }
 
@@ -183,18 +190,95 @@ public class CombatTeam {
         commanderId = findCommander(forceId, campaign);
     }
 
+    /**
+     * Effective size used when determining for many units this combat team is. Sometimes a unit may count as less
+     * than a unit, like a vehicle point in a Clan star (two vehicles would return a size of 1).
+     * <p>
+     *     This method iterates through all combat teams in the specified campaign, ignoring combat teams with the auxiliary
+     *     role. For each valid combat team, it retrieves the associated force and evaluates all units within that force.
+     *     The unit contribution to the total is determined based on its type: </p>
+     *     <ul>
+     *         <li><b>TANK, VTOL, NAVAL, CONV_FIGHTER, AEROSPACEFIGHTER:</b> Adds 1 for non-clan factions, and 0.5
+     *         for clan factions.</li>
+     *         <li><b>PROTOMEK:</b> Adds 0.2 to the total.</li>
+     *         <li><b>BATTLE_ARMOR, INFANTRY:</b> Adds 0 (excluded from the total, unless no other units).</li>
+     *         <li><b>Other types:</b> Adds 1 to the total.</li>
+     *     </ul>
+     *
+     * @param campaign
+     * @return effective size of the combat team
+     */
     public int getSize(Campaign campaign) {
         if (campaign.getFaction().isClan()) {
             return (int) Math.ceil(getEffectivePoints(campaign));
         }
         if (campaign.getForce(forceId) != null) {
-            return campaign.getForce(forceId).getUnits().size();
+            return (int) Math.ceil(getEffectiveLanceSize(campaign));
         } else {
             return 0;
         }
     }
 
-    public double getEffectivePoints(Campaign campaign) {
+    /**
+     * Effective size used when determining for many combat elements this combat team is.
+     * <p>
+     *     Retrieves the associated force and evaluates all units within that force.
+     *     The unit contribution to the total is determined based on its type: </p>
+     *     <ul>
+     *         <li><b>TANK, VTOL, NAVAL, CONV_FIGHTER, AEROSPACEFIGHTER:</b> Adds 1 for non-clan factions, and 0.5
+     *         for clan factions.</li>
+     *         <li><b>PROTOMEK:</b> Adds 0.2 to the total.</li>
+     *         <li><b>BATTLE_ARMOR, INFANTRY:</b> Adds 1. Infantry squads add 1/3. (excluded from the total if count
+     *         of infantry is less than the count of everything else)
+     *         .</li>
+     *         <li><b>Other types:</b> Adds 1 to the total.</li>
+     *         </ul>
+     *
+     * @param campaign
+     * @return effective size of the lance for calculating contract requirements
+     */
+    private double getEffectiveLanceSize(Campaign campaign) {
+        double numUnits = 0;
+        double numInfantry = 0;
+        Force force = getForce(campaign);
+
+        if (force == null) {
+            return numUnits;
+        }
+
+        if (!force.isForceType(STANDARD)) {
+            return numUnits;
+        }
+
+        for (UUID unitId : force.getAllUnits(true)) {
+            Entity entity = EntityUtilities.getEntityFromUnitId(campaign.getHangar(), unitId);
+
+            if (entity == null) {
+                continue;
+            }
+
+            switch (entity.getUnitType()) {
+                case UnitType.TANK,
+                     UnitType.VTOL,
+                     UnitType.NAVAL,
+                     UnitType.CONV_FIGHTER,
+                     UnitType.AEROSPACEFIGHTER,
+                     UnitType.MEK -> numUnits += 1;
+                case UnitType.PROTOMEK -> numUnits += 0.2;
+                case UnitType.BATTLE_ARMOR -> numInfantry += 1;
+                case UnitType.INFANTRY ->
+                      numInfantry += entity instanceof Infantry infantry && infantry.isSquad() ? 1.0 / 4 : 1;
+                default -> numUnits += 0; // All other unit types
+            }
+        }
+
+        if (numInfantry > numUnits) {
+            return (int) Math.floor(numInfantry);
+        }
+        return (int) Math.floor(numUnits);
+    }
+
+    private double getEffectivePoints(Campaign campaign) {
         /*
          * Used to check against force size limits; for this purpose we
          * consider a 'Mek and a Point of BA to be a single Point so that
@@ -205,7 +289,7 @@ public class CombatTeam {
         double armor = 0.0;
         double infantry = 0.0;
         double other = 0.0;
-        for (UUID id : campaign.getForce(forceId).getUnits()) {
+        for (UUID id : campaign.getForce(forceId).getAllUnits(true)) {
             Unit unit = campaign.getUnit(id);
             if (null != unit) {
                 Entity entity = unit.getEntity();
@@ -307,14 +391,14 @@ public class CombatTeam {
         if (campaign.getCampaignOptions().isLimitLanceNumUnits()) {
             int size = getSize(campaign);
             if (size < getStandardForceSize(campaign.getFaction()) - 1 ||
-                    size > getStandardForceSize(campaign.getFaction()) + 2) {
+                      size > getStandardForceSize(campaign.getFaction()) + 2) {
                 force.setCombatTeamStatus(false);
                 return false;
             }
         }
 
         if (campaign.getCampaignOptions().isLimitLanceWeight() &&
-                getWeightClass(campaign) > EntityWeightClass.WEIGHT_ASSAULT) {
+                  getWeightClass(campaign) > EntityWeightClass.WEIGHT_ASSAULT) {
             force.setCombatTeamStatus(false);
             return false;
         }
@@ -369,7 +453,7 @@ public class CombatTeam {
     }
 
     /* Code to find unit commander from ForceViewPanel */
-    public static UUID findCommander(int forceId, Campaign campaign) {
+    public static @Nullable UUID findCommander(int forceId, Campaign campaign) {
         return campaign.getForce(forceId).getForceCommanderID();
     }
 
@@ -379,22 +463,24 @@ public class CombatTeam {
 
     public AtBScenario checkForBattle(Campaign campaign) {
         // Make sure there is a battle first
-        if ((campaign.getCampaignOptions().getAtBBattleChance(role, true) == 0)
-                || (Compute.randomInt(100) > campaign.getCampaignOptions().getAtBBattleChance(role, true))) {
+        if ((campaign.getCampaignOptions().getAtBBattleChance(role, true) == 0) ||
+                  (Compute.randomInt(100) > campaign.getCampaignOptions().getAtBBattleChance(role, true))) {
             // No battle
             return null;
         }
 
         // if we are using StratCon, don't *also* generate legacy scenarios
         if (campaign.getCampaignOptions().isUseStratCon() &&
-                (getContract(campaign).getStratconCampaignState() != null)) {
+                  (getContract(campaign).getStratconCampaignState() != null)) {
             return null;
         }
 
         int roll;
         // thresholds are coded from charts with 1-100 range, so we add 1 to mod to
         // adjust 0-based random int
-        int battleTypeMod = 1 + (AtBMoraleLevel.STALEMATE.ordinal() - getContract(campaign).getMoraleLevel().ordinal()) * 5;
+        int battleTypeMod = 1 +
+                                  (AtBMoraleLevel.STALEMATE.ordinal() -
+                                         getContract(campaign).getMoraleLevel().ordinal()) * 5;
         battleTypeMod += getContract(campaign).getBattleTypeMod();
 
         // debugging code that will allow you to force the generation of a particular
@@ -416,144 +502,204 @@ public class CombatTeam {
             case MANEUVER: {
                 roll = Compute.randomInt(40) + battleTypeMod;
                 if (roll < 1) {
-                    return AtBScenarioFactory.createScenario(campaign, this,
-                            AtBScenario.BASEATTACK, false,
-                            getBattleDate(campaign.getLocalDate()));
+                    return AtBScenarioFactory.createScenario(campaign,
+                          this,
+                          AtBScenario.BASEATTACK,
+                          false,
+                          getBattleDate(campaign.getLocalDate()));
                 } else if (roll < 9) {
-                    return AtBScenarioFactory.createScenario(campaign, this,
-                            AtBScenario.BREAKTHROUGH, true,
-                            getBattleDate(campaign.getLocalDate()));
+                    return AtBScenarioFactory.createScenario(campaign,
+                          this,
+                          AtBScenario.BREAKTHROUGH,
+                          true,
+                          getBattleDate(campaign.getLocalDate()));
                 } else if (roll < 17) {
-                    return AtBScenarioFactory.createScenario(campaign, this,
-                            AtBScenario.STANDUP, true,
-                            getBattleDate(campaign.getLocalDate()));
+                    return AtBScenarioFactory.createScenario(campaign,
+                          this,
+                          AtBScenario.STANDUP,
+                          true,
+                          getBattleDate(campaign.getLocalDate()));
                 } else if (roll < 25) {
-                    return AtBScenarioFactory.createScenario(campaign, this,
-                            AtBScenario.STANDUP, false,
-                            getBattleDate(campaign.getLocalDate()));
+                    return AtBScenarioFactory.createScenario(campaign,
+                          this,
+                          AtBScenario.STANDUP,
+                          false,
+                          getBattleDate(campaign.getLocalDate()));
                 } else if (roll < 33) {
                     if (campaign.getCampaignOptions().isGenerateChases()) {
-                        return AtBScenarioFactory.createScenario(campaign, this,
-                                AtBScenario.CHASE, false,
-                                getBattleDate(campaign.getLocalDate()));
+                        return AtBScenarioFactory.createScenario(campaign,
+                              this,
+                              AtBScenario.CHASE,
+                              false,
+                              getBattleDate(campaign.getLocalDate()));
                     } else {
-                        return AtBScenarioFactory.createScenario(campaign, this,
-                                AtBScenario.HOLDTHELINE, false,
-                                getBattleDate(campaign.getLocalDate()));
+                        return AtBScenarioFactory.createScenario(campaign,
+                              this,
+                              AtBScenario.HOLDTHELINE,
+                              false,
+                              getBattleDate(campaign.getLocalDate()));
                     }
                 } else if (roll < 41) {
-                    return AtBScenarioFactory.createScenario(campaign, this,
-                            AtBScenario.HOLDTHELINE, true,
-                            getBattleDate(campaign.getLocalDate()));
+                    return AtBScenarioFactory.createScenario(campaign,
+                          this,
+                          AtBScenario.HOLDTHELINE,
+                          true,
+                          getBattleDate(campaign.getLocalDate()));
                 } else {
-                    return AtBScenarioFactory.createScenario(campaign, this,
-                            AtBScenario.BASEATTACK, true,
-                            getBattleDate(campaign.getLocalDate()));
+                    return AtBScenarioFactory.createScenario(campaign,
+                          this,
+                          AtBScenario.BASEATTACK,
+                          true,
+                          getBattleDate(campaign.getLocalDate()));
                 }
             }
             case PATROL: {
                 roll = Compute.randomInt(60) + battleTypeMod;
                 if (roll < 1) {
-                    return AtBScenarioFactory.createScenario(campaign, this,
-                            AtBScenario.BASEATTACK, false,
-                            getBattleDate(campaign.getLocalDate()));
+                    return AtBScenarioFactory.createScenario(campaign,
+                          this,
+                          AtBScenario.BASEATTACK,
+                          false,
+                          getBattleDate(campaign.getLocalDate()));
                 } else if (roll < 11) {
                     if (campaign.getCampaignOptions().isGenerateChases()) {
-                        return AtBScenarioFactory.createScenario(campaign, this,
-                                AtBScenario.CHASE, true,
-                                getBattleDate(campaign.getLocalDate()));
+                        return AtBScenarioFactory.createScenario(campaign,
+                              this,
+                              AtBScenario.CHASE,
+                              true,
+                              getBattleDate(campaign.getLocalDate()));
                     } else {
-                        return AtBScenarioFactory.createScenario(campaign, this,
-                                AtBScenario.HIDEANDSEEK, false,
-                                getBattleDate(campaign.getLocalDate()));
+                        return AtBScenarioFactory.createScenario(campaign,
+                              this,
+                              AtBScenario.HIDEANDSEEK,
+                              false,
+                              getBattleDate(campaign.getLocalDate()));
                     }
                 } else if (roll < 21) {
-                    return AtBScenarioFactory.createScenario(campaign, this,
-                            AtBScenario.HIDEANDSEEK, true,
-                            getBattleDate(campaign.getLocalDate()));
+                    return AtBScenarioFactory.createScenario(campaign,
+                          this,
+                          AtBScenario.HIDEANDSEEK,
+                          true,
+                          getBattleDate(campaign.getLocalDate()));
                 } else if (roll < 31) {
-                    return AtBScenarioFactory.createScenario(campaign, this,
-                            AtBScenario.PROBE, true,
-                            getBattleDate(campaign.getLocalDate()));
+                    return AtBScenarioFactory.createScenario(campaign,
+                          this,
+                          AtBScenario.PROBE,
+                          true,
+                          getBattleDate(campaign.getLocalDate()));
                 } else if (roll < 41) {
-                    return AtBScenarioFactory.createScenario(campaign, this,
-                            AtBScenario.PROBE, false,
-                            getBattleDate(campaign.getLocalDate()));
+                    return AtBScenarioFactory.createScenario(campaign,
+                          this,
+                          AtBScenario.PROBE,
+                          false,
+                          getBattleDate(campaign.getLocalDate()));
                 } else if (roll < 51) {
-                    return AtBScenarioFactory.createScenario(campaign, this,
-                            AtBScenario.EXTRACTION, true,
-                            getBattleDate(campaign.getLocalDate()));
+                    return AtBScenarioFactory.createScenario(campaign,
+                          this,
+                          AtBScenario.EXTRACTION,
+                          true,
+                          getBattleDate(campaign.getLocalDate()));
                 } else {
-                    return AtBScenarioFactory.createScenario(campaign, this,
-                            AtBScenario.RECONRAID, true,
-                            getBattleDate(campaign.getLocalDate()));
+                    return AtBScenarioFactory.createScenario(campaign,
+                          this,
+                          AtBScenario.RECONRAID,
+                          true,
+                          getBattleDate(campaign.getLocalDate()));
                 }
             }
             case FRONTLINE: {
                 roll = Compute.randomInt(20) + battleTypeMod;
                 if (roll < 1) {
-                    return AtBScenarioFactory.createScenario(campaign, this,
-                            AtBScenario.BASEATTACK, false,
-                            getBattleDate(campaign.getLocalDate()));
+                    return AtBScenarioFactory.createScenario(campaign,
+                          this,
+                          AtBScenario.BASEATTACK,
+                          false,
+                          getBattleDate(campaign.getLocalDate()));
                 } else if (roll < 5) {
-                    return AtBScenarioFactory.createScenario(campaign, this,
-                            AtBScenario.HOLDTHELINE, false,
-                            getBattleDate(campaign.getLocalDate()));
+                    return AtBScenarioFactory.createScenario(campaign,
+                          this,
+                          AtBScenario.HOLDTHELINE,
+                          false,
+                          getBattleDate(campaign.getLocalDate()));
                 } else if (roll < 9) {
-                    return AtBScenarioFactory.createScenario(campaign, this,
-                            AtBScenario.RECONRAID, false,
-                            getBattleDate(campaign.getLocalDate()));
+                    return AtBScenarioFactory.createScenario(campaign,
+                          this,
+                          AtBScenario.RECONRAID,
+                          false,
+                          getBattleDate(campaign.getLocalDate()));
                 } else if (roll < 13) {
-                    return AtBScenarioFactory.createScenario(campaign, this,
-                            AtBScenario.EXTRACTION, false,
-                            getBattleDate(campaign.getLocalDate()));
+                    return AtBScenarioFactory.createScenario(campaign,
+                          this,
+                          AtBScenario.EXTRACTION,
+                          false,
+                          getBattleDate(campaign.getLocalDate()));
                 } else if (roll < 17) {
-                    return AtBScenarioFactory.createScenario(campaign, this,
-                            AtBScenario.HIDEANDSEEK, true,
-                            getBattleDate(campaign.getLocalDate()));
+                    return AtBScenarioFactory.createScenario(campaign,
+                          this,
+                          AtBScenario.HIDEANDSEEK,
+                          true,
+                          getBattleDate(campaign.getLocalDate()));
                 } else {
-                    return AtBScenarioFactory.createScenario(campaign, this,
-                            AtBScenario.BREAKTHROUGH, false,
-                            getBattleDate(campaign.getLocalDate()));
+                    return AtBScenarioFactory.createScenario(campaign,
+                          this,
+                          AtBScenario.BREAKTHROUGH,
+                          false,
+                          getBattleDate(campaign.getLocalDate()));
                 }
             }
             case TRAINING: {
                 roll = Compute.randomInt(10) + battleTypeMod;
                 if (roll < 1) {
-                    return AtBScenarioFactory.createScenario(campaign, this,
-                            AtBScenario.BASEATTACK, false,
-                            getBattleDate(campaign.getLocalDate()));
+                    return AtBScenarioFactory.createScenario(campaign,
+                          this,
+                          AtBScenario.BASEATTACK,
+                          false,
+                          getBattleDate(campaign.getLocalDate()));
                 } else if (roll < 3) {
-                    return AtBScenarioFactory.createScenario(campaign, this,
-                            AtBScenario.HOLDTHELINE, false,
-                            getBattleDate(campaign.getLocalDate()));
+                    return AtBScenarioFactory.createScenario(campaign,
+                          this,
+                          AtBScenario.HOLDTHELINE,
+                          false,
+                          getBattleDate(campaign.getLocalDate()));
                 } else if (roll < 5) {
-                    return AtBScenarioFactory.createScenario(campaign, this,
-                            AtBScenario.BREAKTHROUGH, true,
-                            getBattleDate(campaign.getLocalDate()));
+                    return AtBScenarioFactory.createScenario(campaign,
+                          this,
+                          AtBScenario.BREAKTHROUGH,
+                          true,
+                          getBattleDate(campaign.getLocalDate()));
                 } else if (roll < 7) {
                     if (campaign.getCampaignOptions().isGenerateChases()) {
-                        return AtBScenarioFactory.createScenario(campaign, this,
-                                AtBScenario.CHASE, true,
-                                getBattleDate(campaign.getLocalDate()));
+                        return AtBScenarioFactory.createScenario(campaign,
+                              this,
+                              AtBScenario.CHASE,
+                              true,
+                              getBattleDate(campaign.getLocalDate()));
                     } else {
-                        return AtBScenarioFactory.createScenario(campaign, this,
-                                AtBScenario.BREAKTHROUGH, false,
-                                getBattleDate(campaign.getLocalDate()));
+                        return AtBScenarioFactory.createScenario(campaign,
+                              this,
+                              AtBScenario.BREAKTHROUGH,
+                              false,
+                              getBattleDate(campaign.getLocalDate()));
                     }
                 } else if (roll < 9) {
-                    return AtBScenarioFactory.createScenario(campaign, this,
-                            AtBScenario.HIDEANDSEEK, false,
-                            getBattleDate(campaign.getLocalDate()));
+                    return AtBScenarioFactory.createScenario(campaign,
+                          this,
+                          AtBScenario.HIDEANDSEEK,
+                          false,
+                          getBattleDate(campaign.getLocalDate()));
                 } else {
                     if (campaign.getCampaignOptions().isGenerateChases()) {
-                        return AtBScenarioFactory.createScenario(campaign, this,
-                                AtBScenario.CHASE, false,
-                                getBattleDate(campaign.getLocalDate()));
+                        return AtBScenarioFactory.createScenario(campaign,
+                              this,
+                              AtBScenario.CHASE,
+                              false,
+                              getBattleDate(campaign.getLocalDate()));
                     } else {
-                        return AtBScenarioFactory.createScenario(campaign, this,
-                                AtBScenario.HOLDTHELINE, false,
-                                getBattleDate(campaign.getLocalDate()));
+                        return AtBScenarioFactory.createScenario(campaign,
+                              this,
+                              AtBScenario.HOLDTHELINE,
+                              false,
+                              getBattleDate(campaign.getLocalDate()));
                     }
                 }
             }
@@ -574,20 +720,19 @@ public class CombatTeam {
 
     public static CombatTeam generateInstanceFromXML(Node wn) {
         CombatTeam retVal = null;
-        NamedNodeMap attrs = wn.getAttributes();
-        Node classNameNode = attrs.getNamedItem("type");
-        String className = classNameNode.getTextContent();
         try {
-            retVal = (CombatTeam) Class.forName(className).newInstance();
+            retVal = new CombatTeam();
             NodeList nl = wn.getChildNodes();
 
             for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
 
                 if (wn2.getNodeName().equalsIgnoreCase("forceId")) {
+                    // We're not using MathUtility here because there is no good fallback value.
+                    // If this breaks, we need it to break loudly so we immediately notice
                     retVal.forceId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("missionId")) {
-                    retVal.missionId = Integer.parseInt(wn2.getTextContent());
+                    retVal.missionId = MathUtility.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("role")) {
                     retVal.setRole(CombatRole.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("commanderId")) {
@@ -603,8 +748,9 @@ public class CombatTeam {
     /**
      * Worker function that calculates the total weight of a force with the given ID
      *
-     * @param campaign       Campaign in which the force resides
-     * @param forceId        Force for which to calculate weight
+     * @param campaign Campaign in which the force resides
+     * @param forceId  Force for which to calculate weight
+     *
      * @return Total force weight
      */
     public static double calculateTotalWeight(Campaign campaign, int forceId) {
@@ -614,21 +760,24 @@ public class CombatTeam {
             try {
                 Unit unit = campaign.getUnit(id);
                 Entity entity = unit.getEntity();
-
-                boolean isClan = campaign.getFaction().isClan();
                 long entityType = entity.getEntityType();
 
-                if (entityType == ETYPE_TANK) {
-                    if (isClan || campaign.getCampaignOptions().isAdjustPlayerVehicles()) {
-                        weight += entity.getWeight() * 0.5;
-                    } else {
-                        weight += entity.getWeight();
-                    }
-                } else if (entityType == ETYPE_AEROSPACEFIGHTER) {
-                    if (isClan) {
-                        weight += entity.getWeight() * 0.5;
-                    } else {
-                        weight += entity.getWeight();
+                boolean isClan = campaign.isClanCampaign();
+
+                CampaignOptions campaignOptions = campaign.getCampaignOptions();
+                if (campaignOptions.isUseAtB() && !campaignOptions.isUseStratCon()) {
+                    if (entityType == ETYPE_TANK) {
+                        if (isClan || campaignOptions.isAdjustPlayerVehicles()) {
+                            weight += entity.getWeight() * 0.5;
+                        } else {
+                            weight += entity.getWeight();
+                        }
+                    } else if (entityType == ETYPE_AEROSPACEFIGHTER) {
+                        if (isClan) {
+                            weight += entity.getWeight() * 0.5;
+                        } else {
+                            weight += entity.getWeight();
+                        }
                     }
                 } else {
                     weight += entity.getWeight();
@@ -642,9 +791,8 @@ public class CombatTeam {
     }
 
     /**
-     * This static method updates the combat teams across the campaign.
-     * It starts at the top level force, and calculates the combat teams for each sub-force.
-     * It keeps only the eligible combat teams and imports them into the campaign.
+     * This static method updates the combat teams across the campaign. It starts at the top level force, and calculates
+     * the combat teams for each sub-force. It keeps only the eligible combat teams and imports them into the campaign.
      * After every formation is processed, an 'OrganizationChangedEvent' is triggered by that force.
      *
      * @param campaign the current campaign.
@@ -663,7 +811,7 @@ public class CombatTeam {
             }
 
             force.setCombatTeamStatus(isEligible);
-        // Otherwise, create a new formation and then add it to the table, if appropriate
+            // Otherwise, create a new formation and then add it to the table, if appropriate
         } else {
             combatTeam = new CombatTeam(0, campaign);
             boolean isEligible = combatTeam.isEligible(campaign);
@@ -681,21 +829,17 @@ public class CombatTeam {
     }
 
     /**
-     * This method is used to update the combat teams for the campaign working downwards
-     * from a specified node, through all of its sub-forces.
-     * It creates a new {@link CombatTeam} for each sub-force and checks its eligibility.
-     * Eligible formations are imported into the campaign, and the combat team status of
-     * the respective force is set to {@code true}.
-     * After every force is processed, an 'OrganizationChangedEvent' is triggered.
-     * This function runs recursively on each sub-force, effectively traversing the complete TO&E.
+     * This method is used to update the combat teams for the campaign working downwards from a specified node, through
+     * all of its sub-forces. It creates a new {@link CombatTeam} for each sub-force and checks its eligibility.
+     * Eligible formations are imported into the campaign, and the combat team status of the respective force is set to
+     * {@code true}. After every force is processed, an 'OrganizationChangedEvent' is triggered. This function runs
+     * recursively on each sub-force, effectively traversing the complete TO&E.
      *
-     * @param campaign the current {@link Campaign}.
-     * @param workingNode the {@link Force} node from which the method starts working down through
-     *                   all its sub-forces.
+     * @param campaign    the current {@link Campaign}.
+     * @param workingNode the {@link Force} node from which the method starts working down through all its sub-forces.
      */
     private static void recalculateSubForceStrategicStatus(Campaign campaign,
-                                                           Hashtable<Integer, CombatTeam> combatTeamsTable,
-                                                           Force workingNode) {
+          Hashtable<Integer, CombatTeam> combatTeamsTable, Force workingNode) {
 
         for (Force force : workingNode.getSubForces()) {
             int forceId = force.getId();
@@ -710,7 +854,7 @@ public class CombatTeam {
                 }
 
                 force.setCombatTeamStatus(isEligible);
-            // Otherwise, create a new formation and then add it to the table, if appropriate
+                // Otherwise, create a new formation and then add it to the table, if appropriate
             } else {
                 combatTeam = new CombatTeam(forceId, campaign);
                 boolean isEligible = combatTeam.isEligible(campaign);
@@ -732,12 +876,12 @@ public class CombatTeam {
      * Retrieves the force associated with the given campaign using the stored force ID.
      *
      * <p>
-     * This method returns a {@link Force} object corresponding to the stored {@code forceId},
-     * if it exists within the specified campaign. If no matching force is found, {@code null}
-     * is returned.
+     * This method returns a {@link Force} object corresponding to the stored {@code forceId}, if it exists within the
+     * specified campaign. If no matching force is found, {@code null} is returned.
      * </p>
      *
      * @param campaign the campaign containing the forces to search for the specified {@code forceId}
+     *
      * @return the {@link Force} object associated with the {@code forceId}, or {@code null} if not found
      */
     public @Nullable Force getForce(Campaign campaign) {

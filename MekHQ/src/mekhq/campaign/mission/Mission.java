@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission;
 
@@ -35,10 +40,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.Version;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
@@ -47,10 +48,13 @@ import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Missions are primarily holder objects for a set of scenarios.
- *
+ * <p>
  * The really cool stuff will happen when we subclass this into Contract
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -88,6 +92,22 @@ public class Mission {
         return name;
     }
 
+    /**
+     * Returns the name of this object as an HTML hyperlink.
+     *
+     * <p>The hyperlink is formatted with a "MISSION:" protocol prefix followed by the object's ID. This allows UI
+     * components that support HTML to render the name as a clickable link, which can be used to navigate to or focus on
+     * this specific object when clicked.</p>
+     *
+     * @return An HTML formatted string containing the object's name as a hyperlink with its ID
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public String getHyperlinkedName() {
+        return String.format("<a href='MISSION:%s'>%s</a>", getId(), getName());
+    }
+
     public void setName(String n) {
         this.name = n;
     }
@@ -113,9 +133,8 @@ public class Mission {
     }
 
     /**
-     * Convenience property to return the name of the current planet.
-     * Sometimes, the "current planet" doesn't match up with an existing planet in
-     * our planet database, in which case we return whatever was stored.
+     * Convenience property to return the name of the current planet. Sometimes, the "current planet" doesn't match up
+     * with an existing planet in our planet database, in which case we return whatever was stored.
      *
      * @return
      */
@@ -165,25 +184,26 @@ public class Mission {
     }
 
     public List<Scenario> getCurrentScenarios() {
-        return getScenarios().stream().filter(scenario -> scenario.getStatus().isCurrent())
-                .collect(Collectors.toList());
+        return getScenarios().stream()
+                     .filter(scenario -> scenario.getStatus().isCurrent())
+                     .collect(Collectors.toList());
     }
 
     public List<AtBScenario> getCurrentAtBScenarios() {
         return getScenarios().stream()
-                .filter(scenario -> scenario.getStatus().isCurrent() && (scenario instanceof AtBScenario))
-                .map(scenario -> (AtBScenario) scenario)
-                .collect(Collectors.toList());
+                     .filter(scenario -> scenario.getStatus().isCurrent() && (scenario instanceof AtBScenario))
+                     .map(scenario -> (AtBScenario) scenario)
+                     .collect(Collectors.toList());
     }
 
     public List<Scenario> getCompletedScenarios() {
-        return getScenarios().stream().filter(scenario -> !scenario.getStatus().isCurrent())
-                .collect(Collectors.toList());
+        return getScenarios().stream()
+                     .filter(scenario -> !scenario.getStatus().isCurrent())
+                     .collect(Collectors.toList());
     }
 
     /**
-     * Don't use this method directly as it will not add an id to the added
-     * scenario. Use Campaign#AddScenario instead
+     * Don't use this method directly as it will not add an id to the added scenario. Use Campaign#AddScenario instead
      *
      * @param scenario the scenario to add this this mission
      */
@@ -199,7 +219,7 @@ public class Mission {
     public boolean hasPendingScenarios() {
         // scenarios that are pending, but have not been revealed don't count
         return getScenarios().stream()
-                .anyMatch(scenario -> (scenario.getStatus().isCurrent() && !scenario.isCloaked()));
+                     .anyMatch(scenario -> (scenario.getStatus().isCurrent() && !scenario.isCloaked()));
     }
     // endregion Scenarios
 
@@ -212,12 +232,29 @@ public class Mission {
     }
 
     // region File I/O
+
+    /**
+     * @deprecated use {@link #writeToXML(Campaign, PrintWriter, int) instead}
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public void writeToXML(final PrintWriter pw, int indent) {
-        indent = writeToXMLBegin(pw, indent);
+        return;
+    }
+
+    public void writeToXML(Campaign campaign, final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(campaign, pw, indent);
         writeToXMLEnd(pw, indent);
     }
 
+    /**
+     * @deprecated use {@link #writeToXMLBegin(Campaign, PrintWriter, int)} instead;
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     protected int writeToXMLBegin(final PrintWriter pw, int indent) {
+        return indent;
+    }
+
+    protected int writeToXMLBegin(Campaign campaign, final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "mission", "id", id, "type", getClass());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", name);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "type", type);
@@ -241,13 +278,21 @@ public class Mission {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "mission");
     }
 
+    /**
+     * @deprecated use {@link #loadFieldsFromXmlNode(Campaign, Version, Node)}  instead;
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public void loadFieldsFromXmlNode(Node wn) throws ParseException {
+        return;
+    }
+
+    public void loadFieldsFromXmlNode(Campaign campaign, Version version, Node wn) throws ParseException {
         // do nothing
     }
 
-    public static Mission generateInstanceFromXML(Node wn, Campaign c, Version version) {
+    public static Mission generateInstanceFromXML(Node node, Campaign campaign, Version version) {
         Mission retVal = null;
-        NamedNodeMap attrs = wn.getAttributes();
+        NamedNodeMap attrs = node.getAttributes();
         Node classNameNode = attrs.getNamedItem("type");
         String className = classNameNode.getTextContent();
 
@@ -255,24 +300,24 @@ public class Mission {
             // Instantiate the correct child class, and call its parsing
             // function.
             retVal = (Mission) Class.forName(className).newInstance();
-            retVal.loadFieldsFromXmlNode(wn);
+            retVal.loadFieldsFromXmlNode(campaign, version, node);
 
             // Okay, now load mission-specific fields!
-            NodeList nl = wn.getChildNodes();
+            NodeList nl = node.getChildNodes();
 
             for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
 
                 if (wn2.getNodeName().equalsIgnoreCase("name")) {
                     retVal.name = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("planetId")
-                        || wn2.getNodeName().equalsIgnoreCase("systemId")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("planetId") ||
+                                 wn2.getNodeName().equalsIgnoreCase("systemId")) {
                     retVal.systemId = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("planetName")) {
-                    PlanetarySystem system = c.getSystemByName(wn2.getTextContent());
+                    PlanetarySystem system = campaign.getSystemByName(wn2.getTextContent());
 
                     if (system != null) {
-                        retVal.systemId = c.getSystemByName(wn2.getTextContent()).getId();
+                        retVal.systemId = campaign.getSystemByName(wn2.getTextContent()).getId();
                     } else {
                         retVal.legacyPlanetName = wn2.getTextContent();
                     }
@@ -300,7 +345,7 @@ public class Mission {
 
                             continue;
                         }
-                        Scenario s = Scenario.generateInstanceFromXML(wn3, c, version);
+                        Scenario s = Scenario.generateInstanceFromXML(wn3, campaign, version);
 
                         if (null != s) {
                             retVal.addScenario(s);

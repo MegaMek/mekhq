@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -47,7 +52,7 @@ import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.SkillPerquisite;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
@@ -62,27 +67,27 @@ public class EditSkillPerquisiteDialog extends JDialog {
     private JButton btnOK;
     private boolean cancelled;
 
-    private Hashtable<String, JComboBox<SkillLevel>> skillLevels = new Hashtable<>();
-    private Hashtable<String, JCheckBox>             skillChks   = new Hashtable<>();
+    private final Hashtable<String, JComboBox<SkillLevel>> skillLevels = new Hashtable<>();
+    private final Hashtable<String, JCheckBox> skillChks = new Hashtable<>();
 
     public EditSkillPerquisiteDialog(final JFrame frame, final SkillPerquisite pre) {
         super(frame, true);
         cancelled = false;
-        prereq    = pre;
+        prereq = pre;
         initComponents();
         setLocationRelativeTo(frame);
         setUserPreferences();
     }
 
     private void initComponents() {
-        btnOK    = new JButton();
+        btnOK = new JButton();
         btnClose = new JButton();
 
         JPanel panMain = new JPanel(new GridLayout(SkillType.skillList.length, 2));
 
         for (int i = 0; i < SkillType.getSkillList().length; i++) {
-            final String type     = SkillType.getSkillList()[i];
-            JCheckBox    chkSkill = new JCheckBox(type);
+            final String type = SkillType.getSkillList()[i];
+            JCheckBox chkSkill = new JCheckBox(type);
             chkSkill.setSelected(prereq.getSkillLevel(type) > -1);
             chkSkill.addItemListener(evt -> changeLevelEnabled(type));
             skillChks.put(type, chkSkill);
@@ -130,11 +135,7 @@ public class EditSkillPerquisiteDialog extends JDialog {
 
     /**
      * These need to be migrated to the Suite Constants / Suite Options Setup
-     *
-     * @since 0.50.04
-     * @deprecated Move to Suite Constants / Suite Options Setup
      */
-    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditSkillPerquisiteDialog.class);

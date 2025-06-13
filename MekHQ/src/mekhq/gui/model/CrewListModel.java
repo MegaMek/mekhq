@@ -24,22 +24,31 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.model;
+
+import java.awt.Component;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import javax.swing.AbstractListModel;
+import javax.swing.JList;
+import javax.swing.ListCellRenderer;
 
 import megamek.common.Aero;
 import megamek.common.Tank;
 import megamek.common.VTOL;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.skills.Attributes;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
 
 /**
  * Model for a list that displays a unit's crew with their role.
@@ -48,14 +57,14 @@ import java.util.List;
  */
 public class CrewListModel extends AbstractListModel<Person> {
     enum CrewRole {
-        COMMANDER (0, "Commander"),
-        CONSOLE_CMDR (1, "Commander"),
-        PILOT (2, "Pilot"),
-        NAVIGATOR (3, "Navigator"),
-        DRIVER (4, "Driver"),
-        GUNNER (5, "Gunner"),
-        TECH_OFFICER (6, "Tech Officer"),
-        CREW (7, "Crew");
+        COMMANDER(0, "Commander"),
+        CONSOLE_CMDR(1, "Commander"),
+        PILOT(2, "Pilot"),
+        NAVIGATOR(3, "Navigator"),
+        DRIVER(4, "Driver"),
+        GUNNER(5, "Gunner"),
+        TECH_OFFICER(6, "Tech Officer"),
+        CREW(7, "Crew");
 
         private final int sortOrder;
         private final String displayName;
@@ -113,6 +122,7 @@ public class CrewListModel extends AbstractListModel<Person> {
     public int getSize() {
         return crew.size();
     }
+
     @Override
     public Person getElementAt(int index) {
         if (index < 0 || index >= crew.size()) {
@@ -131,26 +141,36 @@ public class CrewListModel extends AbstractListModel<Person> {
         }
 
         @Override
-        public Component getListCellRendererComponent(JList<? extends Person> list, Person value,
-                                                      int index, boolean isSelected, boolean cellHasFocus) {
+        public Component getListCellRendererComponent(JList<? extends Person> list, Person value, int index,
+              boolean isSelected, boolean cellHasFocus) {
             setOpaque(true);
-            Person p = getElementAt(index);
+            Person person = getElementAt(index);
             String gunSkill = SkillType.getGunnerySkillFor(unit.getEntity());
             String driveSkill = SkillType.getDrivingSkillFor(unit.getEntity());
-            String sb = "<html><font><b>" + p.getFullTitle() + "</b><br/>"
-                    + CrewRole.getCrewRole(p, unit).getDisplayName()
-                    + " ("
-                    + (p.hasSkill(gunSkill) ? p.getSkill(gunSkill).getFinalSkillValue() : "-")
-                    + "/"
-                    + (p.hasSkill(driveSkill) ? p.getSkill(driveSkill).getFinalSkillValue() : "-")
-                    + ")</font></html>";
+            PersonnelOptions options = person.getOptions();
+            Attributes attributes = person.getATOWAttributes();
+            String sb = "<html><font><b>" +
+                              person.getFullTitle() +
+                              "</b><br/>" +
+                              CrewRole.getCrewRole(person, unit).getDisplayName() +
+                              " ("
+                              // Shooting and driving don't benefit from Reputation, so no need to pass that in.
+                              +
+                              (person.hasSkill(gunSkill) ?
+                                     person.getSkill(gunSkill).getFinalSkillValue(options, attributes, 0) :
+                                     "-") +
+                              '/' +
+                              (person.hasSkill(driveSkill) ?
+                                     person.getSkill(driveSkill).getFinalSkillValue(options, attributes, 0) :
+                                     "-") +
+                              ")</font></html>";
             setHtmlText(sb);
             if (isSelected) {
                 highlightBorder();
             } else {
                 unhighlightBorder();
             }
-            setImage(p.getPortrait().getImage(54));
+            setImage(person.getPortrait().getImage(54));
             return this;
         }
     }

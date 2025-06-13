@@ -41,12 +41,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
 import megamek.client.generator.RandomNameGenerator;
 import megamek.common.enums.Gender;
 import megamek.common.util.weightedMaps.WeightedIntMap;
@@ -54,6 +48,12 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.universe.Faction;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(value = MockitoExtension.class)
 class MergingSurnameStyleTest {
@@ -67,7 +67,7 @@ class MergingSurnameStyleTest {
     private CampaignOptions mockCampaignOptions;
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
     // endregion Variable Declarations
 
     @BeforeEach
@@ -79,17 +79,17 @@ class MergingSurnameStyleTest {
     @Test
     void testGetToolTipText() {
         assertEquals(resources.getString("MergingSurnameStyle.YOURS.toolTipText"),
-                MergingSurnameStyle.YOURS.getToolTipText());
+              MergingSurnameStyle.YOURS.getToolTipText());
         assertEquals(resources.getString("MergingSurnameStyle.WEIGHTED.toolTipText"),
-                MergingSurnameStyle.WEIGHTED.getToolTipText());
+              MergingSurnameStyle.WEIGHTED.getToolTipText());
     }
 
     @Test
     void testGetDropDownText() {
         assertEquals(resources.getString("MergingSurnameStyle.BOTH_HYPHEN_YOURS.dropDownText"),
-                MergingSurnameStyle.BOTH_HYPHEN_YOURS.getDropDownText());
+              MergingSurnameStyle.BOTH_HYPHEN_YOURS.getDropDownText());
         assertEquals(resources.getString("MergingSurnameStyle.BOTH_HYPHEN_SPOUSE.dropDownText"),
-                MergingSurnameStyle.BOTH_HYPHEN_SPOUSE.getDropDownText());
+              MergingSurnameStyle.BOTH_HYPHEN_SPOUSE.getDropDownText());
     }
     // endregion Getters
 
@@ -253,6 +253,10 @@ class MergingSurnameStyleTest {
     void testApplyNoChange() {
         when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
 
+        Faction campaignFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
+
         final Person origin = new Person(mockCampaign);
         origin.setSurname("origin");
         final Person spouse = new Person(mockCampaign);
@@ -266,6 +270,9 @@ class MergingSurnameStyleTest {
     @Test
     void testApplyYours() {
         when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(true);
+        Faction campaignFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         final Person origin = new Person(mockCampaign);
         origin.setSurname("origin");
@@ -280,6 +287,9 @@ class MergingSurnameStyleTest {
     @Test
     void testApplySpouse() {
         when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(true);
+        Faction campaignFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         final Person origin = new Person(mockCampaign);
         origin.setSurname("origin");
@@ -294,6 +304,9 @@ class MergingSurnameStyleTest {
     @Test
     void testApplySpaceYours() {
         when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+        Faction campaignFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         final Person origin = new Person(mockCampaign);
         final Person spouse = new Person(mockCampaign);
@@ -320,6 +333,9 @@ class MergingSurnameStyleTest {
     @Test
     void testApplyBothSpaceYours() {
         when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+        Faction campaignFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         final Person origin = new Person(mockCampaign);
         final Person spouse = new Person(mockCampaign);
@@ -352,6 +368,9 @@ class MergingSurnameStyleTest {
     @Test
     void testApplyHyphenYours() {
         when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+        Faction campaignFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         final Person origin = new Person(mockCampaign);
         final Person spouse = new Person(mockCampaign);
@@ -378,6 +397,9 @@ class MergingSurnameStyleTest {
     @Test
     void testApplyBothHyphenYours() {
         when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+        Faction campaignFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         final Person origin = new Person(mockCampaign);
         final Person spouse = new Person(mockCampaign);
@@ -410,6 +432,9 @@ class MergingSurnameStyleTest {
     @Test
     void testApplySpaceSpouse() {
         when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+        Faction campaignFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         final Person origin = new Person(mockCampaign);
         final Person spouse = new Person(mockCampaign);
@@ -436,6 +461,9 @@ class MergingSurnameStyleTest {
     @Test
     void testApplyBothSpaceSpouse() {
         when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+        Faction campaignFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         final Person origin = new Person(mockCampaign);
         final Person spouse = new Person(mockCampaign);
@@ -468,6 +496,9 @@ class MergingSurnameStyleTest {
     @Test
     void testApplyHyphenSpouse() {
         when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+        Faction campaignFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         final Person origin = new Person(mockCampaign);
         final Person spouse = new Person(mockCampaign);
@@ -494,6 +525,9 @@ class MergingSurnameStyleTest {
     @Test
     void testApplyBothHyphenSpouse() {
         when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+        Faction campaignFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         final Person origin = new Person(mockCampaign);
         final Person spouse = new Person(mockCampaign);
@@ -526,6 +560,9 @@ class MergingSurnameStyleTest {
     @Test
     void testApplyMale() {
         when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+        Faction campaignFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         final Person origin = new Person(mockCampaign);
         final Person spouse = new Person(mockCampaign);
@@ -551,6 +588,9 @@ class MergingSurnameStyleTest {
     @Test
     void testApplyFemale() {
         when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+        Faction campaignFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         final Person origin = new Person(mockCampaign);
         final Person spouse = new Person(mockCampaign);
@@ -576,6 +616,9 @@ class MergingSurnameStyleTest {
     @Test
     void testApplyWeighted() {
         when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+        Faction campaignFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(campaignFaction.getShortName()).thenReturn("MERC");
 
         final WeightedIntMap<MergingSurnameStyle> weightMap = new WeightedIntMap<>();
         weightMap.add(1, MergingSurnameStyle.WEIGHTED);
@@ -586,8 +629,7 @@ class MergingSurnameStyleTest {
         when(mockStyle.createWeightedSurnameMap(any())).thenReturn(weightMap);
 
         final Person person = new Person(mockCampaign);
-        mockStyle.apply(mockCampaign, LocalDate.of(3025, 1, 1),
-                person, mock(Person.class));
+        mockStyle.apply(mockCampaign, LocalDate.of(3025, 1, 1), person, mock(Person.class));
         assertEquals(RandomNameGenerator.UNNAMED_SURNAME, person.getSurname());
     }
 
@@ -598,7 +640,7 @@ class MergingSurnameStyleTest {
             weights.put(style, 1);
         }
         assertFalse(MergingSurnameStyle.WEIGHTED.createWeightedSurnameMap(weights)
-                .containsValue(MergingSurnameStyle.WEIGHTED));
+                          .containsValue(MergingSurnameStyle.WEIGHTED));
     }
 
     // region File I/O
@@ -616,8 +658,7 @@ class MergingSurnameStyleTest {
     @Test
     void testToStringOverride() {
         assertEquals(resources.getString("MergingSurnameStyle.BOTH_SPACE_SPOUSE.text"),
-                MergingSurnameStyle.BOTH_SPACE_SPOUSE.toString());
-        assertEquals(resources.getString("MergingSurnameStyle.WEIGHTED.text"),
-                MergingSurnameStyle.WEIGHTED.toString());
+              MergingSurnameStyle.BOTH_SPACE_SPOUSE.toString());
+        assertEquals(resources.getString("MergingSurnameStyle.WEIGHTED.text"), MergingSurnameStyle.WEIGHTED.toString());
     }
 }

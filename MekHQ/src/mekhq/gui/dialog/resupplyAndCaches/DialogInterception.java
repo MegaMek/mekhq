@@ -24,10 +24,39 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.resupplyAndCaches;
 
-import megamek.client.ui.swing.util.UIUtil;
+import static megamek.common.Compute.randomInt;
+import static megamek.utilities.ImageUtilities.scaleImageIcon;
+import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.getSpeakerDescription;
+import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.getSpeakerIcon;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.util.ResourceBundle;
+import java.util.UUID;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+
+import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
@@ -35,24 +64,11 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import mekhq.campaign.personnel.Person;
 
-import javax.swing.*;
-import java.awt.*;
-import java.util.ResourceBundle;
-import java.util.UUID;
-
-import static megamek.common.Compute.randomInt;
-import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerDescription;
-import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerIcon;
-import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
-
 /**
- * The {@code DialogInterception} class is responsible for displaying a UI dialog when an
- * interception scenario occurs during a supply or convoy mission in MekHQ. The dialog uses
- * localized resources to generate the content dynamically and includes relevant visual elements
- * like the speaker's icon, title, and mission details.
+ * @deprecated unused
  */
-public class DialogInterception extends JDialog{
+@Deprecated(since = "0.05.06", forRemoval = true)
+public class DialogInterception extends JDialog {
     final int LEFT_WIDTH = UIUtil.scaleForGUI(200);
     final int RIGHT_WIDTH = UIUtil.scaleForGUI(400);
     final int INSERT_SIZE = UIUtil.scaleForGUI(10);
@@ -63,24 +79,18 @@ public class DialogInterception extends JDialog{
      * Displays a dialog for an interception event that occurs during a resupply operation.
      *
      * <p>This method performs the following steps:</p>
-     * 1. Constructs a {@link JDialog} with a title from the localized {@link ResourceBundle}.
-     * 2. Determines the speaker's name and icon. This involves:
-     *    - Retrieving the force commander from the convoy (if available).
-     *    - Using fallback values for the speaker name and icon if no target convoy was provided.
-     * 3. Creates a message describing the interception event, using dynamic text
-     *    generated from the resources.
-     * 4. Builds a GUI with Swing components:
-     *    - A description panel containing a localized, HTML-styled message.
-     *    - An image panel displaying the speaker's icon (sized to a width of 100 px).
-     * 5. Adds confirmation buttons to the dialog, allowing users to close it.
-     * 6. Displays the dialog as modal to block further user interaction until dismissed.
+     * 1. Constructs a {@link JDialog} with a title from the localized {@link ResourceBundle}. 2. Determines the
+     * speaker's name and icon. This involves: - Retrieving the force commander from the convoy (if available). - Using
+     * fallback values for the speaker name and icon if no target convoy was provided. 3. Creates a message describing
+     * the interception event, using dynamic text generated from the resources. 4. Builds a GUI with Swing components: -
+     * A description panel containing a localized, HTML-styled message. - An image panel displaying the speaker's icon
+     * (sized to a width of 100 px). 5. Adds confirmation buttons to the dialog, allowing users to close it. 6. Displays
+     * the dialog as modal to block further user interaction until dismissed.
      *
-     * @param resupply    the {@link Resupply} instance containing the current campaign
-     *                    and contract details. Used to access mission context, player commander
-     *                    information, and employer details.
-     * @param targetConvoy the optional {@link Force} representing the convoy involved
-     *                     in the interception. If {@code null}, the dialog will use default values
-     *                     for the speaker and faction visuals.
+     * @param resupply     the {@link Resupply} instance containing the current campaign and contract details. Used to
+     *                     access mission context, player commander information, and employer details.
+     * @param targetConvoy the optional {@link Force} representing the convoy involved in the interception. If
+     *                     {@code null}, the dialog will use default values for the speaker and faction visuals.
      */
     public DialogInterception(Resupply resupply, @Nullable Force targetConvoy) {
         final Campaign campaign = resupply.getCampaign();
@@ -112,8 +122,9 @@ public class DialogInterception extends JDialog{
             speakerName = speaker.getFullTitle();
         } else {
             if (targetConvoy == null) {
-                speakerName = getFormattedTextAt(RESOURCE_BUNDLE, "dialogBorderConvoySpeakerDefault.text",
-                    contract.getEmployerName(campaign.getGameYear()));
+                speakerName = getFormattedTextAt(RESOURCE_BUNDLE,
+                      "dialogBorderConvoySpeakerDefault.text",
+                      contract.getEmployerName(campaign.getGameYear()));
             } else {
                 speakerName = campaign.getName();
             }
@@ -122,7 +133,7 @@ public class DialogInterception extends JDialog{
         // Add speaker image (icon)
         ImageIcon speakerIcon = getSpeakerIcon(campaign, speaker);
         if (speakerIcon != null) {
-            speakerIcon = scaleImageIconToWidth(speakerIcon, 100);
+            speakerIcon = scaleImageIcon(speakerIcon, 100, true);
         }
         JLabel imageLabel = new JLabel();
         imageLabel.setIcon(speakerIcon);
@@ -130,9 +141,10 @@ public class DialogInterception extends JDialog{
 
         // Speaker description (below the icon)
         StringBuilder speakerDescription = getSpeakerDescription(campaign, speaker, speakerName);
-        JLabel leftDescription = new JLabel(
-            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-                LEFT_WIDTH, speakerDescription));
+        JLabel leftDescription = new JLabel(String.format(
+              "<html><div style='width: %s; text-align:center;'>%s</div></html>",
+              LEFT_WIDTH,
+              speakerDescription));
         leftDescription.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Add the image and description to the leftBox
@@ -153,24 +165,26 @@ public class DialogInterception extends JDialog{
         String message = "";
 
         if (targetConvoy != null) {
-            if (targetConvoy.forceContainsOnlyVTOLForces(campaign.getHangar(), false)
-                || targetConvoy.forceContainsOnlyAerialForces(campaign.getHangar(), false,
-                  false)) {
-                message = getFormattedTextAt(RESOURCE_BUNDLE, "statusUpdateIntercepted.boilerplate",
-                        campaign.getCommanderAddress(false),
-                    getFormattedTextAt(RESOURCE_BUNDLE,"interceptionInstructions.text"));
+            if (targetConvoy.forceContainsOnlyVTOLForces(campaign.getHangar(), false) ||
+                      targetConvoy.forceContainsOnlyAerialForces(campaign.getHangar(), false, false)) {
+                message = getFormattedTextAt(RESOURCE_BUNDLE,
+                      "statusUpdateIntercepted.boilerplate",
+                      campaign.getCommanderAddress(false),
+                      getFormattedTextAt(RESOURCE_BUNDLE, "interceptionInstructions.text"));
             }
         }
 
         if (message.isBlank()) {
-            message = getFormattedTextAt(RESOURCE_BUNDLE, "statusUpdateIntercepted" + randomInt(20) + ".text",
-                    campaign.getCommanderAddress(false),
-                getFormattedTextAt(RESOURCE_BUNDLE, "interceptionInstructions.text"));
+            message = getFormattedTextAt(RESOURCE_BUNDLE,
+                  "statusUpdateIntercepted" + randomInt(20) + ".text",
+                  campaign.getCommanderAddress(false),
+                  getFormattedTextAt(RESOURCE_BUNDLE, "interceptionInstructions.text"));
         }
 
-        JLabel rightDescription = new JLabel(
-            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-                RIGHT_WIDTH, message));
+        JLabel rightDescription = new JLabel(String.format(
+              "<html><div style='width: %s; text-align:center;'>%s</div></html>",
+              RIGHT_WIDTH,
+              message));
         rightBox.add(rightDescription);
 
         // Add rightBox to mainPanel
@@ -195,10 +209,9 @@ public class DialogInterception extends JDialog{
 
         // New panel (to be added below the button panel)
         JPanel infoPanel = new JPanel(new BorderLayout());
-        JLabel lblInfo = new JLabel(
-            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-                RIGHT_WIDTH + LEFT_WIDTH,
-                getFormattedTextAt(RESOURCE_BUNDLE, "documentation.prompt")));
+        JLabel lblInfo = new JLabel(String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
+              RIGHT_WIDTH + LEFT_WIDTH,
+              getFormattedTextAt(RESOURCE_BUNDLE, "documentation.prompt")));
         lblInfo.setHorizontalAlignment(SwingConstants.CENTER);
         infoPanel.add(lblInfo, BorderLayout.CENTER);
         infoPanel.setBorder(BorderFactory.createEtchedBorder());

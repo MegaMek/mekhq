@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -42,9 +47,9 @@ import javax.swing.JScrollPane;
 
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.client.ui.swing.DialogOptionComponent;
-import megamek.client.ui.swing.DialogOptionListener;
-import megamek.client.ui.swing.QuirksPanel;
+import megamek.client.ui.panels.DialogOptionComponentYPanel;
+import megamek.client.ui.clientGUI.DialogOptionListener;
+import megamek.client.ui.dialogs.customMek.QuirksPanel;
 import megamek.common.Entity;
 import megamek.common.Mounted;
 import megamek.common.options.IOption;
@@ -60,15 +65,15 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
 public class QuirksDialog extends JDialog implements DialogOptionListener, ActionListener {
     private static final MMLogger logger = MMLogger.create(QuirksDialog.class);
 
-    private QuirksPanel                    quirksPanel;
-    private HashMap<Integer, WeaponQuirks> h_wpnQuirks = new HashMap<>();
-    private Entity                         entity;
+    private QuirksPanel quirksPanel;
+    private final HashMap<Integer, WeaponQuirks> h_wpnQuirks = new HashMap<>();
+    private final Entity entity;
 
     private JButton okayButton;
     private JButton cancelButton;
 
     /**
-     * Handles the editing and deleting of Quirks. Utilizes the QuirksPanel from MegaMek for the bulk of its work.
+     * Handles the editing and deleting of Quirks. Uses the QuirksPanel from MegaMek for the bulk of its work.
      *
      * @param entity The {@link Entity} being edited.
      * @param parent The {@link JFrame} of the parent panel.
@@ -102,11 +107,7 @@ public class QuirksDialog extends JDialog implements DialogOptionListener, Actio
 
     /**
      * These need to be migrated to the Suite Constants / Suite Options Setup
-     *
-     * @since 0.50.04
-     * @deprecated Move to Suite Constants / Suite Options Setup
      */
-    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(QuirksDialog.class);
@@ -134,13 +135,13 @@ public class QuirksDialog extends JDialog implements DialogOptionListener, Actio
     }
 
     @Override
-    public void optionClicked(DialogOptionComponent dialogOptionComponent, IOption iOption, boolean b) {
+    public void optionClicked(DialogOptionComponentYPanel DialogOptionComponentYPanel, IOption iOption, boolean b) {
         // Not Used Included because QuirksPanel requires a DialogOptionListener
         // interface.
     }
 
     @Override
-    public void optionSwitched(DialogOptionComponent comp, IOption option, int i) {
+    public void optionSwitched(DialogOptionComponentYPanel comp, IOption option, int i) {
 
     }
 

@@ -28,7 +28,11 @@
 
 package mekhq.campaign.parts;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import megamek.common.AmmoType;
@@ -92,7 +96,7 @@ public class PartInUse {
         if (null != partToBuy) {
             this.cost = partToBuy.getBuyCost();
             String descString = partToBuy.getAcquisitionName();
-            if( !(descString.contains("(") && descString.contains(")"))) {
+            if( !(descString.contains("(") && descString.contains(")")) && !(part instanceof EnginePart)) {
                 descString = descString.split(",")[0];
                 descString = descString.split("<")[0];
             }

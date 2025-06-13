@@ -24,18 +24,25 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.campaignOptions.components;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
+import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.processWrapSize;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
+
+import javax.swing.JCheckBox;
+
 import megamek.common.annotations.Nullable;
 import mekhq.gui.campaignOptions.CampaignOptionsUtilities;
-
-import javax.swing.*;
-import java.util.ResourceBundle;
-
-import static megamek.client.ui.WrapLayout.wordWrap;
-import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.processWrapSize;
 
 /**
  * A specialized {@link JCheckBox} used in the campaign options dialog.
@@ -47,17 +54,6 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.processWrapSize
  * The checkbox also supports font scaling adjustments.
  */
 public class CampaignOptionsCheckBox extends JCheckBox {
-    /**
-     * The path to the resource bundle containing text and tooltip information
-     * for this component.
-     */
-    private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
-
-    /**
-     * The {@link ResourceBundle} used to load localized strings for checkbox text and tooltips.
-     */
-    static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
-
     /**
      * Constructs a new instance of {@link CampaignOptionsCheckBox} with the specified name.
      * <p>
@@ -94,14 +90,16 @@ public class CampaignOptionsCheckBox extends JCheckBox {
      */
     public CampaignOptionsCheckBox(String name, @Nullable Integer customWrapSize) {
         // Sets the checkbox's text from the resource bundle, wrapped in HTML tags
-        super(String.format("<html>%s</html>", resources.getString("lbl" + name + ".text")));
+        super(String.format("<html>%s</html>", getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".text")));
 
         // Sets the checkbox's internal name
         setName("chk" + name);
 
         // Sets the checkbox's tooltip, applying word wrapping based on customWrapSize
-        setToolTipText(wordWrap(resources.getString("lbl" + name + ".tooltip"),
-                processWrapSize(customWrapSize)));
+        String tooltipText = getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".tooltip");
+        if (isResourceKeyValid(tooltipText) && !tooltipText.isEmpty()) {
+            setToolTipText(wordWrap(tooltipText, processWrapSize(customWrapSize)));
+        }
 
         // Applies font scaling with default scaling disabled
         setFontScaling(this, false, 1);

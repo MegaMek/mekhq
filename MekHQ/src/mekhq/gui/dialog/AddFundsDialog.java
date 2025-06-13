@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -45,7 +50,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
-import megamek.client.ui.baseComponents.MMComboBox;
+import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.logging.MMLogger;
@@ -60,12 +65,11 @@ import mekhq.gui.utilities.JMoneyTextField;
 public class AddFundsDialog extends JDialog implements FocusListener {
     private static final MMLogger logger = MMLogger.create(AddFundsDialog.class);
 
-    private                 JMoneyTextField             fundsQuantityField;
-    private                 JFormattedTextField         descriptionField;
-    private                 MMComboBox<TransactionType> categoryCombo;
-    private                 int                         closedType  = JOptionPane.CLOSED_OPTION;
-    private final transient ResourceBundle              resourceMap = ResourceBundle.getBundle(
-          "mekhq.resources.AddFundsDialog",
+    private JMoneyTextField fundsQuantityField;
+    private JFormattedTextField descriptionField;
+    private MMComboBox<TransactionType> categoryCombo;
+    private int closedType = JOptionPane.CLOSED_OPTION;
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddFundsDialog",
           MekHQ.getMHQOptions().getLocale());
 
     public AddFundsDialog(final JFrame frame, final boolean modal) {
@@ -91,14 +95,10 @@ public class AddFundsDialog extends JDialog implements FocusListener {
         setLocationRelativeTo(getParent());
         pack();
     }
- 
+
     /**
      * These need to be migrated to the Suite Constants / Suite Options Setup
-     *
-     * @since 0.50.04
-     * @deprecated Move to Suite Constants / Suite Options Setup
      */
-    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(AddFundsDialog.class);

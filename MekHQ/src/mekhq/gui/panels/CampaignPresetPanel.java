@@ -39,7 +39,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
 
-import megamek.client.ui.baseComponents.MMButton;
+import megamek.client.ui.buttons.MMButton;
 import megamek.common.annotations.Nullable;
 import mekhq.CampaignPreset;
 import mekhq.campaign.Campaign;

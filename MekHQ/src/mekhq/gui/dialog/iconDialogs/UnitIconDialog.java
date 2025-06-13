@@ -27,8 +27,8 @@
  */
 package mekhq.gui.dialog.iconDialogs;
 
-import megamek.client.ui.baseComponents.MMButton;
-import megamek.client.ui.dialogs.AbstractIconChooserDialog;
+import megamek.client.ui.buttons.MMButton;
+import megamek.client.ui.dialogs.iconChooser.AbstractIconChooserDialog;
 import megamek.client.ui.enums.DialogResult;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;

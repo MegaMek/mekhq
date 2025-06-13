@@ -24,8 +24,16 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.module.atb;
+
+import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
+import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 
 import java.time.DayOfWeek;
 import java.util.ArrayList;
@@ -34,8 +42,9 @@ import java.util.List;
 import megamek.common.Compute;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.module.api.PersonnelMarketMethod;
 
 /**
@@ -51,87 +60,86 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
     }
 
     @Override
-    public List<Person> generatePersonnelForDay(Campaign c) {
-        if (c.getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
-            List<Person> retVal = new ArrayList<>();
-            Person p = null;
+    public List<Person> generatePersonnelForDay(Campaign campaign) {
+        if (campaign.getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
+            List<Person> potentialRecruits = new ArrayList<>();
+            Person recruit = null;
 
             int roll = Compute.d6(2);
             if (roll == 2) {
-                switch (Compute.randomInt(4)) {
-                    case 0:
-                        p = c.newPerson(PersonnelRole.ADMINISTRATOR_COMMAND);
-                        break;
-                    case 1:
-                        p = c.newPerson(PersonnelRole.ADMINISTRATOR_HR);
-                        break;
-                    case 2:
-                        p = c.newPerson(PersonnelRole.ADMINISTRATOR_LOGISTICS);
-                        break;
-                    case 3:
-                        p = c.newPerson(PersonnelRole.ADMINISTRATOR_TRANSPORT);
-                        break;
-                }
+                recruit = switch (Compute.randomInt(4)) {
+                    case 0 -> campaign.newPerson(PersonnelRole.ADMINISTRATOR_COMMAND);
+                    case 1 -> campaign.newPerson(PersonnelRole.ADMINISTRATOR_HR);
+                    case 2 -> campaign.newPerson(PersonnelRole.ADMINISTRATOR_LOGISTICS);
+                    case 3 -> campaign.newPerson(PersonnelRole.ADMINISTRATOR_TRANSPORT);
+                    default -> null;
+                };
             } else if (roll == 3 || roll == 11) {
-                int r = Compute.d6();
-                if ((r == 1) && (c.getGameYear() > (c.getFaction().isClan() ? 2870 : 3050))) {
-                    p = c.newPerson(PersonnelRole.BA_TECH);
-                } else if (r < 4) {
-                    p = c.newPerson(PersonnelRole.MECHANIC);
-                } else if (r == 4 && c.getCampaignOptions().isUseAero()) {
-                    p = c.newPerson(PersonnelRole.AERO_TEK);
+                int secondaryRoll = Compute.d6();
+                if ((secondaryRoll == 1) && (campaign.getGameYear() > (campaign.getFaction().isClan() ? 2870 : 3050))) {
+                    recruit = campaign.newPerson(PersonnelRole.BA_TECH);
+                } else if (secondaryRoll < 4) {
+                    recruit = campaign.newPerson(PersonnelRole.MECHANIC);
+                } else if (secondaryRoll == 4 && campaign.getCampaignOptions().isUseAero()) {
+                    recruit = campaign.newPerson(PersonnelRole.AERO_TEK);
                 } else {
-                    p = c.newPerson(PersonnelRole.MEK_TECH);
+                    recruit = campaign.newPerson(PersonnelRole.MEK_TECH);
                 }
             } else if (roll == 4 || roll == 10) {
-                p = c.newPerson(PersonnelRole.MEKWARRIOR);
-            } else if (roll == 5 && c.getCampaignOptions().isUseAero()) {
-                p = c.newPerson(PersonnelRole.AEROSPACE_PILOT);
-            } else if (roll == 5 && c.getFaction().isClan()) {
-                p = c.newPerson(PersonnelRole.MEKWARRIOR);
+                recruit = campaign.newPerson(PersonnelRole.MEKWARRIOR);
+            } else if (roll == 5 && campaign.getCampaignOptions().isUseAero()) {
+                recruit = campaign.newPerson(PersonnelRole.AEROSPACE_PILOT);
+            } else if (roll == 5 && campaign.getFaction().isClan()) {
+                recruit = campaign.newPerson(PersonnelRole.MEKWARRIOR);
             } else if (roll == 5) {
-                int r = Compute.d6(2);
-                if (r == 2) {
-                    p = c.newPerson(PersonnelRole.VTOL_PILOT);
+                int secondaryRoll = Compute.d6(2);
+                if (secondaryRoll == 2) {
+                    recruit = campaign.newPerson(PersonnelRole.VTOL_PILOT);
                     // Frequency based on frequency of VTOLs in Xotl 3028 Merc/General
-                } else if (r <= 5) {
-                    p = c.newPerson(PersonnelRole.GROUND_VEHICLE_DRIVER);
+                } else if (secondaryRoll <= 5) {
+                    recruit = campaign.newPerson(PersonnelRole.GROUND_VEHICLE_DRIVER);
                 } else {
-                    p = c.newPerson(PersonnelRole.VEHICLE_GUNNER);
+                    recruit = campaign.newPerson(PersonnelRole.VEHICLE_GUNNER);
                 }
             } else if (roll == 6 || roll == 8) {
-                if (c.getFaction().isClan() && (c.getGameYear() > 2870) && (Compute.d6(2) > 3)) {
-                    p = c.newPerson(PersonnelRole.BATTLE_ARMOUR);
-                } else if (!c.getFaction().isClan() && (c.getGameYear() > 3050) && (Compute.d6(2) > 11)) {
-                    p = c.newPerson(PersonnelRole.BATTLE_ARMOUR);
+                if (campaign.getFaction().isClan() && (campaign.getGameYear() > 2870) && (Compute.d6(2) > 3)) {
+                    recruit = campaign.newPerson(PersonnelRole.BATTLE_ARMOUR);
+                } else if (!campaign.getFaction().isClan() && (campaign.getGameYear() > 3050) && (Compute.d6(2) > 11)) {
+                    recruit = campaign.newPerson(PersonnelRole.BATTLE_ARMOUR);
                 } else {
-                    p = c.newPerson(PersonnelRole.SOLDIER);
+                    recruit = campaign.newPerson(PersonnelRole.SOLDIER);
                 }
             } else if (roll == 12) {
-                p = c.newPerson(PersonnelRole.DOCTOR);
+                recruit = campaign.newPerson(PersonnelRole.DOCTOR);
             }
 
-            if (null != p) {
-                retVal.add(p);
+            if (null != recruit) {
+                potentialRecruits.add(recruit);
 
-                if (p.getPrimaryRole().isGroundVehicleDriver()) {
+                if (recruit.getPrimaryRole().isGroundVehicleDriver()) {
                     /*
                      * Replace driver with 1-6 crew with equal
                      * chances of being drivers or gunners
                      */
-                    retVal.remove(p);
+                    potentialRecruits.remove(recruit);
                     for (int i = 0; i < Compute.d6(); i++) {
-                        retVal.add(c.newPerson((Compute.d6() < 4) ? PersonnelRole.GROUND_VEHICLE_DRIVER
+                        potentialRecruits.add(campaign.newPerson((Compute.d6() < 4) ?
+                                PersonnelRole.GROUND_VEHICLE_DRIVER
                                 : PersonnelRole.VEHICLE_GUNNER));
                     }
                 }
 
-                Person adminHR = c.findBestInRole(PersonnelRole.ADMINISTRATOR_HR, SkillType.S_ADMIN);
-                int adminHRExp = (adminHR == null) ? SkillType.EXP_ULTRA_GREEN
-                        : adminHR.getSkill(SkillType.S_ADMIN).getExperienceLevel();
+                Person adminHR = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_HR, S_ADMIN);
+                int adminExperienceLevel = EXP_NONE;
+                if (adminHR != null && adminHR.hasSkill(S_ADMIN)) {
+                    Skill adminSkill = adminHR.getSkill(S_ADMIN);
+                    adminExperienceLevel = adminSkill.getExperienceLevel(adminHR.getOptions(),
+                            adminHR.getATOWAttributes());
+                }
+
                 int gunneryMod = 0;
                 int pilotingMod = 0;
-                switch (adminHRExp) {
+                switch (adminExperienceLevel) {
                     case SkillType.EXP_ULTRA_GREEN:
                         gunneryMod = -1;
                         pilotingMod = -1;
@@ -150,7 +158,7 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                             pilotingMod = 1;
                         }
                         break;
-                    case SkillType.EXP_ELITE:
+                    case SkillType.EXP_ELITE, SkillType.EXP_HEROIC, SkillType.EXP_LEGENDARY:
                         gunneryMod = 1;
                         pilotingMod = 1;
                         break;
@@ -158,43 +166,43 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                         break;
                 }
 
-                switch (p.getPrimaryRole()) {
+                switch (recruit.getPrimaryRole()) {
                     case MEKWARRIOR:
-                        adjustSkill(p, SkillType.S_GUN_MEK, gunneryMod);
-                        adjustSkill(p, SkillType.S_PILOT_MEK, pilotingMod);
+                        adjustSkill(recruit, SkillType.S_GUN_MEK, gunneryMod);
+                        adjustSkill(recruit, SkillType.S_PILOT_MEK, pilotingMod);
                         break;
                     case GROUND_VEHICLE_DRIVER:
-                        adjustSkill(p, SkillType.S_PILOT_GVEE, pilotingMod);
+                        adjustSkill(recruit, SkillType.S_PILOT_GVEE, pilotingMod);
                         break;
                     case NAVAL_VEHICLE_DRIVER:
-                        adjustSkill(p, SkillType.S_PILOT_NVEE, pilotingMod);
+                        adjustSkill(recruit, SkillType.S_PILOT_NVEE, pilotingMod);
                         break;
                     case VTOL_PILOT:
-                        adjustSkill(p, SkillType.S_PILOT_VTOL, pilotingMod);
+                        adjustSkill(recruit, SkillType.S_PILOT_VTOL, pilotingMod);
                         break;
                     case VEHICLE_GUNNER:
-                        adjustSkill(p, SkillType.S_GUN_VEE, gunneryMod);
+                        adjustSkill(recruit, SkillType.S_GUN_VEE, gunneryMod);
                         break;
                     case AEROSPACE_PILOT:
-                        adjustSkill(p, SkillType.S_GUN_AERO, gunneryMod);
-                        adjustSkill(p, SkillType.S_PILOT_AERO, pilotingMod);
+                        adjustSkill(recruit, SkillType.S_GUN_AERO, gunneryMod);
+                        adjustSkill(recruit, SkillType.S_PILOT_AERO, pilotingMod);
                         break;
                     case PROTOMEK_PILOT:
-                        adjustSkill(p, SkillType.S_GUN_PROTO, gunneryMod);
+                        adjustSkill(recruit, SkillType.S_GUN_PROTO, gunneryMod);
                         break;
                     case BATTLE_ARMOUR:
-                        adjustSkill(p, SkillType.S_GUN_BA, gunneryMod);
-                        adjustSkill(p, SkillType.S_ANTI_MEK, pilotingMod);
+                        adjustSkill(recruit, SkillType.S_GUN_BA, gunneryMod);
+                        adjustSkill(recruit, SkillType.S_ANTI_MEK, pilotingMod);
                         break;
                     case SOLDIER:
-                        adjustSkill(p, SkillType.S_SMALL_ARMS, gunneryMod);
-                        adjustSkill(p, SkillType.S_ANTI_MEK, pilotingMod);
+                        adjustSkill(recruit, SkillType.S_SMALL_ARMS, gunneryMod);
+                        adjustSkill(recruit, SkillType.S_ANTI_MEK, pilotingMod);
                         break;
                     default:
                         break;
                 }
             }
-            return retVal;
+            return potentialRecruits;
         }
         return null;
     }

@@ -30,9 +30,6 @@ package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.Compute;
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
@@ -50,15 +47,15 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
- * This part covers most of the equipment types in WeaponType, AmmoType, and
- * MiscType It can robustly handle all equipment with static weights and costs.
- * It can also handle equipment whose only variability in terms of cost is the
- * equipment tonnage itself. More complicated variable weight/cost equipment
- * needs to be subclassed. Some examples of equipment that needs to be
- * subclasses: - MASC (depends on engine rating) - AES (depends on location and
- * cost is by unit tonnage)
+ * This part covers most of the equipment types in WeaponType, AmmoType, and MiscType It can robustly handle all
+ * equipment with static weights and costs. It can also handle equipment whose only variability in terms of cost is the
+ * equipment tonnage itself. More complicated variable weight/cost equipment needs to be subclassed. Some examples of
+ * equipment that needs to be subclasses: - MASC (depends on engine rating) - AES (depends on location and cost is by
+ * unit tonnage)
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
@@ -98,6 +95,10 @@ public class EquipmentPart extends Part {
         if (null != type) {
             this.name = type.getName(size);
             this.typeName = type.getInternalName();
+
+            if (!unitTonnageMatters) {
+                this.unitTonnageMatters = type.isVariableCost();
+            }
         }
 
         this.equipmentNum = equipNum;
@@ -145,6 +146,11 @@ public class EquipmentPart extends Part {
             typeName = type.getName();
         } else {
             type = EquipmentType.get(typeName);
+
+            // This conditional is to handle <50.05 warehouses
+            if (!unitTonnageMatters) { // We don't want to accidentally overwrite this state if it's meant to be true
+                unitTonnageMatters = type.isVariableCost();
+            }
         }
 
         if (type == null) {
@@ -158,11 +164,12 @@ public class EquipmentPart extends Part {
         // they are not acceptable substitutes, so we need to check for that as
         // well
         // http://bg.battletech.com/forums/strategic-operations/(answered)-can-a-lance-for-a-35-ton-mech-be-used-on-a-40-ton-mech-and-so-on/
-        return (getClass() == part.getClass())
-                && getType().equals(((EquipmentPart) part).getType())
-                && getTonnage() == part.getTonnage() && getStickerPrice().equals(part.getStickerPrice())
-                && getSize() == ((EquipmentPart) part).getSize()
-                && isOmniPodded() == part.isOmniPodded();
+        return (getClass() == part.getClass()) &&
+                     getType().equals(((EquipmentPart) part).getType()) &&
+                     getTonnage() == part.getTonnage() &&
+                     getStickerPrice().equals(part.getStickerPrice()) &&
+                     getSize() == ((EquipmentPart) part).getSize() &&
+                     isOmniPodded() == part.isOmniPodded();
     }
 
     @Override
@@ -200,7 +207,7 @@ public class EquipmentPart extends Part {
     }
 
     @Override
-    public int getTechRating() {
+    public TechRating getTechRating() {
         return type.getTechRating();
     }
 
@@ -274,19 +281,22 @@ public class EquipmentPart extends Part {
 
         int priorHits = getHits();
 
-        int newHits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_EQUIPMENT, getEquipmentNum(),
-                mounted.getLocation());
+        int newHits = unit.getEntity()
+                            .getDamagedCriticals(CriticalSlot.TYPE_EQUIPMENT, getEquipmentNum(), mounted.getLocation());
         if (mounted.isSplit()) {
-            newHits += unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_EQUIPMENT, getEquipmentNum(),
-                    mounted.getSecondLocation());
+            newHits += unit.getEntity()
+                             .getDamagedCriticals(CriticalSlot.TYPE_EQUIPMENT,
+                                   getEquipmentNum(),
+                                   mounted.getSecondLocation());
         }
 
         setHits(newHits);
 
         omniPodded = mounted.isOmniPodMounted();
 
-        if (checkForDestruction && (getHits() > priorHits)
-                && (Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget())) {
+        if (checkForDestruction &&
+                  (getHits() > priorHits) &&
+                  (Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget())) {
             remove(false);
             return;
         }
@@ -439,8 +449,8 @@ public class EquipmentPart extends Part {
         final Unit unit = getUnit();
         final Mounted<?> mounted = getMounted();
         if ((unit != null) && (mounted != null)) {
-            return unit.isLocationDestroyed(mounted.getLocation())
-                    || (mounted.isSplit() && unit.isLocationDestroyed(mounted.getSecondLocation()));
+            return unit.isLocationDestroyed(mounted.getLocation()) ||
+                         (mounted.isSplit() && unit.isLocationDestroyed(mounted.getSecondLocation()));
         }
 
         return false;
@@ -451,17 +461,15 @@ public class EquipmentPart extends Part {
         final Unit unit = getUnit();
         final Mounted<?> mounted = getMounted();
         if ((unit != null) && (mounted != null)) {
-            return unit.hasBadHipOrShoulder(mounted.getLocation())
-                    || (mounted.isSplit() && unit.hasBadHipOrShoulder(mounted.getSecondLocation()));
+            return unit.hasBadHipOrShoulder(mounted.getLocation()) ||
+                         (mounted.isSplit() && unit.hasBadHipOrShoulder(mounted.getSecondLocation()));
         }
 
         return false;
     }
 
     /**
-     * Copied from megamek.common.Entity.getWeaponsAndEquipmentCost(StringBuffer
-     * detail, boolean ignoreAmmo)
-     *
+     * Copied from megamek.common.Entity.getWeaponsAndEquipmentCost(StringBuffer detail, boolean ignoreAmmo)
      */
     @Override
     public Money getStickerPrice() {
@@ -517,8 +525,10 @@ public class EquipmentPart extends Part {
                 varCost = Money.of(10000 * getTonnage());
             } else if (type.hasFlag(MiscType.F_OFF_ROAD)) {
                 varCost = Money.of(10 * getTonnage() * getTonnage());
-            } else if (type.hasFlag(MiscType.F_FLOTATION_HULL) || type.hasFlag(MiscType.F_VACUUM_PROTECTION)
-                    || type.hasFlag(MiscType.F_ENVIRONMENTAL_SEALING) || type.hasFlag(MiscType.F_OFF_ROAD)) {
+            } else if (type.hasFlag(MiscType.F_FLOTATION_HULL) ||
+                             type.hasFlag(MiscType.F_VACUUM_PROTECTION) ||
+                             type.hasFlag(MiscType.F_ENVIRONMENTAL_SEALING) ||
+                             type.hasFlag(MiscType.F_OFF_ROAD)) {
                 // ??
             } else if (type.hasFlag(MiscType.F_LIMITED_AMPHIBIOUS) || type.hasFlag((MiscType.F_FULLY_AMPHIBIOUS))) {
                 varCost = Money.of(getTonnage() * 10000);
@@ -527,8 +537,9 @@ public class EquipmentPart extends Part {
             } else if (type.hasFlag(MiscType.F_MASC) && type.hasFlag(MiscType.F_BA_EQUIPMENT)) {
                 // TODO: handle this one differently
                 // costValue = entity.getRunMP() * 75000;
-            } else if (type.hasFlag(MiscType.F_HEAD_TURRET) || type.hasFlag(MiscType.F_SHOULDER_TURRET)
-                    || type.hasFlag(MiscType.F_QUAD_TURRET)) {
+            } else if (type.hasFlag(MiscType.F_HEAD_TURRET) ||
+                             type.hasFlag(MiscType.F_SHOULDER_TURRET) ||
+                             type.hasFlag(MiscType.F_QUAD_TURRET)) {
                 varCost = Money.of(getTonnage() * 10000);
             } else if (type.hasFlag(MiscType.F_SPONSON_TURRET)) {
                 varCost = Money.of(getTonnage() * 4000);
@@ -544,8 +555,8 @@ public class EquipmentPart extends Part {
                 varCost = Money.of((getTonnage() * 10000) + 5000);
             } else if (type.hasFlag(MiscType.F_TARGCOMP)) {
                 varCost = Money.of(getTonnage() * 10000);
-            } else if (type.hasFlag(MiscType.F_CLUB)
-                    && (type.hasSubType(MiscType.S_HATCHET) || type.hasSubType(MiscType.S_MACE_THB))) {
+            } else if (type.hasFlag(MiscType.F_CLUB) &&
+                             (type.hasSubType(MiscType.S_HATCHET) || type.hasSubType(MiscType.S_MACE_THB))) {
                 varCost = Money.of(getTonnage() * 5000);
             } else if (type.hasFlag(MiscType.F_CLUB) && type.hasSubType(MiscType.S_SWORD)) {
                 varCost = Money.of(getTonnage() * 10000);
@@ -589,9 +600,10 @@ public class EquipmentPart extends Part {
      * item tonnage
      */
     public static boolean hasVariableTonnage(EquipmentType type) {
-        return (type instanceof MiscType)
-                && (type.hasFlag(MiscType.F_TARGCOMP) || type.hasFlag(MiscType.F_CLUB)
-                        || type.hasFlag(MiscType.F_TALON));
+        return (type instanceof MiscType) &&
+                     (type.hasFlag(MiscType.F_TARGCOMP) ||
+                            type.hasFlag(MiscType.F_CLUB) ||
+                            type.hasFlag(MiscType.F_TALON));
     }
 
     public static double getStartingTonnage(EquipmentType type) {
@@ -599,11 +611,12 @@ public class EquipmentPart extends Part {
     }
 
     public static double getMaxTonnage(EquipmentType type) {
-        if (type.hasFlag(MiscType.F_TALON) || (type.hasFlag(MiscType.F_CLUB)
-                && (type.hasSubType(MiscType.S_HATCHET) || type.hasSubType(MiscType.S_MACE_THB)))) {
+        if (type.hasFlag(MiscType.F_TALON) ||
+                  (type.hasFlag(MiscType.F_CLUB) &&
+                         (type.hasSubType(MiscType.S_HATCHET) || type.hasSubType(MiscType.S_MACE_THB)))) {
             return 7;
-        } else if (type.hasFlag(MiscType.F_CLUB)
-                && (type.hasSubType(MiscType.S_LANCE) || type.hasSubType(MiscType.S_SWORD))) {
+        } else if (type.hasFlag(MiscType.F_CLUB) &&
+                         (type.hasSubType(MiscType.S_LANCE) || type.hasSubType(MiscType.S_SWORD))) {
             return 5;
         } else if (type.hasFlag(MiscType.F_CLUB) && type.hasSubType(MiscType.S_MACE)) {
             return 10;
@@ -635,11 +648,13 @@ public class EquipmentPart extends Part {
             return false;
         }
         if (type instanceof MiscType) {
-            return type.hasFlag(MiscType.F_MEK_EQUIPMENT) || type.hasFlag(MiscType.F_TANK_EQUIPMENT)
-                    || type.hasFlag(MiscType.F_FIGHTER_EQUIPMENT);
+            return type.hasFlag(MiscType.F_MEK_EQUIPMENT) ||
+                         type.hasFlag(MiscType.F_TANK_EQUIPMENT) ||
+                         type.hasFlag(MiscType.F_FIGHTER_EQUIPMENT);
         } else if (type instanceof WeaponType) {
-            return (type.hasFlag(WeaponType.F_MEK_WEAPON) || type.hasFlag(WeaponType.F_TANK_WEAPON)
-                    || type.hasFlag(WeaponType.F_AERO_WEAPON)) && !((WeaponType) type).isCapital();
+            return (type.hasFlag(WeaponType.F_MEK_WEAPON) ||
+                          type.hasFlag(WeaponType.F_TANK_WEAPON) ||
+                          type.hasFlag(WeaponType.F_AERO_WEAPON)) && !((WeaponType) type).isCapital();
         }
         return true;
     }
@@ -662,23 +677,21 @@ public class EquipmentPart extends Part {
         }
 
         int location = unit.getEntity().getLocationFromAbbr(loc);
-        return (mounted.getLocation() == location)
-                || (mounted.isSplit() && (mounted.getSecondLocation() == location));
+        return (mounted.getLocation() == location) || (mounted.isSplit() && (mounted.getSecondLocation() == location));
     }
 
     /**
-     * This method will check for an existing weapon bay that this equipment belongs
-     * to and if there is one it will check the status of that weapon bay based on
-     * the equipment. If this equipment is functional, then it will clear any hits
-     * from the bay. If not, then it will check all the other equipment in the bay
-     * and if they are all damaged, then it will mark the bay as destroyed. This is
-     * designed to be used only by the fix and remove methods contained here in
-     * order to properly update weapon bay mounts on the entity
+     * This method will check for an existing weapon bay that this equipment belongs to and if there is one it will
+     * check the status of that weapon bay based on the equipment. If this equipment is functional, then it will clear
+     * any hits from the bay. If not, then it will check all the other equipment in the bay and if they are all damaged,
+     * then it will mark the bay as destroyed. This is designed to be used only by the fix and remove methods contained
+     * here in order to properly update weapon bay mounts on the entity
      */
     private static void checkWeaponBay(Unit unit, EquipmentType type, int equipmentNum) {
-        if ((unit == null) || (unit.getEntity() == null)
-                || !unit.getEntity().usesWeaponBays()
-                || !(type instanceof WeaponType)) {
+        if ((unit == null) ||
+                  (unit.getEntity() == null) ||
+                  !unit.getEntity().usesWeaponBays() ||
+                  !(type instanceof WeaponType)) {
             return;
         }
 

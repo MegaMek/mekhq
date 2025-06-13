@@ -27,19 +27,36 @@
  */
 package mekhq.gui.dialog;
 
-import megamek.client.ui.swing.util.UIUtil;
+import static megamek.utilities.ImageUtilities.scaleImageIcon;
+import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.getSpeakerDescription;
+import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.getSpeakerIcon;
+
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.util.ResourceBundle;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+
+import megamek.client.ui.util.UIUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.personnel.Person;
 
-import javax.swing.*;
-import java.awt.*;
-import java.util.ResourceBundle;
-
-import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerDescription;
-import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerIcon;
-import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
-
+/**
+ * @deprecated Unused
+ */
+@Deprecated(since = "0.50.06", forRemoval = true)
 public class ContractAutomationDialog extends JDialog {
     final int LEFT_WIDTH = UIUtil.scaleForGUI(200);
     final int RIGHT_WIDTH = UIUtil.scaleForGUI(400);
@@ -81,7 +98,7 @@ public class ContractAutomationDialog extends JDialog {
         // Add speaker image (icon)
         ImageIcon speakerIcon = getSpeakerIcon(campaign, speaker);
         if (speakerIcon != null) {
-            speakerIcon = scaleImageIconToWidth(speakerIcon, 100);
+            speakerIcon = scaleImageIcon(speakerIcon, 100, true);
         }
         JLabel imageLabel = new JLabel();
         imageLabel.setIcon(speakerIcon);
@@ -89,9 +106,10 @@ public class ContractAutomationDialog extends JDialog {
 
         // Speaker description (below the icon)
         StringBuilder speakerDescription = getSpeakerDescription(campaign, speaker, speakerName);
-        JLabel leftDescription = new JLabel(
-            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-                LEFT_WIDTH, speakerDescription));
+        JLabel leftDescription = new JLabel(String.format(
+              "<html><div style='width: %s; text-align:center;'>%s</div></html>",
+              LEFT_WIDTH,
+              speakerDescription));
         leftDescription.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Add the image and description to the leftBox
@@ -109,9 +127,10 @@ public class ContractAutomationDialog extends JDialog {
         JPanel rightBox = new JPanel(new BorderLayout());
         rightBox.setBorder(BorderFactory.createEtchedBorder());
 
-        JLabel rightDescription = new JLabel(
-            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-                RIGHT_WIDTH, message));
+        JLabel rightDescription = new JLabel(String.format(
+              "<html><div style='width: %s; text-align:center;'>%s</div></html>",
+              RIGHT_WIDTH,
+              message));
         rightBox.add(rightDescription);
 
         // Add rightBox to mainPanel
@@ -145,10 +164,9 @@ public class ContractAutomationDialog extends JDialog {
         if (includeAddendum) {
             // New panel (to be added below the button panel)
             JPanel infoPanel = new JPanel(new BorderLayout());
-            JLabel lblInfo = new JLabel(
-                String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-                    RIGHT_WIDTH + LEFT_WIDTH,
-                    String.format(resources.getString("mothballDescription.addendum"))));
+            JLabel lblInfo = new JLabel(String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
+                  RIGHT_WIDTH + LEFT_WIDTH,
+                  String.format(resources.getString("mothballDescription.addendum"))));
             lblInfo.setHorizontalAlignment(SwingConstants.CENTER);
             infoPanel.add(lblInfo, BorderLayout.CENTER);
             infoPanel.setBorder(BorderFactory.createEtchedBorder());

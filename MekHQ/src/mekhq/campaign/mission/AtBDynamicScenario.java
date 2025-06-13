@@ -24,8 +24,27 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission;
+
+import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getPlanetOwnerAlignment;
+import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getPlanetOwnerFaction;
+import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Allied;
+import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.PlanetOwner;
+
+import java.io.PrintWriter;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import megamek.Version;
 import megamek.common.Entity;
@@ -39,7 +58,7 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
@@ -47,15 +66,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.text.ParseException;
-import java.util.*;
-
-import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getPlanetOwnerAlignment;
-import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getPlanetOwnerFaction;
-import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Allied;
-import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.PlanetOwner;
 
 /**
  * Data structure intended to hold data relevant to AtB Dynamic Scenarios (AtB 3.0)
@@ -425,7 +435,8 @@ public class AtBDynamicScenario extends AtBScenario {
 
         if ((commander != null) &&
                 commander.hasSkill(skillType)) {
-            skillValue = commander.getSkill(skillType).getTotalSkillLevel();
+            skillValue = commander.getSkill(skillType)
+                               .getTotalSkillLevel(commander.getOptions(), commander.getATOWAttributes());
         }
 
         return skillValue;

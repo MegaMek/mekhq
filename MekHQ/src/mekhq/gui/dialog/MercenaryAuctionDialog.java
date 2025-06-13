@@ -40,25 +40,25 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkEvent.EventType;
 
-import megamek.client.ui.swing.MekViewPanel;
-import megamek.client.ui.swing.util.UIUtil;
+import megamek.client.ui.dialogs.unitSelectorDialogs.MekViewPanel;
+import megamek.client.ui.util.UIUtil;
 import megamek.common.Entity;
 import megamek.common.ViewFormatting;
 import megamek.common.annotations.Nullable;
 import megamek.common.templates.TROView;
 import mekhq.campaign.Campaign;
-import mekhq.gui.baseComponents.MHQDialogImmersive;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 
 /**
  * A dialog for handling mercenary unit auctions in the campaign.
  *
  * <p>This dialog allows players to interact with an immersive bidding system for mercenary units.
- * It provides an in-character message about the auction, an adjustable spinner to set the bid percentage,
- * and buttons to confirm or cancel the auction. Upon confirmation, additional actions like viewing
- * detailed data about the unit (TRO View) are available.</p>
+ * It provides an in-character message about the auction, an adjustable spinner to set the bid percentage, and buttons
+ * to confirm or cancel the auction. Upon confirmation, additional actions like viewing detailed data about the unit
+ * (TRO View) are available.</p>
  */
-public class MercenaryAuctionDialog extends MHQDialogImmersive {
-    private static final String RESOURCE_BUNDLE = "mekhq.resources." + MercenaryAuctionDialog.class.getSimpleName();
+public class MercenaryAuctionDialog extends ImmersiveDialogCore {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.MercenaryAuctionDialog";
 
     private Entity entity;
 
@@ -66,8 +66,8 @@ public class MercenaryAuctionDialog extends MHQDialogImmersive {
      * Constructs a new auction dialog for mercenary units in the campaign.
      *
      * <p>The dialog presents an immersive interface for players to bid on mercenary units,
-     * including in-character and out-of-character messages, action buttons, and an adjustable
-     * spinner for bid percentage control. The dialog operates as a modal window.</p>
+     * including in-character and out-of-character messages, action buttons, and an adjustable spinner for bid
+     * percentage control. The dialog operates as a modal window.</p>
      *
      * @param campaign       The {@link Campaign} instance containing information about the auction.
      * @param entity         The {@link Entity} representing the mercenary unit being auctioned.
@@ -76,15 +76,19 @@ public class MercenaryAuctionDialog extends MHQDialogImmersive {
      * @param percentPerStep The percentage increment for the bid adjustments.
      * @param stepSize       The step size for each spinner adjustment.
      */
-    public MercenaryAuctionDialog(Campaign campaign, Entity entity, int minimumBid, int maximumBid,
-                                  int percentPerStep, int stepSize) {
-        super(campaign, campaign.getSeniorAdminPerson(TRANSPORT), null,
-              createCenterMessage(campaign, entity.getShortName()), createButtons(),
+    public MercenaryAuctionDialog(Campaign campaign, Entity entity, int minimumBid, int maximumBid, int percentPerStep,
+                                  int stepSize) {
+        super(campaign,
+              campaign.getSeniorAdminPerson(TRANSPORT),
+              null,
+              createCenterMessage(campaign, entity.getShortName()),
+              createButtons(),
               createOutOfCharacterMessage(minimumBid, maximumBid, percentPerStep),
-              null, false,
+              null,
+              false,
               createJSpinnerPanel(minimumBid, minimumBid, maximumBid, stepSize),
-              false
-        );
+              null,
+              false);
 
         // This setup ensures the dialogs both operate as modal and also assign the entity being
         // auctioned. Just setting it to modal is not enough.
@@ -112,11 +116,14 @@ public class MercenaryAuctionDialog extends MHQDialogImmersive {
      *
      * @param campaign  The {@link Campaign} instance providing context for the message.
      * @param shortName The short name of the entity being auctioned.
+     *
      * @return A formatted in-character message for display in the auction dialog.
      */
     private static String createCenterMessage(Campaign campaign, String shortName) {
-        return getFormattedTextAt(RESOURCE_BUNDLE, "auction.ic.hasFunds",
-              campaign.getCommanderAddress(false), shortName);
+        return getFormattedTextAt(RESOURCE_BUNDLE,
+              "auction.ic.hasFunds",
+              campaign.getCommanderAddress(false),
+              shortName);
     }
 
     /**
@@ -127,10 +134,10 @@ public class MercenaryAuctionDialog extends MHQDialogImmersive {
      * @return A {@link List} of {@link ButtonLabelTooltipPair} objects for the dialog.
      */
     private static List<ButtonLabelTooltipPair> createButtons() {
-        ButtonLabelTooltipPair btnCancel = new ButtonLabelTooltipPair(
-              getFormattedTextAt(RESOURCE_BUNDLE, "cancel.button"), null);
-        ButtonLabelTooltipPair btnConfirm = new ButtonLabelTooltipPair(
-              getFormattedTextAt(RESOURCE_BUNDLE, "confirm.button"), null);
+        ButtonLabelTooltipPair btnCancel = new ButtonLabelTooltipPair(getFormattedTextAt(RESOURCE_BUNDLE,
+              "cancel.button"), null);
+        ButtonLabelTooltipPair btnConfirm = new ButtonLabelTooltipPair(getFormattedTextAt(RESOURCE_BUNDLE,
+              "confirm.button"), null);
 
         return List.of(btnCancel, btnConfirm);
     }
@@ -144,11 +151,11 @@ public class MercenaryAuctionDialog extends MHQDialogImmersive {
      * @param minimumBid     The minimum allowable bid percentage.
      * @param maximumBid     The maximum allowable bid percentage.
      * @param percentPerStep The increment step size for bidding percentages.
+     *
      * @return A formatted out-of-character message for display in the auction dialog.
      */
     private static String createOutOfCharacterMessage(int minimumBid, int maximumBid, int percentPerStep) {
-        return getFormattedTextAt(RESOURCE_BUNDLE, "auction.ooc.hasFunds", minimumBid, maximumBid,
-              percentPerStep);
+        return getFormattedTextAt(RESOURCE_BUNDLE, "auction.ooc.hasFunds", minimumBid, maximumBid, percentPerStep);
     }
 
     /**
@@ -161,10 +168,11 @@ public class MercenaryAuctionDialog extends MHQDialogImmersive {
      * @param minimumValue The minimum allowable percentage value.
      * @param maximumValue The maximum allowable percentage value.
      * @param stepSize     The step size for adjusting the percentage.
+     *
      * @return The JPanel containing the spinner, or {@code null} if the default value is invalid.
      */
-    private static @Nullable JPanel createJSpinnerPanel(int defaultValue, int minimumValue,
-                                                        int maximumValue, int stepSize) {
+    private static @Nullable JPanel createJSpinnerPanel(int defaultValue, int minimumValue, int maximumValue,
+                                                        int stepSize) {
         JSpinner spinner = new JSpinner(new SpinnerNumberModel(defaultValue, minimumValue, maximumValue, stepSize));
         JLabel label = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE, "spinner.label.auction"));
 

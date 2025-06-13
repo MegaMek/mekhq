@@ -24,8 +24,16 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq;
+
+import static megamek.SuiteConstants.LAST_MILESTONE;
+import static mekhq.MHQConstants.CAMPAIGN_PRESET_DIRECTORY;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -48,20 +56,20 @@ import java.util.stream.Collectors;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import megamek.SuiteConstants;
 import megamek.Version;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.GameOptions;
+import megamek.common.preference.PreferenceManager;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import megamek.utilities.xml.MMXMLUtility;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.RandomSkillPreferences;
-import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.ranks.RankSystem;
+import mekhq.campaign.personnel.skills.RandomSkillPreferences;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
@@ -85,7 +93,14 @@ import org.w3c.dom.NodeList;
  * @author Justin "Windchild" Bowen
  */
 public class CampaignPreset {
-    private static final Version LAST_COMPATIBLE_VERSION = new Version("0.50.02");
+
+    /**
+     * Represents the last version we accept presets from. Normally, this will just be the last milestone. Sometimes,
+     * however, major changes can require us to manually assign a specific version.
+     *
+     * @see SuiteConstants#LAST_MILESTONE
+     */
+    private static final Version LAST_COMPATIBLE_VERSION = LAST_MILESTONE;
 
     private static final MMLogger logger = MMLogger.create(CampaignPreset.class);
 
@@ -96,19 +111,19 @@ public class CampaignPreset {
     private String description;
 
     // Startup
-    private LocalDate                date;
-    private Faction                  faction;
-    private Planet                   planet;
-    private RankSystem               rankSystem;
-    private int                      contractCount;
-    private boolean                  gm;
+    private LocalDate date;
+    private Faction faction;
+    private Planet planet;
+    private RankSystem rankSystem;
+    private int contractCount;
+    private boolean gm;
     private CompanyGenerationOptions companyGenerationOptions;
 
     // Continuous
-    private GameOptions                 gameOptions;
-    private CampaignOptions             campaignOptions;
-    private RandomSkillPreferences      randomSkillPreferences;
-    private Map<String, SkillType>      skills;
+    private GameOptions gameOptions;
+    private CampaignOptions campaignOptions;
+    private RandomSkillPreferences randomSkillPreferences;
+    private Map<String, SkillType> skills;
     private Map<String, SpecialAbility> specialAbilities;
     // endregion Variable Declarations
 
@@ -135,30 +150,13 @@ public class CampaignPreset {
               new HashMap<>());
     }
 
-    /**
-     * @since 0.50.04
-     * @deprecated - no indicated uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public CampaignPreset(final Campaign campaign) {
-        this(campaign.getName(),
-              "",
-              true,
-              campaign.getLocalDate(),
-              campaign.getFaction(),
-              campaign.getCurrentSystem().getPrimaryPlanet(),
-              campaign.getRankSystem(),
-              2,
-              campaign.isGM(),
-              null,
-              campaign.getGameOptions(),
-              campaign.getCampaignOptions(),
-              campaign.getRandomSkillPreferences(),
-              SkillType.getSkillHash(),
-              SpecialAbility.getSpecialAbilities());
-    }
-
-    public CampaignPreset(final String title, final String description, final boolean userData, final @Nullable LocalDate date, final @Nullable Faction faction, final @Nullable Planet planet, final @Nullable RankSystem rankSystem, final int contractCount, final boolean gm, final @Nullable CompanyGenerationOptions companyGenerationOptions, final @Nullable GameOptions gameOptions, final @Nullable CampaignOptions campaignOptions, final @Nullable RandomSkillPreferences randomSkillPreferences, final Map<String, SkillType> skills, final Map<String, SpecialAbility> specialAbilities) {
+    public CampaignPreset(final String title, final String description, final boolean userData,
+          final @Nullable LocalDate date, final @Nullable Faction faction, final @Nullable Planet planet,
+          final @Nullable RankSystem rankSystem, final int contractCount, final boolean gm,
+          final @Nullable CompanyGenerationOptions companyGenerationOptions, final @Nullable GameOptions gameOptions,
+          final @Nullable CampaignOptions campaignOptions,
+          final @Nullable RandomSkillPreferences randomSkillPreferences, final Map<String, SkillType> skills,
+          final Map<String, SpecialAbility> specialAbilities) {
         this.userData = userData;
 
         setTitle(title);
@@ -308,48 +306,39 @@ public class CampaignPreset {
     // endregion Getters/Setters
 
     /**
-     * @return a list of all the campaign presets in the default and userdata folders
+     * Retrieves a combined list of all campaign presets from the default directory, the old user data directory, and
+     * the modern (user-difined) user data directory. The campaign presets are sourced, merged, and sorted in natural
+     * order before being returned.
+     *
+     * <p>The method performs the following steps:</p>
+     * <ul>
+     *   <li>Loads campaign presets from the default campaign presets directory.</li>
+     *   <li>Loads campaign presets from the old user-specific campaign presets directory.</li>
+     *   <li>Loads campaign presets from the modern user-specific campaign presets directory,
+     *       typically defined by the user's current preferences.</li>
+     *   <li>Combines all presets into a single list.</li>
+     *   <li>Sorts the combined list of campaign presets in natural order.</li>
+     * </ul>
+     *
+     * @return a {@link List} of all combined and sorted campaign presets found in the default and user data folders.
      */
     public static List<CampaignPreset> getCampaignPresets() {
+        // Main directory
         final List<CampaignPreset> presets = loadCampaignPresetsFromDirectory(new File(MHQConstants.CAMPAIGN_PRESET_DIRECTORY));
+
+        // Old user data directory
         presets.addAll(loadCampaignPresetsFromDirectory(new File(MHQConstants.USER_CAMPAIGN_PRESET_DIRECTORY)));
+
+        // Modern user data directory
+        String userDirectory = PreferenceManager.getClientPreferences().getUserDir();
+        File presetUserDirectory = new File(userDirectory + '/' + CAMPAIGN_PRESET_DIRECTORY);
+        presets.addAll(loadCampaignPresetsFromDirectory(presetUserDirectory));
+
         final NaturalOrderComparator naturalOrderComparator = new NaturalOrderComparator();
 
         presets.sort((p0, p1) -> naturalOrderComparator.compare(p0.toString(), p1.toString()));
 
         return presets;
-    }
-
-    /**
-     * @since 50.04
-     * @deprecated This method is scheduled to be removed following the next milestone
-     */
-    @Deprecated(since = "50.04", forRemoval = true)
-    public void applyContinuousToCampaign(final Campaign campaign) {
-        if (getGameOptions() != null) {
-            campaign.setGameOptions(getGameOptions());
-            if (getCampaignOptions() == null) {
-                campaign.getCampaignOptions().updateCampaignOptionsFromGameOptions(campaign.getGameOptions());
-                MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
-            }
-        }
-
-        if (getCampaignOptions() != null) {
-            campaign.setCampaignOptions(getCampaignOptions());
-            MekHQ.triggerEvent(new OptionsChangedEvent(campaign, getCampaignOptions()));
-        }
-
-        if (getRandomSkillPreferences() != null) {
-            campaign.setRandomSkillPreferences(getRandomSkillPreferences());
-        }
-
-        if (!getSkills().isEmpty()) {
-            SkillType.setSkillHash(getSkills());
-        }
-
-        if (!getSpecialAbilities().isEmpty()) {
-            SpecialAbility.setSpecialAbilities(getSpecialAbilities());
-        }
     }
 
     // region File I/O
@@ -475,8 +464,8 @@ public class CampaignPreset {
         final Element element = xmlDoc.getDocumentElement();
         element.normalize();
 
-        final String  versionString = element.getAttribute("version");
-        final Version version       = new Version(versionString);
+        final String versionString = element.getAttribute("version");
+        final Version version = new Version(versionString);
         return parseFromXML(element.getChildNodes(), version);
     }
 
@@ -488,8 +477,7 @@ public class CampaignPreset {
             return null;
         }
 
-        // TODO Replace this with the Milestone Constant once we hit a Milestone after 49.19.1
-        if (version.isLowerThan(LAST_COMPATIBLE_VERSION)) {
+        if (version.isLowerThan(LAST_MILESTONE)) {
             logger.error("Campaign Presets from {} are incompatible with version {}.", version, MHQConstants.VERSION);
             return null;
         }
@@ -565,13 +553,13 @@ public class CampaignPreset {
                                 continue;
                             }
 
-                            SkillType.generateSeparateInstanceFromXML(wn2, preset.getSkills());
+                            SkillType.generateSeparateInstanceFromXML(wn2, preset.getSkills(), version);
                         }
                         break;
                     }
                     case "specialAbilities": {
                         final PersonnelOptions options = new PersonnelOptions();
-                        final NodeList         nl2     = wn.getChildNodes();
+                        final NodeList nl2 = wn.getChildNodes();
                         for (int y = 0; y < nl2.getLength(); y++) {
                             final Node wn2 = nl2.item(y);
                             if (wn2.getNodeType() != Node.ELEMENT_NODE) {

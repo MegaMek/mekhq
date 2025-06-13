@@ -30,9 +30,6 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.util.StringJoiner;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.Compute;
 import megamek.common.Jumpship;
 import megamek.common.SimpleTechLevel;
@@ -41,8 +38,10 @@ import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * @author MKerensky
@@ -50,10 +49,10 @@ import mekhq.utilities.MHQXMLUtility;
 public class KFChargingSystem extends Part {
     private static final MMLogger logger = MMLogger.create(KFChargingSystem.class);
 
-    public static final TechAdvancement TA_CHARGING_SYSTEM = new TechAdvancement(TECH_BASE_ALL)
-            .setAdvancement(2107, 2120, 2300).setPrototypeFactions(F_TA)
-            .setProductionFactions(F_TA).setTechRating(RATING_D)
-            .setAvailability(RATING_D, RATING_E, RATING_D, RATING_D)
+    public static final TechAdvancement TA_CHARGING_SYSTEM = new TechAdvancement(TechBase.ALL)
+            .setAdvancement(2107, 2120, 2300).setPrototypeFactions(Faction.TA)
+            .setProductionFactions(Faction.TA).setTechRating(TechRating.D)
+            .setAvailability(AvailabilityValue.D, AvailabilityValue.E, AvailabilityValue.D, AvailabilityValue.D)
             .setStaticTechLevel(SimpleTechLevel.ADVANCED);
 
     // Standard, primitive, compact, subcompact...

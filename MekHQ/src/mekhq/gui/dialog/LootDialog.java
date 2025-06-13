@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -36,8 +41,8 @@ import javax.swing.*;
 
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.client.ui.swing.UnitLoadingDialog;
-import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
+import megamek.client.ui.dialogs.UnitLoadingDialog;
+import megamek.client.ui.dialogs.unitSelectorDialogs.AbstractUnitSelectorDialog;
 import megamek.common.Entity;
 import megamek.common.MekSummaryCache;
 import megamek.common.annotations.Nullable;
@@ -55,35 +60,35 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
 public class LootDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(LootDialog.class);
 
-    private JFrame            frame;
-    private Loot              loot;
-    private boolean           cancelled;
-    private ArrayList<Entity> units;
-    private ArrayList<Part>   parts;
-    private Campaign          campaign;
+    private final JFrame frame;
+    private final Loot loot;
+    private boolean cancelled;
+    private final ArrayList<Entity> units;
+    private final ArrayList<Part> parts;
+    private final Campaign campaign;
 
-    private JButton       btnOK;
-    private JButton       btnCancel;
-    private JTextField    txtName;
-    private JSpinner      spnCash;
-    private JButton       btnAddUnit;
-    private JButton       btnRemoveUnit;
-    private JButton       btnAddPart;
-    private JButton       btnRemovePart;
+    private JButton btnOK;
+    private JButton btnCancel;
+    private JTextField txtName;
+    private JSpinner spnCash;
+    private JButton btnAddUnit;
+    private JButton btnRemoveUnit;
+    private JButton btnAddPart;
+    private JButton btnRemovePart;
     private JList<String> listUnits;
     private JList<String> listParts;
-    private JScrollPane   scrUnits;
-    private JScrollPane   scrParts;
+    private JScrollPane scrUnits;
+    private JScrollPane scrParts;
 
     /** Creates new LootDialog form */
     public LootDialog(JFrame parent, boolean modal, Loot l, Campaign c) {
         super(parent, modal);
-        this.frame    = parent;
-        this.loot     = l;
+        this.frame = parent;
+        this.loot = l;
         this.campaign = c;
-        cancelled     = true;
-        units         = new ArrayList<>();
-        parts         = new ArrayList<>();
+        cancelled = true;
+        units = new ArrayList<>();
+        parts = new ArrayList<>();
         units.addAll(l.getUnits());
         parts.addAll(l.getParts());
         initComponents();
@@ -93,169 +98,169 @@ public class LootDialog extends JDialog {
 
     private void initComponents() {
 
-        txtName       = new JTextField();
-        btnOK         = new JButton("Done");
-        btnCancel     = new JButton("Cancel");
-        btnAddUnit    = new JButton("Add");
+        txtName = new JTextField();
+        btnOK = new JButton("Done");
+        btnCancel = new JButton("Cancel");
+        btnAddUnit = new JButton("Add");
         btnRemoveUnit = new JButton("Remove");
-        btnAddPart    = new JButton("Add");
+        btnAddPart = new JButton("Add");
         btnRemovePart = new JButton("Remove");
-        listUnits     = new JList<>(new DefaultListModel<>());
-        listParts     = new JList<>(new DefaultListModel<>());
+        listUnits = new JList<>(new DefaultListModel<>());
+        listParts = new JList<>(new DefaultListModel<>());
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Scenario Costs & Payouts");
         getContentPane().setLayout(new GridBagLayout());
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx     = 0;
-        gridBagConstraints.gridy     = 0;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weighty   = 0.0;
-        gridBagConstraints.anchor    = GridBagConstraints.WEST;
-        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(new JLabel("Name:"), gridBagConstraints);
 
         txtName.setText(loot.getName());
-        gridBagConstraints           = new GridBagConstraints();
-        gridBagConstraints.gridx     = 1;
-        gridBagConstraints.gridy     = 0;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.weightx   = 0.0;
-        gridBagConstraints.weighty   = 0.0;
-        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor    = GridBagConstraints.WEST;
-        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(txtName, gridBagConstraints);
 
-        gridBagConstraints           = new GridBagConstraints();
-        gridBagConstraints.gridx     = 0;
-        gridBagConstraints.gridy     = 1;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weighty   = 0.0;
-        gridBagConstraints.anchor    = GridBagConstraints.WEST;
-        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(new JLabel("Cash"), gridBagConstraints);
 
-        spnCash                      = new JSpinner(new SpinnerNumberModel(loot.getCash().getAmount().intValue(),
+        spnCash = new JSpinner(new SpinnerNumberModel(loot.getCash().getAmount().intValue(),
               -300000000,
               300000000,
               10000));
-        gridBagConstraints           = new GridBagConstraints();
-        gridBagConstraints.gridx     = 1;
-        gridBagConstraints.gridy     = 1;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.weightx   = 0.0;
-        gridBagConstraints.weighty   = 0.0;
-        gridBagConstraints.anchor    = GridBagConstraints.WEST;
-        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(spnCash, gridBagConstraints);
 
-        gridBagConstraints           = new GridBagConstraints();
-        gridBagConstraints.gridx     = 0;
-        gridBagConstraints.gridy     = 2;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weighty   = 0.0;
-        gridBagConstraints.anchor    = GridBagConstraints.WEST;
-        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(new JLabel("Units"), gridBagConstraints);
 
         btnAddUnit.addActionListener(evt -> addUnit());
 
-        gridBagConstraints           = new GridBagConstraints();
-        gridBagConstraints.gridx     = 1;
-        gridBagConstraints.gridy     = 2;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weighty   = 0.0;
-        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
         getContentPane().add(btnAddUnit, gridBagConstraints);
 
         btnRemoveUnit.setEnabled(false);
         btnRemoveUnit.addActionListener(evt -> removeUnit());
-        gridBagConstraints           = new GridBagConstraints();
-        gridBagConstraints.gridx     = 2;
-        gridBagConstraints.gridy     = 2;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weighty   = 0.0;
-        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
         getContentPane().add(btnRemoveUnit, gridBagConstraints);
 
-        gridBagConstraints           = new GridBagConstraints();
-        gridBagConstraints.gridx     = 0;
-        gridBagConstraints.gridy     = 3;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.weightx   = 1.0;
-        gridBagConstraints.weighty   = 1.0;
-        gridBagConstraints.anchor    = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.fill      = GridBagConstraints.BOTH;
-        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
-        scrUnits                     = new JScrollPaneWithSpeed(listUnits);
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        scrUnits = new JScrollPaneWithSpeed(listUnits);
         listUnits.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         listUnits.getSelectionModel().addListSelectionListener(evt -> listUnitsValueChanged());
         refreshUnitList();
         getContentPane().add(scrUnits, gridBagConstraints);
 
-        gridBagConstraints           = new GridBagConstraints();
-        gridBagConstraints.gridx     = 0;
-        gridBagConstraints.gridy     = 4;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weighty   = 0.0;
-        gridBagConstraints.anchor    = GridBagConstraints.WEST;
-        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(new JLabel("Parts"), gridBagConstraints);
 
         btnAddPart.addActionListener(evt -> addPart());
-        gridBagConstraints           = new GridBagConstraints();
-        gridBagConstraints.gridx     = 1;
-        gridBagConstraints.gridy     = 4;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weighty   = 0.0;
-        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
         getContentPane().add(btnAddPart, gridBagConstraints);
 
         btnRemovePart.setEnabled(false);
         btnRemovePart.addActionListener(evt -> removePart());
-        gridBagConstraints           = new GridBagConstraints();
-        gridBagConstraints.gridx     = 2;
-        gridBagConstraints.gridy     = 4;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weighty   = 0.0;
-        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
         getContentPane().add(btnRemovePart, gridBagConstraints);
 
-        gridBagConstraints           = new GridBagConstraints();
-        gridBagConstraints.gridx     = 0;
-        gridBagConstraints.gridy     = 5;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.weightx   = 1.0;
-        gridBagConstraints.weighty   = 1.0;
-        gridBagConstraints.anchor    = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.fill      = GridBagConstraints.BOTH;
-        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
-        scrParts                     = new JScrollPaneWithSpeed(listParts);
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        scrParts = new JScrollPaneWithSpeed(listParts);
         listParts.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         listParts.getSelectionModel().addListSelectionListener(evt -> listPartsValueChanged());
         refreshPartList();
         getContentPane().add(scrParts, gridBagConstraints);
 
         btnOK.addActionListener(evt -> done());
-        gridBagConstraints           = new GridBagConstraints();
-        gridBagConstraints.gridx     = 1;
-        gridBagConstraints.gridy     = 6;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weighty   = 0.0;
-        gridBagConstraints.anchor    = GridBagConstraints.EAST;
-        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.anchor = GridBagConstraints.EAST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(btnOK, gridBagConstraints);
 
         btnCancel.addActionListener(evt -> setVisible(false));
-        gridBagConstraints           = new GridBagConstraints();
-        gridBagConstraints.gridx     = 2;
-        gridBagConstraints.gridy     = 6;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weighty   = 0.0;
-        gridBagConstraints.anchor    = GridBagConstraints.WEST;
-        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(btnCancel, gridBagConstraints);
 
         pack();
@@ -263,11 +268,7 @@ public class LootDialog extends JDialog {
 
     /**
      * These need to be migrated to the Suite Constants / Suite Options Setup
-     *
-     * @since 0.50.04
-     * @deprecated Move to Suite Constants / Suite Options Setup
      */
-    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(LootDialog.class);
@@ -339,8 +340,8 @@ public class LootDialog extends JDialog {
     }
 
     private void refreshUnitList() {
-        int                      selectedRow = listUnits.getSelectedIndex();
-        DefaultListModel<String> model       = (DefaultListModel<String>) listUnits.getModel();
+        int selectedRow = listUnits.getSelectedIndex();
+        DefaultListModel<String> model = (DefaultListModel<String>) listUnits.getModel();
         model.removeAllElements();
         for (Entity e : units) {
             model.addElement(e.getShortName());
@@ -358,8 +359,8 @@ public class LootDialog extends JDialog {
     }
 
     private void refreshPartList() {
-        int                      selectedRow = listParts.getSelectedIndex();
-        DefaultListModel<String> model       = (DefaultListModel<String>) listParts.getModel();
+        int selectedRow = listParts.getSelectedIndex();
+        DefaultListModel<String> model = (DefaultListModel<String>) listParts.getModel();
         model.removeAllElements();
         for (Part p : parts) {
             model.addElement(p.getName());

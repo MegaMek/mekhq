@@ -27,7 +27,7 @@
  */
 package mekhq.gui.baseComponents;
 
-import megamek.client.ui.baseComponents.AbstractScrollPane;
+import megamek.client.ui.panes.AbstractScrollPane;
 import mekhq.MekHQ;
 
 import javax.swing.*;

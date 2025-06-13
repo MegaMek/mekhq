@@ -24,35 +24,15 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission.resupplyAndCaches;
 
-import megamek.codeUtilities.ObjectUtility;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.annotations.Nullable;
-import megamek.logging.MMLogger;
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.Loot;
-import mekhq.campaign.mission.ScenarioTemplate;
-import mekhq.campaign.mission.enums.AtBMoraleLevel;
-import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
-import mekhq.campaign.parts.Armor;
-import mekhq.campaign.parts.Part;
-import mekhq.campaign.parts.equipment.AmmoBin;
-import mekhq.campaign.stratcon.StratconCampaignState;
-import mekhq.campaign.stratcon.StratconCoords;
-import mekhq.campaign.stratcon.StratconScenario;
-import mekhq.campaign.stratcon.StratconTrackState;
-import mekhq.gui.dialog.resupplyAndCaches.*;
-
-import java.util.*;
-import java.util.Map.Entry;
-
+import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.CRITICAL;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.DOMINATING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
@@ -65,6 +45,7 @@ import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_AMMO_TO
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_ARMOR_TONNAGE;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RESUPPLY_CONTRACT_END;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RESUPPLY_LOOT;
+import static mekhq.campaign.personnel.enums.PersonnelRole.GROUND_VEHICLE_DRIVER;
 import static mekhq.campaign.stratcon.StratconContractInitializer.getUnoccupiedCoords;
 import static mekhq.campaign.stratcon.StratconRulesManager.generateExternalScenario;
 import static mekhq.gui.dialog.resupplyAndCaches.DialogItinerary.itineraryDialog;
@@ -73,11 +54,46 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.UUID;
+
+import megamek.codeUtilities.ObjectUtility;
+import megamek.common.Compute;
+import megamek.common.Entity;
+import megamek.common.annotations.Nullable;
+import megamek.common.enums.Gender;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.Hangar;
+import mekhq.campaign.force.Force;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBDynamicScenario;
+import mekhq.campaign.mission.Loot;
+import mekhq.campaign.mission.ScenarioTemplate;
+import mekhq.campaign.mission.enums.AtBMoraleLevel;
+import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
+import mekhq.campaign.parts.Armor;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.equipment.AmmoBin;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.stratcon.StratconCampaignState;
+import mekhq.campaign.stratcon.StratconCoords;
+import mekhq.campaign.stratcon.StratconScenario;
+import mekhq.campaign.stratcon.StratconTrackState;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.gui.dialog.resupplyAndCaches.DialogPlayerConvoyOption;
+import mekhq.gui.dialog.resupplyAndCaches.DialogResupplyFocus;
+import mekhq.gui.dialog.resupplyAndCaches.DialogSwindled;
+import mekhq.utilities.ReportingUtilities;
+
 /**
- * The {@code PerformResupply} class handles the execution and management of resupply operations
- * within MekHQ campaigns. It covers various aspects of resupply, including generating convoy contents,
- * distributing supplies, resolving convoy interceptions, and facilitating player interaction through
- * dialogs tied to specific resupply scenarios.
+ * The {@code PerformResupply} class handles the execution and management of resupply operations within MekHQ campaigns.
+ * It covers various aspects of resupply, including generating convoy contents, distributing supplies, resolving convoy
+ * interceptions, and facilitating player interaction through dialogs tied to specific resupply scenarios.
  */
 public class PerformResupply {
     private static final int NPC_CONVOY_MULTIPLIER = 10;
@@ -93,26 +109,25 @@ public class PerformResupply {
      *
      * <p>This method provides a simplified entry point to the resupply workflow, using a default value
      * of 1 for the supply drop count. It delegates to the overloaded method
-     * {@link #performResupply(Resupply, AtBContract, int)} for the main execution of the resupply
-     * process, encompassing supply generation, convoy interaction, and delivery confirmation.</p>
+     * {@link #performResupply(Resupply, AtBContract, int)} for the main execution of the resupply process, encompassing
+     * supply generation, convoy interaction, and delivery confirmation.</p>
      *
      * <p>This entry point is typically used when the exact number of supply drops is not specified or
      * defaults to a single drop per invocation.</p>
      *
-     * @param resupply the {@link Resupply} instance containing information about the resupply operation,
-     *                 such as the supplies to be delivered, convoy setup, and context-specific rules.
-     * @param contract the {@link AtBContract} representing the current contract, which provides the
-     *                 operational context for the resupply, including permissions and restrictions.
+     * @param resupply the {@link Resupply} instance containing information about the resupply operation, such as the
+     *                 supplies to be delivered, convoy setup, and context-specific rules.
+     * @param contract the {@link AtBContract} representing the current contract, which provides the operational context
+     *                 for the resupply, including permissions and restrictions.
      */
     public static void performResupply(Resupply resupply, AtBContract contract) {
         performResupply(resupply, contract, 1);
     }
 
     /**
-     * Executes the resupply process for a specified campaign, contract, and supply drop count.
-     * This method coordinates supply allocation, convoy interaction, potential for interception,
-     * and player confirmation dialogs, ensuring the resupply process adheres to the campaign's
-     * context and player decisions.
+     * Executes the resupply process for a specified campaign, contract, and supply drop count. This method coordinates
+     * supply allocation, convoy interaction, potential for interception, and player confirmation dialogs, ensuring the
+     * resupply process adheres to the campaign's context and player decisions.
      *
      * <p>Functionality includes:</p>
      * <ul>
@@ -122,12 +137,12 @@ public class PerformResupply {
      *     <li>Dialog-based confirmation for resupply delivery and associated costs.</li>
      * </ul>
      *
-     * @param resupply  the {@link Resupply} instance that defines the campaign's resupply operation,
-     *                  including cargo, player and NPC convoys, and mission-related data.
-     * @param contract  the {@link AtBContract} representing the context of the current contract,
-     *                  determining aspects such as independent resupply permissions and guerrilla warfare rules.
-     * @param dropCount the number of supply drops planned for this resupply operation. If zero,
-     *                  the method exits early.
+     * @param resupply  the {@link Resupply} instance that defines the campaign's resupply operation, including cargo,
+     *                  player and NPC convoys, and mission-related data.
+     * @param contract  the {@link AtBContract} representing the context of the current contract, determining aspects
+     *                  such as independent resupply permissions and guerrilla warfare rules.
+     * @param dropCount the number of supply drops planned for this resupply operation. If zero, the method exits
+     *                  early.
      */
     public static void performResupply(Resupply resupply, AtBContract contract, int dropCount) {
         // These early exits should only occur if the player literally has no units.
@@ -142,7 +157,6 @@ public class PerformResupply {
             return;
         }
 
-        final Campaign campaign = resupply.getCampaign();
         final boolean isIndependent = contract.getCommandRights().isIndependent();
         final boolean isGuerrilla = contract.getContractType().isGuerrillaWarfare();
         final ResupplyType resupplyType = resupply.getResupplyType();
@@ -215,8 +229,8 @@ public class PerformResupply {
      * in the warehouse.</p>
      *
      * @param resupply the {@link Resupply} instance defining the current campaign operation.
-     * @param contents a list of {@link Part} objects representing the resupply contents to be delivered.
-     *                 If {@code null}, fetches convoy contents from the {@link Resupply} instance.
+     * @param contents a list of {@link Part} objects representing the resupply contents to be delivered. If
+     *                 {@code null}, fetches convoy contents from the {@link Resupply} instance.
      */
     public static void makeDelivery(Resupply resupply, @Nullable List<Part> contents) {
         final Campaign campaign = resupply.getCampaign();
@@ -227,8 +241,8 @@ public class PerformResupply {
 
         for (Part part : contents) {
             if (part instanceof AmmoBin) {
-                campaign.getQuartermaster().addAmmo(((AmmoBin) part).getType(),
-                    ((AmmoBin) part).getFullShots() * RESUPPLY_AMMO_TONNAGE);
+                campaign.getQuartermaster()
+                      .addAmmo(((AmmoBin) part).getType(), ((AmmoBin) part).getFullShots() * RESUPPLY_AMMO_TONNAGE);
             } else if (part instanceof Armor) {
                 int quantity = (int) Math.ceil(((Armor) part).getArmorPointsPerTon() * RESUPPLY_ARMOR_TONNAGE);
                 ((Armor) part).setAmount(quantity);
@@ -240,8 +254,7 @@ public class PerformResupply {
     }
 
     /**
-     * Facilitates the delivery of supplies through smugglers, incorporating chances for smuggler
-     * swindling.
+     * Facilitates the delivery of supplies through smugglers, incorporating chances for smuggler swindling.
      *
      * <p>Key behaviors:</p>
      * <ul>
@@ -255,21 +268,22 @@ public class PerformResupply {
         final AtBContract contract = resupply.getContract();
         int swindleChance = contract.getMoraleLevel().ordinal();
 
-        if (Compute.randomInt(10) < swindleChance) {
+        if (randomInt(10) < swindleChance) {
             new DialogSwindled(resupply);
         } else {
             final Campaign campaign = resupply.getCampaign();
 
-            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "convoySuccessfulSmuggler.text",
-                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                CLOSING_SPAN_TAG));
+            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "convoySuccessfulSmuggler.text",
+                  spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
+                  CLOSING_SPAN_TAG));
             makeDelivery(resupply, null);
         }
     }
 
     /**
-     * Loads and organizes player convoys for a resupply operation. It calculates available
-     * convoy capacities, sorts convoys and contents, and assigns parts to convoys based on capacity.
+     * Loads and organizes player convoys for a resupply operation. It calculates available convoy capacities, sorts
+     * convoys and contents, and assigns parts to convoys based on capacity.
      *
      * @param resupply the {@link Resupply} instance containing convoy and mission-specific data.
      */
@@ -281,8 +295,7 @@ public class PerformResupply {
 
         // Sort the player's available convoys according to cargo space, largest -> smallest
         List<Entry<Force, Double>> entryList = new ArrayList<>(playerConvoys.entrySet());
-        entryList.sort((entry1, entry2) ->
-            Double.compare(entry2.getValue(), entry1.getValue()));
+        entryList.sort((entry1, entry2) -> Double.compare(entry2.getValue(), entry1.getValue()));
 
         List<Force> sortedConvoys = new ArrayList<>();
         for (Entry<Force, Double> entry : entryList) {
@@ -319,15 +332,14 @@ public class PerformResupply {
 
             convoyContents.removeAll(convoyItems);
 
-            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "convoyDispatched.text",
-                convoy.getName()));
+            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "convoyDispatched.text", convoy.getName()));
             processConvoy(resupply, convoyItems, convoy);
         }
     }
 
     /**
-     * Processes convoy interactions, resolving outcomes based on player decisions, convoy details,
-     * and interception chances. This includes factors such as convoy weight and morale influence.
+     * Processes convoy interactions, resolving outcomes based on player decisions, convoy details, and interception
+     * chances. This includes factors such as convoy weight and morale influence.
      *
      * <p>Handles logic for:</p>
      * <ul>
@@ -336,10 +348,10 @@ public class PerformResupply {
      *     <li>Triggering convoys and interception scenarios.</li>
      * </ul>
      *
-     * @param resupply        the {@link Resupply} instance defining the resupply operation.
-     * @param convoyContents  a list of {@link Part} objects representing the contents of the convoy.
-     * @param playerConvoy    the {@link Force} object representing the player's convoy.
-     *                        If {@code null}, the convoy is an NPC-controlled unit.
+     * @param resupply       the {@link Resupply} instance defining the resupply operation.
+     * @param convoyContents a list of {@link Part} objects representing the contents of the convoy.
+     * @param playerConvoy   the {@link Force} object representing the player's convoy. If {@code null}, the convoy is
+     *                       an NPC-controlled unit.
      */
     public static void processConvoy(Resupply resupply, List<Part> convoyContents, @Nullable Force playerConvoy) {
         final Campaign campaign = resupply.getCampaign();
@@ -383,7 +395,7 @@ public class PerformResupply {
         interceptionChance = Math.max(1, interceptionChance);
 
         // With interception chance calculated, we check to see whether an interception or event has occurred.
-        if (Compute.randomInt(10) < interceptionChance) {
+        if (randomInt(10) < interceptionChance) {
             generateInterceptionOrConvoyEvent(resupply, playerConvoy, convoyContents, interceptionChance);
         } else {
             completeSuccessfulDelivery(resupply, convoyContents);
@@ -391,9 +403,9 @@ public class PerformResupply {
     }
 
     /**
-     * Handles convoy interceptions and their outcomes. The method determines whether the player receives
-     * a scenario based on the convoy's state and selects the appropriate scenario template, generating an
-     * encounter or completing the delivery as necessary.
+     * Handles convoy interceptions and their outcomes. The method determines whether the player receives a scenario
+     * based on the convoy's state and selects the appropriate scenario template, generating an encounter or completing
+     * the delivery as necessary.
      *
      * <p>Decision-making includes:</p>
      * <ul>
@@ -402,18 +414,17 @@ public class PerformResupply {
      *     <li>Generates strategic map scenarios to handle interception events dynamically.</li>
      * </ul>
      *
-     * @param resupply         the {@link Resupply} instance containing resupply details.
-     * @param convoy           the {@link Force} representing the player's convoy. Can be {@code null} for NPC convoys.
-     * @param convoyContents   a list of {@link Part} objects representing convoy cargo.
+     * @param resupply           the {@link Resupply} instance containing resupply details.
+     * @param convoy             the {@link Force} representing the player's convoy. Can be {@code null} for NPC
+     *                           convoys.
+     * @param convoyContents     a list of {@link Part} objects representing convoy cargo.
      * @param interceptionChance the calculated chance of interception for the convoy.
      */
-    private static void generateInterceptionOrConvoyEvent(Resupply resupply, @Nullable Force convoy,
-                                                             @Nullable List<Part> convoyContents,
-                                                             int interceptionChance) {
+    private static void generateInterceptionOrConvoyEvent(Resupply resupply, @Nullable Force convoy, @Nullable List<Part> convoyContents, int interceptionChance) {
         final Campaign campaign = resupply.getCampaign();
         final AtBContract contract = resupply.getContract();
 
-        if (Compute.randomInt(10) < interceptionChance) {
+        if (randomInt(10) < interceptionChance) {
             processConvoyInterception(resupply, convoy, convoyContents);
         } else {
             // If it is an NPC convoy, we skip roleplay events
@@ -423,8 +434,8 @@ public class PerformResupply {
             }
 
             // Non-ground convoys don't get roleplay events
-            if (convoy.forceContainsOnlyVTOLForces(campaign.getHangar(), false)
-                  || convoy.forceContainsOnlyAerialForces(campaign.getHangar(), false, false)) {
+            if (convoy.forceContainsOnlyVTOLForces(campaign.getHangar(), false) ||
+                      convoy.forceContainsOnlyAerialForces(campaign.getHangar(), false, false)) {
                 completeSuccessfulDelivery(resupply, convoyContents);
                 return;
             }
@@ -439,27 +450,31 @@ public class PerformResupply {
             String eventText;
             if (Compute.d6() <= 2) {
                 eventText = getFormattedTextAt(RESOURCE_BUNDLE,
-                    STATUS_FORWARD + Compute.randomInt(100) + STATUS_AFTERWARD);
+                      STATUS_FORWARD + Compute.randomInt(100) + STATUS_AFTERWARD,
+                      commanderAddress);
             } else {
-                int roll = Compute.randomInt(2);
+                int roll = randomInt(2);
 
                 if (morale.isAdvancing() || morale.isWeakened()) {
                     morale = roll == 0 ? (morale.isAdvancing() ? DOMINATING : CRITICAL) : STALEMATE;
                 }
 
                 eventText = getFormattedTextAt(RESOURCE_BUNDLE,
-                    STATUS_FORWARD + "Enemy" + morale + Compute.randomInt(50) + STATUS_AFTERWARD,
-                    commanderAddress);
+                      STATUS_FORWARD + "Enemy" + morale + randomInt(50) + STATUS_AFTERWARD,
+                      commanderAddress);
             }
 
-            new DialogRoleplayEvent(campaign, convoy, eventText);
+            Person speaker = campaign.getPerson(convoy.getForceCommanderID());
+            String outOfCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "outOfCharacter.roleplay");
+            new ImmersiveDialogSimple(campaign, speaker, null, eventText, null, outOfCharacterMessage, null, false);
+
             completeSuccessfulDelivery(resupply, convoyContents);
         }
     }
 
     /**
-     * Completes the successful delivery of convoy supplies, adding them to campaign resources
-     * and providing a positive campaign report.
+     * Completes the successful delivery of convoy supplies, adding them to campaign resources and providing a positive
+     * campaign report.
      *
      * @param resupply       the {@link Resupply} instance describing the mission context.
      * @param convoyContents the list of convoy contents to be delivered.
@@ -467,16 +482,17 @@ public class PerformResupply {
     private static void completeSuccessfulDelivery(Resupply resupply, List<Part> convoyContents) {
         final Campaign campaign = resupply.getCampaign();
 
-        campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "convoySuccessful.text",
-            spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-            CLOSING_SPAN_TAG));
+        campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+              "convoySuccessful.text",
+              spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
+              CLOSING_SPAN_TAG));
 
         makeDelivery(resupply, convoyContents);
     }
 
     /**
-     * Handles the interception of a convoy operation. Based on the convoy's state and type, it determines
-     * the most appropriate scenario template and resolves the outcome of the interception.
+     * Handles the interception of a convoy operation. Based on the convoy's state and type, it determines the most
+     * appropriate scenario template and resolves the outcome of the interception.
      *
      * <p>Key behaviors:</p>
      * <ul>
@@ -485,12 +501,11 @@ public class PerformResupply {
      *     <li>Provides loot or completes the delivery if no valid interception scenario exists.</li>
      * </ul>
      *
-     * @param resupply        the {@link Resupply} instance representing the resupply mission.
-     * @param targetConvoy    the {@link Force} representing the player's convoy. Can be {@code null} for NPC convoys.
-     * @param convoyContents  a list of {@link Part} objects representing the resupply cargo.
+     * @param resupply       the {@link Resupply} instance representing the resupply mission.
+     * @param targetConvoy   the {@link Force} representing the player's convoy. Can be {@code null} for NPC convoys.
+     * @param convoyContents a list of {@link Part} objects representing the resupply cargo.
      */
-    private static void processConvoyInterception(Resupply resupply, @Nullable Force targetConvoy,
-                                                  @Nullable List<Part> convoyContents) {
+    private static void processConvoyInterception(Resupply resupply, @Nullable Force targetConvoy, @Nullable List<Part> convoyContents) {
         final String DIRECTORY = "data/scenariotemplates/";
         final String GENERIC = DIRECTORY + "Emergency Convoy Defense.xml";
         final String PLAYER_AEROSPACE_CONVOY = DIRECTORY + "Emergency Convoy Defense - Player - Low-Atmosphere.xml";
@@ -500,18 +515,16 @@ public class PerformResupply {
         final Campaign campaign = resupply.getCampaign();
         final AtBContract contract = resupply.getContract();
 
-        // Trigger a dialog to inform the user an interception has taken place
-        new DialogInterception(resupply, targetConvoy);
+        // Trigger a dialog to inform the user that an interception has taken place
+        displayDialog(targetConvoy, campaign, contract);
 
         // Determine which scenario template to use based on convoy state
         String templateAddress = GENERIC;
 
         if (targetConvoy != null) {
-            if (targetConvoy.forceContainsOnlyAerialForces(campaign.getHangar(), false,
-                  false)) {
+            if (targetConvoy.forceContainsOnlyAerialForces(campaign.getHangar(), false, false)) {
                 templateAddress = PLAYER_AEROSPACE_CONVOY;
-            } else if (targetConvoy.forceContainsMajorityVTOLForces(campaign.getHangar(),
-                  false)) {
+            } else if (targetConvoy.forceContainsMajorityVTOLForces(campaign.getHangar(), false)) {
                 templateAddress = PLAYER_VTOL_CONVOY;
             } else {
                 templateAddress = PLAYER_CONVOY;
@@ -528,9 +541,11 @@ public class PerformResupply {
         // We report the error in this fashion, instead of hiding it in the log, as we want to
         // increase the likelihood the player is aware an error has occurred.
         if (template == null) {
-            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "convoyErrorTemplate.text",
-                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
-                templateAddress, CLOSING_SPAN_TAG));
+            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "convoyErrorTemplate.text",
+                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
+                  templateAddress,
+                  CLOSING_SPAN_TAG));
 
             makeDelivery(resupply, convoyContents);
             return;
@@ -544,15 +559,17 @@ public class PerformResupply {
             List<StratconTrackState> tracks = campaignState.getTracks();
             track = ObjectUtility.getRandomItem(tracks);
         } catch (NullPointerException e) {
-            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "convoyErrorTracks.text",
-                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
-                templateAddress, CLOSING_SPAN_TAG));
+            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "convoyErrorTracks.text",
+                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
+                  templateAddress,
+                  CLOSING_SPAN_TAG));
 
             makeDelivery(resupply, convoyContents);
             return;
         }
 
-        StratconCoords coords = getUnoccupiedCoords(track, false);
+        StratconCoords coords = getUnoccupiedCoords(track);
 
         if (coords == null) {
             handleFallbackMessage(resupply, convoyContents, campaign);
@@ -566,8 +583,15 @@ public class PerformResupply {
         // Generate the scenario, placing it in a random hex that does not currently contain a
         // scenario, or a facility. If the player is really lucky, the scenario will spawn on top
         // of a force already deployed to the Strategic Map.
-        StratconScenario scenario = generateExternalScenario(campaign, contract, track,
-            coords, template, false, 0);
+        StratconScenario scenario = generateExternalScenario(campaign,
+              contract,
+              track,
+              coords,
+              template,
+              false,
+              false,
+              false,
+              0);
 
         // If we successfully generated a scenario, we need to make a couple of final
         // adjustments, including assigning the Resupply contents as loot and
@@ -592,9 +616,10 @@ public class PerformResupply {
             backingScenario.addLoot(loot);
 
             // Announce the situation to the player
-            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "convoyInterceptedStratCon.text",
-                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
-                CLOSING_SPAN_TAG));
+            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "convoyInterceptedStratCon.text",
+                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
+                  CLOSING_SPAN_TAG));
         } else {
             // If we failed to generate a scenario, for whatever reason, we don't
             // want the player confused why there isn't a scenario, so we offer
@@ -603,25 +628,61 @@ public class PerformResupply {
         }
     }
 
+    private static void displayDialog(Force targetConvoy, Campaign campaign, AtBContract contract) {
+        Person speaker;
+        String inCharacterMessage = "";
+        String commanderAddress = campaign.getCommanderAddress(false);
+        if (targetConvoy != null) {
+            speaker = campaign.getPerson(targetConvoy.getForceCommanderID());
+
+            Hangar hangar = campaign.getHangar();
+            if (targetConvoy.forceContainsOnlyVTOLForces(hangar, false) ||
+                      targetConvoy.forceContainsOnlyAerialForces(hangar, false, false)) {
+                inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
+                      "statusUpdateIntercepted.boilerplate",
+                      commanderAddress);
+            }
+        } else {
+            // We invent an NPC driver for NPC convoys
+            speaker = campaign.newPerson(GROUND_VEHICLE_DRIVER, contract.getEmployerCode(), Gender.RANDOMIZE);
+        }
+
+        if (inCharacterMessage.isBlank()) {
+            inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
+                  "statusUpdateIntercepted" + randomInt(20) + ".text",
+                  campaign.getCommanderAddress(false));
+        }
+
+        String outOfCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "outOfCharacter.intercepted");
+
+        new ImmersiveDialogSimple(campaign,
+              speaker,
+              null,
+              inCharacterMessage,
+              null,
+              outOfCharacterMessage,
+              null,
+              false);
+    }
+
     /**
      * Handles the fallback scenario where a resupply convoy escapes.
      *
      * <p>This method is triggered in situations where the convoy cannot complete the intended
-     * resupply operation due to certain fallback conditions. It logs a campaign report indicating
-     * the situation and attempts to make the delivery using the remaining convoy contents.</p>
+     * resupply operation due to certain fallback conditions. It logs a campaign report indicating the situation and
+     * attempts to make the delivery using the remaining convoy contents.</p>
      *
-     * @param resupply        The {@link Resupply} instance representing the details of the current
-     *                        resupply operation.
-     * @param convoyContents  A {@link List} of {@link Part} objects representing the contents of the
-     *                        convoy at the time of the fallback. These are the items that will be
-     *                        delivered despite the fallback.
-     * @param campaign        The {@link Campaign} instance where the report of the fallback scenario
-     *                        will be added and the delivery will be processed.
+     * @param resupply       The {@link Resupply} instance representing the details of the current resupply operation.
+     * @param convoyContents A {@link List} of {@link Part} objects representing the contents of the convoy at the time
+     *                       of the fallback. These are the items that will be delivered despite the fallback.
+     * @param campaign       The {@link Campaign} instance where the report of the fallback scenario will be added and
+     *                       the delivery will be processed.
      */
     private static void handleFallbackMessage(Resupply resupply, List<Part> convoyContents, Campaign campaign) {
-        campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "convoyEscaped.text",
-            spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
-            CLOSING_SPAN_TAG));
+        campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+              "convoyEscaped.text",
+              spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
+              CLOSING_SPAN_TAG));
 
         makeDelivery(resupply, convoyContents);
     }

@@ -2,16 +2,16 @@
 <ScenarioTemplate>
     <name>Isolated DropShip Defense</name>
     <shortBriefing>Defend isolated DropShip from interception.</shortBriefing>
-    <detailedBriefing>An allied DropShip has been isolated behind enemy lines, and hostile forces are closing in fast. Your mission is to defend the DropShip until it can lift off or, if necessary, destroy at least 50% of the enemy forces to break their assault. If the DropShip fails to escape and the enemy remains intact, our strategic situation will be severely compromised.
+    <detailedBriefing><![CDATA[An allied DropShip has been isolated behind enemy lines, and hostile forces are closing in fast. Your mission is to defend the DropShip until it can lift off or, if necessary, destroy at least 50% of the enemy forces to break their assault. If the DropShip fails to escape and the enemy remains intact, our strategic situation will be severely compromised.
 
 Expect a relentless assault from multiple directions, with enemy units prioritizing disabling the DropShip before it can launch. They may attempt to immobilize it, breach its hull, or delay its departure long enough for reinforcements to arrive. You must hold the line, intercept high-threat targets, and keep the DropShip secure until it achieves liftoff. If the situation demands it, eliminating half of the enemy force will force them to retreat, buying the DropShip a chance to escape.
 
-The enemy will control the field at the end of the engagement, meaning no salvage or recovery will be possible. This is a battle of survival—ensure the DropShip gets out or cripple the enemy so thoroughly that they can no longer threaten it.</detailedBriefing>
+The enemy will control the field at the end of the engagement, meaning no salvage or recovery will be possible. This is a battle of survival—ensure the DropShip gets out or cripple the enemy so thoroughly that they can no longer threaten it.]]></detailedBriefing>
     <battlefieldControl>ENEMY</battlefieldControl>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>
-        <allowedTerrainTypes />
+        <allowedTerrainTypes/>
         <allowRotation>false</allowRotation>
         <baseHeight>0</baseHeight>
         <baseWidth>0</baseWidth>
@@ -42,7 +42,6 @@ The enemy will control the field at the end of the engagement, meaning no salvag
                     <deploymentZone>6</deploymentZone>
                     <deploymentZone>7</deploymentZone>
                     <deploymentZone>8</deploymentZone>
-                    <deploymentZone>9</deploymentZone>
                 </deploymentZones>
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
@@ -53,7 +52,7 @@ The enemy will control the field at the end of the engagement, meaning no salvag
                 <generationOrder>1</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>
-                <objectiveLinkedForces />
+                <objectiveLinkedForces/>
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
@@ -72,17 +71,7 @@ The enemy will control the field at the end of the engagement, meaning no salvag
                 <contributesToMapSize>true</contributesToMapSize>
                 <contributesToUnitCount>false</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
-                <deploymentZones>
-                    <deploymentZone>1</deploymentZone>
-                    <deploymentZone>2</deploymentZone>
-                    <deploymentZone>3</deploymentZone>
-                    <deploymentZone>4</deploymentZone>
-                    <deploymentZone>5</deploymentZone>
-                    <deploymentZone>6</deploymentZone>
-                    <deploymentZone>7</deploymentZone>
-                    <deploymentZone>8</deploymentZone>
-                    <deploymentZone>9</deploymentZone>
-                </deploymentZones>
+                <deploymentZones />
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
@@ -92,21 +81,16 @@ The enemy will control the field at the end of the engagement, meaning no salvag
                 <generationOrder>5</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>
-                <objectiveLinkedForces />
+                <objectiveLinkedForces/>
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
-                <syncDeploymentType>None</syncDeploymentType>
+                <syncDeploymentType>OppositeEdge</syncDeploymentType>
+                <syncedForceName>Player</syncedForceName>
                 <useArtillery>false</useArtillery>
                 <roleChoices>
                     <forceRole>ARTILLERY</forceRole>
-                    <forceRole>MISSILE_ARTILLERY</forceRole>
-                    <forceRole>MIXED_ARTILLERY</forceRole>
                     <forceRole>FIRE_SUPPORT</forceRole>
                     <forceRole>FIRE_SUPPORT</forceRole>
-                    <forceRole>FIRE_SUPPORT</forceRole>
-                    <forceRole>FIRE_SUPPORT</forceRole>
-                    <forceRole>SR_FIRE_SUPPORT</forceRole>
-                    <forceRole>SR_FIRE_SUPPORT</forceRole>
                     <forceRole>SR_FIRE_SUPPORT</forceRole>
                     <forceRole>SR_FIRE_SUPPORT</forceRole>
                 </roleChoices>
@@ -136,7 +120,7 @@ The enemy will control the field at the end of the engagement, meaning no salvag
                 <generationOrder>3</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>
-                <objectiveLinkedForces />
+                <objectiveLinkedForces/>
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
@@ -158,7 +142,7 @@ The enemy will control the field at the end of the engagement, meaning no salvag
             <associatedForceNames>
                 <associatedForceName>DropShip</associatedForceName>
             </associatedForceNames>
-            <associatedUnitIDs />
+            <associatedUnitIDs/>
             <successEffects>
                 <successEffect>
                     <effectType>ScenarioVictory</effectType>
@@ -188,7 +172,7 @@ The enemy will control the field at the end of the engagement, meaning no salvag
             <associatedForceNames>
                 <associatedForceName>OpFor</associatedForceName>
             </associatedForceNames>
-            <associatedUnitIDs />
+            <associatedUnitIDs/>
             <successEffects>
                 <successEffect>
                     <effectType>ScenarioVictory</effectType>
@@ -203,7 +187,7 @@ The enemy will control the field at the end of the engagement, meaning no salvag
                     <howMuch>1</howMuch>
                 </failureEffect>
             </failureEffects>
-            <additionalDetails />
+            <additionalDetails/>
             <description>Destroy, cripple or force to withdraw 50% of the following forces. +1 SVP if succeeded, -1 SVP if failed.</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>ForceWithdraw</objectiveCriterion>

@@ -25,22 +25,26 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
 import static mekhq.campaign.market.contractMarket.ContractAutomation.contractStartPrompt;
-import static mekhq.campaign.universe.Factions.getFactionLogo;
+import static mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR_HR;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Vector;
 import javax.swing.*;
@@ -52,7 +56,7 @@ import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.JToggleButtonPreference;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.client.ui.swing.util.UIUtil;
+import megamek.common.enums.Gender;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -62,8 +66,13 @@ import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.FactionComboBox;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.dialog.resupplyAndCaches.DialogContractStart;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.IntegerStringSorter;
@@ -81,38 +90,38 @@ public class ContractMarketDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(ContractMarketDialog.class);
 
     /* Save these settings between instantiations */
-    private static boolean payMRBC      = true;
-    private static int     advance      = 25;
-    private static int     signingBonus = 0;
-    private static int     sharePct     = 20;
+    private static boolean payMRBC = true;
+    private static int advance = 25;
+    private static int signingBonus = 0;
+    private static int sharePct = 20;
 
-    private Campaign               campaign;
+    private Campaign campaign;
     private AbstractContractMarket contractMarket;
-    private Contract               selectedContract = null;
-    private List<String>           possibleRetainerContracts;
+    private Contract selectedContract = null;
+    private List<String> possibleRetainerContracts;
 
-    private JScrollPane          scrollContractView;
+    private JScrollPane scrollContractView;
     private ContractSummaryPanel contractView;
 
-    private JCheckBox       chkMRBC;
-    private JSpinner        spnSigningBonus;
-    private JSpinner        spnAdvance;
-    private JSpinner        spnSharePct;
-    private JTable          tableContracts;
-    private JLabel          lblCurrentRetainer;
-    private JLabel          lblRetainerEmployer;
-    private JButton         btnEndRetainer;
-    private JLabel          lblRetainerAvailable;
+    private JCheckBox chkMRBC;
+    private JSpinner spnSigningBonus;
+    private JSpinner spnAdvance;
+    private JSpinner spnSharePct;
+    private JTable tableContracts;
+    private JLabel lblCurrentRetainer;
+    private JLabel lblRetainerEmployer;
+    private JButton btnEndRetainer;
+    private JLabel lblRetainerAvailable;
     private FactionComboBox cbRetainerEmployer;
-    private JButton         btnStartRetainer;
+    private JButton btnStartRetainer;
 
     final static ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractMarketDialog",
           MekHQ.getMHQOptions().getLocale());
 
     public ContractMarketDialog(final JFrame frame, final Campaign campaign) {
         super(frame, true);
-        this.campaign             = campaign;
-        contractMarket            = campaign.getContractMarket();
+        this.campaign = campaign;
+        contractMarket = campaign.getContractMarket();
         possibleRetainerContracts = new ArrayList<>();
         if (campaign.getFaction().isMercenary()) {
             countSuccessfulContracts();
@@ -127,7 +136,23 @@ public class ContractMarketDialog extends JDialog {
      * employer results in the offer of a retainer contract.
      */
     private void countSuccessfulContracts() {
+        List<String> retainers = getPossibleRetainerContracts(campaign);
+        for (String key : retainers) {
+            possibleRetainerContracts.add(key);
+        }
+    }
+
+    /**
+     * Returns the list of possible retainer contracts for a mercenary faction.
+     * A retainer contract becomes available when a faction has 6 or more
+     * successful contracts with the same employer.
+     *
+     * @param campaign the campaign to check retainer contracts for
+     * @return the number of available retainer contracts
+     */
+    private static List<String> getPossibleRetainerContracts(Campaign campaign) {
         HashMap<String, Integer> successfulContracts = new HashMap<>();
+        List<String> retainers = new ArrayList<>();
         for (AtBContract contract : campaign.getCompletedAtBContracts()) {
             if (contract.getEmployerCode().equals(campaign.getRetainerEmployerCode())) {
                 continue;
@@ -137,23 +162,49 @@ public class ContractMarketDialog extends JDialog {
         }
         for (String key : successfulContracts.keySet()) {
             if (successfulContracts.get(key) >= 6) {
-                possibleRetainerContracts.add(key);
+                retainers.add(key);
             }
         }
+        return retainers;
+    }
+
+    /**
+     * Returns the total number of contracts available for the given campaign.
+     * This includes regular contracts from the contract market and potential
+     * retainer contracts for mercenary factions.
+     *
+     * @param campaign the campaign to check contracts for
+     * @return the total number of available contracts
+     */
+    public static int getAvailableContractsCount(Campaign campaign) {
+        int contractCount = 0;
+        
+        // Add regular contracts from the contract market
+        AbstractContractMarket contractMarket = campaign.getContractMarket();
+        if (contractMarket != null) {
+            contractCount += contractMarket.getContracts().size();
+        }
+        
+        // Add retainer contracts if faction is mercenary
+        if (campaign.getFaction().isMercenary()) {
+            contractCount += getPossibleRetainerContracts(campaign).size();
+        }
+        
+        return contractCount;
     }
 
     private void initComponents() {
         JScrollPane scrollTableContracts = new JScrollPaneWithSpeed();
         scrollContractView = new JScrollPaneWithSpeed();
-        JPanel panelTable    = new JPanel();
-        JPanel panelFees     = new JPanel();
+        JPanel panelTable = new JPanel();
+        JPanel panelFees = new JPanel();
         JPanel panelRetainer = new JPanel();
-        JPanel panelOKBtns   = new JPanel();
+        JPanel panelOKBtns = new JPanel();
         contractView = null;
         JButton btnGenerate = new JButton();
-        JButton btnRemove   = new JButton();
-        JButton btnAccept   = new JButton();
-        JButton btnClose    = new JButton();
+        JButton btnRemove = new JButton();
+        JButton btnAccept = new JButton();
+        JButton btnClose = new JButton();
 
         chkMRBC = new JCheckBox();
         chkMRBC.addItemListener(evt -> {
@@ -197,8 +248,8 @@ public class ContractMarketDialog extends JDialog {
             sharePct = (Integer) spnSharePct.getValue();
             for (Contract c : contractMarket.getContracts()) {
                 if (campaign.getCampaignOptions().isUseAtB() &&
-                    campaign.getCampaignOptions().isUseShareSystem() &&
-                    c instanceof AtBContract) {
+                          campaign.getCampaignOptions().isUseShareSystem() &&
+                          c instanceof AtBContract) {
                     ((AtBContract) c).setAtBSharesPercent(sharePct);
                     c.calculateContract(campaign);
                 }
@@ -208,12 +259,12 @@ public class ContractMarketDialog extends JDialog {
             }
         });
 
-        lblCurrentRetainer   = new JLabel();
-        lblRetainerEmployer  = new JLabel();
-        btnEndRetainer       = new JButton();
+        lblCurrentRetainer = new JLabel();
+        lblRetainerEmployer = new JLabel();
+        btnEndRetainer = new JButton();
         lblRetainerAvailable = new JLabel();
-        cbRetainerEmployer   = new FactionComboBox();
-        btnStartRetainer     = new JButton();
+        cbRetainerEmployer = new FactionComboBox();
+        btnStartRetainer = new JButton();
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(resourceMap.getString("Form.title"));
@@ -340,10 +391,10 @@ public class ContractMarketDialog extends JDialog {
         GridBagConstraints gbc = new GridBagConstraints();
 
         lblCurrentRetainer.setText(resourceMap.getString("lblCurrentRetainer.text"));
-        gbc.gridx  = 0;
-        gbc.gridy  = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.fill   = GridBagConstraints.NONE;
+        gbc.fill = GridBagConstraints.NONE;
         panelRetainer.add(lblCurrentRetainer, gbc);
         if (null != campaign.getRetainerEmployerCode()) {
             lblRetainerEmployer.setText(Factions.getInstance()
@@ -479,11 +530,7 @@ public class ContractMarketDialog extends JDialog {
 
     /**
      * These need to be migrated to the Suite Constants / Suite Options Setup
-     *
-     * @since 0.50.04
-     * @deprecated Move to Suite Constants / Suite Options Setup
      */
-    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ContractMarketDialog.class);
@@ -516,13 +563,19 @@ public class ContractMarketDialog extends JDialog {
 
     private void acceptContract(ActionEvent evt) {
         if (selectedContract != null) {
-            if (selectedContract instanceof AtBContract) {
+            if (selectedContract instanceof AtBContract contract) {
                 if (!triggerConfirmationDialog()) {
                     return;
                 }
 
                 if (campaign.getCampaignOptions().isUseStratCon()) {
-                    new DialogContractStart(campaign, (AtBContract) selectedContract);
+                    new DialogContractStart(campaign, contract);
+                }
+
+                contract.createEmployerLiaison(campaign);
+
+                if (contract.getEnemy().isClan()) {
+                    contract.createClanOpponent(campaign);
                 }
             }
 
@@ -537,6 +590,27 @@ public class ContractMarketDialog extends JDialog {
             selectedContract.acceptContract(campaign);
             contractStartPrompt(campaign, selectedContract);
 
+            // Process Faction Standings Changes
+            if (campaign.getCampaignOptions().isTrackFactionStanding()) {
+                Faction enemy = null;
+                boolean isGarrisonType = false;
+                if (selectedContract instanceof AtBContract contract) {
+                    enemy = contract.getEnemy();
+                    isGarrisonType = contract.getContractType().isGarrisonType();
+                }
+
+                // Garrison Type contracts have a dynamic enemy. We update Standing whenever a new enemy is chosen.
+                if (!isGarrisonType) {
+                    FactionStandings factionStandings = campaign.getFactionStandings();
+                    List<String> standingsReports = factionStandings.processContractAccept(enemy,
+                          campaign.getLocalDate());
+
+                    for (String standingReport : standingsReports) {
+                        campaign.addReport(standingReport);
+                    }
+                }
+            }
+
             contractMarket.removeContract(selectedContract);
             ((DefaultTableModel) tableContracts.getModel()).removeRow(tableContracts.convertRowIndexToModel(
                   tableContracts.getSelectedRow()));
@@ -550,110 +624,61 @@ public class ContractMarketDialog extends JDialog {
      * @return {@code true} if the accept button is clicked, {@code false} if the refuse button is clicked
      */
     private boolean triggerConfirmationDialog() {
-        final boolean[] result = new boolean[] { true };
-
-        int difficulty = ((AtBContract) selectedContract).calculateContractDifficulty(campaign);
-
-        // Retrieves the title from the resources
-        String title = resourceMap.getString("incomingTransmission.title");
-
-        // An ImageIcon to hold the faction icon
-        ImageIcon icon = getFactionLogo(campaign, ((AtBContract) selectedContract).getEmployerCode(), true);
+        int difficulty = ((AtBContract) selectedContract).getDifficulty();
 
         // Get the resource string
-        String resourceKey = "";
+        String inCharacterResourceKey = "";
+        String outOfCharacterResourceKey = null;
 
-        if (difficulty == -99) {
-            resourceKey = "messageChallengeUnknown.text";
-        } else if (difficulty <= 2) {
-            resourceKey = "messageChallengeVeryEasy.text";
-        } else if (difficulty > 8) {
-            resourceKey = "messageChallengeVeryHard.text";
-        } else if (difficulty > 6) {
-            resourceKey = "messageChallengeHard.text";
-        }
 
-        if (((AtBContract) selectedContract).getContractType().isGarrisonDuty()) {
-            resourceKey = "messageChallengeGarrison.text";
+        AtBContractType contractType = ((AtBContract) selectedContract).getContractType();
+        if (contractType.isGarrisonDuty()) {
+            inCharacterResourceKey = "messageChallengeGarrison.inCharacter";
+            outOfCharacterResourceKey = "messageChallengeGarrison.outOfCharacter";
+        } else if (contractType.isGuerrillaWarfare()) {
+            inCharacterResourceKey = "messageChallengeGuerrilla.inCharacter";
+            outOfCharacterResourceKey = "messageChallengeGuerrilla.outOfCharacter";
+        } else {
+            if (difficulty == -99) {
+                inCharacterResourceKey = "messageChallengeUnknown.inCharacter";
+                outOfCharacterResourceKey = "messageChallengeUnknown.outOfCharacter";
+            } else if (difficulty <= 2) {
+                inCharacterResourceKey = "messageChallengeVeryEasy.inCharacter";
+                outOfCharacterResourceKey = "messageChallengeVeryEasy.outOfCharacter";
+            } else if (difficulty > 8) {
+                inCharacterResourceKey = "messageChallengeVeryHard.inCharacter";
+                outOfCharacterResourceKey = "messageChallengeVeryHard.outOfCharacter";
+            } else if (difficulty > 6) {
+                inCharacterResourceKey = "messageChallengeHard.inCharacter";
+                outOfCharacterResourceKey = "messageChallengeHard.outOfCharacter";
+            }
         }
 
         // If resourceKey is not found, just return true, acting as if the player had
         // accepted the mission
-        if (resourceKey.isEmpty()) {
+        if (inCharacterResourceKey.isBlank()) {
             return true;
         }
 
-        String messageResource = resourceMap.getString(resourceKey);
+        Person speaker = campaign.newPerson(ADMINISTRATOR_HR,
+              ((AtBContract) selectedContract).getEmployerCode(),
+              Gender.RANDOMIZE);
 
-        // Format the HTML message
-        String message = String.format("<html><i><div style='width: %s; text-align:center;'>%s</div></i></html>",
-              UIUtil.scaleForGUI(500),
-              messageResource);
+        String inCharacterMessage = resourceMap.getString(inCharacterResourceKey);
+        String outOfCharacterMessage = resourceMap.getString(outOfCharacterResourceKey);
 
-        // If no message for provided difficulty, act as if the player had accepted the
-        // mission.
-        if (message.isBlank()) {
-            return true;
-        }
+        List<String> options = List.of(resourceMap.getString("button.cancel"), resourceMap.getString("button.accept"));
 
-        // Create a text pane to display the message
-        JTextPane textPane = new JTextPane();
-        textPane.setContentType("text/html");
-        textPane.setText(message);
-        textPane.setEditable(false);
+        ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
+              speaker,
+              null,
+              inCharacterMessage,
+              options,
+              outOfCharacterMessage,
+              null,
+              false);
 
-        // Create a panel to display the icon and the message
-        JPanel panel      = new JPanel(new BorderLayout());
-        JLabel imageLabel = new JLabel(icon);
-        panel.add(imageLabel, BorderLayout.CENTER);
-        panel.add(textPane, BorderLayout.SOUTH);
-
-        // Create a custom dialog
-        JDialog dialog = new JDialog();
-        dialog.setTitle(title);
-        dialog.setLayout(new BorderLayout());
-
-        // Create an accept button and add its action listener.
-        // When clicked, it will set the result to true and close the dialog
-        JButton acceptButton = new JButton(resourceMap.getString("responseAccept.text"));
-        acceptButton.addActionListener(e -> {
-            result[0] = true;
-            dialog.dispose();
-        });
-
-        // Create a refuse button and add its action listener.
-        // When clicked, it will trigger a refusal confirmation dialog
-        String  refusalOption = resourceMap.getString("responseReturn.text");
-        JButton refuseButton  = new JButton(refusalOption);
-        refuseButton.addActionListener(e -> {
-            result[0] = false;
-            dialog.dispose();
-        });
-
-        // Attach a window listener
-        dialog.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                result[0] = false;
-                dialog.dispose();
-            }
-        });
-
-        // Create a panel for buttons and add buttons to it
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.add(acceptButton);
-        buttonPanel.add(refuseButton);
-
-        // Add the original panel and button panel to the dialog
-        dialog.add(panel, BorderLayout.CENTER);
-        dialog.add(buttonPanel, BorderLayout.SOUTH);
-
-        dialog.pack(); // Size the dialog to fit the preferred size and layouts of its components
-        dialog.setLocationRelativeTo(null); // Center the dialog on the screen
-        dialog.setModal(true); // Make the dialog block user input to other top-level windows
-        dialog.setVisible(true);
-
-        return result[0];
+        return dialog.getDialogChoice() != 0;
     }
 
     private void btnCloseActionPerformed(ActionEvent evt) {
@@ -688,8 +713,8 @@ public class ContractMarketDialog extends JDialog {
         contractView = new ContractSummaryPanel(selectedContract,
               campaign,
               campaign.getCampaignOptions().isUseAtB() &&
-              selectedContract instanceof AtBContract &&
-              !((AtBContract) selectedContract).isSubcontract());
+                    selectedContract instanceof AtBContract &&
+                    !((AtBContract) selectedContract).isSubcontract());
         scrollContractView.setViewportView(contractView);
         // This odd code is to make sure that the scrollbar stays at the top
         // I can't just call it here, because it ends up getting reset somewhere later

@@ -24,28 +24,53 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import javax.swing.DropMode;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTree;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+import javax.swing.tree.TreeSelectionModel;
+
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
-import mekhq.campaign.event.*;
+import mekhq.campaign.event.DeploymentChangedEvent;
+import mekhq.campaign.event.NetworkChangedEvent;
+import mekhq.campaign.event.OrganizationChangedEvent;
+import mekhq.campaign.event.PersonChangedEvent;
+import mekhq.campaign.event.PersonRemovedEvent;
+import mekhq.campaign.event.ScenarioResolvedEvent;
+import mekhq.campaign.event.UnitChangedEvent;
+import mekhq.campaign.event.UnitRemovedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.TOEMouseAdapter;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.handler.TOETransferHandler;
 import mekhq.gui.model.CrewListModel;
 import mekhq.gui.model.OrgTreeModel;
+import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.view.ForceViewPanel;
 import mekhq.gui.view.PersonViewPanel;
 import mekhq.gui.view.UnitViewPanel;
-
-import javax.swing.*;
-import javax.swing.tree.TreeSelectionModel;
-import java.awt.*;
 
 /**
  * Display organization tree (TO&amp;E) and force/unit summary
@@ -76,7 +101,7 @@ public final class TOETab extends CampaignGuiTab {
     public void initTab() {
         setLayout(new GridBagLayout());
 
-        orgModel = new OrgTreeModel(getCampaign());
+        OrgTreeModel orgModel = new OrgTreeModel(getCampaign());
         orgTree = new JTree(orgModel);
         orgTree.getAccessibleContext().setAccessibleName("Table of Organization and Equipment (TOE)");
         TOEMouseAdapter.connect(getCampaignGui(), orgTree);
@@ -87,6 +112,17 @@ public final class TOETab extends CampaignGuiTab {
         orgTree.setDragEnabled(true);
         orgTree.setDropMode(DropMode.ON);
         orgTree.setTransferHandler(new TOETransferHandler(getCampaignGui()));
+        orgTree.setBorder(RoundedLineBorder.createRoundedLineBorder());
+        orgTree.setFocusable(false);
+
+        JPanel pnlTutorial = new TutorialHyperlinkPanel("toeTab");
+
+        JPanel leftPanel = new JPanel(new BorderLayout());
+        leftPanel.setBorder(null);
+        JScrollPane orgScrollPane = new JScrollPane(orgTree);
+        orgScrollPane.setBorder(null);
+        leftPanel.add(orgScrollPane, BorderLayout.CENTER);
+        leftPanel.add(pnlTutorial, BorderLayout.SOUTH);
 
         panForceView = new JPanel();
         panForceView.getAccessibleContext().setAccessibleName("Selected Force Viewer");
@@ -94,8 +130,7 @@ public final class TOETab extends CampaignGuiTab {
         panForceView.setPreferredSize(new Dimension(550, 600));
         panForceView.setLayout(new BorderLayout());
 
-        JScrollPane scrollOrg = new JScrollPaneWithSpeed(orgTree);
-        splitOrg = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollOrg, panForceView);
+        splitOrg = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, panForceView);
         splitOrg.setOneTouchExpandable(true);
         splitOrg.setResizeWeight(1.0);
         splitOrg.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> refreshForceView());
@@ -143,6 +178,7 @@ public final class TOETab extends CampaignGuiTab {
                 JPanel crewPanel = new JPanel(new BorderLayout());
                 crewPanel.getAccessibleContext().setAccessibleName("Crew for " + u.getName());
                 final JScrollPane scrollPerson = new JScrollPaneWithSpeed();
+                scrollPerson.setBorder(null);
                 crewPanel.add(scrollPerson, BorderLayout.CENTER);
                 CrewListModel model = new CrewListModel();
                 model.setData(u);
@@ -170,7 +206,9 @@ public final class TOETab extends CampaignGuiTab {
                 });
                 crewList.setSelectedIndex(0);
                 if (crewSize > 1) {
-                    crewPanel.add(new JScrollPaneWithSpeed(crewList), BorderLayout.NORTH);
+                    JScrollPaneWithSpeed crewScrollPane = new JScrollPaneWithSpeed(crewList);
+                    crewScrollPane.setBorder(null);
+                    crewPanel.add(crewScrollPane, BorderLayout.NORTH);
                 }
                 String name = "Crew";
                 if (u.usesSoloPilot()) {
@@ -181,6 +219,7 @@ public final class TOETab extends CampaignGuiTab {
                 SwingUtilities.invokeLater(() -> scrollPerson.getVerticalScrollBar().setValue(0));
             }
             final JScrollPane scrollUnit = new JScrollPaneWithSpeed(new UnitViewPanel(u, getCampaign()));
+            scrollUnit.setBorder(null);
             tabUnit.add("Unit", scrollUnit);
             panForceView.add(tabUnit, BorderLayout.CENTER);
             SwingUtilities.invokeLater(() -> scrollUnit.getVerticalScrollBar().setValue(0));
@@ -192,7 +231,9 @@ public final class TOETab extends CampaignGuiTab {
             // to not select the unit in the TO&E.
         } else if (node instanceof Force) {
             final JScrollPane scrollForce = new JScrollPaneWithSpeed(new ForceViewPanel((Force) node, getCampaign()));
+            scrollForce.setBorder(null);
             panForceView.add(scrollForce, BorderLayout.CENTER);
+            panForceView.setBorder(null);
             SwingUtilities.invokeLater(() -> scrollForce.getVerticalScrollBar().setValue(0));
         }
         panForceView.updateUI();

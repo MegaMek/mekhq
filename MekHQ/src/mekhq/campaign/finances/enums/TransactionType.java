@@ -35,14 +35,14 @@ import mekhq.MekHQ;
 public enum TransactionType {
     // region Enum Declarations
     BATTLE_LOSS_COMPENSATION("TransactionType.BATTLE_LOSS_COMPENSATION.text",
-            "TransactionType.BATTLE_LOSS_COMPENSATION.toolTipText"),
+          "TransactionType.BATTLE_LOSS_COMPENSATION.toolTipText"),
     CONSTRUCTION("TransactionType.CONSTRUCTION.text", "TransactionType.CONSTRUCTION.toolTipText"),
     CONTRACT_PAYMENT("TransactionType.CONTRACT_PAYMENT.text", "TransactionType.CONTRACT_PAYMENT.toolTipText"),
     EDUCATION("TransactionType.EDUCATION.text", "TransactionType.EDUCATION.toolTipText"),
     EQUIPMENT_PURCHASE("TransactionType.EQUIPMENT_PURCHASE.text", "TransactionType.EQUIPMENT_PURCHASE.toolTipText"),
     EQUIPMENT_SALE("TransactionType.EQUIPMENT_SALE.text", "TransactionType.EQUIPMENT_SALE.toolTipText"),
     FINANCIAL_TERM_END_CARRYOVER("TransactionType.FINANCIAL_TERM_END_CARRYOVER.text",
-            "TransactionType.FINANCIAL_TERM_END_CARRYOVER.toolTipText"),
+          "TransactionType.FINANCIAL_TERM_END_CARRYOVER.toolTipText"),
     FINE("TransactionType.FINE.text", "TransactionType.FINE.toolTipText"),
     LOAN_PAYMENT("TransactionType.LOAN_PAYMENT.text", "TransactionType.LOAN_PAYMENT.toolTipText"),
     LOAN_PRINCIPAL("TransactionType.LOAN_PRINCIPAL.text", "TransactionType.LOAN_PRINCIPAL.toolTipText"),
@@ -64,7 +64,8 @@ public enum TransactionType {
     TRANSPORTATION("TransactionType.TRANSPORTATION.text", "TransactionType.TRANSPORTATION.toolTipText"),
     UNIT_PURCHASE("TransactionType.UNIT_PURCHASE.text", "TransactionType.UNIT_PURCHASE.toolTipText"),
     UNIT_SALE("TransactionType.UNIT_SALE.text", "TransactionType.UNIT_SALE.toolTipText"),
-    BONUS_EXCHANGE("TransactionType.BONUS_EXCHANGE.text", "TransactionType.BONUS_EXCHANGE.toolTipText");
+    BONUS_EXCHANGE("TransactionType.BONUS_EXCHANGE.text", "TransactionType.BONUS_EXCHANGE.toolTipText"),
+    WEALTH("TransactionType.WEALTH.text", "TransactionType.WEALTH.toolTipText");
     // endregion Enum Declarations
 
     // region Variable Declarations
@@ -75,7 +76,7 @@ public enum TransactionType {
     // region Constructors
     TransactionType(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Finances",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
@@ -203,6 +204,10 @@ public enum TransactionType {
     public boolean isBonusExchange() {
         return this == BONUS_EXCHANGE;
     }
+
+    public boolean isWealth() {
+        return this == WEALTH;
+    }
     // endregion Boolean Comparison Methods
 
     // region File I/O
@@ -211,11 +216,6 @@ public enum TransactionType {
             return valueOf(text);
         } catch (Exception ignored) {
 
-        }
-
-        // 0.49.8 Migration
-        if ("CARRYOVER".equals(text)) {
-            return FINANCIAL_TERM_END_CARRYOVER;
         }
 
         try {
@@ -264,6 +264,8 @@ public enum TransactionType {
                     return TAXES;
                 case 21:
                     return BONUS_EXCHANGE;
+                case 22:
+                    return WEALTH;
                 default:
                     break;
             }
@@ -272,7 +274,7 @@ public enum TransactionType {
         }
 
         MMLogger.create(TransactionType.class)
-                .error("Unable to parse " + text + " into a TransactionType. Returning MISCELLANEOUS.");
+              .error("Unable to parse " + text + " into a TransactionType. Returning MISCELLANEOUS.");
         return MISCELLANEOUS;
     }
     // endregion File I/O

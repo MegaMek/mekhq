@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq;
 
@@ -50,7 +55,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final int FACTION_GENERATOR_BORDER_RANGE_CLAN = 90;
     public static final int FACTION_GENERATOR_BORDER_RANGE_NEAR_PERIPHERY = 90;
     public static final int FACTION_GENERATOR_BORDER_RANGE_DEEP_PERIPHERY = 210; // a bit more than this distance
-                                                                                 // between HL and NC
+    // between HL and NC
     public static final LocalDate FORTRESS_REPUBLIC = LocalDate.of(3135, Month.NOVEMBER, 1);
     // endregion Faction Generation Constants
 
@@ -66,12 +71,13 @@ public final class MHQConstants extends SuiteConstants {
     public static final String LONG_DISPLAY_DATE_FORMAT = "longDisplayDateFormat";
     public static final String HISTORICAL_DAILY_LOG = "historicalDailyLog";
     public static final int MAX_HISTORICAL_LOG_DAYS = 120; // max number of days that will be stored in the history,
-                                                           // also used as a limit in the UI
+    // also used as a limit in the UI
     public static final String COMPANY_GENERATOR_STARTUP = "companyGeneratorStartup";
     public static final String SHOW_COMPANY_GENERATOR = "showCompanyGenerator";
     public static final String SHOW_UNIT_PICTURES_ON_TOE = "showUnitPicturesOnTOE";
 
     // region Command Center Tab
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public static final String COMMAND_CENTER_USE_UNIT_MARKET = "commandCenterUseUnitMarket";
     public static final String COMMAND_CENTER_MRMS = "commandCenterMRMS";
     // endregion Command Center Tab
@@ -132,6 +138,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String FATIGUED_BACKGROUND = "fatiguedBackground";
     public static final String STRATCON_HEX_COORD_FOREGROUND = "stratconHexCoordForeground";
     public static final String FONT_COLOR_NEGATIVE = "fontColorNegative";
+    public static final String FONT_COLOR_AMAZING = "fontColorAmazing";
     public static final String FONT_COLOR_POSITIVE = "fontColorPositive";
     public static final String FONT_COLOR_WARNING = "fontColorWarning";
     public static final String FONT_COLOR_SKILL_ULTRAGREEN = "fontColorSkillUltraGreen";
@@ -153,7 +160,8 @@ public final class MHQConstants extends SuiteConstants {
     public static final String SAVE_WEEKLY_KEY = "saveWeekly";
     public static final String SAVE_MONTHLY_KEY = "saveMonthly";
     public static final String SAVE_YEARLY_KEY = "saveYearly";
-    public static final String SAVE_BEFORE_MISSIONS_KEY = "saveBeforeMissions";
+    public static final String SAVE_BEFORE_SCENARIOS_KEY = "saveBeforeScenarios";
+    public static final String SAVE_BEFORE_MISSION_END = "saveBeforeMissionEnd";
     public static final String MAXIMUM_NUMBER_SAVES_KEY = "maximumNumberAutoSaves";
     public static final int DEFAULT_NUMBER_SAVES = 5;
     // endregion Autosave
@@ -182,6 +190,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String UNIT_SPRITE_EXPORT_DIRECTORY_PATH = "unitSpriteExportDirectoryPath";
     public static final String LAYERED_FORCE_ICON_DIRECTORY_PATH = "layeredForceIconDirectoryPath";
     public static final String COMPANY_GENERATION_DIRECTORY_PATH = "companyGenerationDirectoryPath";
+    public static final String LAUNCHER_NEW_PLAYER_QUICKSTART_PATH = "campaigns/The Learning Ropes.cpnx.gz";
     // endregion File Paths
 
     // region Nag Tab
@@ -203,6 +212,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String NAG_UNABLE_TO_AFFORD_EXPENSES = "nagUnableToAffordExpenses";
     public static final String NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT = "nagUnableToAffordLoanPayment";
     public static final String NAG_UNABLE_TO_AFFORD_JUMP = "nagUnableToAffordJump";
+    public static final String NAG_UNABLE_TO_AFFORD_SHOPPING_LIST = "nagUnableToAffordShoppingList";
     // endregion Nag Tab
 
     // region Miscellaneous Options
@@ -250,21 +260,25 @@ public final class MHQConstants extends SuiteConstants {
     public static final String LAYERED_FORCE_ICON_BATTLEMEK_CENTER_FILENAME = "BattleMek (Center).png";
     public static final String CUSTOM_MEKFILES_DIRECTORY_PATH = "data/mekfiles/customs/";
     public static final String AWARDS_DIRECTORY_PATH = "data/universe/awards/";
+    public static final String AWARDS_IMAGE_DIRECTORY_PATH = "data/images/awards";
     public static final String ACADEMY_DIRECTORY_PATH = "data/universe/academies/";
     public static final String RATINFO_DIR = "data/universe/ratdata/";
     public static final String ERAS_FILE_PATH = "data/universe/eras.xml";
     public static final String FACTION_HINTS_FILE = "data/universe/factionhints.xml";
     public static final String FINANCIAL_INSTITUTIONS_FILE_PATH = "data/universe/financialInstitutions.xml";
+    public static final String FINANCIAL_CURRENCIES_FILE_PATH = "data/universe/currencies.xml";
     public static final String RANDOM_DEATH_CAUSES_FILE_PATH = "data/universe/randomDeathCauses.xml";
     public static final String RANKS_FILE_PATH = "data/universe/ranks.xml";
-    public static final String CAMPAIGN_PRESET_DIRECTORY = "mmconf/campaignPresets/";
+    public static final String CAMPAIGN_PRESET_DIRECTORY = "data/campaignPresets/";
     public static final String USER_FINANCIAL_INSTITUTIONS_FILE_PATH = "userdata/data/universe/financialInstitutions.xml";
     public static final String USER_RANDOM_DEATH_CAUSES_FILE_PATH = "userdata/data/universe/randomDeathCauses.xml";
     public static final String USER_RANKS_FILE_PATH = "userdata/data/universe/ranks.xml";
-    public static final String USER_CAMPAIGN_PRESET_DIRECTORY = "userdata/mmconf/campaignPresets/";
+    public static final String USER_CAMPAIGN_PRESET_DIRECTORY = "userdata/data/campaignPresets/";
     public static final String STRATCON_MUL_FILES_DIRECTORY = "data/scenariotemplates/fixedmuls/";
     public static final String PLANETARY_SYSTEM_DIRECTORY_PATH = "data/universe/planetary_systems";
     public static final String FORCE_ICON_PATH = "data/images/force";
+    public static final String PERSONNEL_MARKET_DIRECTORY_PATH = "data/universe/markets/personnelMarket/";
+    public static final String MAPGEN_PATH = "data/mapgen";
 
     // region StratCon
     public static final String STRATCON_REQUIRED_HOSTILE_FACILITY_MODS = "./data/scenariomodifiers/requiredHostileFacilityModifiers.xml";
@@ -310,17 +324,31 @@ public final class MHQConstants extends SuiteConstants {
     // endregion StoryArcs
 
     // region Backgrounds
-    public static final String NAME_MIDDLE_WORD_CORPORATE = Paths.get("data/universe/backgrounds/randomCompanyNameGenerator/middleWordCorporate.csv").toString();
-    public static final String NAME_MIDDLE_WORD_CORPORATE_USER = Paths.get("userdata/data/universe/backgrounds/randomCompanyNameGenerator/middleWordCorporate.csv").toString();
-    public static final String NAME_END_WORD_CORPORATE = Paths.get("data/universe/backgrounds/randomCompanyNameGenerator/endWordCorporate.csv").toString();
-    public static final String NAME_END_WORD_CORPORATE_USER = Paths.get("userdata/data/universe/backgrounds/randomCompanyNameGenerator/endWordCorporate.csv").toString();
-    public static final String NAME_MIDDLE_WORD_MERCENARY = Paths.get("data/universe/backgrounds/randomCompanyNameGenerator/middleWordMercenary.csv").toString();
-    public static final String NAME_MIDDLE_WORD_MERCENARY_USER = Paths.get("userdata/data/universe/backgrounds/randomCompanyNameGenerator/middleWordMercenary.csv").toString();
-    public static final String NAME_END_WORD_MERCENARY = Paths.get("data/universe/backgrounds/randomCompanyNameGenerator/endWordMercenary.csv").toString();
-    public static final String NAME_END_WORD_MERCENARY_USER = Paths.get("userdata/data/universe/backgrounds/randomCompanyNameGenerator/endWordMercenary.csv").toString();
-    public static final String NAME_PRE_FAB = Paths.get("data/universe/backgrounds/randomCompanyNameGenerator/preFab.csv").toString();
-    public static final String NAME_PRE_FAB_USER = Paths.get("userdata/data/universe/backgrounds/randomCompanyNameGenerator/preFab.csv").toString();
+    public static final String NAME_MIDDLE_WORD_CORPORATE = Paths.get(
+          "data/universe/backgrounds/randomCompanyNameGenerator/middleWordCorporate.csv").toString();
+    public static final String NAME_MIDDLE_WORD_CORPORATE_USER = Paths.get(
+          "userdata/data/universe/backgrounds/randomCompanyNameGenerator/middleWordCorporate.csv").toString();
+    public static final String NAME_END_WORD_CORPORATE = Paths.get(
+          "data/universe/backgrounds/randomCompanyNameGenerator/endWordCorporate.csv").toString();
+    public static final String NAME_END_WORD_CORPORATE_USER = Paths.get(
+          "userdata/data/universe/backgrounds/randomCompanyNameGenerator/endWordCorporate.csv").toString();
+    public static final String NAME_MIDDLE_WORD_MERCENARY = Paths.get(
+          "data/universe/backgrounds/randomCompanyNameGenerator/middleWordMercenary.csv").toString();
+    public static final String NAME_MIDDLE_WORD_MERCENARY_USER = Paths.get(
+          "userdata/data/universe/backgrounds/randomCompanyNameGenerator/middleWordMercenary.csv").toString();
+    public static final String NAME_END_WORD_MERCENARY = Paths.get(
+          "data/universe/backgrounds/randomCompanyNameGenerator/endWordMercenary.csv").toString();
+    public static final String NAME_END_WORD_MERCENARY_USER = Paths.get(
+          "userdata/data/universe/backgrounds/randomCompanyNameGenerator/endWordMercenary.csv").toString();
+    public static final String NAME_PRE_FAB = Paths.get(
+          "data/universe/backgrounds/randomCompanyNameGenerator/preFab.csv").toString();
+    public static final String NAME_PRE_FAB_USER = Paths.get(
+          "userdata/data/universe/backgrounds/randomCompanyNameGenerator/preFab.csv").toString();
     // endregion Backgrounds
 
     // endregion File Paths
+
+    // startregion Important Dates
+    public static final LocalDate BATTLE_OF_TUKAYYID = LocalDate.of(3052, 5, 21);
+    // endregion Important Dates
 }

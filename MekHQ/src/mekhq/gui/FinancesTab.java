@@ -24,8 +24,40 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui;
+
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.ResourceBundle;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.JTextArea;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 import megamek.common.event.Subscribe;
 import mekhq.MHQConstants;
@@ -38,13 +70,15 @@ import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.Contract;
 import mekhq.gui.adapter.FinanceTableMouseAdapter;
 import mekhq.gui.adapter.LoanTableMouseAdapter;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.AddFundsDialog;
 import mekhq.gui.dialog.ManageAssetsDialog;
 import mekhq.gui.dialog.NewLoanDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.FinanceTableModel;
 import mekhq.gui.model.LoanTableModel;
-import mekhq.gui.sorter.*;
+import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -62,18 +96,6 @@ import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.XYDataset;
 
-import javax.swing.*;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
-
-import java.awt.*;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.ResourceBundle;
-
 /**
  * Shows record of financial transactions.
  */
@@ -81,14 +103,14 @@ public final class FinancesTab extends CampaignGuiTab {
     private JTable financeTable;
     private JTable loanTable;
     private JTextArea areaNetWorth;
-    private JButton btnAddFunds;
-    private JButton btnManageAssets;
+    private RoundedJButton btnAddFunds;
+    private RoundedJButton btnManageAssets;
 
     private FinanceTableModel financeModel;
     private LoanTableModel loanModel;
 
     private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.FinancesTab",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
 
     //region Constructors
     public FinancesTab(CampaignGUI gui, String name) {
@@ -146,6 +168,7 @@ public final class FinancesTab extends CampaignGuiTab {
         loanTable.setIntercellSpacing(new Dimension(0, 0));
         loanTable.setShowGrid(false);
         JScrollPane scrollLoanTable = new JScrollPaneWithSpeed(loanTable);
+        scrollLoanTable.setBorder(null);
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -155,9 +178,11 @@ public final class FinancesTab extends CampaignGuiTab {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         JPanel panBalance = new JPanel(new GridBagLayout());
-        panBalance.add(new JScrollPaneWithSpeed(financeTable), gridBagConstraints);
+        JScrollPane scrollFinanceTable = new JScrollPaneWithSpeed(financeTable);
+        scrollFinanceTable.setBorder(null);
+        panBalance.add(scrollFinanceTable, gridBagConstraints);
         panBalance.setMinimumSize(new Dimension(350, 100));
-        panBalance.setBorder(BorderFactory.createTitledBorder("Balance Sheet"));
+        panBalance.setBorder(RoundedLineBorder.createRoundedLineBorder("Balance Sheet"));
         JPanel panLoan = new JPanel(new GridBagLayout());
         panLoan.add(scrollLoanTable, gridBagConstraints);
 
@@ -187,15 +212,15 @@ public final class FinancesTab extends CampaignGuiTab {
         JPanel panelFinanceRight = new JPanel(new BorderLayout());
 
         JPanel pnlFinanceBtns = new JPanel(new GridLayout(2, 2));
-        btnAddFunds = new JButton("Add Transaction (GM)");
+        btnAddFunds = new RoundedJButton("Add Transaction (GM)");
         btnAddFunds.addActionListener(ev -> addFundsActionPerformed());
         btnAddFunds.setEnabled(getCampaign().isGM());
         pnlFinanceBtns.add(btnAddFunds);
-        JButton btnGetLoan = new JButton("Get Loan");
+        RoundedJButton btnGetLoan = new RoundedJButton("Get Loan");
         btnGetLoan.addActionListener(e -> showNewLoanDialog());
         pnlFinanceBtns.add(btnGetLoan);
 
-        btnManageAssets = new JButton("Manage Assets (GM)");
+        btnManageAssets = new RoundedJButton("Manage Assets (GM)");
         btnManageAssets.addActionListener(e -> manageAssets());
         btnManageAssets.setEnabled(getCampaign().isGM());
         pnlFinanceBtns.add(btnManageAssets);
@@ -210,9 +235,10 @@ public final class FinancesTab extends CampaignGuiTab {
         areaNetWorth.setEditable(false);
 
         JScrollPane descriptionScroll = new JScrollPaneWithSpeed(areaNetWorth);
+        descriptionScroll.setBorder(RoundedLineBorder.createRoundedLineBorder());
         panelFinanceRight.add(descriptionScroll, BorderLayout.CENTER);
         areaNetWorth.setCaretPosition(0);
-        descriptionScroll.setMinimumSize(new Dimension(300, 200));
+        descriptionScroll.setMinimumSize(scaleForGUI(400, 200));
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -237,7 +263,7 @@ public final class FinancesTab extends CampaignGuiTab {
             // we use addOrUpdate() which assumes transactions are in sequential order by date so we always have the most
             // up-to-date entry for each day
             s1.addOrUpdate(new Day(date.getDayOfMonth(), date.getMonth().getValue(), date.getYear()),
-                    balance.getAmount().doubleValue());
+                  balance.getAmount().doubleValue());
         }
 
         TimeSeriesCollection dataset = new TimeSeriesCollection();
@@ -248,7 +274,7 @@ public final class FinancesTab extends CampaignGuiTab {
 
     private CategoryDataset setupMonthlyDataset() {
         final DateTimeFormatter df = DateTimeFormatter.ofPattern("MMM-yyyy")
-                .withLocale(MekHQ.getMHQOptions().getDateLocale());
+                                           .withLocale(MekHQ.getMHQOptions().getDateLocale());
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
         List<Transaction> transactions = getCampaign().getFinances().getTransactions();
 
@@ -267,8 +293,12 @@ public final class FinancesTab extends CampaignGuiTab {
             } else {
                 // as long as we're not at the first transaction, add the previous month and reset
                 if (i != 0) {
-                    dataset.addValue(monthlyRevenue.getAmount().doubleValue(), resourceMap.getString("graphMonthlyRevenue.text"), pastMonthYear);
-                    dataset.addValue(monthlyExpenditures.getAmount().doubleValue(), resourceMap.getString("graphMonthlyExpenditures.text"), pastMonthYear);
+                    dataset.addValue(monthlyRevenue.getAmount().doubleValue(),
+                          resourceMap.getString("graphMonthlyRevenue.text"),
+                          pastMonthYear);
+                    dataset.addValue(monthlyExpenditures.getAmount().doubleValue(),
+                          resourceMap.getString("graphMonthlyExpenditures.text"),
+                          pastMonthYear);
                     monthlyRevenue = Money.zero();
                     monthlyExpenditures = Money.zero();
                 }
@@ -282,8 +312,12 @@ public final class FinancesTab extends CampaignGuiTab {
 
             // if we're at the last transaction, save it off
             if (i == transactions.size() - 1) {
-                dataset.addValue(monthlyRevenue.getAmount().doubleValue(), resourceMap.getString("graphMonthlyRevenue.text"), pastMonthYear);
-                dataset.addValue(monthlyExpenditures.getAmount().doubleValue(), resourceMap.getString("graphMonthlyExpenditures.text"), pastMonthYear);
+                dataset.addValue(monthlyRevenue.getAmount().doubleValue(),
+                      resourceMap.getString("graphMonthlyRevenue.text"),
+                      pastMonthYear);
+                dataset.addValue(monthlyExpenditures.getAmount().doubleValue(),
+                      resourceMap.getString("graphMonthlyExpenditures.text"),
+                      pastMonthYear);
             }
         }
 
@@ -304,11 +338,10 @@ public final class FinancesTab extends CampaignGuiTab {
     }
 
     private JFreeChart createAmountChart(XYDataset dataset) {
-        JFreeChart chart = ChartFactory.createTimeSeriesChart(
-            "", // title
-            resourceMap.getString("graphDate.text"), // x-axis label
-            resourceMap.getString("graphCBills.text"), // y-axis label
-            dataset);
+        JFreeChart chart = ChartFactory.createTimeSeriesChart("", // title
+              resourceMap.getString("graphDate.text"), // x-axis label
+              resourceMap.getString("graphCBills.text"), // y-axis label
+              dataset);
 
         chart.setBackgroundPaint(Color.WHITE);
 
@@ -336,11 +369,10 @@ public final class FinancesTab extends CampaignGuiTab {
     }
 
     private JFreeChart createMonthlyChart(CategoryDataset dataset) {
-        JFreeChart chart = ChartFactory.createBarChart(
-            "", // title
-            resourceMap.getString("graphDate.text"), // x-axis label
-            resourceMap.getString("graphCBills.text"), // y-axis label
-            dataset);
+        JFreeChart chart = ChartFactory.createBarChart("", // title
+              resourceMap.getString("graphDate.text"), // x-axis label
+              resourceMap.getString("graphCBills.text"), // y-axis label
+              dataset);
 
         chart.setBackgroundPaint(Color.WHITE);
 
@@ -374,7 +406,8 @@ public final class FinancesTab extends CampaignGuiTab {
         addFundsDialog.setVisible(true);
         if (addFundsDialog.getClosedType() == JOptionPane.OK_OPTION) {
             getCampaign().addFunds(addFundsDialog.getTransactionType(),
-                    addFundsDialog.getFundsQuantityField(), addFundsDialog.getFundsDescription());
+                  addFundsDialog.getFundsQuantityField(),
+                  addFundsDialog.getFundsDescription());
         }
     }
 
@@ -412,49 +445,57 @@ public final class FinancesTab extends CampaignGuiTab {
         Money assets = r.getTotalAssets();
         Money netWorth = r.getNetWorth();
 
-        int longest = Math.max(
-                liabilities.toAmountAndSymbolString().length(),
-                assets.toAmountAndSymbolString().length());
-        longest = Math.max(
-                netWorth.toAmountAndSymbolString().length(),
-                longest);
+        int longest = Math.max(liabilities.toAmountAndSymbolString().length(),
+              assets.toAmountAndSymbolString().length());
+        longest = Math.max(netWorth.toAmountAndSymbolString().length(), longest);
         String formatted = "%1$" + longest + 's';
         sb.append("Net Worth................ ")
-                .append(String.format(formatted, netWorth.toAmountAndSymbolString())).append("\n\n");
+              .append(String.format(formatted, netWorth.toAmountAndSymbolString()))
+              .append("\n\n");
         sb.append("    Assets............... ")
-                .append(String.format(formatted, assets.toAmountAndSymbolString())).append('\n');
+              .append(String.format(formatted, assets.toAmountAndSymbolString()))
+              .append('\n');
         sb.append("       Cash.............. ")
-                .append(String.format(formatted, r.getCash().toAmountAndSymbolString())).append('\n');
+              .append(String.format(formatted, r.getCash().toAmountAndSymbolString()))
+              .append('\n');
         if (r.getMekValue().isPositive()) {
             sb.append("       Meks............. ")
-                    .append(String.format(formatted, r.getMekValue().toAmountAndSymbolString())).append('\n');
+                  .append(String.format(formatted, r.getMekValue().toAmountAndSymbolString()))
+                  .append('\n');
         }
         if (r.getVeeValue().isPositive()) {
             sb.append("       Vehicles.......... ")
-                    .append(String.format(formatted, r.getVeeValue().toAmountAndSymbolString())).append('\n');
+                  .append(String.format(formatted, r.getVeeValue().toAmountAndSymbolString()))
+                  .append('\n');
         }
         if (r.getBattleArmorValue().isPositive()) {
             sb.append("       BattleArmor....... ")
-                    .append(String.format(formatted, r.getBattleArmorValue().toAmountAndSymbolString())).append('\n');
+                  .append(String.format(formatted, r.getBattleArmorValue().toAmountAndSymbolString()))
+                  .append('\n');
         }
         if (r.getInfantryValue().isPositive()) {
             sb.append("       Infantry.......... ")
-                    .append(String.format(formatted, r.getInfantryValue().toAmountAndSymbolString())).append('\n');
+                  .append(String.format(formatted, r.getInfantryValue().toAmountAndSymbolString()))
+                  .append('\n');
         }
         if (r.getProtoMekValue().isPositive()) {
             sb.append("       ProtoMeks........ ")
-                    .append(String.format(formatted, r.getProtoMekValue().toAmountAndSymbolString())).append('\n');
+                  .append(String.format(formatted, r.getProtoMekValue().toAmountAndSymbolString()))
+                  .append('\n');
         }
         if (r.getSmallCraftValue().isPositive()) {
             sb.append("       Small Craft....... ")
-                    .append(String.format(formatted, r.getSmallCraftValue().toAmountAndSymbolString())).append('\n');
+                  .append(String.format(formatted, r.getSmallCraftValue().toAmountAndSymbolString()))
+                  .append('\n');
         }
         if (r.getLargeCraftValue().isPositive()) {
             sb.append("       Large Craft....... ")
-                    .append(String.format(formatted, r.getLargeCraftValue().toAmountAndSymbolString())).append('\n');
+                  .append(String.format(formatted, r.getLargeCraftValue().toAmountAndSymbolString()))
+                  .append('\n');
         }
         sb.append("       Spare Parts....... ")
-                .append(String.format(formatted, r.getSparePartsValue().toAmountAndSymbolString())).append('\n');
+              .append(String.format(formatted, r.getSparePartsValue().toAmountAndSymbolString()))
+              .append('\n');
 
         if (!getCampaign().getFinances().getAssets().isEmpty()) {
             for (Asset asset : getCampaign().getFinances().getAssets()) {
@@ -468,39 +509,52 @@ public final class FinancesTab extends CampaignGuiTab {
                     }
                 }
                 assetName += " ";
-                sb.append("       ").append(assetName)
-                        .append(String.format(formatted, asset.getValue().toAmountAndSymbolString()))
-                        .append('\n');
+                sb.append("       ")
+                      .append(assetName)
+                      .append(String.format(formatted, asset.getValue().toAmountAndSymbolString()))
+                      .append('\n');
             }
         }
         sb.append('\n');
         sb.append("    Liabilities.......... ")
-                .append(String.format(formatted, liabilities.toAmountAndSymbolString())).append('\n');
+              .append(String.format(formatted, liabilities.toAmountAndSymbolString()))
+              .append('\n');
         sb.append("       Loans............. ")
-                .append(String.format(formatted, r.getLoans().toAmountAndSymbolString())).append("\n\n\n");
+              .append(String.format(formatted, r.getLoans().toAmountAndSymbolString()))
+              .append("\n\n\n");
 
         sb.append("Monthly Profit........... ")
-                .append(String.format(formatted, r.getMonthlyIncome().minus(r.getMonthlyExpenses()).toAmountAndSymbolString()))
-                .append("\n\n");
+              .append(String.format(formatted,
+                    r.getMonthlyIncome().minus(r.getMonthlyExpenses()).toAmountAndSymbolString()))
+              .append("\n\n");
         sb.append("Monthly Income........... ")
-                .append(String.format(formatted, r.getMonthlyIncome().toAmountAndSymbolString())).append('\n');
+              .append(String.format(formatted, r.getMonthlyIncome().toAmountAndSymbolString()))
+              .append('\n');
         sb.append("    Contract Payments.... ")
-                .append(String.format(formatted, r.getContracts().toAmountAndSymbolString())).append("\n\n");
+              .append(String.format(formatted, r.getContracts().toAmountAndSymbolString()))
+              .append("\n\n");
         sb.append("Monthly Expenses......... ")
-                .append(String.format(formatted, r.getMonthlyExpenses().toAmountAndSymbolString())).append('\n');
+              .append(String.format(formatted, r.getMonthlyExpenses().toAmountAndSymbolString()))
+              .append('\n');
         sb.append("    Salaries............. ")
-                .append(String.format(formatted, r.getSalaries().toAmountAndSymbolString())).append('\n');
+              .append(String.format(formatted, r.getSalaries().toAmountAndSymbolString()))
+              .append('\n');
         sb.append("    Maintenance.......... ")
-                .append(String.format(formatted, r.getMaintenance().toAmountAndSymbolString())).append('\n');
+              .append(String.format(formatted, r.getMaintenance().toAmountAndSymbolString()))
+              .append('\n');
         sb.append("    Overhead............. ")
-                .append(String.format(formatted, r.getOverheadCosts().toAmountAndSymbolString())).append('\n');
+              .append(String.format(formatted, r.getOverheadCosts().toAmountAndSymbolString()))
+              .append('\n');
         if (getCampaign().getCampaignOptions().isUsePeacetimeCost()) {
             sb.append("    Spare Parts.......... ")
-                    .append(String.format(formatted, r.getMonthlySparePartCosts().toAmountAndSymbolString())).append('\n');
+                  .append(String.format(formatted, r.getMonthlySparePartCosts().toAmountAndSymbolString()))
+                  .append('\n');
             sb.append("    Training Munitions... ")
-                    .append(String.format(formatted, r.getMonthlyAmmoCosts().toAmountAndSymbolString())).append('\n');
+                  .append(String.format(formatted, r.getMonthlyAmmoCosts().toAmountAndSymbolString()))
+                  .append('\n');
             sb.append("    Fuel................. ")
-                    .append(String.format(formatted, r.getMonthlyFuelCosts().toAmountAndSymbolString())).append('\n');
+                  .append(String.format(formatted, r.getMonthlyFuelCosts().toAmountAndSymbolString()))
+                  .append('\n');
         }
 
         return sb.toString();

@@ -24,8 +24,24 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.stratcon;
+
+import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ResourceBundle;
 
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
@@ -33,19 +49,14 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.Skill;
-
-import java.util.*;
-
-import static mekhq.campaign.personnel.SkillType.S_ADMIN;
-import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
-import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
+import mekhq.campaign.personnel.skills.Skill;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * This class handles Support Point negotiations for StratCon.
  * <p>
- * It includes functionality to negotiate both initial and weekly support points for contracts,
- * based on the skill levels of available Admin/Transport personnel.
+ * It includes functionality to negotiate both initial and weekly support points for contracts, based on the skill
+ * levels of available Admin/Transport personnel.
  *
  * <p>The workflow includes:</p>
  * <ul>
@@ -58,14 +69,14 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
  */
 public class SupportPointNegotiation {
     private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.AtBStratCon",
-        MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
 
     /**
      * Negotiates weekly additional support points for all active AtB contracts.
      *
      * <p>Uses available Admin/Transport personnel to negotiate support points for contracts, with older contracts
-     * being processed first. Personnel are removed from the available pool as they are assigned to contracts.
-     * If no Admin/Transport personnel are available, an error report is generated, and the method exits early.</p>
+     * being processed first. Personnel are removed from the available pool as they are assigned to contracts. If no
+     * Admin/Transport personnel are available, an error report is generated, and the method exits early.</p>
      *
      * <p>Calculated support points are added to the contract if successful, and reports detailing the
      * outcome are appended to the campaign reports.</p>
@@ -105,15 +116,15 @@ public class SupportPointNegotiation {
      * Negotiates initial support points for a specific AtB contract.
      *
      * <p>This method processes a single contract and uses available Admin/Transport personnel to negotiate
-     * support points. If no Admin/Transport personnel are available, an error report is generated, and
-     * the method exits early.</p>
+     * support points. If no Admin/Transport personnel are available, an error report is generated, and the method exits
+     * early.</p>
      *
      * <p>Calculated support points are added to the contract if successful, and a report detailing the
      * outcome is appended to the campaign reports.</p>
      *
      * @param campaign The {@link Campaign} instance managing the current game state.
-     * @param contract The {@link AtBContract} instance representing the contract for which initial support
-     *                 points are being negotiated.
+     * @param contract The {@link AtBContract} instance representing the contract for which initial support points are
+     *                 being negotiated.
      */
     public static void negotiateInitialSupportPoints(Campaign campaign, AtBContract contract) {
         // Get sorted Admin/Transport personnel
@@ -133,22 +144,22 @@ public class SupportPointNegotiation {
      * Processes the negotiation of support points for a given AtB contract.
      *
      * <p>Rolls dice for assigned personnel to determine successful negotiations. Support points
-     * are calculated based on skill levels and the success of the dice rolls. Personnel are
-     * removed from the pool once assigned, and support points are added to the contract if
-     * successfully negotiated.</p>
+     * are calculated based on skill levels and the success of the dice rolls. Personnel are removed from the pool once
+     * assigned, and support points are added to the contract if successfully negotiated.</p>
      *
-     * @param campaign       The {@link Campaign} instance managing the current game state.
-     * @param contract       The {@link AtBContract} instance for which support points are being processed.
-     * @param adminTransport A {@link List} of available {@link Person} objects representing Admin/Transport personnel.
-     * @param isInitialNegotiation {@code true} if the negotiation took place at the beginning of
-     *                                        the contract, otherwise {@code false}
+     * @param campaign             The {@link Campaign} instance managing the current game state.
+     * @param contract             The {@link AtBContract} instance for which support points are being processed.
+     * @param adminTransport       A {@link List} of available {@link Person} objects representing Admin/Transport
+     *                             personnel.
+     * @param isInitialNegotiation {@code true} if the negotiation took place at the beginning of the contract,
+     *                             otherwise {@code false}
      */
     private static void processContractSupportPoints(Campaign campaign, AtBContract contract,
-                                                     List<Person> adminTransport, boolean isInitialNegotiation) {
+          List<Person> adminTransport, boolean isInitialNegotiation) {
         int negotiatedSupportPoints = 0;
-        int maxSupportPoints = isInitialNegotiation
-            ? contract.getRequiredCombatTeams() * 3
-            : contract.getRequiredCombatTeams();
+        int maxSupportPoints = isInitialNegotiation ?
+                                     contract.getRequiredCombatTeams() * 3 :
+                                     contract.getRequiredCombatTeams();
 
         StratconCampaignState campaignState = contract.getStratconCampaignState();
 
@@ -161,35 +172,33 @@ public class SupportPointNegotiation {
         if (currentSupportPoints >= maxSupportPoints) {
             String pluralizer = (maxSupportPoints > 1) || (maxSupportPoints == 0) ? "s" : "";
 
-            campaign.addReport(String.format(
-                resources.getString("supportPoints.maximum"),
-                contract.getName(),
-                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor()),
-                CLOSING_SPAN_TAG,
-                maxSupportPoints,
-                pluralizer));
+            campaign.addReport(String.format(resources.getString("supportPoints.maximum"),
+                  contract.getHyperlinkedName(),
+                  spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
+                  CLOSING_SPAN_TAG,
+                  maxSupportPoints,
+                  pluralizer));
 
             return;
         }
 
         Iterator<Person> iterator = adminTransport.iterator();
 
-        while (iterator.hasNext()
-              && ((negotiatedSupportPoints + currentSupportPoints) < maxSupportPoints)) {
+        while (iterator.hasNext() && ((negotiatedSupportPoints + currentSupportPoints) < maxSupportPoints)) {
             Person admin = iterator.next();
             int rollResult = Compute.d6(2);
 
-            int adminSkill = admin.getSkill(S_ADMIN).getFinalSkillValue();
+            int adminSkill = admin.getSkill(S_ADMIN).getFinalSkillValue(admin.getOptions(), admin.getATOWAttributes());
             if (rollResult >= adminSkill) {
-                negotiatedSupportPoints ++;
+                negotiatedSupportPoints++;
             }
             iterator.remove();
         }
 
         // Determine font color based on success or failure
-        String fontColor = (negotiatedSupportPoints > 0)
-            ? MekHQ.getMHQOptions().getFontColorPositiveHexColor()
-            : MekHQ.getMHQOptions().getFontColorNegativeHexColor();
+        String fontColor = (negotiatedSupportPoints > 0) ?
+                                 ReportingUtilities.getPositiveColor() :
+                                 ReportingUtilities.getNegativeColor();
 
         // Add points to the contract if positive
         if (negotiatedSupportPoints > 0) {
@@ -199,21 +208,19 @@ public class SupportPointNegotiation {
         // Add a report
         String pluralizer = (negotiatedSupportPoints > 1) || (negotiatedSupportPoints == 0) ? "s" : "";
         if (isInitialNegotiation) {
-            campaign.addReport(String.format(
-                resources.getString("supportPoints.initial"),
-                contract.getName(),
-                spanOpeningWithCustomColor(fontColor),
-                negotiatedSupportPoints,
-                CLOSING_SPAN_TAG,
-                pluralizer));
+            campaign.addReport(String.format(resources.getString("supportPoints.initial"),
+                  contract.getHyperlinkedName(),
+                  spanOpeningWithCustomColor(fontColor),
+                  negotiatedSupportPoints,
+                  CLOSING_SPAN_TAG,
+                  pluralizer));
         } else {
-            campaign.addReport(String.format(
-                resources.getString("supportPoints.weekly"),
-                spanOpeningWithCustomColor(fontColor),
-                negotiatedSupportPoints,
-                CLOSING_SPAN_TAG,
-                pluralizer,
-                contract.getName()));
+            campaign.addReport(String.format(resources.getString("supportPoints.weekly"),
+                  spanOpeningWithCustomColor(fontColor),
+                  negotiatedSupportPoints,
+                  CLOSING_SPAN_TAG,
+                  pluralizer,
+                  contract.getHyperlinkedName()));
         }
     }
 
@@ -221,13 +228,14 @@ public class SupportPointNegotiation {
      * Filters and sorts Admin/Transport personnel from the campaign by their skill levels in descending order.
      *
      * @param campaign The {@link Campaign} instance containing personnel to be filtered and sorted.
+     *
      * @return A {@link List} of {@link Person} objects representing Admin/Transport personnel, sorted by skill.
      */
     private static List<Person> getSortedAdminTransportPersonnel(Campaign campaign) {
         List<Person> adminTransport = new ArrayList<>();
         for (Person person : campaign.getAdmins()) {
-            if (person.getPrimaryRole().isAdministratorTransport()
-                || person.getSecondaryRole().isAdministratorTransport()) {
+            if (person.getPrimaryRole().isAdministratorTransport() ||
+                      person.getSecondaryRole().isAdministratorTransport()) {
                 // Each character gets to roll three times, so we add them to the list three times.
                 adminTransport.add(person);
                 adminTransport.add(person);
@@ -235,7 +243,14 @@ public class SupportPointNegotiation {
             }
         }
 
-        adminTransport.sort((p1, p2) -> Integer.compare(getSkillValue(p2), getSkillValue(p1)));
+        boolean isUseAgingEffects = campaign.getCampaignOptions().isUseAgeEffects();
+        boolean isClanCampaign = campaign.isClanCampaign();
+        LocalDate today = campaign.getLocalDate();
+        adminTransport.sort((p1, p2) -> Integer.compare(getSkillValue(p2,
+              isUseAgingEffects,
+              isClanCampaign,
+              today,
+              p2.getRankLevel()), getSkillValue(p1, isUseAgingEffects, isClanCampaign, today, p1.getRankLevel())));
         return adminTransport;
     }
 
@@ -250,40 +265,59 @@ public class SupportPointNegotiation {
     }
 
     /**
-     * Adds a report to the campaign log indicating the absence of Admin/Transport personnel for support point negotiations.
+     * Adds a report to the campaign log indicating the absence of Admin/Transport personnel for support point
+     * negotiations.
      *
      * <p>If a contract is specified, the report is related to that contract. Otherwise, the report is general
      * (e.g., for weekly negotiations).</p>
      *
      * @param campaign The {@link Campaign} instance managing the current game state.
-     * @param contract An optional {@link AtBContract} instance representing the affected contract (can be {@code null}).
+     * @param contract An optional {@link AtBContract} instance representing the affected contract (can be
+     *                 {@code null}).
      */
     private static void addReportNoPersonnel(Campaign campaign, @Nullable AtBContract contract) {
-        String reportKey = String.format("supportPoints.%s.noAdministrators",
-            contract == null ? "weekly" : "initial");
+        String reportKey = String.format("supportPoints.%s.noAdministrators", contract == null ? "weekly" : "initial");
 
         if (contract == null) {
             campaign.addReport(String.format(resources.getString(reportKey),
-                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
-                CLOSING_SPAN_TAG
-            ));
+                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
+                  CLOSING_SPAN_TAG));
         } else {
             campaign.addReport(String.format(resources.getString(reportKey),
-                contract.getName(),
-                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
-                CLOSING_SPAN_TAG
-            ));
+                  contract.getHyperlinkedName(),
+                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
+                  CLOSING_SPAN_TAG));
         }
     }
 
     /**
-     * Calculates the total skill value for a given person by summing their skill level and bonuses.
+     * Calculates the total skill value for a given person by combining their skill level and relevant bonuses.
      *
-     * @param person The {@link Person} whose skill value is being calculated.
-     * @return An {@code int} representing the total skill value (level + bonus).
+     * <p>This method retrieves the specified skill from the person and computes the total skill level,
+     * taking into account the person's options, attributes, and adjusted reputation (which itself can be
+     * influenced by aging effects, campaign type, the current date, and rank index).</p>
+     *
+     * @param person            The {@link Person} whose skill value is being calculated.
+     * @param isUseAgingEffects Whether to apply aging effects to the reputation calculation.
+     * @param isClanCampaign    Indicates whether the current campaign is a Clan campaign.
+     * @param today             The current in-game date for age/reputation calculations.
+     * @param rankIndex         The index representing the current rank for modifiers.
+     * @return An {@link Integer} representing the total skill value after modifiers.
      */
+    private static int getSkillValue(Person person, boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today,
+          int rankIndex) {
+        Skill skill = person.getSkill(S_ADMIN);
+        return skill.getTotalSkillLevel(person.getOptions(),
+              person.getATOWAttributes(),
+              person.getAdjustedReputation(isUseAgingEffects, isClanCampaign, today, rankIndex));
+    }
+
+    /**
+     * @deprecated use {@link #getSkillValue(Person, boolean, boolean, LocalDate, int)} instead.
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     private static int getSkillValue(Person person) {
         Skill skill = person.getSkill(S_ADMIN);
-        return skill.getTotalSkillLevel();
+        return skill.getTotalSkillLevel(person.getOptions(), person.getATOWAttributes(), 0);
     }
 }

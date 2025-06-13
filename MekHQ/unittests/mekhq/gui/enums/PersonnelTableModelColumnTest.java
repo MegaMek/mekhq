@@ -27,25 +27,36 @@
  */
 package mekhq.gui.enums;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+
+import java.util.ResourceBundle;
+import javax.swing.SortOrder;
+import javax.swing.SwingConstants;
+
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.gui.sorter.*;
+import mekhq.gui.sorter.AttributeScoreSorter;
+import mekhq.gui.sorter.BonusSorter;
+import mekhq.gui.sorter.DateStringComparator;
+import mekhq.gui.sorter.FormattedNumberSorter;
+import mekhq.gui.sorter.IntegerStringSorter;
+import mekhq.gui.sorter.LevelSorter;
+import mekhq.gui.sorter.PersonRankStringSorter;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-
-import javax.swing.*;
-import java.util.ResourceBundle;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
 
 public class PersonnelTableModelColumnTest {
     //region Variable Declarations
     private static final PersonnelTableModelColumn[] columns = PersonnelTableModelColumn.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Boolean Comparison Methods
@@ -479,17 +490,6 @@ public class PersonnelTableModelColumnTest {
     }
 
     @Test
-    public void testIsScrounge() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.SCROUNGE) {
-                assertTrue(personnelTableModelColumn.isScrounge());
-            } else {
-                assertFalse(personnelTableModelColumn.isScrounge());
-            }
-        }
-    }
-
-    @Test
     public void testIsInjuries() {
         for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
             if (personnelTableModelColumn == PersonnelTableModelColumn.INJURIES) {
@@ -785,6 +785,8 @@ public class PersonnelTableModelColumnTest {
                     assertEquals(50, personnelTableModelColumn.getWidth());
                     break;
                 case PERSONNEL_ROLE:
+                    assertEquals(150, personnelTableModelColumn.getWidth());
+                    break;
                 case FORCE:
                     assertEquals(100, personnelTableModelColumn.getWidth());
                     break;
@@ -838,70 +840,57 @@ public class PersonnelTableModelColumnTest {
         final Campaign mockCampaign = mock(Campaign.class);
         for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
             switch (personnelTableModelColumn) {
-                case RANK:
-                    assertInstanceOf(PersonRankStringSorter.class,
+                case RANK -> assertInstanceOf(PersonRankStringSorter.class,
+                      personnelTableModelColumn.getComparator(mockCampaign));
+                case AGE, BIRTHDAY, RECRUITMENT_DATE, LAST_RANK_CHANGE_DATE, DUE_DATE, RETIREMENT_DATE, DEATH_DATE ->
+                      assertInstanceOf(DateStringComparator.class,
                             personnelTableModelColumn.getComparator(mockCampaign));
-                    break;
-                case AGE:
-                case BIRTHDAY:
-                case RECRUITMENT_DATE:
-                case LAST_RANK_CHANGE_DATE:
-                case DUE_DATE:
-                case RETIREMENT_DATE:
-                case DEATH_DATE:
-                    assertInstanceOf(DateStringComparator.class,
-                            personnelTableModelColumn.getComparator(mockCampaign));
-                    break;
-                case SKILL_LEVEL:
-                    assertInstanceOf(LevelSorter.class,
-                            personnelTableModelColumn.getComparator(mockCampaign));
-                    break;
-                case MEK:
-                case GROUND_VEHICLE:
-                case NAVAL_VEHICLE:
-                case VTOL:
-                case AEROSPACE:
-                case CONVENTIONAL_AIRCRAFT:
-                case VESSEL:
-                case BATTLE_ARMOUR:
-                case SMALL_ARMS:
-                case ANTI_MEK:
-                case ARTILLERY:
-                case TACTICS:
-                case STRATEGY:
-                case LEADERSHIP:
-                case TECH_MEK:
-                case TECH_AERO:
-                case TECH_MECHANIC:
-                case TECH_BA:
-                case TECH_VESSEL:
-                case MEDICAL:
-                case ADMINISTRATION:
-                case NEGOTIATION:
-                case SCROUNGE:
-                    assertInstanceOf(BonusSorter.class,
-                            personnelTableModelColumn.getComparator(mockCampaign));
-                    break;
-                case INJURIES:
-                case KILLS:
-                case XP:
-                case TOUGHNESS:
-                case EDGE:
-                case SPA_COUNT:
-                case IMPLANT_COUNT:
-                case LOYALTY:
-                case INTELLIGENCE:
-                    assertInstanceOf(IntegerStringSorter.class,
-                            personnelTableModelColumn.getComparator(mockCampaign));
-                    break;
-                case SALARY:
-                    assertInstanceOf(FormattedNumberSorter.class,
-                            personnelTableModelColumn.getComparator(mockCampaign));
-                    break;
-                default:
-                    assertInstanceOf(NaturalOrderComparator.class,
-                            personnelTableModelColumn.getComparator(mockCampaign));
-                    break;
+                case SKILL_LEVEL ->
+                      assertInstanceOf(LevelSorter.class, personnelTableModelColumn.getComparator(mockCampaign));
+                case MEK,
+                     GROUND_VEHICLE,
+                     NAVAL_VEHICLE,
+                     VTOL,
+                     AEROSPACE,
+                     CONVENTIONAL_AIRCRAFT,
+                     VESSEL,
+                     BATTLE_ARMOUR,
+                     SMALL_ARMS,
+                     ANTI_MEK,
+                     ARTILLERY,
+                     TACTICS,
+                     STRATEGY,
+                     LEADERSHIP,
+                     TECH_MEK,
+                     TECH_AERO,
+                     TECH_MECHANIC,
+                     TECH_BA,
+                     TECH_VESSEL,
+                     MEDICAL,
+                     ADMINISTRATION,
+                     NEGOTIATION ->
+                      assertInstanceOf(BonusSorter.class, personnelTableModelColumn.getComparator(mockCampaign));
+                case INJURIES,
+                     KILLS,
+                     XP,
+                     TOUGHNESS,
+                     CONNECTIONS,
+                     WEALTH,
+                     REPUTATION,
+                     UNLUCKY,
+                     EDGE,
+                     SPA_COUNT,
+                     IMPLANT_COUNT,
+                     LOYALTY,
+                     REASONING -> assertInstanceOf(IntegerStringSorter.class,
+                      personnelTableModelColumn.getComparator(mockCampaign));
+                case STRENGTH, BODY, REFLEXES, DEXTERITY, INTELLIGENCE, WILLPOWER, CHARISMA -> assertInstanceOf(
+                      AttributeScoreSorter.class,
+                      personnelTableModelColumn.getComparator(mockCampaign));
+                case SALARY -> assertInstanceOf(FormattedNumberSorter.class,
+                      personnelTableModelColumn.getComparator(mockCampaign));
+                default -> assertInstanceOf(NaturalOrderComparator.class,
+                      personnelTableModelColumn.getComparator(mockCampaign));
             }
         }
     }
@@ -926,14 +915,14 @@ public class PersonnelTableModelColumnTest {
     @Test
     public void testToStringOverride() {
         assertEquals(resources.getString("PersonnelTableModelColumn.RANK.text"),
-                PersonnelTableModelColumn.RANK.toString());
+              PersonnelTableModelColumn.RANK.toString());
         assertEquals(resources.getString("PersonnelTableModelColumn.PERSONNEL_STATUS.text"),
-                PersonnelTableModelColumn.PERSONNEL_STATUS.toString());
+              PersonnelTableModelColumn.PERSONNEL_STATUS.toString());
         assertEquals(resources.getString("PersonnelTableModelColumn.FORCE.text"),
-                PersonnelTableModelColumn.FORCE.toString());
+              PersonnelTableModelColumn.FORCE.toString());
         assertEquals(resources.getString("PersonnelTableModelColumn.TECH_MECHANIC.text"),
-                PersonnelTableModelColumn.TECH_MECHANIC.toString());
+              PersonnelTableModelColumn.TECH_MECHANIC.toString());
         assertEquals(resources.getString("PersonnelTableModelColumn.RECRUITMENT_DATE.text"),
-                PersonnelTableModelColumn.RECRUITMENT_DATE.toString());
+              PersonnelTableModelColumn.RECRUITMENT_DATE.toString());
     }
 }

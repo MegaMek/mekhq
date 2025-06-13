@@ -47,9 +47,9 @@ import javax.swing.*;
 
 import megamek.client.bot.princess.BehaviorSettings;
 import megamek.client.bot.princess.PrincessException;
-import megamek.client.ui.baseComponents.MMComboBox;
-import megamek.client.ui.dialogs.BotConfigDialog;
-import megamek.client.ui.dialogs.CamoChooserDialog;
+import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.dialogs.buttonDialogs.BotConfigDialog;
+import megamek.client.ui.dialogs.iconChooser.CamoChooserDialog;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
 import megamek.common.EntityWeightClass;

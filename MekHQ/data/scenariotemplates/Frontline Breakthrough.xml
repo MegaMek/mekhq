@@ -2,15 +2,15 @@
 <ScenarioTemplate>
     <name>Frontline Breakthrough</name>
     <shortBriefing>Break through enemy battlelines.</shortBriefing>
-    <detailedBriefing>You are tasked with penetrating the enemy’s main battle line and advancing beyond their position. The enemy has committed significant forces to this sector, making this a high-risk operation. Your primary objective is to reach the far edge of the engagement zone with at least 50% of your forces intact. If direct passage is impossible, an alternative path to victory is available—routing the enemy by destroying at least 50% of their forces.
+    <detailedBriefing><![CDATA[You are tasked with penetrating the enemy’s main battle line and advancing beyond their position. The enemy has committed significant forces to this sector, making this a high-risk operation. Your primary objective is to reach the far edge of the engagement zone with at least 50% of your forces intact. If direct passage is impossible, an alternative path to victory is available—routing the enemy by destroying at least 50% of their forces.
 
 Expect heavy resistance, as the enemy will not yield ground easily. Their forces are well-positioned to block your advance, and delaying tactics may be used to slow you down. Speed, decisive strikes, and tactical maneuvering will be key to achieving your objective. If you can break their formation or force them into disarray, the path forward will open.
 
-The enemy will control the battlefield once the engagement concludes, preventing any opportunity for salvage or recovery. This is a mission of mobility and force—break through, or break them. There is no room for hesitation.</detailedBriefing>
+The enemy will control the battlefield once the engagement concludes, preventing any opportunity for salvage or recovery. This is a mission of mobility and force—break through, or break them. There is no room for hesitation.]]></detailedBriefing>
     <battlefieldControl>ENEMY</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
-        <allowRotation>true</allowRotation>
+        <allowRotation>false</allowRotation>
         <baseHeight>50</baseHeight>
         <baseWidth>17</baseWidth>
         <heightScalingIncrement>0</heightScalingIncrement>
@@ -34,7 +34,7 @@ The enemy will control the battlefield once the engagement concludes, preventing
                 <deploymentZones>
                     <deploymentZone>6</deploymentZone>
                 </deploymentZones>
-                <destinationZone>2</destinationZone>
+                <destinationZone>6</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>0</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>

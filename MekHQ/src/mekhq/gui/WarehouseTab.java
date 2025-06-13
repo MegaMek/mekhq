@@ -24,8 +24,15 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui;
+
+import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -34,6 +41,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+import java.util.Set;
 import javax.swing.*;
 import javax.swing.RowSorter.SortKey;
 import javax.swing.table.TableColumn;
@@ -42,7 +50,7 @@ import javax.swing.table.TableRowSorter;
 import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.client.ui.swing.util.UIUtil;
+import megamek.client.ui.util.UIUtil;
 import megamek.common.MiscType;
 import megamek.common.TargetRoll;
 import megamek.common.WeaponType;
@@ -53,16 +61,22 @@ import mekhq.campaign.event.*;
 import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.Skill;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.PartsTableMouseAdapter;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.gui.baseComponents.roundedComponents.RoundedMMToggleButton;
+import mekhq.gui.dialog.PartsReportDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.gui.model.TechTableModel;
+import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.PartsDetailSorter;
 import mekhq.gui.sorter.TechSorter;
+import mekhq.gui.sorter.WarehouseStatusSorter;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
@@ -72,48 +86,50 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     private static final MMLogger logger = MMLogger.create(WarehouseTab.class);
 
     // parts filter groups
-    private static final int SG_ALL    = 0;
-    private static final int SG_ARMOR  = 1;
+    private static final int SG_ALL = 0;
+    private static final int SG_ARMOR = 1;
     private static final int SG_SYSTEM = 2;
-    private static final int SG_EQUIP  = 3;
-    private static final int SG_LOC    = 4;
-    private static final int SG_WEAP   = 5;
-    private static final int SG_AMMO   = 6;
-    private static final int SG_MISC   = 7;
+    private static final int SG_EQUIP = 3;
+    private static final int SG_LOC = 4;
+    private static final int SG_WEAP = 5;
+    private static final int SG_AMMO = 6;
+    private static final int SG_MISC = 7;
     private static final int SG_ENGINE = 8;
-    private static final int SG_GYRO   = 9;
-    private static final int SG_ACT    = 10;
-    private static final int SG_NUM    = 11;
+    private static final int SG_GYRO = 9;
+    private static final int SG_ACT = 10;
+    private static final int SG_NUM = 11;
 
     // parts views
-    private static final int SV_ALL        = 0;
+    private static final int SV_ALL = 0;
     private static final int SV_IN_TRANSIT = 1;
-    private static final int SV_RESERVED   = 2;
-    private static final int SV_UNDAMAGED  = 3;
-    private static final int SV_DAMAGED    = 4;
-    private static final int SV_NUM        = 5;
+    private static final int SV_RESERVED = 2;
+    private static final int SV_SPARE = 3;
+    private static final int SV_UNDAMAGED = 4;
+    private static final int SV_DAMAGED = 5;
+    private static final int SV_NUM = 6;
 
-    private JPanel            panSupplies;
-    private JSplitPane        splitWarehouse;
-    private JTable            partsTable;
-    private JTable            techTable;
-    private JButton           btnDoTask;
-    private JToggleButton     btnShowAllTechsWarehouse;
-    private JLabel            lblTargetNumWarehouse;
-    private JTextArea         textTargetWarehouse;
-    private JLabel            astechPoolLabel;
+    private JPanel panSupplies;
+    private JSplitPane splitWarehouse;
+    private JTable partsTable;
+    private JTable techTable;
+    private RoundedJButton btnDoTask;
+    private RoundedMMToggleButton btnShowAllTechsWarehouse;
+    private JLabel lblTargetNumWarehouse;
+    private JTextArea textTargetWarehouse;
+    private JLabel astechPoolLabel;
+    private RoundedJButton btnPartsReport;
     private JComboBox<String> choiceParts;
     private JComboBox<String> choicePartsView;
 
     private PartsTableModel partsModel;
-    private TechTableModel  techsModel;
+    private TechTableModel techsModel;
 
     private TableRowSorter<PartsTableModel> partsSorter;
-    private TableRowSorter<TechTableModel>  techSorter;
+    private TableRowSorter<TechTableModel> techSorter;
 
     // remember current selections so they can be restored after refresh
-    private int    selectedRow = -1;
-    private int    partId      = -1;
+    private int selectedRow = -1;
+    private int partId = -1;
     private Person selectedTech;
 
     // region Constructors
@@ -133,16 +149,22 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     public void initTab() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
               MekHQ.getMHQOptions().getLocale());
-        GridBagConstraints gridBagConstraints;
 
         panSupplies = new JPanel(new GridBagLayout());
+        panSupplies.setBorder(RoundedLineBorder.createRoundedLineBorder());
 
-        gridBagConstraints         = new GridBagConstraints();
-        gridBagConstraints.gridx   = 0;
-        gridBagConstraints.gridy   = 0;
+        btnPartsReport = new RoundedJButton(resourceMap.getString("btnPartsReport.text"));
+        btnPartsReport.setToolTipText(resourceMap.getString("btnPartsReport.toolTipText"));
+        btnPartsReport.addActionListener(evt -> new PartsReportDialog(getCampaignGui(), true).setVisible(true));
+
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.anchor  = GridBagConstraints.WEST;
-        gridBagConstraints.insets  = new Insets(5, 5, 5, 0);
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 0);
         panSupplies.add(new JLabel(resourceMap.getString("lblPartsChoice.text")), gridBagConstraints);
 
         DefaultComboBoxModel<String> partsGroupModel = new DefaultComboBoxModel<>();
@@ -152,22 +174,24 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         choiceParts = new JComboBox<>(partsGroupModel);
         choiceParts.setSelectedIndex(0);
         choiceParts.addActionListener(ev -> filterParts());
-        gridBagConstraints         = new GridBagConstraints();
-        gridBagConstraints.gridx   = 1;
-        gridBagConstraints.gridy   = 0;
-        gridBagConstraints.fill    = GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor  = GridBagConstraints.WEST;
-        gridBagConstraints.insets  = new Insets(5, 5, 5, 0);
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 0);
         panSupplies.add(choiceParts, gridBagConstraints);
 
-        gridBagConstraints         = new GridBagConstraints();
-        gridBagConstraints.gridx   = 2;
-        gridBagConstraints.gridy   = 0;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.anchor  = GridBagConstraints.WEST;
-        gridBagConstraints.insets  = new Insets(5, 5, 5, 0);
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 0);
         panSupplies.add(new JLabel(resourceMap.getString("lblPartsChoiceView.text")), gridBagConstraints);
 
         DefaultComboBoxModel<String> partsGroupViewModel = new DefaultComboBoxModel<>();
@@ -177,21 +201,33 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         choicePartsView = new JComboBox<>(partsGroupViewModel);
         choicePartsView.setSelectedIndex(0);
         choicePartsView.addActionListener(ev -> filterParts());
-        gridBagConstraints         = new GridBagConstraints();
-        gridBagConstraints.gridx   = 3;
-        gridBagConstraints.gridy   = 0;
-        gridBagConstraints.fill    = GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor  = GridBagConstraints.WEST;
-        gridBagConstraints.insets  = new Insets(5, 5, 5, 0);
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 0);
         panSupplies.add(choicePartsView, gridBagConstraints);
 
-        partsModel  = new PartsTableModel();
-        partsTable  = new JTable(partsModel);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 1.0; // expand for layout padding
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        panSupplies.add(btnPartsReport, gridBagConstraints);
+
+        Set<PartInUse> partsInUse = getCampaign().getPartsInUse(true, false, QUALITY_A);
+        partsModel = new PartsTableModel(partsInUse);
+        partsTable = new JTable(partsModel);
         partsSorter = new TableRowSorter<>(partsModel);
         partsSorter.setComparator(PartsTableModel.COL_COST, new FormattedNumberSorter());
         partsSorter.setComparator(PartsTableModel.COL_DETAIL, new PartsDetailSorter());
+        partsSorter.setComparator(PartsTableModel.COL_STATUS, new WarehouseStatusSorter());
         partsSorter.setComparator(PartsTableModel.COL_TOTAL_COST, new FormattedNumberSorter());
         partsTable.setRowSorter(partsSorter);
         TableColumn column;
@@ -209,39 +245,39 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         PartsTableMouseAdapter.connect(getCampaignGui(), partsTable, partsModel);
 
         JScrollPane scrollPartsTable = new JScrollPaneWithSpeed(partsTable);
-        gridBagConstraints           = new GridBagConstraints();
-        gridBagConstraints.gridx     = 0;
-        gridBagConstraints.gridy     = 1;
-        gridBagConstraints.gridwidth = 4;
-        gridBagConstraints.fill      = GridBagConstraints.BOTH;
-        gridBagConstraints.weightx   = 1.0;
-        gridBagConstraints.weighty   = 1.0;
-        gridBagConstraints.anchor    = GridBagConstraints.NORTHWEST;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 5;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSupplies.add(scrollPartsTable, gridBagConstraints);
 
         JPanel panelDoTask = new JPanel(new GridBagLayout());
 
-        btnDoTask = new JButton(resourceMap.getString("btnDoTask.text"));
+        btnDoTask = new RoundedJButton(resourceMap.getString("btnDoTask.text"));
         btnDoTask.setToolTipText(resourceMap.getString("btnDoTask.toolTipText"));
         btnDoTask.setEnabled(false);
         btnDoTask.setName("btnDoTask");
         btnDoTask.addActionListener(ev -> doTask());
-        gridBagConstraints       = new GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         panelDoTask.add(btnDoTask, gridBagConstraints);
 
-        gridBagConstraints        = new GridBagConstraints();
-        gridBagConstraints.gridx  = 0;
-        gridBagConstraints.gridy  = 1;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = GridBagConstraints.SOUTH;
         panelDoTask.add(new JLabel(resourceMap.getString("lblTarget.text")), gridBagConstraints);
 
         lblTargetNumWarehouse = new JLabel(resourceMap.getString("lblTargetNum.text"));
         lblTargetNumWarehouse.setHorizontalAlignment(SwingConstants.CENTER);
-        gridBagConstraints        = new GridBagConstraints();
-        gridBagConstraints.gridx  = 0;
-        gridBagConstraints.gridy  = 2;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = GridBagConstraints.NORTH;
         panelDoTask.add(lblTargetNumWarehouse, gridBagConstraints);
 
@@ -254,34 +290,35 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         textTargetWarehouse.setWrapStyleWord(true);
         textTargetWarehouse.setBorder(null);
         JScrollPane scrTargetWarehouse = new JScrollPaneWithSpeed(textTargetWarehouse);
+        scrTargetWarehouse.setBorder(RoundedLineBorder.createRoundedLineBorder());
 
-        gridBagConstraints            = new GridBagConstraints();
-        gridBagConstraints.gridx      = 1;
-        gridBagConstraints.gridy      = 0;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.gridheight = 3;
-        gridBagConstraints.fill       = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor     = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx    = 1.0;
-        gridBagConstraints.weighty    = 0.0;
-        gridBagConstraints.insets     = new Insets(2, 2, 2, 2);
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
         panelDoTask.add(scrTargetWarehouse, gridBagConstraints);
 
-        btnShowAllTechsWarehouse = new JToggleButton(resourceMap.getString("btnShowAllTechs.text"));
+        btnShowAllTechsWarehouse = new RoundedMMToggleButton(resourceMap.getString("btnShowAllTechs.text"));
         btnShowAllTechsWarehouse.setToolTipText(resourceMap.getString("btnShowAllTechs.toolTipText"));
         btnShowAllTechsWarehouse.addActionListener(ev -> filterTechs());
-        gridBagConstraints           = new GridBagConstraints();
-        gridBagConstraints.gridx     = 0;
-        gridBagConstraints.gridy     = 3;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill      = GridBagConstraints.NONE;
-        gridBagConstraints.anchor    = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx   = 1.0;
-        gridBagConstraints.weighty   = 0.0;
-        gridBagConstraints.insets    = new Insets(2, 2, 2, 2);
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
         panelDoTask.add(btnShowAllTechsWarehouse, gridBagConstraints);
 
         techsModel = new TechTableModel(getCampaignGui(), this);
-        techTable  = new JTable(techsModel);
+        techTable = new JTable(techsModel);
         techTable.setRowHeight(UIUtil.scaleForGUI(60));
         techTable.getColumnModel().getColumn(0).setCellRenderer(techsModel.getRenderer());
         techTable.getSelectionModel().addListSelectionListener(ev -> updateTechTarget());
@@ -292,48 +329,48 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         sortKeys.add(new SortKey(0, SortOrder.ASCENDING));
         techSorter.setSortKeys(sortKeys);
         JScrollPane scrollTechTable = new JScrollPaneWithSpeed(techTable);
+        scrollTechTable.setBorder(RoundedLineBorder.createRoundedLineBorder());
         scrollTechTable.setMinimumSize(new Dimension(200, 200));
         scrollTechTable.setPreferredSize(new Dimension(300, 300));
-        gridBagConstraints           = new GridBagConstraints();
-        gridBagConstraints.gridx     = 0;
-        gridBagConstraints.gridy     = 4;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill      = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor    = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx   = 1.0;
-        gridBagConstraints.weighty   = 1.0;
-        gridBagConstraints.insets    = new Insets(2, 2, 2, 2);
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
         panelDoTask.add(scrollTechTable, gridBagConstraints);
 
         astechPoolLabel = new JLabel("<html><b>Astech Pool Minutes:</> " +
-                                     getCampaign().getAstechPoolMinutes() +
-                                     " (" +
-                                     getCampaign().getNumberAstechs() +
-                                     " Astechs)</html>");
+                                           getCampaign().getAstechPoolMinutes() +
+                                           " (" +
+                                           getCampaign().getNumberAstechs() +
+                                           " Astechs)</html>");
         astechPoolLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        gridBagConstraints           = new GridBagConstraints();
-        gridBagConstraints.gridx     = 0;
-        gridBagConstraints.gridy     = 5;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.insets    = new Insets(0, 10, 0, 0);
-        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
         panelDoTask.add(astechPoolLabel, gridBagConstraints);
 
         splitWarehouse = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panSupplies, panelDoTask);
         splitWarehouse.setOneTouchExpandable(true);
         splitWarehouse.setResizeWeight(1.0);
 
+        JPanel pnlTutorial = new TutorialHyperlinkPanel("warehouseTab");
+
         setLayout(new BorderLayout());
         add(splitWarehouse, BorderLayout.CENTER);
+        add(pnlTutorial, BorderLayout.SOUTH);
     }
 
     /**
      * These need to be migrated to the Suite Constants / Suite Options Setup
-     *
-     * @since 0.50.04
-     * @deprecated Move to Suite Constants / Suite Options Setup
      */
-    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(WarehouseTab.class);
@@ -382,15 +419,15 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     }
 
     public void filterParts() {
-        final int nGroup     = choiceParts.getSelectedIndex();
+        final int nGroup = choiceParts.getSelectedIndex();
         final int nGroupView = choicePartsView.getSelectedIndex();
         RowFilter<PartsTableModel, Integer> partsTypeFilter = new RowFilter<>() {
             @Override
             public boolean include(Entry<? extends PartsTableModel, ? extends Integer> entry) {
                 PartsTableModel partsModel = entry.getModel();
-                Part            part       = partsModel.getPartAt(entry.getIdentifier());
-                boolean         inGroup    = false;
-                boolean         inView     = false;
+                Part part = partsModel.getPartAt(entry.getIdentifier());
+                boolean inGroup = false;
+                boolean inView = false;
 
                 // Check grouping
                 if (nGroup == SG_ALL) {
@@ -399,10 +436,10 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
                     inGroup = (part instanceof Armor); // ProtoMekArmor and BaArmor are derived from Armor
                 } else if (nGroup == SG_SYSTEM) {
                     inGroup = part instanceof MekGyro ||
-                              part instanceof EnginePart ||
-                              part instanceof MekActuator ||
-                              part instanceof MekLifeSupport ||
-                              part instanceof MekSensor;
+                                    part instanceof EnginePart ||
+                                    part instanceof MekActuator ||
+                                    part instanceof MekLifeSupport ||
+                                    part instanceof MekSensor;
                 } else if (nGroup == SG_EQUIP) {
                     inGroup = part instanceof EquipmentPart;
                 } else if (nGroup == SG_LOC) {
@@ -428,6 +465,8 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
                     inView = !part.isPresent();
                 } else if (nGroupView == SV_RESERVED) {
                     inView = part.isReservedForRefit() || part.isReservedForReplacement();
+                } else if (nGroupView == SV_SPARE) {
+                    inView = part.isSpare();
                 } else if (nGroupView == SV_UNDAMAGED) {
                     inView = !part.needsFixing();
                 } else if (nGroupView == SV_DAMAGED) {
@@ -461,6 +500,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
             case SV_ALL -> "All";
             case SV_IN_TRANSIT -> "In Transit";
             case SV_RESERVED -> "Reserved for Refit/Repair";
+            case SV_SPARE -> "Spares";
             case SV_UNDAMAGED -> "Undamaged";
             case SV_DAMAGED -> "Damaged";
             default -> "?";
@@ -479,21 +519,23 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
                     return false;
                 }
                 TechTableModel techModel = entry.getModel();
-                Person         tech      = techModel.getTechAt(entry.getIdentifier());
+                Person tech = techModel.getTechAt(entry.getIdentifier());
                 if (!tech.isRightTechTypeFor(part) && !btnShowAllTechsWarehouse.isSelected()) {
                     return false;
                 }
-                Skill skill       = tech.getSkillForWorkingOn(part);
-                int   modePenalty = part.getMode().expReduction;
+                Skill skill = tech.getSkillForWorkingOn(part);
+                int modePenalty = part.getMode().expReduction;
                 if (skill == null) {
                     return false;
-                } else if (part.getSkillMin() > SkillType.EXP_ELITE) {
+                } else if (part.getSkillMin() > SkillType.EXP_LEGENDARY) {
                     return false;
                 } else if (tech.getMinutesLeft() <= 0) {
                     return false;
                 } else {
                     return getCampaign().getCampaignOptions().isDestroyByMargin() ||
-                           (part.getSkillMin() <= (skill.getExperienceLevel() - modePenalty));
+                                 (part.getSkillMin() <=
+                                        (skill.getExperienceLevel(tech.getOptions(), tech.getATOWAttributes()) -
+                                               modePenalty));
                 }
             }
         };
@@ -505,7 +547,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
 
         Part part = getSelectedTask();
         if (null != part) {
-            Unit   u    = part.getUnit();
+            Unit u = part.getUnit();
             Person tech = getSelectedTech();
             if (null != u && u.isSelfCrewed()) {
                 tech = u.getEngineer();
@@ -554,7 +596,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
 
         // If requested, switch to top entry
         if ((null == selectedTech || getCampaign().getCampaignOptions().isResetToFirstTech()) &&
-            techTable.getRowCount() > 0) {
+                  techTable.getRowCount() > 0) {
             techTable.setRowSelectionInterval(0, 0);
         } else if (null != selectedTech) {
             // Or get the selected tech back
@@ -603,7 +645,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
 
     private void doTask() {
         selectedTech = getSelectedTech();
-        selectedRow  = partsTable.getSelectedRow();
+        selectedRow = partsTable.getSelectedRow();
 
         Part part = getSelectedTask();
         if (null == part) {

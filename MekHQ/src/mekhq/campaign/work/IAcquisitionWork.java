@@ -28,6 +28,9 @@
  */
 package mekhq.campaign.work;
 
+import megamek.common.ITechnology;
+import megamek.common.ITechnology.TechBase;
+import megamek.common.ITechnology.AvailabilityValue;
 import megamek.common.TargetRoll;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
@@ -51,7 +54,9 @@ public interface IAcquisitionWork extends IWork {
     public Unit getUnit();
 
     public int getDaysToWait();
+
     public void resetDaysToWait();
+
     public void decrementDaysToWait();
 
     public String find(int transitDays);
@@ -60,7 +65,7 @@ public interface IAcquisitionWork extends IWork {
 
     public TargetRoll getAllAcquisitionMods();
 
-    public int getTechBase();
+    public TechBase getTechBase();
 
     public int getTechLevel();
 
@@ -74,11 +79,15 @@ public interface IAcquisitionWork extends IWork {
 
     public Money getBuyCost();
 
-    public boolean isIntroducedBy(int year, boolean clan, int techFaction);
+    public default Money getTotalBuyCost() {
+        return getBuyCost().multipliedBy(getQuantity());
+    }
 
-    public boolean isExtinctIn(int year, boolean clan, int techFaction);
+    public boolean isIntroducedBy(int year, boolean clan, ITechnology.Faction techFaction);
 
-    public int getAvailability();
+    public boolean isExtinctIn(int year, boolean clan, ITechnology.Faction techFaction);
+
+    public AvailabilityValue getAvailability();
 
     public String getShoppingListReport(int quantity);
 

@@ -24,45 +24,58 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.enums;
 
+import static mekhq.campaign.personnel.enums.PersonnelRole.BATTLE_ARMOUR;
+import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 import java.awt.event.KeyEvent;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.stream.IntStream;
 
+import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.universe.Factions;
 import org.junit.jupiter.api.Test;
-
-import mekhq.MekHQ;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mockito;
 
 class PersonnelRoleTest {
-    // region Variable Declarations
     private static final PersonnelRole[] roles = PersonnelRole.values();
 
-    private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            MekHQ.getMHQOptions().getLocale());
-    // endregion Variable Declarations
-
-    // region Getters
     @Test
-    void testGetName() {
-        assertEquals(resources.getString("PersonnelRole.MEKWARRIOR.text"),
-                PersonnelRole.MEKWARRIOR.getName(false));
-        assertEquals(resources.getString("PersonnelRole.MEKWARRIOR.text"),
-                PersonnelRole.MEKWARRIOR.getName(true));
-        assertEquals(resources.getString("PersonnelRole.BATTLE_ARMOUR.text"),
-                PersonnelRole.BATTLE_ARMOUR.getName(false));
-        assertEquals(resources.getString("PersonnelRole.BATTLE_ARMOUR.clan.text"),
-                PersonnelRole.BATTLE_ARMOUR.getName(true));
-        assertEquals(resources.getString("PersonnelRole.ADMINISTRATOR_LOGISTICS.text"),
-                PersonnelRole.ADMINISTRATOR_LOGISTICS.getName(false));
+    void testGetLabel_NotClan() {
+        for (final PersonnelRole personnelRole : roles) {
+            String label = personnelRole.getLabel(false);
+            boolean isValid = isResourceKeyValid(label);
+            assertTrue(isValid, "Invalid resource key: " + label);
+        }
+    }
+
+    @Test
+    void testGetLabel_IsClan() {
+        for (final PersonnelRole personnelRole : roles) {
+            String label = personnelRole.getLabel(true);
+            boolean isValid = isResourceKeyValid(label);
+            assertTrue(isValid, "Invalid resource key: " + label);
+        }
     }
 
     @Test
@@ -74,10 +87,11 @@ class PersonnelRoleTest {
                 continue;
             }
             assertFalse(usedMnemonics.contains(role.getMnemonic()),
-                    String.format("%s: Using duplicate mnemonic of %d", role.name(), role.getMnemonic()));
+                  String.format("%s: Using duplicate mnemonic of %d", role.name(), role.getMnemonic()));
             usedMnemonics.add(role.getMnemonic());
         }
     }
+
     // endregion Getters
 
     // region Boolean Comparison Methods
@@ -194,7 +208,7 @@ class PersonnelRoleTest {
     @Test
     void testIsBattleArmour() {
         for (final PersonnelRole personnelRole : roles) {
-            if (personnelRole == PersonnelRole.BATTLE_ARMOUR) {
+            if (personnelRole == BATTLE_ARMOUR) {
                 assertTrue(personnelRole.isBattleArmour());
             } else {
                 assertFalse(personnelRole.isBattleArmour());
@@ -401,39 +415,9 @@ class PersonnelRoleTest {
     }
 
     @Test
-    void testIsCombat() {
-        for (final PersonnelRole personnelRole : roles) {
-            switch (personnelRole) {
-                case MEKWARRIOR:
-                case LAM_PILOT:
-                case GROUND_VEHICLE_DRIVER:
-                case NAVAL_VEHICLE_DRIVER:
-                case VTOL_PILOT:
-                case VEHICLE_GUNNER:
-                case VEHICLE_CREW:
-                case AEROSPACE_PILOT:
-                case CONVENTIONAL_AIRCRAFT_PILOT:
-                case PROTOMEK_PILOT:
-                case BATTLE_ARMOUR:
-                case SOLDIER:
-                case VESSEL_PILOT:
-                case VESSEL_GUNNER:
-                case VESSEL_CREW:
-                case VESSEL_NAVIGATOR:
-                    assertTrue(personnelRole.isCombat());
-                    break;
-                default:
-                    assertFalse(personnelRole.isCombat());
-                    break;
-            }
-        }
-    }
-
-    @Test
     void testIsMekWarriorGrouping() {
         for (final PersonnelRole personnelRole : roles) {
-            if ((personnelRole == PersonnelRole.MEKWARRIOR)
-                    || (personnelRole == PersonnelRole.LAM_PILOT)) {
+            if ((personnelRole == PersonnelRole.MEKWARRIOR) || (personnelRole == PersonnelRole.LAM_PILOT)) {
                 assertTrue(personnelRole.isMekWarriorGrouping());
             } else {
                 assertFalse(personnelRole.isMekWarriorGrouping());
@@ -444,8 +428,7 @@ class PersonnelRoleTest {
     @Test
     void testIsAerospaceGrouping() {
         for (final PersonnelRole personnelRole : roles) {
-            if ((personnelRole == PersonnelRole.LAM_PILOT)
-                    || (personnelRole == PersonnelRole.AEROSPACE_PILOT)) {
+            if ((personnelRole == PersonnelRole.LAM_PILOT) || (personnelRole == PersonnelRole.AEROSPACE_PILOT)) {
                 assertTrue(personnelRole.isAerospaceGrouping());
             } else {
                 assertFalse(personnelRole.isAerospaceGrouping());
@@ -457,9 +440,9 @@ class PersonnelRoleTest {
     void testIsConventionalAirGrouping() {
         for (final PersonnelRole personnelRole : roles) {
             if (personnelRole == PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT) {
-                assertTrue(personnelRole.isConventionalAirGrouping());
+                assertTrue(personnelRole.isConventionalAircraftPilot());
             } else {
-                assertFalse(personnelRole.isConventionalAirGrouping());
+                assertFalse(personnelRole.isConventionalAircraftPilot());
             }
         }
     }
@@ -467,9 +450,9 @@ class PersonnelRoleTest {
     @Test
     void testIsGroundVehicleCrew() {
         for (final PersonnelRole personnelRole : roles) {
-            if ((personnelRole == PersonnelRole.GROUND_VEHICLE_DRIVER)
-                    || (personnelRole == PersonnelRole.VEHICLE_GUNNER)
-                    || (personnelRole == PersonnelRole.VEHICLE_CREW)) {
+            if ((personnelRole == PersonnelRole.GROUND_VEHICLE_DRIVER) ||
+                      (personnelRole == PersonnelRole.VEHICLE_GUNNER) ||
+                      (personnelRole == PersonnelRole.VEHICLE_CREW)) {
                 assertTrue(personnelRole.isGroundVehicleCrew());
             } else {
                 assertFalse(personnelRole.isGroundVehicleCrew());
@@ -480,9 +463,9 @@ class PersonnelRoleTest {
     @Test
     void testIsNavalVehicleCrew() {
         for (final PersonnelRole personnelRole : roles) {
-            if ((personnelRole == PersonnelRole.NAVAL_VEHICLE_DRIVER)
-                    || (personnelRole == PersonnelRole.VEHICLE_GUNNER)
-                    || (personnelRole == PersonnelRole.VEHICLE_CREW)) {
+            if ((personnelRole == PersonnelRole.NAVAL_VEHICLE_DRIVER) ||
+                      (personnelRole == PersonnelRole.VEHICLE_GUNNER) ||
+                      (personnelRole == PersonnelRole.VEHICLE_CREW)) {
                 assertTrue(personnelRole.isNavalVehicleCrew());
             } else {
                 assertFalse(personnelRole.isNavalVehicleCrew());
@@ -493,9 +476,9 @@ class PersonnelRoleTest {
     @Test
     void testIsVTOLCrew() {
         for (final PersonnelRole personnelRole : roles) {
-            if ((personnelRole == PersonnelRole.VTOL_PILOT)
-                    || (personnelRole == PersonnelRole.VEHICLE_GUNNER)
-                    || (personnelRole == PersonnelRole.VEHICLE_CREW)) {
+            if ((personnelRole == PersonnelRole.VTOL_PILOT) ||
+                      (personnelRole == PersonnelRole.VEHICLE_GUNNER) ||
+                      (personnelRole == PersonnelRole.VEHICLE_CREW)) {
                 assertTrue(personnelRole.isVTOLCrew());
             } else {
                 assertFalse(personnelRole.isVTOLCrew());
@@ -524,8 +507,7 @@ class PersonnelRoleTest {
     @Test
     void testIsSoldierOrBattleArmour() {
         for (final PersonnelRole personnelRole : roles) {
-            if ((personnelRole == PersonnelRole.SOLDIER)
-                    || (personnelRole == PersonnelRole.BATTLE_ARMOUR)) {
+            if ((personnelRole == PersonnelRole.SOLDIER) || (personnelRole == BATTLE_ARMOUR)) {
                 assertTrue(personnelRole.isSoldierOrBattleArmour());
             } else {
                 assertFalse(personnelRole.isSoldierOrBattleArmour());
@@ -557,8 +539,8 @@ class PersonnelRoleTest {
         assertTrue(PersonnelRole.MEK_TECH.isSupport());
         assertTrue(PersonnelRole.ASTECH.isSupport());
         assertTrue(PersonnelRole.ADMINISTRATOR_COMMAND.isSupport());
-        assertTrue(PersonnelRole.DEPENDENT.isSupport());
-        assertTrue(PersonnelRole.NONE.isSupport());
+        assertFalse(PersonnelRole.DEPENDENT.isSupport());
+        assertFalse(PersonnelRole.NONE.isSupport());
         assertFalse(PersonnelRole.MEKWARRIOR.isSupport(true));
         assertFalse(PersonnelRole.VESSEL_NAVIGATOR.isSupport(true));
         assertTrue(PersonnelRole.MEK_TECH.isSupport(true));
@@ -606,8 +588,7 @@ class PersonnelRoleTest {
     @Test
     void testIsMedicalStaff() {
         for (final PersonnelRole personnelRole : roles) {
-            if ((personnelRole == PersonnelRole.DOCTOR)
-                    || (personnelRole == PersonnelRole.MEDIC)) {
+            if ((personnelRole == PersonnelRole.DOCTOR) || (personnelRole == PersonnelRole.MEDIC)) {
                 assertTrue(personnelRole.isMedicalStaff());
             } else {
                 assertFalse(personnelRole.isMedicalStaff());
@@ -632,26 +613,51 @@ class PersonnelRoleTest {
         }
     }
 
-    @Test
-    void testIsCivilian() {
-        for (final PersonnelRole personnelRole : roles) {
-            if ((personnelRole == PersonnelRole.DEPENDENT)
-                    || (personnelRole == PersonnelRole.NONE)) {
-                assertTrue(personnelRole.isCivilian());
-            } else {
-                assertFalse(personnelRole.isCivilian());
-            }
+    @ParameterizedTest
+    @EnumSource(value = PersonnelRole.class)
+    void isSubType(PersonnelRole personnelRole) {
+        if (personnelRole.isSubType(PersonnelRoleSubType.COMBAT)) {
+            assertTrue(personnelRole.isCombat(), "PersonnelRole " + personnelRole + " is not a combat role.");
+        } else if (personnelRole.isSubType(PersonnelRoleSubType.SUPPORT)) {
+            assertTrue(personnelRole.isSupport(), "PersonnelRole " + personnelRole + " is not a support role.");
+        } else {
+            assertTrue(personnelRole.isCivilian(), "PersonnelRole " + personnelRole + " is not a civilian role.");
         }
     }
+
     // endregion Boolean Comparison Methods
 
     // region Static Methods
     @Test
-    void testGetMilitaryRoles() {
-        final List<PersonnelRole> militaryRoles = PersonnelRole.getMilitaryRoles();
-        assertEquals(roles.length - 2, militaryRoles.size());
-        assertFalse(militaryRoles.contains(PersonnelRole.DEPENDENT));
-        assertFalse(militaryRoles.contains(PersonnelRole.NONE));
+    void testGetMarketableRoles() {
+        int marketableRoles = PersonnelRole.getMarketableRoles().size();
+        int combatRoles = PersonnelRole.getCombatRoles().size();
+        int supportRoles = PersonnelRole.getSupportRoles().size();
+        assertEquals(combatRoles + supportRoles, marketableRoles);
+    }
+
+    @Test
+    void testFromString() {
+        // Valid inputs
+        assertEquals(PersonnelRole.MEKWARRIOR, PersonnelRole.fromString("MEKWARRIOR"));
+        assertEquals(PersonnelRole.GROUND_VEHICLE_DRIVER, PersonnelRole.fromString("GROUND_VEHICLE_DRIVER"));
+        assertEquals(PersonnelRole.ASTECH, PersonnelRole.fromString("ASTECH"));
+
+        // Valid inputs with variations in casing
+        assertEquals(PersonnelRole.MEKWARRIOR, PersonnelRole.fromString("MekWarrior"));
+        assertEquals(PersonnelRole.VEHICLE_CREW, PersonnelRole.fromString("vehicle_crew"));
+
+        // Valid inputs with Clan variance
+        assertEquals(BATTLE_ARMOUR, PersonnelRole.fromString("elemental"));
+        assertEquals(BATTLE_ARMOUR, PersonnelRole.fromString("Battle Armor Pilot"));
+
+        // Index input
+        assertEquals(BATTLE_ARMOUR, PersonnelRole.fromString(BATTLE_ARMOUR.ordinal() + ""));
+
+        // Invalid inputs
+        assertEquals(PersonnelRole.NONE, PersonnelRole.fromString("INVALID_ROLE"));
+        assertEquals(PersonnelRole.NONE, PersonnelRole.fromString(""));
+        assertEquals(PersonnelRole.NONE, PersonnelRole.fromString(null));
     }
 
     @Test
@@ -695,30 +701,187 @@ class PersonnelRoleTest {
 
     @Test
     void testGetCivilianCount() {
-        // Civilian Roles: Dependent and None
-        assertEquals(2, PersonnelRole.getCivilianCount());
+        int civilianCount = 0;
+        for (PersonnelRole personnelRole : roles) {
+            if (personnelRole.isCivilian()) {
+                civilianCount++;
+            }
+        }
+        assertEquals(civilianCount, PersonnelRole.getCivilianCount());
     }
     // endregion Static Methods
 
-    // region File I/O
-    @Test
-    void testParseFromString() {
-        // Normal Parsing
-        assertEquals(PersonnelRole.NONE, PersonnelRole.parseFromString("NONE"));
-        assertEquals(PersonnelRole.BATTLE_ARMOUR, PersonnelRole.parseFromString("BATTLE_ARMOUR"));
-        assertEquals(PersonnelRole.ADMINISTRATOR_LOGISTICS, PersonnelRole.parseFromString("ADMINISTRATOR_LOGISTICS"));
+    @ParameterizedTest
+    @EnumSource(value = PersonnelRole.class, names = "NONE", mode = EnumSource.Mode.EXCLUDE)
+    void testRoleEligibility(PersonnelRole role) {
+        // Setup
+        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        when(mockCampaign.getFaction()).thenReturn(Factions.getInstance().getFaction("MERC"));
 
-        // Error Case
-        assertEquals(PersonnelRole.NONE, PersonnelRole.parseFromString("28"));
-        assertEquals(PersonnelRole.NONE, PersonnelRole.parseFromString("blah"));
+        Person person = new Person(mockCampaign);
+
+        SkillType.initializeTypes();
+        LocalDate today = LocalDate.of(9999, 1, 1);
+
+        // Act
+        for (String skillName : role.getSkillsForProfession()) {
+            person.addSkill(skillName, 3, 0);
+        }
+
+        // Assert
+        assertTrue(person.canPerformRole(today, role, true),
+              "Person " +
+                    person +
+                    " cannot perform role " +
+                    role +
+                    " with skills " +
+                    person.getSkills().getSkillNames() +
+                    " expected :" +
+                    role.getSkillsForProfession());
     }
-    // endregion File I/O
+
+    @ParameterizedTest
+    @EnumSource(value = PersonnelRole.class, names = "NONE", mode = EnumSource.Mode.EXCLUDE)
+    void testGetDescription_notClan(PersonnelRole role) {
+        // Setup
+
+        // Act
+        String description = role.getDescription(false);
+
+        // Assert
+        assertTrue(isResourceKeyValid(description), "Role does not have a description: " + role.name());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = PersonnelRole.class, names = "NONE", mode = EnumSource.Mode.EXCLUDE)
+    void testGetDescription_Clan(PersonnelRole role) {
+        // Setup
+
+        // Act
+        String description = role.getDescription(true);
+
+        // Assert
+        assertTrue(isResourceKeyValid(description), "Role does not have a Clan description: " + role.name());
+    }
+
+    /**
+     * Generates a stream of integers representing the range of days from 0 to the total number of days in 18 years,
+     * accounting for leap years.
+     *
+     * <p><b>Dev Note:</b> it might seem paranoid that we check every day, and it is, but it's better to have
+     * the peace of mind that an underage character will never be eligible for this profession. Especially given the
+     * fallout were we to accidentally allow underage sex workers.</p>
+     */
+    @ParameterizedTest
+    @MethodSource(value = "seventeenToEighteenYearsOld")
+    void testAdultEntertain_ageLimit(int daysOld) {
+        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        when(mockCampaign.getFaction()).thenReturn(Factions.getInstance().getFaction("MERC"));
+
+        LocalDate today = LocalDate.of(3000, 1, 1);
+        when(mockCampaign.getLocalDate()).thenReturn(today);
+
+        Person person = new Person(mockCampaign);
+        person.setDateOfBirth(today.minusDays(daysOld));
+        SkillType.initializeTypes();
+
+        PersonnelRole role = PersonnelRole.ADULT_ENTERTAINER;
+
+        for (String skillName : role.getSkillsForProfession()) {
+            person.addSkill(skillName, 3, 0);
+        }
+
+        assertFalse(person.canPerformRole(today, role, true),
+              "Underage character (" + daysOld + " days old) is incorrectly able to have the ADULT_ENTERTAINER role.");
+    }
+
+    static IntStream seventeenToEighteenYearsOld() {
+        LocalDate today = LocalDate.of(3000, 1, 1);
+
+        // 17th birthday
+        LocalDate seventeen = today.minusYears(17);
+
+        // 18th birthday
+        LocalDate eighteen = today.minusYears(18);
+
+        // All days from the 17th birthday up to but not including the 18th birthday (should be 365 or 366 days depending on leap year)
+        long days = java.time.temporal.ChronoUnit.DAYS.between(eighteen, seventeen);
+        // Stream days from 0 (17th birthday) up to (but not including) the 18th birthday
+        return IntStream.range(0, (int) days);
+    }
 
     @Test
-    void testToStringOverride() {
-        assertEquals(resources.getString("PersonnelRole.MEKWARRIOR.text"),
-                PersonnelRole.MEKWARRIOR.toString());
-        assertEquals(resources.getString("PersonnelRole.ADMINISTRATOR_LOGISTICS.text"),
-                PersonnelRole.ADMINISTRATOR_LOGISTICS.toString());
+    void testAdultEntertainer_atAgeLimit() {
+        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        when(mockCampaign.getFaction()).thenReturn(Factions.getInstance().getFaction("MERC"));
+
+        LocalDate today = LocalDate.of(3030, 1, 1);
+        when(mockCampaign.getLocalDate()).thenReturn(today.minusYears(19));
+
+        Person person = new Person(mockCampaign);
+        person.setDateOfBirth(today.minusYears(18));
+        SkillType.initializeTypes();
+
+        PersonnelRole role = PersonnelRole.ADULT_ENTERTAINER;
+
+        for (String skillName : role.getSkillsForProfession()) {
+            person.addSkill(skillName, 3, 0);
+        }
+
+        assertTrue(person.canPerformRole(today, role, true),
+              "18 year old character is ineligible for the ADULT ENTERTAINER role but should be.");
+    }
+
+    /**
+     * Generates a stream of integers representing the range of days from 0 to the total number of days in 18 years,
+     * accounting for leap years.
+     *
+     * <p><b>Dev Note:</b> it might seem paranoid that we check every day, and it is, but it's better to have
+     * the peace of mind that an underage character will never be eligible for this profession. Especially given the
+     * fallout were we to accidentally allow underage sex workers.</p>
+     */
+    @ParameterizedTest
+    @MethodSource(value = "seventeenToEighteenYearsOld")
+    void testLuxuryCompanion_ageLimit(int daysOld) {
+        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        when(mockCampaign.getFaction()).thenReturn(Factions.getInstance().getFaction("MERC"));
+
+        LocalDate today = LocalDate.of(3000, 1, 1);
+        when(mockCampaign.getLocalDate()).thenReturn(today);
+
+        Person person = new Person(mockCampaign);
+        person.setDateOfBirth(today.minusDays(daysOld));
+        SkillType.initializeTypes();
+
+        PersonnelRole role = PersonnelRole.LUXURY_COMPANION;
+
+        for (String skillName : role.getSkillsForProfession()) {
+            person.addSkill(skillName, 3, 0);
+        }
+
+        assertFalse(person.canPerformRole(today, role, true),
+              "Underage character (" + daysOld + " days old) is incorrectly able to have the LUXURY_COMPANION role.");
+    }
+
+    @Test
+    void testLuxuryCompanion_atAgeLimit() {
+        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        when(mockCampaign.getFaction()).thenReturn(Factions.getInstance().getFaction("MERC"));
+
+        LocalDate today = LocalDate.of(3030, 1, 1);
+        when(mockCampaign.getLocalDate()).thenReturn(today.minusYears(19));
+
+        Person person = new Person(mockCampaign);
+        person.setDateOfBirth(today.minusYears(18));
+        SkillType.initializeTypes();
+
+        PersonnelRole role = PersonnelRole.LUXURY_COMPANION;
+
+        for (String skillName : role.getSkillsForProfession()) {
+            person.addSkill(skillName, 3, 0);
+        }
+
+        assertTrue(person.canPerformRole(today, role, true),
+              "18 year old character is ineligible for the LUXURY_COMPANION role but should be.");
     }
 }

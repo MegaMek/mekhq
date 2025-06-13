@@ -25,14 +25,16 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 import java.util.Objects;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import megamek.common.AmmoType;
 import megamek.common.ITechnology;
@@ -40,7 +42,6 @@ import megamek.common.TargetRoll;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.equipment.EquipmentPart;
@@ -48,6 +49,9 @@ import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.utilities.MHQXMLUtility;
+import mekhq.utilities.ReportingUtilities;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * This will be a special type of part that will only exist as spares
@@ -152,6 +156,8 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
      * is compatible with this instance's ammo.
      *
      * @param otherAmmoType The other {@code AmmoType}.
+     * @return False if the ammo does not support "compatibility" or is not compatible, true if the ammo type
+     * supports compatibility and is compatible
      */
     public boolean isCompatibleAmmo(AmmoType otherAmmoType) {
         return getType().isCompatibleWith(otherAmmoType);
@@ -271,10 +277,10 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         AmmoStorage newPart = getNewPart();
         newPart.setBrandNew(true);
         if (campaign.getQuartermaster().buyPart(newPart, transitDays)) {
-            return "<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor()
+            return "<font color='" + ReportingUtilities.getPositiveColor()
                     + "'><b> part found</b>.</font> It will be delivered in " + transitDays + " days.";
         } else {
-            return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
+            return "<font color='" + ReportingUtilities.getNegativeColor()
                     + "'><b> You cannot afford this part. Transaction cancelled</b>.</font>";
         }
     }
@@ -286,7 +292,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public String failToFind() {
-        return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
+        return "<font color='" + ReportingUtilities.getNegativeColor()
                 + "'><b> part not found</b>.</font>";
     }
 
@@ -343,9 +349,9 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
             target.addModifier(campaign.getCampaignOptions().getIsAcquisitionPenalty(), "Inner Sphere tech");
         }
         // availability mod
-        int avail = getAvailability();
+        AvailabilityValue avail = getAvailability();
         int availabilityMod = Availability.getAvailabilityModifier(avail);
-        target.addModifier(availabilityMod, "availability (" + ITechnology.getRatingName(avail) + ")");
+        target.addModifier(availabilityMod, "availability (" + avail.getName() + ")");
         return target;
     }
 
@@ -389,12 +395,12 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     }
 
     @Override
-    public boolean isIntroducedBy(int year, boolean clan, int techFaction) {
+    public boolean isIntroducedBy(int year, boolean clan, ITechnology.Faction techFaction) {
         return getIntroductionDate(clan, techFaction) <= year;
     }
 
     @Override
-    public boolean isExtinctIn(int year, boolean clan, int techFaction) {
+    public boolean isExtinctIn(int year, boolean clan, ITechnology.Faction techFaction) {
         return isExtinct(year, clan, techFaction);
     }
 }

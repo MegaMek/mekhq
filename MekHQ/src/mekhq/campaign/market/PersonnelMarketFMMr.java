@@ -24,8 +24,16 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.market;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import megamek.common.Compute;
 import megamek.common.Entity;
@@ -35,14 +43,12 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.module.api.PersonnelMarketMethod;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Generation method for personnel market based on Field Manual: Mercenaries (Revised)
  *
  * @author Neoancient
  */
+@Deprecated(since = "0.50.06", forRemoval = false)
 public class PersonnelMarketFMMr implements PersonnelMarketMethod {
 
     @Override
@@ -59,10 +65,13 @@ public class PersonnelMarketFMMr implements PersonnelMarketMethod {
         int q = 0;
         long mft = PersonnelMarket.getUnitMainForceType(c);
         int mftMod = 0;
-        if (mft == Entity.ETYPE_MEK || mft == Entity.ETYPE_TANK || mft == Entity.ETYPE_INFANTRY || mft == Entity.ETYPE_BATTLEARMOR) {
+        if (mft == Entity.ETYPE_MEK ||
+                  mft == Entity.ETYPE_TANK ||
+                  mft == Entity.ETYPE_INFANTRY ||
+                  mft == Entity.ETYPE_BATTLEARMOR) {
             mftMod = 1;
         }
-        for (PersonnelRole role : PersonnelRole.getMilitaryRoles()) {
+        for (PersonnelRole role : PersonnelRole.getMarketableRoles()) {
             int roll = Compute.d6(2);
             // TODO: Modifiers for hiring hall, but first needs to track the hiring hall
             switch (c.getAtBUnitRatingMod()) {

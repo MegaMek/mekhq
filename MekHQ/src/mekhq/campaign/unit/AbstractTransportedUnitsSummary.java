@@ -28,12 +28,20 @@
 
 package mekhq.campaign.unit;
 
-import megamek.common.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.Vector;
+
+import megamek.common.Entity;
+import megamek.common.Transporter;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
+import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.unit.enums.TransporterType;
-
-import java.util.*;
 
 /**
  * Tracks what units this transport is transporting, and its current capacity for its different transporter types.
@@ -43,9 +51,11 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
     protected Unit transport;
     private Set<Unit> transportedUnits = new HashSet<>();
     private Map<TransporterType, Double> transportCapacity = new HashMap<>();
+    private CampaignTransportType campaignTransportType;
 
-    AbstractTransportedUnitsSummary(Unit transport) {
+    AbstractTransportedUnitsSummary(Unit transport, CampaignTransportType campaignTransportType) {
         this.transport = transport;
+        this.campaignTransportType = campaignTransportType;
         init();
     }
 
@@ -151,7 +161,7 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
      * @return The current capacity of the transporter, or 0
      */
     @Override
-    public double getCurrentTransportCapacity(TransporterType transporterType) {
+    public double getCurrentTransportCapacity(@Nullable TransporterType transporterType) {
         return transportCapacity.getOrDefault(transporterType, 0.0);
     }
 
@@ -218,6 +228,14 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
         clearTransportedEntities();
     }
 
+    /**
+     * Completely clears the capacity map. Helpful if the transportCapacity has a TransporterType for a Transporter
+     * the unit no longer has - such as after a refit.
+     */
+    public void clearTransportCapacityMap() {
+        transportCapacity = new HashMap<>();
+    }
+
     protected Set<Entity> clearTransportedEntities() {
         Set<Entity> transportedEntities = new HashSet<>();
         if (transport.getEntity() != null) {
@@ -238,14 +256,37 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
     }
 
     protected void loadTransportedEntities() {
-        if (transport.getEntity() != null) {
+        Entity transportEntity = transport.getEntity();
+        if (transportEntity != null) {
             for (Unit transportedUnit : getTransportedUnits()) {
-                if (transportedUnit.getEntity() != null) {
-                    transport.getEntity().resetBays();
-                    loadEntity(transportedUnit.getEntity());
-                }
+                loadTransportedEntity(transportedUnit, transportEntity);
             }
         }
+    }
+
+    private void loadTransportedEntity(Unit transportedUnit, Entity transportEntity) {
+        if (transportedUnit.getEntity() != null) {
+            transportEntity.resetBays();
+            if ((transportedUnit.hasTransportAssignment(campaignTransportType))
+                      && (transportedUnit.getTransportAssignment(campaignTransportType).hasTransporterType())) {
+                loadEntityInTransporter(transportedUnit, transportEntity.getTransports());
+            } else {
+                loadEntity(transportedUnit.getEntity());
+            }
+        }
+    }
+
+    private void loadEntityInTransporter(Unit transportedUnit, Vector<Transporter> transporters) {
+        TransporterType transporterType =
+              transportedUnit.getTransportAssignment(campaignTransportType).getTransporterType();
+        for (Transporter transporter : transporters) {
+            if (transporterType.getTransporterClass() == transporter.getClass() && transporter.canLoad(
+                  transportedUnit.getEntity())) {
+                transporter.load(transportedUnit.getEntity());
+                return;
+            }
+        }
+        loadEntity(transportedUnit.getEntity());
     }
 
     protected void loadEntity(Entity transportedEntity) {

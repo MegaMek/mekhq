@@ -65,25 +65,25 @@
         <curriculum>Small Arms, Anti-Mek</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>MekTech Apprenticeship</qualification>
-        <curriculum>Astech, Tech/Mek</curriculum>
+        <curriculum>Astech, Tech/Mek, Administration</curriculum>
         <qualificationStartYear>2439</qualificationStartYear>
         <qualification>Mechanic Apprenticeship</qualification>
-        <curriculum>Astech, Tech/Mechanic</curriculum>
+        <curriculum>Astech, Tech/Mechanic, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>AeroTek Apprenticeship</qualification>
-        <curriculum>Astech, Tech/Aero</curriculum>
+        <curriculum>Astech, Tech/Aero, Administration</curriculum>
         <qualificationStartYear>2314</qualificationStartYear>
         <qualification>Battle Armor Technician Apprenticeship</qualification>
-        <curriculum>Astech, Tech/BattleArmor</curriculum>
+        <curriculum>Astech, Tech/BattleArmor, Administration</curriculum>
         <qualificationStartYear>3050</qualificationStartYear>
         <qualification>Black Naval Tech Apprenticeship</qualification>
-        <curriculum>Astech, Tech/Vessel</curriculum>
+        <curriculum>Astech, Tech/Vessel, Administration</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
         <qualification>Administrative Apprenticeship</qualification>
-        <curriculum>Administration, Scrounge</curriculum>
+        <curriculum>Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Medical Apprenticeship</qualification>
-        <curriculum>MedTech, Doctor</curriculum>
+        <curriculum>MedTech, Doctor, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
     </academy>
@@ -100,25 +100,25 @@
         <facultySkill>9</facultySkill>
         <ageMin>16</ageMin>
         <qualification>MekTech Apprenticeship</qualification>
-        <curriculum>Astech, Tech/Mek</curriculum>
+        <curriculum>Astech, Tech/Mek, Administration</curriculum>
         <qualificationStartYear>2439</qualificationStartYear>
         <qualification>Mechanic Apprenticeship</qualification>
-        <curriculum>Astech, Tech/Mechanic</curriculum>
+        <curriculum>Astech, Tech/Mechanic, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>AeroTek Apprenticeship</qualification>
-        <curriculum>Astech, Tech/Aero</curriculum>
+        <curriculum>Astech, Tech/Aero, Administration</curriculum>
         <qualificationStartYear>2314</qualificationStartYear>
         <qualification>Battle Armor Technician Apprenticeship</qualification>
-        <curriculum>Astech, Tech/BattleArmor</curriculum>
+        <curriculum>Astech, Tech/BattleArmor, Administration</curriculum>
         <qualificationStartYear>3050</qualificationStartYear>
         <qualification>Black Naval Tech Apprenticeship</qualification>
-        <curriculum>Astech, Tech/Vessel</curriculum>
+        <curriculum>Astech, Tech/Vessel, Administration</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
         <qualification>Administrative Apprenticeship</qualification>
-        <curriculum>Administration, Scrounge</curriculum>
+        <curriculum>Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Medical Apprenticeship</qualification>
-        <curriculum>MedTech, Doctor</curriculum>
+        <curriculum>MedTech, Doctor, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>

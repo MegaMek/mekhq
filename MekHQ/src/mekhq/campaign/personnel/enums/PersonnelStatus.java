@@ -24,64 +24,71 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.enums;
-
-import megamek.logging.MMLogger;
-import mekhq.MekHQ;
-import mekhq.campaign.personnel.Person;
-
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Person;
+import mekhq.utilities.ReportingUtilities;
+
 /**
  * Represents the various statuses that a {@link Person} can have within MekHQ.
  *
  * <p>This class is implemented as an {@code enum}, providing a predefined set of constants
- * representing specific personnel statuses (e.g., ACTIVE, MIA, KIA, SUICIDE, etc.). Each status
- * is associated with a {@link NotificationSeverity} that indicates the severity level or category
- * of the condition, such as {@code POSITIVE}, {@code WARNING}, or {@code NEGATIVE}. This helps
- * color-code messages or reports for better visual communication.</p>
+ * representing specific personnel statuses (e.g., ACTIVE, MIA, KIA, SUICIDE, etc.). Each status is associated with a
+ * {@link NotificationSeverity} that indicates the severity level or category of the condition, such as
+ * {@code POSITIVE}, {@code WARNING}, or {@code NEGATIVE}. This helps color-code messages or reports for better visual
+ * communication.</p>
  *
  * <p>Additional features include methods to retrieve localized labels, tooltips, report texts,
- * and log texts for each status. These utilize resource bundles for localization, enabling
- * multi-language support. There are also utility methods for checking whether a status belongs
- * to certain predefined categories like "absent," "dead," or "departed from the unit."</p>
+ * and log texts for each status. These utilize resource bundles for localization, enabling multi-language support.
+ * There are also utility methods for checking whether a status belongs to certain predefined categories like "absent,"
+ * "dead," or "departed from the unit."</p>
  */
 public enum PersonnelStatus {
     // region Enum Declarations
-    ACTIVE(NotificationSeverity.WARNING),
-    MIA(NotificationSeverity.WARNING),
-    POW(NotificationSeverity.WARNING),
-    ON_LEAVE(NotificationSeverity.WARNING),
-    ON_MATERNITY_LEAVE(NotificationSeverity.WARNING),
-    AWOL(NotificationSeverity.WARNING),
-    RETIRED(NotificationSeverity.NEGATIVE),
-    RESIGNED(NotificationSeverity.NEGATIVE),
-    SACKED(NotificationSeverity.WARNING),
-    LEFT(NotificationSeverity.NEGATIVE),
-    DESERTED(NotificationSeverity.NEGATIVE),
-    DEFECTED(NotificationSeverity.NEGATIVE),
-    STUDENT(NotificationSeverity.POSITIVE),
-    MISSING(NotificationSeverity.NEGATIVE),
-    KIA(NotificationSeverity.NEGATIVE),
-    HOMICIDE(NotificationSeverity.NEGATIVE),
-    WOUNDS(NotificationSeverity.NEGATIVE),
-    DISEASE(NotificationSeverity.NEGATIVE),
-    ACCIDENTAL(NotificationSeverity.NEGATIVE),
-    NATURAL_CAUSES(NotificationSeverity.NEGATIVE),
-    OLD_AGE(NotificationSeverity.NEGATIVE),
-    MEDICAL_COMPLICATIONS(NotificationSeverity.NEGATIVE),
-    PREGNANCY_COMPLICATIONS(NotificationSeverity.NEGATIVE),
-    UNDETERMINED(NotificationSeverity.NEGATIVE),
-    SUICIDE(NotificationSeverity.NEGATIVE),
-    ENEMY_BONDSMAN(NotificationSeverity.NEGATIVE),
-    BONDSREF(NotificationSeverity.NEGATIVE);
+    ACTIVE(NotificationSeverity.WARNING, true, false),
+    MIA(NotificationSeverity.WARNING, false, false),
+    POW(NotificationSeverity.WARNING, false, false),
+    ON_LEAVE(NotificationSeverity.WARNING, false, false),
+    ON_MATERNITY_LEAVE(NotificationSeverity.WARNING, false, false),
+    AWOL(NotificationSeverity.WARNING, false, false),
+    RETIRED(NotificationSeverity.NEGATIVE, false, false),
+    RESIGNED(NotificationSeverity.NEGATIVE, false, false),
+    SACKED(NotificationSeverity.WARNING, false, false),
+    LEFT(NotificationSeverity.WARNING, true, false),
+    DESERTED(NotificationSeverity.NEGATIVE, false, false),
+    DEFECTED(NotificationSeverity.NEGATIVE, false, false),
+    STUDENT(NotificationSeverity.POSITIVE, false, false),
+    MISSING(NotificationSeverity.NEGATIVE, true, false),
+    KIA(NotificationSeverity.NEGATIVE, true, true),
+    HOMICIDE(NotificationSeverity.NEGATIVE, true, true),
+    WOUNDS(NotificationSeverity.NEGATIVE, true, true),
+    DISEASE(NotificationSeverity.NEGATIVE, true, true),
+    ACCIDENTAL(NotificationSeverity.NEGATIVE, true, true),
+    NATURAL_CAUSES(NotificationSeverity.NEGATIVE, true, true),
+    OLD_AGE(NotificationSeverity.NEGATIVE, true, true),
+    MEDICAL_COMPLICATIONS(NotificationSeverity.NEGATIVE, true, true),
+    PREGNANCY_COMPLICATIONS(NotificationSeverity.NEGATIVE, true, true),
+    UNDETERMINED(NotificationSeverity.NEGATIVE, true, true),
+    SUICIDE(NotificationSeverity.NEGATIVE, true, true),
+    ENEMY_BONDSMAN(NotificationSeverity.NEGATIVE, false, false),
+    BONDSREF(NotificationSeverity.NEGATIVE, true, true),
+    SEPPUKU(NotificationSeverity.NEGATIVE, true, true),
+    BACKGROUND_CHARACTER(NotificationSeverity.WARNING, false, false);
 
     /**
      * Represents the severity levels of a status.
@@ -121,18 +128,30 @@ public enum PersonnelStatus {
 
     // region Variable Declarations
     private final NotificationSeverity severity;
+    private final boolean isPrisonerSuitableStatus;
+    private final boolean isCauseOfDeath;
     // endregion Variable Declarations
 
     // region Constructors
+
     /**
-     * Initializes a new instance of the {@link PersonnelStatus} class with the specified severity level.
+     * Initializes a new instance of the {@link PersonnelStatus} class with the specified severity level and suitability
+     * status for prisoners.
      *
-     * @param severity the severity level of the personnel status, represented by {@link NotificationSeverity}
+     * @param severity                 the severity level of the personnel status, represented by
+     *                                 {@link NotificationSeverity}. This defines the importance or criticality of the
+     *                                 personnel status.
+     * @param isPrisonerSuitableStatus a boolean flag indicating whether the personnel status is suitable for
+     *                                 prisoners.
      */
-    PersonnelStatus(final NotificationSeverity severity) {
+    PersonnelStatus(final NotificationSeverity severity, final boolean isPrisonerSuitableStatus,
+          final boolean isCauseOfDeath) {
         this.severity = severity;
+        this.isPrisonerSuitableStatus = isPrisonerSuitableStatus;
+        this.isCauseOfDeath = isCauseOfDeath;
     }
     // endregion Constructors
+
     /**
      * Retrieves the severity level of this status.
      *
@@ -140,6 +159,28 @@ public enum PersonnelStatus {
      */
     public NotificationSeverity getSeverity() {
         return severity;
+    }
+
+    /**
+     * Checks whether the personnel status is suitable for prisoners.
+     *
+     * @return {@code true} if the personnel status is deemed suitable for prisoners; {@code false} otherwise.
+     *
+     * @since 0.50.05
+     */
+    public boolean isPrisonerSuitableStatus() {
+        return isPrisonerSuitableStatus;
+    }
+
+    /**
+     * Checks whether the personnel status is a cause of death.
+     *
+     * @return {@code true} if the personnel status is a cause of death; {@code false} otherwise.
+     *
+     * @since 0.50.05
+     */
+    public boolean isCauseOfDeath() {
+        return isCauseOfDeath;
     }
 
     /**
@@ -182,10 +223,10 @@ public enum PersonnelStatus {
         final String RESOURCE_KEY = name() + ".report";
 
         String OPENING_SPAN_TEXT = switch (severity) {
-            case NEGATIVE -> spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor());
-            case WARNING -> spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
+            case NEGATIVE -> spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
+            case WARNING -> spanOpeningWithCustomColor(ReportingUtilities.getWarningColor());
             case NEUTRAL -> "";
-            case POSITIVE -> spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor());
+            case POSITIVE -> spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor());
         };
 
         String CLOSING_SPAN_TEXT = OPENING_SPAN_TEXT.isBlank() ? "" : CLOSING_SPAN_TAG;
@@ -209,300 +250,331 @@ public enum PersonnelStatus {
     // endregion Getters
 
     // region Boolean Comparison Methods
+
     /**
-     * Checks if the character has the {@code ACTIVE} personnel status.
+     * Checks if the character has the {@link #ACTIVE} personnel status.
      *
-     * @return {@code true} if the character has the {@code ACTIVE} personnel status {@code false}
-     * otherwise.
+     * @return {@code true} if the character has the {@link #ACTIVE} personnel status {@code false} otherwise.
      */
     public boolean isActive() {
         return this == ACTIVE;
     }
 
     /**
-     * Checks if the character has the {@code MIA} personnel status.
+     * Checks if the character has the {@link #MIA} personnel status.
      *
-     * @return {@code true} if the character has the {@code MIA} personnel status {@code false}
-     * otherwise.
+     * @return {@code true} if the character has the {@link #MIA} personnel status {@code false} otherwise.
      */
     public boolean isMIA() {
         return this == MIA;
     }
 
     /**
-     * Checks if the character has the {@code POW} personnel status.
+     * Checks if the character has the {@link #POW} personnel status.
      *
-     * @return {@code true} if the character has the {@code POW} personnel status {@code false}
-     * otherwise.
+     * @return {@code true} if the character has the {@link #POW} personnel status {@code false} otherwise.
      */
     public boolean isPoW() {
         return this == POW;
     }
 
     /**
-     * Checks if the character has the {@code ON_LEAVE} personnel status.
+     * Checks if the character has the {@link #ON_LEAVE} personnel status.
      *
-     * @return {@code true} if the character has the {@code ON_LEAVE} personnel status {@code false}
-     * otherwise.
+     * @return {@code true} if the character has the {@link #ON_LEAVE} personnel status {@code false} otherwise.
      */
     public boolean isOnLeave() {
         return this == ON_LEAVE;
     }
 
     /**
-     * Checks if the character has the {@code ON_MATERNITY_LEAVE} personnel status.
+     * Checks if the character has the {@link #ON_MATERNITY_LEAVE} personnel status.
      *
-     * @return {@code true} if the character has the {@code ON_MATERNITY_LEAVE} personnel status
-     * {@code false} otherwise.
+     * @return {@code true} if the character has the {@link #ON_MATERNITY_LEAVE} personnel status {@code false}
+     *       otherwise.
      */
     public boolean isOnMaternityLeave() {
         return this == ON_MATERNITY_LEAVE;
     }
 
     /**
-     * Checks if the character has the {@code AWOL} personnel status.
+     * Checks if the character has the {@link #AWOL} personnel status.
      *
-     * @return {@code true} if the character has the {@code AWOL} personnel status {@code false}
-     * otherwise.
+     * @return {@code true} if the character has the {@link #AWOL} personnel status {@code false} otherwise.
      */
     public boolean isAwol() {
         return this == AWOL;
     }
 
     /**
-     * Checks if the character has the {@code RETIRED} personnel status.
+     * Checks if the character has the {@link #RETIRED} personnel status.
      *
-     * @return {@code true} if the character has the {@code RETIRED} personnel status {@code false}
-     * otherwise.
+     * @return {@code true} if the character has the {@link #RETIRED} personnel status {@code false} otherwise.
      */
     public boolean isRetired() {
         return this == RETIRED;
     }
 
     /**
-     * Checks if the character has the {@code RESIGNED} personnel status.
+     * Checks if the character has the {@link #RESIGNED} personnel status.
      *
-     * @return {@code true} if the character has the {@code RESIGNED} personnel status {@code false}
-     * otherwise.
+     * @return {@code true} if the character has the {@link #RESIGNED} personnel status {@code false} otherwise.
      */
     public boolean isResigned() {
         return this == RESIGNED;
     }
 
     /**
-     * Checks if the character has the {@code SACKED} personnel status.
+     * Checks if the character has the {@link #SACKED} personnel status.
      *
-     * @return {@code true} if the character has the {@code SACKED} personnel status {@code false}
-     * otherwise.
+     * @return {@code true} if the character has the {@link #SACKED} personnel status {@code false} otherwise.
      */
     public boolean isSacked() {
         return this == SACKED;
     }
 
     /**
-     * Checks if the character has the {@code LEFT} personnel status.
+     * Checks if the character has the {@link #LEFT} personnel status.
      *
-     * @return {@code true} if the character has the {@code LEFT} personnel status {@code false}
-     * otherwise.
+     * @return {@code true} if the character has the {@link #LEFT} personnel status {@code false} otherwise.
      */
     public boolean isLeft() {
         return this == LEFT;
     }
 
     /**
-     * Checks if the character has the {@code DESERTED} personnel status.
+     * Checks if the character has the {@link #DESERTED} personnel status.
      *
-     * @return {@code true} if the character has the {@code DESERTED} personnel status {@code false}
-     * otherwise.
+     * @return {@code true} if the character has the {@link #DESERTED} personnel status {@code false} otherwise.
      */
     public boolean isDeserted() {
         return this == DESERTED;
     }
 
     /**
-     * Checks if the character has the {@code DEFECTED} personnel status.
+     * Checks if the character has the {@link #DEFECTED} personnel status.
      *
-     * @return {@code true} if the character has the {@code DEFECTED} personnel status {@code false}
-     * otherwise.
+     * @return {@code true} if the character has the {@link #DEFECTED} personnel status {@code false} otherwise.
      */
     public boolean isDefected() {
         return this == DEFECTED;
     }
 
     /**
-     * Checks if the character has the {@code STUDENT} personnel status.
+     * Checks if the character has the {@link #STUDENT} personnel status.
      *
-     * @return {@code true} if the character has the {@code STUDENT} personnel status {@code false}
-     * otherwise.
+     * @return {@code true} if the character has the {@link #STUDENT} personnel status {@code false} otherwise.
      */
     public boolean isStudent() {
         return this == STUDENT;
     }
 
     /**
-     * Checks if the character has the {@code MISSING} personnel status.
+     * Checks if the character has the {@link #MISSING} personnel status.
      *
-     * @return {@code true} if the character has the {@code MISSING} personnel status {@code false}
-     * otherwise.
+     * @return {@code true} if the character has the {@link #MISSING} personnel status {@code false} otherwise.
      */
     public boolean isMissing() {
         return this == MISSING;
     }
 
     /**
-     * Checks if the character has the {@code KIA} personnel status.
+     * Checks if the character has the {@link #KIA} personnel status.
      *
-     * @return {@code true} if the character has the {@code KIA} personnel status {@code false}
-     * otherwise.
+     * @return {@code true} if the character has the {@link #KIA} personnel status {@code false} otherwise.
      */
     public boolean isKIA() {
         return this == KIA;
     }
 
     /**
-     * Checks if the character has the {@code HOMICIDE} personnel status.
+     * Checks if the character has the {@link #HOMICIDE} personnel status.
      *
-     * @return {@code true} if the character has the {@code HOMICIDE} personnel status {@code false}
-     * otherwise.
+     * @return {@code true} if the character has the {@link #HOMICIDE} personnel status {@code false} otherwise.
      */
     public boolean isHomicide() {
         return this == HOMICIDE;
     }
 
     /**
-     * Checks if the character has the {@code WOUNDS} personnel status.
+     * Checks if the character has the {@link #WOUNDS} personnel status.
      *
-     * @return {@code true} if the character has the {@code WOUNDS} personnel status {@code false}
-     * otherwise.
+     * @return {@code true} if the character has the {@link #WOUNDS} personnel status {@code false} otherwise.
      */
     public boolean isWounds() {
         return this == WOUNDS;
     }
 
     /**
-     * Checks if the character has the {@code DISEASE} personnel status.
+     * Checks if the character has the {@link #DISEASE} personnel status.
      *
-     * @return {@code true} if the character has the {@code DISEASE} personnel status {@code false}
-     * otherwise.
+     * @return {@code true} if the character has the {@link #DISEASE} personnel status {@code false} otherwise.
      */
     public boolean isDisease() {
         return this == DISEASE;
     }
 
     /**
-     * Checks if the character has the {@code ACCIDENTAL} personnel status.
+     * Checks if the character has the {@link #ACCIDENTAL} personnel status.
      *
-     * @return {@code true} if the character has the {@code ACCIDENTAL} personnel status {@code false}
-     * otherwise.
+     * @return {@code true} if the character has the {@link #ACCIDENTAL} personnel status {@code false} otherwise.
      */
     public boolean isAccidental() {
         return this == ACCIDENTAL;
     }
 
     /**
-     * Checks if the character has the {@code NATURAL_CAUSES} personnel status.
+     * Checks if the character has the {@link #NATURAL_CAUSES} personnel status.
      *
-     * @return {@code true} if the character has the {@code NATURAL_CAUSES} personnel status {@code false}
-     * otherwise.
+     * @return {@code true} if the character has the {@link #NATURAL_CAUSES} personnel status {@code false} otherwise.
      */
     public boolean isNaturalCauses() {
         return this == NATURAL_CAUSES;
     }
 
     /**
-     * Checks if the character has the {@code OLD_AGE} personnel status.
+     * Checks if the character has the {@link #OLD_AGE} personnel status.
      *
-     * @return {@code true} if the character has the {@code OLD_AGE} personnel status {@code false}
-     * otherwise.
+     * @return {@code true} if the character has the {@link #OLD_AGE} personnel status {@code false} otherwise.
      */
     public boolean isOldAge() {
         return this == OLD_AGE;
     }
 
     /**
-     * Checks if the character has the {@code MEDICAL_COMPLICATIONS} personnel status.
+     * Checks if the character has the {@link #MEDICAL_COMPLICATIONS} personnel status.
      *
-     * @return {@code true} if the character has the {@code MEDICAL_COMPLICATIONS} personnel status
-     * {@code false} otherwise.
+     * @return {@code true} if the character has the {@link #MEDICAL_COMPLICATIONS} personnel status {@code false}
+     *       otherwise.
      */
     public boolean isMedicalComplications() {
         return this == MEDICAL_COMPLICATIONS;
     }
 
     /**
-     * Checks if the character has the {@code PREGNANCY_COMPLICATIONS} personnel status.
+     * Checks if the character has the {@link #PREGNANCY_COMPLICATIONS} personnel status.
      *
-     * @return {@code true} if the character has the {@code PREGNANCY_COMPLICATIONS} personnel status
-     * {@code false} otherwise.
+     * @return {@code true} if the character has the {@link #PREGNANCY_COMPLICATIONS} personnel status {@code false}
+     *       otherwise.
      */
     public boolean isPregnancyComplications() {
         return this == PREGNANCY_COMPLICATIONS;
     }
 
     /**
-     * Checks if the character has the {@code UNDETERMINED} personnel status.
+     * Checks if the character has the {@link #UNDETERMINED} personnel status.
      *
-     * @return {@code true} if the character has the {@code UNDETERMINED} personnel status {@code false}
-     * otherwise.
+     * @return {@code true} if the character has the {@link #UNDETERMINED} personnel status {@code false} otherwise.
      */
     public boolean isUndetermined() {
         return this == UNDETERMINED;
     }
 
     /**
-     * Checks if the character has the {@code SUICIDE} personnel status.
+     * Checks if the character has the {@link #SUICIDE} personnel status.
      *
-     * @return {@code true} if the character has the {@code SUICIDE} personnel status {@code false}
-     * otherwise.
+     * @return {@code true} if the character has the {@link #SUICIDE} personnel status {@code false} otherwise.
      */
     public boolean isSuicide() {
         return this == SUICIDE;
     }
 
     /**
-     * Checks if the character has the {@code ENEMY_BONDSMAN} personnel status.
+     * Checks if the character has the {@link #ENEMY_BONDSMAN} personnel status.
      *
-     * @return {@code true} if the character has the {@code ENEMY_BONDS} personnel status {@code false}
-     * otherwise.
+     * @return {@code true} if the character has the {@link #ENEMY_BONDSMAN} personnel status {@code false} otherwise.
      */
     public boolean isEnemyBondsman() {
         return this == ENEMY_BONDSMAN;
     }
 
     /**
-     * Checks if the character has the {@code BONDSREF} personnel status.
+     * Checks if the character has the {@link #BONDSREF} personnel status.
      *
-     * @return {@code true} if the character has the {@code BONDSREF} personnel status {@code false}
-     * otherwise.
+     * @return {@code true} if the character has the {@link #BONDSREF} personnel status {@code false} otherwise.
      */
     public boolean isBondsref() {
         return this == BONDSREF;
     }
 
     /**
-     * @return {@code true} if a person is currently absent from the core force, otherwise
-     *         {@code false}
+     * Checks if the character has the {@link #SEPPUKU} personnel status.
+     *
+     * @return {@code true} if the character has the {@link #SEPPUKU} personnel status {@code false} otherwise.
+     */
+    public boolean isSeppuku() {
+        return this == SEPPUKU;
+    }
+
+    /**
+     * Checks if the character has the {@link #BACKGROUND_CHARACTER} personnel status.
+     *
+     * @return {@code true} if the character has the {@link #BACKGROUND_CHARACTER} personnel status {@code false}
+     *       otherwise.
+     */
+    public boolean isBackground() {
+        return this == BACKGROUND_CHARACTER;
+    }
+
+    /**
+     * @return {@code true} if a person is currently absent from the core force, otherwise {@code false}
      */
     public boolean isAbsent() {
-        return isMIA() || isPoW() || isEnemyBondsman() || isOnLeave() || isOnMaternityLeave()
-            || isAwol() || isStudent() || isMissing();
+        return isMIA() ||
+                     isPoW() ||
+                     isEnemyBondsman() ||
+                     isOnLeave() ||
+                     isOnMaternityLeave() ||
+                     isAwol() ||
+                     isStudent() ||
+                     isMissing();
+    }
+
+    /**
+     * Determines whether a person is eligible to receive a salary.
+     *
+     * @return {@code true} if the person is eligible to receive a salary; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public boolean isSalaryEligible() {
+        return isActive() || isPoW() || isOnLeave() || isOnMaternityLeave() || isStudent();
     }
 
     /**
      * @return {@code true} if a person has left the unit, otherwise {@code false}
      */
     public boolean isDepartedUnit() {
-        return isDead() || isRetired() || isResigned() || isSacked() || isDeserted() || isDefected()
-            || isMissing() || isLeft() || isEnemyBondsman();
+        return isDead() ||
+                     isRetired() ||
+                     isResigned() ||
+                     isSacked() ||
+                     isDeserted() ||
+                     isDefected() ||
+                     isMissing() ||
+                     isLeft() || isEnemyBondsman() ||
+                     // We count background characters as departed, even though they technically never joined
+                     isBackground();
     }
 
     /**
      * @return {@code true} if a person is dead, otherwise {@code false}
      */
     public boolean isDead() {
-        return isKIA() || isHomicide() || isWounds() || isDisease() || isAccidental()
-                || isNaturalCauses() || isOldAge() || isMedicalComplications()
-                || isPregnancyComplications() || isUndetermined() || isSuicide() || isBondsref();
+        return isKIA() ||
+                     isHomicide() ||
+                     isWounds() ||
+                     isDisease() ||
+                     isAccidental() ||
+                     isNaturalCauses() ||
+                     isOldAge() ||
+                     isMedicalComplications() ||
+                     isPregnancyComplications() ||
+                     isUndetermined() ||
+                     isSuicide() ||
+                     isBondsref() ||
+                     isSeppuku();
     }
 
     /**
@@ -514,34 +586,124 @@ public enum PersonnelStatus {
     // endregion Boolean Comparison Methods
 
     /**
-     * @return The list of implemented personnel statuses.
+     * Retrieves a list of implemented personnel statuses based on the specified criteria.
+     *
+     * @param isFree              a boolean flag that determines the filtering behavior:
+     *                            <ul>
+     *                              <li>If {@code true}, all relevant {@link PersonnelStatus} values are returned.</li>
+     *                              <li>If {@code false}, only {@link PersonnelStatus} values suitable for prisoners
+     *                                  are included in the result.</li>
+     *                            </ul>
+     * @param includeCauseOfDeath a boolean flag that determines whether statuses marked as causes of death should be
+     *                            included:
+     *                            <ul>
+     *                              <li>If {@code true}, cause of death statuses are included.</li>
+     *                              <li>If {@code false}, cause of death statuses are excluded.</li>
+     *                            </ul>
+     *
+     * @return a {@link List} of {@link PersonnelStatus} objects that match the specified criteria.
+     *
+     * @since 0.50.05
      */
-    public static List<PersonnelStatus> getImplementedStatuses() {
-        return Stream.of(values())
-                .collect(Collectors.toList());
+    public static List<PersonnelStatus> getImplementedStatuses(boolean isFree, boolean includeCauseOfDeath) {
+        List<PersonnelStatus> result = new ArrayList<>();
+        for (PersonnelStatus value : values()) {
+            if (value.isCauseOfDeath && !includeCauseOfDeath) {
+                continue;
+            }
+
+            if (isFree || value.isPrisonerSuitableStatus()) {
+                result.add(value);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Retrieves a list of personnel statuses that are marked as causes of death, based on the specified filtering
+     * criteria.
+     *
+     * @param isFree a boolean flag that determines the filtering behavior:
+     *               <ul>
+     *                 <li>If {@code true}, all statuses marked as causes of death are included.</li>
+     *                 <li>If {@code false}, only statuses marked as causes of death and suitable for prisoners
+     *                     are included.</li>
+     *               </ul>
+     *
+     * @return a {@link List} of {@link PersonnelStatus} objects that are causes of death and meet the specified
+     *       criteria.
+     *
+     * @since 0.50.05
+     */
+    public static List<PersonnelStatus> getCauseOfDeathStatuses(boolean isFree) {
+        List<PersonnelStatus> result = new ArrayList<>();
+        for (PersonnelStatus value : values()) {
+            if (!value.isCauseOfDeath) {
+                continue;
+            }
+
+            if (isFree || value.isPrisonerSuitableStatus()) {
+                result.add(value);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Validates and updates the {@link PersonnelStatus} of a {@link Person} based on their prisoner status.
+     *
+     * <p>This method is specifically designed to ensure data integrity in campaigns where invalid personnel statuses
+     * may exist for prisoners (introduced in version <b>v0.50.05</b>). It guarantees that prisoners have status values
+     * appropriate to their situation within the game context. </p>
+     *
+     * @param campaign   the {@link Campaign} object representing the current campaign. It is used for updating the
+     *                   person's status with reference to the campaign context (e.g., current date).
+     * @param person     the {@link Person} whose status is to be validated and potentially updated. This will be
+     *                   modified only if they are marked as a prisoner and their status is deemed invalid.
+     * @param isPrisoner a boolean flag indicating if the person is a prisoner:
+     *                   <ul>
+     *                     <li>{@code true}: The person is a prisoner, and their status will be validated
+     *                     and corrected if needed.</li>
+     *                     <li>{@code false}: No validation or updates are applied to the person's status.</li>
+     *                   </ul>
+     *
+     * @since 0.50.05
+     */
+    public static void statusValidator(Campaign campaign, Person person, boolean isPrisoner) {
+        if (!isPrisoner) {
+            return;
+        }
+
+        PersonnelStatus status = person.getStatus();
+        if (!status.isPrisonerSuitableStatus()) {
+            person.changeStatus(campaign, campaign.getLocalDate(), ACTIVE);
+        }
     }
 
     // region File I/O
+
     /**
-     * Converts a given string to its corresponding {@code PersonnelStatus} enumeration value. The
-     * method first attempts to parse the string as the name of an {@code PersonnelStatus} enum value.
-     * If that fails, it attempts to parse the string as an integer representing the ordinal of an
-     * {@code PersonnelStatus} enum value. If neither succeeds, it logs an error and defaults to
-     * returning {@code ACTIVE}.
+     * Converts a given string to its corresponding {@code PersonnelStatus} enumeration value. The method first attempts
+     * to parse the string as the name of an {@code PersonnelStatus} enum value. If that fails, it attempts to parse the
+     * string as an integer representing the ordinal of an {@code PersonnelStatus} enum value. If neither succeeds, it
+     * logs an error and defaults to returning {@code ACTIVE}.
      *
-     * @param text the input string to parse, which represents either the name or the ordinal
-     *             of an {@code PersonnelStatus} enum value.
-     * @return the corresponding {@code PersonnelStatus} enum instance for the given input string,
-     *         or {@code ACTIVE} if no valid match is found.
+     * @param text the input string to parse, which represents either the name or the ordinal of an
+     *             {@code PersonnelStatus} enum value.
+     *
+     * @return the corresponding {@code PersonnelStatus} enum instance for the given input string, or {@code ACTIVE} if
+     *       no valid match is found.
      */
     public static PersonnelStatus fromString(String text) {
         try {
             return PersonnelStatus.valueOf(text);
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         try {
             return PersonnelStatus.values()[Integer.parseInt(text)];
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         MMLogger logger = MMLogger.create(PersonnelStatus.class);
         logger.error("Unknown PersonnelStatus ordinal: {} - returning {}.", text, ACTIVE);

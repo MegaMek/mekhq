@@ -32,7 +32,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import io.sentry.Sentry;
 import megamek.client.AbstractClient;
@@ -40,11 +44,16 @@ import megamek.client.Client;
 import megamek.client.CloseClientListener;
 import megamek.client.bot.BotClient;
 import megamek.client.bot.princess.Princess;
-import megamek.client.ui.swing.*;
-import megamek.client.ui.swing.util.MegaMekController;
+import megamek.client.ui.clientGUI.ClientGUI;
+import megamek.client.ui.clientGUI.IClientGUI;
+import megamek.client.ui.clientGUI.IDisconnectSilently;
+import megamek.client.ui.clientGUI.ILocalBots;
+import megamek.client.ui.clientGUI.MegaMekGUI;
+import megamek.client.ui.util.MegaMekController;
 import megamek.common.Entity;
 import megamek.common.MapSettings;
 import megamek.common.WeaponOrderHandler;
+import megamek.common.planetaryconditions.PlanetaryConditions;
 import megamek.common.preference.PreferenceManager;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -52,6 +61,7 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.unit.Unit;
+import mekhq.utilities.ScenarioUtils;
 
 class GameThread extends Thread implements CloseClientListener {
     private static final MMLogger logger = MMLogger.create(GameThread.class);
@@ -79,15 +89,15 @@ class GameThread extends Thread implements CloseClientListener {
     /**
      * GameThread
      * <p>
-     *     Initializes a new thread for a game.
+     * Initializes a new thread for a game.
      * </p>
      *
-     * @param name          The player name
-     * @param password      The game password
-     * @param client        The client
-     * @param app           The MekHQ instance
-     * @param units         The list of units you intend to play with in your side
-     * @param scenario      The scenario that is going to be initialized for the game
+     * @param name     The player name
+     * @param password The game password
+     * @param client   The client
+     * @param app      The MekHQ instance
+     * @param units    The list of units you intend to play with in your side
+     * @param scenario The scenario that is going to be initialized for the game
      */
     public GameThread(String name, String password, Client client, MekHQ app, List<Unit> units, Scenario scenario) {
         this(name, password, client, app, units, scenario, true);
@@ -97,15 +107,15 @@ class GameThread extends Thread implements CloseClientListener {
     /**
      * GameThread
      * <p>
-     *     Initializes a new thread for a game.
+     * Initializes a new thread for a game.
      * </p>
      *
-     * @param name          The player name
-     * @param client        The client
-     * @param app           The MekHQ instance
-     * @param units         The list of units you intend to play with in your side
-     * @param scenario      The scenario that is going to be initialized for the game
-     * @param started       Whether the game has already started
+     * @param name     The player name
+     * @param client   The client
+     * @param app      The MekHQ instance
+     * @param units    The list of units you intend to play with in your side
+     * @param scenario The scenario that is going to be initialized for the game
+     * @param started  Whether the game has already started
      */
     public GameThread(String name, Client client, MekHQ app, List<Unit> units, Scenario scenario, boolean started) {
         this(name, "", client, app, units, scenario, started);
@@ -115,19 +125,19 @@ class GameThread extends Thread implements CloseClientListener {
     /**
      * GameThread
      * <p>
-     *     Initializes a new thread for a game.
+     * Initializes a new thread for a game.
      * </p>
      *
-     * @param name          The player name
-     * @param password      The game password
-     * @param client        The client
-     * @param app           The MekHQ instance
-     * @param units         The list of units you intend to play with in your side
-     * @param scenario      The scenario that is going to be initialized for the game
-     * @param started       Whether the game has already started
+     * @param name     The player name
+     * @param password The game password
+     * @param client   The client
+     * @param app      The MekHQ instance
+     * @param units    The list of units you intend to play with in your side
+     * @param scenario The scenario that is going to be initialized for the game
+     * @param started  Whether the game has already started
      */
     public GameThread(String name, String password, Client client, MekHQ app, List<Unit> units, Scenario scenario,
-            boolean started) {
+          boolean started) {
         super(name);
         myname = name.trim();
         this.password = password;
@@ -182,11 +192,11 @@ class GameThread extends Thread implements CloseClientListener {
             }
 
             // if game is running, shouldn't do the following, so detect the phase
-            for (int i = 0; (i < MekHQ.getMHQOptions().getStartGameClientRetryCount())
-                    && client.getGame().getPhase().isUnknown(); i++) {
+            for (int i = 0;
+                  (i < MekHQ.getMHQOptions().getStartGameClientRetryCount()) && client.getGame().getPhase().isUnknown();
+                  i++) {
                 Thread.sleep(MekHQ.getMHQOptions().getStartGameClientDelay());
-                logger
-                        .warn("Client has not finished initialization, and is currently in an unknown phase.");
+                logger.warn("Client has not finished initialization, and is currently in an unknown phase.");
             }
 
             if ((client.getGame() != null) && client.getGame().getPhase().isLounge()) {
@@ -199,60 +209,11 @@ class GameThread extends Thread implements CloseClientListener {
                     Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
                 }
 
-                MapSettings mapSettings = MapSettings.getInstance();
-
-                // check that we have valid conditions for setting the mapSettings
-                if ((scenario.getMapSizeX() > 1) && (scenario.getMapSizeY() > 1) && (null != scenario.getMap())) {
-
-                    mapSettings.setBoardSize(scenario.getMapSizeX(), scenario.getMapSizeY());
-                    mapSettings.setMapSize(1, 1);
-                    mapSettings.getBoardsSelectedVector().clear();
-
-                    // if the scenario is taking place in space, do space settings instead
-                    if (scenario.getBoardType() == Scenario.T_SPACE) {
-                        mapSettings.setMedium(MapSettings.MEDIUM_SPACE);
-                        mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
-                    } else if (scenario.isUsingFixedMap()) {
-                        String board = scenario.getMap().replace(".board", ""); // TODO : remove inline file type
-                        board = board.replace("\\", "/");
-                        mapSettings.getBoardsSelectedVector().add(board);
-
-                        if (scenario.getBoardType() == Scenario.T_ATMOSPHERE) {
-                            mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
-                        }
-                    } else {
-                        File mapgenFile = new File("data/mapgen/" + scenario.getMap() + ".xml"); // TODO : remove inline
-                                                                                                 // file path
-                        try (InputStream is = new FileInputStream(mapgenFile)) {
-                            mapSettings = MapSettings.getInstance(is);
-                        } catch (FileNotFoundException ex) {
-                            logger
-                                    .error(
-                                            String.format("Could not load map file data/mapgen/%s.xml",
-                                                    scenario.getMap()),
-                                            ex);
-                            // TODO: remove inline file path
-                        }
-
-                        if (scenario.getBoardType() == Scenario.T_ATMOSPHERE) {
-                            mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
-                        }
-
-                        // duplicate code, but getting a new instance of map settings resets the size
-                        // parameters
-                        mapSettings.setBoardSize(scenario.getMapSizeX(), scenario.getMapSizeY());
-                        mapSettings.setMapSize(1, 1);
-                        mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
-                    }
-                } else {
-                    logger.error(
-                            String.format("invalid map settings provided for scenario %s", scenario.getName()));
-                }
-
+                MapSettings mapSettings = ScenarioUtils.getMapSettings(scenario);
                 client.sendMapSettings(mapSettings);
                 Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
 
-                client.sendPlanetaryConditions(scenario.createPlanetaryConditions());
+                client.sendPlanetaryConditions(getPlanetaryConditions());
                 Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
 
                 // set player deployment
@@ -295,10 +256,10 @@ class GameThread extends Thread implements CloseClientListener {
                     botClient.setBehaviorSettings(bf.getBehaviorSettings());
                     try {
                         botClient.connect();
+                        botClient.startPrecognition();
                     } catch (Exception e) {
                         Sentry.captureException(e);
-                        logger.error(
-                                String.format("Could not connect with Bot name %s", bf.getName()), e);
+                        logger.error(String.format("Could not connect with Bot name %s", bf.getName()), e);
                     }
                     getLocalBots().put(name, botClient);
 
@@ -330,20 +291,18 @@ class GameThread extends Thread implements CloseClientListener {
     }
 
     /**
-     * wait for the server to add the bot client, then send starting position,
-     * camo, and entities
+     * wait for the server to add the bot client, then send starting position, camo, and entities
      *
      * @param botClient a BotClient to manage the bot
-     * @param botForce  a BotForce that will send its info and entities to the
-     *                  botClient
+     * @param botForce  a BotForce that will send its info and entities to the botClient
      */
     private void configureBot(BotClient botClient, BotForce botForce) {
         try {
             // Wait for the server to add the bot client, but allow a timeout rather than
             // blocking
             int retryCount = 0;
-            while ((botClient.getLocalPlayer() == null)
-                    && (retryCount++ < MekHQ.getMHQOptions().getStartGameBotClientRetryCount())) {
+            while ((botClient.getLocalPlayer() == null) &&
+                         (retryCount++ < MekHQ.getMHQOptions().getStartGameBotClientRetryCount())) {
                 try {
                     Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());
                 } catch (Exception ignored) {
@@ -352,8 +311,7 @@ class GameThread extends Thread implements CloseClientListener {
             }
 
             if (botClient.getLocalPlayer() == null) {
-                logger.error(
-                        String.format("Could not configure bot %s", botClient.getName()));
+                logger.error(String.format("Could not configure bot %s", botClient.getName()));
             } else {
                 botClient.getLocalPlayer().setTeam(botForce.getTeam());
 
@@ -400,6 +358,10 @@ class GameThread extends Thread implements CloseClientListener {
         }
 
         return entities;
+    }
+
+    protected PlanetaryConditions getPlanetaryConditions() {
+        return campaign.getCurrentPlanetaryConditions(scenario);
     }
 
     /*

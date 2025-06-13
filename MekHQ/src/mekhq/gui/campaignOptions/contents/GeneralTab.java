@@ -24,13 +24,20 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.campaignOptions.contents;
 
-import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
+import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.common.options.OptionsConstants.ALLOWED_YEAR;
+import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createGroupLayout;
-import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -38,13 +45,20 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.time.LocalDate;
-import java.util.ResourceBundle;
-import javax.swing.*;
+import javax.swing.Box;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
-import megamek.client.ui.baseComponents.MMComboBox;
-import megamek.client.ui.dialogs.CamoChooserDialog;
-import megamek.client.ui.swing.util.UIUtil;
+import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.dialogs.iconChooser.CamoChooserDialog;
+import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
 import mekhq.MekHQ;
@@ -52,19 +66,17 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
-import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
-import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
-import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsTextField;
 import mekhq.gui.dialog.DateChooser;
@@ -72,8 +84,8 @@ import mekhq.gui.dialog.iconDialogs.UnitIconDialog;
 import mekhq.gui.displayWrappers.FactionDisplay;
 
 /**
- * Represents a tab within the campaign options UI that allows the user to configure
- * general campaign settings. This includes options for:
+ * Represents a tab within the campaign options UI that allows the user to configure general campaign settings. This
+ * includes options for:
  * <ul>
  *     <li>Configuring the campaign name</li>
  *     <li>Setting the faction and faction-related options</li>
@@ -81,53 +93,42 @@ import mekhq.gui.displayWrappers.FactionDisplay;
  *     <li>Specifying the campaign start date</li>
  *     <li>Choosing a camouflage pattern and unit icon</li>
  * </ul>
- *
+ * <p>
  * This class extends the user interface features provided by {@link AbstractMHQTabbedPane}.
  */
 public class GeneralTab {
-    private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
-    private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
-
     private final JFrame frame;
     private final Campaign campaign;
-    private final CampaignOptions campaignOptions;
     private final CampaignOptionsDialogMode mode;
 
     private JLabel lblName;
     private JTextField txtName;
-    private JButton btnNameGenerator;
+    private RoundedJButton btnNameGenerator;
     private JLabel lblFaction;
     private MMComboBox<FactionDisplay> comboFaction;
-    private JLabel lblReputation;
-    private MMComboBox<UnitRatingMethod> unitRatingMethodCombo;
-    private JLabel lblManualUnitRatingModifier;
-    private JSpinner manualUnitRatingModifier;
-    private JCheckBox chkClampReputationPayMultiplier;
-    private JCheckBox chkReduceReputationPerformanceModifier;
-    private JCheckBox chkReputationPerformanceModifierCutOff;
     private JLabel lblDate;
-    private JButton btnDate;
+    private RoundedJButton btnDate;
     private LocalDate date;
     private JLabel lblCamo;
-    private JButton btnCamo;
+    private RoundedJButton btnCamo;
     private Camouflage camouflage;
     private JLabel lblIcon;
-    private JButton btnIcon;
+    private RoundedJButton btnIcon;
     private StandardForceIcon unitIcon;
+    private JLabel lblFurtherReading;
 
     /**
      * Constructs a new instance of the {@code GeneralTab} using the provided {@link Campaign} and {@link JFrame}.
      *
      * @param campaign The {@link Campaign} associated with this tab, which contains the core game data.
      * @param frame    The parent {@link JFrame} used to display this tab.
-     * @param mode     The {@link CampaignOptionsDialogMode} enum determining what state caused the
-     *                dialog to be triggered.
+     * @param mode     The {@link CampaignOptionsDialogMode} enum determining what state caused the dialog to be
+     *                 triggered.
      */
     public GeneralTab(Campaign campaign, JFrame frame, CampaignOptionsDialogMode mode) {
         // region Variable Declarations
         this.frame = frame;
         this.campaign = campaign;
-        this.campaignOptions = campaign.getCampaignOptions();
         this.date = campaign.getLocalDate();
         this.camouflage = campaign.getCamouflage();
         this.unitIcon = campaign.getUnitIcon();
@@ -149,7 +150,7 @@ public class GeneralTab {
      * <p>If no faction is selected, the method defaults to returning the "MERC" faction.</p>
      *
      * @return the {@link Faction} object representing the selected faction, or the "MERC" faction if no selection is
-     * made.
+     *       made.
      */
     public Faction getFaction() {
         if (comboFaction.getSelectedItem() == null) {
@@ -184,25 +185,14 @@ public class GeneralTab {
 
         // Generate new random campaign name
         btnNameGenerator = new CampaignOptionsButton("NameGenerator");
-        btnNameGenerator.addActionListener(e -> txtName.setText(BackgroundsController
-                .randomMercenaryCompanyNameGenerator(campaign.getFlaggedCommander())));
+        btnNameGenerator.addActionListener(e -> txtName.setText(BackgroundsController.randomMercenaryCompanyNameGenerator(
+              campaign.getFlaggedCommander())));
 
         // Campaign faction
         lblFaction = new CampaignOptionsLabel("Faction");
         comboFaction.setSelectedItem(new FactionDisplay(campaign.getFaction(), campaign.getLocalDate()));
         comboFaction.setToolTipText(String.format("<html>%s</html>",
-            resources.getString("lblFaction.tooltip")));
-
-        // Reputation
-        lblReputation = new CampaignOptionsLabel("Reputation");
-        unitRatingMethodCombo.setToolTipText(String.format("<html>%s</html>",
-            resources.getString("lblReputation.tooltip")));
-        lblManualUnitRatingModifier = new CampaignOptionsLabel("ManualUnitRatingModifier");
-        manualUnitRatingModifier = new CampaignOptionsSpinner("ManualUnitRatingModifier",
-            0, -1000, 1000, 1);
-        chkClampReputationPayMultiplier = new CampaignOptionsCheckBox("ClampReputationPayMultiplier");
-        chkReduceReputationPerformanceModifier = new CampaignOptionsCheckBox("ReduceReputationPerformanceModifier");
-        chkReputationPerformanceModifierCutOff = new CampaignOptionsCheckBox("ReputationPerformanceModifierCutOff");
+              getTextAt(getCampaignOptionsResourceBundle(), "lblFaction.tooltip")));
 
         // Date
         lblDate = new CampaignOptionsLabel("Date");
@@ -210,8 +200,7 @@ public class GeneralTab {
         btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
         btnDate.addActionListener(this::btnDateActionPerformed);
 
-        if (mode != CampaignOptionsDialogMode.STARTUP
-            && mode != CampaignOptionsDialogMode.STARTUP_ABRIDGED) {
+        if (mode != CampaignOptionsDialogMode.STARTUP && mode != CampaignOptionsDialogMode.STARTUP_ABRIDGED) {
             lblDate.setEnabled(false);
             btnDate.setEnabled(false);
         }
@@ -230,7 +219,8 @@ public class GeneralTab {
 
         // Initialize the parent panel
         AbstractMHQScrollablePanel generalPanel = new DefaultMHQScrollablePanel(frame,
-            "generalPanel", new GridBagLayout());
+              "generalPanel",
+              new GridBagLayout());
 
         // Layout the Panel
         JPanel panel = new JPanel();
@@ -263,30 +253,12 @@ public class GeneralTab {
         layout.gridwidth = 2;
         panel.add(comboFaction, layout);
 
-        layout.gridwidth = 1;
-        layout.gridy++;
-        panel.add(lblReputation, layout);
-        layout.gridwidth = 2;
-        panel.add(unitRatingMethodCombo, layout);
-
-        layout.gridwidth = 1;
-        layout.gridy++;
-        panel.add(lblManualUnitRatingModifier, layout);
-        panel.add(manualUnitRatingModifier, layout);
-        layout.gridy++;
-        layout.gridwidth = 3;
-        panel.add(chkClampReputationPayMultiplier, layout);
-        layout.gridy++;
-        panel.add(chkReduceReputationPerformanceModifier, layout);
-        layout.gridy++;
-        panel.add(chkReputationPerformanceModifierCutOff, layout);
-
         layout.gridy++;
         layout.gridwidth = 5;
         layout.gridx = GridBagConstraints.RELATIVE;
 
         JPanel iconsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        iconsPanel.setBorder(BorderFactory.createEtchedBorder());
+        iconsPanel.setBorder(RoundedLineBorder.createRoundedLineBorder());
         iconsPanel.setMinimumSize(UIUtil.scaleForGUI(0, 120));
 
         iconsPanel.add(lblIcon);
@@ -297,6 +269,7 @@ public class GeneralTab {
 
         panel.add(iconsPanel, layout);
         layout.gridy++;
+        layout.gridwidth = 5;
         panel.add(createFurtherReadingPanel(), layout);
         generalPanel.add(panel);
 
@@ -306,42 +279,42 @@ public class GeneralTab {
     /**
      * Creates a header panel for the general tab, which includes:
      * <p>
-     *     <li>An image representing the campaign options</li>
-     *     <li>A title for the general tab</li>
-     *     <li>A description of the general tab functionalities</li>
+     * <li>An image representing the campaign options</li>
+     * <li>A title for the general tab</li>
+     * <li>A description of the general tab functionalities</li>
      * </p>
      *
      * @return A {@link JPanel} containing the general tab header.
      */
     private static JPanel createGeneralHeader() {
         ImageIcon imageIcon = new ImageIcon("data/images/misc/MekHQ.png");
-        imageIcon = scaleImageIconToWidth(imageIcon, UIUtil.scaleForGUI(200));
+        imageIcon = scaleImageIcon(imageIcon, 200, true);
         JLabel imageLabel = new JLabel(imageIcon);
 
-        final JLabel lblHeader = new JLabel(resources.getString("lblGeneral.text"), SwingConstants.CENTER);
+        final JLabel lblHeader = new JLabel(getTextAt(getCampaignOptionsResourceBundle(), "lblGeneral.text"),
+              SwingConstants.CENTER);
         setFontScaling(lblHeader, true, 2);
         lblHeader.setName("lblGeneral");
 
         JLabel lblBody = new JLabel(String.format("<html>%s</html>",
-            resources.getString("lblGeneralBody.text")), SwingConstants.CENTER);
+              getTextAt(getCampaignOptionsResourceBundle(), "lblGeneralBody.text")),
+              SwingConstants.CENTER);
         lblBody.setName("lblGeneralHeaderBody");
 
         final JPanel panel = new CampaignOptionsStandardPanel("pnlGeneralHeaderPanel");
         final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(lblHeader)
-                .addComponent(imageLabel)
-                .addComponent(lblBody)
-                .addGap(UIUtil.scaleForGUI(20)));
+        layout.setVerticalGroup(layout.createSequentialGroup()
+                                      .addComponent(lblHeader)
+                                      .addComponent(imageLabel)
+                                      .addComponent(lblBody)
+                                      .addGap(UIUtil.scaleForGUI(20)));
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.CENTER)
-                .addComponent(lblHeader)
-                .addComponent(imageLabel)
-                .addComponent(lblBody));
+        layout.setHorizontalGroup(layout.createParallelGroup(Alignment.CENTER)
+                                        .addComponent(lblHeader)
+                                        .addComponent(imageLabel)
+                                        .addComponent(lblBody));
 
         return panel;
     }
@@ -351,34 +324,24 @@ public class GeneralTab {
      * <p>
      * This method sets up the components for all editable campaign settings, including:
      * <p>
-     *     <li>Labels, text fields, dropdowns, and buttons for campaign settings</li>
-     *     <li>Default values fetched from the campaign instance</li>
+     * <li>Labels, text fields, dropdowns, and buttons for campaign settings</li>
+     * <li>Default values fetched from the campaign instance</li>
      * </p>
      */
     private void initialize() {
         lblName = new JLabel();
         txtName = new JTextField();
 
-        btnNameGenerator = new JButton();
+        btnNameGenerator = new RoundedJButton();
 
         lblFaction = new JLabel();
         comboFaction = new MMComboBox<>("comboFaction", buildFactionDisplayOptions());
 
-        lblReputation = new JLabel();
-        unitRatingMethodCombo = new MMComboBox<>("unitRatingMethodCombo", UnitRatingMethod.values());
-
-        lblManualUnitRatingModifier = new JLabel();
-        manualUnitRatingModifier = new JSpinner();
-
-        chkClampReputationPayMultiplier = new JCheckBox();
-        chkReduceReputationPerformanceModifier = new JCheckBox();
-         chkReputationPerformanceModifierCutOff = new JCheckBox();
-
         lblDate = new JLabel();
-        btnDate = new JButton();
+        btnDate = new RoundedJButton();
 
         lblCamo = new JLabel();
-        btnCamo = new JButton() {
+        btnCamo = new RoundedJButton() {
             @Override
             public Dimension getPreferredSize() {
                 return UIUtil.scaleForGUI(100, 100);
@@ -386,7 +349,7 @@ public class GeneralTab {
         };
 
         lblIcon = new JLabel();
-        btnIcon = new JButton() {
+        btnIcon = new RoundedJButton() {
             @Override
             public Dimension getPreferredSize() {
                 return UIUtil.scaleForGUI(100, 100);
@@ -395,23 +358,23 @@ public class GeneralTab {
     }
 
     /**
-     * Builds a {@link DefaultComboBoxModel} containing faction options based on the current campaign data.
-     * These options allow users to choose valid factions appropriate to the campaign's start date.
+     * Builds a {@link DefaultComboBoxModel} containing faction options based on the current campaign data. These
+     * options allow users to choose valid factions appropriate to the campaign's start date.
      *
      * @return A {@link DefaultComboBoxModel} populated with available {@link FactionDisplay} options.
      */
     private DefaultComboBoxModel<FactionDisplay> buildFactionDisplayOptions() {
         DefaultComboBoxModel<FactionDisplay> factionModel = new DefaultComboBoxModel<>();
 
-        factionModel.addAll(FactionDisplay.getSortedValidFactionDisplays(
-            Factions.getInstance().getChoosableFactions(), date));
+        factionModel.addAll(FactionDisplay.getSortedValidFactionDisplays(Factions.getInstance().getChoosableFactions(),
+              date));
 
         return factionModel;
     }
 
     /**
-     * Handles the "Date" button action, which triggers a date selection via a {@link DateChooser} dialog.
-     * If the user confirms their date choice, it updates the campaign's start date accordingly.
+     * Handles the "Date" button action, which triggers a date selection via a {@link DateChooser} dialog. If the user
+     * confirms their date choice, it updates the campaign's start date accordingly.
      *
      * @param actionEvent The {@link ActionEvent} triggered by the "Date" button.
      */
@@ -441,15 +404,15 @@ public class GeneralTab {
 
         final FactionDisplay factionDisplay = comboFaction.getSelectedItem();
         comboFaction.removeAllItems();
-        ((DefaultComboBoxModel<FactionDisplay>) comboFaction.getModel()).addAll(FactionDisplay
-            .getSortedValidFactionDisplays(Factions.getInstance().getChoosableFactions(), date));
+        ((DefaultComboBoxModel<FactionDisplay>) comboFaction.getModel()).addAll(FactionDisplay.getSortedValidFactionDisplays(
+              Factions.getInstance().getChoosableFactions(),
+              date));
         comboFaction.setSelectedItem(factionDisplay);
     }
 
     /**
-     * Handles the "Camouflage" button action, which opens a {@link CamoChooserDialog}.
-     * If the user confirms their camouflage selection, it updates the button icon to display the
-     * chosen camouflage.
+     * Handles the "Camouflage" button action, which opens a {@link CamoChooserDialog}. If the user confirms their
+     * camouflage selection, it updates the button icon to display the chosen camouflage.
      *
      * @param actionEvent The {@link ActionEvent} triggered by the "Camouflage" button.
      */
@@ -462,9 +425,8 @@ public class GeneralTab {
     }
 
     /**
-     * Handles the "Unit Icon" button action, which opens a {@link UnitIconDialog}.
-     * If the user selects a new unit icon and confirms, this method updates the button icon to
-     * reflect the selection.
+     * Handles the "Unit Icon" button action, which opens a {@link UnitIconDialog}. If the user selects a new unit icon
+     * and confirms, this method updates the button icon to reflect the selection.
      *
      * @param actionEvent The {@link ActionEvent} triggered by the "Unit Icon" button.
      */
@@ -477,43 +439,24 @@ public class GeneralTab {
     }
 
     /**
-     * Creates a "Further Reading" panel that provides links or additional details to guide users
-     * in understanding the campaign options.
-     * <p>
-     * The panel may include references to:
-     * <p>
-     *     <li>BattleMech Manual (BMM)</li>
-     *     <li>Total Warfare rules</li>
-     *     <li>Campaign Operations documentation</li>
-     * </p>
+     * Creates a "Further Reading" panel that provides links or additional details to guide users in understanding the
+     * campaign options.
      *
      * @return A {@link JPanel} containing additional informational components.
      */
     private JPanel createFurtherReadingPanel() {
-        // Contents
-        JPanel headerPanelBMM = new CampaignOptionsHeaderPanel("BMMPanel", "",
-            true);
+        lblFurtherReading = new CampaignOptionsLabel("FurtherReading", null, true);
 
-        JPanel headerPanelTotalWarfare = new CampaignOptionsHeaderPanel("TotalWarfarePanel",
-            "", true);
-
-        JPanel headerPanelCampaignOperations = new CampaignOptionsHeaderPanel("CampaignOperationsPanel",
-            "", true);
-
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("FurtherReadingPanel",
-            true, "FurtherReadingPanel");
+        final JPanel panel = new CampaignOptionsStandardPanel("FurtherReadingPanel", true, "FurtherReadingPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+
         layout.gridwidth = 5;
         layout.gridx = 0;
         layout.gridy = 0;
-        panel.add(headerPanelBMM, layout);
+        layout.fill = GridBagConstraints.HORIZONTAL;
+        layout.weightx = 1.0;
 
-        layout.gridy++;
-        panel.add(headerPanelTotalWarfare, layout);
-
-        layout.gridy++;
-        panel.add(headerPanelCampaignOperations, layout);
+        panel.add(lblFurtherReading, layout);
 
         return panel;
     }
@@ -521,12 +464,13 @@ public class GeneralTab {
     /**
      * Loads the values from the current campaign's {@link CampaignOptions} and updates the user interface components.
      * <p>
-     * This is a convenience method that uses the default campaign options, default date, and default faction
-     * to populate the relevant data fields in the user interface. It essentially delegates the work to the overloaded
-     * method {@link #loadValuesFromCampaignOptions(CampaignOptions, LocalDate, Faction)} with all parameters set to {@code null}.
+     * This is a convenience method that uses the default campaign options, default date, and default faction to
+     * populate the relevant data fields in the user interface. It essentially delegates the work to the overloaded
+     * method {@link #loadValuesFromCampaignOptions(LocalDate, Faction)} with all parameters set to
+     * {@code null}.
      */
     public void loadValuesFromCampaignOptions() {
-        loadValuesFromCampaignOptions(null, null, null);
+        loadValuesFromCampaignOptions(null, null);
     }
 
     /**
@@ -546,28 +490,13 @@ public class GeneralTab {
      *     <li>Performing required UI updates (e.g., repainting date labels).</li>
      * </ul>
      *
-     * @param presetCampaignOptions Optional {@link CampaignOptions} used to populate values.
-     *                              If {@code null}, the current campaign options are used.
-     * @param presetDate Optional {@link LocalDate} to be used as the active date.
-     *                   If {@code null}, the campaign's current date is used.
-     * @param presetFaction Optional {@link Faction} to be used in the faction selection field.
-     *                      If {@code null}, the campaign's default faction is used.
+     *  @param presetDate            Optional {@link LocalDate} to be used as the active date. If {@code null}, the
+     *                              campaign's current date is used.
+     * @param presetFaction         Optional {@link Faction} to be used in the faction selection field. If {@code null},
+     *                              the campaign's default faction is used.
      */
-    public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions,
-                                              @Nullable LocalDate presetDate,
-                                              @Nullable Faction presetFaction) {
-        CampaignOptions options = presetCampaignOptions;
-        if (presetCampaignOptions == null) {
-            options = this.campaignOptions;
-        }
-
+    public void loadValuesFromCampaignOptions(@Nullable LocalDate presetDate, @Nullable Faction presetFaction) {
         txtName.setText(campaign.getName());
-
-        unitRatingMethodCombo.setSelectedItem(options.getUnitRatingMethod());
-        manualUnitRatingModifier.setValue(options.getManualUnitRatingModifier());
-        chkClampReputationPayMultiplier.setSelected(options.isClampReputationPayMultiplier());
-        chkReduceReputationPerformanceModifier.setSelected(options.isReduceReputationPerformanceModifier());
-        chkReputationPerformanceModifierCutOff.setSelected(options.isReputationPerformanceModifierCutOff());
 
         date = campaign.getLocalDate();
         if (presetDate != null) {
@@ -587,15 +516,13 @@ public class GeneralTab {
     }
 
     /**
-     * Applies the updated campaign options from the general tab's UI components to the {@link Campaign}.
-     * This method ensures that any changes made in the UI are reflected in the campaign's settings.
+     * Applies the updated campaign options from the general tab's UI components to the {@link Campaign}. This method
+     * ensures that any changes made in the UI are reflected in the campaign's settings.
      *
-     * @param presetCampaignOptions An optional {@link CampaignOptions} to apply instead of the campaign's current options.
      * @param isStartUp             A boolean indicating if the campaign is in a startup state.
      * @param isSaveAction          A boolean indicating if this is a save action.
      */
-    public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions,
-                                               boolean isStartUp, boolean isSaveAction) {
+    public void applyCampaignOptionsToCampaign(boolean isStartUp, boolean isSaveAction) {
         // First, we apply any updates to the campaign
         if (!isSaveAction) {
             campaign.setName(txtName.getText());
@@ -605,8 +532,8 @@ public class GeneralTab {
                 campaign.setLocalDate(date);
             }
 
-            if ((campaign.getCampaignStartDate() == null)
-                || (campaign.getCampaignStartDate().isAfter(campaign.getLocalDate()))) {
+            if ((campaign.getCampaignStartDate() == null) ||
+                      (campaign.getCampaignStartDate().isAfter(campaign.getLocalDate()))) {
                 campaign.setCampaignStartDate(date);
             }
             // Ensure that the MegaMek year GameOption matches the campaign year
@@ -621,17 +548,5 @@ public class GeneralTab {
             campaign.setCamouflage(camouflage);
             campaign.setUnitIcon(unitIcon);
         }
-
-        // Then updates to Campaign Options
-        CampaignOptions options = presetCampaignOptions;
-        if (presetCampaignOptions == null) {
-            options = this.campaignOptions;
-        }
-
-        options.setUnitRatingMethod(unitRatingMethodCombo.getSelectedItem());
-        options.setManualUnitRatingModifier((int) manualUnitRatingModifier.getValue());
-        options.setClampReputationPayMultiplier(chkClampReputationPayMultiplier.isSelected());
-        options.setReduceReputationPerformanceModifier(chkReduceReputationPerformanceModifier.isSelected());
-        options.setReputationPerformanceModifierCutOff(chkReputationPerformanceModifierCutOff.isSelected());
     }
 }

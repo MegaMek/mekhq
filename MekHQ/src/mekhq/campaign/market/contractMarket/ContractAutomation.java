@@ -24,8 +24,22 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.market.contractMarket;
+
+import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 import megamek.common.Entity;
 import megamek.logging.MMLogger;
@@ -36,12 +50,11 @@ import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.Contract;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.ActivateUnitAction;
 import mekhq.campaign.unit.actions.MothballUnitAction;
-import mekhq.gui.dialog.ContractAutomationDialog;
-
-import java.util.*;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
 /**
  * The ContractAutomation class provides a suite of methods
@@ -50,8 +63,10 @@ import java.util.*;
  * transit to mission location and the automated activation of units when arriving in system.
  */
 public class ContractAutomation {
-    private final static ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.ContractAutomation");
+    private static final String RESOURCE_BUNDLE = "mekhq.resources." + ContractAutomation.class.getSimpleName();
     private static final MMLogger logger = MMLogger.create(ContractAutomation.class);
+
+    private static final int DIALOG_CONFIRM_OPTION = 0;
 
     /**
      * Main function to initiate a sequence of automated tasks when a contract is started.
@@ -69,12 +84,24 @@ public class ContractAutomation {
 
         // Initial setup
         final String commanderAddress = campaign.getCommanderAddress(false);
+        final List<String> buttonLabels = List.of(getTextAt(RESOURCE_BUNDLE, "generalConfirm.text"),
+              getTextAt(RESOURCE_BUNDLE, "generalDecline.text"));
+        final Person speaker = campaign.getSeniorAdminPerson(TRANSPORT);
 
         // Mothballing
-        String message = String.format(resources.getString("mothballDescription.text"), commanderAddress);
+        String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "mothballDescription.text", commanderAddress);
+        String outOfCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "mothballDescription.addendum");
 
-        ContractAutomationDialog mothballDialog = new ContractAutomationDialog(campaign, message, true);
-        if (mothballDialog.isDialogConfirmed()) {
+        ImmersiveDialogSimple mothballDialog = new ImmersiveDialogSimple(campaign,
+              speaker,
+              null,
+              inCharacterMessage,
+              buttonLabels,
+              outOfCharacterMessage,
+              null,
+              false);
+
+        if (mothballDialog.getDialogChoice() == DIALOG_CONFIRM_OPTION) {
             campaign.setAutomatedMothballUnits(performAutomatedMothballing(campaign));
         }
 
@@ -83,7 +110,7 @@ public class ContractAutomation {
         String employerName = contract.getEmployer();
 
         if (!employerName.contains("Clan")) {
-            employerName = String.format(resources.getString("generalNonClan.text"), employerName);
+            employerName = getFormattedTextAt(RESOURCE_BUNDLE, "generalNonClan.text", employerName);
         }
 
         JumpPath jumpPath = contract.getJumpPath(campaign);
@@ -91,40 +118,56 @@ public class ContractAutomation {
 
         Money costPerJump = campaign.calculateCostPerJump(true,
                 campaign.getCampaignOptions().isEquipmentContractBase());
-        String totalCost = costPerJump.multipliedBy(jumpPath.getJumps()).toAmountAndSymbolString();
+        String totalCost = costPerJump.multipliedBy(jumpPath.getJumps()).toAmountString();
 
-        message = String.format(resources.getString("transitDescription.text"),
-            targetSystem, employerName, travelDays, totalCost);
 
-        ContractAutomationDialog transitDialog = new ContractAutomationDialog(campaign, message, false);
-        if (transitDialog.isDialogConfirmed()) {
+        inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
+              "transitDescription.text",
+              targetSystem,
+              employerName,
+              travelDays,
+              totalCost);
+
+        ImmersiveDialogSimple transitDialog = new ImmersiveDialogSimple(campaign,
+              speaker,
+              null,
+              inCharacterMessage,
+              buttonLabels,
+              null,
+              null,
+              false);
+
+        if (transitDialog.getDialogChoice() == DIALOG_CONFIRM_OPTION) {
             campaign.getLocation().setJumpPath(jumpPath);
             campaign.getUnits().forEach(unit -> unit.setSite(Unit.SITE_FACILITY_BASIC));
             campaign.getApp().getCampaigngui().refreshAllTabs();
             campaign.getApp().getCampaigngui().refreshLocation();
 
-            campaign.addReport(String.format(resources.getString("transitDescription.supplemental"),
-                targetSystem, travelDays));
+            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "transitDescription.report",
+                  targetSystem,
+                  travelDays));
         }
     }
 
     /**
      * This method identifies all non-mothballed units within a campaign that are currently
-     * assigned to a {@code Force}. Those units are then GM Mothballed.
+     * assigned to a {@link Force}. Those units are then GM Mothballed.
      *
      * @param campaign The current campaign.
      * @return A list of all newly mothballed units.
      */
-    private static List<Unit> performAutomatedMothballing(Campaign campaign) {
-        List<Unit> mothballTargets = new ArrayList<>();
+    private static List<UUID> performAutomatedMothballing(Campaign campaign) {
+        List<UUID> mothballTargets = new ArrayList<>();
         MothballUnitAction mothballUnitAction = new MothballUnitAction(null, true);
 
         for (Force force : campaign.getAllForces()) {
-            for (UUID unitId : force.getUnits()) {
+            List<UUID> iterationSafeUnitIds = new ArrayList<>(force.getUnits());
+            for (UUID unitId : iterationSafeUnitIds) {
                 Unit unit = campaign.getUnit(unitId);
 
                 if (unit == null) {
-                    logger.error(String.format("Failed to get unit for unit ID %s", unitId));
+                    logger.error("Failed to get unit for unit ID {}", unitId);
                     continue;
                 }
 
@@ -135,24 +178,21 @@ public class ContractAutomation {
                         continue;
                     }
                 } catch (Exception e) {
-                    logger.error(String.format("Failed to get entity for %s", unit.getName()));
+                    logger.error("Failed to get entity for {}", unit.getName());
                     continue;
                 }
 
                 if (unit.isAvailable(false) && !unit.isUnderRepair()) {
-                    mothballTargets.add(unit);
+                    mothballTargets.add(unitId);
+
+                    mothballUnitAction.execute(campaign, unit);
+                    MekHQ.triggerEvent(new UnitChangedEvent(unit));
                 } else {
-                    campaign.addReport(String.format(resources.getString("mothballingFailed.text"),
-                        unit.getName()));
+                    campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+                          "mothballingFailed.text",
+                          unit.getHyperlinkedName()));
                 }
             }
-        }
-
-        // This needs to be a separate list as the act of mothballing the unit removes it from the
-        // list of units attached to the relevant force, resulting in a ConcurrentModificationException
-        for (Unit unit : mothballTargets) {
-            mothballUnitAction.execute(campaign, unit);
-            MekHQ.triggerEvent(new UnitChangedEvent(unit));
         }
 
         return mothballTargets;
@@ -167,13 +207,14 @@ public class ContractAutomation {
      * @param campaign The current campaign.
      */
     public static void performAutomatedActivation(Campaign campaign) {
-        List<Unit> units = campaign.getAutomatedMothballUnits();
-
         ActivateUnitAction activateUnitAction = new ActivateUnitAction(null, true);
 
-        for (Unit unit : units) {
+        List<UUID> unitIds = campaign.getAutomatedMothballUnits();
+        for (UUID unitId : unitIds) {
+            Unit unit = campaign.getUnit(unitId);
+
             if (unit == null) {
-                // <50.03 compatibility handler
+                campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "activationFailed.uuid", unitId.toString()));
                 continue;
             }
 
@@ -182,8 +223,8 @@ public class ContractAutomation {
                 MekHQ.triggerEvent(new UnitChangedEvent(unit));
 
                 if (unit.isMothballed()) {
-                    campaign.addReport(String.format(resources.getString("activationFailed.text"),
-                        unit.getName()));
+                    campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "activationFailed.text"),
+                          unit.getHyperlinkedName());
                 }
             }
         }

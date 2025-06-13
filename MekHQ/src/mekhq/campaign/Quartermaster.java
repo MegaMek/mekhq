@@ -24,8 +24,17 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 import megamek.common.AmmoType;
 import megamek.common.Entity;
@@ -36,15 +45,17 @@ import mekhq.campaign.event.PartArrivedEvent;
 import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.parts.*;
+import mekhq.campaign.parts.AmmoStorage;
+import mekhq.campaign.parts.Armor;
+import mekhq.campaign.parts.InfantryAmmoStorage;
+import mekhq.campaign.parts.MissingPart;
+import mekhq.campaign.parts.OmniPod;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * Manages machines and materiel for a campaign.
@@ -123,6 +134,12 @@ public class Quartermaster {
      */
     public void addPart(Part part, int transitDays, boolean isBrandNew) {
         Objects.requireNonNull(part);
+
+        // Refit kits are special, if this is for a refit kit use that method
+        if (part instanceof Refit refit) {
+            refit.addRefitKitParts(transitDays);
+            return;
+        }
 
         if (part.getUnit() instanceof TestUnit) {
             // If this is a test unit, then we won't add the part
@@ -779,21 +796,13 @@ public class Quartermaster {
             Money cost = part.getActualValue().multipliedBy(costMultiplier);
             if (getCampaign().getFinances().debit(TransactionType.EQUIPMENT_PURCHASE,
                     getCampaign().getLocalDate(), cost, "Purchase of " + part.getName())) {
-                if (part instanceof Refit) {
-                    ((Refit) part).addRefitKitParts(transitDays);
-                } else {
                     addPart(part, transitDays, true);
-                }
                 return true;
             } else {
                 return false;
             }
         } else {
-            if (part instanceof Refit) {
-                ((Refit) part).addRefitKitParts(transitDays);
-            } else {
-                addPart(part, transitDays, true);
-            }
+            addPart(part, transitDays, true);
             return true;
         }
     }

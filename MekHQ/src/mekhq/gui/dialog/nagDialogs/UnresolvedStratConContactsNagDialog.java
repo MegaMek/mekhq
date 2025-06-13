@@ -27,54 +27,33 @@
  */
 package mekhq.gui.dialog.nagDialogs;
 
-import mekhq.MHQConstants;
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.gui.baseComponents.AbstractMHQNagDialog;
+import static mekhq.MHQConstants.NAG_UNRESOLVED_STRATCON_CONTACTS;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.UnresolvedStratConContactsNagLogic.determineUnresolvedContacts;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.UnresolvedStratConContactsNagLogic.hasUnresolvedContacts;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.time.LocalDate;
 import java.util.List;
 
-import static mekhq.gui.dialog.nagDialogs.nagLogic.UnresolvedStratConContactsNagLogic.determineUnresolvedContacts;
-import static mekhq.gui.dialog.nagDialogs.nagLogic.UnresolvedStratConContactsNagLogic.hasUnresolvedContacts;
+import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
 
-/**
- * A nag dialog that warns the user about unresolved StratCon contacts within the campaign.
- *
- * <p>
- * This dialog identifies unresolved scenarios in StratCon tracks attached to active contracts
- * where the player can deploy forces. It provides a detailed report of unresolved contacts to
- * notify the player of critical actions required before advancing the campaign.
- * </p>
- */
-public class UnresolvedStratConContactsNagDialog extends AbstractMHQNagDialog {
-    /**
-     * Constructs the nag dialog for unresolved StratCon contacts.
-     *
-     * <p>
-     * The dialog is initialized with information about unresolved StratCon scenarios and the
-     * campaign's current state. The dynamic message is formatted to include the name or title
-     * of the commander, providing context for the player.
-     * </p>
-     *
-     * @param campaign The {@link Campaign} object representing the current campaign.
-     */
+public class UnresolvedStratConContactsNagDialog extends ImmersiveDialogNag {
     public UnresolvedStratConContactsNagDialog(final Campaign campaign) {
-        super(campaign, MHQConstants.NAG_UNRESOLVED_STRATCON_CONTACTS);
+        super(campaign, COMMAND, NAG_UNRESOLVED_STRATCON_CONTACTS, "UnresolvedStratConContactsNagDialog");
+    }
+
+    @Override
+    protected String getInCharacterMessage(Campaign campaign, String key, String commanderAddress) {
+        final String RESOURCE_BUNDLE = "mekhq.resources.NagDialogs";
 
         String unresolvedContactsReport = determineUnresolvedContacts(campaign.getActiveAtBContracts(),
               campaign.getLocalDate());
 
-        String addendum = "";
-        if (unresolvedContactsReport.isEmpty()) {
-            addendum = resources.getString("UnresolvedStratConContactsNagDialog.stratcon");
-        }
-
-        final String DIALOG_BODY = "UnresolvedStratConContactsNagDialog.text";
-        setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
-            campaign.getCommanderAddress(false), addendum));
-        showDialog();
+        return getFormattedTextAt(RESOURCE_BUNDLE, key + ".ic", commanderAddress, unresolvedContactsReport);
     }
 
     /**
@@ -87,17 +66,18 @@ public class UnresolvedStratConContactsNagDialog extends AbstractMHQNagDialog {
      *     <li>The campaign has unresolved StratCon contacts, as determined by {@code #hasUnresolvedContacts}.</li>
      * </ul>
      *
-     * @param isUseStratCon A flag indicating whether StratCon functionality is enabled in the campaign options.
-     * @param activeContracts A list of active {@link AtBContract} objects to evaluate for unresolved StratCon contacts.
-     * @param today The current campaign date, used to filter unresolved scenarios.
+     * @param isUseStratCon   A flag indicating whether StratCon functionality is enabled in the campaign options.
+     * @param activeContracts A list of active {@link AtBContract} objects to evaluate for unresolved StratCon
+     *                        contacts.
+     * @param today           The current campaign date, used to filter unresolved scenarios.
      *
      * @return {@code true} if all conditions are met and the nag dialog should be displayed; {@code false} otherwise.
      */
     public static boolean checkNag(boolean isUseStratCon, List<AtBContract> activeContracts, LocalDate today) {
-        final String NAG_KEY = MHQConstants.NAG_UNRESOLVED_STRATCON_CONTACTS;
+        final String NAG_KEY = NAG_UNRESOLVED_STRATCON_CONTACTS;
 
-        return isUseStratCon
-              && !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-              && hasUnresolvedContacts(activeContracts, today);
+        return isUseStratCon &&
+                     !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY) &&
+                     hasUnresolvedContacts(activeContracts, today);
     }
 }

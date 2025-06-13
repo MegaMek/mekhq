@@ -24,10 +24,45 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.resupplyAndCaches;
 
-import megamek.client.ui.swing.util.UIUtil;
+import static javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE;
+import static megamek.common.Compute.randomInt;
+import static megamek.utilities.ImageUtilities.scaleImageIcon;
+import static mekhq.campaign.finances.enums.TransactionType.EQUIPMENT_PURCHASE;
+import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.loadPlayerConvoys;
+import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.makeDelivery;
+import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.makeSmugglerDelivery;
+import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.processConvoy;
+import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RESUPPLY_CONTRACT_END;
+import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RESUPPLY_LOOT;
+import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RESUPPLY_SMUGGLER;
+import static mekhq.campaign.universe.Factions.getFactionLogo;
+import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.getSpeakerIcon;
+import static mekhq.gui.dialog.resupplyAndCaches.ResupplyDialogUtilities.createPartsReport;
+import static mekhq.gui.dialog.resupplyAndCaches.ResupplyDialogUtilities.formatColumnData;
+import static mekhq.gui.dialog.resupplyAndCaches.ResupplyDialogUtilities.getEnemyFactionReference;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
+import java.awt.BorderLayout;
+import java.util.List;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
+
+import megamek.client.ui.util.UIUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.mission.AtBContract;
@@ -38,40 +73,18 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 
-import javax.swing.*;
-import java.awt.*;
-import java.util.List;
-
-import static javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE;
-import static megamek.common.Compute.randomInt;
-import static mekhq.campaign.finances.enums.TransactionType.EQUIPMENT_PURCHASE;
-import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.loadPlayerConvoys;
-import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.makeDelivery;
-import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.makeSmugglerDelivery;
-import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.processConvoy;
-import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RESUPPLY_CONTRACT_END;
-import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RESUPPLY_LOOT;
-import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RESUPPLY_SMUGGLER;
-import static mekhq.campaign.universe.Factions.getFactionLogo;
-import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerIcon;
-import static mekhq.gui.dialog.resupplyAndCaches.ResupplyDialogUtilities.createPartsReport;
-import static mekhq.gui.dialog.resupplyAndCaches.ResupplyDialogUtilities.formatColumnData;
-import static mekhq.gui.dialog.resupplyAndCaches.ResupplyDialogUtilities.getEnemyFactionReference;
-import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
-
 /**
- * The {@code DialogItinerary} class generates and displays dialogs related to resupply operations.
- * These include normal resupply, looting, contract-ending resupply, and smuggler-related resupplies.
+ * The {@code DialogItinerary} class generates and displays dialogs related to resupply operations. These include normal
+ * resupply, looting, contract-ending resupply, and smuggler-related resupplies.
  */
 public class DialogItinerary {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Resupply";
 
     /**
-     * Displays a detailed itinerary dialog based on the type of resupply operation. The dialog
-     * provides information such as convoy contents, supply values, roleplay items, speaker
-     * details, and visual assets. It also includes appropriate action buttons to handle
-     * confirmation, refusal, or delivery of supplies, depending on the operation type.
+     * Displays a detailed itinerary dialog based on the type of resupply operation. The dialog provides information
+     * such as convoy contents, supply values, roleplay items, speaker details, and visual assets. It also includes
+     * appropriate action buttons to handle confirmation, refusal, or delivery of supplies, depending on the operation
+     * type.
      *
      * <p>This method performs the following tasks:</p>
      * <ol>
@@ -83,9 +96,8 @@ public class DialogItinerary {
      *         user's choice and the resupply type.</li>
      * </ol>
      *
-     * @param resupply the {@link Resupply} instance, which contains details about the resupply
-     *                operation, including the campaign context, contract, convoy details, and
-     *                resupply type.
+     * @param resupply the {@link Resupply} instance, which contains details about the resupply operation, including the
+     *                 campaign context, contract, convoy details, and resupply type.
      */
     public static void itineraryDialog(Resupply resupply) {
         final Campaign campaign = resupply.getCampaign();
@@ -118,17 +130,17 @@ public class DialogItinerary {
             }
 
             speakerIcon = getSpeakerIcon(campaign, speaker);
-            speakerIcon = scaleImageIconToWidth(speakerIcon, 100);
+            speakerIcon = scaleImageIcon(speakerIcon, 100, true);
         } else if (resupplyType.equals(RESUPPLY_SMUGGLER)) {
             speakerName = getFormattedTextAt(RESOURCE_BUNDLE, "guerrillaSpeaker.text");
 
-            speakerIcon = getFactionLogo(campaign, "PIR", true);
-            speakerIcon = scaleImageIconToWidth(speakerIcon, 200);
+            speakerIcon = getFactionLogo(campaign.getGameYear(), "PIR");
+            speakerIcon = scaleImageIcon(speakerIcon, 200, true);
         } else {
             speakerName = contract.getEmployerName(campaign.getGameYear());
 
-            speakerIcon = getFactionLogo(campaign, contract.getEmployerCode(), true);
-            speakerIcon = scaleImageIconToWidth(speakerIcon, 200);
+            speakerIcon = getFactionLogo(campaign.getGameYear(), contract.getEmployerCode());
+            speakerIcon = scaleImageIcon(speakerIcon, 200, true);
         }
 
         StringBuilder message = new StringBuilder(getInitialDescription(resupply));
@@ -143,20 +155,27 @@ public class DialogItinerary {
         String[] columns = formatColumnData(partsReport);
 
         message.append("<table><tr valign='top'>")
-            .append("<td>").append(columns[0]).append("</td>")
-            .append("<td>").append(columns[1]).append("</td>")
-            .append("<td>").append(columns[2]).append("</td>")
-            .append("</tr></table>");
+              .append("<td>")
+              .append(columns[0])
+              .append("</td>")
+              .append("<td>")
+              .append(columns[1])
+              .append("</td>")
+              .append("<td>")
+              .append(columns[2])
+              .append("</td>")
+              .append("</tr></table>");
 
         // Create a panel to display the icon and the message
-        JLabel description = new JLabel(
-            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-                UIUtil.scaleForGUI(DIALOG_WIDTH), message));
+        JLabel description = new JLabel(String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
+              UIUtil.scaleForGUI(DIALOG_WIDTH),
+              message));
         description.setHorizontalAlignment(JLabel.CENTER);
 
         JPanel descriptionPanel = new JPanel();
-        descriptionPanel.setBorder(BorderFactory.createTitledBorder(
-            getFormattedTextAt(RESOURCE_BUNDLE, "dialogBorderTitle.text", speakerName)));
+        descriptionPanel.setBorder(BorderFactory.createTitledBorder(getFormattedTextAt(RESOURCE_BUNDLE,
+              "dialogBorderTitle.text",
+              speakerName)));
         descriptionPanel.add(description);
 
         // Create the main panel to hold the description and image
@@ -175,8 +194,11 @@ public class DialogItinerary {
         JButton confirmButton = new JButton(getFormattedTextAt(RESOURCE_BUNDLE, "confirmAccept.text"));
         confirmButton.addActionListener(e -> {
             dialog.dispose();
-            campaign.getFinances().debit(EQUIPMENT_PURCHASE, campaign.getLocalDate(),
-                resupply.getConvoyContentsValueCalculated(), getFormattedTextAt(RESOURCE_BUNDLE, "smugglerFee.text"));
+            campaign.getFinances()
+                  .debit(EQUIPMENT_PURCHASE,
+                        campaign.getLocalDate(),
+                        resupply.getConvoyContentsValueCalculated(),
+                        getFormattedTextAt(RESOURCE_BUNDLE, "smugglerFee.text"));
 
             if (resupplyType.equals(RESUPPLY_SMUGGLER)) {
                 makeSmugglerDelivery(resupply);
@@ -221,10 +243,11 @@ public class DialogItinerary {
         // Create a new panel to show additional information below the button panel
         JPanel infoPanel = new JPanel();
         infoPanel.setBorder(BorderFactory.createEtchedBorder());
-        JLabel lblInfo = new JLabel(
-            String.format("<html><div style='width: %s; text-align:center;'>%s<br>%s</div></html>",
-                DIALOG_WIDTH, getFormattedTextAt(RESOURCE_BUNDLE, "roleplayItems.prompt"),
-            getFormattedTextAt(RESOURCE_BUNDLE, "documentation.prompt")));
+        JLabel lblInfo = new JLabel(String.format(
+              "<html><div style='width: %s; text-align:center;'>%s<br>%s</div></html>",
+              DIALOG_WIDTH,
+              getFormattedTextAt(RESOURCE_BUNDLE, "roleplayItems.prompt"),
+              getFormattedTextAt(RESOURCE_BUNDLE, "outOfCharacter.itinerary")));
         infoPanel.add(lblInfo);
 
         // Create a container panel to hold both buttonPanel and infoPanel
@@ -244,9 +267,9 @@ public class DialogItinerary {
     }
 
     /**
-     * Generates roleplay item descriptions based on active personnel and their roles in the campaign.
-     * The roleplay items include items such as ration packs and medical supplies tailored to the personnel's roles.
-     * Additionally, randomized content is added to increase immersion and variety.
+     * Generates roleplay item descriptions based on active personnel and their roles in the campaign. The roleplay
+     * items include items such as ration packs and medical supplies tailored to the personnel's roles. Additionally,
+     * randomized content is added to increase immersion and variety.
      *
      * <p>This method processes:</p>
      * <ul>
@@ -262,7 +285,7 @@ public class DialogItinerary {
         int rationPacks = 0;
         int medicalSupplies = 0;
 
-        for (Person person : campaign.getActivePersonnel()) {
+        for (Person person : campaign.getActivePersonnel(true)) {
             PersonnelRole primaryRole = person.getPrimaryRole();
             PersonnelRole secondaryRole = person.getSecondaryRole();
 
@@ -279,17 +302,26 @@ public class DialogItinerary {
 
         // These are all roleplay items that have no tangible benefit
         if (rationPacks > 0) {
-            partsReport.add("<i>" + getFormattedTextAt(RESOURCE_BUNDLE, "resourcesRations.text")
-                + " x" + rationPacks + "</i>");
+            partsReport.add("<i>" +
+                                  getFormattedTextAt(RESOURCE_BUNDLE, "resourcesRations.text") +
+                                  " x" +
+                                  rationPacks +
+                                  "</i>");
         }
 
         if (medicalSupplies > 0) {
-            partsReport.add("<i>" + getFormattedTextAt(RESOURCE_BUNDLE, "resourcesMedical.text")
-                + " x" + medicalSupplies + "</i>");
+            partsReport.add("<i>" +
+                                  getFormattedTextAt(RESOURCE_BUNDLE, "resourcesMedical.text") +
+                                  " x" +
+                                  medicalSupplies +
+                                  "</i>");
         }
 
-        partsReport.add("<i>" + getFormattedTextAt(RESOURCE_BUNDLE, "resourcesRoleplay" + randomInt(50)
-            + ".text") + " x" + (randomInt((int) Math.ceil((double) rationPacks / 5)) + 1) + "</i>");
+        partsReport.add("<i>" +
+                              getFormattedTextAt(RESOURCE_BUNDLE, "resourcesRoleplay" + randomInt(50) + ".text") +
+                              " x" +
+                              (randomInt((int) Math.ceil((double) rationPacks / 5)) + 1) +
+                              "</i>");
     }
 
     /**
@@ -308,10 +340,11 @@ public class DialogItinerary {
      *     </li>
      * </ul>
      *
-     * @param resupply the {@link Resupply} object containing context such as resupply type, convoy contents,
-     *                 and related mission details.
+     * @param resupply the {@link Resupply} object containing context such as resupply type, convoy contents, and
+     *                 related mission details.
+     *
      * @return a string containing an HTML-formatted description that includes supply costs, salvage details, or
-     *         guerrilla interactions, depending on the {@link ResupplyType}.
+     *       guerrilla interactions, depending on the {@link ResupplyType}.
      */
     private static String getInitialDescription(Resupply resupply) {
         final Campaign campaign = resupply.getCampaign();
@@ -323,27 +356,34 @@ public class DialogItinerary {
                 AtBMoraleLevel morale = contract.getMoraleLevel();
 
                 yield getFormattedTextAt(RESOURCE_BUNDLE,
-                    morale.toString().toLowerCase() + "Supplies" + randomInt(20) + ".text",
-                    getFormattedTextAt(RESOURCE_BUNDLE, "supplyCostFull.text",
-                        resupply.getConvoyContentsValueCalculated().toAmountAndSymbolString(),
-                        resupply.getConvoyContentsValueBase().toAmountAndSymbolString()));
+                      morale.toString().toLowerCase() + "Supplies" + randomInt(20) + ".text",
+                      getFormattedTextAt(RESOURCE_BUNDLE,
+                            "supplyCostFull.text",
+                            resupply.getConvoyContentsValueCalculated().toAmountAndSymbolString(),
+                            resupply.getConvoyContentsValueBase().toAmountAndSymbolString()));
             }
             case RESUPPLY_LOOT -> getFormattedTextAt(RESOURCE_BUNDLE,
-                "salvaged" + randomInt(10) + ".text",
-                getFormattedTextAt(RESOURCE_BUNDLE, "supplyCostAbridged.text",
-                    resupply.getConvoyContentsValueBase().toAmountAndSymbolString()));
+                  "salvaged" + randomInt(10) + ".text",
+                  getFormattedTextAt(RESOURCE_BUNDLE,
+                        "supplyCostAbridged.text",
+                        resupply.getConvoyContentsValueBase().toAmountAndSymbolString()));
             case RESUPPLY_CONTRACT_END -> getFormattedTextAt(RESOURCE_BUNDLE,
-                "looted" + randomInt(10) + ".text",
-                getFormattedTextAt(RESOURCE_BUNDLE, "supplyCostAbridged.text",
-                    resupply.getConvoyContentsValueBase().toAmountAndSymbolString()));
+                  "looted" + randomInt(10) + ".text",
+                  getFormattedTextAt(RESOURCE_BUNDLE,
+                        "supplyCostAbridged.text",
+                        resupply.getConvoyContentsValueBase().toAmountAndSymbolString()));
             case RESUPPLY_SMUGGLER -> {
-                String value = getFormattedTextAt(RESOURCE_BUNDLE, "supplyCostFull.text",
-                    resupply.getConvoyContentsValueCalculated().toAmountAndSymbolString(),
-                    resupply.getConvoyContentsValueBase().toAmountAndSymbolString());
+                String value = getFormattedTextAt(RESOURCE_BUNDLE,
+                      "supplyCostFull.text",
+                      resupply.getConvoyContentsValueCalculated().toAmountAndSymbolString(),
+                      resupply.getConvoyContentsValueBase().toAmountAndSymbolString());
 
-                yield getFormattedTextAt(RESOURCE_BUNDLE, "guerrillaSupplies" + randomInt(25) + ".text",
-                    campaign.getCommanderAddress(true), getEnemyFactionReference(resupply),
-                    resupply.getConvoyContentsValueCalculated().toAmountAndSymbolString(), value);
+                yield getFormattedTextAt(RESOURCE_BUNDLE,
+                      "guerrillaSupplies" + randomInt(25) + ".text",
+                      campaign.getCommanderAddress(true),
+                      getEnemyFactionReference(resupply),
+                      resupply.getConvoyContentsValueCalculated().toAmountAndSymbolString(),
+                      value);
             }
         };
     }

@@ -25,12 +25,49 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel;
 
+import static java.lang.Math.abs;
+import static java.lang.Math.floor;
+import static java.lang.Math.min;
+import static java.lang.Math.round;
+import static megamek.codeUtilities.MathUtility.clamp;
+import static megamek.codeUtilities.StringUtility.isNullOrBlank;
+import static megamek.common.Compute.d6;
+import static megamek.common.Compute.randomInt;
+import static megamek.common.enums.SkillLevel.REGULAR;
+import static mekhq.campaign.log.LogEntryType.ASSIGNMENT;
+import static mekhq.campaign.log.LogEntryType.MEDICAL;
+import static mekhq.campaign.log.LogEntryType.PERFORMANCE;
+import static mekhq.campaign.log.LogEntryType.SERVICE;
+import static mekhq.campaign.personnel.PersonnelOptions.*;
+import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
+import static mekhq.campaign.personnel.skills.Aging.getReputationAgeModifier;
+import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE;
+import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
+import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
+import static mekhq.campaign.personnel.skills.SkillType.*;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
+
+import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
 import megamek.Version;
 import megamek.client.generator.RandomNameGenerator;
-import megamek.codeUtilities.StringUtility;
+import megamek.codeUtilities.MathUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
@@ -52,19 +89,32 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.LogEntryFactory;
+import mekhq.campaign.log.LogEntryType;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.log.ServiceLogger;
-import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.Genealogy;
+import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
-import mekhq.campaign.randomEvents.personalities.enums.*;
+import mekhq.campaign.personnel.skills.Attributes;
+import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.Skills;
+import mekhq.campaign.personnel.skills.enums.SkillAttribute;
+import mekhq.campaign.personnel.skills.enums.SkillSubType;
+import mekhq.campaign.randomEvents.personalities.enums.Aggression;
+import mekhq.campaign.randomEvents.personalities.enums.Ambition;
+import mekhq.campaign.randomEvents.personalities.enums.Greed;
+import mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk;
+import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
+import mekhq.campaign.randomEvents.personalities.enums.Social;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -77,19 +127,6 @@ import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.PrintWriter;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-
-import static java.lang.Math.abs;
-import static megamek.codeUtilities.MathUtility.clamp;
-import static megamek.common.Compute.randomInt;
-
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  * @author Justin "Windchild" Bowen
@@ -98,6 +135,26 @@ public class Person {
     // region Variable Declarations
     public static final Map<Integer, Money> MEKWARRIOR_AERO_RANSOM_VALUES;
     public static final Map<Integer, Money> OTHER_RANSOM_VALUES;
+
+    // Traits
+    public static final int TRAIT_MODIFICATION_COST = 100;
+
+    public static final String CONNECTIONS_LABEL = "CONNECTIONS";
+    public static final int MINIMUM_CONNECTIONS = 0;
+    public static final int MAXIMUM_CONNECTIONS = 10;
+
+    public static final String REPUTATION_LABEL = "REPUTATION";
+    public static final int MINIMUM_REPUTATION = -5;
+    public static final int MAXIMUM_REPUTATION = 5;
+
+    public static final String WEALTH_LABEL = "WEALTH";
+    public static final int MINIMUM_WEALTH = -1;
+    public static final int MAXIMUM_WEALTH = 10;
+
+    public static final String UNLUCKY_LABEL = "UNLUCKY";
+    public static final int MINIMUM_UNLUCKY = 0;
+    public static final int MAXIMUM_UNLUCKY = 5;
+
 
     private PersonAwardController awardController;
 
@@ -124,6 +181,8 @@ public class Person {
     // endregion Name
 
     private Gender gender;
+    private BloodGroup bloodGroup;
+
     private Portrait portrait;
 
     private PersonnelRole primaryRole;
@@ -139,7 +198,10 @@ public class Person {
     private LocalDate lastRankChangeDate;
     private LocalDate dateOfDeath;
     private List<LogEntry> personnelLog;
+    private List<LogEntry> medicalLog;
     private List<LogEntry> scenarioLog;
+    private List<LogEntry> assignmentLog;
+    private List<LogEntry> performanceLog;
 
     // this is used by autoAwards to abstract the support person of the year award
     private int autoAwardSupportPoints;
@@ -152,6 +214,12 @@ public class Person {
     private Skills skills;
     private PersonnelOptions options;
     private int toughness;
+    private int connections;
+    private int wealth;
+    private boolean hasPerformedExtremeExpenditure;
+    private int reputation;
+    private int unlucky;
+    private Attributes atowAttributes;
 
     private PersonnelStatus status;
     private int xp;
@@ -165,7 +233,7 @@ public class Person {
 
     // Supports edge usage by a ship's engineer composite crewman
     private int edgeUsedThisRound;
-    // To track how many edge points support personnel have left until next refresh
+    // To track how many edge points personnel have left until next refresh
     private int currentEdge;
 
     // phenotype and background
@@ -243,9 +311,10 @@ public class Person {
     private int socialDescriptionIndex;
     private PersonalityQuirk personalityQuirk;
     private int personalityQuirkDescriptionIndex;
-    private Intelligence intelligence;
-    private int intelligenceDescriptionIndex;
+    private Reasoning reasoning;
+    private int reasoningDescriptionIndex;
     private String personalityDescription;
+    private String personalityInterviewNotes;
     // endregion Personality
 
     // region Flags
@@ -254,6 +323,7 @@ public class Person {
     private boolean divorceable;
     private boolean founder; // +1 share if using shares system
     private boolean immortal;
+    private boolean employed;
     // this is a flag used in determine whether a person is a potential marriage
     // candidate provided
     // that they are not married, are old enough, etc.
@@ -261,27 +331,32 @@ public class Person {
     // this is a flag used in random procreation to determine whether to attempt to
     // procreate
     private boolean tryingToConceive;
+    private boolean hidePersonality;
     // endregion Flags
 
     // Generic extra data, for use with plugins and mods
     private ExtraData extraData;
 
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            MekHQ.getMHQOptions().getLocale());
+    private final static ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+          MekHQ.getMHQOptions().getLocale());
     private static final MMLogger logger = MMLogger.create(Person.class);
 
     // initializes the AtB ransom values
     static {
         MEKWARRIOR_AERO_RANSOM_VALUES = new HashMap<>();
-        MEKWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_NONE, Money.of(2500)); // no official AtB rules for really
-                                                                               // inexperienced scrubs, but...
-        MEKWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_ULTRA_GREEN, Money.of(5000)); // no official AtB rules for
-                                                                                      // really inexperienced scrubs,
-                                                                                      // but...
+
+        // no official AtB rules for really inexperienced scrubs, but...
+        MEKWARRIOR_AERO_RANSOM_VALUES.put(EXP_NONE, Money.of(2500));
+
+        // no official AtB rules for really inexperienced scrubs, but...
+        MEKWARRIOR_AERO_RANSOM_VALUES.put(EXP_ULTRA_GREEN, Money.of(5000));
+
         MEKWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_GREEN, Money.of(10000));
         MEKWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_REGULAR, Money.of(25000));
         MEKWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_VETERAN, Money.of(50000));
         MEKWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_ELITE, Money.of(100000));
+        MEKWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_HEROIC, Money.of(150000));
+        MEKWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_LEGENDARY, Money.of(200000));
 
         OTHER_RANSOM_VALUES = new HashMap<>();
         OTHER_RANSOM_VALUES.put(SkillType.EXP_NONE, Money.of(1250));
@@ -290,6 +365,8 @@ public class Person {
         OTHER_RANSOM_VALUES.put(SkillType.EXP_REGULAR, Money.of(10000));
         OTHER_RANSOM_VALUES.put(SkillType.EXP_VETERAN, Money.of(25000));
         OTHER_RANSOM_VALUES.put(SkillType.EXP_ELITE, Money.of(50000));
+        OTHER_RANSOM_VALUES.put(SkillType.EXP_HEROIC, Money.of(100000));
+        OTHER_RANSOM_VALUES.put(SkillType.EXP_LEGENDARY, Money.of(150000));
     }
     // endregion Variable Declarations
 
@@ -308,30 +385,26 @@ public class Person {
     }
 
     public Person(final String givenName, final String surname, final Campaign campaign) {
-        this(givenName, surname, campaign, campaign.getFactionCode());
+        this(givenName, surname, campaign, campaign.getFaction().getShortName());
     }
 
     public Person(final String givenName, final String surname, final @Nullable Campaign campaign,
-            final String factionCode) {
+          final String factionCode) {
         this("", givenName, surname, "", campaign, factionCode);
     }
 
     /**
-     * Primary Person constructor, variables are initialized in the exact same order
-     * as they are
-     * saved to the XML file
+     * Primary Person constructor, variables are initialized in the exact same order as they are saved to the XML file
      *
      * @param preNominal  the person's pre-nominal
      * @param givenName   the person's given name
      * @param surname     the person's surname
      * @param postNominal the person's post-nominal
-     * @param campaign    the campaign this person is a part of, or null (unit
-     *                    testing only)
+     * @param campaign    the campaign this person is a part of, or null (unit testing only)
      * @param factionCode the faction this person was borne into
      */
-    public Person(final String preNominal, final String givenName, final String surname,
-            final String postNominal, final @Nullable Campaign campaign,
-            final String factionCode) {
+    public Person(final String preNominal, final String givenName, final String surname, final String postNominal,
+          final @Nullable Campaign campaign, final String factionCode) {
         // We assign the variables in XML file order
         id = UUID.randomUUID();
 
@@ -378,7 +451,12 @@ public class Person {
         hits = 0;
         hitsPrior = 0;
         toughness = 0;
-        resetMinutesLeft(); // this assigns minutesLeft and overtimeLeft
+        connections = 0;
+        wealth = 0;
+        hasPerformedExtremeExpenditure = false;
+        reputation = 0;
+        unlucky = 0;
+        atowAttributes = new Attributes();
         dateOfDeath = null;
         recruitment = null;
         joinedCampaign = null;
@@ -393,7 +471,10 @@ public class Person {
         currentEdge = 0;
         techUnits = new ArrayList<>();
         personnelLog = new ArrayList<>();
+        medicalLog = new ArrayList<>();
         scenarioLog = new ArrayList<>();
+        assignmentLog = new ArrayList<>();
+        performanceLog = new ArrayList<>();
         awardController = new PersonAwardController(this);
         injuries = new ArrayList<>();
         originalUnitWeight = EntityWeightClass.WEIGHT_ULTRA_LIGHT;
@@ -423,9 +504,22 @@ public class Person {
         socialDescriptionIndex = randomInt(Social.MAXIMUM_VARIATIONS);
         personalityQuirk = PersonalityQuirk.NONE;
         personalityQuirkDescriptionIndex = randomInt(PersonalityQuirk.MAXIMUM_VARIATIONS);
-        intelligence = Intelligence.AVERAGE;
-        intelligenceDescriptionIndex = randomInt(Intelligence.MAXIMUM_VARIATIONS);
+        reasoning = Reasoning.AVERAGE;
+        reasoningDescriptionIndex = randomInt(Reasoning.MAXIMUM_VARIATIONS);
         personalityDescription = "";
+        personalityInterviewNotes = "";
+
+        // This assigns minutesLeft and overtimeLeft. Must be after skills to avoid an NPE.
+        if (campaign != null) {
+            // The reason for this paranoid checking is to allow us to Unit Test with real Person objects without
+            // needing
+            // to initialize CampaignOptions
+            CampaignOptions campaignOptions = campaign.getCampaignOptions();
+
+            if (campaignOptions != null) {
+                resetMinutesLeft(campaignOptions.isTechsUseAdministration());
+            }
+        }
 
         // region Flags
         setClanPersonnel(originFaction.isClan());
@@ -433,6 +527,7 @@ public class Person {
         setDivorceable(true);
         setFounder(false);
         setImmortal(false);
+        setEmployed(true);
         setMarriageable(true);
         setTryingToConceive(true);
         // endregion Flags
@@ -452,7 +547,7 @@ public class Person {
         this.phenotype = phenotype;
     }
 
-    public String getBloodname() {
+    public @Nullable String getBloodname() {
         return bloodname;
     }
 
@@ -490,16 +585,14 @@ public class Person {
     }
 
     /**
-     * This requires expanded checks because a number of functionalities are
-     * strictly dependent on
-     * the current person's prisoner status.
+     * This requires expanded checks because a number of functionalities are strictly dependent on the current person's
+     * prisoner status.
      *
      * @param campaign       the campaign the person is a part of
      * @param prisonerStatus The new prisoner status for the person in question
      * @param log            whether to log the change or not
      */
-    public void setPrisonerStatus(final Campaign campaign, final PrisonerStatus prisonerStatus,
-            final boolean log) {
+    public void setPrisonerStatus(final Campaign campaign, final PrisonerStatus prisonerStatus, final boolean log) {
         // This must be processed completely, as the unchanged prisoner status of Free
         // to Free is
         // used during recruitment
@@ -517,11 +610,9 @@ public class Person {
                 setLastRankChangeDate(null);
                 if (log) {
                     if (isPrisoner) {
-                        ServiceLogger.madePrisoner(this, campaign.getLocalDate(),
-                                campaign.getName(), "");
+                        ServiceLogger.madePrisoner(this, campaign.getLocalDate(), campaign.getName(), "");
                     } else {
-                        ServiceLogger.madeBondsman(this, campaign.getLocalDate(),
-                                campaign.getName(), "");
+                        ServiceLogger.madeBondsman(this, campaign.getLocalDate(), campaign.getName(), "");
                     }
                 }
                 break;
@@ -542,11 +633,9 @@ public class Person {
 
                 if (log) {
                     if (freed) {
-                        ServiceLogger.freed(this, campaign.getLocalDate(),
-                                campaign.getName(), "");
+                        ServiceLogger.freed(this, campaign.getLocalDate(), campaign.getName(), "");
                     } else {
-                        ServiceLogger.joined(this, campaign.getLocalDate(),
-                                campaign.getName(), "");
+                        ServiceLogger.joined(this, campaign.getLocalDate(), campaign.getName(), "");
                     }
                 }
                 break;
@@ -577,6 +666,7 @@ public class Person {
     // endregion Text Getters
 
     // region Name
+
     /**
      * @return the person's full name
      */
@@ -592,47 +682,41 @@ public class Person {
     }
 
     /**
-     * This is used to create the full name of the person, based on their first and
-     * last names
+     * This is used to create the full name of the person, based on their first and last names
      */
     public void setFullName() {
         final String lastName = getLastName();
-        setFullNameDirect(getFirstName()
-                + (getCallsign().isBlank() ? "" : (" \"" + getCallsign() + '"'))
-                + (lastName.isBlank() ? "" : ' ' + lastName));
+        setFullNameDirect(getFirstName() +
+                                (getCallsign().isBlank() ? "" : (" \"" + getCallsign() + '"')) +
+                                (lastName.isBlank() ? "" : ' ' + lastName));
     }
 
     /**
-     * @param fullName this sets the full name to be equal to the input string. This
-     *                 can ONLY be
-     *                 called by {@link Person#setFullName()} or its overrides.
+     * @param fullName this sets the full name to be equal to the input string. This can ONLY be called by
+     *                 {@link Person#setFullName()} or its overrides.
      */
     protected void setFullNameDirect(final String fullName) {
         this.fullName = fullName;
     }
 
     /**
-     * @return a String containing the person's first name including their
-     *         pre-nominal
+     * @return a String containing the person's first name including their pre-nominal
      */
     public String getFirstName() {
         return (getPreNominal().isBlank() ? "" : (getPreNominal() + ' ')) + getGivenName();
     }
 
     /**
-     * Return a full last name which may be a bloodname or a surname with or without
-     * a post-nominal.
-     * A bloodname will overrule a surname but we do not disallow surnames for clan
-     * personnel, if the
-     * player wants to input them
+     * Return a full last name which may be a bloodname or a surname with or without a post-nominal. A bloodname will
+     * overrule a surname but we do not disallow surnames for clan personnel, if the player wants to input them
      *
      * @return a String of the person's last name
      */
     public String getLastName() {
-        String lastName = !StringUtility.isNullOrBlank(getBloodname()) ? getBloodname()
-                : !StringUtility.isNullOrBlank(getSurname()) ? getSurname()
-                        : "";
-        if (!StringUtility.isNullOrBlank(getPostNominal())) {
+        String lastName = !isNullOrBlank(getBloodname()) ?
+                                getBloodname() :
+                                !isNullOrBlank(getSurname()) ? getSurname() : "";
+        if (!isNullOrBlank(getPostNominal())) {
             lastName += (lastName.isBlank() ? "" : " ") + getPostNominal();
         }
         return lastName;
@@ -748,11 +832,8 @@ public class Person {
     }
 
     /**
-     * This method is used to migrate names from being a joined name to split
-     * between given name and
-     * surname, as part of the Personnel changes in MekHQ 0.47.4, and is used to
-     * migrate from
-     * MM-style names to MHQ-style names
+     * This method is used to migrate names from being a joined name to split between given name and surname, as part of
+     * the Personnel changes in MekHQ 0.47.4, and is used to migrate from MM-style names to MHQ-style names
      *
      * @param text text containing the name to be migrated
      */
@@ -784,7 +865,7 @@ public class Person {
                     givenName.append(' ').append(name[i]);
                 }
 
-                if (!(!StringUtility.isNullOrBlank(getBloodname()) && getBloodname().equals(name[i]))) {
+                if (!(!isNullOrBlank(getBloodname()) && getBloodname().equals(name[i]))) {
                     givenName.append(' ').append(name[i]);
                 }
             }
@@ -838,23 +919,18 @@ public class Person {
         // 4) Cannot be a primary Astech and a secondary tech
         // 5) Cannot be primary medical staff and a secondary Medic
         // 6) Cannot be a primary Medic and secondary medical staff
-        if ((primaryRole == getSecondaryRole())
-                || primaryRole.isDependent()
-                || (primaryRole.isTech() && getSecondaryRole().isAstech())
-                || (primaryRole.isAstech() && getSecondaryRole().isTechSecondary())
-                || (primaryRole.isMedicalStaff() && getSecondaryRole().isMedic())
-                || (primaryRole.isMedic() && getSecondaryRole().isMedicalStaff())) {
+        if ((primaryRole == getSecondaryRole()) ||
+                  primaryRole.isDependent() ||
+                  (primaryRole.isTech() && getSecondaryRole().isAstech()) ||
+                  (primaryRole.isAstech() && getSecondaryRole().isTechSecondary()) ||
+                  (primaryRole.isMedicalStaff() && getSecondaryRole().isMedic()) ||
+                  (primaryRole.isMedic() && getSecondaryRole().isMedicalStaff())) {
             setSecondaryRoleDirect(PersonnelRole.NONE);
         }
 
-        // Now, we can perform the time in service and last rank change tracking change
-        // for dependents
-        if (primaryRole.isDependent()) {
-            setRecruitment(null);
-            setLastRankChangeDate(null);
-        } else if (getPrimaryRole().isDependent()) {
+        // Now, we can perform the time in service and last rank change tracking change for dependents
+        if (!primaryRole.isCivilian() && recruitment != null) {
             setRecruitment(campaign.getLocalDate());
-            setLastRankChangeDate(campaign.getLocalDate());
         }
 
         // Finally, we can set the primary role
@@ -886,13 +962,11 @@ public class Person {
     }
 
     /**
-     * This is used to determine if a person has a specific role as either their
-     * primary OR their
-     * secondary role
+     * This is used to determine if a person has a specific role as either their primary OR their secondary role
      *
      * @param role the role to determine
-     * @return true if the person has the specific role either as their primary or
-     *         secondary role
+     *
+     * @return true if the person has the specific role either as their primary or secondary role
      */
     public boolean hasRole(final PersonnelRole role) {
         return (getPrimaryRole() == role) || (getSecondaryRole() == role);
@@ -906,8 +980,8 @@ public class Person {
     }
 
     /**
-     * @param excludeUnmarketable whether to exclude the unmarketable roles from the
-     *                            comparison
+     * @param excludeUnmarketable whether to exclude the unmarketable roles from the comparison
+     *
      * @return true if the person has a primary or secondary support role
      */
     public boolean hasSupportRole(final boolean excludeUnmarketable) {
@@ -927,45 +1001,104 @@ public class Person {
         if (isClanPersonnel()) {
             bgPrefix = getPhenotype().getShortName() + ' ';
         }
-        return bgPrefix + getPrimaryRole().getName(isClanPersonnel());
+        return bgPrefix + getPrimaryRole().getLabel(isClanPersonnel());
+    }
+
+    /**
+     * Returns an HTML-formatted string describing the primary and, if applicable, secondary personnel roles. Civilian
+     * roles are displayed in italics. If a secondary role is present and is not {@code NONE}, it is appended to the
+     * description, separated by a slash. The description is wrapped in HTML tags.
+     *
+     * @return an HTML-formatted string describing the personnel roles, with civilian roles shown in italics
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public String getFormatedRoleDescriptions(LocalDate today) {
+        StringBuilder description = new StringBuilder("<html>");
+
+        if (!employed) {
+            description.append("\u25CF ");
+        }
+
+        String primaryDesc = getPrimaryRoleDesc();
+
+        if (primaryRole.isSubType(PersonnelRoleSubType.CIVILIAN)) {
+            if (primaryRole.isNone()) {
+                // Error state: emphasize the issue
+                description.append("<b><i><u>").append(primaryDesc.toUpperCase()).append("</u></i></b>");
+            } else if (primaryRole.isDependent()) {
+                String label;
+                if (status.isStudent()) {
+                    label = status.getLabel();
+                } else if (isChild(today)) {
+                    label = resources.getString("relationChild.text");
+                } else {
+                    label = primaryDesc;
+                }
+                description.append("<i>").append(label).append("</i>");
+            } else {
+                description.append("<i>").append(primaryDesc).append("</i>");
+            }
+        } else {
+            description.append(primaryDesc);
+        }
+
+        if (!secondaryRole.isNone()) {
+            description.append(" / ");
+            String secondaryDesc = getSecondaryRoleDesc();
+            if (secondaryRole.isSubType(PersonnelRoleSubType.CIVILIAN)) {
+                description.append("<i>").append(secondaryDesc).append("</i>");
+            } else {
+                description.append(secondaryDesc);
+            }
+        }
+
+        description.append("</html>");
+        return description.toString();
     }
 
     public String getSecondaryRoleDesc() {
-        return getSecondaryRole().getName(isClanPersonnel());
+        return getSecondaryRole().getLabel(isClanPersonnel());
     }
 
     public boolean canPerformRole(LocalDate today, final PersonnelRole role, final boolean primary) {
         if (primary) {
             // Primary Role:
-            // We only do a few here, as it is better on the UX-side to correct the issues
-            // when
-            // assigning the primary role
             // 1) Can always be Dependent
             // 2) Cannot be None
+            // 3) Cannot be equal to the secondary role
+            // 4) Cannot be a tech role if the secondary role is a tech role (inc. Astech)
+            // 5) Cannot be Medic if the secondary role is one of the medical staff roles
+            // 6) Cannot be Admin if the secondary role is one of the administrator roles
             if (role.isDependent()) {
                 return true;
             } else if (role.isNone()) {
+                return false;
+            } else if ((role == getSecondaryRole()) ||
+                             ((role.isTech() || role.isAstech()) &&
+                                    (getSecondaryRole().isTech() || getSecondaryRole().isAstech())) ||
+                             (role.isMedicalStaff() && getSecondaryRole().isMedicalStaff()) ||
+                             (role.isAdministrator() && getSecondaryRole().isAdministrator())) {
                 return false;
             }
         } else {
             // Secondary Role:
             // 1) Can always be None
             // 2) Cannot be Dependent
-            // 3) Can only be None if the primary role is a Dependent
-            // 4) Cannot be equal to the primary role
-            // 5) Cannot be a tech role if the primary role is an Astech
-            // 6) Cannot be Astech if the primary role is a tech role
-            // 7) Cannot be a medical staff role if the primary role is a Medic
-            // 8) Cannot be Medic if the primary role is one of the medical staff roles
+            // 3) Cannot be equal to the primary role
+            // 4) Cannot be a tech role if the primary role is a tech role (inc. Astech)
+            // 5) Cannot be Medic if the primary role is one of the medical staff roles
+            // 6) Cannot be Admin if the primary role is one of the administrator roles
             if (role.isNone()) {
                 return true;
-            } else if (role.isDependent()
-                    || getPrimaryRole().isDependent()
-                    || (getPrimaryRole() == role)
-                    || (role.isTechSecondary() && getPrimaryRole().isAstech())
-                    || (role.isAstech() && getPrimaryRole().isTech())
-                    || (role.isMedicalStaff() && getPrimaryRole().isMedic())
-                    || (role.isMedic() && getPrimaryRole().isMedicalStaff())) {
+            } else if ((role.isDependent()) ||
+                             (getPrimaryRole().isDependent()) ||
+                             (getPrimaryRole() == role) ||
+                             ((role.isTech() || role.isAstech()) &&
+                                    (getPrimaryRole().isTech() || getPrimaryRole().isAstech())) ||
+                             (role.isMedicalStaff() && getPrimaryRole().isMedicalStaff()) ||
+                             (role.isAdministrator() && getPrimaryRole().isAdministrator())) {
                 return false;
             }
         }
@@ -975,19 +1108,16 @@ public class Person {
         }
 
         return switch (role) {
-            case MEKWARRIOR -> hasSkill(SkillType.S_GUN_MEK) && hasSkill(SkillType.S_PILOT_MEK);
-            case LAM_PILOT ->
-                Stream.of(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK, SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO)
-                        .allMatch(this::hasSkill);
-            case GROUND_VEHICLE_DRIVER -> hasSkill(SkillType.S_PILOT_GVEE);
-            case NAVAL_VEHICLE_DRIVER -> hasSkill(SkillType.S_PILOT_NVEE);
-            case VTOL_PILOT -> hasSkill(SkillType.S_PILOT_VTOL);
-            case VEHICLE_GUNNER -> hasSkill(SkillType.S_GUN_VEE);
-            case MECHANIC -> hasSkill(SkillType.S_TECH_MECHANIC);
-            case VEHICLE_CREW ->
-                Stream.of(SkillType.S_TECH_MEK, SkillType.S_TECH_AERO, SkillType.S_TECH_MECHANIC,
-                    SkillType.S_TECH_BA, SkillType.S_DOCTOR, SkillType.S_MEDTECH, SkillType.S_ASTECH)
-                    .anyMatch(this::hasSkill);
+            case VEHICLE_CREW -> Stream.of(SkillType.S_TECH_MEK,
+                  SkillType.S_TECH_AERO,
+                  SkillType.S_TECH_MECHANIC,
+                  SkillType.S_TECH_BA,
+                  SkillType.S_SURGERY,
+                  SkillType.S_MEDTECH,
+                  SkillType.S_ASTECH,
+                  SkillType.S_COMMUNICATIONS,
+                  SkillType.S_SENSOR_OPERATIONS,
+                  SkillType.S_ART_COOKING).anyMatch(this::hasSkill);
             case AEROSPACE_PILOT -> hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO);
             case CONVENTIONAL_AIRCRAFT_PILOT -> hasSkill(SkillType.S_GUN_JET) && hasSkill(SkillType.S_PILOT_JET);
             case PROTOMEK_PILOT -> hasSkill(SkillType.S_GUN_PROTO);
@@ -996,18 +1126,71 @@ public class Person {
             case VESSEL_PILOT -> hasSkill(SkillType.S_PILOT_SPACE);
             case VESSEL_CREW -> hasSkill(SkillType.S_TECH_VESSEL);
             case VESSEL_GUNNER -> hasSkill(SkillType.S_GUN_SPACE);
-            case VESSEL_NAVIGATOR -> hasSkill(SkillType.S_NAV);
+            case VESSEL_NAVIGATOR -> hasSkill(SkillType.S_NAVIGATION);
             case MEK_TECH -> hasSkill(SkillType.S_TECH_MEK);
             case AERO_TEK -> hasSkill(SkillType.S_TECH_AERO);
             case BA_TECH -> hasSkill(SkillType.S_TECH_BA);
             case ASTECH -> hasSkill(SkillType.S_ASTECH);
-            case DOCTOR -> hasSkill(SkillType.S_DOCTOR);
+            case DOCTOR -> hasSkill(SkillType.S_SURGERY);
             case MEDIC -> hasSkill(SkillType.S_MEDTECH);
             case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_HR ->
-                hasSkill(SkillType.S_ADMIN);
-            case DEPENDENT, NONE -> true;
+                  hasSkill(SkillType.S_ADMIN);
+            case ADULT_ENTERTAINER -> {
+                // A character under the age of 18 should never have access to this profession
+                if (isChild(today, true)) {
+                    yield false;
+                } else {
+                    yield hasSkill(SkillType.S_ART_OTHER) && hasSkill(SkillType.S_ACTING);
+                }
+            }
+            case LUXURY_COMPANION -> {
+                // A character under the age of 18 should never have access to this profession
+                if (isChild(today, true)) {
+                    yield false;
+                } else {
+                    yield hasSkill(SkillType.S_ACTING) && hasSkill(SkillType.S_PROTOCOLS);
+                }
+            }
+            default -> {
+                for (String skillName : role.getSkillsForProfession()) {
+                    if (!hasSkill(skillName)) {
+                        yield false;
+                    }
+                }
+
+                yield true;
+            }
         };
     }
+
+    /**
+     * Validates and updates the primary and secondary roles of this person for the given campaign.
+     *
+     * <p>This method checks if the current primary and secondary roles can be performed based on the campaign's
+     * local date. If the person is not eligible for their primary role, it will be set to
+     * {@link PersonnelRole#DEPENDENT}. If they cannot perform their secondary role, it will be set to
+     * {@link PersonnelRole#NONE}.
+     *
+     * @param campaign the {@link Campaign} context used for validation, particularly the local date
+     */
+    public void validateRoles(Campaign campaign) {
+        if (!primaryRole.isNone()) {
+            boolean canPerform = canPerformRole(campaign.getLocalDate(), primaryRole, true);
+
+            if (!canPerform) {
+                setPrimaryRole(campaign, PersonnelRole.DEPENDENT);
+            }
+        }
+
+        if (!secondaryRole.isNone()) {
+            boolean canPerform = canPerformRole(campaign.getLocalDate(), secondaryRole, false);
+
+            if (!canPerform) {
+                setSecondaryRole(PersonnelRole.NONE);
+            }
+        }
+    }
+
     // endregion Personnel Roles
 
     public PersonnelStatus getStatus() {
@@ -1021,15 +1204,13 @@ public class Person {
      * @param today    the current date
      * @param status   the person's new PersonnelStatus
      */
-    public void changeStatus(final Campaign campaign, final LocalDate today,
-            final PersonnelStatus status) {
+    public void changeStatus(final Campaign campaign, final LocalDate today, final PersonnelStatus status) {
         if (status == getStatus()) { // no change means we don't need to process anything
             return;
         } else if (getStatus().isDead() && !status.isDead()) {
             // remove date of death for resurrection
             setDateOfDeath(null);
-            campaign.addReport(String.format(resources.getString("resurrected.report"),
-                    getHyperlinkedFullTitle()));
+            campaign.addReport(String.format(resources.getString("resurrected.report"), getHyperlinkedFullTitle()));
             ServiceLogger.resurrected(this, today);
         }
 
@@ -1037,31 +1218,30 @@ public class Person {
             case ACTIVE:
                 if (getStatus().isMIA()) {
                     campaign.addReport(String.format(resources.getString("recoveredMIA.report"),
-                            getHyperlinkedFullTitle()));
+                          getHyperlinkedFullTitle()));
                     ServiceLogger.recoveredMia(this, today);
                 } else if (getStatus().isPoW()) {
                     campaign.addReport(String.format(resources.getString("recoveredPoW.report"),
-                            getHyperlinkedFullTitle()));
+                          getHyperlinkedFullTitle()));
                     ServiceLogger.recoveredPoW(this, campaign.getLocalDate());
                 } else if (getStatus().isOnLeave() || getStatus().isOnMaternityLeave()) {
                     campaign.addReport(String.format(resources.getString("returnedFromLeave.report"),
-                            getHyperlinkedFullTitle()));
+                          getHyperlinkedFullTitle()));
                     ServiceLogger.returnedFromLeave(this, campaign.getLocalDate());
                 } else if (getStatus().isStudent()) {
                     campaign.addReport(String.format(resources.getString("returnedFromEducation.report"),
-                            getHyperlinkedFullTitle()));
+                          getHyperlinkedFullTitle()));
                     ServiceLogger.returnedFromEducation(this, campaign.getLocalDate());
                 } else if (getStatus().isMissing()) {
                     campaign.addReport(String.format(resources.getString("returnedFromMissing.report"),
-                            getHyperlinkedFullTitle()));
+                          getHyperlinkedFullTitle()));
                     ServiceLogger.returnedFromMissing(this, campaign.getLocalDate());
                 } else if (getStatus().isAwol()) {
                     campaign.addReport(String.format(resources.getString("returnedFromAWOL.report"),
-                            getHyperlinkedFullTitle()));
+                          getHyperlinkedFullTitle()));
                     ServiceLogger.returnedFromAWOL(this, campaign.getLocalDate());
                 } else {
-                    campaign.addReport(String.format(resources.getString("rehired.report"),
-                            getHyperlinkedFullTitle()));
+                    campaign.addReport(String.format(resources.getString("rehired.report"), getHyperlinkedFullTitle()));
                     ServiceLogger.rehired(this, today);
                 }
                 setRetirement(null);
@@ -1137,8 +1317,10 @@ public class Person {
                         if (!child.getGenealogy().hasLivingParents()) {
                             ServiceLogger.orphaned(child, campaign.getLocalDate());
                         } else if (child.getGenealogy().hasLivingParents()) {
-                            PersonalLogger.RelativeHasDied(child, this, resources.getString("relationParent.text"),
-                                    campaign.getLocalDate());
+                            PersonalLogger.RelativeHasDied(child,
+                                  this,
+                                  resources.getString("relationParent.text"),
+                                  campaign.getLocalDate());
                         }
                     }
                 }
@@ -1147,8 +1329,10 @@ public class Person {
             if (genealogy.hasLivingParents()) {
                 for (Person parent : genealogy.getParents()) {
                     if (!parent.getStatus().isDead()) {
-                        PersonalLogger.RelativeHasDied(parent, this, resources.getString("relationChild.text"),
-                                campaign.getLocalDate());
+                        PersonalLogger.RelativeHasDied(parent,
+                              this,
+                              resources.getString("relationChild.text"),
+                              campaign.getLocalDate());
                     }
                 }
             }
@@ -1194,7 +1378,10 @@ public class Person {
 
         for (UUID tagAlongId : eduTagAlongs) {
             Person tagAlong = campaign.getPerson(tagAlongId);
-            tagAlong.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
+
+            if (tagAlong != null) {
+                tagAlong.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
+            }
         }
         this.setEduTagAlongs(new ArrayList<>());
 
@@ -1202,8 +1389,7 @@ public class Person {
     }
 
     /**
-     * If the current character is the campaign commander, adjust loyalty across the
-     * entire unit.
+     * If the current character is the campaign commander, adjust loyalty across the entire unit.
      *
      * @param campaign The current campaign
      */
@@ -1222,8 +1408,8 @@ public class Person {
 
         if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
             campaign.addReport(String.format(resources.getString("loyaltyChangeGroup.text"),
-                    "<span color=" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>",
-                    ReportingUtilities.CLOSING_SPAN_TAG));
+                  "<span color=" + ReportingUtilities.getWarningColor() + "'>",
+                  ReportingUtilities.CLOSING_SPAN_TAG));
         }
     }
 
@@ -1232,8 +1418,7 @@ public class Person {
      *
      * @param campaign  The current campaign
      * @param isMajor   Flag to indicate if the loyalty change is major.
-     * @param isVerbose Flag to indicate if the change should be individually posted
-     *                  to the campaign report.
+     * @param isVerbose Flag to indicate if the change should be individually posted to the campaign report.
      */
     public void performRandomizedLoyaltyChange(Campaign campaign, boolean isMajor, boolean isVerbose) {
         int originalLoyalty = loyalty;
@@ -1251,8 +1436,8 @@ public class Person {
             }
         };
 
-        int roll = Compute.d6(3);
-        int secondRoll = Compute.d6(3);
+        int roll = d6(3);
+        int secondRoll = d6(3);
 
         // if this is a major change, we use whichever result is furthest from the
         // midpoint (9)
@@ -1268,19 +1453,16 @@ public class Person {
     }
 
     /**
-     * Performs a loyalty change where the results will always be neutral or
-     * positive, or neutral or negative.
+     * Performs a loyalty change where the results will always be neutral or positive, or neutral or negative.
      *
      * @param campaign   the current campaign
-     * @param isPositive a boolean indicating whether the loyalty change should be
-     *                   positive or negative
-     * @param isMajor    a boolean indicating whether a major loyalty change should
-     *                   be performed in addition to the initial change
-     * @param isVerbose  a boolean indicating whether the method should generate a
-     *                   report if the loyalty has changed
+     * @param isPositive a boolean indicating whether the loyalty change should be positive or negative
+     * @param isMajor    a boolean indicating whether a major loyalty change should be performed in addition to the
+     *                   initial change
+     * @param isVerbose  a boolean indicating whether the method should generate a report if the loyalty has changed
      */
     public void performForcedDirectionLoyaltyChange(Campaign campaign, boolean isPositive, boolean isMajor,
-            boolean isVerbose) {
+          boolean isVerbose) {
         int originalLoyalty = loyalty;
 
         Consumer<Integer> applyLoyaltyChange = (roll) -> {
@@ -1296,10 +1478,10 @@ public class Person {
             }
         };
 
-        applyLoyaltyChange.accept(Compute.d6(3));
+        applyLoyaltyChange.accept(d6(3));
 
         if (isMajor) {
-            applyLoyaltyChange.accept(Compute.d6(3));
+            applyLoyaltyChange.accept(d6(3));
         }
 
         if ((isVerbose) && (originalLoyalty != loyalty)) {
@@ -1310,8 +1492,7 @@ public class Person {
     /**
      * Reports the change in loyalty.
      *
-     * @param campaign        The campaign for which the loyalty change is being
-     *                        reported.
+     * @param campaign        The campaign for which the loyalty change is being reported.
      * @param originalLoyalty The original loyalty value before the change.
      */
     private void reportLoyaltyChange(Campaign campaign, int originalLoyalty) {
@@ -1324,22 +1505,24 @@ public class Person {
 
         // choose the color and string based on the loyalty comparison.
         if (originalLoyalty > loyalty) {
-            color = MekHQ.getMHQOptions().getFontColorNegativeHexColor();
+            color = ReportingUtilities.getNegativeColor();
             changeString.append(resources.getString("loyaltyChangeNegative.text"));
         } else {
-            color = MekHQ.getMHQOptions().getFontColorPositiveHexColor();
+            color = ReportingUtilities.getPositiveColor();
             changeString.append(resources.getString("loyaltyChangePositive.text"));
         }
 
-        String report = String.format(resources.getString("loyaltyChangeReport.text"), getHyperlinkedFullTitle(),
-                "<span color=" + color + "'>", changeString, ReportingUtilities.CLOSING_SPAN_TAG);
+        String report = String.format(resources.getString("loyaltyChangeReport.text"),
+              getHyperlinkedFullTitle(),
+              "<span color=" + color + "'>",
+              changeString,
+              CLOSING_SPAN_TAG);
 
         campaign.addReport(report);
     }
 
     /**
-     * This is used to directly set the Person's PersonnelStatus without any
-     * processing
+     * This is used to directly set the Person's PersonnelStatus without any processing
      *
      * @param status the person's new status
      */
@@ -1371,6 +1554,25 @@ public class Person {
         return gender;
     }
 
+    public void setBloodGroup(final BloodGroup bloodGroup) {
+        this.bloodGroup = bloodGroup;
+    }
+
+    /**
+     * Retrieves the blood group of the person. If the blood group has not been set, it generates a random blood group
+     * using {@link BloodGroup#getRandomBloodGroup()}.
+     *
+     * @return The {@link BloodGroup} of the entity. If no blood group is previously assigned, a random one is generated
+     *       and returned.
+     */
+    public BloodGroup getBloodGroup() {
+        if (bloodGroup == null) {
+            bloodGroup = getRandomBloodGroup();
+        }
+
+        return bloodGroup;
+    }
+
     /**
      * Sets the date of birth (the date they are born) for the person.
      *
@@ -1393,6 +1595,7 @@ public class Person {
      * Retrieves the birthday for a person, with the year set to the same as the provided year.
      *
      * @param currentYear the current in-game year
+     *
      * @return the birthday with the year updated to match the provided year
      */
     public LocalDate getBirthday(int currentYear) {
@@ -1429,14 +1632,24 @@ public class Person {
         return recruitment;
     }
 
+    /**
+     * Sets the recruitment (join) date for this entity.
+     * <p>
+     * If the provided date is not {@code null}, the entity is marked as employed.
+     * </p>
+     *
+     * @param recruitment the date the entity was recruited, or {@code null} to unset
+     */
     public void setRecruitment(final @Nullable LocalDate recruitment) {
+        employed = recruitment != null;
+
         this.recruitment = recruitment;
     }
 
     public String getTimeInService(final Campaign campaign) {
         // Get time in service based on year
         if (getRecruitment() == null) {
-            // use "" they haven't been recruited or are dependents
+            // use "" they haven't been recruited
             return "";
         }
 
@@ -1449,15 +1662,15 @@ public class Person {
             today = getDateOfDeath();
         }
 
-        return campaign.getCampaignOptions().getTimeInServiceDisplayFormat()
-                .getDisplayFormattedOutput(getRecruitment(), today);
+        return campaign.getCampaignOptions()
+                     .getTimeInServiceDisplayFormat()
+                     .getDisplayFormattedOutput(getRecruitment(), today);
     }
 
     /**
-     * @return how many years a character has spent employed in the campaign,
-     *         factoring in date of death and retirement
-     *
      * @param campaign the current Campaign
+     *
+     * @return how many years a character has spent employed in the campaign, factoring in date of death and retirement
      */
     public long getYearsInService(final Campaign campaign) {
         // Get time in service based on year
@@ -1500,8 +1713,9 @@ public class Person {
             today = getDateOfDeath();
         }
 
-        return campaign.getCampaignOptions().getTimeInRankDisplayFormat()
-                .getDisplayFormattedOutput(getLastRankChangeDate(), today);
+        return campaign.getCampaignOptions()
+                     .getTimeInRankDisplayFormat()
+                     .getDisplayFormattedOutput(getLastRankChangeDate(), today);
     }
 
     public void setId(final UUID id) {
@@ -1519,6 +1733,7 @@ public class Person {
      * for procreation-specific thresholds.</p>
      *
      * @param today the current date to calculate the age against
+     *
      * @return {@code true} if the person's age is less than 16; {@code false} otherwise
      */
     public boolean isChild(final LocalDate today) {
@@ -1526,15 +1741,14 @@ public class Person {
     }
 
     /**
-     * Checks if the person is considered a child based on their age, today's date, and procreation
-     * status.
+     * Checks if the person is considered a child based on their age, today's date, and procreation status.
      *
      * @param today the current date to calculate the age against
-     * @param use18 if {@code true}, the threshold considers a person a child
-     *                      if their age is less than 18; otherwise, the default age threshold of
-     *                      16 applies
-     * @return {@code true} if the person's age is less than the specified threshold
-     *         (procreation or default), {@code false} otherwise
+     * @param use18 if {@code true}, the threshold considers a person a child if their age is less than 18; otherwise,
+     *              the default age threshold of 16 applies
+     *
+     * @return {@code true} if the person's age is less than the specified threshold (procreation or default),
+     *       {@code false} otherwise
      */
     public boolean isChild(final LocalDate today, boolean use18) {
         int age = getAge(today);
@@ -1577,8 +1791,8 @@ public class Person {
     }
 
     /**
-     * Changes the loyalty value for the current person by the specified amount.
-     * Positive values increase loyalty, while negative values decrease loyalty.
+     * Changes the loyalty value for the current person by the specified amount. Positive values increase loyalty, while
+     * negative values decrease loyalty.
      *
      * @param change The amount to change the loyalty value by.
      */
@@ -1587,11 +1801,11 @@ public class Person {
     }
 
     /**
+     * @param loyaltyModifier the loyalty modifier
+     *
      * @return the name corresponding to an individual's loyalty modifier.
      *
-     * @param loyaltyModifier the loyalty modifier
-     * @throws IllegalStateException if an unexpected value is passed for
-     *                               loyaltyModifier
+     * @throws IllegalStateException if an unexpected value is passed for loyaltyModifier
      */
     public static String getLoyaltyName(int loyaltyModifier) {
         return switch (loyaltyModifier) {
@@ -1602,9 +1816,8 @@ public class Person {
             case 1 -> "Unreliable";
             case 2 -> "Disloyal";
             case 3 -> "Treacherous";
-            default ->
-                throw new IllegalStateException(
-                        "Unexpected value in mekhq/campaign/personnel/Person.java/getLoyaltyName: " + loyaltyModifier);
+            default -> throw new IllegalStateException(
+                  "Unexpected value in mekhq/campaign/personnel/Person.java/getLoyaltyName: " + loyaltyModifier);
         };
     }
 
@@ -1617,19 +1830,23 @@ public class Person {
     }
 
     /**
-     * Adjusts the current fatigue level by the specified amount.
+     * Adjusts the current fatigue level by the specified amount, applying an SPA fatigue multiplier where applicable.
      *
-     * <p>
-     * This method modifies the fatigue level by adding the value of {@code change}
-     * to the current fatigue. Positive values will increase the fatigue, while
-     * negative values will decrease it.
-     * </p>
+     * <p>This method modifies the fatigue level based on the given {@code delta} value. Positive values, which
+     * indicate an increase in fatigue, are scaled by the result of {@link #getFatigueMultiplier()} and rounded down
+     * using {@link Math#floor(double)} to ensure consistent results. Negative values, which indicate a reduction in
+     * fatigue, are applied directly without modification.</p>
      *
-     * @param change The amount to adjust the fatigue by. Positive values increase fatigue,
-     *               and negative values decrease it.
+     * @param delta The amount to adjust the fatigue by. Positive values represent fatigue gain and are scaled by the
+     *              fatigue multiplier, while negative values represent fatigue reduction and are applied as-is.
      */
-    public void changeFatigue(final int change) {
-        this.fatigue = this.fatigue + change;
+    public void changeFatigue(int delta) {
+        if (delta > 0) {
+            // Only fatigue gain is modified by SPAs, not reduction.
+            delta = (int) floor(delta * getFatigueMultiplier());
+        }
+
+        this.fatigue = this.fatigue + delta;
     }
 
     public boolean getIsRecoveringFromFatigue() {
@@ -1638,6 +1855,65 @@ public class Person {
 
     public void setIsRecoveringFromFatigue(final boolean isRecoveringFromFatigue) {
         this.isRecoveringFromFatigue = isRecoveringFromFatigue;
+    }
+
+    /**
+     * Calculates the fatigue multiplier for a character based on their traits and fitness-related options.
+     *
+     * <p>The calculation is influenced by the following conditions:</p>
+     * <ul>
+     *     <li><b>{@code FLAW_GLASS_JAW}</b>: If set, increases the multiplier by 1.</li>
+     *     <li><b>{@code ATOW_TOUGHNESS}</b>: If set, decreases the multiplier by 1.</li>
+     *     <li>Both {@code FLAW_GLASS_JAW} and {@code ATOW_TOUGHNESS} cannot modify the multiplier if both are
+     *     present, as they cancel each other out.</li>
+     *     <li><b>{@code ATOW_FIT}</b>: If set, decreases the multiplier by 1.</li>
+     *     <li><b>{@code FLAW_UNFIT}</b>: If set, increases the multiplier by 1.</li>
+     *     <li>Both {@code ATOW_FIT} and {@code FLAW_UNFIT}, when present simultaneously, cancel each other out and
+     *     do not affect the multiplier.</li>
+     * </ul>
+     *
+     * <p>After calculating the initial multiplier, the following adjustments are applied:</p>
+     * <ul>
+     *     <li>If the resulting multiplier equals {@code 0}, it is set to {@code 0.5} to avoid zeroing Fatigue.</li>
+     *     <li>If the resulting multiplier is less than {@code 0}, it is set to a minimum value of {@code 0.25}.</li>
+     * </ul>
+     *
+     * @return the calculated fatigue multiplier, adjusted based on the character's traits and options
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    private double getFatigueMultiplier() {
+        double fatigueMultiplier = 1;
+
+        // Glass Jaw and Toughness
+        boolean hasGlassJaw = options.booleanOption(FLAW_GLASS_JAW);
+        boolean hasToughness = options.booleanOption(ATOW_TOUGHNESS);
+        boolean modifyForGlassJawToughness = !(hasGlassJaw && hasToughness);
+
+        if (modifyForGlassJawToughness) {
+            fatigueMultiplier += (hasGlassJaw ? 1 : 0);
+            fatigueMultiplier -= (hasToughness ? 1 : 0);
+        }
+
+        // Fit and Unfit
+        boolean hasFit = options.booleanOption(ATOW_FIT);
+        boolean hasUnfit = options.booleanOption(FLAW_UNFIT);
+        boolean modifyForFitness = !(hasFit && hasUnfit);
+
+        if (modifyForFitness) {
+            fatigueMultiplier += (hasUnfit ? 1 : 0);
+            fatigueMultiplier -= (hasFit ? 1 : 0);
+        }
+
+        // Conclusion
+        if (fatigueMultiplier == 0) {
+            fatigueMultiplier = 0.5;
+        } else if (fatigueMultiplier < 0) {
+            fatigueMultiplier = 0.25;
+        }
+
+        return fatigueMultiplier;
     }
     // region Turnover and Retention
 
@@ -1659,9 +1935,9 @@ public class Person {
     }
 
     public String getDueDateAsString(final Campaign campaign) {
-        final LocalDate date = campaign.getCampaignOptions().isDisplayTrueDueDate()
-                ? getDueDate()
-                : getExpectedDueDate();
+        final LocalDate date = campaign.getCampaignOptions().isDisplayTrueDueDate() ?
+                                     getDueDate() :
+                                     getExpectedDueDate();
         return (date == null) ? "" : MekHQ.getMHQOptions().getDisplayFormattedDate(date);
     }
 
@@ -1671,10 +1947,23 @@ public class Person {
     // endregion Pregnancy
 
     // region Experience
+
+    /**
+     * @return the current experience points (XP) of the character.
+     */
     public int getXP() {
         return xp;
     }
 
+    /**
+     * Awards experience points (XP) to the character and optionally tracks the total XP earnings if enabled.
+     *
+     * <p>This method increments the current XP by the specified amount and, if the campaign
+     * option for tracking total XP earnings is enabled, updates the total XP earnings as well.</p>
+     *
+     * @param campaign the {@link Campaign} instance providing the campaign options
+     * @param xp       the amount of XP to be awarded
+     */
     public void awardXP(final Campaign campaign, final int xp) {
         this.xp += xp;
         if (campaign.getCampaignOptions().isTrackTotalXPEarnings()) {
@@ -1682,10 +1971,28 @@ public class Person {
         }
     }
 
+    /**
+     * Spends (deducts) experience points (XP) from the character's current XP total.
+     *
+     * <p>This method decrements the current XP by the specified amount.</p>
+     *
+     * @param xp the amount of XP to deduct
+     */
     public void spendXP(final int xp) {
         this.xp -= xp;
     }
 
+    /**
+     * Sets the current experience points (XP) for the character and optionally tracks the adjustment in total XP
+     * earnings if enabled.
+     *
+     * <p>This method updates the current XP to the specified value. If the campaign option for tracking total XP
+     * earnings is enabled, it also calculates and updates the total XP earnings based on the difference between the new
+     * and current XP values.</p>
+     *
+     * @param campaign the {@link Campaign} instance providing the campaign options
+     * @param xp       the new XP value to set
+     */
     public void setXP(final Campaign campaign, final int xp) {
         if (campaign.getCampaignOptions().isTrackTotalXPEarnings()) {
             changeTotalXPEarnings(xp - getXP());
@@ -1693,7 +2000,17 @@ public class Person {
         setXPDirect(xp);
     }
 
-    private void setXPDirect(final int xp) {
+    /**
+     * Directly sets the experience points (XP) for the entity without adjusting total XP earnings tracking.
+     *
+     * <p>This method updates the XP value directly, bypassing any optional campaign-related tracking logic.</p>
+     *
+     * <p><b>Usage:</b> Generally this should only be used in special circumstances, as it bypasses the tracking of
+     * experience point gains. For most use cases {@code #awardXP()} or {@code #setXP()} are preferred.</p>
+     *
+     * @param xp the new XP value to set
+     */
+    public void setXPDirect(final int xp) {
         this.xp = xp;
     }
 
@@ -1725,15 +2042,6 @@ public class Person {
     public void setDoctorId(final @Nullable UUID doctorId, final int daysToWaitForHealing) {
         this.doctorId = doctorId;
         this.daysToWaitForHealing = daysToWaitForHealing;
-    }
-
-    public boolean checkNaturalHealing(final int daysToWait) {
-        if (needsFixing() && (getDaysToWaitForHealing() <= 0) && (getDoctorId() == null)) {
-            heal();
-            daysToWaitForHealing = daysToWait;
-            return true;
-        }
-        return false;
     }
 
     public void decrementDaysToWaitForHealing() {
@@ -1884,13 +2192,11 @@ public class Person {
     /**
      * Sets the index value for the {@link Aggression} description.
      *
-     * @param aggressionDescriptionIndex The index value to set for the aggression description.
-     *                                    It will be clamped to ensure it remains within the valid
-     *                                    range.
+     * @param aggressionDescriptionIndex The index value to set for the aggression description. It will be clamped to
+     *                                   ensure it remains within the valid range.
      */
     public void setAggressionDescriptionIndex(final int aggressionDescriptionIndex) {
-        this.aggressionDescriptionIndex = clamp(aggressionDescriptionIndex,
-            0, Aggression.MAXIMUM_VARIATIONS - 1);
+        this.aggressionDescriptionIndex = clamp(aggressionDescriptionIndex, 0, Aggression.MAXIMUM_VARIATIONS - 1);
     }
 
     public Ambition getAmbition() {
@@ -1908,12 +2214,11 @@ public class Person {
     /**
      * Sets the index value for the {@link Ambition} description.
      *
-     * @param ambitionDescriptionIndex The index value to set for the Ambition description. It will
-     *                                be clamped to ensure it remains within the valid range.
+     * @param ambitionDescriptionIndex The index value to set for the Ambition description. It will be clamped to ensure
+     *                                 it remains within the valid range.
      */
     public void setAmbitionDescriptionIndex(final int ambitionDescriptionIndex) {
-        this.ambitionDescriptionIndex = clamp(ambitionDescriptionIndex,
-            0, Ambition.MAXIMUM_VARIATIONS - 1);
+        this.ambitionDescriptionIndex = clamp(ambitionDescriptionIndex, 0, Ambition.MAXIMUM_VARIATIONS - 1);
     }
 
     public Greed getGreed() {
@@ -1931,12 +2236,11 @@ public class Person {
     /**
      * Sets the index value for the {@link Greed} description.
      *
-     * @param greedDescriptionIndex The index value to set for the Greed description. It will be
-     *                             clamped to ensure it remains within the valid range.
+     * @param greedDescriptionIndex The index value to set for the Greed description. It will be clamped to ensure it
+     *                              remains within the valid range.
      */
     public void setGreedDescriptionIndex(final int greedDescriptionIndex) {
-        this.greedDescriptionIndex = clamp(greedDescriptionIndex,
-            0, Greed.MAXIMUM_VARIATIONS - 1);
+        this.greedDescriptionIndex = clamp(greedDescriptionIndex, 0, Greed.MAXIMUM_VARIATIONS - 1);
     }
 
     public Social getSocial() {
@@ -1954,12 +2258,11 @@ public class Person {
     /**
      * Sets the index value for the {@link Social} description.
      *
-     * @param socialDescriptionIndex The index value to set for the Social description. It will be
-     *                              clamped to ensure it remains within the valid range.
+     * @param socialDescriptionIndex The index value to set for the Social description. It will be clamped to ensure it
+     *                               remains within the valid range.
      */
     public void setSocialDescriptionIndex(final int socialDescriptionIndex) {
-        this.socialDescriptionIndex = clamp(socialDescriptionIndex,
-            0, Social.MAXIMUM_VARIATIONS - 1);
+        this.socialDescriptionIndex = clamp(socialDescriptionIndex, 0, Social.MAXIMUM_VARIATIONS - 1);
     }
 
     public PersonalityQuirk getPersonalityQuirk() {
@@ -1977,37 +2280,35 @@ public class Person {
     /**
      * Sets the index value for the {@link PersonalityQuirk} description.
      *
-     * @param personalityQuirkDescriptionIndex The index value to set for the quirk description.
-     *                                    It will be clamped to ensure it remains within the valid
-     *                                    range.
+     * @param personalityQuirkDescriptionIndex The index value to set for the quirk description. It will be clamped to
+     *                                         ensure it remains within the valid range.
      */
     public void setPersonalityQuirkDescriptionIndex(final int personalityQuirkDescriptionIndex) {
         this.personalityQuirkDescriptionIndex = clamp(personalityQuirkDescriptionIndex,
-            0, PersonalityQuirk.MAXIMUM_VARIATIONS - 1);
+              0,
+              PersonalityQuirk.MAXIMUM_VARIATIONS - 1);
     }
 
-    public Intelligence getIntelligence() {
-        return intelligence;
+    public Reasoning getReasoning() {
+        return reasoning;
     }
 
-    public void setIntelligence(final Intelligence intelligence) {
-        this.intelligence = intelligence;
+    public void setReasoning(final Reasoning reasoning) {
+        this.reasoning = reasoning;
     }
 
-    public int getIntelligenceDescriptionIndex() {
-        return intelligenceDescriptionIndex;
+    public int getReasoningDescriptionIndex() {
+        return reasoningDescriptionIndex;
     }
 
     /**
-     * Sets the index value for the {@link Intelligence} description.
+     * Sets the index value for the {@link Reasoning} description.
      *
-     * @param intelligenceDescriptionIndex The index value to set for the intelligence description.
-     *                                    It will be clamped to ensure it remains within the valid
-     *                                    range.
+     * @param reasoningDescriptionIndex The index value to set for the Reasoning description. It will be clamped to
+     *                                  ensure it remains within the valid range.
      */
-    public void setIntelligenceDescriptionIndex(final int intelligenceDescriptionIndex) {
-        this.intelligenceDescriptionIndex = clamp(intelligenceDescriptionIndex,
-            0, Intelligence.MAXIMUM_VARIATIONS - 1);
+    public void setReasoningDescriptionIndex(final int reasoningDescriptionIndex) {
+        this.reasoningDescriptionIndex = clamp(reasoningDescriptionIndex, 0, Reasoning.MAXIMUM_VARIATIONS - 1);
     }
 
     public String getPersonalityDescription() {
@@ -2016,6 +2317,14 @@ public class Person {
 
     public void setPersonalityDescription(final String personalityDescription) {
         this.personalityDescription = personalityDescription;
+    }
+
+    public String getPersonalityInterviewNotes() {
+        return personalityInterviewNotes;
+    }
+
+    public void setPersonalityInterviewNotes(final String personalityInterviewNotes) {
+        this.personalityInterviewNotes = personalityInterviewNotes;
     }
 
     // region Flags
@@ -2065,6 +2374,14 @@ public class Person {
         this.immortal = immortal;
     }
 
+    public boolean isEmployed() {
+        return employed;
+    }
+
+    public void setEmployed(final boolean employed) {
+        this.employed = employed;
+    }
+
     public boolean isMarriageable() {
         return marriageable;
     }
@@ -2080,6 +2397,14 @@ public class Person {
     public void setTryingToConceive(final boolean tryingToConceive) {
         this.tryingToConceive = tryingToConceive;
     }
+
+    public boolean isHidePersonality() {
+        return hidePersonality;
+    }
+
+    public void setHidePersonality(final boolean hidePersonality) {
+        this.hidePersonality = hidePersonality;
+    }
     // endregion Flags
 
     public ExtraData getExtraData() {
@@ -2089,16 +2414,21 @@ public class Person {
     // region File I/O
     public void writeToXML(final PrintWriter pw, int indent, final Campaign campaign) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "person", "id", id, "type", getClass());
+        indent = writeToXMLHeadless(pw, indent, campaign);
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "person");
+    }
+
+    public int writeToXMLHeadless(PrintWriter pw, int indent, Campaign campaign) {
         try {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "id", id.toString());
 
             // region Name
-            if (!StringUtility.isNullOrBlank(getPreNominal())) {
+            if (!isNullOrBlank(getPreNominal())) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "preNominal", getPreNominal());
             }
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "givenName", getGivenName());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "surname", getSurname());
-            if (!StringUtility.isNullOrBlank(getPostNominal())) {
+            if (!isNullOrBlank(getPostNominal())) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "postNominal", getPostNominal());
             }
 
@@ -2106,7 +2436,7 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "maidenName", getMaidenName());
             }
 
-            if (!StringUtility.isNullOrBlank(getCallsign())) {
+            if (!isNullOrBlank(getCallsign())) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "callsign", getCallsign());
             }
             // endregion Name
@@ -2128,24 +2458,26 @@ public class Person {
             // Always save the person's origin faction
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "faction", originFaction.getShortName());
             if (originPlanet != null) {
-                MHQXMLUtility.writeSimpleXMLAttributedTag(pw, indent, "planetId", "systemId",
-                        originPlanet.getParentSystem().getId(), originPlanet.getId());
+                MHQXMLUtility.writeSimpleXMLAttributedTag(pw, indent,
+                      "planetId",
+                      "systemId",
+                      originPlanet.getParentSystem().getId(),
+                      originPlanet.getId());
             }
 
             if (becomingBondsmanEndDate != null) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "becomingBondsmanEndDate",
-                    becomingBondsmanEndDate);
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "becomingBondsmanEndDate", becomingBondsmanEndDate);
             }
 
             if (!getPhenotype().isNone()) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "phenotype", getPhenotype().name());
             }
 
-            if (!StringUtility.isNullOrBlank(bloodname)) {
+            if (!isNullOrBlank(bloodname)) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bloodname", bloodname);
             }
 
-            if (!StringUtility.isNullOrBlank(biography)) {
+            if (!isNullOrBlank(biography)) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "biography", biography);
             }
 
@@ -2172,6 +2504,7 @@ public class Person {
             }
             // Always save the person's gender, as it would otherwise get confusing fast
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "gender", getGender().name());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bloodGroup", getBloodGroup().name());
             if (!getRankSystem().equals(campaign.getRankSystem())) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "rankSystem", getRankSystem().getCode());
             }
@@ -2223,9 +2556,31 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "toughness", toughness);
             }
 
-            if (minutesLeft > 0) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "minutesLeft", minutesLeft);
+            if (connections != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "connections", connections);
             }
+
+            if (wealth != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "wealth", wealth);
+            }
+
+            if (hasPerformedExtremeExpenditure) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hasPerformedExtremeExpenditure", true);
+            }
+
+            if (reputation != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "reputation", reputation);
+            }
+
+            if (unlucky != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unlucky", unlucky);
+            }
+
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "atowAttributes");
+            atowAttributes.writeAttributesToXML(pw, indent);
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "atowAttributes");
+
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "minutesLeft", minutesLeft);
 
             if (overtimeLeft > 0) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "overtimeLeft", overtimeLeft);
@@ -2246,22 +2601,22 @@ public class Person {
             }
 
             if (countOptions(PersonnelOptions.LVL3_ADVANTAGES) > 0) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "advantages",
-                        getOptionList("::", PersonnelOptions.LVL3_ADVANTAGES));
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent,
+                      "advantages",
+                      getOptionList("::", PersonnelOptions.LVL3_ADVANTAGES));
             }
 
             if (countOptions(PersonnelOptions.EDGE_ADVANTAGES) > 0) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "edge",
-                        getOptionList("::", PersonnelOptions.EDGE_ADVANTAGES));
-                // For support personnel, write an available edge value
-                if (hasSupportRole(true) || isEngineer()) {
-                    MHQXMLUtility.writeSimpleXMLTag(pw, indent, "edgeAvailable", getCurrentEdge());
-                }
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent,
+                      "edge",
+                      getOptionList("::", PersonnelOptions.EDGE_ADVANTAGES));
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "edgeAvailable", getCurrentEdge());
             }
 
             if (countOptions(PersonnelOptions.MD_ADVANTAGES) > 0) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "implants",
-                        getOptionList("::", PersonnelOptions.MD_ADVANTAGES));
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent,
+                      "implants",
+                      getOptionList("::", PersonnelOptions.MD_ADVANTAGES));
             }
 
             if (!techUnits.isEmpty()) {
@@ -2280,12 +2635,36 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "personnelLog");
             }
 
+            if (!medicalLog.isEmpty()) {
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "medicalLog");
+                for (LogEntry entry : medicalLog) {
+                    entry.writeToXML(pw, indent);
+                }
+                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "medicalLog");
+            }
+
             if (!scenarioLog.isEmpty()) {
                 MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "scenarioLog");
                 for (LogEntry entry : scenarioLog) {
                     entry.writeToXML(pw, indent);
                 }
                 MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "scenarioLog");
+            }
+
+            if (!assignmentLog.isEmpty()) {
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "assignmentLog");
+                for (LogEntry entry : assignmentLog) {
+                    entry.writeToXML(pw, indent);
+                }
+                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "assignmentLog");
+            }
+
+            if (!performanceLog.isEmpty()) {
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "performanceLog");
+                for (LogEntry entry : performanceLog) {
+                    entry.writeToXML(pw, indent);
+                }
+                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "performanceLog");
             }
 
             if (!getAwardController().getAwards().isEmpty()) {
@@ -2317,7 +2696,7 @@ public class Person {
             }
 
             if (eduHighestEducation != EducationLevel.EARLY_CHILDHOOD) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduHighestEducation", eduHighestEducation.toString());
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduHighestEducation", eduHighestEducation.name());
             }
 
             if (eduJourneyTime != 0) {
@@ -2384,89 +2763,72 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "aggression", aggression.name());
             }
 
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "aggressionDescriptionIndex",
-                aggressionDescriptionIndex);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "aggressionDescriptionIndex", aggressionDescriptionIndex);
 
             if (ambition != Ambition.NONE) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ambition", ambition.name());
             }
 
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ambitionDescriptionIndex",
-                ambitionDescriptionIndex);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ambitionDescriptionIndex", ambitionDescriptionIndex);
 
             if (greed != Greed.NONE) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "greed", greed.name());
             }
 
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "greedDescriptionIndex",
-                greedDescriptionIndex);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "greedDescriptionIndex", greedDescriptionIndex);
 
             if (social != Social.NONE) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "social", social.name());
             }
 
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "socialDescriptionIndex",
-                socialDescriptionIndex);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "socialDescriptionIndex", socialDescriptionIndex);
 
             if (personalityQuirk != PersonalityQuirk.NONE) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personalityQuirk", personalityQuirk.ordinal());
             }
 
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personalityQuirkDescriptionIndex",
-                personalityQuirkDescriptionIndex);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent,
+                  "personalityQuirkDescriptionIndex",
+                  personalityQuirkDescriptionIndex);
 
-            if (intelligence != Intelligence.AVERAGE) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "intelligence", intelligence.ordinal());
+            if (reasoning != Reasoning.AVERAGE) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "reasoning", reasoning.ordinal());
             }
 
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "intelligenceDescriptionIndex",
-                intelligenceDescriptionIndex);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "reasoningDescriptionIndex", reasoningDescriptionIndex);
 
-            if (!StringUtility.isNullOrBlank(personalityDescription)) {
+            if (!isNullOrBlank(personalityDescription)) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personalityDescription", personalityDescription);
             }
 
+            if (!isNullOrBlank(personalityInterviewNotes)) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personalityInterviewNotes", personalityInterviewNotes);
+            }
+
             // region Flags
-            // Always save whether they are clan personnel or not
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clanPersonnel", isClanPersonnel());
-            if (isCommander()) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commander", true);
-            }
-
-            if (!isDivorceable()) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "divorceable", false);
-            }
-
-            if (isFounder()) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "founder", true);
-            }
-
-            if (isImmortal()) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "immortal", true);
-            }
-
-            if (!isMarriageable()) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "marriageable", false);
-            }
-
-            if (!isTryingToConceive()) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tryingToConceive", false);
-            }
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commander", commander);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "divorceable", divorceable);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "founder", founder);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "immortal", immortal);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "employed", employed);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "marriageable", marriageable);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tryingToConceive", tryingToConceive);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hidePersonality", hidePersonality);
             // endregion Flags
 
             if (!extraData.isEmpty()) {
                 extraData.writeToXml(pw);
             }
         } catch (Exception ex) {
-            logger.error("Failed to write {} to the XML File", getFullName(), ex);
+            logger.error(ex, "Failed to write {} to the XML File", getFullName());
             throw ex; // we want to rethrow to ensure that the save fails
         }
-
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "person");
+        return indent;
     }
 
-    public static Person generateInstanceFromXML(Node wn, Campaign c, Version version) {
-        Person retVal = new Person(c);
+    public static Person generateInstanceFromXML(Node wn, Campaign campaign, Version version) {
+        Person person = new Person(campaign);
 
         try {
             // Okay, now load Person-specific fields!
@@ -2478,157 +2840,170 @@ public class Person {
 
             for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
+                String nodeName = wn2.getNodeName();
 
-                if (wn2.getNodeName().equalsIgnoreCase("preNominal")) {
-                    retVal.setPreNominalDirect(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("givenName")) {
-                    retVal.setGivenNameDirect(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("surname")) {
-                    retVal.setSurnameDirect(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("postNominal")) {
-                    retVal.setPostNominalDirect(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("maidenName")) {
-                    retVal.setMaidenName(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("callsign")) {
-                    retVal.setCallsignDirect(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("faction")) {
-                    retVal.setOriginFaction(Factions.getInstance().getFaction(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("planetId")) {
+                if (nodeName.equalsIgnoreCase("preNominal")) {
+                    person.setPreNominalDirect(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("givenName")) {
+                    person.setGivenNameDirect(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("surname")) {
+                    person.setSurnameDirect(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("postNominal")) {
+                    person.setPostNominalDirect(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("maidenName")) {
+                    person.setMaidenName(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("callsign")) {
+                    person.setCallsignDirect(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("faction")) {
+                    person.setOriginFaction(Factions.getInstance().getFaction(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("planetId")) {
                     String systemId = "", planetId = "";
                     try {
                         systemId = wn2.getAttributes().getNamedItem("systemId").getTextContent().trim();
                         planetId = wn2.getTextContent().trim();
-                        PlanetarySystem ps = c.getSystemById(systemId);
+                        PlanetarySystem ps = campaign.getSystemById(systemId);
                         Planet p = null;
                         if (ps == null) {
-                            ps = c.getSystemByName(systemId);
+                            ps = campaign.getSystemByName(systemId);
                         }
                         if (ps != null) {
                             p = ps.getPlanetById(planetId);
                         }
-                        retVal.originPlanet = p;
+                        person.originPlanet = p;
                     } catch (NullPointerException e) {
                         logger.error("Error loading originPlanet for {}, {}", systemId, planetId, e);
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("becomingBondsmanEndDate")) {
-                    retVal.becomingBondsmanEndDate = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("phenotype")) {
-                    retVal.phenotype = Phenotype.parseFromString(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("bloodname")) {
-                    retVal.bloodname = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("biography")) {
-                    retVal.biography = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("primaryRole")) {
-                    final PersonnelRole primaryRole = PersonnelRole.parseFromString(wn2.getTextContent().trim());
-                    retVal.setPrimaryRoleDirect(primaryRole);
-                } else if (wn2.getNodeName().equalsIgnoreCase("secondaryRole")) {
-                    retVal.setSecondaryRoleDirect(PersonnelRole.parseFromString(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("acquisitions")) {
-                    retVal.acquisitions = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("primaryDesignator")) {
-                    retVal.primaryDesignator = ROMDesignation.parseFromString(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("secondaryDesignator")) {
-                    retVal.secondaryDesignator = ROMDesignation.parseFromString(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("daysToWaitForHealing")) {
-                    retVal.daysToWaitForHealing = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("vocationalXPTimer")
-                    // <50.03 compatibility handler
-                    || wn2.getNodeName().equalsIgnoreCase("idleMonths")) {
-                    retVal.vocationalXPTimer = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("id")) {
-                    retVal.id = UUID.fromString(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("genealogy")) {
-                    retVal.getGenealogy().fillFromXML(wn2.getChildNodes());
-                } else if (wn2.getNodeName().equalsIgnoreCase("dueDate")) {
-                    retVal.dueDate = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("expectedDueDate")) {
-                    retVal.expectedDueDate = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase(Portrait.XML_TAG)) {
-                    retVal.setPortrait(Portrait.parseFromXML(wn2));
-                } else if (wn2.getNodeName().equalsIgnoreCase("xp")) {
-                    retVal.setXPDirect(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("totalXPEarnings")) {
-                    retVal.setTotalXPEarnings(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("nTasks")) {
-                    retVal.nTasks = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("hits")) {
-                    retVal.hits = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("hitsPrior")) {
-                    retVal.hitsPrior = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("gender")) {
-                    retVal.setGender(Gender.parseFromString(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("rankSystem")) {
+                } else if (nodeName.equalsIgnoreCase("becomingBondsmanEndDate")) {
+                    person.becomingBondsmanEndDate = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("phenotype")) {
+                    person.phenotype = Phenotype.fromString(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("bloodname")) {
+                    person.bloodname = wn2.getTextContent();
+                } else if (nodeName.equalsIgnoreCase("biography")) {
+                    person.biography = wn2.getTextContent();
+                } else if (nodeName.equalsIgnoreCase("primaryRole")) {
+                    final PersonnelRole primaryRole = PersonnelRole.fromString(wn2.getTextContent().trim());
+                    person.setPrimaryRoleDirect(primaryRole);
+                } else if (nodeName.equalsIgnoreCase("secondaryRole")) {
+                    person.setSecondaryRoleDirect(PersonnelRole.fromString(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("acquisitions")) {
+                    person.acquisitions = MathUtility.parseInt(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("primaryDesignator")) {
+                    person.primaryDesignator = ROMDesignation.parseFromString(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("secondaryDesignator")) {
+                    person.secondaryDesignator = ROMDesignation.parseFromString(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("daysToWaitForHealing")) {
+                    person.daysToWaitForHealing = MathUtility.parseInt(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("vocationalXPTimer")) {
+                    person.vocationalXPTimer = MathUtility.parseInt(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("id")) {
+                    person.id = UUID.fromString(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("genealogy")) {
+                    person.getGenealogy().fillFromXML(wn2.getChildNodes());
+                } else if (nodeName.equalsIgnoreCase("dueDate")) {
+                    person.dueDate = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("expectedDueDate")) {
+                    person.expectedDueDate = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase(Portrait.XML_TAG)) {
+                    person.setPortrait(Portrait.parseFromXML(wn2));
+                } else if (nodeName.equalsIgnoreCase("xp")) {
+                    person.setXPDirect(MathUtility.parseInt(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("totalXPEarnings")) {
+                    person.setTotalXPEarnings(MathUtility.parseInt(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("nTasks")) {
+                    person.nTasks = MathUtility.parseInt(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("hits")) {
+                    person.hits = MathUtility.parseInt(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("hitsPrior")) {
+                    person.hitsPrior = MathUtility.parseInt(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("gender")) {
+                    person.setGender(Gender.parseFromString(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("bloodGroup")) {
+                    person.setBloodGroup(BloodGroup.fromString(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("rankSystem")) {
                     final RankSystem rankSystem = Ranks.getRankSystemFromCode(wn2.getTextContent().trim());
 
                     if (rankSystem != null) {
-                        retVal.setRankSystemDirect(rankSystem);
+                        person.setRankSystemDirect(rankSystem);
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
-                    retVal.setRank(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("rankLevel")) {
-                    retVal.setRankLevel(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("maneiDominiClass")) {
-                    retVal.setManeiDominiClassDirect(ManeiDominiClass.parseFromString(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("maneiDominiRank")) {
-                    retVal.setManeiDominiRankDirect(ManeiDominiRank.parseFromString(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("doctorId")) {
+                } else if (nodeName.equalsIgnoreCase("rank")) {
+                    person.setRank(MathUtility.parseInt(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("rankLevel")) {
+                    person.setRankLevel(MathUtility.parseInt(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("maneiDominiClass")) {
+                    person.setManeiDominiClassDirect(ManeiDominiClass.parseFromString(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("maneiDominiRank")) {
+                    person.setManeiDominiRankDirect(ManeiDominiRank.parseFromString(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("doctorId")) {
                     if (!wn2.getTextContent().equals("null")) {
-                        retVal.doctorId = UUID.fromString(wn2.getTextContent());
+                        person.doctorId = UUID.fromString(wn2.getTextContent());
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("unitId")) {
+                } else if (nodeName.equalsIgnoreCase("unitId")) {
                     if (!wn2.getTextContent().equals("null")) {
-                        retVal.unit = new PersonUnitRef(UUID.fromString(wn2.getTextContent()));
+                        person.unit = new PersonUnitRef(UUID.fromString(wn2.getTextContent()));
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("status")) {
-                    retVal.setStatus(PersonnelStatus.fromString(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("prisonerStatus")) {
-                    retVal.prisonerStatus = PrisonerStatus.parseFromString(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("salary")) {
-                    retVal.salary = Money.fromXmlString(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("totalEarnings")) {
-                    retVal.totalEarnings = Money.fromXmlString(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("minutesLeft")) {
-                    retVal.minutesLeft = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("overtimeLeft")) {
-                    retVal.overtimeLeft = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("birthday")) {
-                    retVal.birthday = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("deathday")) {
-                    retVal.dateOfDeath = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("recruitment")) {
-                    retVal.recruitment = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("joinedCampaign")) {
-                    retVal.joinedCampaign = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("lastRankChangeDate")) {
-                    retVal.lastRankChangeDate = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("autoAwardSupportPoints")) {
-                    retVal.setAutoAwardSupportPoints(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("retirement")) {
-                    retVal.setRetirement(MHQXMLUtility.parseDate(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("loyalty")) {
-                    retVal.loyalty = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("fatigue")) {
-                    retVal.fatigue = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("isRecoveringFromFatigue")) {
-                    retVal.isRecoveringFromFatigue = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("advantages")) {
+                } else if (nodeName.equalsIgnoreCase("status")) {
+                    person.setStatus(PersonnelStatus.fromString(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("prisonerStatus")) {
+                    person.prisonerStatus = PrisonerStatus.parseFromString(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("salary")) {
+                    person.salary = Money.fromXmlString(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("totalEarnings")) {
+                    person.totalEarnings = Money.fromXmlString(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("minutesLeft")) {
+                    person.minutesLeft = MathUtility.parseInt(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("overtimeLeft")) {
+                    person.overtimeLeft = MathUtility.parseInt(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("birthday")) {
+                    person.birthday = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("deathday")) {
+                    person.dateOfDeath = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("recruitment")) {
+                    person.recruitment = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("joinedCampaign")) {
+                    person.joinedCampaign = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("lastRankChangeDate")) {
+                    person.lastRankChangeDate = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("autoAwardSupportPoints")) {
+                    person.setAutoAwardSupportPoints(MathUtility.parseInt(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("retirement")) {
+                    person.setRetirement(MHQXMLUtility.parseDate(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("loyalty")) {
+                    person.loyalty = MathUtility.parseInt(wn2.getTextContent(), 9);
+                } else if (nodeName.equalsIgnoreCase("fatigue")) {
+                    person.fatigue = MathUtility.parseInt(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("isRecoveringFromFatigue")) {
+                    person.isRecoveringFromFatigue = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("advantages")) {
                     advantages = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("edge")) {
+                } else if (nodeName.equalsIgnoreCase("edge")) {
                     edge = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("edgeAvailable")) {
-                    retVal.currentEdge = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("implants")) {
+                } else if (nodeName.equalsIgnoreCase("edgeAvailable")) {
+                    person.currentEdge = MathUtility.parseInt(wn2.getTextContent(), 0);
+                } else if (nodeName.equalsIgnoreCase("implants")) {
                     implants = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("toughness")) {
-                    retVal.toughness = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("pilotHits")) {
-                    retVal.hits = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("skill")) {
+                } else if (nodeName.equalsIgnoreCase("toughness")) {
+                    person.toughness = MathUtility.parseInt(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("connections")) {
+                    person.connections = MathUtility.parseInt(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("wealth")) {
+                    person.wealth = MathUtility.parseInt(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("hasPerformedExtremeExpenditure")) {
+                    person.hasPerformedExtremeExpenditure = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("reputation")) {
+                    person.reputation = MathUtility.parseInt(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("unlucky")) {
+                    person.unlucky = MathUtility.parseInt(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("atowAttributes")) {
+                    person.atowAttributes = new Attributes().generateAttributesFromXML(wn2);
+                } else if (nodeName.equalsIgnoreCase("pilotHits")) {
+                    person.hits = MathUtility.parseInt(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("skill")) {
                     Skill s = Skill.generateInstanceFromXML(wn2);
                     if ((s != null) && (s.getType() != null)) {
-                        retVal.skills.addSkill(s.getType().getName(), s);
+                        person.skills.addSkill(s.getType().getName(), s);
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("techUnitIds")) {
+                } else if (nodeName.equalsIgnoreCase("techUnitIds")) {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {
                         Node wn3 = nl2.item(y);
@@ -2638,12 +3013,13 @@ public class Person {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("id")) {
-                            logger.error("Unknown node type not loaded in techUnitIds nodes: {}", wn3.getNodeName());
+                            logger.error("(techUnitIds) Unknown node type not loaded in techUnitIds nodes: {}",
+                                  wn3.getNodeName());
                             continue;
                         }
-                        retVal.addTechUnit(new PersonUnitRef(UUID.fromString(wn3.getTextContent())));
+                        person.addTechUnit(new PersonUnitRef(UUID.fromString(wn3.getTextContent())));
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("personnelLog")) {
+                } else if (nodeName.equalsIgnoreCase("personnelLog")) {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {
                         Node wn3 = nl2.item(y);
@@ -2653,16 +3029,64 @@ public class Person {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
-                            logger.error("Unknown node type not loaded in personnel log nodes: {}", wn3.getNodeName());
+                            logger.error("(personnelLog) Unknown node type not loaded in personnel logEntry nodes: {}",
+                                  wn3.getNodeName());
                             continue;
                         }
 
                         final LogEntry logEntry = LogEntryFactory.getInstance().generateInstanceFromXML(wn3);
                         if (logEntry != null) {
-                            retVal.addLogEntry(logEntry);
+                            // <50.05 compatibility handler
+                            LogEntryType logEntryType = logEntry.getType();
+                            String logEntryDescription = logEntry.getDesc();
+                            if (logEntryType == MEDICAL) {
+                                person.addMedicalLogEntry(logEntry);
+                            } else if (logEntryType == SERVICE) {
+                                // < 50.05 compatibility handler
+                                List<String> assignmentTargetStrings = List.of("Assigned to",
+                                      "Reassigned from",
+                                      "Removed from",
+                                      "Added to");
+
+                                boolean shiftedLogType = false;
+                                for (String targetString : assignmentTargetStrings) {
+                                    if (logEntryDescription.startsWith(targetString)) {
+                                        logEntry.setType(ASSIGNMENT);
+                                        person.addAssignmentLogEntry(logEntry);
+                                        shiftedLogType = true;
+                                        break;
+                                    }
+                                }
+
+                                if (!shiftedLogType) {
+                                    person.addPersonalLogEntry(logEntry);
+                                }
+                            } else {
+                                // < 50.05 compatibility handler
+                                List<String> performanceTargetStrings = List.of("Changed edge to",
+                                      "Gained",
+                                      "Improved",
+                                      "injuries, gaining",
+                                      "XP from successful medical work");
+
+                                boolean foundPerformanceTarget = false;
+                                for (String targetString : performanceTargetStrings) {
+                                    if (logEntryDescription.startsWith(targetString)) {
+                                        foundPerformanceTarget = true;
+                                        break;
+                                    }
+                                }
+
+                                if (foundPerformanceTarget) {
+                                    logEntry.setType(PERFORMANCE);
+                                    person.addPerformanceLogEntry(logEntry);
+                                } else {
+                                    person.addPersonalLogEntry(logEntry);
+                                }
+                            }
                         }
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("scenarioLog")) {
+                } else if (nodeName.equalsIgnoreCase("medicalLog")) {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {
                         Node wn3 = nl2.item(y);
@@ -2672,16 +3096,77 @@ public class Person {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
-                            logger.error("Unknown node type not loaded in scenario log nodes: {}", wn3.getNodeName());
+                            logger.error("(medicalLog) Unknown node type not loaded in personnel logEntry nodes: {}",
+                                  wn3.getNodeName());
                             continue;
                         }
 
                         final LogEntry logEntry = LogEntryFactory.getInstance().generateInstanceFromXML(wn3);
                         if (logEntry != null) {
-                            retVal.addScenarioLogEntry(logEntry);
+                            person.addMedicalLogEntry(logEntry);
                         }
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("awards")) {
+                } else if (nodeName.equalsIgnoreCase("scenarioLog")) {
+                    NodeList nl2 = wn2.getChildNodes();
+                    for (int y = 0; y < nl2.getLength(); y++) {
+                        Node wn3 = nl2.item(y);
+                        // If it's not an element node, we ignore it.
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                            continue;
+                        }
+
+                        if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
+                            logger.error("Unknown node type not loaded in scenario logEntry nodes: {}",
+                                  wn3.getNodeName());
+                            continue;
+                        }
+
+                        final LogEntry logEntry = LogEntryFactory.getInstance().generateInstanceFromXML(wn3);
+                        if (logEntry != null) {
+                            person.addScenarioLogEntry(logEntry);
+                        }
+                    }
+                } else if (nodeName.equalsIgnoreCase("assignmentLog")) {
+                    NodeList nl2 = wn2.getChildNodes();
+                    for (int y = 0; y < nl2.getLength(); y++) {
+                        Node wn3 = nl2.item(y);
+                        // If it's not an element node, we ignore it.
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                            continue;
+                        }
+
+                        if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
+                            logger.error("(assignmentLog) Unknown node type not loaded in scenario logEntry nodes: {}",
+                                  wn3.getNodeName());
+                            continue;
+                        }
+
+                        final LogEntry logEntry = LogEntryFactory.getInstance().generateInstanceFromXML(wn3);
+                        if (logEntry != null) {
+                            person.addAssignmentLogEntry(logEntry);
+                        }
+                    }
+                } else if (nodeName.equalsIgnoreCase("performanceLog")) {
+                    NodeList nl2 = wn2.getChildNodes();
+                    for (int y = 0; y < nl2.getLength(); y++) {
+                        Node wn3 = nl2.item(y);
+                        // If it's not an element node, we ignore it.
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                            continue;
+                        }
+
+                        if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
+                            logger.error("(performanceLog) Unknown node type not loaded in scenario logEntry nodes: {}",
+                                  wn3.getNodeName());
+                            continue;
+                        }
+
+                        final LogEntry logEntry = LogEntryFactory.getInstance().generateInstanceFromXML(wn3);
+                        if (logEntry != null) {
+                            person.addPerformanceLogEntry(logEntry);
+                        }
+                    }
+                } else if (nodeName.equalsIgnoreCase("awards")) {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {
                         Node wn3 = nl2.item(y);
@@ -2690,14 +3175,15 @@ public class Person {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("award")) {
-                            logger.error("Unknown node type not loaded in personnel log nodes: {}", wn3.getNodeName());
+                            logger.error("Unknown node type not loaded in personnel award log nodes: {}",
+                                  wn3.getNodeName());
                             continue;
                         }
 
-                        retVal.getAwardController().addAwardFromXml(AwardsFactory.getInstance()
-                            .generateNewFromXML(wn3));
+                        person.getAwardController()
+                              .addAwardFromXml(AwardsFactory.getInstance().generateNewFromXML(wn3));
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("injuries")) {
+                } else if (nodeName.equalsIgnoreCase("injuries")) {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {
                         Node wn3 = nl2.item(y);
@@ -2710,25 +3196,26 @@ public class Person {
                             logger.error("Unknown node type not loaded in injury nodes: {}", wn3.getNodeName());
                             continue;
                         }
-                        retVal.injuries.add(Injury.generateInstanceFromXML(wn3));
+                        person.injuries.add(Injury.generateInstanceFromXML(wn3));
                     }
-                    LocalDate now = c.getLocalDate();
-                    retVal.injuries.stream().filter(inj -> (null == inj.getStart()))
-                            .forEach(inj -> inj.setStart(now.minusDays(inj.getOriginalTime() - inj.getTime())));
-                } else if (wn2.getNodeName().equalsIgnoreCase("originalUnitWeight")) {
-                    retVal.originalUnitWeight = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("originalUnitTech")) {
-                    retVal.originalUnitTech = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("originalUnitId")) {
-                    retVal.originalUnitId = UUID.fromString(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("eduHighestEducation")) {
-                    retVal.eduHighestEducation = EducationLevel.parseFromString(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("eduJourneyTime")) {
-                    retVal.eduJourneyTime = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("eduDaysOfTravel")) {
-                    retVal.eduDaysOfTravel = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("eduTagAlongs")) {
-                    if (wn2.getNodeName().equalsIgnoreCase("eduTagAlongs")) {
+                    LocalDate now = campaign.getLocalDate();
+                    person.injuries.stream()
+                          .filter(inj -> (null == inj.getStart()))
+                          .forEach(inj -> inj.setStart(now.minusDays(inj.getOriginalTime() - inj.getTime())));
+                } else if (nodeName.equalsIgnoreCase("originalUnitWeight")) {
+                    person.originalUnitWeight = MathUtility.parseInt(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("originalUnitTech")) {
+                    person.originalUnitTech = MathUtility.parseInt(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("originalUnitId")) {
+                    person.originalUnitId = UUID.fromString(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("eduHighestEducation")) {
+                    person.eduHighestEducation = EducationLevel.fromString(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("eduJourneyTime")) {
+                    person.eduJourneyTime = MathUtility.parseInt(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("eduDaysOfTravel")) {
+                    person.eduDaysOfTravel = MathUtility.parseInt(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("eduTagAlongs")) {
+                    if (nodeName.equalsIgnoreCase("eduTagAlongs")) {
                         NodeList uuidNodes = wn2.getChildNodes();
 
                         for (int j = 0; j < uuidNodes.getLength(); j++) {
@@ -2739,84 +3226,90 @@ public class Person {
 
                                 UUID uuid = UUID.fromString(uuidString);
 
-                                retVal.eduTagAlongs.add(uuid);
+                                person.eduTagAlongs.add(uuid);
                             }
                         }
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("eduFailedApplications")) {
-                    if (wn2.getNodeName().equalsIgnoreCase("eduFailedApplications")) {
+                } else if (nodeName.equalsIgnoreCase("eduFailedApplications")) {
+                    if (nodeName.equalsIgnoreCase("eduFailedApplications")) {
                         NodeList nodes = wn2.getChildNodes();
 
                         for (int j = 0; j < nodes.getLength(); j++) {
                             Node node = nodes.item(j);
 
                             if (node.getNodeName().equalsIgnoreCase("eduFailedApplication")) {
-                                retVal.eduFailedApplications.add(node.getTextContent());
+                                person.eduFailedApplications.add(node.getTextContent());
                             }
                         }
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("eduAcademySystem")) {
-                    retVal.eduAcademySystem = String.valueOf(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("eduAcademyName")) {
-                    retVal.eduAcademyName = String.valueOf(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("eduAcademySet")) {
-                    retVal.eduAcademySet = String.valueOf(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("eduAcademyNameInSet")) {
-                    retVal.eduAcademyNameInSet = String.valueOf(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("eduAcademyFaction")) {
-                    retVal.eduAcademyFaction = String.valueOf(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("eduCourseIndex")) {
-                    retVal.eduCourseIndex = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("eduEducationStage")) {
-                    retVal.eduEducationStage = EducationStage.parseFromString(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("eduEducationTime")) {
-                    retVal.eduEducationTime = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("aggression")) {
-                    retVal.aggression = Aggression.fromString(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("aggressionDescriptionIndex")) {
-                    retVal.aggressionDescriptionIndex = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("ambition")) {
-                    retVal.ambition = Ambition.fromString(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("ambitionDescriptionIndex")) {
-                    retVal.ambitionDescriptionIndex = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("greed")) {
-                    retVal.greed = Greed.fromString(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("greedDescriptionIndex")) {
-                    retVal.greedDescriptionIndex = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("social")) {
-                    retVal.social = Social.fromString(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("socialDescriptionIndex")) {
-                    retVal.socialDescriptionIndex = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("personalityQuirk")) {
-                    retVal.personalityQuirk = PersonalityQuirk.fromString(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("personalityQuirkDescriptionIndex")) {
-                    retVal.personalityQuirkDescriptionIndex = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("intelligence")) {
-                    retVal.intelligence = Intelligence.fromString(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("intelligenceDescriptionIndex")) {
-                    retVal.intelligenceDescriptionIndex = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("personalityDescription")) {
-                    retVal.personalityDescription = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("clanPersonnel")) {
-                    retVal.setClanPersonnel(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("commander")) {
-                    retVal.setCommander(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("divorceable")) {
-                    retVal.setDivorceable(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("founder")) {
-                    retVal.setFounder(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("immortal")) {
-                    retVal.setImmortal(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("marriageable")) {
-                    retVal.setMarriageable(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("tryingToConceive")) {
-                    retVal.setTryingToConceive(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("extraData")) {
-                    retVal.extraData = ExtraData.createFromXml(wn2);
+                } else if (nodeName.equalsIgnoreCase("eduAcademySystem")) {
+                    person.eduAcademySystem = String.valueOf(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("eduAcademyName")) {
+                    person.eduAcademyName = String.valueOf(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("eduAcademySet")) {
+                    person.eduAcademySet = String.valueOf(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("eduAcademyNameInSet")) {
+                    person.eduAcademyNameInSet = String.valueOf(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("eduAcademyFaction")) {
+                    person.eduAcademyFaction = String.valueOf(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("eduCourseIndex")) {
+                    person.eduCourseIndex = MathUtility.parseInt(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("eduEducationStage")) {
+                    person.eduEducationStage = EducationStage.parseFromString(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("eduEducationTime")) {
+                    person.eduEducationTime = MathUtility.parseInt(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("aggression")) {
+                    person.aggression = Aggression.fromString(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("aggressionDescriptionIndex")) {
+                    person.aggressionDescriptionIndex = MathUtility.parseInt(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("ambition")) {
+                    person.ambition = Ambition.fromString(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("ambitionDescriptionIndex")) {
+                    person.ambitionDescriptionIndex = MathUtility.parseInt(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("greed")) {
+                    person.greed = Greed.fromString(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("greedDescriptionIndex")) {
+                    person.greedDescriptionIndex = MathUtility.parseInt(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("social")) {
+                    person.social = Social.fromString(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("socialDescriptionIndex")) {
+                    person.socialDescriptionIndex = MathUtility.parseInt(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("personalityQuirk")) {
+                    person.personalityQuirk = PersonalityQuirk.fromString(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("personalityQuirkDescriptionIndex")) {
+                    person.personalityQuirkDescriptionIndex = MathUtility.parseInt(wn2.getTextContent());
+                } else if ((nodeName.equalsIgnoreCase("reasoning"))) {
+                    person.reasoning = Reasoning.fromString(wn2.getTextContent());
+                } else if ((nodeName.equalsIgnoreCase("reasoningDescriptionIndex"))) {
+                    person.reasoningDescriptionIndex = MathUtility.parseInt(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("personalityDescription")) {
+                    person.personalityDescription = wn2.getTextContent();
+                } else if (nodeName.equalsIgnoreCase("personalityInterviewNotes")) {
+                    person.personalityInterviewNotes = wn2.getTextContent();
+                } else if (nodeName.equalsIgnoreCase("clanPersonnel")) {
+                    person.setClanPersonnel(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("commander")) {
+                    person.setCommander(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("divorceable")) {
+                    person.setDivorceable(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("founder")) {
+                    person.setFounder(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("immortal")) {
+                    person.setImmortal(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("employed")) {
+                    person.setEmployed(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("marriageable")) {
+                    person.setMarriageable(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("tryingToConceive")) {
+                    person.setTryingToConceive(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("hidePersonality")) {
+                    person.setHidePersonality(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("extraData")) {
+                    person.extraData = ExtraData.createFromXml(wn2);
                 }
             }
 
-            retVal.setFullName(); // this sets the name based on the loaded values
+            person.setFullName(); // this sets the name based on the loaded values
 
             if ((advantages != null) && !advantages.isBlank()) {
                 StringTokenizer st = new StringTokenizer(advantages, "::");
@@ -2826,7 +3319,7 @@ public class Person {
                     Object value = Crew.parseAdvantageValue(adv);
 
                     try {
-                        retVal.getOptions().getOption(advName).setValue(value);
+                        person.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
                         logger.warn("Error restoring advantage: {}", adv);
                     }
@@ -2839,8 +3332,8 @@ public class Person {
                 // list of options for that group
                 edgeOptionList.remove(0);
 
-                updateOptions(edge, retVal, edgeOptionList);
-                removeUnusedEdgeTriggers(retVal, edgeOptionList);
+                updateOptions(edge, person, edgeOptionList);
+                removeUnusedEdgeTriggers(person, edgeOptionList);
             }
 
             if ((implants != null) && !implants.isBlank()) {
@@ -2851,7 +3344,7 @@ public class Person {
                     Object value = Crew.parseAdvantageValue(adv);
 
                     try {
-                        retVal.getOptions().getOption(advName).setValue(value);
+                        person.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
                         logger.error("Error restoring implants: {}", adv);
                     }
@@ -2859,37 +3352,39 @@ public class Person {
             }
 
             // Fixing Prisoner Ranks - 0.47.X Fix
-            if (retVal.getRankNumeric() < 0) {
-                retVal.setRank(0);
+            if (person.getRankNumeric() < 0) {
+                person.setRank(0);
             }
 
-            // Fixing recruitment dates
-            // I don't know when this metric was added, so we check all versions
-            if (retVal.getRecruitment() == null) {
-                retVal.setRecruitment(c.getLocalDate());
+            if (person.getJoinedCampaign() == null) {
+                person.setJoinedCampaign(campaign.getLocalDate());
             }
 
             // This resolves a bug squashed in 2025 (50.03) but lurked in our codebase
             // potentially as far back as 2014. The next two handlers should never be removed.
-            if (!retVal.canPerformRole(c.getLocalDate(), retVal.getPrimaryRole(), true)) {
-                retVal.setPrimaryRole(c, PersonnelRole.NONE);
-                logger.info(String.format("%s was found to be ineligible for their" +
-                    " primary role. That role has been removed and they were assigned the" +
-                    " NONE role.", retVal.getFullTitle()));
+            if (!person.canPerformRole(campaign.getLocalDate(), person.getPrimaryRole(), true)) {
+                person.setPrimaryRole(campaign, PersonnelRole.NONE);
+
+                campaign.addReport(String.format(resources.getString("ineligibleForPrimaryRole"),
+                      spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
+                      CLOSING_SPAN_TAG,
+                      person.getHyperlinkedFullTitle()));
             }
 
-            if (!retVal.canPerformRole(c.getLocalDate(), retVal.getSecondaryRole(), false)) {
-                retVal.setSecondaryRole(PersonnelRole.NONE);
-                logger.info(String.format("%s was found to be ineligible for their" +
-                    " secondary role. That role has been removed and they were assigned the" +
-                    " NONE role.", retVal.getFullTitle()));
+            if (!person.canPerformRole(campaign.getLocalDate(), person.getSecondaryRole(), false)) {
+                person.setSecondaryRole(PersonnelRole.NONE);
+
+                campaign.addReport(String.format(resources.getString("ineligibleForSecondaryRole"),
+                      spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
+                      CLOSING_SPAN_TAG,
+                      person.getHyperlinkedFullTitle()));
             }
         } catch (Exception e) {
-            logger.error("Failed to read person {} from file", retVal.getFullName(), e);
-            retVal = null;
+            logger.error(e, "Failed to read person {} from file", person.getFullName());
+            person = null;
         }
 
-        return retVal;
+        return person;
     }
     // endregion File I/O
 
@@ -2897,8 +3392,39 @@ public class Person {
         this.salary = salary;
     }
 
+    /**
+     * Calculates and returns the salary for this person based on campaign rules and status.
+     *
+     * <p>The method applies the following logic:</p>
+     * <ul>
+     *     <li>If the person is not free (e.g., a prisoner), returns a zero salary.</li>
+     *     <li>If a positive or zero custom salary has been set, it is used directly.</li>
+     *     <li>If the salary is negative, the standard salary is calculated based on campaign options and the
+     *     person's roles, skills, and attributes:</li>
+     *     <li>Base salaries are taken from the campaign options, according to primary and secondary roles.</li>
+     *     <li>If the person is specialized infantry with applicable unit and specialization, a multiplier is
+     *     applied to the primary base salary.</li>
+     *     <li>An experience-level multiplier is applied to both primary and secondary salaries based on the
+     *     person's skills.</li>
+     *     <li>Additional multipliers for specializations (e.g., anti-mek skill) may also apply.</li>
+     *     <li>Secondary role salaries are halved and only applied if not disabled via campaign options.</li>
+     *     <li>The base salaries for primary and secondary roles are summed.</li>
+     *     <li>If the person's rank provides a pay multiplier, the calculated total is multiplied accordingly.</li>
+     * </ul>
+     *
+     * <p>The method does not currently account for era modifiers or crew type (e.g., DropShip, JumpShip, WarShip).</p>
+     *
+     * @param campaign The current {@link Campaign} used to determine relevant options and settings.
+     *
+     * @return A {@link Money} object representing the person's salary according to current campaign rules and their
+     *       status.
+     */
     public Money getSalary(final Campaign campaign) {
         if (!getPrisonerStatus().isFree()) {
+            return Money.zero();
+        }
+
+        if (!employed) {
             return Money.zero();
         }
 
@@ -2912,20 +3438,22 @@ public class Person {
         // SpecInf is a special case, this needs to be applied first to bring base
         // salary up to RAW.
         if (getPrimaryRole().isSoldierOrBattleArmour()) {
-            if ((getUnit() != null) && getUnit().isConventionalInfantry()
-                    && ((Infantry) getUnit().getEntity()).hasSpecialization()) {
-                primaryBase = primaryBase
-                        .multipliedBy(campaign.getCampaignOptions().getSalarySpecialistInfantryMultiplier());
+            if ((getUnit() != null) &&
+                      getUnit().isConventionalInfantry() &&
+                      ((Infantry) getUnit().getEntity()).hasSpecialization()) {
+                primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions()
+                                                             .getSalarySpecialistInfantryMultiplier());
             }
         }
 
         // Experience multiplier
-        primaryBase = primaryBase.multipliedBy(
-                campaign.getCampaignOptions().getSalaryXPMultipliers().get(getSkillLevel(campaign, false)));
+        primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions()
+                                                     .getSalaryXPMultipliers()
+                                                     .get(getSkillLevel(campaign, false)));
 
         // Specialization multiplier
         if (getPrimaryRole().isSoldierOrBattleArmour()) {
-            if (hasSkill(SkillType.S_ANTI_MEK)) {
+            if (hasSkill(S_ANTI_MEK)) {
                 primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
             }
         }
@@ -2935,27 +3463,28 @@ public class Person {
         Money secondaryBase = Money.zero();
 
         if (!campaign.getCampaignOptions().isDisableSecondaryRoleSalary()) {
-            secondaryBase = campaign.getCampaignOptions().getRoleBaseSalaries()[getSecondaryRole().ordinal()]
-                    .dividedBy(2);
+            secondaryBase = campaign.getCampaignOptions().getRoleBaseSalaries()[getSecondaryRole().ordinal()].dividedBy(
+                  2);
 
             // SpecInf is a special case, this needs to be applied first to bring base
             // salary up to RAW.
             if (getSecondaryRole().isSoldierOrBattleArmour()) {
-                if (hasSkill(SkillType.S_ANTI_MEK)) {
-                    secondaryBase = secondaryBase
-                            .multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
+                if (hasSkill(S_ANTI_MEK)) {
+                    secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions()
+                                                                     .getSalaryAntiMekMultiplier());
                 }
             }
 
             // Experience modifier
-            secondaryBase = secondaryBase.multipliedBy(
-                    campaign.getCampaignOptions().getSalaryXPMultipliers().get(getSkillLevel(campaign, true)));
+            secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions()
+                                                             .getSalaryXPMultipliers()
+                                                             .get(getSkillLevel(campaign, true)));
 
             // Specialization
             if (getSecondaryRole().isSoldierOrBattleArmour()) {
-                if (hasSkill(SkillType.S_ANTI_MEK)) {
-                    secondaryBase = secondaryBase
-                            .multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
+                if (hasSkill(S_ANTI_MEK)) {
+                    secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions()
+                                                                     .getSalaryAntiMekMultiplier());
                 }
             }
         }
@@ -2972,8 +3501,7 @@ public class Person {
     /**
      * Retrieves a list of edge triggers from PilotOptions.
      *
-     * @return a List of edge triggers. If no edge triggers are found, an empty List
-     *         is returned.
+     * @return a List of edge triggers. If no edge triggers are found, an empty List is returned.
      */
     private static List<String> getEdgeTriggersList() {
         Enumeration<IOptionGroup> groups = new PilotOptions().getGroups();
@@ -3039,11 +3567,8 @@ public class Person {
     }
 
     /**
-     * This is used to pay a person. Preventing negative payments
-     * is intentional to ensure we don't accidentally
-     * change someone when trying to give them money.
-     * To charge a person, implement a new method.
-     * (And then add a @see here)
+     * This is used to pay a person. Preventing negative payments is intentional to ensure we don't accidentally change
+     * someone when trying to give them money. To charge a person, implement a new method. (And then add a @see here)
      *
      * @param money the amount of money to add to their total earnings
      */
@@ -3054,15 +3579,13 @@ public class Person {
     }
 
     /**
-     * This is used to pay a person their share value based on the value of a single
-     * share
+     * This is used to pay a person their share value based on the value of a single share
      *
      * @param campaign     the campaign the person is a part of
      * @param money        the value of a single share
      * @param sharesForAll whether or not all personnel have shares
      */
-    public void payPersonShares(final Campaign campaign, final Money money,
-            final boolean sharesForAll) {
+    public void payPersonShares(final Campaign campaign, final Money money, final boolean sharesForAll) {
         final int shares = getNumShares(campaign, sharesForAll);
         if (shares > 0) {
             payPerson(money.multipliedBy(shares));
@@ -3104,8 +3627,7 @@ public class Person {
         this.rankLevel = rankLevel;
     }
 
-    public void changeRank(final Campaign campaign, final int rankNumeric, final int rankLevel,
-            final boolean report) {
+    public void changeRank(final Campaign campaign, final int rankNumeric, final int rankLevel, final boolean report) {
         final int oldRankNumeric = getRankNumeric();
         final int oldRankLevel = getRankLevel();
         setRank(rankNumeric);
@@ -3122,8 +3644,7 @@ public class Person {
         campaign.personUpdated(this);
 
         if (report) {
-            if ((rankNumeric > oldRankNumeric)
-                    || ((rankNumeric == oldRankNumeric) && (rankLevel > oldRankLevel))) {
+            if ((rankNumeric > oldRankNumeric) || ((rankNumeric == oldRankNumeric) && (rankLevel > oldRankLevel))) {
                 ServiceLogger.promotedTo(this, campaign.getLocalDate());
             } else if ((rankNumeric < oldRankNumeric) || (rankLevel < oldRankLevel)) {
                 ServiceLogger.demotedTo(this, campaign.getLocalDate());
@@ -3156,9 +3677,9 @@ public class Person {
         }
 
         // Prisoner Status Modifications
-        rankName = rankName.equalsIgnoreCase("None")
-                ? getPrisonerStatus().getTitleExtension()
-                : getPrisonerStatus().getTitleExtension() + ' ' + rankName;
+        rankName = rankName.equalsIgnoreCase("None") ?
+                         getPrisonerStatus().getTitleExtension() :
+                         getPrisonerStatus().getTitleExtension() + ' ' + rankName;
 
         // We have our name, return it
         return rankName.trim();
@@ -3191,13 +3712,12 @@ public class Person {
     }
 
     /**
-     * Determines whether this person outranks another, taking into account the
-     * seniority rank for
-     * ComStar and WoB ranks.
+     * Determines whether this person outranks another, taking into account the seniority rank for ComStar and WoB
+     * ranks.
      *
      * @param other The <code>Person</code> to compare ranks with
-     * @return true if <code>other</code> has a lower rank, or if <code>other</code>
-     *         is null.
+     *
+     * @return true if <code>other</code> has a lower rank, or if <code>other</code> is null.
      */
     public boolean outRanks(final @Nullable Person other) {
         if (other == null) {
@@ -3210,16 +3730,14 @@ public class Person {
     }
 
     /**
-     * Checks if the current person outranks another person using a skill
-     * tiebreaker.
-     * If the other person is null, it is considered that the current person
-     * outranks them.
-     * If both persons have the same rank numeric value, the rank level is compared.
-     * If both persons have the same rank numeric value and rank level, the
-     * experience levels are compared.
+     * Checks if the current person outranks another person using a skill tiebreaker. If the other person is null, it is
+     * considered that the current person outranks them. If both persons have the same rank numeric value, the rank
+     * level is compared. If both persons have the same rank numeric value and rank level, the experience levels are
+     * compared.
      *
      * @param campaign    the campaign used to calculate the experience levels
      * @param otherPerson the other person to compare ranks with
+     *
      * @return true if the current person outranks the other person, false otherwise
      */
     public boolean outRanksUsingSkillTiebreaker(Campaign campaign, @Nullable Person otherPerson) {
@@ -3252,6 +3770,7 @@ public class Person {
      * Two people are determined to be equal if they have the same id
      *
      * @param object The object to check if it is equal to the person or not
+     *
      * @return True if they have the same id, otherwise false
      */
     @Override
@@ -3274,205 +3793,113 @@ public class Person {
         return Skills.SKILL_LEVELS[getExperienceLevel(campaign, secondary) + 1];
     }
 
+    /**
+     * Determines the experience level of a person in their current profession within the context of a campaign.
+     *
+     * <p>The calculation varies depending on the person's role and campaign options:</p>
+     * <ul>
+     *     <li>
+     *         <b>Vehicle Gunners:</b> If artillery usage is enabled in the campaign, calculates the maximum
+     *         experience level between Gunnery (Vee) and Artillery skills. Otherwise, uses the profession's
+     *         associated skills and campaign averaging option.
+     *     </li>
+     *     <li>
+     *         <b>Vehicle Crew:</b> Returns the highest experience level among a specific set of technical and support skills.
+     *     </li>
+     *     <li>
+     *         <b>Administrators:</b> Averages the Administrator skill and (optionally) Negotiation skills,
+     *         depending on campaign options. If all selected skills are untrained, returns {@link SkillType#EXP_NONE}.
+     *         Otherwise, returns the average, floored at 0.
+     *     </li>
+     *     <li>
+     *         <b>All other roles:</b> Calculates the experience level using their associated skills and campaign averaging option.
+     *     </li>
+     * </ul>
+     *
+     * @param campaign  the campaign context, providing options and relevant configuration
+     * @param secondary if {@code true}, evaluates the person's secondary role; if {@code false}, evaluates the primary
+     *                  role
+     *
+     * @return the calculated experience level for the relevant role, or {@link SkillType#EXP_NONE} if not qualified
+     */
     public int getExperienceLevel(final Campaign campaign, final boolean secondary) {
         final PersonnelRole role = secondary ? getSecondaryRole() : getPrimaryRole();
-        switch (role) {
-            case MEKWARRIOR:
-                if (hasSkill(SkillType.S_GUN_MEK) && hasSkill(SkillType.S_PILOT_MEK)) {
-                    /*
-                     * Attempt to use higher precision averaging, but if it doesn't provide a clear
-                     * result
-                     * due to non-standard experience thresholds then fall back on lower precision
-                     * averaging
-                     * See Bug #140
-                     */
-                    if (campaign.getCampaignOptions().isAlternativeQualityAveraging()) {
-                        int rawScore = (int) Math.floor(
-                                (getSkill(SkillType.S_GUN_MEK).getLevel() + getSkill(SkillType.S_PILOT_MEK).getLevel())
-                                        / 2.0);
-                        if (getSkill(SkillType.S_GUN_MEK).getType().getExperienceLevel(
-                                rawScore) == getSkill(SkillType.S_PILOT_MEK).getType().getExperienceLevel(rawScore)) {
-                            return getSkill(SkillType.S_GUN_MEK).getType().getExperienceLevel(rawScore);
-                        }
-                    }
 
-                    return (int) Math.floor((getSkill(SkillType.S_GUN_MEK).getExperienceLevel()
-                            + getSkill(SkillType.S_PILOT_MEK).getExperienceLevel()) / 2.0);
-                } else {
-                    return SkillType.EXP_NONE;
-                }
-            case LAM_PILOT:
-                if (Stream.of(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK,
-                        SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO).allMatch(this::hasSkill)) {
-                    /*
-                     * Attempt to use higher precision averaging, but if it doesn't provide a clear
-                     * result
-                     * due to non-standard experience thresholds then fall back on lower precision
-                     * averaging
-                     * See Bug #140
-                     */
-                    if (campaign.getCampaignOptions().isAlternativeQualityAveraging()) {
-                        int rawScore = (int) Math.floor((Stream.of(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK,
-                                SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO).mapToInt(s -> getSkill(s).getLevel())
-                                .sum())
-                                / 4.0);
+        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        final boolean doAdminCountNegotiation = campaignOptions.isAdminExperienceLevelIncludeNegotiation();
+        final boolean isUseArtillery = campaignOptions.isUseArtillery();
 
-                        final int mekGunneryExperienceLevel = SkillType.lookupHash.get(SkillType.S_GUN_MEK)
-                                .getExperienceLevel(rawScore);
-                        if ((mekGunneryExperienceLevel == SkillType.lookupHash.get(SkillType.S_PILOT_MEK)
-                                .getExperienceLevel(rawScore)
-                                && (mekGunneryExperienceLevel == SkillType.lookupHash.get(SkillType.S_GUN_AERO)
-                                        .getExperienceLevel(rawScore))
-                                && (mekGunneryExperienceLevel == SkillType.lookupHash.get(SkillType.S_PILOT_AERO)
-                                        .getExperienceLevel(rawScore)))) {
-                            return getSkill(SkillType.S_GUN_MEK).getType().getExperienceLevel(rawScore);
-                        }
-                    }
+        final boolean isAlternativeQualityAveraging = campaignOptions.isAlternativeQualityAveraging();
 
-                    return (int) Math.floor(
-                            (getSkill(SkillType.S_GUN_MEK).getExperienceLevel()
-                                    + getSkill(SkillType.S_PILOT_MEK).getExperienceLevel()
-                                    + getSkill(SkillType.S_GUN_AERO).getExperienceLevel()
-                                    + getSkill(SkillType.S_PILOT_AERO).getExperienceLevel())
-                                    / 4.0);
-                } else {
-                    return SkillType.EXP_NONE;
-                }
-            case GROUND_VEHICLE_DRIVER:
-                return hasSkill(SkillType.S_PILOT_GVEE) ? getSkill(SkillType.S_PILOT_GVEE).getExperienceLevel()
-                        : SkillType.EXP_NONE;
-            case NAVAL_VEHICLE_DRIVER:
-                return hasSkill(SkillType.S_PILOT_NVEE) ? getSkill(SkillType.S_PILOT_NVEE).getExperienceLevel()
-                        : SkillType.EXP_NONE;
-            case VTOL_PILOT:
-                return hasSkill(SkillType.S_PILOT_VTOL) ? getSkill(SkillType.S_PILOT_VTOL).getExperienceLevel()
-                        : SkillType.EXP_NONE;
-            case VEHICLE_GUNNER:
-                if (!campaign.getCampaignOptions().isUseArtillery()) {
-                    return hasSkill(SkillType.S_GUN_VEE) ? getSkill(SkillType.S_GUN_VEE).getExperienceLevel()
-                            : SkillType.EXP_NONE;
+        final int adjustedReputation = getAdjustedReputation(campaignOptions.isUseAgeEffects(),
+              campaign.isClanCampaign(),
+              campaign.getLocalDate(),
+              rankLevel);
+
+        // Optional skills such as Admin for Techs are not counted towards the character's experience level, except
+        // in the special case of Vehicle Gunners. So we only want to fetch the base professions.
+        List<String> associatedSkillNames = role.getSkillsForProfession();
+
+        return switch (role) {
+            case VEHICLE_GUNNER -> {
+                if (!isUseArtillery) {
+                    yield calculateExperienceLevelForProfession(associatedSkillNames,
+                          isAlternativeQualityAveraging,
+                          adjustedReputation);
                 } else {
                     if ((hasSkill(SkillType.S_GUN_VEE)) && (hasSkill(SkillType.S_ARTILLERY))) {
-                        return Math.max((getSkill(SkillType.S_GUN_VEE).getExperienceLevel()),
-                                (getSkill(SkillType.S_ARTILLERY).getExperienceLevel()));
+                        yield Math.max((getSkill(SkillType.S_GUN_VEE).getExperienceLevel(options, atowAttributes)),
+                              (getSkill(SkillType.S_ARTILLERY).getExperienceLevel(options, atowAttributes)));
                     } else if (hasSkill(SkillType.S_GUN_VEE)) {
-                        return getSkill(SkillType.S_GUN_VEE).getExperienceLevel();
+                        yield getSkill(SkillType.S_GUN_VEE).getExperienceLevel(options, atowAttributes);
                     } else if (hasSkill(SkillType.S_ARTILLERY)) {
-                        return getSkill(SkillType.S_ARTILLERY).getExperienceLevel();
+                        yield getSkill(SkillType.S_ARTILLERY).getExperienceLevel(options, atowAttributes);
                     } else {
-                        return SkillType.EXP_NONE;
+                        yield SkillType.EXP_NONE;
                     }
                 }
-            case VEHICLE_CREW, MECHANIC:
-                return hasSkill(SkillType.S_TECH_MECHANIC) ? getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel()
-                        : SkillType.EXP_NONE;
-            case AEROSPACE_PILOT:
-                if (hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO)) {
-                    if (campaign.getCampaignOptions().isAlternativeQualityAveraging()) {
-                        int rawScore = (int) Math.floor(
-                                (getSkill(SkillType.S_GUN_AERO).getLevel()
-                                        + getSkill(SkillType.S_PILOT_AERO).getLevel()) / 2.0);
-                        if (getSkill(SkillType.S_GUN_AERO).getType().getExperienceLevel(
-                                rawScore) == getSkill(SkillType.S_PILOT_AERO).getType().getExperienceLevel(rawScore)) {
-                            return getSkill(SkillType.S_GUN_AERO).getType().getExperienceLevel(rawScore);
-                        }
+            }
+            case VEHICLE_CREW -> {
+                // Vehicle crew are a special case as they just need one of any of the following skills to qualify,
+                // rather than needing all relevant skills
+                List<String> relevantSkills = List.of(SkillType.S_TECH_MEK,
+                      SkillType.S_TECH_AERO,
+                      SkillType.S_TECH_MECHANIC,
+                      SkillType.S_TECH_BA,
+                      SkillType.S_SURGERY,
+                      SkillType.S_MEDTECH,
+                      SkillType.S_ASTECH,
+                      SkillType.S_COMMUNICATIONS,
+                      SkillType.S_ART_COOKING,
+                      SkillType.S_SENSOR_OPERATIONS);
+                int highestExperienceLevel = SkillType.EXP_NONE;
+                for (String relevantSkill : relevantSkills) {
+                    Skill skill = getSkill(relevantSkill);
+
+                    if (skill == null) {
+                        continue;
                     }
 
-                    return (int) Math.floor((getSkill(SkillType.S_GUN_AERO).getExperienceLevel()
-                            + getSkill(SkillType.S_PILOT_AERO).getExperienceLevel()) / 2.0);
-                } else {
-                    return SkillType.EXP_NONE;
-                }
-            case CONVENTIONAL_AIRCRAFT_PILOT:
-                if (hasSkill(SkillType.S_GUN_JET) && hasSkill(SkillType.S_PILOT_JET)) {
-                    if (campaign.getCampaignOptions().isAlternativeQualityAveraging()) {
-                        int rawScore = (int) Math.floor(
-                                (getSkill(SkillType.S_GUN_JET).getLevel() + getSkill(SkillType.S_PILOT_JET).getLevel())
-                                        / 2.0);
-                        if (getSkill(SkillType.S_GUN_JET).getType().getExperienceLevel(
-                                rawScore) == getSkill(SkillType.S_PILOT_JET).getType().getExperienceLevel(rawScore)) {
-                            return getSkill(SkillType.S_GUN_JET).getType().getExperienceLevel(rawScore);
-                        }
+                    int currentExperienceLevel = skill.getExperienceLevel(options, atowAttributes);
+                    if (currentExperienceLevel > highestExperienceLevel) {
+                        highestExperienceLevel = currentExperienceLevel;
                     }
-
-                    return (int) Math.floor((getSkill(SkillType.S_GUN_JET).getExperienceLevel()
-                            + getSkill(SkillType.S_PILOT_JET).getExperienceLevel()) / 2.0);
-                } else {
-                    return SkillType.EXP_NONE;
                 }
-            case PROTOMEK_PILOT:
-                return hasSkill(SkillType.S_GUN_PROTO) ? getSkill(SkillType.S_GUN_PROTO).getExperienceLevel()
-                        : SkillType.EXP_NONE;
-            case BATTLE_ARMOUR:
-                if (hasSkill(SkillType.S_GUN_BA) && hasSkill(SkillType.S_ANTI_MEK)) {
-                    if (campaign.getCampaignOptions().isAlternativeQualityAveraging()) {
-                        int rawScore = (int) Math.floor(
-                                (getSkill(SkillType.S_GUN_BA).getLevel() + getSkill(SkillType.S_ANTI_MEK).getLevel())
-                                        / 2.0);
-                        if (getSkill(SkillType.S_GUN_BA).getType().getExperienceLevel(
-                                rawScore) == getSkill(SkillType.S_ANTI_MEK).getType().getExperienceLevel(rawScore)) {
-                            return getSkill(SkillType.S_GUN_BA).getType().getExperienceLevel(rawScore);
-                        }
-                    }
 
-                    return (int) Math.floor((getSkill(SkillType.S_GUN_BA).getExperienceLevel()
-                            + getSkill(SkillType.S_ANTI_MEK).getExperienceLevel()) / 2.0);
-                } else {
-                    return SkillType.EXP_NONE;
-                }
-            case SOLDIER:
-                return hasSkill(SkillType.S_SMALL_ARMS) ? getSkill(SkillType.S_SMALL_ARMS).getExperienceLevel()
-                        : SkillType.EXP_NONE;
-            case VESSEL_PILOT:
-                return hasSkill(SkillType.S_PILOT_SPACE) ? getSkill(SkillType.S_PILOT_SPACE).getExperienceLevel()
-                        : SkillType.EXP_NONE;
-            case VESSEL_GUNNER:
-                return hasSkill(SkillType.S_GUN_SPACE) ? getSkill(SkillType.S_GUN_SPACE).getExperienceLevel()
-                        : SkillType.EXP_NONE;
-            case VESSEL_CREW:
-                return hasSkill(SkillType.S_TECH_VESSEL) ? getSkill(SkillType.S_TECH_VESSEL).getExperienceLevel()
-                        : SkillType.EXP_NONE;
-            case VESSEL_NAVIGATOR:
-                return hasSkill(SkillType.S_NAV) ? getSkill(SkillType.S_NAV).getExperienceLevel() : SkillType.EXP_NONE;
-            case MEK_TECH:
-                return hasSkill(SkillType.S_TECH_MEK) ? getSkill(SkillType.S_TECH_MEK).getExperienceLevel()
-                        : SkillType.EXP_NONE;
-            case AERO_TEK:
-                return hasSkill(SkillType.S_TECH_AERO) ? getSkill(SkillType.S_TECH_AERO).getExperienceLevel()
-                        : SkillType.EXP_NONE;
-            case BA_TECH:
-                return hasSkill(SkillType.S_TECH_BA) ? getSkill(SkillType.S_TECH_BA).getExperienceLevel()
-                        : SkillType.EXP_NONE;
-            case ASTECH:
-                return hasSkill(SkillType.S_ASTECH) ? getSkill(SkillType.S_ASTECH).getExperienceLevel()
-                        : SkillType.EXP_NONE;
-            case DOCTOR:
-                return hasSkill(SkillType.S_DOCTOR) ? getSkill(SkillType.S_DOCTOR).getExperienceLevel()
-                        : SkillType.EXP_NONE;
-            case MEDIC:
-                return hasSkill(SkillType.S_MEDTECH) ? getSkill(SkillType.S_MEDTECH).getExperienceLevel()
-                        : SkillType.EXP_NONE;
-            case ADMINISTRATOR_COMMAND:
-            case ADMINISTRATOR_LOGISTICS:
-            case ADMINISTRATOR_TRANSPORT:
-            case ADMINISTRATOR_HR:
+                yield highestExperienceLevel;
+            }
+            case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_HR -> {
                 int adminLevel = getSkillLevelOrNegative(SkillType.S_ADMIN);
-                int negotiationLevel = getSkillLevelOrNegative(SkillType.S_NEG);
-                int scroungeLevel = getSkillLevelOrNegative(SkillType.S_SCROUNGE);
+                adminLevel = adminLevel == -1 ? 0 : adminLevel;
+
+                int negotiationLevel = getSkillLevelOrNegative(SkillType.S_NEGOTIATION);
+                negotiationLevel = negotiationLevel == -1 ? 0 : negotiationLevel;
 
                 int levelSum;
-                boolean includeNegotiation = campaign.getCampaignOptions().isAdminExperienceLevelIncludeNegotiation();
-                boolean includeScrounge = campaign.getCampaignOptions().isAdminExperienceLevelIncludeScrounge();
                 int divisor;
 
-                if (includeNegotiation && includeScrounge) {
-                    levelSum = adminLevel + negotiationLevel + scroungeLevel;
-                    divisor = 3;
-                } else if (includeNegotiation) {
+                if (doAdminCountNegotiation) {
                     levelSum = adminLevel + negotiationLevel;
-                    divisor = 2;
-                } else if (includeScrounge) {
-                    levelSum = adminLevel + scroungeLevel;
                     divisor = 2;
                 } else {
                     levelSum = adminLevel;
@@ -3480,97 +3907,132 @@ public class Person {
                 }
 
                 if (levelSum == -divisor) {
-                    return SkillType.EXP_NONE;
+                    yield SkillType.EXP_NONE;
                 } else {
-                    return Math.max(0, levelSum / divisor);
-                }
-            case DEPENDENT:
-            case NONE:
-            default:
-                return SkillType.EXP_NONE;
-        }
-    }
-
-    /**
-     * Retrieves the skills associated with the character's profession.
-     * The skills returned depend on whether the personnel's primary or secondary role
-     * is being queried and may also vary based on the campaign's configuration settings, such as
-     * whether artillery skills are enabled.
-     *
-     * <p>This method identifies the {@link PersonnelRole} associated with the personnel and returns
-     * a list of corresponding skills. The resulting skills depend on the profession and specific
-     * conditions, such as whether artillery is enabled in the campaign options.</p>
-     *
-     * <p>Examples of skill mappings include:
-     * <ul>
-     *     <li><strong>MEKWARRIOR:</strong> Includes gun and piloting skills for meks, with optional
-     *     artillery skills if enabled in the campaign.</li>
-     *     <li><strong>LAM_PILOT:</strong> Covers skills for both meks and aerospace combat.</li>
-     *     <li><strong>GROUND_VEHICLE_DRIVER:</strong> Includes piloting skills for ground vehicles.</li>
-     *     <li><strong>VEHICLE_GUNNER:</strong> Includes vehicle gunnery skills, with optional artillery skills
-     *         if enabled.</li>
-     *     <li><strong>AEROSPACE_PILOT:</strong> Covers skills for aerospace gunnery and piloting.</li>
-     *     <li><strong>ADMINISTRATORS:</strong> Includes administrative, negotiation, and scrounging skills.</li>
-     *     <li><strong>DEPENDENT or NONE:</strong> Returns no specific skills.</li>
-     * </ul>
-     *
-     * @param campaign  the current {@link Campaign}
-     * @param secondary a boolean indicating whether to retrieve skills for the secondary ({@code true})
-     *                  or primary ({@code false}) profession of the character
-     * @return a {@link List} of skill identifiers ({@link String}) associated with the personnel's role,
-     *         possibly modified by campaign settings
-     */
-    public List<String> getProfessionSkills(final Campaign campaign, final boolean secondary) {
-        final PersonnelRole profession = secondary ? getSecondaryRole() : getPrimaryRole();
-        final boolean isUseArtillery = campaign.getCampaignOptions().isUseArtillery();
-
-        return switch (profession) {
-            case MEKWARRIOR -> {
-                if (isUseArtillery) {
-                    yield List.of(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK, SkillType.S_ARTILLERY);
-                } else {
-                    yield List.of(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK);
+                    yield Math.max(0, levelSum / divisor);
                 }
             }
-            case LAM_PILOT -> List.of(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK,
-                SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO);
-            case GROUND_VEHICLE_DRIVER -> List.of(SkillType.S_PILOT_GVEE);
-            case NAVAL_VEHICLE_DRIVER -> List.of(SkillType.S_PILOT_NVEE);
-            case VTOL_PILOT -> List.of(SkillType.S_PILOT_VTOL);
-            case VEHICLE_GUNNER -> {
-                if (isUseArtillery) {
-                    yield List.of(SkillType.S_GUN_VEE, SkillType.S_ARTILLERY);
-                } else {
-                    yield List.of(SkillType.S_GUN_VEE);
-                }
-            }
-            case VEHICLE_CREW, MECHANIC -> List.of(SkillType.S_TECH_MECHANIC);
-            case AEROSPACE_PILOT -> List.of(SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO);
-            case CONVENTIONAL_AIRCRAFT_PILOT -> List.of(SkillType.S_GUN_JET, SkillType.S_PILOT_JET);
-            case PROTOMEK_PILOT -> List.of(SkillType.S_GUN_PROTO, SkillType.S_GUN_PROTO);
-            case BATTLE_ARMOUR -> List.of(SkillType.S_GUN_BA, SkillType.S_ANTI_MEK);
-            case SOLDIER -> List.of(SkillType.S_SMALL_ARMS);
-            case VESSEL_PILOT -> List.of(SkillType.S_PILOT_SPACE);
-            case VESSEL_GUNNER -> List.of(SkillType.S_GUN_SPACE);
-            case VESSEL_CREW -> List.of(SkillType.S_TECH_VESSEL);
-            case VESSEL_NAVIGATOR -> List.of(SkillType.S_NAV);
-            case MEK_TECH -> List.of(SkillType.S_TECH_MEK);
-            case AERO_TEK -> List.of(SkillType.S_TECH_AERO);
-            case BA_TECH -> List.of(SkillType.S_TECH_BA);
-            case ASTECH -> List.of(SkillType.S_ASTECH);
-            case DOCTOR -> List.of(SkillType.S_DOCTOR);
-            case MEDIC -> List.of(SkillType.S_MEDTECH);
-            case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT,
-                 ADMINISTRATOR_HR -> List.of(SkillType.S_ADMIN, SkillType.S_NEG, SkillType.S_SCROUNGE);
-            case DEPENDENT, NONE -> List.of(String.valueOf(SkillType.EXP_NONE));
+            default -> calculateExperienceLevelForProfession(associatedSkillNames,
+                  isAlternativeQualityAveraging,
+                  adjustedReputation);
         };
     }
 
     /**
+     * Calculates the experience level for a profession based on the specified skill names and quality averaging
+     * method.
+     *
+     * <p>If the provided list of skill names is empty, this method returns {@link SkillType#EXP_REGULAR} by default.
+     * If any skill is missing or its type cannot be determined, {@link SkillType#EXP_NONE} is returned.</p>
+     *
+     * <ul>
+     *     <li>
+     *         <b>Standard Averaging:</b> If {@code isAlternativeQualityAveraging} is {@code false}, the experience
+     *         level is determined by averaging the levels of all provided skills and converting the average to an
+     *         experience level using the first skill's type.
+     *     </li>
+     *     <li>
+     *         <b>Alternative Quality Averaging:</b> If {@code isAlternativeQualityAveraging} is {@code true}, the
+     *         method checks if all experience levels for the listed skills are equal. If they are, that shared
+     *         experience level is returned. Otherwise, standard averaging is used as described above.
+     *     </li>
+     * </ul>
+     *
+     * @param skillNames                    list of skill names relevant to the profession
+     * @param isAlternativeQualityAveraging if {@code true}, uses the alternative averaging method; if {@code false},
+     *                                      uses standard averaging
+     *
+     * @return the determined experience level, or {@link SkillType#EXP_NONE} if an error occurs or prerequisite skills
+     *       are missing
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    private int calculateExperienceLevelForProfession(List<String> skillNames, boolean isAlternativeQualityAveraging,
+          int adjustedReputation) {
+        if (skillNames.isEmpty()) {
+            // If we're not tracking skills for this profession, it always counts as REGULAR
+            return SkillType.EXP_REGULAR;
+        }
+
+        int totalSkillLevel = 0;
+        boolean areAllEqual = true;
+        Integer expectedExperienceLevel = null;
+
+        for (String skillName : skillNames) {
+            Skill skill = getSkill(skillName);
+            if (skill == null) {
+                // If a character is missing a skill, it means they're unqualified for a profession. They will lose
+                // that profession the next time the campaign is loaded. We don't remove it here as that would
+                // require passing in a bunch of extra information that is largely irrelevant.
+                return SkillType.EXP_NONE;
+            }
+
+            SkillType skillType = SkillType.getType(skillName);
+            if (skillType == null) {
+                logger.warn("Unable to find skill type for {}. Experience level assessment aborted", skillName);
+                return SkillType.EXP_NONE;
+            }
+
+            int individualSkillLevel = skill.getTotalSkillLevel(options, atowAttributes, adjustedReputation);
+            totalSkillLevel += individualSkillLevel;
+
+            if (isAlternativeQualityAveraging) {
+                int expLevel = skill.getExperienceLevel(options, atowAttributes, adjustedReputation);
+                if (expectedExperienceLevel == null) {
+                    expectedExperienceLevel = expLevel;
+                } else if (!expectedExperienceLevel.equals(expLevel)) {
+                    areAllEqual = false;
+                }
+            }
+        }
+
+        if (isAlternativeQualityAveraging && areAllEqual) {
+            return expectedExperienceLevel;
+        }
+
+        int averageSkillLevel = (int) Math.floor((double) totalSkillLevel / skillNames.size());
+
+        Skill skill = getSkill(skillNames.get(0));
+        if (skill == null) {
+            return SkillType.EXP_NONE;
+        }
+
+        return skill.getType().getExperienceLevel(averageSkillLevel);
+    }
+
+    /**
+     * Retrieves the skills associated with the character's profession. The skills returned depend on whether the
+     * personnel's primary or secondary role is being queried and may also vary based on the campaign's configuration
+     * settings, such as whether artillery skills are enabled.
+     *
+     * @param campaign  the current {@link Campaign}
+     * @param secondary a boolean indicating whether to retrieve skills for the secondary ({@code true}) or primary
+     *                  ({@code false}) profession of the character
+     *
+     * @return a {@link List} of skill identifiers ({@link String}) associated with the personnel's role, possibly
+     *       modified by campaign settings
+     */
+    public List<String> getProfessionSkills(final Campaign campaign, final boolean secondary) {
+        final PersonnelRole profession = secondary ? getSecondaryRole() : getPrimaryRole();
+
+        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        final boolean isAdminsHaveNegotiation = campaignOptions.isAdminsHaveNegotiation();
+        final boolean isDoctorsUseAdministration = campaignOptions.isDoctorsUseAdministration();
+        final boolean isTechsUseAdministration = campaignOptions.isTechsUseAdministration();
+        final boolean isUseArtillery = campaignOptions.isUseArtillery();
+
+        return profession.getSkillsForProfession(isAdminsHaveNegotiation,
+              isDoctorsUseAdministration,
+              isTechsUseAdministration,
+              isUseArtillery);
+    }
+
+    /**
      * @param campaign the campaign the person is a part of
-     * @return a full description in HTML format that will be used for the graphical
-     *         display in the
-     *         personnel table among other places
+     *
+     * @return a full description in HTML format that will be used for the graphical display in the personnel table
+     *       among other places
      */
     public String getFullDesc(final Campaign campaign) {
         return "<b>" + getFullTitle() + "</b><br/>" + getSkillLevel(campaign, false) + ' ' + getRoleDesc();
@@ -3578,16 +4040,15 @@ public class Person {
 
     public String getHTMLTitle() {
         return String.format("<html><div id=\"%s\" style=\"white-space: nowrap;\">%s</div></html>",
-                getId(), getFullTitle());
+              getId(),
+              getFullTitle());
     }
 
     /**
-     * Constructs and returns the full title by combining the rank and full name. If the rank is
-     * not available or an exception occurs while retrieving it, the method will only return the
-     * full name.
+     * Constructs and returns the full title by combining the rank and full name. If the rank is not available or an
+     * exception occurs while retrieving it, the method will only return the full name.
      *
-     * @return the full title as a combination of rank and full name, or just the full name if the
-     * rank is unavailable
+     * @return the full title as a combination of rank and full name, or just the full name if the rank is unavailable
      */
     public String getFullTitle() {
         String rank = "";
@@ -3605,6 +4066,40 @@ public class Person {
         }
 
         return rank + getFullName();
+    }
+
+    /**
+     * Returns the person's title (rank) and surname as a single string.
+     *
+     * <p>If the person has an assigned rank, the rank (followed by a space) will precede the surname. If no rank is
+     * available, only the surname is returned. If an exception occurs while retrieving the rank (for example, if the
+     * person has not been assigned a rank system), the method will ignore the exception and return only the
+     * surname.</p>
+     *
+     * <p>This design ensures robust behavior for test cases and scenarios where the person may not have a rank
+     * assignment.</p>
+     *
+     * @return a string containing the person's rank (if any) and surname
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public String getTitleAndSurname() {
+        String rank = "";
+
+        try {
+            rank = getRankName();
+
+            if (!rank.isBlank()) {
+                rank = rank + ' ';
+            }
+        } catch (Exception ignored) {
+            // This try-catch exists to allow us to more easily test Person objects. Previously, if
+            // a method included 'getTitleAndSurname' it would break if the Person object hadn't been
+            // assigned a Rank System.
+        }
+
+        return rank + getSurname();
     }
 
     public String makeHTMLRank() {
@@ -3649,13 +4144,12 @@ public class Person {
         return campaign.getCampaignOptions().isTougherHealing() ? Math.max(0, getHits() - 2) : 0;
     }
 
-    public TargetRoll getHealingMods(final Campaign campaign) {
-        return new TargetRoll(getHealingDifficulty(campaign), "difficulty");
+    public TargetRollModifier getHealingMods(final Campaign campaign) {
+        return new TargetRollModifier(getHealingDifficulty(campaign), "difficulty");
     }
 
     public String fail() {
-        return " <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
-                + "'><b>Failed to heal.</b></font>";
+        return " <font color='" + ReportingUtilities.getNegativeColor() + "'><b>Failed to heal.</b></font>";
     }
 
     // region skill
@@ -3671,20 +4165,52 @@ public class Person {
         return skills.getSkill(skillName);
     }
 
+    /**
+     * @deprecated use {@link #getSkillLevel(String, boolean, boolean, LocalDate)} instead
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public int getSkillLevel(final String skillName) {
         final Skill skill = getSkill(skillName);
-        return (skill == null) ? 0 : skill.getExperienceLevel();
+        return (skill == null) ? 0 : skill.getExperienceLevel(options, atowAttributes);
     }
 
     /**
-     * @return the skill level of a person for a given skill, or -1 if the person
-     *         does not have the skill.
+     * Retrieves the experience level for a specified skill by name, with options to account for aging effects and
+     * campaign type.
      *
-     * @param skillName The name of the skill to retrieve the level for.
+     * <p>This method calculates the experience level for the given skill, applying adjustments based on aging effects,
+     * campaign context, and the current date. If the skill is not found, {@code 0} is returned.</p>
+     *
+     * @param skillName         the name of the skill to retrieve
+     * @param isUseAgingEffects {@code true} to include aging effects in reputation adjustment, {@code false} otherwise
+     * @param isClanCampaign    {@code true} if the context is a Clan campaign, {@code false} otherwise
+     * @param today             the current date used for age-related calculations
+     *
+     * @return the corresponding experience level for the skill, or {@code 0} if the skill does not exist
+     */
+    public int getSkillLevel(final String skillName, boolean isUseAgingEffects, boolean isClanCampaign,
+          LocalDate today) {
+        final Skill skill = getSkill(skillName);
+
+        int adjustedReputation = getAdjustedReputation(isUseAgingEffects, isClanCampaign, today, rankLevel);
+
+        return (skill == null) ? 0 : skill.getExperienceLevel(options, atowAttributes, adjustedReputation);
+    }
+
+    /**
+     * Returns the experience level for the specified skill, or {@code -1} if the skill is not present.
+     *
+     * <p>If the entity has the specified skill, this method retrieves the skill and returns its experience level,
+     * potentially taking into account any configured options or attribute modifiers. Otherwise, it returns {@code -1}
+     * to indicate that the skill is not available.</p>
+     *
+     * @param skillName the name of the skill to query
+     *
+     * @return the experience level of the skill, or {@code -1} if the skill is not found
      */
     public int getSkillLevelOrNegative(final String skillName) {
         if (hasSkill(skillName)) {
-            return getSkill(skillName).getExperienceLevel();
+            return getSkill(skillName).getExperienceLevel(options, atowAttributes);
         } else {
             return -1;
         }
@@ -3698,12 +4224,44 @@ public class Person {
         skills.addSkill(skillName, new Skill(skillName, level, bonus));
     }
 
+    public void addSkill(final String skillName, final int level, final int bonus, final int ageModifier) {
+        skills.addSkill(skillName, new Skill(skillName, level, bonus, ageModifier));
+    }
+
     public void removeSkill(final String skillName) {
         skills.removeSkill(skillName);
     }
 
+    /**
+     * @return the the number of skills learned by the character.
+     */
     public int getSkillNumber() {
         return skills.size();
+    }
+
+    /**
+     * Returns a list of skill names that the current object possesses, filtered by the specified skill subtypes.
+     *
+     * <p>For each skill subtype provided, this method collects all skill names associated
+     * with those subtypes, then adds to the result only those skills that the object is known to have (i.e., those for
+     * which {@code hasSkill(skillName)} returns true).</p>
+     *
+     * @param skillSubTypes the list of {@link SkillSubType} to use for filtering skills
+     *
+     * @return a {@link List} of skill names that are both of the specified subtypes and known to the object
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public List<String> getKnownSkillsBySkillSubType(List<SkillSubType> skillSubTypes) {
+        List<String> knownSkills = new ArrayList<>();
+        for (String skillName : getSkillsBySkillSubType(skillSubTypes)) {
+            if (hasSkill(skillName)) {
+                knownSkills.add(skillName);
+            }
+        }
+
+        return knownSkills;
     }
 
     /**
@@ -3733,8 +4291,46 @@ public class Person {
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
-    public int getCostToImprove(final String skillName) {
-        return hasSkill(skillName) ? getSkill(skillName).getCostToImprove() : -1;
+    /**
+     * Calculates the cost to improve a specific skill, with an optional reasoning multiplier.
+     *
+     * <p>If the skill exists, the cost is based on its current level's improvement cost.</p>
+     *
+     * <p>If the skill does not exist, the method calculates the cost using the default cost for the skill type at
+     * level 0.</p>
+     *
+     * @param skillName    the name of the skill for which to calculate the improvement cost.
+     * @param useReasoning a boolean indicating whether to apply {@link Reasoning} cost multipliers.
+     *
+     * @return the cost to improve the skill, adjusted by the reasoning multiplier if applicable, or the cost for level
+     *       0 if the specified skill does not currently exist.
+     */
+    public int getCostToImprove(final String skillName, final boolean useReasoning) {
+        final Skill skill = getSkill(skillName);
+        final SkillType skillType = getType(skillName);
+        int cost = hasSkill(skillName) ? skill.getCostToImprove() : skillType.getCost(0);
+
+        double multiplier = getReasoningXpCostMultiplier(useReasoning);
+
+        if (options.booleanOption(FLAW_SLOW_LEARNER)) {
+            multiplier += 0.2;
+        }
+
+        if (options.booleanOption(ATOW_FAST_LEARNER)) {
+            multiplier -= 0.2;
+        }
+
+        if (skillType.isAffectedByGremlinsOrTechEmpathy()) {
+            if (options.booleanOption(FLAW_GREMLINS)) {
+                multiplier += 0.1;
+            }
+
+            if (options.booleanOption(ATOW_TECH_EMPATHY)) {
+                multiplier -= 0.1;
+            }
+        }
+
+        return (int) round(cost * multiplier);
     }
     // endregion skill
 
@@ -3770,18 +4366,15 @@ public class Person {
 
     /**
      * @return <code>true</code> if the location (or any of its parent locations)
-     *         has an injury
-     *         which implies that the location (most likely a limb) is severed. By
-     *         checking parents we
-     *         can tell that they should be missing from the parent being severed,
-     *         like a hand is missing if
-     *         the corresponding arms is.
+     *       has an injury which implies that the location (most likely a limb) is severed. By checking parents we can
+     *       tell that they should be missing from the parent being severed, like a hand is missing if the corresponding
+     *       arms is.
      */
     public boolean isLocationMissing(final @Nullable BodyLocation location) {
-        return (location != null)
-                && (getInjuriesByLocation(location).stream()
-                        .anyMatch(injury -> injury.getType().impliesMissingLocation())
-                        || isLocationMissing(location.Parent()));
+        return (location != null) &&
+                     (getInjuriesByLocation(location).stream()
+                            .anyMatch(injury -> injury.getType().impliesMissingLocation()) ||
+                            isLocationMissing(location.Parent()));
     }
 
     public void heal() {
@@ -3795,10 +4388,15 @@ public class Person {
         return ((hits > 0) || needsAMFixing()) && getStatus().isActive();
     }
 
+    /**
+     * @deprecated No longer in use
+     */
+    @Deprecated(since = "0.50.06", forRemoval = true)
     public String succeed() {
         heal();
-        return " <font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor()
-                + "'><b>Successfully healed one hit.</b></font>";
+        return " <font color='" +
+                     ReportingUtilities.getPositiveColor() +
+                     "'><b>Successfully healed one hit.</b></font>";
     }
 
     // region Personnel Options
@@ -3816,14 +4414,14 @@ public class Person {
     public int countOptions(final String groupKey) {
         int count = 0;
 
-        for (final Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements();) {
+        for (final Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements(); ) {
             final IOptionGroup group = i.nextElement();
 
             if (!group.getKey().equalsIgnoreCase(groupKey)) {
                 continue;
             }
 
-            for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
+            for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements(); ) {
                 final IOption option = j.nextElement();
 
                 if (option.booleanValue()) {
@@ -3836,8 +4434,7 @@ public class Person {
     }
 
     /**
-     * Returns a string of all the option "codes" for this pilot, for a given group,
-     * using sep as the separator
+     * Returns a string of all the option "codes" for this pilot, for a given group, using sep as the separator
      */
     public String getOptionList(@Nullable String sep, final String groupKey) {
         final StringBuilder adv = new StringBuilder();
@@ -3846,13 +4443,13 @@ public class Person {
             sep = "";
         }
 
-        for (final Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements();) {
+        for (final Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements(); ) {
             final IOptionGroup group = i.nextElement();
             if (!group.getKey().equalsIgnoreCase(groupKey)) {
                 continue;
             }
 
-            for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
+            for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements(); ) {
                 final IOption option = j.nextElement();
 
                 if (option.booleanValue()) {
@@ -3862,7 +4459,7 @@ public class Person {
 
                     adv.append(option.getName());
                     if (IntStream.of(IOption.STRING, IOption.CHOICE, IOption.INTEGER)
-                            .anyMatch(k -> (option.getType() == k))) {
+                              .anyMatch(k -> (option.getType() == k))) {
                         adv.append(' ').append(option.stringValue());
                     }
                 }
@@ -3873,12 +4470,11 @@ public class Person {
     }
 
     /**
-     * @return an html-coded list that says what abilities are enabled for this
-     *         pilot
+     * @return an html-coded list that says what abilities are enabled for this pilot
      */
     public @Nullable String getAbilityListAsString(final String type) {
         final StringBuilder abilityString = new StringBuilder();
-        for (Enumeration<IOption> i = getOptions(type); i.hasMoreElements();) {
+        for (Enumeration<IOption> i = getOptions(type); i.hasMoreElements(); ) {
             final IOption ability = i.nextElement();
             if (ability.booleanValue()) {
                 abilityString.append(Utilities.getOptionDisplayName(ability)).append("<br>");
@@ -3890,12 +4486,33 @@ public class Person {
     // endregion Personnel Options
 
     // region edge
+
+    /**
+     * Retrieves the edge value for the current person.
+     *
+     * <p><b>Usage:</b> This method gets the character's raw Edge score. Generally you likely want to use
+     * {@link #getAdjustedEdge()} instead, as that includes adjustments for the character's {@code unlucky} trait.</p>
+     *
+     * @return The edge value defined in the person's options.
+     */
     public int getEdge() {
         return getOptions().intOption(OptionsConstants.EDGE);
     }
 
+    /**
+     * Retrieves the adjusted edge value for the current person.
+     *
+     * <p>The adjusted Edge value is calculated by subtracting the person's level of bad luck (unlucky)
+     * from their base Edge value.</p>
+     *
+     * @return The adjusted edge value after accounting for the person's level of bad luck.
+     */
+    public int getAdjustedEdge() {
+        return getOptions().intOption(OptionsConstants.EDGE) - unlucky;
+    }
+
     public void setEdge(final int edge) {
-        for (Enumeration<IOption> i = getOptions(PersonnelOptions.EDGE_ADVANTAGES); i.hasMoreElements();) {
+        for (Enumeration<IOption> i = getOptions(PersonnelOptions.EDGE_ADVANTAGES); i.hasMoreElements(); ) {
             IOption ability = i.nextElement();
             if (OptionsConstants.EDGE.equals(ability.getName())) {
                 ability.setValue(edge);
@@ -3908,19 +4525,16 @@ public class Person {
     }
 
     /**
-     * Resets support personnel edge points to the purchased level. Used for weekly
-     * refresh.
+     * Resets edge points to the purchased level. Used for weekly refresh.
      */
     public void resetCurrentEdge() {
-        setCurrentEdge(getEdge());
+        setCurrentEdge(getAdjustedEdge());
     }
 
     /**
-     * Sets support personnel edge points to the value 'currentEdge'. Used for
-     * weekly refresh.
+     * Sets edge points to the value 'currentEdge'. Used for weekly refresh.
      *
-     * @param currentEdge - integer used to track this person's edge points
-     *                    available for the current week
+     * @param currentEdge - integer used to track this person's edge points available for the current week
      */
     public void setCurrentEdge(final int currentEdge) {
         this.currentEdge = currentEdge;
@@ -3931,8 +4545,7 @@ public class Person {
     }
 
     /**
-     * @return this person's currently available edge points. Used for weekly
-     *         refresh.
+     * @return this person's currently available edge points. Used for weekly refresh.
      */
     public int getCurrentEdge() {
         return currentEdge;
@@ -3950,7 +4563,7 @@ public class Person {
      * This will set a specific edge trigger, regardless of the current status
      */
     public void setEdgeTrigger(final String name, final boolean status) {
-        for (Enumeration<IOption> i = getOptions(PersonnelOptions.EDGE_ADVANTAGES); i.hasMoreElements();) {
+        for (Enumeration<IOption> i = getOptions(PersonnelOptions.EDGE_ADVANTAGES); i.hasMoreElements(); ) {
             final IOption ability = i.nextElement();
             if (ability.getName().equals(name)) {
                 ability.setValue(status);
@@ -3965,7 +4578,7 @@ public class Person {
      * @param name of the trigger condition
      */
     public void changeEdgeTrigger(final String name) {
-        for (Enumeration<IOption> i = getOptions(PersonnelOptions.EDGE_ADVANTAGES); i.hasMoreElements();) {
+        for (Enumeration<IOption> i = getOptions(PersonnelOptions.EDGE_ADVANTAGES); i.hasMoreElements(); ) {
             final IOption ability = i.nextElement();
             if (ability.getName().equals(name)) {
                 ability.setValue(!ability.booleanValue());
@@ -3979,7 +4592,7 @@ public class Person {
      */
     public String getEdgeTooltip() {
         final StringBuilder stringBuilder = new StringBuilder();
-        for (Enumeration<IOption> i = getOptions(PersonnelOptions.EDGE_ADVANTAGES); i.hasMoreElements();) {
+        for (Enumeration<IOption> i = getOptions(PersonnelOptions.EDGE_ADVANTAGES); i.hasMoreElements(); ) {
             final IOption ability = i.nextElement();
             // yuck, it would be nice to have a more fool-proof way of identifying edge
             // triggers
@@ -3992,93 +4605,230 @@ public class Person {
     }
     // endregion edge
 
+    /**
+     * Determines whether the user possesses the necessary skills to operate the given entity.
+     *
+     * <p>The required skills are based on the type of the provided entity. The method checks for specific piloting or
+     * gunnery skills relevant to the entity type, such as Mechs, VTOLs, tanks, aerospace units, battle armor, and
+     * others.</p>
+     *
+     * <p>If the appropriate skill(s) for the entity type are present, the method returns {@code true}; otherwise, it
+     * returns {@code false}.</p>
+     *
+     * @param entity the entity to be checked for driving capability
+     *
+     * @return {@code true} if the required skill(s) to drive or operate the given entity are present; {@code false}
+     *       otherwise
+     */
     public boolean canDrive(final Entity entity) {
         if (entity instanceof LandAirMek) {
-            return hasSkill(SkillType.S_PILOT_MEK) && hasSkill(SkillType.S_PILOT_AERO);
+            return hasSkill(S_PILOT_MEK) && hasSkill(S_PILOT_AERO);
         } else if (entity instanceof Mek) {
-            return hasSkill(SkillType.S_PILOT_MEK);
+            return hasSkill(S_PILOT_MEK);
         } else if (entity instanceof VTOL) {
-            return hasSkill(SkillType.S_PILOT_VTOL);
+            return hasSkill(S_PILOT_VTOL);
         } else if (entity instanceof Tank) {
-            return hasSkill(entity.getMovementMode().isMarine() ? SkillType.S_PILOT_NVEE : SkillType.S_PILOT_GVEE);
+            return hasSkill(entity.getMovementMode().isMarine() ? S_PILOT_NVEE : S_PILOT_GVEE);
         } else if (entity instanceof ConvFighter) {
-            return hasSkill(SkillType.S_PILOT_JET) || hasSkill(SkillType.S_PILOT_AERO);
+            return hasSkill(S_PILOT_JET) || hasSkill(S_PILOT_AERO);
         } else if ((entity instanceof SmallCraft) || (entity instanceof Jumpship)) {
-            return hasSkill(SkillType.S_PILOT_SPACE);
+            return hasSkill(S_PILOT_SPACE);
         } else if (entity instanceof Aero) {
-            return hasSkill(SkillType.S_PILOT_AERO);
+            return hasSkill(S_PILOT_AERO);
         } else if (entity instanceof BattleArmor) {
-            return hasSkill(SkillType.S_GUN_BA);
+            return hasSkill(S_GUN_BA);
         } else if (entity instanceof Infantry) {
-            return hasSkill(SkillType.S_SMALL_ARMS);
+            return hasSkill(S_SMALL_ARMS);
         } else if (entity instanceof ProtoMek) {
-            return hasSkill(SkillType.S_GUN_PROTO);
-        } else {
-            return false;
-        }
-    }
-
-    public boolean canGun(final Entity entity) {
-        if (entity instanceof LandAirMek) {
-            return hasSkill(SkillType.S_GUN_MEK) && hasSkill(SkillType.S_GUN_AERO);
-        } else if (entity instanceof Mek) {
-            return hasSkill(SkillType.S_GUN_MEK);
-        } else if (entity instanceof Tank) {
-            return hasSkill(SkillType.S_GUN_VEE);
-        } else if (entity instanceof ConvFighter) {
-            return hasSkill(SkillType.S_GUN_JET) || hasSkill(SkillType.S_GUN_AERO);
-        } else if ((entity instanceof SmallCraft) || (entity instanceof Jumpship)) {
-            return hasSkill(SkillType.S_GUN_SPACE);
-        } else if (entity instanceof Aero) {
-            return hasSkill(SkillType.S_GUN_AERO);
-        } else if (entity instanceof BattleArmor) {
-            return hasSkill(SkillType.S_GUN_BA);
-        } else if (entity instanceof Infantry) {
-            return hasSkill(SkillType.S_SMALL_ARMS);
-        } else if (entity instanceof ProtoMek) {
-            return hasSkill(SkillType.S_GUN_PROTO);
-        } else {
-            return false;
-        }
-    }
-
-    public boolean canTech(final Entity entity) {
-        if (entity == null) {
-            return false;
-        }
-        if ((entity instanceof Mek) || (entity instanceof ProtoMek)) {
-            return hasSkill(SkillType.S_TECH_MEK);
-        } else if (entity instanceof Dropship || entity instanceof Jumpship) {
-            return hasSkill(SkillType.S_TECH_VESSEL);
-        } else if (entity instanceof Aero) {
-            return hasSkill(SkillType.S_TECH_AERO);
-        } else if (entity instanceof BattleArmor) {
-            return hasSkill(SkillType.S_TECH_BA);
-        } else if (entity instanceof Tank) {
-            return hasSkill(SkillType.S_TECH_MECHANIC);
+            return hasSkill(S_GUN_PROTO);
         } else {
             return false;
         }
     }
 
     /**
-     * @return the person's current daily available tech time. This does NOT account
-     *         for any expended
-     *         time.
+     * Determines whether the user possesses the necessary skills to operate weapons for the given entity.
+     *
+     * <p>The required gunnery skill is dependent on the type of entity provided. This method checks for the relevant
+     * gunnery or weapon skill associated with the entity type, such as Mechs, tanks, aerospace units, battle armor,
+     * infantry, and others.</p>
+     *
+     * <p>Returns {@code true} if the necessary skill(s) to use the entity's weapons are present; {@code false}
+     * otherwise.</p>
+     *
+     * @param entity the entity to check for gunnery capability
+     *
+     * @return {@code true} if the user is qualified to operate weapons for the given entity; {@code false} otherwise
      */
-    public int getDailyAvailableTechTime() {
-        return (getPrimaryRole().isTech() ? PRIMARY_ROLE_SUPPORT_TIME : SECONDARY_ROLE_SUPPORT_TIME)
-                - getMaintenanceTimeUsing();
+    public boolean canGun(final Entity entity) {
+        if (entity instanceof LandAirMek) {
+            return hasSkill(S_GUN_MEK) && hasSkill(S_GUN_AERO);
+        } else if (entity instanceof Mek) {
+            return hasSkill(S_GUN_MEK);
+        } else if (entity instanceof Tank) {
+            return hasSkill(S_GUN_VEE);
+        } else if (entity instanceof ConvFighter) {
+            return hasSkill(S_GUN_JET) || hasSkill(S_GUN_AERO);
+        } else if ((entity instanceof SmallCraft) || (entity instanceof Jumpship)) {
+            return hasSkill(S_GUN_SPACE);
+        } else if (entity instanceof Aero) {
+            return hasSkill(S_GUN_AERO);
+        } else if (entity instanceof BattleArmor) {
+            return hasSkill(S_GUN_BA);
+        } else if (entity instanceof Infantry) {
+            return hasSkill(S_SMALL_ARMS);
+        } else if (entity instanceof ProtoMek) {
+            return hasSkill(S_GUN_PROTO);
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Determines whether the user possesses the necessary technical skills to service or repair the given entity.
+     *
+     * <p>The required technical skill depends on the entity type. This method checks for the appropriate technical
+     * skill based on whether the entity is a type of Mek, vessel, aerospace unit, battle armor, tank, or other
+     * supported classes.</p>
+     *
+     * <p>Returns {@code true} if the user has the qualifying technical skill for the entity; {@code false} otherwise
+     * .</p>
+     *
+     * @param entity the entity to check for technical capability
+     *
+     * @return {@code true} if the user is qualified to service or repair the given entity; {@code false} otherwise
+     */
+    public boolean canTech(final Entity entity) {
+        if (entity == null) {
+            return false;
+        }
+        if ((entity instanceof Mek) || (entity instanceof ProtoMek)) {
+            return hasSkill(S_TECH_MEK);
+        } else if (entity instanceof Dropship || entity instanceof Jumpship) {
+            return hasSkill(S_TECH_VESSEL);
+        } else if (entity instanceof Aero) {
+            return hasSkill(S_TECH_AERO);
+        } else if (entity instanceof BattleArmor) {
+            return hasSkill(S_TECH_BA);
+        } else if (entity instanceof Tank) {
+            return hasSkill(S_TECH_MECHANIC);
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Calculates and retrieves the current daily available tech time for the person.
+     *
+     * <p>This calculation does not account for any expended time but incorporates potential administrative
+     * adjustments if specified.</p>
+     *
+     * <p>The calculation follows these rules:</p>
+     * <ul>
+     *   <li>If the person's primary role is a technician, the base support time is determined from the primary
+     *   role.</li>
+     *   <li>Otherwise, the base support time is taken from the secondary role.</li>
+     * </ul>
+     *
+     * <p>If administrative adjustments are enabled (via the {@code isTechsUseAdministration} parameter),
+     * the support time is multiplied by an administrative adjustment multiplier.</p>
+     *
+     * @param isTechsUseAdministration A boolean flag indicating whether administrative adjustments should be applied in
+     *                                 the calculation.
+     *
+     * @return The adjusted daily available tech time for the person, after factoring in the appropriate role support
+     *       time, applying the administrative multiplier (if enabled), and deducting maintenance time.
+     */
+    public int getDailyAvailableTechTime(final boolean isTechsUseAdministration) {
+        int baseTime = (getPrimaryRole().isTech() ? PRIMARY_ROLE_SUPPORT_TIME : SECONDARY_ROLE_SUPPORT_TIME);
+
+        return (int) round(baseTime * calculateTechTimeMultiplier(isTechsUseAdministration));
     }
 
     public int getMaintenanceTimeUsing() {
         return getTechUnits().stream()
-            .filter(unit -> !(unit.isRefitting() && unit.getRefit().getTech() == this))
-            .mapToInt(Unit::getMaintenanceTime).sum();
+                     .filter(unit -> !(unit.isRefitting() && unit.getRefit().getTech() == this))
+                     .mapToInt(Unit::getMaintenanceTime)
+                     .sum();
     }
 
     public boolean isMothballing() {
         return isTech() && techUnits.stream().anyMatch(Unit::isMothballing);
+    }
+
+    /**
+     * Determines whether this {@code Person} is considered "busy" based on their current status, unit assignment, and
+     * associated tasks.
+     *
+     * <p>This method checks:</p>
+     * <ol>
+     *     <li>If the personnel is active (i.e., has an active {@link PersonnelStatus}).</li>
+     *     <li>Special cases for units that are self-crewed, including activities such as
+     *         mothballing, refitting, or undergoing repairs, during which crew members are
+     *         considered busy.</li>
+     *     <li>If the personnel is a technician, by reviewing their current tech assignments,
+     *         such as units being mothballed, refitted, or repaired.</li>
+     *     <li>If the personnel has a unit assignment and whether that unit is currently deployed.</li>
+     * </ol>
+     *
+     * @return {@code true} if the person is deemed busy due to one of the above conditions; {@code false} otherwise.
+     */
+    public boolean isBusy() {
+        // Personnel status
+        if (!status.isActive()) {
+            return false;
+        }
+
+        final boolean hasUnitAssignment = unit != null;
+        final Entity entity = hasUnitAssignment ? unit.getEntity() : null;
+        final boolean isSpecialCase = entity != null && unit.isSelfCrewed();
+
+        // Special case handlers (self crewed units have their tech teams formed as a composite of their crew, so all
+        // crew are considered to be busy during these states)
+        if (isSpecialCase) {
+            if (unit.isMothballing()) {
+                return true;
+            }
+
+            if (unit.isRefitting()) {
+                return true;
+            }
+
+            if (unit.isUnderRepair()) {
+                return true;
+            }
+        }
+
+        // Tech assignments
+        if (isTech()) {
+            for (Unit unit : techUnits) {
+                Refit refit = unit.getRefit();
+                boolean isActiveTech = refit != null && Objects.equals(refit.getTech(), this);
+
+                if (unit.isMothballing() && isActiveTech) {
+                    return true;
+                }
+
+                if (unit.isRefitting() && isActiveTech) {
+                    return true;
+                }
+
+                if (unit.isUnderRepair()) {
+                    for (Part part : unit.getParts()) {
+                        if (Objects.equals(part.getTech(), this)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Unit assignments
+        if (hasUnitAssignment) {
+            return unit.isDeployed();
+        }
+
+        return false;
     }
 
     public @Nullable Unit getUnit() {
@@ -4122,7 +4872,7 @@ public class Person {
 
         for (final Part part : campaign.getWarehouse().getParts()) {
             if (equals(part.getTech())) {
-                part.cancelAssignment();
+                part.cancelAssignment(true);
             }
         }
 
@@ -4141,17 +4891,16 @@ public class Person {
         this.minutesLeft = minutesLeft;
         if (engineer && (getUnit() != null)) {
             // set minutes for all crew members, except the engineer to not cause infinite recursion.
-            getUnit().getActiveCrew()
-                .stream()
-                .filter(this::isNotSelf)
-                .forEach(p -> p.setMinutesLeft(minutesLeft));
+            getUnit().getActiveCrew().stream().filter(this::isNotSelf).forEach(p -> p.setMinutesLeft(minutesLeft));
         }
     }
 
     /**
      * Checks if the other person is not the same person as this person, easy right?
+     *
      * @param p Person to check against
-     * @return  true if the person is not the same person as this person
+     *
+     * @return true if the person is not the same person as this person
      */
     private boolean isNotSelf(Person p) {
         return !this.equals(p);
@@ -4164,40 +4913,92 @@ public class Person {
     public void setOvertimeLeft(final int overtimeLeft) {
         this.overtimeLeft = overtimeLeft;
         if (engineer && (getUnit() != null)) {
-            getUnit().getActiveCrew()
-                .stream()
-                .filter(this::isNotSelf)
-                .forEach(p -> p.setOvertimeLeft(overtimeLeft));
+            getUnit().getActiveCrew().stream().filter(this::isNotSelf).forEach(p -> p.setOvertimeLeft(overtimeLeft));
         }
     }
 
-    public void resetMinutesLeft() {
-        if (getPrimaryRole().isTech() || getPrimaryRole().isDoctor()) {
+    /**
+     * Resets the number of minutes and overtime minutes a person has left for tasks, based on their primary or
+     * secondary role. Administrative adjustments may be applied for technicians if specified.
+     *
+     * <p>This method calculates and assigns task and overtime time values depending on whether
+     * the person is identified as a technician or doctor, and whether their role is primary or secondary. If
+     * administrative adjustments are enabled (via the {@code isTechsUseAdministration} parameter), a multiplier is
+     * applied to calculate the adjusted task time for technicians.</p>
+     *
+     * <ul>
+     *   <li>If the primary role is a doctor, the base support time values for the primary role
+     *       are assigned without any adjustments.</li>
+     *   <li>If the secondary role is a doctor, the base support time values for the secondary role
+     *       are assigned without any adjustments.</li>
+     *   <li>If the primary role is a technician and administrative adjustments are enabled, the primary
+     *       role's support time is multiplied by the administrative adjustment multiplier and assigned.</li>
+     *   <li>If the secondary role is a technician (secondary-specific), and administrative adjustments
+     *       are enabled, the secondary role's support time is multiplied by the adjustment multiplier and assigned.</li>
+     *   <li>If administrative adjustments are not enabled for technicians, base (non-adjusted) time values
+     *       are used for both primary and secondary roles.</li>
+     * </ul>
+     *
+     * <p>If the person has both primary and secondary roles applicable (e.g., a doctor as the primary
+     * and a technician as the secondary), the logic prioritizes the roles as listed above, with primary roles
+     * taking precedence.</p>
+     *
+     * @param isTechsUseAdministration Indicates whether administrative adjustments should be applied to the time
+     *                                 calculations for technicians.
+     */
+    public void resetMinutesLeft(boolean isTechsUseAdministration) {
+        // Doctors and Technicians without adjustments
+        if (primaryRole.isDoctor() || (primaryRole.isTech() && !isTechsUseAdministration)) {
             this.minutesLeft = PRIMARY_ROLE_SUPPORT_TIME;
             this.overtimeLeft = PRIMARY_ROLE_OVERTIME_SUPPORT_TIME;
-        } else if (getSecondaryRole().isTechSecondary() || getSecondaryRole().isDoctor()) {
+        } else if (secondaryRole.isDoctor() || (secondaryRole.isTech() && !isTechsUseAdministration)) {
             this.minutesLeft = SECONDARY_ROLE_SUPPORT_TIME;
             this.overtimeLeft = SECONDARY_ROLE_OVERTIME_SUPPORT_TIME;
         }
+
+        // Technicians with adjustments
+        if (primaryRole.isTech()) {
+            double techTimeMultiplier = calculateTechTimeMultiplier(isTechsUseAdministration);
+
+            this.minutesLeft = (int) round(PRIMARY_ROLE_SUPPORT_TIME * techTimeMultiplier);
+            this.overtimeLeft = (int) round(PRIMARY_ROLE_OVERTIME_SUPPORT_TIME * techTimeMultiplier);
+        } else if (secondaryRole.isTechSecondary()) {
+            double techTimeMultiplier = calculateTechTimeMultiplier(isTechsUseAdministration);
+
+            this.minutesLeft = (int) round(SECONDARY_ROLE_SUPPORT_TIME * techTimeMultiplier);
+            this.overtimeLeft = (int) round(SECONDARY_ROLE_OVERTIME_SUPPORT_TIME * techTimeMultiplier);
+        }
     }
 
-    public Skill getBestTechSkill() {
+    /**
+     * Determines and returns the tech skill with the highest experience level possessed by this entity.
+     *
+     * <p>This method evaluates all available technical skills (such as Mek, Aero, Mechanic, and Battle Armor tech
+     * skills) and selects the one with the greatest experience level. If multiple skills are present, the one with the
+     * highest experience is returned. If no relevant tech skills are found, returns {@code null}.</p>
+     *
+     * @return the {@link Skill} object representing the highest-level technical skill, or {@code null} if none are
+     *       present
+     */
+    public @Nullable Skill getBestTechSkill() {
         Skill skill = null;
-        int lvl = SkillType.EXP_NONE;
-        if (hasSkill(SkillType.S_TECH_MEK) && getSkill(SkillType.S_TECH_MEK).getExperienceLevel() > lvl) {
-            skill = getSkill(SkillType.S_TECH_MEK);
-            lvl = getSkill(SkillType.S_TECH_MEK).getExperienceLevel();
+        int level = EXP_NONE;
+
+        if (hasSkill(S_TECH_MEK) && getSkill(S_TECH_MEK).getExperienceLevel(options, atowAttributes) > level) {
+            skill = getSkill(S_TECH_MEK);
+            level = getSkill(S_TECH_MEK).getExperienceLevel(options, atowAttributes);
         }
-        if (hasSkill(SkillType.S_TECH_AERO) && getSkill(SkillType.S_TECH_AERO).getExperienceLevel() > lvl) {
-            skill = getSkill(SkillType.S_TECH_AERO);
-            lvl = getSkill(SkillType.S_TECH_AERO).getExperienceLevel();
+        if (hasSkill(S_TECH_AERO) && getSkill(S_TECH_AERO).getExperienceLevel(options, atowAttributes) > level) {
+            skill = getSkill(S_TECH_AERO);
+            level = getSkill(S_TECH_AERO).getExperienceLevel(options, atowAttributes);
         }
-        if (hasSkill(SkillType.S_TECH_MECHANIC) && getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() > lvl) {
-            skill = getSkill(SkillType.S_TECH_MECHANIC);
-            lvl = getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel();
+        if (hasSkill(S_TECH_MECHANIC) &&
+                  getSkill(S_TECH_MECHANIC).getExperienceLevel(options, atowAttributes) > level) {
+            skill = getSkill(S_TECH_MECHANIC);
+            level = getSkill(S_TECH_MECHANIC).getExperienceLevel(options, atowAttributes);
         }
-        if (hasSkill(SkillType.S_TECH_BA) && getSkill(SkillType.S_TECH_BA).getExperienceLevel() > lvl) {
-            skill = getSkill(SkillType.S_TECH_BA);
+        if (hasSkill(S_TECH_BA) && getSkill(S_TECH_BA).getExperienceLevel(options, atowAttributes) > level) {
+            skill = getSkill(S_TECH_BA);
         }
         return skill;
     }
@@ -4208,6 +5009,7 @@ public class Person {
 
     /**
      * Checks if the person is a tech, includes mektek, mechanic, aerotek, BAtek and the non-cannon "large vessel tek"
+     *
      * @return true if the person is a tech
      */
     public boolean isTechExpanded() {
@@ -4215,28 +5017,72 @@ public class Person {
     }
 
     public boolean isTechLargeVessel() {
-        boolean hasSkill = hasSkill(SkillType.S_TECH_VESSEL);
+        boolean hasSkill = hasSkill(S_TECH_VESSEL);
         return hasSkill && (getPrimaryRole().isVesselCrew() || getSecondaryRole().isVesselCrew());
     }
 
     public boolean isTechMek() {
-        boolean hasSkill = hasSkill(SkillType.S_TECH_MEK);
+        boolean hasSkill = hasSkill(S_TECH_MEK);
         return hasSkill && (getPrimaryRole().isMekTech() || getSecondaryRole().isMekTech());
     }
 
     public boolean isTechAero() {
-        boolean hasSkill = hasSkill(SkillType.S_TECH_AERO);
+        boolean hasSkill = hasSkill(S_TECH_AERO);
         return hasSkill && (getPrimaryRole().isAeroTek() || getSecondaryRole().isAeroTek());
     }
 
     public boolean isTechMechanic() {
-        boolean hasSkill = hasSkill(SkillType.S_TECH_MECHANIC);
+        boolean hasSkill = hasSkill(S_TECH_MECHANIC);
         return hasSkill && (getPrimaryRole().isMechanic() || getSecondaryRole().isMechanic());
     }
 
     public boolean isTechBA() {
-        boolean hasSkill = hasSkill(SkillType.S_TECH_BA);
+        boolean hasSkill = hasSkill(S_TECH_BA);
         return hasSkill && (getPrimaryRole().isBATech() || getSecondaryRole().isBATech());
+    }
+
+    /**
+     * Calculates the tech availability time multiplier for tasks based on the technician's experience level and
+     * administration skill.
+     *
+     * <p>The method considers whether administration skills should be applied to improve efficiency. If
+     * administration is enabled, the multiplier is adjusted based on the technician's baseline experience level and
+     * their administration skill level.</p>
+     *
+     * @param isTechsUseAdministration {@code true} if administration skills are considered for task calculation;
+     *                                 {@code false} otherwise.
+     *
+     * @return the calculated time multiplier, where:
+     *       <ul>
+     *         <li>0.0 indicates the person is not a technician.</li>
+     *         <li>1.0 indicates no adjustment is applied.</li>
+     *         <li>Values greater or less than 1.0 adjust task times accordingly.</li>
+     *       </ul>
+     */
+    public double calculateTechTimeMultiplier(boolean isTechsUseAdministration) {
+        final double TECH_ADMINISTRATION_MULTIPLIER = 0.05;
+        final int REGULAR_EXPERIENCE_LEVEL = REGULAR.getExperienceLevel();
+
+        if (!isTechExpanded()) {
+            return 0;
+        }
+
+        if (!isTechsUseAdministration) {
+            return 1.0;
+        }
+
+        double administrationMultiplier = 1.0 - (TECH_ADMINISTRATION_MULTIPLIER * REGULAR_EXPERIENCE_LEVEL);
+
+        Skill administration = skills.getSkill(SkillType.S_ADMIN);
+        int experienceLevel = SkillLevel.NONE.getExperienceLevel();
+
+        if (administration != null) {
+            experienceLevel = administration.getExperienceLevel(options, atowAttributes);
+        }
+
+        administrationMultiplier += experienceLevel * TECH_ADMINISTRATION_MULTIPLIER;
+
+        return administrationMultiplier;
     }
 
     public boolean isAdministrator() {
@@ -4244,7 +5090,47 @@ public class Person {
     }
 
     public boolean isDoctor() {
-        return hasSkill(SkillType.S_DOCTOR) && (getPrimaryRole().isDoctor() || getSecondaryRole().isDoctor());
+        return hasSkill(SkillType.S_SURGERY) && (getPrimaryRole().isDoctor() || getSecondaryRole().isDoctor());
+    }
+
+    /**
+     * Calculates the medical capacity of a doctor based on their administrative skills, and the base number of hospital
+     * beds they are responsible for. If the entity represented is not a doctor, the capacity is returned as 0.
+     *
+     * @param doctorsUseAdministration A flag indicating whether the doctor's administrative skills should be considered
+     *                                 in the calculation. If {@code true}, administrative skills are included in the
+     *                                 performance multiplier adjustment. If {@code false}, {@code baseBedCount} is
+     *                                 returned, instead.
+     * @param baseBedCount             The base number of hospital beds assigned to the doctor. This value is adjusted
+     *                                 by the calculated multiplier to determine the doctor's effective capacity.
+     *
+     * @return The calculated medical capacity of the doctor, as an {@link Integer} representing their ability to
+     *       effectively manage hospital beds. If the entity is not a doctor, returns {@code 0}.
+     */
+    public int getDoctorMedicalCapacity(final boolean doctorsUseAdministration, final int baseBedCount) {
+        final double DOCTOR_ADMINISTRATION_MULTIPLIER = 0.2;
+        final int REGULAR_EXPERIENCE_LEVEL = REGULAR.getExperienceLevel();
+
+        if (!isDoctor()) {
+            return 0;
+        }
+
+        if (!doctorsUseAdministration) {
+            return baseBedCount;
+        }
+
+        double administrationMultiplier = 1.0 - (DOCTOR_ADMINISTRATION_MULTIPLIER * REGULAR_EXPERIENCE_LEVEL);
+
+        Skill administration = skills.getSkill(SkillType.S_ADMIN);
+        int experienceLevel = SkillLevel.NONE.getExperienceLevel();
+
+        if (administration != null) {
+            experienceLevel = administration.getExperienceLevel(options, atowAttributes);
+        }
+
+        administrationMultiplier += experienceLevel * DOCTOR_ADMINISTRATION_MULTIPLIER;
+
+        return (int) round(baseBedCount * administrationMultiplier);
     }
 
     public boolean isSupport() {
@@ -4263,7 +5149,7 @@ public class Person {
         return (partWork.getTimeLeft() > getMinutesLeft()) && (getOvertimeLeft() > 0);
     }
 
-    public Skill getSkillForWorkingOn(final IPartWork part) {
+    public @Nullable Skill getSkillForWorkingOn(final IPartWork part) {
         final Unit unit = part.getUnit();
         Skill skill = getSkillForWorkingOn(unit);
         if (skill != null) {
@@ -4271,34 +5157,39 @@ public class Person {
         }
         // check spare parts
         // return the best one
-        if (part.isRightTechType(SkillType.S_TECH_MEK) && hasSkill(SkillType.S_TECH_MEK)) {
-            skill = getSkill(SkillType.S_TECH_MEK);
+        if (part.isRightTechType(S_TECH_MEK) && hasSkill(S_TECH_MEK)) {
+            skill = getSkill(S_TECH_MEK);
         }
 
-        if (part.isRightTechType(SkillType.S_TECH_BA) && hasSkill(SkillType.S_TECH_BA)) {
-            if ((skill == null) || (skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_BA).getFinalSkillValue())) {
-                skill = getSkill(SkillType.S_TECH_BA);
+        if (part.isRightTechType(S_TECH_BA) && hasSkill(S_TECH_BA)) {
+            if ((skill == null) ||
+                      (skill.getFinalSkillValue(options, atowAttributes, reputation) >
+                             getSkill(S_TECH_BA).getFinalSkillValue(options, atowAttributes, reputation))) {
+                skill = getSkill(S_TECH_BA);
             }
         }
 
-        if (part.isRightTechType(SkillType.S_TECH_AERO) && hasSkill(SkillType.S_TECH_AERO)) {
-            if ((skill == null)
-                    || (skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_AERO).getFinalSkillValue())) {
-                skill = getSkill(SkillType.S_TECH_AERO);
+        if (part.isRightTechType(S_TECH_AERO) && hasSkill(S_TECH_AERO)) {
+            if ((skill == null) ||
+                      (skill.getFinalSkillValue(options, atowAttributes, reputation) >
+                             getSkill(S_TECH_AERO).getFinalSkillValue(options, atowAttributes, reputation))) {
+                skill = getSkill(S_TECH_AERO);
             }
         }
 
-        if (part.isRightTechType(SkillType.S_TECH_MECHANIC) && hasSkill(SkillType.S_TECH_MECHANIC)) {
-            if ((skill == null)
-                    || (skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_MECHANIC).getFinalSkillValue())) {
-                skill = getSkill(SkillType.S_TECH_MECHANIC);
+        if (part.isRightTechType(S_TECH_MECHANIC) && hasSkill(S_TECH_MECHANIC)) {
+            if ((skill == null) ||
+                      (skill.getFinalSkillValue(options, atowAttributes, reputation) >
+                             getSkill(S_TECH_MECHANIC).getFinalSkillValue(options, atowAttributes, reputation))) {
+                skill = getSkill(S_TECH_MECHANIC);
             }
         }
 
-        if (part.isRightTechType(SkillType.S_TECH_VESSEL) && hasSkill(SkillType.S_TECH_VESSEL)) {
-            if ((skill == null)
-                    || (skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_VESSEL).getFinalSkillValue())) {
-                skill = getSkill(SkillType.S_TECH_VESSEL);
+        if (part.isRightTechType(S_TECH_VESSEL) && hasSkill(S_TECH_VESSEL)) {
+            if ((skill == null) ||
+                      (skill.getFinalSkillValue(options, atowAttributes, reputation) >
+                             getSkill(S_TECH_VESSEL).getFinalSkillValue(options, atowAttributes, reputation))) {
+                skill = getSkill(S_TECH_VESSEL);
             }
         }
 
@@ -4308,27 +5199,31 @@ public class Person {
         // if we are still here then we didn't have the right tech skill, so return the
         // highest
         // of any tech skills that we do have
-        if (hasSkill(SkillType.S_TECH_MEK)) {
-            skill = getSkill(SkillType.S_TECH_MEK);
+        if (hasSkill(S_TECH_MEK)) {
+            skill = getSkill(S_TECH_MEK);
         }
 
-        if (hasSkill(SkillType.S_TECH_BA)) {
-            if ((skill == null) || (skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_BA).getFinalSkillValue())) {
-                skill = getSkill(SkillType.S_TECH_BA);
+        if (hasSkill(S_TECH_BA)) {
+            if ((skill == null) ||
+                      (skill.getFinalSkillValue(options, atowAttributes, reputation) >
+                             getSkill(S_TECH_BA).getFinalSkillValue(options, atowAttributes, reputation))) {
+                skill = getSkill(S_TECH_BA);
             }
         }
 
-        if (hasSkill(SkillType.S_TECH_MECHANIC)) {
-            if ((skill == null)
-                    || (skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_MECHANIC).getFinalSkillValue())) {
-                skill = getSkill(SkillType.S_TECH_MECHANIC);
+        if (hasSkill(S_TECH_MECHANIC)) {
+            if ((skill == null) ||
+                      (skill.getFinalSkillValue(options, atowAttributes, reputation) >
+                             getSkill(S_TECH_MECHANIC).getFinalSkillValue(options, atowAttributes, reputation))) {
+                skill = getSkill(S_TECH_MECHANIC);
             }
         }
 
-        if (hasSkill(SkillType.S_TECH_AERO)) {
-            if ((skill == null)
-                    || (skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_AERO).getFinalSkillValue())) {
-                skill = getSkill(SkillType.S_TECH_AERO);
+        if (hasSkill(S_TECH_AERO)) {
+            if ((skill == null) ||
+                      (skill.getFinalSkillValue(options, atowAttributes, reputation) >
+                             getSkill(S_TECH_AERO).getFinalSkillValue(options, atowAttributes, reputation))) {
+                skill = getSkill(S_TECH_AERO);
             }
         }
 
@@ -4338,19 +5233,21 @@ public class Person {
     public @Nullable Skill getSkillForWorkingOn(final @Nullable Unit unit) {
         if (unit == null) {
             return null;
-        } else if (((unit.getEntity() instanceof Mek) || (unit.getEntity() instanceof ProtoMek))
-                && hasSkill(SkillType.S_TECH_MEK)) {
-            return getSkill(SkillType.S_TECH_MEK);
-        } else if ((unit.getEntity() instanceof BattleArmor) && hasSkill(SkillType.S_TECH_BA)) {
-            return getSkill(SkillType.S_TECH_BA);
-        } else if ((unit.getEntity() instanceof Tank) && hasSkill(SkillType.S_TECH_MECHANIC)) {
-            return getSkill(SkillType.S_TECH_MECHANIC);
-        } else if (((unit.getEntity() instanceof Dropship) || (unit.getEntity() instanceof Jumpship))
-                && hasSkill(SkillType.S_TECH_VESSEL)) {
-            return getSkill(SkillType.S_TECH_VESSEL);
-        } else if ((unit.getEntity() instanceof Aero) && !(unit.getEntity() instanceof Dropship)
-                && !(unit.getEntity() instanceof Jumpship) && hasSkill(SkillType.S_TECH_AERO)) {
-            return getSkill(SkillType.S_TECH_AERO);
+        } else if (((unit.getEntity() instanceof Mek) || (unit.getEntity() instanceof ProtoMek)) &&
+                         hasSkill(S_TECH_MEK)) {
+            return getSkill(S_TECH_MEK);
+        } else if ((unit.getEntity() instanceof BattleArmor) && hasSkill(S_TECH_BA)) {
+            return getSkill(S_TECH_BA);
+        } else if ((unit.getEntity() instanceof Tank) && hasSkill(S_TECH_MECHANIC)) {
+            return getSkill(S_TECH_MECHANIC);
+        } else if (((unit.getEntity() instanceof Dropship) || (unit.getEntity() instanceof Jumpship)) &&
+                         hasSkill(S_TECH_VESSEL)) {
+            return getSkill(S_TECH_VESSEL);
+        } else if ((unit.getEntity() instanceof Aero) &&
+                         !(unit.getEntity() instanceof Dropship) &&
+                         !(unit.getEntity() instanceof Jumpship) &&
+                         hasSkill(S_TECH_AERO)) {
+            return getSkill(S_TECH_AERO);
         } else {
             return null;
         }
@@ -4367,11 +5264,11 @@ public class Person {
     }
 
     public int getBestTechLevel() {
-        int level = SkillType.EXP_NONE;
-        final Skill mekSkill = getSkill(SkillType.S_TECH_MEK);
-        final Skill mechanicSkill = getSkill(SkillType.S_TECH_MECHANIC);
-        final Skill baSkill = getSkill(SkillType.S_TECH_BA);
-        final Skill aeroSkill = getSkill(SkillType.S_TECH_AERO);
+        int level = EXP_NONE;
+        final Skill mekSkill = getSkill(S_TECH_MEK);
+        final Skill mechanicSkill = getSkill(S_TECH_MECHANIC);
+        final Skill baSkill = getSkill(S_TECH_BA);
+        final Skill aeroSkill = getSkill(S_TECH_AERO);
         if ((mekSkill != null) && (mekSkill.getLevel() > level)) {
             level = mekSkill.getLevel();
         }
@@ -4394,21 +5291,21 @@ public class Person {
     public boolean isRightTechTypeFor(final IPartWork part) {
         Unit unit = part.getUnit();
         if (unit == null) {
-            return (hasSkill(SkillType.S_TECH_MEK) && part.isRightTechType(SkillType.S_TECH_MEK))
-                    || (hasSkill(SkillType.S_TECH_AERO) && part.isRightTechType(SkillType.S_TECH_AERO))
-                    || (hasSkill(SkillType.S_TECH_MECHANIC) && part.isRightTechType(SkillType.S_TECH_MECHANIC))
-                    || (hasSkill(SkillType.S_TECH_BA) && part.isRightTechType(SkillType.S_TECH_BA))
-                    || (hasSkill(SkillType.S_TECH_VESSEL) && part.isRightTechType(SkillType.S_TECH_VESSEL));
+            return (hasSkill(S_TECH_MEK) && part.isRightTechType(S_TECH_MEK)) ||
+                         (hasSkill(S_TECH_AERO) && part.isRightTechType(S_TECH_AERO)) ||
+                         (hasSkill(S_TECH_MECHANIC) && part.isRightTechType(S_TECH_MECHANIC)) ||
+                         (hasSkill(S_TECH_BA) && part.isRightTechType(S_TECH_BA)) ||
+                         (hasSkill(S_TECH_VESSEL) && part.isRightTechType(S_TECH_VESSEL));
         } else if ((unit.getEntity() instanceof Mek) || (unit.getEntity() instanceof ProtoMek)) {
-            return hasSkill(SkillType.S_TECH_MEK);
+            return hasSkill(S_TECH_MEK);
         } else if (unit.getEntity() instanceof BattleArmor) {
-            return hasSkill(SkillType.S_TECH_BA);
+            return hasSkill(S_TECH_BA);
         } else if ((unit.getEntity() instanceof Tank) || (unit.getEntity() instanceof Infantry)) {
-            return hasSkill(SkillType.S_TECH_MECHANIC);
+            return hasSkill(S_TECH_MECHANIC);
         } else if ((unit.getEntity() instanceof Dropship) || (unit.getEntity() instanceof Jumpship)) {
-            return hasSkill(SkillType.S_TECH_VESSEL);
+            return hasSkill(S_TECH_VESSEL);
         } else if (unit.getEntity() instanceof Aero) {
-            return hasSkill(SkillType.S_TECH_AERO);
+            return hasSkill(S_TECH_AERO);
         } else {
             return false;
         }
@@ -4426,6 +5323,294 @@ public class Person {
         this.toughness = toughness;
     }
 
+    public int getConnections() {
+        return connections;
+    }
+
+    public void setConnections(final int connections) {
+        this.connections = clamp(connections, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
+    }
+
+    /**
+     * Adjusts the person's Connections score by the specified amount.
+     *
+     * <p>The change in connections can be positive or negative, depending on the provided delta value.</p>
+     *
+     * @param delta The amount by which to adjust the number of connections. A positive value increases the connections,
+     *              while a negative value decreases them.
+     */
+    public void changeConnections(final int delta) {
+        int newValue = connections + delta;
+        connections = clamp(newValue, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
+    }
+
+    public int getWealth() {
+        return wealth;
+    }
+
+    public void setWealth(final int wealth) {
+        this.wealth = clamp(wealth, MINIMUM_WEALTH, MAXIMUM_WEALTH);
+    }
+
+    /**
+     * Adjusts the person's wealth by the specified amount.
+     *
+     * <p>The change in wealth can be positive or negative, depending on the provided delta value.</p>
+     *
+     * @param delta The amount by which to adjust the wealth. A positive value increases the wealth, while a negative
+     *              value decreases it.
+     */
+    public void changeWealth(final int delta) {
+        int newValue = wealth + delta;
+        wealth = clamp(newValue, MINIMUM_WEALTH, MAXIMUM_WEALTH);
+    }
+
+    public boolean isHasPerformedExtremeExpenditure() {
+        return hasPerformedExtremeExpenditure;
+    }
+
+    public void setHasPerformedExtremeExpenditure(final boolean hasPerformedExtremeExpenditure) {
+        this.hasPerformedExtremeExpenditure = hasPerformedExtremeExpenditure;
+    }
+
+    /**
+     * Retrieves the raw reputation value of the character.
+     *
+     * <p>This method returns the unadjusted reputation value associated with the character.</p>
+     *
+     * <p><b>Usage:</b> If aging effects are enabled, you likely want to use
+     * {@link #getAdjustedReputation(boolean, boolean, LocalDate, int)}  instead.</p>
+     *
+     * @return The raw reputation value.
+     */
+    public int getReputation() {
+        return reputation;
+    }
+
+    /**
+     * Calculates the adjusted reputation value for the character based on aging effects, the current campaign type,
+     * date, and rank.
+     *
+     * <p>This method computes the character's reputation by applying age-based modifiers, which depend on factors such
+     * as whether aging effects are enabled, whether the campaign is clan-specific, the character's bloodname status,
+     * and their rank in the clan hierarchy. If aging effects are disabled, the reputation remains unchanged.</p>
+     *
+     * <p><b>Usage:</b> If aging effects are disabled, the result will be equivalent to the base reputation value
+     * provided by {@link #getReputation()}.</p>
+     *
+     * @param isUseAgingEffects Indicates whether aging effects should be applied to the reputation calculation.
+     * @param isClanCampaign    Indicates whether the current campaign is specific to a clan.
+     * @param today             The current date used to calculate the character's age.
+     * @param rankLevel         The rank index of the character, which can adjust the reputation modifier in clan-based
+     *                          campaigns.
+     *
+     * @return The adjusted reputation value, accounting for factors like age, clan campaign status, bloodname
+     *       possession, and rank. If aging effects are disabled, the base reputation value is returned.
+     */
+    public int getAdjustedReputation(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today,
+          int rankLevel) {
+        int modifier = isUseAgingEffects ?
+                             getReputationAgeModifier(getAge(today),
+                                   isClanCampaign,
+                                   !isNullOrBlank(bloodname),
+                                   rankLevel) :
+                             0;
+        return reputation + modifier;
+    }
+
+    public void setReputation(final int reputation) {
+        this.reputation = clamp(reputation, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
+    }
+
+    /**
+     * Adjusts the person's reputation by the specified amount.
+     *
+     * <p>The change in reputation can be positive or negative, depending on the provided delta value.</p>
+     *
+     * @param delta The amount by which to adjust the reputation. A positive value increases the reputation, while a
+     *              negative value decreases it.
+     */
+    public void changeReputation(final int delta) {
+        int newValue = reputation + delta;
+        reputation = clamp(newValue, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
+    }
+
+    public int getUnlucky() {
+        return unlucky;
+    }
+
+    public void setUnlucky(final int unlucky) {
+        this.unlucky = clamp(unlucky, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY);
+    }
+
+    public void changeUnlucky(final int delta) {
+        int newValue = unlucky + delta;
+        unlucky = clamp(newValue, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY);
+    }
+
+    /**
+     * Retrieves the character's {@link Attributes} object containing the character's attribute scores.
+     *
+     * <p><b>Usage:</b> In most cases you'll want to use {@link #getAttributeScore(SkillAttribute)} instead, as that
+     * will allow you to jump straight to the exact score you need.</p>
+     *
+     * @return the character's {@link Attributes} object.
+     *
+     * @since 0.50.5
+     */
+    public Attributes getATOWAttributes() {
+        return atowAttributes;
+    }
+
+    /**
+     * Updates the score for a specific skill attribute.
+     *
+     * <p>This method sets the provided score for the given {@link SkillAttribute}. If the attribute is
+     * <code>null</code> or represents "NONE", the method logs a warning and exits without making any changes.</p>
+     *
+     * <p>The actual attribute score update is delegated to the underlying attribute handler.</p>
+     *
+     * @param attribute The {@link SkillAttribute} to be updated. Must not be <code>null</code> or "NONE".
+     * @param newScore  The new score to assign to the specified skill attribute.
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public void setAttributeScore(final SkillAttribute attribute, final int newScore) {
+        if (attribute == null || attribute == SkillAttribute.NONE) {
+            logger.warn("(setAttributeScore) SkillAttribute is null or NONE.");
+            return;
+        }
+
+        atowAttributes.setAttributeScore(phenotype, options, attribute, newScore);
+    }
+
+    /**
+     * Retrieves the score of a specified attribute.
+     *
+     * @param attribute the {@link SkillAttribute} to retrieve the score for.
+     *
+     * @return the score of the specified attribute, or {@link Attributes#DEFAULT_ATTRIBUTE_SCORE} if the attribute is
+     *       {@code NONE} or {@code null}.
+     *
+     * @since 0.50.5
+     */
+    public int getAttributeScore(final SkillAttribute attribute) {
+        if (attribute == null || attribute.isNone()) {
+            logger.error("(getAttributeScore) SkillAttribute is null or NONE.");
+            return DEFAULT_ATTRIBUTE_SCORE;
+        }
+
+        boolean hasFreakishStrength = options.booleanOption(MUTATION_FREAKISH_STRENGTH);
+        boolean hasExoticAppearance = options.booleanOption(MUTATION_EXOTIC_APPEARANCE);
+        boolean hasFacialHair = options.booleanOption(MUTATION_FACIAL_HAIR);
+        boolean hasSeriousDisfigurement = options.booleanOption(MUTATION_SERIOUS_DISFIGUREMENT);
+        boolean isCatGirl = options.booleanOption(MUTATION_CAT_GIRL);
+        boolean isCatGirlUnofficial = options.booleanOption(MUTATION_CAT_GIRL_UNOFFICIAL);
+
+        return switch (attribute) {
+            case NONE -> 0;
+            case STRENGTH -> {
+                int attributeScore = atowAttributes.getAttributeScore(attribute);
+                if (hasFreakishStrength) {
+                    attributeScore += 2;
+                }
+                yield min(attributeScore, MAXIMUM_ATTRIBUTE_SCORE);
+            }
+            case BODY, REFLEXES, DEXTERITY, INTELLIGENCE, WILLPOWER -> atowAttributes.getAttributeScore(attribute);
+            case CHARISMA -> {
+                int attributeScore = atowAttributes.getAttributeScore(attribute);
+                if (hasExoticAppearance) {
+                    attributeScore++;
+                }
+                if (hasFacialHair) {
+                    attributeScore--;
+                }
+                if (hasSeriousDisfigurement) {
+                    attributeScore -= 3;
+                }
+                if (isCatGirl) {
+                    attributeScore -= 3;
+                }
+                if (isCatGirlUnofficial) {
+                    attributeScore++;
+                }
+                yield clamp(attributeScore, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
+            }
+        };
+    }
+
+    /**
+     * Retrieves the maximum allowed value (cap) for the specified {@link SkillAttribute}.
+     *
+     * <p>If the attribute is {@code null} or marked as {@link SkillAttribute#NONE}, a default maximum attribute score
+     * is returned, and a warning is logged.</p>
+     *
+     * <p>For valid attributes, this method delegates to
+     * {@link Attributes#getAttributeCap(Phenotype, PersonnelOptions, SkillAttribute)}.</p>
+     *
+     * @param attribute The {@link SkillAttribute} for which the maximum value is being retrieved. Must not be
+     *                  {@code null} or {@link SkillAttribute#NONE}.
+     *
+     * @return The maximum allowed value (cap) for the given attribute. Returns the default maximum value if the input
+     *       attribute is invalid.
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public int getAttributeCap(final SkillAttribute attribute) {
+        if (attribute == null || attribute.isNone()) {
+            logger.warn("(getAttributeCap) SkillAttribute is null or NONE.");
+            return MAXIMUM_ATTRIBUTE_SCORE;
+        }
+
+        return atowAttributes.getAttributeCap(phenotype, options, attribute);
+    }
+
+    /**
+     * Sets the character's {@link Attributes} object which contains their ATOW Attribute scores.
+     *
+     * <p><b>Usage:</b> This completely wipes the character's attribute scores and is likely not the method you're
+     * looking for. Consider{@link #changeAttributeScore(SkillAttribute, int)} if you just want to increment or
+     * decrement a specific attribute by a certain value.</p>
+     *
+     * @param atowAttributes the {@link Attributes} object to set.
+     *
+     * @since 0.50.5
+     */
+    public void setATOWAttributes(final Attributes atowAttributes) {
+        this.atowAttributes = atowAttributes;
+    }
+
+    /**
+     * Modifies the score of a specified skill attribute by a given delta value.
+     *
+     * <p>This method adjusts the current score of the provided {@link SkillAttribute} by adding the specified delta
+     * to it. If the attribute is {@code null} or {@link SkillAttribute#NONE}, a warning is logged, and the method exits
+     * without making any changes.</p>
+     *
+     * <p>The new score is computed as the sum of the current score and the delta, and it is passed
+     * to {@link Attributes#setAttributeScore(Phenotype, PersonnelOptions, SkillAttribute, int)} to ensure is compiles
+     * with the character's minimum and maximum attribute score values.</p>
+     *
+     * @param attribute The {@link SkillAttribute} whose score is to be modified. Must not be <code>null</code>.
+     * @param delta     The value to add to the current score of the specified skill attribute.
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public void changeAttributeScore(final SkillAttribute attribute, final int delta) {
+        if (attribute == null || attribute.isNone()) {
+            logger.warn("(changeAttributeScore) SkillAttribute is null or NONE.");
+            return;
+        }
+
+        int current = atowAttributes.getAttributeScore(attribute);
+        int newScore = current + delta;
+
+        setAttributeScore(attribute, newScore);
+    }
+
     public void resetSkillTypes() {
         skills.getSkills().forEach(Skill::updateType);
     }
@@ -4438,9 +5623,22 @@ public class Person {
         this.nTasks = nTasks;
     }
 
+    /**
+     * @deprecated use {@link #getPersonalLog()} instead.
+     */
+    @Deprecated(forRemoval = true, since = "0.50.5")
     public List<LogEntry> getPersonnelLog() {
+        return getPersonalLog();
+    }
+
+    public List<LogEntry> getPersonalLog() {
         personnelLog.sort(Comparator.comparing(LogEntry::getDate));
         return personnelLog;
+    }
+
+    public List<LogEntry> getMedicalLog() {
+        medicalLog.sort(Comparator.comparing(LogEntry::getDate));
+        return medicalLog;
     }
 
     public List<LogEntry> getScenarioLog() {
@@ -4448,15 +5646,46 @@ public class Person {
         return scenarioLog;
     }
 
+    public List<LogEntry> getAssignmentLog() {
+        assignmentLog.sort(Comparator.comparing(LogEntry::getDate));
+        return assignmentLog;
+    }
+
+    public List<LogEntry> getPerformanceLog() {
+        performanceLog.sort(Comparator.comparing(LogEntry::getDate));
+        return performanceLog;
+    }
+
+    /**
+     * @deprecated use {@link #addPersonalLogEntry(LogEntry)} instead.
+     */
+    @Deprecated(forRemoval = true, since = "0.50.5")
     public void addLogEntry(final LogEntry entry) {
+        addPersonalLogEntry(entry);
+    }
+
+    public void addPersonalLogEntry(final LogEntry entry) {
         personnelLog.add(entry);
+    }
+
+    public void addMedicalLogEntry(final LogEntry entry) {
+        medicalLog.add(entry);
     }
 
     public void addScenarioLogEntry(final LogEntry entry) {
         scenarioLog.add(entry);
     }
 
+    public void addAssignmentLogEntry(final LogEntry entry) {
+        assignmentLog.add(entry);
+    }
+
+    public void addPerformanceLogEntry(final LogEntry entry) {
+        performanceLog.add(entry);
+    }
+
     // region injuries
+
     /**
      * All methods below are for the Advanced Medical option
      */
@@ -4466,9 +5695,7 @@ public class Person {
     }
 
     public List<Injury> getPermanentInjuries() {
-        return injuries.stream()
-                .filter(Injury::isPermanent)
-                .collect(Collectors.toList());
+        return injuries.stream().filter(Injury::isPermanent).collect(Collectors.toList());
     }
 
     public void clearInjuries() {
@@ -4515,28 +5742,101 @@ public class Person {
     }
 
     public boolean needsAMFixing() {
-        return !injuries.isEmpty()
-                && injuries.stream().anyMatch(injury -> (injury.getTime() > 0) || !injury.isPermanent());
+        return !injuries.isEmpty() &&
+                     injuries.stream().anyMatch(injury -> (injury.getTime() > 0) || !injury.isPermanent());
     }
 
-    public int getPilotingInjuryMod() {
-        return Modifier.calcTotalModifier(injuries.stream().flatMap(injury -> injury.getModifiers().stream()),
-                ModifierValue.PILOTING);
-    }
+    /**
+     * Calculates the total injury modifier for the pilot, based on the character's injuries and ambidextrous trait (if
+     * present). This modifier can apply to either piloting or gunnery checks depending on the input parameter.
+     *
+     * <p>This method examines all injuries and their associated modifiers, distinguishing between left-side and
+     * right-side injuries if the character is ambidextrous, and the injury implies a missing body location. If the
+     * character is not ambidextrous, all modifiers are considered uniformly.</p>
+     *
+     * <p>The method performs the following steps:</p>
+     * <ul>
+     *    <li>If the character is ambidextrous and the injury implies a missing location:
+     *        <ul>
+     *            <li>Classifies injuries into left-side or right-side based on their body location.</li>
+     *            <li>Adds associated modifiers to separate lists for left-side and right-side injuries.</li>
+     *            <li>If injuries are only present on one side, the modifiers for the opposite side are removed.</li>
+     *        </ul>
+     *    </li>
+     *    <li>If the character is not ambidextrous or the injury does not imply a missing body location all modifiers
+     *    from all injuries are included without distinguishing between left and right sides.</li>
+     * </ul>
+     *
+     * <p>After processing the injuries, the method calculates the total injury modifier by summing up the relevant
+     * modifier values, taking into account whether the modifier applies to piloting or gunnery checks.</p>
+     *
+     * @param isPiloting A boolean value indicating whether the modifier calculation is for piloting checks
+     *                   ({@code true}) or gunnery checks ({@code false}).
+     *
+     * @return The total injury modifier calculated from the character's injuries, specific to piloting or gunnery.
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public int getInjuryModifiers(boolean isPiloting) {
+        boolean isAmbidextrous = options.booleanOption(ATOW_AMBIDEXTROUS);
 
-    public int getGunneryInjuryMod() {
-        return Modifier.calcTotalModifier(injuries.stream().flatMap(injury -> injury.getModifiers().stream()),
-                ModifierValue.GUNNERY);
+        List<Modifier> leftSideModifiers = new ArrayList<>();
+        List<Modifier> rightSideModifiers = new ArrayList<>();
+
+        List<Modifier> allModifiers = new ArrayList<>();
+        for (Injury injury : injuries) {
+            boolean isLeftSide = false;
+            boolean isRightSide = false;
+            if (isAmbidextrous && injury.getType().impliesMissingLocation()) {
+                BodyLocation location = injury.getLocation();
+                if (location.isLimb()) {
+                    if (location == BodyLocation.LEFT_ARM || location == BodyLocation.LEFT_HAND) {
+                        isLeftSide = true;
+                    } else if (location == BodyLocation.RIGHT_ARM || location == BodyLocation.RIGHT_HAND) {
+                        isRightSide = true;
+                    }
+                }
+            }
+
+            for (Modifier modifier : injury.getModifiers()) {
+                if (isAmbidextrous) {
+                    if (isLeftSide) {
+                        leftSideModifiers.add(modifier);
+                    }
+
+                    if (isRightSide) {
+                        rightSideModifiers.add(modifier);
+                    }
+                }
+
+                allModifiers.add(modifier);
+            }
+        }
+
+        if (isAmbidextrous) {
+            if (leftSideModifiers.isEmpty() && !rightSideModifiers.isEmpty()) {
+                allModifiers.removeAll(rightSideModifiers);
+            }
+
+            if (rightSideModifiers.isEmpty() && !leftSideModifiers.isEmpty()) {
+                allModifiers.removeAll(leftSideModifiers);
+            }
+        }
+
+        return Modifier.calcTotalModifier(allModifiers.stream(),
+              isPiloting ? ModifierValue.PILOTING : ModifierValue.GUNNERY);
     }
 
     public boolean hasInjuries(final boolean permanentCheck) {
-        return !injuries.isEmpty() && (!permanentCheck
-                || injuries.stream().anyMatch(injury -> !injury.isPermanent() || (injury.getTime() > 0)));
+        return !injuries.isEmpty() &&
+                     (!permanentCheck ||
+                            injuries.stream().anyMatch(injury -> !injury.isPermanent() || (injury.getTime() > 0)));
     }
 
     public boolean hasOnlyHealedPermanentInjuries() {
-        return !injuries.isEmpty()
-                && injuries.stream().noneMatch(injury -> !injury.isPermanent() || (injury.getTime() > 0));
+        return !injuries.isEmpty() &&
+                     injuries.stream().noneMatch(injury -> !injury.isPermanent() || (injury.getTime() > 0));
     }
 
     public List<Injury> getInjuriesByLocation(final BodyLocation location) {
@@ -4607,14 +5907,15 @@ public class Person {
      * This is used to get the number of shares the person has
      *
      * @param campaign     the campaign the person is a part of
-     * @param sharesForAll true if all combat and support personnel have shares,
-     *                     otherwise false if
-     *                     just MekWarriors have shares
+     * @param sharesForAll true if all combat and support personnel have shares, otherwise false if just MekWarriors
+     *                     have shares
+     *
      * @return the number of shares the person has
      */
     public int getNumShares(final Campaign campaign, final boolean sharesForAll) {
-        if (!getStatus().isActive() || !getPrisonerStatus().isFree()
-                || (!sharesForAll && !hasRole(PersonnelRole.MEKWARRIOR))) {
+        if (!getStatus().isActive() ||
+                  !getPrisonerStatus().isFree() ||
+                  (!sharesForAll && !hasRole(PersonnelRole.MEKWARRIOR))) {
             return 0;
         }
         int shares = 1;
@@ -4657,16 +5958,15 @@ public class Person {
 
     /**
      * @param campaign the campaign to get the ransom value based on
-     * @return the ransom value of this individual
-     *         Useful for prisoner who you want to ransom or hand off to your
-     *         employer in an AtB context
+     *
+     * @return the ransom value of this individual Useful for prisoner who you want to ransom or hand off to your
+     *       employer in an AtB context
      */
     public Money getRansomValue(final Campaign campaign) {
         // MekWarriors and aero pilots are worth more than the other types of scrubs
-        return (getPrimaryRole().isMekWarriorGrouping() || getPrimaryRole().isAerospacePilot()
-                ? MEKWARRIOR_AERO_RANSOM_VALUES
-                : OTHER_RANSOM_VALUES)
-                .get(getExperienceLevel(campaign, false));
+        return (getPrimaryRole().isMekWarriorGrouping() || getPrimaryRole().isAerospacePilot() ?
+                      MEKWARRIOR_AERO_RANSOM_VALUES :
+                      OTHER_RANSOM_VALUES).get(getExperienceLevel(campaign, false));
     }
 
     public static class PersonUnitRef extends Unit {
@@ -4680,8 +5980,7 @@ public class Person {
             final UUID id = unit.getId();
             unit = campaign.getUnit(id);
             if (unit == null) {
-                logger.error(String.format("Person %s ('%s') references missing unit %s",
-                        getId(), getFullName(), id));
+                logger.error(String.format("Person %s ('%s') references missing unit %s", getId(), getFullName(), id));
             }
         }
 
@@ -4692,8 +5991,7 @@ public class Person {
                 if (realUnit != null) {
                     techUnits.set(ii, realUnit);
                 } else {
-                    logger.error(String.format("Person %s ('%s') techs missing unit %s",
-                            getId(), getFullName(), techUnit.getId()));
+                    logger.error("Person {} ('{}') techs missing unit {}", getId(), getFullName(), techUnit.getId());
                     techUnits.remove(ii);
                 }
             }
@@ -4722,26 +6020,58 @@ public class Person {
     }
 
     /**
-     * @return the intelligence experience cost multiplier based on campaign
-     *         options.
+     * Calculates the experience cost multiplier based on reasoning.
      *
-     * @param campaignOptions the campaign options to determine whether to calculate
-     *                        the multiplier or to just return 1
+     * <p>If reasoning adjustment is not enabled, the multiplier is 1 (no effect).</p>
+     *
+     * <p>Otherwise, the multiplier is determined by the reasoning score, where each point adjusts the cost by 2.5%.
+     * A neutral reasoning score (resulting in a modifier of 0) will also return a multiplier of 1.</p>
+     *
+     * @param useReasoningXpCostMultiplier a {@link Boolean} indicating whether to apply the reasoning-based adjustment
+     *                                     to the experience cost.
+     *
+     * @return the experience cost multiplier: - `1` if reasoning adjustment is disabled or {@link Reasoning} is
+     *       neutral. - A value adjusted by the formula `1 - (score * 0.025)` otherwise.
      */
-    public double getIntelligenceXpCostMultiplier(CampaignOptions campaignOptions) {
-        if (campaignOptions.isUseRandomPersonalities() && campaignOptions.isUseIntelligenceXpMultiplier()) {
-            double intelligenceMultiplier = 0.025; // each rank in Intelligence should adjust costs by 2.5%
+    public double getReasoningXpCostMultiplier(final boolean useReasoningXpCostMultiplier) {
+        Reasoning reasoning = getReasoning();
 
-            int intelligence = getIntelligence().getIntelligenceScore();
-            double intelligenceScore = intelligence * intelligenceMultiplier;
-
-            if (intelligenceScore == 0) {
-                return 1;
-            } else {
-                return 1 - intelligenceScore;
-            }
+        if (!useReasoningXpCostMultiplier || reasoning.isAverageType()) {
+            return 1;
         }
 
-        return 1;
+        double reasoningMultiplier = 0.025; // each rank in Reasoning should adjust costs by 2.5%
+
+        int score = reasoning.getReasoningScore();
+        double modifier = score * reasoningMultiplier;
+
+        if (modifier == 0) { // neutral reasoning
+            return 1;
+        } else {
+            return 1 - modifier;
+        }
+    }
+
+    /**
+     * Removes all skills from the collection that match the specified subtype.
+     *
+     * <p>Iterates safely over the current list of skills, removing each skill whose type corresponds to the given
+     * {@link SkillSubType}.</p>
+     *
+     * @param subType the {@code SkillSubType} to remove from the collection
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public void removeAllSkillsOfSubType(SkillSubType subType) {
+        // We make an iteration safe list so we can easily remove skills during the loop
+        List<Skill> allSkills = new ArrayList<>(skills.getSkills());
+        for (Skill skill : allSkills) {
+            SkillType skillType = skill.getType();
+
+            if (skillType.isSubTypeOf(subType)) {
+                removeSkill(skillType.getName());
+            }
+        }
     }
 }

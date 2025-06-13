@@ -24,8 +24,17 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.module.atb;
+
+import static mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR_HR;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
+import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 
 import java.time.DayOfWeek;
 import java.util.ArrayList;
@@ -51,12 +60,14 @@ import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.RandomFactionGenerator;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * Main engine of the Against the Bot campaign system.
@@ -80,75 +91,85 @@ public class AtBEventProcessor {
     @Subscribe
     public void handleNewDay(NewDayEvent ev) {
         // TODO: move code from Campaign here
-        if (!ev.getCampaign().hasActiveContract() && ev.getCampaign().getPersonnelMarket().getPaidRecruitment()
-                && (ev.getCampaign().getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY)) {
-            if (ev.getCampaign().getFinances().debit(TransactionType.RECRUITMENT,
-                    ev.getCampaign().getLocalDate(), Money.of(100000), "Paid recruitment roll")) {
+        if (!ev.getCampaign().hasActiveContract() &&
+                  ev.getCampaign().getPersonnelMarket().getPaidRecruitment() &&
+                  (ev.getCampaign().getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY)) {
+            if (ev.getCampaign()
+                      .getFinances()
+                      .debit(TransactionType.RECRUITMENT,
+                            ev.getCampaign().getLocalDate(),
+                            Money.of(100000),
+                            "Paid recruitment roll")) {
                 doPaidRecruitment(ev.getCampaign());
             } else {
-                ev.getCampaign().addReport("<html><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
-                        + "'>Insufficient funds for paid recruitment.</font></html>");
+                ev.getCampaign()
+                      .addReport("<html><font color='" +
+                                       ReportingUtilities.getNegativeColor() +
+                                       "'>Insufficient funds for paid recruitment.</font></html>");
             }
         }
     }
 
+    /**
+     * Performs the paid recruitment process for a campaign, generating and adding new recruitable personnel to the
+     * personnel market.
+     *
+     * <p>The recruitment process considers the type of recruit being sought, the campaign's unit rating, financial
+     * state,
+     * and the experience level of the best available HR administrator. Based on these factors, it computes a
+     * recruitment roll using two six-sided dice plus all modifiers. The number of new recruits to generate is
+     * determined by the result of this roll. Each new recruit is created and added to the campaign's personnel
+     * market.</p>
+     *
+     * @param campaign the {@link Campaign} instance in which recruitment is to take place
+     */
     private void doPaidRecruitment(Campaign campaign) {
-        int mod;
-        switch (campaign.getPersonnelMarket().getPaidRecruitRole()) {
-            case MEKWARRIOR:
-                mod = -2;
-                break;
-            case SOLDIER:
-                mod = 2;
-                break;
-            case MEK_TECH:
-            case MECHANIC:
-            case AERO_TEK:
-            case BA_TECH:
-            case DOCTOR:
-                mod = 1;
-                break;
-            default:
-                mod = 0;
-                break;
-        }
+        int modifier = switch (campaign.getPersonnelMarket().getPaidRecruitRole()) {
+            case MEKWARRIOR -> -2;
+            case SOLDIER -> 2;
+            case MEK_TECH, MECHANIC, AERO_TEK, BA_TECH, DOCTOR -> 1;
+            default -> 0;
+        };
 
-        mod += campaign.getAtBUnitRatingMod() - IUnitRating.DRAGOON_C;
+        modifier += campaign.getAtBUnitRatingMod() - IUnitRating.DRAGOON_C;
         if (campaign.getFinances().isInDebt()) {
-            mod -= 3;
+            modifier -= 3;
         }
 
-        Person adminHR = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_HR, SkillType.S_ADMIN);
-        int adminHRExp = (adminHR == null) ? SkillType.EXP_ULTRA_GREEN
-                : adminHR.getSkill(SkillType.S_ADMIN).getExperienceLevel();
-        mod += adminHRExp - 2;
-        int q = 0;
-        int r = Compute.d6(2) + mod;
-
-        if (r > 15) {
-            q = 6;
-        } else if (r > 12) {
-            q = 5;
-        } else if (r > 10) {
-            q = 4;
-        } else if (r > 8) {
-            q = 3;
-        } else if (r > 5) {
-            q = 2;
-        } else if (r > 3) {
-            q = 1;
+        Person adminHR = campaign.findBestInRole(ADMINISTRATOR_HR, S_ADMIN);
+        Skill adminSkill = adminHR.getSkill(S_ADMIN);
+        int adminExperienceLevel = EXP_NONE;
+        if (adminSkill != null) {
+            adminExperienceLevel = adminSkill.getExperienceLevel(adminHR.getOptions(), adminHR.getATOWAttributes());
         }
 
-        for (int i = 0; i < q; i++) {
-            Person p = campaign.newPerson(campaign.getPersonnelMarket().getPaidRecruitRole());
-            campaign.getPersonnelMarket().addPerson(p);
-            addRecruitUnit(p);
+        modifier += adminExperienceLevel - 2;
+        int quantityOfRecruits = 0;
+        int roll = Compute.d6(2) + modifier;
+
+        if (roll > 15) {
+            quantityOfRecruits = 6;
+        } else if (roll > 12) {
+            quantityOfRecruits = 5;
+        } else if (roll > 10) {
+            quantityOfRecruits = 4;
+        } else if (roll > 8) {
+            quantityOfRecruits = 3;
+        } else if (roll > 5) {
+            quantityOfRecruits = 2;
+        } else if (roll > 3) {
+            quantityOfRecruits = 1;
+        }
+
+        for (int i = 0; i < quantityOfRecruits; i++) {
+            Person recruit = campaign.newPerson(campaign.getPersonnelMarket().getPaidRecruitRole());
+            campaign.getPersonnelMarket().addPerson(recruit);
+            addRecruitUnit(recruit);
         }
     }
 
     /**
-     * Listens for new personnel to be added to the market and determines which
-     * should come with units.
+     * Listens for new personnel to be added to the market and determines which should come with units.
      *
      * @param ev
      */
@@ -192,9 +213,7 @@ public class AtBEventProcessor {
         }
 
         int weight = -1;
-        if (unitType == UnitType.MEK
-                || unitType == UnitType.TANK
-                || unitType == UnitType.AEROSPACEFIGHTER) {
+        if (unitType == UnitType.MEK || unitType == UnitType.TANK || unitType == UnitType.AEROSPACEFIGHTER) {
             int roll = Compute.d6(2);
             if (roll < 8) {
                 return;
@@ -208,8 +227,14 @@ public class AtBEventProcessor {
             }
         }
         final String faction = getRecruitFaction(campaign);
-        MekSummary ms = campaign.getUnitGenerator().generate(faction, unitType, weight, campaign.getGameYear(),
-                IUnitRating.DRAGOON_F, movementModes, missionRoles);
+        MekSummary ms = campaign.getUnitGenerator()
+                              .generate(faction,
+                                    unitType,
+                                    weight,
+                                    campaign.getGameYear(),
+                                    IUnitRating.DRAGOON_F,
+                                    movementModes,
+                                    missionRoles);
         Entity en;
         if (null != ms) {
             if (Factions.getInstance().getFaction(faction).isClan() && ms.getName().matches(".*Platoon.*")) {
@@ -221,12 +246,18 @@ public class AtBEventProcessor {
                 en = new MekFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
             } catch (EntityLoadingException ex) {
                 en = null;
-                logger.error("Unable to load entity: "
-                        + ms.getSourceFile() + ": " + ms.getEntryName() + ": " + ex.getMessage(), ex);
+                logger.error("Unable to load entity: " +
+                                   ms.getSourceFile() +
+                                   ": " +
+                                   ms.getEntryName() +
+                                   ": " +
+                                   ex.getMessage(), ex);
             }
         } else {
-            logger.error("Personnel market could not find "
-                    + UnitType.getTypeName(unitType) + " for recruit from faction " + faction);
+            logger.error("Personnel market could not find " +
+                               UnitType.getTypeName(unitType) +
+                               " for recruit from faction " +
+                               faction);
             return;
         }
 
@@ -235,9 +266,9 @@ public class AtBEventProcessor {
             /* adjust vehicle pilot roles according to the type of vehicle rolled */
             if ((en.getEntityType() & Entity.ETYPE_TANK) != 0) {
                 if (en.getMovementMode() == EntityMovementMode.TRACKED ||
-                        en.getMovementMode() == EntityMovementMode.WHEELED ||
-                        en.getMovementMode() == EntityMovementMode.HOVER ||
-                        en.getMovementMode() == EntityMovementMode.WIGE) {
+                          en.getMovementMode() == EntityMovementMode.WHEELED ||
+                          en.getMovementMode() == EntityMovementMode.HOVER ||
+                          en.getMovementMode() == EntityMovementMode.WIGE) {
                     if (p.getPrimaryRole().isVTOLPilot()) {
                         swapSkills(p, SkillType.S_PILOT_VTOL, SkillType.S_PILOT_GVEE);
                         p.setPrimaryRoleDirect(PersonnelRole.GROUND_VEHICLE_DRIVER);
@@ -254,8 +285,8 @@ public class AtBEventProcessor {
                         p.setPrimaryRoleDirect(PersonnelRole.VTOL_PILOT);
                     }
                 } else if (en.getMovementMode() == EntityMovementMode.NAVAL ||
-                        en.getMovementMode() == EntityMovementMode.HYDROFOIL ||
-                        en.getMovementMode() == EntityMovementMode.SUBMARINE) {
+                                 en.getMovementMode() == EntityMovementMode.HYDROFOIL ||
+                                 en.getMovementMode() == EntityMovementMode.SUBMARINE) {
                     if (p.getPrimaryRole().isGroundVehicleDriver()) {
                         swapSkills(p, SkillType.S_PILOT_GVEE, SkillType.S_PILOT_NVEE);
                         p.setPrimaryRoleDirect(PersonnelRole.NAVAL_VEHICLE_DRIVER);
@@ -303,6 +334,6 @@ public class AtBEventProcessor {
                 }
             }
         }
-        return c.getFactionCode();
+        return c.getFaction().getShortName();
     }
 }

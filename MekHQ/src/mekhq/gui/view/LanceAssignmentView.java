@@ -25,8 +25,31 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.view;
+
+import static megamek.client.ui.WrapLayout.wordWrap;
+import static mekhq.campaign.mission.enums.CombatRole.FRONTLINE;
+import static mekhq.campaign.mission.enums.CombatRole.MANEUVER;
+import static mekhq.campaign.mission.enums.CombatRole.PATROL;
+import static mekhq.campaign.mission.enums.CombatRole.TRAINING;
+
+import java.awt.Component;
+import java.awt.Dimension;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import javax.swing.*;
+import javax.swing.RowSorter.SortKey;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
 
 import megamek.client.ui.models.XTableColumnModel;
 import megamek.common.util.sorter.NaturalOrderComparator;
@@ -36,31 +59,13 @@ import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.CombatRole;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.model.DataTableModel;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
-import javax.swing.*;
-import javax.swing.RowSorter.SortKey;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-
-import static megamek.client.ui.WrapLayout.wordWrap;
-import static mekhq.campaign.mission.enums.CombatRole.FRONTLINE;
-import static mekhq.campaign.mission.enums.CombatRole.MANEUVER;
-import static mekhq.campaign.mission.enums.CombatRole.PATROL;
-import static mekhq.campaign.mission.enums.CombatRole.TRAINING;
-
 /**
- * Against the Bot
- * Shows how many lances are required to be deployed on active contracts and
- * in what roles and allows the player to assign units to those roles.
+ * Against the Bot Shows how many lances are required to be deployed on active contracts and in what roles and allows
+ * the player to assign units to those roles.
  *
  * @author Neoancient
  */
@@ -83,8 +88,7 @@ public class LanceAssignmentView extends JPanel {
         cbContract = new JComboBox<>();
         cbContract.setRenderer(new DefaultListCellRenderer() {
             @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index,
-                                                          boolean isSelected, boolean cellHasFocus) {
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 return new JLabel((null == value) ? "None" : ((AtBContract) value).getName());
             }
         });
@@ -93,9 +97,7 @@ public class LanceAssignmentView extends JPanel {
         cbRole.setName("cbRole");
         cbRole.setRenderer(new DefaultListCellRenderer() {
             @Override
-            public Component getListCellRendererComponent(final JList<?> list, final Object value,
-                                                          final int index, final boolean isSelected,
-                                                          final boolean cellHasFocus) {
+            public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index, final boolean isSelected, final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof CombatRole) {
                     list.setToolTipText(wordWrap(((CombatRole) value).getToolTipText()));
@@ -117,12 +119,10 @@ public class LanceAssignmentView extends JPanel {
             column.setPreferredWidth(rlModel.getColumnWidth(i));
             column.setCellRenderer(new MekHqTableCellRenderer() {
                 @Override
-                public Component getTableCellRendererComponent(JTable table, Object value,
-                                                               boolean isSelected, boolean hasFocus,
-                                                               int row, int column) {
+                public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                     super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                    setHorizontalAlignment(((RequiredLancesTableModel) table.getModel()).
-                            getAlignment(table.convertColumnIndexToModel(column)));
+                    setHorizontalAlignment(((RequiredLancesTableModel) table.getModel()).getAlignment(table.convertColumnIndexToModel(
+                          column)));
                     if (table.convertColumnIndexToModel(column) > RequiredLancesTableModel.COL_CONTRACT) {
                         if (((String) value).indexOf('/') >= 0) {
                             setForeground(MekHQ.getMHQOptions().getBelowContractMinimumForeground());
@@ -132,7 +132,7 @@ public class LanceAssignmentView extends JPanel {
                 }
             });
         }
-        TableRowSorter<RequiredLancesTableModel>sorter = new TableRowSorter<>(rlModel);
+        TableRowSorter<RequiredLancesTableModel> sorter = new TableRowSorter<>(rlModel);
         tblRequiredLances.setRowSorter(sorter);
 
         tblRequiredLances.setIntercellSpacing(new Dimension(0, 0));
@@ -148,9 +148,7 @@ public class LanceAssignmentView extends JPanel {
             column.setPreferredWidth(rlModel.getColumnWidth(i));
             column.setCellRenderer(new MekHqTableCellRenderer() {
                 @Override
-                public Component getTableCellRendererComponent(JTable table, Object value,
-                                                               boolean isSelected, boolean hasFocus,
-                                                               int row, int column) {
+                public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                     switch (column) {
                         case LanceAssignmentTableModel.COL_FORCE:
                             if (null != value) {
@@ -169,7 +167,7 @@ public class LanceAssignmentView extends JPanel {
                             break;
                         default:
                             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                   }
+                    }
                     return this;
                 }
             });
@@ -191,13 +189,13 @@ public class LanceAssignmentView extends JPanel {
             }
         };
         final NaturalOrderComparator noc = new NaturalOrderComparator();
-        TableRowSorter<LanceAssignmentTableModel>laSorter = new TableRowSorter<>(laModel);
+        TableRowSorter<LanceAssignmentTableModel> laSorter = new TableRowSorter<>(laModel);
         laSorter.setRowFilter(laFilter);
         laSorter.setComparator(LanceAssignmentTableModel.COL_FORCE, forceComparator);
-        laSorter.setComparator(LanceAssignmentTableModel.COL_CONTRACT, (c1, c2) ->
-                noc.compare(((AtBContract) c1).getName(), ((AtBContract) c2).getName()));
-        laSorter.setComparator(LanceAssignmentTableModel.COL_ROLE, (r1, r2) ->
-                noc.compare(r1.toString(), r2.toString()));
+        laSorter.setComparator(LanceAssignmentTableModel.COL_CONTRACT,
+              (c1, c2) -> noc.compare(((AtBContract) c1).getName(), ((AtBContract) c2).getName()));
+        laSorter.setComparator(LanceAssignmentTableModel.COL_ROLE,
+              (r1, r2) -> noc.compare(r1.toString(), r2.toString()));
         List<SortKey> sortKeys = new ArrayList<>();
         sortKeys.add(new SortKey(LanceAssignmentTableModel.COL_FORCE, SortOrder.ASCENDING));
         sorter.setSortKeys(sortKeys);
@@ -208,23 +206,14 @@ public class LanceAssignmentView extends JPanel {
 
         panRequiredLances = new JPanel();
         panRequiredLances.setLayout(new BoxLayout(panRequiredLances, BoxLayout.Y_AXIS));
-        panRequiredLances.setBorder(BorderFactory.createTitledBorder("Deployment Requirements"));
+        panRequiredLances.setBorder(RoundedLineBorder.createRoundedLineBorder("Deployment Requirements"));
         panRequiredLances.add(tblRequiredLances.getTableHeader());
         panRequiredLances.add(tblRequiredLances);
         add(panRequiredLances);
 
-        int cmdrStrategy = 0;
-        if ((campaign.getFlaggedCommander() != null)
-                && (campaign.getFlaggedCommander().getSkill(SkillType.S_STRATEGY) != null)) {
-            cmdrStrategy = campaign.getFlaggedCommander().getSkill(SkillType.S_STRATEGY).getLevel();
-        }
-        int maxDeployedLances = campaign.getCampaignOptions().getBaseStrategyDeployment() +
-                campaign.getCampaignOptions().getAdditionalStrategyDeployment() * cmdrStrategy;
-        add(new JLabel("Maximum Deployed Forces: " + maxDeployedLances));
-
         panAssignments = new JPanel();
         panAssignments.setLayout(new BoxLayout(panAssignments, BoxLayout.Y_AXIS));
-        panAssignments.setBorder(BorderFactory.createTitledBorder("Current Assignments"));
+        panAssignments.setBorder(RoundedLineBorder.createRoundedLineBorder("Current Assignments"));
         panAssignments.add(tblAssignments.getTableHeader());
         panAssignments.add(tblAssignments);
         add(panAssignments);
@@ -241,8 +230,8 @@ public class LanceAssignmentView extends JPanel {
         }
         AtBContract defaultContract = activeContracts.isEmpty() ? null : activeContracts.get(0);
         for (CombatTeam combatTeam : campaign.getCombatTeamsTable().values()) {
-            if ((combatTeam.getContract(campaign) == null)
-                    || !combatTeam.getContract(campaign).isActiveOn(campaign.getLocalDate(), true)) {
+            if ((combatTeam.getContract(campaign) == null) ||
+                      !combatTeam.getContract(campaign).isActiveOn(campaign.getLocalDate(), true)) {
                 combatTeam.setContract(defaultContract);
             }
         }
@@ -307,8 +296,8 @@ class RequiredLancesTableModel extends DataTableModel {
     public RequiredLancesTableModel(final Campaign campaign) {
         this.campaign = campaign;
         data = new ArrayList<AtBContract>();
-        columnNames = new String[]{"Contract", "Total", MANEUVER.toString(), FRONTLINE.toString(),
-            PATROL.toString(), TRAINING.toString()};
+        columnNames = new String[] { "Contract", "Total", MANEUVER.toString(), FRONTLINE.toString(), PATROL.toString(),
+                                     TRAINING.toString() };
     }
 
     @Override
@@ -363,26 +352,31 @@ class RequiredLancesTableModel extends DataTableModel {
             if (column == COL_TOTAL) {
                 int t = 0;
                 for (CombatTeam combatTeam : campaign.getAllCombatTeams()) {
-                    if (data.get(row).equals(combatTeam.getContract(campaign))
-                            && (combatTeam.getRole() != CombatRole.RESERVE)
-                            && combatTeam.isEligible(campaign)) {
-                        t++;
+                    AtBContract assignedContract = combatTeam.getContract(campaign);
+                    boolean isCadreDuty = assignedContract.getContractType().isCadreDuty();
+                    CombatRole role = combatTeam.getRole();
+                    boolean isRoleSuitable = (isCadreDuty && role.isTraining()) || role.isCombatRole();
+                    boolean isDeploymentEligible = combatTeam.isEligible(campaign);
+
+                    if ((data.get(row).equals(assignedContract)) && isRoleSuitable && isDeploymentEligible) {
+                        t += combatTeam.getSize(campaign);
                     }
                 }
-                if (t < contract.getRequiredCombatTeams()) {
-                    return t + "/" + contract.getRequiredCombatTeams();
+                if (t < contract.getRequiredCombatElements()) {
+                    return t + "/" + contract.getRequiredCombatElements();
                 }
-                return Integer.toString(contract.getRequiredCombatTeams());
+                return Integer.toString(contract.getRequiredCombatElements());
             } else if (contract.getContractType().getRequiredCombatRole().ordinal() == column - 2) {
                 int t = 0;
                 for (CombatTeam combatTeam : campaign.getAllCombatTeams()) {
-                    if (data.get(row).equals(combatTeam.getContract(campaign))
-                            && (combatTeam.getRole() == combatTeam.getContract(campaign).getContractType().getRequiredCombatRole())
-                            && combatTeam.isEligible(campaign)) {
-                        t++;
+                    if (data.get(row).equals(combatTeam.getContract(campaign)) &&
+                              (combatTeam.getRole() ==
+                                     combatTeam.getContract(campaign).getContractType().getRequiredCombatRole()) &&
+                              combatTeam.isEligible(campaign)) {
+                        t += combatTeam.getSize(campaign);
                     }
                 }
-                int required = Math.max(contract.getRequiredCombatTeams() / 2, 1);
+                int required = Math.max(contract.getRequiredCombatElements() / 2, 1);
                 if (t < required) {
                     return t + "/" + required;
                 }
@@ -405,7 +399,7 @@ class LanceAssignmentTableModel extends DataTableModel {
     public LanceAssignmentTableModel(Campaign campaign) {
         this.campaign = campaign;
         data = new ArrayList<>();
-        columnNames = new String[]{"Force", "Weight Class", "Mission", "Role"};
+        columnNames = new String[] { "Force", "Weight Class", "Mission", "Role" };
     }
 
     @Override
@@ -447,7 +441,7 @@ class LanceAssignmentTableModel extends DataTableModel {
 
     @Override
     public Object getValueAt(int row, int column) {
-        final String[] WEIGHT_CODES = {"Ultra-Light", "Light", "Medium", "Heavy", "Assault", "Super Heavy"};
+        final String[] WEIGHT_CODES = { "Ultra-Light", "Light", "Medium", "Heavy", "Assault", "Super Heavy" };
 
         if (row >= getRowCount()) {
             return "";
