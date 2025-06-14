@@ -3363,20 +3363,20 @@ public class Person {
 
             // This resolves a bug squashed in 2025 (50.03) but lurked in our codebase
             // potentially as far back as 2014. The next two handlers should never be removed.
-            if (!person.canPerformRole(campaign.getLocalDate(), person.getPrimaryRole(), true)) {
-                person.setPrimaryRole(campaign, PersonnelRole.NONE);
-
-                campaign.addReport(String.format(resources.getString("ineligibleForPrimaryRole"),
-                      spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
-                      CLOSING_SPAN_TAG,
-                      person.getHyperlinkedFullTitle()));
-            }
-
             if (!person.canPerformRole(campaign.getLocalDate(), person.getSecondaryRole(), false)) {
                 person.setSecondaryRole(PersonnelRole.NONE);
 
                 campaign.addReport(String.format(resources.getString("ineligibleForSecondaryRole"),
                       spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
+                      CLOSING_SPAN_TAG,
+                      person.getHyperlinkedFullTitle()));
+            }
+
+            if (!person.canPerformRole(campaign.getLocalDate(), person.getPrimaryRole(), true)) {
+                person.setPrimaryRole(campaign, PersonnelRole.NONE);
+
+                campaign.addReport(String.format(resources.getString("ineligibleForPrimaryRole"),
+                      spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                       CLOSING_SPAN_TAG,
                       person.getHyperlinkedFullTitle()));
             }
