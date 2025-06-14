@@ -52,7 +52,6 @@ import java.util.stream.Collectors;
 
 import megamek.Version;
 import megamek.codeUtilities.MathUtility;
-import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
 import megamek.common.enums.SkillLevel;
 import megamek.common.options.GameOptions;
@@ -75,14 +74,13 @@ import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
 import mekhq.campaign.rating.UnitRatingMethod;
+import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
+import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
 import mekhq.service.mrms.MRMSOption;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
-import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 
 /**
  * @author natit
@@ -248,6 +246,7 @@ public class CampaignOptions {
     private boolean displayAssignmentRecord;
     private boolean displayPerformanceRecord;
     private boolean rewardComingOfAgeAbilities;
+    private boolean rewardComingOfAgeRPSkills;
 
     // Expanded Personnel Information
     private boolean useTimeInService;
@@ -803,6 +802,7 @@ public class CampaignOptions {
         setDisplayKillRecord(false);
         setDisplayMedicalRecord(false);
         setRewardComingOfAgeAbilities(false);
+        setRewardComingOfAgeRPSkills(false);
 
         // Expanded Personnel Information
         setUseTimeInService(false);
@@ -1704,6 +1704,14 @@ public class CampaignOptions {
 
     public void setRewardComingOfAgeAbilities(final boolean rewardComingOfAgeAbilities) {
         this.rewardComingOfAgeAbilities = rewardComingOfAgeAbilities;
+    }
+
+    public boolean isRewardComingOfAgeRPSkills() {
+        return rewardComingOfAgeRPSkills;
+    }
+
+    public void setRewardComingOfAgeRPSkills(final boolean rewardComingOfAgeRPSkills) {
+        this.rewardComingOfAgeRPSkills = rewardComingOfAgeRPSkills;
     }
 
     public boolean isUseFatigue() {
@@ -5011,6 +5019,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayAssignmentRecord", isDisplayAssignmentRecord());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayPerformanceRecord", isDisplayPerformanceRecord());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "rewardComingOfAgeAbilities", isRewardComingOfAgeAbilities());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "rewardComingOfAgeRPSkills", isRewardComingOfAgeRPSkills());
         // endregion General Personnel
 
         // region Expanded Personnel Information
@@ -5847,6 +5856,8 @@ public class CampaignOptions {
                     campaignOptions.setDisplayPerformanceRecord(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("rewardComingOfAgeAbilities")) {
                     campaignOptions.setRewardComingOfAgeAbilities(Boolean.parseBoolean(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("rewardComingOfAgeRPSkills")) {
+                    campaignOptions.setRewardComingOfAgeRPSkills(Boolean.parseBoolean(nodeContents));
                     // endregion General Personnel
 
                     // region Expanded Personnel Information
