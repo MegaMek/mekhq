@@ -500,43 +500,13 @@ public class Faction {
     }
 
     /**
-     * Determines whether this faction performs Batchalls based on its short name.
+     * Determines whether this faction performs Batchalls.
      *
-     * <p>Batchalls are a tradition among specific factions - primarily various clans and related groups. This method
-     * checks if the faction's short name matches any of the known batchall-performing factions.</p>
+     * <p>Batchalls are a tradition among specific factions - primarily various clans and related groups. </p>
      *
      * @return {@code true} if the faction performs Batchalls; {@code false} otherwise
      */
     public boolean performsBatchalls() {
-        List<String> batchallFactions = List.of("CBS",
-              "CB",
-              "CCC",
-              "CCO",
-              "CDS",
-              "CFM",
-              "CGB",
-              "CGS",
-              "CHH",
-              "CIH",
-              "CJF",
-              "CMG",
-              "CNC",
-              "CSJ",
-              "CSR",
-              "CSA",
-              "CSV",
-              "CSL",
-              "CWI",
-              "CW",
-              "CWE",
-              "CWIE",
-              "CEI",
-              "RD",
-              "RA",
-              "CP",
-              "AML",
-              "CLAN");
-
-        return batchallFactions.contains(shortName);
+        return faction2.performsBatchalls();
     }
 }
