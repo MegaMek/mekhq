@@ -303,6 +303,7 @@ public enum PersonalityQuirk {
     FREEZES,
     TRAUMATIZED,
     HAUNTED,
+    @Deprecated(since = "0.50.07", forRemoval = true)
     BROKEN,
     REGRETS,
     DARK_SECRET,
