@@ -906,27 +906,24 @@ public class Person {
         return primaryRole;
     }
 
+    /**
+     * Sets the primary role for this person within the specified {@link Campaign}.
+     *
+     * <p>If the new primary role is different from the current one, this method performs any necessary updates, such
+     * as adjusting recruitment-related dates for non-civilian roles, updating the primary role, and triggering a
+     * {@link PersonChangedEvent}.</p>
+     *
+     * <p><b>Usage:</b> if there is any uncertainty as to whether the character is eligible for the role they are
+     * being assigned, make sure to call {@link #canPerformRole(LocalDate, PersonnelRole, boolean)} prior to this
+     * method.</p>
+     *
+     * @param campaign    the {@link Campaign} context, used for date retrieval and event tracking
+     * @param primaryRole the new {@link PersonnelRole} to be set as primary for this person
+     */
     public void setPrimaryRole(final Campaign campaign, final PersonnelRole primaryRole) {
         // don't need to do any processing for no changes
         if (primaryRole == getPrimaryRole()) {
             return;
-        }
-
-        // We need to make some secondary role assignments to None here for better UX in
-        // assigning roles, following these rules:
-        // 1) Cannot have the same primary and secondary roles
-        // 2) Must have a None secondary role if you are a Dependent
-        // 3) Cannot be a primary tech and a secondary Astech
-        // 4) Cannot be a primary Astech and a secondary tech
-        // 5) Cannot be primary medical staff and a secondary Medic
-        // 6) Cannot be a primary Medic and secondary medical staff
-        if ((primaryRole == getSecondaryRole()) ||
-                  primaryRole.isDependent() ||
-                  (primaryRole.isTech() && getSecondaryRole().isAstech()) ||
-                  (primaryRole.isAstech() && getSecondaryRole().isTechSecondary()) ||
-                  (primaryRole.isMedicalStaff() && getSecondaryRole().isMedic()) ||
-                  (primaryRole.isMedic() && getSecondaryRole().isMedicalStaff())) {
-            setSecondaryRoleDirect(PersonnelRole.NONE);
         }
 
         // Now, we can perform the time in service and last rank change tracking change for dependents
@@ -1063,6 +1060,25 @@ public class Person {
         return getSecondaryRole().getLabel(isClanPersonnel());
     }
 
+    /**
+     * Determines if this person can perform the specified {@link PersonnelRole} as either a primary or secondary role
+     * on the given date.
+     *
+     * <p>For primary roles, certain constraints are enforced, such as uniqueness compared to the secondary role and
+     * limitations based on the type of role (e.g., tech, medical, administrator).</p>
+     *
+     * <p>For secondary roles, different restrictions apply, including the ability to always select "None" and
+     * disallowing dependent roles.</p>
+     *
+     * <p>Additionally, the person's age and required skill sets are considered to ensure eligibility for the chosen
+     * role.</p>
+     *
+     * @param today   the {@link LocalDate} representing the current date, used for age-based checks
+     * @param role    the {@link PersonnelRole} being considered for assignment
+     * @param primary {@code true} to check eligibility as a primary role, {@code false} for secondary
+     *
+     * @return {@code true} if the person is eligible to perform the given role as specified; {@code false} otherwise
+     */
     public boolean canPerformRole(LocalDate today, final PersonnelRole role, final boolean primary) {
         if (primary) {
             // Primary Role:
@@ -1070,17 +1086,29 @@ public class Person {
             // 2) Cannot be None
             // 3) Cannot be equal to the secondary role
             // 4) Cannot be a tech role if the secondary role is a tech role (inc. Astech)
-            // 5) Cannot be Medic if the secondary role is one of the medical staff roles
-            // 6) Cannot be Admin if the secondary role is one of the administrator roles
+            // 5) Cannot be a medical if the secondary role is one of the medical staff roles
+            // 6) Cannot be an admin role if the secondary role is one of the administrator roles
             if (role.isDependent()) {
                 return true;
-            } else if (role.isNone()) {
+            }
+
+            if (role.isNone()) {
                 return false;
-            } else if ((role == getSecondaryRole()) ||
-                             ((role.isTech() || role.isAstech()) &&
-                                    (getSecondaryRole().isTech() || getSecondaryRole().isAstech())) ||
-                             (role.isMedicalStaff() && getSecondaryRole().isMedicalStaff()) ||
-                             (role.isAdministrator() && getSecondaryRole().isAdministrator())) {
+            }
+
+            if (role == secondaryRole) {
+                return false;
+            }
+
+            if (role.isTech() && (secondaryRole.isTech() || secondaryRole.isAstech())) {
+                return false;
+            }
+
+            if (role.isMedicalStaff() && secondaryRole.isMedicalStaff()) {
+                return false;
+            }
+
+            if (role.isAdministrator() && secondaryRole.isAdministrator()) {
                 return false;
             }
         } else {
@@ -1089,17 +1117,29 @@ public class Person {
             // 2) Cannot be Dependent
             // 3) Cannot be equal to the primary role
             // 4) Cannot be a tech role if the primary role is a tech role (inc. Astech)
-            // 5) Cannot be Medic if the primary role is one of the medical staff roles
-            // 6) Cannot be Admin if the primary role is one of the administrator roles
+            // 5) Cannot be a medical role if the primary role is one of the medical staff roles
+            // 6) Cannot be an admin role if the primary role is one of the administrator roles
             if (role.isNone()) {
                 return true;
-            } else if ((role.isDependent()) ||
-                             (getPrimaryRole().isDependent()) ||
-                             (getPrimaryRole() == role) ||
-                             ((role.isTech() || role.isAstech()) &&
-                                    (getPrimaryRole().isTech() || getPrimaryRole().isAstech())) ||
-                             (role.isMedicalStaff() && getPrimaryRole().isMedicalStaff()) ||
-                             (role.isAdministrator() && getPrimaryRole().isAdministrator())) {
+            }
+
+            if (role.isDependent()) {
+                return false;
+            }
+
+            if (role == primaryRole) {
+                return false;
+            }
+
+            if (role.isTech() && (primaryRole.isTech() || primaryRole.isAstech())) {
+                return false;
+            }
+
+            if (role.isMedicalStaff() && primaryRole.isMedicalStaff()) {
+                return false;
+            }
+
+            if (role.isAdministrator() && primaryRole.isAdministrator()) {
                 return false;
             }
         }
@@ -1108,6 +1148,7 @@ public class Person {
             return false;
         }
 
+        List<String> skillsForProfession = role.getSkillsForProfession();
         return switch (role) {
             case VEHICLE_CREW -> Stream.of(SkillType.S_TECH_MEK,
                   SkillType.S_TECH_AERO,
@@ -1119,21 +1160,12 @@ public class Person {
                   SkillType.S_COMMUNICATIONS,
                   SkillType.S_SENSOR_OPERATIONS,
                   SkillType.S_ART_COOKING).anyMatch(this::hasSkill);
-            case AEROSPACE_PILOT -> hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO);
-            case CONVENTIONAL_AIRCRAFT_PILOT -> hasSkill(SkillType.S_GUN_JET) && hasSkill(SkillType.S_PILOT_JET);
-            case PROTOMEK_PILOT -> hasSkill(SkillType.S_GUN_PROTO);
             case BATTLE_ARMOUR -> hasSkill(SkillType.S_GUN_BA);
-            case SOLDIER -> hasSkill(SkillType.S_SMALL_ARMS);
-            case VESSEL_PILOT -> hasSkill(SkillType.S_PILOT_SPACE);
             case VESSEL_CREW -> hasSkill(SkillType.S_TECH_VESSEL);
-            case VESSEL_GUNNER -> hasSkill(SkillType.S_GUN_SPACE);
-            case VESSEL_NAVIGATOR -> hasSkill(SkillType.S_NAVIGATION);
             case MEK_TECH -> hasSkill(SkillType.S_TECH_MEK);
             case AERO_TEK -> hasSkill(SkillType.S_TECH_AERO);
             case BA_TECH -> hasSkill(SkillType.S_TECH_BA);
-            case ASTECH -> hasSkill(SkillType.S_ASTECH);
             case DOCTOR -> hasSkill(SkillType.S_SURGERY);
-            case MEDIC -> hasSkill(SkillType.S_MEDTECH);
             case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_HR ->
                   hasSkill(SkillType.S_ADMIN);
             case ADULT_ENTERTAINER -> {
@@ -1153,7 +1185,7 @@ public class Person {
                 }
             }
             default -> {
-                for (String skillName : role.getSkillsForProfession()) {
+                for (String skillName : skillsForProfession) {
                     if (!hasSkill(skillName)) {
                         yield false;
                     }
