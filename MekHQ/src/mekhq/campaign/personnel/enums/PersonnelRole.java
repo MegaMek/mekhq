@@ -406,7 +406,9 @@ public enum PersonnelRole {
     DROPSHIP_ENTERTAINMENT_OFFICER(KeyEvent.VK_UNDEFINED),
     JUMPSHIP_BOTANIST(KeyEvent.VK_UNDEFINED),
     LOCAL_WARLORD(KeyEvent.VK_UNDEFINED),
-    MISCELLANEOUS_JOB(KeyEvent.VK_UNDEFINED);
+    MISCELLANEOUS_JOB(KeyEvent.VK_UNDEFINED),
+    NOBLE(KeyEvent.VK_UNDEFINED),
+    COMMON_CRIMINAL(KeyEvent.VK_UNDEFINED);
     // endregion Enum Declarations
 
     // region Variable Declarations
@@ -969,6 +971,8 @@ public enum PersonnelRole {
             case DROPSHIP_ENTERTAINMENT_OFFICER -> List.of(SkillType.S_ART_INSTRUMENT, SkillType.S_TECH_VESSEL);
             case JUMPSHIP_BOTANIST -> List.of(SkillType.S_SCIENCE_BIOLOGY, SkillType.S_TECH_VESSEL);
             case LOCAL_WARLORD -> List.of(SkillType.S_SMALL_ARMS, SkillType.S_LEADER);
+            case NOBLE -> List.of(SkillType.S_PROTOCOLS, SkillType.S_INTEREST_POLITICS);
+            case COMMON_CRIMINAL -> List.of(SkillType.S_STREETWISE, SkillType.S_INTEREST_GAMBLING);
         };
     }
     // endregion Getters
