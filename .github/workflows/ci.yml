@@ -113,7 +113,7 @@ jobs:
 
       - name: Test All
         working-directory: mekhq
-        run: ./gradlew testAll  --stacktrace --scan
+        run: ./gradlew testAll
 
       - name: Upload Test Logs on Failure
         uses: actions/upload-artifact@v4
