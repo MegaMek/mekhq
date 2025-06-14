@@ -680,12 +680,6 @@ public enum PersonnelTableModelColumn {
                         return person.getUnit().getTransportShipAssignment().getTransportShip().getName();
                     }
                 }
-                if (!person.getTechUnits().isEmpty()) {
-                        Unit unit = person.getTechUnits().get(0);
-                        if (unit.getTransportShipAssignment() != null) {
-                            return unit.getTransportShipAssignment().getTransportShip().getName();
-                        }else return "-";
-                }
                 return "-";
 
             case TACTICAL_TRANSPORT:
@@ -693,12 +687,6 @@ public enum PersonnelTableModelColumn {
                     if (person.getUnit().getTacticalTransportAssignment() != null) {
                         return person.getUnit().getTacticalTransportAssignment().getTransport().getName();
                     }
-                }
-                if (!person.getTechUnits().isEmpty()) {
-                    Unit unit = person.getTechUnits().get(0);
-                    if (unit.getTacticalTransportAssignment() != null) {
-                        return person.getTechUnits().get(0).getTacticalTransportAssignment().getTransport().getName();
-                    } else return "-";
                 }
                 return  "-";
 
