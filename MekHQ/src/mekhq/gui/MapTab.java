@@ -43,8 +43,11 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -119,13 +122,23 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         panTopButtons.add(new JLabel(resourceMap.getString("lblFindPlanet.text")), gridBagConstraints);
 
         suggestPlanet = new JSuggestField(getFrame(), getCampaign().getSystemNames());
-        suggestPlanet.setFocusable(false);
         suggestPlanet.addActionListener(ev -> {
             PlanetarySystem p = getCampaign().getSystemByName(suggestPlanet.getText());
             if (null != p) {
                 panMap.setSelectedSystem(p);
                 panSystem.updatePlanetarySystem(p);
                 refreshPlanetView();
+            }
+        });
+        suggestPlanet.setBorder(BorderFactory.createLineBorder(suggestPlanet.getBackground(), 1));
+        suggestPlanet.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                suggestPlanet.setBorder(BorderFactory.createLineBorder(suggestPlanet.getBackground(), 1));
+            }
+            @Override
+            public void focusLost(FocusEvent e) {
+                suggestPlanet.setBorder(BorderFactory.createLineBorder(suggestPlanet.getBackground(), 1));
             }
         });
         gridBagConstraints = new GridBagConstraints();

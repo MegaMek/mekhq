@@ -68,9 +68,11 @@ public class PartsStore {
     private Map<String, Part> nameAndDetailMap;
 
     public PartsStore(Campaign c) {
+        logger.debug("Creating PartsStore for campaign");
         parts = new ArrayList<>(EXPECTED_SIZE);
         nameAndDetailMap = new HashMap<>(EXPECTED_SIZE);
         stock(c);
+        logger.debug("Finished creating PartsStore for campaign");
     }
 
     public ArrayList<Part> getInventory() {

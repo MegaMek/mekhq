@@ -94,6 +94,10 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+        with:
+          build-scan-publish: true
+          build-scan-terms-of-use-url: "https://gradle.com/terms-of-service"
+          build-scan-terms-of-use-agree: "yes"
 
       - name: Set short git commit SHA
         id: vars
@@ -114,6 +118,8 @@ jobs:
       - name: Test All
         working-directory: mekhq
         run: ./gradlew testAll  --stacktrace --scan
+        env:
+          mm.profile: dev
 
       - name: Upload Test Logs on Failure
         uses: actions/upload-artifact@v4
@@ -121,6 +127,7 @@ jobs:
         with:
           name: cd-failure-logs
           path: ./mekhq/MekHQ/build/reports/
+          overwrite: true
 
       - name: Build with Gradle
         working-directory: mekhq

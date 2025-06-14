@@ -57,7 +57,7 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
-import mekhq.campaign.personnel.SkillPerquisite;
+import mekhq.campaign.personnel.SkillPrerequisite;
 import mekhq.campaign.personnel.SpecialAbility;
 
 /**
@@ -76,10 +76,10 @@ public class EditSpecialAbilityDialog extends JDialog {
     private JButton btnEditInvalid;
     private JButton btnEditRemove;
     private JButton btnClearPrerequisiteSkills;
-    private JButton btnAddSkillPerquisite;
+    private JButton btnAddSkillPrerequisite;
 
     private Vector<String> prerequisiteAbilities;
-    private Vector<SkillPerquisite> prerequisiteSkills;
+    private Vector<SkillPrerequisite> prerequisiteSkills;
     private Vector<String> invalidAbilities;
     private Vector<String> removeAbilities;
 
@@ -104,7 +104,7 @@ public class EditSpecialAbilityDialog extends JDialog {
         prerequisiteAbilities = (Vector<String>) ability.getPrereqAbilities().clone();
         invalidAbilities = (Vector<String>) ability.getInvalidAbilities().clone();
         removeAbilities = (Vector<String>) ability.getRemovedAbilities().clone();
-        prerequisiteSkills = (Vector<SkillPerquisite>) ability.getPrereqSkills().clone();
+        prerequisiteSkills = (Vector<SkillPrerequisite>) ability.getPrereqSkills().clone();
         cancelled = false;
         currentXP = ability.getCost();
         initComponents();
@@ -311,10 +311,10 @@ public class EditSpecialAbilityDialog extends JDialog {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         panSkill.add(new JLabel("<html><b>Prerequisite Skill Sets</b></html>"), gridBagConstraints);
 
-        btnAddSkillPerquisite = new JButton("Add Skill Prerequisite");
-        btnAddSkillPerquisite.addActionListener(evt -> {
-            EditSkillPerquisiteDialog newSkillPrerequisiteDialog = new EditSkillPerquisiteDialog(null,
-                  new SkillPerquisite());
+        btnAddSkillPrerequisite = new JButton("Add Skill Prerequisite");
+        btnAddSkillPrerequisite.addActionListener(evt -> {
+            EditSkillPreRequisiteDialog newSkillPrerequisiteDialog = new EditSkillPreRequisiteDialog(null,
+                  new SkillPrerequisite());
             newSkillPrerequisiteDialog.setVisible(true);
             if (!newSkillPrerequisiteDialog.wasCancelled() && !newSkillPrerequisiteDialog.getPrereq().isEmpty()) {
                 prerequisiteSkills.add(newSkillPrerequisiteDialog.getPrereq());
@@ -328,7 +328,7 @@ public class EditSpecialAbilityDialog extends JDialog {
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.insets = new Insets(2, 2, 2, 2);
         gridBagConstraints.fill = GridBagConstraints.NONE;
-        panSkill.add(btnAddSkillPerquisite, gridBagConstraints);
+        panSkill.add(btnAddSkillPrerequisite, gridBagConstraints);
 
         btnClearPrerequisiteSkills = new JButton("Clear Skill Prerequisites");
         btnClearPrerequisiteSkills.addActionListener(evt -> {
@@ -357,7 +357,7 @@ public class EditSpecialAbilityDialog extends JDialog {
         JButton btnRemoveSkill;
         JButton btnEditSkill;
         for (int i = 0; i < prerequisiteSkills.size(); i++) {
-            SkillPerquisite skillPerquisite = prerequisiteSkills.get(i);
+            SkillPrerequisite skillPrerequisite = prerequisiteSkills.get(i);
             panSkPre = new JPanel(new GridBagLayout());
 
             GridBagConstraints c = new GridBagConstraints();
@@ -369,7 +369,7 @@ public class EditSpecialAbilityDialog extends JDialog {
             c.anchor = GridBagConstraints.NORTHWEST;
             c.insets = new Insets(2, 2, 2, 2);
             c.fill = GridBagConstraints.BOTH;
-            panSkPre.add(new JLabel("<html>" + skillPerquisite.toString() + "</html>"), c);
+            panSkPre.add(new JLabel("<html>" + skillPrerequisite.toString() + "</html>"), c);
 
             c.gridx = 1;
             c.gridy = 0;
@@ -501,12 +501,12 @@ public class EditSpecialAbilityDialog extends JDialog {
         getContentPane().repaint();
     }
 
-    private void removeSkillPerquisite(int i) {
+    private void removeSkillPreRequisite(int i) {
         prerequisiteSkills.remove(i);
     }
 
-    private void editSkillPerquisite(int i) {
-        EditSkillPerquisiteDialog newSkillPrerequisiteDialog = new EditSkillPerquisiteDialog(null,
+    private void editSkillPreRequisite(int i) {
+        EditSkillPreRequisiteDialog newSkillPrerequisiteDialog = new EditSkillPreRequisiteDialog(null,
               prerequisiteSkills.get(i));
         newSkillPrerequisiteDialog.setVisible(true);
         if (!newSkillPrerequisiteDialog.wasCancelled() && !newSkillPrerequisiteDialog.getPrereq().isEmpty()) {
@@ -527,7 +527,7 @@ public class EditSpecialAbilityDialog extends JDialog {
         @Override
         public void actionPerformed(ActionEvent evt) {
             int id = Integer.parseInt(evt.getActionCommand());
-            removeSkillPerquisite(id);
+            removeSkillPreRequisite(id);
             refreshGUI();
         }
     }
@@ -540,7 +540,7 @@ public class EditSpecialAbilityDialog extends JDialog {
         @Override
         public void actionPerformed(ActionEvent evt) {
             int id = Integer.parseInt(evt.getActionCommand());
-            editSkillPerquisite(id);
+            editSkillPreRequisite(id);
             refreshGUI();
         }
     }
