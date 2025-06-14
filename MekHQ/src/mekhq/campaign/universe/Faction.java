@@ -34,9 +34,6 @@
 package mekhq.campaign.universe;
 
 import static megamek.common.Compute.randomInt;
-import static mekhq.campaign.universe.enums.HonorRating.LIBERAL;
-import static mekhq.campaign.universe.enums.HonorRating.OPPORTUNISTIC;
-import static mekhq.campaign.universe.enums.HonorRating.STRICT;
 
 import java.awt.Color;
 import java.time.LocalDate;
@@ -50,15 +47,9 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import megamek.common.universe.HonorRating;
 
-import java.awt.*;
 import java.nio.file.Path;
-import java.time.LocalDate;
 import java.util.List;
-import java.util.*;
-import java.util.Map.Entry;
 import java.util.stream.Collectors;
-
-import static megamek.common.Compute.randomInt;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
