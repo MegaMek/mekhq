@@ -236,7 +236,7 @@ public class FinancesTab {
     public JPanel createFinancesGeneralOptionsTab() {
         // Header
         financesGeneralOptions = new CampaignOptionsHeaderPanel("FinancesGeneralTab",
-              getImageDirectory() + "logo_star_league.png", 6);
+              getImageDirectory() + "logo_star_league.png", 10);
 
         // Contents
         pnlGeneralOptions = createGeneralOptionsPanel();
