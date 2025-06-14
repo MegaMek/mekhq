@@ -42,6 +42,7 @@ import mekhq.campaign.personnel.enums.PersonnelRoleSubType;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.Faction;
+import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 import mekhq.gui.campaignOptions.contents.*;
@@ -109,6 +110,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private MarketsTab marketsTab;
     private SystemsTab systemsTab;
     private RulesetsTab rulesetsTab;
+    private CampaignGUI campaignGui;
 
     /**
      * Constructs a {@code CampaignOptionsPane} for managing campaign settings. This initializes the tabbed pane and
@@ -123,7 +125,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         this.campaign = campaign;
         this.campaignOptions = campaign.getCampaignOptions();
         this.mode = mode;
-
+        if (campaign.getApp() != null) {
+            campaignGui = campaign.getApp().getCampaigngui();
+        }
         initialize();
     }
 
@@ -548,8 +552,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         }
 
         campaign.resetRandomDeath();
-
-        campaign.getApp().getCampaigngui().refreshMarketButtonLabels();
+        if (campaignGui != null) {
+            campaignGui.refreshMarketButtonLabels();
+        }
     }
 
     /**

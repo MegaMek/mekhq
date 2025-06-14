@@ -117,7 +117,9 @@ jobs:
 
       - name: Test All
         working-directory: mekhq
-        run: ./gradlew testAll
+        run: ./gradlew testAll  --stacktrace --scan
+        env:
+          mm.profile: dev
 
       - name: Upload Test Logs on Failure
         uses: actions/upload-artifact@v4
@@ -125,6 +127,7 @@ jobs:
         with:
           name: cd-failure-logs
           path: ./mekhq/MekHQ/build/reports/
+          overwrite: true
 
       - name: Build with Gradle
         working-directory: mekhq

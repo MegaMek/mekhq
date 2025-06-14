@@ -59,7 +59,7 @@ public class VeeStabilizer extends Part {
     public VeeStabilizer(int tonnage, int loc, Campaign c) {
         super(tonnage, c);
         this.loc = loc;
-        this.name = "Vehicle Stabiliser";
+        this.name = "Vehicle Stabilizer";
     }
 
     @Override

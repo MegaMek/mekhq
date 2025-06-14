@@ -47,7 +47,8 @@ import static mekhq.utilities.spaUtilities.enums.AbilityCategory.UTILITY_ABILITY
 import java.util.List;
 import java.util.regex.Pattern;
 
-import mekhq.campaign.personnel.SkillPerquisite;
+import megamek.logging.MMLogger;
+import mekhq.campaign.personnel.SkillPrerequisite;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.spaUtilities.enums.AbilityCategory;
@@ -63,6 +64,8 @@ import mekhq.utilities.spaUtilities.enums.AbilityCategory;
  * @since 0.50.06
  */
 public class SpaUtilities {
+    private static final MMLogger LOGGER = MMLogger.create(SpaUtilities.class);
+
     /**
      * Checks if a given {@link SpecialAbility} belongs to the specified {@link AbilityCategory}.
      *
@@ -118,25 +121,29 @@ public class SpaUtilities {
         // Precompile regex patterns
         final Pattern curlyBracesPattern = Pattern.compile("[{}]");
         final Pattern orPattern = Pattern.compile("OR ");
-        for (SkillPerquisite skillPerquisite : ability.getPrereqSkills()) {
-            String skillPerquisiteString = skillPerquisite.toString();
+        for (SkillPrerequisite skillPrerequisite : ability.getPrereqSkills()) {
+            String skillPrerequisiteString = skillPrerequisite.toString();
             // Step 1: Remove extra information
-            skillPerquisiteString = curlyBracesPattern.matcher(skillPerquisiteString).replaceAll("");
-            skillPerquisiteString = orPattern.matcher(skillPerquisiteString).replaceAll("");
+            skillPrerequisiteString = curlyBracesPattern.matcher(skillPrerequisiteString).replaceAll("");
+            skillPrerequisiteString = orPattern.matcher(skillPrerequisiteString).replaceAll("");
 
             // Step 2: remove experience levels
             for (int i = 0; i < EXP_LEGENDARY; i++) {
-                skillPerquisiteString = skillPerquisiteString.replaceAll(getExperienceLevelName(i) + ' ', "");
+                skillPrerequisiteString = skillPrerequisiteString.replaceAll(getExperienceLevelName(i) + ' ', "");
             }
 
             // Step 3: Split the string by <br>
-            String[] parts = skillPerquisiteString.split("<br>");
+            String[] parts = skillPrerequisiteString.split("<br>");
 
             // Step 4: Test each part
             List<String> specialAbilitySkills = List.of(S_GUN_PROTO, S_GUN_BA);
             for (String part : parts) {
                 SkillType skillType = SkillType.getType(part);
-
+                if (part == null || skillType == null) {
+                    LOGGER.warn("Invalid skill type in prerequisite: Invalid value={} - skillPrerequisiteString {}",
+                          part, skillPrerequisiteString);
+                    continue; // Continue if part is null or not a valid SkillType - this is a cope out, not a solution
+                }
                 if (skillType.isSubTypeOf(COMBAT_GUNNERY) && !specialAbilitySkills.contains(part)) {
                     return COMBAT_ABILITY;
                 }

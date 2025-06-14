@@ -136,7 +136,7 @@ public abstract class Part implements IPartWork, ITechnology {
     protected boolean brandNew;
 
     // we need to keep track of a couple of potential mods that result from carrying
-    // over a task, otherwise people can get away with working over time with no
+    // over a task, otherwise people can get away with working overtime with no
     // consequence
     protected boolean workingOvertime;
     protected int shorthandedMod;
@@ -448,7 +448,7 @@ public abstract class Part implements IPartWork, ITechnology {
                                              "None in stock") :
                                        ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
                                                                                                  .getFontColorPositiveHexColor(),
-                                             String.valueOf(inStock) + " in stock");
+                                             inStock + " in stock");
 
             toReturn.append(inStockText).append("<br>");
         } else {
@@ -502,18 +502,12 @@ public abstract class Part implements IPartWork, ITechnology {
     }
 
     public static String getTechBaseName(TechBase base) {
-        switch (base) {
-            case ALL:
-                return "IS/Clan";
-            case CLAN:
-                return "Clan";
-            case IS:
-                return "IS";
-            case UNKNOWN:
-                return "UNKNOWN";
-            default:
-                return "??";
-        }
+        return switch (base) {
+            case ALL -> "IS/Clan";
+            case CLAN -> "Clan";
+            case IS -> "IS";
+            case UNKNOWN -> "UNKNOWN";
+        };
     }
 
     /**
@@ -666,11 +660,31 @@ public abstract class Part implements IPartWork, ITechnology {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "part");
     }
 
+    /**
+     * Fixes the class name for renamed classes.
+     * This is used to handle cases where the class name has changed in a way that would break XML loading.
+     * <p>
+     * Example: "OldClassName" have been renamed to "NewClassName".
+     * <p>
+     * In this case, you would add a case for "OldClassName" that returns NewClassName.class.getSimpleName().
+     * @param className the name of the class to fix (if necessary)
+     * @return the fixed class name, or the passed class name if no fix is needed
+     */
+    private static String fixForRenamedClasses(String className) {
+        return switch (className) {
+            // case "OldClassName" -> NewClassName.class.getSimpleName();
+            case "VeeStabiliser" -> VeeStabilizer.class.getSimpleName();
+            case "MissingVeeStabiliser" -> MissingVeeStabilizer.class.getSimpleName();
+            default -> className;
+        };
+    }
+
     public static Part generateInstanceFromXML(Node wn, Version version) {
         NamedNodeMap attrs = wn.getAttributes();
         Node classNameNode = attrs.getNamedItem("type");
-        String className = classNameNode.getTextContent();
-        
+        // fix for migrations
+        String className = fixForRenamedClasses(classNameNode.getTextContent());
+
         Part retVal = null;
         try {
             // Instantiate the correct child class, and call its parsing function.
@@ -745,11 +759,12 @@ public abstract class Part implements IPartWork, ITechnology {
             if (retVal.unit != null && retVal.refitUnit != null) {
                 retVal.setUnit(null);
             }
+        } catch (ClassNotFoundException classNotFoundException) {
+            logger.error(classNotFoundException, "Could not find Part subclass with name {}, please check if this " +
+                                                       "class was not renamed, if thats the case, register its new " +
+                                                       "name in the function Part#fixForRenamedClasses", className);
         } catch (Exception ex) {
-            // Errrr, apparently either the class name was invalid...
-            // Or the listed name doesn't exist.
-            // Doh!
-            logger.error("", ex);
+            logger.error(ex,"Unexpected error {}", ex.getMessage());
         }
 
         return retVal;
@@ -1217,7 +1232,7 @@ public abstract class Part implements IPartWork, ITechnology {
     }
 
     /**
-     * Gets a value indicating whether or not the part is present.
+     * Gets a value indicating whether the part is present.
      */
     public boolean isPresent() {
         return daysToArrival == 0;
@@ -1306,7 +1321,7 @@ public abstract class Part implements IPartWork, ITechnology {
     }
 
     /**
-     * Gets a value indicating whether or not this is a spare part.
+     * Gets a value indicating whether this is a spare part.
      */
     public boolean isSpare() {
         return (unit == null) && (parentPart == null) && (refitUnit == null) && (reservedBy == null);
@@ -1355,7 +1370,7 @@ public abstract class Part implements IPartWork, ITechnology {
      * Get the acquisition work to acquire a new part of this type For most parts this is just getMissingPart(), but
      * some override it
      *
-     * @return
+     * @return the acquisition work to acquire a new part of this type
      */
     public IAcquisitionWork getAcquisitionWork() {
         return getMissingPart();
@@ -1406,14 +1421,14 @@ public abstract class Part implements IPartWork, ITechnology {
     }
 
     /**
-     * Gets a value indicating whether or not this part has a parent part.
+     * Gets a value indicating whether this part has a parent part.
      */
     public boolean hasParentPart() {
         return parentPart != null;
     }
 
     /**
-     * Gets a value indicating whether or not this part has child parts.
+     * Gets a value indicating whether this part has child parts.
      */
     public boolean hasChildParts() {
         return !childParts.isEmpty();
@@ -1751,10 +1766,7 @@ public abstract class Part implements IPartWork, ITechnology {
             int id = replacementPart.getId();
             replacementPart = campaign.getWarehouse().getPart(id);
             if ((replacementPart == null) && (id > 0)) {
-                logger.error(String.format("Part %d ('%s') references missing replacement part %d",
-                      getId(),
-                      getName(),
-                      id));
+                logger.error("Part {} ('{}') references missing replacement part {}", getId(), getName(), id);
             }
         }
 
@@ -1762,7 +1774,7 @@ public abstract class Part implements IPartWork, ITechnology {
             int id = parentPart.getId();
             parentPart = campaign.getWarehouse().getPart(id);
             if ((parentPart == null) && (id > 0)) {
-                logger.error(String.format("Part %d ('%s') references missing parent part %d", getId(), getName(), id));
+                logger.error("Part {} ('{}') references missing replacement part {}", getId(), getName(), id);
             }
         }
 
@@ -1773,10 +1785,7 @@ public abstract class Part implements IPartWork, ITechnology {
                 if (realPart != null) {
                     childParts.set(ii, realPart);
                 } else if (childPart.getId() > 0) {
-                    logger.error(String.format("Part %d ('%s') references missing child part %d",
-                          getId(),
-                          getName(),
-                          childPart.getId()));
+                    logger.error("Part {} ('{}') references missing child part {}", getId(), getName(), childPart.getId());
                     childParts.remove(ii);
                 }
             }
@@ -1786,17 +1795,14 @@ public abstract class Part implements IPartWork, ITechnology {
             UUID id = tech.getId();
             tech = campaign.getPerson(id);
             if (tech == null) {
-                logger.error(String.format("Part %d ('%s') references missing tech %s", getId(), getName(), id));
+                logger.error("Part {} ('{}') references missing tech {}", getId(), getName(), id);
             }
         }
         if (reservedBy instanceof PartPersonRef) {
             UUID id = reservedBy.getId();
             reservedBy = campaign.getPerson(id);
             if (reservedBy == null) {
-                logger.error(String.format("Part %d ('%s') references missing tech (reservation) %s",
-                      getId(),
-                      getName(),
-                      id));
+                logger.error("Part {} ('{}') references missing tech (reservation) {}", getId(), getName(), id);
             }
         }
 
@@ -1804,7 +1810,7 @@ public abstract class Part implements IPartWork, ITechnology {
             UUID id = unit.getId();
             unit = campaign.getUnit(id);
             if (unit == null) {
-                logger.error(String.format("Part %d ('%s') references missing unit %s", getId(), getName(), id));
+                logger.error("Part {} ('{}') references missing unit (reservation) {}", getId(), getName(), id);
             }
         }
 
@@ -1812,7 +1818,7 @@ public abstract class Part implements IPartWork, ITechnology {
             UUID id = refitUnit.getId();
             refitUnit = campaign.getUnit(id);
             if (refitUnit == null) {
-                logger.error(String.format("Part %d ('%s') references missing refit unit %s", getId(), getName(), id));
+                logger.error("Part {} ('{}') references missing refit unit {}", getId(), getName(), id);
             }
         }
     }
