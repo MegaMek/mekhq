@@ -9,8 +9,30 @@ jobs:
   dependency-submission:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout project sources
+      - name: "Check out MekHQ"
         uses: actions/checkout@v4
+        with:
+          path: MekHQ
+
+      - name: "Check out MegaMekLab"
+        uses: actions/checkout@v4
+        with:
+          repository: MegaMek/megameklab
+          ref: master
+          path: megameklab
+
+      - name: Checkout MegaMek
+        uses: actions/checkout@v4
+        with:
+          repository: MegaMek/megamek
+          ref: master
+          path: megamek
+
+      - name: Set up Temurin JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
 
       - name: Generate and submit dependency graph
         uses: gradle/actions/dependency-submission@v4
@@ -18,3 +40,4 @@ jobs:
           build-scan-publish: true
           build-scan-terms-of-use-url: "https://gradle.com/terms-of-service"
           build-scan-terms-of-use-agree: "yes"
+          build-root-directory: MekHQ
