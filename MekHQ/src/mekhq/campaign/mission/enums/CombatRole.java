@@ -135,7 +135,7 @@ public enum CombatRole {
         } catch (Exception ignored) {
         }
 
-        MMLogger.create(CombatRole.class).error("Unable to parse " + text + " into an CombatRole. Returning RESERVE.");
+        MMLogger.create(CombatRole.class).warn("Unable to parse {} into an CombatRole. Returning RESERVE.", text);
         return RESERVE;
     }
     // endregion File I/O

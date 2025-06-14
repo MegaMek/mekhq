@@ -154,6 +154,7 @@ public class Person {
     public static final String UNLUCKY_LABEL = "UNLUCKY";
     public static final int MINIMUM_UNLUCKY = 0;
     public static final int MAXIMUM_UNLUCKY = 5;
+    private static final String DELIMITER = "::";
 
 
     private PersonAwardController awardController;
@@ -708,7 +709,7 @@ public class Person {
 
     /**
      * Return a full last name which may be a bloodname or a surname with or without a post-nominal. A bloodname will
-     * overrule a surname but we do not disallow surnames for clan personnel, if the player wants to input them
+     * overrule a surname, but we do not disallow surnames for clan personnel, if the player wants to input them
      *
      * @return a String of the person's last name
      */
@@ -2603,20 +2604,20 @@ public class Person {
             if (countOptions(PersonnelOptions.LVL3_ADVANTAGES) > 0) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent,
                       "advantages",
-                      getOptionList("::", PersonnelOptions.LVL3_ADVANTAGES));
+                      getOptionList(DELIMITER, PersonnelOptions.LVL3_ADVANTAGES));
             }
 
             if (countOptions(PersonnelOptions.EDGE_ADVANTAGES) > 0) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent,
                       "edge",
-                      getOptionList("::", PersonnelOptions.EDGE_ADVANTAGES));
+                      getOptionList(DELIMITER, PersonnelOptions.EDGE_ADVANTAGES));
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "edgeAvailable", getCurrentEdge());
             }
 
             if (countOptions(PersonnelOptions.MD_ADVANTAGES) > 0) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent,
                       "implants",
-                      getOptionList("::", PersonnelOptions.MD_ADVANTAGES));
+                      getOptionList(DELIMITER, PersonnelOptions.MD_ADVANTAGES));
             }
 
             if (!techUnits.isEmpty()) {
@@ -3312,7 +3313,7 @@ public class Person {
             person.setFullName(); // this sets the name based on the loaded values
 
             if ((advantages != null) && !advantages.isBlank()) {
-                StringTokenizer st = new StringTokenizer(advantages, "::");
+                StringTokenizer st = new StringTokenizer(advantages, DELIMITER);
                 while (st.hasMoreTokens()) {
                     String adv = st.nextToken();
                     String advName = Crew.parseAdvantageName(adv);
@@ -3337,7 +3338,7 @@ public class Person {
             }
 
             if ((implants != null) && !implants.isBlank()) {
-                StringTokenizer st = new StringTokenizer(implants, "::");
+                StringTokenizer st = new StringTokenizer(implants, DELIMITER);
                 while (st.hasMoreTokens()) {
                     String adv = st.nextToken();
                     String advName = Crew.parseAdvantageName(adv);
@@ -3525,7 +3526,7 @@ public class Person {
      * @param edgeOptionList the list of edge triggers to remove
      */
     private static void updateOptions(String edgeTriggers, Person retVal, List<String> edgeOptionList) {
-        StringTokenizer st = new StringTokenizer(edgeTriggers, "::");
+        StringTokenizer st = new StringTokenizer(edgeTriggers, DELIMITER);
 
         while (st.hasMoreTokens()) {
             String trigger = st.nextToken();
@@ -3583,7 +3584,7 @@ public class Person {
      *
      * @param campaign     the campaign the person is a part of
      * @param money        the value of a single share
-     * @param sharesForAll whether or not all personnel have shares
+     * @param sharesForAll whether all personnel have shares
      */
     public void payPersonShares(final Campaign campaign, final Money money, final boolean sharesForAll) {
         final int shares = getNumShares(campaign, sharesForAll);
@@ -3860,7 +3861,7 @@ public class Person {
                 }
             }
             case VEHICLE_CREW -> {
-                // Vehicle crew are a special case as they just need one of any of the following skills to qualify,
+                // Vehicle crew are a special case as they just need any one of the following skills to qualify,
                 // rather than needing all relevant skills
                 List<String> relevantSkills = List.of(SkillType.S_TECH_MEK,
                       SkillType.S_TECH_AERO,
@@ -4233,7 +4234,7 @@ public class Person {
     }
 
     /**
-     * @return the the number of skills learned by the character.
+     * @return the number of skills learned by the character.
      */
     public int getSkillNumber() {
         return skills.size();
@@ -4470,7 +4471,7 @@ public class Person {
     }
 
     /**
-     * @return an html-coded list that says what abilities are enabled for this pilot
+     * @return a html-coded list that says what abilities are enabled for this pilot
      */
     public @Nullable String getAbilityListAsString(final String type) {
         final StringBuilder abilityString = new StringBuilder();
@@ -4588,7 +4589,7 @@ public class Person {
     }
 
     /**
-     * @return an html-coded tooltip that says what edge will be used
+     * @return a html-coded tooltip that says what edge will be used
      */
     public String getEdgeTooltip() {
         final StringBuilder stringBuilder = new StringBuilder();
@@ -4609,7 +4610,7 @@ public class Person {
      * Determines whether the user possesses the necessary skills to operate the given entity.
      *
      * <p>The required skills are based on the type of the provided entity. The method checks for specific piloting or
-     * gunnery skills relevant to the entity type, such as Mechs, VTOLs, tanks, aerospace units, battle armor, and
+     * gunnery skills relevant to the entity type, such as Meks, VTOLs, tanks, aerospace units, battle armor, and
      * others.</p>
      *
      * <p>If the appropriate skill(s) for the entity type are present, the method returns {@code true}; otherwise, it
@@ -4650,7 +4651,7 @@ public class Person {
      * Determines whether the user possesses the necessary skills to operate weapons for the given entity.
      *
      * <p>The required gunnery skill is dependent on the type of entity provided. This method checks for the relevant
-     * gunnery or weapon skill associated with the entity type, such as Mechs, tanks, aerospace units, battle armor,
+     * gunnery or weapon skill associated with the entity type, such as Mek, tanks, aerospace units, battle armor,
      * infantry, and others.</p>
      *
      * <p>Returns {@code true} if the necessary skill(s) to use the entity's weapons are present; {@code false}
@@ -5590,7 +5591,7 @@ public class Person {
      * without making any changes.</p>
      *
      * <p>The new score is computed as the sum of the current score and the delta, and it is passed
-     * to {@link Attributes#setAttributeScore(Phenotype, PersonnelOptions, SkillAttribute, int)} to ensure is compiles
+     * to {@link Attributes#setAttributeScore(Phenotype, PersonnelOptions, SkillAttribute, int)} to ensure it compiles
      * with the character's minimum and maximum attribute score values.</p>
      *
      * @param attribute The {@link SkillAttribute} whose score is to be modified. Must not be <code>null</code>.
@@ -5980,7 +5981,7 @@ public class Person {
             final UUID id = unit.getId();
             unit = campaign.getUnit(id);
             if (unit == null) {
-                logger.error(String.format("Person %s ('%s') references missing unit %s", getId(), getFullName(), id));
+                logger.error("Person {} ('{}') references missing unit {}", getId(), getFullName(), id);
             }
         }
 

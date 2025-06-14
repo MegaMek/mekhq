@@ -64,12 +64,7 @@ import megamek.logging.MMLogger;
 import mekhq.Utilities;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.skills.Skills;
 import mekhq.utilities.MHQXMLUtility;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * This object will serve as a wrapper for a specific pilot special ability. In the actual person object we will use
@@ -100,7 +95,7 @@ public class SpecialAbility {
 
     // prerequisite skills and options
     private Vector<String> prereqAbilities;
-    private Vector<SkillPerquisite> prereqSkills;
+    private Vector<SkillPrerequisite> prereqSkills;
     private Map<String, String> prereqMisc;
 
     // these are abilities that will disqualify the person from getting the current
@@ -149,13 +144,13 @@ public class SpecialAbility {
         clone.invalidAbilities = (Vector<String>) this.invalidAbilities.clone();
         clone.removeAbilities = (Vector<String>) this.removeAbilities.clone();
         clone.choiceValues = (Vector<String>) this.choiceValues.clone();
-        clone.prereqSkills = (Vector<SkillPerquisite>) this.prereqSkills.clone();
+        clone.prereqSkills = (Vector<SkillPrerequisite>) this.prereqSkills.clone();
         clone.prereqMisc = new HashMap<>(this.prereqMisc);
         return clone;
     }
 
     public boolean isEligible(Person p) {
-        for (SkillPerquisite sp : prereqSkills) {
+        for (SkillPrerequisite sp : prereqSkills) {
             if (!sp.qualifies(p)) {
                 return false;
             }
@@ -180,7 +175,7 @@ public class SpecialAbility {
     }
 
     public boolean isEligible(boolean isClanPilot, Skills skills, PersonnelOptions options) {
-        for (SkillPerquisite sp : prereqSkills) {
+        for (SkillPrerequisite sp : prereqSkills) {
             if (!sp.qualifies(skills)) {
                 return false;
             }
@@ -236,11 +231,11 @@ public class SpecialAbility {
         this.weight = weight;
     }
 
-    public Vector<SkillPerquisite> getPrereqSkills() {
+    public Vector<SkillPrerequisite> getPrereqSkills() {
         return prereqSkills;
     }
 
-    public void setPrereqSkills(Vector<SkillPerquisite> prereq) {
+    public void setPrereqSkills(Vector<SkillPrerequisite> prereq) {
         prereqSkills = prereq;
     }
 
@@ -286,7 +281,7 @@ public class SpecialAbility {
               Utilities.combineString(invalidAbilities, "::"));
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "removeAbilities", Utilities.combineString(removeAbilities, "::"));
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "choiceValues", Utilities.combineString(choiceValues, "::"));
-        for (SkillPerquisite skillpre : prereqSkills) {
+        for (SkillPrerequisite skillpre : prereqSkills) {
             skillpre.writeToXML(pw, indent);
         }
 
@@ -322,7 +317,7 @@ public class SpecialAbility {
                 } else if (wn2.getNodeName().equalsIgnoreCase("choiceValues")) {
                     retVal.choiceValues = Utilities.splitString(wn2.getTextContent(), "::");
                 } else if (wn2.getNodeName().equalsIgnoreCase("skillPrereq")) {
-                    SkillPerquisite skill = SkillPerquisite.generateInstanceFromXML(wn2);
+                    SkillPrerequisite skill = SkillPrerequisite.generateInstanceFromXML(wn2);
                     if (!skill.isEmpty()) {
                         retVal.prereqSkills.add(skill);
                     }
@@ -379,7 +374,7 @@ public class SpecialAbility {
                 } else if (wn2.getNodeName().equalsIgnoreCase("choiceValues")) {
                     retVal.choiceValues = Utilities.splitString(wn2.getTextContent(), "::");
                 } else if (wn2.getNodeName().equalsIgnoreCase("skillPrereq")) {
-                    SkillPerquisite skill = SkillPerquisite.generateInstanceFromXML(wn2);
+                    SkillPrerequisite skill = SkillPrerequisite.generateInstanceFromXML(wn2);
                     if (!skill.isEmpty()) {
                         retVal.prereqSkills.add(skill);
                     }
@@ -606,7 +601,7 @@ public class SpecialAbility {
             toReturn += getDisplayName(prereq) + "<br>";
         }
 
-        for (SkillPerquisite skPr : prereqSkills) {
+        for (SkillPrerequisite skPr : prereqSkills) {
             toReturn += skPr + "<br>";
         }
 
