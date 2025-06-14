@@ -33,9 +33,9 @@ import java.util.List;
 import java.util.UUID;
 
 import megamek.Version;
-import megamek.common.force.Force;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -63,7 +63,7 @@ public class MothballInfo {
      * Parameterless constructor, used for deserialization.
      */
     private MothballInfo() {
-        forceId = Force.NO_FORCE;
+        forceId = Force.FORCE_NONE;
     }
 
     /**
@@ -168,8 +168,11 @@ public class MothballInfo {
             unit.setNavigator(navigator);
         }
 
-        if (campaign.getForce(forceId) != null) {
-            campaign.addUnitToForce(unit, forceId);
+        Force force = campaign.getForce(forceId);
+        if (force != null) {
+            if (!force.isDeployed()) {
+                campaign.addUnitToForce(unit, forceId);
+            }
         }
 
         unit.resetEngineer();
