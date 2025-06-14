@@ -1923,10 +1923,8 @@ public class Campaign implements ITechManager {
         PersonnelRole civilianProfession = PersonnelRole.MISCELLANEOUS_JOB;
 
         int dependentProfessionDieSize = campaignOptions.getDependentProfessionDieSize();
-        if (dependentProfessionDieSize > 0) { // A value of 0 denotes that this system has been disabled
-            if (randomInt(dependentProfessionDieSize) == 0) {
-                civilianProfession = PersonnelRole.DEPENDENT;
-            }
+        if (dependentProfessionDieSize == 0 || randomInt(dependentProfessionDieSize) == 0) {
+            civilianProfession = PersonnelRole.DEPENDENT;
         }
 
         int civilianProfessionDieSize = campaignOptions.getCivilianProfessionDieSize();
