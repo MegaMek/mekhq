@@ -77,9 +77,7 @@ planet:
     event:
       - date: '2322-03-24'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 52662.0
         socioIndustrial: D-D-B-D-C
       - date: '2330-01-01'
@@ -251,24 +249,20 @@ planet:
         population: 147798942.0
       - date: '3050-05-01'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CSJ
       - date: '3059-06-29'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '3060-01-01'
         population: 149523392.0
       - date: '3070-01-01'
         population: 151449593.0
       - date: '3075-06-01'
         faction:
-          source: canon
-          value:
-            - DC
-            - CDS
+          - DC
+          - CDS
       - date: '3080-01-01'
         population: 154077057.0
       - date: '3090-12-27'
@@ -286,11 +280,6 @@ planet:
         population: 158547281.0
       - date: '3145-01-01'
         population: 159437636.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - DC
   - name: Schmallenberg
     type: ICE_GIANT
     orbitalDist: 0.9

@@ -48,9 +48,7 @@ planet:
     event:
       - date: '2258-07-24'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 49556.0
         socioIndustrial: D-D-A-D-C
       - date: '2260-01-01'
@@ -75,9 +73,7 @@ planet:
         population: 35948960.0
       - date: '2360-07-17'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 49973706.0
       - date: '2370-01-01'
         population: 66682102.0
@@ -221,22 +217,22 @@ planet:
         population: 374028501.0
       - date: '3026-01-01'
         socioIndustrial: C-D-B-F-D
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 375252972.0
       - date: '3040-01-01'
         population: 380201125.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3045-01-01'
         socioIndustrial: B-D-A-D-C
       - date: '3050-01-01'
         population: 385407181.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -263,9 +259,7 @@ planet:
         population: 442349542.0
       - date: '3145-05-29'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 446170154.0
   - name: Poklop's Belt
     type: ASTEROID_BELT

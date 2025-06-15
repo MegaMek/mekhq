@@ -99,9 +99,7 @@ planet:
     event:
       - date: '2644-12-12'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 45609.0
         socioIndustrial: D-D-C-D-D
       - date: '2650-01-01'
@@ -212,9 +210,7 @@ planet:
         population: 127778340.0
       - date: '3075-04-13'
         faction:
-          source: canon
-          value:
-            - RCM
+          - RCM
       - date: '3080-01-01'
         population: 129398533.0
       - date: '3090-01-01'
@@ -237,11 +233,6 @@ planet:
         population: 136441650.0
       - date: '3145-01-01'
         population: 136769503.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Suchopcek
     type: TERRESTRIAL
     orbitalDist: 0.9

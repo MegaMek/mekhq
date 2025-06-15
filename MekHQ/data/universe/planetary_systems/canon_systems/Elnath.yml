@@ -31,9 +31,7 @@ planet:
     event:
       - date: '2618-07-13'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 49782.0
         socioIndustrial: C-D-A-D-C
       - date: '2620-01-01'
@@ -86,9 +84,7 @@ planet:
         population: 1214882626.0
       - date: '2821-06-09'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2830-01-01'
         population: 1198379329.0
       - date: '2840-01-01'
@@ -101,9 +97,7 @@ planet:
         population: 1199001922.0
       - date: '2864-10-07'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '2870-01-01'
         population: 1170492042.0
       - date: '2880-01-01'
@@ -141,28 +135,19 @@ planet:
         population: 882843882.0
       - date: '3030-02-25'
         faction:
-          source: canon
-          value:
-            - FS
+          - FC
         population: 900855762.0
       - date: '3038-01-01'
         socioIndustrial: C-C-B-D-C
       - date: '3040-01-01'
         population: 910910964.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3046-01-01'
         socioIndustrial: B-B-A-C-B
       - date: '3050-01-01'
         population: 920157783.0
       - date: '3057-10-01'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '3060-01-01'
         population: 928940936.0
       - date: '3070-01-01'
@@ -171,9 +156,7 @@ planet:
         population: 940813718.0
       - date: '3085-04-13'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 939309620.0
       - date: '3100-01-01'
@@ -188,9 +171,7 @@ planet:
         population: 950649237.0
       - date: '3135-03-14'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '3140-01-01'
         population: 949129414.0
       - date: '3145-01-01'

@@ -73,9 +73,7 @@ planet:
     event:
       - date: '2242-06-23'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 51857.0
         socioIndustrial: D-D-A-D-D
       - date: '2250-01-01'
@@ -88,9 +86,7 @@ planet:
         population: 3007725.0
       - date: '2290-07-12'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 6386993.0
       - date: '2300-01-01'
         population: 12262984.0
@@ -249,14 +245,10 @@ planet:
         population: 667587048.0
       - date: '3014-03-22'
         faction:
-          source: canon
-          value:
-            - FWLR
+          - FWLR
       - date: '3015-02-03'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3020-01-01'
         population: 647711863.0
       - date: '3030-01-01'
@@ -275,14 +267,10 @@ planet:
         population: 668236580.0
       - date: '3081-06-14'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3082-04-14'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 673065246.0
       - date: '3100-01-01'
@@ -297,18 +285,14 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3137-01-01'
         socioIndustrial: B-B-A-C-C
       - date: '3140-01-01'
         population: 682145019.0
       - date: '3145-07-16'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 681599521.0
   - name: Prince
     type: DWARF_TERRESTRIAL

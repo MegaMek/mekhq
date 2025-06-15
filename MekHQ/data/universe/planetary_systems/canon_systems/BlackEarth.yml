@@ -85,9 +85,7 @@ planet:
     event:
       - date: '2353-11-02'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 44760.0
         socioIndustrial: C-D-A-D-D
       - date: '2360-01-01'
@@ -182,9 +180,7 @@ planet:
         population: 245470713.0
       - date: '2779-07-12'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2780-01-01'
         population: 243037105.0
       - date: '2790-01-01'
@@ -238,42 +234,38 @@ planet:
         population: 196507354.0
       - date: '3020-01-01'
         population: 194653076.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 194621920.0
       - date: '3040-01-01'
         population: 196204760.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3047-01-01'
         socioIndustrial: B-C-A-C-B
       - date: '3050-01-01'
         population: 197662060.0
       - date: '3050-05-08'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
             - FC
       - date: '3050-05-09'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
       - date: '3060-01-01'
         population: 199329415.0
       - date: '3067-05-09'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '3069-01-27'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3070-01-01'
         population: 201513990.0
       - date: '3080-01-01'
@@ -298,9 +290,7 @@ planet:
         population: 205625963.0
       - date: '3152-01-15'
         faction:
-          source: canon
-          value:
-            - CHH
+          - CHH
   - name: Anderson's World
     type: DWARF_TERRESTRIAL
     orbitalDist: 4.48

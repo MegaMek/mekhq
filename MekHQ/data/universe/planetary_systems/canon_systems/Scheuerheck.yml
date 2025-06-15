@@ -68,9 +68,7 @@ planet:
     event:
       - date: '2263-10-11'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 51920.0
         socioIndustrial: D-D-A-F-F
       - date: '2270-01-01'
@@ -101,9 +99,7 @@ planet:
         population: 74944492.0
       - date: '2400-12-04'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 90399284.0
       - date: '2410-01-01'
         population: 106012771.0
@@ -137,9 +133,7 @@ planet:
         population: 290525161.0
       - date: '2553-01-15'
         faction:
-          source: canon
-          value:
-            - MOC
+          - MOC
       - date: '2560-08-30'
         population: 297272651.0
         socioIndustrial: C-D-A-D-F
@@ -147,20 +141,14 @@ planet:
         population: 301277382.0
       - date: '2578-07-12'
         faction:
-          source: canon
-          value:
-            - MOC
-            - SL
+          - MOC
+          - SL
       - date: '2578-07-20'
         faction:
-          source: canon
-          value:
-            - SL
+          - SL
       - date: '2579-04-01'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2580-01-01'
         population: 302832056.0
       - date: '2590-01-01'
@@ -275,9 +263,7 @@ planet:
         population: 258135005.0
       - date: '3081-05-16'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 259792367.0
       - date: '3096-01-01'
@@ -298,12 +284,7 @@ planet:
         population: 272185202.0
       - date: '3148-03-01'
         faction:
-          source: canon
-          value:
-            - DA
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - DA
   - name: Meier

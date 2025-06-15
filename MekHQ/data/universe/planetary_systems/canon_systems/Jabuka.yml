@@ -42,9 +42,7 @@ planet:
     event:
       - date: '2671-04-14'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 48831.0
         socioIndustrial: C-D-F-D-D
       - date: '2677-01-01'
@@ -103,9 +101,7 @@ planet:
         population: 4115241677.0
       - date: '2900-04-21'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 4067366795.0
       - date: '2906-01-01'
         socioIndustrial: C-C-F-D-D
@@ -135,20 +131,16 @@ planet:
         population: 3194850015.0
       - date: '3025-11-24'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '3029-01-01'
         socioIndustrial: B-B-F-C-D
       - date: '3030-02-01'
         faction:
-          source: canon
-          value:
-            - LA
+          - FC
         population: 3188444056.0
       - date: '3034-03-13'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FRR
       - date: '3040-01-01'
@@ -159,21 +151,17 @@ planet:
         population: 3256760668.0
       - date: '3052-09-01'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CSV
       - date: '3060-01-01'
         population: 3284561118.0
       - date: '3062-04-27'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3069-10-04'
         faction:
-          source: canon
-          value:
-            - CW
+          - CW
       - date: '3070-01-01'
         population: 3311274105.0
       - date: '3080-01-01'
@@ -196,9 +184,7 @@ planet:
         population: 3663917907.0
       - date: '3145-03-31'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
         population: 3691869765.0
   - name: Veliko Trgovišće
     type: ICE_GIANT

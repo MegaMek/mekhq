@@ -72,9 +72,7 @@ planet:
     event:
       - date: '2643-08-11'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 50044.0
         socioIndustrial: C-D-B-D-F
       - date: '2650-01-01'
@@ -113,17 +111,13 @@ planet:
         population: 174228.0
       - date: '2800-06-26'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
       - date: '2821-04-29'
         faction:
-          source: canon
-          value:
-            - CS
+          - CS
         population: 51696.0
         socioIndustrial: D-D-B-D-F
       - date: '2824-01-23'
@@ -178,9 +172,7 @@ planet:
         population: 534016823.0
       - date: '3057-09-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3060-01-01'
         population: 529585656.0
       - date: '3070-01-01'
@@ -205,16 +197,6 @@ planet:
         population: 598075847.0
       - date: '3145-01-01'
         population: 603000232.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN
-      - date: '2108-12-05'
-        name: Versailles
-      - date: '2822-01-01'
-        name: Taussen
-        message: Versailles renamed to Taussen
   - name: Attilloncourt
     type: DWARF_TERRESTRIAL
     orbitalDist: 1.44

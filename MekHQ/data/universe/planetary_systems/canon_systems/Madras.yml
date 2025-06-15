@@ -49,9 +49,7 @@ planet:
     event:
       - date: '2599-01-23'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 48727.0
         socioIndustrial: C-D-C-C-F
       - date: '2600-01-01'

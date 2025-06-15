@@ -70,9 +70,7 @@ planet:
     event:
       - date: '2241-06-04'
         faction:
-          source: canon
-          value:
-            - DO
+          - DO
         population: 52683.0
         socioIndustrial: D-C-C-D-F
       - date: '2250-01-01'
@@ -83,7 +81,7 @@ planet:
         population: 1627103.0
       - date: '2271-06-01'
         faction:
-          source: canon
+          source: 'Handbook: House Marik'
           value:
             - FWL
       - date: '2280-01-01'
@@ -264,16 +262,12 @@ planet:
         population: 888608947.0
       - date: '3079-12-09'
         faction:
-          source: canon
-          value:
-            - DO
+          - DO
       - date: '3080-01-01'
         population: 897360125.0
       - date: '3086-07-01'
         faction:
-          source: canon
-          value:
-            - OP
+          - OP
       - date: '3090-01-01'
         population: 910011520.0
       - date: '3100-01-01'
@@ -292,11 +286,6 @@ planet:
         population: 983243951.0
       - date: '3145-01-01'
         population: 988370136.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Zhytkavichy
     type: ICE_GIANT
     orbitalDist: 1.6

@@ -86,9 +86,7 @@ planet:
     event:
       - date: '2269-04-02'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 50942.0
         socioIndustrial: D-D-A-D-D
       - date: '2270-01-01'
@@ -109,9 +107,7 @@ planet:
         population: 10860901.0
       - date: '2350-07-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 16288528.0
       - date: '2360-01-01'
         population: 23021373.0
@@ -269,16 +265,12 @@ planet:
         population: 219506379.0
       - date: '3078-05-01'
         faction:
-          source: canon
-          value:
-            - PR
+          - PR
       - date: '3080-01-01'
         population: 221092528.0
       - date: '3086-02-01'
         faction:
-          source: canon
-          value:
-            - RF
+          - RF
       - date: '3090-01-01'
         population: 221092528.0
       - date: '3100-01-01'
@@ -301,12 +293,7 @@ planet:
         population: 232567683.0
       - date: '3148-07-07'
         faction:
-          source: canon
-          value:
-            - FWL
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - FWL
   - name: Jones

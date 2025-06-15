@@ -128,9 +128,7 @@ planet:
     event:
       - date: '2242-04-28'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 44649.0
         socioIndustrial: D-D-A-F-D
       - date: '2250-01-01'
@@ -149,9 +147,7 @@ planet:
         population: 486152.0
       - date: '2320-03-06'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
         population: 601633.0
       - date: '2330-01-01'
         population: 725826.0
@@ -253,24 +249,18 @@ planet:
         population: 2969527.0
       - date: '2767-03-02'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 2983000.0
       - date: '2770-01-01'
         population: 2986117.0
       - date: '2779-10-12'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-01-01'
         population: 3048079.0
       - date: '2786-11-08'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         hpg: X
       - date: '2790-01-01'
         population: 3147272.0
@@ -335,11 +325,6 @@ planet:
         socioIndustrial: D-D-C-C-C
       - date: '3040-01-01'
         population: 26760977.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3049-01-01'
         socioIndustrial: C-C-B-C-C
       - date: '3050-01-01'
@@ -348,7 +333,7 @@ planet:
         population: 266532037.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -357,9 +342,7 @@ planet:
         population: 738761365.0
       - date: '3081-12-15'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 744844113.0
       - date: '3100-01-01'
@@ -376,16 +359,12 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 789480356.0
       - date: '3145-01-09'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 793596347.0
   - name: Nemesis's Harvest
     type: TERRESTRIAL

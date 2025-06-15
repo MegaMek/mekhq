@@ -109,9 +109,7 @@ planet:
     event:
       - date: '2271-12-17'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 39389.0
         socioIndustrial: D-D-B-D-F
       - date: '2280-01-01'
@@ -120,9 +118,7 @@ planet:
         population: 530585.0
       - date: '2299-02-07'
         faction:
-          source: canon
-          value:
-            - FoS
+          - FoS
       - date: '2300-01-01'
         population: 1591784.0
       - date: '2301-01-01'
@@ -135,9 +131,9 @@ planet:
         population: 19086886.0
       - date: '2340-01-01'
         population: 35431447.0
-      - date: '2341-10-10'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2350-01-01'
@@ -284,21 +280,21 @@ planet:
         population: 1009846293.0
       - date: '3020-01-01'
         population: 970950097.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 949882220.0
       - date: '3040-10-16'
         population: 958949100.0
         socioIndustrial: C-D-B-D-F
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3050-01-01'
         population: 968199342.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -309,9 +305,7 @@ planet:
         population: 994796305.0
       - date: '3081-07-22'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1001183418.0
       - date: '3100-01-01'
@@ -328,22 +322,13 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 1053778966.0
       - date: '3145-11-18'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 1055888633.0
-      - date: '3152-06-01'
-        faction:
-          source: sucs
-          value:
-            - IND
   - name: Robežnieku pagasts
     type: ICE_GIANT
     orbitalDist: 1.96

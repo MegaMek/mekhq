@@ -115,18 +115,14 @@ planet:
     event:
       - date: '2294-03-15'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 44795.0
         socioIndustrial: D-F-C-D-D
       - date: '2300-01-01'
         population: 85026.0
       - date: '2310-01-19'
         faction:
-          source: canon
-          value:
-            - CCom
+          - CCom
         population: 219733.0
       - date: '2320-01-01'
         population: 500272.0
@@ -140,7 +136,7 @@ planet:
         population: 5012932.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -259,9 +255,7 @@ planet:
         population: 73911520.0
       - date: '2900-11-04'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 72995737.0
         socioIndustrial: D-D-D-D-F
       - date: '2910-01-01'
@@ -290,27 +284,19 @@ planet:
         population: 73827206.0
       - date: '3025-06-22'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3030-01-01'
         population: 73437350.0
       - date: '3030-09-11'
         faction:
-          source: canon
-          value:
-            - DA
+          - DA
       - date: '3038-02-11'
         faction:
-          source: canon
-          value:
-            - FWL
-            - DA
+          - FWL
+          - DA
       - date: '3038-02-23'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3039-01-01'
         socioIndustrial: D-D-D-D-D
       - date: '3040-01-01'
@@ -331,9 +317,7 @@ planet:
         population: 75772290.0
       - date: '3079-04-22'
         faction:
-          source: canon
-          value:
-            - DA
+          - DA
       - date: '3080-01-01'
         population: 76702374.0
       - date: '3090-01-01'
@@ -342,9 +326,7 @@ planet:
         population: 78439894.0
       - date: '3105-03-16'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '3110-01-01'
         population: 79022503.0
       - date: '3120-01-01'
@@ -363,9 +345,7 @@ planet:
         population: 80313093.0
       - date: '3151-11-10'
         faction:
-          source: canon
-          value:
-            - DA
+          - DA
   - name: Rodríguez
     type: GAS_GIANT
     orbitalDist: 4.16

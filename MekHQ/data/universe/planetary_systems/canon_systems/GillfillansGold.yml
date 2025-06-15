@@ -67,9 +67,7 @@ planet:
     event:
       - date: '2722-10-23'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 49172.0
         socioIndustrial: C-D-B-D-D
       - date: '2723-10-28'
@@ -86,9 +84,7 @@ planet:
         population: 24841478.0
       - date: '2779-10-23'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2780-01-01'
         population: 48196300.0
       - date: '2790-01-01'
@@ -147,9 +143,7 @@ planet:
         socioIndustrial: C-C-B-D-C
       - date: '3048-05-16'
         faction:
-          source: canon
-          value:
-            - RIM
+          - RIM
       - date: '3050-01-01'
         population: 688034730.0
       - date: '3060-01-01'
@@ -174,11 +168,6 @@ planet:
         population: 793403210.0
       - date: '3145-01-01'
         population: 798976516.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - TiC
   - name: Crom Crúaich Belt
     type: ASTEROID_BELT
     orbitalDist: 1.44

@@ -117,9 +117,7 @@ planet:
     event:
       - date: '2165-09-13'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 40443.0
         socioIndustrial: F-D-A-D-C
       - date: '2170-01-01'
@@ -139,20 +137,14 @@ planet:
         population: 12207556.0
       - date: '2235-03-27'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2236-04-17'
         faction:
-          source: canon
-          value:
-            - IND
-            - TA
+          - IND
+          - TA
       - date: '2237-12-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2240-01-01'
         population: 21084908.0
       - date: '2250-01-01'
@@ -167,9 +159,7 @@ planet:
         population: 142514388.0
       - date: '2299-01-08'
         faction:
-          source: canon
-          value:
-            - FoS
+          - FoS
       - date: '2300-01-01'
         population: 185162012.0
       - date: '2310-01-01'
@@ -180,9 +170,9 @@ planet:
         population: 342696124.0
       - date: '2340-01-01'
         population: 399640245.0
-      - date: '2341-12-08'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2350-01-01'
@@ -330,6 +320,11 @@ planet:
         population: 945043935.0
       - date: '3020-01-01'
         population: 902720428.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 885850814.0
       - date: '3039-01-01'
@@ -337,16 +332,11 @@ planet:
       - date: '3040-01-23'
         population: 896186514.0
         socioIndustrial: B-C-A-C-A
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3050-01-01'
         population: 908003792.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -357,9 +347,7 @@ planet:
         population: 943360552.0
       - date: '3081-01-19'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 954940042.0
       - date: '3100-01-01'
@@ -374,9 +362,7 @@ planet:
         population: 986584082.0
       - date: '3132-07-01'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3132-08-07'
         hpg:
           source: canon
@@ -385,11 +371,6 @@ planet:
         population: 999893282.0
       - date: '3145-01-01'
         population: 1003900864.0
-      - date: '3152-06-01'
-        faction:
-          source: sucs
-          value:
-            - IND
   - name: Hepburn
     type: GAS_GIANT
     orbitalDist: 3.92

@@ -84,9 +84,7 @@ planet:
     event:
       - date: '2736-10-26'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 44850.0
         socioIndustrial: C-F-C-D-F
       - date: '2739-06-26'
@@ -165,9 +163,7 @@ planet:
         population: 95998124.0
       - date: '3075-04-13'
         faction:
-          source: canon
-          value:
-            - RCM
+          - RCM
       - date: '3080-01-01'
         population: 97157041.0
       - date: '3090-01-01'
@@ -188,11 +184,6 @@ planet:
         population: 106583493.0
       - date: '3145-01-01'
         population: 107482565.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Bin Jamal Port
     type: TERRESTRIAL
     orbitalDist: 2.4

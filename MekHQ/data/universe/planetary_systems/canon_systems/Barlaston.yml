@@ -90,16 +90,12 @@ planet:
     event:
       - date: '2270-06-30'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 39445.0
         socioIndustrial: D-F-B-D-F
       - date: '2280-03-24'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 125746.0
       - date: '2290-01-01'
         population: 343984.0
@@ -259,14 +255,10 @@ planet:
         population: 201044291.0
       - date: '3014-03-22'
         faction:
-          source: canon
-          value:
-            - FWLR
+          - FWLR
       - date: '3015-03-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3020-01-01'
         population: 201397725.0
       - date: '3028-01-01'
@@ -288,9 +280,7 @@ planet:
         population: 210313993.0
       - date: '3081-05-21'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 211791355.0
       - date: '3096-01-01'
@@ -311,9 +301,7 @@ planet:
         population: 223631949.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - DA
+          - DA
   - name: Anu
     type: TERRESTRIAL
     orbitalDist: 4.48

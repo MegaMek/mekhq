@@ -73,9 +73,7 @@ planet:
     event:
       - date: '2160-03-01'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 46030.0
         socioIndustrial: D-C-A-C-F
       - date: '2170-01-01'
@@ -96,9 +94,7 @@ planet:
         population: 27019179.0
       - date: '2242-04-17'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 42149519.0
       - date: '2260-01-01'
@@ -111,9 +107,7 @@ planet:
         population: 154553718.0
       - date: '2299-05-10'
         faction:
-          source: canon
-          value:
-            - FoS
+          - FoS
       - date: '2300-01-01'
         population: 195211980.0
       - date: '2310-01-01'
@@ -124,9 +118,9 @@ planet:
         population: 335621216.0
       - date: '2340-01-01'
         population: 384955637.0
-      - date: '2341-05-20'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2350-01-01'
@@ -274,22 +268,22 @@ planet:
         population: 1088210904.0
       - date: '3026-01-01'
         socioIndustrial: C-D-B-D-F
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 1088223640.0
       - date: '3040-01-01'
         population: 1097512965.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3047-01-01'
         socioIndustrial: C-C-A-C-D
       - date: '3050-01-01'
         population: 1109319405.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -300,9 +294,7 @@ planet:
         population: 1130258852.0
       - date: '3081-03-17'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1137060790.0
       - date: '3091-01-01'
@@ -317,20 +309,13 @@ planet:
         population: 1150097451.0
       - date: '3132-07-01'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3132-08-07'
         hpg: X
       - date: '3140-01-01'
         population: 1157250206.0
       - date: '3145-01-01'
         population: 1159567022.0
-      - date: '3152-06-01'
-        faction:
-          source: sucs
-          value:
-            - IND
   - name: Bakewell's Frontier
     type: TERRESTRIAL
     orbitalDist: 0.28

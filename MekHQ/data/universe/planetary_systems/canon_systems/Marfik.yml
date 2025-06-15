@@ -159,9 +159,7 @@ planet:
     event:
       - date: '2743-08-02'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 52791.0
         socioIndustrial: C-D-C-C-C
       - date: '2750-01-01'
@@ -200,9 +198,7 @@ planet:
         population: 2177033603.0
       - date: '2900-01-11'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 2330761454.0
       - date: '2910-01-01'
         population: 2459374443.0
@@ -230,30 +226,27 @@ planet:
         population: 3132286927.0
       - date: '3025-12-23'
         faction:
-          source: canon
+          - LA
+          - DC
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
           value:
-            - LA
+            - FC
             - DC
       - date: '3030-02-06'
         faction:
-          source: canon
-          value:
-            - LA
+          - FC
         population: 3139452950.0
       - date: '3040-01-01'
         population: 3133781181.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3049-01-01'
         socioIndustrial: A-C-C-A-B
       - date: '3050-01-01'
         population: 3144594720.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -264,9 +257,7 @@ planet:
         population: 3241447889.0
       - date: '3081-06-29'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 3251186834.0
       - date: '3100-01-01'
@@ -281,23 +272,14 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-25'
         population: 3314875643.0
         socioIndustrial: A-B-C-A-B
       - date: '3145-07-01'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 3316865165.0
-      - date: '3152-06-01'
-        faction:
-          source: sucs
-          value:
-            - IND
   - name: Clark's Madness
     type: ICE_GIANT
     orbitalDist: 14.04

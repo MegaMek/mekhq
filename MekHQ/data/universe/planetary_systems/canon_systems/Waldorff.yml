@@ -138,9 +138,7 @@ planet:
     event:
       - date: '2430-02-18'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 45383.0
         socioIndustrial: C-D-C-D-C
       - date: '2440-01-01'
@@ -273,15 +271,15 @@ planet:
         population: 98007468.0
       - date: '3020-01-01'
         population: 98694435.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 99464230.0
       - date: '3040-01-01'
         population: 100604610.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3048-01-01'
         socioIndustrial:
           source: canon
@@ -290,39 +288,31 @@ planet:
         population: 101992378.0
       - date: '3050-06-28'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
       - date: '3051-11-01'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CSV
       - date: '3060-01-01'
         population: 103461347.0
       - date: '3062-02-18'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3070-01-01'
         population: 104678954.0
       - date: '3072-06-04'
         faction:
-          source: canon
-          value:
-            - SOC
+          - SOC
       - date: '3072-06-18'
         faction:
-          source: canon
-          value:
-            - SOC
-            - CJF
+          - SOC
+          - CJF
       - date: '3072-06-30'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3080-01-01'
         population: 105836779.0
       - date: '3090-01-01'
@@ -347,9 +337,7 @@ planet:
         population: 111932732.0
       - date: '3151-07-20'
         faction:
-          source: canon
-          value:
-            - AML
+          - AML
   - name: Matungao
     type: GAS_GIANT
     orbitalDist: 10.0

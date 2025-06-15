@@ -82,9 +82,7 @@ planet:
     event:
       - date: '2617-01-13'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 44020.0
         socioIndustrial: B-D-B-D-D
       - date: '2620-01-01'
@@ -153,9 +151,7 @@ planet:
         population: 392574683.0
       - date: '2900-03-28'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 385810379.0
       - date: '2902-01-01'
         socioIndustrial: C-D-C-D-C
@@ -185,14 +181,12 @@ planet:
         population: 271318950.0
       - date: '3025-07-20'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '3030-01-01'
         population: 267852057.0
       - date: '3034-03-13'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FRR
       - date: '3040-01-01'
@@ -203,13 +197,13 @@ planet:
         population: 272717048.0
       - date: '3051-11-03'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CW
             - FRR
       - date: '3051-11-10'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CW
       - date: '3060-01-01'
@@ -236,9 +230,7 @@ planet:
         population: 288771236.0
       - date: '3145-08-15'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
         population: 288713487.0
   - name: Riedlingen
     type: ICE_GIANT

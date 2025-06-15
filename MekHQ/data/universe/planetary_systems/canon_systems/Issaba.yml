@@ -59,9 +59,7 @@ planet:
     event:
       - date: '2657-07-24'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 49103.0
         socioIndustrial: B-D-A-F-F
       - date: '2660-01-01'
@@ -98,9 +96,7 @@ planet:
         population: 58954617.0
       - date: '2779-09-25'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2780-01-01'
         population: 59006501.0
       - date: '2790-01-01'
@@ -158,24 +154,24 @@ planet:
         population: 53516937.0
       - date: '3025-01-01'
         socioIndustrial: D-C-B-D-D
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3029-01-01'
         socioIndustrial: C-C-A-C-D
       - date: '3030-01-01'
         population: 53709307.0
       - date: '3040-01-01'
         population: 54379449.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3044-01-01'
         socioIndustrial: C-D-A-C-D
       - date: '3050-01-01'
         population: 54964433.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -204,12 +200,7 @@ planet:
         population: 59103273.0
       - date: '3148-12-01'
         faction:
-          source: canon
-          value:
-            - RT
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - RT
   - name: Méridien de Lair

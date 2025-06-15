@@ -97,19 +97,15 @@ planet:
           source: Warriors of Kerensky, pg. 107
           value: Ortin
     event:
-      - date: '2802-12-03'
-        faction:
-          source: canon
-          value:
-            - CCC
-        population: 9234.0
-        socioIndustrial: B-C-C-C-D
       - date: '2802-01-01'
         faction:
-          source: canon
-          value:
-            - CCC
-            - CBS
+          - CCC
+          - CBS
+      - date: '2802-12-03'
+        faction:
+          - CCC
+        population: 9234.0
+        socioIndustrial: B-C-C-C-D
       - date: '2804-07-06'
         hpg:
           source: canon
@@ -120,9 +116,7 @@ planet:
         population: 244079.0
       - date: '2824-01-01'
         faction:
-          source: canon
-          value:
-            - CCC
+          - CCC
       - date: '2830-01-01'
         population: 829164.0
       - date: '2840-01-01'
@@ -133,9 +127,7 @@ planet:
         population: 7224542.0
       - date: '2864-01-19'
         faction:
-          source: canon
-          value:
-            - CCC
+          - CCC
       - date: '2870-01-01'
         population: 10868142.0
       - date: '2880-01-01'
@@ -164,11 +156,9 @@ planet:
         population: 40443718.0
       - date: '3000-04-12'
         faction:
-          source: canon
-          value:
-            - CCC
-            - CSJ
-            - CSV
+          - CCC
+          - CSJ
+          - CSV
         population: 41107594.0
       - date: '3010-01-01'
         population: 41366660.0
@@ -176,9 +166,7 @@ planet:
         population: 41206289.0
       - date: '3025-08-20'
         faction:
-          source: canon
-          value:
-            - CLAN
+          - CLAN
       - date: '3030-01-01'
         population: 40928162.0
       - date: '3040-02-03'
@@ -188,33 +176,25 @@ planet:
         population: 40527037.0
       - date: '3058-09-24'
         faction:
-          source: canon
-          value:
-            - CCC
-            - CSV
+          - CCC
+          - CSV
       - date: '3060-01-01'
         population: 40228435.0
       - date: '3067-03-26'
         faction:
-          source: canon
-          value:
-            - CCC
-            - CSA
+          - CCC
+          - CSA
       - date: '3070-01-01'
         population: 40128205.0
       - date: '3075-03-09'
         faction:
-          source: canon
-          value:
-            - CCC
+          - CCC
       - date: '3080-01-01'
         population: 40337415.0
       - date: '3085-05-27'
         faction:
-          source: canon
-          value:
-            - CCC
-            - CCO
+          - CCC
+          - CCO
       - date: '3090-01-01'
         population: 40734665.0
       - date: '3100-06-04'
@@ -230,8 +210,6 @@ planet:
         population: 44092048.0
       - date: '3145-01-01'
         population: 44463981.0
-      - date: '2108-12-05'
-      - date: '2850-01-01'
   - name: Fort Rodrigues
     type: DWARF_TERRESTRIAL
     orbitalDist: 0.7

@@ -42,9 +42,7 @@ planet:
     event:
       - date: '2323-07-20'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
         population: 44270.0
         socioIndustrial: D-D-C-D-F
       - date: '2330-01-01'
@@ -144,22 +142,16 @@ planet:
         population: 2252289870.0
       - date: '2767-09-07'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         hpg: X
       - date: '2770-01-01'
         population: 2241654329.0
       - date: '2779-10-14'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-03-10'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         hpg: B
         population: 2175995520.0
       - date: '2790-01-01'
@@ -174,9 +166,7 @@ planet:
         population: 894622.0
       - date: '2834-02-17'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X

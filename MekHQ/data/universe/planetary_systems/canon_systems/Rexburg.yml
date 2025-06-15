@@ -37,9 +37,7 @@ planet:
     event:
       - date: '2235-07-09'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 42593.0
         socioIndustrial: D-D-A-F-B
       - date: '2240-01-01'
@@ -58,9 +56,7 @@ planet:
         population: 15557034.0
       - date: '2310-12-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 26454544.0
       - date: '2320-01-01'
         population: 42105770.0
@@ -235,9 +231,7 @@ planet:
         population: 1009257956.0
       - date: '3081-03-24'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 1023896415.0
       - date: '3100-10-22'
@@ -255,9 +249,7 @@ planet:
         population: 1127739700.0
       - date: '3145-07-14'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 1137252612.0
   - name: Akuma
     type: ICE_GIANT

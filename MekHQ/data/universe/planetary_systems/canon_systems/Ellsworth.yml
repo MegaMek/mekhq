@@ -31,9 +31,7 @@ planet:
     event:
       - date: '2401-09-03'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 45310.0
         socioIndustrial: C-D-A-F-F
       - date: '2410-01-01'
@@ -192,16 +190,12 @@ planet:
         population: 267786524.0
       - date: '3078-05-01'
         faction:
-          source: canon
-          value:
-            - PR
+          - PR
       - date: '3080-01-01'
         population: 270477823.0
       - date: '3086-02-01'
         faction:
-          source: canon
-          value:
-            - RF
+          - RF
       - date: '3090-01-01'
         population: 274236291.0
       - date: '3099-01-01'
@@ -222,12 +216,7 @@ planet:
         population: 303441885.0
       - date: '3148-07-07'
         faction:
-          source: canon
-          value:
-            - FWL
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - FWL
   - name: Reedy

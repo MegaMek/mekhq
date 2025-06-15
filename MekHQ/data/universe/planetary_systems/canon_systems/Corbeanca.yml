@@ -56,9 +56,7 @@ planet:
     event:
       - date: '2643-06-04'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 52904.0
         socioIndustrial: C-D-C-D-F
       - date: '2644-01-01'
@@ -168,9 +166,7 @@ planet:
         population: 83920574.0
       - date: '3081-08-12'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 84139051.0
       - date: '3100-01-01'
@@ -189,9 +185,7 @@ planet:
         population: 86961962.0
       - date: '3145-10-12'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 87397860.0
   - name: Amarynthia
     type: GIANT_TERRESTRIAL

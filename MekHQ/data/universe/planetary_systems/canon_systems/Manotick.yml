@@ -73,9 +73,7 @@ planet:
     event:
       - date: '2627-08-25'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 54460.0
         socioIndustrial: C-F-A-D-C
       - date: '2628-01-01'
@@ -186,9 +184,7 @@ planet:
         population: 173827439.0
       - date: '3079-08-14'
         faction:
-          source: canon
-          value:
-            - DTA
+          - DTA
       - date: '3080-01-01'
         population: 176137172.0
       - date: '3090-01-01'
@@ -209,11 +205,6 @@ planet:
         population: 186319525.0
       - date: '3145-01-01'
         population: 186580555.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Warwick
     type: TERRESTRIAL
     orbitalDist: 2.08

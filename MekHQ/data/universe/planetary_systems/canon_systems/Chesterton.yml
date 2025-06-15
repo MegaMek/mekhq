@@ -166,9 +166,7 @@ planet:
     event:
       - date: '2193-12-04'
         faction:
-          source: canon
-          value:
-            - CTL
+          - CTL
         population: 59281.0
         socioIndustrial: D-D-A-D-B
       - date: '2200-01-01'
@@ -183,9 +181,7 @@ planet:
         population: 7959705.0
       - date: '2243-03-26'
         faction:
-          source: canon
-          value:
-            - TGU
+          - TGU
       - date: '2250-01-01'
         population: 16187349.0
       - date: '2260-01-01'
@@ -194,9 +190,7 @@ planet:
         population: 52631750.0
       - date: '2271-09-15'
         faction:
-          source: canon
-          value:
-            - CTL
+          - CTL
       - date: '2280-01-01'
         population: 86188796.0
       - date: '2290-01-01'
@@ -215,14 +209,10 @@ planet:
         population: 722918642.0
       - date: '2352-05-07'
         faction:
-          source: canon
-          value:
-            - SSUP
+          - SSUP
       - date: '2357-08-01'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2360-01-01'
         population: 860499618.0
       - date: '2370-01-01'
@@ -376,15 +366,15 @@ planet:
           value: 1684000000.0
       - date: '3028-01-01'
         socioIndustrial: C-C-B-C-B
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 1772148314.0
       - date: '3040-01-01'
         population: 2012189651.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3045-01-01'
         socioIndustrial:
           source: canon
@@ -399,7 +389,7 @@ planet:
           value: 2607760000.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -425,9 +415,7 @@ planet:
         population: 2722339485.0
       - date: '3145-12-05'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 2722339485.0
   - name: Melton's Ship
     type: ICE_GIANT

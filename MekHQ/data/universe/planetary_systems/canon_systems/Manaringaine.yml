@@ -88,9 +88,7 @@ planet:
     event:
       - date: '2900-04-12'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 49871.0
         socioIndustrial: C-D-A-D-C
       - date: '2905-12-10'
@@ -121,9 +119,7 @@ planet:
         population: 10243355.0
       - date: '3025-07-03'
         faction:
-          source: canon
-          value:
-            - EF
+          - EF
       - date: '3030-01-01'
         population: 10327950.0
       - date: '3040-01-01'
@@ -132,7 +128,7 @@ planet:
         socioIndustrial: C-D-A-D-C
       - date: '3049-09-18'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CW
       - date: '3050-01-01'
@@ -143,9 +139,7 @@ planet:
         population: 1155164.0
       - date: '3071-01-25'
         faction:
-          source: canon
-          value:
-            - CHH
+          - CHH
       - date: '3080-01-01'
         population: 438404.0
       - date: '3090-01-01'
@@ -160,17 +154,10 @@ planet:
         population: 17832.0
       - date: '3130-07-31'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FCo
   - name: Dancer
     type: TERRESTRIAL
     orbitalDist: 4.2

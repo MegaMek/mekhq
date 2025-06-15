@@ -107,9 +107,7 @@ planet:
     event:
       - date: '2241-04-29'
         faction:
-          source: canon
-          value:
-            - DO
+          - DO
         population: 50709.0
         socioIndustrial: D-F-C-D-F
       - date: '2250-01-01'
@@ -122,7 +120,7 @@ planet:
         population: 2124899.0
       - date: '2271-06-01'
         faction:
-          source: canon
+          source: 'Handbook: House Marik'
           value:
             - FWL
       - date: '2280-01-01'
@@ -315,16 +313,12 @@ planet:
         population: 551211332.0
       - date: '3079-06-19'
         faction:
-          source: canon
-          value:
-            - DO
+          - DO
       - date: '3080-01-01'
         population: 554195924.0
       - date: '3086-07-03'
         faction:
-          source: canon
-          value:
-            - OP
+          - OP
       - date: '3090-01-01'
         population: 557419600.0
       - date: '3100-01-01'
@@ -345,11 +339,6 @@ planet:
         population: 587054863.0
       - date: '3145-01-01'
         population: 587054863.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN
   - name: Sweeney's Rock
     type: GIANT_TERRESTRIAL
     orbitalDist: 1.0

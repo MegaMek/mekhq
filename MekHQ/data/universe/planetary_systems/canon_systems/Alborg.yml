@@ -100,9 +100,7 @@ planet:
     event:
       - date: '2504-04-21'
         faction:
-          source: canon
-          value:
-            - JF
+          - JF
         population: 50945.0
         socioIndustrial: B-D-A-D-D
       - date: '2510-01-01'
@@ -125,9 +123,7 @@ planet:
         population: 6142472.0
       - date: '2571-03-05'
         faction:
-          source: canon
-          value:
-            - JF
+          - JF
       - date: '2580-01-01'
         population: 7875997.0
       - date: '2590-01-01'

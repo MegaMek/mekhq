@@ -96,9 +96,7 @@ planet:
     event:
       - date: '2705-06-18'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 49044.0
         socioIndustrial: C-D-B-D-C
       - date: '2710-01-01'
@@ -129,9 +127,7 @@ planet:
         population: 5146348.0
       - date: '2814-02-28'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2820-01-01'
         population: 2910587.0
       - date: '2830-01-01'
@@ -159,36 +155,21 @@ planet:
         population: 1980464.0
       - date: '2990-01-01'
         faction:
-          source: canon
-          value:
-            - ARC
+          - ARC
       - date: '3022-01-01'
         faction:
-          source: canon
-          value:
-            - ARD
+          - ARD
       - date: '3025-01-25'
         faction:
-          source: assumption
-          value:
-            - ARC
-            - ARD
+          - ARC
+          - ARD
       - date: '3025-03-01'
         faction:
-          source: assumption
-          value:
-            - ARC
+          - ARC
       - date: '3026-01-01'
         faction:
-          source: canon
-          value:
-            - ARC
+          - ARC
         population: 2804788.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN
   - name: Crowley
     type: ICE_GIANT
     orbitalDist: 4.48

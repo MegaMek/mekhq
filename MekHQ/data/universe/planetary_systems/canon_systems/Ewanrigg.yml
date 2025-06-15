@@ -39,9 +39,7 @@ planet:
     event:
       - date: '2736-09-12'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 53642.0
         socioIndustrial: C-D-B-D-F
       - date: '2737-03-28'
@@ -106,22 +104,22 @@ planet:
         population: 560272292.0
       - date: '3020-01-01'
         population: 558579618.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 556131802.0
       - date: '3040-01-01'
         population: 555685714.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3045-01-01'
         socioIndustrial: C-C-B-B-D
       - date: '3050-01-01'
         population: 553639505.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'

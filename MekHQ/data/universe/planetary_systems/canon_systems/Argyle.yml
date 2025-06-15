@@ -110,14 +110,15 @@ planet:
         icon: oddmoon1
     event:
       - date: '2309-11-19'
-        faction:
-          source: canon
-          value:
-            - FS
         population: 39627.0
         socioIndustrial: D-C-A-D-B
       - date: '2310-01-01'
         population: 47602.0
+      - date: '2317-06-26'
+        faction:
+          source: 'Handbook: House Davion'
+          value:
+            - FS
       - date: '2320-01-01'
         population: 255561.0
       - date: '2330-01-01'
@@ -273,16 +274,16 @@ planet:
         population: 4365689349.0
       - date: '3020-01-01'
         population: 4313614152.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-08-18'
         population: 4291241578.0
         socioIndustrial: B-B-B-C-B
       - date: '3040-01-01'
         population: 4324411679.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3046-01-01'
         socioIndustrial:
           source: canon
@@ -297,7 +298,7 @@ planet:
           value: 4395477200.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'

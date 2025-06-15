@@ -66,9 +66,7 @@ planet:
     event:
       - date: '2746-08-25'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 49677.0
         socioIndustrial: C-D-B-D-C
       - date: '2747-09-23'
@@ -93,9 +91,7 @@ planet:
         population: 409030228.0
       - date: '2821-06-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2830-01-01'
         population: 612877568.0
       - date: '2840-01-01'
@@ -112,9 +108,7 @@ planet:
         population: 1853227730.0
       - date: '2900-10-22'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 2001906329.0
       - date: '2910-01-01'
         population: 2123616532.0
@@ -148,20 +142,14 @@ planet:
         population: 2512949763.0
       - date: '3030-09-11'
         faction:
-          source: canon
-          value:
-            - DA
+          - DA
       - date: '3038-08-12'
         faction:
-          source: canon
-          value:
-            - FWL
-            - DA
+          - FWL
+          - DA
       - date: '3038-10-21'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3040-01-01'
         population: 2527626635.0
       - date: '3048-01-01'
@@ -180,9 +168,7 @@ planet:
         population: 2608313214.0
       - date: '3079-03-05'
         faction:
-          source: canon
-          value:
-            - DA
+          - DA
       - date: '3080-01-01'
         population: 2615103652.0
       - date: '3090-01-01'
@@ -205,11 +191,6 @@ planet:
         population: 2716933173.0
       - date: '3145-01-01'
         population: 2717476614.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN
   - name: Kutkha
     type: GIANT_TERRESTRIAL
     orbitalDist: 0.35

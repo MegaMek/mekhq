@@ -88,9 +88,7 @@ planet:
     event:
       - date: '2920-02-04'
         faction:
-          source: canon
-          value:
-            - MH
+          - MH
         hpg:
           source: canon
           value: B

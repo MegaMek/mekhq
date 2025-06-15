@@ -125,9 +125,7 @@ planet:
     event:
       - date: '2891-10-09'
         faction:
-          source: canon
-          value:
-            - HL
+          - HL
         population: 42461.0
         socioIndustrial: C-D-B-D-D
       - date: '2895-10-22'
@@ -192,9 +190,7 @@ planet:
         population: 194276.0
       - date: '3140-11-09'
         faction:
-          source: canon
-          value:
-            - CEI
+          - CEI
       - date: '3145-01-01'
         population: 194354.0
   - name: Burger's Belt

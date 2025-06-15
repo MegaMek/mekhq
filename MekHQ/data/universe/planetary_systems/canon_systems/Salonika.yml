@@ -95,7 +95,7 @@ planet:
     event:
       - date: '3049-09-13'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CNC
         hpg: A
@@ -103,7 +103,7 @@ planet:
         socioIndustrial: A-X-X-X-X
       - date: '3052-09-11'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CNC
         hpg: A
@@ -111,25 +111,16 @@ planet:
         socioIndustrial: A-X-X-X-X
       - date: '3062-06-20'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
       - date: '3063-02-16'
         faction:
-          source: canon
-          value:
-            - CDS
+          - CDS
         hpg: A
         population: 1166.0
         socioIndustrial: A-X-X-X-X
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN
   - name: 0OX4
     type: GAS_GIANT
     orbitalDist: 21.0

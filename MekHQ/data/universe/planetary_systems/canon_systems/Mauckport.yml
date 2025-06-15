@@ -45,9 +45,7 @@ planet:
     event:
       - date: '2538-12-12'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 50834.0
         socioIndustrial: C-F-A-C-D
       - date: '2540-01-01'
@@ -160,15 +158,15 @@ planet:
         population: 94973445.0
       - date: '3020-01-01'
         population: 94386550.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 94674284.0
       - date: '3040-01-01'
         population: 95482446.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3042-01-01'
         socioIndustrial: D-D-B-D-D
       - date: '3044-01-01'
@@ -179,7 +177,7 @@ planet:
         population: 96548205.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -204,15 +202,8 @@ planet:
         population: 102170442.0
       - date: '3145-04-14'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 102620982.0
-      - date: '3152-06-01'
-        faction:
-          source: sucs
-          value:
-            - FS
   - name: Zu
     type: GIANT_TERRESTRIAL
     orbitalDist: 2.4

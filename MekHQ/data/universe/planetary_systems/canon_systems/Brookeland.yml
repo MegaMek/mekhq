@@ -35,9 +35,7 @@ planet:
     event:
       - date: '2360-03-18'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 59950.0
         socioIndustrial: F-F-B-D-F
       - date: '2370-01-01'
@@ -185,15 +183,15 @@ planet:
         population: 177300838.0
       - date: '3020-01-01'
         population: 171980647.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 170108140.0
       - date: '3040-01-01'
         population: 171457317.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3043-01-01'
         socioIndustrial: C-C-B-C-C
       - date: '3050-01-01'
@@ -202,7 +200,7 @@ planet:
         population: 175850526.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -227,9 +225,7 @@ planet:
         population: 195690504.0
       - date: '3145-02-15'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 195964663.0
   - name: Lynn Haven
     type: ICE_GIANT

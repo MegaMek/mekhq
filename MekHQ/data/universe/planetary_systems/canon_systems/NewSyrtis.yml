@@ -121,9 +121,7 @@ planet:
     event:
       - date: '2265-07-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 47139.0
         socioIndustrial: D-D-B-D-D
       - date: '2270-01-01'
@@ -146,9 +144,7 @@ planet:
         population: 15413313.0
       - date: '2350-12-28'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 23147382.0
       - date: '2360-01-01'
         population: 33049481.0
@@ -294,6 +290,11 @@ planet:
         population: 248796090.0
       - date: '3020-01-01'
         population: 249572687.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 250458005.0
       - date: '3040-03-17'
@@ -301,11 +302,6 @@ planet:
         socioIndustrial:
           source: canon
           value: B-B-C-B-D
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3048-01-01'
         socioIndustrial:
           source: canon
@@ -320,7 +316,7 @@ planet:
           value: 258654000.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -350,18 +346,11 @@ planet:
         population: 261726093.0
       - date: '3145-09-25'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 262250069.0
       - date: '3147-12-25'
         faction:
-          source: canon
-          value:
-            - FS
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - FS
   - name: Zisimides

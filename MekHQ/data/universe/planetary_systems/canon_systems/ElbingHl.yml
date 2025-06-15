@@ -41,9 +41,7 @@ planet:
     event:
       - date: '2891-04-26'
         faction:
-          source: canon
-          value:
-            - HL
+          - HL
         hpg: X
         population: 54619.0
         socioIndustrial: B-D-A-D-D
@@ -107,9 +105,7 @@ planet:
         population: 143914.0
       - date: '3140-11-15'
         faction:
-          source: canon
-          value:
-            - CEI
+          - CEI
       - date: '3145-01-01'
         population: 144288.0
   - name: Bara's Stand

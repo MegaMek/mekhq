@@ -41,9 +41,7 @@ planet:
     event:
       - date: '2235-08-09'
         faction:
-          source: canon
-          value:
-            - TamP
+          - TamP
         population: 58084.0
         socioIndustrial: D-D-C-F-C
       - date: '2240-01-01'
@@ -68,9 +66,9 @@ planet:
         population: 61804759.0
       - date: '2340-01-01'
         population: 85427907.0
-      - date: '2341-11-14'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2350-01-01'
@@ -195,9 +193,7 @@ planet:
         socioIndustrial: F-D-C-D-C
       - date: '2900-08-06'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 575970855.0
       - date: '2910-01-01'
         population: 572225484.0
@@ -225,18 +221,14 @@ planet:
         population: 523654740.0
       - date: '3025-03-25'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '3030-09-09'
         faction:
-          source: canon
-          value:
-            - LA
+          - FC
         population: 519041939.0
       - date: '3034-03-13'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FRR
       - date: '3038-01-01'
@@ -249,22 +241,20 @@ planet:
         population: 527518896.0
       - date: '3051-12-07'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
             - FRR
       - date: '3051-12-10'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
       - date: '3060-01-01'
         population: 531330738.0
       - date: '3069-10-04'
         faction:
-          source: canon
-          value:
-            - CW
+          - CW
       - date: '3070-01-01'
         population: 536724371.0
       - date: '3080-01-01'
@@ -286,9 +276,7 @@ planet:
         population: 607945164.0
       - date: '3145-01-10'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
         population: 611726133.0
   - name: Neva
     type: TERRESTRIAL

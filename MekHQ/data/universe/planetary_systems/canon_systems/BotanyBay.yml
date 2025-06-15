@@ -65,9 +65,7 @@ planet:
     event:
       - date: '2726-07-17'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 50741.0
         socioIndustrial: C-F-C-D-F
       - date: '2730-01-01'
@@ -84,9 +82,7 @@ planet:
         population: 3339447.0
       - date: '2779-01-25'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2780-01-01'
         population: 5674404.0
       - date: '2790-01-01'
@@ -141,19 +137,13 @@ planet:
         population: 50388674.0
       - date: '3021-07-29'
         faction:
-          source: canon
-          value:
-            - MV
+          - MV
       - date: '3025-11-27'
         faction:
-          source: canon
-          value:
-            - MV
+          - MV
       - date: '3028-04-30'
         faction:
-          source: canon
-          value:
-            - GV
+          - GV
       - date: '3030-01-01'
         population: 50198876.0
       - date: '3040-01-01'
@@ -162,7 +152,7 @@ planet:
         socioIndustrial: D-D-C-D-D
       - date: '3049-09-05'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
       - date: '3050-01-01'
@@ -173,14 +163,10 @@ planet:
         population: 50868475.0
       - date: '3071-09-15'
         faction:
-          source: canon
-          value:
-            - CIH
+          - CIH
       - date: '3071-12-18'
         faction:
-          source: canon
-          value:
-            - CHH
+          - CHH
       - date: '3080-01-01'
         population: 51359163.0
       - date: '3090-01-01'
@@ -189,9 +175,7 @@ planet:
         population: 52166648.0
       - date: '3100-02-07'
         faction:
-          source: canon
-          value:
-            - TB
+          - TB
       - date: '3110-01-01'
         population: 52459601.0
       - date: '3115-01-01'
@@ -204,11 +188,6 @@ planet:
         population: 52933869.0
       - date: '3145-01-01'
         population: 53018631.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - RU
   - name: Parks
     type: GIANT_TERRESTRIAL
     orbitalDist: 1.44

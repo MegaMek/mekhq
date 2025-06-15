@@ -87,9 +87,7 @@ planet:
     event:
       - date: '2656-08-05'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 54637.0
         socioIndustrial: C-D-B-D-A
       - date: '2660-01-01'
@@ -194,9 +192,7 @@ planet:
         population: 231697195.0
       - date: '3081-05-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 236047092.0
       - date: '3100-01-01'
@@ -217,9 +213,7 @@ planet:
         population: 249642858.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - DA
+          - DA
   - name: Grey Cloud Isl
     type: GIANT_TERRESTRIAL
     orbitalDist: 3.92

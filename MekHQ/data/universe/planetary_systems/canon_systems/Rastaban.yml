@@ -67,9 +67,7 @@ planet:
     event:
       - date: '2550-11-04'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 50906.0
         socioIndustrial: C-D-B-F-C
       - date: '2560-01-01'
@@ -121,9 +119,7 @@ planet:
         population: 880130286.0
       - date: '2750-05-29'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 886320553.0
       - date: '2760-01-01'
         population: 889123581.0
@@ -182,15 +178,15 @@ planet:
         population: 652663509.0
       - date: '3020-01-01'
         population: 651551872.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 656648241.0
       - date: '3040-01-01'
         population: 663313993.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3043-01-01'
         socioIndustrial: D-D-C-C-C
       - date: '3044-01-01'
@@ -199,7 +195,7 @@ planet:
         population: 668909298.0
       - date: '3052-01-10'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CW
       - date: '3060-01-01'
@@ -226,15 +222,11 @@ planet:
         population: 719350321.0
       - date: '3145-02-18'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 720502203.0
       - date: '3151-02-15'
         faction:
-          source: canon
-          value:
-            - CHH
+          - CHH
   - name: T74
     type: GIANT_TERRESTRIAL
     orbitalDist: 1.44

@@ -175,9 +175,7 @@ planet:
     event:
       - date: '2266-07-18'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 44252.0
         socioIndustrial: F-D-A-F-F
       - date: '2270-01-01'
@@ -192,9 +190,7 @@ planet:
         population: 5372716.0
       - date: '2320-08-23'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
         population: 11055825.0
       - date: '2330-01-01'
         population: 20498051.0
@@ -298,23 +294,17 @@ planet:
         population: 951955896.0
       - date: '2767-10-05'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2770-01-01'
         population: 953827653.0
       - date: '2779-01-11'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-01-01'
         population: 941441084.0
       - date: '2785-12-06'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         hpg:
           source: canon
           value: X
@@ -393,31 +383,23 @@ planet:
         population: 1343220104.0
       - date: '3069-03-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3070-01-01'
         population: 1561784249.0
       - date: '3079-07-22'
         faction:
-          source: canon
-          value:
-            - CGB
-            - CSR
-            - Stone
-            - WOB
+          - CGB
+          - CSR
+          - Stone
+          - WOB
       - date: '3079-07-28'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 1573384319.0
       - date: '3081-11-27'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1582536464.0
       - date: '3094-01-01'
@@ -432,9 +414,7 @@ planet:
         population: 1651409089.0
       - date: '3132-07-01'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '3132-08-07'
         hpg:
           source: canon

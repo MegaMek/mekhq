@@ -101,9 +101,7 @@ planet:
     event:
       - date: '2176-12-12'
         faction:
-          source: canon
-          value:
-            - SSUP
+          - SSUP
         population: 53704.0
         socioIndustrial: D-F-D-D-D
       - date: '2180-01-01'
@@ -146,7 +144,7 @@ planet:
         population: 447086012.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -297,17 +295,10 @@ planet:
         population: 1050514608.0
       - date: '3030-07-12'
         faction:
-          source: canon
-          value:
-            - FS
+          - FC
         population: 1046143549.0
       - date: '3040-01-01'
         population: 1061210877.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3041-01-01'
         socioIndustrial:
           source: canon
@@ -316,16 +307,12 @@ planet:
         population: 1076602870.0
       - date: '3057-11-01'
         faction:
-          source: canon
-          value:
-            - CM
+          - CM
       - date: '3060-01-01'
         population: 1091890495.0
       - date: '3062-11-15'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '3070-01-01'
         population: 1105182625.0
       - date: '3080-01-01'

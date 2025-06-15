@@ -75,9 +75,7 @@ planet:
     event:
       - date: '2678-07-09'
         faction:
-          source: canon
-          value:
-            - TC
+          - TC
         population: 48500.0
         socioIndustrial: C-D-A-D-D
       - date: '2680-01-01'
@@ -115,9 +113,7 @@ planet:
         population: 21551448.0
       - date: '2814-02-28'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2820-01-01'
         population: 14305238.0
       - date: '2830-01-01'
@@ -150,36 +146,21 @@ planet:
         population: 12643.0
       - date: '2983-01-01'
         faction:
-          source: canon
-          value:
-            - ARC
+          - ARC
       - date: '3022-01-01'
         faction:
-          source: canon
-          value:
-            - ARD
+          - ARD
       - date: '3025-03-01'
         faction:
-          source: assumption
-          value:
-            - ARC
-            - ARD
+          - ARC
+          - ARD
       - date: '3025-04-01'
         faction:
-          source: assumption
-          value:
-            - ARD
+          - ARD
       - date: '3026-01-01'
         faction:
-          source: canon
-          value:
-            - ARC
+          - ARC
         population: 11924.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN
   - name: Back Swamp
     type: TERRESTRIAL
     orbitalDist: 1.44

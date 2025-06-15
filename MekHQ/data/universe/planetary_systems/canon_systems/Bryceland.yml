@@ -38,9 +38,7 @@ planet:
     event:
       - date: '2503-11-23'
         faction:
-          source: canon
-          value:
-            - OA
+          - OA
         population: 51695.0
         socioIndustrial: C-D-C-F-C
       - date: '2510-01-01'
@@ -65,9 +63,7 @@ planet:
         population: 59267304.0
       - date: '2596-09-22'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2600-01-01'
         population: 71134882.0
       - date: '2610-01-01'
@@ -124,9 +120,7 @@ planet:
         population: 117031798.0
       - date: '2850-06-14'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 114391561.0
       - date: '2851-01-01'
         socioIndustrial: C-B-C-D-B
@@ -165,15 +159,15 @@ planet:
         population: 96848671.0
       - date: '3020-01-01'
         population: 92587646.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 91313390.0
       - date: '3040-01-01'
         population: 92092862.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3047-01-01'
         socioIndustrial: D-C-C-D-B
       - date: '3050-01-01'
@@ -182,18 +176,18 @@ planet:
         population: 93213955.0
       - date: '3063-10-04'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FC
             - LA
       - date: '3064-06-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FC
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -212,9 +206,7 @@ planet:
         population: 97095734.0
       - date: '3130-05-23'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 98839512.0
       - date: '3132-08-07'
         hpg: X

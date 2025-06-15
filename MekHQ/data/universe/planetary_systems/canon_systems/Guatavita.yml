@@ -54,9 +54,7 @@ planet:
     event:
       - date: '2409-04-01'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 50944.0
         socioIndustrial: C-D-B-D-C
       - date: '2410-01-01'
@@ -193,22 +191,22 @@ planet:
         population: 166476622.0
       - date: '3020-01-01'
         population: 167279891.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 168276861.0
       - date: '3040-01-01'
         population: 169425043.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3042-01-01'
         socioIndustrial: B-C-B-C-B
       - date: '3050-01-01'
         population: 170598118.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -235,15 +233,11 @@ planet:
         population: 186440211.0
       - date: '3145-02-07'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 187299811.0
       - date: '3151-05-15'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
   - name: Ybarra
     type: DWARF_TERRESTRIAL
     orbitalDist: 0.8

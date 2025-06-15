@@ -145,9 +145,7 @@ planet:
     event:
       - date: '2284-04-03'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 46970.0
         socioIndustrial: D-D-A-D-B
       - date: '2290-01-01'
@@ -168,9 +166,7 @@ planet:
         population: 42157492.0
       - date: '2355-10-20'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2360-01-01'
         population: 73877550.0
       - date: '2370-01-01'
@@ -316,17 +312,17 @@ planet:
         population: 1992829773.0
       - date: '3026-01-01'
         socioIndustrial: C-C-B-C-B
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 2001074948.0
       - date: '3034-01-01'
         socioIndustrial: B-B-B-B-B
       - date: '3040-01-01'
         population: 2025435036.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3044-01-01'
         socioIndustrial:
           source: canon
@@ -339,16 +335,12 @@ planet:
           value: STANDARD
       - date: '3057-11-20'
         faction:
-          source: canon
-          value:
-            - LA
-            - CWIE
+          - LA
+          - CWIE
       - date: '3057-12-01'
         faction:
-          source: canon
-          value:
-            - ARDC
-            - CWIE
+          - ARDC
+          - CWIE
       - date: '3060-01-01'
         population: 2077124551.0
       - date: '3067-01-01'
@@ -357,10 +349,8 @@ planet:
           value: 2098000000.0
       - date: '3067-04-24'
         faction:
-          source: canon
-          value:
-            - LA
-            - CWIE
+          - LA
+          - CWIE
       - date: '3070-01-01'
         population: 2103882632.0
       - date: '3080-01-01'
@@ -387,19 +377,12 @@ planet:
         population: 2158437348.0
       - date: '3146-09-25'
         faction:
-          source: canon
-          value:
-            - CJF
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - CJF
       - date: '3151-10-02'
         faction:
-          source: canon
-          value:
-            - ARL
+          - ARL
   - name: Harris
     type: ICE_GIANT
     orbitalDist: 2.8

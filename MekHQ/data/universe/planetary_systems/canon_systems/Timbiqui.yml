@@ -77,9 +77,7 @@ planet:
     event:
       - date: '2625-06-09'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 52892.0
         socioIndustrial: C-D-C-D-B
       - date: '2630-01-01'
@@ -169,38 +167,34 @@ planet:
         population: 273094088.0
       - date: '3020-01-01'
         population: 272246747.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 273213906.0
       - date: '3040-01-01'
         population: 275408384.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3045-01-01'
         socioIndustrial: C-C-C-C-A
       - date: '3050-01-01'
         population: 276816554.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
         population: 278566003.0
       - date: '3068-09-01'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3070-01-01'
         population: 280915813.0
       - date: '3079-11-24'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '3080-01-01'
         population: 285617935.0
       - date: '3090-01-01'
@@ -223,15 +217,8 @@ planet:
         population: 302552564.0
       - date: '3145-01-03'
         faction:
-          source: canon
-          value:
-            - DTA
+          - DTA
         population: 303582993.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Cuevas
     type: GIANT_TERRESTRIAL
     orbitalDist: 4.2

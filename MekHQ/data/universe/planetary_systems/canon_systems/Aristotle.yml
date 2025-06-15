@@ -60,9 +60,7 @@ planet:
     event:
       - date: '2268-12-30'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 46187.0
         socioIndustrial: D-D-C-D-C
       - date: '2270-01-01'
@@ -83,9 +81,7 @@ planet:
         population: 24303851.0
       - date: '2345-11-10'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2350-01-01'
         population: 38686330.0
       - date: '2360-01-01'
@@ -233,33 +229,33 @@ planet:
         population: 669161684.0
       - date: '3020-01-01'
         population: 666113319.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 667726012.0
       - date: '3040-11-07'
         population: 675449185.0
         socioIndustrial: B-C-C-B-B
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3050-01-01'
         population: 681896528.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
         population: 686961279.0
       - date: '3064-07-01'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FC
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - LA
       - date: '3070-01-01'
@@ -282,9 +278,7 @@ planet:
         population: 718580636.0
       - date: '3145-02-09'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 721027969.0
   - name: Stercutus Belt
     type: ASTEROID_BELT

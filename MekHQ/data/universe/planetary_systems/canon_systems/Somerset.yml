@@ -71,9 +71,7 @@ planet:
     event:
       - date: '2372-09-16'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 38556.0
         socioIndustrial: D-D-C-D-C
       - date: '2380-01-01'
@@ -120,9 +118,7 @@ planet:
         population: 118772258.0
       - date: '2571-04-05'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2580-01-01'
         population: 123678090.0
       - date: '2590-01-01'
@@ -171,14 +167,10 @@ planet:
         population: 166164190.0
       - date: '2774-03-31'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2779-04-01'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2780-01-01'
         population: 167245413.0
       - date: '2790-01-01'
@@ -233,6 +225,11 @@ planet:
         population: 160912554.0
       - date: '3020-01-01'
         population: 159565055.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 159694867.0
       - date: '3031-01-01'
@@ -242,22 +239,17 @@ planet:
         socioIndustrial:
           source: canon
           value: C-C-C-C-B
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3050-01-01'
         population: 161832995.0
       - date: '3050-05-22'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
             - FC
       - date: '3050-05-23'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
       - date: '3060-01-01'
@@ -266,14 +258,10 @@ planet:
         population: 163688448.0
       - date: '3071-06-02'
         faction:
-          source: canon
-          value:
-            - CIH
+          - CIH
       - date: '3071-07-13'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3080-01-01'
         population: 165234373.0
       - date: '3090-01-01'
@@ -298,9 +286,7 @@ planet:
         population: 172046521.0
       - date: '3151-12-10'
         faction:
-          source: canon
-          value:
-            - CHH
+          - CHH
   - name: Trimdon
     type: DWARF_TERRESTRIAL
     orbitalDist: 0.49

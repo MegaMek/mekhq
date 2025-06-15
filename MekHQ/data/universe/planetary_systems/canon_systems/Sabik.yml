@@ -194,9 +194,7 @@ planet:
     event:
       - date: '2400-04-19'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
         population: 46359.0
         socioIndustrial: C-D-B-D-F
       - date: '2410-01-01'
@@ -281,9 +279,7 @@ planet:
         population: 69076.0
       - date: '2767-05-09'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 70000.0
       - date: '2768-12-13'
         hpg: X
@@ -291,17 +287,13 @@ planet:
         population: 66064.0
       - date: '2779-11-08'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2780-10-12'
         hpg: B
         population: 51907.0
       - date: '2790-11-22'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 38971.0
       - date: '2800-01-01'
         population: 30875.0
@@ -311,9 +303,7 @@ planet:
         population: 18517.0
       - date: '2821-11-29'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2830-01-01'
         population: 14310.0
       - date: '2840-01-01'
@@ -326,9 +316,7 @@ planet:
         population: 7793.0
       - date: '2864-08-07'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2870-01-01'
         population: 6624.0
       - date: '2880-01-01'
@@ -346,9 +334,7 @@ planet:
         population: 5973.0
       - date: '2940-07-26'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 5867.0
       - date: '2950-01-01'
         population: 5176.0
@@ -372,68 +358,49 @@ planet:
           value: 2000.0
       - date: '3030-04-07'
         faction:
-          source: canon
-          value:
-            - LA
+          - FC
         population: 8507.0
       - date: '3040-01-01'
         population: 164648.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3045-01-01'
         socioIndustrial: B-B-C-A-D
       - date: '3050-01-01'
         population: 5461079.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3057-11-01'
         faction:
-          source: canon
-          value:
-            - DC
-            - LA
+          - DC
+          - LA
       - date: '3060-01-01'
         population: 253643951.0
       - date: '3061-01-01'
         socioIndustrial: B-C-C-A-D
       - date: '3062-10-19'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '3069-02-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3070-01-01'
         population: 2777322019.0
       - date: '3076-07-21'
         faction:
-          source: canon
-          value:
-            - CGB
-            - CSR
-            - Stone
-            - WOB
+          - CGB
+          - CSR
+          - Stone
+          - WOB
       - date: '3076-07-28'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 2808602871.0
       - date: '3081-01-05'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 2850479315.0
       - date: '3100-01-01'
@@ -450,16 +417,12 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 3108334838.0
       - date: '3145-04-02'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
         population: 3132674651.0
   - name: Nuri
     type: DWARF_TERRESTRIAL

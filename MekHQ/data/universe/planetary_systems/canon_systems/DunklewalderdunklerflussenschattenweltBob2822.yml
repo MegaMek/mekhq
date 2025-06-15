@@ -74,9 +74,7 @@ planet:
     event:
       - date: '2616-08-07'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 47935.0
         socioIndustrial: C-D-D-D-F
       - date: '2620-01-01'
@@ -126,19 +124,12 @@ planet:
         population: 1063429.0
       - date: '2815-02-13'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg:
           source: canon
           value: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
-      - date: '2108-12-05'
-        name: Dunklewälderdunklerflüssenschattenwelt
-      - date: '2822-01-01'
-        name: Bob
-        message: Dunklewälderdunklerflüssenschattenwelt renamed to Bob
   - name: Garner's Garden
     type: GAS_GIANT
     orbitalDist: 0.4

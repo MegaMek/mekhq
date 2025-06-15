@@ -37,9 +37,7 @@ planet:
     event:
       - date: '2514-04-14'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 51406.0
         socioIndustrial: C-D-B-D-C
       - date: '2520-01-01'
@@ -169,15 +167,11 @@ planet:
         population: 161539732.0
       - date: '3059-07-27'
         faction:
-          source: canon
-          value:
-            - DC
-            - CSJ
+          - DC
+          - CSJ
       - date: '3059-08-13'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '3060-01-01'
         population: 162446892.0
       - date: '3070-01-01'

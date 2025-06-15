@@ -107,9 +107,7 @@ planet:
     event:
       - date: '2319-11-05'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 56549.0
         socioIndustrial: D-F-C-F-F
       - date: '2320-01-01'
@@ -120,9 +118,7 @@ planet:
         population: 1926966.0
       - date: '2350-08-27'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 7053539.0
       - date: '2360-01-01'
         population: 21304968.0
@@ -228,9 +224,7 @@ planet:
         population: 7733442347.0
       - date: '2821-05-21'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2830-01-01'
         population: 7773812936.0
       - date: '2840-01-01'
@@ -243,9 +237,7 @@ planet:
         population: 7644794839.0
       - date: '2864-08-13'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2870-01-01'
         population: 7517219034.0
       - date: '2880-01-01'
@@ -256,9 +248,7 @@ planet:
         socioIndustrial: C-D-D-F-D
       - date: '2900-02-11'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 7001113818.0
       - date: '2910-01-01'
         population: 6832628293.0
@@ -300,27 +290,19 @@ planet:
         population: 6351974656.0
       - date: '3072-02-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3075-08-27'
         faction:
-          source: canon
-          value:
-            - CGB
-            - WOB
+          - CGB
+          - WOB
       - date: '3075-09-05'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 6433802512.0
       - date: '3081-04-24'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 6498463303.0
       - date: '3100-01-01'
@@ -337,16 +319,12 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 6813907431.0
       - date: '3145-04-10'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
         population: 6834379846.0
   - name: Ghissignies
     type: DWARF_TERRESTRIAL

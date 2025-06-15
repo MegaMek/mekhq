@@ -72,9 +72,7 @@ planet:
     event:
       - date: '2719-07-26'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 53975.0
         socioIndustrial: C-D-B-D-F
       - date: '2720-01-01'
@@ -93,17 +91,13 @@ planet:
         population: 95492.0
       - date: '2779-02-10'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
       - date: '2783-02-12'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 45950.0
         socioIndustrial: C-C-B-D-F
       - date: '2785-01-16'
@@ -187,11 +181,6 @@ planet:
         population: 46371120.0
       - date: '3145-01-01'
         population: 46389672.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN
   - name: Cronos's Choice
     type: TERRESTRIAL
     orbitalDist: 1.92

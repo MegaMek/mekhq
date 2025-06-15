@@ -33,9 +33,7 @@ planet:
     event:
       - date: '2647-05-11'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 46427.0
         socioIndustrial: C-D-A-D-F
       - date: '2650-01-01'
@@ -70,9 +68,7 @@ planet:
         population: 2996905.0
       - date: '2779-06-12'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2780-01-01'
         population: 1602192.0
       - date: '2790-01-01'
@@ -95,17 +91,13 @@ planet:
         population: 5025.0
       - date: '2863-03-14'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
       - date: '3100-10-15'
         faction:
-          source: canon
-          value:
-            - RIM
+          - RIM
         population: 50000.0
         socioIndustrial: C-D-A-D-D
       - date: '3101-12-29'
@@ -120,11 +112,6 @@ planet:
         population: 192197.0
       - date: '3145-01-01'
         population: 211563.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - TiC
   - name: Moore's Stand
     type: TERRESTRIAL
     orbitalDist: 0.7

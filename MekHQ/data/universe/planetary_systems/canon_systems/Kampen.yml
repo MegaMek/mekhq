@@ -76,9 +76,7 @@ planet:
     event:
       - date: '2891-05-27'
         faction:
-          source: canon
-          value:
-            - HL
+          - HL
         population: 28679.0
         socioIndustrial: C-D-B-D-F
       - date: '2898-12-16'
@@ -115,9 +113,7 @@ planet:
         population: 34548.0
       - date: '3025-02-23'
         faction:
-          source: canon
-          value:
-            - HL
+          - HL
       - date: '3030-01-01'
         population: 34897.0
       - date: '3040-01-01'
@@ -147,9 +143,7 @@ planet:
         population: 37249.0
       - date: '3140-03-03'
         faction:
-          source: canon
-          value:
-            - CEI
+          - CEI
       - date: '3145-01-01'
         population: 37249.0
   - name: Stephan's Redoubt

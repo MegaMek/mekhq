@@ -67,16 +67,12 @@ planet:
     event:
       - date: '2596-09-21'
         faction:
-          source: canon
-          value:
-            - SL
+          - SL
         population: 48648.0
         socioIndustrial: C-D-B-D-D
       - date: '2597-03-21'
         faction:
-          source: canon
-          value:
-            - TC
+          - TC
       - date: '2600-01-01'
         population: 142143.0
       - date: '2604-01-01'

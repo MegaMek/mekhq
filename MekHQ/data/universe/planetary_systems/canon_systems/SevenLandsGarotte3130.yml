@@ -37,9 +37,7 @@ planet:
     event:
       - date: '2605-01-10'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 52459.0
         socioIndustrial: B-C-B-D-D
       - date: '2610-01-01'
@@ -86,9 +84,7 @@ planet:
         population: 7587818.0
       - date: '2779-09-29'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2780-01-01'
         population: 3441162.0
       - date: '2790-01-01'
@@ -113,17 +109,13 @@ planet:
         population: 6972.0
       - date: '2880-01-29'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
       - date: '3087-05-14'
         faction:
-          source: canon
-          value:
-            - RT
+          - RT
         population: 50000.0
         socioIndustrial: D-D-C-D-C
       - date: '3090-04-28'
@@ -141,11 +133,6 @@ planet:
         population: 229184.0
       - date: '3145-01-01'
         population: 252655.0
-      - date: '2108-12-05'
-        name: Seven Lands
-      - date: '3130-01-01'
-        name: Garotte
-        message: Seven Lands renamed to Garotte
   - name: QGZ-2
     type: DWARF_TERRESTRIAL
     orbitalDist: 0.14

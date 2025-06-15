@@ -72,9 +72,7 @@ planet:
     event:
       - date: '2341-10-01'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 61234.0
         socioIndustrial: D-F-C-D-C
       - date: '2350-01-01'
@@ -199,22 +197,10 @@ planet:
         population: 31409.0
       - date: '2912-09-01'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - DC
-      - date: '2108-12-05'
-        name: Takata
-      - date: '3130-01-01'
-        name: New Start
-        message: Takata renamed to New Start
   - name: Nova Kusatsu-shi
     type: GAS_GIANT
     orbitalDist: 2.52

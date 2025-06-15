@@ -62,9 +62,7 @@ planet:
     event:
       - date: '2779-07-25'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 45547.0
         socioIndustrial: C-D-D-D-F
       - date: '2780-06-03'
@@ -120,9 +118,7 @@ planet:
         population: 4944929.0
       - date: '3012-07-19'
         faction:
-          source: canon
-          value:
-            - OC
+          - OC
       - date: '3020-01-01'
         population: 4967406.0
       - date: '3030-01-01'
@@ -133,7 +129,7 @@ planet:
         socioIndustrial: D-D-D-D-D
       - date: '3049-08-19'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CW
       - date: '3050-01-01'
@@ -144,9 +140,7 @@ planet:
         population: 5052586.0
       - date: '3071-01-25'
         faction:
-          source: canon
-          value:
-            - CHH
+          - CHH
       - date: '3080-01-01'
         population: 5078928.0
       - date: '3090-01-01'
@@ -155,9 +149,7 @@ planet:
         population: 5111538.0
       - date: '3100-02-07'
         faction:
-          source: canon
-          value:
-            - TB
+          - TB
       - date: '3110-01-01'
         population: 5140242.0
       - date: '3120-01-01'
@@ -169,11 +161,6 @@ planet:
         socioIndustrial: D-D-D-D-D
       - date: '3145-01-01'
         population: 5210627.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - NOC
   - name: Trivia
     type: ICE_GIANT
     orbitalDist: 4.48

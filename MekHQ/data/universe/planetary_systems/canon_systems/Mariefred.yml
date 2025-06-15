@@ -54,9 +54,7 @@ planet:
     event:
       - date: '2270-01-03'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 39817.0
         socioIndustrial: D-D-C-D-B
       - date: '2280-01-01'
@@ -79,9 +77,7 @@ planet:
         population: 47140964.0
       - date: '2355-07-13'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2360-01-01'
         population: 72929347.0
       - date: '2370-01-01'
@@ -225,24 +221,24 @@ planet:
         population: 1165221176.0
       - date: '3020-01-01'
         population: 1161098279.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 1165339621.0
       - date: '3034-01-01'
         socioIndustrial: B-C-C-B-B
       - date: '3040-01-01'
         population: 1178111303.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3043-01-01'
         socioIndustrial: A-B-C-B-A
       - date: '3050-01-01'
         population: 1189356691.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -268,9 +264,7 @@ planet:
         population: 1311816168.0
       - date: '3145-01-17'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 1319182947.0
   - name: Nilsen
     type: GIANT_TERRESTRIAL

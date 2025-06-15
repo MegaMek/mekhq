@@ -40,9 +40,7 @@ planet:
     event:
       - date: '2250-10-16'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 63529.0
         socioIndustrial: D-D-B-F-D
       - date: '2260-01-01'
@@ -51,9 +49,7 @@ planet:
         population: 698224.0
       - date: '2280-10-08'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 1834323.0
       - date: '2290-01-01'
         population: 4198711.0
@@ -229,9 +225,7 @@ planet:
         population: 706747426.0
       - date: '3079-03-22'
         faction:
-          source: canon
-          value:
-            - MSC
+          - MSC
       - date: '3080-01-01'
         population: 717859132.0
       - date: '3090-01-01'
@@ -252,9 +246,7 @@ planet:
         population: 758750768.0
       - date: '3145-09-08'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 759206155.0
   - name: Ranga
     type: TERRESTRIAL
@@ -279,9 +271,7 @@ planet:
     event:
       - date: '2250-01-31'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 45764.0
         socioIndustrial: F-D-B-D-B
       - date: '2254-01-01'
@@ -292,9 +282,7 @@ planet:
         population: 404579.0
       - date: '2280-06-22'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 973953.0
       - date: '2290-01-01'
         population: 2085246.0
@@ -466,9 +454,7 @@ planet:
         population: 386425206.0
       - date: '3079-10-28'
         faction:
-          source: canon
-          value:
-            - MSC
+          - MSC
       - date: '3080-01-01'
         population: 390699348.0
       - date: '3090-01-01'
@@ -487,9 +473,7 @@ planet:
         population: 416355029.0
       - date: '3145-04-13'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 420203170.0
   - name: Miller's Point
     type: GIANT_TERRESTRIAL

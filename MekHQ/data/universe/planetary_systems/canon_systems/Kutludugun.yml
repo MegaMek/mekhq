@@ -46,9 +46,7 @@ planet:
     event:
       - date: '2441-01-27'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 52433.0
         socioIndustrial: B-D-A-D-B
       - date: '2450-01-01'
@@ -198,9 +196,7 @@ planet:
         population: 315268041.0
       - date: '3081-03-27'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 320096720.0
       - date: '3097-01-01'
@@ -219,9 +215,7 @@ planet:
         population: 341184437.0
       - date: '3145-02-01'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 342551907.0
   - name: Andrews Port
     type: TERRESTRIAL

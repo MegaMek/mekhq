@@ -60,9 +60,7 @@ planet:
     event:
       - date: '2247-12-22'
         faction:
-          source: canon
-          value:
-            - PR
+          - PR
         population: 44822.0
         socioIndustrial: F-D-A-D-F
       - date: '2250-01-01'
@@ -75,7 +73,7 @@ planet:
         population: 589316.0
       - date: '2271-06-01'
         faction:
-          source: canon
+          source: 'Handbook: House Marik'
           value:
             - FWL
       - date: '2280-01-01'
@@ -252,16 +250,12 @@ planet:
         population: 463132906.0
       - date: '3078-05-01'
         faction:
-          source: canon
-          value:
-            - PR
+          - PR
       - date: '3080-01-01'
         population: 468349151.0
       - date: '3086-02-01'
         faction:
-          source: canon
-          value:
-            - RF
+          - RF
       - date: '3090-01-01'
         population: 472583319.0
       - date: '3100-01-01'
@@ -280,11 +274,6 @@ planet:
         population: 480109435.0
       - date: '3145-01-01'
         population: 480493676.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN
   - name: Apiaí
     type: GIANT_TERRESTRIAL
     orbitalDist: 1.28

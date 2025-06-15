@@ -40,9 +40,7 @@ planet:
     event:
       - date: '2302-09-03'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 56696.0
         socioIndustrial: D-D-D-D-B
       - date: '2310-01-01'
@@ -61,9 +59,7 @@ planet:
         population: 38196729.0
       - date: '2367-06-07'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2370-01-01'
         population: 71100967.0
       - date: '2380-01-01'
@@ -110,9 +106,7 @@ planet:
         population: 2372184644.0
       - date: '2571-06-05'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '2580-01-01'
         population: 2432664586.0
       - date: '2590-01-01'
@@ -178,9 +172,7 @@ planet:
         population: 2595696694.0
       - date: '2864-04-18'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2870-01-01'
         population: 2615844519.0
       - date: '2880-01-01'
@@ -217,15 +209,15 @@ planet:
         population: 2121595669.0
       - date: '3025-01-01'
         socioIndustrial: B-C-F-B-C
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 2103134868.0
       - date: '3040-01-01'
         population: 2127460523.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3043-01-01'
         socioIndustrial: A-B-D-A-B
       - date: '3050-01-01'
@@ -234,7 +226,7 @@ planet:
         population: 2180663146.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -259,15 +251,8 @@ planet:
         population: 2484146217.0
       - date: '3145-05-14'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 2506103172.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FS
   - name: Jeffries
     type: DWARF_TERRESTRIAL
     orbitalDist: 0.14

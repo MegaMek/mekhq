@@ -56,9 +56,7 @@ planet:
     event:
       - date: '2609-10-20'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 46110.0
         socioIndustrial: C-D-B-C-B
       - date: '2610-01-01'
@@ -170,9 +168,7 @@ planet:
         population: 129041284.0
       - date: '3079-07-01'
         faction:
-          source: canon
-          value:
-            - MH
+          - MH
       - date: '3080-01-01'
         population: 129791899.0
       - date: '3090-01-01'
@@ -193,12 +189,7 @@ planet:
         population: 135440494.0
       - date: '3150-08-15'
         faction:
-          source: canon
-          value:
-            - FWL
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - FWL
   - name: Oreithyia
@@ -232,9 +223,7 @@ planet:
     event:
       - date: '2609-08-18'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 56005.0
         socioIndustrial: C-D-B-D-B
       - date: '2610-01-01'
@@ -347,9 +336,7 @@ planet:
         population: 104929954.0
       - date: '3079-07-01'
         faction:
-          source: canon
-          value:
-            - MH
+          - MH
       - date: '3080-01-01'
         population: 106388025.0
       - date: '3090-12-30'
@@ -369,12 +356,7 @@ planet:
         population: 116850229.0
       - date: '3150-08-15'
         faction:
-          source: canon
-          value:
-            - FWL
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - FWL
   - name: Hecatonchires

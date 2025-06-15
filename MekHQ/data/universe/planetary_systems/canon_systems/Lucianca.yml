@@ -69,9 +69,7 @@ planet:
     event:
       - date: '2235-12-11'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 52190.0
         socioIndustrial: D-F-D-D-F
       - date: '2240-01-01'
@@ -100,9 +98,7 @@ planet:
         population: 597170262.0
       - date: '2345-07-31'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2350-01-01'
         population: 858754133.0
       - date: '2360-01-01'
@@ -253,22 +249,22 @@ planet:
         population: 7592930348.0
       - date: '3027-01-01'
         socioIndustrial: B-B-D-C-D
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 7601223987.0
       - date: '3040-01-01'
         population: 7681457327.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3041-01-01'
         socioIndustrial: A-A-D-B-D
       - date: '3050-01-01'
         population: 7773412719.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -295,15 +291,11 @@ planet:
         population: 8769758643.0
       - date: '3145-09-29'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 8829596219.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
   - name: Ruşii Munţi
     type: ICE_GIANT
     orbitalDist: 1.28

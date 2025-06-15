@@ -106,9 +106,7 @@ planet:
     event:
       - date: '2215-05-30'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 41691.0
         socioIndustrial: D-D-C-D-F
       - date: '2220-01-01'
@@ -137,9 +135,9 @@ planet:
         population: 490430.0
       - date: '2340-01-01'
         population: 544273.0
-      - date: '2341-11-16'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2350-01-01'
@@ -246,9 +244,7 @@ planet:
         population: 1356978.0
       - date: '2821-07-24'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2830-01-01'
         population: 1325092.0
       - date: '2840-01-01'
@@ -259,9 +255,7 @@ planet:
         population: 1254382.0
       - date: '2864-10-14'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2867-01-01'
         socioIndustrial: F-D-C-C-D
       - date: '2870-01-01'
@@ -278,9 +272,7 @@ planet:
         population: 1047777.0
       - date: '2917-05-16'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2920-01-01'
         population: 1015431.0
       - date: '2930-01-01'
@@ -325,31 +317,23 @@ planet:
           value: 1000000.0
       - date: '3068-07-25'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3070-01-01'
         population: 1002403.0
       - date: '3077-06-10'
         faction:
-          source: canon
-          value:
-            - Stone
-            - CW
-            - CJF
-            - WOB
+          - Stone
+          - CW
+          - CJF
+          - WOB
       - date: '3077-06-18'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 1008234.0
       - date: '3081-10-24'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1016129.0
       - date: '3094-01-01'
@@ -368,30 +352,24 @@ planet:
           value: X
       - date: '3135-09-01'
         faction:
-          source: canon
-          value:
-            - ShA
+          - ShA
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 1098999.0
       - date: '3145-09-23'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 1109157.0
       - date: '3150-03-20'
         faction:
-          source: canon
+          source: Shattered Fortress
           value:
             - ROS
       - date: '3150-04-20'
         faction:
-          source: canon
+          source: Shattered Fortress
           value:
             - CWE
   - name: Gray

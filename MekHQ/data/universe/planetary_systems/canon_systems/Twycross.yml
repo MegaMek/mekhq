@@ -116,9 +116,7 @@ planet:
     event:
       - date: '2607-12-25'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 48835.0
         socioIndustrial: B-D-B-D-F
       - date: '2610-01-01'
@@ -219,6 +217,11 @@ planet:
         population: 1066041671.0
       - date: '3020-01-01'
         population: 1065958910.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-08-25'
         population: 1074885827.0
         socioIndustrial: C-C-C-C-D
@@ -227,52 +230,43 @@ planet:
         socioIndustrial:
           source: canon
           value: B-B-C-C-D
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3050-01-01'
         population: 1098575618.0
       - date: '3050-06-04'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
             - FC
       - date: '3050-06-25'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
       - date: '3050-09-10'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
             - FC
       - date: '3050-09-11'
         faction:
-          source: canon
-          value:
-            - FC
+          - FC
       - date: '3050-09-14'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
       - date: '3051-11-01'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CSV
       - date: '3060-01-01'
         population: 1110060422.0
       - date: '3062-07-20'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3070-01-01'
         population: 1123124404.0
       - date: '3080-01-01'
@@ -299,9 +293,7 @@ planet:
         population: 1166391096.0
       - date: '3151-07-20'
         faction:
-          source: canon
-          value:
-            - AML
+          - AML
   - name: Vivian
     type: DWARF_TERRESTRIAL
     orbitalDist: 2.56

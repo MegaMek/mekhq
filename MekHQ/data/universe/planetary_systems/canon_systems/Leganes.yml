@@ -42,9 +42,7 @@ planet:
     event:
       - date: '2605-04-22'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 48050.0
         socioIndustrial: B-D-B-C-D
       - date: '2610-01-01'
@@ -87,9 +85,7 @@ planet:
         population: 3400245573.0
       - date: '2750-07-17'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 3447806616.0
       - date: '2760-01-01'
         population: 3484637957.0
@@ -149,24 +145,24 @@ planet:
         population: 2461901978.0
       - date: '3020-01-01'
         population: 2462438248.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3029-01-01'
         socioIndustrial: B-B-C-B-C
       - date: '3030-01-01'
         population: 2476371660.0
       - date: '3040-01-01'
         population: 2492520503.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3042-01-01'
         socioIndustrial: A-A-C-A-C
       - date: '3050-01-01'
         population: 2507269842.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -191,17 +187,13 @@ planet:
         hpg: X
       - date: '3140-02-27'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 2604119069.0
       - date: '3145-01-01'
         population: 2602557066.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
   - name: Wen Chang
     type: GIANT_TERRESTRIAL
     orbitalDist: 0.42

@@ -32,9 +32,7 @@ planet:
     event:
       - date: '2236-05-21'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 49863.0
         socioIndustrial: D-D-A-D-C
       - date: '2240-01-01'
@@ -219,22 +217,16 @@ planet:
         population: 1537736.0
       - date: '3063-06-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3070-01-01'
         population: 1548538.0
       - date: '3075-08-01'
         faction:
-          source: canon
-          value:
-            - CGS
+          - CGS
       - date: '3080-01-01'
-        population: 1564101.0
         faction:
-          source: canon
-          value:
-            - CEI
+          - CEI
+        population: 1564101.0
       - date: '3090-01-01'
         population: 1574143.0
       - date: '3092-01-01'

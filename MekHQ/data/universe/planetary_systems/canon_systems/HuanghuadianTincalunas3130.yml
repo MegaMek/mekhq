@@ -47,9 +47,7 @@ planet:
     event:
       - date: '2597-09-22'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 48416.0
         socioIndustrial: B-D-D-C-D
       - date: '2600-01-01'
@@ -96,16 +94,9 @@ planet:
         population: 411233.0
       - date: '2787-09-13'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         population: 0.0
         socioIndustrial: X-X-X-X-X
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FR
   - name:
       source: canon
       value: Huanghuadian
@@ -133,9 +124,7 @@ planet:
     event:
       - date: '2597-01-01'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 56669.0
         socioIndustrial: C-F-A-D-D
       - date: '2600-01-01'
@@ -182,22 +171,10 @@ planet:
         population: 4163322.0
       - date: '2787-10-20'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FR
-      - date: '2108-12-05'
-        name: Huanghuadian
-      - date: '3130-01-01'
-        name: Tincalunas
-        message: Huanghuadian renamed to Tincalunas
   - name: Sainte-Julienne
     type: TERRESTRIAL
     orbitalDist: 3.08

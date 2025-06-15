@@ -59,9 +59,7 @@ planet:
     event:
       - date: '2156-01-06'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 47025.0
         socioIndustrial: D-C-B-D-C
       - date: '2160-01-01'
@@ -84,9 +82,7 @@ planet:
         population: 36908579.0
       - date: '2242-12-09'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 56936012.0
       - date: '2260-01-01'
@@ -111,9 +107,7 @@ planet:
         population: 536290902.0
       - date: '2345-07-01'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2350-01-01'
         population: 616229852.0
       - date: '2360-01-01'
@@ -164,9 +158,7 @@ planet:
         population: 1546569984.0
       - date: '2571-12-01'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2580-01-01'
         population: 1556837922.0
       - date: '2590-01-01'
@@ -263,23 +255,23 @@ planet:
         population: 1309606210.0
       - date: '3020-01-01'
         population: 1292602022.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 1291146411.0
       - date: '3040-01-15'
         population: 1299436247.0
         socioIndustrial: B-C-C-B-B
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3046-01-01'
         socioIndustrial: A-B-B-A-B
       - date: '3050-01-01'
         population: 1308956840.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -302,17 +294,10 @@ planet:
         population: 1378409798.0
       - date: '3140-06-14'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 1382827774.0
       - date: '3145-01-01'
         population: 1386982487.0
-      - date: '3152-06-01'
-        faction:
-          source: sucs
-          value:
-            - IND
   - name: Triglav
     type: GIANT_TERRESTRIAL
     orbitalDist: 0.8

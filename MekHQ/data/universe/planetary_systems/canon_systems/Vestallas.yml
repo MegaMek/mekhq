@@ -151,9 +151,7 @@ planet:
     event:
       - date: '2245-02-10'
         faction:
-          source: canon
-          value:
-            - SIMA
+          - SIMA
         population: 70590.0
         socioIndustrial: D-C-B-C-C
       - date: '2250-01-01'
@@ -182,7 +180,7 @@ planet:
         population: 802121006.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -338,11 +336,12 @@ planet:
         population:
           source: canon
           value: 3617000000.0
-      - date: '3030-02-01'
+      - date: '3029-11-16'
         faction:
-          source: canon
+          source: NAIS 4th SW Atlas, Vol 2
           value:
             - SIC
+      - date: '3030-02-01'
         population: 3060327891.0
       - date: '3040-01-01'
         population: 2246036101.0
@@ -354,9 +353,7 @@ planet:
         population: 1087392335.0
       - date: '3062-07-06'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '3070-01-01'
         population: 814001046.0
       - date: '3080-01-01'

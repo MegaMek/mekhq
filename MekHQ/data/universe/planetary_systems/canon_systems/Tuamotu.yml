@@ -85,9 +85,7 @@ planet:
     event:
       - date: '2626-01-19'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 44793.0
         socioIndustrial: B-D-A-D-C
       - date: '2630-01-01'
@@ -196,9 +194,7 @@ planet:
         population: 313803248.0
       - date: '3081-12-09'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 315187024.0
       - date: '3100-01-01'
@@ -211,9 +207,7 @@ planet:
         socioIndustrial: A-D-A-C-A
       - date: '3130-03-29'
         faction:
-          source: canon
-          value:
-            - RF
+          - RF
         population: 326544486.0
       - date: '3132-08-07'
         hpg: X
@@ -223,12 +217,7 @@ planet:
         population: 330552729.0
       - date: '3148-07-07'
         faction:
-          source: canon
-          value:
-            - FWL
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - FWL
   - name: P-1 Belt

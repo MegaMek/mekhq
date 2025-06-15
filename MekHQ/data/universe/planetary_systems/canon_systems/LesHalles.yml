@@ -82,9 +82,7 @@ planet:
     event:
       - date: '2739-02-21'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 51932.0
         socioIndustrial: D-D-C-D-F
       - date: '2740-04-17'
@@ -118,9 +116,7 @@ planet:
         population: 741321815.0
       - date: '2864-08-08'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2870-01-01'
         population: 840004310.0
       - date: '2880-01-01'
@@ -129,9 +125,7 @@ planet:
         population: 1009225434.0
       - date: '2900-04-13'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 1077757573.0
       - date: '2910-01-01'
         population: 1130272975.0
@@ -163,15 +157,11 @@ planet:
         population: 1258130484.0
       - date: '3039-08-06'
         faction:
-          source: canon
-          value:
-            - CC
-            - FWL
+          - CC
+          - FWL
       - date: '3039-08-12'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3040-01-01'
         population: 1251961029.0
       - date: '3042-01-01'
@@ -190,16 +180,12 @@ planet:
         population: 1254759036.0
       - date: '3079-11-04'
         faction:
-          source: canon
-          value:
-            - DO
+          - DO
       - date: '3080-01-01'
         population: 1266356084.0
       - date: '3086-04-04'
         faction:
-          source: canon
-          value:
-            - OP
+          - OP
       - date: '3090-08-22'
         population: 1274486754.0
         socioIndustrial: B-B-C-C-D
@@ -219,11 +205,6 @@ planet:
         population: 1305705557.0
       - date: '3145-01-01'
         population: 1305183379.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: ND7-3
     type: TERRESTRIAL
     orbitalDist: 1.4

@@ -34,9 +34,7 @@ planet:
     event:
       - date: '2242-11-04'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 53780.0
         socioIndustrial: D-D-A-D-D
       - date: '2250-01-01'
@@ -59,9 +57,7 @@ planet:
         socioIndustrial: C-D-A-C-C
       - date: '2330-01-02'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 32520788.0
       - date: '2340-01-01'
         population: 46488662.0
@@ -224,9 +220,7 @@ planet:
         population: 489500095.0
       - date: '3081-02-12'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 495112325.0
       - date: '3100-01-01'
@@ -247,12 +241,7 @@ planet:
         population: 516349910.0
       - date: '3148-03-01'
         faction:
-          source: canon
-          value:
-            - DA
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - DA
   - name: Anumati Belt

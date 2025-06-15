@@ -83,14 +83,15 @@ planet:
       - name: Swan River
     event:
       - date: '2302-09-01'
-        faction:
-          source: canon
-          value:
-            - FS
         population: 65911.0
         socioIndustrial: D-D-A-D-B
       - date: '2310-01-01'
         population: 204655.0
+      - date: '2317-06-26'
+        faction:
+          source: 'Handbook: House Davion'
+          value:
+            - FS
       - date: '2320-01-01'
         population: 696823.0
       - date: '2330-01-01'
@@ -244,15 +245,15 @@ planet:
         population: 569243930.0
       - date: '3020-01-01'
         population: 556627747.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 552275757.0
       - date: '3040-01-01'
         population: 556433397.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3042-01-01'
         socioIndustrial: C-C-B-D-B
       - date: '3047-01-01'
@@ -263,7 +264,7 @@ planet:
         population: 567220140.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'

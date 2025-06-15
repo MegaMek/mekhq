@@ -71,9 +71,7 @@ planet:
     event:
       - date: '2665-08-05'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 51108.0
         socioIndustrial: C-D-A-D-B
       - date: '2669-05-08'
@@ -176,9 +174,7 @@ planet:
         population: 151141605.0
       - date: '3081-09-10'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 152599551.0
       - date: '3098-01-01'
@@ -191,9 +187,7 @@ planet:
         population: 160905490.0
       - date: '3130-09-20'
         faction:
-          source: canon
-          value:
-            - RCM
+          - RCM
         population: 163304601.0
       - date: '3132-08-07'
         hpg: X
@@ -201,11 +195,6 @@ planet:
         population: 166104511.0
       - date: '3145-01-01'
         population: 168076154.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Ochinyan
     type: ICE_GIANT
     orbitalDist: 1.44

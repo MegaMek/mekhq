@@ -90,18 +90,14 @@ planet:
     event:
       - date: '2269-10-17'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 55406.0
         socioIndustrial: D-D-D-D-C
       - date: '2270-01-01'
         population: 62878.0
       - date: '2280-05-27'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 202521.0
       - date: '2290-01-01'
         population: 559733.0
@@ -280,16 +276,12 @@ planet:
         population: 247312581.0
       - date: '3078-05-01'
         faction:
-          source: canon
-          value:
-            - PR
+          - PR
       - date: '3080-01-01'
         population: 248701416.0
       - date: '3086-02-01'
         faction:
-          source: canon
-          value:
-            - RF
+          - RF
       - date: '3090-01-01'
         population: 249948038.0
       - date: '3100-01-01'
@@ -310,12 +302,7 @@ planet:
         population: 259784657.0
       - date: '3148-07-07'
         faction:
-          source: canon
-          value:
-            - FWL
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - FWL
   - name: Ayacucho

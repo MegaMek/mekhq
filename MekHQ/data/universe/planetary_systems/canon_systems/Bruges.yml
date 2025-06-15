@@ -32,9 +32,7 @@ planet:
     event:
       - date: '2891-07-22'
         faction:
-          source: canon
-          value:
-            - HL
+          - HL
         population: 54706.0
         socioIndustrial: C-D-A-D-D
       - date: '2894-07-21'
@@ -69,9 +67,7 @@ planet:
         population: 139439.0
       - date: '3025-08-04'
         faction:
-          source: canon
-          value:
-            - HL
+          - HL
       - date: '3030-01-01'
         population: 139476.0
       - date: '3040-05-24'
@@ -101,9 +97,7 @@ planet:
         population: 138734.0
       - date: '3140-03-03'
         faction:
-          source: canon
-          value:
-            - CEI
+          - CEI
       - date: '3145-01-01'
         population: 139095.0
   - name: Istar's Rock

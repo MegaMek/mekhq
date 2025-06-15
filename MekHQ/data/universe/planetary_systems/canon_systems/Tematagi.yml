@@ -59,9 +59,7 @@ planet:
     event:
       - date: '2623-08-21'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 45790.0
         socioIndustrial: D-D-B-F-D
       - date: '2628-01-01'
@@ -172,9 +170,7 @@ planet:
         population: 1955497387.0
       - date: '3075-04-13'
         faction:
-          source: canon
-          value:
-            - RCM
+          - RCM
       - date: '3080-01-01'
         population: 1967659133.0
       - date: '3090-01-01'
@@ -195,11 +191,6 @@ planet:
         population: 1973570974.0
       - date: '3145-01-01'
         population: 1977917609.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Hansen
     type: TERRESTRIAL
     orbitalDist: 0.8

@@ -103,9 +103,7 @@ planet:
     event:
       - date: '2279-07-23'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 48633.0
         socioIndustrial: C-D-C-D-B
       - date: '2280-01-01'
@@ -118,9 +116,7 @@ planet:
         population: 513062.0
       - date: '2310-02-18'
         faction:
-          source: canon
-          value:
-            - CCom
+          - CCom
         population: 1250460.0
       - date: '2320-01-01'
         population: 2679847.0
@@ -134,7 +130,7 @@ planet:
         population: 22943722.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -257,9 +253,7 @@ planet:
         socioIndustrial: D-B-F-C-B
       - date: '2900-10-23'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 342187060.0
       - date: '2910-01-01'
         population: 341976851.0
@@ -287,20 +281,18 @@ planet:
         population: 337518291.0
       - date: '3025-03-29'
         faction:
-          source: canon
+          - FS
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
           value:
-            - FS
+            - FC
       - date: '3030-01-01'
         population: 339142722.0
       - date: '3033-01-01'
         socioIndustrial: C-B-F-B-B
       - date: '3040-01-01'
         population: 343271277.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3047-01-01'
         socioIndustrial: B-B-D-A-A
       - date: '3050-01-01'
@@ -309,7 +301,7 @@ planet:
         population: 352242912.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -324,9 +316,7 @@ planet:
         population: 672518.0
       - date: '3105-08-15'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X

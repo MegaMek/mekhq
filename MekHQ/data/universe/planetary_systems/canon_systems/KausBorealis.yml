@@ -129,9 +129,7 @@ planet:
     event:
       - date: '2281-08-11'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 56132.0
         socioIndustrial: D-D-F-D-F
       - date: '2290-01-01'
@@ -146,9 +144,9 @@ planet:
         population: 34837229.0
       - date: '2340-01-01'
         population: 78117523.0
-      - date: '2341-03-01'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2350-01-01'
@@ -185,9 +183,7 @@ planet:
         population: 5691508639.0
       - date: '2500-12-11'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 6096641888.0
       - date: '2510-01-01'
         population: 6474251368.0
@@ -322,27 +318,19 @@ planet:
         population: 7933618885.0
       - date: '3072-02-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3075-08-28'
         faction:
-          source: canon
-          value:
-            - CGB
-            - WOB
+          - CGB
+          - WOB
       - date: '3075-09-06'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 7946322836.0
       - date: '3081-09-10'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 7941556472.0
       - date: '3100-01-01'
@@ -361,16 +349,12 @@ planet:
           value: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 8040644851.0
       - date: '3145-06-13'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
         population: 8039036883.0
   - name: Potter
     type: TERRESTRIAL

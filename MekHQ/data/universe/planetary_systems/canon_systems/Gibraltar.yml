@@ -41,9 +41,7 @@ planet:
     event:
       - date: '2529-02-24'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 46181.0
         socioIndustrial: C-D-B-D-B
       - date: '2530-04-05'
@@ -174,9 +172,7 @@ planet:
         population: 205741131.0
       - date: '3079-11-15'
         faction:
-          source: canon
-          value:
-            - DTA
+          - DTA
       - date: '3080-01-01'
         population: 207850430.0
       - date: '3090-01-01'
@@ -196,14 +192,12 @@ planet:
         population: 214137586.0
       - date: '3147-10-01'
         faction:
-          source: canon
+          source: Shattered Fortress
           value:
             - MH
       - date: '3151-07-18'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
   - name: Andrade's Glory
     type: TERRESTRIAL
     orbitalDist: 0.42

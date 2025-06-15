@@ -59,9 +59,7 @@ planet:
     event:
       - date: '2269-11-17'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 51920.0
         socioIndustrial: C-D-A-D-C
       - date: '2270-01-01'
@@ -84,9 +82,7 @@ planet:
         population: 26134086.0
       - date: '2355-12-21'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2360-01-01'
         population: 37777650.0
       - date: '2370-01-01'
@@ -234,14 +230,10 @@ planet:
         population: 312867411.0
       - date: '3014-03-22'
         faction:
-          source: canon
-          value:
-            - FWLR
+          - FWLR
       - date: '3015-03-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3020-01-01'
         population: 314882036.0
       - date: '3030-01-01'
@@ -260,9 +252,7 @@ planet:
         population: 331962748.0
       - date: '3081-11-30'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 333493294.0
       - date: '3100-01-01'
@@ -281,9 +271,7 @@ planet:
         population: 338059785.0
       - date: '3145-05-01'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 339890246.0
   - name: Martínez's Roost
     type: GIANT_TERRESTRIAL

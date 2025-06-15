@@ -59,9 +59,7 @@ planet:
     event:
       - date: '2165-07-07'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 36506.0
         socioIndustrial: C-D-A-D-C
       - date: '2170-01-01'
@@ -82,9 +80,7 @@ planet:
         population: 10577089.0
       - date: '2242-03-11'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 16439149.0
       - date: '2260-01-01'
@@ -101,18 +97,16 @@ planet:
         population: 98067020.0
       - date: '2319-01-20'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2320-01-01'
         population: 118319464.0
       - date: '2330-01-01'
         population: 139375809.0
       - date: '2340-01-01'
         population: 160874929.0
-      - date: '2341-03-08'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2350-01-01'
@@ -165,9 +159,7 @@ planet:
         population: 549766468.0
       - date: '2571-04-01'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2580-01-01'
         population: 555437566.0
       - date: '2590-01-01'
@@ -265,33 +257,31 @@ planet:
         population: 438628974.0
       - date: '3020-01-01'
         population: 437441294.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 439985355.0
       - date: '3039-01-01'
         socioIndustrial: C-C-B-C-C
       - date: '3040-01-01'
         population: 443430660.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3049-01-01'
         socioIndustrial: B-C-A-B-B
       - date: '3050-01-01'
         population: 446992333.0
       - date: '3051-11-07'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CSV
       - date: '3060-01-01'
         population: 452841169.0
       - date: '3062-02-03'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3070-01-01'
         population: 458262170.0
       - date: '3080-01-01'
@@ -316,9 +306,7 @@ planet:
         population: 465001877.0
       - date: '3151-11-15'
         faction:
-          source: canon
-          value:
-            - CHH
+          - CHH
   - name: Kashiwa No Kami
     type: GIANT_TERRESTRIAL
     orbitalDist: 0.9

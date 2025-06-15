@@ -68,9 +68,7 @@ planet:
     event:
       - date: '2514-07-26'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 51468.0
         socioIndustrial: C-D-B-D-D
       - date: '2520-01-01'
@@ -163,9 +161,7 @@ planet:
         socioIndustrial: C-D-D-B-D
       - date: '2900-06-03'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 2063191865.0
       - date: '2910-01-01'
         population: 2051186363.0
@@ -205,16 +201,12 @@ planet:
         population: 2029150335.0
       - date: '3070-01-01'
         population: 2050978818.0
-      - date: '3079-10-30'
-        faction:
-          source: canon
-          value:
-            - DTA
       - date: '3079-10-01'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
+      - date: '3079-10-30'
+        faction:
+          - DTA
       - date: '3080-01-01'
         population: 2067452455.0
       - date: '3090-01-01'
@@ -235,15 +227,8 @@ planet:
         population: 2299098642.0
       - date: '3145-10-09'
         faction:
-          source: canon
-          value:
-            - DTA
+          - DTA
         population: 2318028759.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Susano
     type: ICE_GIANT
     orbitalDist: 6.24

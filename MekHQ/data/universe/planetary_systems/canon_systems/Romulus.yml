@@ -78,9 +78,7 @@ planet:
     event:
       - date: '2436-08-13'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 45647.0
         socioIndustrial: C-D-A-D-B
       - date: '2440-01-01'
@@ -115,9 +113,7 @@ planet:
         population: 206041383.0
       - date: '2571-05-11'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2580-01-01'
         population: 227981959.0
       - date: '2590-01-01'
@@ -218,28 +214,28 @@ planet:
         population: 359114396.0
       - date: '3026-01-01'
         socioIndustrial: C-C-B-D-B
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 360765522.0
       - date: '3040-01-01'
         population: 363772337.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3042-01-01'
         socioIndustrial: B-B-A-C-A
       - date: '3050-01-01'
         population: 366144559.0
       - date: '3050-05-07'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
             - FC
       - date: '3050-05-09'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
       - date: '3060-01-01'
@@ -248,14 +244,10 @@ planet:
         population: 371715295.0
       - date: '3071-07-12'
         faction:
-          source: canon
-          value:
-            - CIH
+          - CIH
       - date: '3072-01-05'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3080-01-01'
         population: 375901907.0
       - date: '3090-01-01'
@@ -270,9 +262,7 @@ planet:
         population: 404854695.0
       - date: '3130-07-09'
         faction:
-          source: canon
-          value:
-            - CHH
+          - CHH
         population: 412125628.0
       - date: '3132-08-07'
         hpg: X

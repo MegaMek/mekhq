@@ -75,9 +75,7 @@ planet:
     event:
       - date: '2238-08-11'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 46353.0
         socioIndustrial: D-D-B-D-C
       - date: '2240-01-01'
@@ -104,9 +102,7 @@ planet:
         population: 134312074.0
       - date: '2350-10-01'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 185230621.0
       - date: '2353-01-01'
         socioIndustrial: C-C-B-C-C
@@ -211,9 +207,7 @@ planet:
         population: 1630161504.0
       - date: '2821-10-25'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2830-01-01'
         population: 1636040662.0
       - date: '2840-01-01'
@@ -276,14 +270,10 @@ planet:
         population: 1913203557.0
       - date: '3081-01-16'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3082-06-03'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1944449867.0
       - date: '3100-01-01'
@@ -300,32 +290,21 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-02-02'
         faction:
-          source: canon
-          value:
-            - RR
+          - RR
         population: 2073377857.0
       - date: '3145-01-01'
         population: 2086272732.0
       - date: '3149-06-01'
         faction:
-          source: canon
-          value:
-            - CWE
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - CWE
       - date: '3151-12-01'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
   - name: Bonilla
     type: GIANT_TERRESTRIAL
     orbitalDist: 1.9

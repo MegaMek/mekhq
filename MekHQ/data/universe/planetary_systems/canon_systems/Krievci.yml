@@ -94,9 +94,7 @@ planet:
     event:
       - date: '2623-06-25'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 54026.0
         socioIndustrial: C-D-B-D-F
       - date: '2630-06-28'
@@ -190,22 +188,22 @@ planet:
         population: 2287975707.0
       - date: '3020-01-01'
         population: 2289436552.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 2298652290.0
       - date: '3040-01-01'
         population: 2326634936.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3043-01-01'
         socioIndustrial: C-C-B-B-D
       - date: '3050-01-01'
         population: 2347669163.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -232,15 +230,11 @@ planet:
         population: 2643550739.0
       - date: '3145-02-12'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 2669051031.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
   - name: Ilinden
     type: GIANT_TERRESTRIAL
     orbitalDist: 3.36

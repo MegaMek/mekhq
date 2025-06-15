@@ -111,9 +111,7 @@ planet:
     event:
       - date: '2534-10-28'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 46283.0
         socioIndustrial: D-C-D-D-D
       - date: '2540-01-01'
@@ -226,15 +224,15 @@ planet:
         population: 1069385009.0
       - date: '3020-01-01'
         population: 1060800137.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 1060293053.0
       - date: '3040-01-01'
         population: 1068595677.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3046-01-01'
         socioIndustrial:
           source: canon
@@ -243,31 +241,25 @@ planet:
         population: 1075564172.0
       - date: '3050-08-05'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
       - date: '3052-09-16'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CSV
       - date: '3060-01-01'
         population: 1082145165.0
       - date: '3062-02-23'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3067-09-09'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '3069-01-25'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3070-01-01'
         population: 1090509845.0
       - date: '3079-01-01'
@@ -297,9 +289,7 @@ planet:
         population: 1170048657.0
       - date: '3151-12-31'
         faction:
-          source: canon
-          value:
-            - AML
+          - AML
   - name: Owenton
     type: DWARF_TERRESTRIAL
     orbitalDist: 1.6

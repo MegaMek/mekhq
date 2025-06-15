@@ -34,9 +34,7 @@ planet:
     event:
       - date: '2522-01-27'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 44735.0
         socioIndustrial: C-D-C-D-C
       - date: '2530-01-01'
@@ -164,16 +162,12 @@ planet:
         population: 248845968.0
       - date: '3078-05-01'
         faction:
-          source: canon
-          value:
-            - PR
+          - PR
       - date: '3080-01-01'
         population: 251749389.0
       - date: '3086-02-01'
         faction:
-          source: canon
-          value:
-            - RF
+          - RF
       - date: '3090-01-01'
         population: 254635753.0
       - date: '3091-01-01'
@@ -194,12 +188,7 @@ planet:
         population: 266089869.0
       - date: '3148-07-07'
         faction:
-          source: canon
-          value:
-            - FWL
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - FWL
   - name: Chimatano's Stand

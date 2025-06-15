@@ -112,9 +112,7 @@ planet:
     event:
       - date: '2197-06-16'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 46021.0
         socioIndustrial: D-C-B-D-D
       - date: '2200-01-01'
@@ -129,9 +127,7 @@ planet:
         population: 4366641.0
       - date: '2250-09-28'
         faction:
-          source: canon
-          value:
-            - SIS
+          - SIS
         population: 9122292.0
       - date: '2260-01-01'
         population: 17361360.0
@@ -157,7 +153,7 @@ planet:
         population: 556018288.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'

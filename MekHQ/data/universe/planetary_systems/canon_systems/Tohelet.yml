@@ -47,9 +47,7 @@ planet:
     event:
       - date: '2371-08-05'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 43698.0
         socioIndustrial: F-C-B-D-D
       - date: '2380-01-01'
@@ -208,9 +206,7 @@ planet:
         population: 165169517.0
       - date: '3075-04-13'
         faction:
-          source: canon
-          value:
-            - RCM
+          - RCM
       - date: '3080-01-01'
         population: 167029813.0
       - date: '3090-01-01'
@@ -231,11 +227,6 @@ planet:
         population: 185225188.0
       - date: '3145-01-01'
         population: 186974514.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Mellingen
     type: DWARF_TERRESTRIAL
     orbitalDist: 0.8

@@ -74,9 +74,7 @@ planet:
     event:
       - date: '2596-07-01'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 44980.0
         socioIndustrial: C-D-A-D-F
       - date: '2600-01-01'
@@ -175,24 +173,24 @@ planet:
         population: 807664251.0
       - date: '3020-01-01'
         population: 782130763.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 774809591.0
       - date: '3031-01-01'
         socioIndustrial: D-D-B-D-D
       - date: '3040-01-01'
         population: 779550374.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3048-01-01'
         socioIndustrial: C-D-A-C-C
       - date: '3050-01-01'
         population: 784241736.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -219,9 +217,7 @@ planet:
         population: 869238299.0
       - date: '3145-08-28'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 876395357.0
   - name: Clayton
     type: ICE_GIANT

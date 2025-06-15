@@ -41,9 +41,7 @@ planet:
     event:
       - date: '2891-12-17'
         faction:
-          source: canon
-          value:
-            - HL
+          - HL
         population: 51983.0
         socioIndustrial: D-D-A-D-F
       - date: '2897-12-23'
@@ -76,9 +74,7 @@ planet:
         population: 56392.0
       - date: '3025-06-28'
         faction:
-          source: canon
-          value:
-            - HL
+          - HL
       - date: '3030-01-01'
         population: 56717.0
       - date: '3040-01-01'
@@ -109,9 +105,7 @@ planet:
         population: 58164.0
       - date: '3140-01-15'
         faction:
-          source: canon
-          value:
-            - CEI
+          - CEI
       - date: '3145-01-01'
         population: 58152.0
   - name: Ymir

@@ -92,9 +92,7 @@ planet:
     event:
       - date: '2350-04-14'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 44813.0
         socioIndustrial: D-D-B-D-D
       - date: '2360-01-01'
@@ -243,15 +241,15 @@ planet:
         population: 81764049.0
       - date: '3026-01-01'
         socioIndustrial: D-C-D-F-C
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 82193406.0
       - date: '3040-01-01'
         population: 83127459.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3043-01-01'
         socioIndustrial: D-C-C-F-C
       - date: '3047-01-01'
@@ -262,7 +260,7 @@ planet:
         population: 84747401.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -287,15 +285,8 @@ planet:
         population: 88170733.0
       - date: '3145-12-14'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 88347250.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FS
   - name: Wyndham
     type: DWARF_TERRESTRIAL
     orbitalDist: 3.92

@@ -111,9 +111,7 @@ planet:
     event:
       - date: '2169-05-09'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 47822.0
         socioIndustrial: D-D-C-D-D
       - date: '2170-01-01'
@@ -136,9 +134,7 @@ planet:
         population: 43030868.0
       - date: '2242-07-16'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 75609456.0
       - date: '2260-01-01'
@@ -153,35 +149,25 @@ planet:
         population: 553641169.0
       - date: '2309-06-13'
         faction:
-          source: canon
-          value:
-            - AG
+          - AG
       - date: '2310-01-01'
         population: 727142492.0
       - date: '2311-09-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2311-09-15'
         faction:
-          source: canon
-          value:
-            - IND
-            - AG
+          - IND
+          - AG
       - date: '2311-10-01'
         faction:
-          source: canon
-          value:
-            - AG
+          - AG
       - date: '2317-07-03'
         faction:
-          source: canon
-          value:
-            - AG
-      - date: '2319-09-29'
+          - AG
+      - date: '2319-11-15'
         faction:
-          source: canon
+          source: 'Handbook: House Kurita'
           value:
             - DC
       - date: '2320-01-01'
@@ -358,53 +344,37 @@ planet:
         population: 1469329706.0
       - date: '3068-12-02'
         faction:
-          source: canon
-          value:
-            - DC
-            - FS
+          - DC
+          - FS
       - date: '3069-02-14'
         faction:
-          source: canon
-          value:
-            - DC
-            - FS
-            - WOB
+          - DC
+          - FS
+          - WOB
       - date: '3069-02-25'
         faction:
-          source: canon
-          value:
-            - DC
-            - WOB
+          - DC
+          - WOB
       - date: '3070-01-01'
         population: 1066055984.0
       - date: '3072-05-12'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3072-11-03'
         faction:
-          source: canon
-          value:
-            - WOB
-            - DC
+          - WOB
+          - DC
       - date: '3072-11-17'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3072-12-16'
         faction:
-          source: canon
-          value:
-            - WOB
-            - DC
-            - CNC
+          - WOB
+          - DC
+          - CNC
       - date: '3072-12-22'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '3080-01-01'
         population: 1081301969.0
       - date: '3090-01-01'

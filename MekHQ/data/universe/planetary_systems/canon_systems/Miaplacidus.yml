@@ -41,9 +41,7 @@ planet:
     event:
       - date: '2241-01-29'
         faction:
-          source: canon
-          value:
-            - MCM
+          - MCM
         population: 48915.0
         socioIndustrial: D-D-B-D-D
       - date: '2250-01-01'
@@ -54,7 +52,7 @@ planet:
         population: 1451478.0
       - date: '2271-06-01'
         faction:
-          source: canon
+          source: 'Handbook: House Marik'
           value:
             - FWL
       - date: '2280-01-01'
@@ -239,16 +237,12 @@ planet:
         population: 1283339648.0
       - date: '3079-06-24'
         faction:
-          source: canon
-          value:
-            - MSC
+          - MSC
       - date: '3080-01-01'
         population: 1305865162.0
       - date: '3082-01-27'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1330381549.0
       - date: '3091-01-01'
@@ -265,23 +259,14 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3137-10-01'
         faction:
-          source: canon
-          value:
-            - CvW
+          - CvW
       - date: '3140-01-01'
         population: 1444937084.0
       - date: '3145-01-01'
         population: 1453923523.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: New Ya
     type: GIANT_TERRESTRIAL
     orbitalDist: 0.42

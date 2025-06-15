@@ -109,9 +109,7 @@ planet:
     event:
       - date: '2715-04-26'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 61938.0
         socioIndustrial: C-D-C-D-D
       - date: '2720-01-01'
@@ -182,15 +180,15 @@ planet:
         population: 949962552.0
       - date: '3020-01-01'
         population: 947074870.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 943583385.0
       - date: '3040-01-01'
         population: 944511490.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3043-01-01'
         socioIndustrial:
           source: canon
@@ -199,7 +197,7 @@ planet:
         population: 942776017.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -212,9 +210,7 @@ planet:
         population: 936993587.0
       - date: '3075-06-12'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3080-01-01'
         population: 948115602.0
       - date: '3090-01-01'
@@ -239,9 +235,7 @@ planet:
         population: 1052029504.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
   - name: Sāgar
     type: TERRESTRIAL
     orbitalDist: 1.68

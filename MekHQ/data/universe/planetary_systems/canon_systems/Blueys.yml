@@ -48,9 +48,7 @@ planet:
     event:
       - date: '2597-10-13'
         faction:
-          source: canon
-          value:
-            - OA
+          - OA
         population: 49344.0
         socioIndustrial: C-C-C-D-F
       - date: '2600-01-01'
@@ -119,9 +117,7 @@ planet:
         population: 47394102.0
       - date: '2864-08-04'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2870-01-01'
         population: 47211266.0
       - date: '2880-01-01'
@@ -188,11 +184,6 @@ planet:
         population: 38774789.0
       - date: '3145-01-01'
         population: 39140991.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN
   - name: FM3
     type: GAS_GIANT
     orbitalDist: 2.52

@@ -59,9 +59,7 @@ planet:
     event:
       - date: '2166-04-15'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 40040.0
         socioIndustrial: D-D-C-D-C
       - date: '2170-02-06'
@@ -83,9 +81,7 @@ planet:
         population: 15655783.0
       - date: '2242-01-16'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 24998676.0
       - date: '2260-01-01'
@@ -108,9 +104,7 @@ planet:
         population: 262370807.0
       - date: '2345-01-24'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2350-01-01'
         population: 300789277.0
       - date: '2360-01-01'
@@ -257,6 +251,11 @@ planet:
         population: 835070094.0
       - date: '3020-01-01'
         population: 837843876.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 840744535.0
       - date: '3032-01-01'
@@ -264,16 +263,11 @@ planet:
       - date: '3040-03-01'
         population: 852768274.0
         socioIndustrial: B-C-C-C-B
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3050-01-01'
         population: 865310022.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -296,9 +290,7 @@ planet:
         hpg: X
       - date: '3140-10-20'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 939631568.0
       - date: '3141-01-01'
         socioIndustrial: B-C-C-C-C
@@ -306,9 +298,7 @@ planet:
         population: 945475381.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
   - name: Heerenveen
     type: TERRESTRIAL
     orbitalDist: 0.8

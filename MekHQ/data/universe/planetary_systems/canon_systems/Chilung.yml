@@ -59,9 +59,7 @@ planet:
     event:
       - date: '2280-05-06'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 57369.0
         socioIndustrial: D-C-B-D-C
       - date: '2290-01-01'
@@ -84,9 +82,7 @@ planet:
         population: 45497715.0
       - date: '2367-07-13'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2370-01-01'
         population: 68038449.0
       - date: '2380-01-01'
@@ -245,9 +241,7 @@ planet:
         population: 445406929.0
       - date: '3081-04-11'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 448894687.0
       - date: '3100-01-01'
@@ -266,9 +260,7 @@ planet:
         population: 460534748.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
   - name: King
     type: ICE_GIANT
     orbitalDist: 1.92

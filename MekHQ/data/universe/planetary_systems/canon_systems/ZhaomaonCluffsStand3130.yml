@@ -35,9 +35,7 @@ planet:
     event:
       - date: '2667-11-04'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 49766.0
         socioIndustrial: B-D-A-D-F
       - date: '2670-01-01'
@@ -96,22 +94,10 @@ planet:
         population: 4835.0
       - date: '2890-08-28'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - CC
-      - date: '2108-12-05'
-        name: Zhaomaon
-      - date: '3130-01-01'
-        name: Cluff's Stand
-        message: Zhaomaon renamed to Cluff's Stand
   - name: Nox Belt A
     type: ASTEROID_BELT
     orbitalDist: 0.49

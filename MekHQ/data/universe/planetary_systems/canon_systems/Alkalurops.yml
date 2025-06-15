@@ -95,9 +95,7 @@ planet:
     event:
       - date: '2117-02-27'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 63047.0
         socioIndustrial: C-D-C-D-F
       - date: '2120-01-01'
@@ -128,9 +126,7 @@ planet:
         population: 185323282.0
       - date: '2242-07-23'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 243186026.0
       - date: '2260-01-01'
@@ -145,9 +141,7 @@ planet:
         socioIndustrial: C-C-C-C-F
       - date: '2299-09-28'
         faction:
-          source: canon
-          value:
-            - FoS
+          - FoS
       - date: '2300-01-01'
         population: 641044793.0
       - date: '2310-01-01'
@@ -158,9 +152,9 @@ planet:
         population: 914641344.0
       - date: '2340-01-01'
         population: 1005089382.0
-      - date: '2341-06-08'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2349-01-01'
@@ -286,9 +280,7 @@ planet:
         population: 1889278146.0
       - date: '2891-04-07'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2900-01-01'
         population: 1881564963.0
       - date: '2901-01-01'
@@ -313,31 +305,29 @@ planet:
         population: 1396053543.0
       - date: '2998-03-25'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '3000-01-01'
         population: 1352863298.0
       - date: '3010-01-01'
         population: 1324240010.0
       - date: '3020-01-01'
         population: 1281840518.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 1264169899.0
       - date: '3040-01-01'
         population: 1277769143.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3047-01-01'
         socioIndustrial: C-B-C-B-D
       - date: '3050-01-01'
         population: 1289449910.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -348,9 +338,7 @@ planet:
         population: 1323282908.0
       - date: '3081-09-04'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1328055312.0
       - date: '3096-01-01'
@@ -367,22 +355,13 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-20'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 1405391204.0
       - date: '3145-01-01'
         population: 1418380462.0
-      - date: '3152-06-01'
-        faction:
-          source: sucs
-          value:
-            - IND
   - name: Decker
     type: ICE_GIANT
     orbitalDist: 2.88

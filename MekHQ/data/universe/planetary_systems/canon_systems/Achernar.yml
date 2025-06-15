@@ -93,9 +93,7 @@ planet:
     event:
       - date: '2242-06-16'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 51177.0
         socioIndustrial: D-D-C-C-F
       - date: '2250-01-01'
@@ -114,9 +112,7 @@ planet:
         population: 34360640.0
       - date: '2320-12-06'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
         population: 57540972.0
       - date: '2330-01-01'
         population: 89764153.0
@@ -215,23 +211,17 @@ planet:
         population: 1655956378.0
       - date: '2767-04-06'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2770-01-01'
         population: 1644011412.0
       - date: '2779-05-08'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-01-01'
         population: 1619619232.0
       - date: '2790-07-30'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 1614301709.0
       - date: '2800-01-01'
         population: 1622042075.0
@@ -285,19 +275,12 @@ planet:
         population: 1056353875.0
       - date: '3030-11-20'
         faction:
-          source: canon
-          value:
-            - FS
+          - FC
         population: 1060431425.0
       - date: '3037-01-01'
         socioIndustrial: B-C-C-B-F
       - date: '3040-01-01'
         population: 1073018634.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3041-01-01'
         socioIndustrial: B-C-C-A-D
       - date: '3050-01-01'
@@ -306,34 +289,26 @@ planet:
         population: 1096228695.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3069-09-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3070-01-01'
         population: 1107799738.0
       - date: '3077-06-11'
         faction:
-          source: canon
-          value:
-            - Stone
-            - WOB
+          - Stone
+          - WOB
       - date: '3077-06-16'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 1118933310.0
       - date: '3081-04-30'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1127244129.0
       - date: '3093-01-01'
@@ -350,16 +325,12 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 1175596678.0
       - date: '3145-08-04'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 1182908019.0
   - name: Ponikarov
     type: DWARF_TERRESTRIAL

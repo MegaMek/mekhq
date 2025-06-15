@@ -33,9 +33,7 @@ planet:
     event:
       - date: '2611-12-25'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 43469.0
         socioIndustrial: C-D-B-D-F
       - date: '2620-01-01'
@@ -103,9 +101,7 @@ planet:
         population: 137512449.0
       - date: '2900-03-01'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 136556600.0
       - date: '2910-01-01'
         population: 135933423.0
@@ -135,18 +131,14 @@ planet:
         population: 131680206.0
       - date: '3025-06-07'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '3030-07-19'
         faction:
-          source: canon
-          value:
-            - LA
+          - FC
         population: 132355389.0
       - date: '3034-03-13'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FRR
       - date: '3040-01-01'
@@ -157,13 +149,13 @@ planet:
         population: 135164242.0
       - date: '3050-09-17'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CW
             - FRR
       - date: '3050-09-29'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CW
       - date: '3060-01-01'
@@ -190,9 +182,7 @@ planet:
         population: 145705964.0
       - date: '3145-12-17'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
         population: 147052644.0
   - name: Sumual's Refuge
     type: TERRESTRIAL

@@ -106,9 +106,7 @@ planet:
     event:
       - date: '2237-12-17'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 51940.0
         socioIndustrial: D-D-B-D-F
       - date: '2240-01-01'
@@ -129,9 +127,7 @@ planet:
         population: 8196755.0
       - date: '2320-01-01'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
         population: 11929086.0
       - date: '2330-01-01'
         population: 16643189.0
@@ -226,23 +222,17 @@ planet:
         population: 147077497.0
       - date: '2767-03-19'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2770-01-01'
         population: 146966712.0
       - date: '2779-01-30'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-01-01'
         population: 143150370.0
       - date: '2790-03-10'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 138275391.0
       - date: '2800-01-01'
         population: 132973799.0
@@ -308,27 +298,19 @@ planet:
         population: 86870778.0
       - date: '3072-02-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3077-05-10'
         faction:
-          source: canon
-          value:
-            - Stone
-            - WOB
+          - Stone
+          - WOB
       - date: '3077-06-14'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 87656144.0
       - date: '3081-02-01'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 88501695.0
       - date: '3100-01-01'
@@ -343,16 +325,12 @@ planet:
         population: 93430861.0
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 94975761.0
       - date: '3145-06-15'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 95547328.0
   - name: Xango
     type: TERRESTRIAL

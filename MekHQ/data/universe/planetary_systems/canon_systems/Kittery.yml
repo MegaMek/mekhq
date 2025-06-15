@@ -97,9 +97,7 @@ planet:
     event:
       - date: '2646-07-18'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 50648.0
         socioIndustrial: C-D-B-D-B
       - date: '2650-01-01'
@@ -190,24 +188,22 @@ planet:
         population: 969143472.0
       - date: '3005-07-09'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '3010-01-01'
         population: 958363011.0
       - date: '3020-01-01'
         population: 946274193.0
       - date: '3027-01-01'
         socioIndustrial: F-F-C-C-B
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 948529766.0
       - date: '3040-01-01'
         population: 960364760.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3048-01-01'
         socioIndustrial:
           source: canon
@@ -222,35 +218,27 @@ planet:
           value: 987240000.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3068-05-09'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3070-01-01'
         population: 988820848.0
       - date: '3071-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3072-04-01'
         faction:
-          source: canon
-          value:
-            - KP
+          - KP
       - date: '3079-01-01'
         population:
           source: canon
           value: 987240000.0
       - date: '3080-04-10'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 992585516.0
       - date: '3090-01-01'
         population: 1000958351.0
@@ -260,9 +248,7 @@ planet:
         population: 1011018150.0
       - date: '3105-09-11'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '3110-01-01'
         population: 1023632824.0
       - date: '3120-01-01'

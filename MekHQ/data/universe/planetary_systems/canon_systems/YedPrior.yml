@@ -115,9 +115,7 @@ planet:
     event:
       - date: '2142-07-26'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 51300.0
         socioIndustrial: D-D-B-D-D
       - date: '2150-01-01'
@@ -142,9 +140,7 @@ planet:
         population: 68346702.0
       - date: '2242-10-29'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 97953915.0
       - date: '2260-01-01'
@@ -157,9 +153,7 @@ planet:
         population: 285847957.0
       - date: '2299-07-05'
         faction:
-          source: canon
-          value:
-            - FoS
+          - FoS
       - date: '2300-01-01'
         population: 348661733.0
       - date: '2310-01-01'
@@ -170,9 +164,9 @@ planet:
         population: 572347091.0
       - date: '2340-01-01'
         population: 655655951.0
-      - date: '2341-01-02'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2350-01-01'
@@ -322,22 +316,22 @@ planet:
         population: 1143230554.0
       - date: '3020-01-01'
         population: 1148570542.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 1152498991.0
       - date: '3040-01-01'
         population: 1162453225.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3043-01-01'
         socioIndustrial: C-C-B-B-D
       - date: '3050-01-01'
         population: 1174018666.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -364,17 +358,13 @@ planet:
           value: X
       - date: '3140-08-09'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 1308828707.0
       - date: '3145-01-01'
         population: 1315126187.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
   - name: Lecques
     type: ICE_GIANT
     orbitalDist: 8.32

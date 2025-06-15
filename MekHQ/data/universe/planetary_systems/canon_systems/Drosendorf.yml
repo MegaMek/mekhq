@@ -66,9 +66,7 @@ planet:
     event:
       - date: '2211-07-10'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 56661.0
         socioIndustrial: C-D-A-D-B
       - date: '2220-01-01'
@@ -103,9 +101,7 @@ planet:
         population: 147885819.0
       - date: '2365-10-09'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2370-01-01'
         population: 174479075.0
       - date: '2380-01-01'
@@ -250,21 +246,21 @@ planet:
         population: 456085930.0
       - date: '3026-01-01'
         socioIndustrial: C-D-B-C-B
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 465346010.0
       - date: '3040-06-19'
         population: 469271380.0
         socioIndustrial: B-C-A-C-A
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3050-01-01'
         population: 473561238.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -291,9 +287,7 @@ planet:
         population: 515264951.0
       - date: '3145-07-13'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 516813066.0
   - name: Port Sarus
     type: TERRESTRIAL

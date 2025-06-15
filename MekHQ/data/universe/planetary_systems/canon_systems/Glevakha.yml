@@ -40,9 +40,7 @@ planet:
     event:
       - date: '2653-07-12'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 55507.0
         socioIndustrial: C-D-A-D-D
       - date: '2660-01-01'
@@ -147,9 +145,7 @@ planet:
         population: 234826997.0
       - date: '3081-12-20'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3089-01-01'
         socioIndustrial: B-D-B-C-C
       - date: '3090-01-01'
@@ -170,20 +166,11 @@ planet:
         population: 253369541.0
       - date: '3145-09-19'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 254029159.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - MOC
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
   - name: Gorinov's Plains
     type: TERRESTRIAL
     orbitalDist: 0.07

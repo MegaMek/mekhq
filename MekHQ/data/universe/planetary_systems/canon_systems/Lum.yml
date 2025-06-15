@@ -102,9 +102,7 @@ planet:
     event:
       - date: '2821-04-14'
         faction:
-          source: canon
-          value:
-            - CSR
+          - CSR
         population: 10136.0
         socioIndustrial: C-C-C-C-C
       - date: '2822-10-21'
@@ -148,10 +146,8 @@ planet:
         population: 192011.0
       - date: '3000-08-24'
         faction:
-          source: canon
-          value:
-            - CSR
-            - CDS
+          - CSR
+          - CDS
         population: 92556.0
       - date: '3010-01-01'
         population: 52131.0
@@ -159,9 +155,7 @@ planet:
         population: 33159.0
       - date: '3025-07-20'
         faction:
-          source: canon
-          value:
-            - CLAN
+          - CLAN
       - date: '3030-01-01'
         population: 18586.0
       - date: '3040-01-01'
@@ -172,46 +166,32 @@ planet:
         population: 4134.0
       - date: '3059-12-12'
         faction:
-          source: canon
-          value:
-            - CSR
+          - CSR
       - date: '3060-01-01'
         population: 2022.0
       - date: '3065-09-08'
         faction:
-          source: canon
-          value:
-            - CSR
-            - CSV
+          - CSR
+          - CSV
       - date: '3065-10-12'
         faction:
-          source: canon
-          value:
-            - CSR
+          - CSR
       - date: '3067-04-05'
         faction:
-          source: canon
-          value:
-            - CSR
-            - CJF
+          - CSR
+          - CJF
       - date: '3070-01-01'
         population: 1106.0
       - date: '3070-02-10'
         faction:
-          source: canon
-          value:
-            - CSR
-            - CSV
+          - CSR
+          - CSV
       - date: '3070-10-10'
         faction:
-          source: canon
-          value:
-            - CSV
+          - CSV
       - date: '3075-07-24'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         population: 0.0
         socioIndustrial: X-X-X-X-X
   - name: Hnatek

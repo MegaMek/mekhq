@@ -39,9 +39,7 @@ planet:
     event:
       - date: '2891-03-12'
         faction:
-          source: canon
-          value:
-            - HL
+          - HL
         population: 56962.0
         socioIndustrial: C-C-A-D-D
       - date: '2899-01-01'
@@ -105,9 +103,7 @@ planet:
         population: 350170.0
       - date: '3140-04-03'
         faction:
-          source: canon
-          value:
-            - CEI
+          - CEI
       - date: '3145-01-01'
         population: 351011.0
   - name: Rodriguez

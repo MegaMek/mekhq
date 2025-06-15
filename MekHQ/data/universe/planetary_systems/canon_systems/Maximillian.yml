@@ -92,9 +92,7 @@ planet:
     event:
       - date: '2785-10-04'
         faction:
-          source: canon
-          value:
-            - CIR
+          - CIR
         population: 53998.0
         socioIndustrial: C-F-C-D-F
       - date: '2788-02-23'
@@ -151,9 +149,7 @@ planet:
         population: 17297638.0
       - date: '3025-07-26'
         faction:
-          source: canon
-          value:
-            - CIR
+          - CIR
       - date: '3030-01-01'
         population: 17458557.0
       - date: '3040-01-01'
@@ -166,18 +162,14 @@ planet:
         population: 17711785.0
       - date: '3066-12-24'
         faction:
-          source: canon
-          value:
-            - CIR
+          - CIR
       - date: '3070-01-01'
         population: 17850076.0
       - date: '3080-01-01'
         population: 18069181.0
       - date: '3081-05-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 18375308.0
       - date: '3100-01-01'
@@ -186,9 +178,7 @@ planet:
         socioIndustrial: D-C-B-F-D
       - date: '3110-06-23'
         faction:
-          source: canon
-          value:
-            - MH
+          - MH
         population: 19117570.0
       - date: '3120-01-01'
         population: 19441458.0

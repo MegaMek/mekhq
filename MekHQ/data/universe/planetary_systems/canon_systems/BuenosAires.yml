@@ -76,9 +76,7 @@ planet:
     event:
       - date: '2272-11-13'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 57288.0
         socioIndustrial: D-D-A-D-D
       - date: '2280-01-01'
@@ -89,9 +87,7 @@ planet:
         population: 2360483.0
       - date: '2310-09-24'
         faction:
-          source: canon
-          value:
-            - CCom
+          - CCom
         population: 6316567.0
       - date: '2320-01-01'
         population: 14751674.0
@@ -105,7 +101,7 @@ planet:
         population: 158562798.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -262,20 +258,14 @@ planet:
         population: 1747658867.0
       - date: '3031-11-01'
         faction:
-          source: canon
-          value:
-            - DA
+          - DA
       - date: '3034-06-05'
         faction:
-          source: canon
-          value:
-            - DA
-            - CC
+          - DA
+          - CC
       - date: '3034-07-17'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '3040-01-01'
         population: 1088566701.0
       - date: '3044-01-01'
@@ -308,11 +298,6 @@ planet:
         population: 386465758.0
       - date: '3145-01-01'
         population: 389336212.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN
   - name: Torres's Folly
     type: ICE_GIANT
     orbitalDist: 1.28

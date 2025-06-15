@@ -110,9 +110,7 @@ planet:
     event:
       - date: '2242-01-12'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 47546.0
         socioIndustrial: F-D-A-C-C
       - date: '2245-01-01'
@@ -133,9 +131,7 @@ planet:
         population: 107487786.0
       - date: '2320-01-08'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
         population: 197561410.0
       - date: '2330-01-01'
         population: 335394309.0
@@ -147,9 +143,7 @@ planet:
         population: 1088124646.0
       - date: '2367-01-29'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2370-01-01'
         population: 1450911071.0
       - date: '2380-01-01'
@@ -180,9 +174,7 @@ planet:
         population: 6223777250.0
       - date: '2500-03-29'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
         population: 6514164223.0
       - date: '2510-01-01'
         population: 6812574448.0
@@ -246,28 +238,20 @@ planet:
         population: 8785153645.0
       - date: '2767-09-30'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2770-01-01'
         population: 8741312990.0
       - date: '2779-08-16'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-01-01'
         population: 8701209180.0
       - date: '2786-06-18'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2790-01-02'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 8669477086.0
       - date: '2800-01-01'
         population: 8657471069.0
@@ -336,14 +320,10 @@ planet:
         population: 7434793193.0
       - date: '3081-07-30'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3082-07-28'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 7440743407.0
       - date: '3100-01-01'
@@ -362,23 +342,14 @@ planet:
           value: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3137-10-01'
         faction:
-          source: canon
-          value:
-            - CvW
+          - CvW
       - date: '3140-01-01'
         population: 7521538946.0
       - date: '3145-01-01'
         population: 7556217726.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Vonhof
     type: DWARF_TERRESTRIAL
     orbitalDist: 0.64

@@ -67,9 +67,7 @@ planet:
     event:
       - date: '2686-12-07'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 53027.0
         socioIndustrial: C-D-C-C-D
       - date: '2690-01-01'
@@ -78,8 +76,8 @@ planet:
         population: 640042.0
       - date: '2701-10-27'
         hpg: B
-        socioIndustrial: C-D-C-C-C
         population: 680888.0
+        socioIndustrial: C-D-C-C-C
       - date: '2710-01-01'
         population: 1355400.0
       - date: '2720-01-01'
@@ -106,9 +104,7 @@ planet:
         population: 3936122.0
       - date: '2814-02-28'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2820-01-01'
         population: 2457455.0
       - date: '2830-01-01'
@@ -135,36 +131,21 @@ planet:
         population: 955975.0
       - date: '2978-01-01'
         faction:
-          source: canon
-          value:
-            - ARC
+          - ARC
       - date: '3022-01-01'
         faction:
-          source: canon
-          value:
-            - ARD
+          - ARD
       - date: '3025-01-25'
         faction:
-          source: assumption
-          value:
-            - ARC
-            - ARD
+          - ARC
+          - ARD
       - date: '3025-03-01'
         faction:
-          source: assumption
-          value:
-            - ARC
+          - ARC
       - date: '3026-01-01'
         faction:
-          source: canon
-          value:
-            - ARC
+          - ARC
         population: 1187434.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN
   - name: Vaiano
     type: TERRESTRIAL
     orbitalDist: 1.92

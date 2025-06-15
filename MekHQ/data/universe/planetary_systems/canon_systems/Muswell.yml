@@ -64,14 +64,15 @@ planet:
         capital: Canon Pyon City
     event:
       - date: '2336-06-22'
-        faction:
-          source: canon
-          value:
-            - LA
         population: 50537.0
         socioIndustrial: D-D-A-D-C
       - date: '2340-01-01'
         population: 89426.0
+      - date: '2341-01-01'
+        faction:
+          source: 'Handbook: House Steiner'
+          value:
+            - LA
       - date: '2350-01-01'
         population: 317956.0
       - date: '2360-01-01'
@@ -172,9 +173,7 @@ planet:
         population: 24662.0
       - date: '2816-04-14'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X

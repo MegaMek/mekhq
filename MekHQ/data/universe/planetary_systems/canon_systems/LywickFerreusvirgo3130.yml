@@ -57,9 +57,7 @@ planet:
     event:
       - date: '2719-11-12'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         hpg: X
         population: 59118.0
         socioIndustrial: C-F-B-D-D
@@ -77,9 +75,7 @@ planet:
         population: 5251968.0
       - date: '2779-03-18'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2780-01-01'
         population: 8187986.0
       - date: '2790-01-01'
@@ -106,17 +102,13 @@ planet:
         population: 164749.0
       - date: '2882-11-02'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
       - date: '3087-03-04'
         faction:
-          source: canon
-          value:
-            - RT
+          - RT
         population: 50000.0
         socioIndustrial: F-F-B-F-F
       - date: '3089-09-16'
@@ -135,11 +127,6 @@ planet:
         population: 187546.0
       - date: '3145-01-01'
         population: 196473.0
-      - date: '2108-12-05'
-        name: Lywick
-      - date: '3130-01-01'
-        name: Ferreusvirgo
-        message: Lywick renamed to Ferreusvirgo
   - name: Lares Belt
     type: ASTEROID_BELT
     orbitalDist: 1.44

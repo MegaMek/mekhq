@@ -73,9 +73,7 @@ planet:
     event:
       - date: '2802-11-18'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 8480.0
         socioIndustrial: B-C-A-C-F
       - date: '2803-07-29'
@@ -88,9 +86,7 @@ planet:
         population: 117285.0
       - date: '2821-09-11'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '2830-01-01'
         population: 317557.0
       - date: '2840-01-01'
@@ -143,33 +139,23 @@ planet:
         population: 6691.0
       - date: '3069-11-07'
         faction:
-          source: canon
-          value:
-            - CJF
-            - CSV
+          - CJF
+          - CSV
       - date: '3069-12-15'
         faction:
-          source: canon
-          value:
-            - CSV
+          - CSV
       - date: '3070-01-01'
         population: 4856.0
       - date: '3072-01-15'
         faction:
-          source: canon
-          value:
-            - CSV
-            - SOC
+          - CSV
+          - SOC
       - date: '3072-01-21'
         faction:
-          source: canon
-          value:
-            - SOC
+          - SOC
       - date: '3075-03-05'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         population: 0.0
         socioIndustrial: X-X-X-X-X
   - name: Ika Tere Maeri

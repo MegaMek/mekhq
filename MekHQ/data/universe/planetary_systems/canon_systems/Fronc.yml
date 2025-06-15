@@ -138,9 +138,7 @@ planet:
     event:
       - date: '3057-01-09'
         faction:
-          source: canon
-          value:
-            - NCR
+          - NCR
         hpg:
           source: canon
           value: B
@@ -150,9 +148,7 @@ planet:
         population: 2963151.0
       - date: '3066-04-09'
         faction:
-          source: canon
-          value:
-            - FR
+          - FR
       - date: '3070-01-01'
         population: 6130664.0
       - date: '3080-01-01'

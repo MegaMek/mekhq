@@ -57,9 +57,7 @@ planet:
     event:
       - date: '2540-02-21'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 45933.0
         socioIndustrial: C-F-D-F-B
       - date: '2550-01-01'
@@ -185,9 +183,7 @@ planet:
         population: 3171664374.0
       - date: '3081-08-17'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 3204180903.0
       - date: '3099-01-01'
@@ -206,9 +202,7 @@ planet:
         population: 3459958134.0
       - date: '3145-12-30'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 3479388253.0
   - name: Sekikawa Mura
     type: TERRESTRIAL

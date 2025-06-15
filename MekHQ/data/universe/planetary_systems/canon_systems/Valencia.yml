@@ -47,9 +47,7 @@ planet:
     event:
       - date: '2392-05-14'
         faction:
-          source: canon
-          value:
-            - NC
+          - NC
         population: 42415.0
         socioIndustrial: D-D-C-D-F
       - date: '2400-01-01'
@@ -91,9 +89,7 @@ planet:
         population: 754465.0
       - date: '2571-05-19'
         faction:
-          source: canon
-          value:
-            - NC
+          - NC
       - date: '2580-01-01'
         population: 778848.0
       - date: '2590-01-01'
@@ -209,9 +205,7 @@ planet:
         population: 527800.0
       - date: '3080-01-23'
         faction:
-          source: canon
-          value:
-            - CEI
+          - CEI
       - date: '3090-01-01'
         population: 536635.0
       - date: '3092-01-01'

@@ -108,9 +108,7 @@ planet:
     event:
       - date: '2596-08-04'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 55336.0
         socioIndustrial: C-D-B-D-D
       - date: '2600-01-01'
@@ -213,6 +211,11 @@ planet:
         population: 838134853.0
       - date: '3020-01-01'
         population: 839687957.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3029-01-01'
         socioIndustrial: B-C-C-C-C
       - date: '3030-01-01'
@@ -222,16 +225,11 @@ planet:
         socioIndustrial:
           source: canon
           value: B-B-B-B-C
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3050-01-01'
         population: 851879836.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -260,9 +258,7 @@ planet:
         population: 916301519.0
       - date: '3145-10-11'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 919974065.0
   - name: Dakhadayevskiy Belt
     type: ASTEROID_BELT

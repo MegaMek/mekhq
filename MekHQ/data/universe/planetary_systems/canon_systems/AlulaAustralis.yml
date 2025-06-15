@@ -203,9 +203,7 @@ planet:
     event:
       - date: '2242-11-11'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 47082.0
         socioIndustrial: D-D-B-D-C
       - date: '2245-01-01'
@@ -218,9 +216,7 @@ planet:
         population: 2060040.0
       - date: '2271-03-23'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
       - date: '2280-01-01'
         population: 5654025.0
       - date: '2290-01-01'
@@ -231,15 +227,11 @@ planet:
         population: 54523595.0
       - date: '2316-08-25'
         faction:
-          source: canon
-          value:
-            - TH
-            - FWL
+          - TH
+          - FWL
       - date: '2317-07-22'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2320-01-01'
         population: 94900847.0
       - date: '2330-01-01'
@@ -337,9 +329,7 @@ planet:
         population: 3742158459.0
       - date: '2767-05-17'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2769-08-09'
         hpg:
           source: canon
@@ -348,9 +338,7 @@ planet:
         population: 3708008454.0
       - date: '2779-07-15'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-12-07'
         hpg:
           source: canon
@@ -358,9 +346,7 @@ planet:
         population: 3717712359.0
       - date: '2790-03-16'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 3726528457.0
       - date: '2800-01-01'
         population: 3736280829.0
@@ -370,9 +356,7 @@ planet:
         population: 3714677164.0
       - date: '2821-09-25'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2830-01-01'
         population: 3681753814.0
       - date: '2840-01-01'
@@ -423,17 +407,10 @@ planet:
           value: 3119000000.0
       - date: '3030-10-14'
         faction:
-          source: canon
-          value:
-            - LA
+          - FC
         population: 3106379356.0
       - date: '3040-01-01'
         population: 3139358973.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3041-01-01'
         socioIndustrial:
           source: canon
@@ -442,9 +419,7 @@ planet:
         population: 3181676269.0
       - date: '3057-10-01'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3060-01-01'
         population: 3220006419.0
       - date: '3067-02-26'
@@ -456,27 +431,19 @@ planet:
         population: 3252146859.0
       - date: '3072-02-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3078-03-09'
         faction:
-          source: canon
-          value:
-            - Stone
-            - WOB
+          - Stone
+          - WOB
       - date: '3078-03-15'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 3280892044.0
       - date: '3081-03-06'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 3307244450.0
       - date: '3093-01-01'
@@ -499,12 +466,7 @@ planet:
         population: 3384192584.0
       - date: '3150-03-19'
         faction:
-          source: canon
-          value:
-            - CWE
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - CWE
   - name: Osiris

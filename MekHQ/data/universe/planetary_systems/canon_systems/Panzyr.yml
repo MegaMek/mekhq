@@ -83,9 +83,7 @@ planet:
     event:
       - date: '2610-06-20'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 51803.0
         socioIndustrial: C-D-B-D-F
       - date: '2620-01-01'
@@ -135,53 +133,34 @@ planet:
         population: 95774302.0
       - date: '2814-02-28'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2943-01-01'
         faction:
-          source: canon
-          value:
-            - ARC
+          - ARC
       - date: '3022-01-01'
         faction:
-          source: canon
-          value:
-            - ARD
+          - ARD
       - date: '3025-02-15'
         faction:
-          source: assumption
-          value:
-            - ARC
-            - ARD
+          - ARC
+          - ARD
       - date: '3025-04-20'
         faction:
-          source: assumption
-          value:
-            - ARC
-            - ARD
-            - TC
+          - ARC
+          - ARD
+          - TC
       - date: '3025-08-15'
         faction:
-          source: assumption
-          value:
-            - ARC
+          - ARC
       - date: '3026-01-01'
         faction:
-          source: canon
-          value:
-            - ARC
+          - ARC
         population:
           source: canon
           value: 93721000.0
         socioIndustrial:
           source: canon
           value: C-C-C-D-D
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN
   - name: Néa Ionía
     type: ICE_GIANT
     orbitalDist: 0.5

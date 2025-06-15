@@ -114,9 +114,7 @@ planet:
     event:
       - date: '2243-11-27'
         faction:
-          source: canon
-          value:
-            - TGU
+          - TGU
         population: 42610.0
         socioIndustrial: D-D-C-D-D
       - date: '2250-01-01'
@@ -145,7 +143,7 @@ planet:
         population: 165692585.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -295,17 +293,10 @@ planet:
         socioIndustrial: C-C-C-B-C
       - date: '3030-09-20'
         faction:
-          source: canon
-          value:
-            - FS
+          - FC
         population: 1161423730.0
       - date: '3040-01-01'
         population: 1171103663.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3044-01-01'
         socioIndustrial: B-B-C-A-C
       - date: '3050-01-01'
@@ -314,7 +305,7 @@ planet:
         population: 1185952923.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -323,9 +314,7 @@ planet:
         population: 1215003073.0
       - date: '3081-12-30'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1230655072.0
       - date: '3092-01-01'
@@ -340,16 +329,12 @@ planet:
         population: 1283443379.0
       - date: '3135-07-02'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '3140-01-01'
         population: 1298158350.0
       - date: '3145-02-14'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 1301277672.0
   - name: Ongol Ilawod
     type: DWARF_TERRESTRIAL

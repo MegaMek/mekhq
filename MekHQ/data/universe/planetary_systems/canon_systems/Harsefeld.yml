@@ -31,9 +31,7 @@ planet:
     event:
       - date: '2670-02-09'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 51788.0
         socioIndustrial: D-D-D-D-B
       - date: '2675-02-06'
@@ -73,9 +71,7 @@ planet:
         population: 687442425.0
       - date: '2821-10-30'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2830-01-01'
         population: 687280415.0
       - date: '2840-01-01'
@@ -94,9 +90,7 @@ planet:
         population: 681439000.0
       - date: '2900-04-04'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 679989282.0
       - date: '2910-01-01'
         population: 678628331.0
@@ -128,15 +122,11 @@ planet:
         population: 672258178.0
       - date: '3035-11-23'
         faction:
-          source: canon
-          value:
-            - LA
-            - FWL
+          - FC
+          - FWL
       - date: '3035-11-29'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3040-01-01'
         population: 680169791.0
       - date: '3047-01-01'
@@ -153,9 +143,7 @@ planet:
         population: 711120902.0
       - date: '3081-04-09'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 722734880.0
       - date: '3100-01-01'
@@ -167,9 +155,7 @@ planet:
         population: 760550460.0
       - date: '3130-01-04'
         faction:
-          source: canon
-          value:
-            - OP
+          - OP
         population: 769578114.0
       - date: '3132-08-07'
         hpg: X
@@ -177,11 +163,6 @@ planet:
         population: 781208797.0
       - date: '3145-01-01'
         population: 786539120.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Valkyries Belt
     type: ASTEROID_BELT
     orbitalDist: 0.35

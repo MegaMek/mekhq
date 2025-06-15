@@ -84,9 +84,7 @@ planet:
     event:
       - date: '2739-11-25'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 40851.0
         socioIndustrial: C-D-C-F-C
       - date: '2740-01-01'
@@ -129,22 +127,10 @@ planet:
         population: 17510.0
       - date: '2915-12-10'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - CC
-      - date: '2108-12-05'
-        name: Arn
-      - date: '3130-01-01'
-        name: Jia Tian
-        message: Arn renamed to Jia Tian
   - name: Kradenbach
     type: TERRESTRIAL
     orbitalDist: 3.64

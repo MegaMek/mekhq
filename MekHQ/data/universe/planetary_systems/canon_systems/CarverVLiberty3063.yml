@@ -190,9 +190,7 @@ planet:
     event:
       - date: '2228-11-22'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 46798.0
         socioIndustrial: F-D-C-D-D
       - date: '2230-01-01'
@@ -215,14 +213,10 @@ planet:
         population: 9143491.0
       - date: '2316-12-13'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2317-06-20'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2320-01-01'
         population: 12711445.0
       - date: '2330-01-01'
@@ -326,24 +320,18 @@ planet:
         population: 117474214.0
       - date: '2767-05-19'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 119580000.0
       - date: '2770-01-01'
         population: 118343408.0
       - date: '2779-11-05'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-01-01'
         population: 118726046.0
       - date: '2790-05-22'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 119247572.0
       - date: '2800-01-01'
         population: 119516272.0
@@ -353,9 +341,7 @@ planet:
         population: 120279694.0
       - date: '2821-12-29'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '2830-01-01'
         population: 120775849.0
       - date: '2840-01-01'
@@ -388,9 +374,7 @@ planet:
         population: 127762847.0
       - date: '2956-09-27'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '2960-01-01'
         population: 127902922.0
       - date: '2970-01-01'
@@ -409,16 +393,16 @@ planet:
         population:
           source: canon
           value: 130000000.0
-      - date: '3029-04-04'
+      - date: '3029-03-03'
         faction:
-          source: canon
+          source: NAIS 4th SW Atlas Volume 2, p. 16–17
           value:
             - TFR
       - date: '3030-01-01'
         population: 122906457.0
-      - date: '3032-10-31'
+      - date: '3031-09-15'
         faction:
-          source: canon
+          source: 20 Year Update, p. 12
           value:
             - FC
       - date: '3040-01-01'
@@ -435,37 +419,27 @@ planet:
         population: 102183243.0
       - date: '3057-11-01'
         faction:
-          source: canon
-          value:
-            - CM
+          - CM
       - date: '3060-01-01'
         population: 91522634.0
       - date: '3068-08-22'
         faction:
-          source: canon
-          value:
-            - CM
-            - WOB
+          - CM
+          - WOB
       - date: '3068-08-30'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3070-01-01'
         population: 84915042.0
       - date: '3078-04-02'
         faction:
-          source: canon
-          value:
-            - Stone
-            - CC
-            - WOB
+          - Stone
+          - CC
+          - WOB
       - date: '3078-04-17'
         faction:
-          source: canon
-          value:
-            - Stone
-            - CC
+          - Stone
+          - CC
       - date: '3079-01-01'
         population:
           source: canon
@@ -474,9 +448,7 @@ planet:
         population: 85068027.0
       - date: '3085-03-11'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 85562855.0
       - date: '3100-01-01'
@@ -499,21 +471,14 @@ planet:
         population: 91181430.0
       - date: '3149-08-01'
         faction:
-          source: canon
+          source: Shattered Fortress
           value:
             - CC
       - date: '3149-10-28'
         faction:
-          source: canon
+          source: Shattered Fortress
           value:
             - ROS
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - CC
-      - date: '2108-12-05'
-      - date: '3063-01-01'
   - name: Carver VI
     type: TERRESTRIAL
     orbitalDist: 1.04

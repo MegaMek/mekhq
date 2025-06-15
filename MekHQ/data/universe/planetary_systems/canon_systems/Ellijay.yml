@@ -53,9 +53,7 @@ planet:
     event:
       - date: '2630-07-24'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 49614.0
         socioIndustrial: C-D-B-F-A
       - date: '2640-01-01'
@@ -106,9 +104,7 @@ planet:
         population: 244263633.0
       - date: '2821-12-10'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2830-01-01'
         population: 244572209.0
       - date: '2840-01-01'
@@ -153,23 +149,23 @@ planet:
         population: 251637492.0
       - date: '3020-01-01'
         population: 253206378.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 255369765.0
       - date: '3040-07-29'
         population: 258323468.0
         socioIndustrial: B-D-C-C-B
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3045-01-01'
         socioIndustrial: A-C-B-C-A
       - date: '3050-01-01'
         population: 261494318.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -198,12 +194,12 @@ planet:
         population: 294097855.0
       - date: '3146-09-01'
         faction:
-          source: canon
+          source: Shattered Fortress
           value:
             - BC
       - date: '3148-01-30'
         faction:
-          source: canon
+          source: Shattered Fortress
           value:
             - LA
   - name: Moore

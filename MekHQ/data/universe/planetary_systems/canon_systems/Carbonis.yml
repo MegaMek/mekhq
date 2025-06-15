@@ -78,9 +78,7 @@ planet:
     event:
       - date: '2603-12-09'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 54197.0
         socioIndustrial: C-D-C-D-D
       - date: '2610-01-01'
@@ -131,9 +129,7 @@ planet:
         population: 728814889.0
       - date: '2790-12-12'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 722399862.0
       - date: '2800-01-01'
         population: 714201228.0
@@ -143,9 +139,7 @@ planet:
         population: 702509043.0
       - date: '2821-07-05'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2830-01-01'
         population: 700046147.0
       - date: '2840-01-01'
@@ -206,9 +200,7 @@ planet:
         population: 647986478.0
       - date: '3079-11-26'
         faction:
-          source: canon
-          value:
-            - DoO
+          - DoO
       - date: '3080-01-01'
         population: 654367964.0
       - date: '3090-01-01'
@@ -231,11 +223,6 @@ planet:
         population: 716565621.0
       - date: '3145-01-01'
         population: 720877939.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: San Ildefonso
     type: DWARF_TERRESTRIAL
     orbitalDist: 0.5

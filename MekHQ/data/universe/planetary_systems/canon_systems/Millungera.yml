@@ -46,9 +46,7 @@ planet:
     event:
       - date: '2626-08-18'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 48456.0
         socioIndustrial: D-D-C-D-C
       - date: '2630-01-01'
@@ -93,9 +91,7 @@ planet:
         population: 371122042.0
       - date: '2790-09-10'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 372618868.0
       - date: '2800-01-01'
         population: 370850113.0
@@ -161,9 +157,7 @@ planet:
         population: 364162620.0
       - date: '3079-03-04'
         faction:
-          source: canon
-          value:
-            - DTA
+          - DTA
       - date: '3080-01-01'
         population: 367675416.0
       - date: '3090-01-01'
@@ -184,11 +178,6 @@ planet:
         population: 385831415.0
       - date: '3145-01-01'
         population: 388619426.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Sharp
     type: TERRESTRIAL
     orbitalDist: 0.7

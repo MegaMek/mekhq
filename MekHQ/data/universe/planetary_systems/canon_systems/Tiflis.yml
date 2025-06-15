@@ -120,16 +120,12 @@ planet:
     event:
       - date: '2319-07-23'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 47036.0
         socioIndustrial: F-D-D-D-B
       - date: '2320-03-09'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 53933.0
       - date: '2330-01-01'
         population: 189259.0

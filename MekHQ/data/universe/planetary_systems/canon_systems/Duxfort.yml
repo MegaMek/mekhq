@@ -42,9 +42,7 @@ planet:
     event:
       - date: '2341-06-09'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 51209.0
         socioIndustrial: D-D-B-D-C
       - date: '2350-01-01'
@@ -178,9 +176,7 @@ planet:
         population: 22667.0
       - date: '2923-08-22'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X

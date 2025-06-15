@@ -118,18 +118,14 @@ planet:
     event:
       - date: '2264-05-12'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 57449.0
         socioIndustrial: D-C-C-D-D
       - date: '2270-01-01'
         population: 124356.0
       - date: '2280-04-25'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 390756.0
       - date: '2290-01-01'
         population: 1055183.0
@@ -310,9 +306,7 @@ planet:
         population: 564669810.0
       - date: '3081-12-02'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 572630784.0
       - date: '3098-01-01'
@@ -325,9 +319,7 @@ planet:
         population: 596119502.0
       - date: '3130-08-19'
         faction:
-          source: canon
-          value:
-            - RF
+          - RF
         population: 606704076.0
       - date: '3132-08-07'
         hpg:
@@ -339,12 +331,7 @@ planet:
         population: 619455678.0
       - date: '3148-03-25'
         faction:
-          source: canon
-          value:
-            - FWL
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - FWL
   - name: Broadbent's Hole

@@ -78,9 +78,7 @@ planet:
     event:
       - date: '3055-12-19'
         faction:
-          source: canon
-          value:
-            - TC
+          - TC
         population: 50056.0
         socioIndustrial: D-D-B-D-D
       - date: '3056-07-09'
@@ -89,14 +87,10 @@ planet:
         population: 6377024.0
       - date: '3066-04-01'
         faction:
-          source: canon
-          value:
-            - CDP
+          - CDP
       - date: '3066-10-01'
         faction:
-          source: canon
-          value:
-            - TC
+          - TC
       - date: '3070-01-01'
         population: 9093249.0
       - date: '3080-01-01'
@@ -109,9 +103,7 @@ planet:
         population: 9193827.0
       - date: '3120-09-14'
         faction:
-          source: canon
-          value:
-            - CDP
+          - CDP
         population: 9215919.0
       - date: '3130-01-01'
         population: 9329042.0

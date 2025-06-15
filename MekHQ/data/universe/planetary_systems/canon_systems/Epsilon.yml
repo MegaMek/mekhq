@@ -38,9 +38,7 @@ planet:
     event:
       - date: '2523-09-19'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 47312.0
         socioIndustrial: D-C-D-F-B
       - date: '2525-01-01'
@@ -131,9 +129,7 @@ planet:
         socioIndustrial: C-D-D-C-C
       - date: '2900-04-18'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 438255632.0
       - date: '2910-01-01'
         population: 435209317.0
@@ -173,16 +169,12 @@ planet:
         population: 389209150.0
       - date: '3070-01-01'
         population: 392767117.0
-      - date: '3079-12-20'
-        faction:
-          source: canon
-          value:
-            - DTA
       - date: '3079-10-01'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
+      - date: '3079-12-20'
+        faction:
+          - DTA
       - date: '3080-01-01'
         population: 393710890.0
       - date: '3090-01-01'
@@ -203,15 +195,8 @@ planet:
         population: 401503744.0
       - date: '3145-02-12'
         faction:
-          source: canon
-          value:
-            - DTA
+          - DTA
         population: 402227102.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Old Saint-Damase-de-L'Islet
     type: ICE_GIANT
     orbitalDist: 0.21

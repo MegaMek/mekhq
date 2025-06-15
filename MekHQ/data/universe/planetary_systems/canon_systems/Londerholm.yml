@@ -68,9 +68,7 @@ planet:
     event:
       - date: '2802-10-12'
         faction:
-          source: canon
-          value:
-            - CSJ
+          - CSJ
         hpg:
           source: canon
           value: A
@@ -82,9 +80,7 @@ planet:
         population: 118481.0
       - date: '2821-12-10'
         faction:
-          source: canon
-          value:
-            - CSJ
+          - CSJ
       - date: '2830-01-01'
         population: 293117.0
       - date: '2840-01-01'
@@ -137,41 +133,31 @@ planet:
         population: 5154118.0
       - date: '3060-12-26'
         faction:
-          source: canon
-          value:
-            - CIH
-            - CCO
+          - CIH
+          - CCO
         population: 5126877.0
       - date: '3070-01-01'
         population: 5133329.0
       - date: '3072-09-07'
         faction:
-          source: canon
-          value:
-            - CSV
-            - CCO
+          - CSV
+          - CCO
       - date: '3072-09-17'
         faction:
-          source: canon
-          value:
-            - CSV
+          - CSV
       - date: '3075-09-23'
         faction:
-          source: canon
-          value:
-            - CCO
-            - CSA
-            - CCC
+          - CCO
+          - CSA
+          - CCC
       - date: '3080-01-01'
         population: 5197379.0
       - date: '3085-03-07'
         faction:
-          source: canon
-          value:
-            - CCO
-            - CSL
-            - CCC
-            - CSA
+          - CCO
+          - CSL
+          - CCC
+          - CSA
       - date: '3090-01-01'
         population: 5226566.0
       - date: '3100-01-01'

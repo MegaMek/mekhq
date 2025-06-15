@@ -97,9 +97,7 @@ planet:
     event:
       - date: '2242-06-04'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 58224.0
         socioIndustrial: D-D-C-D-F
       - date: '2250-01-01'
@@ -118,9 +116,7 @@ planet:
         population: 35653420.0
       - date: '2320-11-12'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
         population: 59445099.0
       - date: '2330-01-01'
         population: 92061715.0
@@ -218,23 +214,17 @@ planet:
         population: 1312736244.0
       - date: '2767-03-11'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2770-01-01'
         population: 1320632379.0
       - date: '2779-07-21'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-01-01'
         population: 1315082147.0
       - date: '2790-03-18'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 1307804500.0
       - date: '2800-01-01'
         population: 1306768129.0
@@ -288,35 +278,31 @@ planet:
         population: 1116051219.0
       - date: '3028-01-01'
         socioIndustrial: C-C-C-C-D
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 1118202047.0
       - date: '3033-01-01'
         socioIndustrial: B-B-C-B-D
       - date: '3039-07-06'
         faction:
-          source: canon
-          value:
-            - FWL
-            - LA
+          - FWL
+          - FC
       - date: '3039-07-13'
         faction:
-          source: canon
-          value:
-            - LA
+          - FC
       - date: '3040-01-01'
         population: 1131588141.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3041-01-01'
         socioIndustrial: A-A-C-A-D
       - date: '3050-01-01'
         population: 1144790991.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -327,9 +313,7 @@ planet:
         population: 1186398301.0
       - date: '3081-06-10'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1209881088.0
       - date: '3092-01-01'
@@ -346,16 +330,12 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 1321440038.0
       - date: '3145-01-01'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 1333653382.0
   - name: Humbaba's Glory
     type: TERRESTRIAL

@@ -45,9 +45,7 @@ planet:
     event:
       - date: '2440-02-15'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 57566.0
         socioIndustrial: C-D-A-F-C
       - date: '2450-01-01'
@@ -215,9 +213,7 @@ planet:
         population: 170103639.0
       - date: '3145-01-22'
         faction:
-          source: canon
-          value:
-            - RA
+          - RA
         population: 170171694.0
   - name: Inalcik
     type: TERRESTRIAL

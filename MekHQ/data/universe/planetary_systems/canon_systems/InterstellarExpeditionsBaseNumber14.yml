@@ -22,9 +22,7 @@ planet:
     event:
       - date: '3095-09-13'
         faction:
-          source: canon
-          value:
-            - IE
+          - IE
         population: 1778.0
         socioIndustrial: B-X-X-X-X
   - name: TNN-1

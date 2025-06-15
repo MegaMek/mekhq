@@ -136,9 +136,7 @@ planet:
     event:
       - date: '2695-05-13'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 48041.0
         socioIndustrial: C-D-C-D-D
       - date: '2696-01-01'
@@ -218,15 +216,15 @@ planet:
         population: 233802169.0
       - date: '3020-01-01'
         population: 228455893.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 226220002.0
       - date: '3040-01-01'
         population: 228790786.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3044-01-01'
         socioIndustrial:
           source: canon
@@ -239,9 +237,7 @@ planet:
         population: 231900404.0
       - date: '3057-12-01'
         faction:
-          source: canon
-          value:
-            - ARDC
+          - ARDC
       - date: '3060-01-01'
         population: 234348187.0
       - date: '3067-01-01'
@@ -250,20 +246,14 @@ planet:
           value: 235900000.0
       - date: '3067-04-24'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '3069-07-12'
         faction:
-          source: canon
-          value:
-            - LA
-            - CJF
+          - LA
+          - CJF
       - date: '3069-09-02'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3070-01-01'
         population: 236750770.0
       - date: '3080-01-01'
@@ -290,9 +280,7 @@ planet:
         population: 258270629.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
   - name: Montenegro
     type: GIANT_TERRESTRIAL
     orbitalDist: 9.0

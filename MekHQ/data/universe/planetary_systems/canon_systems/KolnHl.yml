@@ -69,9 +69,7 @@ planet:
     event:
       - date: '2891-06-08'
         faction:
-          source: canon
-          value:
-            - HL
+          - HL
         population: 45340.0
         socioIndustrial: D-D-A-D-F
       - date: '2894-06-22'
@@ -132,9 +130,7 @@ planet:
         population: 225832.0
       - date: '3140-11-30'
         faction:
-          source: canon
-          value:
-            - CEI
+          - CEI
       - date: '3145-01-01'
         population: 227691.0
   - name: Davis's Delight

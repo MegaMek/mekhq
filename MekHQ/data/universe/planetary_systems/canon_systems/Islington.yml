@@ -33,9 +33,7 @@ planet:
         hpg: B
       - date: '2930-08-27'
         faction:
-          source: canon
-          value:
-            - MH
+          - MH
         population: 55651.0
         socioIndustrial: C-F-A-F-D
       - date: '2937-08-03'
@@ -64,9 +62,7 @@ planet:
         population: 59488568.0
       - date: '3025-09-27'
         faction:
-          source: canon
-          value:
-            - MH
+          - MH
       - date: '3030-01-01'
         population: 60879523.0
       - date: '3040-01-01'
@@ -101,12 +97,7 @@ planet:
         population: 62883257.0
       - date: '3150-10-10'
         faction:
-          source: canon
-          value:
-            - MOC
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - MOC
   - name: Onuris

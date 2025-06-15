@@ -31,18 +31,14 @@ planet:
     event:
       - date: '2310-01-17'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 56764.0
         socioIndustrial: F-D-B-D-C
       - date: '2320-01-01'
         population: 213783.0
       - date: '2330-06-19'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 662505.0
       - date: '2340-01-01'
         population: 1745357.0
@@ -219,10 +215,8 @@ planet:
         population: 487243297.0
       - date: '3130-10-10'
         faction:
-          source: canon
-          value:
-            - DC
-            - FS
+          - DC
+          - FS
         population: 495597240.0
       - date: '3132-08-07'
         hpg: X
@@ -230,9 +224,7 @@ planet:
         population: 503590572.0
       - date: '3145-11-24'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 508041726.0
   - name: Bjort
     type: TERRESTRIAL

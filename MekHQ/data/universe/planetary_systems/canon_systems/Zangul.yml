@@ -39,9 +39,7 @@ planet:
     event:
       - date: '2708-02-16'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 59509.0
         socioIndustrial: B-D-C-D-D
       - date: '2710-01-01'
@@ -72,36 +70,21 @@ planet:
         socioIndustrial: D-D-C-D-D
       - date: '2814-02-28'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3003-01-01'
         faction:
-          source: canon
-          value:
-            - ARC
+          - ARC
       - date: '3022-01-01'
         faction:
-          source: canon
-          value:
-            - ARD
+          - ARD
       - date: '3025-03-15'
         faction:
-          source: assumption
-          value:
-            - ARC
-            - ARD
+          - ARC
+          - ARD
       - date: '3026-01-01'
         faction:
-          source: canon
-          value:
-            - ARC
+          - ARC
         population: 4456717.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN
   - name: Fugen
     type: TERRESTRIAL
     orbitalDist: 0.42

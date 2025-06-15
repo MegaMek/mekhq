@@ -3,9 +3,11 @@ sucsId: 1294
 xcood: -292.397
 ycood: -243.278
 spectralType:
-  source: canon
+  source: A Time of War Companion, p. 152
   value: F8V
-primarySlot: 2
+primarySlot:
+  source: A Time of War Companion, p. 152
+  value: 2
 planet:
   - name: Loki
     type: TERRESTRIAL
@@ -31,25 +33,27 @@ planet:
     sysPos: 2
     icon: dry4
     pressure:
-      source: canon
+      source: A Time of War Companion, p. 152
       value: THIN
-    atmosphere: TAINTEDPOISON
+    atmosphere:
+      source: A Time of War Companion, p. 152
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: A Time of War Companion, p. 152
       value: 1.08
     diameter: 12026
     density: 6.314912155126
     dayLength: 19
     yearLength: 2.9
     temperature:
-      source: canon
+      source: A Time of War Companion, p. 152
       value: 24
     water:
-      source: canon
+      source: A Time of War Companion, p. 152
       value: 17
     lifeForm:
-      source: canon
+      source: A Time of War Companion, p. 152
       value: MAMMAL
     desc: 'Karachi is an unattractive, arid planet with a thin atmosphere - it''s
       only redeeming feature is it''s easily accessible mineral wealth. The surface
@@ -57,20 +61,16 @@ planet:
       of water: the Southern Ocean and the Arctic Seas, around which most of the planet''s
       residential and industrial infrastructure is concentrated. The Star League Defence
       Force is known to have constructed huge military maintenance facilities here.'
-    landmass:
-      - name:
-          source: canon
-          value: .na.character
     satellite:
-      - name: Name unknown
+      - name:
+          source: A Time of War Companion, p. 152
+          value: Clifton Beach
         size: medium
         icon: oddmoon2
     event:
       - date: '2564-02-13'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 49511.0
         socioIndustrial: C-D-A-C-D
       - date: '2570-01-01'
@@ -197,9 +197,7 @@ planet:
         population: 146390066.0
       - date: '3081-07-25'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 147035601.0
       - date: '3093-01-01'
@@ -212,9 +210,7 @@ planet:
         population: 148157329.0
       - date: '3130-09-01'
         faction:
-          source: canon
-          value:
-            - RCM
+          - RCM
         population: 148543039.0
       - date: '3132-08-07'
         hpg:
@@ -224,11 +220,6 @@ planet:
         population: 148483634.0
       - date: '3145-01-01'
         population: 148721398.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Kech
     type: TERRESTRIAL
     orbitalDist: 1.2

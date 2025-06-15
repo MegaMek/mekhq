@@ -53,11 +53,9 @@ planet:
     event:
       - date: '2802-07-23'
         faction:
-          source: canon
-          value:
-            - CCO
-            - CFM
-            - CIH
+          - CCO
+          - CFM
+          - CIH
         population: 8436.0
         socioIndustrial: A-C-C-C-D
       - date: '2808-06-23'
@@ -81,21 +79,17 @@ planet:
         population: 2271359.0
       - date: '2864-11-08'
         faction:
-          source: canon
-          value:
-            - CBS
+          - CBS
       - date: '2870-01-01'
         faction:
-          source: canon
-          value:
-            - CFM
+          - CFM
+      - date: '2870-01-01'
+        faction:
+          - CFM
+        population: 3224362.0
       - date: '2872-01-01'
         faction:
-          source: canon
-          value:
-            - CLAN
-      - date: '2870-01-01'
-        population: 3224362.0
+          - CLAN
       - date: '2880-01-01'
         population: 4238422.0
       - date: '2890-01-01'
@@ -128,9 +122,7 @@ planet:
         population: 10705792.0
       - date: '3025-05-15'
         faction:
-          source: canon
-          value:
-            - CLAN
+          - CLAN
       - date: '3030-01-01'
         population: 10832900.0
       - date: '3040-01-01'
@@ -141,71 +133,51 @@ planet:
         population: 10995573.0
       - date: '3059-12-12'
         faction:
-          source: canon
-          value:
-            - CFM
-            - CCO
+          - CFM
+          - CCO
       - date: '3060-01-01'
         population: 11107675.0
       - date: '3070-01-01'
         population: 11240393.0
       - date: '3071-07-15'
         faction:
-          source: canon
-          value:
-            - CGS
-            - CFM
-            - CIH
+          - CGS
+          - CFM
+          - CIH
       - date: '3072-09-18'
         faction:
-          source: canon
-          value:
-            - CGS
-            - CFM
-            - CSV
-      - date: '3073-09-13'
-        faction:
-          source: canon
-          value:
-            - CGS
-            - CSV
+          - CGS
+          - CFM
+          - CSV
       - date: '3073-03-12'
         faction:
-          source: canon
-          value:
-            - CSV
-            - CCO
-            - SOC
+          - CSV
+          - CCO
+          - SOC
       - date: '3073-05-19'
         faction:
-          source: canon
-          value:
-            - CSV
+          - CSV
       - date: '3073-06-12'
         faction:
-          source: canon
-          value:
-            - CSV
-            - CGS
+          - CSV
+          - CGS
+      - date: '3073-09-13'
+        faction:
+          - CGS
+          - CSV
       - date: '3074-01-01'
         socioIndustrial: A-A-D-B-C
       - date: '3075-10-01'
         faction:
-          source: canon
-          value:
-            - CGS
+          - CGS
       - date: '3079-02-04'
         faction:
-          source: canon
-          value:
-            - CSA
+          - CSA
       - date: '3080-01-01'
         population: 11353360.0
       - date: '3085-04-07'
         faction:
-          source: canon
-          value:
-            - CCC
+          - CCC
       - date: '3090-01-01'
         population: 11446841.0
       - date: '3100-01-01'

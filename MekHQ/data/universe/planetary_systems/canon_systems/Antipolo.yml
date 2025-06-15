@@ -94,9 +94,7 @@ planet:
     event:
       - date: '2359-07-05'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 45921.0
         socioIndustrial: C-D-C-D-B
       - date: '2360-01-01'
@@ -260,9 +258,7 @@ planet:
         population: 506294537.0
       - date: '3081-12-24'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 514357521.0
       - date: '3100-01-01'
@@ -273,9 +269,7 @@ planet:
         population: 524118912.0
       - date: '3130-03-15'
         faction:
-          source: canon
-          value:
-            - DA
+          - DA
         population: 528328680.0
       - date: '3131-01-01'
         socioIndustrial: B-C-C-C-A
@@ -285,15 +279,8 @@ planet:
         population: 532465757.0
       - date: '3145-12-26'
         faction:
-          source: canon
-          value:
-            - OP
+          - OP
         population: 535241790.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Rosacega's Rift
     type: DWARF_TERRESTRIAL
     orbitalDist: 3.08

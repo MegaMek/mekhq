@@ -72,9 +72,7 @@ planet:
     event:
       - date: '2241-02-16'
         faction:
-          source: canon
-          value:
-            - DO
+          - DO
         population: 48867.0
         socioIndustrial: D-D-C-D-C
       - date: '2250-01-01'
@@ -85,7 +83,7 @@ planet:
         population: 1208054.0
       - date: '2271-06-01'
         faction:
-          source: canon
+          source: 'Handbook: House Marik'
           value:
             - FWL
       - date: '2280-01-01'
@@ -261,16 +259,12 @@ planet:
         population: 754026941.0
       - date: '3079-08-09'
         faction:
-          source: canon
-          value:
-            - DO
+          - DO
       - date: '3080-01-01'
         population: 766494941.0
       - date: '3086-09-19'
         faction:
-          source: canon
-          value:
-            - OP
+          - OP
       - date: '3090-01-01'
         population: 781041353.0
       - date: '3100-01-01'
@@ -283,9 +277,7 @@ planet:
         population: 824377122.0
       - date: '3130-08-21'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 836501319.0
       - date: '3132-08-07'
         hpg: X
@@ -293,9 +285,7 @@ planet:
         population: 843726253.0
       - date: '3145-10-25'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 847446828.0
   - name: Metn
     type: TERRESTRIAL

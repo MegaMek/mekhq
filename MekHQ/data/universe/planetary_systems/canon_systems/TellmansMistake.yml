@@ -73,9 +73,7 @@ planet:
     event:
       - date: '2545-12-09'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 47096.0
         socioIndustrial: C-D-A-C-B
       - date: '2550-01-01'
@@ -209,9 +207,7 @@ planet:
         population: 267580803.0
       - date: '3081-09-17'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 268223768.0
       - date: '3096-01-01'
@@ -224,9 +220,7 @@ planet:
         population: 270107921.0
       - date: '3130-10-31'
         faction:
-          source: canon
-          value:
-            - RCM
+          - RCM
         population: 270324094.0
       - date: '3132-08-07'
         hpg:
@@ -236,16 +230,9 @@ planet:
         population: 270107921.0
       - date: '3145-01-01'
         population: 269945905.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - MOC
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
   - name: Port Iuppiter
     type: ICE_GIANT
     orbitalDist: 0.9

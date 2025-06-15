@@ -73,9 +73,7 @@ planet:
     event:
       - date: '2743-08-07'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 47207.0
         socioIndustrial: C-D-C-D-C
       - date: '2744-06-30'
@@ -138,22 +136,22 @@ planet:
         population: 154390801.0
       - date: '3020-01-01'
         population: 154853382.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 155197633.0
       - date: '3040-01-01'
         population: 155696047.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3042-01-01'
         socioIndustrial: A-C-C-B-B
       - date: '3050-01-01'
         population: 156213346.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -180,15 +178,11 @@ planet:
         population: 172436665.0
       - date: '3145-02-23'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 172816444.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
   - name: Daytona Beach
     type: TERRESTRIAL
     orbitalDist: 1.6

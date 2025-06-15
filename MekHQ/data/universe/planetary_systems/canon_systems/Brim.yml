@@ -114,10 +114,8 @@ planet:
     event:
       - date: '2802-07-01'
         faction:
-          source: canon
-          value:
-            - CCC
-            - CNC
+          - CCC
+          - CNC
         population: 11390.0
         socioIndustrial: B-C-C-D-D
       - date: '2808-03-11'
@@ -130,19 +128,15 @@ planet:
         population: 161816.0
       - date: '2821-08-14'
         faction:
-          source: canon
-          value:
-            - CLAN
+          - CLAN
       - date: '2830-01-01'
         population: 439777.0
       - date: '2840-03-05'
         faction:
-          source: canon
-          value:
-            - CCC
-            - CSA
-            - CSR
-            - CNC
+          - CCC
+          - CSA
+          - CSR
+          - CNC
         population: 939840.0
       - date: '2850-01-01'
         population: 1666948.0
@@ -190,41 +184,31 @@ planet:
         population: 9576899.0
       - date: '3060-07-01'
         faction:
-          source: canon
-          value:
-            - CCC
-            - CSA
-            - CSR
+          - CCC
+          - CSA
+          - CSR
         population: 9585863.0
       - date: '3070-01-01'
         population: 9632696.0
       - date: '3070-06-01'
         faction:
-          source: canon
-          value:
-            - CCC
-            - CSA
-            - CSV
-            - CBS
+          - CCC
+          - CSA
+          - CSV
+          - CBS
       - date: '3072-02-12'
         faction:
-          source: canon
-          value:
-            - CCC
-            - CSV
-            - SOC
+          - CCC
+          - CSV
+          - SOC
       - date: '3075-04-17'
         faction:
-          source: canon
-          value:
-            - CCC
+          - CCC
       - date: '3080-01-01'
         population: 9776320.0
       - date: '3085-09-28'
         faction:
-          source: canon
-          value:
-            - CCC
+          - CCC
       - date: '3090-01-01'
         population: 9945927.0
       - date: '3095-01-01'

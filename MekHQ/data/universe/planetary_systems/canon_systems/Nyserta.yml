@@ -53,9 +53,7 @@ planet:
     event:
       - date: '2900-09-18'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 50980.0
         socioIndustrial: C-D-A-D-F
       - date: '2905-11-06'
@@ -90,9 +88,7 @@ planet:
         population: 3205631.0
       - date: '3025-10-12'
         faction:
-          source: canon
-          value:
-            - EF
+          - EF
         population:
           source: canon
           value: 43000.0
@@ -104,19 +100,17 @@ planet:
         socioIndustrial: F-F-A-D-F
       - date: '3049-09-03'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CGB
       - date: '3050-01-01'
         population: 3365171.0
       - date: '3052-06-30'
         faction:
-          source: canon
-          value:
-            - CDS
+          - CDS
       - date: '3052-08-01'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CW
       - date: '3060-01-01'
@@ -125,15 +119,11 @@ planet:
         population: 3427251.0
       - date: '3070-11-14'
         faction:
-          source: canon
-          value:
-            - CW
-            - CHH
+          - CW
+          - CHH
       - date: '3070-12-04'
         faction:
-          source: canon
-          value:
-            - CHH
+          - CHH
       - date: '3080-01-01'
         population: 3463773.0
       - date: '3090-01-01'
@@ -142,9 +132,7 @@ planet:
         population: 3485315.0
       - date: '3100-02-07'
         faction:
-          source: canon
-          value:
-            - TB
+          - TB
       - date: '3110-01-01'
         population: 3483224.0
       - date: '3119-01-01'
@@ -157,11 +145,6 @@ planet:
         population: 3507693.0
       - date: '3145-01-01'
         population: 3509096.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FCo
   - name: Melin
     type: TERRESTRIAL
     orbitalDist: 1.7

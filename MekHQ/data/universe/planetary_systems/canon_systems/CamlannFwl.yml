@@ -72,9 +72,7 @@ planet:
     event:
       - date: '2718-12-26'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 52276.0
         socioIndustrial: C-D-C-D-D
       - date: '2719-08-31'
@@ -171,9 +169,7 @@ planet:
         population: 3464530067.0
       - date: '3081-08-05'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 3466609409.0
       - date: '3093-01-01'
@@ -186,9 +182,7 @@ planet:
         population: 3523930552.0
       - date: '3130-01-22'
         faction:
-          source: canon
-          value:
-            - RF
+          - RF
         population: 3572183383.0
       - date: '3132-08-07'
         hpg:
@@ -198,16 +192,6 @@ planet:
         population: 3614584823.0
       - date: '3145-01-01'
         population: 3633429619.0
-      - date: '3148-07-07'
-        faction:
-          source: sucs
-          value:
-            - FWL
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: 5T2
     type: TERRESTRIAL
     orbitalDist: 0.2

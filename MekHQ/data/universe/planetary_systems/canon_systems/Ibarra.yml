@@ -32,9 +32,7 @@ planet:
     event:
       - date: '2552-06-07'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 49411.0
         socioIndustrial: C-D-C-D-B
       - date: '2560-03-21'
@@ -162,9 +160,7 @@ planet:
         population: 149127252.0
       - date: '3081-08-06'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 151350748.0
       - date: '3100-01-01'
@@ -177,9 +173,7 @@ planet:
         population: 154717362.0
       - date: '3130-05-19'
         faction:
-          source: canon
-          value:
-            - RF
+          - RF
         population: 154748308.0
       - date: '3140-01-01'
         population: 155866517.0
@@ -187,12 +181,7 @@ planet:
         population: 156241046.0
       - date: '3148-03-25'
         faction:
-          source: canon
-          value:
-            - FWL
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - FWL
   - name: Rivera

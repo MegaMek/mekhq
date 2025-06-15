@@ -101,9 +101,7 @@ planet:
     event:
       - date: '2302-05-08'
         faction:
-          source: canon
-          value:
-            - CCom
+          - CCom
         population: 60238.0
         socioIndustrial: D-F-A-D-D
       - date: '2310-01-01'
@@ -116,9 +114,7 @@ planet:
         population: 6582200.0
       - date: '2350-06-14'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 15128422.0
       - date: '2360-01-01'
         population: 30523539.0
@@ -168,9 +164,7 @@ planet:
         population: 1448685928.0
       - date: '2571-10-29'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '2580-01-01'
         population: 1483558625.0
       - date: '2590-01-01'
@@ -243,9 +237,7 @@ planet:
         population: 1398878436.0
       - date: '2900-01-12'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 1357672192.0
         socioIndustrial: C-D-B-C-D
       - date: '2910-01-01'
@@ -274,20 +266,18 @@ planet:
         population: 919415554.0
       - date: '3025-06-03'
         faction:
-          source: canon
+          - FS
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
           value:
-            - FS
+            - FC
       - date: '3030-01-01'
         population: 921939336.0
       - date: '3033-01-01'
         socioIndustrial: C-D-A-C-C
       - date: '3040-01-01'
         population: 930367273.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3046-01-01'
         socioIndustrial: C-D-A-D-C
       - date: '3050-01-01'
@@ -296,7 +286,7 @@ planet:
         population: 951918503.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -321,11 +311,6 @@ planet:
         population: 1040627760.0
       - date: '3145-01-01'
         population: 1046471623.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - CC
   - name: Martin's Belt
     type: ASTEROID_BELT
     orbitalDist: 3.92

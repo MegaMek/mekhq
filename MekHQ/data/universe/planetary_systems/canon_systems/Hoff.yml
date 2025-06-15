@@ -132,9 +132,7 @@ planet:
     event:
       - date: '2301-04-25'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 44876.0
         socioIndustrial: D-D-B-F-D
       - date: '2310-01-01'
@@ -149,9 +147,7 @@ planet:
         population: 6174373.0
       - date: '2360-05-10'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 11530527.0
       - date: '2370-01-01'
         population: 19681926.0
@@ -299,15 +295,15 @@ planet:
         population: 381351140.0
       - date: '3020-01-01'
         population: 369796634.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 363834583.0
       - date: '3040-01-01'
         population: 366756934.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3047-01-01'
         socioIndustrial: D-C-C-C-C
       - date: '3050-01-01'
@@ -316,7 +312,7 @@ planet:
         population: 371147413.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -339,9 +335,7 @@ planet:
         population: 389903520.0
       - date: '3145-04-28'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 389825547.0
   - name: Messmerstein
     type: GAS_GIANT

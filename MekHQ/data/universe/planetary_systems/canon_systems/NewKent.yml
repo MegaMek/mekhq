@@ -75,9 +75,7 @@ planet:
     event:
       - date: '2802-04-05'
         faction:
-          source: canon
-          value:
-            - CSV
+          - CSV
         population: 8545.0
         socioIndustrial: B-C-C-C-F
       - date: '2804-04-20'
@@ -98,9 +96,7 @@ planet:
         population: 2413026.0
       - date: '2864-12-22'
         faction:
-          source: canon
-          value:
-            - CSV
+          - CSV
       - date: '2870-01-01'
         population: 3447645.0
       - date: '2880-01-01'
@@ -115,12 +111,10 @@ planet:
         population: 7469619.0
       - date: '2920-05-04'
         faction:
-          source: canon
-          value:
-            - CSV
-            - CCO
-            - CIH
-            - CDS
+          - CSV
+          - CCO
+          - CIH
+          - CDS
         population: 8231313.0
       - date: '2930-01-01'
         population: 8897870.0
@@ -144,9 +138,7 @@ planet:
         population: 90822.0
       - date: '3025-05-27'
         faction:
-          source: canon
-          value:
-            - CLAN
+          - CLAN
       - date: '3030-01-01'
         population: 48633.0
       - date: '3040-01-01'
@@ -157,54 +149,37 @@ planet:
         population: 18998.0
       - date: '3059-12-12'
         faction:
-          source: canon
-          value:
-            - CIH
-            - CCO
+          - CIH
+          - CCO
       - date: '3060-01-01'
         population: 13045.0
       - date: '3067-11-07'
         faction:
-          source: canon
-          value:
-            - CSV
-            - CCO
-            - CJF
+          - CSV
+          - CCO
+          - CJF
       - date: '3070-01-28'
         faction:
-          source: canon
-          value:
-            - CSV
-            - CCO
+          - CSV
+          - CCO
         population: 9691.0
       - date: '3073-05-01'
         faction:
-          source: canon
-          value:
-            - CSV
-      - date: '3075-12-22'
-        faction:
-          source: canon
-          value:
-            - ABN
-        population: 0.0
-        socioIndustrial: X-X-X-X-X
+          - CSV
       - date: '3075-12-14'
         faction:
-          source: canon
-          value:
-            - CSV
-            - CSL
-            - CBS
-            - CCC
-            - CCO
-            - CGS
-            - CSA
-      - date: '3151-01-01'
+          - CSV
+          - CSL
+          - CBS
+          - CCC
+          - CCO
+          - CGS
+          - CSA
+      - date: '3075-12-22'
         faction:
-          source: sucs
-          value:
-            - ABN
+          - ABN
+        population: 0.0
+        socioIndustrial: X-X-X-X-X
   - name: Wyndrowski
     type: ICE_GIANT
     orbitalDist: 1.5

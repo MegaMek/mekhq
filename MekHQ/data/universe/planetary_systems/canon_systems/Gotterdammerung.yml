@@ -35,9 +35,7 @@ planet:
     event:
       - date: '2341-06-15'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 52045.0
         socioIndustrial: D-D-B-D-C
       - date: '2350-01-01'
@@ -134,9 +132,7 @@ planet:
         population: 152809520.0
       - date: '2779-09-28'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2780-01-01'
         population: 151773072.0
       - date: '2790-01-01'
@@ -193,19 +189,13 @@ planet:
         population: 134505668.0
       - date: '3021-05-10'
         faction:
-          source: canon
-          value:
-            - MV
+          - MV
       - date: '3025-12-02'
         faction:
-          source: canon
-          value:
-            - MV
+          - MV
       - date: '3028-04-22'
         faction:
-          source: canon
-          value:
-            - GV
+          - GV
       - date: '3030-01-01'
         population: 134368700.0
       - date: '3040-01-01'
@@ -214,7 +204,7 @@ planet:
         socioIndustrial: C-C-B-C-B
       - date: '3049-09-27'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
       - date: '3050-01-01'
@@ -225,14 +215,10 @@ planet:
         population: 140609637.0
       - date: '3071-10-10'
         faction:
-          source: canon
-          value:
-            - CIH
+          - CIH
       - date: '3071-12-28'
         faction:
-          source: canon
-          value:
-            - CHH
+          - CHH
       - date: '3080-01-01'
         population: 142592016.0
       - date: '3090-01-01'
@@ -243,9 +229,7 @@ planet:
         population: 147848414.0
       - date: '3100-02-07'
         faction:
-          source: canon
-          value:
-            - TB
+          - TB
       - date: '3110-01-01'
         population: 150473579.0
       - date: '3120-01-01'
@@ -256,11 +240,6 @@ planet:
         population: 156114157.0
       - date: '3145-01-01'
         population: 156865306.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - RU
   - name: Shini
     type: TERRESTRIAL
     orbitalDist: 0.07

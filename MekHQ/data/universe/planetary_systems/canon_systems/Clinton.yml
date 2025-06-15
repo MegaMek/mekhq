@@ -53,9 +53,7 @@ planet:
     event:
       - date: '2224-07-20'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 56210.0
         socioIndustrial: D-D-A-D-F
       - date: '2230-01-01'
@@ -74,9 +72,7 @@ planet:
         population: 17204112.0
       - date: '2299-03-27'
         faction:
-          source: canon
-          value:
-            - FoS
+          - FoS
       - date: '2300-01-01'
         population: 28442586.0
       - date: '2310-01-01'
@@ -87,9 +83,9 @@ planet:
         population: 89539239.0
       - date: '2340-01-01'
         population: 119545608.0
-      - date: '2341-09-20'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2350-01-01'
@@ -241,22 +237,22 @@ planet:
         population: 646883628.0
       - date: '3020-01-01'
         population: 650219691.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 655053990.0
       - date: '3040-01-01'
         population: 660645680.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3045-01-01'
         socioIndustrial: C-D-B-D-F
       - date: '3050-01-01'
         population: 664754407.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -285,9 +281,7 @@ planet:
         population: 697789624.0
       - date: '3145-03-06'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 701287309.0
   - name: Toms River
     type: TERRESTRIAL

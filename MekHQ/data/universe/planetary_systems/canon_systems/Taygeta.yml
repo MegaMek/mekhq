@@ -85,9 +85,7 @@ planet:
     event:
       - date: '2350-01-24'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 62961.0
         socioIndustrial: D-F-B-D-C
       - date: '2358-01-01'
@@ -235,17 +233,17 @@ planet:
         population: 274298441.0
       - date: '3020-01-01'
         population: 268797713.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 267513411.0
       - date: '3037-01-01'
         socioIndustrial: B-C-C-B-C
       - date: '3040-01-01'
         population: 270607572.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3041-01-01'
         socioIndustrial: A-C-B-B-B
       - date: '3050-01-01'
@@ -254,7 +252,7 @@ planet:
         population: 278013507.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -277,15 +275,8 @@ planet:
         population: 293938246.0
       - date: '3145-08-30'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 293703190.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FS
   - name: Saint-Antoine-de-Tilly
     type: GIANT_TERRESTRIAL
     orbitalDist: 4.48

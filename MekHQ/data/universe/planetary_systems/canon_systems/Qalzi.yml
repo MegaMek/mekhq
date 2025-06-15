@@ -68,9 +68,7 @@ planet:
     event:
       - date: '2621-06-02'
         faction:
-          source: canon
-          value:
-            - TC
+          - TC
         population: 46546.0
         socioIndustrial: C-C-B-D-F
       - date: '2630-01-01'
@@ -137,29 +135,16 @@ planet:
         socioIndustrial: F-D-C-D-D
       - date: '2957-01-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3020-01-01'
         faction:
-          source: canon
-          value:
-            - ARC
+          - ARC
       - date: '3022-01-01'
         faction:
-          source: canon
-          value:
-            - ARD
+          - ARD
       - date: '3026-01-01'
         faction:
-          source: canon
-          value:
-            - ARC
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN
+          - ARC
   - name: Cantón Guayaquil
     type: GIANT_TERRESTRIAL
     orbitalDist: 2.4

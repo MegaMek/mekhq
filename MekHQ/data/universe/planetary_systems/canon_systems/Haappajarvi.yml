@@ -50,9 +50,7 @@ planet:
     event:
       - date: '2670-12-08'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 53205.0
         socioIndustrial: C-D-A-D-F
       - date: '2678-01-01'
@@ -103,9 +101,7 @@ planet:
         population: 546665794.0
       - date: '2864-01-20'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2870-01-01'
         population: 549711849.0
       - date: '2880-01-01'
@@ -116,9 +112,7 @@ planet:
         socioIndustrial: C-D-B-D-C
       - date: '2900-06-25'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 556123615.0
       - date: '2910-01-01'
         population: 537368819.0
@@ -146,15 +140,15 @@ planet:
         population: 318044250.0
       - date: '3028-01-01'
         socioIndustrial: C-D-A-D-C
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 310843863.0
       - date: '3040-01-01'
         population: 313873719.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3049-01-01'
         socioIndustrial: C-D-A-D-D
       - date: '3050-01-01'
@@ -163,7 +157,7 @@ planet:
         population: 318362521.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -188,9 +182,7 @@ planet:
         population: 344774554.0
       - date: '3145-04-18'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 346156414.0
   - name: En'ko
     type: DWARF_TERRESTRIAL

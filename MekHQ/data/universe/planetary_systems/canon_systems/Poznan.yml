@@ -146,9 +146,7 @@ planet:
     event:
       - date: '2267-07-18'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 49102.0
         socioIndustrial: D-D-B-D-F
       - date: '2270-01-01'
@@ -163,9 +161,7 @@ planet:
         population: 6345650.0
       - date: '2320-11-03'
         faction:
-          source: canon
-          value:
-            - DoL
+          - DoL
         population: 13492921.0
       - date: '2330-03-27'
         population: 25877314.0
@@ -174,16 +170,14 @@ planet:
         population: 45710584.0
       - date: '2345-10-14'
         faction:
-          source: canon
-          value:
-            - TGU
+          - TGU
       - date: '2350-01-01'
         population: 74998820.0
       - date: '2360-01-01'
         population: 115115864.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -330,70 +324,47 @@ planet:
         population: 1231987237.0
       - date: '3028-08-29'
         faction:
-          source: canon
-          value:
-            - CC
-            - FS
+          - CC
+          - FC
       - date: '3028-09-05'
         faction:
-          source: canon
-          value:
-            - FS
+          - FC
       - date: '3030-01-01'
         population: 1229175502.0
       - date: '3030-02-28'
         faction:
-          source: canon
-          value:
-            - LA
+          - FC
       - date: '3040-01-01'
         population: 1239668024.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3044-01-01'
         socioIndustrial: C-C-B-B-D
       - date: '3050-01-01'
         population: 1253003691.0
       - date: '3057-11-01'
         faction:
-          source: canon
-          value:
-            - CM
+          - CM
       - date: '3060-01-01'
         population: 1269018315.0
       - date: '3062-04-04'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '3070-01-01'
         population: 1286266224.0
       - date: '3072-02-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3077-08-12'
         faction:
-          source: canon
-          value:
-            - CC
-            - WOB
+          - CC
+          - WOB
       - date: '3077-08-18'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '3080-01-01'
         population: 1296338331.0
       - date: '3085-01-30'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1307012007.0
       - date: '3100-01-01'
@@ -410,16 +381,12 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 1331549926.0
       - date: '3145-02-19'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 1330219041.0
   - name: Drugnowski
     type: ICE_GIANT

@@ -38,9 +38,7 @@ planet:
     event:
       - date: '2608-12-21'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 50838.0
         socioIndustrial: C-D-C-D-C
       - date: '2610-09-15'
@@ -155,9 +153,7 @@ planet:
         population: 172837870.0
       - date: '3081-02-10'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 173426519.0
       - date: '3093-01-01'
@@ -176,18 +172,16 @@ planet:
         population: 176258909.0
       - date: '3145-05-06'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 177142410.0
       - date: '3150-08-30'
         faction:
-          source: canon
+          source: Shattered Fortress
           value:
             - MH
       - date: '3150-12-01'
         faction:
-          source: canon
+          source: Shattered Fortress
           value:
             - FWL
   - name: Hreidmar

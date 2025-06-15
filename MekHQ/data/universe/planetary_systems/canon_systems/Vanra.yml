@@ -113,9 +113,7 @@ planet:
     event:
       - date: '2241-12-12'
         faction:
-          source: canon
-          value:
-            - DO
+          - DO
         population: 54987.0
         socioIndustrial: D-D-B-D-F
       - date: '2250-01-01'
@@ -126,7 +124,7 @@ planet:
         population: 1576706.0
       - date: '2271-06-01'
         faction:
-          source: canon
+          source: 'Handbook: House Marik'
           value:
             - FWL
       - date: '2280-01-01'
@@ -137,9 +135,7 @@ planet:
         population: 15659238.0
       - date: '2310-01-25'
         faction:
-          source: canon
-          value:
-            - CCom
+          - CCom
         population: 27828568.0
       - date: '2320-01-01'
         population: 45910998.0
@@ -153,7 +149,7 @@ planet:
         population: 187322419.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -267,9 +263,7 @@ planet:
         population: 1193321167.0
       - date: '2821-12-12'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2830-01-01'
         population: 1193934811.0
       - date: '2840-01-01'
@@ -290,9 +284,7 @@ planet:
         socioIndustrial: C-C-C-C-D
       - date: '2900-03-19'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 1195693362.0
       - date: '2910-01-01'
         population: 1196070177.0
@@ -318,20 +310,14 @@ planet:
         population: 1204869675.0
       - date: '3015-01-05'
         faction:
-          source: canon
-          value:
-            - FWL
-            - FWLR
+          - FWL
+          - FWLR
       - date: '3015-01-12'
         faction:
-          source: canon
-          value:
-            - FWLR
+          - FWLR
       - date: '3015-03-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3020-01-01'
         population: 1205309346.0
       - date: '3030-01-01'
@@ -356,9 +342,7 @@ planet:
         population: 1254006407.0
       - date: '3079-01-09'
         faction:
-          source: canon
-          value:
-            - DoO
+          - DoO
       - date: '3080-01-01'
         population: 1271940327.0
       - date: '3090-01-01'
@@ -381,11 +365,6 @@ planet:
         population: 1361168540.0
       - date: '3145-01-01'
         population: 1371278548.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Knox
     type: ICE_GIANT
     orbitalDist: 2.52

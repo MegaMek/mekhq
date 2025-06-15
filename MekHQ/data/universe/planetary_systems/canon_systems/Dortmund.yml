@@ -66,9 +66,7 @@ planet:
     event:
       - date: '2891-03-13'
         faction:
-          source: canon
-          value:
-            - HL
+          - HL
         population: 50179.0
         socioIndustrial: B-D-A-C-F
       - date: '2892-09-21'
@@ -133,9 +131,7 @@ planet:
         population: 278208.0
       - date: '3140-06-09'
         faction:
-          source: canon
-          value:
-            - CEI
+          - CEI
       - date: '3145-01-01'
         population: 279490.0
   - name: E-4

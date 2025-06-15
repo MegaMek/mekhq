@@ -52,9 +52,7 @@ planet:
     event:
       - date: '2748-12-09'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 50066.0
         socioIndustrial: C-D-C-C-F
       - date: '2750-01-01'
@@ -67,9 +65,7 @@ planet:
         population: 782746.0
       - date: '2779-07-30'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2780-01-01'
         population: 1856082.0
       - date: '2790-01-01'
@@ -90,17 +86,13 @@ planet:
         population: 5352.0
       - date: '2865-11-18'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
       - date: '3087-10-30'
         faction:
-          source: canon
-          value:
-            - RT
+          - RT
         hpg: X
         population: 50000.0
         socioIndustrial: C-D-C-C-D
@@ -118,11 +110,6 @@ planet:
         population: 269218.0
       - date: '3145-01-01'
         population: 293689.0
-      - date: '2108-12-05'
-        name: Lushun
-      - date: '3130-01-01'
-        name: Jibbet
-        message: Lushun renamed to Jibbet
   - name: Lunar
     type: TERRESTRIAL
     orbitalDist: 0.9

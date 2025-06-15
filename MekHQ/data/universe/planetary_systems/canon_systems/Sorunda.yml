@@ -177,9 +177,7 @@ planet:
     event:
       - date: '2203-04-04'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 56525.0
         socioIndustrial: D-D-A-D-C
       - date: '2210-01-01'
@@ -198,9 +196,7 @@ planet:
         population: 20559274.0
       - date: '2280-08-20'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 34492697.0
       - date: '2290-01-01'
         population: 54135755.0
@@ -384,9 +380,7 @@ planet:
         population: 974492767.0
       - date: '3081-07-28'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 990606217.0
       - date: '3097-01-01'
@@ -407,15 +401,8 @@ planet:
         population: 1075474347.0
       - date: '3145-07-08'
         faction:
-          source: canon
-          value:
-            - OP
+          - OP
         population: 1085631469.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Lopti
     type: DWARF_TERRESTRIAL
     orbitalDist: 3.0

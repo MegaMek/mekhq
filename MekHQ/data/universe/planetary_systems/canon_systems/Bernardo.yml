@@ -148,9 +148,7 @@ planet:
     event:
       - date: '2261-10-28'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 38363.0
         socioIndustrial: D-C-B-D-F
       - date: '2270-01-01'
@@ -165,9 +163,7 @@ planet:
         population: 7723571.0
       - date: '2315-05-17'
         faction:
-          source: canon
-          value:
-            - DoL
+          - DoL
       - date: '2320-01-01'
         population: 15424554.0
       - date: '2330-01-01'
@@ -180,7 +176,7 @@ planet:
         population: 110251628.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -286,9 +282,7 @@ planet:
         population: 1580266141.0
       - date: '2821-04-24'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2830-01-01'
         population: 1577903745.0
       - date: '2840-01-01'
@@ -333,20 +327,14 @@ planet:
         population: 1464429108.0
       - date: '3014-03-22'
         faction:
-          source: canon
-          value:
-            - FWLR
+          - FWLR
       - date: '3015-01-14'
         faction:
-          source: canon
-          value:
-            - FWLR
-            - FWL
+          - FWLR
+          - FWL
       - date: '3015-02-01'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3020-01-01'
         population: 1455505158.0
       - date: '3030-01-01'
@@ -367,14 +355,10 @@ planet:
         population: 1517191486.0
       - date: '3081-02-11'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3082-08-01'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1533972720.0
       - date: '3097-01-01'
@@ -393,25 +377,14 @@ planet:
           value: X
       - date: '3135-05-01'
         faction:
-          source: canon
-          value:
-            - SA
+          - SA
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3139-12-12'
         faction:
-          source: canon
-          value:
-            - AA
+          - AA
       - date: '3140-01-01'
         population: 1630131879.0
       - date: '3145-01-01'
         population: 1640270093.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL

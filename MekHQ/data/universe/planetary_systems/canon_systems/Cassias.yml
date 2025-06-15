@@ -85,9 +85,7 @@ planet:
     event:
       - date: '2340-05-01'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 58692.0
         socioIndustrial: D-D-A-C-C
       - date: '2350-01-01'
@@ -186,33 +184,25 @@ planet:
         population: 637484909.0
       - date: '2780-07-17'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 633302627.0
       - date: '2790-01-01'
         population: 627631120.0
       - date: '2796-04-02'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2800-01-01'
         population: 619691357.0
       - date: '2808-04-10'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2810-01-01'
         population: 614436078.0
       - date: '2820-01-01'
         population: 610671317.0
       - date: '2822-12-10'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2830-01-01'
         population: 604217976.0
       - date: '2840-01-01'
@@ -225,9 +215,7 @@ planet:
         socioIndustrial: D-B-B-B-B
       - date: '2864-12-07'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2870-01-01'
         population: 568350394.0
       - date: '2880-01-01'
@@ -264,11 +252,14 @@ planet:
         population: 560618844.0
       - date: '3025-09-19'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '3026-01-01'
         socioIndustrial: D-C-C-C-B
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 564738655.0
       - date: '3040-01-09'
@@ -276,11 +267,6 @@ planet:
         socioIndustrial:
           source: canon
           value: C-C-B-B-B
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3050-01-01'
         population: 572070975.0
       - date: '3060-01-01'
@@ -291,7 +277,7 @@ planet:
           value: 578225000.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -310,10 +296,8 @@ planet:
         population: 588138854.0
       - date: '3130-12-05'
         faction:
-          source: canon
-          value:
-            - DC
-            - FS
+          - DC
+          - FS
         population: 586729013.0
       - date: '3132-08-07'
         hpg:
@@ -323,9 +307,7 @@ planet:
         population: 587551009.0
       - date: '3145-06-17'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 588256494.0
   - name: Herlev
     type: TERRESTRIAL

@@ -50,9 +50,7 @@ planet:
     event:
       - date: '2666-09-02'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 48470.0
         socioIndustrial: C-D-A-D-D
       - date: '2670-01-01'
@@ -87,9 +85,7 @@ planet:
         hpg: X
       - date: '2779-10-15'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2780-03-02'
         hpg: B
         population: 196151425.0
@@ -145,21 +141,21 @@ planet:
         population: 119904668.0
       - date: '3020-01-01'
         population: 115198176.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 114499802.0
       - date: '3040-10-03'
         population: 115592733.0
         socioIndustrial: B-D-A-D-C
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3050-01-01'
         population: 116521184.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -186,15 +182,11 @@ planet:
         population: 129136901.0
       - date: '3145-12-22'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 130200177.0
       - date: '3151-05-13'
         faction:
-          source: canon
-          value:
-            - VSM
+          - VSM
   - name: Porto di Liabø
     type: TERRESTRIAL
     orbitalDist: 1.44

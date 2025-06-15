@@ -75,9 +75,7 @@ planet:
     event:
       - date: '2711-10-14'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         hpg: B
         population: 57278.0
         socioIndustrial: C-D-B-D-F

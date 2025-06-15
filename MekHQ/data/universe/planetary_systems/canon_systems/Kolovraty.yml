@@ -48,9 +48,7 @@ planet:
     event:
       - date: '2605-08-05'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 52365.0
         socioIndustrial: C-D-C-D-F
       - date: '2608-01-01'
@@ -100,9 +98,7 @@ planet:
         hpg: X
       - date: '2779-08-09'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2780-07-04'
         hpg: B
         population: 306498690.0
@@ -160,24 +156,24 @@ planet:
         population: 85814373.0
       - date: '3028-01-01'
         socioIndustrial: C-F-C-C-B
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 86435468.0
       - date: '3037-01-01'
         socioIndustrial: C-F-C-C-C
       - date: '3040-01-01'
         population: 87164584.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3045-01-01'
         socioIndustrial: B-D-C-B-C
       - date: '3050-01-01'
         population: 88014195.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -198,9 +194,7 @@ planet:
         population: 94452598.0
       - date: '3130-05-16'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 95268393.0
       - date: '3132-08-07'
         hpg: X
@@ -210,9 +204,7 @@ planet:
         population: 96553581.0
       - date: '3151-05-13'
         faction:
-          source: canon
-          value:
-            - VSM
+          - VSM
   - name: Polewik
     type: TERRESTRIAL
     orbitalDist: 1.0

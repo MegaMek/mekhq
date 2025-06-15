@@ -118,9 +118,7 @@ planet:
     event:
       - date: '2193-01-23'
         faction:
-          source: canon
-          value:
-            - CTL
+          - CTL
         population: 53629.0
         socioIndustrial: D-F-B-D-C
       - date: '2200-01-01'
@@ -135,9 +133,7 @@ planet:
         population: 11259356.0
       - date: '2243-08-15'
         faction:
-          source: canon
-          value:
-            - TGU
+          - TGU
       - date: '2250-01-01'
         population: 24619328.0
       - date: '2260-01-01'
@@ -146,9 +142,7 @@ planet:
         population: 89816378.0
       - date: '2271-03-07'
         faction:
-          source: canon
-          value:
-            - CTL
+          - CTL
       - date: '2280-01-01'
         population: 152659446.0
       - date: '2290-01-01'
@@ -159,9 +153,7 @@ planet:
         population: 522054105.0
       - date: '2317-07-05'
         faction:
-          source: canon
-          value:
-            - TGU
+          - TGU
       - date: '2320-01-01'
         population: 715345017.0
       - date: '2330-01-01'
@@ -172,9 +164,7 @@ planet:
         population: 1509561789.0
       - date: '2357-06-28'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2360-01-01'
         population: 1819803062.0
       - date: '2370-01-01'
@@ -324,17 +314,17 @@ planet:
         population:
           source: canon
           value: 4192000000.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3029-01-01'
         socioIndustrial: C-C-C-B-C
       - date: '3030-01-01'
         population: 4299518285.0
       - date: '3040-01-01'
         population: 4507505674.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3041-01-01'
         socioIndustrial:
           source: canon
@@ -345,49 +335,39 @@ planet:
         population: 4975913668.0
       - date: '3063-01-07'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FC
             - LA
       - date: '3063-01-31'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - LA
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3068-04-25'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3070-01-01'
         population: 5158915429.0
       - date: '3077-02-01'
         faction:
-          source: canon
-          value:
-            - FS
-            - WOB
+          - FS
+          - WOB
       - date: '3078-03-03'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '3080-09-28'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
         population: 5207637871.0
       - date: '3081-09-26'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 5246317328.0
       - date: '3100-01-01'
@@ -400,9 +380,7 @@ planet:
         population: 5398528245.0
       - date: '3130-07-19'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 5457148329.0
       - date: '3132-08-07'
         hpg:
@@ -412,9 +390,7 @@ planet:
         population: 5514198820.0
       - date: '3145-09-05'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 5555155243.0
   - name: Dougherty's Grove
     type: TERRESTRIAL

@@ -132,9 +132,7 @@ planet:
     event:
       - date: '2252-05-24'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 48955.0
         socioIndustrial: D-F-A-D-B
       - date: '2260-01-01'
@@ -153,9 +151,7 @@ planet:
         population: 58383420.0
       - date: '2315-05-06'
         faction:
-          source: canon
-          value:
-            - DoL
+          - DoL
       - date: '2320-01-01'
         population: 117559890.0
       - date: '2330-01-01'
@@ -168,7 +164,7 @@ planet:
         population: 836230169.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -219,9 +215,7 @@ planet:
         population: 8383390093.0
       - date: '2571-09-29'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2580-01-01'
         population: 8507721385.0
       - date: '2590-01-01'
@@ -268,9 +262,7 @@ planet:
         population: 9118602107.0
       - date: '2767-01-12'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         hpg:
           source: canon
           value: X
@@ -278,9 +270,7 @@ planet:
         population: 9026486238.0
       - date: '2779-03-22'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-09-14'
         hpg:
           source: canon
@@ -288,14 +278,10 @@ planet:
         population: 8828282295.0
       - date: '2786-02-17'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '2790-12-28'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 8529353954.0
       - date: '2800-01-01'
         population: 8212344236.0
@@ -350,27 +336,22 @@ planet:
         population:
           source: canon
           value: 5918000000.0
-      - date: '3029-11-02'
+      - date: '3029-03-03'
         faction:
-          source: canon
+          source: NAIS 4th SW Atlas Volume 2, p. 16–17
           value:
             - TFR
       - date: '3030-01-01'
         population: 5913387115.0
       - date: '3031-01-01'
         socioIndustrial: B-B-B-C-B
-      - date: '3032-09-07'
+      - date: '3031-09-15'
         faction:
-          source: canon
-          value:
-            - FS
-      - date: '3040-01-01'
-        population: 5933493008.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
+          source: 20 Year Update, p. 12
           value:
             - FC
+      - date: '3040-01-01'
+        population: 5933493008.0
       - date: '3044-01-01'
         socioIndustrial:
           source: canon
@@ -381,13 +362,13 @@ planet:
         population: 5964874405.0
       - date: '3062-11-28'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FC
             - LA
       - date: '3063-03-28'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FC
       - date: '3067-01-01'
@@ -396,28 +377,22 @@ planet:
           value: 5975280350.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
         population: 5974426756.0
       - date: '3072-02-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3077-11-10'
         faction:
-          source: canon
-          value:
-            - Stone
-            - CC
-            - WOB
+          - Stone
+          - CC
+          - WOB
       - date: '3077-11-12'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '3079-01-01'
         population:
           source: canon
@@ -426,9 +401,7 @@ planet:
         population: 5975899037.0
       - date: '3085-03-30'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 5987862795.0
       - date: '3100-01-01'
@@ -447,16 +420,12 @@ planet:
           value: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 6008256177.0
       - date: '3145-02-06'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 6027513392.0
   - name: Merk's Den
     type: DWARF_TERRESTRIAL

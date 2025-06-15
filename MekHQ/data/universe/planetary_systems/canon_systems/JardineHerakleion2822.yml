@@ -101,9 +101,7 @@ planet:
     event:
       - date: '2217-07-20'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 43453.0
         socioIndustrial: D-D-A-D-C
       - date: '2220-01-01'
@@ -124,9 +122,7 @@ planet:
         population: 9805020.0
       - date: '2300-04-22'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 14897796.0
       - date: '2310-01-01'
         population: 21513117.0
@@ -244,9 +240,7 @@ planet:
         population: 317162658.0
       - date: '2821-06-26'
         faction:
-          source: canon
-          value:
-            - CS
+          - CS
       - date: '2830-01-01'
         population: 327803636.0
       - date: '2840-01-12'
@@ -302,24 +296,15 @@ planet:
         population: 308066220.0
       - date: '3057-09-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3060-01-01'
         population: 310913506.0
       - date: '3068-02-24'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
-      - date: '2108-12-05'
-        name: Jardine
-      - date: '2822-01-01'
-        name: Herakleion
-        message: Jardine renamed to Herakleion
   - name: Chernobog
     type: GIANT_TERRESTRIAL
     orbitalDist: 3.92

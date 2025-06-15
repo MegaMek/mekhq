@@ -65,9 +65,7 @@ planet:
     event:
       - date: '2786-05-09'
         faction:
-          source: canon
-          value:
-            - SLIE
+          - SLIE
         population: 1025163.0
         socioIndustrial: B-C-F-C-F
       - date: '2790-05-27'
@@ -79,19 +77,15 @@ planet:
         population: 1031745.0
       - date: '2802-06-11'
         faction:
-          source: canon
-          value:
-            - CB
-            - CBS
+          - CB
+          - CBS
       - date: '2810-01-01'
         population: 571173.0
       - date: '2820-01-01'
         population: 411704.0
       - date: '2824-01-01'
         faction:
-          source: canon
-          value:
-            - CB
+          - CB
       - date: '2830-01-01'
         population: 643337.0
       - date: '2840-01-01'
@@ -142,71 +136,53 @@ planet:
         population: 229519.0
       - date: '3059-02-27'
         faction:
-          source: canon
-          value:
-            - CSA
+          - CSA
       - date: '3060-01-01'
         population: 114244.0
       - date: '3070-01-01'
         population: 40720.0
       - date: '3070-05-01'
         faction:
-          source: canon
-          value:
-            - CBS
-            - CSA
+          - CBS
+          - CSA
       - date: '3070-11-01'
         faction:
-          source: canon
-          value:
-            - CBS
-            - CSA
-            - CCC
+          - CBS
+          - CSA
+          - CCC
       - date: '3072-03-01'
         faction:
-          source: canon
-          value:
-            - CBS
-            - CSA
-            - CCC
-            - CGS
+          - CBS
+          - CSA
+          - CCC
+          - CGS
       - date: '3072-03-18'
         faction:
-          source: canon
-          value:
-            - CBS
-            - CSA
-            - CCC
-            - SOC
+          - CBS
+          - CSA
+          - CCC
+          - SOC
       - date: '3073-04-27'
         faction:
-          source: canon
-          value:
-            - CBS
-            - CSA
-            - CCC
-            - SOC
+          - CBS
+          - CSA
+          - CCC
+          - SOC
       - date: '3073-05-02'
         faction:
-          source: canon
-          value:
-            - CCC
-            - CBS
+          - CCC
+          - CBS
       - date: '3075-12-17'
         faction:
-          source: canon
-          value:
-            - CBS
-            - CCC
-            - CCO
-            - CSA
+          - CBS
+          - CCC
+          - CCO
+          - CSA
       - date: '3079-02-05'
         faction:
-          source: canon
-          value:
-            - CCC
-            - CCO
-            - CSA
+          - CCC
+          - CCO
+          - CSA
         population:
           source: canon
           value: 7300000.0
@@ -214,9 +190,7 @@ planet:
         population: 15632.0
       - date: '3085-07-10'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         population: 0.0
         socioIndustrial: X-X-X-X-X
   - name: P1 Belt
