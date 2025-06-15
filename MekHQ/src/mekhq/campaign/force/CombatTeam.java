@@ -119,25 +119,10 @@ public class CombatTeam {
      * @return The standard force size, at the provided formation level, for the provided faction
      */
     public static int getStandardForceSize(Faction faction, int formationLevelDepth) {
-        int formationSize;
-        if (faction.isClan() || faction.isMarianHegemony()) {
-            formationSize = STAR_SIZE;
-        } else if (faction.isComStarOrWoB()) {
-            formationSize = LEVEL_II_SIZE;
-        } else {
-            formationSize = LANCE_SIZE;
+        int formationSize = faction.getFormationBaseSize();
+        for (int i = 1; i <= formationLevelDepth; i++) {
+            formationSize *= faction.getFormationGrouping();
         }
-
-        if (formationLevelDepth == LANCE.getDepth()) {
-            return formationSize;
-        }
-
-        if (faction.isComStarOrWoB()) {
-            formationSize *= (int) Math.pow(6, formationLevelDepth);
-        } else {
-            formationSize *= (int) Math.pow(3, formationLevelDepth);
-        }
-
         return formationSize;
     }
 

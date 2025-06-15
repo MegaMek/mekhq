@@ -28,12 +28,12 @@
 package mekhq.campaign.universe.selectors.factionSelectors;
 
 import megamek.common.annotations.Nullable;
+import megamek.common.universe.FactionTag;
 import megamek.common.util.weightedMaps.WeightedDoubleMap;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.universe.*;
-import mekhq.campaign.universe.Faction.Tag;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -146,12 +146,12 @@ public class RangedFactionSelector extends AbstractFactionSelector {
             // to affect the 'spread'.
             final double delta = Math.log10(pop) / (1.0 + distance * getOptions().getOriginDistanceScale());
             for (Faction faction : planetarySystem.getFactionSet(now)) {
-                if (faction.is(Tag.ABANDONED) || faction.is(Tag.HIDDEN) || faction.is(Tag.SPECIAL)
+                if (faction.is(FactionTag.ABANDONED) || faction.is(FactionTag.HIDDEN) || faction.is(FactionTag.SPECIAL)
                         || faction.isMercenary()) {
                     continue;
                 }
 
-                if (faction.is(Tag.INACTIVE) && !faction.isComStar()) {
+                if (faction.is(FactionTag.INACTIVE) && !faction.isComStar()) {
                     // Skip INACTIVE factions [excepting ComStar]
                     continue;
                 }
@@ -246,7 +246,7 @@ public class RangedFactionSelector extends AbstractFactionSelector {
             return 0.5;
         } else if (faction.isSmall()) {
             return 0.2;
-        } else if (faction.isRebelOrPirate() || faction.is(Tag.CHAOS) || faction.is(Tag.TRADER)) {
+        } else if (faction.isRebelOrPirate() || faction.is(FactionTag.CHAOS) || faction.is(FactionTag.TRADER)) {
             return 0.05;
         } else if (faction.isClan()) {
             return 0.01;

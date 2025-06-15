@@ -31,13 +31,13 @@ import megamek.codeUtilities.MathUtility;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.EquipmentType;
 import megamek.common.annotations.Nullable;
+import megamek.common.universe.FactionTag;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.universe.*;
-import mekhq.campaign.universe.Faction.Tag;
 import mekhq.campaign.universe.Systems.HPGLink;
 import mekhq.campaign.universe.enums.HPGRating;
 import mekhq.campaign.universe.enums.HiringHallLevel;
@@ -1028,7 +1028,7 @@ public class InterstellarMapPanel extends JPanel {
         }
 
         return factions.stream()
-                .allMatch(faction -> faction.is(Tag.ABANDONED));
+                .allMatch(faction -> faction.is(FactionTag.ABANDONED));
     }
 
     private boolean isSystemVisible(PlanetarySystem system, boolean hideEmpty) {

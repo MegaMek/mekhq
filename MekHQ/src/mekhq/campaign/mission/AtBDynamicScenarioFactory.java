@@ -79,6 +79,7 @@ import megamek.common.enums.SkillLevel;
 import megamek.common.equipment.WeaponMounted;
 import megamek.common.icons.Camouflage;
 import megamek.common.planetaryconditions.Atmosphere;
+import megamek.common.universe.FactionTag;
 import megamek.common.planetaryconditions.Wind;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
@@ -112,7 +113,6 @@ import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Faction.Tag;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.Planet;
@@ -120,7 +120,7 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.UnitGeneratorParameters;
 import mekhq.campaign.universe.enums.EraFlag;
-import mekhq.campaign.universe.enums.HonorRating;
+import megamek.common.universe.HonorRating;
 import mekhq.campaign.universe.factionStanding.BatchallFactions;
 
 /**
@@ -2826,9 +2826,9 @@ public class AtBDynamicScenarioFactory {
               faction.isClan(), extraData);
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        
+
         // Optionally assign a callsign to the unit commander if enabled and skill at or above minimum level
-        if (campaignOptions.isAutoGenerateOpForCallsigns() && 
+        if (campaignOptions.isAutoGenerateOpForCallsigns() &&
                   (skill.equalsOrGreaterThan(campaignOptions.getMinimumCallsignSkillLevel()))) {
             entityCrew.setNickname(RandomCallsignGenerator.getInstance().generate(), 0);
         }
@@ -4634,7 +4634,7 @@ public class AtBDynamicScenarioFactory {
             factionCode = planetFactions.get(0);
             Faction ownerFaction = Factions.getInstance().getFaction(factionCode);
 
-            if (ownerFaction.is(Tag.ABANDONED)) {
+            if (ownerFaction.is(FactionTag.ABANDONED)) {
                 factionCode = "MERC";
             }
         }
