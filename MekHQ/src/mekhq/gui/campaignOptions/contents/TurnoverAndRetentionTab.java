@@ -64,7 +64,7 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
  * </p>
  * <ul>
  *   <li>Unit turnover settings, including retirement, contract durations, payouts, and modifiers.</li>
- *   <li>Administrative strain and management skills impacting unit cohesion.</li>
+ *   <li>HR strain and management skills impacting unit cohesion.</li>
  *   <li>Fatigue mechanics such as fatigue rates, leave thresholds, and injury fatigue.</li>
  * </ul>
  * <p>
@@ -128,12 +128,12 @@ public class TurnoverAndRetentionTab {
 
     private JPanel pnlUnitCohesion;
 
-    private JPanel pnlAdministrativeStrainWrapper;
-    private JCheckBox chkUseAdministrativeStrain;
+    private JPanel pnlHRStrainWrapper;
+    private JCheckBox chkUseHRStrain;
 
-    private JPanel pnlAdministrativeStrain;
-    private JLabel lblAdministrativeCapacity;
-    private JSpinner spnAdministrativeCapacity;
+    private JPanel pnlHRStrain;
+    private JLabel lblHRCapacity;
+    private JSpinner spnHRCapacity;
 
     private JPanel pnlManagementSkillWrapper;
     private JCheckBox chkUseManagementSkill;
@@ -249,12 +249,12 @@ public class TurnoverAndRetentionTab {
 
         pnlUnitCohesion = new JPanel();
 
-        pnlAdministrativeStrainWrapper = new JPanel();
-        chkUseAdministrativeStrain = new JCheckBox();
+        pnlHRStrainWrapper = new JPanel();
+        chkUseHRStrain = new JCheckBox();
 
-        pnlAdministrativeStrain = new JPanel();
-        lblAdministrativeCapacity = new JLabel();
-        spnAdministrativeCapacity = new JSpinner();
+        pnlHRStrain = new JPanel();
+        lblHRCapacity = new JLabel();
+        spnHRCapacity = new JSpinner();
 
         pnlManagementSkillWrapper = new JPanel();
         chkUseManagementSkill = new JCheckBox();
@@ -365,7 +365,7 @@ public class TurnoverAndRetentionTab {
     /**
      * Creates and configures the "Turnover" tab with its relevant components.
      * These include options for turnover control, random retirement, payout settings,
-     * and modifiers for administrative strain and cohesion.
+     * and modifiers for HR Strain and cohesion.
      *
      * @return the {@link JPanel} representing the constructed Turnover tab.
      */
@@ -697,13 +697,13 @@ public class TurnoverAndRetentionTab {
 
     /**
      * Creates the unit cohesion panel for the "Turnover" tab, which includes settings like
-     * administrative strain and management skills.
+     * HR strain and management skills.
      *
      * @return the {@link JPanel} containing unit cohesion settings.
      */
     private JPanel createUnitCohesionPanel() {
         // Contents
-        pnlAdministrativeStrainWrapper = createAdministrativeStrainWrapperPanel();
+        pnlHRStrainWrapper = createHRStrainWrapperPanel();
         pnlManagementSkillWrapper = createManagementSkillWrapperPanel();
 
         // Layout the Panel
@@ -714,7 +714,7 @@ public class TurnoverAndRetentionTab {
         layout.gridy = 0;
         layout.gridx = 0;
         layout.gridwidth = 1;
-        panel.add(pnlAdministrativeStrainWrapper, layout);
+        panel.add(pnlHRStrainWrapper, layout);
 
         layout.gridy++;
         panel.add(pnlManagementSkillWrapper, layout);
@@ -723,57 +723,57 @@ public class TurnoverAndRetentionTab {
     }
 
     /**
-     * Creates the administrative strain wrapper panel. Includes a checkbox to enable
-     * administrative strain and settings for related capacities and behaviors.
+     * Creates the HR strain wrapper panel. Includes a checkbox to enable
+     * HR strain and settings for related capacities and behaviors.
      *
-     * @return the {@link JPanel} for managing administrative strain settings.
+     * @return the {@link JPanel} for managing HR strain settings.
      */
-    private JPanel createAdministrativeStrainWrapperPanel() {
+    private JPanel createHRStrainWrapperPanel() {
         // Contents
-        chkUseAdministrativeStrain = new CampaignOptionsCheckBox("UseAdministrativeStrain");
-        chkUseAdministrativeStrain.addMouseListener(createTipPanelUpdater(turnoverHeader, "UseAdministrativeStrain"));
-        pnlAdministrativeStrain = createAdministrativeStrainPanel();
+        chkUseHRStrain = new CampaignOptionsCheckBox("UseHRStrain");
+        chkUseHRStrain.addMouseListener(createTipPanelUpdater(turnoverHeader, "UseHRStrain"));
+        pnlHRStrain = createHRStrainPanel();
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("AdministrativeStrainPanel");
+        final JPanel panel = new CampaignOptionsStandardPanel("HRStrainPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridy = 0;
         layout.gridx = 0;
         layout.gridwidth = 1;
-        panel.add(chkUseAdministrativeStrain, layout);
+        panel.add(chkUseHRStrain, layout);
 
         layout.gridy++;
-        panel.add(pnlAdministrativeStrain, layout);
+        panel.add(pnlHRStrain, layout);
 
         return panel;
     }
 
     /**
-     * Creates the panel for administrative strain settings, which contains
-     * spinners to adjust administrative capacity and multi-crew strain dividers.
+     * Creates the panel for HR strain settings, which contains
+     * spinners to adjust HR capacity and multi-crew strain dividers.
      *
-     * @return the {@link JPanel} for administrative strain adjustment.
+     * @return the {@link JPanel} for HR strain adjustment.
      */
-    private JPanel createAdministrativeStrainPanel() {
+    private JPanel createHRStrainPanel() {
         // Contents
-        lblAdministrativeCapacity = new CampaignOptionsLabel("AdministrativeCapacity");
-        lblAdministrativeCapacity.addMouseListener(createTipPanelUpdater(turnoverHeader, "AdministrativeCapacity"));
-        spnAdministrativeCapacity = new CampaignOptionsSpinner("AdministrativeCapacity",
+        lblHRCapacity = new CampaignOptionsLabel("HRCapacity");
+        lblHRCapacity.addMouseListener(createTipPanelUpdater(turnoverHeader, "HRCapacity"));
+        spnHRCapacity = new CampaignOptionsSpinner("HRCapacity",
             10, 1, 30, 1);
-        spnAdministrativeCapacity.addMouseListener(createTipPanelUpdater(turnoverHeader, "AdministrativeCapacity"));
+        spnHRCapacity.addMouseListener(createTipPanelUpdater(turnoverHeader, "HRCapacity"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("AdministrativeStrain", true,
-            "AdministrativeStrain");
+        final JPanel panel = new CampaignOptionsStandardPanel("HRStrain", true,
+              "HRStrain");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridy = 0;
         layout.gridx = 0;
         layout.gridwidth = 1;
-        panel.add(lblAdministrativeCapacity, layout);
+        panel.add(lblHRCapacity, layout);
         layout.gridx++;
-        panel.add(spnAdministrativeCapacity, layout);
+        panel.add(spnHRCapacity, layout);
 
         return panel;
     }
@@ -894,8 +894,8 @@ public class TurnoverAndRetentionTab {
         spnPayoutRetirementMultiplier.setValue(options.getPayoutRetirementMultiplier());
         chkUsePayoutServiceBonus.setSelected(options.isUsePayoutServiceBonus());
         spnPayoutServiceBonusRate.setValue(options.getPayoutServiceBonusRate());
-        chkUseAdministrativeStrain.setSelected(options.isUseAdministrativeStrain());
-        spnAdministrativeCapacity.setValue(options.getAdministrativeCapacity());
+        chkUseHRStrain.setSelected(options.isUseHRStrain());
+        spnHRCapacity.setValue(options.getHRCapacity());
         chkUseManagementSkill.setSelected(options.isUseManagementSkill());
         chkUseCommanderLeadershipOnly.setSelected(options.isUseCommanderLeadershipOnly());
         spnManagementSkillPenalty.setValue(options.getManagementSkillPenalty());
@@ -952,8 +952,8 @@ public class TurnoverAndRetentionTab {
         options.setPayoutRetirementMultiplier((int) spnPayoutRetirementMultiplier.getValue());
         options.setUsePayoutServiceBonus(chkUsePayoutServiceBonus.isSelected());
         options.setPayoutServiceBonusRate((int) spnPayoutServiceBonusRate.getValue());
-        options.setUseAdministrativeStrain(chkUseAdministrativeStrain.isSelected());
-        options.setAdministrativeCapacity((int) spnAdministrativeCapacity.getValue());
+        options.setUseHRStrain(chkUseHRStrain.isSelected());
+        options.setHRCapacity((int) spnHRCapacity.getValue());
         options.setUseManagementSkill(chkUseManagementSkill.isSelected());
         options.setUseCommanderLeadershipOnly(chkUseCommanderLeadershipOnly.isSelected());
         options.setManagementSkillPenalty((int) spnManagementSkillPenalty.getValue());

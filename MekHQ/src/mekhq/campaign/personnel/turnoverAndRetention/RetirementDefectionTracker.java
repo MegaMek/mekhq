@@ -208,13 +208,13 @@ public class RetirementDefectionTracker {
                 }
             }
 
-            // Administrative Strain Modifiers
-            if (campaign.getCampaignOptions().isUseAdministrativeStrain()) {
-                int administrativeStrainModifier = getAdministrativeStrainModifier(campaign);
+            // HR Strain Modifiers
+            if (campaign.getCampaignOptions().isUseHRStrain()) {
+                int hrStrainModifier = getHRStrainModifier(campaign);
 
-                if (administrativeStrainModifier > 0) {
-                    targetNumber.addModifier(administrativeStrainModifier,
-                          resources.getString("administrativeStrain.text"));
+                if (hrStrainModifier > 0) {
+                    targetNumber.addModifier(hrStrainModifier,
+                          resources.getString("hrStrain.text"));
                 }
             }
 
@@ -635,16 +635,24 @@ public class RetirementDefectionTracker {
     }
 
     /**
+     * use {@link #getHRStrainModifier(Campaign)} instead
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
+    public static int getAdministrativeStrainModifier(Campaign campaign) {
+        return getHRStrainModifier(campaign);
+    }
+
+    /**
      * This method calculates the combatant strain modifier based on the active personnel assigned to units.
      *
      * @param campaign the campaign for which to calculate the strain modifier
      *
      * @return the strain modifier
      */
-    public static int getAdministrativeStrainModifier(Campaign campaign) {
-        int personnel = getAdministrativeStrain(campaign);
+    public static int getHRStrainModifier(Campaign campaign) {
+        int personnel = getHRStrain(campaign);
 
-        int maximumStrain = campaign.getCampaignOptions().getAdministrativeCapacity() *
+        int maximumStrain = campaign.getCampaignOptions().getHRCapacity() *
                                   getCombinedSkillValues(campaign, SkillType.S_ADMIN);
 
         if (maximumStrain != 0) {
@@ -655,13 +663,21 @@ public class RetirementDefectionTracker {
     }
 
     /**
+     * use {@link #getHRStrain(Campaign)} instead
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
+    public static int getAdministrativeStrain(Campaign campaign) {
+        return getHRStrain(campaign);
+    }
+
+    /**
      * Calculates the administrative strain for a given campaign.
      *
      * @param campaign the campaign for which to calculate the administrative strain
      *
      * @return the total administrative strain of the campaign
      */
-    public static int getAdministrativeStrain(Campaign campaign) {
+    public static int getHRStrain(Campaign campaign) {
         double personnel = 0;
 
         for (Person person : campaign.getActivePersonnel(false)) {

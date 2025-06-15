@@ -32,35 +32,35 @@
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * This test class verifies the functionality of the `hasAdminStrain` method
  * in the `AdminStrainNagLogic` class. The method checks if the given
  * admin strain value is positive.
  */
-public class AdminStrainNagLogicTest {
+public class HRStrainNagLogicTest {
     @Test
-    void testHasAdminStrainWithPositiveValue() {
+    void testHasHRStrainWithPositiveValue() {
         int adminStrain = 10;
-        boolean result = AdminStrainNagLogic.hasAdminStrain(adminStrain);
+        boolean result = HRStrainNagLogic.hasHRStrain(adminStrain);
         assertTrue(result, "Admin strain should be positive and return true.");
     }
 
     @Test
-    void testHasAdminStrainWithZeroValue() {
+    void testHasHRStrainWithZeroValue() {
         int adminStrain = 0;
-        boolean result = AdminStrainNagLogic.hasAdminStrain(adminStrain);
+        boolean result = HRStrainNagLogic.hasHRStrain(adminStrain);
         assertFalse(result, "Admin strain of zero should return false.");
     }
 
     @Test
-    void testHasAdminStrainWithNegativeValue() {
+    void testHasHRStrainWithNegativeValue() {
         int adminStrain = -5;
-        boolean result = AdminStrainNagLogic.hasAdminStrain(adminStrain);
+        boolean result = HRStrainNagLogic.hasHRStrain(adminStrain);
         assertFalse(result, "Admin strain should not be negative; it should return false.");
     }
 }
