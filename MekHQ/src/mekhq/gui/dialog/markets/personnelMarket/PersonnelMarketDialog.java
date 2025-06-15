@@ -46,6 +46,7 @@ import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -61,6 +62,9 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
 import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
@@ -107,12 +111,14 @@ import mekhq.gui.view.PersonViewPanel;
  * @since 0.50.06
  */
 public class PersonnelMarketDialog {
+    private static final MMLogger LOGGER = MMLogger.create(PersonnelMarketDialog.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PersonnelMarket";
 
     private static final int MAXIMUM_DAYS_IN_MONTH = 31;
     private static final int MAXIMUM_NUMBER_OF_SYSTEM_ROLLS = 4;
 
     private final int PADDING = scaleForGUI(5);
+    private final Dimension PERSON_VIEW_MINIMUM_SIZE = scaleForGUI(500, 500);
 
     private final NewPersonnelMarket market;
     private final JFrame parent;
@@ -198,9 +204,9 @@ public class PersonnelMarketDialog {
 
         // Finalize the dialog
         dialog.setModal(true);
-        dialog.pack();
         dialog.setLocationRelativeTo(parent);
-        dialog.setVisible(true);
+        setPreferences(dialog); // Must be before setVisible
+        dialog.setVisible(true); // Should always be last
     }
 
 
@@ -227,7 +233,7 @@ public class PersonnelMarketDialog {
 
         // Golden Hello Checkbox
         leftGbc.gridy = leftRow++;
-        leftGbc.insets = new Insets(0, 0, 8, 0);
+        leftGbc.insets = new Insets(0, 0, PADDING, 0);
         JCheckBox goldenHelloCheckbox = new JCheckBox(getTextAt(RESOURCE_BUNDLE,
               "checkbox.personnelMarket.goldenHello"));
         goldenHelloCheckbox.setSelected(market.isOfferingGoldenHello());
@@ -253,7 +259,7 @@ public class PersonnelMarketDialog {
 
         // Personnel Availability Label (Centered)
         rightGbc.gridy = rightRow++;
-        rightGbc.insets = new Insets(0, 0, 8, 0);
+        rightGbc.insets = new Insets(0, 0, PADDING, 0);
         JLabel availabilityLabel = new JLabel(getTextAt(RESOURCE_BUNDLE, "label.personnelMarket.availability"));
         availabilityLabel.setHorizontalAlignment(SwingConstants.CENTER);
         rightPanel.add(availabilityLabel, rightGbc);
@@ -420,7 +426,7 @@ public class PersonnelMarketDialog {
     private JSplitPane initializePersonView(AtomicReference<Person> selectedPerson, JPanel mainPanel) {
         personViewPanel = new PersonViewPanel(selectedPerson.get(), campaign, campaign.getApp().getCampaigngui());
         JScrollPane viewScrollPane = new JScrollPane(personViewPanel);
-        viewScrollPane.setPreferredSize(scaleForGUI(500, 750));
+        viewScrollPane.setMinimumSize(PERSON_VIEW_MINIMUM_SIZE);
         SwingUtilities.invokeLater(() -> viewScrollPane.getVerticalScrollBar().setValue(0));
 
         JPanel buttonPanel = initializeButtonPanel();
@@ -555,5 +561,18 @@ public class PersonnelMarketDialog {
                   closingBrace);
         }
         return noAvailabilityMessage;
+    }
+
+    /**
+     * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek.
+     */
+    private void setPreferences(JDialog dialog) {
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(PersonnelMarketDialog.class);
+            dialog.setName("PersonnelMarketDialog");
+            preferences.manage(new JWindowPreference(dialog));
+        } catch (Exception ex) {
+            LOGGER.error("Failed to set user preferences", ex);
+        }
     }
 }
