@@ -321,8 +321,8 @@
         <payoutRetirementMultiplier>12</payoutRetirementMultiplier>
         <usePayoutServiceBonus>true</usePayoutServiceBonus>
         <payoutServiceBonusRate>10</payoutServiceBonusRate>
-        <useAdministrativeStrain>true</useAdministrativeStrain>
-        <administrativeStrain>10</administrativeStrain>
+        <UseHRStrain>true</UseHRStrain>
+        <hrStrain>10</hrStrain>
         <multiCrewStrainDivider>5</multiCrewStrainDivider>
         <useManagementSkill>true</useManagementSkill>
         <useCommanderLeadershipOnly>false</useCommanderLeadershipOnly>

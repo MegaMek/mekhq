@@ -32,63 +32,68 @@
  */
 package mekhq.gui.dialog.nagDialogs;
 
-import static mekhq.MHQConstants.NAG_ADMIN_STRAIN;
+import static mekhq.MHQConstants.NAG_HR_STRAIN;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
-import static mekhq.gui.dialog.nagDialogs.nagLogic.AdminStrainNagLogic.hasAdminStrain;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.HRStrainNagLogic.hasHRStrain;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
 
 /**
- * A dialog class used to notify players about administrative strain in their campaign.
+ * A dialog class used to notify players about HR Strain in their campaign.
  *
- * <p>The {@code AdminStrainNagDialog} extends {@link ImmersiveDialogNag} and provides a specialized
- * nag dialog specifically intended to alert players when administrative strain occurs. It utilizes predefined
- * parameters such as the "HR" specialization, the "NAG_ADMIN_STRAIN" constant, and a specific message key to display
+ * <p>The {@code HRStrainNagDialog} extends {@link ImmersiveDialogNag} and provides a specialized
+ * nag dialog specifically intended to alert players when HR Strain occurs. It utilizes predefined
+ * parameters such as the "HR" specialization, the "NAG_HR_STRAIN" constant, and a specific message key to display
  * relevant information to the player.</p>
  */
-public class AdminStrainNagDialog extends ImmersiveDialogNag {
+public class HRStrainNagDialog extends ImmersiveDialogNag {
 
     /**
-     * Constructs a new {@code AdminStrainNagDialog} instance to display the administrative strain nag dialog.
+     * Constructs a new {@code HRStrainNagDialog} instance to display the HR Strain nag dialog.
      *
      * <p>This constructor sets up the nag dialog using predefined parameters specific to administrative
      * strain scenarios. It passes the {@code HR} specialization to highlight administrators relevant to human resources
-     * and uses the {@code NAG_ADMIN_STRAIN} constant for suppression control. The {@code "AdminStrainNagDialog"}
+     * and uses the {@code NAG_HR_STRAIN} constant for suppression control. The {@code "HRStrainNagDialog"}
      * message key is used to retrieve localized message content.</p>
      *
      * @param campaign The {@link Campaign} instance associated with this dialog. Provides access to campaign data and
      *                 settings required for dialog construction.
      */
-    public AdminStrainNagDialog(final Campaign campaign) {
-        super(campaign, HR, NAG_ADMIN_STRAIN, "AdminStrainNagDialog");
+    public HRStrainNagDialog(final Campaign campaign) {
+        super(campaign, HR, NAG_HR_STRAIN, "HRStrainNagDialog");
     }
 
     /**
-     * Determines if the administrative strain nag dialog should be displayed.
+     * Determines if the HR Strain nag dialog should be displayed.
      *
-     * <p>This method evaluates whether a warning about administrative strain should
+     * <p>This method evaluates whether a warning about HR Strain should
      * be shown to the user based on the following conditions:</p>
      * <ul>
      *     <li>Turnover checks are enabled.</li>
-     *     <li>Administrative strain checks are enabled.</li>
-     *     <li>The nag dialog for administrative strain has not been ignored in the user options.</li>
-     *     <li>The campaign's administrative strain level is above 0.</li>
+     *     <li>HR Strain checks are enabled.</li>
+     *     <li>The nag dialog for HR Strain has not been ignored in the user options.</li>
+     *     <li>The campaign's HR Strain level is above 0.</li>
      * </ul>
      *
      * @param isUseTurnover    {@code true} if turnover-based checks are enabled, {@code false} otherwise.
-     * @param isUseAdminStrain {@code true} if administrative strain checks are enabled, {@code false} otherwise.
-     * @param adminStrainLevel The current level of administrative strain in the campaign.
+     * @param isUseHRStrain {@code true} if HR Strain checks are enabled, {@code false} otherwise.
+     * @param hrStrainLevel The current level of HR Strain in the campaign.
      *
-     * @return {@code true} if the administrative strain nag dialog should be displayed; {@code false} otherwise.
+     * @return {@code true} if the HR Strain nag dialog should be displayed; {@code false} otherwise.
      */
-    public static boolean checkNag(boolean isUseTurnover, boolean isUseAdminStrain, int adminStrainLevel) {
-        final String NAG_KEY = NAG_ADMIN_STRAIN;
-
+    public static boolean checkNag(boolean isUseTurnover, boolean isUseHRStrain, int hrStrainLevel) {
         return isUseTurnover &&
-                     isUseAdminStrain &&
-                     !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY) &&
-                     hasAdminStrain(adminStrainLevel);
+                     isUseHRStrain &&
+                     !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_HR_STRAIN) &&
+                     hasHRStrain(hrStrainLevel);
+    }
+
+    @Deprecated(since = "0.50.07", forRemoval = true)
+    public class AdminStrainNagDialog extends HRStrainNagDialog {
+        public AdminStrainNagDialog(Campaign campaign) {
+            super(campaign);
+        }
     }
 }
