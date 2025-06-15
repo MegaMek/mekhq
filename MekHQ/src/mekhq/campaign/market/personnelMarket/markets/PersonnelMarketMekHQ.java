@@ -257,7 +257,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
 
                 int difference = applicantSkill - averageSkillLevel;
                 for (int i = 0; i < difference; i++) {
-                    int interestRoll = Compute.randomInt(4); // TODO make this a campaign option
+                    int interestRoll = Compute.randomInt(5); // TODO make this a campaign option
 
                     if (interestRoll != 0) {
                         notInterested = true;
