@@ -41,7 +41,6 @@ import static mekhq.campaign.CampaignOptions.S_AUTO;
 import static mekhq.campaign.CampaignOptions.S_TECH;
 import static mekhq.campaign.CampaignOptions.TRANSIT_UNIT_MONTH;
 import static mekhq.campaign.CampaignOptions.TRANSIT_UNIT_WEEK;
-import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.force.Force.FORCE_NONE;
 import static mekhq.campaign.force.Force.FORCE_ORIGIN;
@@ -110,7 +109,6 @@ import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.util.PlayerColour;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
-import megamek.common.BombType.BombTypeEnum;
 import megamek.common.ITechnology.AvailabilityValue;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
@@ -195,8 +193,10 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
+import mekhq.campaign.personnel.generator.AbstractSkillGenerator;
 import mekhq.campaign.personnel.generator.AbstractSpecialAbilityGenerator;
 import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
+import mekhq.campaign.personnel.generator.DefaultSkillGenerator;
 import mekhq.campaign.personnel.generator.DefaultSpecialAbilityGenerator;
 import mekhq.campaign.personnel.generator.RandomPortraitGenerator;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
@@ -5342,22 +5342,31 @@ public class Campaign implements ITechManager {
             }
         }
 
-        if (campaignOptions.isShowLifeEventDialogComingOfAge()) {
-            if ((age == 16) && (isBirthday)) {
-                new ComingOfAgeAnnouncement(this, person);
-            }
-        }
-
         if (campaignOptions.isUseAgeEffects() && isBirthday) {
             // This is where we update all the aging modifiers for the character.
             updateAllSkillAgeModifiers(currentDay, person);
             applyAgingSPA(age, person);
         }
 
-        if (campaignOptions.isRewardComingOfAgeAbilities() && isBirthday && (person.getAge(currentDay) == 16)) {
-            SingleSpecialAbilityGenerator singleSpecialAbilityGenerator = new SingleSpecialAbilityGenerator();
-            singleSpecialAbilityGenerator.rollSPA(this, person);
+        // Coming of Age Events
+        if (isBirthday && (person.getAge(currentDay) == 16)) {
+            if (campaignOptions.isRewardComingOfAgeAbilities()) {
+                SingleSpecialAbilityGenerator singleSpecialAbilityGenerator = new SingleSpecialAbilityGenerator();
+                singleSpecialAbilityGenerator.rollSPA(this, person);
+            }
+
+            if (campaignOptions.isRewardComingOfAgeRPSkills()) {
+                AbstractSkillGenerator skillGenerator = new DefaultSkillGenerator(rskillPrefs);
+                skillGenerator.generateRoleplaySkills(person);
+            }
+
+            // We want the event trigger to fire before the dialog is shown, so that the character will have finished
+            // updating in the gui before the player has a chance to jump to them
             MekHQ.triggerEvent(new PersonChangedEvent(person));
+
+            if (campaignOptions.isShowLifeEventDialogComingOfAge()) {
+                new ComingOfAgeAnnouncement(this, person);
+            }
         }
     }
 
