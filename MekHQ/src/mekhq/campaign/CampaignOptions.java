@@ -52,7 +52,6 @@ import java.util.stream.Collectors;
 
 import megamek.Version;
 import megamek.codeUtilities.MathUtility;
-import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
 import megamek.common.enums.SkillLevel;
 import megamek.common.options.GameOptions;
@@ -75,14 +74,13 @@ import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
 import mekhq.campaign.rating.UnitRatingMethod;
+import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
+import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
 import mekhq.service.mrms.MRMSOption;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
-import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 
 /**
  * @author natit
@@ -883,6 +881,7 @@ public class CampaignOptions {
         setRoleBaseSalary(PersonnelRole.ADMINISTRATOR_LOGISTICS, 500);
         setRoleBaseSalary(PersonnelRole.ADMINISTRATOR_TRANSPORT, 500);
         setRoleBaseSalary(PersonnelRole.ADMINISTRATOR_HR, 500);
+        setRoleBaseSalary(PersonnelRole.NOBLE, 2500);
         setRoleBaseSalary(PersonnelRole.DEPENDENT, 50);
         setRoleBaseSalary(PersonnelRole.NONE, 0);
 
