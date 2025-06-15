@@ -277,6 +277,8 @@ public class CampaignOptions {
     // Dependent
     private boolean useRandomDependentAddition;
     private boolean useRandomDependentRemoval;
+    private int dependentProfessionDieSize;
+    private int civilianProfessionDieSize;
 
     // Personnel Removal
     private boolean usePersonnelRemoval;
@@ -833,6 +835,8 @@ public class CampaignOptions {
         // Dependent
         setUseRandomDependentAddition(false);
         setUseRandomDependentRemoval(false);
+        setDependentProfessionDieSize(4);
+        setCivilianProfessionDieSize(2);
 
         // Personnel Removal
         setUsePersonnelRemoval(false);
@@ -2397,6 +2401,22 @@ public class CampaignOptions {
 
     public void setUseRandomDependentRemoval(final boolean useRandomDependentRemoval) {
         this.useRandomDependentRemoval = useRandomDependentRemoval;
+    }
+
+    public int getDependentProfessionDieSize() {
+        return dependentProfessionDieSize;
+    }
+
+    public void setDependentProfessionDieSize(final int dependentProfessionDieSize) {
+        this.dependentProfessionDieSize = dependentProfessionDieSize;
+    }
+
+    public int getCivilianProfessionDieSize() {
+        return civilianProfessionDieSize;
+    }
+
+    public void setCivilianProfessionDieSize(final int civilianProfessionDieSize) {
+        this.civilianProfessionDieSize = civilianProfessionDieSize;
     }
     // endregion Dependent
 
@@ -5062,6 +5082,8 @@ public class CampaignOptions {
         // region Dependent
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomDependentAddition", isUseRandomDependentAddition());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomDependentRemoval", isUseRandomDependentRemoval());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "dependentProfessionDieSize", getDependentProfessionDieSize());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "civilianProfessionDieSize", getCivilianProfessionDieSize());
         // endregion Dependent
 
         // region Personnel Removal
@@ -5911,6 +5933,10 @@ public class CampaignOptions {
                     campaignOptions.setUseRandomDependentAddition(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useRandomDependentRemoval")) {
                     campaignOptions.setUseRandomDependentRemoval(Boolean.parseBoolean(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("dependentProfessionDieSize")) {
+                    campaignOptions.setDependentProfessionDieSize(MathUtility.parseInt(nodeContents, 4));
+                } else if (nodeName.equalsIgnoreCase("civilianProfessionDieSize")) {
+                    campaignOptions.setCivilianProfessionDieSize(MathUtility.parseInt(nodeContents, 2));
                     // endregion Dependent
 
                     // region Personnel Removal

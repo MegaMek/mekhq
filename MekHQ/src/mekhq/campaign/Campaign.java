@@ -1911,7 +1911,7 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Creates a new dependent with given gender, origin faction and origin planet.
+     * Creates a new dependent with the given gender, origin faction, and origin planet.
      *
      * @param gender        The {@link Gender} of the new dependent.
      * @param originFaction The {@link Faction} that represents the origin faction for the new dependent. This can be
@@ -1924,10 +1924,21 @@ public class Campaign implements ITechManager {
     public Person newDependent(Gender gender, @Nullable Faction originFaction, @Nullable Planet originPlanet) {
         PersonnelRole civilianProfession = PersonnelRole.MISCELLANEOUS_JOB;
 
-        if (randomInt(20) == 0) {
-            List<PersonnelRole> civilianRoles = PersonnelRole.getCivilianRolesExceptNone();
-            civilianProfession = ObjectUtility.getRandomItem(civilianRoles);
+        int dependentProfessionDieSize = campaignOptions.getDependentProfessionDieSize();
+        if (dependentProfessionDieSize == 0 || randomInt(dependentProfessionDieSize) == 0) {
+            civilianProfession = PersonnelRole.DEPENDENT;
         }
+
+        int civilianProfessionDieSize = campaignOptions.getCivilianProfessionDieSize();
+        if (civilianProfessionDieSize > 0) { // A value of 0 denotes that this system has been disabled
+            if (randomInt(civilianProfessionDieSize) == 0) {
+                List<PersonnelRole> civilianRoles = PersonnelRole.getCivilianRolesExceptNone();
+                civilianProfession = ObjectUtility.getRandomItem(civilianRoles);
+            }
+        }
+
+        // When a character is generated we include age checks to ensure they're old enough for the profession
+        // chosen, so we don't need to include age-checks here.
 
         return newPerson(civilianProfession,
               PersonnelRole.NONE,

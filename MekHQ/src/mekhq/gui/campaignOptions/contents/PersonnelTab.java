@@ -199,6 +199,10 @@ public class PersonnelTab {
     private JPanel dependentsPanel;
     private JCheckBox chkUseRandomDependentAddition;
     private JCheckBox chkUseRandomDependentRemoval;
+    private JLabel lblDependentProfessionDieSize;
+    private JSpinner spnDependentProfessionDieSize;
+    private JLabel lblCivilianProfessionDieSize;
+    private JSpinner spnCivilianProfessionDieSize;
     //end Prisoners and Dependents Tab
     //end Salaries Tab
 
@@ -239,6 +243,10 @@ public class PersonnelTab {
         dependentsPanel = new JPanel();
         chkUseRandomDependentAddition = new JCheckBox();
         chkUseRandomDependentRemoval = new JCheckBox();
+        lblDependentProfessionDieSize = new JLabel();
+        spnDependentProfessionDieSize = new JSpinner();
+        lblCivilianProfessionDieSize = new JLabel();
+        spnCivilianProfessionDieSize = new JSpinner();
     }
 
     /**
@@ -1050,7 +1058,7 @@ public class PersonnelTab {
         // Header
         prisonersAndDependentsHeader = new CampaignOptionsHeaderPanel("PrisonersAndDependentsTab",
               getImageDirectory() + "logo_illyrian_palatinate.png",
-              2);
+              9);
 
         // Contents
         prisonerPanel = createPrisonersPanel();
@@ -1133,9 +1141,26 @@ public class PersonnelTab {
         chkUseRandomDependentAddition = new CampaignOptionsCheckBox("UseRandomDependentAddition");
         chkUseRandomDependentAddition.addMouseListener(createTipPanelUpdater(prisonersAndDependentsHeader,
               "UseRandomDependentAddition"));
+
         chkUseRandomDependentRemoval = new CampaignOptionsCheckBox("UseRandomDependentRemoval");
         chkUseRandomDependentRemoval.addMouseListener(createTipPanelUpdater(prisonersAndDependentsHeader,
               "UseRandomDependentRemoval"));
+
+        lblDependentProfessionDieSize = new CampaignOptionsLabel("DependentProfessionDieSize");
+        lblDependentProfessionDieSize.addMouseListener(createTipPanelUpdater(prisonersAndDependentsHeader,
+              "DependentProfessionDieSize"));
+        spnDependentProfessionDieSize = new CampaignOptionsSpinner("DependentProfessionDieSize",
+              4, 0, 100, 1);
+        spnDependentProfessionDieSize.addMouseListener(createTipPanelUpdater(prisonersAndDependentsHeader,
+              "DependentProfessionDieSize"));
+
+        lblCivilianProfessionDieSize = new CampaignOptionsLabel("CivilianProfessionDieSize");
+        lblCivilianProfessionDieSize.addMouseListener(createTipPanelUpdater(prisonersAndDependentsHeader,
+              "CivilianProfessionDieSize"));
+        spnCivilianProfessionDieSize = new CampaignOptionsSpinner("CivilianProfessionDieSize",
+              2, 0, 100, 1);
+        spnCivilianProfessionDieSize.addMouseListener(createTipPanelUpdater(prisonersAndDependentsHeader,
+              "CivilianProfessionDieSize"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("DependentsPanel", true, "DependentsPanel");
@@ -1148,6 +1173,17 @@ public class PersonnelTab {
 
         layout.gridy++;
         panel.add(chkUseRandomDependentRemoval, layout);
+
+        layout.gridy++;
+        panel.add(lblDependentProfessionDieSize, layout);
+        layout.gridx++;
+        panel.add(spnDependentProfessionDieSize, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblCivilianProfessionDieSize, layout);
+        layout.gridx++;
+        panel.add(spnCivilianProfessionDieSize, layout);
 
         return panel;
     }
@@ -1308,6 +1344,8 @@ public class PersonnelTab {
         comboPrisonerCaptureStyle.setSelectedItem(options.getPrisonerCaptureStyle());
         chkUseRandomDependentAddition.setSelected(options.isUseRandomDependentAddition());
         chkUseRandomDependentRemoval.setSelected(options.isUseRandomDependentRemoval());
+        spnDependentProfessionDieSize.setValue(options.getDependentProfessionDieSize());
+        spnCivilianProfessionDieSize.setValue(options.getCivilianProfessionDieSize());
     }
 
     /**
@@ -1400,5 +1438,7 @@ public class PersonnelTab {
         }
         options.setUseRandomDependentAddition(chkUseRandomDependentAddition.isSelected());
         options.setUseRandomDependentRemoval(chkUseRandomDependentRemoval.isSelected());
+        options.setDependentProfessionDieSize((int) spnDependentProfessionDieSize.getValue());
+        options.setCivilianProfessionDieSize((int) spnCivilianProfessionDieSize.getValue());
     }
 }

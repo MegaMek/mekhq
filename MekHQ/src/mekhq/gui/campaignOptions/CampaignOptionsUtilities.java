@@ -245,6 +245,25 @@ public class CampaignOptionsUtilities {
         return customWrapSize == null ? 100 : customWrapSize;
     }
 
+    /**
+     * Creates a {@link MouseAdapter} that updates the text of a {@link JLabel} within the specified panel to display a
+     * tip string when the mouse enters a related component.
+     *
+     * <p>
+     * When the mouse enters a component with the specified name, this adapter retrieves a localized tip string
+     * associated with that component. If the tip contains fewer than five HTML line break tags ({@code <br>}), extra
+     * line breaks are appended to ensure a minimum number of lines. The formatted tip is then set as the text of a
+     * {@link JLabel} within the provided panel, specifically targeting labels whose name matches the required pattern.
+     * </p>
+     *
+     * @param associatedHeaderPanel   the {@link JPanel} containing the label to update
+     * @param sourceComponentBaseName the name of the component whose tip string will be shown in the label
+     *
+     * @return a {@link MouseAdapter} instance that updates the label with formatted tip text on mouse enter
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
     public static MouseAdapter createTipPanelUpdater(CampaignOptionsHeaderPanel associatedHeaderPanel,
           @Nullable String sourceComponentBaseName) {
         return createTipPanelUpdater(associatedHeaderPanel, sourceComponentBaseName, null);
@@ -263,6 +282,8 @@ public class CampaignOptionsUtilities {
      *
      * @param associatedHeaderPanel         the {@link JPanel} containing the label to update
      * @param sourceComponentBaseName the name of the component whose tip string will be shown in the label
+     * @param replacementText the specific text to use, or {@code null} if the text should be dynamically fetched
+     *                        from the source component.
      *
      * @return a {@link MouseAdapter} instance that updates the label with formatted tip text on mouse enter
      *
