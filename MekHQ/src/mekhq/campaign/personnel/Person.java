@@ -2785,7 +2785,7 @@ public class Person {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "socialDescriptionIndex", socialDescriptionIndex);
 
             if (personalityQuirk != PersonalityQuirk.NONE) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personalityQuirk", personalityQuirk.ordinal());
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personalityQuirk", personalityQuirk.name());
             }
 
             MHQXMLUtility.writeSimpleXMLTag(pw, indent,
@@ -3277,6 +3277,11 @@ public class Person {
                     person.socialDescriptionIndex = MathUtility.parseInt(wn2.getTextContent());
                 } else if (nodeName.equalsIgnoreCase("personalityQuirk")) {
                     person.personalityQuirk = PersonalityQuirk.fromString(wn2.getTextContent());
+
+                    // < 50.07 compatibility handler
+                    if (person.personalityQuirk == PersonalityQuirk.BROKEN) {
+                        person.personalityQuirk = PersonalityQuirk.HAUNTED;
+                    }
                 } else if (nodeName.equalsIgnoreCase("personalityQuirkDescriptionIndex")) {
                     person.personalityQuirkDescriptionIndex = MathUtility.parseInt(wn2.getTextContent());
                 } else if ((nodeName.equalsIgnoreCase("reasoning"))) {
