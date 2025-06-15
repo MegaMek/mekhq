@@ -50,6 +50,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import megamek.common.Compute;
 import megamek.common.enums.Gender;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -243,7 +244,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         unorderedMarketEntries = sanitizeMarketEntries(unorderedMarketEntries);
         List<PersonnelMarketEntry> orderedMarketEntries = getMarketEntriesAsList(unorderedMarketEntries);
 
-        for (int roll = 0; roll < getRecruitmentRolls(); roll++) {
+        for (int recruitmentRoll = 0; recruitmentRoll < getRecruitmentRolls(); recruitmentRoll++) {
             Person applicant = generateSingleApplicant(unorderedMarketEntries, orderedMarketEntries);
             if (applicant == null) {
                 continue;
@@ -252,8 +253,22 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
             int applicantSkill = applicant.getSkillLevel(getCampaign(), false).getExperienceLevel();
 
             if (applicantSkill > averageSkillLevel) {
-                getLogger().debug("Applicant is too experienced for the campaign, skipping.");
-                continue;
+                boolean notInterested = false;
+
+                int difference = applicantSkill - averageSkillLevel;
+                for (int i = 0; i < difference; i++) {
+                    int interestRoll = Compute.randomInt(4); // TODO make this a campaign option
+
+                    if (interestRoll != 0) {
+                        notInterested = true;
+                        break;
+                    }
+                }
+
+                if (notInterested) {
+                    getLogger().debug("Applicant is too experienced for the campaign, skipping.");
+                    continue;
+                }
             }
 
             addApplicant(applicant);
