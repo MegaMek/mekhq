@@ -106,7 +106,7 @@ import mekhq.gui.view.PersonViewPanel;
  * @author Illiani
  * @since 0.50.06
  */
-public class PersonnelMarketDialog {
+public class PersonnelMarketDialog extends JDialog {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PersonnelMarket";
 
     private static final int MAXIMUM_DAYS_IN_MONTH = 31;
@@ -153,14 +153,11 @@ public class PersonnelMarketDialog {
      * @since 0.50.06
      */
     public void initializeComponents() {
-        JDialog dialog = new JDialog(parent);
-        setDialogTitle(dialog);
-        dialog.addWindowListener(new WindowAdapter() {
+        setDialogTitle();
+        addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                market.setOfferingGoldenHello(goldenHelloCheckbox.isSelected());
-                market.setCurrentApplicants(currentApplicants);
-                dialog.dispose();
+                closeAction();
             }
         });
 
@@ -194,13 +191,28 @@ public class PersonnelMarketDialog {
 
         // This handles the initializing and display of the applicant panel
         JSplitPane splitPane = initializePersonView(selectedPerson, mainPanel);
-        dialog.getContentPane().add(splitPane, BorderLayout.CENTER);
+        getContentPane().add(splitPane, BorderLayout.CENTER);
 
         // Finalize the dialog
-        dialog.setModal(true);
-        dialog.pack();
-        dialog.setLocationRelativeTo(parent);
-        dialog.setVisible(true);
+        setModal(true);
+        pack();
+        setLocationRelativeTo(parent);
+        setVisible(true);
+    }
+
+    /**
+     * Applies the current UI settings to the {@link NewPersonnelMarket} object and closes the dialog.
+     *
+     * <p>This method updates the market's "golden hello" offering status and the list of current applicants based on
+     * the user selections, then disposes of the dialog.</p>
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private void closeAction() {
+        market.setOfferingGoldenHello(goldenHelloCheckbox.isSelected());
+        market.setCurrentApplicants(currentApplicants);
+        dispose();
     }
 
 
@@ -335,6 +347,10 @@ public class PersonnelMarketDialog {
         boolean isGM = campaign.isGM();
 
         JPanel buttonPanel = new JPanel();
+        JButton closeButton = new JButton(getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.close"));
+        closeButton.addActionListener(e -> closeAction());
+        buttonPanel.add(closeButton);
+
         JButton hireButton = new JButton(getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.hire.normal"));
         hireButton.addActionListener(e -> hireActionListener(isGM));
         buttonPanel.add(hireButton);
@@ -480,25 +496,23 @@ public class PersonnelMarketDialog {
     /**
      * Sets the dialog's title based on market and campaign context.
      *
-     * @param dialog the dialog window to set the title on
-     *
      * @author Illiani
      * @since 0.50.06
      */
-    private void setDialogTitle(JDialog dialog) {
+    private void setDialogTitle() {
         Faction campaignFaction = campaign.getFaction();
         if (campaignFaction.isClan()) {
-            dialog.setTitle(getTextAt(RESOURCE_BUNDLE, "title.personnelMarket.clan"));
+            setTitle(getTextAt(RESOURCE_BUNDLE, "title.personnelMarket.clan"));
         } else if (campaignFaction.isComStarOrWoB()) {
             Person commander = campaign.getFlaggedCommander();
             String address = commander != null ? commander.getTitleAndSurname() : campaign.getCommanderAddress(false);
-            dialog.setTitle(getFormattedTextAt(RESOURCE_BUNDLE,
+            setTitle(getFormattedTextAt(RESOURCE_BUNDLE,
                   "title.personnelMarket.comStarOrWoB",
                   address.toUpperCase()));
         } else if (campaignFaction.isMercenary()) {
-            dialog.setTitle(getTextAt(RESOURCE_BUNDLE, "title.personnelMarket.mercenary"));
+            setTitle(getTextAt(RESOURCE_BUNDLE, "title.personnelMarket.mercenary"));
         } else if (campaignFaction.isMercenary()) {
-            dialog.setTitle(getTextAt(RESOURCE_BUNDLE, "title.personnelMarket.normal"));
+            setTitle(getTextAt(RESOURCE_BUNDLE, "title.personnelMarket.normal"));
         }
     }
 
