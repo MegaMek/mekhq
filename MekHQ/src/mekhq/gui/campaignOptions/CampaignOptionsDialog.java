@@ -33,7 +33,6 @@
 package mekhq.gui.campaignOptions;
 
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
-import static mekhq.gui.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CANCELLED;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.Container;
@@ -231,9 +230,10 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
      * current campaign options if a preset is selected and not canceled.
      */
     private void btnLoadActionPerformed() {
-        final SelectPresetDialog presetSelectionDialog = new SelectPresetDialog(null, true, false);
-        if (presetSelectionDialog.getReturnState() != PRESET_SELECTION_CANCELLED) {
-            campaignOptionsPane.applyPreset(presetSelectionDialog.getSelectedPreset());
+        final CampaignOptionsPresetPicker campaignOptionsPresetPicker = new CampaignOptionsPresetPicker(getFrame(),
+              false);
+        if (!campaignOptionsPresetPicker.wasCanceled()) {
+            campaignOptionsPane.applyPreset(campaignOptionsPresetPicker.getSelectedPreset());
         }
     }
 

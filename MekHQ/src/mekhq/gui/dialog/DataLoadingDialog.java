@@ -35,9 +35,6 @@ package mekhq.gui.dialog;
 import static java.util.Arrays.sort;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP_ABRIDGED;
-import static mekhq.gui.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CANCELLED;
-import static mekhq.gui.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CUSTOMIZE;
-import static mekhq.gui.campaignOptions.SelectPresetDialog.PRESET_SELECTION_SELECT;
 import static mekhq.utilities.EntityUtilities.isUnsupportedEntity;
 
 import java.awt.BorderLayout;
@@ -95,7 +92,7 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.baseComponents.AbstractMHQDialogBasic;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
-import mekhq.gui.campaignOptions.SelectPresetDialog;
+import mekhq.gui.campaignOptions.CampaignOptionsPresetPicker;
 
 public class DataLoadingDialog extends AbstractMHQDialogBasic implements PropertyChangeListener {
     private static final MMLogger logger = MMLogger.create(DataLoadingDialog.class);
@@ -327,26 +324,20 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 campaign = new Campaign();
 
                 // Campaign Preset
-                final SelectPresetDialog presetSelectionDialog = new SelectPresetDialog(getFrame(), true, true);
+                final CampaignOptionsPresetPicker campaignOptionsPresetPicker =
+                      new CampaignOptionsPresetPicker(getFrame(), true);
                 CampaignPreset preset;
-                boolean isSelect = false;
+                boolean isSelect;
 
-                switch (presetSelectionDialog.getReturnState()) {
-                    case PRESET_SELECTION_CANCELLED -> {
-                        if (isInAppNewCampaign) {
-                            application.exit(false);
-                        }
-                        return null;
+                if (campaignOptionsPresetPicker.wasCanceled()) {
+                    if (isInAppNewCampaign) {
+                        application.exit(false);
                     }
-                    case PRESET_SELECTION_SELECT -> {
-                        preset = presetSelectionDialog.getSelectedPreset();
-                        isSelect = true;
-                    }
-                    case PRESET_SELECTION_CUSTOMIZE -> preset = presetSelectionDialog.getSelectedPreset();
-                    default -> throw new IllegalStateException(
-                          "Unexpected value in mekhq/gui/dialog/DataLoadingDialog.java/Step 6: " +
-                                presetSelectionDialog.getReturnState());
+                    return null;
                 }
+
+                preset = campaignOptionsPresetPicker.getSelectedPreset();
+                isSelect = campaignOptionsPresetPicker.wasApplied();
 
                 // MegaMek Options
                 if ((preset != null) && (preset.getGameOptions() != null)) {

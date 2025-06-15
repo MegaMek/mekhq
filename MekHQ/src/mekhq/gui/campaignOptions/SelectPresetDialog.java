@@ -57,6 +57,7 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
  * A dialog for selecting campaign presets. Extends {@link JDialog}. Keeps track of the selected preset and return
  * state. Provides options to select a preset, customize a preset, or cancel the operation.
  */
+@Deprecated(since = "0.50.07", forRemoval = true)
 public class SelectPresetDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(SelectPresetDialog.class);
 
