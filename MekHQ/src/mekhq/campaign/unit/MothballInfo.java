@@ -33,10 +33,12 @@ import java.util.List;
 import java.util.UUID;
 
 import megamek.Version;
-import megamek.common.force.Force;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.force.Force;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -63,7 +65,7 @@ public class MothballInfo {
      * Parameterless constructor, used for deserialization.
      */
     private MothballInfo() {
-        forceId = Force.NO_FORCE;
+        forceId = Force.FORCE_NONE;
     }
 
     /**
@@ -168,7 +170,32 @@ public class MothballInfo {
             unit.setNavigator(navigator);
         }
 
-        if (campaign.getForce(forceId) != null) {
+        // Attempt to return the unit to its last force assignment.
+        Force force = campaign.getForce(forceId);
+        if (force != null) {
+            // If the force is deployed to a scenario, back out. We don't want to restore the unit to the original
+            // force as that would cause them to teleport into the scenario. This will likely cause issues, so it's
+            // prohibited.
+            if (force.isDeployed()) {
+                return;
+            }
+
+            // If StratCon is enabled, we need to perform an additional check to ensure the original force isn't
+            // currently deployed to the Area of Operations.
+            boolean isUseStratCon = campaign.getCampaignOptions().isUseStratCon();
+            if (isUseStratCon) {
+                for (AtBContract contract : campaign.getActiveAtBContracts()) {
+                    StratconCampaignState campaignState = contract.getStratconCampaignState();
+
+                    if (campaignState != null) {
+                        if (campaignState.isForceDeployedHere(forceId)) {
+                            return; // If the force is deployed to the AO return without restoring force assignment.
+                        }
+                    }
+                }
+            }
+
+            // If all the checks have passed, restore the unit to its last force
             campaign.addUnitToForce(unit, forceId);
         }
 
