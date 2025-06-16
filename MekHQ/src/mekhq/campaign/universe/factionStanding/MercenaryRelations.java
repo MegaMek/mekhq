@@ -149,7 +149,7 @@ public class MercenaryRelations {
           Map.entry("TC", List.of(
                 // Generally suspicious of mercenaries due to anti-Inner Sphere paranoia (default standing)
                 new MercenaryRelation(NO_STARTING_DATE, LocalDate.of(3058, 8, 1), BELOW_AVERAGE),
-                // Trinity Alliance Period: Cooperation with CC and MoC led to more professional mercenary relations (new default)
+                // Trinity Alliance Period: Cooperation with CC and MoC led to more professional mercenary relations
                 new MercenaryRelation(LocalDate.of(3058, 8, 2), LocalDate.of(3067, 12, 31), AVERAGE),
                 // Generally suspicious of mercenaries due to anti-Inner Sphere paranoia (default standing)
                 new MercenaryRelation(LocalDate.of(3068, 1, 1), NO_ENDING_DATE, BELOW_AVERAGE)
