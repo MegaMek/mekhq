@@ -40,17 +40,9 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Frame;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 
 import megamek.utilities.ImageUtilities;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
@@ -69,10 +61,14 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 public class NewPlayerQuickstartDialog extends JDialog {
     final private String RESOURCE_BUNDLE = "mekhq.resources." + getClass().getSimpleName();
 
-    private static int PADDING = scaleForGUI(10);
-    private static int DIALOG_WIDTH = scaleForGUI(750);
-    private static int IMAGE_WIDTH = scaleForGUI(256);
-    private static String NEW_PLAYER_QUICKSTART_ADDRESS = FORCE_ICON_PATH + "/Units/The Learning Ropes.png";
+    private static final int PADDING = scaleForGUI(10);
+    private static final int DIALOG_WIDTH = scaleForGUI(750);
+    private static final Dimension IN_CHARACTER_TEXT_SIZE = scaleForGUI(750, 250);
+    private static final int IMAGE_WIDTH = scaleForGUI(256);
+    private static final Dimension BUTTON_SIZE = scaleForGUI(100, 30);
+    private static final String NEW_PLAYER_QUICKSTART_ADDRESS = FORCE_ICON_PATH + "/Units/The Learning Ropes.png";
+
+    private boolean wasCanceled = true;
 
     /**
      * Creates a new dialog for providing information about the new player quickstart campaign. The dialog is modal and
@@ -87,11 +83,10 @@ public class NewPlayerQuickstartDialog extends JDialog {
         super(parent, getFormattedTextAt("mekhq.resources.NewPlayerQuickstartDialog",
               "NewPlayerQuickstartDialog.header"), true);
         initComponents();
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setPreferredSize(new Dimension(DIALOG_WIDTH, (int) (getPreferredSize().height * 1.1)));
-        setMinimumSize(new Dimension(DIALOG_WIDTH, (int) (getPreferredSize().height * 1.1)));
         pack();
         setLocationRelativeTo(parent);
-        setResizable(true);
         setVisible(true);
     }
 
@@ -113,64 +108,102 @@ public class NewPlayerQuickstartDialog extends JDialog {
      */
     private void initComponents() {
         setLayout(new BorderLayout(PADDING, PADDING));
-        setResizable(false);
+        buildTopPanel();
+        buildBottomPanel();
+    }
 
-        // Create panel with padding
-        JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
+    private void buildTopPanel() {
+        JPanel topPanel = new JPanel();
+        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
+        topPanel.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
 
-        // Add the unit icon to the top
+        // Add Unit Icon
         ImageIcon icon = new ImageIcon(NEW_PLAYER_QUICKSTART_ADDRESS);
         icon = ImageUtilities.scaleImageIcon(icon, IMAGE_WIDTH, true);
         JLabel imageLabel = new JLabel(icon);
         imageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        mainPanel.add(imageLabel);
-        mainPanel.add(Box.createRigidArea(scaleForGUI(0, PADDING)));
+        topPanel.add(imageLabel);
+        topPanel.add(Box.createRigidArea(scaleForGUI(0, PADDING)));
 
         // Add In Character Text
         JLabel lblTitle = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE, "NewPlayerQuickstartDialog.title"));
         lblTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
         lblTitle.setHorizontalAlignment(SwingConstants.CENTER);
-        mainPanel.add(lblTitle);
+        topPanel.add(lblTitle);
 
         String fontStyle = "font-family: Noto Sans;";
-        JLabel lblInCharacter = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
+        String htmlInCharacter = getFormattedTextAt(RESOURCE_BUNDLE,
               "NewPlayerQuickstartDialog.inCharacter",
               DIALOG_WIDTH,
-              fontStyle));
-        setFontScaling(lblInCharacter, false, 1.1);
-        lblInCharacter.setAlignmentX(Component.CENTER_ALIGNMENT);
-        mainPanel.add(lblInCharacter);
+              fontStyle);
 
-        mainPanel.add(Box.createRigidArea(scaleForGUI(0, PADDING)));
+        JTextPane txtInCharacter = new JTextPane();
+        txtInCharacter.setContentType("text/html");
+        txtInCharacter.setText(htmlInCharacter);
+        txtInCharacter.setEditable(false);
+        txtInCharacter.setOpaque(false);
+        txtInCharacter.setBorder(BorderFactory.createEmptyBorder(0, PADDING, 0, PADDING));
+        setFontScaling(txtInCharacter, false, 1.1);
 
-        // Add Confirm button
+        JScrollPane scrollPaneInCharacter = new JScrollPane(txtInCharacter);
+        scrollPaneInCharacter.setBorder(null);
+        scrollPaneInCharacter.setPreferredSize(IN_CHARACTER_TEXT_SIZE);
+        scrollPaneInCharacter.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        topPanel.add(scrollPaneInCharacter);
+
+        add(topPanel, BorderLayout.CENTER);
+    }
+
+    private void buildBottomPanel() {
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
+        bottomPanel.setBorder(BorderFactory.createEmptyBorder(0, PADDING, 0, PADDING));
+
+        // Buttons
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, PADDING, PADDING));
+
+        RoundedJButton cancelButton = new RoundedJButton(getFormattedTextAt(RESOURCE_BUNDLE,
+              "NewPlayerQuickstartDialog.button.cancel"));
+        cancelButton.setPreferredSize(BUTTON_SIZE);
+        cancelButton.addActionListener(e -> {
+            wasCanceled = true;
+            dispose();
+        });
+        buttonPanel.add(cancelButton);
+
         RoundedJButton confirmButton = new RoundedJButton(getFormattedTextAt(RESOURCE_BUNDLE,
-              "NewPlayerQuickstartDialog.button"));
-        confirmButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        mainPanel.add(confirmButton);
-        mainPanel.add(Box.createRigidArea(scaleForGUI(0, PADDING)));
+              "NewPlayerQuickstartDialog.button.confirm"));
+        confirmButton.setPreferredSize(BUTTON_SIZE);
+        confirmButton.addActionListener(e -> {
+            wasCanceled = false;
+            dispose();
+        });
+        buttonPanel.add(confirmButton);
 
-        // Add OOC Text
+        bottomPanel.add(buttonPanel);
+
+        // OOC label
         JLabel lblOutOfCharacter = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
               "NewPlayerQuickstartDialog.outOfCharacter",
               DIALOG_WIDTH));
         setFontScaling(lblOutOfCharacter, false, 1);
-        lblOutOfCharacter.setBorder(RoundedLineBorder.createRoundedLineBorder());
+        lblOutOfCharacter.setBorder(
+              BorderFactory.createCompoundBorder(
+                    RoundedLineBorder.createRoundedLineBorder(),
+                    BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING)
+              )
+        );
         lblOutOfCharacter.setAlignmentX(Component.CENTER_ALIGNMENT);
-        mainPanel.add(lblOutOfCharacter);
 
-        add(mainPanel, BorderLayout.CENTER);
+        bottomPanel.add(Box.createRigidArea(new Dimension(0, PADDING)));
+        bottomPanel.add(lblOutOfCharacter);
 
-        // Handle dialog closing events
-        confirmButton.addActionListener(e -> dispose());
+        add(bottomPanel, BorderLayout.SOUTH);
+    }
 
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                dispose();
-            }
-        });
+    public boolean wasCanceled() {
+        return wasCanceled;
     }
 }

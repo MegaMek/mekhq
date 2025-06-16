@@ -188,9 +188,11 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         btnNewPlayerQuickstart.addActionListener(evt -> {
             btnNewPlayerQuickstart.setEnabled(false);
 
-            new NewPlayerQuickstartDialog(getFrame());
-
-            startCampaign(newPlayerQuickstartFile);
+            if (!new NewPlayerQuickstartDialog(getFrame()).wasCanceled()) {
+                startCampaign(newPlayerQuickstartFile);
+            } else {
+                btnNewPlayerQuickstart.setEnabled(true);
+            }
         });
 
         MegaMekButton btnLoadStoryArc = new MegaMekButton(resources.getString("btnLoadStoryArc.text"),
