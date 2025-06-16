@@ -587,6 +587,15 @@ public class FactionStandings {
             if (factionHints.isRivalOf(campaignFaction, otherFaction, today)) {
                 climateRegard.put(otherFactionCode, CLIMATE_REGARD_ENEMY_FACTION_RIVAL);
             }
+
+            if (campaignFaction.isMercenary()) {
+                double mercenaryRelationsModifier = MercenaryRelations.getMercenaryRelationsModifier(otherFaction,
+                      today);
+
+                if (mercenaryRelationsModifier != DEFAULT_REGARD) {
+                    climateRegard.put(otherFactionCode, mercenaryRelationsModifier);
+                }
+            }
         }
 
         // If we're not handling any climate modifiers, return an empty string
