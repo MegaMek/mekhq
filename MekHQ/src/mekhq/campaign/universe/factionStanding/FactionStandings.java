@@ -351,6 +351,18 @@ public class FactionStandings {
                     regardChangeReports.add(report);
                 }
             }
+
+            if (campaignFaction.isMercenary()) {
+                double mercenaryRelationsModifier = MercenaryRelations.getMercenaryRelationsModifier(otherFaction,
+                      today);
+
+                if (mercenaryRelationsModifier != DEFAULT_REGARD) {
+                    report = changeRegardForFaction(otherFactionCode, mercenaryRelationsModifier, gameYear);
+                    if (!report.isBlank()) {
+                        regardChangeReports.add(report);
+                    }
+                }
+            }
         }
 
         return regardChangeReports;
