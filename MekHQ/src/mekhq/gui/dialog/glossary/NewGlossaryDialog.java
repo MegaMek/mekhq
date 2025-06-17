@@ -55,7 +55,6 @@ import mekhq.campaign.utilities.glossary.DocumentationEntry;
 import mekhq.campaign.utilities.glossary.GlossaryEntry;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
-import mekhq.gui.dialog.GlossaryDialog;
 
 /**
  * A dialog window for displaying both glossary and documentation entries in MekHQ.
@@ -81,7 +80,7 @@ public class NewGlossaryDialog extends JDialog {
      * @see #handleHyperlinkClick(HyperlinkEvent)
      * @since 0.50.07
      */
-    private static final String GLOSSARY_COMMAND_STRING = "GLOSSARY";
+    static final String GLOSSARY_COMMAND_STRING = "GLOSSARY";
 
     /**
      * The command string prefix used to identify documentation entry hyperlinks.
@@ -92,7 +91,7 @@ public class NewGlossaryDialog extends JDialog {
      * @see #handleHyperlinkClick(HyperlinkEvent)
      * @since 0.50.07
      */
-    private static final String DOCUMENTATION_COMMAND_STRING = "DOCUMENTATION";
+    static final String DOCUMENTATION_COMMAND_STRING = "DOCUMENTATION";
 
     private static final int PADDING = UIUtil.scaleForGUI(10);
     private static final int ABOUT_WIDTH = UIUtil.scaleForGUI(400) - (PADDING * 2);
@@ -102,12 +101,12 @@ public class NewGlossaryDialog extends JDialog {
     /**
      * Glossary term keys sorted by localized title.
      */
-    private final List<String> glossaryEntries = GlossaryEntry.getLookUpNamesSortedByTitle();
+    final static List<String> glossaryEntries = GlossaryEntry.getLookUpNamesSortedByTitle();
 
     /**
      * Documentation keys sorted by localized title.
      */
-    private final List<String> documentationEntries = DocumentationEntry.getLookUpNamesSortedByTitle();
+    private final static List<String> documentationEntries = DocumentationEntry.getLookUpNamesSortedByTitle();
     private int minimumWidth = 0;
 
     /**
@@ -192,7 +191,6 @@ public class NewGlossaryDialog extends JDialog {
 
         JTextPane txtAbout = new JTextPane();
         txtAbout.setContentType("text/html");
-        txtAbout.setText(getTextAt(RESOURCE_BUNDLE, "GlossaryDialog.aboutPane"));
         String fontStyle = "font-family: Noto Sans;";
         txtAbout.setText(String.format("<div style='width: %s; %s'>%s</div>",
               ABOUT_WIDTH, fontStyle, getTextAt(RESOURCE_BUNDLE, "GlossaryDialog.aboutPane")));
@@ -342,19 +340,27 @@ public class NewGlossaryDialog extends JDialog {
      * @author Illiani
      * @since 0.50.07
      */
-    public void handleHyperlinkClick(HyperlinkEvent hyperlinkEvent) {
+    private void handleHyperlinkClick(HyperlinkEvent hyperlinkEvent) {
         if (hyperlinkEvent.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
             String[] splitReference = hyperlinkEvent.getDescription().split(":", 2);
             if (splitReference.length != 2) {
                 LOGGER.warn("Malformed hyperlink: {}", hyperlinkEvent.getDescription());
                 return;
             }
-            String commandKey = splitReference[0];
-            String entryKey = splitReference[1];
+            String command = splitReference[0];
+            String entry = splitReference[1];
 
-            if (commandKey.equalsIgnoreCase(GLOSSARY_COMMAND_STRING)) {
-                new GlossaryDialog(this, entryKey);
-            } else if (commandKey.equalsIgnoreCase(DOCUMENTATION_COMMAND_STRING)) {
+            if (command.equalsIgnoreCase(GLOSSARY_COMMAND_STRING)) {
+                GlossaryEntry glossaryEntry = GlossaryEntry.getGlossaryEntryFromLookUpName(entry);
+
+                if (glossaryEntry == null) {
+                    LOGGER.warn("Glossary entry not found: {}", entry);
+                    return;
+                }
+
+                new NewGlossaryEntryDialog(this, glossaryEntry);
+                //                new GlossaryDialog(this, entryKey);
+            } else if (command.equalsIgnoreCase(DOCUMENTATION_COMMAND_STRING)) {
                 // Handle documentation display
             }
         }

@@ -32,11 +32,11 @@
  */
 package mekhq.campaign.utilities.glossary;
 
-import static mekhq.utilities.MHQInternationalization.getTextAt;
+import megamek.common.annotations.Nullable;
 
 import java.util.List;
 
-import megamek.common.annotations.Nullable;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 /**
  * The {@code GlossaryEntry} enum represents individual glossary entries used within MekHQ.
@@ -150,10 +150,20 @@ public enum GlossaryEntry {
     }
 
     /**
+     * Returns the lookup name for this glossary entry.
+     *
+     * @return the lookup name for this entry
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String getLookUpName() {
+        return lookUpName;
+    }
+
+    /**
      * Returns the localized title for this glossary entry.
      *
      * @return the title string for this entry
-     *
      * @author Illiani
      * @since 0.50.07
      */
