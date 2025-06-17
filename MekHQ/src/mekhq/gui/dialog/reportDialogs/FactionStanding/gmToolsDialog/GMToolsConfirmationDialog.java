@@ -32,24 +32,38 @@
  */
 package mekhq.gui.dialog.reportDialogs.FactionStanding.gmToolsDialog;
 
-import megamek.common.annotations.Nullable;
-import megamek.logging.MMLogger;
-import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
-import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
-import mekhq.gui.dialog.GlossaryDialog;
-
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.HyperlinkEvent;
-import java.awt.*;
-
 import static java.lang.Integer.MAX_VALUE;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
-import static mekhq.utilities.ReportingUtilities.*;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getWarningColor;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
+
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JDialog;
+import javax.swing.JEditorPane;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.HyperlinkEvent;
+
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
+import mekhq.campaign.utilities.glossary.GlossaryEntry;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.gui.dialog.glossary.NewGlossaryEntryDialog;
 
 /**
  * A confirmation dialog for {@link GMTools} actions in MekHQ's Faction Standing system.
@@ -271,7 +285,14 @@ public class GMToolsConfirmationDialog extends JDialog {
         String entryKey = splitReference[1];
 
         if (commandKey.equalsIgnoreCase(GLOSSARY_COMMAND_STRING)) {
-            new GlossaryDialog(this, entryKey);
+            GlossaryEntry glossaryEntry = GlossaryEntry.getGlossaryEntryFromLookUpName(entryKey);
+
+            if (glossaryEntry == null) {
+                LOGGER.warn("Glossary entry not found: {}", entryKey);
+                return;
+            }
+
+            new NewGlossaryEntryDialog(this, glossaryEntry);
         } else {
             LOGGER.warn("Invalid hyperlink command: {}", commandKey);
         }

@@ -62,6 +62,7 @@ import mekhq.gui.panels.TutorialHyperlinkPanel;
  * related glossary entries. If a related term is clicked, a new {@code GlossaryDialog} is opened to show its details.
  * </p>
  */
+@Deprecated(since = "0.50.07", forRemoval = true)
 public class GlossaryDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(GlossaryDialog.class);
 

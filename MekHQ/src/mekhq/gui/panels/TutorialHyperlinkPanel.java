@@ -40,7 +40,9 @@ import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.event.HyperlinkEvent;
 
-import mekhq.gui.dialog.GlossaryDialog;
+import megamek.logging.MMLogger;
+import mekhq.campaign.utilities.glossary.GlossaryEntry;
+import mekhq.gui.dialog.glossary.NewGlossaryEntryDialog;
 
 /**
  * {@code TutorialHyperlinkPanel} is a GUI component for displaying text (typically instructional or tutorial content)
@@ -55,6 +57,7 @@ import mekhq.gui.dialog.GlossaryDialog;
  * @since 0.50.06
  */
 public class TutorialHyperlinkPanel extends JPanel {
+    private static final MMLogger LOGGER = MMLogger.create(TutorialHyperlinkPanel.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.TutorialHyperlinkPanel";
 
     /** Command string key indicating a glossary lookup request in a hyperlink event. */
@@ -95,7 +98,7 @@ public class TutorialHyperlinkPanel extends JPanel {
      * Handles a hyperlink-click event within the tutorial panel.
      *
      * <p>If the hyperlink reference string starts with the {@link #GLOSSARY_COMMAND_STRING} command, it opens a
-     * {@link GlossaryDialog} with the provided entry key.</p>
+     * {@link NewGlossaryEntryDialog} with the provided entry key.</p>
      *
      * <p>The reference is expected to be in the form {@code "COMMAND:entryKey"}.</p>
      *
@@ -114,7 +117,14 @@ public class TutorialHyperlinkPanel extends JPanel {
         String entryKey = splitReference[1];
 
         if (commandKey.equalsIgnoreCase(GLOSSARY_COMMAND_STRING)) {
-            new GlossaryDialog(parent, entryKey);
+            GlossaryEntry glossaryEntry = GlossaryEntry.getGlossaryEntryFromLookUpName(entryKey);
+
+            if (glossaryEntry == null) {
+                LOGGER.warn("Glossary entry not found: {}", entryKey);
+                return;
+            }
+
+            new NewGlossaryEntryDialog(parent, glossaryEntry);
         }
     }
 }

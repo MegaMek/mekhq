@@ -32,28 +32,40 @@
  */
 package mekhq.gui.dialog.reportDialogs.FactionStanding.gmToolsDialog;
 
-import megamek.logging.MMLogger;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.factionStanding.FactionStandings;
-import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
-import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
-import mekhq.gui.dialog.GlossaryDialog;
-import mekhq.gui.dialog.reportDialogs.FactionStanding.manualMissionDialogs.StandingUpdateConfirmationDialog;
-
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.HyperlinkEvent;
-import java.awt.*;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-
 import static java.lang.Integer.MAX_VALUE;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
+
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JDialog;
+import javax.swing.JEditorPane;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.HyperlinkEvent;
+
+import megamek.logging.MMLogger;
+import mekhq.campaign.mission.Mission;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
+import mekhq.campaign.utilities.glossary.GlossaryEntry;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.gui.dialog.glossary.NewGlossaryEntryDialog;
+import mekhq.gui.dialog.reportDialogs.FactionStanding.manualMissionDialogs.StandingUpdateConfirmationDialog;
 
 /**
  * GMTools allows Game Masters to adjust Faction Standings through various operations. These operations include zeroing
@@ -376,7 +388,14 @@ public class GMTools extends JDialog {
         String entryKey = splitReference[1];
 
         if (commandKey.equalsIgnoreCase(GLOSSARY_COMMAND_STRING)) {
-            new GlossaryDialog(this, entryKey);
+            GlossaryEntry glossaryEntry = GlossaryEntry.getGlossaryEntryFromLookUpName(entryKey);
+
+            if (glossaryEntry == null) {
+                LOGGER.warn("Glossary entry not found: {}", entryKey);
+                return;
+            }
+
+            new NewGlossaryEntryDialog(this, glossaryEntry);
         } else {
             LOGGER.warn("Invalid hyperlink command: {}", commandKey);
         }

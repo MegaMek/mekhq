@@ -67,9 +67,10 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
+import mekhq.campaign.utilities.glossary.GlossaryEntry;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
-import mekhq.gui.dialog.GlossaryDialog;
+import mekhq.gui.dialog.glossary.NewGlossaryEntryDialog;
 
 /**
  * This class is used to update Faction Standings when campaign options change.
@@ -336,7 +337,14 @@ public class CampaignOptionsChangedConfirmationDialog extends JDialog {
         String entryKey = splitReference[1];
 
         if (commandKey.equalsIgnoreCase(GLOSSARY_COMMAND_STRING)) {
-            new GlossaryDialog(this, entryKey);
+            GlossaryEntry glossaryEntry = GlossaryEntry.getGlossaryEntryFromLookUpName(entryKey);
+
+            if (glossaryEntry == null) {
+                LOGGER.warn("Glossary entry not found: {}", entryKey);
+                return;
+            }
+
+            new NewGlossaryEntryDialog(this, glossaryEntry);
         } else {
             LOGGER.warn("Invalid hyperlink command: {}", commandKey);
         }

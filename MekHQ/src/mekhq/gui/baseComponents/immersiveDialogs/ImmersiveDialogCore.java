@@ -73,10 +73,11 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Factions;
+import mekhq.campaign.utilities.glossary.GlossaryEntry;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
-import mekhq.gui.dialog.GlossaryDialog;
+import mekhq.gui.dialog.glossary.NewGlossaryEntryDialog;
 
 /**
  * An immersive dialog used in MekHQ to display interactions between speakers, messages, and actions. The dialog
@@ -114,7 +115,7 @@ public class ImmersiveDialogCore extends JDialog {
 
     private int dialogChoice = 0;
 
-    private static final MMLogger logger = MMLogger.create(ImmersiveDialogCore.class);
+    private static final MMLogger LOGGER = MMLogger.create(ImmersiveDialogCore.class);
 
     /**
      * Retrieves the user's selected dialog choice.
@@ -397,7 +398,7 @@ public class ImmersiveDialogCore extends JDialog {
      *
      * <b>Supported Commands:</b>
      * <ul>
-     *   <li>{@code GLOSSARY_COMMAND_STRING}: Opens a new {@link GlossaryDialog} to display the
+     *   <li>{@code GLOSSARY_COMMAND_STRING}: Opens a new {@link NewGlossaryEntryDialog} to display the
      *   referenced glossary entry.</li>
      *   <li>{@code PERSON_COMMAND_STRING}: Focuses on a specific person in the campaign using
      *   their unique identifier (UUID). If using this, you will need to ensure your dialog has
@@ -422,7 +423,14 @@ public class ImmersiveDialogCore extends JDialog {
         CampaignGUI campaignGUI = campaign.getApp().getCampaigngui();
 
         if (commandKey.equalsIgnoreCase(GLOSSARY_COMMAND_STRING)) {
-            new GlossaryDialog(parent, entryKey);
+            GlossaryEntry glossaryEntry = GlossaryEntry.getGlossaryEntryFromLookUpName(entryKey);
+
+            if (glossaryEntry == null) {
+                LOGGER.warn("Glossary entry not found: {}", entryKey);
+                return;
+            }
+
+            new NewGlossaryEntryDialog(parent, glossaryEntry);
         } else if (commandKey.equalsIgnoreCase(PERSON_COMMAND_STRING)) {
             final UUID id = UUID.fromString(reference.split(":")[1]);
             campaignGUI.focusOnPerson(id);
@@ -431,14 +439,14 @@ public class ImmersiveDialogCore extends JDialog {
                 final int targetId = MathUtility.parseInt(entryKey, -1);
                 campaignGUI.focusOnMission(targetId);
             } catch (Exception e) {
-                logger.error("Failed to parse mission ID: " + entryKey, e);
+                LOGGER.error("Failed to parse mission ID: {}", entryKey, e);
             }
         } else if (commandKey.equalsIgnoreCase(SCENARIO_COMMAND_STRING)) {
             try {
                 final int targetId = MathUtility.parseInt(entryKey, -1);
                 campaignGUI.focusOnScenario(targetId);
             } catch (Exception e) {
-                logger.error("Failed to parse scenario ID: " + entryKey, e);
+                LOGGER.error("Failed to parse scenario ID: {}", entryKey, e);
             }
         }
     }
