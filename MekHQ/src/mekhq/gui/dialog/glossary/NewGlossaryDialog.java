@@ -128,7 +128,6 @@ public class NewGlossaryDialog extends JDialog {
         add(pnlContents, BorderLayout.EAST);
 
         setMinimumSize(new Dimension(minimumWidth, DEFAULT_DIALOG_HEIGHT));
-        setMaximumSize(new Dimension(minimumWidth, Integer.MAX_VALUE));
         setPreferences(); // Must be before setVisible
         setLocationRelativeTo(parent);
 
@@ -212,6 +211,8 @@ public class NewGlossaryDialog extends JDialog {
 
         JScrollPane scrollAbout = new JScrollPane(aboutPanel);
         scrollAbout.setBorder(RoundedLineBorder.createRoundedLineBorder());
+        scrollAbout.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollAbout.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 
         JButton btnClose = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "GlossaryDialog.button.close"));
         btnClose.setPreferredSize(BUTTON_SIZE);
@@ -343,8 +344,11 @@ public class NewGlossaryDialog extends JDialog {
      */
     public void handleHyperlinkClick(HyperlinkEvent hyperlinkEvent) {
         if (hyperlinkEvent.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-            String[] splitReference = hyperlinkEvent.getDescription().split(":");
-
+            String[] splitReference = hyperlinkEvent.getDescription().split(":", 2);
+            if (splitReference.length != 2) {
+                LOGGER.warn("Malformed hyperlink: {}", hyperlinkEvent.getDescription());
+                return;
+            }
             String commandKey = splitReference[0];
             String entryKey = splitReference[1];
 
