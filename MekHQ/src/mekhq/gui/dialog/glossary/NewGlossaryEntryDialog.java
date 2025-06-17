@@ -56,7 +56,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 /**
  * Dialog for displaying {@link GlossaryEntry} details in a tabbed interface, along with a contents pane listing all
  * available entries. Each entry can display formatted HTML and supports clickable links to navigate between glossary
- * terms. Faction logos are randomly selected and displayed alongside glossary entries.</p>
+ * terms. Faction logos are randomly selected and displayed alongside glossary entries.
  *
  * @author Illiani
  * @since 0.50.07
