@@ -239,6 +239,10 @@ public class NewGlossaryEntryDialog extends JDialog {
         txtDefinition.setBorder(null);
         txtDefinition.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
         txtDefinition.setCaretPosition(0);
+        txtDefinition.setMaximumSize(new Dimension(TEXT_WIDTH, Integer.MAX_VALUE));
+        txtDefinition.setPreferredSize(new Dimension(TEXT_WIDTH, txtDefinition.getPreferredSize().height));
+        txtDefinition.setAlignmentX(Component.CENTER_ALIGNMENT);
+
         txtDefinition.addHyperlinkListener(this::handleHyperlinkClick);
 
         // Create a panel to hold both image and text, then put that in the scroll pane
