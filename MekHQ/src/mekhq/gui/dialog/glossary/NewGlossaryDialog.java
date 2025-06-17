@@ -358,9 +358,10 @@ public class NewGlossaryDialog extends JDialog {
                     return;
                 }
 
+                dispose(); // Get rid of the main dialog
                 new NewGlossaryEntryDialog(this, glossaryEntry);
-                //                new GlossaryDialog(this, entryKey);
             } else if (command.equalsIgnoreCase(DOCUMENTATION_COMMAND_STRING)) {
+                dispose(); // Get rid of the main dialog
                 // Handle documentation display
             }
         }
