@@ -126,10 +126,9 @@ public class PersonnelMarketDialog extends JDialog {
     private final Campaign campaign;
     private final CampaignOptions campaignOptions;
 
-    private List<Person> currentApplicants;
+    private final List<Person> currentApplicants;
     private MMComboBox<PersonnelFilter> roleComboBox = new MMComboBox<>("roleFilter");
-    private JCheckBox goldenHelloCheckbox = new JCheckBox();
-    private Person selectedPerson;
+    private final JCheckBox goldenHelloCheckbox = new JCheckBox();
     private PersonnelTablePanel tablePanel;
     private PersonViewPanel personViewPanel;
 
@@ -197,7 +196,7 @@ public class PersonnelMarketDialog extends JDialog {
         setModal(true);
         pack();
         setLocationRelativeTo(parent);
-        setPreferences(dialog); // Must be before setVisible
+        setPreferences(this); // Must be before setVisible
         setVisible(true); // Should always be last
     }
 
