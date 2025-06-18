@@ -175,13 +175,6 @@ public class PersonnelMarketDialog {
         pnlLeft.add(pnlHeader, BorderLayout.NORTH);
 
         tablePanel = initializeTablePanel();
-        tablePanel.addListSelectionListener(e -> {
-            List<Person> applicants = tablePanel.getSelectedApplicants();
-            selectedPerson = applicants.isEmpty() ? null : applicants.get(0);
-            if (personViewPanel != null) {
-                personViewPanel.setPerson(selectedPerson);
-            }
-        });
         pnlLeft.add(tablePanel, BorderLayout.CENTER);
 
         JPanel pnlTips = initializeTipPanel();
@@ -379,6 +372,16 @@ public class PersonnelMarketDialog {
         PersonnelTablePanel tablePanel = new PersonnelTablePanel(campaign, currentApplicants);
 
         JTable personnelTable = tablePanel.getTable();
+        personnelTable.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                SwingUtilities.invokeLater(() -> {
+                    List<Person> selected = tablePanel.getSelectedApplicants();
+                    Person selectedPerson = selected.isEmpty() ? null : selected.get(0);
+                    personViewPanel.setPerson(selectedPerson);
+                });
+            }
+        });
+
         if (personnelTable.getRowSorter() instanceof TableRowSorter<?> sorter) {
             filterRoles(sorter);
             roleComboBox.addActionListener(ev -> filterRoles(sorter));
