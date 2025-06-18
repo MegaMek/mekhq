@@ -1283,6 +1283,16 @@ public class CampaignOptions {
         setScenarioModBV(50);
         autoGenerateOpForCallsigns = true;
         minimumCallsignSkillLevel = SkillLevel.VETERAN;
+        useFactionStandingNegotiation = true;
+        useFactionStandingResupply = true;
+        useFactionStandingCommandCircuit = true;
+        useFactionStandingOutlawed = true;
+        useFactionStandingBatchallRestrictions = true;
+        useFactionStandingRecruitment = true;
+        useFactionStandingBarracksCosts = true;
+        useFactionStandingUnitMarket = true;
+        useFactionStandingContractPay = true;
+        useFactionStandingSupportPoints = true;
         // endregion Against the Bot Tab
     }
     // endregion Constructors
@@ -6877,80 +6887,275 @@ public class CampaignOptions {
         this.autoResolveExperimentalPacarGuiEnabled = autoResolveExperimentalPacarGuiEnabled;
     }
 
+    /**
+     * Determines if faction standing negotiation is enabled.
+     *
+     * <p><b>Usage:</b> for most use cases you will want to use {@link #isUseFactionStandingNegotiationSafe()} as
+     * that also verifies that Faction Standing is enabled.</p>
+     *
+     * @return {@code true} if faction standing negotiation is enabled, {@code false} otherwise.
+     */
     public boolean isUseFactionStandingNegotiation() {
         return useFactionStandingNegotiation;
     }
 
+    /**
+     * Checks whether tracking faction standing is enabled and if the use of faction standing negotiation is active.
+     *
+     * @return {@code true} if both faction standing tracking and faction standing negotiation usage are enabled;
+     *       {@code false} otherwise.
+     */
+    public boolean isUseFactionStandingNegotiationSafe() {
+        return trackFactionStanding && useFactionStandingNegotiation;
+    }
+
+    /**
+     * Sets whether the system should use faction standing negotiation.
+     *
+     * @param useFactionStandingNegotiation a boolean indicating if faction standing negotiation should be enabled
+     *                                      (true) or disabled (false)
+     */
     public void setUseFactionStandingNegotiation(boolean useFactionStandingNegotiation) {
         this.useFactionStandingNegotiation = useFactionStandingNegotiation;
     }
 
+    /**
+     * Determines if faction standing resupply modifiers is enabled.
+     *
+     * <p><b>Usage:</b> for most use cases you will want to use {@link #isUseFactionStandingResupplySafe()} as
+     * that also verifies that Faction Standing is enabled.</p>
+     *
+     * @return {@code true} if faction standing resupply modifiers is enabled, {@code false} otherwise.
+     */
     public boolean isUseFactionStandingResupply() {
         return useFactionStandingResupply;
+    }
+
+    /**
+     * Checks whether tracking faction standing is enabled and if the use of faction standing resupply modifiers is
+     * active.
+     *
+     * @return {@code true} if both faction standing tracking and faction standing resupply modifier usage are enabled;
+     *       {@code false} otherwise.
+     */
+    public boolean isUseFactionStandingResupplySafe() {
+        return trackFactionStanding && useFactionStandingResupply;
     }
 
     public void setUseFactionStandingResupply(boolean useFactionStandingResupply) {
         this.useFactionStandingResupply = useFactionStandingResupply;
     }
 
+    /**
+     * Determines if faction standing command circuit access is enabled.
+     *
+     * <p><b>Usage:</b> for most use cases you will want to use {@link #isUseFactionStandingCommandCircuitSafe()} as
+     * that also verifies that Faction Standing is enabled.</p>
+     *
+     * @return {@code true} if faction standing command circuit access is enabled, {@code false} otherwise.
+     */
     public boolean isUseFactionStandingCommandCircuit() {
         return useFactionStandingCommandCircuit;
+    }
+
+    /**
+     * Checks whether tracking faction standing is enabled and if the use of faction standing command circuits are
+     * active.
+     *
+     * @return {@code true} if both faction standing tracking and faction standing command circuit
+     *         usage are enabled; {@code false} otherwise.
+     */
+    public boolean isUseFactionStandingCommandCircuitSafe() {
+        return trackFactionStanding && useFactionStandingCommandCircuit;
     }
 
     public void setUseFactionStandingCommandCircuit(boolean useFactionStandingCommandCircuit) {
         this.useFactionStandingCommandCircuit = useFactionStandingCommandCircuit;
     }
 
+    /**
+     * Determines if faction standing outlawing is enabled.
+     *
+     * <p><b>Usage:</b> for most use cases you will want to use {@link #isUseFactionStandingOutlawedSafe()} as
+     * that also verifies that Faction Standing is enabled.</p>
+     *
+     * @return {@code true} if faction standing outlawing is enabled, {@code false} otherwise.
+     */
     public boolean isUseFactionStandingOutlawed() {
         return useFactionStandingOutlawed;
+    }
+
+    /**
+     * Checks whether tracking faction standing is enabled and if the use of faction standing outlawing is
+     * active.
+     *
+     * @return {@code true} if both faction standing tracking and faction standing outlaw
+     *         usage are enabled; {@code false} otherwise.
+     */
+    public boolean isUseFactionStandingOutlawedSafe() {
+        return trackFactionStanding && useFactionStandingOutlawed;
     }
 
     public void setUseFactionStandingOutlawed(boolean useFactionStandingOutlawed) {
         this.useFactionStandingOutlawed = useFactionStandingOutlawed;
     }
 
+    /**
+     * Determines if faction standing batchall restriction is enabled.
+     *
+     * <p><b>Usage:</b> for most use cases you will want to use {@link #isUseFactionStandingBatchallRestrictionsSafe()} as
+     * that also verifies that Faction Standing is enabled.</p>
+     *
+     * @return {@code true} if faction standing batchall restriction is enabled, {@code false} otherwise.
+     */
     public boolean isUseFactionStandingBatchallRestrictions() {
         return useFactionStandingBatchallRestrictions;
+    }
+
+    /**
+     * Checks whether tracking faction standing is enabled and if the use of faction standing batchall restrictions are
+     * active.
+     *
+     * @return {@code true} if both faction standing tracking and faction standing batchall restrictions
+     *         usage are enabled; {@code false} otherwise.
+     */
+    public boolean isUseFactionStandingBatchallRestrictionsSafe() {
+        return trackFactionStanding && useFactionStandingBatchallRestrictions;
     }
 
     public void setUseFactionStandingBatchallRestrictions(boolean useFactionStandingBatchallRestrictions) {
         this.useFactionStandingBatchallRestrictions = useFactionStandingBatchallRestrictions;
     }
 
+    /**
+     * Determines if faction standing recruitment modifiers is enabled.
+     *
+     * <p><b>Usage:</b> for most use cases you will want to use {@link #isUseFactionStandingRecruitmentSafe()} as
+     * that also verifies that Faction Standing is enabled.</p>
+     *
+     * @return {@code true} if faction standing recruitment modifiers is enabled, {@code false} otherwise.
+     */
     public boolean isUseFactionStandingRecruitment() {
         return useFactionStandingRecruitment;
+    }
+
+    /**
+     * Checks whether tracking faction standing is enabled and if the use of faction standing recruitment modifiers is
+     * active.
+     *
+     * @return {@code true} if both faction standing tracking and faction standing recruitment modifier
+     *         usage are enabled; {@code false} otherwise.
+     */
+    public boolean isUseFactionStandingRecruitmentSafe() {
+        return trackFactionStanding && useFactionStandingRecruitment;
     }
 
     public void setUseFactionStandingRecruitment(boolean useFactionStandingRecruitment) {
         this.useFactionStandingRecruitment = useFactionStandingRecruitment;
     }
 
+    /**
+     * Determines if faction standing barrack costs is enabled.
+     *
+     * <p><b>Usage:</b> for most use cases you will want to use {@link #isUseFactionStandingBarracksCostsSafe()} as
+     * that also verifies that Faction Standing is enabled.</p>
+     *
+     * @return {@code true} if faction standing barrack costs is enabled, {@code false} otherwise.
+     */
     public boolean isUseFactionStandingBarracksCosts() {
         return useFactionStandingBarracksCosts;
+    }
+
+    /**
+     * Checks whether tracking faction standing is enabled and if the use of faction standing barrack cost modifiers is
+     * active.
+     *
+     * @return {@code true} if both faction standing tracking and faction standing barrack cost modifier
+     *         usage are enabled; {@code false} otherwise.
+     */
+    public boolean isUseFactionStandingBarracksCostsSafe() {
+        return trackFactionStanding && useFactionStandingBarracksCosts;
     }
 
     public void setUseFactionStandingBarracksCosts(boolean useFactionStandingBarracksCosts) {
         this.useFactionStandingBarracksCosts = useFactionStandingBarracksCosts;
     }
 
+    /**
+     * Determines if faction standing unit market modifiers is enabled.
+     *
+     * <p><b>Usage:</b> for most use cases you will want to use {@link #isUseFactionStandingUnitMarketSafe()} as
+     * that also verifies that Faction Standing is enabled.</p>
+     *
+     * @return {@code true} if faction standing unit market modifiers is enabled, {@code false} otherwise.
+     */
     public boolean isUseFactionStandingUnitMarket() {
         return useFactionStandingUnitMarket;
+    }
+
+    /**
+     * Checks whether tracking faction standing is enabled and if the use of faction standing unit market modifiers is
+     * active.
+     *
+     * @return {@code true} if both faction standing tracking and faction standing unit market modifier
+     *         usage are enabled; {@code false} otherwise.
+     */
+    public boolean isUseFactionStandingUnitMarketSafe() {
+        return trackFactionStanding && useFactionStandingUnitMarket;
     }
 
     public void setUseFactionStandingUnitMarket(boolean useFactionStandingUnitMarket) {
         this.useFactionStandingUnitMarket = useFactionStandingUnitMarket;
     }
 
+    /**
+     * Determines if faction standing contract pay is enabled.
+     *
+     * <p><b>Usage:</b> for most use cases you will want to use {@link #isUseFactionStandingContractPaySafe()} as
+     * that also verifies that Faction Standing is enabled.</p>
+     *
+     * @return {@code true} if faction standing contract pay is enabled, {@code false} otherwise.
+     */
     public boolean isUseFactionStandingContractPay() {
         return useFactionStandingContractPay;
+    }
+
+    /**
+     * Checks whether tracking faction standing is enabled and if the use of faction standing contract payment modifiers
+     * is active.
+     *
+     * @return {@code true} if both faction standing tracking and faction standing contract pay modifier
+     *         usage are enabled; {@code false} otherwise.
+     */
+    public boolean isUseFactionStandingContractPaySafe() {
+        return trackFactionStanding && useFactionStandingContractPay;
     }
 
     public void setUseFactionStandingContractPay(boolean useFactionStandingContractPay) {
         this.useFactionStandingContractPay = useFactionStandingContractPay;
     }
 
+    /**
+     * Determines if faction standing support points is enabled.
+     *
+     * <p><b>Usage:</b> for most use cases you will want to use {@link #isUseFactionStandingSupportPointsSafe()} as
+     * that also verifies that Faction Standing is enabled.</p>
+     *
+     * @return {@code true} if faction standing support points is enabled, {@code false} otherwise.
+     */
     public boolean isUseFactionStandingSupportPoints() {
         return useFactionStandingSupportPoints;
+    }
+
+    /**
+     * Checks whether tracking faction standing is enabled and if the use of faction standing support point modifiers
+     * is active.
+     *
+     * @return {@code true} if both faction standing tracking and faction standing resupply modifier
+     *         usage are enabled; {@code false} otherwise.
+     */
+    public boolean isUseFactionStandingSupportPointsSafe() {
+        return trackFactionStanding && useFactionStandingSupportPoints;
     }
 
     public void setUseFactionStandingSupportPoints(boolean useFactionStandingSupportPoints) {
