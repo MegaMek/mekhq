@@ -87,6 +87,7 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.Option;
 import megamek.common.options.OptionsConstants;
+import megamek.common.universe.FactionTag;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -107,7 +108,6 @@ import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.campaign.randomEvents.personalities.enums.Social;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Faction.Tag;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -1269,7 +1269,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             if (faction.equals(person.getOriginFaction())) {
                 factionsModel.addElement(faction);
             } else {
-                if (faction.is(Tag.HIDDEN) || faction.is(Tag.SPECIAL)) {
+                if (faction.is(FactionTag.HIDDEN) || faction.is(FactionTag.SPECIAL)) {
                     continue;
                 }
 

@@ -446,8 +446,8 @@ public class CampaignOptions {
     private boolean usePayoutServiceBonus;
     private int payoutServiceBonusRate;
 
-    private boolean useAdministrativeStrain;
-    private int administrativeCapacity;
+    private boolean UseHRStrain;
+    private int hrCapacity;
 
     private boolean useManagementSkill;
     private boolean useCommanderLeadershipOnly;
@@ -1070,8 +1070,8 @@ public class CampaignOptions {
         setUsePayoutServiceBonus(true);
         setPayoutServiceBonusRate(10);
 
-        setUseAdministrativeStrain(true);
-        setAdministrativeCapacity(10);
+        setUseHRStrain(true);
+        setHRCapacity(10);
 
         setUseManagementSkill(true);
         setUseCommanderLeadershipOnly(false);
@@ -2219,20 +2219,52 @@ public class CampaignOptions {
         this.useFamilyModifiers = useFamilyModifiers;
     }
 
+    /**
+     * Use {@link #isUseHRStrain()} instead
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public boolean isUseAdministrativeStrain() {
-        return useAdministrativeStrain;
+        return UseHRStrain;
     }
 
-    public void setUseAdministrativeStrain(final boolean useAdministrativeStrain) {
-        this.useAdministrativeStrain = useAdministrativeStrain;
+    public boolean isUseHRStrain() {
+        return UseHRStrain;
     }
 
+    /**
+     * Use {@link #setUseHRStrain(boolean)} instead
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
+    public void setUseAdministrativeStrain(final boolean UseHRStrain) {
+        this.UseHRStrain = UseHRStrain;
+    }
+
+    public void setUseHRStrain(final boolean UseHRStrain) {
+        this.UseHRStrain = UseHRStrain;
+    }
+
+    /**
+     * Use {@link #getHRCapacity()} instead
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public Integer getAdministrativeCapacity() {
-        return administrativeCapacity;
+        return hrCapacity;
     }
 
-    public void setAdministrativeCapacity(final Integer administrativeCapacity) {
-        this.administrativeCapacity = administrativeCapacity;
+    public Integer getHRCapacity() {
+        return hrCapacity;
+    }
+
+    /**
+     * Use {@link #setHRCapacity(Integer)} instead
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
+    public void setAdministrativeCapacity(final Integer hrCapacity) {
+        this.hrCapacity = hrCapacity;
+    }
+
+    public void setHRCapacity(final Integer hrCapacity) {
+        this.hrCapacity = hrCapacity;
     }
 
     /**
@@ -5194,8 +5226,8 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePayoutServiceBonus", isUsePayoutServiceBonus());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payoutServiceBonusRate", getPayoutServiceBonusRate());
 
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAdministrativeStrain", isUseAdministrativeStrain());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "administrativeStrain", getAdministrativeCapacity());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "UseHRStrain", isUseHRStrain());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hrStrain", getHRCapacity());
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useManagementSkill", isUseManagementSkill());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useCommanderLeadershipOnly", isUseCommanderLeadershipOnly());
@@ -6322,10 +6354,12 @@ public class CampaignOptions {
                     campaignOptions.setUsePayoutServiceBonus(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("payoutServiceBonusRate")) {
                     campaignOptions.setPayoutServiceBonusRate(Integer.parseInt(nodeContents));
-                } else if (nodeName.equalsIgnoreCase("useAdministrativeStrain")) {
-                    campaignOptions.setUseAdministrativeStrain(Boolean.parseBoolean(nodeContents));
-                } else if (nodeName.equalsIgnoreCase("administrativeStrain")) {
-                    campaignOptions.setAdministrativeCapacity(Integer.parseInt(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("UseHRStrain")) {
+                    campaignOptions.setUseHRStrain(Boolean.parseBoolean(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("hrStrain")) {
+                    campaignOptions.setHRCapacity(MathUtility.parseInt(nodeContents));
+                } else if (nodeName.equalsIgnoreCase("administrativeStrain")) { // Legacy <50.07
+                    campaignOptions.setHRCapacity(MathUtility.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useManagementSkill")) {
                     campaignOptions.setUseManagementSkill(Boolean.parseBoolean(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("useCommanderLeadershipOnly")) {

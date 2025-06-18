@@ -48,6 +48,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
  * <p>This class constructs and presents an {@link ImmersiveDialogSimple} instance tailored to display glossary
  * information in the context of the current campaign.</p>
  */
+@Deprecated(since = "0.50.07", forRemoval = true)
 public class FullGlossaryDialog {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FullGlossaryDialog";
 

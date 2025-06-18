@@ -32,28 +32,39 @@
  */
 package mekhq.gui.dialog.reportDialogs.FactionStanding.gmToolsDialog;
 
+import static java.lang.Integer.MAX_VALUE;
+import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static megamek.utilities.ImageUtilities.scaleImageIcon;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JDialog;
+import javax.swing.JEditorPane;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.HyperlinkEvent;
+
 import megamek.logging.MMLogger;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
-import mekhq.gui.dialog.GlossaryDialog;
+import mekhq.gui.dialog.glossary.NewGlossaryDialog;
 import mekhq.gui.dialog.reportDialogs.FactionStanding.manualMissionDialogs.StandingUpdateConfirmationDialog;
-
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.HyperlinkEvent;
-import java.awt.*;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-
-import static java.lang.Integer.MAX_VALUE;
-import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
-import static megamek.client.ui.util.UIUtil.scaleForGUI;
-import static megamek.utilities.ImageUtilities.scaleImageIcon;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 /**
  * GMTools allows Game Masters to adjust Faction Standings through various operations. These operations include zeroing
@@ -73,7 +84,6 @@ public class GMTools extends JDialog {
     private final int PADDING = scaleForGUI(10);
     protected static final int IMAGE_WIDTH = scaleForGUI(200);
     protected static final int CENTER_WIDTH = scaleForGUI(450);
-    public final static String GLOSSARY_COMMAND_STRING = "GLOSSARY";
 
     private ImageIcon campaignIcon;
     private final Faction campaignFaction;
@@ -357,28 +367,7 @@ public class GMTools extends JDialog {
      */
     protected void hyperlinkEventListenerActions(HyperlinkEvent evt) {
         if (evt.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-            handleImmersiveHyperlinkClick(evt.getDescription());
-        }
-    }
-
-    /**
-     * Processes logic when immersive (in-dialog) hyperlinks are clicked.
-     *
-     * @param reference the string reference associated with the hyperlink.
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    private void handleImmersiveHyperlinkClick(String reference) {
-        String[] splitReference = reference.split(":");
-
-        String commandKey = splitReference[0];
-        String entryKey = splitReference[1];
-
-        if (commandKey.equalsIgnoreCase(GLOSSARY_COMMAND_STRING)) {
-            new GlossaryDialog(this, entryKey);
-        } else {
-            LOGGER.warn("Invalid hyperlink command: {}", commandKey);
+            NewGlossaryDialog.handleGlossaryHyperlinkClick(this, evt);
         }
     }
 }

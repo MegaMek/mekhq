@@ -65,7 +65,7 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
-import mekhq.gui.dialog.GlossaryDialog;
+import mekhq.gui.dialog.glossary.NewGlossaryDialog;
 
 
 /**
@@ -87,7 +87,6 @@ public class FactionSelectionDialog extends JDialog {
     private final int PADDING = scaleForGUI(10);
     protected static final int IMAGE_WIDTH = scaleForGUI(200);
     protected static final int CENTER_WIDTH = scaleForGUI(450);
-    public final static String GLOSSARY_COMMAND_STRING = "GLOSSARY";
 
     private ImageIcon campaignIcon;
     private final LocalDate today;
@@ -395,28 +394,7 @@ public class FactionSelectionDialog extends JDialog {
      */
     protected void hyperlinkEventListenerActions(HyperlinkEvent evt) {
         if (evt.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-            handleImmersiveHyperlinkClick(evt.getDescription());
-        }
-    }
-
-    /**
-     * Processes logic when immersive (in-dialog) hyperlinks are clicked.
-     *
-     * @param reference the string reference associated with the hyperlink.
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    private void handleImmersiveHyperlinkClick(String reference) {
-        String[] splitReference = reference.split(":");
-
-        String commandKey = splitReference[0];
-        String entryKey = splitReference[1];
-
-        if (commandKey.equalsIgnoreCase(GLOSSARY_COMMAND_STRING)) {
-            new GlossaryDialog(this, entryKey);
-        } else {
-            LOGGER.warn("Invalid hyperlink command: {}", commandKey);
+            NewGlossaryDialog.handleGlossaryHyperlinkClick(this, evt);
         }
     }
 }

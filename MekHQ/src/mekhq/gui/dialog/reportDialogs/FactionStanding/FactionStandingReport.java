@@ -32,12 +32,41 @@
  */
 package mekhq.gui.dialog.reportDialogs.FactionStanding;
 
+import static java.lang.Math.round;
+import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
+import static mekhq.gui.dialog.reportDialogs.FactionStanding.manualMissionDialogs.SimulateMissionDialog.handleFactionRegardUpdates;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getAmazingColor;
+import static mekhq.utilities.ReportingUtilities.getNegativeColor;
+import static mekhq.utilities.ReportingUtilities.getPositiveColor;
+import static mekhq.utilities.ReportingUtilities.getWarningColor;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import javax.swing.*;
+import javax.swing.border.Border;
+
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
 import megamek.logging.MMLogger;
 import megamek.utilities.ImageUtilities;
 import mekhq.MekHQ;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.universe.Faction;
@@ -46,28 +75,14 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel;
+import mekhq.campaign.utilities.glossary.DocumentationEntry;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
-import mekhq.gui.dialog.GlossaryDialog;
+import mekhq.gui.dialog.glossary.NewDocumentationEntryDialog;
 import mekhq.gui.dialog.reportDialogs.FactionStanding.gmToolsDialog.GMTools;
 import mekhq.gui.dialog.reportDialogs.FactionStanding.manualMissionDialogs.SimulateMissionDialog;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.WrapLayout;
-
-import javax.swing.*;
-import javax.swing.border.Border;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.List;
-
-import static java.lang.Math.round;
-import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
-import static mekhq.gui.dialog.reportDialogs.FactionStanding.manualMissionDialogs.SimulateMissionDialog.handleFactionRegardUpdates;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
-import static mekhq.utilities.ReportingUtilities.*;
 
 /**
  * Displays a dialog window that visualizes a report on faction standings for the current campaign year. Shows
@@ -111,6 +126,7 @@ public class FactionStandingReport extends JDialog {
     private final ImageIcon campaignIcon;
     private final List<Mission> missions;
     private final boolean isFactionStandingEnabled;
+    private final CampaignOptions campaignOptions;
 
     private final List<String> innerSphereFactions = new ArrayList<>();
     private final List<String> clanFactions = new ArrayList<>();
@@ -129,14 +145,14 @@ public class FactionStandingReport extends JDialog {
      * @param isGM A boolean indicating whether the user is a Game Master (GM).
      * @param campaignFaction The primary faction for the campaign associated with the report.
      * @param campaignIcon An {@link ImageIcon} for the campaign (either a custom user icon or faction icon).
-     * @param isFactionStandingEnabled {@code true} if the tacking of Faction Standing is enabled in campaign options; {@code false} otherwise.
+     * @param campaignOptions the {@link CampaignOptions} object associated with the current campaign.
      *
      * @author Illiani
      * @since 0.50.07
      */
     public FactionStandingReport(final JFrame frame, final FactionStandings factionStandings, final LocalDate today,
-                                 final boolean isGM, final Faction campaignFaction, final ImageIcon campaignIcon,
-                                 final Collection<Mission> missions, final boolean isFactionStandingEnabled) {
+          final boolean isGM, final Faction campaignFaction, final ImageIcon campaignIcon,
+          final Collection<Mission> missions, final CampaignOptions campaignOptions) {
         this.frame = frame;
         this.today = today;
         this.gameYear = today.getYear();
@@ -146,7 +162,8 @@ public class FactionStandingReport extends JDialog {
         this.factionStandings = factionStandings;
         factions = Factions.getInstance();
         this.missions = new ArrayList<>(missions);
-        this.isFactionStandingEnabled = isFactionStandingEnabled;
+        this.isFactionStandingEnabled = campaignOptions.isTrackFactionStanding();
+        this.campaignOptions = campaignOptions;
 
         sortFactions();
         createReportPanel();
@@ -337,12 +354,8 @@ public class FactionStandingReport extends JDialog {
         lblStandingEffects.setBorder(null);
         lblStandingEffects.setFocusable(false);
         lblStandingEffects.setText("");
-        lblStandingEffects.setMinimumSize(new Dimension(Integer.MAX_VALUE, FACTION_EFFECTS_MINIMUM_HEIGHT));
-        lblStandingEffects.setPreferredSize(new Dimension(Integer.MAX_VALUE, FACTION_EFFECTS_MINIMUM_HEIGHT));
 
-        pnlEffects.add(lblStandingEffects, BorderLayout.CENTER);
-        pnlEffects.setMinimumSize(new Dimension(Integer.MAX_VALUE, FACTION_EFFECTS_MINIMUM_HEIGHT));
-        pnlEffects.setPreferredSize(new Dimension(Integer.MAX_VALUE, FACTION_EFFECTS_MINIMUM_HEIGHT));
+        pnlEffects.add(lblStandingEffects, BorderLayout.SOUTH);
 
         return pnlEffects;
     }
@@ -363,7 +376,17 @@ public class FactionStandingReport extends JDialog {
         RoundedJButton btnDocumentation = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
               "factionStandingReport.button.documentation"));
         btnDocumentation.setName("btnDocumentation");
-        btnDocumentation.addActionListener(e -> new GlossaryDialog(this, "FACTION_STANDING"));
+        btnDocumentation.addActionListener(e -> {
+            DocumentationEntry documentationEntry = DocumentationEntry.getDocumentationEntryFromLookUpName(
+                  "FACTION_STANDING");
+
+            if (documentationEntry == null) {
+                LOGGER.warn("Glossary entry not found: {}", "FACTION_STANDING");
+                return;
+            }
+
+            new NewDocumentationEntryDialog(this, documentationEntry);
+        });
         btnDocumentation.setFocusable(false);
         pnlButtons.add(btnDocumentation);
 
@@ -451,7 +474,8 @@ public class FactionStandingReport extends JDialog {
         pnlFactionStanding.setBorder(createStandingColoredRoundedTitledBorder(factionStanding.getStandingLevel()));
         pnlFactionStanding.setPreferredSize(new Dimension(FACTION_PANEL_WIDTH, FACTION_PANEL_HEIGHT));
         pnlFactionStanding.setMaximumSize(new Dimension(FACTION_PANEL_WIDTH, FACTION_PANEL_HEIGHT));
-        pnlFactionStanding.addMouseListener(createEffectsPanelUpdater(getEffectsDescription(climateRegard)));
+        pnlFactionStanding.addMouseListener(createEffectsPanelUpdater(getEffectsDescription(faction.isClan(),
+              climateRegard)));
 
         // Faction Logo
         ImageIcon icon = Factions.getFactionLogo(gameYear, factionCode);
@@ -621,15 +645,17 @@ public class FactionStandingReport extends JDialog {
     /**
      * Calculates the standing effects description string for a given faction regard value.
      *
+     * @param isClan {@code true} if the faction is a Clan faction, otherwise {@code false}
      * @param factionRegard the regard value of the faction
+     *
      * @return the standing effects description for the corresponding {@link FactionStandingLevel}
      *
      * @author Illiani
      * @since 0.50.07
      */
-    private static String getEffectsDescription(double factionRegard) {
+    private String getEffectsDescription(boolean isClan, double factionRegard) {
         FactionStandingLevel factionStanding = FactionStandingUtilities.calculateFactionStandingLevel(factionRegard);
-        return factionStanding.getEffectsDescription();
+        return factionStanding.getEffectsDescription(isClan, campaignOptions);
     }
 
     /**

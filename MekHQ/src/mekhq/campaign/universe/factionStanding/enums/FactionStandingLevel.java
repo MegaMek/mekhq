@@ -32,21 +32,19 @@
  */
 package mekhq.campaign.universe.factionStanding.enums;
 
+import static java.lang.Math.round;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
-import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
-import static mekhq.utilities.ReportingUtilities.getNegativeColor;
-import static mekhq.utilities.ReportingUtilities.getPositiveColor;
-import static mekhq.utilities.ReportingUtilities.getWarningColor;
-import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import megamek.codeUtilities.MathUtility;
 import megamek.logging.MMLogger;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.universe.Faction;
+import mekhq.gui.dialog.reportDialogs.FactionStanding.FactionStandingReport;
 
 /**
  * Represents a standing level within the Faction Standing reputation system.
@@ -73,7 +71,7 @@ public enum FactionStandingLevel {
     STANDING_LEVEL_2(2, -40, -25, -2, 0.5, false, false, true, 1, 0, 1.75, -1, 0.8, -1, -2),
     STANDING_LEVEL_3(3, -25, -10, -1, 0.75, false, false, true, 2, 0, 1.5, 0, 0.9, 0, -1),
     STANDING_LEVEL_4(4, -10, 10, 0, 1.0, false, false, true, 3, 0, 1.0, 0, 1.0, 0, 0),
-    STANDING_LEVEL_5(5, 10, 25, 1, 1.9, false, false, true, 4, 0, 1.0, 0, 1.05, 0, 1),
+    STANDING_LEVEL_5(5, 10, 25, 1, 1.25, false, false, true, 4, 0, 1.0, 0, 1.05, 0, 1),
     STANDING_LEVEL_6(6, 25, 40, 2, 1.5, false, false, true, 5, 0, 0.85, 1, 1.1, 1, 1),
     STANDING_LEVEL_7(7, 40, 50, 3, 1.75, true, false, true, 10, 1, 0.80, 2, 1.15, 1, 2),
     STANDING_LEVEL_8(8, 50, Integer.MAX_VALUE, 4, 2.0, true, false, true, 15, 2, 0.75, 3, 1.2, 2, 3);
@@ -419,6 +417,14 @@ public enum FactionStandingLevel {
     }
 
     /**
+     * Use {@link #getEffectsDescription(boolean, CampaignOptions)} instead
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
+    public String getEffectsDescription() {
+        return getEffectsDescription(false, new CampaignOptions());
+    }
+
+    /**
      * Generates a textual description of all effects based on the current faction standing modifiers.
      *
      * <p>This method inspects various modifiers (such as negotiation, resupply, command circuit access, outlaw status,
@@ -429,76 +435,74 @@ public enum FactionStandingLevel {
      * @return a comma-separated {@link String} listing all active faction standing effects; returns
      * an empty string if there are no effects.
      */
-    public String getEffectsDescription() {
+    public String getEffectsDescription(boolean isClan, CampaignOptions campaignOptions) {
+        MMLogger logger = MMLogger.create(FactionStandingReport.class);
+        logger.info(this);
         List<String> effects = new ArrayList<>();
 
-        // If we're fetching for STANDING_LEVEL_4, then we're guaranteed not to pass any of the conditionals, so exit.
-        if (this == STANDING_LEVEL_4) {
-            return "";
+        if (hasCommandCircuitAccess && campaignOptions.isUseFactionStandingCommandCircuit()) {
+            effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.commandCircuit"));
         }
 
-        if (negotiationModifier != STANDING_LEVEL_4.getNegotiationModifier()) {
+        if (isOutlawed && campaignOptions.isUseFactionStandingOutlawed()) {
+            effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.outlawed"));
+        }
+
+        if (isClan && !isBatchallAllowed && campaignOptions.isUseFactionStandingBatchallRestrictions()) {
+            effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.batchall"));
+        }
+
+        if (negotiationModifier != 0 && campaignOptions.isUseFactionStandingNegotiation()) {
             effects.add(getFormattedTextAt(RESOURCE_BUNDLE,
                   "factionStandingLevel.negotiation",
                   getPolarityOfModifier(negotiationModifier)));
         }
 
-        int resupplyPercentage = (int) resupplyWeightModifier * 100;
-        effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.resupply", resupplyPercentage));
-
-        if (hasCommandCircuitAccess) {
-            effects.add(getFormattedTextAt(RESOURCE_BUNDLE,
-                  "factionStandingLevel.commandCircuit",
-                  spanOpeningWithCustomColor(getPositiveColor()),
-                  CLOSING_SPAN_TAG));
+        if (resupplyWeightModifier != 1.0
+                  && campaignOptions.isUseStratCon()
+                  && campaignOptions.isUseFactionStandingResupply()) {
+            int resupplyPercentage = (int) round(resupplyWeightModifier * 100);
+            effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.resupply", resupplyPercentage));
         }
 
-        if (isOutlawed) {
-            effects.add(getFormattedTextAt(RESOURCE_BUNDLE,
-                  "factionStandingLevel.outlawed",
-                  spanOpeningWithCustomColor(getNegativeColor()),
-                  CLOSING_SPAN_TAG));
+        if (campaignOptions.isUseFactionStandingRecruitment()) {
+            int ticketsModifier = recruitmentTickets - STANDING_LEVEL_4.getRecruitmentTickets();
+            if (ticketsModifier != 0) {
+                effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.recruitment.popularity",
+                      getPolarityOfModifier(ticketsModifier)));
+            }
+
+            if (recruitmentRollsModifier != 0) {
+                effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.recruitment.rolls",
+                      getPolarityOfModifier(recruitmentRollsModifier)));
+            }
         }
 
-        if (!isBatchallAllowed) {
-            effects.add(getFormattedTextAt(RESOURCE_BUNDLE,
-                  "factionStandingLevel.batchall",
-                  spanOpeningWithCustomColor(getWarningColor()),
-                  CLOSING_SPAN_TAG));
+        if (barrackCostsMultiplier != 1.0 && campaignOptions.isUseFactionStandingBarracksCosts()) {
+            int barracksCostPercentage = (int) round(barrackCostsMultiplier * 100);
+            effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.barracks", barracksCostPercentage));
         }
 
-        effects.add(getFormattedTextAt(RESOURCE_BUNDLE,
-              "factionStandingLevel.recruitment.popularity",
-              getPolarityOfModifier(recruitmentTickets - STANDING_LEVEL_4.getRecruitmentTickets())));
-
-        if (recruitmentRollsModifier != STANDING_LEVEL_4.getRecruitmentRollsModifier()) {
-            effects.add(getFormattedTextAt(RESOURCE_BUNDLE,
-                  "factionStandingLevel.recruitment.rolls",
-                  getPolarityOfModifier(recruitmentRollsModifier)));
-        }
-
-        int barracksCostPercentage = (int) barrackCostsMultiplier * 100;
-        effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.barracks", barracksCostPercentage));
-
-        if (unitMarketRarityModifier != STANDING_LEVEL_4.getUnitMarketRarityModifier()) {
-            effects.add(getFormattedTextAt(RESOURCE_BUNDLE,
-                  "factionStandingLevel.unitMarket",
+        if (unitMarketRarityModifier != 0 && campaignOptions.isUseFactionStandingUnitMarket()) {
+            effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.unitMarket",
                   getPolarityOfModifier(unitMarketRarityModifier)));
         }
 
-        int payPercentage = (int) contractPayMultiplier * 100;
-        effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.contractPay", payPercentage));
-
-        if (supportPointModifierContractStart != STANDING_LEVEL_4.getSupportPointModifierContractStart()) {
-            effects.add(getFormattedTextAt(RESOURCE_BUNDLE,
-                  "factionStandingLevel.supportPoints.signing",
-                  getPolarityOfModifier(supportPointModifierContractStart)));
+        if (contractPayMultiplier != 1.0 && campaignOptions.isUseFactionStandingContractPay()) {
+            int payPercentage = (int) round(contractPayMultiplier * 100);
+            effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.contractPay", payPercentage));
         }
 
-        if (supportPointModifierPeriodic != STANDING_LEVEL_4.getSupportPointModifierPeriodic()) {
-            effects.add(getFormattedTextAt(RESOURCE_BUNDLE,
-                  "factionStandingLevel.supportPoints.periodic",
-                  getPolarityOfModifier(supportPointModifierContractStart)));
+        if (campaignOptions.isUseFactionStandingSupportPoints()) {
+            if (supportPointModifierContractStart != 0) {
+                effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.supportPoints.signing",
+                      getPolarityOfModifier(supportPointModifierContractStart)));
+            }
+
+            if (supportPointModifierPeriodic != 0) {
+                effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.supportPoints.periodic",
+                      getPolarityOfModifier(supportPointModifierPeriodic)));
+            }
         }
 
         return String.join(", ", effects);
