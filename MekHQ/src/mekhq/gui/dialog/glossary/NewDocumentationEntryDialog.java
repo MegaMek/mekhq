@@ -37,11 +37,11 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.EnhancedTabbedPane;
 import megamek.logging.MMLogger;
-import megamek.utilities.PDFReaderPanel;
 import mekhq.MekHQ;
 import mekhq.campaign.utilities.glossary.DocumentationEntry;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
+import mekhq.gui.utilities.MHQPDFReaderPanel;
 
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
@@ -142,7 +142,7 @@ public class NewDocumentationEntryDialog extends JDialog {
         }
 
         // If it doesn't, create a new tab
-        PDFReaderPanel pnlReader = new PDFReaderPanel(getOwner(), documentationEntry.getFileAddress());
+        MHQPDFReaderPanel pnlReader = new MHQPDFReaderPanel(getOwner(), documentationEntry.getFileAddress());
 
         JPanel outerPanel = new JPanel(new BorderLayout());
         outerPanel.add(pnlReader, BorderLayout.CENTER);
