@@ -34,11 +34,19 @@ package mekhq.campaign.utilities.glossary;
 
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -64,5 +72,43 @@ class DocumentationEntryTest {
         sorted.sort(String::compareTo);
 
         assertEquals(sorted, titles, "Titles are not sorted alphabetically.");
+    }
+
+    @Test
+    void testTitlesAreUnique() {
+        List<String> lookUpNames = DocumentationEntry.getLookUpNamesSortedByTitle();
+        List<String> uniqueTitles = lookUpNames.stream()
+                                          .map(name -> Objects.requireNonNull(DocumentationEntry.getDocumentationEntryFromLookUpName(
+                                                name)).getTitle())
+                                          .distinct()
+                                          .toList();
+
+        assertEquals(lookUpNames.size(), uniqueTitles.size(), "Titles are not unique.");
+    }
+
+    @ParameterizedTest
+    @EnumSource(DocumentationEntry.class)
+    void testGetFileAddressReturnsExistingFile(DocumentationEntry documentationEntry) {
+        String filePath = documentationEntry.getFileAddress();
+        Path path = Path.of(filePath);
+
+        assertTrue(Files.exists(path), "File does not exist at: " + filePath);
+        assertTrue(Files.isRegularFile(path), "Path is not a regular file: " + filePath);
+        assertTrue(Files.isReadable(path), "File is not readable: " + filePath);
+    }
+
+    @ParameterizedTest
+    @EnumSource(DocumentationEntry.class)
+    void testAllDocumentationEntriesCanBeOpenedAsPdf(DocumentationEntry entry) {
+        String fileAddress = entry.getFileAddress();
+        File file = new File(fileAddress);
+        assertTrue(file.exists(), "File does not exist: " + fileAddress);
+
+        try (PDDocument pdf = Loader.loadPDF(file)) {
+            assertNotNull(pdf, "Could not load PDF document: " + fileAddress);
+            assertTrue(pdf.getNumberOfPages() > 0, "PDF has no pages: " + fileAddress);
+        } catch (IOException e) {
+            fail("File '" + fileAddress + "' could not be opened as a PDF. Exception: " + e.getMessage());
+        }
     }
 }

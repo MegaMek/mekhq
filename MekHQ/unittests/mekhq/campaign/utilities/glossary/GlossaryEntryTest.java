@@ -73,4 +73,16 @@ class GlossaryEntryTest {
 
         assertEquals(sorted, titles, "Titles are not sorted alphabetically.");
     }
+
+    @Test
+    void testTitlesAreUnique() {
+        List<String> lookUpNames = GlossaryEntry.getLookUpNamesSortedByTitle();
+        List<String> uniqueTitles = lookUpNames.stream()
+                                          .map(name -> Objects.requireNonNull(GlossaryEntry.getGlossaryEntryFromLookUpName(
+                                                name)).getTitle())
+                                          .distinct()
+                                          .toList();
+
+        assertEquals(lookUpNames.size(), uniqueTitles.size(), "Titles are not unique.");
+    }
 }
