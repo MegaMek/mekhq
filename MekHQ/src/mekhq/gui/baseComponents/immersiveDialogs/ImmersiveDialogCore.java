@@ -41,6 +41,8 @@ import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.common.icons.Portrait.DEFAULT_PORTRAIT_FILENAME;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.campaign.force.Force.FORCE_NONE;
+import static mekhq.gui.dialog.glossary.NewGlossaryDialog.DOCUMENTATION_COMMAND_STRING;
+import static mekhq.gui.dialog.glossary.NewGlossaryDialog.GLOSSARY_COMMAND_STRING;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.awt.BorderLayout;
@@ -73,10 +75,12 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Factions;
+import mekhq.campaign.utilities.glossary.DocumentationEntry;
 import mekhq.campaign.utilities.glossary.GlossaryEntry;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.gui.dialog.glossary.NewDocumentationEntryDialog;
 import mekhq.gui.dialog.glossary.NewGlossaryEntryDialog;
 
 /**
@@ -91,7 +95,6 @@ import mekhq.gui.dialog.glossary.NewGlossaryEntryDialog;
  */
 public class ImmersiveDialogCore extends JDialog {
     private final String RESOURCE_BUNDLE = "mekhq.resources.GUI";
-    public final static String GLOSSARY_COMMAND_STRING = "GLOSSARY";
     public final static String PERSON_COMMAND_STRING = "PERSON";
     public final static String MISSION_COMMAND_STRING = "MISSION";
     public final static String SCENARIO_COMMAND_STRING = "SCENARIO";
@@ -431,6 +434,19 @@ public class ImmersiveDialogCore extends JDialog {
             }
 
             new NewGlossaryEntryDialog(parent, glossaryEntry);
+        } else if (commandKey.equalsIgnoreCase(DOCUMENTATION_COMMAND_STRING)) {
+            DocumentationEntry documentationEntry = DocumentationEntry.getDocumentationEntryFromLookUpName(entryKey);
+
+            if (documentationEntry == null) {
+                LOGGER.warn("Documentation entry not found: {}", entryKey);
+                return;
+            }
+
+            try {
+                new NewDocumentationEntryDialog(parent, documentationEntry);
+            } catch (Exception ex) {
+                LOGGER.error("Failed to open PDF", ex);
+            }
         } else if (commandKey.equalsIgnoreCase(PERSON_COMMAND_STRING)) {
             final UUID id = UUID.fromString(reference.split(":")[1]);
             campaignGUI.focusOnPerson(id);

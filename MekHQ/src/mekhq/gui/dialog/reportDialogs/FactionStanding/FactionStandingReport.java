@@ -74,10 +74,10 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel;
-import mekhq.campaign.utilities.glossary.GlossaryEntry;
+import mekhq.campaign.utilities.glossary.DocumentationEntry;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
-import mekhq.gui.dialog.glossary.NewGlossaryEntryDialog;
+import mekhq.gui.dialog.glossary.NewDocumentationEntryDialog;
 import mekhq.gui.dialog.reportDialogs.FactionStanding.gmToolsDialog.GMTools;
 import mekhq.gui.dialog.reportDialogs.FactionStanding.manualMissionDialogs.SimulateMissionDialog;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
@@ -378,14 +378,15 @@ public class FactionStandingReport extends JDialog {
               "factionStandingReport.button.documentation"));
         btnDocumentation.setName("btnDocumentation");
         btnDocumentation.addActionListener(e -> {
-            GlossaryEntry glossaryEntry = GlossaryEntry.getGlossaryEntryFromLookUpName("FACTION_STANDING");
+            DocumentationEntry documentationEntry = DocumentationEntry.getDocumentationEntryFromLookUpName(
+                  "FACTION_STANDING");
 
-            if (glossaryEntry == null) {
+            if (documentationEntry == null) {
                 LOGGER.warn("Glossary entry not found: {}", "FACTION_STANDING");
                 return;
             }
 
-            new NewGlossaryEntryDialog(this, glossaryEntry);
+            new NewDocumentationEntryDialog(this, documentationEntry);
         });
         btnDocumentation.setFocusable(false);
         pnlButtons.add(btnDocumentation);

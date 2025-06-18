@@ -42,8 +42,10 @@ import megamek.logging.MMLogger;
 import megamek.utilities.ImageUtilities;
 import mekhq.MekHQ;
 import mekhq.campaign.universe.Factions;
+import mekhq.campaign.utilities.glossary.DocumentationEntry;
 import mekhq.campaign.utilities.glossary.GlossaryEntry;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
@@ -62,7 +64,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
  * @since 0.50.07
  */
 public class NewGlossaryEntryDialog extends JDialog {
-    private static final MMLogger LOGGER = MMLogger.create(NewGlossaryDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(NewGlossaryEntryDialog.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.NewGlossaryDialog";
 
     private static final int PADDING = UIUtil.scaleForGUI(10);
@@ -70,6 +72,7 @@ public class NewGlossaryEntryDialog extends JDialog {
     private static final int CENTER_PANEL_MINIMUM_WIDTH = UIUtil.scaleForGUI(900);
     private static final int TEXT_WIDTH = UIUtil.scaleForGUI(500);
     private static final Dimension BUTTON_SIZE = UIUtil.scaleForGUI(100, 30);
+    private static final int CONTENTS_INDENT = UIUtil.scaleForGUI(300);
 
     /**
      * The list of faction codes eligible for random selection as glossary tab images.
@@ -171,21 +174,20 @@ public class NewGlossaryEntryDialog extends JDialog {
     public NewGlossaryEntryDialog(JDialog parent, GlossaryEntry glossaryEntry) {
         super(parent, getTextAt(RESOURCE_BUNDLE, "GlossaryDialog.title"));
 
-        JLabel tabLabel = new JLabel("Tab Name");
-        tabLabel.setPreferredSize(new Dimension(120, 32));
-
         tabbedPane = new EnhancedTabbedPane(false, true);
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
         tabbedPane.setTabPlacement(JTabbedPane.LEFT);
         tabbedPane.setMinimumSize(new Dimension(CENTER_PANEL_MINIMUM_WIDTH, Integer.MIN_VALUE));
         addGlossaryEntry(glossaryEntry);
 
-        JScrollPane scrollFullGlossary = buildGlossaryPane();
-        JPanel fullGlossaryWrapper = new JPanel(new BorderLayout());
-        fullGlossaryWrapper.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
-        fullGlossaryWrapper.add(scrollFullGlossary, BorderLayout.CENTER);
+        JScrollPaneWithSpeed scrollFullGlossary = buildGlossaryPane();
+        JPanel fullContentsWrapper = new JPanel(new BorderLayout());
+        fullContentsWrapper.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
+        fullContentsWrapper.add(scrollFullGlossary, BorderLayout.CENTER);
 
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, tabbedPane, fullGlossaryWrapper);
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, tabbedPane, fullContentsWrapper);
+        splitPane.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
+        splitPane.setDividerSize(PADDING);
         splitPane.setOneTouchExpandable(true);
 
         JPanel contentPanel = new JPanel(new BorderLayout());
@@ -194,9 +196,12 @@ public class NewGlossaryEntryDialog extends JDialog {
         setContentPane(contentPanel);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setSize(new Dimension(DIALOG_SIZE));
-        setLocationRelativeTo(parent.getParent());
+        setLocationRelativeTo(parent);
         setMinimumSize(new Dimension(CENTER_PANEL_MINIMUM_WIDTH, DIALOG_SIZE.height));
         setPreferences(); // Must be before setVisible
+
+        SwingUtilities.invokeLater(() -> splitPane.setDividerLocation(getWidth() - CONTENTS_INDENT));
+
         setVisible(true);
     }
 
@@ -242,8 +247,11 @@ public class NewGlossaryEntryDialog extends JDialog {
         txtDefinition.setMaximumSize(new Dimension(TEXT_WIDTH, Integer.MAX_VALUE));
         txtDefinition.setPreferredSize(new Dimension(TEXT_WIDTH, txtDefinition.getPreferredSize().height));
         txtDefinition.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        txtDefinition.addHyperlinkListener(this::handleHyperlinkClick);
+        txtDefinition.addHyperlinkListener(e -> {
+            if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                handleHyperlinkClick(e);
+            }
+        });
 
         // Create a panel to hold both image and text, then put that in the scroll pane
         JPanel scrollContent = new JPanel();
@@ -257,7 +265,7 @@ public class NewGlossaryEntryDialog extends JDialog {
         scrollContent.add(Box.createVerticalStrut(PADDING));
         scrollContent.add(txtDefinition);
 
-        JScrollPane scrollGlossaryEntry = new JScrollPane(scrollContent);
+        JScrollPaneWithSpeed scrollGlossaryEntry = new JScrollPaneWithSpeed(scrollContent);
         scrollGlossaryEntry.setBorder(null);
         scrollGlossaryEntry.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollGlossaryEntry.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -302,7 +310,7 @@ public class NewGlossaryEntryDialog extends JDialog {
      * @since 0.50.07
      */
     public void addTab(String title, Component component) {
-        tabbedPane.addTab(title, component);
+        tabbedPane.addCloseableTab(title, null, component);
     }
 
     /**
@@ -334,7 +342,14 @@ public class NewGlossaryEntryDialog extends JDialog {
 
                 addGlossaryEntry(glossaryEntry);
             } else if (command.equalsIgnoreCase(DOCUMENTATION_COMMAND_STRING)) {
-                // Handle documentation display
+                DocumentationEntry documentationEntry = DocumentationEntry.getDocumentationEntryFromLookUpName(entry);
+
+                if (documentationEntry == null) {
+                    LOGGER.warn("Documentation entry not found: {}", entry);
+                    return;
+                }
+
+                new NewDocumentationEntryDialog(this, documentationEntry);
             }
         }
     }
@@ -359,12 +374,12 @@ public class NewGlossaryEntryDialog extends JDialog {
     /**
      * Builds the scrollable contents pane listing all glossary entries with links for navigation.
      *
-     * @return a {@link JScrollPane} containing the formatted glossary contents
+     * @return a {@link JScrollPaneWithSpeed} containing the formatted glossary contents
      *
      * @author Illiani
      * @since 0.50.07
      */
-    private JScrollPane buildGlossaryPane() {
+    private JScrollPaneWithSpeed buildGlossaryPane() {
         StringBuilder formatedGlossaryText = new StringBuilder();
         formatedGlossaryText.append(getTextAt(RESOURCE_BUNDLE, "GlossaryDialog.contentsPane.title"));
 
@@ -388,7 +403,7 @@ public class NewGlossaryEntryDialog extends JDialog {
         txtGlossary.setCaretPosition(0);
         txtGlossary.addHyperlinkListener(this::handleHyperlinkClick);
 
-        JScrollPane scrollGlossary = new JScrollPane(txtGlossary);
+        JScrollPaneWithSpeed scrollGlossary = new JScrollPaneWithSpeed(txtGlossary);
         scrollGlossary.setBorder(RoundedLineBorder.createRoundedLineBorder());
 
         return scrollGlossary;

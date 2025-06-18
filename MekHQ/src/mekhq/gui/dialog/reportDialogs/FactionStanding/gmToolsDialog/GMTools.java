@@ -61,10 +61,9 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
-import mekhq.campaign.utilities.glossary.GlossaryEntry;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
-import mekhq.gui.dialog.glossary.NewGlossaryEntryDialog;
+import mekhq.gui.dialog.glossary.NewGlossaryDialog;
 import mekhq.gui.dialog.reportDialogs.FactionStanding.manualMissionDialogs.StandingUpdateConfirmationDialog;
 
 /**
@@ -85,7 +84,6 @@ public class GMTools extends JDialog {
     private final int PADDING = scaleForGUI(10);
     protected static final int IMAGE_WIDTH = scaleForGUI(200);
     protected static final int CENTER_WIDTH = scaleForGUI(450);
-    public final static String GLOSSARY_COMMAND_STRING = "GLOSSARY";
 
     private ImageIcon campaignIcon;
     private final Faction campaignFaction;
@@ -369,35 +367,7 @@ public class GMTools extends JDialog {
      */
     protected void hyperlinkEventListenerActions(HyperlinkEvent evt) {
         if (evt.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-            handleImmersiveHyperlinkClick(evt.getDescription());
-        }
-    }
-
-    /**
-     * Processes logic when immersive (in-dialog) hyperlinks are clicked.
-     *
-     * @param reference the string reference associated with the hyperlink.
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    private void handleImmersiveHyperlinkClick(String reference) {
-        String[] splitReference = reference.split(":");
-
-        String commandKey = splitReference[0];
-        String entryKey = splitReference[1];
-
-        if (commandKey.equalsIgnoreCase(GLOSSARY_COMMAND_STRING)) {
-            GlossaryEntry glossaryEntry = GlossaryEntry.getGlossaryEntryFromLookUpName(entryKey);
-
-            if (glossaryEntry == null) {
-                LOGGER.warn("Glossary entry not found: {}", entryKey);
-                return;
-            }
-
-            new NewGlossaryEntryDialog(this, glossaryEntry);
-        } else {
-            LOGGER.warn("Invalid hyperlink command: {}", commandKey);
+            NewGlossaryDialog.handleGlossaryHyperlinkClick(this, evt);
         }
     }
 }

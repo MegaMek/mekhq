@@ -41,8 +41,7 @@ import javax.swing.JPanel;
 import javax.swing.event.HyperlinkEvent;
 
 import megamek.logging.MMLogger;
-import mekhq.campaign.utilities.glossary.GlossaryEntry;
-import mekhq.gui.dialog.glossary.NewGlossaryEntryDialog;
+import mekhq.gui.dialog.glossary.NewGlossaryDialog;
 
 /**
  * {@code TutorialHyperlinkPanel} is a GUI component for displaying text (typically instructional or tutorial content)
@@ -87,44 +86,10 @@ public class TutorialHyperlinkPanel extends JPanel {
         paneTutorial.setOpaque(false);
         paneTutorial.addHyperlinkListener(evt -> {
             if (evt.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                handleTutorialHyperlinkClick(null, evt.getDescription());
+                NewGlossaryDialog.handleGlossaryHyperlinkClick(null, evt);
             }
         });
 
         add(paneTutorial, BorderLayout.CENTER);
-    }
-
-    /**
-     * Handles a hyperlink-click event within the tutorial panel.
-     *
-     * <p>If the hyperlink reference string starts with the {@link #GLOSSARY_COMMAND_STRING} command, it opens a
-     * {@link NewGlossaryEntryDialog} with the provided entry key.</p>
-     *
-     * <p>The reference is expected to be in the form {@code "COMMAND:entryKey"}.</p>
-     *
-     * <p>Example: {@code GLOSSARY:PRISONERS_OF_WAR}</p>
-     *
-     * @param parent    the parent {@link JDialog}, or {@code null} for no parent dialog.
-     * @param reference the hyperlink reference string specifying the command and key.
-     *
-     * @author Illiani
-     * @since 0.50.06
-     */
-    public static void handleTutorialHyperlinkClick(JDialog parent, String reference) {
-        String[] splitReference = reference.split(":");
-
-        String commandKey = splitReference[0];
-        String entryKey = splitReference[1];
-
-        if (commandKey.equalsIgnoreCase(GLOSSARY_COMMAND_STRING)) {
-            GlossaryEntry glossaryEntry = GlossaryEntry.getGlossaryEntryFromLookUpName(entryKey);
-
-            if (glossaryEntry == null) {
-                LOGGER.warn("Glossary entry not found: {}", entryKey);
-                return;
-            }
-
-            new NewGlossaryEntryDialog(parent, glossaryEntry);
-        }
     }
 }

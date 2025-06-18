@@ -55,6 +55,7 @@ import mekhq.campaign.utilities.glossary.DocumentationEntry;
 import mekhq.campaign.utilities.glossary.GlossaryEntry;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * A dialog window for displaying both glossary and documentation entries in MekHQ.
@@ -77,10 +78,10 @@ public class NewGlossaryDialog extends JDialog {
      * <p>Hyperlink URLs in the glossary pane use this prefix to indicate that an entry should be handled as a
      * glossary term, e.g. {@code "GLOSSARY:entryKey"}.</p>
      *
-     * @see #handleHyperlinkClick(HyperlinkEvent)
+     * @see #handleGlossaryHyperlinkClick(JDialog, HyperlinkEvent)
      * @since 0.50.07
      */
-    static final String GLOSSARY_COMMAND_STRING = "GLOSSARY";
+    public static final String GLOSSARY_COMMAND_STRING = "GLOSSARY";
 
     /**
      * The command string prefix used to identify documentation entry hyperlinks.
@@ -88,10 +89,10 @@ public class NewGlossaryDialog extends JDialog {
      * <p>Hyperlink URLs in the documentation pane use this prefix to indicate that an entry should be handled as a
      * documentation term, e.g. {@code "DOCUMENTATION:entryKey"}.</p>
      *
-     * @see #handleHyperlinkClick(HyperlinkEvent)
+     * @see #handleGlossaryHyperlinkClick(JDialog, HyperlinkEvent)
      * @since 0.50.07
      */
-    static final String DOCUMENTATION_COMMAND_STRING = "DOCUMENTATION";
+    public static final String DOCUMENTATION_COMMAND_STRING = "DOCUMENTATION";
 
     private static final int PADDING = UIUtil.scaleForGUI(10);
     private static final int ABOUT_WIDTH = UIUtil.scaleForGUI(400) - (PADDING * 2);
@@ -106,7 +107,7 @@ public class NewGlossaryDialog extends JDialog {
     /**
      * Documentation keys sorted by localized title.
      */
-    private final static List<String> documentationEntries = DocumentationEntry.getLookUpNamesSortedByTitle();
+    final static List<String> documentationEntries = DocumentationEntry.getLookUpNamesSortedByTitle();
     private int minimumWidth = 0;
 
     /**
@@ -150,14 +151,14 @@ public class NewGlossaryDialog extends JDialog {
 
         minimumWidth += aboutWrapper.getPreferredSize().width;
 
-        JScrollPane scrollGlossary = buildGlossaryPane();
+        JScrollPaneWithSpeed scrollGlossary = buildGlossaryPane();
         JPanel contentsWrapper = new JPanel(new BorderLayout());
         contentsWrapper.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
         contentsWrapper.add(scrollGlossary, BorderLayout.CENTER);
 
         minimumWidth += contentsWrapper.getPreferredSize().width;
 
-        JScrollPane scrollDocumentation = buildDocumentationPane();
+        JScrollPaneWithSpeed scrollDocumentation = buildDocumentationPane();
         JPanel documentationWrapper = new JPanel(new BorderLayout());
         documentationWrapper.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
         documentationWrapper.add(scrollDocumentation, BorderLayout.CENTER);
@@ -198,7 +199,12 @@ public class NewGlossaryDialog extends JDialog {
         txtAbout.setBorder(null);
         txtAbout.setEditable(false);
         txtAbout.setCaretPosition(0);
-        txtAbout.addHyperlinkListener(this::handleHyperlinkClick);
+        txtAbout.addHyperlinkListener(e -> {
+            if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                dispose();
+                handleGlossaryHyperlinkClick(this, e);
+            }
+        });
         txtAbout.setAlignmentY(Component.TOP_ALIGNMENT);
 
         JPanel aboutPanel = new JPanel();
@@ -207,7 +213,7 @@ public class NewGlossaryDialog extends JDialog {
         aboutPanel.add(imageWrapper);
         aboutPanel.add(txtAbout);
 
-        JScrollPane scrollAbout = new JScrollPane(aboutPanel);
+        JScrollPaneWithSpeed scrollAbout = new JScrollPaneWithSpeed(aboutPanel);
         scrollAbout.setBorder(RoundedLineBorder.createRoundedLineBorder());
         scrollAbout.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollAbout.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -248,12 +254,12 @@ public class NewGlossaryDialog extends JDialog {
     /**
      * Builds the scrollable glossary section, populated with clickable entry links.
      *
-     * @return a {@link JScrollPane} containing the glossary links
+     * @return a {@link JScrollPaneWithSpeed} containing the glossary links
      *
      * @author Illiani
      * @since 0.50.07
      */
-    private JScrollPane buildGlossaryPane() {
+    private JScrollPaneWithSpeed buildGlossaryPane() {
         StringBuilder formatedGlossaryText = new StringBuilder();
         formatedGlossaryText.append(getTextAt(RESOURCE_BUNDLE, "GlossaryDialog.contentsPane.title"));
 
@@ -270,7 +276,7 @@ public class NewGlossaryDialog extends JDialog {
 
         JTextPane txtGlossary = createGlossaryDialogTextPane(formatedGlossaryText);
 
-        JScrollPane scrollGlossary = new JScrollPane(txtGlossary);
+        JScrollPaneWithSpeed scrollGlossary = new JScrollPaneWithSpeed(txtGlossary);
         scrollGlossary.setBorder(RoundedLineBorder.createRoundedLineBorder());
 
         return scrollGlossary;
@@ -294,7 +300,12 @@ public class NewGlossaryDialog extends JDialog {
         txtGlossary.setBorder(null);
         txtGlossary.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
         txtGlossary.setCaretPosition(0);
-        txtGlossary.addHyperlinkListener(this::handleHyperlinkClick);
+        txtGlossary.addHyperlinkListener(e -> {
+            if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                dispose();
+                handleGlossaryHyperlinkClick(this, e);
+            }
+        });
 
         return txtGlossary;
     }
@@ -302,12 +313,12 @@ public class NewGlossaryDialog extends JDialog {
     /**
      * Builds the scrollable documentation section, each entry as a clickable link.
      *
-     * @return a {@link JScrollPane} containing the documentation links
+     * @return a {@link JScrollPaneWithSpeed} containing the documentation links
      *
      * @author Illiani
      * @since 0.50.07
      */
-    private JScrollPane buildDocumentationPane() {
+    private JScrollPaneWithSpeed buildDocumentationPane() {
         StringBuilder formatedDocumentationText = new StringBuilder();
         formatedDocumentationText.append(getTextAt(RESOURCE_BUNDLE, "GlossaryDialog.documentationPane.title"));
 
@@ -324,7 +335,7 @@ public class NewGlossaryDialog extends JDialog {
 
         JTextPane txtDocumentation = createGlossaryDialogTextPane(formatedDocumentationText);
 
-        JScrollPane scrollDocumentation = new JScrollPane(txtDocumentation);
+        JScrollPaneWithSpeed scrollDocumentation = new JScrollPaneWithSpeed(txtDocumentation);
         scrollDocumentation.setBorder(RoundedLineBorder.createRoundedLineBorder());
 
         return scrollDocumentation;
@@ -340,7 +351,7 @@ public class NewGlossaryDialog extends JDialog {
      * @author Illiani
      * @since 0.50.07
      */
-    private void handleHyperlinkClick(HyperlinkEvent hyperlinkEvent) {
+    public static void handleGlossaryHyperlinkClick(JDialog parent, HyperlinkEvent hyperlinkEvent) {
         if (hyperlinkEvent.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
             String[] splitReference = hyperlinkEvent.getDescription().split(":", 2);
             if (splitReference.length != 2) {
@@ -358,11 +369,20 @@ public class NewGlossaryDialog extends JDialog {
                     return;
                 }
 
-                dispose(); // Get rid of the main dialog
-                new NewGlossaryEntryDialog(this, glossaryEntry);
+                new NewGlossaryEntryDialog(parent, glossaryEntry);
             } else if (command.equalsIgnoreCase(DOCUMENTATION_COMMAND_STRING)) {
-                dispose(); // Get rid of the main dialog
-                // Handle documentation display
+                DocumentationEntry documentationEntry = DocumentationEntry.getDocumentationEntryFromLookUpName(entry);
+
+                if (documentationEntry == null) {
+                    LOGGER.warn("Documentation entry not found: {}", entry);
+                    return;
+                }
+
+                try {
+                    new NewDocumentationEntryDialog(parent, documentationEntry);
+                } catch (Exception ex) {
+                    LOGGER.error("Failed to open PDF", ex);
+                }
             }
         }
     }

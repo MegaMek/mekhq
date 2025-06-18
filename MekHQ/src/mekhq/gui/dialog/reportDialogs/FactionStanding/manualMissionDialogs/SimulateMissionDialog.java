@@ -70,10 +70,9 @@ import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
-import mekhq.campaign.utilities.glossary.GlossaryEntry;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
-import mekhq.gui.dialog.glossary.NewGlossaryEntryDialog;
+import mekhq.gui.dialog.glossary.NewGlossaryDialog;
 
 /**
  * Dialog window to simulate missions and adjust faction standings based on employer, enemy, and mission status
@@ -551,35 +550,7 @@ public class SimulateMissionDialog extends JDialog {
      */
     protected void hyperlinkEventListenerActions(HyperlinkEvent evt) {
         if (evt.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-            handleImmersiveHyperlinkClick(evt.getDescription());
-        }
-    }
-
-    /**
-     * Processes logic when immersive (in-dialog) hyperlinks are clicked.
-     *
-     * @param reference the string reference associated with the hyperlink.
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    private void handleImmersiveHyperlinkClick(String reference) {
-        String[] splitReference = reference.split(":");
-
-        String commandKey = splitReference[0];
-        String entryKey = splitReference[1];
-
-        if (commandKey.equalsIgnoreCase(GLOSSARY_COMMAND_STRING)) {
-            GlossaryEntry glossaryEntry = GlossaryEntry.getGlossaryEntryFromLookUpName(entryKey);
-
-            if (glossaryEntry == null) {
-                LOGGER.warn("Glossary entry not found: {}", entryKey);
-                return;
-            }
-
-            new NewGlossaryEntryDialog(this, glossaryEntry);
-        } else {
-            LOGGER.warn("Invalid hyperlink command: {}", commandKey);
+            NewGlossaryDialog.handleGlossaryHyperlinkClick(this, evt);
         }
     }
 

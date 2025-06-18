@@ -33,6 +33,7 @@
 package mekhq.gui.dialog;
 
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
+import static mekhq.gui.dialog.glossary.NewGlossaryDialog.handleGlossaryHyperlinkClick;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 
@@ -51,7 +52,6 @@ import megamek.codeUtilities.ObjectUtility;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.universe.Factions;
-import mekhq.gui.panels.TutorialHyperlinkPanel;
 
 /**
  * The {@code GlossaryDialog} class represents a dialog window for displaying glossary entries. It displays detailed
@@ -215,11 +215,9 @@ public class GlossaryDialog extends JDialog {
                                                "<h1 style='text-align: center;'>%s</h1>" +
                                                "%s</div>", CENTER_WIDTH, fontStyle, title, description));
         setFontScaling(editorPane, false, 1.1);
-
-        // Add a HyperlinkListener to capture hyperlink clicks
-        editorPane.addHyperlinkListener(evt -> {
-            if (evt.getEventType() == EventType.ACTIVATED) {
-                TutorialHyperlinkPanel.handleTutorialHyperlinkClick(this, evt.getDescription());
+        editorPane.addHyperlinkListener(e -> {
+            if (e.getEventType() == EventType.ACTIVATED) {
+                handleGlossaryHyperlinkClick(this, e);
             }
         });
 

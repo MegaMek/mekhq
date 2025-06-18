@@ -47,25 +47,45 @@ import java.util.List;
  * @since 0.50.07
  */
 public enum DocumentationEntry {
-    /**
-     * Placeholder documentation entry.
-     */
-    EXAMPLE("EXAMPLE");
+    AGING_EFFECTS("AGING_EFFECTS", "Personnel Modules/Aging Effects"),
+    AWARDS_MODULE("AWARDS_MODULE", "Personnel Modules/Awards Module"),
+    EDUCATION_MODULE("EDUCATION_MODULE", "Personnel Modules/Education Module"),
+    RANDOM_DEATH("RANDOM_DEATH", "Personnel Modules/Random Death in MekHQ"),
+    RANDOM_DEPENDENTS("RANDOM_DEPENDENTS", "Personnel Modules/Random Dependents"),
+    RANDOM_PERSONALITIES("RANDOM_PERSONALITIES", "Personnel Modules/Random Personalities"),
+    STARTING_ATTRIBUTE_SCORES("STARTING_ATTRIBUTE_SCORES", "Personnel Modules/Starting Attribute Scores"),
+    TURNOVER_AND_RETENTION("TURNOVER_AND_RETENTION", "Personnel Modules/Turnover & Retention Module (feat. Fatigue)"),
+    PRISONERS_OF_WAR("PRISONERS_OF_WAR", "Random Events/Prisoners of War & Abstracted Search and Rescue"),
+    ACAR("ACAR", "StratCon/ACAR-Abstract Combat Auto-Resolve documentation"),
+    ADMIN_SKILLS("ADMIN_SKILLS", "StratCon/Admin Skills"),
+    COMBAT_TEAMS("COMBAT_TEAMS", "StratCon/Combat Teams, Roles, Training & Reinforcements"),
+    MORALE("MORALE", "StratCon/MekHQ Morale"),
+    RESUPPLY_AND_CONVOYS("RESUPPLY_AND_CONVOYS", "StratCon/Resupply & Convoys"),
+    UNIT_MARKETS("UNIT_MARKETS", "StratCon/Unit Markets"),
+    CHAOS_CAMPAIGNS("CHAOS_CAMPAIGNS", "MegaMek -MekHQ Chaos Campaign Guide"),
+    COOP_CAMPAIGNS("COOP_CAMPAIGNS", "MekHQ Co-Op Campaign Guide v1"),
+    NEW_PLAYER_GUIDE("NEW_PLAYER_GUIDE", "0_MHQ New Player Guide");
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.DocumentationEntry";
 
+    private final String DIRECTORY = "docs/";
+    private final String FILE_EXTENSION = ".pdf";
+
     private final String lookUpName;
+    private final String fileAddress;
 
     /**
      * Constructs a {@code DocumentationEntry} with the specified lookup name.
      *
      * @param lookUpName the resource key used to look up this entry's localized strings
+     * @param fileAddress the document address
      *
      * @author Illiani
      * @since 0.50.07
      */
-    DocumentationEntry(String lookUpName) {
+    DocumentationEntry(String lookUpName, String fileAddress) {
         this.lookUpName = lookUpName;
+        this.fileAddress = fileAddress;
     }
 
     /**
@@ -78,6 +98,19 @@ public enum DocumentationEntry {
      */
     public String getTitle() {
         return getTextAt(RESOURCE_BUNDLE, lookUpName + ".title");
+    }
+
+    /**
+     * Returns the full file address for this object by concatenating the directory path, the stored file address, and
+     * the file extension constants.
+     *
+     * @return the complete file address as a String
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String getFileAddress() {
+        return DIRECTORY + fileAddress + FILE_EXTENSION;
     }
 
     /**
