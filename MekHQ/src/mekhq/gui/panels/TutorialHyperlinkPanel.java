@@ -40,7 +40,8 @@ import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.event.HyperlinkEvent;
 
-import mekhq.gui.dialog.GlossaryDialog;
+import megamek.logging.MMLogger;
+import mekhq.gui.dialog.glossary.NewGlossaryDialog;
 
 /**
  * {@code TutorialHyperlinkPanel} is a GUI component for displaying text (typically instructional or tutorial content)
@@ -55,6 +56,7 @@ import mekhq.gui.dialog.GlossaryDialog;
  * @since 0.50.06
  */
 public class TutorialHyperlinkPanel extends JPanel {
+    private static final MMLogger LOGGER = MMLogger.create(TutorialHyperlinkPanel.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.TutorialHyperlinkPanel";
 
     /** Command string key indicating a glossary lookup request in a hyperlink event. */
@@ -64,8 +66,7 @@ public class TutorialHyperlinkPanel extends JPanel {
      * Creates a {@code TutorialHyperlinkPanel} displaying text associated with the specified resource key.
      *
      * <p>Displays HTML-formatted, centered text with hyperlinks on a transparent background. Hyperlinks are handled by
-     * {@link #handleTutorialHyperlinkClick(JDialog, String)}.</p>
-     *
+     * {@link NewGlossaryDialog#handleGlossaryHyperlinkClick(JDialog, HyperlinkEvent)}.</p>
      * @param key The resource key used to look up the tutorial/instructional text for display.
      *
      * @author Illiani
@@ -84,37 +85,10 @@ public class TutorialHyperlinkPanel extends JPanel {
         paneTutorial.setOpaque(false);
         paneTutorial.addHyperlinkListener(evt -> {
             if (evt.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                handleTutorialHyperlinkClick(null, evt.getDescription());
+                NewGlossaryDialog.handleGlossaryHyperlinkClick(null, evt);
             }
         });
 
         add(paneTutorial, BorderLayout.CENTER);
-    }
-
-    /**
-     * Handles a hyperlink-click event within the tutorial panel.
-     *
-     * <p>If the hyperlink reference string starts with the {@link #GLOSSARY_COMMAND_STRING} command, it opens a
-     * {@link GlossaryDialog} with the provided entry key.</p>
-     *
-     * <p>The reference is expected to be in the form {@code "COMMAND:entryKey"}.</p>
-     *
-     * <p>Example: {@code GLOSSARY:PRISONERS_OF_WAR}</p>
-     *
-     * @param parent    the parent {@link JDialog}, or {@code null} for no parent dialog.
-     * @param reference the hyperlink reference string specifying the command and key.
-     *
-     * @author Illiani
-     * @since 0.50.06
-     */
-    public static void handleTutorialHyperlinkClick(JDialog parent, String reference) {
-        String[] splitReference = reference.split(":");
-
-        String commandKey = splitReference[0];
-        String entryKey = splitReference[1];
-
-        if (commandKey.equalsIgnoreCase(GLOSSARY_COMMAND_STRING)) {
-            new GlossaryDialog(parent, entryKey);
-        }
     }
 }

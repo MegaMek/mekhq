@@ -81,6 +81,8 @@ dependencies {
     implementation 'org.apache.commons:commons-text:1.13.1'
     implementation 'org.apache.logging.log4j:log4j-core:2.24.3'
 
+    implementation 'org.apache.pdfbox:pdfbox:3.0.5'
+
     implementation 'org.commonmark:commonmark:0.24.0'
 
     implementation 'org.jfree:jfreechart:1.5.6'

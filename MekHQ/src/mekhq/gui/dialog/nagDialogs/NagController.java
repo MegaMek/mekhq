@@ -32,7 +32,7 @@
  */
 package mekhq.gui.dialog.nagDialogs;
 
-import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getAdministrativeStrainModifier;
+import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getHRStrainModifier;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -247,12 +247,12 @@ public class NagController {
             }
         }
 
-        // Admin Strain
-        if (AdminStrainNagDialog.checkNag(campaignOptions.isUseRandomRetirement(),
-              campaignOptions.isUseAdministrativeStrain(),
-              getAdministrativeStrainModifier(campaign))) {
-            AdminStrainNagDialog adminStrainNagDialog = new AdminStrainNagDialog(campaign);
-            if (adminStrainNagDialog.shouldCancelAdvanceDay()) {
+        // HR Strain
+        if (HRStrainNagDialog.checkNag(campaignOptions.isUseRandomRetirement(),
+              campaignOptions.isUseHRStrain(),
+              getHRStrainModifier(campaign))) {
+            HRStrainNagDialog HRStrainNagDialog = new HRStrainNagDialog(campaign);
+            if (HRStrainNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
         }

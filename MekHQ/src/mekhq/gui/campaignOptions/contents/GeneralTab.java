@@ -228,6 +228,8 @@ public class GeneralTab {
 
         layout.gridy = 0;
         layout.gridwidth = 5;
+        layout.weightx = 1.0;
+        layout.fill = GridBagConstraints.HORIZONTAL;
         panel.add(headerPanel, layout);
 
         layout.gridwidth = 1;
@@ -293,6 +295,7 @@ public class GeneralTab {
 
         final JLabel lblHeader = new JLabel(getTextAt(getCampaignOptionsResourceBundle(), "lblGeneral.text"),
               SwingConstants.CENTER);
+        lblHeader.setMinimumSize(UIUtil.scaleForGUI(600, 0));
         setFontScaling(lblHeader, true, 2);
         lblHeader.setName("lblGeneral");
 
