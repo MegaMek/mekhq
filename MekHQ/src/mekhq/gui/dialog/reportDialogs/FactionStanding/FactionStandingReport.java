@@ -66,6 +66,7 @@ import megamek.client.ui.util.UIUtil;
 import megamek.logging.MMLogger;
 import megamek.utilities.ImageUtilities;
 import mekhq.MekHQ;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.universe.Faction;
@@ -125,6 +126,7 @@ public class FactionStandingReport extends JDialog {
     private final ImageIcon campaignIcon;
     private final List<Mission> missions;
     private final boolean isFactionStandingEnabled;
+    private final CampaignOptions campaignOptions;
 
     private final List<String> innerSphereFactions = new ArrayList<>();
     private final List<String> clanFactions = new ArrayList<>();
@@ -143,14 +145,14 @@ public class FactionStandingReport extends JDialog {
      * @param isGM A boolean indicating whether the user is a Game Master (GM).
      * @param campaignFaction The primary faction for the campaign associated with the report.
      * @param campaignIcon An {@link ImageIcon} for the campaign (either a custom user icon or faction icon).
-     * @param isFactionStandingEnabled {@code true} if the tacking of Faction Standing is enabled in campaign options; {@code false} otherwise.
+     * @param campaignOptions the {@link CampaignOptions} object associated with the current campaign.
      *
      * @author Illiani
      * @since 0.50.07
      */
     public FactionStandingReport(final JFrame frame, final FactionStandings factionStandings, final LocalDate today,
-                                 final boolean isGM, final Faction campaignFaction, final ImageIcon campaignIcon,
-                                 final Collection<Mission> missions, final boolean isFactionStandingEnabled) {
+          final boolean isGM, final Faction campaignFaction, final ImageIcon campaignIcon,
+          final Collection<Mission> missions, final CampaignOptions campaignOptions) {
         this.frame = frame;
         this.today = today;
         this.gameYear = today.getYear();
@@ -160,7 +162,8 @@ public class FactionStandingReport extends JDialog {
         this.factionStandings = factionStandings;
         factions = Factions.getInstance();
         this.missions = new ArrayList<>(missions);
-        this.isFactionStandingEnabled = isFactionStandingEnabled;
+        this.isFactionStandingEnabled = campaignOptions.isTrackFactionStanding();
+        this.campaignOptions = campaignOptions;
 
         sortFactions();
         createReportPanel();
@@ -351,12 +354,8 @@ public class FactionStandingReport extends JDialog {
         lblStandingEffects.setBorder(null);
         lblStandingEffects.setFocusable(false);
         lblStandingEffects.setText("");
-        lblStandingEffects.setMinimumSize(new Dimension(Integer.MAX_VALUE, FACTION_EFFECTS_MINIMUM_HEIGHT));
-        lblStandingEffects.setPreferredSize(new Dimension(Integer.MAX_VALUE, FACTION_EFFECTS_MINIMUM_HEIGHT));
 
-        pnlEffects.add(lblStandingEffects, BorderLayout.CENTER);
-        pnlEffects.setMinimumSize(new Dimension(Integer.MAX_VALUE, FACTION_EFFECTS_MINIMUM_HEIGHT));
-        pnlEffects.setPreferredSize(new Dimension(Integer.MAX_VALUE, FACTION_EFFECTS_MINIMUM_HEIGHT));
+        pnlEffects.add(lblStandingEffects, BorderLayout.SOUTH);
 
         return pnlEffects;
     }
@@ -475,7 +474,8 @@ public class FactionStandingReport extends JDialog {
         pnlFactionStanding.setBorder(createStandingColoredRoundedTitledBorder(factionStanding.getStandingLevel()));
         pnlFactionStanding.setPreferredSize(new Dimension(FACTION_PANEL_WIDTH, FACTION_PANEL_HEIGHT));
         pnlFactionStanding.setMaximumSize(new Dimension(FACTION_PANEL_WIDTH, FACTION_PANEL_HEIGHT));
-        pnlFactionStanding.addMouseListener(createEffectsPanelUpdater(getEffectsDescription(climateRegard)));
+        pnlFactionStanding.addMouseListener(createEffectsPanelUpdater(getEffectsDescription(faction.isClan(),
+              climateRegard)));
 
         // Faction Logo
         ImageIcon icon = Factions.getFactionLogo(gameYear, factionCode);
@@ -645,15 +645,17 @@ public class FactionStandingReport extends JDialog {
     /**
      * Calculates the standing effects description string for a given faction regard value.
      *
+     * @param isClan {@code true} if the faction is a Clan faction, otherwise {@code false}
      * @param factionRegard the regard value of the faction
+     *
      * @return the standing effects description for the corresponding {@link FactionStandingLevel}
      *
      * @author Illiani
      * @since 0.50.07
      */
-    private static String getEffectsDescription(double factionRegard) {
+    private String getEffectsDescription(boolean isClan, double factionRegard) {
         FactionStandingLevel factionStanding = FactionStandingUtilities.calculateFactionStandingLevel(factionRegard);
-        return factionStanding.getEffectsDescription();
+        return factionStanding.getEffectsDescription(isClan, campaignOptions);
     }
 
     /**
