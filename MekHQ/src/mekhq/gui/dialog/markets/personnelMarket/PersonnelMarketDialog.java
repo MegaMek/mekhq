@@ -234,7 +234,7 @@ public class PersonnelMarketDialog extends JDialog {
         // Golden Hello Checkbox
         leftGbc.gridy = leftRow++;
         leftGbc.insets = new Insets(0, 0, 8, 0);
-        JCheckBox goldenHelloCheckbox = new JCheckBox(getTextAt(RESOURCE_BUNDLE,
+        goldenHelloCheckbox.setText(getTextAt(RESOURCE_BUNDLE,
               "checkbox.personnelMarket.goldenHello"));
         goldenHelloCheckbox.setSelected(market.isOfferingGoldenHello());
         goldenHelloCheckbox.setEnabled(market.getAssociatedPersonnelMarketStyle() == MEKHQ);
