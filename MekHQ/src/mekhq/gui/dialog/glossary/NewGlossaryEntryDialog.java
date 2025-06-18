@@ -310,7 +310,7 @@ public class NewGlossaryEntryDialog extends JDialog {
      * @since 0.50.07
      */
     public void addTab(String title, Component component) {
-        tabbedPane.addCloseableTab(title, null, component);
+        tabbedPane.addTab(title, component);
     }
 
     /**
