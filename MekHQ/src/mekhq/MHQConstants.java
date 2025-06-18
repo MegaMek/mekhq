@@ -32,11 +32,11 @@
  */
 package mekhq;
 
-import megamek.SuiteConstants;
-
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.Month;
+
+import megamek.SuiteConstants;
 
 /**
  * These are constants that hold across MekHQ.
@@ -198,6 +198,8 @@ public final class MHQConstants extends SuiteConstants {
     public static final String NAG_UNMAINTAINED_UNITS = "nagUnmaintainedUnits";
     public static final String NAG_PREGNANT_COMBATANT = "nagPregnantCombatant";
     public static final String NAG_PRISONERS = "nagPrisoners";
+    public static final String NAG_HR_STRAIN = "nagHRStrain";
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public static final String NAG_ADMIN_STRAIN = "nagAdminStrain";
     public static final String NAG_UNTREATED_PERSONNEL = "nagUntreatedPersonnel";
     public static final String NAG_NO_COMMANDER = "nagNoCommander";

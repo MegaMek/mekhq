@@ -37,9 +37,9 @@ import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_TETRIS_MASTER;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.areFieldKitchensWithinCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenUsage;
-import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getAdministrativeStrain;
-import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getAdministrativeStrainModifier;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getCombinedSkillValues;
+import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getHRStrain;
+import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getHRStrainModifier;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.calculatePrisonerCapacity;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.calculatePrisonerCapacityUsage;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -364,21 +364,33 @@ public class CampaignSummary {
      *
      * @return the administrative capacity report in HTML format
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public String getAdministrativeCapacityReport(Campaign campaign) {
+        return getHRCapacityReport(campaign);
+    }
+
+    /**
+     * Generates an administrative capacity report for the Command Center.
+     *
+     * @param campaign the campaign for which the administrative capacity report is generated
+     *
+     * @return the administrative capacity report in HTML format
+     */
+    public String getHRCapacityReport(Campaign campaign) {
         int combinedSkillValues = getCombinedSkillValues(campaign, SkillType.S_ADMIN);
 
-        StringBuilder administrativeCapacityReport = new StringBuilder().append(getAdministrativeStrain(campaign))
+        StringBuilder hrCapacityReport = new StringBuilder().append(getHRStrain(campaign))
                                                            .append(" / ")
                                                            .append(campaign.getCampaignOptions()
-                                                                         .getAdministrativeCapacity() *
+                                                                         .getHRCapacity() *
                                                                          combinedSkillValues)
                                                            .append(" personnel");
 
-        if (getAdministrativeStrainModifier(campaign) > 0) {
-            administrativeCapacityReport.append(" (+").append(getAdministrativeStrainModifier(campaign)).append(')');
+        if (getHRStrainModifier(campaign) > 0) {
+            hrCapacityReport.append(" (+").append(getHRStrainModifier(campaign)).append(')');
         }
 
-        return administrativeCapacityReport.toString();
+        return hrCapacityReport.toString();
     }
 
     /**
