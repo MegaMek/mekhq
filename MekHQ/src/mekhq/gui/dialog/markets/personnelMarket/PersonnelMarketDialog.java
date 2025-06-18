@@ -175,13 +175,6 @@ public class PersonnelMarketDialog {
         pnlLeft.add(pnlHeader, BorderLayout.NORTH);
 
         tablePanel = initializeTablePanel();
-        tablePanel.addListSelectionListener(e -> {
-            List<Person> applicants = tablePanel.getSelectedApplicants();
-            selectedPerson = applicants.isEmpty() ? null : applicants.get(0);
-            if (personViewPanel != null) {
-                personViewPanel.setPerson(selectedPerson);
-            }
-        });
         pnlLeft.add(tablePanel, BorderLayout.CENTER);
 
         JPanel pnlTips = initializeTipPanel();
@@ -379,32 +372,52 @@ public class PersonnelMarketDialog {
         PersonnelTablePanel tablePanel = new PersonnelTablePanel(campaign, currentApplicants);
 
         JTable personnelTable = tablePanel.getTable();
-        if (personnelTable.getRowSorter() instanceof TableRowSorter<?> sorter) {
-            roleComboBox.addActionListener(ev -> {
-                PersonnelFilter selectedFilter = roleComboBox.getSelectedItem();
-                if (selectedFilter == null) {
-                    selectedFilter = ALL;
-                } else {
-                    market.setLastSelectedFilter(roleComboBox.getSelectedIndex());
-                }
-                PersonnelFilter finalSelectedFilter = selectedFilter;
-                sorter.setRowFilter(new RowFilter<TableModel, Integer>() {
-                    @Override
-                    public boolean include(Entry<? extends TableModel, ? extends Integer> entry) {
-                        int modelRow = entry.getIdentifier();
-                        TableModel model = entry.getModel();
-                        if (model instanceof PersonTableModel) {
-                            Person person = ((PersonTableModel) model).getPerson(modelRow);
-                            return finalSelectedFilter.getFilteredInformation(person, campaign.getLocalDate());
-                        }
-                        return true;
-                    }
+        personnelTable.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                SwingUtilities.invokeLater(() -> {
+                    List<Person> selected = tablePanel.getSelectedApplicants();
+                    Person selectedPerson = selected.isEmpty() ? null : selected.get(0);
+                    personViewPanel.setPerson(selectedPerson);
                 });
-            });
+            }
+        });
+
+        if (personnelTable.getRowSorter() instanceof TableRowSorter<?> sorter) {
+            filterRoles(sorter);
+            roleComboBox.addActionListener(ev -> filterRoles(sorter));
         }
         return tablePanel;
     }
 
+    /**
+     * Applies filtering logic to the given table row sorter based on the selected role filter.
+     *
+     * @param sorter the {@link TableRowSorter} to which the filtering logic is applied
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private void filterRoles(TableRowSorter<?> sorter) {
+        PersonnelFilter selectedFilter = roleComboBox.getSelectedItem();
+        if (selectedFilter == null) {
+            selectedFilter = ALL;
+        } else {
+            market.setLastSelectedFilter(roleComboBox.getSelectedIndex());
+        }
+        PersonnelFilter finalSelectedFilter = selectedFilter;
+        sorter.setRowFilter(new RowFilter<TableModel, Integer>() {
+            @Override
+            public boolean include(Entry<? extends TableModel, ? extends Integer> entry) {
+                int modelRow = entry.getIdentifier();
+                TableModel model = entry.getModel();
+                if (model instanceof PersonTableModel) {
+                    Person person = ((PersonTableModel) model).getPerson(modelRow);
+                    return finalSelectedFilter.getFilteredInformation(person, campaign.getLocalDate());
+                }
+                return true;
+            }
+        });
+    }
 
     /**
      * Initializes and returns the detail view pane for the selected person.
