@@ -341,6 +341,10 @@ public class PersonnelMarketDialog extends JDialog {
         boolean isGM = campaign.isGM();
 
         JPanel buttonPanel = new JPanel();
+        JButton closeButton = new JButton(getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.close"));
+        closeButton.addActionListener(e -> closeAction());
+        buttonPanel.add(closeButton);
+
         JButton hireButton = new JButton(getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.hire.normal"));
         hireButton.addActionListener(e -> hireActionListener(isGM));
         buttonPanel.add(hireButton);
