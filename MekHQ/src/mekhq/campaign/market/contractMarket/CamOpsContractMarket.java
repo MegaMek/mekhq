@@ -48,6 +48,7 @@ import java.util.Random;
 
 import megamek.common.Compute;
 import megamek.common.enums.SkillLevel;
+import megamek.common.universe.FactionTag;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -63,7 +64,6 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Faction.Tag;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 
@@ -307,7 +307,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
     }
 
     private Faction determineEmployer(Campaign campaign, int ratingMod, HiringHallModifiers hiringHallModifiers) {
-        Collection<Tag> employerTags;
+        Collection<FactionTag> employerTags;
         int roll = Compute.d6(2) + ratingMod + hiringHallModifiers.employersMod;
         if (roll < 6) {
             // Roll again on the independent employers column
@@ -319,7 +319,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         return getRandomEmployer(campaign, employerTags);
     }
 
-    private Faction getRandomEmployer(Campaign campaign, Collection<Tag> employerTags) {
+    private Faction getRandomEmployer(Campaign campaign, Collection<FactionTag> employerTags) {
         Collection<Faction> factions = Factions.getInstance().getActiveFactions(campaign.getLocalDate());
         List<Faction> filtered = new ArrayList<>();
         for (Faction faction : factions) {
@@ -327,11 +327,11 @@ public class CamOpsContractMarket extends AbstractContractMarket {
             if (faction.isClan() && !faction.equals(campaign.getFaction())) {
                 continue;
             }
-            for (Tag employerTag : employerTags) {
+            for (FactionTag employerTag : employerTags) {
                 if (!faction.is(employerTag)) {
                     // The SMALL tag has to be converted to independent for now, since for some reason
                     // independent is coded as a string.
-                    if (employerTag == Tag.SMALL && faction.isIndependent()) {
+                    if (employerTag == FactionTag.SMALL && faction.isIndependent()) {
                         continue;
                     }
                     break;
@@ -343,40 +343,40 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         return filtered.get(rand.nextInt(filtered.size()));
     }
 
-    private Collection<Tag> getEmployerTags(Campaign campaign, int roll, boolean independent) {
-        Collection<Tag> tags = new ArrayList<>();
+    private Collection<FactionTag> getEmployerTags(Campaign campaign, int roll, boolean independent) {
+        Collection<FactionTag> tags = new ArrayList<>();
         if (independent) {
-            tags.add(Tag.SMALL);
+            tags.add(FactionTag.SMALL);
             if (roll < 4) {
-                tags.add(Tag.NOBLE);
+                tags.add(FactionTag.NOBLE);
             } else if (roll < 6) {
-                tags.add(Tag.PLANETARY_GOVERNMENT);
+                tags.add(FactionTag.PLANETARY_GOVERNMENT);
             } else if (roll == 6) {
-                tags.add(Tag.MERC);
+                tags.add(FactionTag.MERC);
             } else if (roll < 9) {
-                tags.add(Tag.PERIPHERY);
-                tags.add(Tag.MAJOR);
+                tags.add(FactionTag.PERIPHERY);
+                tags.add(FactionTag.MAJOR);
             } else if (roll < 11) {
-                tags.add(Tag.PERIPHERY);
-                tags.add(Tag.MINOR);
+                tags.add(FactionTag.PERIPHERY);
+                tags.add(FactionTag.MINOR);
             } else {
-                tags.add(Tag.CORPORATION);
+                tags.add(FactionTag.CORPORATION);
             }
         } else {
             if (roll < 6) {
-                tags.add(Tag.SMALL);
+                tags.add(FactionTag.SMALL);
             } else if (roll < 8) {
-                tags.add(Tag.MINOR);
+                tags.add(FactionTag.MINOR);
             } else if (roll < 11) {
-                tags.add(Tag.MAJOR);
+                tags.add(FactionTag.MAJOR);
             } else {
                 if (Factions.getInstance()
                           .getActiveFactions(campaign.getLocalDate())
                           .stream()
                           .anyMatch(Faction::isSuperPower)) {
-                    tags.add(Tag.SUPER);
+                    tags.add(FactionTag.SUPER);
                 } else {
-                    tags.add(Tag.MAJOR);
+                    tags.add(FactionTag.MAJOR);
                 }
             }
         }
