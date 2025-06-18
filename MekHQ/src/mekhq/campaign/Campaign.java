@@ -6664,6 +6664,7 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "info");
 
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "id", id.toString());
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "calendar", getLocalDate());
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "name", name);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "faction", getFaction().getShortName());
         if (retainerEmployerCode != null) {
@@ -6707,7 +6708,6 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "lastForceId", lastForceId);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "lastMissionId", lastMissionId);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "lastScenarioId", lastScenarioId);
-        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "calendar", getLocalDate());
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "initiativeBonus", initiativeBonus);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "initiativeMaxBonus", initiativeMaxBonus);
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "nameGen");
