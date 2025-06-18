@@ -84,7 +84,7 @@ public class NewPersonnelMarket {
     private static int LOW_POPULATION_RECRUITMENT_DIVIDER = 1;
     private static int UNIT_REPUTATION_RECRUITMENT_CUTOFF = Integer.MIN_VALUE;
     @SuppressWarnings(value = "FieldCanBeLocal")
-    private static int PROFESSION_EXTINCTION_IGNORE_VALUE = -1;
+    private static final int PROFESSION_EXTINCTION_IGNORE_VALUE = -1;
 
     final private Campaign campaign;
     private PersonnelMarketStyle associatedPersonnelMarketStyle = PERSONNEL_MARKET_DISABLED;
@@ -868,6 +868,11 @@ public class NewPersonnelMarket {
 
         int introductionYear = entry.introductionYear();
         int extinctionYear = entry.extinctionYear();
+
+        if (extinctionYear == PROFESSION_EXTINCTION_IGNORE_VALUE) {
+            extinctionYear = Integer.MAX_VALUE;
+        }
+
         while (gameYear < introductionYear || (gameYear >= extinctionYear)) {
             PersonnelRole fallbackProfession = entry.fallbackProfession();
             entry = unorderedMarketEntries.get(fallbackProfession);
