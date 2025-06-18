@@ -32,24 +32,37 @@
  */
 package mekhq.gui.dialog.reportDialogs.FactionStanding.gmToolsDialog;
 
-import megamek.common.annotations.Nullable;
-import megamek.logging.MMLogger;
-import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
-import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
-import mekhq.gui.dialog.GlossaryDialog;
-
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.HyperlinkEvent;
-import java.awt.*;
-
 import static java.lang.Integer.MAX_VALUE;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
-import static mekhq.utilities.ReportingUtilities.*;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getWarningColor;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
+
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JDialog;
+import javax.swing.JEditorPane;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.HyperlinkEvent;
+
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.gui.dialog.glossary.NewGlossaryDialog;
 
 /**
  * A confirmation dialog for {@link GMTools} actions in MekHQ's Faction Standing system.
@@ -69,7 +82,6 @@ public class GMToolsConfirmationDialog extends JDialog {
     private final int PADDING = scaleForGUI(10);
     protected static final int IMAGE_WIDTH = scaleForGUI(200);
     protected static final int CENTER_WIDTH = scaleForGUI(450);
-    public final static String GLOSSARY_COMMAND_STRING = "GLOSSARY";
 
     private ImageIcon campaignIcon;
     private final FactionStandingsGMToolsActionType actionType;
@@ -252,28 +264,7 @@ public class GMToolsConfirmationDialog extends JDialog {
      */
     protected void hyperlinkEventListenerActions(HyperlinkEvent evt) {
         if (evt.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-            handleImmersiveHyperlinkClick(evt.getDescription());
-        }
-    }
-
-    /**
-     * Processes logic when immersive (in-dialog) hyperlinks are clicked.
-     *
-     * @param reference the string reference associated with the hyperlink.
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    private void handleImmersiveHyperlinkClick(String reference) {
-        String[] splitReference = reference.split(":");
-
-        String commandKey = splitReference[0];
-        String entryKey = splitReference[1];
-
-        if (commandKey.equalsIgnoreCase(GLOSSARY_COMMAND_STRING)) {
-            new GlossaryDialog(this, entryKey);
-        } else {
-            LOGGER.warn("Invalid hyperlink command: {}", commandKey);
+            NewGlossaryDialog.handleGlossaryHyperlinkClick(this, evt);
         }
     }
 }
