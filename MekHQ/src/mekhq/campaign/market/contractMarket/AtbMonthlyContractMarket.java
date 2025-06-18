@@ -76,6 +76,8 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.Systems;
+import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
 
 /**
  * Contract offers that are generated monthly under AtB rules.
@@ -799,6 +801,15 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
             if (contract.getEnemySkill().isEliteOrGreater()) {
                 mods.mods[Compute.randomInt(4)] += 1;
+            }
+        }
+
+        if (campaign.getCampaignOptions().isUseFactionStandingNegotiationSafe()) {
+            FactionStandings standings = campaign.getFactionStandings();
+            double regard = standings.getRegardForFaction(contract.getEmployerCode(), true);
+            int negotiationModifier = FactionStandingUtilities.getNegotiationModifier(regard);
+            for (int i = 0; i < 4; i++) {
+                mods.mods[i] += negotiationModifier;
             }
         }
 
