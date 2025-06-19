@@ -34,7 +34,6 @@
 package mekhq.campaign.mission;
 
 import static java.lang.Math.ceil;
-import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
@@ -70,7 +69,6 @@ import static mekhq.campaign.rating.IUnitRating.DRAGOON_F;
 import static mekhq.campaign.stratcon.StratconContractDefinition.getContractDefinition;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.campaign.universe.factionStanding.BatchallFactions.BATCHALL_FACTIONS;
-import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -144,6 +142,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.factionStanding.BatchallFactions;
+import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.campaign.universe.factionStanding.PerformBatchall;
 import mekhq.utilities.MHQXMLUtility;
@@ -629,7 +628,13 @@ public class AtBContract extends Contract {
             boolean tracksStanding = campaign.getCampaignOptions().isTrackFactionStanding();
             FactionStandings factionStandings = campaign.getFactionStandings();
 
-            if (faction.performsBatchalls()) {
+            boolean allowBatchalls = true;
+            if (campaign.getCampaignOptions().isUseFactionStandingBatchallRestrictions()) {
+                double regard = factionStandings.getRegardForFaction(faction.getShortName(), true);
+                allowBatchalls = FactionStandingUtilities.isBatchallAllowed(regard);
+            }
+
+            if (faction.performsBatchalls() && allowBatchalls) {
                 PerformBatchall batchallDialog = new PerformBatchall(campaign, clanOpponent, enemyCode);
 
                 batchallAccepted = batchallDialog.isBatchallAccepted();
