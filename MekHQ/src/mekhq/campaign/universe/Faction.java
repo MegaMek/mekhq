@@ -40,6 +40,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.Map.Entry;
 
+import megamek.client.ratgenerator.FactionRecord;
 import megamek.common.annotations.Nullable;
 import megamek.common.universe.Faction2;
 import megamek.common.universe.FactionTag;
@@ -135,11 +136,10 @@ public class Faction {
         for (Entry<Integer, String> entry : faction2.getCapitalChanges().entrySet()) {
             planetChanges.put(LocalDate.ofYearDay(entry.getKey(), 1), entry.getValue());
         }
-        if (!faction2.getYearsActive().isEmpty()) {
-            Integer startYear = faction2.getYearsActive().get(0).start;
-            start = startYear == null ? 0 : startYear;
-            Integer endYear = faction2.getYearsActive().get(0).end;
-            start = endYear == null ? 0 : endYear;
+        List<FactionRecord.DateRange> active = faction2.getYearsActive();
+        if (!active.isEmpty()) {
+            start = Objects.requireNonNullElse(active.get(0).start, 0);
+            end = Objects.requireNonNullElse(active.get(active.size() - 1).end, 9999);
         }
         HonorRating preInvasion = faction2.getPreInvasionHonorRating();
         preInvasionHonorRating = (preInvasion != null) ? preInvasion : HonorRating.STRICT;
