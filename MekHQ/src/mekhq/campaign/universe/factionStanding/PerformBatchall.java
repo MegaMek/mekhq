@@ -148,7 +148,7 @@ public class PerformBatchall {
      * @since 0.50.07
      */
     private void getBatchallStandingTooLowDialog() {
-        ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
+        new ImmersiveDialogSimple(campaign,
               clanOpponent,
               null,
               getBatchallForbiddenText(),
