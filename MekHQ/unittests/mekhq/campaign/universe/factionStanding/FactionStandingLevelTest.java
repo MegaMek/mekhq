@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
-import static mekhq.campaign.universe.Faction.Tag.CLAN;
 import static mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel.getMaximumStandingLevel;
 import static mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel.getMinimumStandingLevel;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
@@ -46,6 +45,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
+import megamek.common.universe.FactionTag;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel;
 import org.junit.jupiter.api.BeforeAll;
@@ -68,7 +68,7 @@ class FactionStandingLevelTest {
         assertFalse(innerSphereFaction.isComStarOrWoB());
 
         clanFaction = new Faction("CSB", "Clan Stink Badger");
-        clanFaction.setTags(Collections.singleton(CLAN));
+        clanFaction.setTags(Collections.singleton(FactionTag.CLAN));
         assertTrue(clanFaction.isClan());
 
         comStarFaction = new Faction("CS", "ComStar");
