@@ -440,32 +440,33 @@ public enum FactionStandingLevel {
         logger.info(this);
         List<String> effects = new ArrayList<>();
 
-        if (hasCommandCircuitAccess && campaignOptions.isUseFactionStandingCommandCircuit()) {
+        if (hasCommandCircuitAccess && campaignOptions.isUseFactionStandingCommandCircuitSafe()) {
             effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.commandCircuit"));
         }
 
-        if (isOutlawed && campaignOptions.isUseFactionStandingOutlawed()) {
+        if (isOutlawed && campaignOptions.isUseFactionStandingOutlawedSafe()) {
             effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.outlawed"));
         }
 
-        if (isClan && !isBatchallAllowed && campaignOptions.isUseFactionStandingBatchallRestrictions()) {
+        if (isClan && !isBatchallAllowed && campaignOptions.isUseFactionStandingBatchallRestrictionsSafe()) {
             effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.batchall"));
         }
 
-        if (negotiationModifier != 0 && campaignOptions.isUseFactionStandingNegotiation()) {
+        if (negotiationModifier != 0 && campaignOptions.isUseFactionStandingNegotiationSafe()) {
             effects.add(getFormattedTextAt(RESOURCE_BUNDLE,
                   "factionStandingLevel.negotiation",
                   getPolarityOfModifier(negotiationModifier)));
         }
 
+        final boolean isUseStratCon = campaignOptions.isUseStratCon();
         if (resupplyWeightModifier != 1.0
-                  && campaignOptions.isUseStratCon()
-                  && campaignOptions.isUseFactionStandingResupply()) {
+                  && isUseStratCon
+                  && campaignOptions.isUseFactionStandingResupplySafe()) {
             int resupplyPercentage = (int) round(resupplyWeightModifier * 100);
             effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.resupply", resupplyPercentage));
         }
 
-        if (campaignOptions.isUseFactionStandingRecruitment()) {
+        if (campaignOptions.isUseFactionStandingRecruitmentSafe()) {
             int ticketsModifier = recruitmentTickets - STANDING_LEVEL_4.getRecruitmentTickets();
             if (ticketsModifier != 0) {
                 effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.recruitment.popularity",
@@ -478,22 +479,24 @@ public enum FactionStandingLevel {
             }
         }
 
-        if (barrackCostsMultiplier != 1.0 && campaignOptions.isUseFactionStandingBarracksCosts()) {
+        if (barrackCostsMultiplier != 1.0 && campaignOptions.isUseFactionStandingBarracksCostsSafe()) {
             int barracksCostPercentage = (int) round(barrackCostsMultiplier * 100);
             effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.barracks", barracksCostPercentage));
         }
 
-        if (unitMarketRarityModifier != 0 && campaignOptions.isUseFactionStandingUnitMarket()) {
+        if (unitMarketRarityModifier != 0
+                  && !campaignOptions.getUnitMarketMethod().isNone()
+                  && campaignOptions.isUseFactionStandingUnitMarketSafe()) {
             effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.unitMarket",
                   getPolarityOfModifier(unitMarketRarityModifier)));
         }
 
-        if (contractPayMultiplier != 1.0 && campaignOptions.isUseFactionStandingContractPay()) {
+        if (contractPayMultiplier != 1.0 && campaignOptions.isUseFactionStandingContractPaySafe()) {
             int payPercentage = (int) round(contractPayMultiplier * 100);
             effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.contractPay", payPercentage));
         }
 
-        if (campaignOptions.isUseFactionStandingSupportPoints()) {
+        if (isUseStratCon && campaignOptions.isUseFactionStandingSupportPointsSafe()) {
             if (supportPointModifierContractStart != 0) {
                 effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.supportPoints.signing",
                       getPolarityOfModifier(supportPointModifierContractStart)));
