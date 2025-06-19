@@ -27,20 +27,20 @@
  */
 package mekhq.campaign.universe;
 
-import mekhq.campaign.universe.Faction.Tag;
-import org.junit.jupiter.api.Test;
-import org.w3c.dom.DOMException;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.time.LocalDate;
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.List;
+import javax.xml.parsers.ParserConfigurationException;
+
+import megamek.common.universe.FactionTag;
+import org.junit.jupiter.api.Test;
+import org.w3c.dom.DOMException;
+import org.xml.sax.SAXException;
 
 public class FactionsIntegrationTest {
     @Test
@@ -64,24 +64,24 @@ public class FactionsIntegrationTest {
         assertNotNull(capellans);
         assertFalse(capellans.isClan());
         assertEquals("Sian", capellans.getStartingPlanet(LocalDate.of(3025, 1, 1)));
-        assertTrue(capellans.is(Tag.IS));
-        assertTrue(capellans.is(Tag.MAJOR));
+        assertTrue(capellans.is(FactionTag.IS));
+        assertTrue(capellans.is(FactionTag.MAJOR));
 
         Faction comStar = factions.getFaction("CS");
         assertNotNull(comStar);
         assertTrue(comStar.isComStar());
         assertEquals("Terra", comStar.getStartingPlanet(LocalDate.of(3025, 1, 1)));
         assertEquals("Tukayyid", comStar.getStartingPlanet(LocalDate.of(3067, 1, 1)));
-        assertTrue(comStar.is(Tag.IS));
-        assertTrue(comStar.is(Tag.INACTIVE));
-        assertTrue(comStar.is(Tag.MAJOR));
+        assertTrue(comStar.is(FactionTag.IS));
+        assertTrue(comStar.is(FactionTag.INACTIVE));
+        assertTrue(comStar.is(FactionTag.MAJOR));
 
         Faction ghostBear = factions.getFaction("CGB");
         assertNotNull(ghostBear);
         assertTrue(ghostBear.isClan());
         assertEquals("Arcadia (Clan)", ghostBear.getStartingPlanet(LocalDate.of(3025, 1, 1)));
         assertEquals("Alshain", ghostBear.getStartingPlanet(LocalDate.of(3067, 1, 1)));
-        assertTrue(ghostBear.is(Tag.CLAN));
-        assertTrue(ghostBear.is(Tag.MAJOR));
+        assertTrue(ghostBear.is(FactionTag.CLAN));
+        assertTrue(ghostBear.is(FactionTag.MAJOR));
     }
 }
