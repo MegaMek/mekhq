@@ -1155,10 +1155,31 @@ public class CampaignGUI extends JPanel {
         statusPanel.add(lblPartsAvailabilityRating);
     }
 
+    /**
+     * Initializes and arranges the top button panel and its components in the user interface.
+     *
+     * <p>This method sets up the location label with a travel status report, applies visual borders, and positions
+     * the major controls at the top of the panel using a {@link GridBagLayout}:</p>
+     *
+     * <ul>
+     *   <li>Adds the current location and travel status label.</li>
+     *   <li>Places market-related controls beside the location label.</li>
+     *   <li>Adds the main button panel for user actions.</li>
+     * </ul>
+     *
+     * <p>Accessibility names and layout constraints are assigned to ensure that the UI is properly arranged and
+     * accessible.</p>
+     */
     private void initTopButtons() {
+        boolean isUseCommandCircuit =
+              Campaign.isUseCommandCircuit(getCampaign().isOverridingCommandCircuitRequirements(),
+                    getCampaign().isGM(), getCampaign().getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
+                    getCampaign().getFactionStandings(), getCampaign().getActiveAtBContracts());
+
         lblLocation = new JLabel(getCampaign().getLocation()
                                        .getReport(getCampaign().getLocalDate(),
-                                             getCampaign().calculateCostPerJump(false, true)));
+                                             getCampaign().calculateCostPerJump(false, true),
+                                             isUseCommandCircuit));
         lblLocation.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("currentLocation.title")));
 
         pnlTop = new JPanel(new GridBagLayout());
@@ -2712,9 +2733,15 @@ public class CampaignGUI extends JPanel {
     private final ActionScheduler fundsScheduler = new ActionScheduler(this::refreshFunds);
 
     public void refreshLocation() {
+        boolean isUseCommandCircuit =
+              Campaign.isUseCommandCircuit(getCampaign().isOverridingCommandCircuitRequirements(),
+                    getCampaign().isGM(), getCampaign().getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
+                    getCampaign().getFactionStandings(), getCampaign().getActiveAtBContracts());
+
         lblLocation.setText(getCampaign().getLocation()
                                   .getReport(getCampaign().getLocalDate(),
-                                        getCampaign().calculateCostPerJump(false, true)));
+                                        getCampaign().calculateCostPerJump(false, true),
+                                        isUseCommandCircuit));
     }
 
     public int getTabIndexByName(String tabTitle) {

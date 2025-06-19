@@ -244,8 +244,10 @@ import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.universe.eras.Era;
 import mekhq.campaign.universe.eras.Eras;
+import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.campaign.universe.factionStanding.PerformBatchall;
+import mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel;
 import mekhq.campaign.universe.fameAndInfamy.FameAndInfamyController;
 import mekhq.campaign.universe.selectors.factionSelectors.AbstractFactionSelector;
 import mekhq.campaign.universe.selectors.factionSelectors.DefaultFactionSelector;
@@ -357,6 +359,7 @@ public class Campaign implements ITechManager {
 
     private CurrentLocation location;
     private boolean isAvoidingEmptySystems;
+    private boolean isOverridingCommandCircuitRequirements;
 
     private final News news;
 
@@ -457,6 +460,7 @@ public class Campaign implements ITechManager {
         CurrencyManager.getInstance().setCampaign(this);
         location = new CurrentLocation(Systems.getInstance().getSystems().get("Galatea"), 0);
         isAvoidingEmptySystems = true;
+        isOverridingCommandCircuitRequirements = false;
         currentReport = new ArrayList<>();
         currentReportHTML = "";
         newReports = new ArrayList<>();
@@ -611,6 +615,14 @@ public class Campaign implements ITechManager {
 
     public void setIsAvoidingEmptySystems(boolean isAvoidingEmptySystems) {
         this.isAvoidingEmptySystems = isAvoidingEmptySystems;
+    }
+
+    public boolean isOverridingCommandCircuitRequirements() {
+        return isOverridingCommandCircuitRequirements;
+    }
+
+    public void setIsOverridingCommandCircuitRequirements(boolean isOverridingCommandCircuitRequirements) {
+        this.isOverridingCommandCircuitRequirements = isOverridingCommandCircuitRequirements;
     }
 
     /**
@@ -6758,6 +6770,10 @@ public class Campaign implements ITechManager {
         finances.writeToXML(writer, indent);
         location.writeToXML(writer, indent);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "isAvoidingEmptySystems", isAvoidingEmptySystems);
+        MHQXMLUtility.writeSimpleXMLTag(writer,
+              indent,
+              "isOverridingCommandCircuitRequirements",
+              isOverridingCommandCircuitRequirements);
         shoppingList.writeToXML(writer, indent);
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "kills");
         for (List<Kill> kills : kills.values()) {
@@ -7028,9 +7044,13 @@ public class Campaign implements ITechManager {
         // A* search
         final int MAX_JUMPS = 10000;
         for (int jumps = 0; jumps < MAX_JUMPS; jumps++) {
-            // Get current node's information
             PlanetarySystem currentSystem = systemsInstance.getSystemById(current);
-            double currentG = scoreG.get(current) + currentSystem.getRechargeTime(getLocalDate());
+
+            boolean isUseCommandCircuits = isUseCommandCircuit(isOverridingCommandCircuitRequirements, gmMode,
+                  campaignOptions.isUseFactionStandingCommandCircuitSafe(), factionStandings, getActiveAtBContracts());
+
+            // Get current node's information
+            double currentG = scoreG.get(current) + currentSystem.getRechargeTime(getLocalDate(), isUseCommandCircuits);
             final String localCurrent = current;
 
             // Explore neighbors
@@ -7080,6 +7100,57 @@ public class Campaign implements ITechManager {
 
         // No path found or maximum jumps reached
         return reconstructPath(current, parent, systemsInstance);
+    }
+
+    /**
+     * Determines whether command circuit access should be granted based on campaign settings, game master mode, current
+     * faction standings, and a list of active contracts.
+     *
+     * <p>Access is immediately granted if both command circuit requirements are overridden and game master mode is
+     * active. If not, and if faction standing is used as a criterion, the method evaluates the player's highest faction
+     * regard across all active contracts, granting access if this level meets the threshold.</p>
+     *
+     * <p>If there are no active contracts, access is denied.</p>
+     *
+     * @param overridingCommandCircuitRequirements {@code true} if command circuit requirements are overridden
+     * @param isGM                                 {@code true} if game master mode is enabled
+     * @param useFactionStandingCommandCircuit     {@code true} if faction standing is used to determine access
+     * @param factionStandings                     player faction standing data
+     * @param activeContracts                      list of currently active contracts to evaluate for access
+     *
+     * @return {@code true} if command circuit access should be used; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public static boolean isUseCommandCircuit(boolean overridingCommandCircuitRequirements, boolean isGM,
+          boolean useFactionStandingCommandCircuit, FactionStandings factionStandings,
+          List<AtBContract> activeContracts) {
+        boolean useCommandCircuit = overridingCommandCircuitRequirements && isGM;
+
+        if (useCommandCircuit) {
+            logger.debug("(Override) isUseCommandCircuit = {}", true);
+            return true;
+        }
+
+        if (activeContracts.isEmpty()) {
+            logger.debug("(No Contract) isUseCommandCircuit = {}", false);
+            return false;
+        }
+
+        double highestRegard = FactionStandingLevel.STANDING_LEVEL_0.getMinimumRegard();
+        if (useFactionStandingCommandCircuit) {
+            for (AtBContract contract : activeContracts) {
+                double currentRegard = factionStandings.getRegardForFaction(contract.getEmployerCode(), true);
+                if (currentRegard > highestRegard) {
+                    highestRegard = currentRegard;
+                }
+            }
+        }
+
+        useCommandCircuit = FactionStandingUtilities.hasCommandCircuitAccess(highestRegard);
+        logger.debug("(Faction Standing) isUseCommandCircuit = {}", useCommandCircuit);
+        return useCommandCircuit;
     }
 
     /**
