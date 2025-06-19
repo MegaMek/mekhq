@@ -638,12 +638,6 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             }
         }
 
-        if (campaign.getLocalDate().isBefore(BATTLE_OF_TUKAYYID)) {
-            if (employer.isInnerSphere() && enemy.isClan()) {
-                multiplier *= 0.5;
-            }
-        }
-
         if (campaignOptions.isUseFactionStandingContractPaySafe()) {
             FactionStandings factionStandings = campaign.getFactionStandings();
             double regard = factionStandings.getRegardForFaction(employer.getShortName(), true);
@@ -651,7 +645,11 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         }
 
         // FG3 Difficulty Multiplier
-        if (campaignOptions.isUseGenericBattleValue()) {
+        if (campaign.getLocalDate().isBefore(BATTLE_OF_TUKAYYID)
+                  && employer.isInnerSphere()
+                  && enemy.isClan()) {
+            multiplier *= 0.5;
+        } else if (campaignOptions.isUseGenericBattleValue()) {
             int contractDifficulty = contract.getDifficulty();
             if (contractDifficulty != Integer.MIN_VALUE && contractDifficulty <= 2) {
                 multiplier /= 0.5;
