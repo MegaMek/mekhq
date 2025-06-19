@@ -120,6 +120,7 @@ import mekhq.campaign.report.TransportReport;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.NewsItem;
+import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
@@ -1172,7 +1173,7 @@ public class CampaignGUI extends JPanel {
      */
     private void initTopButtons() {
         boolean isUseCommandCircuit =
-              Campaign.isUseCommandCircuit(getCampaign().isOverridingCommandCircuitRequirements(),
+              FactionStandingUtilities.isUseCommandCircuit(getCampaign().isOverridingCommandCircuitRequirements(),
                     getCampaign().isGM(), getCampaign().getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
                     getCampaign().getFactionStandings(), getCampaign().getActiveAtBContracts());
 
@@ -2734,7 +2735,7 @@ public class CampaignGUI extends JPanel {
 
     public void refreshLocation() {
         boolean isUseCommandCircuit =
-              Campaign.isUseCommandCircuit(getCampaign().isOverridingCommandCircuitRequirements(),
+              FactionStandingUtilities.isUseCommandCircuit(getCampaign().isOverridingCommandCircuitRequirements(),
                     getCampaign().isGM(), getCampaign().getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
                     getCampaign().getFactionStandings(), getCampaign().getActiveAtBContracts());
 

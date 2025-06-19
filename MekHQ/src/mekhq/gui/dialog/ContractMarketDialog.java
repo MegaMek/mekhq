@@ -69,6 +69,7 @@ import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.FactionComboBox;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
@@ -310,7 +311,7 @@ public class ContractMarketDialog extends JDialog {
                                                       (Integer) spnSharePct.getValue() :
                                                       0);
                 if (!isUseCommandCircuit) {
-                    isUseCommandCircuit = Campaign.isUseCommandCircuit(isOverridingCommandCircuit, isGM,
+                    isUseCommandCircuit = FactionStandingUtilities.isUseCommandCircuit(isOverridingCommandCircuit, isGM,
                           isUseFactionStandingCommandCircuits, factionStandings, List.of(atbContract));
                 }
             }

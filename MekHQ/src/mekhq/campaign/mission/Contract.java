@@ -48,6 +48,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -491,7 +492,8 @@ public class Contract extends Mission {
     public int getTravelDays(Campaign campaign) {
         if (null != this.getSystem()) {
             boolean isUseCommandCircuit =
-                  Campaign.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(), campaign.isGM(),
+                  FactionStandingUtilities.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(),
+                        campaign.isGM(),
                         campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
                         campaign.getFactionStandings(), campaign.getActiveAtBContracts());
 
@@ -725,7 +727,8 @@ public class Contract extends Mission {
 
         if (adjustStartDate && (campaign.getSystemByName(systemId) != null)) {
             boolean isUseCommandCircuit =
-                  Campaign.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(), campaign.isGM(),
+                  FactionStandingUtilities.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(),
+                        campaign.isGM(),
                         campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
                         campaign.getFactionStandings(), campaign.getActiveAtBContracts());
 

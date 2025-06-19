@@ -58,6 +58,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
+import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
@@ -253,7 +254,7 @@ public class CurrentLocation {
      * @return True if the JumpShip has to spend time recharging, otherwise false.
      */
     public boolean isRecharging(Campaign campaign) {
-        boolean isUseCommandCircuit = Campaign.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(),
+        boolean isUseCommandCircuit = FactionStandingUtilities.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(),
               campaign.isGM(), campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
               campaign.getFactionStandings(), campaign.getActiveAtBContracts());
 
@@ -266,7 +267,7 @@ public class CurrentLocation {
      * @param campaign The campaign object which owns the JumpShip.
      */
     public void setRecharged(Campaign campaign) {
-        boolean isUseCommandCircuit = Campaign.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(),
+        boolean isUseCommandCircuit = FactionStandingUtilities.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(),
               campaign.isGM(), campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
               campaign.getFactionStandings(), campaign.getActiveAtBContracts());
 
@@ -279,7 +280,7 @@ public class CurrentLocation {
     public void newDay(Campaign campaign) {
         final boolean wasTraveling = !isOnPlanet();
 
-        boolean isUseCommandCircuit = Campaign.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(),
+        boolean isUseCommandCircuit = FactionStandingUtilities.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(),
               campaign.isGM(), campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
               campaign.getFactionStandings(), campaign.getActiveAtBContracts());
 

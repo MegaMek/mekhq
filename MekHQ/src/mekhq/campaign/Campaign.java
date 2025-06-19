@@ -247,7 +247,6 @@ import mekhq.campaign.universe.eras.Eras;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.campaign.universe.factionStanding.PerformBatchall;
-import mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel;
 import mekhq.campaign.universe.fameAndInfamy.FameAndInfamyController;
 import mekhq.campaign.universe.selectors.factionSelectors.AbstractFactionSelector;
 import mekhq.campaign.universe.selectors.factionSelectors.DefaultFactionSelector;
@@ -7046,7 +7045,8 @@ public class Campaign implements ITechManager {
         for (int jumps = 0; jumps < MAX_JUMPS; jumps++) {
             PlanetarySystem currentSystem = systemsInstance.getSystemById(current);
 
-            boolean isUseCommandCircuits = isUseCommandCircuit(isOverridingCommandCircuitRequirements, gmMode,
+            boolean isUseCommandCircuits =
+                  FactionStandingUtilities.isUseCommandCircuit(isOverridingCommandCircuitRequirements, gmMode,
                   campaignOptions.isUseFactionStandingCommandCircuitSafe(), factionStandings, getActiveAtBContracts());
 
             // Get current node's information
@@ -7100,57 +7100,6 @@ public class Campaign implements ITechManager {
 
         // No path found or maximum jumps reached
         return reconstructPath(current, parent, systemsInstance);
-    }
-
-    /**
-     * Determines whether command circuit access should be granted based on campaign settings, game master mode, current
-     * faction standings, and a list of active contracts.
-     *
-     * <p>Access is immediately granted if both command circuit requirements are overridden and game master mode is
-     * active. If not, and if faction standing is used as a criterion, the method evaluates the player's highest faction
-     * regard across all active contracts, granting access if this level meets the threshold.</p>
-     *
-     * <p>If there are no active contracts, access is denied.</p>
-     *
-     * @param overridingCommandCircuitRequirements {@code true} if command circuit requirements are overridden
-     * @param isGM                                 {@code true} if game master mode is enabled
-     * @param useFactionStandingCommandCircuit     {@code true} if faction standing is used to determine access
-     * @param factionStandings                     player faction standing data
-     * @param activeContracts                      list of currently active contracts to evaluate for access
-     *
-     * @return {@code true} if command circuit access should be used; {@code false} otherwise
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    public static boolean isUseCommandCircuit(boolean overridingCommandCircuitRequirements, boolean isGM,
-          boolean useFactionStandingCommandCircuit, FactionStandings factionStandings,
-          List<AtBContract> activeContracts) {
-        boolean useCommandCircuit = overridingCommandCircuitRequirements && isGM;
-
-        if (useCommandCircuit) {
-            logger.debug("(Override) isUseCommandCircuit = {}", true);
-            return true;
-        }
-
-        if (activeContracts.isEmpty()) {
-            logger.debug("(No Contract) isUseCommandCircuit = {}", false);
-            return false;
-        }
-
-        double highestRegard = FactionStandingLevel.STANDING_LEVEL_0.getMinimumRegard();
-        if (useFactionStandingCommandCircuit) {
-            for (AtBContract contract : activeContracts) {
-                double currentRegard = factionStandings.getRegardForFaction(contract.getEmployerCode(), true);
-                if (currentRegard > highestRegard) {
-                    highestRegard = currentRegard;
-                }
-            }
-        }
-
-        useCommandCircuit = FactionStandingUtilities.hasCommandCircuitAccess(highestRegard);
-        logger.debug("(Faction Standing) isUseCommandCircuit = {}", useCommandCircuit);
-        return useCommandCircuit;
     }
 
     /**

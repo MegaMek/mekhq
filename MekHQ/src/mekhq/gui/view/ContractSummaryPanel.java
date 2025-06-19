@@ -62,6 +62,7 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.Systems;
+import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.gui.enums.MHQTabType;
 
 /**
@@ -273,7 +274,8 @@ public class ContractSummaryPanel extends JPanel {
             JumpPath path = campaign.calculateJumpPath(campaign.getCurrentSystem(), contract.getSystem());
 
             boolean isUseCommandCircuit =
-                  Campaign.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(), campaign.isGM(),
+                  FactionStandingUtilities.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(),
+                        campaign.isGM(),
                         campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
                         campaign.getFactionStandings(), List.of(atBContract));
 

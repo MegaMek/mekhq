@@ -45,6 +45,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.gui.baseComponents.JScrollablePanel;
 
 /**
@@ -122,7 +123,8 @@ public class JumpPathViewPanel extends JScrollablePanel {
         LocalDate currentDate = campaign.getLocalDate();
 
         boolean isUseCommandCircuit =
-              Campaign.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(), campaign.isGM(),
+              FactionStandingUtilities.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(),
+                    campaign.isGM(),
                     campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
                     campaign.getFactionStandings(), campaign.getActiveAtBContracts());
 
@@ -239,7 +241,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblRechargeTime, gridBagConstraints);
 
-        boolean isUseCommandCircuit = Campaign.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(),
+        boolean isUseCommandCircuit = FactionStandingUtilities.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(),
               campaign.isGM(), campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
               campaign.getFactionStandings(), campaign.getActiveAtBContracts());
 
