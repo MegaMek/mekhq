@@ -109,8 +109,8 @@ public class CombatTeam {
     }
 
     /**
-     * Determines the standard size for a given faction. The size varies depending on whether the faction is a Clan,
-     * ComStar/WoB, or others (Inner Sphere).
+     * Determines the standard size for a given faction. The size varies depending on whether the faction is
+     * ComStar/WoB, or others (Inner Sphere, Clan, etc).
      *
      * @param faction             The {@link Faction} object for which the standard force size is to be calculated.
      * @param formationLevelDepth The {@link FormationLevel} {@code Depth} from which the standard force size is to be
@@ -119,11 +119,10 @@ public class CombatTeam {
      * @return The standard force size, at the provided formation level, for the provided faction
      */
     public static int getStandardForceSize(Faction faction, int formationLevelDepth) {
-        int formationSize = faction.getFormationBaseSize();
-        for (int i = 1; i <= formationLevelDepth; i++) {
-            formationSize *= faction.getFormationGrouping();
-        }
-        return formationSize;
+        int multiplier = faction.isComStar() ? 6 : 3;
+        int base = faction.getFormationBaseSize();
+
+        return (int) (base * Math.pow(multiplier, formationLevelDepth));
     }
 
     /**
