@@ -336,7 +336,7 @@ public class FactionStandingUtilities {
           List<AtBContract> activeAtBContracts) {
         // Always allowed in empty systems
         if (targetSystem.getPopulation(when) == 0) {
-            LOGGER.info("Target system is empty, access granted");
+            LOGGER.debug("Target system is empty, access granted");
             return true;
         }
 
@@ -353,21 +353,21 @@ public class FactionStandingUtilities {
         if (systemFactions.stream()
                   .anyMatch(systemFaction -> contractEmployers.contains(systemFaction)
                                                    || contractTargets.contains(systemFaction))) {
-            LOGGER.info("System is owned by a contract employer or target, access granted");
+            LOGGER.debug("System is owned by a contract employer or target, access granted");
             return true;
         }
 
         // Always allowed to leave if outlawed in the current system
         if (currentSystem != null) {
             if (isOutlawedInSystem(factionStandings, currentSystem, when)) {
-                LOGGER.info("Player is outlawed in current system, but always allowed to escape, access granted");
+                LOGGER.debug("Player is outlawed in current system, but always allowed to escape, access granted");
                 return true;
             }
         }
 
         // Banned if outlawed in the target system
         if (isOutlawedInSystem(factionStandings, targetSystem, when)) {
-            LOGGER.info("Player is outlawed in target system, access denied");
+            LOGGER.debug("Player is outlawed in target system, access denied");
             return false;
         }
 
@@ -379,7 +379,7 @@ public class FactionStandingUtilities {
                                                    systemFaction,
                                                    when));
         if (allAtWarWithCampaign) {
-            LOGGER.info("Campaign faction is at war with all system factions, access denied");
+            LOGGER.debug("Campaign faction is at war with all system factions, access denied");
             return false;
         }
 
@@ -391,12 +391,12 @@ public class FactionStandingUtilities {
                                                        systemFaction,
                                                        when) != null);
             if (allAtWarWithEmployer) {
-                LOGGER.info("All system factions are at war with employer {}, access denied", employer.getShortName());
+                LOGGER.debug("All system factions are at war with employer {}, access denied", employer.getShortName());
                 return false;
             }
         }
 
-        LOGGER.info("Access granted");
+        LOGGER.debug("Access granted");
         return true;
     }
 
