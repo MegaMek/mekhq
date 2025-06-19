@@ -646,7 +646,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
         // FG3 Difficulty Multiplier
         if (campaign.getLocalDate().isBefore(BATTLE_OF_TUKAYYID)
-                  && employer.isInnerSphere()
+                  && !employer.isClan()
                   && enemy.isClan()) {
             multiplier *= 0.5;
         } else if (campaignOptions.isUseGenericBattleValue()) {
