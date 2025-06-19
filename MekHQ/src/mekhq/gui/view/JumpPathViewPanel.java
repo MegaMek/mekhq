@@ -24,19 +24,29 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.view;
+
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.time.LocalDate;
+import java.util.ResourceBundle;
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.gui.baseComponents.JScrollablePanel;
-
-import javax.swing.*;
-import java.awt.*;
-import java.time.LocalDate;
-import java.util.ResourceBundle;
 
 /**
  * A custom panel that gets filled in with goodies from a JumpPath record
@@ -111,8 +121,17 @@ public class JumpPathViewPanel extends JScrollablePanel {
         int i = 0;
         JLabel lblPlanet;
         LocalDate currentDate = campaign.getLocalDate();
+
+        boolean isUseCommandCircuit =
+              FactionStandingUtilities.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(),
+                    campaign.isGM(),
+                    campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
+                    campaign.getFactionStandings(), campaign.getActiveAtBContracts());
+
         for (PlanetarySystem system : path.getSystems()) {
-            lblPlanet = new JLabel(system.getPrintableName(currentDate) + " (" + system.getRechargeTimeText(currentDate) + ")");
+            lblPlanet =
+                  new JLabel(system.getPrintableName(currentDate) + " (" + system.getRechargeTimeText(currentDate,
+                        isUseCommandCircuit) + ")");
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = i;
@@ -222,8 +241,16 @@ public class JumpPathViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblRechargeTime, gridBagConstraints);
 
+        boolean isUseCommandCircuit = FactionStandingUtilities.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(),
+              campaign.isGM(), campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
+              campaign.getFactionStandings(), campaign.getActiveAtBContracts());
+
         txtRechargeTime.setName("lblRechargeTime2");
-        txtRechargeTime.setText("<html>" + Math.round(path.getTotalRechargeTime(currentDate)*100.0)/100.0 + " days" + "</html>");
+        txtRechargeTime.setText("<html>" +
+                                      Math.round(path.getTotalRechargeTime(currentDate, isUseCommandCircuit) * 100.0) /
+                                            100.0 +
+                                      " days" +
+                                      "</html>");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
@@ -243,7 +270,8 @@ public class JumpPathViewPanel extends JScrollablePanel {
         pnlStats.add(lblTotalTime, gridBagConstraints);
 
         txtTotalTime.setName("lblTotalTime2");
-        txtTotalTime.setText("<html>" + Math.round(path.getTotalTime(currentDate, campaign.getLocation().getTransitTime())*100.0)/100.0 + " days" + "</html>");
+        txtTotalTime.setText("<html>" + Math.round(path.getTotalTime(currentDate,
+              campaign.getLocation().getTransitTime(), isUseCommandCircuit) * 100.0) / 100.0 + " days" + "</html>");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 5;

@@ -191,6 +191,20 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         gridBagConstraints.weighty = 0.0;
         panTopButtons.add(chkAvoidAbandonedSystems, gridBagConstraints);
 
+        JCheckBox chkUseCommandCircuits = new JCheckBox(resourceMap.getString("chkUseCommandCircuits.text"));
+        chkUseCommandCircuits.setToolTipText(wordWrap(resourceMap.getString("chkUseCommandCircuits.toolTipText")));
+        chkUseCommandCircuits.addActionListener(ev -> getCampaign().setIsOverridingCommandCircuitRequirements(
+              chkUseCommandCircuits.isSelected()));
+        chkUseCommandCircuits.setSelected(getCampaign().isOverridingCommandCircuitRequirements());
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.weighty = 0.0;
+        panTopButtons.add(chkUseCommandCircuits, gridBagConstraints);
+
         panMapView.add(panTopButtons, BorderLayout.PAGE_START);
 
         //the actual map

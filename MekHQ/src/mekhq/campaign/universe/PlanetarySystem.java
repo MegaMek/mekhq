@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe;
 
@@ -60,8 +65,8 @@ import mekhq.campaign.universe.enums.HiringHallLevel;
 @JsonIgnoreProperties(ignoreUnknown=true)
 @JsonDeserialize(converter= PlanetarySystem.PlanetarySystemPostLoader.class)
 public class PlanetarySystem {
+    private static final double COMMAND_CIRCUIT_RECHARGE_TIME_HOURS = 10;
 
-    
     // --- Sophistication Rating Enum ---
     public enum PlanetarySophistication {
         ADVANCED(0, "Advanced"),
@@ -354,28 +359,64 @@ public class PlanetarySystem {
     }
 
     /**
-     * Recharge time in hours (assuming the usage of the fastest charging method
-     * available)
+     * Use {@link #getRechargeTime(LocalDate, boolean)} instead
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public double getRechargeTime(LocalDate when) {
-        if (isZenithCharge(when) || isNadirCharge(when)) {
-            // The 176 value comes from pg. 87-88 and 138 of StratOps
-            return Math.min(176.0, getSolarRechargeTime());
-        } else {
-            return getSolarRechargeTime();
-        }
+        return getRechargeTime(when, false);
     }
 
     /**
-     * Recharge time in hours using solar radiation alone (at jump point and 100%
-     * efficiency)
+     * Calculates the recharge time for a jump ship in hours, based on a given date and whether command circuits are
+     * used.
+     *
+     * <p>When recharging at a zenith or nadir jump point, the method returns the minimum of either the command
+     * circuit recharge time (if command circuits are enabled) or 176 hours, and the standard solar recharge time. For
+     * all other locations, only the solar recharge time is considered, unless using command circuits, in which case
+     * their recharge time is also taken into account.</p>
+     *
+     * @param when                 the date for which the recharge time should be determined
+     * @param isUseCommandCircuits {@code true} if command circuits are being used, possibly reducing recharge time at
+     *                             specific locations
+     *
+     * @return the calculated recharge time in hours
      */
+    public double getRechargeTime(LocalDate when, boolean isUseCommandCircuits) {
+        if (isZenithCharge(when) || isNadirCharge(when)) {
+            // The 176 value comes from pg. 87-88 and 138 of StratOps
+            return Math.min(isUseCommandCircuits ? COMMAND_CIRCUIT_RECHARGE_TIME_HOURS : 176.0, getSolarRechargeTime());
+        } else {
+            return Math.min(isUseCommandCircuits ? COMMAND_CIRCUIT_RECHARGE_TIME_HOURS : Double.MAX_VALUE,
+                  getSolarRechargeTime());
+        }
+    }
+
     public double getSolarRechargeTime() {
         return getStar().getSolarRechargeTime();
     }
 
+    /**
+     * Use {@link #getRechargeTimeText(LocalDate, boolean)} instead
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public String getRechargeTimeText(LocalDate when) {
-        double time = getRechargeTime(when);
+        return getRechargeTimeText(when, false);
+    }
+
+    /**
+     * Returns a human-readable description of the recharge time for a jump ship based on the specified date and whether
+     * command circuits are used.
+     *
+     * <p>If the recharge is not possible (i.e., the computed recharge time is infinite), returns a message
+     * indicating impossibility; otherwise, returns the recharge time formatted as hours.</p>
+     *
+     * @param when                the date to evaluate recharge conditions
+     * @param isUseCommandCircuit {@code true} if command circuits are in use, which may affect recharge time
+     *
+     * @return a string describing the recharge time or indicating if recharging is impossible
+     */
+    public String getRechargeTimeText(LocalDate when, boolean isUseCommandCircuit) {
+        double time = getRechargeTime(when, isUseCommandCircuit);
         if (Double.isInfinite(time)) {
             return "recharging impossible";
         } else {

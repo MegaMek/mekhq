@@ -44,6 +44,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.List;
 import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -61,6 +62,7 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.Systems;
+import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.gui.enums.MHQTabType;
 
 /**
@@ -262,7 +264,8 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsText.gridy = y;
         mainPanel.add(txtLocation, gridBagConstraintsText);
 
-        if (contract instanceof AtBContract && Systems.getInstance().getSystems().get(contract.getSystemId()) != null) {
+        if (contract instanceof AtBContract atBContract &&
+                  Systems.getInstance().getSystems().get(contract.getSystemId()) != null) {
             JLabel lblDistance = new JLabel(resourceMap.getString("lblDistance.text"));
             lblDistance.setName("lblDistance");
             gridBagConstraintsLabels.gridy = ++y;
@@ -270,8 +273,14 @@ public class ContractSummaryPanel extends JPanel {
 
             JumpPath path = campaign.calculateJumpPath(campaign.getCurrentSystem(), contract.getSystem());
 
+            boolean isUseCommandCircuit =
+                  FactionStandingUtilities.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(),
+                        campaign.isGM(),
+                        campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
+                        campaign.getFactionStandings(), List.of(atBContract));
+
             int days = (int) Math.ceil(path.getTotalTime(contract.getStartDate(),
-                  campaign.getLocation().getTransitTime()));
+                  campaign.getLocation().getTransitTime(), isUseCommandCircuit));
             int jumps = path.getJumps();
             if (campaign.getCurrentSystem().getId().equals(contract.getSystemId()) &&
                       campaign.getLocation().isOnPlanet()) {

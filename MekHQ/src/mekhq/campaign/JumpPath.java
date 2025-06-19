@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign;
 
@@ -33,12 +38,11 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.logging.MMLogger;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * This is an array list of planets for a jump path, from which we can derive
@@ -104,7 +108,26 @@ public class JumpPath {
         return endTime;
     }
 
+    /**
+     * Use {@link #getTotalRechargeTime(LocalDate, boolean)} instead
+     */
     public double getTotalRechargeTime(LocalDate when) {
+        return getTotalRechargeTime(when, false);
+    }
+
+    /**
+     * Calculates the total recharge time, in days, required to complete a journey along the path of planetary systems.
+     *
+     * <p>This method iterates through each system in the path, excluding the first and last systems, and sums the
+     * rounded-up recharge time (in hours) for each waypoint. The total is then converted from hours to days.</p>
+     *
+     * @param when                the date to use for determining recharge times at each system
+     * @param isUseCommandCircuit {@code true} if command circuits are being utilized during the journey; may affect
+     *                            recharge efficiency or duration
+     *
+     * @return the total recharge time for the route, expressed in days
+     */
+    public double getTotalRechargeTime(LocalDate when, boolean isUseCommandCircuit) {
         int rechargeTime = 0;
         for (PlanetarySystem system : path) {
             if (system.equals(getFirstSystem())) {
@@ -113,7 +136,7 @@ public class JumpPath {
             if (system.equals(getLastSystem())) {
                 continue;
             }
-            rechargeTime += (int) Math.ceil(system.getRechargeTime(when));
+            rechargeTime += (int) Math.ceil(system.getRechargeTime(when, isUseCommandCircuit));
         }
         return rechargeTime / 24.0;
     }
@@ -122,8 +145,36 @@ public class JumpPath {
         return size() - 1;
     }
 
+    /**
+     * Use {@link #getTotalTime(LocalDate, double, boolean)} instead
+     * <p>
+     * Used in Legacy AtB tests.
+     */
+    @Deprecated(since = "0.50.07", forRemoval = false)
     public double getTotalTime(LocalDate when, double currentTransit) {
-        return getTotalRechargeTime(when) + getStartTime(currentTransit) + getEndTime();
+        return getTotalTime(when, currentTransit, false);
+    }
+
+    /**
+     * Calculates the total journey time for the path of planetary systems, including recharge, start, and end times.
+     *
+     * <p>This method sums three parts:</p>
+     * <ul>
+     *     <li>Recharge time for intermediate planetary systems (in days), accounting for possible command circuit usage</li>
+     *     <li>Start time, based on the current transit</li>
+     *     <li>End time, representing final approach or operations at the destination</li>
+     * </ul>
+     *
+     * @param when                the date to use for all time calculations in the journey
+     * @param currentTransit      the remaining fraction of the current transit (in days or hours, depending on
+     *                            context)
+     * @param isUseCommandCircuit {@code true} if command circuits are used for the journey, which may affect recharge
+     *                            time calculations
+     *
+     * @return the total time required for the journey, in days
+     */
+    public double getTotalTime(LocalDate when, double currentTransit, boolean isUseCommandCircuit) {
+        return getTotalRechargeTime(when, isUseCommandCircuit) + getStartTime(currentTransit) + getEndTime();
     }
 
     public void addSystem(PlanetarySystem s) {
