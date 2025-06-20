@@ -30,11 +30,11 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.dialog.reportDialogs.FactionStanding;
+package mekhq.gui.dialog.factionStanding;
 
 import static java.lang.Math.round;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
-import static mekhq.gui.dialog.reportDialogs.FactionStanding.manualMissionDialogs.SimulateMissionDialog.handleFactionRegardUpdates;
+import static mekhq.gui.dialog.factionStanding.manualMissionDialogs.SimulateMissionDialog.handleFactionRegardUpdates;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getAmazingColor;
@@ -78,9 +78,9 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.campaign.utilities.glossary.DocumentationEntry;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.gui.dialog.factionStanding.gmToolsDialog.GMTools;
+import mekhq.gui.dialog.factionStanding.manualMissionDialogs.SimulateMissionDialog;
 import mekhq.gui.dialog.glossary.NewDocumentationEntryDialog;
-import mekhq.gui.dialog.reportDialogs.FactionStanding.gmToolsDialog.GMTools;
-import mekhq.gui.dialog.reportDialogs.FactionStanding.manualMissionDialogs.SimulateMissionDialog;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.WrapLayout;
 

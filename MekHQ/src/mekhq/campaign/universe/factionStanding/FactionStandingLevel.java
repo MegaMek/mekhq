@@ -44,7 +44,7 @@ import megamek.codeUtilities.MathUtility;
 import megamek.logging.MMLogger;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.universe.Faction;
-import mekhq.gui.dialog.reportDialogs.FactionStanding.FactionStandingReport;
+import mekhq.gui.dialog.factionStanding.FactionStandingReport;
 
 /**
  * Represents a standing level within the Faction Standing reputation system.
