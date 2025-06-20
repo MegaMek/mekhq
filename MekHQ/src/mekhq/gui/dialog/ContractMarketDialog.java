@@ -33,9 +33,6 @@
  */
 package mekhq.gui.dialog;
 
-import static mekhq.campaign.market.contractMarket.ContractAutomation.contractStartPrompt;
-import static mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR_HR;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -44,7 +41,6 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Vector;
 import javax.swing.*;
@@ -56,7 +52,6 @@ import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.JToggleButtonPreference;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.enums.Gender;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -64,15 +59,16 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
+import mekhq.campaign.market.contractMarket.ContractAutomation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.enums.AtBContractType;
-import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.FactionComboBox;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.gui.dialog.factionStanding.events.FactionStandingGreeting;
 import mekhq.gui.dialog.resupplyAndCaches.DialogContractStart;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.IntegerStringSorter;
@@ -564,15 +560,11 @@ public class ContractMarketDialog extends JDialog {
     private void acceptContract(ActionEvent evt) {
         if (selectedContract != null) {
             if (selectedContract instanceof AtBContract contract) {
+                contract.createEmployerLiaison(campaign);
+
                 if (!triggerConfirmationDialog()) {
                     return;
                 }
-
-                if (campaign.getCampaignOptions().isUseStratCon()) {
-                    new DialogContractStart(campaign, contract);
-                }
-
-                contract.createEmployerLiaison(campaign);
 
                 if (contract.getEnemy().isClan()) {
                     contract.createClanOpponent(campaign);
@@ -588,7 +580,6 @@ public class ContractMarketDialog extends JDialog {
             campaign.addMission(selectedContract);
             // must be invoked after campaign.addMission to ensure presence of mission ID
             selectedContract.acceptContract(campaign);
-            contractStartPrompt(campaign, selectedContract);
 
             // Process Faction Standings Changes
             if (campaign.getCampaignOptions().isTrackFactionStanding()) {
@@ -609,7 +600,14 @@ public class ContractMarketDialog extends JDialog {
                         campaign.addReport(standingReport);
                     }
                 }
+
+                new FactionStandingGreeting(campaign, selectedContract);
+            } else if (selectedContract instanceof AtBContract && campaign.getCampaignOptions().isUseStratCon()) {
+                // The convoy dialog is wrapped in the Faction Standing greeting found just above this comment
+                new DialogContractStart(campaign, (AtBContract) selectedContract);
             }
+
+            ContractAutomation.contractStartPrompt(campaign, selectedContract);
 
             contractMarket.removeContract(selectedContract);
             ((DefaultTableModel) tableContracts.getModel()).removeRow(tableContracts.convertRowIndexToModel(
@@ -660,17 +658,13 @@ public class ContractMarketDialog extends JDialog {
             return true;
         }
 
-        Person speaker = campaign.newPerson(ADMINISTRATOR_HR,
-              ((AtBContract) selectedContract).getEmployerCode(),
-              Gender.RANDOMIZE);
-
         String inCharacterMessage = resourceMap.getString(inCharacterResourceKey);
         String outOfCharacterMessage = resourceMap.getString(outOfCharacterResourceKey);
 
         List<String> options = List.of(resourceMap.getString("button.cancel"), resourceMap.getString("button.accept"));
 
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
-              speaker,
+              ((AtBContract) selectedContract).getEmployerLiaison(),
               null,
               inCharacterMessage,
               options,
