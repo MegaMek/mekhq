@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.universe.factionStanding.enums;
+package mekhq.campaign.universe.factionStanding;
 
 import static java.lang.Math.round;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;

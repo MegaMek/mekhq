@@ -65,7 +65,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.FactionHints;
 import mekhq.campaign.universe.Factions;
-import mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel;
 import mekhq.gui.dialog.reportDialogs.FactionStanding.manualMissionDialogs.ManualMissionDialog;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
