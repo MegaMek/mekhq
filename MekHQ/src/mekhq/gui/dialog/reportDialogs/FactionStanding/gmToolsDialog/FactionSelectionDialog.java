@@ -36,7 +36,7 @@ import static java.lang.Integer.MAX_VALUE;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
-import static mekhq.campaign.universe.factionStanding.FactionStandings.getMaximumRegard;
+import static mekhq.campaign.universe.factionStanding.FactionStandings.getMaximumSameFactionRegard;
 import static mekhq.campaign.universe.factionStanding.FactionStandings.getMinimumRegard;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -323,7 +323,7 @@ public class FactionSelectionDialog extends JDialog {
         double currentRegard = factionStandings.getRegardForFaction(currentSelectedFaction.getShortName(), false);
         JSpinner spnNewRegard = new JSpinner(new SpinnerNumberModel(currentRegard,
               getMinimumRegard(),
-              getMaximumRegard(),
+              getMaximumSameFactionRegard(),
               0.01));
         gbc.gridx = 0;
         gbc.gridy = 1;
