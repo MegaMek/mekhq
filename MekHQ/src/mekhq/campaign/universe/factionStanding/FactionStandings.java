@@ -33,7 +33,7 @@
 package mekhq.campaign.universe.factionStanding;
 
 import static megamek.codeUtilities.MathUtility.clamp;
-import static mekhq.gui.dialog.reportDialogs.FactionStanding.manualMissionDialogs.SimulateMissionDialog.handleFactionRegardUpdates;
+import static mekhq.gui.dialog.factionStanding.manualMissionDialogs.SimulateMissionDialog.handleFactionRegardUpdates;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -65,8 +65,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.FactionHints;
 import mekhq.campaign.universe.Factions;
-import mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel;
-import mekhq.gui.dialog.reportDialogs.FactionStanding.manualMissionDialogs.ManualMissionDialog;
+import mekhq.gui.dialog.factionStanding.manualMissionDialogs.ManualMissionDialog;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

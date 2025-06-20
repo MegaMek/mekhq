@@ -30,16 +30,21 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.dialog.reportDialogs.FactionStanding;
-
-import megamek.client.ui.util.UIUtil;
-
-import javax.swing.*;
-import javax.swing.plaf.basic.BasicSliderUI;
-import java.awt.*;
-import java.awt.geom.RoundRectangle2D;
+package mekhq.gui.dialog.factionStanding;
 
 import static mekhq.utilities.MHQInternationalization.getTextAt;
+
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.geom.RoundRectangle2D;
+import javax.swing.JLabel;
+import javax.swing.JSlider;
+import javax.swing.plaf.basic.BasicSliderUI;
+
+import megamek.client.ui.util.UIUtil;
 
 /**
  * A custom {@link JSlider} used to visually represent faction standing levels with labeled "Regard" and "Climate" slider
