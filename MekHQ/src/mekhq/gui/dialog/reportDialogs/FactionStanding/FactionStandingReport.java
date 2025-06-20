@@ -614,7 +614,7 @@ public class FactionStandingReport extends JDialog {
      * <p>The slider uses integer values, so the provided double regard values are rounded.</p>
      *
      * <p>The minimum and maximum values are determined using {@link FactionStandings#getMinimumRegard()} and
-     * {@link FactionStandings#getMaximumRegard()}.</p>
+     * {@link FactionStandings#getMaximumSameFactionRegard()}.</p>
      *
      * @param factionCode   the code identifying the faction, used to set the slider's name
      * @param factionRegard the current regard value for the faction; will be rounded to the nearest {@link Integer}
@@ -630,7 +630,7 @@ public class FactionStandingReport extends JDialog {
         int roundedFactionRegard = (int) round(factionRegard); // JSlider doesn't accept doubles, so we round.
         int roundedClimateRegard = (int) round(climateRegard); // JSlider doesn't accept doubles, so we round.
         int minimumRegard = (int) Math.floor(FactionStandings.getMinimumRegard());
-        int maximumRegard = (int) Math.ceil(FactionStandings.getMaximumRegard());
+        int maximumRegard = (int) Math.ceil(FactionStandings.getMaximumSameFactionRegard());
         JSlider sldRegard = new FactionStandingSlider(minimumRegard,
               maximumRegard,
               roundedFactionRegard,

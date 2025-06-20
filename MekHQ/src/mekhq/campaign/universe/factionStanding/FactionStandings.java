@@ -33,6 +33,9 @@
 package mekhq.campaign.universe.factionStanding;
 
 import static megamek.codeUtilities.MathUtility.clamp;
+import static mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel.STANDING_LEVEL_0;
+import static mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel.STANDING_LEVEL_7;
+import static mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel.STANDING_LEVEL_8;
 import static mekhq.gui.dialog.reportDialogs.FactionStanding.manualMissionDialogs.SimulateMissionDialog.handleFactionRegardUpdates;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -52,6 +55,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import javax.swing.ImageIcon;
 
 import megamek.codeUtilities.MathUtility;
@@ -87,14 +91,19 @@ public class FactionStandings {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionStandings";
 
     /**
-     * This value defines the upper limit of Regard a campaign can achieve with a faction.
+     * This value defines the upper limit of Regard a campaign can achieve with the campaign's faction.
      */
-    static final double MAXIMUM_REGARD = 60.0;
+    static final double MAXIMUM_SAME_FACTION_REGARD = STANDING_LEVEL_8.getMaximumRegard() + 10;
 
     /**
-     * A constant representing the minimum regard a campaign can have with a faction.
+     * The maximum regard value a campaign can have with a faction other than the campaign's faction
      */
-    static final double MINIMUM_REGARD = -60.0;
+    static final double MAXIMUM_OTHER_FACTION_REGARD = STANDING_LEVEL_7.getMinimumRegard();
+
+    /**
+     * A constant representing the minimum regard a campaign can have with any faction.
+     */
+    static final double MINIMUM_REGARD = STANDING_LEVEL_0.getMinimumRegard() - 10;
 
     /**
      * The base regard value for all factions.
@@ -260,8 +269,18 @@ public class FactionStandings {
      * @author Illiani
      * @since 0.50.07
      */
-    public static double getMaximumRegard() {
-        return MAXIMUM_REGARD;
+    public static double getMaximumSameFactionRegard() {
+        return MAXIMUM_SAME_FACTION_REGARD;
+    }
+
+    /**
+     * @return the maximum regard the campaign can have with a faction other than the campaign's faction.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public static double getMaximumOtherFactionRegard() {
+        return MAXIMUM_OTHER_FACTION_REGARD;
     }
 
     /**
@@ -455,7 +474,7 @@ public class FactionStandings {
      * Retrieves the current regard value for the specified faction.
      *
      * @param factionCode a unique code identifying the faction
-     * @param includeCurrentClimate whether to include temporary modifiers from the current climate climate
+     * @param includeCurrentClimate whether to include temporary modifiers from the current climate
      *
      * @return the regard value for the faction, or 0 if none is present
      *
@@ -469,31 +488,47 @@ public class FactionStandings {
             regard += climateRegard.getOrDefault(factionCode, DEFAULT_REGARD);
         }
 
-        return clamp(regard, MINIMUM_REGARD, MAXIMUM_REGARD);
+        return clamp(regard, MINIMUM_REGARD, MAXIMUM_SAME_FACTION_REGARD);
     }
 
     /**
-     * Sets the regard value for the specified faction, directly assigning (or overwriting) the value. If the faction
+     * Use {@link #setRegardForFaction(String, String, double, int, boolean)} instead
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
+    public String setRegardForFaction(final String factionCode, final double newRegard, final int gameYear,
+          final boolean includeReport) {
+        return setRegardForFaction(null, factionCode, newRegard, gameYear, includeReport);
+    }
+
+    /**
+     * Sets the regard value for the specified faction, directly assigning or overwriting the value. If the faction
      * code does not already exist, a new entry is created.
      *
-     * <p>The regard value is automatically clamped between {@code MINIMUM_REGARD} and {@code MAXIMUM_REGARD}.</p>
+     * <p>The regard value is automatically clamped between {@code MINIMUM_REGARD} and the appropriate maximum:
+     * {@code MAXIMUM_SAME_FACTION_REGARD} if setting regard for the campaign's own code or if {@code
+     * campaignFactionCode} is {@code null}, or {@code MAXIMUM_OTHER_FACTION_REGARD} for other factions.</p>
      *
-     * <p>If {@code includeReport} is {@code true}, a report string describing the change is returned. Otherwise, an
-     * empty string is returned.</p>
+     * <p>If {@code includeReport} is {@code true}, a report string describing the change is generated and returned.
+     * If {@code includeReport} is {@code false}, an empty string is returned.</p>
      *
-     * @param factionCode a unique code identifying the faction
+     * @param campaignFactionCode the unique code identifying the campaign's main faction.
+     * @param factionCode a unique code identifying the faction whose regard value will be set
      * @param newRegard the regard (standing) value to assign
-     * @param gameYear  the current in-game year for reporting purposes
-     * @param includeReport  if {@code true}, no report string is returned; if {@code false}, a report of the change is generated
-     * @return a report string describing the change if {@code includeReport} is {@code true}; otherwise, an empty
-     * string
+     * @param gameYear the current in-game year, for report generation purposes
+     * @param includeReport if {@code true}, a report string describing the change is generated and returned;
+     *                      if {@code false}, an empty string is returned
+     * @return a report string describing the change if {@code includeReport} is {@code true}; otherwise, an empty string
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public String setRegardForFaction(final String factionCode, final double newRegard, final int gameYear,
-          final boolean includeReport) {
-        double regardValue = clamp(newRegard, MINIMUM_REGARD, MAXIMUM_REGARD);
+    public String setRegardForFaction(@Nullable String campaignFactionCode, final String factionCode,
+          final double newRegard, final int gameYear, final boolean includeReport) {
+        double maximumRegard = Objects.equals(campaignFactionCode, factionCode) || campaignFactionCode == null
+                                     ? MAXIMUM_SAME_FACTION_REGARD
+                                     : MAXIMUM_OTHER_FACTION_REGARD;
+
+        double regardValue = clamp(newRegard, MINIMUM_REGARD, maximumRegard);
         double currentRegard = getRegardForFaction(factionCode, false);
 
         factionRegard.put(factionCode, regardValue);
@@ -533,7 +568,7 @@ public class FactionStandings {
         }
 
         double originalRegard = getRegardForFaction(factionCode, false);
-        double newRegard = clamp(originalRegard + delta, MINIMUM_REGARD, MAXIMUM_REGARD);
+        double newRegard = clamp(originalRegard + delta, MINIMUM_REGARD, MAXIMUM_SAME_FACTION_REGARD);
 
         factionRegard.put(factionCode, newRegard);
 
@@ -829,7 +864,7 @@ public class FactionStandings {
 
                 if ((currentRegard > DEFAULT_REGARD && newRegard < DEFAULT_REGARD) ||
                           (currentRegard < DEFAULT_REGARD && newRegard > DEFAULT_REGARD)) {
-                    setRegardForFaction(factionCode, DEFAULT_REGARD, gameYear, false);
+                    setRegardForFaction(null, factionCode, DEFAULT_REGARD, gameYear, false);
                 }
 
                 if (!report.isBlank()) {
