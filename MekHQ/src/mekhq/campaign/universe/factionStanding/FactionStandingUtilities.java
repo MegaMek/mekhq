@@ -43,7 +43,6 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.FactionHints;
 import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel;
 
 
 public class FactionStandingUtilities {
