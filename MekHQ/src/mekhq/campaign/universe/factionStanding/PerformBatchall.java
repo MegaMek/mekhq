@@ -44,7 +44,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
-import mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
 /**

@@ -1,0 +1,6 @@
+# This is a test faction, do not update lore data
+key: CLAN_TAG
+name: irrelevant
+capital: irrelevant
+tags:
+  - CLAN
