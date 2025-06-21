@@ -33,21 +33,15 @@
 package mekhq.campaign.universe.factionStanding;
 
 import java.util.List;
-import java.util.ResourceBundle;
 
 import megamek.codeUtilities.MathUtility;
 import megamek.common.Compute;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 
 /**
- * Provides utility methods for working with clan factions within the Fame and Infamy module:
- * determining whether they engage in batchalling, retrieving greetings and version strings for
- * factions based on various conditions, such as the faction code, infamy level, and current year.
- * <p>
- * The class is stateless and all methods are static, so it doesn't need to be instantiated.
- * Therefore, all of its methods can be called directly on the class.
+ * Unused outside deprecated classes and methods
  */
+@Deprecated(since = "0.50.07", forRemoval = true)
 public class BatchallFactions {
 
     public static final List<String> BATCHALL_FACTIONS = List.of("CBS", "CB", "CCC", "CCO",

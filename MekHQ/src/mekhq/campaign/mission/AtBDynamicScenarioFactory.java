@@ -79,8 +79,9 @@ import megamek.common.enums.SkillLevel;
 import megamek.common.equipment.WeaponMounted;
 import megamek.common.icons.Camouflage;
 import megamek.common.planetaryconditions.Atmosphere;
-import megamek.common.universe.FactionTag;
 import megamek.common.planetaryconditions.Wind;
+import megamek.common.universe.FactionTag;
+import megamek.common.universe.HonorRating;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
@@ -120,8 +121,6 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.UnitGeneratorParameters;
 import mekhq.campaign.universe.enums.EraFlag;
-import megamek.common.universe.HonorRating;
-import mekhq.campaign.universe.factionStanding.BatchallFactions;
 
 /**
  * This class handles the creation and substantive manipulation of AtBDynamicScenarios
@@ -1089,7 +1088,7 @@ public class AtBDynamicScenarioFactory {
         if (generatedForce.getTeam() != 1 &&
                   forceTemplate.getGenerationMethod() != ForceGenerationMethod.None.ordinal() &&
                   campaign.getCampaignOptions().isUseGenericBattleValue() &&
-                  BatchallFactions.usesBatchalls(factionCode) &&
+                  faction.performsBatchalls() &&
                   contract.isBatchallAccepted()) {
             // Simulate bidding away of forces
             List<Entity> bidAwayForces = new ArrayList<>();
@@ -1097,7 +1096,7 @@ public class AtBDynamicScenarioFactory {
 
             if (generatedForce.getTeam() != 1 &&
                       campaign.getCampaignOptions().isUseGenericBattleValue() &&
-                      BatchallFactions.usesBatchalls(factionCode) &&
+                      faction.performsBatchalls() &&
                       contract.isBatchallAccepted()) {
                 // Player force values
                 int playerBattleValue = calculateEffectiveBV(scenario, campaign, true);
@@ -1240,7 +1239,7 @@ public class AtBDynamicScenarioFactory {
             // Report the bidding results (if any) to the player
             if (generatedForce.getTeam() != 1 &&
                       campaign.getCampaignOptions().isUseGenericBattleValue() &&
-                      BatchallFactions.usesBatchalls(factionCode) &&
+                      faction.performsBatchalls() &&
                       contract.isBatchallAccepted()) {
                 reportResultsOfBidding(campaign, bidAwayForces, generatedForce, supplementedForces, faction);
             }
