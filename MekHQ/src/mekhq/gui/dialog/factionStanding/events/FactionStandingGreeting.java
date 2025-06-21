@@ -48,7 +48,6 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
-import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.factionStanding.FactionStandingLevel;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
@@ -255,7 +254,7 @@ public class FactionStandingGreeting {
         Person employerLiaison = campaign.newPerson(PersonnelRole.MILITARY_LIAISON, campaignFaction.getShortName(),
               Gender.RANDOMIZE);
 
-        final RankSystem rankSystem = Ranks.getRankSystemFromCode(campaignFaction.isClan() ? "CLAN" : "SLDF");
+        final RankSystem rankSystem = campaignFaction.getRankSystem();
 
         final RankValidator rankValidator = new RankValidator();
         if (!rankValidator.validate(rankSystem, false)) {

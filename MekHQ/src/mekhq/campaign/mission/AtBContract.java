@@ -1321,7 +1321,7 @@ public class AtBContract extends Contract {
     public void createEmployerLiaison(Campaign campaign) {
         employerLiaison = campaign.newPerson(PersonnelRole.MILITARY_LIAISON, getEmployerCode(), Gender.RANDOMIZE);
 
-        final RankSystem rankSystem = Ranks.getRankSystemFromCode("SLDF");
+        final RankSystem rankSystem = getEmployerFaction().getRankSystem();
 
         final RankValidator rankValidator = new RankValidator();
         if (!rankValidator.validate(rankSystem, false)) {
