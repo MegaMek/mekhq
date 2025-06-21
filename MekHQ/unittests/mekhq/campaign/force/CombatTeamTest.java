@@ -35,22 +35,24 @@ package mekhq.campaign.force;
 import static mekhq.campaign.force.FormationLevel.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.Set;
-
-import megamek.common.universe.Faction2;
-import megamek.common.universe.FactionTag;
+import megamek.common.universe.Factions2;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 public class CombatTeamTest {
-    private static Factions factions;
+    private static Factions2 testFactions2;
 
     @BeforeAll
     public static void setup() {
+        testFactions2 = new Factions2("testresources/data/universe/factions");
         Factions.setInstance(Factions.loadDefault());
-        factions = Factions.getInstance();
+    }
+
+    @SuppressWarnings("all") // get() without test; if it fails, test data is not loading; the test should fail
+    private Faction getFaction(String code) {
+        return new Faction(testFactions2.getFaction(code).get());
     }
 
     // Inner Sphere
@@ -58,7 +60,7 @@ public class CombatTeamTest {
     @Test
     public void testGetStandardForceSize_InnerSphere_LanceDepth() {
         // Setup
-        Faction faction = factions.getFaction("LA");
+        Faction faction = getFaction("LA");
 
         // Act
         int result = CombatTeam.getStandardForceSize(faction, LANCE.getDepth());
@@ -70,7 +72,7 @@ public class CombatTeamTest {
     @Test
     public void testGetStandardForceSize_InnerSphere_CompanyDepth() {
         // Setup
-        Faction faction = factions.getFaction("LA");
+        Faction faction = getFaction("LA");
 
         // Act
         int result = CombatTeam.getStandardForceSize(faction, COMPANY.getDepth());
@@ -82,7 +84,7 @@ public class CombatTeamTest {
     @Test
     public void testGetStandardForceSize_InnerSphere_BattalionDepth() {
         // Setup
-        Faction faction = factions.getFaction("LA");
+        Faction faction = getFaction("LA");
 
         // Act
         int result = CombatTeam.getStandardForceSize(faction, BATTALION.getDepth());
@@ -94,7 +96,7 @@ public class CombatTeamTest {
     @Test
     public void testGetStandardForceSize_InnerSphere_RegimentDepth() {
         // Setup
-        Faction faction = factions.getFaction("LA");
+        Faction faction = getFaction("LA");
 
         // Act
         int result = CombatTeam.getStandardForceSize(faction, REGIMENT.getDepth());
@@ -106,7 +108,7 @@ public class CombatTeamTest {
     @Test
     public void testGetStandardForceSize_InnerSphere_BrigadeDepth() {
         // Setup
-        Faction faction = factions.getFaction("LA");
+        Faction faction = getFaction("LA");
 
         // Act
         int result = CombatTeam.getStandardForceSize(faction, BRIGADE.getDepth());
@@ -118,7 +120,7 @@ public class CombatTeamTest {
     @Test
     public void testGetStandardForceSize_InnerSphere_DivisionDepth() {
         // Setup
-        Faction faction = factions.getFaction("LA");
+        Faction faction = getFaction("LA");
 
         // Act
         int result = CombatTeam.getStandardForceSize(faction, DIVISION.getDepth());
@@ -130,7 +132,7 @@ public class CombatTeamTest {
     @Test
     public void testGetStandardForceSize_InnerSphere_CorpsDepth() {
         // Setup
-        Faction faction = factions.getFaction("LA");
+        Faction faction = getFaction("LA");
 
         // Act
         int result = CombatTeam.getStandardForceSize(faction, CORPS.getDepth());
@@ -142,7 +144,7 @@ public class CombatTeamTest {
     @Test
     public void testGetStandardForceSize_InnerSphere_ArmyDepth() {
         // Setup
-        Faction faction = factions.getFaction("LA");
+        Faction faction = getFaction("LA");
 
         // Act
         int result = CombatTeam.getStandardForceSize(faction, ARMY.getDepth());
@@ -154,7 +156,7 @@ public class CombatTeamTest {
     @Test
     public void testGetStandardForceSize_InnerSphere_ArmyGroupDepth() {
         // Setup
-        Faction faction = factions.getFaction("LA");
+        Faction faction = getFaction("LA");
 
         // Act
         int result = CombatTeam.getStandardForceSize(faction, ARMY_GROUP.getDepth());
@@ -168,7 +170,7 @@ public class CombatTeamTest {
     @Test
     public void testGetStandardForceSize_ClanFaction_LanceDepth() {
         // Setup
-        Faction faction = factions.getFaction("CJF");
+        Faction faction = getFaction("CBS");
 
         // Act
         int result = CombatTeam.getStandardForceSize(faction, STAR_OR_NOVA.getDepth());
@@ -180,7 +182,7 @@ public class CombatTeamTest {
     @Test
     public void testGetStandardForceSize_ClanFaction_CompanyDepth() {
         // Setup
-        Faction faction = factions.getFaction("CJF");
+        Faction faction = getFaction("CBS");
 
         // Act
         int result = CombatTeam.getStandardForceSize(faction, BINARY_OR_TRINARY.getDepth());
@@ -192,7 +194,7 @@ public class CombatTeamTest {
     @Test
     public void testGetStandardForceSize_ClanFaction_BattalionDepth() {
         // Setup
-        Faction faction = factions.getFaction("CJF");
+        Faction faction = getFaction("CBS");
 
         // Act
         int result = CombatTeam.getStandardForceSize(faction, CLUSTER.getDepth());
@@ -204,7 +206,7 @@ public class CombatTeamTest {
     @Test
     public void testGetStandardForceSize_ClanFaction_RegimentDepth() {
         // Setup
-        Faction faction = factions.getFaction("CJF");
+        Faction faction = getFaction("CBS");
 
         // Act
         int result = CombatTeam.getStandardForceSize(faction, GALAXY.getDepth());
@@ -216,7 +218,7 @@ public class CombatTeamTest {
     @Test
     public void testGetStandardForceSize_ClanFaction_BrigadeDepth() {
         // Setup
-        Faction faction = factions.getFaction("CJF");
+        Faction faction = getFaction("CBS");
 
         // Act
         int result = CombatTeam.getStandardForceSize(faction, TOUMAN.getDepth());
@@ -230,7 +232,7 @@ public class CombatTeamTest {
     @Test
     public void testGetStandardForceSize_MarianHegemonyFaction_LanceDepth() {
         // Setup
-        Faction faction = factions.getFaction("MH");
+        Faction faction = getFaction("MH");
 
         // Act
         int result = CombatTeam.getStandardForceSize(faction, LANCE.getDepth());
@@ -242,7 +244,7 @@ public class CombatTeamTest {
     @Test
     public void testGetStandardForceSize_MarianHegemonyFaction_CompanyDepth() {
         // Setup
-        Faction faction = factions.getFaction("MH");
+        Faction faction = getFaction("MH");
 
         // Act
         int result = CombatTeam.getStandardForceSize(faction, COMPANY.getDepth());
@@ -254,7 +256,7 @@ public class CombatTeamTest {
     @Test
     public void testGetStandardForceSize_MarianHegemonyFaction_BattalionDepth() {
         // Setup
-        Faction faction = factions.getFaction("MH");
+        Faction faction = getFaction("MH");
 
         // Act
         int result = CombatTeam.getStandardForceSize(faction, BATTALION.getDepth());
@@ -266,7 +268,7 @@ public class CombatTeamTest {
     @Test
     public void testGetStandardForceSize_MarianHegemonyFaction_RegimentDepth() {
         // Setup
-        Faction faction = factions.getFaction("MH");
+        Faction faction = getFaction("MH");
 
         // Act
         int result = CombatTeam.getStandardForceSize(faction, REGIMENT.getDepth());
@@ -278,7 +280,7 @@ public class CombatTeamTest {
     @Test
     public void testGetStandardForceSize_MarianHegemonyFaction_BrigadeDepth() {
         // Setup
-        Faction faction = factions.getFaction("MH");
+        Faction faction = getFaction("MH");
 
         // Act
         int result = CombatTeam.getStandardForceSize(faction, BRIGADE.getDepth());
@@ -290,7 +292,7 @@ public class CombatTeamTest {
     @Test
     public void testGetStandardForceSize_MarianHegemonyFaction_DivisionDepth() {
         // Setup
-        Faction faction = factions.getFaction("MH");
+        Faction faction = getFaction("MH");
 
         // Act
         int result = CombatTeam.getStandardForceSize(faction, DIVISION.getDepth());
@@ -302,7 +304,7 @@ public class CombatTeamTest {
     @Test
     public void testGetStandardForceSize_MarianHegemonyFaction_CorpsDepth() {
         // Setup
-        Faction faction = factions.getFaction("MH");
+        Faction faction = getFaction("MH");
 
         // Act
         int result = CombatTeam.getStandardForceSize(faction, CORPS.getDepth());
@@ -314,7 +316,7 @@ public class CombatTeamTest {
     @Test
     public void testGetStandardForceSize_MarianHegemonyFaction_ArmyDepth() {
         // Setup
-        Faction faction = factions.getFaction("MH");
+        Faction faction = getFaction("MH");
 
         // Act
         int result = CombatTeam.getStandardForceSize(faction, ARMY.getDepth());
@@ -326,7 +328,7 @@ public class CombatTeamTest {
     @Test
     public void testGetStandardForceSize_MarianHegemonyFaction_ArmyGroupDepth() {
         // Setup
-        Faction faction = factions.getFaction("MH");
+        Faction faction = getFaction("MH");
 
         // Act
         int result = CombatTeam.getStandardForceSize(faction, ARMY_GROUP.getDepth());
@@ -340,7 +342,7 @@ public class CombatTeamTest {
     @Test
     public void testGetStandardForceSize_ComStarFaction_LanceDepth() {
         // Setup
-        Faction faction = factions.getFaction("CS");
+        Faction faction = getFaction("CS");
 
         // Act
         int result = CombatTeam.getStandardForceSize(faction, LEVEL_II_OR_CHOIR.getDepth());
@@ -352,7 +354,7 @@ public class CombatTeamTest {
     @Test
     public void testGetStandardForceSize_ComStarFaction_CompanyDepth() {
         // Setup
-        Faction faction = factions.getFaction("CS");
+        Faction faction = getFaction("CS");
 
         // Act
         int result = CombatTeam.getStandardForceSize(faction, LEVEL_III.getDepth());
@@ -364,7 +366,7 @@ public class CombatTeamTest {
     @Test
     public void testGetStandardForceSize_ComStarFaction_BattalionDepth() {
         // Setup
-        Faction faction = factions.getFaction("CS");
+        Faction faction = getFaction("CS");
 
         // Act
         int result = CombatTeam.getStandardForceSize(faction, LEVEL_IV.getDepth());
@@ -376,7 +378,7 @@ public class CombatTeamTest {
     @Test
     public void testGetStandardForceSize_ComStarFaction_RegimentDepth() {
         // Setup
-        Faction faction = factions.getFaction("CS");
+        Faction faction = getFaction("CS");
 
         // Act
         int result = CombatTeam.getStandardForceSize(faction, LEVEL_V.getDepth());
@@ -388,7 +390,7 @@ public class CombatTeamTest {
     @Test
     public void testGetStandardForceSize_ComStarFaction_BrigadeDepth() {
         // Setup
-        Faction faction = factions.getFaction("CS");
+        Faction faction = getFaction("CS");
 
         // Act
         int result = CombatTeam.getStandardForceSize(faction, LEVEL_VI.getDepth());
@@ -402,9 +404,7 @@ public class CombatTeamTest {
     @Test
     public void testGetStandardForceSize_FallbackInnerSphere_LanceDepth() {
         // Setup
-        Faction2 faction2 = new Faction2();
-        faction2.setTags(Set.of(FactionTag.IS));
-        Faction faction = new Faction(faction2);
+        var faction = getFaction("IS_TAG");
 
         // Act
         int result = CombatTeam.getStandardForceSize(faction, LANCE.getDepth());
@@ -416,9 +416,7 @@ public class CombatTeamTest {
     @Test
     public void testGetStandardForceSize_FallbackInnerSphere_CompanyDepth() {
         // Setup
-        Faction2 faction2 = new Faction2();
-        faction2.setTags(Set.of(FactionTag.IS));
-        Faction faction = new Faction(faction2);
+        var faction = getFaction("IS_TAG");
 
         // Act
         int result = CombatTeam.getStandardForceSize(faction, COMPANY.getDepth());
@@ -430,9 +428,7 @@ public class CombatTeamTest {
     @Test
     public void testGetStandardForceSize_FallbackInnerSphere_BattalionDepth() {
         // Setup
-        Faction2 faction2 = new Faction2();
-        faction2.setTags(Set.of(FactionTag.IS));
-        Faction faction = new Faction(faction2);
+        var faction = getFaction("IS_TAG");
 
         // Act
         int result = CombatTeam.getStandardForceSize(faction, BATTALION.getDepth());
@@ -444,9 +440,7 @@ public class CombatTeamTest {
     @Test
     public void testGetStandardForceSize_FallbackInnerSphere_RegimentDepth() {
         // Setup
-        Faction2 faction2 = new Faction2();
-        faction2.setTags(Set.of(FactionTag.IS));
-        Faction faction = new Faction(faction2);
+        var faction = getFaction("IS_TAG");
 
         // Act
         int result = CombatTeam.getStandardForceSize(faction, REGIMENT.getDepth());
@@ -458,9 +452,7 @@ public class CombatTeamTest {
     @Test
     public void testGetStandardForceSize_FallbackInnerSphere_BrigadeDepth() {
         // Setup
-        Faction2 faction2 = new Faction2();
-        faction2.setTags(Set.of(FactionTag.IS));
-        Faction faction = new Faction(faction2);
+        var faction = getFaction("IS_TAG");
 
         // Act
         int result = CombatTeam.getStandardForceSize(faction, BRIGADE.getDepth());
@@ -472,9 +464,7 @@ public class CombatTeamTest {
     @Test
     public void testGetStandardForceSize_FallbackInnerSphere_DivisionDepth() {
         // Setup
-        Faction2 faction2 = new Faction2();
-        faction2.setTags(Set.of(FactionTag.IS));
-        Faction faction = new Faction(faction2);
+        var faction = getFaction("IS_TAG");
 
         // Act
         int result = CombatTeam.getStandardForceSize(faction, DIVISION.getDepth());
@@ -486,9 +476,7 @@ public class CombatTeamTest {
     @Test
     public void testGetStandardForceSize_FallbackInnerSphere_CorpsDepth() {
         // Setup
-        Faction2 faction2 = new Faction2();
-        faction2.setTags(Set.of(FactionTag.IS));
-        Faction faction = new Faction(faction2);
+        var faction = getFaction("IS_TAG");
 
         // Act
         int result = CombatTeam.getStandardForceSize(faction, CORPS.getDepth());
@@ -500,9 +488,7 @@ public class CombatTeamTest {
     @Test
     public void testGetStandardForceSize_FallbackInnerSphere_ArmyDepth() {
         // Setup
-        Faction2 faction2 = new Faction2();
-        faction2.setTags(Set.of(FactionTag.IS));
-        Faction faction = new Faction(faction2);
+        var faction = getFaction("IS_TAG");
 
         // Act
         int result = CombatTeam.getStandardForceSize(faction, ARMY.getDepth());
@@ -514,9 +500,7 @@ public class CombatTeamTest {
     @Test
     public void testGetStandardForceSize_FallbackInnerSphere_ArmyGroupDepth() {
         // Setup
-        Faction2 faction2 = new Faction2();
-        faction2.setTags(Set.of(FactionTag.IS));
-        Faction faction = new Faction(faction2);
+        var faction = getFaction("IS_TAG");
 
         // Act
         int result = CombatTeam.getStandardForceSize(faction, ARMY_GROUP.getDepth());
@@ -530,9 +514,7 @@ public class CombatTeamTest {
     @Test
     public void testGetStandardForceSize_FallbackClanFaction_LanceDepth() {
         // Setup
-        Faction2 faction2 = new Faction2();
-        faction2.setTags(Set.of(FactionTag.CLAN));
-        Faction faction = new Faction(faction2);
+        var faction = getFaction("CLAN_TAG");
 
         // Act
         int result = CombatTeam.getStandardForceSize(faction, STAR_OR_NOVA.getDepth());
@@ -544,9 +526,7 @@ public class CombatTeamTest {
     @Test
     public void testGetStandardForceSize_FallbackClanFaction_CompanyDepth() {
         // Setup
-        Faction2 faction2 = new Faction2();
-        faction2.setTags(Set.of(FactionTag.CLAN));
-        Faction faction = new Faction(faction2);
+        var faction = getFaction("CLAN_TAG");
 
         // Act
         int result = CombatTeam.getStandardForceSize(faction, BINARY_OR_TRINARY.getDepth());
@@ -558,9 +538,7 @@ public class CombatTeamTest {
     @Test
     public void testGetStandardForceSize_FallbackClanFaction_BattalionDepth() {
         // Setup
-        Faction2 faction2 = new Faction2();
-        faction2.setTags(Set.of(FactionTag.CLAN));
-        Faction faction = new Faction(faction2);
+        var faction = getFaction("CLAN_TAG");
 
         // Act
         int result = CombatTeam.getStandardForceSize(faction, CLUSTER.getDepth());
@@ -572,9 +550,7 @@ public class CombatTeamTest {
     @Test
     public void testGetStandardForceSize_FallbackClanFaction_RegimentDepth() {
         // Setup
-        Faction2 faction2 = new Faction2();
-        faction2.setTags(Set.of(FactionTag.CLAN));
-        Faction faction = new Faction(faction2);
+        var faction = getFaction("CLAN_TAG");
 
         // Act
         int result = CombatTeam.getStandardForceSize(faction, GALAXY.getDepth());
@@ -586,9 +562,7 @@ public class CombatTeamTest {
     @Test
     public void testGetStandardForceSize_FallbackClanFaction_BrigadeDepth() {
         // Setup
-        Faction2 faction2 = new Faction2();
-        faction2.setTags(Set.of(FactionTag.CLAN));
-        Faction faction = new Faction(faction2);
+        var faction = getFaction("CLAN_TAG");
 
         // Act
         int result = CombatTeam.getStandardForceSize(faction, TOUMAN.getDepth());

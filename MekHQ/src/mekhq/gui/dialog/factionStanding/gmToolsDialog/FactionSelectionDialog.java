@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.dialog.reportDialogs.FactionStanding.gmToolsDialog;
+package mekhq.gui.dialog.factionStanding.gmToolsDialog;
 
 import static java.lang.Integer.MAX_VALUE;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
@@ -182,7 +182,7 @@ public class FactionSelectionDialog extends JDialog {
             }
         }
 
-        activeFactions.removeIf(faction -> FactionStandings.isUntrackedFaction(faction.getShortName()));
+        activeFactions.removeIf(Faction::isAggregate);
         activeFactions.sort(Comparator.comparing(faction -> faction.getFullName(today.getYear())));
 
         allFactions.addAll(activeFactions);
