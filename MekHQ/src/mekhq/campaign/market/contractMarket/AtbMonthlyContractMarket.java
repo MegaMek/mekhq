@@ -76,6 +76,8 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.Systems;
+import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
 
 /**
  * Contract offers that are generated monthly under AtB rules.
@@ -785,7 +787,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
         if (Factions.getInstance().getFaction(contract.getEnemyCode()).isClan() &&
                   !Factions.getInstance().getFaction(contract.getEmployerCode()).isClan()) {
-            for (int i = 0; i < 4; i++) {
+            for (int i = 0; i < mods.mods.length; i++) {
                 if (i == CLAUSE_SALVAGE) {
                     mods.mods[i] -= 2;
                 } else {
@@ -802,10 +804,19 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             }
         }
 
+        if (campaign.getCampaignOptions().isUseFactionStandingNegotiationSafe()) {
+            FactionStandings standings = campaign.getFactionStandings();
+            double regard = standings.getRegardForFaction(contract.getEmployerCode(), true);
+            int negotiationModifier = FactionStandingUtilities.getNegotiationModifier(regard);
+            for (int i = 0; i < mods.mods.length; i++) {
+                mods.mods[i] += negotiationModifier;
+            }
+        }
+
         int[][] missionMods = { { 1, 0, 1, 0 }, { 0, 1, -1, -3 }, { -3, 0, 2, 1 }, { -2, 1, -1, -1 }, { -2, 0, 2, 3 },
                                 { -1, 1, 1, 1 }, { -2, 3, -2, -1 }, { 2, 2, -1, -1 }, { 0, 2, 2, 1 }, { -1, 0, 1, 2 },
                                 { -1, -2, 1, -1 }, { -1, -1, 2, 1 } };
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < mods.mods.length; i++) {
             mods.mods[i] += missionMods[contract.getContractType().ordinal()][i];
         }
 

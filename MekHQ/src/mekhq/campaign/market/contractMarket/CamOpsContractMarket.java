@@ -66,6 +66,8 @@ import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.enums.HiringHallLevel;
+import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
 
 /**
  * Contract Market as described in Campaign Operations, 4th printing.
@@ -169,6 +171,14 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         }
         int negotiationSkill = findNegotiationSkill(campaign);
         int ratingMod = campaign.getReputation().getReputationModifier();
+
+        if (campaign.getCampaignOptions().isUseFactionStandingNegotiationSafe()) {
+            FactionStandings standings = campaign.getFactionStandings();
+            double regard = standings.getRegardForFaction(contract.getEmployerCode(), true);
+            int negotiationModifier = FactionStandingUtilities.getNegotiationModifier(regard);
+            ratingMod += negotiationModifier;
+        }
+
         int margin = rollOpposedNegotiation(negotiationSkill, ratingMod);
         int change = margin / 2;
         ContractTerms terms = getContractTerms(campaign, contract);
