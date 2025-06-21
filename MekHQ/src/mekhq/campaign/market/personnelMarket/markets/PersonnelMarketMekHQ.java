@@ -66,6 +66,8 @@ import mekhq.campaign.universe.FactionHints;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.enums.HiringHallLevel;
+import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
 
 /**
  * Implements MekHQ's custom personnel market system.
@@ -143,6 +145,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
             return interestedFactions;
         }
 
+        FactionStandings factionStandings = getCampaign().getFactionStandings();
         for (Faction faction : systemFactions) {
             if (filterOutLegalFactions) {
                 if (!faction.isPirate() && !faction.isMercenary()) {
@@ -154,12 +157,21 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
                 continue;
             }
 
+            int factionStandingMultiplier = 1;
+            if (getCampaign().getCampaignOptions().isUseFactionStandingRecruitmentSafe()) {
+                double regard = factionStandings.getRegardForFaction(faction.getShortName(), true);
+                factionStandingMultiplier = FactionStandingUtilities.getRecruitmentTickets(regard);
+            }
+
             // Allies are three times as likely to join the campaign as non-allies
-            if (FactionHints.defaultFactionHints().isAlliedWith(getCampaignFaction(), faction, getToday())) {
-                interestedFactions.add(faction);
+            if (getCampaignFaction().equals(faction)
+                      || FactionHints.defaultFactionHints().isAlliedWith(getCampaignFaction(), faction, getToday())) {
+                factionStandingMultiplier *= 3;
+            }
+
+            for (int i = 0; i < factionStandingMultiplier; i++) {
                 interestedFactions.add(faction);
             }
-            interestedFactions.add(faction);
         }
 
         Faction mercenaryFaction = Factions.getInstance().getFaction("MERC");
@@ -318,7 +330,42 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         rolls = clamp((int) round(rolls * getSystemPopulationRecruitmentMultiplier()), 1, rolls);
         getLogger().debug("Rolls modified for population: {}", rolls);
 
+        if (getCampaign().getCampaignOptions().isUseFactionStandingRecruitmentSafe()) {
+            rolls += getFactionStandingsRecruitmentModifier();
+        }
+
         setRecruitmentRolls(rolls);
+    }
+
+    /**
+     * Calculates the recruitment modifier based on the campaign's faction standing with local factions.
+     *
+     * <p>For each faction present in the current planetary system, this method determines the recruitment
+     * modifier using the campaign's regard value with that faction. The highest recruitment modifier found among the
+     * factions is returned.
+     *
+     * @return the highest recruitment modifier from all local faction standings
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private int getFactionStandingsRecruitmentModifier() {
+        FactionStandings factionStandings = getCampaign().getFactionStandings();
+
+        CurrentLocation location = getCampaign().getLocation();
+        PlanetarySystem currentSystem = location.getCurrentSystem();
+        int modifier = 0;
+
+        for (Faction faction : currentSystem.getFactionSet(getToday())) {
+            double regard = factionStandings.getRegardForFaction(faction.getShortName(), true);
+            int currentModifier = FactionStandingUtilities.getRecruitmentRollsModifier(regard);
+
+            if (currentModifier > modifier) {
+                modifier = currentModifier;
+            }
+        }
+
+        return modifier;
     }
 
 
