@@ -39,6 +39,7 @@ import static megamek.common.enums.SkillLevel.ELITE;
 import static megamek.common.enums.SkillLevel.GREEN;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.enums.SkillLevel.VETERAN;
+import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
@@ -76,6 +77,8 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.Systems;
+import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
 
 /**
  * Contract offers that are generated monthly under AtB rules.
@@ -635,8 +638,18 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             }
         }
 
+        if (campaignOptions.isUseFactionStandingContractPaySafe()) {
+            FactionStandings factionStandings = campaign.getFactionStandings();
+            double regard = factionStandings.getRegardForFaction(employer.getShortName(), true);
+            multiplier *= FactionStandingUtilities.getContractPayMultiplier(regard);
+        }
+
         // FG3 Difficulty Multiplier
-        if (campaignOptions.isUseGenericBattleValue()) {
+        if (campaign.getLocalDate().isBefore(BATTLE_OF_TUKAYYID)
+                  && !employer.isClan()
+                  && enemy.isClan()) {
+            multiplier *= 0.5;
+        } else if (campaignOptions.isUseGenericBattleValue()) {
             int contractDifficulty = contract.getDifficulty();
             if (contractDifficulty != Integer.MIN_VALUE && contractDifficulty <= 2) {
                 multiplier /= 0.5;
