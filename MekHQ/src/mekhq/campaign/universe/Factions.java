@@ -106,14 +106,38 @@ public class Factions {
     }
 
     /**
-     * Returns a list of all factions active in a specific year.
-     * @param date
-     * @return
+     * Returns a collection of all active factions on the specified date, excluding Command factions.
+     *
+     * <p>A faction is considered active if it is valid for the given date and not marked as inactive. Command
+     * factions (those whose short name contains a dot, {@code .}) are not included in the results.</p>
+     *
+     * @param date the date for which to check faction activity
+     * @return a collection of active factions (excluding Commands) for the specified date
      */
     public Collection<Faction> getActiveFactions(LocalDate date) {
-        return getFactions().stream().filter(f ->
-            f.validIn(date) && !f.isInactive())
-            .collect(Collectors.toList());
+        return getActiveFactions(date, false);
+    }
+
+    /**
+     * Returns a collection of all active factions on the specified date.
+     *
+     * <p>A faction is considered active if it is valid for the given date and not marked as inactive.</p>
+     *
+     * <p>If {@code includeCommands} is {@code false}, factions whose short name contains a dot ({@code .}) are
+     * excluded, as these denote Commands rather than standard factions. If {@code includeCommands} is {@code true},
+     * these Command factions are included in the results.</p>
+     *
+     * @param date            the date for which to check faction activity
+     * @param includeCommands whether to include Command factions (those whose short name contains a dot)
+     *
+     * @return a collection of active factions for the specified date, optionally including Commands
+     */
+    public Collection<Faction> getActiveFactions(LocalDate date, boolean includeCommands) {
+        return getFactions().stream()
+                     .filter(f -> f.validIn(date)
+                                        && !f.isInactive()
+                                        && (includeCommands || !f.getShortName().contains(".")))
+                     .collect(Collectors.toList());
     }
 
     public Collection<String> getFactionList() {
