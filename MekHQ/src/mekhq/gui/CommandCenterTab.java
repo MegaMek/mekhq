@@ -32,6 +32,25 @@
  */
 package mekhq.gui;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.ResourceBundle;
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
+
 import megamek.common.event.Subscribe;
 import mekhq.MHQOptionsChangedEvent;
 import mekhq.MekHQ;
@@ -56,8 +75,8 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.AcquisitionsDialog;
 import mekhq.gui.dialog.PartsReportDialog;
+import mekhq.gui.dialog.factionStanding.FactionStandingReport;
 import mekhq.gui.dialog.reportDialogs.CargoReportDialog;
-import mekhq.gui.dialog.reportDialogs.FactionStanding.FactionStandingReport;
 import mekhq.gui.dialog.reportDialogs.HangarReportDialog;
 import mekhq.gui.dialog.reportDialogs.PersonnelReportDialog;
 import mekhq.gui.dialog.reportDialogs.ReputationReportDialog;
@@ -70,25 +89,6 @@ import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.TargetSorter;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.utilities.ReportingUtilities;
-
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.ResourceBundle;
 
 /**
  * Collates important information about the campaign and displays it, along with some actionable buttons
@@ -103,7 +103,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private JLabel lblExperience;
     private JLabel lblPersonnel;
     private JLabel lblMorale;
-    private JLabel lblAdminstrativeCapacity;
+    private JLabel lblHRCapacity;
     private JLabel lblMissionSuccess;
     private JLabel lblComposition;
     private JLabel lblRepairStatus;
@@ -309,21 +309,21 @@ public final class CommandCenterTab extends CampaignGuiTab {
         panInfo.add(lblPersonnel, gridBagConstraints);
 
         if ((getCampaign().getCampaignOptions().isUseRandomRetirement()) &&
-                  (getCampaign().getCampaignOptions().isUseAdministrativeStrain())) {
-            JLabel lblAdministrativeCapacityHead = new JLabel(resourceMap.getString("lblAdministrativeCapacity.text"));
+                  (getCampaign().getCampaignOptions().isUseHRStrain())) {
+            JLabel lblHRCapacityHead = new JLabel(resourceMap.getString("lblHRCapacity.text"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y++;
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             gridBagConstraints.insets = new Insets(1, 5, 1, 5);
-            panInfo.add(lblAdministrativeCapacityHead, gridBagConstraints);
-            lblAdminstrativeCapacity = new JLabel(getCampaign().getCampaignSummary()
-                                                        .getAdministrativeCapacityReport(getCampaign()));
-            lblAdministrativeCapacityHead.setLabelFor(lblAdminstrativeCapacity);
+            panInfo.add(lblHRCapacityHead, gridBagConstraints);
+            lblHRCapacity = new JLabel(getCampaign().getCampaignSummary()
+                                             .getHRCapacityReport(getCampaign()));
+            lblHRCapacityHead.setLabelFor(lblHRCapacity);
             gridBagConstraints.gridx = 1;
             gridBagConstraints.weightx = 1.0;
-            panInfo.add(lblAdminstrativeCapacity, gridBagConstraints);
+            panInfo.add(lblHRCapacity, gridBagConstraints);
         }
 
         JLabel lblCompositionHead = new JLabel(resourceMap.getString("lblComposition.text"));
@@ -595,7 +595,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
                   getCampaign().getFaction(),
                   getCampaign().getCampaignFactionIcon(),
                   getCampaign().getMissions(),
-                  getCampaignOptions().isTrackFactionStanding());
+                  getCampaignOptions());
 
             for (String report : factionStandingReport.getReports()) {
                 if (report != null && !report.isBlank()) {
@@ -663,9 +663,9 @@ public final class CommandCenterTab extends CampaignGuiTab {
         lblRepairStatus.setText(campaignSummary.getForceRepairReport());
         lblTransportCapacity.setText(campaignSummary.getTransportCapacity());
 
-        if (campaignOptions.isUseAdministrativeStrain()) {
+        if (campaignOptions.isUseHRStrain()) {
             try {
-                lblAdminstrativeCapacity.setText(campaignSummary.getAdministrativeCapacityReport(campaign));
+                lblHRCapacity.setText(campaignSummary.getHRCapacityReport(campaign));
             } catch (Exception ignored) {
             }
         }

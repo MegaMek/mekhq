@@ -32,6 +32,20 @@
  */
 package mekhq.gui.dialog;
 
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.FlowLayout;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Hashtable;
+import java.util.Objects;
+import javax.swing.*;
+import javax.swing.GroupLayout.Alignment;
+
 import megamek.MMConstants;
 import megamek.client.ui.Messages;
 import megamek.client.ui.buttons.ColourSelectorButton;
@@ -51,20 +65,6 @@ import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 import mekhq.gui.enums.ForceIconOperationalStatusStyle;
 import mekhq.gui.enums.PersonnelFilterStyle;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
-
-import javax.swing.*;
-import javax.swing.GroupLayout.Alignment;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.FlowLayout;
-import java.awt.event.KeyEvent;
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Hashtable;
-import java.util.Objects;
 
 /**
  * MHQOptionsDialog is a dialog that allows the user to configure various options in MegaMekHQ. It extends the
@@ -196,7 +196,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private JCheckBox optionUnmaintainedUnitsNag;
     private JCheckBox optionPregnantCombatantNag;
     private JCheckBox optionPrisonersNag;
-    private JCheckBox optionAdminStrainNag;
+    private JCheckBox optionHRStrainNag;
     private JCheckBox optionUntreatedPersonnelNag;
     private JCheckBox optionNoCommanderNag;
     private JCheckBox optionContractEndedNag;
@@ -1055,9 +1055,9 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionPrisonersNag.setToolTipText(resources.getString("optionPrisonersNag.toolTipText"));
         optionPrisonersNag.setName("optionPrisonersNag");
 
-        optionAdminStrainNag = new JCheckBox(resources.getString("optionAdminStrainNag.text"));
-        optionAdminStrainNag.setToolTipText(resources.getString("optionAdminStrainNag.toolTipText"));
-        optionAdminStrainNag.setName("optionAdminStrainNag");
+        optionHRStrainNag = new JCheckBox(resources.getString("optionAdminStrainNag.text"));
+        optionHRStrainNag.setToolTipText(resources.getString("optionAdminStrainNag.toolTipText"));
+        optionHRStrainNag.setName("optionAdminStrainNag");
 
         optionUntreatedPersonnelNag = new JCheckBox(resources.getString("optionUntreatedPersonnelNag.text"));
         optionUntreatedPersonnelNag.setToolTipText(resources.getString("optionUntreatedPersonnelNag.toolTipText"));
@@ -1133,7 +1133,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                       .addComponent(optionUnmaintainedUnitsNag)
                                       .addComponent(optionPregnantCombatantNag)
                                       .addComponent(optionPrisonersNag)
-                                      .addComponent(optionAdminStrainNag)
+                                      .addComponent(optionHRStrainNag)
                                       .addComponent(optionUntreatedPersonnelNag)
                                       .addComponent(optionNoCommanderNag)
                                       .addComponent(optionContractEndedNag)
@@ -1153,7 +1153,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                         .addComponent(optionUnmaintainedUnitsNag)
                                         .addComponent(optionPregnantCombatantNag)
                                         .addComponent(optionPrisonersNag)
-                                        .addComponent(optionAdminStrainNag)
+                                        .addComponent(optionHRStrainNag)
                                         .addComponent(optionUntreatedPersonnelNag)
                                         .addComponent(optionNoCommanderNag)
                                         .addComponent(optionContractEndedNag)
@@ -1458,7 +1458,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMHQOptions()
               .setNagDialogIgnore(MHQConstants.NAG_PREGNANT_COMBATANT, optionPregnantCombatantNag.isSelected());
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_PRISONERS, optionPrisonersNag.isSelected());
-        MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_ADMIN_STRAIN, optionAdminStrainNag.isSelected());
+        MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_HR_STRAIN, optionHRStrainNag.isSelected());
         MekHQ.getMHQOptions()
               .setNagDialogIgnore(MHQConstants.NAG_UNTREATED_PERSONNEL, optionUntreatedPersonnelNag.isSelected());
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_NO_COMMANDER, optionNoCommanderNag.isSelected());
@@ -1622,7 +1622,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionPregnantCombatantNag.setSelected(MekHQ.getMHQOptions()
                                                      .getNagDialogIgnore(MHQConstants.NAG_PREGNANT_COMBATANT));
         optionPrisonersNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_PRISONERS));
-        optionAdminStrainNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_ADMIN_STRAIN));
+        optionHRStrainNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_HR_STRAIN));
         optionUntreatedPersonnelNag.setSelected(MekHQ.getMHQOptions()
                                                       .getNagDialogIgnore(MHQConstants.NAG_UNTREATED_PERSONNEL));
         optionNoCommanderNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_NO_COMMANDER));

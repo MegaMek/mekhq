@@ -228,6 +228,8 @@ public class GeneralTab {
 
         layout.gridy = 0;
         layout.gridwidth = 5;
+        layout.weightx = 1.0;
+        layout.fill = GridBagConstraints.HORIZONTAL;
         panel.add(headerPanel, layout);
 
         layout.gridwidth = 1;
@@ -293,6 +295,7 @@ public class GeneralTab {
 
         final JLabel lblHeader = new JLabel(getTextAt(getCampaignOptionsResourceBundle(), "lblGeneral.text"),
               SwingConstants.CENTER);
+        lblHeader.setMinimumSize(UIUtil.scaleForGUI(600, 0));
         setFontScaling(lblHeader, true, 2);
         lblHeader.setName("lblGeneral");
 
@@ -498,18 +501,12 @@ public class GeneralTab {
     public void loadValuesFromCampaignOptions(@Nullable LocalDate presetDate, @Nullable Faction presetFaction) {
         txtName.setText(campaign.getName());
 
-        date = campaign.getLocalDate();
-        if (presetDate != null) {
-            date = presetDate;
-        }
+        setDate((presetDate != null) ? presetDate : campaign.getLocalDate());
 
-        comboFaction.setSelectedItem(campaign.getFaction());
+        comboFaction.setSelectedItem(new FactionDisplay(campaign.getFaction(), date));
         if (presetFaction != null) {
             comboFaction.setSelectedItem(new FactionDisplay(presetFaction, date));
         }
-
-        // Button labels are not updated when we repaint, so we have to specifically call it here
-        btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
 
         camouflage = campaign.getCamouflage();
         unitIcon = campaign.getUnitIcon();

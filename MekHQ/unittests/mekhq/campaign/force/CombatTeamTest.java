@@ -34,430 +34,540 @@ package mekhq.campaign.force;
 
 import static mekhq.campaign.force.FormationLevel.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
+import megamek.common.universe.Factions2;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 public class CombatTeamTest {
+    private static Factions2 testFactions2;
+
+    @BeforeAll
+    public static void setup() {
+        testFactions2 = new Factions2("testresources/data/universe/factions");
+        Factions.setInstance(Factions.loadDefault());
+    }
+
+    @SuppressWarnings("all") // get() without test; if it fails, test data is not loading; the test should fail
+    private Faction getFaction(String code) {
+        return new Faction(testFactions2.getFaction(code).get());
+    }
+
+    // Inner Sphere
+
     @Test
     public void testGetStandardForceSize_InnerSphere_LanceDepth() {
         // Setup
-        Faction mockFaction = mock(Faction.class);
-        when(mockFaction.isClan()).thenReturn(false);
-        when(mockFaction.isMarianHegemony()).thenReturn(false);
-        when(mockFaction.isComStarOrWoB()).thenReturn(false);
+        Faction faction = getFaction("LA");
 
         // Act
-        int result = CombatTeam.getStandardForceSize(mockFaction, LANCE.getDepth());
+        int result = CombatTeam.getStandardForceSize(faction, LANCE.getDepth());
 
         // Assert
         assertEquals(CombatTeam.LANCE_SIZE, result);
     }
 
     @Test
-    public void testGetStandardForceSize_ClanFaction_LanceDepth() {
-        // Setup
-        Faction mockFaction = mock(Faction.class);
-        when(mockFaction.isClan()).thenReturn(true);
-        when(mockFaction.isMarianHegemony()).thenReturn(false);
-        when(mockFaction.isComStarOrWoB()).thenReturn(false);
-
-        // Act
-        int result = CombatTeam.getStandardForceSize(mockFaction, STAR_OR_NOVA.getDepth());
-
-        // Assert
-        assertEquals(CombatTeam.STAR_SIZE, result);
-    }
-
-    @Test
-    public void testGetStandardForceSize_MarianHegemonyFaction_LanceDepth() {
-        // Setup
-        Faction mockFaction = mock(Faction.class);
-        when(mockFaction.isClan()).thenReturn(false);
-        when(mockFaction.isMarianHegemony()).thenReturn(true);
-        when(mockFaction.isComStarOrWoB()).thenReturn(false);
-
-        // Act
-        int result = CombatTeam.getStandardForceSize(mockFaction, LANCE.getDepth());
-
-        // Assert
-        assertEquals(CombatTeam.STAR_SIZE, result);
-    }
-
-    @Test
-    public void testGetStandardForceSize_ComStarFaction_LanceDepth() {
-        // Setup
-        Faction mockFaction = mock(Faction.class);
-        when(mockFaction.isClan()).thenReturn(false);
-        when(mockFaction.isMarianHegemony()).thenReturn(false);
-        when(mockFaction.isComStarOrWoB()).thenReturn(true);
-
-        // Act
-        int result = CombatTeam.getStandardForceSize(mockFaction, LEVEL_II_OR_CHOIR.getDepth());
-
-        // Assert
-        assertEquals(CombatTeam.LEVEL_II_SIZE, result);
-    }
-
-    @Test
     public void testGetStandardForceSize_InnerSphere_CompanyDepth() {
         // Setup
-        Faction mockFaction = mock(Faction.class);
-        when(mockFaction.isClan()).thenReturn(false);
-        when(mockFaction.isMarianHegemony()).thenReturn(false);
-        when(mockFaction.isComStarOrWoB()).thenReturn(false);
+        Faction faction = getFaction("LA");
 
         // Act
-        int result = CombatTeam.getStandardForceSize(mockFaction, COMPANY.getDepth());
+        int result = CombatTeam.getStandardForceSize(faction, COMPANY.getDepth());
 
         // Assert
         assertEquals(CombatTeam.LANCE_SIZE * 3, result);
     }
 
     @Test
-    public void testGetStandardForceSize_ClanFaction_CompanyDepth() {
-        // Setup
-        Faction mockFaction = mock(Faction.class);
-        when(mockFaction.isClan()).thenReturn(true);
-        when(mockFaction.isMarianHegemony()).thenReturn(false);
-        when(mockFaction.isComStarOrWoB()).thenReturn(false);
-
-        // Act
-        int result = CombatTeam.getStandardForceSize(mockFaction, BINARY_OR_TRINARY.getDepth());
-
-        // Assert
-        assertEquals(CombatTeam.STAR_SIZE * 3, result);
-    }
-
-    @Test
-    public void testGetStandardForceSize_MarianHegemonyFaction_CompanyDepth() {
-        // Setup
-        Faction mockFaction = mock(Faction.class);
-        when(mockFaction.isClan()).thenReturn(false);
-        when(mockFaction.isMarianHegemony()).thenReturn(true);
-        when(mockFaction.isComStarOrWoB()).thenReturn(false);
-
-        // Act
-        int result = CombatTeam.getStandardForceSize(mockFaction, COMPANY.getDepth());
-
-        // Assert
-        assertEquals(CombatTeam.STAR_SIZE * 3, result);
-    }
-
-    @Test
-    public void testGetStandardForceSize_ComStarFaction_CompanyDepth() {
-        // Setup
-        Faction mockFaction = mock(Faction.class);
-        when(mockFaction.isClan()).thenReturn(false);
-        when(mockFaction.isMarianHegemony()).thenReturn(false);
-        when(mockFaction.isComStarOrWoB()).thenReturn(true);
-
-        // Act
-        int result = CombatTeam.getStandardForceSize(mockFaction, LEVEL_III.getDepth());
-
-        // Assert
-        assertEquals(CombatTeam.LEVEL_II_SIZE * 6, result);
-    }
-
-    @Test
     public void testGetStandardForceSize_InnerSphere_BattalionDepth() {
         // Setup
-        Faction mockFaction = mock(Faction.class);
-        when(mockFaction.isClan()).thenReturn(false);
-        when(mockFaction.isMarianHegemony()).thenReturn(false);
-        when(mockFaction.isComStarOrWoB()).thenReturn(false);
+        Faction faction = getFaction("LA");
 
         // Act
-        int result = CombatTeam.getStandardForceSize(mockFaction, BATTALION.getDepth());
+        int result = CombatTeam.getStandardForceSize(faction, BATTALION.getDepth());
 
         // Assert
         assertEquals(CombatTeam.LANCE_SIZE * 3 * 3, result);
     }
 
     @Test
-    public void testGetStandardForceSize_ClanFaction_BattalionDepth() {
-        // Setup
-        Faction mockFaction = mock(Faction.class);
-        when(mockFaction.isClan()).thenReturn(true);
-        when(mockFaction.isMarianHegemony()).thenReturn(false);
-        when(mockFaction.isComStarOrWoB()).thenReturn(false);
-
-        // Act
-        int result = CombatTeam.getStandardForceSize(mockFaction, CLUSTER.getDepth());
-
-        // Assert
-        assertEquals(CombatTeam.STAR_SIZE * 3 * 3, result);
-    }
-
-    @Test
-    public void testGetStandardForceSize_MarianHegemonyFaction_BattalionDepth() {
-        // Setup
-        Faction mockFaction = mock(Faction.class);
-        when(mockFaction.isClan()).thenReturn(false);
-        when(mockFaction.isMarianHegemony()).thenReturn(true);
-        when(mockFaction.isComStarOrWoB()).thenReturn(false);
-
-        // Act
-        int result = CombatTeam.getStandardForceSize(mockFaction, BATTALION.getDepth());
-
-        // Assert
-        assertEquals(CombatTeam.STAR_SIZE * 3 * 3, result);
-    }
-
-    @Test
-    public void testGetStandardForceSize_ComStarFaction_BattalionDepth() {
-        // Setup
-        Faction mockFaction = mock(Faction.class);
-        when(mockFaction.isClan()).thenReturn(false);
-        when(mockFaction.isMarianHegemony()).thenReturn(false);
-        when(mockFaction.isComStarOrWoB()).thenReturn(true);
-
-        // Act
-        int result = CombatTeam.getStandardForceSize(mockFaction, LEVEL_IV.getDepth());
-
-        // Assert
-        assertEquals(CombatTeam.LEVEL_II_SIZE * 6 * 6, result);
-    }
-
-    @Test
     public void testGetStandardForceSize_InnerSphere_RegimentDepth() {
         // Setup
-        Faction mockFaction = mock(Faction.class);
-        when(mockFaction.isClan()).thenReturn(false);
-        when(mockFaction.isMarianHegemony()).thenReturn(false);
-        when(mockFaction.isComStarOrWoB()).thenReturn(false);
+        Faction faction = getFaction("LA");
 
         // Act
-        int result = CombatTeam.getStandardForceSize(mockFaction, REGIMENT.getDepth());
+        int result = CombatTeam.getStandardForceSize(faction, REGIMENT.getDepth());
 
         // Assert
         assertEquals(CombatTeam.LANCE_SIZE * 3 * 3 * 3, result);
     }
 
     @Test
-    public void testGetStandardForceSize_ClanFaction_RegimentDepth() {
-        // Setup
-        Faction mockFaction = mock(Faction.class);
-        when(mockFaction.isClan()).thenReturn(true);
-        when(mockFaction.isMarianHegemony()).thenReturn(false);
-        when(mockFaction.isComStarOrWoB()).thenReturn(false);
-
-        // Act
-        int result = CombatTeam.getStandardForceSize(mockFaction, GALAXY.getDepth());
-
-        // Assert
-        assertEquals(CombatTeam.STAR_SIZE * 3 * 3 * 3, result);
-    }
-
-    @Test
-    public void testGetStandardForceSize_MarianHegemonyFaction_RegimentDepth() {
-        // Setup
-        Faction mockFaction = mock(Faction.class);
-        when(mockFaction.isClan()).thenReturn(false);
-        when(mockFaction.isMarianHegemony()).thenReturn(true);
-        when(mockFaction.isComStarOrWoB()).thenReturn(false);
-
-        // Act
-        int result = CombatTeam.getStandardForceSize(mockFaction, REGIMENT.getDepth());
-
-        // Assert
-        assertEquals(CombatTeam.STAR_SIZE * 3 * 3 * 3, result);
-    }
-
-    @Test
-    public void testGetStandardForceSize_ComStarFaction_RegimentDepth() {
-        // Setup
-        Faction mockFaction = mock(Faction.class);
-        when(mockFaction.isClan()).thenReturn(false);
-        when(mockFaction.isMarianHegemony()).thenReturn(false);
-        when(mockFaction.isComStarOrWoB()).thenReturn(true);
-
-        // Act
-        int result = CombatTeam.getStandardForceSize(mockFaction, LEVEL_V.getDepth());
-
-        // Assert
-        assertEquals(CombatTeam.LEVEL_II_SIZE * 6 * 6 * 6, result);
-    }
-
-    @Test
     public void testGetStandardForceSize_InnerSphere_BrigadeDepth() {
         // Setup
-        Faction mockFaction = mock(Faction.class);
-        when(mockFaction.isClan()).thenReturn(false);
-        when(mockFaction.isMarianHegemony()).thenReturn(false);
-        when(mockFaction.isComStarOrWoB()).thenReturn(false);
+        Faction faction = getFaction("LA");
 
         // Act
-        int result = CombatTeam.getStandardForceSize(mockFaction, BRIGADE.getDepth());
+        int result = CombatTeam.getStandardForceSize(faction, BRIGADE.getDepth());
 
         // Assert
         assertEquals(CombatTeam.LANCE_SIZE * 3 * 3 * 3 * 3, result);
     }
 
     @Test
-    public void testGetStandardForceSize_ClanFaction_BrigadeDepth() {
-        // Setup
-        Faction mockFaction = mock(Faction.class);
-        when(mockFaction.isClan()).thenReturn(true);
-        when(mockFaction.isMarianHegemony()).thenReturn(false);
-        when(mockFaction.isComStarOrWoB()).thenReturn(false);
-
-        // Act
-        int result = CombatTeam.getStandardForceSize(mockFaction, TOUMAN.getDepth());
-
-        // Assert
-        assertEquals(CombatTeam.STAR_SIZE * 3 * 3 * 3 * 3, result);
-    }
-
-    @Test
-    public void testGetStandardForceSize_MarianHegemonyFaction_BrigadeDepth() {
-        // Setup
-        Faction mockFaction = mock(Faction.class);
-        when(mockFaction.isClan()).thenReturn(false);
-        when(mockFaction.isMarianHegemony()).thenReturn(true);
-        when(mockFaction.isComStarOrWoB()).thenReturn(false);
-
-        // Act
-        int result = CombatTeam.getStandardForceSize(mockFaction, BRIGADE.getDepth());
-
-        // Assert
-        assertEquals(CombatTeam.STAR_SIZE * 3 * 3 * 3 * 3, result);
-    }
-
-    @Test
-    public void testGetStandardForceSize_ComStarFaction_BrigadeDepth() {
-        // Setup
-        Faction mockFaction = mock(Faction.class);
-        when(mockFaction.isClan()).thenReturn(false);
-        when(mockFaction.isMarianHegemony()).thenReturn(false);
-        when(mockFaction.isComStarOrWoB()).thenReturn(true);
-
-        // Act
-        int result = CombatTeam.getStandardForceSize(mockFaction, LEVEL_VI.getDepth());
-
-        // Assert
-        assertEquals(CombatTeam.LEVEL_II_SIZE * 6 * 6 * 6 * 6, result);
-    }
-
-    @Test
     public void testGetStandardForceSize_InnerSphere_DivisionDepth() {
         // Setup
-        Faction mockFaction = mock(Faction.class);
-        when(mockFaction.isClan()).thenReturn(false);
-        when(mockFaction.isMarianHegemony()).thenReturn(false);
-        when(mockFaction.isComStarOrWoB()).thenReturn(false);
+        Faction faction = getFaction("LA");
 
         // Act
-        int result = CombatTeam.getStandardForceSize(mockFaction, DIVISION.getDepth());
+        int result = CombatTeam.getStandardForceSize(faction, DIVISION.getDepth());
 
         // Assert
         assertEquals(CombatTeam.LANCE_SIZE * 3 * 3 * 3 * 3 * 3, result);
     }
 
     @Test
-    public void testGetStandardForceSize_MarianHegemonyFaction_DivisionDepth() {
-        // Setup
-        Faction mockFaction = mock(Faction.class);
-        when(mockFaction.isClan()).thenReturn(false);
-        when(mockFaction.isMarianHegemony()).thenReturn(true);
-        when(mockFaction.isComStarOrWoB()).thenReturn(false);
-
-        // Act
-        int result = CombatTeam.getStandardForceSize(mockFaction, DIVISION.getDepth());
-
-        // Assert
-        assertEquals(CombatTeam.STAR_SIZE * 3 * 3 * 3 * 3 * 3, result);
-    }
-
-    @Test
     public void testGetStandardForceSize_InnerSphere_CorpsDepth() {
         // Setup
-        Faction mockFaction = mock(Faction.class);
-        when(mockFaction.isClan()).thenReturn(false);
-        when(mockFaction.isMarianHegemony()).thenReturn(false);
-        when(mockFaction.isComStarOrWoB()).thenReturn(false);
+        Faction faction = getFaction("LA");
 
         // Act
-        int result = CombatTeam.getStandardForceSize(mockFaction, CORPS.getDepth());
+        int result = CombatTeam.getStandardForceSize(faction, CORPS.getDepth());
 
         // Assert
         assertEquals(CombatTeam.LANCE_SIZE * 3 * 3 * 3 * 3 * 3 * 3, result);
     }
 
     @Test
-    public void testGetStandardForceSize_MarianHegemonyFaction_CorpsDepth() {
-        // Setup
-        Faction mockFaction = mock(Faction.class);
-        when(mockFaction.isClan()).thenReturn(false);
-        when(mockFaction.isMarianHegemony()).thenReturn(true);
-        when(mockFaction.isComStarOrWoB()).thenReturn(false);
-
-        // Act
-        int result = CombatTeam.getStandardForceSize(mockFaction, CORPS.getDepth());
-
-        // Assert
-        assertEquals(CombatTeam.STAR_SIZE * 3 * 3 * 3 * 3 * 3 * 3, result);
-    }
-
-    @Test
     public void testGetStandardForceSize_InnerSphere_ArmyDepth() {
         // Setup
-        Faction mockFaction = mock(Faction.class);
-        when(mockFaction.isClan()).thenReturn(false);
-        when(mockFaction.isMarianHegemony()).thenReturn(false);
-        when(mockFaction.isComStarOrWoB()).thenReturn(false);
+        Faction faction = getFaction("LA");
 
         // Act
-        int result = CombatTeam.getStandardForceSize(mockFaction, ARMY.getDepth());
+        int result = CombatTeam.getStandardForceSize(faction, ARMY.getDepth());
 
         // Assert
         assertEquals(CombatTeam.LANCE_SIZE * 3 * 3 * 3 * 3 * 3 * 3 * 3, result);
     }
 
     @Test
-    public void testGetStandardForceSize_MarianHegemonyFaction_ArmyDepth() {
+    public void testGetStandardForceSize_InnerSphere_ArmyGroupDepth() {
         // Setup
-        Faction mockFaction = mock(Faction.class);
-        when(mockFaction.isClan()).thenReturn(false);
-        when(mockFaction.isMarianHegemony()).thenReturn(true);
-        when(mockFaction.isComStarOrWoB()).thenReturn(false);
+        Faction faction = getFaction("LA");
 
         // Act
-        int result = CombatTeam.getStandardForceSize(mockFaction, ARMY.getDepth());
+        int result = CombatTeam.getStandardForceSize(faction, ARMY_GROUP.getDepth());
+
+        // Assert
+        assertEquals(CombatTeam.LANCE_SIZE * 3 * 3 * 3 * 3 * 3 * 3 * 3 * 3, result);
+    }
+
+    // Clan
+
+    @Test
+    public void testGetStandardForceSize_ClanFaction_LanceDepth() {
+        // Setup
+        Faction faction = getFaction("CBS");
+
+        // Act
+        int result = CombatTeam.getStandardForceSize(faction, STAR_OR_NOVA.getDepth());
+
+        // Assert
+        assertEquals(CombatTeam.STAR_SIZE, result);
+    }
+
+    @Test
+    public void testGetStandardForceSize_ClanFaction_CompanyDepth() {
+        // Setup
+        Faction faction = getFaction("CBS");
+
+        // Act
+        int result = CombatTeam.getStandardForceSize(faction, BINARY_OR_TRINARY.getDepth());
+
+        // Assert
+        assertEquals(CombatTeam.STAR_SIZE * 3, result);
+    }
+
+    @Test
+    public void testGetStandardForceSize_ClanFaction_BattalionDepth() {
+        // Setup
+        Faction faction = getFaction("CBS");
+
+        // Act
+        int result = CombatTeam.getStandardForceSize(faction, CLUSTER.getDepth());
+
+        // Assert
+        assertEquals(CombatTeam.STAR_SIZE * 3 * 3, result);
+    }
+
+    @Test
+    public void testGetStandardForceSize_ClanFaction_RegimentDepth() {
+        // Setup
+        Faction faction = getFaction("CBS");
+
+        // Act
+        int result = CombatTeam.getStandardForceSize(faction, GALAXY.getDepth());
+
+        // Assert
+        assertEquals(CombatTeam.STAR_SIZE * 3 * 3 * 3, result);
+    }
+
+    @Test
+    public void testGetStandardForceSize_ClanFaction_BrigadeDepth() {
+        // Setup
+        Faction faction = getFaction("CBS");
+
+        // Act
+        int result = CombatTeam.getStandardForceSize(faction, TOUMAN.getDepth());
+
+        // Assert
+        assertEquals(CombatTeam.STAR_SIZE * 3 * 3 * 3 * 3, result);
+    }
+
+    // Marian Hegemony
+
+    @Test
+    public void testGetStandardForceSize_MarianHegemonyFaction_LanceDepth() {
+        // Setup
+        Faction faction = getFaction("MH");
+
+        // Act
+        int result = CombatTeam.getStandardForceSize(faction, LANCE.getDepth());
+
+        // Assert
+        assertEquals(CombatTeam.STAR_SIZE, result);
+    }
+
+    @Test
+    public void testGetStandardForceSize_MarianHegemonyFaction_CompanyDepth() {
+        // Setup
+        Faction faction = getFaction("MH");
+
+        // Act
+        int result = CombatTeam.getStandardForceSize(faction, COMPANY.getDepth());
+
+        // Assert
+        assertEquals(CombatTeam.STAR_SIZE * 3, result);
+    }
+
+    @Test
+    public void testGetStandardForceSize_MarianHegemonyFaction_BattalionDepth() {
+        // Setup
+        Faction faction = getFaction("MH");
+
+        // Act
+        int result = CombatTeam.getStandardForceSize(faction, BATTALION.getDepth());
+
+        // Assert
+        assertEquals(CombatTeam.STAR_SIZE * 3 * 3, result);
+    }
+
+    @Test
+    public void testGetStandardForceSize_MarianHegemonyFaction_RegimentDepth() {
+        // Setup
+        Faction faction = getFaction("MH");
+
+        // Act
+        int result = CombatTeam.getStandardForceSize(faction, REGIMENT.getDepth());
+
+        // Assert
+        assertEquals(CombatTeam.STAR_SIZE * 3 * 3 * 3, result);
+    }
+
+    @Test
+    public void testGetStandardForceSize_MarianHegemonyFaction_BrigadeDepth() {
+        // Setup
+        Faction faction = getFaction("MH");
+
+        // Act
+        int result = CombatTeam.getStandardForceSize(faction, BRIGADE.getDepth());
+
+        // Assert
+        assertEquals(CombatTeam.STAR_SIZE * 3 * 3 * 3 * 3, result);
+    }
+
+    @Test
+    public void testGetStandardForceSize_MarianHegemonyFaction_DivisionDepth() {
+        // Setup
+        Faction faction = getFaction("MH");
+
+        // Act
+        int result = CombatTeam.getStandardForceSize(faction, DIVISION.getDepth());
+
+        // Assert
+        assertEquals(CombatTeam.STAR_SIZE * 3 * 3 * 3 * 3 * 3, result);
+    }
+
+    @Test
+    public void testGetStandardForceSize_MarianHegemonyFaction_CorpsDepth() {
+        // Setup
+        Faction faction = getFaction("MH");
+
+        // Act
+        int result = CombatTeam.getStandardForceSize(faction, CORPS.getDepth());
+
+        // Assert
+        assertEquals(CombatTeam.STAR_SIZE * 3 * 3 * 3 * 3 * 3 * 3, result);
+    }
+
+    @Test
+    public void testGetStandardForceSize_MarianHegemonyFaction_ArmyDepth() {
+        // Setup
+        Faction faction = getFaction("MH");
+
+        // Act
+        int result = CombatTeam.getStandardForceSize(faction, ARMY.getDepth());
 
         // Assert
         assertEquals(CombatTeam.STAR_SIZE * 3 * 3 * 3 * 3 * 3 * 3 * 3, result);
     }
 
     @Test
-    public void testGetStandardForceSize_InnerSphere_ArmyGroupDepth() {
+    public void testGetStandardForceSize_MarianHegemonyFaction_ArmyGroupDepth() {
         // Setup
-        Faction mockFaction = mock(Faction.class);
-        when(mockFaction.isClan()).thenReturn(false);
-        when(mockFaction.isMarianHegemony()).thenReturn(false);
-        when(mockFaction.isComStarOrWoB()).thenReturn(false);
+        Faction faction = getFaction("MH");
 
         // Act
-        int result = CombatTeam.getStandardForceSize(mockFaction, ARMY_GROUP.getDepth());
+        int result = CombatTeam.getStandardForceSize(faction, ARMY_GROUP.getDepth());
+
+        // Assert
+        assertEquals(CombatTeam.STAR_SIZE * 3 * 3 * 3 * 3 * 3 * 3 * 3 * 3, result);
+    }
+
+    // ComStar
+
+    @Test
+    public void testGetStandardForceSize_ComStarFaction_LanceDepth() {
+        // Setup
+        Faction faction = getFaction("CS");
+
+        // Act
+        int result = CombatTeam.getStandardForceSize(faction, LEVEL_II_OR_CHOIR.getDepth());
+
+        // Assert
+        assertEquals(CombatTeam.LEVEL_II_SIZE, result);
+    }
+
+    @Test
+    public void testGetStandardForceSize_ComStarFaction_CompanyDepth() {
+        // Setup
+        Faction faction = getFaction("CS");
+
+        // Act
+        int result = CombatTeam.getStandardForceSize(faction, LEVEL_III.getDepth());
+
+        // Assert
+        assertEquals(CombatTeam.LEVEL_II_SIZE * 6, result);
+    }
+
+    @Test
+    public void testGetStandardForceSize_ComStarFaction_BattalionDepth() {
+        // Setup
+        Faction faction = getFaction("CS");
+
+        // Act
+        int result = CombatTeam.getStandardForceSize(faction, LEVEL_IV.getDepth());
+
+        // Assert
+        assertEquals(CombatTeam.LEVEL_II_SIZE * 6 * 6, result);
+    }
+
+    @Test
+    public void testGetStandardForceSize_ComStarFaction_RegimentDepth() {
+        // Setup
+        Faction faction = getFaction("CS");
+
+        // Act
+        int result = CombatTeam.getStandardForceSize(faction, LEVEL_V.getDepth());
+
+        // Assert
+        assertEquals(CombatTeam.LEVEL_II_SIZE * 6 * 6 * 6, result);
+    }
+
+    @Test
+    public void testGetStandardForceSize_ComStarFaction_BrigadeDepth() {
+        // Setup
+        Faction faction = getFaction("CS");
+
+        // Act
+        int result = CombatTeam.getStandardForceSize(faction, LEVEL_VI.getDepth());
+
+        // Assert
+        assertEquals(CombatTeam.LEVEL_II_SIZE * 6 * 6 * 6 * 6, result);
+    }
+
+    // Fallback - Inner Sphere
+
+    @Test
+    public void testGetStandardForceSize_FallbackInnerSphere_LanceDepth() {
+        // Setup
+        var faction = getFaction("IS_TAG");
+
+        // Act
+        int result = CombatTeam.getStandardForceSize(faction, LANCE.getDepth());
+
+        // Assert
+        assertEquals(CombatTeam.LANCE_SIZE, result);
+    }
+
+    @Test
+    public void testGetStandardForceSize_FallbackInnerSphere_CompanyDepth() {
+        // Setup
+        var faction = getFaction("IS_TAG");
+
+        // Act
+        int result = CombatTeam.getStandardForceSize(faction, COMPANY.getDepth());
+
+        // Assert
+        assertEquals(CombatTeam.LANCE_SIZE * 3, result);
+    }
+
+    @Test
+    public void testGetStandardForceSize_FallbackInnerSphere_BattalionDepth() {
+        // Setup
+        var faction = getFaction("IS_TAG");
+
+        // Act
+        int result = CombatTeam.getStandardForceSize(faction, BATTALION.getDepth());
+
+        // Assert
+        assertEquals(CombatTeam.LANCE_SIZE * 3 * 3, result);
+    }
+
+    @Test
+    public void testGetStandardForceSize_FallbackInnerSphere_RegimentDepth() {
+        // Setup
+        var faction = getFaction("IS_TAG");
+
+        // Act
+        int result = CombatTeam.getStandardForceSize(faction, REGIMENT.getDepth());
+
+        // Assert
+        assertEquals(CombatTeam.LANCE_SIZE * 3 * 3 * 3, result);
+    }
+
+    @Test
+    public void testGetStandardForceSize_FallbackInnerSphere_BrigadeDepth() {
+        // Setup
+        var faction = getFaction("IS_TAG");
+
+        // Act
+        int result = CombatTeam.getStandardForceSize(faction, BRIGADE.getDepth());
+
+        // Assert
+        assertEquals(CombatTeam.LANCE_SIZE * 3 * 3 * 3 * 3, result);
+    }
+
+    @Test
+    public void testGetStandardForceSize_FallbackInnerSphere_DivisionDepth() {
+        // Setup
+        var faction = getFaction("IS_TAG");
+
+        // Act
+        int result = CombatTeam.getStandardForceSize(faction, DIVISION.getDepth());
+
+        // Assert
+        assertEquals(CombatTeam.LANCE_SIZE * 3 * 3 * 3 * 3 * 3, result);
+    }
+
+    @Test
+    public void testGetStandardForceSize_FallbackInnerSphere_CorpsDepth() {
+        // Setup
+        var faction = getFaction("IS_TAG");
+
+        // Act
+        int result = CombatTeam.getStandardForceSize(faction, CORPS.getDepth());
+
+        // Assert
+        assertEquals(CombatTeam.LANCE_SIZE * 3 * 3 * 3 * 3 * 3 * 3, result);
+    }
+
+    @Test
+    public void testGetStandardForceSize_FallbackInnerSphere_ArmyDepth() {
+        // Setup
+        var faction = getFaction("IS_TAG");
+
+        // Act
+        int result = CombatTeam.getStandardForceSize(faction, ARMY.getDepth());
+
+        // Assert
+        assertEquals(CombatTeam.LANCE_SIZE * 3 * 3 * 3 * 3 * 3 * 3 * 3, result);
+    }
+
+    @Test
+    public void testGetStandardForceSize_FallbackInnerSphere_ArmyGroupDepth() {
+        // Setup
+        var faction = getFaction("IS_TAG");
+
+        // Act
+        int result = CombatTeam.getStandardForceSize(faction, ARMY_GROUP.getDepth());
 
         // Assert
         assertEquals(CombatTeam.LANCE_SIZE * 3 * 3 * 3 * 3 * 3 * 3 * 3 * 3, result);
     }
 
+    // Fallback - Clan
+
     @Test
-    public void testGetStandardForceSize_MarianHegemonyFaction_ArmyGroupDepth() {
+    public void testGetStandardForceSize_FallbackClanFaction_LanceDepth() {
         // Setup
-        Faction mockFaction = mock(Faction.class);
-        when(mockFaction.isClan()).thenReturn(false);
-        when(mockFaction.isMarianHegemony()).thenReturn(true);
-        when(mockFaction.isComStarOrWoB()).thenReturn(false);
+        var faction = getFaction("CLAN_TAG");
 
         // Act
-        int result = CombatTeam.getStandardForceSize(mockFaction, ARMY_GROUP.getDepth());
+        int result = CombatTeam.getStandardForceSize(faction, STAR_OR_NOVA.getDepth());
 
         // Assert
-        assertEquals(CombatTeam.STAR_SIZE * 3 * 3 * 3 * 3 * 3 * 3 * 3 * 3, result);
+        assertEquals(CombatTeam.STAR_SIZE, result);
+    }
+
+    @Test
+    public void testGetStandardForceSize_FallbackClanFaction_CompanyDepth() {
+        // Setup
+        var faction = getFaction("CLAN_TAG");
+
+        // Act
+        int result = CombatTeam.getStandardForceSize(faction, BINARY_OR_TRINARY.getDepth());
+
+        // Assert
+        assertEquals(CombatTeam.STAR_SIZE * 3, result);
+    }
+
+    @Test
+    public void testGetStandardForceSize_FallbackClanFaction_BattalionDepth() {
+        // Setup
+        var faction = getFaction("CLAN_TAG");
+
+        // Act
+        int result = CombatTeam.getStandardForceSize(faction, CLUSTER.getDepth());
+
+        // Assert
+        assertEquals(CombatTeam.STAR_SIZE * 3 * 3, result);
+    }
+
+    @Test
+    public void testGetStandardForceSize_FallbackClanFaction_RegimentDepth() {
+        // Setup
+        var faction = getFaction("CLAN_TAG");
+
+        // Act
+        int result = CombatTeam.getStandardForceSize(faction, GALAXY.getDepth());
+
+        // Assert
+        assertEquals(CombatTeam.STAR_SIZE * 3 * 3 * 3, result);
+    }
+
+    @Test
+    public void testGetStandardForceSize_FallbackClanFaction_BrigadeDepth() {
+        // Setup
+        var faction = getFaction("CLAN_TAG");
+
+        // Act
+        int result = CombatTeam.getStandardForceSize(faction, TOUMAN.getDepth());
+
+        // Assert
+        assertEquals(CombatTeam.STAR_SIZE * 3 * 3 * 3 * 3, result);
     }
 }

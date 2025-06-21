@@ -71,7 +71,7 @@ import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
-import mekhq.campaign.universe.enums.HonorRating;
+import megamek.common.universe.HonorRating;
 import mekhq.utilities.ReportingUtilities;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 

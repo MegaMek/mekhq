@@ -46,6 +46,7 @@ import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -61,6 +62,9 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
 import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
@@ -68,6 +72,7 @@ import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.gui.dialog.AdvanceDaysDialog;
 import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.view.PersonViewPanel;
 
@@ -106,23 +111,24 @@ import mekhq.gui.view.PersonViewPanel;
  * @author Illiani
  * @since 0.50.06
  */
-public class PersonnelMarketDialog {
+public class PersonnelMarketDialog extends JDialog {
+    private static final MMLogger LOGGER = MMLogger.create(PersonnelMarketDialog.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PersonnelMarket";
 
     private static final int MAXIMUM_DAYS_IN_MONTH = 31;
     private static final int MAXIMUM_NUMBER_OF_SYSTEM_ROLLS = 4;
 
     private final int PADDING = scaleForGUI(5);
+    private final Dimension PERSON_VIEW_MINIMUM_SIZE = scaleForGUI(500, 500);
 
     private final NewPersonnelMarket market;
     private final JFrame parent;
     private final Campaign campaign;
     private final CampaignOptions campaignOptions;
 
-    private List<Person> currentApplicants;
+    private final List<Person> currentApplicants;
     private MMComboBox<PersonnelFilter> roleComboBox = new MMComboBox<>("roleFilter");
-    private JCheckBox goldenHelloCheckbox = new JCheckBox();
-    private Person selectedPerson;
+    private final JCheckBox goldenHelloCheckbox = new JCheckBox();
     private PersonnelTablePanel tablePanel;
     private PersonViewPanel personViewPanel;
 
@@ -153,14 +159,11 @@ public class PersonnelMarketDialog {
      * @since 0.50.06
      */
     public void initializeComponents() {
-        JDialog dialog = new JDialog(parent);
-        setDialogTitle(dialog);
-        dialog.addWindowListener(new WindowAdapter() {
+        setDialogTitle();
+        addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                market.setOfferingGoldenHello(goldenHelloCheckbox.isSelected());
-                market.setCurrentApplicants(currentApplicants);
-                dialog.dispose();
+                closeAction();
             }
         });
 
@@ -175,13 +178,6 @@ public class PersonnelMarketDialog {
         pnlLeft.add(pnlHeader, BorderLayout.NORTH);
 
         tablePanel = initializeTablePanel();
-        tablePanel.addListSelectionListener(e -> {
-            List<Person> applicants = tablePanel.getSelectedApplicants();
-            selectedPerson = applicants.isEmpty() ? null : applicants.get(0);
-            if (personViewPanel != null) {
-                personViewPanel.setPerson(selectedPerson);
-            }
-        });
         pnlLeft.add(tablePanel, BorderLayout.CENTER);
 
         JPanel pnlTips = initializeTipPanel();
@@ -194,13 +190,29 @@ public class PersonnelMarketDialog {
 
         // This handles the initializing and display of the applicant panel
         JSplitPane splitPane = initializePersonView(selectedPerson, mainPanel);
-        dialog.getContentPane().add(splitPane, BorderLayout.CENTER);
+        getContentPane().add(splitPane, BorderLayout.CENTER);
 
         // Finalize the dialog
-        dialog.setModal(true);
-        dialog.pack();
-        dialog.setLocationRelativeTo(parent);
-        dialog.setVisible(true);
+        setModal(true);
+        pack();
+        setLocationRelativeTo(parent);
+        setPreferences(this); // Must be before setVisible
+        setVisible(true); // Should always be last
+    }
+
+    /**
+     * Applies the current UI settings to the {@link NewPersonnelMarket} object and closes the dialog.
+     *
+     * <p>This method updates the market's "golden hello" offering status and the list of current applicants based on
+     * the user selections, then disposes of the dialog.</p>
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private void closeAction() {
+        market.setOfferingGoldenHello(goldenHelloCheckbox.isSelected());
+        market.setCurrentApplicants(currentApplicants);
+        dispose();
     }
 
 
@@ -227,8 +239,8 @@ public class PersonnelMarketDialog {
 
         // Golden Hello Checkbox
         leftGbc.gridy = leftRow++;
-        leftGbc.insets = new Insets(0, 0, 8, 0);
-        JCheckBox goldenHelloCheckbox = new JCheckBox(getTextAt(RESOURCE_BUNDLE,
+        leftGbc.insets = new Insets(0, 0, PADDING, 0);
+        goldenHelloCheckbox.setText(getTextAt(RESOURCE_BUNDLE,
               "checkbox.personnelMarket.goldenHello"));
         goldenHelloCheckbox.setSelected(market.isOfferingGoldenHello());
         goldenHelloCheckbox.setEnabled(market.getAssociatedPersonnelMarketStyle() == MEKHQ);
@@ -253,7 +265,7 @@ public class PersonnelMarketDialog {
 
         // Personnel Availability Label (Centered)
         rightGbc.gridy = rightRow++;
-        rightGbc.insets = new Insets(0, 0, 8, 0);
+        rightGbc.insets = new Insets(0, 0, PADDING, 0);
         JLabel availabilityLabel = new JLabel(getTextAt(RESOURCE_BUNDLE, "label.personnelMarket.availability"));
         availabilityLabel.setHorizontalAlignment(SwingConstants.CENTER);
         rightPanel.add(availabilityLabel, rightGbc);
@@ -335,6 +347,10 @@ public class PersonnelMarketDialog {
         boolean isGM = campaign.isGM();
 
         JPanel buttonPanel = new JPanel();
+        JButton closeButton = new JButton(getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.close"));
+        closeButton.addActionListener(e -> closeAction());
+        buttonPanel.add(closeButton);
+
         JButton hireButton = new JButton(getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.hire.normal"));
         hireButton.addActionListener(e -> hireActionListener(isGM));
         buttonPanel.add(hireButton);
@@ -343,6 +359,21 @@ public class PersonnelMarketDialog {
         addGMButton.addActionListener(e -> hireActionListener(isGM));
         addGMButton.setEnabled(isGM);
         buttonPanel.add(addGMButton);
+
+        JButton advanceMultipleDays = new JButton(getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.advanceDays"));
+        advanceMultipleDays.addActionListener(e -> {
+            closeAction(); // Close old instance
+
+            AdvanceDaysDialog advanceDaysDialog = new AdvanceDaysDialog(parent, campaign.getApp().getCampaigngui());
+            advanceDaysDialog.setVisible(true);
+            advanceDaysDialog.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosed(WindowEvent e) {
+                    new PersonnelMarketDialog(market); // Open a new instance (to ensure the market is refreshed)
+                }
+            });
+        });
+        buttonPanel.add(advanceMultipleDays);
 
         return buttonPanel;
     }
@@ -379,32 +410,52 @@ public class PersonnelMarketDialog {
         PersonnelTablePanel tablePanel = new PersonnelTablePanel(campaign, currentApplicants);
 
         JTable personnelTable = tablePanel.getTable();
-        if (personnelTable.getRowSorter() instanceof TableRowSorter<?> sorter) {
-            roleComboBox.addActionListener(ev -> {
-                PersonnelFilter selectedFilter = roleComboBox.getSelectedItem();
-                if (selectedFilter == null) {
-                    selectedFilter = ALL;
-                } else {
-                    market.setLastSelectedFilter(roleComboBox.getSelectedIndex());
-                }
-                PersonnelFilter finalSelectedFilter = selectedFilter;
-                sorter.setRowFilter(new RowFilter<TableModel, Integer>() {
-                    @Override
-                    public boolean include(Entry<? extends TableModel, ? extends Integer> entry) {
-                        int modelRow = entry.getIdentifier();
-                        TableModel model = entry.getModel();
-                        if (model instanceof PersonTableModel) {
-                            Person person = ((PersonTableModel) model).getPerson(modelRow);
-                            return finalSelectedFilter.getFilteredInformation(person, campaign.getLocalDate());
-                        }
-                        return true;
-                    }
+        personnelTable.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                SwingUtilities.invokeLater(() -> {
+                    List<Person> selected = tablePanel.getSelectedApplicants();
+                    Person selectedPerson = selected.isEmpty() ? null : selected.get(0);
+                    personViewPanel.setPerson(selectedPerson);
                 });
-            });
+            }
+        });
+
+        if (personnelTable.getRowSorter() instanceof TableRowSorter<?> sorter) {
+            filterRoles(sorter);
+            roleComboBox.addActionListener(ev -> filterRoles(sorter));
         }
         return tablePanel;
     }
 
+    /**
+     * Applies filtering logic to the given table row sorter based on the selected role filter.
+     *
+     * @param sorter the {@link TableRowSorter} to which the filtering logic is applied
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private void filterRoles(TableRowSorter<?> sorter) {
+        PersonnelFilter selectedFilter = roleComboBox.getSelectedItem();
+        if (selectedFilter == null) {
+            selectedFilter = ALL;
+        } else {
+            market.setLastSelectedFilter(roleComboBox.getSelectedIndex());
+        }
+        PersonnelFilter finalSelectedFilter = selectedFilter;
+        sorter.setRowFilter(new RowFilter<TableModel, Integer>() {
+            @Override
+            public boolean include(Entry<? extends TableModel, ? extends Integer> entry) {
+                int modelRow = entry.getIdentifier();
+                TableModel model = entry.getModel();
+                if (model instanceof PersonTableModel) {
+                    Person person = ((PersonTableModel) model).getPerson(modelRow);
+                    return finalSelectedFilter.getFilteredInformation(person, campaign.getLocalDate());
+                }
+                return true;
+            }
+        });
+    }
 
     /**
      * Initializes and returns the detail view pane for the selected person.
@@ -420,7 +471,7 @@ public class PersonnelMarketDialog {
     private JSplitPane initializePersonView(AtomicReference<Person> selectedPerson, JPanel mainPanel) {
         personViewPanel = new PersonViewPanel(selectedPerson.get(), campaign, campaign.getApp().getCampaigngui());
         JScrollPane viewScrollPane = new JScrollPane(personViewPanel);
-        viewScrollPane.setPreferredSize(scaleForGUI(500, 750));
+        viewScrollPane.setMinimumSize(PERSON_VIEW_MINIMUM_SIZE);
         SwingUtilities.invokeLater(() -> viewScrollPane.getVerticalScrollBar().setValue(0));
 
         JPanel buttonPanel = initializeButtonPanel();
@@ -480,25 +531,23 @@ public class PersonnelMarketDialog {
     /**
      * Sets the dialog's title based on market and campaign context.
      *
-     * @param dialog the dialog window to set the title on
-     *
      * @author Illiani
      * @since 0.50.06
      */
-    private void setDialogTitle(JDialog dialog) {
+    private void setDialogTitle() {
         Faction campaignFaction = campaign.getFaction();
         if (campaignFaction.isClan()) {
-            dialog.setTitle(getTextAt(RESOURCE_BUNDLE, "title.personnelMarket.clan"));
+            setTitle(getTextAt(RESOURCE_BUNDLE, "title.personnelMarket.clan"));
         } else if (campaignFaction.isComStarOrWoB()) {
             Person commander = campaign.getFlaggedCommander();
             String address = commander != null ? commander.getTitleAndSurname() : campaign.getCommanderAddress(false);
-            dialog.setTitle(getFormattedTextAt(RESOURCE_BUNDLE,
+            setTitle(getFormattedTextAt(RESOURCE_BUNDLE,
                   "title.personnelMarket.comStarOrWoB",
                   address.toUpperCase()));
         } else if (campaignFaction.isMercenary()) {
-            dialog.setTitle(getTextAt(RESOURCE_BUNDLE, "title.personnelMarket.mercenary"));
+            setTitle(getTextAt(RESOURCE_BUNDLE, "title.personnelMarket.mercenary"));
         } else if (campaignFaction.isMercenary()) {
-            dialog.setTitle(getTextAt(RESOURCE_BUNDLE, "title.personnelMarket.normal"));
+            setTitle(getTextAt(RESOURCE_BUNDLE, "title.personnelMarket.normal"));
         }
     }
 
@@ -555,5 +604,18 @@ public class PersonnelMarketDialog {
                   closingBrace);
         }
         return noAvailabilityMessage;
+    }
+
+    /**
+     * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek.
+     */
+    private void setPreferences(JDialog dialog) {
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(PersonnelMarketDialog.class);
+            dialog.setName("PersonnelMarketDialog");
+            preferences.manage(new JWindowPreference(dialog));
+        } catch (Exception ex) {
+            LOGGER.error("Failed to set user preferences", ex);
+        }
     }
 }

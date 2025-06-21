@@ -28,15 +28,15 @@
 package mekhq.gui.utilities;
 
 import java.awt.Component;
-
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import megamek.client.ui.clientGUI.GUIPreferences;
 
 /**
- * It's a JScrollPane that manages its scroll speed based on the UI scale
+ * Use the version housed in MegaMek, instead
  */
+@Deprecated(since = "0.50.07")
 public class JScrollPaneWithSpeed extends JScrollPane {
     static final int BASE_INCREMENT = 16;
 

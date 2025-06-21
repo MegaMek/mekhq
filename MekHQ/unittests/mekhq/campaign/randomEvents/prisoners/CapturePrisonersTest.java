@@ -27,21 +27,6 @@
  */
 package mekhq.campaign.randomEvents.prisoners;
 
-import megamek.common.ITechnology;
-import megamek.common.MapSettings;
-import megamek.common.ITechnology.AvailabilityValue;
-import megamek.common.ITechnology.TechRating;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
-import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Faction.Tag;
-import org.junit.jupiter.api.Test;
-
-import java.time.LocalDate;
-import java.util.Set;
-
 import static java.lang.Math.round;
 import static megamek.common.MiscType.createBeagleActiveProbe;
 import static megamek.common.MiscType.createISImprovedSensors;
@@ -57,6 +42,22 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
+import java.util.Set;
+
+import megamek.common.ITechnology;
+import megamek.common.ITechnology.AvailabilityValue;
+import megamek.common.MapSettings;
+import megamek.common.universe.FactionTag;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
 /**
  * The {@link CapturePrisonersTest} class is a test suite for validating the functionality of the
  * prisoner capture and processing mechanisms. This class contains a variety of unit test cases to
@@ -68,6 +69,14 @@ import static org.mockito.Mockito.when;
  * prisoner defection are also tested for various factions and conditions.</p>
  */
 class CapturePrisonersTest {
+    private static Factions factions;
+
+    @BeforeAll
+    public static void setup() {
+        Factions.setInstance(Factions.loadDefault());
+        factions = Factions.getInstance();
+    }
+
     @Test
     void testCapturePrisoners_Ground() {
         // Setup
@@ -285,8 +294,7 @@ class CapturePrisonersTest {
         LocalDate today = LocalDate.of(3151, 1, 1);
         when(mockCampaign.getLocalDate()).thenReturn(today);
 
-        Faction campaignFaction = new Faction();
-        campaignFaction.setTags(Set.of(Tag.CLAN));
+        Faction campaignFaction = factions.getFaction("CJF");
         when(mockCampaign.getFaction()).thenReturn(campaignFaction);
 
         Scenario scenario = new Scenario();
@@ -296,7 +304,7 @@ class CapturePrisonersTest {
         CapturePrisoners realCapturePrisoners = new CapturePrisoners(mockCampaign, campaignFaction, scenario, DRAGOON_C) {
             @Override
             protected int d6(int dice) {
-                return prisoner.getOriginFaction().getHonorRating(mockCampaign).getBondsmanTargetNumber() - 1;
+                return Integer.MIN_VALUE;
             }
         };
 
@@ -319,21 +327,19 @@ class CapturePrisonersTest {
         LocalDate today = LocalDate.of(3151, 1, 1);
         when(mockCampaign.getLocalDate()).thenReturn(today);
 
-        Faction campaignFaction = new Faction();
-        campaignFaction.setTags(Set.of(Tag.CLAN));
+        Faction campaignFaction = factions.getFaction("CJF");
         when(mockCampaign.getFaction()).thenReturn(campaignFaction);
 
         Scenario scenario = new Scenario();
 
         Person prisoner = new Person(mockCampaign);
-        Faction prisonerFaction = new Faction();
-        campaignFaction.setTags(Set.of(Tag.CLAN));
+        Faction prisonerFaction = factions.getFaction("CJF");
         prisoner.setOriginFaction(prisonerFaction);
 
         CapturePrisoners realCapturePrisoners = new CapturePrisoners(mockCampaign, campaignFaction, scenario, DRAGOON_C) {
             @Override
             protected int d6(int dice) {
-                return prisoner.getOriginFaction().getHonorRating(mockCampaign).getBondsmanTargetNumber() + 1;
+                return Integer.MAX_VALUE;
             }
         };
 
@@ -389,8 +395,7 @@ class CapturePrisonersTest {
         LocalDate today = LocalDate.of(3151, 1, 1);
         when(mockCampaign.getLocalDate()).thenReturn(today);
 
-        Faction campaignFaction = new Faction();
-        campaignFaction.setTags(Set.of(Tag.CLAN));
+        Faction campaignFaction = factions.getFaction("CJF");
         when(mockCampaign.getFaction()).thenReturn(campaignFaction);
 
         Scenario scenario = new Scenario();
@@ -400,7 +405,7 @@ class CapturePrisonersTest {
         CapturePrisoners realCapturePrisoners = new CapturePrisoners(mockCampaign, campaignFaction, scenario, DRAGOON_C) {
             @Override
             protected int d6(int dice) {
-                return prisoner.getOriginFaction().getHonorRating(mockCampaign).getBondsmanTargetNumber() - 1;
+                return Integer.MIN_VALUE;
             }
         };
 
@@ -423,20 +428,19 @@ class CapturePrisonersTest {
         LocalDate today = LocalDate.of(3151, 1, 1);
         when(mockCampaign.getLocalDate()).thenReturn(today);
 
-        Faction campaignFaction = new Faction();
-        campaignFaction.setTags(Set.of(Tag.CLAN));
+        Faction campaignFaction = factions.getFaction("CJF");
         when(mockCampaign.getFaction()).thenReturn(campaignFaction);
 
         Scenario scenario = new Scenario();
 
         Person prisoner = new Person(mockCampaign);
-        Faction prisonerFaction = new Faction();
+        Faction prisonerFaction = factions.getFaction("LA");
         prisoner.setOriginFaction(prisonerFaction);
 
         CapturePrisoners realCapturePrisoners = new CapturePrisoners(mockCampaign, campaignFaction, scenario, DRAGOON_C) {
             @Override
             protected int d6(int dice) {
-                return prisoner.getOriginFaction().getHonorRating(mockCampaign).getBondsmanTargetNumber() + 1;
+                return Integer.MAX_VALUE;
             }
         };
 
@@ -493,7 +497,7 @@ class CapturePrisonersTest {
 
         Person prisoner = new Person(mockCampaign);
         Faction prisonerFaction = new Faction();
-        prisonerFaction.setTags(Set.of(Tag.MERC));
+        prisonerFaction.setTags(Set.of(FactionTag.MERC));
         prisoner.setOriginFaction(prisonerFaction);
 
         // Act
@@ -517,7 +521,7 @@ class CapturePrisonersTest {
         when(mockCampaign.getLocalDate()).thenReturn(today);
 
         Faction campaignFaction = new Faction();
-        campaignFaction.setTags(Set.of(Tag.CLAN));
+        campaignFaction.setTags(Set.of(FactionTag.CLAN));
         when(mockCampaign.getFaction()).thenReturn(campaignFaction);
 
         Scenario scenario = new Scenario();
@@ -546,7 +550,7 @@ class CapturePrisonersTest {
         when(mockCampaign.getLocalDate()).thenReturn(today);
 
         Faction campaignFaction = new Faction();
-        campaignFaction.setTags(Set.of(Tag.MERC));
+        campaignFaction.setTags(Set.of(FactionTag.MERC));
         when(mockCampaign.getFaction()).thenReturn(campaignFaction);
 
         Scenario scenario = new Scenario();
