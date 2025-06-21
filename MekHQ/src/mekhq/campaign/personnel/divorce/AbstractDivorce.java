@@ -27,6 +27,11 @@
  */
 package mekhq.campaign.personnel.divorce;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
@@ -40,11 +45,6 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.RandomDivorceMethod;
 import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
 import mekhq.campaign.personnel.familyTree.FormerSpouse;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
 
 /**
  * AbstractDivorce is the baseline class for divorce in MekHQ. It holds all the common logic for
@@ -263,11 +263,11 @@ public abstract class AbstractDivorce {
 
         List<Person> departingPartners = new ArrayList<>();
 
-        if (origin.isDependent() && !origin.getStatus().isDead()) {
+        if ((origin.isDependent() || !origin.isEmployed()) && !origin.getStatus().isDead()) {
             departingPartners.add(origin);
         }
 
-        if (spouse.isDependent() && !spouse.getStatus().isDead()) {
+        if ((origin.isDependent() || !origin.isEmployed()) && !spouse.getStatus().isDead()) {
             departingPartners.add(spouse);
         }
 

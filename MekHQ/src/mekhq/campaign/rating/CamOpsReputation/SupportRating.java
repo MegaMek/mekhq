@@ -115,7 +115,10 @@ public class SupportRating {
         for (Person person : campaign.getActivePersonnel(false)) {
             boolean isAdult = !person.isChild(today);
 
-            if (isAdult && (person.isAdministrator() || person.isDependent() || person.isDoctor())) {
+            if (isAdult &&
+                      (person.isAdministrator() ||
+                             (person.isCivilian() && !person.isDependent()) ||
+                             person.isDoctor())) {
                 administratorCount++;
             }
         }

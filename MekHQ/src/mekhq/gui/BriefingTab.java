@@ -465,6 +465,10 @@ public final class BriefingTab extends CampaignGuiTab {
                     continue;
                 }
 
+                if (!person.isEmployed()) {
+                    continue;
+                }
+
                 person.awardXP(getCampaign(), xpAward);
             }
         }
