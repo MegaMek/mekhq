@@ -52,7 +52,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -193,7 +192,6 @@ class FactionStandingsTest {
                     5.0, REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_CLAN, REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_ALLY_NORMAL));
     }
 
-    @Disabled
     @ParameterizedTest(name = "{0}")
     @MethodSource(value = "provideContractAcceptCases")
     void test_processAcceptContract_various(String testName, String primaryFaction, double primaryStart,
