@@ -35,8 +35,6 @@ package mekhq.campaign.universe;
 import static java.awt.Color.BLACK;
 import static megamek.utilities.ImageUtilities.addTintToImageIcon;
 
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,8 +44,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.swing.ImageIcon;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
 
 import megamek.client.ratgenerator.FactionRecord;
 import megamek.client.ratgenerator.RATGenerator;
@@ -55,18 +51,6 @@ import megamek.common.annotations.Nullable;
 import megamek.common.universe.Factions2;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.utilities.MHQXMLUtility;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
-import javax.swing.*;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class Factions {
     private static final MMLogger logger = MMLogger.create(Factions.class);
@@ -157,7 +141,10 @@ public class Factions {
      */
     public FactionRecord getFactionRecordOrFallback(String faction) {
         FactionRecord fRec = getRATGenerator().getFaction(faction);
-        if (fRec == null) {
+        // With the unification of the factions between MHQ and the RATGen, factions that were originally only
+        // present in MHQ did not get a FactionRecord but can now, but they miss a rating system, must also
+        // provide a fallback for those
+        if ((fRec == null) || fRec.getRatingLevelSystem().isEmpty()) {
             Faction f = getFaction(faction);
             if (f != null) {
                 if (f.isPeriphery()) {

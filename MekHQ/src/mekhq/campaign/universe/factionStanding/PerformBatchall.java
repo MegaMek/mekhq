@@ -32,20 +32,19 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
-import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Factions;
-import mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
 /**
  * Handles the process of issuing Batchalls to the player when facing a Clan opponent.

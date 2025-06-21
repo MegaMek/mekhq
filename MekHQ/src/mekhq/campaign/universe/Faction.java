@@ -36,21 +36,19 @@ package mekhq.campaign.universe;
 import static megamek.common.Compute.randomInt;
 
 import java.awt.Color;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import megamek.client.ratgenerator.FactionRecord;
 import megamek.common.annotations.Nullable;
 import megamek.common.universe.Faction2;
 import megamek.common.universe.FactionTag;
+import megamek.common.universe.HonorRating;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
-import megamek.common.universe.HonorRating;
-
-import java.nio.file.Path;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -508,5 +506,19 @@ public class Faction {
      */
     public boolean performsBatchalls() {
         return faction2.performsBatchalls();
+    }
+
+    /**
+     * @return {@code true} if the faction is an aggregate of independent 'factions', rather than a singular
+     *       organization.
+     *
+     *       <p>For example, "PIR" (pirates) is used to abstractly represent all pirates, not individual pirate
+     *       groups.</p>
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public boolean isAggregate() {
+        return faction2.isAggregate();
     }
 }
