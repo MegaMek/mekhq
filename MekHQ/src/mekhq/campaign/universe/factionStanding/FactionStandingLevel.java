@@ -393,7 +393,7 @@ public enum FactionStandingLevel {
      * @since 0.50.07
      */
     public String getDescription(Faction relevantFaction) {
-        String label = " ";
+        String label;
 
         String key = "factionStandingLevel." + name() + '.' + relevantFaction.getShortName() + ".description";
         label = getTextAt(RESOURCE_BUNDLE, key);

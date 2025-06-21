@@ -1,0 +1,127 @@
+/*
+ * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
+ */
+package mekhq.campaign.universe.factionStanding;
+
+/**
+ * Enumerates the possible types of disciplinary actions (censures) that can be imposed by a faction due to low Faction
+ * Standing or disciplinary issues.
+ *
+ * <p>These censures range from fines and forced retirements to more severe actions such as execution or exile. This
+ * enumeration is used to represent outcomes resulting from faction standing events or penalties.</p>
+ *
+ * @author Illiani
+ * @since 0.50.07
+ */
+public enum FactionCensureLevel {
+    /** The absence of any censure or disciplinary action. */
+    NONE(0),
+    /** A financial penalty imposed as a form of censure. */
+    FINE(1),
+    /** Mandatory retirement imposed on a commander as censure. */
+    COMMANDER_RETIREMENT(2),
+    /** Execution of a commander as a disciplinary action. */
+    COMMANDER_EXECUTION(3),
+    /** Removal of leadership as a punitive measure. */
+    LEADERSHIP_REMOVAL(4),
+    /** Execution of leadership as the result of censure. */
+    LEADERSHIP_EXECUTION(5),
+    /** Forcible exile from the faction as a disciplinary action. */
+    EXILE(6);
+
+    public static final int MIN_CENSURE_SEVERITY = NONE.getSeverity();
+    public static final int MAX_CENSURE_SEVERITY = EXILE.getSeverity();
+
+    /** The severity level of this censure. Higher values indicate more severe censures. */
+    private final int severity;
+
+    /**
+     * Constructs a FactionStandingCensure with the specified severity.
+     *
+     * @param severity the numeric severity level of this censure
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    FactionCensureLevel(int severity) {
+        this.severity = severity;
+    }
+
+    /**
+     * Returns the severity level associated with this censure.
+     *
+     * @return the severity as an integer
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public int getSeverity() {
+        return severity;
+    }
+
+    /**
+     * Determines if this censure is the same as the provided censure.
+     *
+     * @param other the censure to compare with
+     *
+     * @return {@code true} if this censure and the provided censure are the same; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public boolean is(FactionCensureLevel other) {
+        return this == other;
+    }
+
+    /**
+     * Retrieves the {@link FactionCensureLevel} corresponding to the specified severity value.
+     * <p>
+     * Iterates through all available censure levels and returns the one whose severity matches the provided value. If
+     * no match is found, returns {@code NONE}.
+     * </p>
+     *
+     * @param severity the severity level to search for
+     *
+     * @return the matching {@link FactionCensureLevel}, or {@code NONE} if not found
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public static FactionCensureLevel getCensureLevelFromSeverity(int severity) {
+        for (FactionCensureLevel censureLevel : FactionCensureLevel.values()) {
+            if (censureLevel.getSeverity() == severity) {
+                return censureLevel;
+            }
+        }
+        return NONE;
+    }
+}

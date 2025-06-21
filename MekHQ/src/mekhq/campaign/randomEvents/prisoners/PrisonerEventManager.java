@@ -566,7 +566,8 @@ public class PrisonerEventManager {
     private void processExecutions(int executions, List<Person> prisoners) {
         if (campaign.getCampaignOptions().isTrackFactionStanding()) {
             FactionStandings factionStandings = campaign.getFactionStandings();
-            List<String> reports = factionStandings.executePrisonersOfWar(prisoners, campaign.getGameYear());
+            List<String> reports = factionStandings.executePrisonersOfWar(campaign.getFaction().getShortName(),
+                  prisoners, campaign.getLocalDate());
 
             for (String report : reports) {
                 campaign.addReport(report);
