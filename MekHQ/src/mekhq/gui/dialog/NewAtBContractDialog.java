@@ -66,6 +66,7 @@ import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.Systems;
 import mekhq.gui.FactionComboBox;
 import mekhq.gui.baseComponents.SortedComboBoxModel;
+import mekhq.gui.dialog.factionStanding.events.FactionStandingGreeting;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 
@@ -608,6 +609,10 @@ public class NewAtBContractDialog extends NewContractDialog {
         setVisible(false);
 
         contractStartPrompt(campaign, contract);
+
+        if (campaign.getCampaignOptions().isTrackFactionStanding()) {
+            new FactionStandingGreeting(campaign, contract);
+        }
     }
 
     @Override

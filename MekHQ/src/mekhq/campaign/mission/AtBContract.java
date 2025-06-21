@@ -34,7 +34,6 @@
 package mekhq.campaign.mission;
 
 import static java.lang.Math.ceil;
-import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
@@ -70,7 +69,6 @@ import static mekhq.campaign.rating.IUnitRating.DRAGOON_F;
 import static mekhq.campaign.stratcon.StratconContractDefinition.getContractDefinition;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.campaign.universe.factionStanding.BatchallFactions.BATCHALL_FACTIONS;
-import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -129,6 +127,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
@@ -1320,7 +1319,17 @@ public class AtBContract extends Contract {
     }
 
     public void createEmployerLiaison(Campaign campaign) {
-        employerLiaison = campaign.newPerson(PersonnelRole.ADMINISTRATOR_COMMAND, getEmployerCode(), Gender.RANDOMIZE);
+        employerLiaison = campaign.newPerson(PersonnelRole.MILITARY_LIAISON, getEmployerCode(), Gender.RANDOMIZE);
+
+        final RankSystem rankSystem = Ranks.getRankSystemFromCode("SLDF");
+
+        final RankValidator rankValidator = new RankValidator();
+        if (!rankValidator.validate(rankSystem, false)) {
+            return;
+        }
+
+        employerLiaison.setRankSystem(rankValidator, rankSystem);
+        employerLiaison.setRank(Rank.RWO_MIN);
     }
 
     public Person getClanOpponent() {
