@@ -47,13 +47,19 @@ import megamek.common.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
 
 /**
  * Provides accounting for a Campaign.
@@ -152,10 +158,17 @@ public record Accountant(Campaign campaign) {
      */
     public Money getMonthlyFoodAndHousingExpenses() {
         boolean payForFood = getCampaignOptions().isPayForFood();
-        boolean payForHousing = getCampaignOptions().isPayForHousing() && campaign.getLocation().isOnPlanet();
+        CurrentLocation location = campaign.getLocation();
+        boolean isOnPlanet = location.isOnPlanet();
+        boolean payForHousing = getCampaignOptions().isPayForHousing() && isOnPlanet;
 
         if (!payForFood && !payForHousing) {
             return Money.zero();
+        }
+
+        double barrackCostMultiplier = 1.0;
+        if (isOnPlanet && getCampaignOptions().isUseFactionStandingBarracksCostsSafe()) {
+            barrackCostMultiplier = setFactionStandingBarrackCostMultiplier(location);
         }
 
         int prisonerOrDependentHousingUsage = 0;
@@ -231,7 +244,52 @@ public record Accountant(Campaign campaign) {
         logger.debug("officerFoodUsage: {}", officerFoodUsage);
         logger.debug("expenses: {}", expenses);
 
-        return Money.of(expenses);
+        return Money.of(expenses).multipliedBy(barrackCostMultiplier);
+    }
+
+    /**
+     * Calculates the barrack cost multiplier for the given location based on faction standing.
+     *
+     * <p>This method determines the highest "regard" value the player has with employers of contracts active in the
+     * current system. If no contracts are present, it uses the highest regard among all local factions in the planetary
+     * system. The multiplier is then derived from this maximum regard value.</p>
+     *
+     * @param location the current location within the campaign
+     *
+     * @return the barrack cost multiplier determined by the best available faction regard
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private double setFactionStandingBarrackCostMultiplier(CurrentLocation location) {
+        FactionStandings factionStandings = campaign.getFactionStandings();
+        PlanetarySystem currentSystem = location.getCurrentSystem();
+
+        double maxRegard = 0.0;
+        boolean foundContract = false;
+
+        // Consider contracts in the current system
+        for (AtBContract contract : campaign.getActiveAtBContracts()) {
+            if (contract.getSystem().equals(currentSystem)) {
+                double currentRegard = factionStandings.getRegardForFaction(contract.getEmployerCode(), true);
+                if (currentRegard > maxRegard) {
+                    maxRegard = currentRegard;
+                }
+                foundContract = true;
+            }
+        }
+
+        // If no contract found, check local factions
+        if (!foundContract) {
+            for (Faction faction : currentSystem.getFactionSet(campaign.getLocalDate())) {
+                double currentRegard = factionStandings.getRegardForFaction(faction.getShortName(), true);
+                if (currentRegard > maxRegard) {
+                    maxRegard = currentRegard;
+                }
+            }
+        }
+
+        return FactionStandingUtilities.getBarrackCostsMultiplier(maxRegard);
     }
 
     /**
