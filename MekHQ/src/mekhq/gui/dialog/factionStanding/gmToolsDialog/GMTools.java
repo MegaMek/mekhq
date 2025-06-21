@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.dialog.reportDialogs.FactionStanding.gmToolsDialog;
+package mekhq.gui.dialog.factionStanding.gmToolsDialog;
 
 import static java.lang.Integer.MAX_VALUE;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
@@ -63,8 +63,8 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.gui.dialog.factionStanding.manualMissionDialogs.StandingUpdateConfirmationDialog;
 import mekhq.gui.dialog.glossary.NewGlossaryDialog;
-import mekhq.gui.dialog.reportDialogs.FactionStanding.manualMissionDialogs.StandingUpdateConfirmationDialog;
 
 /**
  * GMTools allows Game Masters to adjust Faction Standings through various operations. These operations include zeroing

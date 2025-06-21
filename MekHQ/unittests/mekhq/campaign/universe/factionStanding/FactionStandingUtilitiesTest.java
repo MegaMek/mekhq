@@ -32,15 +32,14 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
-import static mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel.STANDING_LEVEL_0;
-import static mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel.STANDING_LEVEL_8;
+import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_0;
+import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Arrays;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;

@@ -32,11 +32,11 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
+import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_3;
+import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_4;
+import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_5;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.calculateFactionStandingLevel;
 import static mekhq.campaign.universe.factionStanding.FactionStandings.*;
-import static mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel.STANDING_LEVEL_3;
-import static mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel.STANDING_LEVEL_4;
-import static mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel.STANDING_LEVEL_5;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.mock;
@@ -51,7 +51,6 @@ import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
-import mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;

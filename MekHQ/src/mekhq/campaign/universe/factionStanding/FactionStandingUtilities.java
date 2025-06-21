@@ -33,7 +33,6 @@
 package mekhq.campaign.universe.factionStanding;
 
 import megamek.logging.MMLogger;
-import mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel;
 
 
 public class FactionStandingUtilities {
