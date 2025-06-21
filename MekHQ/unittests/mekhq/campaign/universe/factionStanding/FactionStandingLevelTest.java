@@ -32,8 +32,8 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
-import static mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel.getMaximumStandingLevel;
-import static mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel.getMinimumStandingLevel;
+import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.getMaximumStandingLevel;
+import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.getMinimumStandingLevel;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -47,7 +47,6 @@ import java.util.stream.Stream;
 
 import megamek.common.universe.FactionTag;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

@@ -299,7 +299,6 @@ public class ImmersiveDialogCore extends JDialog {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setModal(isModal);
         setLocationRelativeTo(null); // Needs to be after pack
-        setResizable(false);
         setVisible(true);
     }
 
