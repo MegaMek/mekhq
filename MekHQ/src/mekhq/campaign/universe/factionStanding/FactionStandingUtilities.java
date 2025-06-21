@@ -36,7 +36,6 @@ import java.util.List;
 
 import megamek.logging.MMLogger;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.universe.factionStanding.enums.FactionStandingLevel;
 
 
 public class FactionStandingUtilities {
