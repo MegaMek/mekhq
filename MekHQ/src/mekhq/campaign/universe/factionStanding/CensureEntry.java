@@ -83,16 +83,17 @@ public record CensureEntry(FactionCensureLevel level, LocalDate issueDate) {
      * since issuance.
      * </p>
      *
+     * @param today the current campaign date
      * @return {@code true} if the censure can be escalated, {@code false} otherwise
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public boolean canEscalate() {
+    public boolean canEscalate(LocalDate today) {
         if (level.getSeverity() >= MAX_CENSURE_SEVERITY) {
             return false;
         }
         LocalDate cooldownDate = issueDate.plusMonths(COOLDOWN_PERIOD);
-        return issueDate.isAfter(cooldownDate);
+        return today.isAfter(cooldownDate);
     }
 }

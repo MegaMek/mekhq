@@ -244,6 +244,7 @@ import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.universe.eras.Era;
 import mekhq.campaign.universe.eras.Eras;
+import mekhq.campaign.universe.factionStanding.FactionCensureLevel;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.campaign.universe.factionStanding.PerformBatchall;
 import mekhq.campaign.universe.fameAndInfamy.FameAndInfamyController;
@@ -258,6 +259,7 @@ import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
+import mekhq.gui.dialog.factionStanding.FactionCensureDialog;
 import mekhq.module.atb.AtBEventProcessor;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
@@ -5714,6 +5716,13 @@ public class Campaign implements ITechManager {
         if (isFirstOfMonth && campaignOptions.isTrackFactionStanding()) {
             String report = factionStandings.updateClimateRegard(faction, currentDay);
             addReport(report);
+
+            FactionCensureLevel newCensureLevel = factionStandings.checkForCensure(faction, currentDay);
+            if (newCensureLevel != null) {
+                new FactionCensureDialog(this, newCensureLevel, getFlaggedCommander());
+            }
+
+            factionStandings.processCensureDegradation(currentDay);
         }
 
         // This must be the last step before returning true

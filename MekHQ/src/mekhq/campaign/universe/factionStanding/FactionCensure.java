@@ -32,42 +32,21 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
-import static mekhq.campaign.universe.factionStanding.FactionCensureLevel.MIN_CENSURE_SEVERITY;
-import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_2;
+import megamek.common.annotations.Nullable;
 
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
-import megamek.common.annotations.Nullable;
-import megamek.logging.MMLogger;
+import static mekhq.campaign.universe.factionStanding.FactionCensureLevel.MIN_CENSURE_SEVERITY;
+import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_3;
 
 public class FactionCensure {
-    private static final MMLogger LOGGER = MMLogger.create(FactionCensure.class);
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionCensure";
-
-    static final int THRESHOLD_FOR_CENSURE = STANDING_LEVEL_2.getStandingLevel();
+    static final int THRESHOLD_FOR_CENSURE = STANDING_LEVEL_3.getStandingLevel();
 
     private final Map<String, CensureEntry> factionCensures = new HashMap<>();
 
     public FactionCensure() {
-    }
-
-    public void resetAllFactionCensures() {
-        factionCensures.clear();
-    }
-
-    public void resetFactionCensure(final String factionCode) {
-        factionCensures.remove(factionCode);
-    }
-
-    public Map<String, CensureEntry> getAllFactionCensures() {
-        return factionCensures;
-    }
-
-    public FactionCensureLevel getCensureForFaction(final String factionCode) {
-        CensureEntry censure = factionCensures.get(factionCode);
-        return censure == null ? FactionCensureLevel.NONE : censure.level();
     }
 
     public void setCensureForFaction(final String factionCode, final FactionCensureLevel censureLevel,
@@ -76,15 +55,19 @@ public class FactionCensure {
         factionCensures.put(factionCode, censureEntry);
     }
 
-    public boolean canBeCensured(final String factionCode, final LocalDate today) {
-        CensureEntry censureEntry = factionCensures.get(factionCode);
-        if (censureEntry == null) {
-            return true;
-        }
-
-        return censureEntry.canEscalate();
-    }
-
+    /**
+     * Processes all tracked faction censures to determine if any have expired as of the provided date, and
+     * automatically degrades (reduces) the censure level for any faction whose censure has expired.
+     * <p>
+     * Iterates through all current censure entries, checking if each entry's expiration date has passed. If so, it
+     * triggers a decrease in censure for the corresponding faction effective on the given day.
+     * </p>
+     *
+     * @param today the date to use when checking for censure expiration and applying any degradation
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     public void processCensureDegradation(final LocalDate today) {
         for (Map.Entry<String, CensureEntry> entry : factionCensures.entrySet()) {
             String factionCode = entry.getKey();
@@ -118,11 +101,11 @@ public class FactionCensure {
         CensureEntry censureEntry = factionCensures.get(factionCode);
 
         if (censureEntry == null) {
-            setCensureForFaction(factionCode, FactionCensureLevel.FINE, today);
-            return FactionCensureLevel.FINE;
+            setCensureForFaction(factionCode, FactionCensureLevel.WARNING, today);
+            return FactionCensureLevel.WARNING;
         }
 
-        if (!censureEntry.canEscalate()) {
+        if (!censureEntry.canEscalate(today)) {
             return null;
         }
 
@@ -133,9 +116,5 @@ public class FactionCensure {
 
         setCensureForFaction(factionCode, newCensureLevel, today);
         return newCensureLevel;
-    }
-
-    public static void triggerCensureDialog(final String factionCode, final FactionCensureLevel level) {
-
     }
 }

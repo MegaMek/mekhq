@@ -36,8 +36,8 @@ package mekhq.campaign.universe.factionStanding;
  * Enumerates the possible types of disciplinary actions (censures) that can be imposed by a faction due to low Faction
  * Standing or disciplinary issues.
  *
- * <p>These censures range from fines and forced retirements to more severe actions such as execution or exile. This
- * enumeration is used to represent outcomes resulting from faction standing events or penalties.</p>
+ * <p>These censures range from fines and forced retirements to more severe actions such as forced retirement or
+ * replacement. This enumeration is used to represent outcomes resulting from faction standing events or penalties.</p>
  *
  * @author Illiani
  * @since 0.50.07
@@ -45,21 +45,19 @@ package mekhq.campaign.universe.factionStanding;
 public enum FactionCensureLevel {
     /** The absence of any censure or disciplinary action. */
     NONE(0),
-    /** A financial penalty imposed as a form of censure. */
-    FINE(1),
-    /** Mandatory retirement imposed on a commander as censure. */
+    /** A warning imposed as a form of censure. */
+    WARNING(1),
+    /** Mandatory retirement imposed on the campaign commander as censure. */
     COMMANDER_RETIREMENT(2),
-    /** Execution of a commander as a disciplinary action. */
-    COMMANDER_EXECUTION(3),
-    /** Removal of leadership as a punitive measure. */
-    LEADERSHIP_REMOVAL(4),
-    /** Execution of leadership as the result of censure. */
-    LEADERSHIP_EXECUTION(5),
-    /** Forcible exile from the faction as a disciplinary action. */
-    EXILE(6);
+    /** Imprisonment of the campaign commander as a disciplinary action. */
+    COMMANDER_IMPRISONMENT(3),
+    /** Replacement of all officers as a punitive measure. */
+    LEADERSHIP_REPLACEMENT(4),
+    /** Forcible disbanding of the campaign as a disciplinary action. */
+    DISBAND(5);
 
     public static final int MIN_CENSURE_SEVERITY = NONE.getSeverity();
-    public static final int MAX_CENSURE_SEVERITY = EXILE.getSeverity();
+    public static final int MAX_CENSURE_SEVERITY = DISBAND.getSeverity();
 
     /** The severity level of this censure. Higher values indicate more severe censures. */
     private final int severity;

@@ -548,32 +548,54 @@ public class FactionStandings {
     }
 
     /**
-     * Evaluates whether the given campaign should receive a new or escalated censure based on its current standing and
-     * triggers the appropriate event if needed.
+     * Checks if the specified faction should receive a new or escalated censure based on its latest standing,
+     * and applies the appropriate censure level if necessary.
      * <p>
-     * If the new regard value corresponds to a standing level that meets or falls below the censure threshold, an
-     * attempt is made to increase the censure level for the faction on the given date. If a change occurs, a censure
-     * dialog is displayed to the user with details about the new censure level.
+     * This method computes the current regard value for the given faction and determines the corresponding standing level.
+     * If the calculated standing level is at or below the threshold for censure, the faction's censure level
+     * will be increased for the provided date. The updated censure level is then returned; if no change is needed,
+     * {@code null} is returned.
      * </p>
      *
-     * @param factionCode the identifier for the faction being checked
-     * @param today       the current date, used for censure record keeping
-     * @param newRegard   the updated standing or regard value for the faction
+     * @param faction the {@link Faction} object to check against
+     * @param today the date to use when recording a possible censure escalation
+     * @return the new {@link FactionCensureLevel} if a censure change occurred, or {@code null} if there was no change
      *
      * @author Illiani
      * @since 0.50.07
      */
-    private void checkForCensure(String factionCode, LocalDate today, double newRegard) {
-        FactionStandingLevel newFactionStanding = FactionStandingUtilities.calculateFactionStandingLevel(newRegard);
+    public @Nullable FactionCensureLevel checkForCensure(Faction faction, LocalDate today) {
+        if (faction.isAggregate()) {
+            return null;
+        }
+
+        String factionCode = faction.getShortName();
+        double regard = getRegardForFaction(factionCode, true);
+        FactionStandingLevel newFactionStanding = FactionStandingUtilities.calculateFactionStandingLevel(regard);
 
         if (newFactionStanding.getStandingLevel() <= FactionCensure.THRESHOLD_FOR_CENSURE) {
             // This will return null if no change has taken place
-            FactionCensureLevel newCensureLevel = factionCensure.increaseCensureForFaction(factionCode, today);
-
-            if (newCensureLevel != null) {
-                FactionCensure.triggerCensureDialog(factionCode, newCensureLevel);
-            }
+            return factionCensure.increaseCensureForFaction(factionCode, today);
         }
+
+        return null;
+    }
+
+    /**
+     * Processes all tracked faction censures to determine if any have expired as of the provided date, and
+     * automatically degrades (reduces) the censure level for any faction whose censure has expired.
+     * <p>
+     * Iterates through all current censure entries, checking if each entry's expiration date has passed. If so, it
+     * triggers a decrease in censure for the corresponding faction effective on the given day.
+     * </p>
+     *
+     * @param today the date to use when checking for censure expiration and applying any degradation
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public void processCensureDegradation(final LocalDate today) {
+        factionCensure.processCensureDegradation(today);
     }
 
     /**
