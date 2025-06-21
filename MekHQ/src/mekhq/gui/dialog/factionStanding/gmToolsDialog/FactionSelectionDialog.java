@@ -182,7 +182,7 @@ public class FactionSelectionDialog extends JDialog {
             }
         }
 
-        activeFactions.removeIf(faction -> FactionStandings.isUntrackedFaction(faction.getShortName()));
+        activeFactions.removeIf(Faction::isAggregate);
         activeFactions.sort(Comparator.comparing(faction -> faction.getFullName(today.getYear())));
 
         allFactions.addAll(activeFactions);

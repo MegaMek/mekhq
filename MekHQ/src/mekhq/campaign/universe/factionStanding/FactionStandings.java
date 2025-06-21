@@ -316,7 +316,7 @@ public class FactionStandings {
 
             String otherFactionCode = otherFaction.getShortName();
 
-            if (isUntrackedFaction(otherFactionCode)) {
+            if (otherFaction.isAggregate()) {
                 continue;
             }
 
@@ -382,6 +382,7 @@ public class FactionStandings {
      *
      * @return {@code true} if the faction is untracked; {@code false} otherwise
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public static boolean isUntrackedFaction(final String factionCode) {
         final List<String> untrackedFactionTags = Arrays.asList("MERC",
               "PIR",
@@ -574,7 +575,7 @@ public class FactionStandings {
 
             String otherFactionCode = otherFaction.getShortName();
 
-            if (isUntrackedFaction(otherFactionCode)) {
+            if (otherFaction.isAggregate()) {
                 continue;
             }
 
@@ -747,9 +748,7 @@ public class FactionStandings {
             deltaDirection = getTextAt(RESOURCE_BUNDLE, "factionStandings.change.decreased");
         }
 
-        String factionName = relevantFaction == null ?
-                                   getTextAt(RESOURCE_BUNDLE, "factionStandings.change.report.unknownFaction") :
-                                   relevantFaction.getFullName(gameYear);
+        String factionName = relevantFaction.getFullName(gameYear);
         if (!factionName.contains(getTextAt(RESOURCE_BUNDLE, "factionStandings.change.report.clan.check"))) {
             factionName = getTextAt(RESOURCE_BUNDLE, "factionStandings.change.report.clan.prefix") + ' ' + factionName;
         }
@@ -813,7 +812,7 @@ public class FactionStandings {
                 continue;
             }
 
-            if (isNotValidForTracking(faction, gameYear, factionCode)) {
+            if (isNotValidForTracking(faction, gameYear)) {
                 continue;
             }
 
@@ -885,7 +884,7 @@ public class FactionStandings {
 
             String otherFactionCode = otherFaction.getShortName();
 
-            if (isUntrackedFaction(otherFactionCode)) {
+            if (otherFaction.isAggregate()) {
                 continue;
             }
 
@@ -985,7 +984,7 @@ public class FactionStandings {
         for (Faction otherFaction : allFactions) {
             String otherFactionCode = otherFaction.getShortName();
 
-            if (isNotValidForTracking(otherFaction, gameYear, otherFactionCode)) {
+            if (isNotValidForTracking(otherFaction, gameYear)) {
                 continue;
             }
 
@@ -1014,18 +1013,17 @@ public class FactionStandings {
      *
      * @param otherFaction the {@link Faction} to evaluate
      * @param gameYear the year for which validity should be checked
-     * @param otherFactionCode the short code identifying the other faction
      * @return {@code true} if the faction is either invalid in the specified year or is untracked; {@code false} otherwise
      *
      * @author Illiani
      * @since 0.50.07
      */
-    private boolean isNotValidForTracking(Faction otherFaction, int gameYear, String otherFactionCode) {
+    private boolean isNotValidForTracking(Faction otherFaction, int gameYear) {
         if (!otherFaction.validIn(gameYear)) {
             return true;
         }
 
-        return isUntrackedFaction(otherFactionCode);
+        return otherFaction.isAggregate();
     }
 
     /**
@@ -1092,7 +1090,7 @@ public class FactionStandings {
             Faction originFaction = victim.getOriginFaction();
             String factionCode = originFaction.getShortName();
 
-            if (isUntrackedFaction(factionCode)) {
+            if (originFaction.isAggregate()) {
                 continue;
             }
 
