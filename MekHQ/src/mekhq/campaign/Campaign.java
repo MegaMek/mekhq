@@ -5622,7 +5622,7 @@ public class Campaign implements ITechManager {
             getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(getGameYear());
 
             // Degrade Regard
-            List<String> degradedRegardReports = factionStandings.processRegardDegradation(currentDay);
+            List<String> degradedRegardReports = factionStandings.processRegardDegradation(currentDay.getYear());
             for (String report : degradedRegardReports) {
                 addReport(report);
             }

@@ -163,7 +163,7 @@ class FactionStandingsTest {
         factionStandings.setRegardForFaction("FS", initialRegard, 3025, false);
 
         // Act
-        factionStandings.processRegardDegradation(LocalDate.of(3025, 1, 1));
+        factionStandings.processRegardDegradation(3025);
 
         // Assert
         double actualRegard = factionStandings.getRegardForFaction("FS", false);
@@ -251,7 +251,7 @@ class FactionStandingsTest {
         LocalDate today = LocalDate.of(3028, 8, 20);
 
         // Act
-        factionStandings.processContractCompletion("", employerFaction, today, status);
+        factionStandings.processContractCompletion(employerFaction, today, status);
 
         // Assert
         assertEquals(startingFsRegard + expectedFsDelta,
@@ -309,7 +309,7 @@ class FactionStandingsTest {
         List<Person> prisoners = List.of(federatedSunsPrisoner, capellanPrisoner, capellanPrisoner, comStarPrisoner);
 
         // Act
-        List<String> reports = factionStandings.executePrisonersOfWar("", prisoners, LocalDate.of(3025, 1, 1));
+        List<String> reports = factionStandings.executePrisonersOfWar(prisoners, 3025);
 
         // Assert
         assertEquals(3, reports.size(), "Reports size mismatch");

@@ -255,7 +255,7 @@ public class SimulateMissionDialog extends JDialog {
         Factions factions = Factions.getInstance();
         List<Faction> activeFactions = new ArrayList<>(factions.getActiveFactions(today));
 
-        activeFactions.removeIf(Faction::isAggregate);
+        activeFactions.removeIf(faction -> FactionStandings.isUntrackedFaction(faction.getShortName()));
         activeFactions.sort(Comparator.comparing(faction -> faction.getFullName(today.getYear())));
 
         // This is a placeholder to ensure that the indexes of the combos and the list remain in sync
@@ -555,21 +555,9 @@ public class SimulateMissionDialog extends JDialog {
     }
 
     /**
-     * Use {@link #handleFactionRegardUpdates(String, Faction, Faction, MissionStatus, LocalDate, FactionStandings)}
-     * instead
-     */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    public static List<String> handleFactionRegardUpdates(@Nullable final Faction employer,
-          @Nullable final Faction enemy, final MissionStatus status, final LocalDate today,
-          final FactionStandings factionStandings) {
-        return handleFactionRegardUpdates("", employer, enemy, status, today, factionStandings);
-    }
-
-    /**
      * Calculates and describes updates to faction regard values in response to mission simulation parameters, for
      * both employer and enemy.
      *
-     * @param campaignFactionCode        the unique identifier for the faction the campaign belongs to
      * @param employer        the employer faction, or {@code null} if not specified
      * @param enemy           the enemy faction, or {@code null} if not specified
      * @param status          the mission status applied to the simulation
@@ -580,16 +568,16 @@ public class SimulateMissionDialog extends JDialog {
      * @author Illiani
      * @since 0.50.07
      */
-    public static List<String> handleFactionRegardUpdates(final String campaignFactionCode,
-          @Nullable final Faction employer, @Nullable final Faction enemy, final MissionStatus status,
-          final LocalDate today, final FactionStandings factionStandings) {
+    public static List<String> handleFactionRegardUpdates(@Nullable final Faction employer,
+          @Nullable final Faction enemy, final MissionStatus status, final LocalDate today,
+          final FactionStandings factionStandings) {
         List<String> reports = new ArrayList<>();
         if (enemy != null) { // Null means the faction isn't tracked
             reports.addAll(factionStandings.processContractAccept(enemy, today));
         }
 
         if (employer != null) {
-            reports.addAll(factionStandings.processContractCompletion(campaignFactionCode, employer, today, status));
+            reports.addAll(factionStandings.processContractCompletion(employer, today, status));
         }
 
         return reports;
