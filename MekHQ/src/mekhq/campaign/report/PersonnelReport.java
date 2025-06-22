@@ -212,29 +212,30 @@ public class PersonnelReport extends AbstractReport {
 
         StringBuilder sb = new StringBuilder(resources.getString("support.personnel.header.text")+"\n\n");
 
-        sb.append(String.format("%-30s        %4s\n", resources.getString("support.personnel.text"), countTotal));
+        sb.append(String.format("%-30s           %4s\n", resources.getString("support.personnel.text"), countTotal));
 
         for (PersonnelRole role : personnelRoles) {
             if (role.isSupport(true)) {
-                sb.append(String.format("    %-30s    %4s\n",
+                sb.append(String.format("    %-30s       %4s\n",
                       role.getLabel(getCampaign().getFaction().isClan()),
                       countPersonByType[role.ordinal()]));
             }
         }
 
         //Add Temp Medics and Astechs to Support List
-        sb.append(String.format("    %-30s    %4s\n", "Temp Medics", getCampaign().getMedicPool()));
-        sb.append(String.format("    %-30s    %4s\n", "Temp Astechs", getCampaign().getAstechPool()));
+        sb.append(String.format("    %-30s       %4s\n", "Temp Medics", getCampaign().getMedicPool()));
+        sb.append(String.format("    %-30s       %4s\n", "Temp Astechs", getCampaign().getAstechPool()));
 
         sb.append(getSecondarySupportPersonnelDetails());
 
         sb.append('\n')
-              .append(String.format("%-30s        %4s\n", resources.getString("support.injured.text"), countInjured))
-              .append(String.format("%-30s        %4s\n", resources.getString("support.MIA.text"), countMIA))
-              .append(String.format("%-30s        %4s\n", resources.getString("support.KIA.text"), countKIA))
-              .append(String.format("%-30s        %4s\n", resources.getString("support.retired.text"), countRetired))
-              .append(String.format("%-30s        %4s\n", resources.getString("support.dead.text"), countDead))
-              .append(String.format("%-30s        %4s\n", resources.getString("support.student.text"), countStudents))
+              .append(String.format("%-30s           %4s\n", resources.getString("support.injured.text"), countInjured))
+              .append(String.format("%-30s           %4s\n", resources.getString("support.MIA.text"), countMIA))
+              .append(String.format("%-30s           %4s\n", resources.getString("support.KIA.text"), countKIA))
+              .append(String.format("%-30s           %4s\n", resources.getString("support.retired.text"), countRetired))
+              .append(String.format("%-30s           %4s\n", resources.getString("support.dead.text"), countDead))
+              .append(String.format("%-30s           %4s\n", resources.getString("support.student.text"),
+                    countStudents))
               .append("\n").append(resources.getString("support.salary.text")).append(": ")
               .append(salary.toAmountAndSymbolString())
               .append((dependents == 1) ? "\n"+ getFormattedTextAt("mekhq.resources.PersonnelReport", "support.dependant.text"
@@ -245,7 +246,6 @@ public class PersonnelReport extends AbstractReport {
                     + ".PersonnelReport", "support.children.text", children, childrenStudents))
               .append("\n").append(resources.getString("dependant.salary.text")).append(": ")
               .append(civilianSalaries.toAmountAndSymbolString())
-              .append("\n").append(resources.getString("support.salary.text")).append(": ")
               .append("\n").append((prisoners == 1) ? getFormattedTextAt("mekhq.resources"
                     + ".PersonnelReport", "prisoner.text", prisoners):getFormattedTextAt("mekhq.resources"
                     + ".PersonnelReport", "prisoners.text", prisoners)).append(": ")
@@ -272,11 +272,11 @@ public class PersonnelReport extends AbstractReport {
 
         StringBuilder sb = new StringBuilder("\n" + resources.getString("secondary.support.header.text")+"\n\n");
 
-        sb.append(String.format("%-30s%4s\n", resources.getString("secondary.support.text"), countSecondary));
+        sb.append(String.format("%-30s   %4s\n", resources.getString("secondary.support.text"), countSecondary));
 
         countPersonByType.forEach((role, value) ->
             {if (role.isSupport(true) && value >= 0){
-                sb.append(String.format("    %-30s    %4s\n",
+                sb.append(String.format("    %-30s       %4s\n",
                      role.getLabel(getCampaign().getFaction().isClan()),
                       value));
             }
