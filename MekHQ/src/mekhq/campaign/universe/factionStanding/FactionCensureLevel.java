@@ -32,6 +32,9 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
+import megamek.codeUtilities.MathUtility;
+import megamek.logging.MMLogger;
+
 /**
  * Enumerates the possible types of disciplinary actions (censures) that can be imposed by a faction due to low Faction
  * Standing or disciplinary issues.
@@ -120,6 +123,40 @@ public enum FactionCensureLevel {
                 return censureLevel;
             }
         }
+        return NONE;
+    }
+
+    /**
+     * Parses the specified censure {@link String} into a {@link FactionCensureLevel} value.
+     *
+     * <p>The method first attempts to parse the text as an {@link Integer}, returning the corresponding ordinal
+     * value from the {@link FactionCensureLevel} enum. If that fails, it then attempts to parse the text by its
+     * name.</p>
+     *
+     * <p>If neither parsing attempt succeeds, it logs a warning and returns {@link FactionCensureLevel#NONE}.</p>
+     *
+     * @param text the {@link String} to parse, representing either an enum ordinal or name
+     *
+     * @return the matching {@link FactionCensureLevel}, or {@code FactionCensureLevel#NONE} if parsing fails
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public static FactionCensureLevel getCensureLevelFromCensureString(String text) {
+        try {
+            return valueOf(text);
+        } catch (Exception ignored) {
+        }
+
+        try {
+            int severity = MathUtility.parseInt(text, NONE.getSeverity());
+            return getCensureLevelFromSeverity(severity);
+        } catch (Exception ignored) {
+        }
+
+        MMLogger.create(FactionCensureLevel.class)
+              .warn("Unable to parse {} into an FactionCensureLevel. Returning NONE.",
+                    text);
         return NONE;
     }
 }

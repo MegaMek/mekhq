@@ -238,12 +238,11 @@ public class FactionStandings {
     private Map<String, Double> climateRegard = new HashMap<>();
 
     /**
-     * Holds information relating to faction censure activities.
+     * Holds information relating to faction judgment activities.
      *
-     * <p>This variable is used to store and track any disciplinary actions a faction may have taken against the
-     * campaign.</p>
+     * <p>This variable is used to store and track any actions a faction may have taken for or against the campaign.</p>
      */
-    private final FactionCensure factionCensure = new FactionCensure();
+    private FactionJudgment factionJudgment = new FactionJudgment();
 
     /**
      * Constructs an empty standings map. No initial relationships or regard values are set.
@@ -435,6 +434,20 @@ public class FactionStandings {
     }
 
     /**
+     * Replaces the current {@link FactionJudgment} with the provided object.
+     *
+     * <p>Existing contents are discarded. After this call, only the entries in the given object remain.</p>
+     *
+     * @param factionJudgment the new {@link FactionJudgment} object
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public void setFactionJudgment(FactionJudgment factionJudgment) {
+        this.factionJudgment = factionJudgment;
+    }
+
+    /**
      * Retrieves all current faction standings.
      *
      * @return a {@link Map} containing all faction codes mapped to their current regard values.
@@ -456,6 +469,21 @@ public class FactionStandings {
      */
     public Map<String, Double> getAllClimateRegard() {
         return climateRegard;
+    }
+
+    /**
+     * Returns the {@link FactionJudgment} instance associated with this object.
+     * <p>
+     * The {@link FactionJudgment} provides information and operations related to the judgement actions (censures)
+     * imposed due to faction standing or rule violations.</p>
+     *
+     * @return the {@link FactionJudgment} for this instance
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public FactionJudgment getFactionJudgements() {
+        return factionJudgment;
     }
 
     /**
@@ -573,9 +601,9 @@ public class FactionStandings {
         double regard = getRegardForFaction(factionCode, true);
         FactionStandingLevel newFactionStanding = FactionStandingUtilities.calculateFactionStandingLevel(regard);
 
-        if (newFactionStanding.getStandingLevel() <= FactionCensure.THRESHOLD_FOR_CENSURE) {
+        if (newFactionStanding.getStandingLevel() <= FactionJudgment.THRESHOLD_FOR_CENSURE) {
             // This will return null if no change has taken place
-            return factionCensure.increaseCensureForFaction(factionCode, today);
+            return factionJudgment.increaseCensureForFaction(factionCode, today);
         }
 
         return null;
@@ -595,7 +623,7 @@ public class FactionStandings {
      * @since 0.50.07
      */
     public void processCensureDegradation(final LocalDate today) {
-        factionCensure.processCensureDegradation(today);
+        factionJudgment.processCensureDegradation(today);
     }
 
     /**
@@ -1169,110 +1197,6 @@ public class FactionStandings {
     }
 
     /**
-     * Writes all faction standings as XML out to the specified {@link PrintWriter}.
-     *
-     * <p>The output includes each faction code and its current regard value as a separate tag, indented for
-     * readability within a parent {@code standings} element.</p>
-     *
-     * <p>This is primarily used for saving campaign data.</p>
-     *
-     * @param writer the writer to output XML to
-     * @param indent the indentation level for formatting
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    public void writeFactionStandingsToXML(final PrintWriter writer, int indent) {
-        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "factionRegard");
-        for (String factionCode : factionRegard.keySet()) {
-            MHQXMLUtility.writeSimpleXMLTag(writer, indent, factionCode, factionRegard.get(factionCode).toString());
-        }
-        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "factionRegard");
-
-        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "climateRegard");
-        for (String factionCode : climateRegard.keySet()) {
-            MHQXMLUtility.writeSimpleXMLTag(writer, indent, factionCode, climateRegard.get(factionCode).toString());
-        }
-        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "climateRegard");
-    }
-
-    /**
-     * Creates a new {@code FactionStandings} instance by parsing standing values from an XML node.
-     *
-     * <p>This method reads child elements of the provided XML node, looking for a "standings" element.</p>
-     *
-     * <p>For each faction code found as a subelement, it extracts the faction's regard value from the element's text
-     * content. Parsed standing values are collected into a map, and then applied to a new {@link FactionStandings}
-     * instance.</p>
-     *
-     * <p>If any parsing errors occur for individual entries, an error is logged and the process continues.</p>
-     *
-     * <p>If the entire node cannot be parsed, an error is logged and an (empty) {@link FactionStandings} is still
-     * returned.</p>
-     *
-     * @param parentNode the XML node containing faction standings data, typically as a parent "standings" element
-     *
-     * @return a new {@link FactionStandings} instance populated with parsed standing values from the XML, or empty if
-     *       nothing could be read
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    public static FactionStandings generateInstanceFromXML(final Node parentNode) {
-        NodeList childNodes = parentNode.getChildNodes();
-
-        FactionStandings standings = new FactionStandings();
-        try {
-            for (int i = 0; i < childNodes.getLength(); i++) {
-                Node childNode = childNodes.item(i);
-                String nodeName = childNode.getNodeName();
-
-                if (nodeName.equalsIgnoreCase("factionRegard")) {
-                    standings.setFactionRegard(processRegardNode(childNode, nodeName));
-                } else if (nodeName.equalsIgnoreCase("climateRegard")) {
-                    standings.setClimateRegard(processRegardNode(childNode, nodeName));
-                }
-            }
-        } catch (Exception ex) {
-            LOGGER.error("Could not parse FactionStandings: ", ex);
-        }
-
-        return standings;
-    }
-
-    /**
-     * Parses a node containing faction regard information and returns a mapping of faction codes to their
-     * corresponding regard values as doubles.
-     *
-     * <p>Each child element node is processed for its name and text value. If the value cannot be parsed as a
-     * double, a default is used and the error is logged with the provided label.</p>
-     *
-     * @param childNode the XML {@link Node} containing child entries representing faction regards
-     * @param logLabel a label to help identify log messages during parsing errors
-     * @return a {@link Map} of faction codes to parsed regard values
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    private static Map<String, Double> processRegardNode(Node childNode, String logLabel) {
-        NodeList factionEntries = childNode.getChildNodes();
-        Map<String, Double> regard = new HashMap<>();
-        for (int i = 0; i < factionEntries.getLength(); i++) {
-            Node node = factionEntries.item(i);
-            if (node.getNodeType() == Node.ELEMENT_NODE) {
-                try {
-                    regard.put(node.getNodeName(),
-                          MathUtility.parseDouble(node.getTextContent(), FactionStandings.DEFAULT_REGARD));
-                } catch (Exception ex) {
-                    LOGGER.error("Could not parse {} {}: ", logLabel, node.getNodeName(), ex);
-                }
-            }
-        }
-
-        return regard;
-    }
-
-    /**
      * Updates the campaign's faction standings and generates reports for a sequence of past missions.
      * <p>
      * This method performs a full re-evaluation of all historical missions for the campaign—resetting faction
@@ -1393,18 +1317,112 @@ public class FactionStandings {
     }
 
     /**
-     * Returns the {@link FactionCensure} instance associated with this object.
-     * <p>
-     * The {@code FactionCensure} provides information and operations related to the disciplinary actions (censures)
-     * imposed due to faction standing or rule violations.
-     * </p>
+     * Writes all faction standings as XML out to the specified {@link PrintWriter}.
      *
-     * @return the {@link FactionCensure} for this instance
+     * <p>The output includes each faction code and its current regard value as a separate tag, indented for
+     * readability within a parent {@code standings} element.</p>
+     *
+     * <p>This is primarily used for saving campaign data.</p>
+     *
+     * @param writer the writer to output XML to
+     * @param indent the indentation level for formatting
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public FactionCensure getFactionCensures() {
-        return factionCensure;
+    public void writeFactionStandingsToXML(final PrintWriter writer, int indent) {
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "factionRegard");
+        for (String factionCode : factionRegard.keySet()) {
+            MHQXMLUtility.writeSimpleXMLTag(writer, indent, factionCode, factionRegard.get(factionCode).toString());
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "factionRegard");
+
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "climateRegard");
+        for (String factionCode : climateRegard.keySet()) {
+            MHQXMLUtility.writeSimpleXMLTag(writer, indent, factionCode, climateRegard.get(factionCode).toString());
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "climateRegard");
+
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "factionJudgment");
+        factionJudgment.writeFactionJudgmentToXML(writer, indent);
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "factionJudgment");
+    }
+
+    /**
+     * Creates a new {@code FactionStandings} instance by parsing standing values from an XML node.
+     *
+     * <p>This method reads child elements of the provided XML node, looking for a "standings" element.</p>
+     *
+     * <p>For each faction code found as a subelement, it extracts the faction's regard value from the element's text
+     * content. Parsed standing values are collected into a map, and then applied to a new {@link FactionStandings}
+     * instance.</p>
+     *
+     * <p>If any parsing errors occur for individual entries, an error is logged and the process continues.</p>
+     *
+     * <p>If the entire node cannot be parsed, an error is logged and an (empty) {@link FactionStandings} is still
+     * returned.</p>
+     *
+     * @param parentNode the XML node containing faction standings data, typically as a parent "standings" element
+     *
+     * @return a new {@link FactionStandings} instance populated with parsed standing values from the XML, or empty if
+     *       nothing could be read
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public static FactionStandings generateInstanceFromXML(final Node parentNode) {
+        NodeList childNodes = parentNode.getChildNodes();
+
+        FactionStandings standings = new FactionStandings();
+        try {
+            for (int i = 0; i < childNodes.getLength(); i++) {
+                Node childNode = childNodes.item(i);
+                String nodeName = childNode.getNodeName();
+
+                if (nodeName.equalsIgnoreCase("factionRegard")) {
+                    standings.setFactionRegard(processRegardNode(childNode, nodeName));
+                } else if (nodeName.equalsIgnoreCase("climateRegard")) {
+                    standings.setClimateRegard(processRegardNode(childNode, nodeName));
+                } else if (nodeName.equalsIgnoreCase("factionJudgment")) {
+                    standings.setFactionJudgment(FactionJudgment.generateInstanceFromXML(childNode));
+                }
+            }
+        } catch (Exception ex) {
+            LOGGER.error("Could not parse FactionStandings: ", ex);
+        }
+
+        return standings;
+    }
+
+    /**
+     * Parses a node containing faction regard information and returns a mapping of faction codes to their
+     * corresponding regard values as doubles.
+     *
+     * <p>Each child element node is processed for its name and text value. If the value cannot be parsed as a
+     * double, a default is used and the error is logged with the provided label.</p>
+     *
+     * @param childNode the XML {@link Node} containing child entries representing faction regards
+     * @param logLabel a label to help identify log messages during parsing errors
+     * @return a {@link Map} of faction codes to parsed regard values
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private static Map<String, Double> processRegardNode(Node childNode, String logLabel) {
+        NodeList factionEntries = childNode.getChildNodes();
+        Map<String, Double> regard = new HashMap<>();
+        for (int i = 0; i < factionEntries.getLength(); i++) {
+            Node node = factionEntries.item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                try {
+                    regard.put(node.getNodeName(),
+                          MathUtility.parseDouble(node.getTextContent(), FactionStandings.DEFAULT_REGARD));
+                } catch (Exception ex) {
+                    LOGGER.error("Could not parse {} {}: ", logLabel, node.getNodeName(), ex);
+                }
+            }
+        }
+
+        return regard;
     }
 }

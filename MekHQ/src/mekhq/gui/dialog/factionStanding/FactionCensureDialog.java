@@ -173,11 +173,7 @@ public class FactionCensureDialog {
         options.add(getTextAt(RESOURCE_BUNDLE, BUTTON_KEY_ROGUE + contextKey));
 
         boolean isDraconisCombineCampaign = Objects.equals(campaign.getFaction().getShortName(), DRACONIS_COMBINE);
-        boolean isDraconisCombineCommander = mostSeniorCharacter != null &&
-                                                   Objects.equals(mostSeniorCharacter.getOriginFaction().getShortName(),
-                                                         DRACONIS_COMBINE);
-
-        if (isDraconisCombineCampaign || isDraconisCombineCommander) {
+        if (mostSeniorCharacter != null && isDraconisCombineCampaign) {
             options.add(getTextAt(RESOURCE_BUNDLE, BUTTON_KEY_SEPPUKU + KEY_AFFIX_WARNING));
         }
 

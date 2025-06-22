@@ -244,6 +244,7 @@ import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.universe.eras.Era;
 import mekhq.campaign.universe.eras.Eras;
+import mekhq.campaign.universe.factionStanding.FactionCensureEvent;
 import mekhq.campaign.universe.factionStanding.FactionCensureLevel;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.campaign.universe.factionStanding.PerformBatchall;
@@ -259,7 +260,6 @@ import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
-import mekhq.gui.dialog.factionStanding.FactionCensureDialog;
 import mekhq.module.atb.AtBEventProcessor;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
@@ -5594,6 +5594,7 @@ public class Campaign implements ITechManager {
         // Advance the day by one
         final LocalDate yesterday = currentDay;
         currentDay = currentDay.plusDays(1);
+        boolean isMonday = currentDay.getDayOfWeek() == DayOfWeek.MONDAY;
         boolean isFirstOfMonth = currentDay.getDayOfMonth() == 1;
         boolean isNewYear = currentDay.getDayOfYear() == 1;
 
@@ -5672,7 +5673,7 @@ public class Campaign implements ITechManager {
 
         // Prisoner events can occur on Monday or the 1st of the month depending on the
         // type of event
-        if (currentDay.getDayOfWeek() == DayOfWeek.MONDAY || isFirstOfMonth) {
+        if (isMonday || isFirstOfMonth) {
             new PrisonerEventManager(this);
         }
 
@@ -5702,7 +5703,7 @@ public class Campaign implements ITechManager {
             }
         }
 
-        if (topUpWeekly && currentDay.getDayOfWeek() == DayOfWeek.MONDAY) {
+        if (topUpWeekly && isMonday) {
             int bought = stockUpPartsInUse(getPartsInUse(ignoreMothballed, false, ignoreSparesUnderQuality));
             addReport(String.format(resources.getString("weeklyStockCheck.text"), bought));
         }
@@ -5713,16 +5714,22 @@ public class Campaign implements ITechManager {
         }
 
         // Faction Standing
-        if (isFirstOfMonth && campaignOptions.isTrackFactionStanding()) {
-            String report = factionStandings.updateClimateRegard(faction, currentDay);
-            addReport(report);
-
-            FactionCensureLevel newCensureLevel = factionStandings.checkForCensure(faction, currentDay);
-            if (newCensureLevel != null) {
-                new FactionCensureDialog(this, newCensureLevel, getFlaggedCommander());
+        if (campaignOptions.isTrackFactionStanding()) {
+            if (isFirstOfMonth) {
+                String report = factionStandings.updateClimateRegard(faction, currentDay);
+                addReport(report);
             }
 
-            factionStandings.processCensureDegradation(currentDay);
+            // We only check when the campaign doesn't have an active Mission. This is so we don't have to deal with
+            // leadership personnel becoming unavailable while on active deployment.
+            if (getActiveMissions(false).isEmpty()) {
+                FactionCensureLevel newCensureLevel = factionStandings.checkForCensure(faction, currentDay);
+                if (newCensureLevel != null) {
+                    new FactionCensureEvent(this, newCensureLevel);
+                }
+
+                factionStandings.processCensureDegradation(currentDay);
+            }
         }
 
         // This must be the last step before returning true
