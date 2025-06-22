@@ -2218,7 +2218,7 @@ public class Campaign implements ITechManager {
                                                                 "personnelRecruitmentPrisoner.text")) :
                                "";
             addReport(String.format(resources.getString("personnelRecruitmentAddedToRoster.text"),
-                  person.getHyperlinkedName(),
+                  person.getHyperlinkedFullTitle(),
                   formerSurname,
                   add));
         }
