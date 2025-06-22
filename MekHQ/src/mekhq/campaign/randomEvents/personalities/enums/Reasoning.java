@@ -40,7 +40,7 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import megamek.codeUtilities.MathUtility;
 import megamek.common.enums.Gender;
-import mekhq.campaign.randomEvents.personalities.PersonalityController.PronounData;
+import mekhq.campaign.personnel.PronounData;
 
 /**
  * Represents various levels and traits of Reasoning in a personality.
