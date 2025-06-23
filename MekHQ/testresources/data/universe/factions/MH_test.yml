@@ -1,3 +1,4 @@
+# This is a test faction, do not update lore data
 key: MH
 name: Marian Hegemony
 capital: Alphard (MH)
@@ -36,4 +37,3 @@ ratingLevels:
 fallBackFactions:
   - Periphery.ME
 formationBaseSize: 5
-rankSystem: MHAF

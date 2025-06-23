@@ -501,18 +501,12 @@ public class GeneralTab {
     public void loadValuesFromCampaignOptions(@Nullable LocalDate presetDate, @Nullable Faction presetFaction) {
         txtName.setText(campaign.getName());
 
-        date = campaign.getLocalDate();
-        if (presetDate != null) {
-            date = presetDate;
-        }
+        setDate((presetDate != null) ? presetDate : campaign.getLocalDate());
 
-        comboFaction.setSelectedItem(campaign.getFaction());
+        comboFaction.setSelectedItem(new FactionDisplay(campaign.getFaction(), date));
         if (presetFaction != null) {
             comboFaction.setSelectedItem(new FactionDisplay(presetFaction, date));
         }
-
-        // Button labels are not updated when we repaint, so we have to specifically call it here
-        btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
 
         camouflage = campaign.getCamouflage();
         unitIcon = campaign.getUnitIcon();
