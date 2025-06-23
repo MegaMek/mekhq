@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.dialog.reportDialogs.FactionStanding.gmToolsDialog;
+package mekhq.gui.dialog.factionStanding.gmToolsDialog;
 
 /**
  * Enum representing the types of actions that can be performed on faction standings through GM (Game Master) tools.
