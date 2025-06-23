@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.dialog.reportDialogs.FactionStanding.manualMissionDialogs;
+package mekhq.gui.dialog.factionStanding.manualMissionDialogs;
 
 import static java.lang.Integer.MAX_VALUE;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
@@ -255,7 +255,7 @@ public class SimulateMissionDialog extends JDialog {
         Factions factions = Factions.getInstance();
         List<Faction> activeFactions = new ArrayList<>(factions.getActiveFactions(today));
 
-        activeFactions.removeIf(faction -> FactionStandings.isUntrackedFaction(faction.getShortName()));
+        activeFactions.removeIf(Faction::isAggregate);
         activeFactions.sort(Comparator.comparing(faction -> faction.getFullName(today.getYear())));
 
         // This is a placeholder to ensure that the indexes of the combos and the list remain in sync
