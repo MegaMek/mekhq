@@ -244,6 +244,7 @@ import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.universe.eras.Era;
 import mekhq.campaign.universe.eras.Eras;
+import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.campaign.universe.factionStanding.PerformBatchall;
 import mekhq.campaign.universe.fameAndInfamy.FameAndInfamyController;
@@ -5033,7 +5034,14 @@ public class Campaign implements ITechManager {
                       contract.getStartDate().equals(currentDay)) {
                 Faction faction = contract.getEnemy();
                 String factionCode = contract.getEnemyCode();
-                if (faction.performsBatchalls()) {
+
+                boolean allowBatchalls = true;
+                if (campaignOptions.isUseFactionStandingBatchallRestrictions()) {
+                    double regard = factionStandings.getRegardForFaction(factionCode, true);
+                    allowBatchalls = FactionStandingUtilities.isBatchallAllowed(regard);
+                }
+
+                if (faction.performsBatchalls() && allowBatchalls) {
                     PerformBatchall batchallDialog = new PerformBatchall(this,
                           contract.getClanOpponent(),
                           contract.getEnemyCode());
