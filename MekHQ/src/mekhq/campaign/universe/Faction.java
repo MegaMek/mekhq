@@ -36,20 +36,21 @@ package mekhq.campaign.universe;
 import static megamek.common.Compute.randomInt;
 
 import java.awt.Color;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
+import megamek.client.ratgenerator.FactionRecord;
 import megamek.common.annotations.Nullable;
 import megamek.common.universe.Faction2;
 import megamek.common.universe.FactionTag;
+import megamek.common.universe.HonorRating;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
-import megamek.common.universe.HonorRating;
-
-import java.nio.file.Path;
-import java.util.List;
-import java.util.stream.Collectors;
+import mekhq.campaign.personnel.ranks.RankSystem;
+import mekhq.campaign.personnel.ranks.Ranks;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -135,11 +136,10 @@ public class Faction {
         for (Entry<Integer, String> entry : faction2.getCapitalChanges().entrySet()) {
             planetChanges.put(LocalDate.ofYearDay(entry.getKey(), 1), entry.getValue());
         }
-        if (!faction2.getYearsActive().isEmpty()) {
-            Integer startYear = faction2.getYearsActive().get(0).start;
-            start = startYear == null ? 0 : startYear;
-            Integer endYear = faction2.getYearsActive().get(0).end;
-            start = endYear == null ? 0 : endYear;
+        List<FactionRecord.DateRange> active = faction2.getYearsActive();
+        if (!active.isEmpty()) {
+            start = Objects.requireNonNullElse(active.get(0).start, 0);
+            end = Objects.requireNonNullElse(active.get(active.size() - 1).end, 9999);
         }
         HonorRating preInvasion = faction2.getPreInvasionHonorRating();
         preInvasionHonorRating = (preInvasion != null) ? preInvasion : HonorRating.STRICT;
@@ -500,6 +500,45 @@ public class Faction {
     }
 
     /**
+     * Retrieves the rank system identifier for this faction.
+     *
+     * <p>The method checks the `rankSystem` field; if it is set and not {@code -1}, its value is returned
+     * directly.</p>
+     *
+     * <p>If the rank system is unspecified but there are fallback factions, the method iterates through each
+     * fallback faction, returning the first available rank system found among them.</p>
+     *
+     * <p>If no fallback faction provides a rank system, the method returns a default value based on whether the
+     * faction is a clan or not.</p>
+     *
+     * @return the rank system identifier for this faction, or a default value ({@code CLAN} for Clan factions,
+     *       {@code SLDF} for non-Clan factions) if not specified.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String getRankSystemCode() {
+        return faction2.getRankSystem();
+    }
+
+    /**
+     * Returns the {@link RankSystem} object associated with this faction.
+     *
+     * <p>This uses the rank system code obtained from {@link #getRankSystemCode()} and looks up the corresponding
+     * {@link RankSystem} instance using {@code Ranks.getRankSystemFromCode}. If a {@link RankSystem} cannot be found
+     * for the return value of {@link #getRankSystemCode()}, the rank system associated with
+     * {@link Ranks#DEFAULT_SYSTEM_CODE} will be returned.</p>
+     *
+     * @return the {@code RankSystem} for this faction, or {@code null} if not found
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public RankSystem getRankSystem() {
+        return Ranks.getRankSystemFromCode(getRankSystemCode());
+    }
+
+    /**
      * Determines whether this faction performs Batchalls.
      *
      * <p>Batchalls are a tradition among specific factions - primarily various clans and related groups. </p>
@@ -508,5 +547,19 @@ public class Faction {
      */
     public boolean performsBatchalls() {
         return faction2.performsBatchalls();
+    }
+
+    /**
+     * @return {@code true} if the faction is an aggregate of independent 'factions', rather than a singular
+     *       organization.
+     *
+     *       <p>For example, "PIR" (pirates) is used to abstractly represent all pirates, not individual pirate
+     *       groups.</p>
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public boolean isAggregate() {
+        return faction2.isAggregate();
     }
 }
