@@ -255,7 +255,7 @@ public class SimulateMissionDialog extends JDialog {
         Factions factions = Factions.getInstance();
         List<Faction> activeFactions = new ArrayList<>(factions.getActiveFactions(today));
 
-        activeFactions.removeIf(faction -> FactionStandings.isUntrackedFaction(faction.getShortName()));
+        activeFactions.removeIf(Faction::isAggregate);
         activeFactions.sort(Comparator.comparing(faction -> faction.getFullName(today.getYear())));
 
         // This is a placeholder to ensure that the indexes of the combos and the list remain in sync
