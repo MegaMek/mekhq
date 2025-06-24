@@ -44,8 +44,8 @@ import java.util.List;
 
 import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
+import mekhq.campaign.personnel.PronounData;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.randomEvents.personalities.PersonalityController.PronounData;
 import mekhq.campaign.universe.Faction;
 
 /**
