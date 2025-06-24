@@ -34,9 +34,6 @@ package mekhq.campaign.randomEvents.personalities;
 
 import static java.lang.Math.max;
 import static megamek.common.Compute.randomInt;
-import static mekhq.campaign.personnel.enums.GenderDescriptors.HE_SHE_THEY;
-import static mekhq.campaign.personnel.enums.GenderDescriptors.HIM_HER_THEM;
-import static mekhq.campaign.personnel.enums.GenderDescriptors.HIS_HER_THEIR;
 import static mekhq.campaign.randomEvents.personalities.enums.Reasoning.*;
 
 import java.util.ArrayList;
@@ -618,53 +615,5 @@ public class PersonalityController {
         }
 
         return personalityValue;
-    }
-
-    /**
-     * Represents a set of grammatical pronouns associated with a subject, object, and possessive form, along with their
-     * lowercased variations, and additional data for pluralization handling.
-     *
-     * <p>This record is intended to encapsulate information related to personal pronouns for use in
-     * linguistic or grammatical processing. It includes pronoun forms commonly required for sentence construction and
-     * supports pluralization when applicable.</p>
-     *
-     * <b>Fields</b>
-     * <ul>
-     *   <li><b>subjectPronoun</b>: The pronoun used as the subject of a sentence (e.g., "He", "She", "They").</li>
-     *   <li><b>subjectPronounLowerCase</b>: The lowercased version of the subject pronoun (e.g., "he", "she", "they").</li>
-     *   <li><b>objectPronoun</b>: The pronoun used as the object of a sentence (e.g., "Him", "Her", "Them").</li>
-     *   <li><b>objectPronounLowerCase</b>: The lowercased version of the object pronoun (e.g., "him", "her", "them").</li>
-     *   <li><b>possessivePronoun</b>: The pronoun used to indicate possession (e.g., "His", "Hers", "Theirs").</li>
-     *   <li><b>possessivePronounLowerCase</b>: The lowercased version of the possessive pronoun (e.g., "his", "hers", "theirs").</li>
-     *   <li><b>pluralizer</b>: An integer value used to determine pluralization behavior. The exact logic depends
-     *       on the context in which the pronoun data is used (e.g., 1 for singular, >1 for plural).</li>
-     * </ul>
-     *
-     * @param subjectPronoun             The subject pronoun (e.g., "He", "She", "They").
-     * @param subjectPronounLowerCase    The lowercased version of the subject pronoun.
-     * @param objectPronoun              The object pronoun (e.g., "Him", "Her", "Them").
-     * @param objectPronounLowerCase     The lowercased version of the object pronoun.
-     * @param possessivePronoun          The possessive pronoun (e.g., "His", "Hers", "Theirs").
-     * @param possessivePronounLowerCase The lowercased version of the possessive pronoun.
-     * @param pluralizer                 An integer value to represent singular (1) or plural (>1).
-     */
-    public record PronounData(String subjectPronoun, String subjectPronounLowerCase, String objectPronoun,
-          String objectPronounLowerCase, String possessivePronoun, String possessivePronounLowerCase, int pluralizer) {
-        /**
-         * Constructs a new {@code PronounData} record based on the specified gender.
-         *
-         * @param gender The gender used to determine the pronouns and pluralizer.
-         */
-        public PronounData(Gender gender) {
-            this(HE_SHE_THEY.getDescriptorCapitalized(gender),
-                  HE_SHE_THEY.getDescriptorCapitalized(gender).toLowerCase(),
-                  HIM_HER_THEM.getDescriptorCapitalized(gender),
-                  HIM_HER_THEM.getDescriptorCapitalized(gender).toLowerCase(),
-                  HIS_HER_THEIR.getDescriptorCapitalized(gender),
-                  HIS_HER_THEIR.getDescriptorCapitalized(gender).toLowerCase(),
-                  gender.isGenderNeutral() ? 0 : 1
-                  // Used to determine whether to use a plural case
-            );
-        }
     }
 }
