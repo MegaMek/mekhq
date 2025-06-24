@@ -32,18 +32,6 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
-import static megamek.common.Compute.randomInt;
-import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
-import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
-import static mekhq.campaign.universe.factionStanding.FactionStandings.STARTING_REGARD_ALLIED_FACTION;
-import static mekhq.campaign.universe.factionStanding.FactionStandings.STARTING_REGARD_SAME_FACTION;
-
-import java.time.LocalDate;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
@@ -56,6 +44,18 @@ import mekhq.gui.dialog.factionStanding.factionJudgment.FactionCensureConfirmati
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionCensureDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentSceneDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentSceneType;
+
+import java.time.LocalDate;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import static megamek.common.Compute.randomInt;
+import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
+import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
+import static mekhq.campaign.universe.factionStanding.FactionStandings.STARTING_REGARD_ALLIED_FACTION;
+import static mekhq.campaign.universe.factionStanding.FactionStandings.STARTING_REGARD_SAME_FACTION;
 
 public class FactionCensureEvent {
     private final static int GO_ROGUE_DIALOG_CHOICE_INDEX = 3;
@@ -179,7 +179,7 @@ public class FactionCensureEvent {
         Faction faction = campaign.getFaction();
         String factionCode = faction.getShortName();
         FactionStandings factionStandings = campaign.getFactionStandings();
-        factionStandings.changeRegardForFaction(factionCode, delta, campaign.getGameYear());
+        factionStandings.changeRegardForFaction(campaign.getFaction().getShortName(), factionCode, delta, campaign.getGameYear());
     }
 
     private void processCensureCommanderImprisonment() {

@@ -1,18 +1,18 @@
 package mekhq.campaign.universe.factionStanding;
 
-import static megamek.common.Compute.randomInt;
-import static mekhq.campaign.universe.factionStanding.FactionCensureEvent.POLITICAL_ROLES;
-import static mekhq.campaign.universe.factionStanding.FactionCensureEvent.processMassLoyaltyChange;
-
-import java.time.LocalDate;
-import java.util.Collection;
-
 import megamek.common.Compute;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionCensureGoingRogueDialog;
+
+import java.time.LocalDate;
+import java.util.Collection;
+
+import static megamek.common.Compute.randomInt;
+import static mekhq.campaign.universe.factionStanding.FactionCensureEvent.POLITICAL_ROLES;
+import static mekhq.campaign.universe.factionStanding.FactionCensureEvent.processMassLoyaltyChange;
 
 public class GoingRogue {
     private final static int LOYALTY_TARGET_NUMBER = 6;
@@ -99,7 +99,7 @@ public class GoingRogue {
             return;
         }
 
-        String report = factionStandings.setRegardForFaction(factionCode, targetRegard, campaign.getGameYear(), true);
+        String report = factionStandings.setRegardForFaction(campaign.getFaction().getShortName(), factionCode, targetRegard, campaign.getGameYear(), true);
         campaign.addReport(report);
     }
 
@@ -117,7 +117,7 @@ public class GoingRogue {
             return;
         }
 
-        String report = factionStandings.setRegardForFaction(factionCode, targetRegard, campaign.getGameYear(), true);
+        String report = factionStandings.setRegardForFaction(campaign.getFaction().getShortName(), factionCode, targetRegard, campaign.getGameYear(), true);
         campaign.addReport(report);
     }
 
