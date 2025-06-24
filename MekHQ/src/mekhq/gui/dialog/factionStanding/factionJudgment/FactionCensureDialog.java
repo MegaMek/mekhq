@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.dialog.factionStanding;
+package mekhq.gui.dialog.factionStanding.factionJudgment;
 
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -69,16 +69,11 @@ public class FactionCensureDialog {
 
     private final static String DIALOG_KEY_OUT_OF_CHARACTER = "FactionCensureEvent.outOfCharacter.";
 
-    private final static String KEY_AFFIX_WARNING = "warning";
-    private final static String KEY_AFFIX_COMMANDER_RETIREMENT = "retirement";
-    private final static String KEY_AFFIX_COMMANDER_IMPRISONMENT = "imprisonment";
-    private final static String KEY_AFFIX_LEADERSHIP_REPLACEMENT = "replacement";
-    private final static String KEY_AFFIX_DISBAND = "disband";
-
     private final static String DRACONIS_COMBINE = "DC";
 
 
     private final Campaign campaign;
+    private final FactionCensureLevel censureLevel;
     private int dialogChoiceIndex = 0;
 
     public int getDialogChoiceIndex() {
@@ -88,21 +83,13 @@ public class FactionCensureDialog {
     public FactionCensureDialog(final Campaign campaign, final FactionCensureLevel censureLevel,
           Person mostSeniorCharacter) {
         this.campaign = campaign;
-
-        String contextKey = switch (censureLevel) {
-            case WARNING -> KEY_AFFIX_WARNING;
-            case COMMANDER_RETIREMENT -> KEY_AFFIX_COMMANDER_RETIREMENT;
-            case COMMANDER_IMPRISONMENT -> KEY_AFFIX_COMMANDER_IMPRISONMENT;
-            case LEADERSHIP_REPLACEMENT -> KEY_AFFIX_LEADERSHIP_REPLACEMENT;
-            case DISBAND -> KEY_AFFIX_DISBAND;
-            default -> null;
-        };
+        this.censureLevel = censureLevel;
 
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
               getSpeaker(campaign),
               null,
-              getInCharacterMessage(contextKey),
-              getDialogOptions(contextKey, mostSeniorCharacter),
+              getInCharacterMessage(),
+              getDialogOptions(mostSeniorCharacter),
               getOutOfCharacterMessage(),
               null,
               true);
@@ -138,11 +125,12 @@ public class FactionCensureDialog {
         return speaker;
     }
 
-    public String getInCharacterMessage(String contextKey) {
+    public String getInCharacterMessage() {
         String commanderAddress = campaign.getCommanderAddress(false);
         String campaignName = campaign.getName();
         Faction campaignFaction = campaign.getFaction();
         String campaignFactionCode = campaignFaction.getShortName();
+        String contextKey = censureLevel.name();
 
         String dialog = getFormattedTextAt(RESOURCE_BUNDLE,
               DIALOG_KEY_IN_CHARACTER + contextKey + '.' + campaignFactionCode, commanderAddress, campaignName);
@@ -164,9 +152,10 @@ public class FactionCensureDialog {
               commanderAddress, campaignName);
     }
 
-    public List<String> getDialogOptions(String contextKey, Person mostSeniorCharacter) {
-        List<String> options = new ArrayList<>();
+    public List<String> getDialogOptions(Person mostSeniorCharacter) {
+        String contextKey = censureLevel.name();
 
+        List<String> options = new ArrayList<>();
         options.add(getTextAt(RESOURCE_BUNDLE, BUTTON_KEY_POSITIVE + contextKey));
         options.add(getTextAt(RESOURCE_BUNDLE, BUTTON_KEY_NEUTRAL + contextKey));
         options.add(getTextAt(RESOURCE_BUNDLE, BUTTON_KEY_NEGATIVE + contextKey));
@@ -174,13 +163,13 @@ public class FactionCensureDialog {
 
         boolean isDraconisCombineCampaign = Objects.equals(campaign.getFaction().getShortName(), DRACONIS_COMBINE);
         if (mostSeniorCharacter != null && isDraconisCombineCampaign) {
-            options.add(getTextAt(RESOURCE_BUNDLE, BUTTON_KEY_SEPPUKU + KEY_AFFIX_WARNING));
+            options.add(getTextAt(RESOURCE_BUNDLE, BUTTON_KEY_SEPPUKU + contextKey));
         }
 
         return options;
     }
 
     public String getOutOfCharacterMessage() {
-        return null;
+        return getFormattedTextAt(RESOURCE_BUNDLE, DIALOG_KEY_OUT_OF_CHARACTER + censureLevel.name());
     }
 }

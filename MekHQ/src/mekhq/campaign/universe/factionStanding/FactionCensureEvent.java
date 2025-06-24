@@ -32,103 +32,156 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
+import static megamek.common.Compute.randomInt;
+import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
+import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
+import static mekhq.campaign.universe.factionStanding.FactionStandings.STARTING_REGARD_ALLIED_FACTION;
+import static mekhq.campaign.universe.factionStanding.FactionStandings.STARTING_REGARD_SAME_FACTION;
+
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
+import megamek.codeUtilities.ObjectUtility;
+import megamek.common.Compute;
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.gui.dialog.factionStanding.FactionCensureDialog;
-import mekhq.gui.dialog.factionStanding.SeppukuDialog;
+import mekhq.campaign.universe.Faction;
+import mekhq.gui.dialog.factionStanding.factionJudgment.FactionCensureConfirmationDialog;
+import mekhq.gui.dialog.factionStanding.factionJudgment.FactionCensureDialog;
+import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentSceneDialog;
+import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentSceneType;
 
 public class FactionCensureEvent {
-    private final Campaign campaign;
-    private final Person mostSeniorCharacter;
-
     private final static int GO_ROGUE_DIALOG_CHOICE_INDEX = 3;
     private final static int SEPPUKU_DIALOG_CHOICE_INDEX = 4;
+
+    final static List<PersonnelRole> POLITICAL_ROLES = List.of(
+          PersonnelRole.MORALE_OFFICER,
+          PersonnelRole.LOYALTY_MONITOR,
+          PersonnelRole.LOYALTY_AUDITOR);
+
+    private final Campaign campaign;
+    private final Person mostSeniorCharacter;
+    private final Person secondCharacter;
 
     public FactionCensureEvent(Campaign campaign, FactionCensureLevel censureLevel) {
         this.campaign = campaign;
         mostSeniorCharacter = getMostSeniorCharacter();
+        secondCharacter = getSecondCharacter(mostSeniorCharacter);
 
         // There is nobody to censure
         if (mostSeniorCharacter == null) {
             return;
         }
 
-        FactionCensureDialog dialog = new FactionCensureDialog(campaign, censureLevel, mostSeniorCharacter);
-        int choiceIndex = dialog.getDialogChoiceIndex();
+        FactionCensureDialog initialDialog = new FactionCensureDialog(campaign, censureLevel, mostSeniorCharacter);
+        int choiceIndex = initialDialog.getDialogChoiceIndex();
 
-        if (choiceIndex == GO_ROGUE_DIALOG_CHOICE_INDEX) {
-            // TODO GO ROGUE WOOOO REBEL TIME
-        } else if (choiceIndex == SEPPUKU_DIALOG_CHOICE_INDEX) {
-            new SeppukuDialog(campaign, mostSeniorCharacter);
-            mostSeniorCharacter.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.SEPPUKU);
+        FactionCensureConfirmationDialog confirmationDialog = new FactionCensureConfirmationDialog(campaign,
+              mostSeniorCharacter);
+        if (!confirmationDialog.wasConfirmed()) {
+            new FactionCensureEvent(campaign, censureLevel);
             return;
         }
 
+        boolean committedSeppuku = false;
+        if (choiceIndex == GO_ROGUE_DIALOG_CHOICE_INDEX) {
+            new GoingRogue(campaign, mostSeniorCharacter, secondCharacter);
+
+            switch (censureLevel) {
+                case NONE -> {}
+                case WARNING -> {} // These will be filled in as dialog is written for these scene types
+                case COMMANDER_RETIREMENT -> {}
+                case COMMANDER_IMPRISONMENT -> {}
+                case LEADERSHIP_REPLACEMENT -> {}
+                case DISBAND -> new FactionJudgmentSceneDialog(campaign, mostSeniorCharacter, secondCharacter,
+                      FactionJudgmentSceneType.GO_ROGUE_DISBAND);
+            }
+            return;
+        } else if (choiceIndex == SEPPUKU_DIALOG_CHOICE_INDEX) {
+            new FactionJudgmentSceneDialog(campaign,
+                  mostSeniorCharacter,
+                  secondCharacter,
+                  FactionJudgmentSceneType.SEPPUKU);
+            mostSeniorCharacter.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.SEPPUKU);
+            committedSeppuku = true;
+        }
+
+        handleCensureEffects(censureLevel, committedSeppuku);
+    }
+
+    private void handleCensureEffects(FactionCensureLevel censureLevel,
+          boolean committedSeppuku) {
         switch (censureLevel) {
-            case WARNING -> {}
-            case COMMANDER_RETIREMENT -> processCensureCommanderRetirement();
-            case COMMANDER_IMPRISONMENT -> processCensureCommanderImprisonment();
-            case LEADERSHIP_REPLACEMENT -> processCensureLeadershipReplacement();
+            case WARNING -> {
+                if (committedSeppuku) {
+                    processMassLoyaltyChange(campaign, false, true);
+                }
+            }
+            case COMMANDER_RETIREMENT -> {
+                if (committedSeppuku) {
+                    processMassLoyaltyChange(campaign, false, true);
+                }
+                processCensureCommanderRetirement();
+            }
+            case COMMANDER_IMPRISONMENT -> {
+                processMassLoyaltyChange(campaign, false, committedSeppuku);
+                processCensureCommanderImprisonment();
+            }
+            case LEADERSHIP_REPLACEMENT -> {
+                processMassLoyaltyChange(campaign, true, committedSeppuku);
+                processCensureLeadershipReplacement();
+            }
             case DISBAND -> processCensureDisband();
         }
+
+        processFactionStandingChange(committedSeppuku);
     }
 
     private void processCensureCommanderRetirement() {
         mostSeniorCharacter.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.RETIRED);
-        processMassLoyaltyChange(false);
     }
 
-    private void processMassLoyaltyChange(boolean isMajor) {
-        for (Person remaningPerson : campaign.getPersonnel()) {
-            if (remaningPerson.getStatus().isDepartedUnit()) {
+    static void processMassLoyaltyChange(Campaign campaign, boolean isMajor, boolean isPositiveChange) {
+        LocalDate today = campaign.getLocalDate();
+        for (Person person : campaign.getPersonnel()) {
+            if (isExempt(person, today)) {
                 continue;
             }
 
-            if (!remaningPerson.isEmployed()) {
-                continue;
-            }
-
-            remaningPerson.performForcedDirectionLoyaltyChange(campaign, false, isMajor, false);
+            person.performForcedDirectionLoyaltyChange(campaign, isPositiveChange, isMajor, false);
         }
+    }
+
+    private void processFactionStandingChange(boolean isMajor) {
+        double delta = isMajor ? STARTING_REGARD_SAME_FACTION : STARTING_REGARD_ALLIED_FACTION;
+        Faction faction = campaign.getFaction();
+        String factionCode = faction.getShortName();
+        FactionStandings factionStandings = campaign.getFactionStandings();
+        factionStandings.changeRegardForFaction(factionCode, delta, campaign.getGameYear());
     }
 
     private void processCensureCommanderImprisonment() {
         mostSeniorCharacter.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.IMPRISONED);
-        processMassLoyaltyChange(true);
     }
 
     private void processCensureLeadershipReplacement() {
-        processMassLoyaltyChange(true);
-
-        List<Force> forces = campaign.getAllForces();
-
         Set<Person> replacedPersonnel = new HashSet<>();
         replacedPersonnel.add(mostSeniorCharacter);
-
-        for (Force force : forces) {
-            UUID commanderId = force.getForceCommanderID();
-            if (commanderId == null) {
-                continue;
-            }
-
-            Person commander = campaign.getPerson(commanderId);
-            if (commander != null) {
-                replacedPersonnel.add(commander);
-            }
-        }
 
         LocalDate today = campaign.getLocalDate();
         for (Person officer : campaign.getPersonnel()) {
             if (isExempt(officer, today)) {
+                continue;
+            }
+
+            if (!officer.getRank().isOfficer()) {
                 continue;
             }
 
@@ -144,16 +197,35 @@ public class FactionCensureEvent {
             final int level = seniorPerson.getRankLevel();
             final int rank = seniorPerson.getRankNumeric();
 
-            seniorPerson.changeStatus(campaign, today, PersonnelStatus.SACKED);
+            seniorPerson.changeStatus(campaign, today, PersonnelStatus.DISHONORABLY_DISCHARGED);
 
-            Person replacement = campaign.newPerson(seniorPerson.getPrimaryRole(), seniorPerson.getSecondaryRole());
+            Person replacement = getReplacementCharacter(seniorPerson);
             replacement.changeRank(campaign, rank, level, false);
             campaign.recruitPerson(replacement, true, true);
         }
     }
 
-    private void processCensureDisband() {
+    private Person getReplacementCharacter(Person seniorPerson) {
+        Person replacement = campaign.newPerson(seniorPerson.getPrimaryRole(), getPoliticalRole());
+        if (!replacement.hasSkill(S_LEADER)) {
+            replacement.addSkill(S_LEADER, randomInt(3) + 1, 0);
+        }
+        if (!replacement.hasSkill(S_ADMIN)) {
+            replacement.addSkill(S_ADMIN, randomInt(3) + 1, 0);
+        }
+        replacement.setLoyalty(Compute.d6(3) + 2);
+        return replacement;
+    }
 
+    private PersonnelRole getPoliticalRole() {
+        return ObjectUtility.getRandomItem(POLITICAL_ROLES);
+    }
+
+    private void processCensureDisband() {
+        new FactionJudgmentSceneDialog(campaign,
+              mostSeniorCharacter,
+              secondCharacter,
+              FactionJudgmentSceneType.DISBAND);
     }
 
     public Person getMostSeniorCharacter() {
@@ -184,7 +256,7 @@ public class FactionCensureEvent {
         return highestRankedPerson;
     }
 
-    private static boolean isExempt(Person person, LocalDate today) {
+    static boolean isExempt(Person person, LocalDate today) {
         if (person.getStatus().isDepartedUnit()) {
             return true;
         }
@@ -202,5 +274,24 @@ public class FactionCensureEvent {
         }
 
         return person.isDependent();
+    }
+
+    private @Nullable Person getSecondCharacter(Person commander) {
+        Person second = campaign.getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND);
+        if (second != null && !second.equals(commander)) {
+            return second;
+        }
+
+        for (Person person : campaign.getActivePersonnel(false)) {
+            if (person == commander) {
+                continue;
+            }
+
+            if (second == null || person.outRanksUsingSkillTiebreaker(campaign, second)) {
+                second = person;
+            }
+        }
+
+        return second;
     }
 }
