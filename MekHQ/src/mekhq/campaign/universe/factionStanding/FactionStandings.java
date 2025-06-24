@@ -33,6 +33,9 @@
 package mekhq.campaign.universe.factionStanding;
 
 import static megamek.codeUtilities.MathUtility.clamp;
+import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_0;
+import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_7;
+import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_8;
 import static mekhq.gui.dialog.factionStanding.manualMissionDialogs.SimulateMissionDialog.handleFactionRegardUpdates;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -52,6 +55,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import javax.swing.ImageIcon;
 
 import megamek.codeUtilities.MathUtility;
@@ -86,14 +90,19 @@ public class FactionStandings {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionStandings";
 
     /**
-     * This value defines the upper limit of Regard a campaign can achieve with a faction.
+     * This value defines the upper limit of Regard a campaign can achieve with the campaign's faction.
      */
-    static final double MAXIMUM_REGARD = 60.0;
+    static final double MAXIMUM_SAME_FACTION_REGARD = STANDING_LEVEL_8.getMaximumRegard() + 10;
 
     /**
-     * A constant representing the minimum regard a campaign can have with a faction.
+     * The maximum regard value a campaign can have with a faction other than the campaign's faction
      */
-    static final double MINIMUM_REGARD = -60.0;
+    static final double MAXIMUM_OTHER_FACTION_REGARD = STANDING_LEVEL_7.getMinimumRegard();
+
+    /**
+     * A constant representing the minimum regard a campaign can have with any faction.
+     */
+    static final double MINIMUM_REGARD = STANDING_LEVEL_0.getMinimumRegard() - 10;
 
     /**
      * The base regard value for all factions.
@@ -259,8 +268,18 @@ public class FactionStandings {
      * @author Illiani
      * @since 0.50.07
      */
-    public static double getMaximumRegard() {
-        return MAXIMUM_REGARD;
+    public static double getMaximumSameFactionRegard() {
+        return MAXIMUM_SAME_FACTION_REGARD;
+    }
+
+    /**
+     * @return the maximum regard the campaign can have with a faction other than the campaign's faction.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public static double getMaximumOtherFactionRegard() {
+        return MAXIMUM_OTHER_FACTION_REGARD;
     }
 
     /**
@@ -314,6 +333,7 @@ public class FactionStandings {
                 continue;
             }
 
+            String campaignFactionCode = campaignFaction.getShortName();
             String otherFactionCode = otherFaction.getShortName();
 
             if (otherFaction.isAggregate()) {
@@ -321,7 +341,8 @@ public class FactionStandings {
             }
 
             if (otherFaction.equals(campaignFaction)) {
-                report = changeRegardForFaction(otherFactionCode, STARTING_REGARD_SAME_FACTION, gameYear);
+                report = changeRegardForFaction(campaignFactionCode, otherFactionCode, STARTING_REGARD_SAME_FACTION,
+                      gameYear);
                 if (!report.isBlank()) {
                     regardChangeReports.add(report);
                 }
@@ -329,7 +350,8 @@ public class FactionStandings {
             }
 
             if (factionHints.isAlliedWith(campaignFaction, otherFaction, today)) {
-                report = changeRegardForFaction(otherFactionCode, STARTING_REGARD_ALLIED_FACTION, gameYear);
+                report = changeRegardForFaction(campaignFactionCode, otherFactionCode, STARTING_REGARD_ALLIED_FACTION,
+                      gameYear);
                 if (!report.isBlank()) {
                     regardChangeReports.add(report);
                     continue;
@@ -337,7 +359,8 @@ public class FactionStandings {
             }
 
             if (factionHints.isAtWarWith(campaignFaction, otherFaction, today)) {
-                report = changeRegardForFaction(otherFactionCode, STARTING_REGARD_ENEMY_FACTION_AT_WAR, gameYear);
+                report = changeRegardForFaction(campaignFactionCode, otherFactionCode,
+                      STARTING_REGARD_ENEMY_FACTION_AT_WAR, gameYear);
                 if (!report.isBlank()) {
                     regardChangeReports.add(report);
                     continue;
@@ -345,7 +368,8 @@ public class FactionStandings {
             }
 
             if (factionHints.isRivalOf(campaignFaction, otherFaction, today)) {
-                report = changeRegardForFaction(otherFactionCode, STARTING_REGARD_ENEMY_FACTION_RIVAL, gameYear);
+                report = changeRegardForFaction(campaignFactionCode, otherFactionCode,
+                      STARTING_REGARD_ENEMY_FACTION_RIVAL, gameYear);
                 if (!report.isBlank()) {
                     regardChangeReports.add(report);
                 }
@@ -356,7 +380,8 @@ public class FactionStandings {
                       today);
 
                 if (mercenaryRelationsModifier != DEFAULT_REGARD) {
-                    report = changeRegardForFaction(otherFactionCode, mercenaryRelationsModifier, gameYear);
+                    report = changeRegardForFaction(campaignFactionCode, otherFactionCode, mercenaryRelationsModifier,
+                          gameYear);
                     if (!report.isBlank()) {
                         regardChangeReports.add(report);
                     }
@@ -455,7 +480,7 @@ public class FactionStandings {
      * Retrieves the current regard value for the specified faction.
      *
      * @param factionCode a unique code identifying the faction
-     * @param includeCurrentClimate whether to include temporary modifiers from the current climate climate
+     * @param includeCurrentClimate whether to include temporary modifiers from the current climate
      *
      * @return the regard value for the faction, or 0 if none is present
      *
@@ -469,31 +494,47 @@ public class FactionStandings {
             regard += climateRegard.getOrDefault(factionCode, DEFAULT_REGARD);
         }
 
-        return clamp(regard, MINIMUM_REGARD, MAXIMUM_REGARD);
+        return clamp(regard, MINIMUM_REGARD, MAXIMUM_SAME_FACTION_REGARD);
     }
 
     /**
-     * Sets the regard value for the specified faction, directly assigning (or overwriting) the value. If the faction
+     * Use {@link #setRegardForFaction(String, String, double, int, boolean)} instead
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
+    public String setRegardForFaction(final String factionCode, final double newRegard, final int gameYear,
+          final boolean includeReport) {
+        return setRegardForFaction(null, factionCode, newRegard, gameYear, includeReport);
+    }
+
+    /**
+     * Sets the regard value for the specified faction, directly assigning or overwriting the value. If the faction
      * code does not already exist, a new entry is created.
      *
-     * <p>The regard value is automatically clamped between {@code MINIMUM_REGARD} and {@code MAXIMUM_REGARD}.</p>
+     * <p>The regard value is automatically clamped between {@code MINIMUM_REGARD} and the appropriate maximum:
+     * {@code MAXIMUM_SAME_FACTION_REGARD} if setting regard for the campaign's own code or if {@code
+     * campaignFactionCode} is {@code null}, or {@code MAXIMUM_OTHER_FACTION_REGARD} for other factions.</p>
      *
-     * <p>If {@code includeReport} is {@code true}, a report string describing the change is returned. Otherwise, an
-     * empty string is returned.</p>
+     * <p>If {@code includeReport} is {@code true}, a report string describing the change is generated and returned.
+     * If {@code includeReport} is {@code false}, an empty string is returned.</p>
      *
-     * @param factionCode a unique code identifying the faction
+     * @param campaignFactionCode the unique code identifying the campaign's main faction.
+     * @param factionCode a unique code identifying the faction whose regard value will be set
      * @param newRegard the regard (standing) value to assign
-     * @param gameYear  the current in-game year for reporting purposes
-     * @param includeReport  if {@code true}, no report string is returned; if {@code false}, a report of the change is generated
-     * @return a report string describing the change if {@code includeReport} is {@code true}; otherwise, an empty
-     * string
+     * @param gameYear the current in-game year, for report generation purposes
+     * @param includeReport if {@code true}, a report string describing the change is generated and returned;
+     *                      if {@code false}, an empty string is returned
+     * @return a report string describing the change if {@code includeReport} is {@code true}; otherwise, an empty string
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public String setRegardForFaction(final String factionCode, final double newRegard, final int gameYear,
-          final boolean includeReport) {
-        double regardValue = clamp(newRegard, MINIMUM_REGARD, MAXIMUM_REGARD);
+    public String setRegardForFaction(@Nullable String campaignFactionCode, final String factionCode,
+          final double newRegard, final int gameYear, final boolean includeReport) {
+        double maximumRegard = Objects.equals(campaignFactionCode, factionCode) || campaignFactionCode == null
+                                     ? MAXIMUM_SAME_FACTION_REGARD
+                                     : MAXIMUM_OTHER_FACTION_REGARD;
+
+        double regardValue = clamp(newRegard, MINIMUM_REGARD, maximumRegard);
         double currentRegard = getRegardForFaction(factionCode, false);
 
         factionRegard.put(factionCode, regardValue);
@@ -517,6 +558,7 @@ public class FactionStandings {
      *
      * <p>If {@code delta} is zero, the method leaves regard and milestones unchanged and returns an empty string.</p>
      *
+     * @param campaignFactionCode the unique code identifying the campaign's faction.
      * @param factionCode unique identifier for the faction whose regard should be adjusted
      * @param delta the amount to increment or decrement the faction's regard (can be positive or negative)
      * @param gameYear the current in-game year, affecting how faction names are displayed in reports
@@ -526,14 +568,19 @@ public class FactionStandings {
      * @author Illiani
      * @since 0.50.07
      */
-    public String changeRegardForFaction(final String factionCode, final double delta, final int gameYear) {
+    public String changeRegardForFaction(@Nullable String campaignFactionCode, final String factionCode,
+          final double delta, final int gameYear) {
         if (delta == 0) {
             LOGGER.debug("A change of 0 Regard requested for {}. Shortcutting the method.", factionCode);
             return "";
         }
 
         double originalRegard = getRegardForFaction(factionCode, false);
-        double newRegard = clamp(originalRegard + delta, MINIMUM_REGARD, MAXIMUM_REGARD);
+
+        double maximumRegard = Objects.equals(campaignFactionCode, factionCode) || campaignFactionCode == null
+                                     ? MAXIMUM_SAME_FACTION_REGARD
+                                     : MAXIMUM_OTHER_FACTION_REGARD;
+        double newRegard = clamp(originalRegard + delta, MINIMUM_REGARD, maximumRegard);
 
         factionRegard.put(factionCode, newRegard);
 
@@ -795,6 +842,7 @@ public class FactionStandings {
      * <p>This method is typically called annually to model the natural decline of relationships or reputation over
      * time.</p>
      *
+     * @param campaignFactionCode the unique identifier for the current campaign faction
      * @param gameYear the current in-game year, used for proper display of faction names in reports
      * @return a list of formatted report strings describing each regard change made during this process; one entry per
      * modified faction, or an empty list if no changes occurred
@@ -802,7 +850,7 @@ public class FactionStandings {
      * @author Illiani
      * @since 0.50.07
      */
-    public List<String> processRegardDegradation(final int gameYear) {
+    public List<String> processRegardDegradation(@Nullable String campaignFactionCode, final int gameYear) {
         List<String> regardChangeReports = new ArrayList<>();
         LOGGER.info("Processing regard decay for {} factions.", factionRegard.size());
         for (String factionCode : new HashSet<>(factionRegard.keySet())) {
@@ -822,12 +870,12 @@ public class FactionStandings {
                 double delta = currentRegard > DEFAULT_REGARD ?
                                      -DEFAULT_REGARD_DEGRADATION :
                                      DEFAULT_REGARD_DEGRADATION;
-                String report = changeRegardForFaction(factionCode, delta, gameYear);
+                String report = changeRegardForFaction(campaignFactionCode, factionCode, delta, gameYear);
                 double newRegard = getRegardForFaction(factionCode, false);
 
                 if ((currentRegard > DEFAULT_REGARD && newRegard < DEFAULT_REGARD) ||
                           (currentRegard < DEFAULT_REGARD && newRegard > DEFAULT_REGARD)) {
-                    setRegardForFaction(factionCode, DEFAULT_REGARD, gameYear, false);
+                    setRegardForFaction(null, factionCode, DEFAULT_REGARD, gameYear, false);
                 }
 
                 if (!report.isBlank()) {
@@ -851,6 +899,7 @@ public class FactionStandings {
      * <p>For each application of a regard delta, a report string is generated and included in the result list if it is
      * not blank.</p>
      *
+     * @param campaignFactionCode The unique identifier for the current campaign faction
      * @param enemyFaction The {@link Faction} representing the enemy against whom the contract is accepted.
      * @param today        The {@link LocalDate} representing the game date on which the contract is accepted.
      *
@@ -860,7 +909,8 @@ public class FactionStandings {
      * @author Illiani
      * @since 0.50.07
      */
-    public List<String> processContractAccept(@Nullable final Faction enemyFaction, final LocalDate today) {
+    public List<String> processContractAccept(@Nullable final String campaignFactionCode,
+          @Nullable final Faction enemyFaction, final LocalDate today) {
         // If we're missing the relevant faction, alert the player and abort
         if (enemyFaction == null) {
             String report = getMissingFactionReport();
@@ -896,7 +946,7 @@ public class FactionStandings {
                     regardDelta = REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_NORMAL;
                 }
 
-                report = changeRegardForFaction(otherFactionCode, regardDelta, gameYear);
+                report = changeRegardForFaction(campaignFactionCode, otherFactionCode, regardDelta, gameYear);
                 if (!report.isBlank()) {
                     regardChangeReports.add(report);
                 }
@@ -911,7 +961,7 @@ public class FactionStandings {
                     regardDelta = REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_ALLY_NORMAL;
                 }
 
-                report = changeRegardForFaction(otherFactionCode, regardDelta, gameYear);
+                report = changeRegardForFaction(campaignFactionCode, otherFactionCode, regardDelta, gameYear);
                 if (!report.isBlank()) {
                     regardChangeReports.add(report);
                 }
@@ -933,6 +983,7 @@ public class FactionStandings {
      * <p>Regard changes are applied to the employer and all allied factions, and corresponding report strings are
      * returned for each regard change applied.</p>
      *
+     * @param campaignFactionCode The unique identifier for the current campaign faction.
      * @param employerFaction The {@link Faction} that employed the contract, or {@code null} if unavailable.
      * @param today           The {@link LocalDate} representing the date of contract completion.
      * @param missionStatus   The {@link MissionStatus} of the contract upon completion.
@@ -940,7 +991,8 @@ public class FactionStandings {
      * @author Illiani
      * @since 0.50.07
      */
-    public List<String> processContractCompletion(@Nullable final Faction employerFaction, final LocalDate today,
+    public List<String> processContractCompletion(@Nullable final String campaignFactionCode,
+          @Nullable final Faction employerFaction, final LocalDate today,
                                                   final MissionStatus missionStatus) {
         // If the mission is still active, there is nothing to process, so abort
         if (missionStatus == MissionStatus.ACTIVE) {
@@ -989,7 +1041,7 @@ public class FactionStandings {
             }
 
             if (otherFaction.equals(employerFaction)) {
-                report = changeRegardForFaction(otherFactionCode, regardDeltaEmployer, gameYear);
+                report = changeRegardForFaction(campaignFactionCode, otherFactionCode, regardDeltaEmployer, gameYear);
                 if (!report.isBlank()) {
                     regardChangeReports.add(report);
                 }
@@ -997,7 +1049,10 @@ public class FactionStandings {
             }
 
             if (factionHints.isAlliedWith(employerFaction, otherFaction, today)) {
-                report = changeRegardForFaction(otherFactionCode, regardDeltaEmployerAlly, gameYear);
+                report = changeRegardForFaction(campaignFactionCode,
+                      otherFactionCode,
+                      regardDeltaEmployerAlly,
+                      gameYear);
                 if (!report.isBlank()) {
                     regardChangeReports.add(report);
                 }
@@ -1051,16 +1106,19 @@ public class FactionStandings {
      * <p>This method is included as a shortcut to allow developers to call Batchall refusal changes without needing to
      * worry about setting up bespoke methods any time this could occur.</p>
      *
+     * @param campaignFactionCode The code representing the current campaign faction.
      * @param clanFactionCode The code representing the clan faction being penalized.
      * @param gameYear        The year in which the batchall was refused.
      * @return A {@link List} of regard change report strings relating to the refusal.
      * @author Illiani
      * @since 0.50.07
      */
-    public List<String> processRefusedBatchall(final String clanFactionCode, final int gameYear) {
+    public List<String> processRefusedBatchall(final String campaignFactionCode, final String clanFactionCode,
+          final int gameYear) {
         List<String> regardChangeReports = new ArrayList<>();
 
-        String report = changeRegardForFaction(clanFactionCode, REGARD_DELTA_REFUSE_BATCHALL, gameYear);
+        String report = changeRegardForFaction(campaignFactionCode, clanFactionCode, REGARD_DELTA_REFUSE_BATCHALL,
+              gameYear);
 
         if (!report.isBlank()) {
             regardChangeReports.add(report);
@@ -1079,11 +1137,13 @@ public class FactionStandings {
      * <p>After processing all victims, the method applies the total regard change for each affected faction for the
      * specified game year and collects any resulting regard change reports.</p>
      *
+     * @param campaignFactionCode  the unique identifier for the current campaign faction
      * @param victims  the list of {@link Person} prisoners executed by the player
      * @param gameYear the year in which the executions and regard changes occur
      * @return a {@link List} of non-blank regard change report strings for each affected faction
      */
-    public List<String> executePrisonersOfWar(final List<Person> victims, final int gameYear) {
+    public List<String> executePrisonersOfWar(@Nullable String campaignFactionCode, final List<Person> victims,
+          final int gameYear) {
         Map<String, Double> affectedFactions = new HashMap<>();
 
         for (Person victim : victims) {
@@ -1099,7 +1159,7 @@ public class FactionStandings {
 
         List<String> regardChangeReports = new ArrayList<>();
         for (Map.Entry<String, Double> entry : affectedFactions.entrySet()) {
-            String report = changeRegardForFaction(entry.getKey(), entry.getValue(), gameYear);
+            String report = changeRegardForFaction(campaignFactionCode, entry.getKey(), entry.getValue(), gameYear);
             if (!report.isBlank()) {
                 regardChangeReports.add(report);
             }
@@ -1234,21 +1294,20 @@ public class FactionStandings {
             missionsByYear.computeIfAbsent(missionYear, y -> new ArrayList<>()).add(mission);
         }
 
+        String campaignFactionCode = campaignFaction.getShortName();
         List<Integer> sortedYears = new ArrayList<>(missionsByYear.keySet());
         Collections.sort(sortedYears);
-
         for (int year : sortedYears) {
             List<Mission> missionsForYear = missionsByYear.get(year);
             for (Mission mission : missionsForYear) {
                 MissionStatus missionStatus = mission.getStatus();
 
                 if (mission instanceof AtBContract atbContract) {
-                    reports.addAll(processContractAccept(atbContract.getEnemy(), today));
+                    reports.addAll(processContractAccept(campaignFactionCode, atbContract.getEnemy(), today));
 
                     if (missionStatus != MissionStatus.ACTIVE) {
-                        reports.addAll(processContractCompletion(atbContract.getEmployerFaction(),
-                              today,
-                              missionStatus));
+                        reports.addAll(processContractCompletion(campaignFactionCode, atbContract.getEmployerFaction(),
+                              today, missionStatus));
                     }
                 } else {
                     // Non-AtB missions have their Standings updated when the contract concludes
@@ -1264,18 +1323,15 @@ public class FactionStandings {
                         Faction enemyChoice = dialog.getEnemyChoice();
                         MissionStatus statusChoice = dialog.getStatusChoice();
 
-                        reports.addAll(handleFactionRegardUpdates(employerChoice,
-                              enemyChoice,
-                              statusChoice,
-                              today,
-                              this));
+                        reports.addAll(handleFactionRegardUpdates(campaignFaction.getShortName(), employerChoice,
+                              enemyChoice, statusChoice, today, this));
                     }
                 }
             }
 
             // At the end of each processed year, simulate degradation (unless we're on the current year)
             if (year != currentYear) {
-                reports.addAll(processRegardDegradation(year));
+                reports.addAll(processRegardDegradation(campaignFactionCode, year));
             }
         }
 

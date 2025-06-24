@@ -335,10 +335,8 @@ public class GMTools extends JDialog {
                     }
 
                     double newRegard = factionSelectionDialog.getSelectedRegard();
-                    reports.add(factionStandings.setRegardForFaction(selectedFaction.getShortName(),
-                          newRegard,
-                          gameYear,
-                          true));
+                    reports.add(factionStandings.setRegardForFaction(campaignFaction.getShortName(),
+                          selectedFaction.getShortName(), newRegard, gameYear, true));
                 }
                 case UPDATE_HISTORIC_CONTRACTS -> {
                     reports.add(getTextAt(RESOURCE_BUNDLE, "gmTools.ZERO_ALL_REGARD.report"));

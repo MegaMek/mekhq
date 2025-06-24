@@ -635,13 +635,15 @@ public class AtBContract extends Contract {
                 allowBatchalls = FactionStandingUtilities.isBatchallAllowed(regard);
             }
 
+            String campaignFactionCode = campaign.getFaction().getShortName();
             if (faction.performsBatchalls() && allowBatchalls) {
                 PerformBatchall batchallDialog = new PerformBatchall(campaign, clanOpponent, enemyCode);
 
                 batchallAccepted = batchallDialog.isBatchallAccepted();
 
                 if (!batchallAccepted && tracksStanding) {
-                    List<String> reports = factionStandings.processRefusedBatchall(enemyCode, today.getYear());
+                    List<String> reports = factionStandings.processRefusedBatchall(campaignFactionCode, enemyCode,
+                          today.getYear());
 
                     for (String report : reports) {
                         campaign.addReport(report);
@@ -651,7 +653,7 @@ public class AtBContract extends Contract {
 
             if (tracksStanding) {
                 // Whenever we dynamically change the enemy faction, we update standing accordingly
-                factionStandings.processContractAccept(faction, today);
+                factionStandings.processContractAccept(campaignFactionCode, faction, today);
             }
         }
     }
