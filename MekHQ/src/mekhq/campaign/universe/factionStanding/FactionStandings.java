@@ -1366,6 +1366,24 @@ public class FactionStandings {
         return regard;
     }
 
+    /**
+     * Updates the campaign status for a list of past missions, adjusting faction standings, applying campaign icon and
+     * faction, and generating a report of changes.
+     *
+     * <p>The method resets all faction standings, initializes regard values, sorts missions by date and class,
+     * groups them by year, and processes each mission to handle standing updates and degradation if needed.</p>
+     *
+     * @param missions        the list of missions (including {@code Contract} and {@code AtBContract} types) to
+     *                        process
+     * @param campaignIcon    the icon that represents the campaign visually
+     * @param campaignFaction the main faction for the campaign
+     * @param today           the current in-campaign date
+     *
+     * @return a list of {@link String} objects representing reports or logs of actions performed during the update
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     public List<String> updateCampaignForPastMissions(List<Mission> missions, ImageIcon campaignIcon,
           Faction campaignFaction, LocalDate today) {
         List<String> reports = new ArrayList<>();
@@ -1432,6 +1450,14 @@ public class FactionStandings {
         return reports;
     }
 
+    /**
+     * Sorts the provided list of missions, ordering contract missions before non-contract missions. If both missions
+     * are contracts, they are ordered by their start dates.
+     *
+     * <p>This ensures contracts are prioritized chronologically, while other missions retain their relative order.</p>
+     *
+     * @param missions the list of missions to sort in-place
+     */
     private static void sortMissionsBasedOnStartDateAndClass(List<Mission> missions) {
         missions.sort((mission1, mission2) -> {
             boolean m1IsContract = mission1 instanceof Contract;

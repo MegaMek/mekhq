@@ -32,6 +32,18 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
+import static megamek.common.Compute.randomInt;
+import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
+import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
+import static mekhq.campaign.universe.factionStanding.FactionStandings.STARTING_REGARD_ALLIED_FACTION;
+import static mekhq.campaign.universe.factionStanding.FactionStandings.STARTING_REGARD_SAME_FACTION;
+
+import java.time.LocalDate;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
@@ -45,22 +57,24 @@ import mekhq.gui.dialog.factionStanding.factionJudgment.FactionCensureDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentSceneDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentSceneType;
 
-import java.time.LocalDate;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import static megamek.common.Compute.randomInt;
-import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
-import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
-import static mekhq.campaign.universe.factionStanding.FactionStandings.STARTING_REGARD_ALLIED_FACTION;
-import static mekhq.campaign.universe.factionStanding.FactionStandings.STARTING_REGARD_SAME_FACTION;
-
+/**
+ * Represents a faction censure event within a campaign, handling the narrative and mechanical consequences associated
+ * with various censure outcomes, such as going rogue, seppuku, changes in leadership, and more.
+ *
+ * <p>This class encapsulates the logic needed to process different scenarios based on the severity and nature of the
+ * censure, modifying the campaign, involved personnel, and force status accordingly. It provides helper methods to
+ * apply specific outcomes and manage related characters.</p>
+ *
+ * @author Illiani
+ * @since 0.50.07
+ */
 public class FactionCensureEvent {
     private final static int GO_ROGUE_DIALOG_CHOICE_INDEX = 3;
     private final static int SEPPUKU_DIALOG_CHOICE_INDEX = 4;
 
+    /**
+     * List of personnel roles considered political in the context of censure effects.
+     */
     final static List<PersonnelRole> POLITICAL_ROLES = List.of(
           PersonnelRole.MORALE_OFFICER,
           PersonnelRole.LOYALTY_MONITOR,
@@ -70,6 +84,15 @@ public class FactionCensureEvent {
     private final Person mostSeniorCharacter;
     private final Person secondCharacter;
 
+    /**
+     * Constructs a new FactionCensureEvent for the given campaign and censure level.
+     *
+     * @param campaign     the campaign in which the event takes place
+     * @param censureLevel the censure level triggering this event
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     public FactionCensureEvent(Campaign campaign, FactionCensureLevel censureLevel) {
         this.campaign = campaign;
         mostSeniorCharacter = getMostSeniorCharacter();
@@ -83,8 +106,7 @@ public class FactionCensureEvent {
         FactionCensureDialog initialDialog = new FactionCensureDialog(campaign, censureLevel, mostSeniorCharacter);
         int choiceIndex = initialDialog.getDialogChoiceIndex();
 
-        FactionCensureConfirmationDialog confirmationDialog = new FactionCensureConfirmationDialog(campaign,
-              mostSeniorCharacter);
+        FactionCensureConfirmationDialog confirmationDialog = new FactionCensureConfirmationDialog(campaign);
         if (!confirmationDialog.wasConfirmed()) {
             new FactionCensureEvent(campaign, censureLevel);
             return;
@@ -102,6 +124,12 @@ public class FactionCensureEvent {
         handleCensureEffects(censureLevel, committedSeppuku);
     }
 
+    /**
+     * Handles the mechanical and narrative consequences when a character performs seppuku.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private void processPerformingSeppuku() {
         new FactionJudgmentSceneDialog(campaign,
               mostSeniorCharacter,
@@ -110,6 +138,14 @@ public class FactionCensureEvent {
         mostSeniorCharacter.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.SEPPUKU);
     }
 
+    /**
+     * Handles the consequences and procedures when the force chooses to go rogue as a result of a faction censure.
+     *
+     * @param censureLevel the current censure level
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private void processGoingRogue(FactionCensureLevel censureLevel) {
         GoingRogue goingRogueDialog = new GoingRogue(campaign, mostSeniorCharacter, secondCharacter);
         if (!goingRogueDialog.wasConfirmed()) {
@@ -131,6 +167,16 @@ public class FactionCensureEvent {
         }
     }
 
+    /**
+     * Applies the effects of a censure to the campaign and personnel, based on the level of censure and whether
+     * seppuku was performed.
+     *
+     * @param censureLevel the level of censure
+     * @param committedSeppuku {@code true} if seppuku was performed
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private void handleCensureEffects(FactionCensureLevel censureLevel,
           boolean committedSeppuku) {
         switch (censureLevel) {
@@ -159,10 +205,27 @@ public class FactionCensureEvent {
         processFactionStandingChange(committedSeppuku);
     }
 
+    /**
+     * Handles the process of a forced retirement of the commander as a result of censure.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private void processCensureCommanderRetirement() {
         mostSeniorCharacter.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.RETIRED);
     }
 
+    /**
+     * Processes a mass change in loyalty for all relevant personnel, typically in response to a major positive or
+     * negative censure outcome.
+     *
+     * @param campaign the campaign instance
+     * @param isMajor whether this is a major change
+     * @param isPositiveChange {@code true} for positive, {@code false} for negative shifts
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     static void processMassLoyaltyChange(Campaign campaign, boolean isMajor, boolean isPositiveChange) {
         LocalDate today = campaign.getLocalDate();
         for (Person person : campaign.getPersonnel()) {
@@ -174,6 +237,14 @@ public class FactionCensureEvent {
         }
     }
 
+    /**
+     * Adjusts the faction standing for the force, based on whether the change is major or minor.
+     *
+     * @param isMajor {@code true} if the standing change is significant
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private void processFactionStandingChange(boolean isMajor) {
         double delta = isMajor ? STARTING_REGARD_SAME_FACTION : STARTING_REGARD_ALLIED_FACTION;
         Faction faction = campaign.getFaction();
@@ -182,10 +253,22 @@ public class FactionCensureEvent {
         factionStandings.changeRegardForFaction(campaign.getFaction().getShortName(), factionCode, delta, campaign.getGameYear());
     }
 
+    /**
+     * Handles the consequences when the commander is imprisoned as a result of censure.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private void processCensureCommanderImprisonment() {
         mostSeniorCharacter.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.IMPRISONED);
     }
 
+    /**
+     * Manages leadership replacement due to a censure event.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private void processCensureLeadershipReplacement() {
         Set<Person> replacedPersonnel = new HashSet<>();
         replacedPersonnel.add(mostSeniorCharacter);
@@ -215,12 +298,24 @@ public class FactionCensureEvent {
             seniorPerson.changeStatus(campaign, today, PersonnelStatus.DISHONORABLY_DISCHARGED);
 
             Person replacement = getReplacementCharacter(seniorPerson);
-            replacement.changeRank(campaign, rank, level, false);
-            campaign.recruitPerson(replacement, true, true);
+            if (replacement != null) {
+                replacement.changeRank(campaign, rank, level, false);
+                campaign.recruitPerson(replacement, true, true);
+            }
         }
     }
 
-    private Person getReplacementCharacter(Person seniorPerson) {
+    /**
+     * Finds a suitable replacement character when needed.
+     *
+     * @param seniorPerson the most senior person available
+     *
+     * @return the replacement character, or {@code null} if not found
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private @Nullable Person getReplacementCharacter(Person seniorPerson) {
         Person replacement = campaign.newPerson(seniorPerson.getPrimaryRole(), getPoliticalRole());
         if (!replacement.hasSkill(S_LEADER)) {
             replacement.addSkill(S_LEADER, randomInt(3) + 1, 0);
@@ -232,10 +327,24 @@ public class FactionCensureEvent {
         return replacement;
     }
 
+    /**
+     * Determines a political role to be assigned during the censure process, if applicable.
+     *
+     * @return the chosen {@link PersonnelRole}
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private PersonnelRole getPoliticalRole() {
         return ObjectUtility.getRandomItem(POLITICAL_ROLES);
     }
 
+    /**
+     * Handles the complete disbanding of the force as an effect of censure.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private void processCensureDisband() {
         new FactionJudgmentSceneDialog(campaign,
               mostSeniorCharacter,
@@ -243,6 +352,14 @@ public class FactionCensureEvent {
               FactionJudgmentSceneType.DISBAND);
     }
 
+    /**
+     * Returns the most senior character involved in this censure event.
+     *
+     * @return the most senior {@link Person}
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     public Person getMostSeniorCharacter() {
         Person flaggedCommander = campaign.getFlaggedCommander();
         if (flaggedCommander != null) {
@@ -271,6 +388,16 @@ public class FactionCensureEvent {
         return highestRankedPerson;
     }
 
+    /**
+     * Determines if a person is exempt from certain censure actions on the given date.
+     *
+     * @param person the person to evaluate
+     * @param today the current date
+     * @return {@code true} if the person is exempt, {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private static boolean isExempt(Person person, LocalDate today) {
         if (person.getStatus().isDepartedUnit()) {
             return true;
@@ -291,6 +418,15 @@ public class FactionCensureEvent {
         return person.isDependent();
     }
 
+    /**
+     * Finds and returns a suitable "second" character for a given commander.
+     *
+     * @param commander the commander for whom a second character is sought
+     * @return the selected {@link Person}, or {@code null} if none is found
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private @Nullable Person getSecondCharacter(Person commander) {
         Person second = campaign.getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND);
         if (second != null && !second.equals(commander)) {

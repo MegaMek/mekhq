@@ -46,6 +46,19 @@ import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+/**
+ * Tracks and manages judgments for factions within a campaign.
+ *
+ * <p>This class maintains the current judgment levels and issue date for each faction, provides methods for
+ * escalating or degrading censures, and handles (de)serialization from and to XML for persistence. Censures represent
+ * punitive actions that can increase (escalate) or decrease (degrade) over time based on in-game events.</p>
+ *
+ * <p>Typical usage involves adding or updating faction censure records, processing degradations on a new campaign
+ * day, escalating censure due to events, or instantiating from XML-serialized data.</p>
+ *
+ * @author Illiani
+ * @since 0.50.07
+ */
 public class FactionJudgment {
     private static final MMLogger LOGGER = MMLogger.create(FactionJudgment.class);
 
@@ -53,14 +66,38 @@ public class FactionJudgment {
 
     private final Map<String, CensureEntry> factionCensures = new HashMap<>();
 
+    /**
+     * Constructs a new, empty {@code FactionJudgment} instance.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     public FactionJudgment() {
     }
 
+    /**
+     * Replaces the map of current faction censures with the provided map.
+     *
+     * @param factionCensures the map of faction codes to {@link CensureEntry} objects
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     public void setFactionCensures(final Map<String, CensureEntry> factionCensures) {
         this.factionCensures.clear();
         this.factionCensures.putAll(factionCensures);
     }
 
+    /**
+     * Sets the censure level for a specific faction as of the provided date.
+     *
+     * @param factionCode  the faction's code
+     * @param censureLevel the {@link FactionCensureLevel} to assign
+     * @param today        the issue date of the new censure
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     public void setCensureForFaction(final String factionCode, final FactionCensureLevel censureLevel,
           final LocalDate today) {
         CensureEntry censureEntry = new CensureEntry(censureLevel, today);
@@ -70,10 +107,9 @@ public class FactionJudgment {
     /**
      * Processes all tracked faction censures to determine if any have expired as of the provided date, and
      * automatically degrades (reduces) the censure level for any faction whose censure has expired.
-     * <p>
-     * Iterates through all current censure entries, checking if each entry's expiration date has passed. If so, it
-     * triggers a decrease in censure for the corresponding faction effective on the given day.
-     * </p>
+     *
+     * <p>Iterates through all current censure entries, checking if each entry's expiration date has passed. If so, it
+     * triggers a decrease in censure for the corresponding faction effective on the given day.</p>
      *
      * @param today the date to use when checking for censure expiration and applying any degradation
      *
@@ -91,6 +127,18 @@ public class FactionJudgment {
         }
     }
 
+    /**
+     * Lowers the censure level for the specified faction, if possible.
+     *
+     * <p>If the faction has a censure above the minimum severity, its level is reduced; otherwise, no action is
+     * performed.</p>
+     *
+     * @param factionCode the faction's code
+     * @param today       the date to use as issue date for the new, reduced censure
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     public void decreaseCensureForFaction(final String factionCode, final LocalDate today) {
         CensureEntry censureEntry = factionCensures.get(factionCode);
 
@@ -109,6 +157,20 @@ public class FactionJudgment {
         }
     }
 
+    /**
+     * Raises the censure level for the specified faction if escalation is permitted.
+     *
+     * <p>If the faction does not have a current censure entry, sets the level to {@link FactionCensureLevel#WARNING}.
+     * If an escalation is possible (not blocked by time or rules), increases the severity by one.</p>
+     *
+     * @param factionCode the faction's code
+     * @param today       the current date for issue date/escalation check
+     *
+     * @return the new censure level if increased, {@code null} if no escalation occurred
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     public @Nullable FactionCensureLevel increaseCensureForFaction(final String factionCode, final LocalDate today) {
         CensureEntry censureEntry = factionCensures.get(factionCode);
 
@@ -130,6 +192,15 @@ public class FactionJudgment {
         return newCensureLevel;
     }
 
+    /**
+     * Writes the current faction censure data as XML to the given writer.
+     *
+     * @param writer the {@link PrintWriter} to write to
+     * @param indent the indentation level for pretty-printing the XML
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     public void writeFactionJudgmentToXML(final PrintWriter writer, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "factionCensures");
         for (String factionCode : factionCensures.keySet()) {
@@ -145,6 +216,15 @@ public class FactionJudgment {
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "factionCensures");
     }
 
+    /**
+     * Constructs a new {@link FactionJudgment} instance by reading serialized censure data from an XML node.
+     *
+     * @param parentNode the XML parent node containing the censure entries
+     * @return a new {@link FactionJudgment} instance populated from the XML data
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     public static FactionJudgment generateInstanceFromXML(final Node parentNode) {
         NodeList childNodes = parentNode.getChildNodes();
 
@@ -165,6 +245,15 @@ public class FactionJudgment {
         return judgements;
     }
 
+    /**
+     * Reads all faction censure entries from the given XML node and returns them as a map.
+     *
+     * @param parentNode the XML node containing child nodes for each faction's censure entry
+     * @return a map of faction code to {@link CensureEntry} read from the XML
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     static Map<String, CensureEntry> processCensureEntries(Node parentNode) {
         Map<String, CensureEntry> entries = new HashMap<>();
         NodeList childNodes = parentNode.getChildNodes();
@@ -182,6 +271,15 @@ public class FactionJudgment {
         return entries;
     }
 
+    /**
+     * Creates a {@link CensureEntry} by reading censure data from the given XML node.
+     *
+     * @param codeNode the XML node containing "level" and "issueDate" elements
+     * @return a {@link CensureEntry} populated from the node's content
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private static CensureEntry readFromFactionNode(Node codeNode) {
         FactionCensureLevel level = FactionCensureLevel.NONE;
         LocalDate issueDate = LocalDate.MIN;
@@ -200,6 +298,7 @@ public class FactionJudgment {
                 }
             }
         }
+
         return new CensureEntry(level, issueDate);
     }
 }

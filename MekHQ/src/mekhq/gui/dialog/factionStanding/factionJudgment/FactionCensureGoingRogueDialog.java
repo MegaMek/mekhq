@@ -1,3 +1,35 @@
+/*
+ * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
+ */
 package mekhq.gui.dialog.factionStanding.factionJudgment;
 
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -12,6 +44,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
@@ -20,25 +53,68 @@ import mekhq.campaign.universe.FactionHints;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 
+/**
+ * Displays a dialog allowing the user to choose a new faction for their force when going rogue.
+ *
+ * <p>This dialog presents a list of possible factions the campaign can join, based on campaign state, and records
+ * whether the user confirmed the change, as well as which faction was selected. The options are presented within an
+ * immersive dialog with both in-character and out-of-character text.</p>
+ *
+ * <p>Intended to be used when a player-controlled unit has chosen to go rogue and thus must select a new faction to
+ * affiliate with.</p>
+ *
+ * @author Illiani
+ * @since 0.50.07
+ */
 public class FactionCensureGoingRogueDialog {
     static MMLogger LOGGER = MMLogger.create(FactionCensureGoingRogueDialog.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionCensureDialog";
 
+    /** Button index returned by the dialog when the 'confirm' action is selected. */
     private static final int CONFIRMED_DIALOG_INDEX = 1;
 
+    /** The campaign context for which the dialog is being shown. */
     private final Campaign campaign;
+    /** List of possible factions that the player can choose to join. */
     private final List<Faction> possibleFactions = new ArrayList<>();
+    /** {@code true} if the user confirmed their choice in the dialog. */
     private final boolean wasConfirmed;
+    /** The faction chosen by the user, or null if the dialog was canceled. */
     private final Faction chosenFaction;
 
+    /**
+     * Returns true if the user confirmed their choice in the dialog.
+     *
+     * @return true if the player confirmed; false if cancelled.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     public boolean wasConfirmed() {
         return wasConfirmed;
     }
 
-    public Faction getChosenFaction() {
+    /**
+     * Gets the faction the user selected to join, or {@code null} if none was selected.
+     *
+     * @return the chosen {@link Faction}, or {@code null} if no selection was made.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public @Nullable Faction getChosenFaction() {
         return chosenFaction;
     }
 
+    /**
+     * Constructs and displays the dialog for selecting a new affiliation when going rogue. The dialog is modal and
+     * completes upon construction.
+     *
+     * @param campaign the campaign context to use for available factions and dialog content.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     public FactionCensureGoingRogueDialog(Campaign campaign) {
         this.campaign = campaign;
 
@@ -60,15 +136,39 @@ public class FactionCensureGoingRogueDialog {
         chosenFaction = possibleFactions.get(dialog.getComboBoxChoiceIndex());
     }
 
+    /**
+     * Returns the {@link Person} to serve as the in-character speaker for the dialog.
+     *
+     * @return the campaign's senior administrator with a command role.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private Person getSpeaker() {
         return campaign.getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND);
     }
 
+    /**
+     * Retrieves the localized in-character dialog text, including the commander's address.
+     *
+     * @return in-character dialog text.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private String getInCharacterText() {
         return getFormattedTextAt(RESOURCE_BUNDLE, "FactionCensureGoingRogueDialog.inCharacter",
               campaign.getCommanderAddress(false));
     }
 
+    /**
+     * Provides the button options for the dialog, typically Cancel and Confirm.
+     *
+     * @return a list of button label and tooltip pairs.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private List<ImmersiveDialogCore.ButtonLabelTooltipPair> getButtons() {
         return List.of(
               new ImmersiveDialogCore.ButtonLabelTooltipPair(
@@ -78,10 +178,28 @@ public class FactionCensureGoingRogueDialog {
         );
     }
 
+    /**
+     * Retrieves the out-of-character help or explanation text for the dialog.
+     *
+     * @return localized out-of-character text.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private String getOutOfCharacterText() {
         return getTextAt(RESOURCE_BUNDLE, "FactionCensureGoingRogueDialog.outOfCharacter");
     }
 
+    /**
+     * Fills the possibleFactions list with available choices based on the current campaign state.
+     *
+     * <p>Only factions the campaign is not currently a member of are considered, with priority given to mercenaries,
+     * pirates, and factions at war or rival with the current faction. Logging is used to trace faction relationships
+     * and the resulting options.</p>
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private void getPossibleFactions() {
         Faction campaignFaction = campaign.getFaction();
         LocalDate today = campaign.getLocalDate();
@@ -124,6 +242,14 @@ public class FactionCensureGoingRogueDialog {
         LOGGER.debug("Possible factions: {}", possibleFactions);
     }
 
+    /**
+     * Constructs a Swing panel containing the UI for selecting a faction from the available options.
+     *
+     * @return a {@link JPanel} containing the faction drop-down selection.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private JPanel getFactionPanel() {
         JPanel factionPanel = new JPanel();
         JLabel lblFactions = new JLabel("Possible Factions:");
@@ -135,6 +261,15 @@ public class FactionCensureGoingRogueDialog {
         return factionPanel;
     }
 
+    /**
+     * Builds the combo box model for displaying possible faction options by their full names for the current game
+     * year.
+     *
+     * @return a {@link DefaultComboBoxModel} containing faction names.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private DefaultComboBoxModel<String> createPersonGroupModel() {
         final int gameYear = campaign.getGameYear();
         final DefaultComboBoxModel<String> factionModel = new DefaultComboBoxModel<>();

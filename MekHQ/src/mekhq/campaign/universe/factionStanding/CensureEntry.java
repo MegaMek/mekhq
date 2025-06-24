@@ -53,16 +53,15 @@ import java.time.LocalDate;
  */
 public record CensureEntry(FactionCensureLevel level, LocalDate issueDate) {
     /** The number of months after which a censure expires. */
-    private static final int EXPIRY_PERIOD = 12;
+    private static final int EXPIRY_PERIOD = 24;
 
     /** The minimum number of months that must pass before a censure is eligible for escalation. */
     private static final int COOLDOWN_PERIOD = 6;
 
     /**
      * Determines whether this censure has expired according to the specified date.
-     * <p>
-     * A censure is considered expired if more than one year has elapsed since it was issued.
-     * </p>
+     *
+     * <p>A censure is considered expired if more than one year has elapsed since it was issued.</p>
      *
      * @param today the date to check expiration against
      *
@@ -78,10 +77,9 @@ public record CensureEntry(FactionCensureLevel level, LocalDate issueDate) {
 
     /**
      * Determines whether the censure can be escalated based on its severity and issue date.
-     * <p>
-     * Escalation is possible if the severity has not reached the maximum allowed and at least six months have passed
-     * since issuance.
-     * </p>
+     *
+     * <p>Escalation is possible if the severity has not reached the maximum allowed and at least six months have passed
+     * since issuance.</p>
      *
      * @param today the current campaign date
      * @return {@code true} if the censure can be escalated, {@code false} otherwise

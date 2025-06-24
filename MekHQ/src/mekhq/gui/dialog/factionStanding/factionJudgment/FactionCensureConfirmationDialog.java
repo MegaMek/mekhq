@@ -44,6 +44,15 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
+/**
+ * Displays a confirmation dialog for faction censure actions within a campaign.
+ *
+ * <p>This dialog asks the user to confirm or cancel a censure event affecting the campaign. It presents both
+ * in-character and out-of-character explanatory text and returns whether the user confirmed the action.</p>
+ *
+ * @author Illiani
+ * @since 0.50.07
+ */
 public class FactionCensureConfirmationDialog {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionCensureDialog";
 
@@ -53,18 +62,36 @@ public class FactionCensureConfirmationDialog {
 
     private final boolean wasConfirmed;
 
+    /**
+     * Returns whether the user confirmed the censure action.
+     *
+     * @return {@code true} if the user confirmed; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     public boolean wasConfirmed() {
         return wasConfirmed;
     }
 
-    public FactionCensureConfirmationDialog(Campaign campaign, Person commander) {
+    /**
+     * Constructs a new {@link FactionCensureConfirmationDialog}, showing the dialog to the user.
+     *
+     * <p>The dialog content is dynamically generated based on the specified campaign and its commander.</p>
+     *
+     * @param campaign the campaign context in which censure is being performed
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public FactionCensureConfirmationDialog(Campaign campaign) {
         Person speaker = campaign.getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND);
 
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(
               campaign,
               speaker,
               null,
-              getInCharacterText(campaign, commander),
+              getInCharacterText(campaign),
               getDialogOptions(),
               getOutOfCharacterText(),
               null,
@@ -73,16 +100,42 @@ public class FactionCensureConfirmationDialog {
         wasConfirmed = dialog.getDialogChoice() == CONFIRMED_DIALOG_INDEX;
     }
 
+    /**
+     * Returns the list of dialog option labels presented to the user.
+     *
+     * @return a list of option labels (such as "Cancel" and "Confirm")
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     public List<String> getDialogOptions() {
         return List.of(getTextAt(RESOURCE_BUNDLE, "FactionCensureDialog.button.cancel"),
               getTextAt(RESOURCE_BUNDLE, "FactionCensureDialog.button.confirm"));
     }
 
-    public String getInCharacterText(final Campaign campaign, Person commander) {
+    /**
+     * Returns the in-character narrative text shown in the dialog.
+     *
+     * @param campaign the campaign context used to personalize the dialog text
+     *
+     * @return the formatted in-character dialog string
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String getInCharacterText(final Campaign campaign) {
         return getFormattedTextAt(RESOURCE_BUNDLE, IN_CHARACTER_KEY,
               campaign.getCommanderAddress(false));
     }
 
+    /**
+     * Returns the out-of-character explanatory text shown in the dialog.
+     *
+     * @return the formatted out-of-character dialog string with warning highlight
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     public String getOutOfCharacterText() {
         return getFormattedTextAt(RESOURCE_BUNDLE, OUT_OF_CHARACTER_KEY,
               spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG);
