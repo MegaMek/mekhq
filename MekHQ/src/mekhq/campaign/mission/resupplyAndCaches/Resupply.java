@@ -39,7 +39,6 @@ import static java.lang.Math.round;
 import static megamek.common.MiscType.F_SPONSON_TURRET;
 import static megamek.common.enums.SkillLevel.NONE;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
-import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 import static mekhq.campaign.force.ForceType.CONVOY;
 import static mekhq.campaign.force.ForceType.STANDARD;
 import static mekhq.campaign.market.procurement.Procurement.getTechFaction;
@@ -78,6 +77,8 @@ import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
 
 /**
  * The {@code Resupply} class manages the resupply process during a campaign. It calculates the required resupply
@@ -450,7 +451,14 @@ public class Resupply {
         final double baseTonnage = min(unitTonnage, tonnageCap);
 
         final int TONNAGE_DIVIDER = 125;
-        final double dropSize = baseTonnage / TONNAGE_DIVIDER;
+        double dropSize = baseTonnage / TONNAGE_DIVIDER;
+
+        if (campaign.getCampaignOptions().isUseFactionStandingResupplySafe()) {
+            FactionStandings standings = campaign.getFactionStandings();
+            double regard = standings.getRegardForFaction(contract.getEmployerCode(), true);
+            double resupplyMultiplier = FactionStandingUtilities.getResupplyWeightModifier(regard);
+            dropSize *= resupplyMultiplier;
+        }
 
         return (int) max(CARGO_MINIMUM_WEIGHT, round(dropSize));
     }
