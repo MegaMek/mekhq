@@ -105,18 +105,21 @@ public class FactionCensureEvent {
 
         FactionCensureDialog initialDialog = new FactionCensureDialog(campaign, censureLevel, mostSeniorCharacter);
         int choiceIndex = initialDialog.getDialogChoiceIndex();
+        boolean isSeppuku = choiceIndex == SEPPUKU_DIALOG_CHOICE_INDEX;
+        boolean isGoingRogue = choiceIndex == GO_ROGUE_DIALOG_CHOICE_INDEX;
 
-        FactionCensureConfirmationDialog confirmationDialog = new FactionCensureConfirmationDialog(campaign);
+        FactionCensureConfirmationDialog confirmationDialog = new FactionCensureConfirmationDialog(campaign,
+              censureLevel, mostSeniorCharacter, isSeppuku, isGoingRogue);
         if (!confirmationDialog.wasConfirmed()) {
             new FactionCensureEvent(campaign, censureLevel);
             return;
         }
 
         boolean committedSeppuku = false;
-        if (choiceIndex == GO_ROGUE_DIALOG_CHOICE_INDEX) {
+        if (isGoingRogue) {
             processGoingRogue(censureLevel);
             return;
-        } else if (choiceIndex == SEPPUKU_DIALOG_CHOICE_INDEX) {
+        } else if (isSeppuku) {
             processPerformingSeppuku();
             committedSeppuku = true;
         }
@@ -250,7 +253,10 @@ public class FactionCensureEvent {
         Faction faction = campaign.getFaction();
         String factionCode = faction.getShortName();
         FactionStandings factionStandings = campaign.getFactionStandings();
-        factionStandings.changeRegardForFaction(campaign.getFaction().getShortName(), factionCode, delta, campaign.getGameYear());
+        String report = factionStandings.changeRegardForFaction(campaign.getFaction().getShortName(), factionCode,
+              delta, campaign.getGameYear());
+
+        campaign.addReport(report);
     }
 
     /**
