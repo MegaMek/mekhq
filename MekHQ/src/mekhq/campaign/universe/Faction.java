@@ -403,6 +403,10 @@ public class Faction {
         return is(FactionTag.INACTIVE);
     }
 
+    public boolean isActive() {
+        return !isInactive();
+    }
+
     public boolean isChaos() {
         return is(FactionTag.CHAOS);
     }

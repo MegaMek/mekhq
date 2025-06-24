@@ -32,7 +32,18 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
+import java.util.List;
+
+import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
+
+import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.FactionHints;
+import mekhq.campaign.universe.PlanetarySystem;
 
 
 public class FactionStandingUtilities {
@@ -289,5 +300,180 @@ public class FactionStandingUtilities {
         final FactionStandingLevel standing = calculateFactionStandingLevel(regard);
 
         return standing.getSupportPointModifierPeriodic();
+    }
+
+    /**
+     * Determines whether command circuit access should be granted based on campaign settings, game master mode, current
+     * faction standings, and a list of active contracts.
+     *
+     * <p>Access is immediately granted if both command circuit requirements are overridden and game master mode is
+     * active. If not, and if faction standing is used as a criterion, the method evaluates the player's highest faction
+     * regard across all active contracts, granting access if this level meets the threshold.</p>
+     *
+     * <p>If there are no active contracts, access is denied.</p>
+     *
+     * @param overridingCommandCircuitRequirements {@code true} if command circuit requirements are overridden
+     * @param isGM                                 {@code true} if game master mode is enabled
+     * @param useFactionStandingCommandCircuit     {@code true} if faction standing is used to determine access
+     * @param factionStandings                     player faction standing data
+     * @param activeContracts                      list of currently active contracts to evaluate for access
+     *
+     * @return {@code true} if command circuit access should be used; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public static boolean isUseCommandCircuit(boolean overridingCommandCircuitRequirements, boolean isGM,
+          boolean useFactionStandingCommandCircuit, FactionStandings factionStandings,
+          List<AtBContract> activeContracts) {
+        boolean useCommandCircuit = overridingCommandCircuitRequirements && isGM;
+
+        if (useCommandCircuit) {
+            return true;
+        }
+
+        if (activeContracts.isEmpty()) {
+            return false;
+        }
+
+        double highestRegard = FactionStandingLevel.STANDING_LEVEL_0.getMinimumRegard();
+        if (useFactionStandingCommandCircuit) {
+            for (AtBContract contract : activeContracts) {
+                double currentRegard = factionStandings.getRegardForFaction(contract.getEmployerCode(), true);
+                if (currentRegard > highestRegard) {
+                    highestRegard = currentRegard;
+                }
+            }
+        }
+
+        useCommandCircuit = hasCommandCircuitAccess(highestRegard);
+        return useCommandCircuit;
+    }
+
+    /**
+     * Determines whether a campaign force is allowed to enter the specified target planetary system, based on
+     * population, ownership, outlaw status, contract relationships, and state of war.
+     *
+     * <p>The rules for entry are as follows:</p>
+     * <ol>
+     *   <li>If the target system is empty (population zero), entry is always permitted.</li>
+     *   <li>If the target system is owned by any faction that is either an employer or a contract target, entry is
+     *   allowed.</li>
+     *   <li>If the player is outlawed in their current system, they may always exit to another system (unless {@code
+     *   currentSystem} is {@code null}).</li>
+     *   <li>If the player is outlawed in the target system, entry is denied.</li>
+     *   <li>If the campaign faction is at war with all system factions, entry is denied.</li>
+     *   <li>If all system factions are at war with any employer faction, entry is denied.</li>
+     *   <li>If none of the above conditions block entry, it is permitted.</li>
+     * </ol>
+     *
+     * @param campaignFaction    the campaign's primary faction
+     * @param factionStandings   the standings of the campaign with all factions
+     * @param currentSystem      the planetary system currently occupied
+     * @param targetSystem       the planetary system to test entry for
+     * @param when               the date of attempted entry (population/ownership may change over time)
+     * @param activeAtBContracts list of currently active contracts
+     *
+     * @return {@code true} if entry to the target system is allowed; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public static boolean canEnterTargetSystem(Faction campaignFaction, FactionStandings factionStandings,
+          @Nullable PlanetarySystem currentSystem, PlanetarySystem targetSystem, LocalDate when,
+          List<AtBContract> activeAtBContracts) {
+        // Always allowed in empty systems
+        if (targetSystem.getPopulation(when) == 0) {
+            LOGGER.debug("Target system is empty, access granted");
+            return true;
+        }
+
+        Set<Faction> systemFactions = targetSystem.getFactionSet(when);
+
+        Set<Faction> contractEmployers = new HashSet<>();
+        Set<Faction> contractTargets = new HashSet<>();
+        for (AtBContract contract : activeAtBContracts) {
+            contractEmployers.add(contract.getEmployerFaction());
+            contractTargets.add(contract.getEnemy());
+        }
+
+        // Entry always allowed if the system is owned by any contract employer or target
+        if (systemFactions.stream()
+                  .anyMatch(systemFaction -> contractEmployers.contains(systemFaction)
+                                                   || contractTargets.contains(systemFaction))) {
+            LOGGER.debug("System is owned by a contract employer or target, access granted");
+            return true;
+        }
+
+        // Always allowed to leave if outlawed in the current system
+        if (currentSystem != null) {
+            if (isOutlawedInSystem(factionStandings, currentSystem, when)) {
+                LOGGER.debug("Player is outlawed in current system, but always allowed to escape, access granted");
+                return true;
+            }
+        }
+
+        // Banned if outlawed in the target system
+        if (isOutlawedInSystem(factionStandings, targetSystem, when)) {
+            LOGGER.debug("Player is outlawed in target system, access denied");
+            return false;
+        }
+
+        // Disallow if the campaign faction is at war with all system factions
+        FactionHints factionHints = FactionHints.defaultFactionHints();
+        boolean allAtWarWithCampaign = systemFactions
+                                             .stream()
+                                             .allMatch(systemFaction -> factionHints.isAtWarWith(campaignFaction,
+                                                   systemFaction,
+                                                   when));
+        if (allAtWarWithCampaign) {
+            LOGGER.debug("Campaign faction is at war with all system factions, access denied");
+            return false;
+        }
+
+        // Disallow if all system factions are at war with any one employer
+        for (Faction employer : contractEmployers) {
+            boolean allAtWarWithEmployer = systemFactions
+                                                 .stream()
+                                                 .allMatch(systemFaction -> factionHints.getCurrentWar(employer,
+                                                       systemFaction,
+                                                       when) != null);
+            if (allAtWarWithEmployer) {
+                LOGGER.debug("All system factions are at war with employer {}, access denied", employer.getShortName());
+                return false;
+            }
+        }
+
+        LOGGER.debug("Access granted");
+        return true;
+    }
+
+    /**
+     * Determines whether a faction is outlawed in the specified target system at a given date.
+     *
+     * <p>This method evaluates the highest standing ("regard") among all factions present in the target planetary
+     * system on the specified date. It then checks whether the faction corresponding to the highest regard is
+     * considered outlawed.</p>
+     *
+     * @param factionStandings the faction standings data to use for regard calculations
+     * @param targetSystem     the planetary system in which to perform the check
+     * @param when             the date for which to determine outlaw status
+     *
+     * @return {@code true} if the faction is outlawed in the target system at the given date; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private static boolean isOutlawedInSystem(FactionStandings factionStandings, PlanetarySystem targetSystem,
+          LocalDate when) {
+        double highestRegard = FactionStandingLevel.STANDING_LEVEL_0.getMinimumRegard();
+        for (Faction faction : targetSystem.getFactionSet(when)) {
+            double currentRegard = factionStandings.getRegardForFaction(faction.getShortName(), true);
+            if (currentRegard > highestRegard) {
+                highestRegard = currentRegard;
+            }
+        }
+
+        return isOutlawed(highestRegard);
     }
 }

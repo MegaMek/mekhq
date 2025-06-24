@@ -127,6 +127,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
@@ -1325,7 +1326,17 @@ public class AtBContract extends Contract {
     }
 
     public void createEmployerLiaison(Campaign campaign) {
-        employerLiaison = campaign.newPerson(PersonnelRole.ADMINISTRATOR_COMMAND, getEmployerCode(), Gender.RANDOMIZE);
+        employerLiaison = campaign.newPerson(PersonnelRole.MILITARY_LIAISON, getEmployerCode(), Gender.RANDOMIZE);
+
+        final RankSystem rankSystem = getEmployerFaction().getRankSystem();
+
+        final RankValidator rankValidator = new RankValidator();
+        if (!rankValidator.validate(rankSystem, false)) {
+            return;
+        }
+
+        employerLiaison.setRankSystem(rankValidator, rankSystem);
+        employerLiaison.setRank(Rank.RWO_MIN);
     }
 
     public Person getClanOpponent() {

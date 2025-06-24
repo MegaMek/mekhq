@@ -652,7 +652,7 @@ public class CampaignOptions {
     private boolean useFactionStandingNegotiation;
     private boolean useFactionStandingResupply;
     private boolean useFactionStandingCommandCircuit;
-    private boolean useFactionStandingOutlawed;
+    private boolean useFactionStandingOutlawed; // TODO
     private boolean useFactionStandingBatchallRestrictions;
     private boolean useFactionStandingRecruitment;
     private boolean useFactionStandingBarracksCosts;
@@ -6996,8 +6996,8 @@ public class CampaignOptions {
      * Checks whether tracking faction standing is enabled and if the use of faction standing command circuits are
      * active.
      *
-     * @return {@code true} if both faction standing tracking and faction standing command circuit
-     *         usage are enabled; {@code false} otherwise.
+     * @return {@code true} if both faction standing tracking and faction standing command circuit usage are enabled;
+     *       {@code false} otherwise.
      */
     public boolean isUseFactionStandingCommandCircuitSafe() {
         return trackFactionStanding && useFactionStandingCommandCircuit;
@@ -7020,11 +7020,10 @@ public class CampaignOptions {
     }
 
     /**
-     * Checks whether tracking faction standing is enabled and if the use of faction standing outlawing is
-     * active.
+     * Checks whether tracking faction standing is enabled and if the use of faction standing outlawing is active.
      *
-     * @return {@code true} if both faction standing tracking and faction standing outlaw
-     *         usage are enabled; {@code false} otherwise.
+     * @return {@code true} if both faction standing tracking and faction standing outlaw usage are enabled;
+     *       {@code false} otherwise.
      */
     public boolean isUseFactionStandingOutlawedSafe() {
         return trackFactionStanding && useFactionStandingOutlawed;
