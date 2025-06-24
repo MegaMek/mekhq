@@ -5046,7 +5046,7 @@ public class Campaign implements ITechManager {
                 String enemyFactionCode = contract.getEnemyCode();
 
                 boolean allowBatchalls = true;
-                if (campaignOptions.isUseFactionStandingBatchallRestrictions()) {
+                if (campaignOptions.isUseFactionStandingBatchallRestrictionsSafe()) {
                     double regard = factionStandings.getRegardForFaction(enemyFactionCode, true);
                     allowBatchalls = FactionStandingUtilities.isBatchallAllowed(regard);
                 }
@@ -7036,7 +7036,7 @@ public class Campaign implements ITechManager {
 
         List<AtBContract> activeAtBContracts = getActiveAtBContracts();
 
-        if (campaignOptions.isUseFactionStandingOutlawed()) {
+        if (campaignOptions.isUseFactionStandingOutlawedSafe()) {
             boolean canAccessSystem = FactionStandingUtilities.canEnterTargetSystem(faction, factionStandings,
                   getCurrentSystem(), end, currentDay, activeAtBContracts);
             if (!canAccessSystem) {
@@ -7095,7 +7095,7 @@ public class Campaign implements ITechManager {
                 }
 
                 // Skip systems where the campaign is outlawed
-                if (campaignOptions.isUseFactionStandingOutlawed()) {
+                if (campaignOptions.isUseFactionStandingOutlawedSafe()) {
                     boolean canAccessSystem = FactionStandingUtilities.canEnterTargetSystem(faction, factionStandings,
                           getCurrentSystem(), neighborSystem, currentDay, activeAtBContracts);
                     if (!canAccessSystem) {
