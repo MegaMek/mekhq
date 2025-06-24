@@ -92,28 +92,43 @@ public class FactionCensureEvent {
 
         boolean committedSeppuku = false;
         if (choiceIndex == GO_ROGUE_DIALOG_CHOICE_INDEX) {
-            new GoingRogue(campaign, mostSeniorCharacter, secondCharacter);
-
-            switch (censureLevel) {
-                case NONE -> {}
-                case WARNING -> {} // These will be filled in as dialog is written for these scene types
-                case COMMANDER_RETIREMENT -> {}
-                case COMMANDER_IMPRISONMENT -> {}
-                case LEADERSHIP_REPLACEMENT -> {}
-                case DISBAND -> new FactionJudgmentSceneDialog(campaign, mostSeniorCharacter, secondCharacter,
-                      FactionJudgmentSceneType.GO_ROGUE_DISBAND);
-            }
+            processGoingRogue(censureLevel);
             return;
         } else if (choiceIndex == SEPPUKU_DIALOG_CHOICE_INDEX) {
-            new FactionJudgmentSceneDialog(campaign,
-                  mostSeniorCharacter,
-                  secondCharacter,
-                  FactionJudgmentSceneType.SEPPUKU);
-            mostSeniorCharacter.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.SEPPUKU);
+            processPerformingSeppuku();
             committedSeppuku = true;
         }
 
         handleCensureEffects(censureLevel, committedSeppuku);
+    }
+
+    private void processPerformingSeppuku() {
+        new FactionJudgmentSceneDialog(campaign,
+              mostSeniorCharacter,
+              secondCharacter,
+              FactionJudgmentSceneType.SEPPUKU);
+        mostSeniorCharacter.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.SEPPUKU);
+    }
+
+    private void processGoingRogue(FactionCensureLevel censureLevel) {
+        GoingRogue goingRogueDialog = new GoingRogue(campaign, mostSeniorCharacter, secondCharacter);
+        if (!goingRogueDialog.wasConfirmed()) {
+            new FactionCensureEvent(campaign, censureLevel);
+            return;
+        }
+
+        FactionJudgmentSceneType sceneType = switch (censureLevel) {
+            case NONE -> null;
+            case WARNING -> FactionJudgmentSceneType.GO_ROGUE_WARNING;
+            case COMMANDER_RETIREMENT -> FactionJudgmentSceneType.GO_ROGUE_RETIRED;
+            case COMMANDER_IMPRISONMENT -> FactionJudgmentSceneType.GO_ROGUE_IMPRISONED;
+            case LEADERSHIP_REPLACEMENT -> FactionJudgmentSceneType.GO_ROGUE_REPLACED;
+            case DISBAND -> FactionJudgmentSceneType.GO_ROGUE_DISBAND;
+        };
+
+        if (sceneType != null) {
+            new FactionJudgmentSceneDialog(campaign, mostSeniorCharacter, secondCharacter, sceneType);
+        }
     }
 
     private void handleCensureEffects(FactionCensureLevel censureLevel,
@@ -256,7 +271,7 @@ public class FactionCensureEvent {
         return highestRankedPerson;
     }
 
-    static boolean isExempt(Person person, LocalDate today) {
+    private static boolean isExempt(Person person, LocalDate today) {
         if (person.getStatus().isDepartedUnit()) {
             return true;
         }

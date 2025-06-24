@@ -6,7 +6,7 @@ public enum FactionJudgmentSceneType {
     GO_ROGUE_RETIRED("GO_ROGUE_RETIRED"),
     GO_ROGUE_IMPRISONED("GO_ROGUE_IMPRISONED"),
     GO_ROGUE_REPLACED("GO_ROGUE_REPLACED"),
-    GO_ROGUE_DISBAND("GO_ROGUE"),
+    GO_ROGUE_DISBAND("GO_ROGUE_DISBAND"),
     SEPPUKU("SEPPUKU");
 
     private final String lookUpName;

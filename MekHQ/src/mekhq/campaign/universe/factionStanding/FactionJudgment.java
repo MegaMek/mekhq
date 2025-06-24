@@ -33,7 +33,7 @@
 package mekhq.campaign.universe.factionStanding;
 
 import static mekhq.campaign.universe.factionStanding.FactionCensureLevel.MIN_CENSURE_SEVERITY;
-import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_3;
+import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_4;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
@@ -49,7 +49,7 @@ import org.w3c.dom.NodeList;
 public class FactionJudgment {
     private static final MMLogger LOGGER = MMLogger.create(FactionJudgment.class);
 
-    static final int THRESHOLD_FOR_CENSURE = STANDING_LEVEL_3.getStandingLevel();
+    static final int THRESHOLD_FOR_CENSURE = STANDING_LEVEL_4.getStandingLevel();
 
     private final Map<String, CensureEntry> factionCensures = new HashMap<>();
 
