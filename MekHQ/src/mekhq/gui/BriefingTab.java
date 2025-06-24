@@ -544,7 +544,8 @@ public final class BriefingTab extends CampaignGuiTab {
 
             if (mission instanceof AtBContract contract) {
                 Faction employer = contract.getEmployerFaction();
-                reports = factionStandings.processContractCompletion(employer, today, status);
+                reports = factionStandings.processContractCompletion(getCampaign().getFaction().getShortName(),
+                      employer, today, status);
             } else {
                 SimulateMissionDialog dialog = new ManualMissionDialog(getFrame(),
                       getCampaign().getCampaignFactionIcon(),
@@ -557,11 +558,8 @@ public final class BriefingTab extends CampaignGuiTab {
                 Faction enemyChoice = dialog.getEnemyChoice();
                 MissionStatus statusChoice = dialog.getStatusChoice();
 
-                reports.addAll(handleFactionRegardUpdates(employerChoice,
-                      enemyChoice,
-                      statusChoice,
-                      today,
-                      factionStandings));
+                reports.addAll(handleFactionRegardUpdates(getCampaign().getFaction().getShortName(), employerChoice,
+                      enemyChoice, statusChoice, today, factionStandings));
             }
 
             for (String report : reports) {
