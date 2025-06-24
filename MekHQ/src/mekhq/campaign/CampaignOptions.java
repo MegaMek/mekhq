@@ -652,7 +652,7 @@ public class CampaignOptions {
     private boolean useFactionStandingNegotiation;
     private boolean useFactionStandingResupply;
     private boolean useFactionStandingCommandCircuit;
-    private boolean useFactionStandingOutlawed;
+    private boolean useFactionStandingOutlawed; // TODO
     private boolean useFactionStandingBatchallRestrictions;
     private boolean useFactionStandingRecruitment;
     private boolean useFactionStandingBarracksCosts;

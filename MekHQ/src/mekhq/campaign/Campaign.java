@@ -358,6 +358,7 @@ public class Campaign implements ITechManager {
 
     private CurrentLocation location;
     private boolean isAvoidingEmptySystems;
+    private boolean isOverridingCommandCircuitRequirements;
 
     private final News news;
 
@@ -458,6 +459,7 @@ public class Campaign implements ITechManager {
         CurrencyManager.getInstance().setCampaign(this);
         location = new CurrentLocation(Systems.getInstance().getSystems().get("Galatea"), 0);
         isAvoidingEmptySystems = true;
+        isOverridingCommandCircuitRequirements = false;
         currentReport = new ArrayList<>();
         currentReportHTML = "";
         newReports = new ArrayList<>();
@@ -612,6 +614,14 @@ public class Campaign implements ITechManager {
 
     public void setIsAvoidingEmptySystems(boolean isAvoidingEmptySystems) {
         this.isAvoidingEmptySystems = isAvoidingEmptySystems;
+    }
+
+    public boolean isOverridingCommandCircuitRequirements() {
+        return isOverridingCommandCircuitRequirements;
+    }
+
+    public void setIsOverridingCommandCircuitRequirements(boolean isOverridingCommandCircuitRequirements) {
+        this.isOverridingCommandCircuitRequirements = isOverridingCommandCircuitRequirements;
     }
 
     /**
@@ -6766,6 +6776,10 @@ public class Campaign implements ITechManager {
         finances.writeToXML(writer, indent);
         location.writeToXML(writer, indent);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "isAvoidingEmptySystems", isAvoidingEmptySystems);
+        MHQXMLUtility.writeSimpleXMLTag(writer,
+              indent,
+              "isOverridingCommandCircuitRequirements",
+              isOverridingCommandCircuitRequirements);
         shoppingList.writeToXML(writer, indent);
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "kills");
         for (List<Kill> kills : kills.values()) {
@@ -7060,9 +7074,14 @@ public class Campaign implements ITechManager {
         // A* search
         final int MAX_JUMPS = 10000;
         for (int jumps = 0; jumps < MAX_JUMPS; jumps++) {
-            // Get current node's information
             PlanetarySystem currentSystem = systemsInstance.getSystemById(current);
-            double currentG = scoreG.get(current) + currentSystem.getRechargeTime(getLocalDate());
+
+            boolean isUseCommandCircuits =
+                  FactionStandingUtilities.isUseCommandCircuit(isOverridingCommandCircuitRequirements, gmMode,
+                  campaignOptions.isUseFactionStandingCommandCircuitSafe(), factionStandings, getActiveAtBContracts());
+
+            // Get current node's information
+            double currentG = scoreG.get(current) + currentSystem.getRechargeTime(getLocalDate(), isUseCommandCircuits);
             final String localCurrent = current;
 
             // Explore neighbors

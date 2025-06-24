@@ -48,6 +48,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -476,11 +477,30 @@ public class Contract extends Mission {
                 .minus(getTotalEstimatedPayrollExpenses(c));
     }
 
-    public int getTravelDays(Campaign c) {
+    /**
+     * Calculates the number of days required for travel based on the current campaign state.
+     *
+     * <p>This method determines if a valid destination system is set, computes if the command circuit should be used,
+     * retrieves the jump path, and totals the travel time (including recharge, start, and end times). The result is
+     * rounded to two decimal places and then to the nearest whole day.</p>
+     *
+     * @param campaign the {@link Campaign} instance containing context such as date, location, and command circuit
+     *                 options
+     *
+     * @return the total number of travel days required; returns 0 if there is no valid system to travel to
+     */
+    public int getTravelDays(Campaign campaign) {
         if (null != this.getSystem()) {
-            JumpPath jumpPath = getJumpPath(c);
-            double days = Math.round(jumpPath.getTotalTime(c.getLocalDate(), c.getLocation().getTransitTime()) * 100.0)
-                    / 100.0;
+            boolean isUseCommandCircuit =
+                  FactionStandingUtilities.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(),
+                        campaign.isGM(),
+                        campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
+                        campaign.getFactionStandings(), campaign.getActiveAtBContracts());
+
+            JumpPath jumpPath = getJumpPath(campaign);
+            double days = Math.round(jumpPath.getTotalTime(campaign.getLocalDate(),
+                  campaign.getLocation().getTransitTime(), isUseCommandCircuit) * 100.0)
+                                / 100.0;
             return (int) Math.round(days);
         }
         return 0;
@@ -602,10 +622,10 @@ public class Contract extends Mission {
      * after
      * the ink is signed, which is a no-no.
      *
-     * @param c current campaign
+     * @param campaign current campaign
      */
-    public void calculateContract(Campaign c) {
-        Accountant accountant = c.getAccountant();
+    public void calculateContract(Campaign campaign) {
+        Accountant accountant = campaign.getAccountant();
 
         // calculate base amount
         baseAmount = accountant.getContractBase()
@@ -627,14 +647,14 @@ public class Contract extends Mission {
         }
 
         // calculate support amount
-        if (c.getCampaignOptions().isUsePeacetimeCost()
-                && c.getCampaignOptions().getUnitRatingMethod().equals(UnitRatingMethod.CAMPAIGN_OPS)) {
+        if (campaign.getCampaignOptions().isUsePeacetimeCost()
+                  && campaign.getCampaignOptions().getUnitRatingMethod().equals(UnitRatingMethod.CAMPAIGN_OPS)) {
             supportAmount = accountant.getPeacetimeCost()
                     .multipliedBy(getLength())
                     .multipliedBy(straightSupport)
                     .dividedBy(100);
         } else {
-            Money maintCosts = c.getHangar().getUnitCosts(u -> !u.isConventionalInfantry(),
+            Money maintCosts = campaign.getHangar().getUnitCosts(u -> !u.isConventionalInfantry(),
                     Unit::getWeeklyMaintenanceCost);
             maintCosts = maintCosts.multipliedBy(4);
             supportAmount = maintCosts
@@ -644,15 +664,15 @@ public class Contract extends Mission {
         }
 
         // calculate transportation costs
-        if (null != getSystem() && c.getCampaignOptions().isPayForTransport()) {
-            JumpPath jumpPath = getJumpPath(c);
+        if (null != getSystem() && campaign.getCampaignOptions().isPayForTransport()) {
+            JumpPath jumpPath = getJumpPath(campaign);
 
             // FM:Mercs transport payments take into account owned transports and do not use
             // CampaignOps DropShip costs.
             // CampaignOps doesn't care about owned transports and does use its own DropShip
             // costs.
-            boolean campaignOps = c.getCampaignOptions().isEquipmentContractBase();
-            transportAmount = c.calculateCostPerJump(campaignOps, campaignOps)
+            boolean campaignOps = campaign.getCampaignOptions().isEquipmentContractBase();
+            transportAmount = campaign.calculateCostPerJump(campaignOps, campaignOps)
                     .multipliedBy(jumpPath.getJumps())
                     .multipliedBy(2)
                     .multipliedBy(transportComp)
@@ -662,12 +682,12 @@ public class Contract extends Mission {
         }
 
         // calculate transit amount for CO
-        if (c.getCampaignOptions().isUsePeacetimeCost()
-                && c.getCampaignOptions().getUnitRatingMethod().equals(UnitRatingMethod.CAMPAIGN_OPS)) {
+        if (campaign.getCampaignOptions().isUsePeacetimeCost()
+                  && campaign.getCampaignOptions().getUnitRatingMethod().equals(UnitRatingMethod.CAMPAIGN_OPS)) {
             // contract base * transport period * reputation * employer modifier
             transitAmount = accountant.getContractBase()
-                    .multipliedBy(((getJumpPath(c).getJumps()) * 2.0) / 4.0)
-                    .multipliedBy(c.getAtBUnitRatingMod() * 0.2 + 0.5)
+                                  .multipliedBy(((getJumpPath(campaign).getJumps()) * 2.0) / 4.0)
+                                  .multipliedBy(campaign.getAtBUnitRatingMod() * 0.2 + 0.5)
                     .multipliedBy(1.2);
         } else {
             transitAmount = Money.zero();
@@ -701,13 +721,19 @@ public class Contract extends Mission {
         boolean adjustStartDate = false;
         LocalDate startDate = getStartDate();
         if (startDate == null) {
-            startDate = c.getLocalDate();
+            startDate = campaign.getLocalDate();
             adjustStartDate = true;
         }
 
-        if (adjustStartDate && (c.getSystemByName(systemId) != null)) {
-            int days = (int) Math.ceil(getJumpPath(c).getTotalTime(c.getLocalDate(),
-                    c.getLocation().getTransitTime()));
+        if (adjustStartDate && (campaign.getSystemByName(systemId) != null)) {
+            boolean isUseCommandCircuit =
+                  FactionStandingUtilities.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(),
+                        campaign.isGM(),
+                        campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
+                        campaign.getFactionStandings(), campaign.getActiveAtBContracts());
+
+            int days = (int) Math.ceil(getJumpPath(campaign).getTotalTime(campaign.getLocalDate(),
+                  campaign.getLocation().getTransitTime(), isUseCommandCircuit));
             startDate = startDate.plusDays(days);
         }
 

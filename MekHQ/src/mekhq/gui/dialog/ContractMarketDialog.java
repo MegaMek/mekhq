@@ -65,6 +65,7 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.FactionComboBox;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
@@ -288,48 +289,60 @@ public class ContractMarketDialog extends JDialog {
             panelFees.add(spnSharePct);
         }
 
+        boolean isOverridingCommandCircuit = campaign.isOverridingCommandCircuitRequirements();
+        boolean isGM = campaign.isGM();
+        boolean isUseCommandCircuit = isOverridingCommandCircuit && isGM;
+
+        boolean isUseFactionStandingCommandCircuits =
+              campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe();
+        FactionStandings factionStandings = campaign.getFactionStandings();
+
         Vector<Vector<String>> data = new Vector<>();
-        for (Contract c : contractMarket.getContracts()) {
+        for (Contract contract : contractMarket.getContracts()) {
             // Changes in rating or force size since creation can alter some details
-            if (c instanceof AtBContract atbContract) {
+            if (contract instanceof AtBContract atbContract) {
                 atbContract.initContractDetails(campaign);
                 campaign.getContractMarket().calculatePaymentMultiplier(campaign, atbContract);
                 atbContract.setPartsAvailabilityLevel(atbContract.getContractType().calculatePartsAvailabilityLevel());
                 atbContract.setAtBSharesPercent(campaign.getCampaignOptions().isUseShareSystem() ?
                                                       (Integer) spnSharePct.getValue() :
                                                       0);
+                if (!isUseCommandCircuit) {
+                    isUseCommandCircuit = FactionStandingUtilities.isUseCommandCircuit(isOverridingCommandCircuit, isGM,
+                          isUseFactionStandingCommandCircuits, factionStandings, List.of(atbContract));
+                }
             }
-            c.setStartDate(null);
-            c.setMRBCFee(payMRBC);
-            c.setAdvancePct(advance);
-            c.setSigningBonusPct(signingBonus);
-            c.calculateContract(campaign);
+            contract.setStartDate(null);
+            contract.setMRBCFee(payMRBC);
+            contract.setAdvancePct(advance);
+            contract.setSigningBonusPct(signingBonus);
+            contract.calculateContract(campaign);
 
             Vector<String> row = new Vector<>();
-            if (c instanceof AtBContract) {
-                row.add(((AtBContract) c).getEmployerName(campaign.getGameYear()));
-                row.add(((AtBContract) c).getEnemyName(campaign.getGameYear()));
-                if (((AtBContract) c).isSubcontract()) {
-                    row.add(((AtBContract) c).getContractType() + " (Subcontract)");
+            if (contract instanceof AtBContract) {
+                row.add(((AtBContract) contract).getEmployerName(campaign.getGameYear()));
+                row.add(((AtBContract) contract).getEnemyName(campaign.getGameYear()));
+                if (((AtBContract) contract).isSubcontract()) {
+                    row.add(((AtBContract) contract).getContractType() + " (Subcontract)");
                 } else {
-                    row.add(((AtBContract) c).getContractType().toString());
+                    row.add(((AtBContract) contract).getContractType().toString());
                 }
             } else {
-                row.add(c.getEmployer());
+                row.add(contract.getEmployer());
                 row.add("");
-                row.add(c.getType());
+                row.add(contract.getType());
             }
 
-            final JumpPath path = campaign.calculateJumpPath(campaign.getCurrentSystem(), c.getSystem());
-            final int days = (int) Math.ceil(path.getTotalTime(c.getStartDate(),
-                  campaign.getLocation().getTransitTime()));
+            final JumpPath path = campaign.calculateJumpPath(campaign.getCurrentSystem(), contract.getSystem());
+            final int days = (int) Math.ceil(path.getTotalTime(contract.getStartDate(),
+                  campaign.getLocation().getTransitTime(), isUseCommandCircuit));
             row.add(Integer.toString(days));
-            row.add(String.valueOf(c.getLength()));
-            row.add(c.getTransportCompString());
-            row.add(c.getSalvagePctString());
-            row.add(c.getStraightSupportString());
-            row.add(c.getBattleLossCompString());
-            row.add(c.getEstimatedTotalProfit(campaign).toAmountAndSymbolString());
+            row.add(String.valueOf(contract.getLength()));
+            row.add(contract.getTransportCompString());
+            row.add(contract.getSalvagePctString());
+            row.add(contract.getStraightSupportString());
+            row.add(contract.getBattleLossCompString());
+            row.add(contract.getEstimatedTotalProfit(campaign).toAmountAndSymbolString());
             data.add(row);
         }
 
@@ -459,39 +472,40 @@ public class ContractMarketDialog extends JDialog {
 
         btnGenerate.setText(resourceMap.getString("btnGenerate.text"));
         btnGenerate.setName("btnGenerate");
+        boolean finalIsUseCommandCircuit = isUseCommandCircuit;
         btnGenerate.addActionListener(evt -> {
-            AtBContract c = contractMarket.addAtBContract(campaign);
+            AtBContract contract = contractMarket.addAtBContract(campaign);
 
-            if (c == null) {
+            if (contract == null) {
                 campaign.addReport(resourceMap.getString("report.UnableToGMContract"));
                 return;
             }
 
-            c.initContractDetails(campaign);
-            c.setPartsAvailabilityLevel(c.getContractType().calculatePartsAvailabilityLevel());
-            c.setAtBSharesPercent(campaign.getCampaignOptions().isUseShareSystem() ?
+            contract.initContractDetails(campaign);
+            contract.setPartsAvailabilityLevel(contract.getContractType().calculatePartsAvailabilityLevel());
+            contract.setAtBSharesPercent(campaign.getCampaignOptions().isUseShareSystem() ?
                                         (Integer) spnSharePct.getValue() :
                                         0);
-            c.setStartDate(null);
-            c.setMRBCFee(payMRBC);
-            c.setAdvancePct(advance);
-            c.setSigningBonusPct(signingBonus);
+            contract.setStartDate(null);
+            contract.setMRBCFee(payMRBC);
+            contract.setAdvancePct(advance);
+            contract.setSigningBonusPct(signingBonus);
 
-            c.calculateContract(campaign);
+            contract.calculateContract(campaign);
             Vector<String> row = new Vector<>();
-            row.add(c.getEmployerName(campaign.getGameYear()));
-            row.add(c.getEnemyName(campaign.getGameYear()));
-            row.add(c.getContractType().toString());
-            final JumpPath path = campaign.calculateJumpPath(campaign.getCurrentSystem(), c.getSystem());
-            final int days = (int) Math.ceil(path.getTotalTime(c.getStartDate(),
-                  campaign.getLocation().getTransitTime()));
+            row.add(contract.getEmployerName(campaign.getGameYear()));
+            row.add(contract.getEnemyName(campaign.getGameYear()));
+            row.add(contract.getContractType().toString());
+            final JumpPath path = campaign.calculateJumpPath(campaign.getCurrentSystem(), contract.getSystem());
+            final int days = (int) Math.ceil(path.getTotalTime(contract.getStartDate(),
+                  campaign.getLocation().getTransitTime(), finalIsUseCommandCircuit));
             row.add(Integer.toString(days));
-            row.add(String.valueOf(c.getLength()));
-            row.add(c.getTransportCompString());
-            row.add(c.getSalvagePctString());
-            row.add(c.getStraightSupportString());
-            row.add(c.getBattleLossCompString());
-            row.add(c.getEstimatedTotalProfit(campaign).toAmountAndSymbolString());
+            row.add(String.valueOf(contract.getLength()));
+            row.add(contract.getTransportCompString());
+            row.add(contract.getSalvagePctString());
+            row.add(contract.getStraightSupportString());
+            row.add(contract.getBattleLossCompString());
+            row.add(contract.getEstimatedTotalProfit(campaign).toAmountAndSymbolString());
             ((DefaultTableModel) tableContracts.getModel()).addRow(row);
         });
         btnGenerate.setEnabled(campaign.isGM());
