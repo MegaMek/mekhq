@@ -134,10 +134,10 @@ public class Factions {
      */
     public Collection<Faction> getActiveFactions(LocalDate date, boolean includeCommands) {
         return getFactions().stream()
-                     .filter(f -> f.validIn(date)
-                                        && !f.isInactive()
-                                        && (includeCommands || !f.getShortName().contains(".")))
-                     .collect(Collectors.toList());
+                     .filter(f -> f.validIn(date))
+                     .filter(Faction::isActive)
+                     .filter(f -> (includeCommands || !f.getShortName().contains(".")))
+                     .toList();
     }
 
     public Collection<String> getFactionList() {
