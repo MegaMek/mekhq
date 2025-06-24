@@ -2219,7 +2219,7 @@ public class Campaign implements ITechManager {
                                                                 "personnelRecruitmentPrisoner.text")) :
                                "";
             addReport(String.format(resources.getString("personnelRecruitmentAddedToRoster.text"),
-                  person.getHyperlinkedName(),
+                  person.getHyperlinkedFullTitle(),
                   formerSurname,
                   add));
         }
@@ -5034,7 +5034,14 @@ public class Campaign implements ITechManager {
                       contract.getStartDate().equals(currentDay)) {
                 Faction faction = contract.getEnemy();
                 String factionCode = contract.getEnemyCode();
-                if (faction.performsBatchalls()) {
+
+                boolean allowBatchalls = true;
+                if (campaignOptions.isUseFactionStandingBatchallRestrictions()) {
+                    double regard = factionStandings.getRegardForFaction(factionCode, true);
+                    allowBatchalls = FactionStandingUtilities.isBatchallAllowed(regard);
+                }
+
+                if (faction.performsBatchalls() && allowBatchalls) {
                     PerformBatchall batchallDialog = new PerformBatchall(this,
                           contract.getClanOpponent(),
                           contract.getEnemyCode());

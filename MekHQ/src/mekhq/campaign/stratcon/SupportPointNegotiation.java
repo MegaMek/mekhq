@@ -50,6 +50,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.utilities.ReportingUtilities;
 
 /**
@@ -161,6 +163,11 @@ public class SupportPointNegotiation {
                                      contract.getRequiredCombatTeams() * 3 :
                                      contract.getRequiredCombatTeams();
 
+        FactionStandings factionStandings = campaign.getFactionStandings();
+        double regard = factionStandings.getRegardForFaction(contract.getEmployerCode(), true);
+        boolean isUseFactionStandingSupportPoints = campaign.getCampaignOptions()
+                                                          .isUseFactionStandingSupportPointsSafe();
+
         StratconCampaignState campaignState = contract.getStratconCampaignState();
 
         if (campaignState == null) {
@@ -182,17 +189,28 @@ public class SupportPointNegotiation {
             return;
         }
 
+        int modifier = 0;
+        if (!isInitialNegotiation && isUseFactionStandingSupportPoints) {
+            modifier = FactionStandingUtilities.getSupportPointModifierPeriodic(regard);
+        }
+
         Iterator<Person> iterator = adminTransport.iterator();
 
         while (iterator.hasNext() && ((negotiatedSupportPoints + currentSupportPoints) < maxSupportPoints)) {
             Person admin = iterator.next();
-            int rollResult = Compute.d6(2);
+            int rollResult = Compute.d6(2) + modifier;
 
             int adminSkill = admin.getSkill(S_ADMIN).getFinalSkillValue(admin.getOptions(), admin.getATOWAttributes());
             if (rollResult >= adminSkill) {
                 negotiatedSupportPoints++;
             }
             iterator.remove();
+        }
+
+        if (isInitialNegotiation && isUseFactionStandingSupportPoints) {
+            int multiplier = contract.getRequiredCombatTeams();
+            negotiatedSupportPoints += FactionStandingUtilities.getSupportPointModifierContractStart(regard) *
+                                             multiplier;
         }
 
         // Determine font color based on success or failure
