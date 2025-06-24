@@ -7012,15 +7012,39 @@ public class Campaign implements ITechManager {
      *       exists between the systems. If start and end are the same system, returns a path containing only that
      *       system.
      */
-    public @Nullable JumpPath calculateJumpPath(PlanetarySystem start, PlanetarySystem end) {
+    public JumpPath calculateJumpPath(PlanetarySystem start, PlanetarySystem end) {
         // Handle edge cases
         if (null == start) {
-            return null;
+            return new JumpPath();
         }
+
         if ((null == end) || start.getId().equals(end.getId())) {
             JumpPath jumpPath = new JumpPath();
             jumpPath.addSystem(start);
             return jumpPath;
+        }
+
+        // Shortcuts to ensure we're not processing a lot of data when we're unable to reach the target system
+        if (isAvoidingEmptySystems && end.getPopulation(currentDay) == 0) {
+            new ImmersiveDialogSimple(this, getSeniorAdminPerson(AdministratorSpecialization.TRANSPORT), null,
+                  String.format(resources.getString("unableToEnterSystem.abandoned.ic"), getCommanderAddress(false)),
+                  null, resources.getString("unableToEnterSystem.abandoned.ooc"), null, false);
+
+            return new JumpPath();
+        }
+
+        List<AtBContract> activeAtBContracts = getActiveAtBContracts();
+
+        if (campaignOptions.isUseFactionStandingOutlawed()) {
+            boolean canAccessSystem = FactionStandingUtilities.canEnterTargetSystem(faction, factionStandings,
+                  getCurrentSystem(), end, currentDay, activeAtBContracts);
+            if (!canAccessSystem) {
+                new ImmersiveDialogSimple(this, getSeniorAdminPerson(AdministratorSpecialization.TRANSPORT), null,
+                      String.format(resources.getString("unableToEnterSystem.outlawed.ic"), getCommanderAddress(false)),
+                      null, resources.getString("unableToEnterSystem.outlawed.ooc"), null, false);
+
+                return new JumpPath();
+            }
         }
 
         // Initialize A* algorithm variables
@@ -7065,8 +7089,17 @@ public class Campaign implements ITechManager {
                 String neighborId = neighborSystem.getId();
 
                 // Skip systems without population if avoiding empty systems
-                if (isAvoidingEmptySystems && neighborSystem.getPopulation(currentDay) <= 0) {
+                if (isAvoidingEmptySystems && neighborSystem.getPopulation(currentDay) == 0) {
                     return;
+                }
+
+                // Skip systems where the campaign is outlawed
+                if (campaignOptions.isUseFactionStandingOutlawed()) {
+                    boolean canAccessSystem = FactionStandingUtilities.canEnterTargetSystem(faction, factionStandings,
+                          getCurrentSystem(), neighborSystem, currentDay, activeAtBContracts);
+                    if (!canAccessSystem) {
+                        return;
+                    }
                 }
 
                 if (closed.contains(neighborId)) {
