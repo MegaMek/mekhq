@@ -323,7 +323,7 @@ public class EducationController {
 
         boolean hasActiveParent = false;
         if (spouse != null) {
-            if (spouse.getStatus().isActive() && spouse.isDependent()) {
+            if (spouse.getStatus().isActive() && (spouse.isDependent() || !spouse.isEmployed())) {
                 person.addEduTagAlong(spouse.getId());
                 spouse.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ON_LEAVE);
             }
