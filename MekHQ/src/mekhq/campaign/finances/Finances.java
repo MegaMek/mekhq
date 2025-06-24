@@ -312,9 +312,9 @@ public class Finances {
     }
 
     public void addReportInsufficientFunds(Campaign campaign, String report) {
-        String stringToColor = resourceMap.getString("InsufficientFunds.text") + report;
-        String colorToUse = MekHQ.getMHQOptions().getFontColorNegativeHexColor();
-        campaign.addReport(ReportingUtilities.messageSurroundedBySpanWithColor(stringToColor, colorToUse));
+        String stringToColor = String.format(resourceMap.getString("InsufficientFunds.text"), report);
+        String colorToUse = ReportingUtilities.getNegativeColor();
+        campaign.addReport(ReportingUtilities.messageSurroundedBySpanWithColor(colorToUse, stringToColor));
     }
 
     public void newDay(final Campaign campaign, final LocalDate yesterday, final LocalDate today) {
@@ -444,7 +444,7 @@ public class Finances {
                           MekHQ.getMHQOptions().getLocale());
 
                     campaign.addReport(String.format(loyaltyChangeResources.getString("loyaltyChangeGroup.text"),
-                          "<span color=" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>",
+                          ReportingUtilities.spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                           ReportingUtilities.CLOSING_SPAN_TAG));
                 }
             }
@@ -458,6 +458,19 @@ public class Finances {
                           overheadCost.toAmountAndSymbolString()));
                 } else {
                     addReportInsufficientFunds(campaign, resourceMap.getString("OverheadCosts.text"));
+                }
+            }
+
+            Money foodAndHousingExpenses = accountant.getMonthlyFoodAndHousingExpenses();
+            if (!foodAndHousingExpenses.equals(Money.zero())) {
+                if (debit(TransactionType.OVERHEAD,
+                      today,
+                      foodAndHousingExpenses,
+                      resourceMap.getString("FoodAndHousing.title"))) {
+                    campaign.addReport(String.format(resourceMap.getString("FoodAndHousing.text"),
+                          foodAndHousingExpenses.toAmountAndSymbolString()));
+                } else {
+                    addReportInsufficientFunds(campaign, resourceMap.getString("HousingAndFoodCosts.text"));
                 }
             }
         }
@@ -553,12 +566,9 @@ public class Finances {
                      * This should not happen, as the shares payment should be less than the
                      * contract payment that has just been made.
                      */
-                    campaign.addReport("<font color='" +
-                                             ReportingUtilities.getNegativeColor() +
-                                             "'>" +
-                                             resourceMap.getString("InsufficientFunds.text"),
-                          resourceMap.getString("Shares.text"),
-                          "</font>");
+                    campaign.addReport(ReportingUtilities.messageSurroundedBySpanWithColor(ReportingUtilities.getNegativeColor(),
+                          String.format(resourceMap.getString("InsufficientFunds.text"), resourceMap.getString(
+                                "Shares.text"))));
                     logger.error("Attempted to payout share amount larger than the payment of the contract");
                 }
             }

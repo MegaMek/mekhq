@@ -152,7 +152,7 @@ public class RandomDependents {
         int activeNonDependents = 0;
 
         for (Person person : campaign.getActivePersonnel(false)) {
-            if (person.isDependent()) {
+            if (!person.isEmployed()) {
                 activeDependents.add(person);
                 continue;
             }
@@ -202,7 +202,7 @@ public class RandomDependents {
                     }
 
                     Person spouse = genealogy.getSpouse();
-                    if (spouse != null && spouse.isDependent()) {
+                    if (spouse != null && (spouse.isDependent() || !spouse.isEmployed())) {
                         dependentsToRemove.add(spouse);
                     }
                 }
