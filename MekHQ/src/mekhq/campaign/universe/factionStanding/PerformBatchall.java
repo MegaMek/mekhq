@@ -92,6 +92,14 @@ public class PerformBatchall {
         standingLevel = getFactionStandingLevel(campaign.getFactionStandings());
         batchallVersion = randomInt(BATCHALL_OPTIONS_COUNT);
 
+        if (campaign.getCampaignOptions().isUseFactionStandingBatchallRestrictions()) {
+            if (!standingLevel.isBatchallAllowed()) {
+                getBatchallStandingTooLowDialog();
+                isBatchallAccepted = false;
+                return;
+            }
+        }
+
         if (getInitialChallengeDialog() < DIALOG_DECLINE_OPTION_START_INDEX) {
             getBatchallFollowUpDialog(false);
             return;
@@ -133,6 +141,47 @@ public class PerformBatchall {
     }
 
     /**
+     * Displays a dialog informing the player that their standing is too low to issue a Batchall challenge.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private void getBatchallStandingTooLowDialog() {
+        new ImmersiveDialogSimple(campaign,
+              clanOpponent,
+              null,
+              getBatchallForbiddenText(),
+              null,
+              getTextAt(RESOURCE_BUNDLE, "performBatchall.batchall.tooLowStanding.ooc"),
+              null,
+              true);
+    }
+
+    /**
+     * Retrieves the narrative text displayed when the player's standing is too low to issue a Batchall challenge.
+     *
+     * @return A string containing the formatted message indicating that the player's standing is insufficient to issue
+     *       a Batchall challenge.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private String getBatchallForbiddenText() {
+        final String bundleKey = "performBatchall.batchall.tooLowStanding";
+
+        Faction opponentClan = Factions.getInstance().getFaction(enemyFactionCode);
+        String opponentClanName = opponentClan == null ? "" : opponentClan.getFullName(campaign.getGameYear());
+
+        if (!opponentClanName.contains(getTextAt(RESOURCE_BUNDLE, "performBatchall.clanName.prefix.clan"))) {
+            opponentClanName = String.format("%s %s",
+                  getTextAt(RESOURCE_BUNDLE, "performBatchall.clanName.prefix.the"),
+                  opponentClanName);
+        }
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, bundleKey, opponentClanName);
+    }
+
+    /**
      * Displays the initial Batchall challenge dialog to the player and returns their selection.
      * The dialog options and message use randomized and context-aware narrative variations.
      *
@@ -141,7 +190,7 @@ public class PerformBatchall {
      * @author Illiani
      * @since 0.50.07
      */
-    public int getInitialChallengeDialog() {
+    private int getInitialChallengeDialog() {
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
               clanOpponent,
               null,
@@ -163,7 +212,7 @@ public class PerformBatchall {
      * @author Illiani
      * @since 0.50.07
      */
-    public String getBatchallIntroText() {
+    private String getBatchallIntroText() {
         final String bundleKey = "performBatchall." + standingLevel.name() + ".batchall." + batchallVersion + ".intro";
         final String campaignName = campaign.getName();
         final String opponentName = clanOpponent == null ? "" : clanOpponent.getFullTitle();
@@ -189,7 +238,7 @@ public class PerformBatchall {
      * @author Illiani
      * @since 0.50.07
      */
-    public List<String> getInitialChallengeDialogOptions() {
+    private List<String> getInitialChallengeDialogOptions() {
         List<String> responses = new ArrayList<>();
 
         for (int i = 0; i < INTRO_RESPONSE_COUNT; i++) {
@@ -209,7 +258,7 @@ public class PerformBatchall {
      * @author Illiani
      * @since 0.50.07
      */
-    public void getBatchallFollowUpDialog(boolean isRefuse) {
+    private void getBatchallFollowUpDialog(boolean isRefuse) {
         String message = getBatchallPostIntroText(isRefuse);
 
         new ImmersiveDialogSimple(campaign, clanOpponent, null, message, null, null, null, true);
@@ -225,7 +274,7 @@ public class PerformBatchall {
      * @author Illiani
      * @since 0.50.07
      */
-    public String getBatchallPostIntroText(boolean isRefuse) {
+    private String getBatchallPostIntroText(boolean isRefuse) {
         final String keySuffix = isRefuse ? "refuse" : "accept";
         final String bundleKey = "performBatchall." +
                                        standingLevel.name() +
@@ -246,7 +295,7 @@ public class PerformBatchall {
      * @author Illiani
      * @since 0.50.07
      */
-    public int getAreYouSureDialog() {
+    private int getAreYouSureDialog() {
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
               campaign.getSeniorAdminPerson(COMMAND),
               null,
@@ -267,7 +316,7 @@ public class PerformBatchall {
      * @author Illiani
      * @since 0.50.07
      */
-    public String getAreYouSureDialogText() {
+    private String getAreYouSureDialogText() {
         String commanderAddress = campaign.getCommanderAddress(false);
         return getFormattedTextAt(RESOURCE_BUNDLE, "performBatchall.areYouSure.inCharacter", commanderAddress);
     }
@@ -280,7 +329,7 @@ public class PerformBatchall {
      * @author Illiani
      * @since 0.50.07
      */
-    public List<String> getAreYouSureDialogOptions() {
+    private List<String> getAreYouSureDialogOptions() {
         return List.of(getTextAt(RESOURCE_BUNDLE, "performBatchall.areYouSure.button.cancel"),
                 getTextAt(RESOURCE_BUNDLE, "performBatchall.areYouSure.button.confirm"));
     }

@@ -143,6 +143,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.factionStanding.BatchallFactions;
+import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.campaign.universe.factionStanding.PerformBatchall;
 import mekhq.utilities.MHQXMLUtility;
@@ -628,7 +629,13 @@ public class AtBContract extends Contract {
             boolean tracksStanding = campaign.getCampaignOptions().isTrackFactionStanding();
             FactionStandings factionStandings = campaign.getFactionStandings();
 
-            if (faction.performsBatchalls()) {
+            boolean allowBatchalls = true;
+            if (campaign.getCampaignOptions().isUseFactionStandingBatchallRestrictions()) {
+                double regard = factionStandings.getRegardForFaction(faction.getShortName(), true);
+                allowBatchalls = FactionStandingUtilities.isBatchallAllowed(regard);
+            }
+
+            if (faction.performsBatchalls() && allowBatchalls) {
                 PerformBatchall batchallDialog = new PerformBatchall(campaign, clanOpponent, enemyCode);
 
                 batchallAccepted = batchallDialog.isBatchallAccepted();

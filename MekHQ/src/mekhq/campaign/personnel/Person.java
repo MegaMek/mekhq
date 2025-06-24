@@ -5183,6 +5183,10 @@ public class Person {
         return (getPrimaryRole().isDependent() || getSecondaryRole().isDependent());
     }
 
+    public boolean isCivilian() {
+        return (getPrimaryRole().isCivilian() || getSecondaryRole().isCivilian());
+    }
+
     public boolean isTaskOvertime(final IPartWork partWork) {
         return (partWork.getTimeLeft() > getMinutesLeft()) && (getOvertimeLeft() > 0);
     }
