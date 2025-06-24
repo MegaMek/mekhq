@@ -460,6 +460,19 @@ public class Finances {
                     addReportInsufficientFunds(campaign, resourceMap.getString("OverheadCosts.text"));
                 }
             }
+
+            Money foodAndHousingExpenses = accountant.getMonthlyFoodAndHousingExpenses();
+            if (!foodAndHousingExpenses.equals(Money.zero())) {
+                if (debit(TransactionType.OVERHEAD,
+                      today,
+                      foodAndHousingExpenses,
+                      resourceMap.getString("FoodAndHousing.title"))) {
+                    campaign.addReport(String.format(resourceMap.getString("FoodAndHousing.text"),
+                          foodAndHousingExpenses.toAmountAndSymbolString()));
+                } else {
+                    addReportInsufficientFunds(campaign, resourceMap.getString("HousingAndFoodCosts.text"));
+                }
+            }
         }
 
         List<Loan> newLoans = new ArrayList<>();
