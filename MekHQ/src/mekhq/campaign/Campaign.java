@@ -5044,16 +5044,16 @@ public class Campaign implements ITechManager {
             if (campaignOptions.isUseGenericBattleValue() &&
                       !contract.getContractType().isGarrisonType() &&
                       contract.getStartDate().equals(currentDay)) {
-                Faction faction = contract.getEnemy();
-                String factionCode = contract.getEnemyCode();
+                Faction enemyFaction = contract.getEnemy();
+                String enemyFactionCode = contract.getEnemyCode();
 
                 boolean allowBatchalls = true;
                 if (campaignOptions.isUseFactionStandingBatchallRestrictions()) {
-                    double regard = factionStandings.getRegardForFaction(factionCode, true);
+                    double regard = factionStandings.getRegardForFaction(enemyFactionCode, true);
                     allowBatchalls = FactionStandingUtilities.isBatchallAllowed(regard);
                 }
 
-                if (faction.performsBatchalls() && allowBatchalls) {
+                if (enemyFaction.performsBatchalls() && allowBatchalls) {
                     PerformBatchall batchallDialog = new PerformBatchall(this,
                           contract.getClanOpponent(),
                           contract.getEnemyCode());
@@ -5062,8 +5062,8 @@ public class Campaign implements ITechManager {
                     contract.setBatchallAccepted(batchallAccepted);
 
                     if (!batchallAccepted && campaignOptions.isTrackFactionStanding()) {
-                        List<String> reports = factionStandings.processRefusedBatchall(factionCode,
-                              currentDay.getYear());
+                        List<String> reports = factionStandings.processRefusedBatchall(faction.getShortName(),
+                              enemyFactionCode, currentDay.getYear());
 
                         for (String report : reports) {
                             addReport(report);
@@ -5643,7 +5643,8 @@ public class Campaign implements ITechManager {
             getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(getGameYear());
 
             // Degrade Regard
-            List<String> degradedRegardReports = factionStandings.processRegardDegradation(currentDay.getYear());
+            List<String> degradedRegardReports = factionStandings.processRegardDegradation(faction.getShortName(),
+                  currentDay.getYear());
             for (String report : degradedRegardReports) {
                 addReport(report);
             }

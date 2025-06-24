@@ -607,8 +607,9 @@ public class ContractMarketDialog extends JDialog {
                 // Garrison Type contracts have a dynamic enemy. We update Standing whenever a new enemy is chosen.
                 if (!isGarrisonType) {
                     FactionStandings factionStandings = campaign.getFactionStandings();
-                    List<String> standingsReports = factionStandings.processContractAccept(enemy,
-                          campaign.getLocalDate());
+                    List<String> standingsReports =
+                          factionStandings.processContractAccept(campaign.getFaction().getShortName(), enemy,
+                                campaign.getLocalDate());
 
                     for (String standingReport : standingsReports) {
                         campaign.addReport(standingReport);
