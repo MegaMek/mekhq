@@ -61,7 +61,7 @@ public record CensureEntry(FactionCensureLevel level, LocalDate issueDate) {
     /**
      * Determines whether this censure has expired according to the specified date.
      *
-     * <p>A censure is considered expired if more than one year has elapsed since it was issued.</p>
+     * <p>A censure is considered expired if more than {@link #EXPIRY_PERIOD} months have elapsed since it was issued.</p>
      *
      * @param today the date to check expiration against
      *

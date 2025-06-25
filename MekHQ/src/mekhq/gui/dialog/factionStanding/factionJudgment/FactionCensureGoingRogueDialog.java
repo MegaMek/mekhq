@@ -252,7 +252,7 @@ public class FactionCensureGoingRogueDialog {
      */
     private JPanel getFactionPanel() {
         JPanel factionPanel = new JPanel();
-        JLabel lblFactions = new JLabel("Possible Factions:");
+        JLabel lblFactions = new JLabel(getTextAt(RESOURCE_BUNDLE, "FactionCensureGoingRogueDialog.possibleFactions"));
         MMComboBox<String> cmboFactions = new MMComboBox<>("choicePerson", createPersonGroupModel());
 
         factionPanel.add(lblFactions);

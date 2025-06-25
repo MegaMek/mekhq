@@ -507,7 +507,7 @@ public class FactionStandings {
      * @author Illiani
      * @since 0.50.07
      */
-    public FactionJudgment getFactionJudgements() {
+    public FactionJudgment getFactionJudgments() {
         return factionJudgment;
     }
 
