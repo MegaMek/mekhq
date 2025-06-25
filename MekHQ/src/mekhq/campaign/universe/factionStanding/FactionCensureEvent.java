@@ -157,18 +157,10 @@ public class FactionCensureEvent {
             return;
         }
 
-        FactionJudgmentSceneType sceneType = switch (censureLevel) {
-            case NONE -> null;
-            case WARNING -> FactionJudgmentSceneType.GO_ROGUE_WARNING;
-            case COMMANDER_RETIREMENT -> FactionJudgmentSceneType.GO_ROGUE_RETIRED;
-            case COMMANDER_IMPRISONMENT -> FactionJudgmentSceneType.GO_ROGUE_IMPRISONED;
-            case LEADERSHIP_REPLACEMENT -> FactionJudgmentSceneType.GO_ROGUE_REPLACED;
-            case DISBAND -> FactionJudgmentSceneType.GO_ROGUE_DISBAND;
-        };
-
-        if (sceneType != null) {
-            new FactionJudgmentSceneDialog(campaign, mostSeniorCharacter, secondCharacter, sceneType);
-        }
+        new FactionJudgmentSceneDialog(campaign,
+              mostSeniorCharacter,
+              secondCharacter,
+              FactionJudgmentSceneType.GO_ROGUE);
     }
 
     /**

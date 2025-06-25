@@ -33,6 +33,7 @@
 package mekhq.gui.dialog.factionStanding.factionJudgment;
 
 import static megamek.common.Compute.randomInt;
+import static mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentSceneType.SEPPUKU;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -179,7 +180,7 @@ public class FactionJudgmentSceneDialog {
                                  + sceneType.getLookUpName() + '.'
                                  + (isPlanetside ? DIALOG_KEY_AFFIX_PLANETSIDE : DIALOG_KEY_AFFIX_IN_TRANSIT) + '.'
                                  + campaignFactionCode
-                                 + (sceneType == FactionJudgmentSceneType.SEPPUKU ? seppukuVariant : "");
+                                 + (sceneType == SEPPUKU ? seppukuVariant : "");
 
         // Attempt a faction-localized template first, then fall back to general grouping
         String testReturn = getTextAt(RESOURCE_BUNDLE, dialogKey);
@@ -197,7 +198,7 @@ public class FactionJudgmentSceneDialog {
                               + sceneType.getLookUpName() + '.'
                               + (isPlanetside ? DIALOG_KEY_AFFIX_PLANETSIDE : DIALOG_KEY_AFFIX_IN_TRANSIT) + '.'
                               + affixKey
-                              + (sceneType == FactionJudgmentSceneType.SEPPUKU ? seppukuVariant : "");
+                              + (sceneType == SEPPUKU ? seppukuVariant : "");
         }
 
         // Format and return the localized dialog text with the current context.
@@ -222,21 +223,12 @@ public class FactionJudgmentSceneDialog {
      */
     private static List<String> getButtonLabels(FactionJudgmentSceneType sceneType) {
         String key = "FactionJudgmentSceneDialog.button.";
-        String color = "";
-        switch (sceneType) {
-            case DISBAND -> {
-                key += "disband";
-                color = getNegativeColor();
-            }
-            case GO_ROGUE_WARNING, GO_ROGUE_RETIRED, GO_ROGUE_IMPRISONED, GO_ROGUE_REPLACED, GO_ROGUE_DISBAND -> {
-                key += "goRogue";
-                color = getPositiveColor();
-            }
-            case SEPPUKU -> {
-                key += "seppuku";
-                color = getWarningColor();
-            }
-        }
+        key += sceneType.getLookUpName();
+        String color = switch (sceneType) {
+            case DISBAND -> getNegativeColor();
+            case GO_ROGUE -> getPositiveColor();
+            case SEPPUKU -> getWarningColor();
+        };
 
         return List.of(getFormattedTextAt(RESOURCE_BUNDLE,
               key,

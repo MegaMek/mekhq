@@ -33,7 +33,6 @@
 package mekhq.gui.dialog.factionStanding.factionJudgment;
 
 import mekhq.campaign.universe.factionStanding.FactionCensureEvent;
-import mekhq.campaign.universe.factionStanding.FactionCensureLevel;
 
 /**
  * Enum representing the various judgment scene types that can occur during a faction censure event. Each constant is
@@ -52,29 +51,9 @@ public enum FactionJudgmentSceneType {
     DISBAND("DISBAND"),
 
     /**
-     * Scene type where the player responded to {@link FactionCensureLevel#WARNING} by going rogue.
+     * Scene type where the player goes rogue.
      */
-    GO_ROGUE_WARNING("GO_ROGUE_WARNING"),
-
-    /**
-     * Scene type where the player responded to {@link FactionCensureLevel#COMMANDER_RETIREMENT} by going rogue.
-     */
-    GO_ROGUE_RETIRED("GO_ROGUE_RETIRED"),
-
-    /**
-     * Scene type where the player responded to {@link FactionCensureLevel#COMMANDER_IMPRISONMENT} by going rogue.
-     */
-    GO_ROGUE_IMPRISONED("GO_ROGUE_IMPRISONED"),
-
-    /**
-     * Scene type where the player responded to {@link FactionCensureLevel#LEADERSHIP_REPLACEMENT} by going rogue.
-     */
-    GO_ROGUE_REPLACED("GO_ROGUE_REPLACED"),
-
-    /**
-     * Scene type where the player responded to {@link FactionCensureLevel#DISBAND} by going rogue.
-     */
-    GO_ROGUE_DISBAND("GO_ROGUE_DISBAND"),
+    GO_ROGUE("GO_ROGUE"),
 
     /**
      * Scene type where the player responded to a {@link FactionCensureEvent} by committing seppuku
