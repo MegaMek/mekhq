@@ -32,6 +32,18 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
+import static megamek.common.Compute.randomInt;
+import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
+import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
+import static mekhq.campaign.universe.factionStanding.FactionStandings.STARTING_REGARD_ALLIED_FACTION;
+import static mekhq.campaign.universe.factionStanding.FactionStandings.STARTING_REGARD_SAME_FACTION;
+
+import java.time.LocalDate;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
@@ -44,18 +56,6 @@ import mekhq.gui.dialog.factionStanding.factionJudgment.FactionCensureConfirmati
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionCensureDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentSceneDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentSceneType;
-
-import java.time.LocalDate;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import static megamek.common.Compute.randomInt;
-import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
-import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
-import static mekhq.campaign.universe.factionStanding.FactionStandings.STARTING_REGARD_ALLIED_FACTION;
-import static mekhq.campaign.universe.factionStanding.FactionStandings.STARTING_REGARD_SAME_FACTION;
 
 /**
  * Represents a faction censure event within a campaign, handling the narrative and mechanical consequences associated
@@ -122,6 +122,7 @@ public class FactionCensureEvent {
         } else if (isSeppuku) {
             processPerformingSeppuku();
             committedSeppuku = true;
+            // Seppuku doesn't prevent what comes next, so don't add a return here.
         }
 
         handleCensureEffects(censureLevel, committedSeppuku);

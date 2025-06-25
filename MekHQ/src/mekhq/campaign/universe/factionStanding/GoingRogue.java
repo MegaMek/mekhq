@@ -38,12 +38,16 @@ import static mekhq.campaign.universe.factionStanding.FactionCensureEvent.proces
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionCensureGoingRogueDialog;
 
@@ -148,12 +152,16 @@ public class GoingRogue {
     private void processPersonnel(boolean isDefection, Person commander, Person second) {
         final LocalDate today = campaign.getLocalDate();
         Collection<Person> allPersonnel = campaign.getPersonnel();
+        Set<Person> preProcessedPersonnel = new HashSet<>();
+        preProcessedPersonnel.add(commander);
+        preProcessedPersonnel.add(second);
+
         for (Person person : allPersonnel) {
             if (isExempt(person, today)) {
                 continue;
             }
 
-            if (person.equals(commander) || person.equals(second)) {
+            if (preProcessedPersonnel.contains(person)) {
                 continue;
             }
 
@@ -178,6 +186,30 @@ public class GoingRogue {
                 if (roll == 0) {
                     person.changeStatus(campaign, today, PersonnelStatus.HOMICIDE);
                 }
+            }
+
+            Genealogy genealogy = person.getGenealogy();
+            Person spouse = genealogy.getSpouse();
+            List<Person> children = genealogy.getChildren();
+
+            // Spouses follow each other to their fate. This prevents us from needing to add handlers for split
+            // relationships
+            if (spouse != null) {
+                spouse.changeStatus(campaign, today, person.getStatus());
+                preProcessedPersonnel.add(spouse);
+            }
+
+            // Non-adult children follow their parents if their parents are still alive, otherwise they awkwardly
+            // remain with the campaign. Their fate is left up to the player. Adult children follow the fate of their
+            // parents.
+            for (Person child : children) {
+                if (child.isChild(today)) {
+                    child.changeStatus(campaign, today, PersonnelStatus.LEFT);
+                } else {
+                    child.changeStatus(campaign, today, person.getStatus());
+                }
+
+                preProcessedPersonnel.add(child);
             }
         }
     }
