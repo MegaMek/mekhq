@@ -118,10 +118,6 @@ public class FactionJudgmentSceneDialog {
      */
     private String getInCharacterText(Person commander, @Nullable Person secondCharacter,
           FactionJudgmentSceneType sceneType) {
-        Faction campaignFaction = campaign.getFaction();
-        String campaignFactionCode = campaignFaction.getShortName();
-        boolean isPlanetside = campaign.getLocation().isOnPlanet();
-
         // COMMANDER pronoun/identity context
         final PronounData commanderPronounData = new PronounData(commander.getGender());
         // {0} hyperlinked full title
@@ -167,6 +163,10 @@ public class FactionJudgmentSceneDialog {
         final String secondHisHerTheirLowercase = secondPronounData.possessivePronounLowerCase();
         // {17} = Gender Neutral = 0, Otherwise 1 (used to determine whether to use a plural case)
         final int secondPluralizer = secondCharacter == null ? 0 : secondPronounData.pluralizer();
+
+        Faction campaignFaction = campaign.getFaction();
+        String campaignFactionCode = campaignFaction.getShortName();
+        boolean isPlanetside = campaign.getLocation().isOnPlanet();
 
         // Miscellaneous campaign context
         // {18} = campaign name

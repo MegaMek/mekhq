@@ -154,13 +154,7 @@ public class FactionCensureEvent {
         GoingRogue goingRogueDialog = new GoingRogue(campaign, mostSeniorCharacter, secondCharacter);
         if (!goingRogueDialog.wasConfirmed()) {
             new FactionCensureEvent(campaign, censureLevel);
-            return;
         }
-
-        new FactionJudgmentSceneDialog(campaign,
-              mostSeniorCharacter,
-              secondCharacter,
-              FactionJudgmentSceneType.GO_ROGUE);
     }
 
     /**

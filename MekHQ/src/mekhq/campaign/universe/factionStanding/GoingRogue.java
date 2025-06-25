@@ -50,6 +50,8 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionCensureGoingRogueDialog;
+import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentSceneDialog;
+import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentSceneType;
 
 /**
  * Handles the "going rogue" event for a campaign, where a force defects or leaves its current faction.
@@ -112,6 +114,11 @@ public class GoingRogue {
             return;
         }
 
+        new FactionJudgmentSceneDialog(campaign,
+              commander,
+              second,
+              FactionJudgmentSceneType.GO_ROGUE);
+
         processGoingRogue(chosenFaction, commander, second);
     }
 
@@ -173,14 +180,14 @@ public class GoingRogue {
                 continue;
             }
 
-            // Loyalty check: personnel with low loyalty may leave or be killed (homicide/left), others remain
+            // Loyalty check: personnel with low loyalty may leave or be killed (homicide/deserted), others remain
             boolean loyaltyEnabled = campaign.getCampaignOptions().isUseLoyaltyModifiers();
             int loyalty = loyaltyEnabled ? person.getLoyalty() : 0;
             int modifier = loyaltyEnabled ? person.getLoyaltyModifier(loyalty) : 0;
             int roll = Compute.d6(2);
 
             if (roll < (LOYALTY_TARGET_NUMBER + modifier)) {
-                person.changeStatus(campaign, today, isDefection ? PersonnelStatus.HOMICIDE : PersonnelStatus.LEFT);
+                person.changeStatus(campaign, today, isDefection ? PersonnelStatus.HOMICIDE : PersonnelStatus.DESERTED);
             } else if (isDefection) {
                 // Small chance a person still gets murdered when defecting
                 roll = randomInt(MURDER_DIE_SIZE);
@@ -234,8 +241,9 @@ public class GoingRogue {
         // parents.
         for (Person child : children) {
             if (child.isChild(today)) {
-                if (person.getStatus().isLeft()) {
-                    child.changeStatus(campaign, today, PersonnelStatus.LEFT);
+                if (person.getStatus().isDeserted()) {
+                    child.changeStatus(campaign, today, PersonnelStatus.DESERTED);
+                } else {
                     child.performForcedDirectionLoyaltyChange(campaign, false, true, true);
                 }
             } else {
