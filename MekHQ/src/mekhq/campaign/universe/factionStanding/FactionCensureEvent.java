@@ -300,10 +300,8 @@ public class FactionCensureEvent {
             seniorPerson.changeStatus(campaign, today, PersonnelStatus.DISHONORABLY_DISCHARGED);
 
             Person replacement = getReplacementCharacter(seniorPerson);
-            if (replacement != null) {
-                replacement.changeRank(campaign, rank, level, false);
-                campaign.recruitPerson(replacement, true, true);
-            }
+            replacement.changeRank(campaign, rank, level, false);
+            campaign.recruitPerson(replacement, true, true);
         }
     }
 
