@@ -169,6 +169,7 @@ public class GoingRogue {
             if (POLITICAL_ROLES.contains(person.getPrimaryRole())
                       || POLITICAL_ROLES.contains(person.getSecondaryRole())) {
                 person.changeStatus(campaign, today, PersonnelStatus.HOMICIDE);
+                processGenealogicallyLinkedPersonnel(person, today, preProcessedPersonnel);
                 continue;
             }
 
@@ -188,29 +189,60 @@ public class GoingRogue {
                 }
             }
 
-            Genealogy genealogy = person.getGenealogy();
-            Person spouse = genealogy.getSpouse();
-            List<Person> children = genealogy.getChildren();
+            processGenealogicallyLinkedPersonnel(person, today, preProcessedPersonnel);
+        }
+    }
 
-            // Spouses follow each other to their fate. This prevents us from needing to add handlers for split
-            // relationships
-            if (spouse != null) {
-                spouse.changeStatus(campaign, today, person.getStatus());
-                preProcessedPersonnel.add(spouse);
-            }
+    /**
+     * Processes all genealogically linked personnel (spouse and children) of the specified person, updating their
+     * statuses in accordance with event resolution logic.
+     *
+     * <p>When we determine how a character will react to the campaign going rogue, their spouse will automatically
+     * adopt the same status, ensuring relationship continuity. All such processed spouses are added to the
+     * {@code preProcessedPersonnel} set to prevent duplicate handling.</p>
+     *
+     * <p>Each child of the person is also processed as follows:</p>
+     * <ul>
+     *   <li>If a child is a minor at the specified date, their status is set to {@code PersonnelStatus.LEFT} unless
+     *   their parent was killed at which point they will remain with the campaign but suffer a loyalty penalty.</li>
+     *   <li>For adult children, their status will mirror the fate of their parents.</li>
+     *   <li>All children processed are added to {@code preProcessedPersonnel}.</li>
+     * </ul>
+     *
+     * @param person                the {@link Person} whose genealogical relations are to be processed
+     * @param today                 the current {@link LocalDate} for age/status determination
+     * @param preProcessedPersonnel a set of {@link Person} objects already processed during this operation
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private void processGenealogicallyLinkedPersonnel(Person person, LocalDate today,
+          Set<Person> preProcessedPersonnel) {
+        Genealogy genealogy = person.getGenealogy();
+        Person spouse = genealogy.getSpouse();
+        List<Person> children = genealogy.getChildren();
 
-            // Non-adult children follow their parents if their parents are still alive, otherwise they awkwardly
-            // remain with the campaign. Their fate is left up to the player. Adult children follow the fate of their
-            // parents.
-            for (Person child : children) {
-                if (child.isChild(today)) {
+        // Spouses follow each other to their fate. This prevents us from needing to add handlers for split
+        // relationships
+        if (spouse != null) {
+            spouse.changeStatus(campaign, today, person.getStatus());
+            preProcessedPersonnel.add(spouse);
+        }
+
+        // Non-adult children follow their parents if their parents are still alive, otherwise they awkwardly
+        // remain with the campaign. Their fate is left up to the player. Adult children follow the fate of their
+        // parents.
+        for (Person child : children) {
+            if (child.isChild(today)) {
+                if (person.getStatus().isLeft()) {
                     child.changeStatus(campaign, today, PersonnelStatus.LEFT);
-                } else {
-                    child.changeStatus(campaign, today, person.getStatus());
+                    child.performForcedDirectionLoyaltyChange(campaign, false, true, true);
                 }
-
-                preProcessedPersonnel.add(child);
+            } else {
+                child.changeStatus(campaign, today, person.getStatus());
             }
+
+            preProcessedPersonnel.add(child);
         }
     }
 
