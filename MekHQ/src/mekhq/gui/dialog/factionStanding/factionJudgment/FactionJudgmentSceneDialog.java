@@ -169,6 +169,7 @@ public class FactionJudgmentSceneDialog {
         final int secondPluralizer = secondCharacter == null ? 0 : secondPronounData.pluralizer();
 
         // Miscellaneous campaign context
+        // {18} = campaign name
         String campaignName = campaign.getName();
         // {19} = planet name
         String planetName = isPlanetside ? campaign.getLocation().getPlanet().getName(campaign.getLocalDate()) : "";
