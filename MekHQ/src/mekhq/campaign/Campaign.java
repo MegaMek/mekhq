@@ -6994,6 +6994,23 @@ public class Campaign implements ITechManager {
     }
 
     /**
+     * Calculates and returns a {@code JumpPath} between two planetary systems, using default parameters for jump range
+     * and travel safety.
+     *
+     * <p>This method provides a convenient way to compute the most likely or optimal jump path from the specified
+     * starting system to the destination system. Internal behavior and constraints are determined by the method's
+     * default parameter settings.</p>
+     *
+     * @param start the starting {@link PlanetarySystem}
+     * @param end   the destination {@link PlanetarySystem}
+     *
+     * @return the calculated {@link JumpPath} between the two systems
+     */
+    public JumpPath calculateJumpPath(PlanetarySystem start, PlanetarySystem end) {
+        return calculateJumpPath(start, end, true, true);
+    }
+
+    /**
      * Calculates the optimal jump path between two planetary systems using the A* algorithm.
      *
      * <p>This implementation minimizes a combination of jump counts and recharge times to find the most efficient
@@ -7008,12 +7025,18 @@ public class Campaign implements ITechManager {
      *
      * @param start The starting planetary system
      * @param end   The destination planetary system
+     * @param skipAccessCheck   {@code true} to skipp checking for Outlaw status in system, {@code false} otherwise.
+     *                                      Should be {@code false} when determining contract-related jump paths as
+     *                                      system access is guaranteed for contract target systems.
+     * @param skipEmptySystemCheck   {@code true} to skipp checking for empty status status, {@code false} otherwise.
+     *                                      Should be {@code false} when determining contract-related jump paths.
      *
      * @return A {@link JumpPath} containing the sequence of systems to traverse, or {@code null} if no valid path
      *       exists between the systems. If start and end are the same system, returns a path containing only that
      *       system.
      */
-    public JumpPath calculateJumpPath(PlanetarySystem start, PlanetarySystem end) {
+    public JumpPath calculateJumpPath(PlanetarySystem start, PlanetarySystem end, boolean skipAccessCheck,
+          boolean skipEmptySystemCheck) {
         // Handle edge cases
         if (null == start) {
             return new JumpPath();
@@ -7026,7 +7049,9 @@ public class Campaign implements ITechManager {
         }
 
         // Shortcuts to ensure we're not processing a lot of data when we're unable to reach the target system
-        if (isAvoidingEmptySystems && end.getPopulation(currentDay) == 0) {
+        if (!skipEmptySystemCheck
+                  && isAvoidingEmptySystems
+                  && end.getPopulation(currentDay) == 0) {
             new ImmersiveDialogSimple(this, getSeniorAdminPerson(AdministratorSpecialization.TRANSPORT), null,
                   String.format(resources.getString("unableToEnterSystem.abandoned.ic"), getCommanderAddress(false)),
                   null, resources.getString("unableToEnterSystem.abandoned.ooc"), null, false);
@@ -7036,9 +7061,11 @@ public class Campaign implements ITechManager {
 
         List<AtBContract> activeAtBContracts = getActiveAtBContracts();
 
-        if (campaignOptions.isUseFactionStandingOutlawed()) {
+        if (!skipAccessCheck
+                  && campaignOptions.isUseFactionStandingOutlawedSafe()) {
+            FactionHints factionHints = FactionHints.defaultFactionHints();
             boolean canAccessSystem = FactionStandingUtilities.canEnterTargetSystem(faction, factionStandings,
-                  getCurrentSystem(), end, currentDay, activeAtBContracts);
+                  getCurrentSystem(), end, currentDay, activeAtBContracts, factionHints);
             if (!canAccessSystem) {
                 new ImmersiveDialogSimple(this, getSeniorAdminPerson(AdministratorSpecialization.TRANSPORT), null,
                       String.format(resources.getString("unableToEnterSystem.outlawed.ic"), getCommanderAddress(false)),
@@ -7072,6 +7099,8 @@ public class Campaign implements ITechManager {
         scoreG.put(current, 0.0);
         closed.add(current);
 
+        FactionHints factionHints = FactionHints.defaultFactionHints();
+
         // A* search
         final int MAX_JUMPS = 10000;
         for (int jumps = 0; jumps < MAX_JUMPS; jumps++) {
@@ -7095,9 +7124,10 @@ public class Campaign implements ITechManager {
                 }
 
                 // Skip systems where the campaign is outlawed
-                if (campaignOptions.isUseFactionStandingOutlawed()) {
+                if (!skipAccessCheck
+                          && campaignOptions.isUseFactionStandingOutlawed()) {
                     boolean canAccessSystem = FactionStandingUtilities.canEnterTargetSystem(faction, factionStandings,
-                          getCurrentSystem(), neighborSystem, currentDay, activeAtBContracts);
+                          getCurrentSystem(), neighborSystem, currentDay, activeAtBContracts, factionHints);
                     if (!canAccessSystem) {
                         return;
                     }
