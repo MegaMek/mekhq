@@ -73,6 +73,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.FactionHints;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.SocioIndustrialData;
@@ -369,7 +370,7 @@ public class InterstellarMapPanel extends JPanel {
                         if (e.isAltDown()) {
                             // calculate a new jump path from the current location
                             jumpPath = InterstellarMapPanel.this.campaign.calculateJumpPath(InterstellarMapPanel.this.campaign.getCurrentSystem(),
-                                  target);
+                                  target, false, false);
                             selectedSystem = target;
                             repaint();
                             notifyListeners();
@@ -380,7 +381,8 @@ public class InterstellarMapPanel extends JPanel {
                             if (null == lastSystem) {
                                 lastSystem = InterstellarMapPanel.this.campaign.getCurrentSystem();
                             }
-                            JumpPath addPath = InterstellarMapPanel.this.campaign.calculateJumpPath(lastSystem, target);
+                            JumpPath addPath = InterstellarMapPanel.this.campaign.calculateJumpPath(lastSystem,
+                                  target, false, false);
                             if (!jumpPath.isEmpty()) {
                                 addPath.removeFirstSystem();
                             }
@@ -734,6 +736,8 @@ public class InterstellarMapPanel extends JPanel {
                 LocalDate today = campaign.getLocalDate();
                 List<AtBContract> activeAtBContracts = campaign.getActiveAtBContracts();
 
+                FactionHints factionHints = FactionHints.defaultFactionHints();
+
                 for (PlanetarySystem system : systems) {
                     if (isSystemVisible(system, false)) {
                         double x = map2scrX(system.getX());
@@ -822,7 +826,7 @@ public class InterstellarMapPanel extends JPanel {
                         // Outlaw status image
                         if (isUseFactionStandingOutlawing) {
                             boolean isOutlawedInSystem = !FactionStandingUtilities.canEnterTargetSystem(campaignFaction,
-                                  factionStandings, null, system, today, activeAtBContracts);
+                                  factionStandings, null, system, today, activeAtBContracts, factionHints);
                             if (isOutlawedInSystem) {
                                 int half = (int) (size * 0.8);
                                 g2.setPaint(Color.BLACK);

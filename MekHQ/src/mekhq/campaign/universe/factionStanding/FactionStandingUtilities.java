@@ -32,10 +32,9 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
-import java.util.List;
-
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import megamek.common.annotations.Nullable;
@@ -363,7 +362,6 @@ public class FactionStandingUtilities {
      *   currentSystem} is {@code null}).</li>
      *   <li>If the player is outlawed in the target system, entry is denied.</li>
      *   <li>If the campaign faction is at war with all system factions, entry is denied.</li>
-     *   <li>If all system factions are at war with any employer faction, entry is denied.</li>
      *   <li>If none of the above conditions block entry, it is permitted.</li>
      * </ol>
      *
@@ -373,6 +371,7 @@ public class FactionStandingUtilities {
      * @param targetSystem       the planetary system to test entry for
      * @param when               the date of attempted entry (population/ownership may change over time)
      * @param activeAtBContracts list of currently active contracts
+     * @param factionHints       the details of the current factional relations
      *
      * @return {@code true} if entry to the target system is allowed; {@code false} otherwise
      *
@@ -381,7 +380,7 @@ public class FactionStandingUtilities {
      */
     public static boolean canEnterTargetSystem(Faction campaignFaction, FactionStandings factionStandings,
           @Nullable PlanetarySystem currentSystem, PlanetarySystem targetSystem, LocalDate when,
-          List<AtBContract> activeAtBContracts) {
+          List<AtBContract> activeAtBContracts, FactionHints factionHints) {
         // Always allowed in empty systems
         if (targetSystem.getPopulation(when) == 0) {
             LOGGER.debug("Target system is empty, access granted");
@@ -420,7 +419,6 @@ public class FactionStandingUtilities {
         }
 
         // Disallow if the campaign faction is at war with all system factions
-        FactionHints factionHints = FactionHints.defaultFactionHints();
         boolean allAtWarWithCampaign = systemFactions
                                              .stream()
                                              .allMatch(systemFaction -> factionHints.isAtWarWith(campaignFaction,
@@ -429,19 +427,6 @@ public class FactionStandingUtilities {
         if (allAtWarWithCampaign) {
             LOGGER.debug("Campaign faction is at war with all system factions, access denied");
             return false;
-        }
-
-        // Disallow if all system factions are at war with any one employer
-        for (Faction employer : contractEmployers) {
-            boolean allAtWarWithEmployer = systemFactions
-                                                 .stream()
-                                                 .allMatch(systemFaction -> factionHints.getCurrentWar(employer,
-                                                       systemFaction,
-                                                       when) != null);
-            if (allAtWarWithEmployer) {
-                LOGGER.debug("All system factions are at war with employer {}, access denied", employer.getShortName());
-                return false;
-            }
         }
 
         LOGGER.debug("Access granted");
