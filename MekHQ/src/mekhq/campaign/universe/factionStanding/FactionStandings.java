@@ -34,7 +34,7 @@ package mekhq.campaign.universe.factionStanding;
 
 import static megamek.codeUtilities.MathUtility.clamp;
 import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_0;
-import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_7;
+import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_6;
 import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_8;
 import static mekhq.gui.dialog.factionStanding.manualMissionDialogs.SimulateMissionDialog.handleFactionRegardUpdates;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -97,7 +97,7 @@ public class FactionStandings {
     /**
      * The maximum regard value a campaign can have with a faction other than the campaign's faction
      */
-    static final double MAXIMUM_OTHER_FACTION_REGARD = STANDING_LEVEL_7.getMinimumRegard();
+    static final double MAXIMUM_OTHER_FACTION_REGARD = STANDING_LEVEL_6.getMaximumRegard();
 
     /**
      * A constant representing the minimum regard a campaign can have with any faction.
