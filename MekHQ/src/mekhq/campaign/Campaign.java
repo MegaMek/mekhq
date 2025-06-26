@@ -7025,10 +7025,10 @@ public class Campaign implements ITechManager {
      *
      * @param start The starting planetary system
      * @param end   The destination planetary system
-     * @param skipAccessCheck   {@code true} to skipp checking for Outlaw status in system, {@code false} otherwise.
+     * @param skipAccessCheck   {@code true} to skip checking for Outlaw status in system, {@code false} otherwise.
      *                                      Should be {@code false} when determining contract-related jump paths as
      *                                      system access is guaranteed for contract target systems.
-     * @param skipEmptySystemCheck   {@code true} to skipp checking for empty status status, {@code false} otherwise.
+     * @param skipEmptySystemCheck   {@code true} to skip checking for empty system status, {@code false} otherwise.
      *                                      Should be {@code false} when determining contract-related jump paths.
      *
      * @return A {@link JumpPath} containing the sequence of systems to traverse, or {@code null} if no valid path
