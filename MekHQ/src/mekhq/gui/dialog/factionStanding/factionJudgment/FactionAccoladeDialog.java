@@ -49,13 +49,13 @@ public class FactionAccoladeDialog {
         return wasRefused;
     }
 
-    public FactionAccoladeDialog(Campaign campaign, String factionCode,
-          FactionAccoladeLevel accoladeLevel, boolean isSameFaction) {
+    public FactionAccoladeDialog(Campaign campaign, String factionCode, FactionAccoladeLevel accoladeLevel,
+          boolean isSameFaction, Person commander) {
         this.campaign = campaign;
         this.factionCode = factionCode;
 
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
-              campaign.getFlaggedCommander(),
+              commander,
               getSpeaker(accoladeLevel),
               getInCharacterMessage(accoladeLevel, isSameFaction),
               getButtons(accoladeLevel, isSameFaction),

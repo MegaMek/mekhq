@@ -75,7 +75,7 @@ public record AccoladeEntry(FactionAccoladeLevel level, LocalDate issueDate) {
         boolean isOffCooldown = today.isAfter(cooldownDate);
 
         int currentStandingLevel = currentFactionStanding.getStandingLevel();
-        int requiredStandingLevel = level.getRequiredStanding().getStandingLevel();
+        int requiredStandingLevel = level.getRequiredStandingLevel();
         boolean standingRequirementsMet = currentStandingLevel >= requiredStandingLevel;
 
         return isOffCooldown && standingRequirementsMet;

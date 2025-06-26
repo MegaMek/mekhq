@@ -34,6 +34,7 @@ package mekhq.campaign.universe.factionStanding;
 
 import static mekhq.campaign.universe.factionStanding.FactionCensureLevel.MIN_CENSURE_SEVERITY;
 import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_4;
+import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_5;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
@@ -63,6 +64,7 @@ public class FactionJudgment {
     private static final MMLogger LOGGER = MMLogger.create(FactionJudgment.class);
 
     static final int THRESHOLD_FOR_CENSURE = STANDING_LEVEL_4.getStandingLevel();
+    static final int THRESHOLD_FOR_ACCOLADE = STANDING_LEVEL_5.getStandingLevel();
 
     private final Map<String, CensureEntry> factionCensures = new HashMap<>();
     private final Map<String, AccoladeEntry> factionAccolades = new HashMap<>();
@@ -250,11 +252,13 @@ public class FactionJudgment {
         AccoladeEntry accoladeEntry = factionAccolades.get(factionCode);
 
         if (accoladeEntry == null) {
-            setAccoladeForFaction(factionCode, FactionAccoladeLevel.FIELD_COMMENDATION, today);
-            return FactionAccoladeLevel.FIELD_COMMENDATION;
+            setAccoladeForFaction(factionCode, FactionAccoladeLevel.TAKING_NOTICE, today);
+            LOGGER.info("Faction {} has no accolade entry, assigning TAKING_NOTICE", factionCode);
+            return FactionAccoladeLevel.TAKING_NOTICE;
         }
 
         if (!accoladeEntry.canImprove(today, currentStandingWithFaction)) {
+            LOGGER.info("Faction {} cannot improve accolade, skipping", factionCode);
             return null;
         }
 
@@ -263,6 +267,7 @@ public class FactionJudgment {
         currentRecognition++;
         FactionAccoladeLevel updatedAccoladeLevel = FactionAccoladeLevel.getAccoladeRecognitionFromRecognition(
               currentRecognition);
+        LOGGER.info("Increasing accolade level for faction {} to {}", factionCode, updatedAccoladeLevel);
 
         setAccoladeForFaction(factionCode, updatedAccoladeLevel, today);
         return updatedAccoladeLevel;

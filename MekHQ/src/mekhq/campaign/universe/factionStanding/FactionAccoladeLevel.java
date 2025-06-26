@@ -50,25 +50,25 @@ import megamek.logging.MMLogger;
  */
 public enum FactionAccoladeLevel {
     /** No accolade awarded. */
-    NO_ACCOLADE(0, FactionStandingLevel.STANDING_LEVEL_0),
+    NO_ACCOLADE(0, FactionStandingLevel.STANDING_LEVEL_0.getStandingLevel()),
     /** The faction has taken an interest in the campaign. */
-    TAKING_NOTICE(1, FactionStandingLevel.STANDING_LEVEL_5),
+    TAKING_NOTICE(1, FactionStandingLevel.STANDING_LEVEL_5.getStandingLevel()),
     /** Quiet acknowledgment for services rendered. */
-    FIELD_COMMENDATION(1, FactionStandingLevel.STANDING_LEVEL_5),
+    FIELD_COMMENDATION(2, FactionStandingLevel.STANDING_LEVEL_6.getStandingLevel()),
     /** Minor achievement noted in internal faction records. */
-    OFFICIAL_COMMENDATION(2, FactionStandingLevel.STANDING_LEVEL_5),
+    OFFICIAL_COMMENDATION(3, FactionStandingLevel.STANDING_LEVEL_6.getStandingLevel()),
     /** Public acknowledgement via a faction-wide news outlet. */
-    PRESS_RECOGNITION(3, FactionStandingLevel.STANDING_LEVEL_6),
+    PRESS_RECOGNITION(4, FactionStandingLevel.STANDING_LEVEL_6.getStandingLevel()),
     /** Personal thanks issued from a senior commander or noble. */
-    LETTER_OF_DISTINCTION(4, FactionStandingLevel.STANDING_LEVEL_6),
+    LETTER_OF_DISTINCTION(5, FactionStandingLevel.STANDING_LEVEL_6.getStandingLevel()),
     /** Offer of adoption into the faction (or a lance of units) */
-    ADOPTION_OR_LANCE(5, FactionStandingLevel.STANDING_LEVEL_6),
-    /** Formal recognition from the faction head of state. */
-    LETTER_FROM_HEAD_OF_STATE(6, FactionStandingLevel.STANDING_LEVEL_7),
+    ADOPTION_OR_LANCE(6, FactionStandingLevel.STANDING_LEVEL_7.getStandingLevel()),
     /** High-profile celebration or parade in the unit's honor or entered into the remembrance. */
-    TRIUMPH_OR_REMEMBRANCE(7, FactionStandingLevel.STANDING_LEVEL_7),
+    TRIUMPH_OR_REMEMBRANCE(7, FactionStandingLevel.STANDING_LEVEL_7.getStandingLevel()),
     /** Statue made in the unit’s honor or a sibko founded from their bloodline */
-    STATUE_OR_SIBKO(8, FactionStandingLevel.STANDING_LEVEL_8);
+    STATUE_OR_SIBKO(8, FactionStandingLevel.STANDING_LEVEL_7.getStandingLevel()),
+    /** Formal recognition from the faction head of state. */
+    LETTER_FROM_HEAD_OF_STATE(9, FactionStandingLevel.STANDING_LEVEL_8.getStandingLevel());
 
     /** The minimum possible accolade recognition (inclusive). */
     public static final int MIN_ACCOLADE_RECOGNITION = NO_ACCOLADE.getRecognition();
@@ -77,20 +77,20 @@ public enum FactionAccoladeLevel {
 
     /** The integer representation of the accolade recognition. */
     private final int recognition;
-    private final FactionStandingLevel requiredStanding;
+    private final int requiredStandingLevel;
 
     /**
      * Constructs a new {@link FactionAccoladeLevel} constant.
      *
      * @param recognition      the integer value associated with this accolade recognition
-     * @param requiredStanding the minimum Faction Standing required for the accolade
+     * @param requiredStandingLevel the minimum Faction Standing required for the accolade
      *
      * @author Illiani
      * @since 0.50.07
      */
-    FactionAccoladeLevel(int recognition, FactionStandingLevel requiredStanding) {
+    FactionAccoladeLevel(int recognition, int requiredStandingLevel) {
         this.recognition = recognition;
-        this.requiredStanding = requiredStanding;
+        this.requiredStandingLevel = requiredStandingLevel;
     }
 
     /**
@@ -113,8 +113,8 @@ public enum FactionAccoladeLevel {
      * @author Illiani
      * @since 0.50.07
      */
-    public FactionStandingLevel getRequiredStanding() {
-        return requiredStanding;
+    public int getRequiredStandingLevel() {
+        return requiredStandingLevel;
     }
 
     /**

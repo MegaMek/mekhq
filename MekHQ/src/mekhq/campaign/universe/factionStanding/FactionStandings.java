@@ -680,6 +680,42 @@ public class FactionStandings {
     }
 
     /**
+     * Checks if the specified faction should receive a new or escalated accolade based on its latest standing, and
+     * applies the appropriate accolade level if necessary.
+     *
+     * <p>This method computes the current regard value for the given faction and determines the corresponding
+     * standing level. If the calculated standing level is at or below the threshold for accolade, the faction's
+     * accolade level will be increased for the provided date. The updated accolade level is then returned; if no change
+     * is needed, {@code null} is returned.</p>
+     *
+     * @param faction the {@link Faction} object to check against
+     * @param today   the date to use when recording a possible accolade improvement
+     *
+     * @return the new {@link FactionAccoladeLevel} if a accolade change occurred, or {@code null} if there was no
+     *       change
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public @Nullable FactionAccoladeLevel checkForAccolade(Faction faction, LocalDate today) {
+        if (faction.isAggregate()) {
+            return null;
+        }
+
+        String factionCode = faction.getShortName();
+        double regard = getRegardForFaction(factionCode, true);
+        FactionStandingLevel factionStanding = FactionStandingUtilities.calculateFactionStandingLevel(regard);
+
+        if (factionStanding.getStandingLevel() >= FactionJudgment.THRESHOLD_FOR_ACCOLADE) {
+            LOGGER.info("Faction {} has sufficient standing for accolade improvement.", factionCode);
+            // This will return null if no change has taken place
+            return factionJudgment.increaseAccoladeForFaction(factionCode, today, factionStanding);
+        }
+
+        return null;
+    }
+
+    /**
      * Updates the internal map representing the "climate regard"—an attitude or relationship level—between the
      * specified campaign faction and all other factions for the given date.
      *

@@ -244,6 +244,8 @@ import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.universe.eras.Era;
 import mekhq.campaign.universe.eras.Eras;
+import mekhq.campaign.universe.factionStanding.FactionAccoladeEvent;
+import mekhq.campaign.universe.factionStanding.FactionAccoladeLevel;
 import mekhq.campaign.universe.factionStanding.FactionCensureEvent;
 import mekhq.campaign.universe.factionStanding.FactionCensureLevel;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
@@ -3602,6 +3604,74 @@ public class Campaign implements ITechManager {
     }
 
     /**
+     * Determines the commander of the unit.
+     *
+     * <p>If a flagged commander exists, that person is returned. Otherwise, the highest-ranking member among the
+     * unit's active personnel is selected as commander. In case of a rank tie, a skill-based tiebreaker is used to
+     * determine precedence.</p>
+     *
+     * @return the {@link Person} serving as commander, or {@code null} if no eligible personnel are found.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public @Nullable Person getCommander() {
+        Person commander = getFlaggedCommander();
+
+        if (commander != null) {
+            return commander;
+        }
+
+        for (Person person : getActivePersonnel(false)) {
+            if (commander == null) {
+                commander = person;
+                continue;
+            }
+
+            if (person.outRanksUsingSkillTiebreaker(this, commander)) {
+                commander = person;
+            }
+        }
+
+        return commander;
+    }
+
+    /**
+     * Retrieves the second-in-command among the unit's active personnel.
+     *
+     * <p>The second-in-command is determined as the highest-ranking active personnel member who is not the flagged
+     * commander. If more than one candidate has the same rank, a skill-based tiebreaker is used to determine which
+     * person outranks the others.</p>
+     *
+     * @return the {@link Person} who is considered the second-in-command, or {@code null} if there are no suitable
+     *       candidates.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public @Nullable Person getSecondInCommand() {
+        Person commander = getCommander();
+
+        Person secondInCommand = null;
+        for (Person person : getActivePersonnel(false)) {
+            if (person.equals(commander)) {
+                continue;
+            }
+
+            if (secondInCommand == null) {
+                secondInCommand = person;
+                continue;
+            }
+
+            if (person.outRanksUsingSkillTiebreaker(this, secondInCommand)) {
+                secondInCommand = person;
+            }
+        }
+
+        return secondInCommand;
+    }
+
+    /**
      * Retrieves a list of eligible logistics personnel who can perform procurement actions based on the current
      * campaign options. If acquisitions are set to automatically succeed, an empty list is returned.
      *
@@ -5734,26 +5804,63 @@ public class Campaign implements ITechManager {
 
         // Faction Standing
         if (campaignOptions.isTrackFactionStanding()) {
-            if (isFirstOfMonth) {
-                String report = factionStandings.updateClimateRegard(faction, currentDay);
-                addReport(report);
-            }
-
-            // We only check when the campaign doesn't have an active Mission. This is so we don't have to deal with
-            // leadership personnel becoming unavailable while on active deployment.
-            if (getActiveMissions(false).isEmpty()) {
-                FactionCensureLevel newCensureLevel = factionStandings.checkForCensure(faction, currentDay);
-                if (newCensureLevel != null) {
-                    new FactionCensureEvent(this, newCensureLevel);
-                }
-
-                factionStandings.processCensureDegradation(currentDay);
-            }
+            performFactionStandingChecks(isFirstOfMonth);
         }
 
         // This must be the last step before returning true
         MekHQ.triggerEvent(new NewDayEvent(this));
         return true;
+    }
+
+    /**
+     * Performs a series of faction standing checks that may impact campaign relations.
+     *
+     * <p>On the first day of the month, this method updates the standing climate and regard for the current faction
+     * and records a report. Regular checks include running censure evaluations and processing any necessary censure
+     * degradation if there are no active missions, ensuring that key leadership changes do not occur while deployed.
+     * Additionally, on the first day of the month, the method evaluates accolade status for all relevant factions.</p>
+     *
+     * @param isFirstOfMonth {@code true} if this method is being called on the first day of the month, enabling
+     *                       climate, regard, and accolade checks; otherwise {@code false}.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private void performFactionStandingChecks(boolean isFirstOfMonth) {
+        if (isFirstOfMonth) {
+            String report = factionStandings.updateClimateRegard(faction, currentDay);
+            addReport(report);
+        }
+
+        // We only check when the campaign doesn't have an active Mission. This is so we don't have to deal with
+        // leadership personnel becoming unavailable while on active deployment.
+        if (getActiveMissions(false).isEmpty()) {
+            FactionCensureLevel newCensureLevel = factionStandings.checkForCensure(faction, currentDay);
+            if (newCensureLevel != null) {
+                new FactionCensureEvent(this, newCensureLevel);
+            }
+
+            factionStandings.processCensureDegradation(currentDay);
+        }
+
+        if (isFirstOfMonth) {
+            for (Entry<String, Double> standing : factionStandings.getAllFactionStandings().entrySet()) {
+                Faction relevantFaction = Factions.getInstance().getFaction(standing.getKey());
+
+                if (relevantFaction != null) {
+                    FactionAccoladeLevel newAccoladeLevel = factionStandings.checkForAccolade(relevantFaction,
+                          currentDay);
+                    logger.info("Accolade level: {} for faction: {}", newAccoladeLevel, relevantFaction.getShortName());
+
+                    if (newAccoladeLevel != null) {
+                        new FactionAccoladeEvent(this, relevantFaction, newAccoladeLevel,
+                              faction.equals(relevantFaction));
+                    }
+                } else {
+                    logger.warn("Unable to fetch faction standing for faction: {}", standing.getKey());
+                }
+            }
+        }
     }
 
     public void refreshPersonnelMarkets() {
@@ -5966,16 +6073,21 @@ public class Campaign implements ITechManager {
         }
     }
 
+    /**
+     * Retrieves the flagged commander from the personnel list. If no flagged commander is found returns {@code null}.
+     *
+     * <p><b>Usage:</b> consider using {@link #getCommander()} instead.</p>
+     *
+     * @return the flagged commander if present, otherwise {@code null}
+     */
     public @Nullable Person getFlaggedCommander() {
         return getPersonnel().stream().filter(Person::isCommander).findFirst().orElse(null);
     }
 
     /**
-     * return the probable commander. If we find a flagged commander, return that. Otherwise, return person with most
-     * senior rank. Ties go to the first in the queue.
-     *
-     * @return Person object of the commander
+     * Use {@link #getCommander()} instead
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public Person getSeniorCommander() {
         Person commander = null;
         for (Person p : getActivePersonnel(true)) {
@@ -9818,7 +9930,7 @@ public class Campaign implements ITechManager {
      * @return A {@link String} representing the appropriate address for the commander, either formal or informal.
      */
     public String getCommanderAddress(boolean isInformal) {
-        Person commander = getFlaggedCommander();
+        Person commander = getCommander();
 
         if (commander == null) {
             if (isInformal) {

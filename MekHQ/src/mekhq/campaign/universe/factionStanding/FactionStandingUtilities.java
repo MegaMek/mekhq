@@ -72,6 +72,14 @@ public class FactionStandingUtilities {
             }
         }
 
+        if (regard > FactionStandingLevel.STANDING_LEVEL_8.getMaximumRegard()) {
+            return FactionStandingLevel.STANDING_LEVEL_8;
+        }
+
+        if (regard < FactionStandingLevel.STANDING_LEVEL_0.getMinimumRegard()) {
+            return FactionStandingLevel.STANDING_LEVEL_0;
+        }
+
         // I'm not expecting this to happen, given we already accept all values between Integer#MIN_VALUE and
         // Integer#MAX_VALUE. But if it somehow does, we'll just return STANDING_LEVEL_4 as a default.
         LOGGER.warn("Regard value {} is outside of the faction standing level range. Returning STANDING_LEVEL_4.",
