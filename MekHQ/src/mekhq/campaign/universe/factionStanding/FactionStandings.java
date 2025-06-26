@@ -334,6 +334,9 @@ public class FactionStandings {
         Collection<Faction> allFactions = Factions.getInstance().getFactions();
         FactionHints factionHints = FactionHints.defaultFactionHints();
 
+        boolean isMercenary = campaignFaction.isMercenary();
+        boolean isPirate = campaignFaction.isPirate();
+
         String report;
         for (Faction otherFaction : allFactions) {
             if (!otherFaction.validIn(gameYear)) {
@@ -356,7 +359,8 @@ public class FactionStandings {
                 continue;
             }
 
-            if (factionHints.isAlliedWith(campaignFaction, otherFaction, today)) {
+            if ((isPirate && otherFaction.isPirate())
+                      || factionHints.isAlliedWith(campaignFaction, otherFaction, today)) {
                 report = changeRegardForFaction(campaignFactionCode, otherFactionCode, STARTING_REGARD_ALLIED_FACTION,
                       gameYear);
                 if (!report.isBlank()) {
@@ -365,7 +369,8 @@ public class FactionStandings {
                 }
             }
 
-            if (factionHints.isAtWarWith(campaignFaction, otherFaction, today)) {
+            if ((isPirate && !otherFaction.isPirate())
+                      || factionHints.isAtWarWith(campaignFaction, otherFaction, today)) {
                 report = changeRegardForFaction(campaignFactionCode, otherFactionCode,
                       STARTING_REGARD_ENEMY_FACTION_AT_WAR, gameYear);
                 if (!report.isBlank()) {
@@ -379,10 +384,11 @@ public class FactionStandings {
                       STARTING_REGARD_ENEMY_FACTION_RIVAL, gameYear);
                 if (!report.isBlank()) {
                     regardChangeReports.add(report);
+                    continue;
                 }
             }
 
-            if (campaignFaction.isMercenary()) {
+            if (isMercenary) {
                 double mercenaryRelationsModifier = MercenaryRelations.getMercenaryRelationsModifier(otherFaction,
                       today);
 
@@ -717,18 +723,6 @@ public class FactionStandings {
                 continue;
             }
 
-            if ((isPirate && otherFaction.isPirate()) ||
-                      factionHints.isAlliedWith(campaignFaction, otherFaction, today)) {
-                climateRegard.put(otherFactionCode, CLIMATE_REGARD_ALLIED_FACTION);
-                continue;
-            }
-
-            if ((isPirate && !otherFaction.isPirate()) ||
-                      factionHints.isAtWarWith(campaignFaction, otherFaction, today)) {
-                climateRegard.put(otherFactionCode, CLIMATE_REGARD_ENEMY_FACTION_AT_WAR);
-                continue;
-            }
-
             if (factionHints.isRivalOf(campaignFaction, otherFaction, today)) {
                 climateRegard.put(otherFactionCode, CLIMATE_REGARD_ENEMY_FACTION_RIVAL);
             }
@@ -740,6 +734,18 @@ public class FactionStandings {
                 if (mercenaryRelationsModifier != DEFAULT_REGARD) {
                     climateRegard.put(otherFactionCode, mercenaryRelationsModifier);
                 }
+            }
+
+            if ((isPirate && otherFaction.isPirate()) ||
+                      factionHints.isAlliedWith(campaignFaction, otherFaction, today)) {
+                climateRegard.put(otherFactionCode, CLIMATE_REGARD_ALLIED_FACTION);
+                continue;
+            }
+
+            if ((isPirate && !otherFaction.isPirate()) ||
+                      factionHints.isAtWarWith(campaignFaction, otherFaction, today)) {
+                climateRegard.put(otherFactionCode, CLIMATE_REGARD_ENEMY_FACTION_AT_WAR);
+                continue;
             }
         }
 
