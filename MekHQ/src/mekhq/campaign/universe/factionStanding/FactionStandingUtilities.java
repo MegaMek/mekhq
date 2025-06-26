@@ -51,8 +51,8 @@ public class FactionStandingUtilities {
     /**
      * Determines the {@link FactionStandingLevel} corresponding to the given regard value.
      *
-     * <p>Iterates through all defined standing levels and returns the one whose regard range (exclusive of minimum,
-     * and inclusive of maximum) contains the provided regard value.</p>
+     * <p>Iterates through all defined standing levels and returns the one whose regard range (inclusive of the minimum
+     * and maximum regard) contains the provided regard value.</p>
      *
      * <p>If the regard value does not fall within any defined standing level range, this method logs a warning and
      * returns {@link FactionStandingLevel#STANDING_LEVEL_4} as a default.</p>
@@ -302,17 +302,17 @@ public class FactionStandingUtilities {
     }
 
     /**
-     * Determines whether command circuit access should be granted based on campaign settings, game master mode, current
+     * Determines whether command circuit access should be granted based on campaign settings, GM mode, current
      * faction standings, and a list of active contracts.
      *
-     * <p>Access is immediately granted if both command circuit requirements are overridden and game master mode is
+     * <p>Access is immediately granted if both command circuit requirements are overridden and GM mode is
      * active. If not, and if faction standing is used as a criterion, the method evaluates the player's highest faction
      * regard across all active contracts, granting access if this level meets the threshold.</p>
      *
      * <p>If there are no active contracts, access is denied.</p>
      *
      * @param overridingCommandCircuitRequirements {@code true} if command circuit requirements are overridden
-     * @param isGM                                 {@code true} if game master mode is enabled
+     * @param isGM                                 {@code true} if GM mode is enabled
      * @param useFactionStandingCommandCircuit     {@code true} if faction standing is used to determine access
      * @param factionStandings                     player faction standing data
      * @param activeContracts                      list of currently active contracts to evaluate for access
