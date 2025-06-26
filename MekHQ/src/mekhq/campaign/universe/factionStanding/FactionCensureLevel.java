@@ -47,7 +47,7 @@ import megamek.logging.MMLogger;
  */
 public enum FactionCensureLevel {
     /** The absence of any censure or disciplinary action. */
-    NONE(0),
+    NO_CENSURE(0),
     /** A warning imposed as a form of censure. */
     WARNING(1),
     /** Mandatory retirement imposed on the campaign commander as censure. */
@@ -59,7 +59,7 @@ public enum FactionCensureLevel {
     /** Forcible disbanding of the campaign as a disciplinary action. */
     DISBAND(5);
 
-    public static final int MIN_CENSURE_SEVERITY = NONE.getSeverity();
+    public static final int MIN_CENSURE_SEVERITY = NO_CENSURE.getSeverity();
     public static final int MAX_CENSURE_SEVERITY = DISBAND.getSeverity();
 
     /** The severity level of this censure. Higher values indicate more severe censures. */
@@ -123,7 +123,7 @@ public enum FactionCensureLevel {
                 return censureLevel;
             }
         }
-        return NONE;
+        return NO_CENSURE;
     }
 
     /**
@@ -133,7 +133,7 @@ public enum FactionCensureLevel {
      * value from the {@link FactionCensureLevel} enum. If that fails, it then attempts to parse the text by its
      * name.</p>
      *
-     * <p>If neither parsing attempt succeeds, it logs a warning and returns {@link FactionCensureLevel#NONE}.</p>
+     * <p>If neither parsing attempt succeeds, it logs a warning and returns {@link FactionCensureLevel#NO_CENSURE}.</p>
      *
      * @param text the {@link String} to parse, representing either an enum ordinal or name
      *
@@ -149,7 +149,7 @@ public enum FactionCensureLevel {
         }
 
         try {
-            int severity = MathUtility.parseInt(text, NONE.getSeverity());
+            int severity = MathUtility.parseInt(text, NO_CENSURE.getSeverity());
             return getCensureLevelFromSeverity(severity);
         } catch (Exception ignored) {
         }
@@ -157,6 +157,6 @@ public enum FactionCensureLevel {
         MMLogger.create(FactionCensureLevel.class)
               .warn("Unable to parse {} into an FactionCensureLevel. Returning NONE.",
                     text);
-        return NONE;
+        return NO_CENSURE;
     }
 }

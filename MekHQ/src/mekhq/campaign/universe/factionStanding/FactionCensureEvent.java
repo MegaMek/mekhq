@@ -169,7 +169,7 @@ public class FactionCensureEvent {
     private void handleCensureEffects(FactionCensureLevel censureLevel,
           boolean committedSeppuku) {
         switch (censureLevel) {
-            case NONE -> {
+            case NO_CENSURE -> {
                 return;
             }
             case WARNING -> {

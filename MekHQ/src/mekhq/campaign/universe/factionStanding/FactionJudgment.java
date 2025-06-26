@@ -281,7 +281,7 @@ public class FactionJudgment {
      * @since 0.50.07
      */
     private static CensureEntry readFromFactionNode(Node codeNode) {
-        FactionCensureLevel level = FactionCensureLevel.NONE;
+        FactionCensureLevel level = FactionCensureLevel.NO_CENSURE;
         LocalDate issueDate = LocalDate.MIN;
 
         NodeList props = codeNode.getChildNodes();
