@@ -52,8 +52,8 @@ class AccoladeEntryTest {
           COOLDOWN_PERIOD + ",FIELD_COMMENDATION,false",
           (COOLDOWN_PERIOD - 1) + ",FIELD_COMMENDATION,false",
           (COOLDOWN_PERIOD + 1) + ",FIELD_COMMENDATION,true",
-          // Improvement should be false for STATUE even after cooldown
-          (COOLDOWN_PERIOD + 1) + ",STATUE,false"
+          // Improvement should be false for STATUE_OR_SIBKO even after cooldown
+          (COOLDOWN_PERIOD + 1) + ",STATUE_OR_SIBKO,false"
     })
     void testCanImprove(int monthsToAdd, FactionAccoladeLevel accoladeLevel,
           boolean expectedCanImprove) {

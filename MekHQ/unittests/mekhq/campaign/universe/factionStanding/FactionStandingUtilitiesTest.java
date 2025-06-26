@@ -68,12 +68,12 @@ class FactionStandingUtilitiesTest {
                                       FactionStandingLevel.STANDING_LEVEL_2.getMaximumRegard()) / 2,
                         FactionStandingLevel.STANDING_LEVEL_2),
                 // Out-of-range (below min, above max)
-                Arguments.of(Double.NEGATIVE_INFINITY, FactionStandingLevel.STANDING_LEVEL_4),
-                Arguments.of(Double.POSITIVE_INFINITY, FactionStandingLevel.STANDING_LEVEL_4),
-                Arguments.of(FactionStandingLevel.STANDING_LEVEL_1.getMinimumRegard() - 100.0,
-                        FactionStandingLevel.STANDING_LEVEL_4),
-                Arguments.of(FactionStandingLevel.STANDING_LEVEL_4.getMaximumRegard() + 100.0,
-                        FactionStandingLevel.STANDING_LEVEL_4)
+              Arguments.of(Double.NEGATIVE_INFINITY, FactionStandingLevel.STANDING_LEVEL_0),
+              Arguments.of(Double.POSITIVE_INFINITY, FactionStandingLevel.STANDING_LEVEL_8),
+              Arguments.of(FactionStandingLevel.STANDING_LEVEL_0.getMinimumRegard() - 100.0,
+                    FactionStandingLevel.STANDING_LEVEL_0),
+              Arguments.of(FactionStandingLevel.STANDING_LEVEL_8.getMaximumRegard() + 100.0,
+                    FactionStandingLevel.STANDING_LEVEL_8)
         );
     }
 
