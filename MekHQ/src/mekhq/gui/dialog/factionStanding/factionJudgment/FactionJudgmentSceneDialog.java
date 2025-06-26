@@ -33,7 +33,7 @@
 package mekhq.gui.dialog.factionStanding.factionJudgment;
 
 import static megamek.common.Compute.randomInt;
-import static mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentSceneType.SEPPUKU;
+import static mekhq.campaign.universe.factionStanding.FactionJudgmentSceneType.SEPPUKU;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -50,6 +50,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PronounData;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.factionStanding.FactionJudgmentSceneType;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.utilities.MHQInternationalization;
 

@@ -32,16 +32,6 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
-import static megamek.common.Compute.randomInt;
-import static mekhq.campaign.universe.factionStanding.FactionCensureEvent.POLITICAL_ROLES;
-import static mekhq.campaign.universe.factionStanding.FactionCensureEvent.processMassLoyaltyChange;
-
-import java.time.LocalDate;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
@@ -51,7 +41,16 @@ import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionCensureGoingRogueDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentSceneDialog;
-import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentSceneType;
+
+import java.time.LocalDate;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import static megamek.common.Compute.randomInt;
+import static mekhq.campaign.universe.factionStanding.FactionCensureEvent.POLITICAL_ROLES;
+import static mekhq.campaign.universe.factionStanding.FactionCensureEvent.processMassLoyaltyChange;
 
 /**
  * Handles the "going rogue" event for a campaign, where a force defects or leaves its current faction.

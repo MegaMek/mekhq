@@ -30,9 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.dialog.factionStanding.factionJudgment;
-
-import mekhq.campaign.universe.factionStanding.FactionCensureEvent;
+package mekhq.campaign.universe.factionStanding;
 
 /**
  * Enum representing the various judgment scene types that can occur during a faction censure event. Each constant is
