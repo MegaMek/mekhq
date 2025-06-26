@@ -261,11 +261,9 @@ public class FactionJudgment {
         for (int i = 0; i < childNodes.getLength(); i++) {
             Node node = childNodes.item(i);
             if (node.getNodeType() == Node.ELEMENT_NODE) {
-                String factionCode = node.getNodeName(); // here: "DC", or whatever code
+                String factionCode = node.getNodeName();
                 CensureEntry entry = readFromFactionNode(node);
-                if (entry != null) {
-                    entries.put(factionCode, entry);
-                }
+                entries.put(factionCode, entry);
             }
         }
         return entries;
