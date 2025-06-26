@@ -703,11 +703,16 @@ public class FactionStandings {
         }
 
         String factionCode = faction.getShortName();
+        if (factionJudgment.factionHasCensure(factionCode)) {
+            LOGGER.debug("Faction {} has a censure, so accolade improvement is impossible.", factionCode);
+            return null;
+        }
+
         double regard = getRegardForFaction(factionCode, true);
         FactionStandingLevel factionStanding = FactionStandingUtilities.calculateFactionStandingLevel(regard);
 
         if (factionStanding.getStandingLevel() >= FactionJudgment.THRESHOLD_FOR_ACCOLADE) {
-            LOGGER.info("Faction {} has sufficient standing for accolade improvement.", factionCode);
+            LOGGER.debug("Faction {} has sufficient standing for accolade improvement.", factionCode);
             // This will return null if no change has taken place
             return factionJudgment.increaseAccoladeForFaction(factionCode, today, factionStanding);
         }

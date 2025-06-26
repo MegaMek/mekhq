@@ -92,6 +92,20 @@ public class FactionJudgment {
     }
 
     /**
+     * Checks whether the specified faction currently has an active censure.
+     *
+     * @param factionCode the unique code identifying the faction to check
+     *
+     * @return {@code true} if the faction has an active censure; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public boolean factionHasCensure(final String factionCode) {
+        return factionCensures.containsKey(factionCode);
+    }
+
+    /**
      * Sets the censure level for a specific faction as of the provided date.
      *
      * @param factionCode  the faction's code
@@ -253,12 +267,12 @@ public class FactionJudgment {
 
         if (accoladeEntry == null) {
             setAccoladeForFaction(factionCode, FactionAccoladeLevel.TAKING_NOTICE, today);
-            LOGGER.info("Faction {} has no accolade entry, assigning TAKING_NOTICE", factionCode);
+            LOGGER.debug("Faction {} has no accolade entry, assigning TAKING_NOTICE", factionCode);
             return FactionAccoladeLevel.TAKING_NOTICE;
         }
 
         if (!accoladeEntry.canImprove(today, currentStandingWithFaction)) {
-            LOGGER.info("Faction {} cannot improve accolade, skipping", factionCode);
+            LOGGER.debug("Faction {} cannot improve accolade, skipping", factionCode);
             return null;
         }
 
@@ -267,7 +281,7 @@ public class FactionJudgment {
         currentRecognition++;
         FactionAccoladeLevel updatedAccoladeLevel = FactionAccoladeLevel.getAccoladeRecognitionFromRecognition(
               currentRecognition);
-        LOGGER.info("Increasing accolade level for faction {} to {}", factionCode, updatedAccoladeLevel);
+        LOGGER.debug("Increasing accolade level for faction {} to {}", factionCode, updatedAccoladeLevel);
 
         setAccoladeForFaction(factionCode, updatedAccoladeLevel, today);
         return updatedAccoladeLevel;

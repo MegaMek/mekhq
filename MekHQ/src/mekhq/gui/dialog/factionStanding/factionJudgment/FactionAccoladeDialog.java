@@ -1,13 +1,5 @@
 package mekhq.gui.dialog.factionStanding.factionJudgment;
 
-import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.ADOPTION_OR_LANCE;
-import static mekhq.utilities.MHQInternationalization.getFormattedText;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
@@ -23,6 +15,12 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.factionStanding.FactionAccoladeLevel;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.utilities.MHQInternationalization;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.ADOPTION_OR_LANCE;
+import static mekhq.utilities.MHQInternationalization.*;
 
 public class FactionAccoladeDialog {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionAccoladeDialog";
@@ -55,10 +53,10 @@ public class FactionAccoladeDialog {
         this.factionCode = factionCode;
 
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
-              commander,
-              getSpeaker(accoladeLevel),
-              getInCharacterMessage(accoladeLevel, isSameFaction),
-              getButtons(accoladeLevel, isSameFaction),
+                getSpeaker(accoladeLevel),
+                null,
+                getInCharacterMessage(accoladeLevel, isSameFaction),
+                getButtons(accoladeLevel, isSameFaction),
               null,
               null,
               true);

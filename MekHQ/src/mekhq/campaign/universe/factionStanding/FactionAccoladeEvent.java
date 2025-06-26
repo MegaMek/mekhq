@@ -55,12 +55,37 @@ import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionAccoladeConfirmationDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionAccoladeDialog;
 
+/**
+ * Handles events where a campaign receives a faction accolade, such as adoption.
+ *
+ * <p>This class manages the process of applying faction accolades to a campaign, potentially including confirming
+ * with the user, generating narrative dialogs, and adding new units to the campaign roster as a result of the accolade
+ * event. Accolade effects and unit generation can be configured based on both the awarded faction and the level of
+ * recognition.</p>
+ *
+ * @author Illiani
+ * @since 0.50.07
+ */
 public class FactionAccoladeEvent {
     private static final MMLogger LOGGER = MMLogger.create(FactionAccoladeEvent.class);
 
     final Campaign campaign;
     final String factionCode;
 
+    /**
+     * Creates a new {@link FactionAccoladeEvent} and applies its effects to the campaign.
+     *
+     * <p>Handles user dialog interaction, confirmation (if required), processing narrative events, and generating
+     * new units awarded by the accolade.</p>
+     *
+     * @param campaign      the campaign receiving the accolade
+     * @param faction       the faction granting the accolade
+     * @param accoladeLevel the type/level of accolade
+     * @param isSameFaction whether the campaign's commander currently belongs to the awarding faction
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     public FactionAccoladeEvent(Campaign campaign, Faction faction, FactionAccoladeLevel accoladeLevel,
           boolean isSameFaction) {
         this.campaign = campaign;
@@ -68,17 +93,22 @@ public class FactionAccoladeEvent {
 
         Person commander = campaign.getCommander();
 
-        FactionAccoladeDialog dialog = new FactionAccoladeDialog(campaign, factionCode, accoladeLevel, isSameFaction,
+        FactionAccoladeDialog initialDialog = new FactionAccoladeDialog(campaign,
+              factionCode,
+              accoladeLevel,
+              isSameFaction,
               commander);
 
-        if (accoladeLevel.is(ADOPTION_OR_LANCE)) {
-            if (dialog.wasRefused()) {
-                FactionAccoladeConfirmationDialog confirmationDialog = new FactionAccoladeConfirmationDialog(campaign,
-                      accoladeLevel);
-                if (!confirmationDialog.wasConfirmed()) {
-                    new FactionAccoladeEvent(campaign, faction, accoladeLevel, isSameFaction);
-                    return;
-                }
+        if ((accoladeLevel.is(ADOPTION_OR_LANCE))) {
+            FactionAccoladeConfirmationDialog confirmationDialog = new FactionAccoladeConfirmationDialog(campaign,
+                  accoladeLevel);
+            if (!confirmationDialog.wasConfirmed()) {
+                new FactionAccoladeEvent(campaign, faction, accoladeLevel, isSameFaction);
+                return;
+            }
+
+            if (initialDialog.wasRefused()) {
+                return;
             }
 
             if (!isSameFaction) {
@@ -92,6 +122,18 @@ public class FactionAccoladeEvent {
         }
     }
 
+    /**
+     * Generates and returns a list of units awarded as part of the accolade event.
+     *
+     * <p>The generation process considers the faction, game year, required movement modes, and whether clan or inner
+     * sphere eligibility applies in unit selection. If unit files fail to load, this is logged, and failed units are
+     * skipped.</p>
+     *
+     * @return a list of {@link Entity} objects representing the generated units; may be empty if generation failed
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private List<Entity> generateUnits() {
         List<Entity> generatedEntities = new ArrayList<>();
 
@@ -138,6 +180,22 @@ public class FactionAccoladeEvent {
         return generatedEntities;
     }
 
+    /**
+     * Determines whether a {@link MekSummary} represents a unit that is suitable for addition to this event's
+     * accolade.
+     *
+     * <p>A unit is suitable if its introduction year is less than the campaign's current year and its affiliation
+     * (clan vs. inner sphere) matches the awarding faction.</p>
+     *
+     * @param mekSummary    the summary for the unit to check
+     * @param gameYear      the current campaign year
+     * @param factionIsClan whether the awarding faction is a clan
+     *
+     * @return {@code true} if the unit meets all suitability criteria; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private static boolean isSuitable(MekSummary mekSummary, int gameYear, boolean factionIsClan) {
         if (gameYear < mekSummary.getYear()) {
             return false;

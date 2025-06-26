@@ -5850,7 +5850,8 @@ public class Campaign implements ITechManager {
                 if (relevantFaction != null) {
                     FactionAccoladeLevel newAccoladeLevel = factionStandings.checkForAccolade(relevantFaction,
                           currentDay);
-                    logger.info("Accolade level: {} for faction: {}", newAccoladeLevel, relevantFaction.getShortName());
+                    logger.debug("Accolade level: {} for faction: {}", newAccoladeLevel,
+                          relevantFaction.getShortName());
 
                     if (newAccoladeLevel != null) {
                         new FactionAccoladeEvent(this, relevantFaction, newAccoladeLevel,
