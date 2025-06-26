@@ -32,10 +32,9 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
-import java.util.List;
-
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import megamek.common.annotations.Nullable;
@@ -68,12 +67,12 @@ public class FactionStandingUtilities {
      */
     public static FactionStandingLevel calculateFactionStandingLevel(double regard) {
         for (FactionStandingLevel standingLevel : FactionStandingLevel.values()) {
-            if (regard > standingLevel.getMinimumRegard() && regard <= standingLevel.getMaximumRegard()) {
+            if (regard >= standingLevel.getMinimumRegard() && regard <= standingLevel.getMaximumRegard()) {
                 return standingLevel;
             }
         }
 
-        // I'm not expecting this to happen given we already accept all values between Integer#MIN_VALUE and
+        // I'm not expecting this to happen, given we already accept all values between Integer#MIN_VALUE and
         // Integer#MAX_VALUE. But if it somehow does, we'll just return STANDING_LEVEL_4 as a default.
         LOGGER.warn("Regard value {} is outside of the faction standing level range. Returning STANDING_LEVEL_4.",
               FactionStandingLevel.STANDING_LEVEL_4);

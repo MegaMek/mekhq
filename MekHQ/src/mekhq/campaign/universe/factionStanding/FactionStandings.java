@@ -102,7 +102,7 @@ public class FactionStandings {
     /**
      * A constant representing the minimum regard a campaign can have with any faction.
      */
-    static final double MINIMUM_REGARD = STANDING_LEVEL_0.getMinimumRegard() - 10;
+    static final double MINIMUM_REGARD = STANDING_LEVEL_0.getMinimumRegard();
 
     /**
      * The base regard value for all factions.
