@@ -255,7 +255,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
     private void calculateJumpPath() {
         if (null != panMap.getSelectedSystem()) {
             panMap.setJumpPath(getCampaign().calculateJumpPath(getCampaign().getCurrentSystem(),
-                  panMap.getSelectedSystem()));
+                  panMap.getSelectedSystem(), false, false));
             refreshPlanetView();
         }
     }

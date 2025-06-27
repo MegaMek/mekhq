@@ -45,6 +45,7 @@ import java.util.stream.Collectors;
 import megamek.client.ratgenerator.FactionRecord;
 import megamek.common.annotations.Nullable;
 import megamek.common.universe.Faction2;
+import megamek.common.universe.FactionLeaderData;
 import megamek.common.universe.FactionTag;
 import megamek.common.universe.HonorRating;
 import mekhq.Utilities;
@@ -565,5 +566,19 @@ public class Faction {
      */
     public boolean isAggregate() {
         return faction2.isAggregate();
+    }
+
+    /**
+     * Retrieves the faction leader in power during the specified year.
+     *
+     * @param year the year to check for a valid leader
+     *
+     * @return the {@link FactionLeaderData} for the leader valid in the given year, or {@code null} if none found
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public @Nullable FactionLeaderData getLeaderForYear(final int year) {
+        return faction2.getFactionLeaderForYear(year);
     }
 }
