@@ -26,3 +26,10 @@ ratingLevels:
 fallBackFactions:
   - CLAN.HW
 preInvasionHonorRating: OPPORTUNISTIC
+factionLeaders:
+  - title: "Khan"
+    firstName: "Dana"
+    surname: "Kufahl"
+    gender: "FEMALE"
+    startYear: 2807
+    endYear: 2822
