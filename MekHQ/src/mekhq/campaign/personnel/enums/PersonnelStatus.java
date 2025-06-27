@@ -88,7 +88,9 @@ public enum PersonnelStatus {
     ENEMY_BONDSMAN(NotificationSeverity.NEGATIVE, false, false),
     BONDSREF(NotificationSeverity.NEGATIVE, true, true),
     SEPPUKU(NotificationSeverity.NEGATIVE, true, true),
-    BACKGROUND_CHARACTER(NotificationSeverity.WARNING, false, false);
+    BACKGROUND_CHARACTER(NotificationSeverity.WARNING, false, false),
+    IMPRISONED(NotificationSeverity.NEGATIVE, false, false),
+    DISHONORABLY_DISCHARGED(NotificationSeverity.NEGATIVE, false, false);
 
     /**
      * Represents the severity levels of a status.
@@ -489,6 +491,16 @@ public enum PersonnelStatus {
     }
 
     /**
+     * Checks if the character has the {@link #DISHONORABLY_DISCHARGED} personnel status.
+     *
+     * @return {@code true} if the character has the {@link #DISHONORABLY_DISCHARGED} personnel status {@code false}
+     *       otherwise.
+     */
+    public boolean isDishonorablyDischarged() {
+        return this == DISHONORABLY_DISCHARGED;
+    }
+
+    /**
      * Checks if the character has the {@link #BONDSREF} personnel status.
      *
      * @return {@code true} if the character has the {@link #BONDSREF} personnel status {@code false} otherwise.
@@ -517,17 +529,24 @@ public enum PersonnelStatus {
     }
 
     /**
+     * Checks if the character has the {@link #IMPRISONED} personnel status.
+     *
+     * @return {@code true} if the character has the {@link #IMPRISONED} personnel status {@code false} otherwise.
+     */
+    public boolean isImprisoned() {
+        return this == IMPRISONED;
+    }
+
+    /**
      * @return {@code true} if a person is currently absent from the core force, otherwise {@code false}
      */
     public boolean isAbsent() {
         return isMIA() ||
                      isPoW() ||
-                     isEnemyBondsman() ||
                      isOnLeave() ||
                      isOnMaternityLeave() ||
                      isAwol() ||
-                     isStudent() ||
-                     isMissing();
+                     isStudent();
     }
 
     /**
@@ -553,7 +572,10 @@ public enum PersonnelStatus {
                      isDeserted() ||
                      isDefected() ||
                      isMissing() ||
-                     isLeft() || isEnemyBondsman() ||
+                     isLeft() ||
+                     isImprisoned() ||
+                     isEnemyBondsman() ||
+                     isDishonorablyDischarged() ||
                      // We count background characters as departed, even though they technically never joined
                      isBackground();
     }

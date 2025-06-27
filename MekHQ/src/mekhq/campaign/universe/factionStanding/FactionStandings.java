@@ -102,7 +102,7 @@ public class FactionStandings {
     /**
      * A constant representing the minimum regard a campaign can have with any faction.
      */
-    static final double MINIMUM_REGARD = STANDING_LEVEL_0.getMinimumRegard() - 10;
+    static final double MINIMUM_REGARD = STANDING_LEVEL_0.getMinimumRegard();
 
     /**
      * The base regard value for all factions.
@@ -247,6 +247,13 @@ public class FactionStandings {
     private Map<String, Double> climateRegard = new HashMap<>();
 
     /**
+     * Holds information relating to faction judgment activities.
+     *
+     * <p>This variable is used to store and track any actions a faction may have taken for or against the campaign.</p>
+     */
+    private FactionJudgment factionJudgment = new FactionJudgment();
+
+    /**
      * Constructs an empty standings map. No initial relationships or regard values are set.
      *
      * <p><b>Usage:</b> this does not populate the 'standing' map with any values. That has to be handled
@@ -327,6 +334,9 @@ public class FactionStandings {
         Collection<Faction> allFactions = Factions.getInstance().getFactions();
         FactionHints factionHints = FactionHints.defaultFactionHints();
 
+        boolean isMercenary = campaignFaction.isMercenary();
+        boolean isPirate = campaignFaction.isPirate();
+
         String report;
         for (Faction otherFaction : allFactions) {
             if (!otherFaction.validIn(gameYear)) {
@@ -349,7 +359,8 @@ public class FactionStandings {
                 continue;
             }
 
-            if (factionHints.isAlliedWith(campaignFaction, otherFaction, today)) {
+            if ((isPirate && otherFaction.isPirate())
+                      || factionHints.isAlliedWith(campaignFaction, otherFaction, today)) {
                 report = changeRegardForFaction(campaignFactionCode, otherFactionCode, STARTING_REGARD_ALLIED_FACTION,
                       gameYear);
                 if (!report.isBlank()) {
@@ -358,7 +369,8 @@ public class FactionStandings {
                 }
             }
 
-            if (factionHints.isAtWarWith(campaignFaction, otherFaction, today)) {
+            if ((isPirate && !otherFaction.isPirate())
+                      || factionHints.isAtWarWith(campaignFaction, otherFaction, today)) {
                 report = changeRegardForFaction(campaignFactionCode, otherFactionCode,
                       STARTING_REGARD_ENEMY_FACTION_AT_WAR, gameYear);
                 if (!report.isBlank()) {
@@ -372,10 +384,11 @@ public class FactionStandings {
                       STARTING_REGARD_ENEMY_FACTION_RIVAL, gameYear);
                 if (!report.isBlank()) {
                     regardChangeReports.add(report);
+                    continue;
                 }
             }
 
-            if (campaignFaction.isMercenary()) {
+            if (isMercenary) {
                 double mercenaryRelationsModifier = MercenaryRelations.getMercenaryRelationsModifier(otherFaction,
                       today);
 
@@ -437,7 +450,6 @@ public class FactionStandings {
         this.factionRegard = factionRegard;
     }
 
-
     /**
      * Replaces the current map of faction standings with the provided map.
      *
@@ -450,6 +462,20 @@ public class FactionStandings {
      */
     public void setClimateRegard(Map<String, Double> climateRegard) {
         this.climateRegard = climateRegard;
+    }
+
+    /**
+     * Replaces the current {@link FactionJudgment} with the provided object.
+     *
+     * <p>Existing contents are discarded. After this call, only the entries in the given object remain.</p>
+     *
+     * @param factionJudgment the new {@link FactionJudgment} object
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public void setFactionJudgment(FactionJudgment factionJudgment) {
+        this.factionJudgment = factionJudgment;
     }
 
     /**
@@ -474,6 +500,21 @@ public class FactionStandings {
      */
     public Map<String, Double> getAllClimateRegard() {
         return climateRegard;
+    }
+
+    /**
+     * Returns the {@link FactionJudgment} instance associated with this object.
+     * <p>
+     * The {@link FactionJudgment} provides information and operations related to the judgement actions (censures)
+     * imposed due to faction standing or rule violations.</p>
+     *
+     * @return the {@link FactionJudgment} for this instance
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public FactionJudgment getFactionJudgments() {
+        return factionJudgment;
     }
 
     /**
@@ -588,6 +629,57 @@ public class FactionStandings {
     }
 
     /**
+     * Checks if the specified faction should receive a new or escalated censure based on its latest standing,
+     * and applies the appropriate censure level if necessary.
+     * <p>
+     * This method computes the current regard value for the given faction and determines the corresponding standing level.
+     * If the calculated standing level is at or below the threshold for censure, the faction's censure level
+     * will be increased for the provided date. The updated censure level is then returned; if no change is needed,
+     * {@code null} is returned.
+     * </p>
+     *
+     * @param faction the {@link Faction} object to check against
+     * @param today the date to use when recording a possible censure escalation
+     * @return the new {@link FactionCensureLevel} if a censure change occurred, or {@code null} if there was no change
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public @Nullable FactionCensureLevel checkForCensure(Faction faction, LocalDate today) {
+        if (faction.isAggregate()) {
+            return null;
+        }
+
+        String factionCode = faction.getShortName();
+        double regard = getRegardForFaction(factionCode, true);
+        FactionStandingLevel newFactionStanding = FactionStandingUtilities.calculateFactionStandingLevel(regard);
+
+        if (newFactionStanding.getStandingLevel() <= FactionJudgment.THRESHOLD_FOR_CENSURE) {
+            // This will return null if no change has taken place
+            return factionJudgment.increaseCensureForFaction(factionCode, today);
+        }
+
+        return null;
+    }
+
+    /**
+     * Processes all tracked faction censures to determine if any have expired as of the provided date, and
+     * automatically degrades (reduces) the censure level for any faction whose censure has expired.
+     * <p>
+     * Iterates through all current censure entries, checking if each entry's expiration date has passed. If so, it
+     * triggers a decrease in censure for the corresponding faction effective on the given day.
+     * </p>
+     *
+     * @param today the date to use when checking for censure expiration and applying any degradation
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public void processCensureDegradation(final LocalDate today) {
+        factionJudgment.processCensureDegradation(today);
+    }
+
+    /**
      * Updates the internal map representing the "climate regard"—an attitude or relationship level—between the
      * specified campaign faction and all other factions for the given date.
      *
@@ -631,18 +723,6 @@ public class FactionStandings {
                 continue;
             }
 
-            if ((isPirate && otherFaction.isPirate()) ||
-                      factionHints.isAlliedWith(campaignFaction, otherFaction, today)) {
-                climateRegard.put(otherFactionCode, CLIMATE_REGARD_ALLIED_FACTION);
-                continue;
-            }
-
-            if ((isPirate && !otherFaction.isPirate()) ||
-                      factionHints.isAtWarWith(campaignFaction, otherFaction, today)) {
-                climateRegard.put(otherFactionCode, CLIMATE_REGARD_ENEMY_FACTION_AT_WAR);
-                continue;
-            }
-
             if (factionHints.isRivalOf(campaignFaction, otherFaction, today)) {
                 climateRegard.put(otherFactionCode, CLIMATE_REGARD_ENEMY_FACTION_RIVAL);
             }
@@ -654,6 +734,18 @@ public class FactionStandings {
                 if (mercenaryRelationsModifier != DEFAULT_REGARD) {
                     climateRegard.put(otherFactionCode, mercenaryRelationsModifier);
                 }
+            }
+
+            if ((isPirate && otherFaction.isPirate()) ||
+                      factionHints.isAlliedWith(campaignFaction, otherFaction, today)) {
+                climateRegard.put(otherFactionCode, CLIMATE_REGARD_ALLIED_FACTION);
+                continue;
+            }
+
+            if ((isPirate && !otherFaction.isPirate()) ||
+                      factionHints.isAtWarWith(campaignFaction, otherFaction, today)) {
+                climateRegard.put(otherFactionCode, CLIMATE_REGARD_ENEMY_FACTION_AT_WAR);
+                continue;
             }
         }
 
@@ -795,7 +887,9 @@ public class FactionStandings {
             deltaDirection = getTextAt(RESOURCE_BUNDLE, "factionStandings.change.decreased");
         }
 
-        String factionName = relevantFaction.getFullName(gameYear);
+        String factionName = relevantFaction == null ?
+                                   getTextAt(RESOURCE_BUNDLE, "factionStandings.change.report.unknownFaction") :
+                                   relevantFaction.getFullName(gameYear);
         if (!factionName.contains(getTextAt(RESOURCE_BUNDLE, "factionStandings.change.report.clan.check"))) {
             factionName = getTextAt(RESOURCE_BUNDLE, "factionStandings.change.report.clan.prefix") + ' ' + factionName;
         }
@@ -1194,6 +1288,10 @@ public class FactionStandings {
             MHQXMLUtility.writeSimpleXMLTag(writer, indent, factionCode, climateRegard.get(factionCode).toString());
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "climateRegard");
+
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "factionJudgment");
+        factionJudgment.writeFactionJudgmentToXML(writer, indent);
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "factionJudgment");
     }
 
     /**
@@ -1231,6 +1329,8 @@ public class FactionStandings {
                     standings.setFactionRegard(processRegardNode(childNode, nodeName));
                 } else if (nodeName.equalsIgnoreCase("climateRegard")) {
                     standings.setClimateRegard(processRegardNode(childNode, nodeName));
+                } else if (nodeName.equalsIgnoreCase("factionJudgment")) {
+                    standings.setFactionJudgment(FactionJudgment.generateInstanceFromXML(childNode));
                 }
             }
         } catch (Exception ex) {
@@ -1272,6 +1372,24 @@ public class FactionStandings {
         return regard;
     }
 
+    /**
+     * Updates the campaign status for a list of past missions, adjusting faction standings, applying campaign icon and
+     * faction, and generating a report of changes.
+     *
+     * <p>The method resets all faction standings, initializes regard values, sorts missions by date and class,
+     * groups them by year, and processes each mission to handle standing updates and degradation if needed.</p>
+     *
+     * @param missions        the list of missions (including {@code Contract} and {@code AtBContract} types) to
+     *                        process
+     * @param campaignIcon    the icon that represents the campaign visually
+     * @param campaignFaction the main faction for the campaign
+     * @param today           the current in-campaign date
+     *
+     * @return a list of {@link String} objects representing reports or logs of actions performed during the update
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     public List<String> updateCampaignForPastMissions(List<Mission> missions, ImageIcon campaignIcon,
           Faction campaignFaction, LocalDate today) {
         List<String> reports = new ArrayList<>();
@@ -1338,6 +1456,14 @@ public class FactionStandings {
         return reports;
     }
 
+    /**
+     * Sorts the provided list of missions, ordering contract missions before non-contract missions. If both missions
+     * are contracts, they are ordered by their start dates.
+     *
+     * <p>This ensures contracts are prioritized chronologically, while other missions retain their relative order.</p>
+     *
+     * @param missions the list of missions to sort in-place
+     */
     private static void sortMissionsBasedOnStartDateAndClass(List<Mission> missions) {
         missions.sort((mission1, mission2) -> {
             boolean m1IsContract = mission1 instanceof Contract;

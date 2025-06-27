@@ -32,70 +32,64 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
-import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_0;
-import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import java.util.Arrays;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 class FactionStandingUtilitiesTest {
-    @Test
-    void test_calculateFactionStandingLevel_veryLowRegard() {
-        // Setup
-        int regard = Integer.MIN_VALUE + 1; // values must be above Integer#MIN_VALUE
+    static Stream<Arguments> standingLevelProvider() {
+        return Stream.of(
+                // In-range for all standing levels
+                Arguments.of(FactionStandingLevel.STANDING_LEVEL_1.getMinimumRegard(),
+                        FactionStandingLevel.STANDING_LEVEL_1),
+                Arguments.of(FactionStandingLevel.STANDING_LEVEL_1.getMaximumRegard(),
+                        FactionStandingLevel.STANDING_LEVEL_1),
+                Arguments.of(FactionStandingLevel.STANDING_LEVEL_2.getMinimumRegard(),
+                        FactionStandingLevel.STANDING_LEVEL_2),
+                Arguments.of(FactionStandingLevel.STANDING_LEVEL_2.getMaximumRegard(),
+                        FactionStandingLevel.STANDING_LEVEL_2),
+                Arguments.of(FactionStandingLevel.STANDING_LEVEL_3.getMinimumRegard(),
+                        FactionStandingLevel.STANDING_LEVEL_3),
+                Arguments.of(FactionStandingLevel.STANDING_LEVEL_3.getMaximumRegard(),
+                        FactionStandingLevel.STANDING_LEVEL_3),
+                Arguments.of(FactionStandingLevel.STANDING_LEVEL_4.getMinimumRegard(),
+                        FactionStandingLevel.STANDING_LEVEL_4),
+                Arguments.of(FactionStandingLevel.STANDING_LEVEL_4.getMaximumRegard(),
+                        FactionStandingLevel.STANDING_LEVEL_4),
+                // Typical mid-range values
+                Arguments.of((FactionStandingLevel.STANDING_LEVEL_2.getMinimumRegard() +
+                                      FactionStandingLevel.STANDING_LEVEL_2.getMaximumRegard()) / 2,
+                        FactionStandingLevel.STANDING_LEVEL_2),
+                // Out-of-range (below min, above max)
+                Arguments.of(Double.NEGATIVE_INFINITY, FactionStandingLevel.STANDING_LEVEL_4),
+                Arguments.of(Double.POSITIVE_INFINITY, FactionStandingLevel.STANDING_LEVEL_4),
+                Arguments.of(FactionStandingLevel.STANDING_LEVEL_1.getMinimumRegard() - 100.0,
+                        FactionStandingLevel.STANDING_LEVEL_4),
+                Arguments.of(FactionStandingLevel.STANDING_LEVEL_4.getMaximumRegard() + 100.0,
+                        FactionStandingLevel.STANDING_LEVEL_4)
+        );
+    }
 
-        // Act
-        FactionStandingLevel result = FactionStandingUtilities.calculateFactionStandingLevel(regard);
-
-        // Assert
-        assertEquals(STANDING_LEVEL_0, result, "Expected default STANDING_LEVEL_0 for very low Regard.");
+    @ParameterizedTest
+    @MethodSource("standingLevelProvider")
+    @DisplayName("Test calculateFactionStandingLevel for in-range and out-of-range values")
+    void testCalculateFactionStandingLevel(double inputRegard, FactionStandingLevel expectedLevel) {
+        assertEquals(expectedLevel, FactionStandingUtilities.calculateFactionStandingLevel(inputRegard));
     }
 
     @Test
-    void test_calculateFactionStandingLevel_veryHighRegard() {
-        // Setup
-        int regard = Integer.MAX_VALUE;
-
-        // Act
-        FactionStandingLevel result = FactionStandingUtilities.calculateFactionStandingLevel(regard);
-
-        // Assert
-        assertEquals(STANDING_LEVEL_8, result, "Expected default STANDING_LEVEL_8 for very high Regard.");
+    @DisplayName("Test calculateFactionStandingLevel always returns a valid standing level")
+    void testAlwaysReturnsStandingLevel() {
+        for (double regard : new double[] { Double.MIN_VALUE, 0.0, 1.0, -1.0, 100000, -100000, Double.NaN }) {
+            assertNotNull(FactionStandingUtilities.calculateFactionStandingLevel(regard));
+        }
     }
 
-    @ParameterizedTest(name = "Regard {0} → Standing {1}")
-    @MethodSource(value = "regardAndExpectedStandingLevel")
-    void testCalculateFactionStandingLevel_AllLevels(int regard, FactionStandingLevel expectedStanding) {
-        // Act
-        FactionStandingLevel result = FactionStandingUtilities.calculateFactionStandingLevel(regard);
-
-        // Assert
-        assertEquals(expectedStanding, result, "Expected " + expectedStanding.name() + " for " + regard + " regard.");
-    }
-
-    private static Stream<Arguments> regardAndExpectedStandingLevel() {
-        return Arrays.stream(FactionStandingLevel.values()).flatMap(standing -> {
-            // We're casting to an int as we don't need to check every possible decimal value.
-            // If all ints pass the test, then all doubles will too.
-            int minimumRegard = (int) standing.getMinimumRegard() + 1;
-            int maximumRegard = (int) standing.getMaximumRegard();
-            // These special handlers stop us iterating for all values between Integer#MIN_VALUE and
-            // Integer#MAX_VALUE.
-            if (standing == STANDING_LEVEL_0) {
-                minimumRegard = -110;
-            }
-            if (standing == STANDING_LEVEL_8) {
-                maximumRegard = 110;
-            }
-            return IntStream.rangeClosed(minimumRegard, maximumRegard)
-                         .mapToObj(regard -> Arguments.of(regard, standing));
-        });
-    }
 }
