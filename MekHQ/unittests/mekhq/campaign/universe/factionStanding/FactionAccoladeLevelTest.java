@@ -32,18 +32,20 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
+import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.MAX_ACCOLADE_RECOGNITION;
+import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.MIN_ACCOLADE_RECOGNITION;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.MAX_ACCOLADE_RECOGNITION;
-import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.MIN_ACCOLADE_RECOGNITION;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class FactionAccoladeLevelTest {
     @Test
@@ -81,12 +83,12 @@ class FactionAccoladeLevelTest {
         return Stream.of(
               // Valid enum name strings
               Arguments.of("NONE", FactionAccoladeLevel.NO_ACCOLADE),
-              Arguments.of("FIELD_COMMENDATION", FactionAccoladeLevel.FIELD_COMMENDATION),
-              Arguments.of("OFFICIAL_COMMENDATION", FactionAccoladeLevel.OFFICIAL_COMMENDATION),
+              Arguments.of("CASH_BONUS", FactionAccoladeLevel.CASH_BONUS),
+              Arguments.of("APPEARING_IN_SEARCHES", FactionAccoladeLevel.APPEARING_IN_SEARCHES),
               // Valid numeric strings
               Arguments.of("0", FactionAccoladeLevel.NO_ACCOLADE),
                 Arguments.of("1", FactionAccoladeLevel.TAKING_NOTICE),
-                Arguments.of("3", FactionAccoladeLevel.OFFICIAL_COMMENDATION),
+              Arguments.of("3", FactionAccoladeLevel.PRESS_RECOGNITION),
               // Invalid strings
               Arguments.of("INVALID", FactionAccoladeLevel.NO_ACCOLADE),
               Arguments.of("@!#", FactionAccoladeLevel.NO_ACCOLADE),

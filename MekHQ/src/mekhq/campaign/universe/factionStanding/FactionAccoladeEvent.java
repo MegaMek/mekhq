@@ -34,6 +34,10 @@ package mekhq.campaign.universe.factionStanding;
 
 import static mekhq.campaign.rating.IUnitRating.DRAGOON_A;
 import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.ADOPTION_OR_LANCE;
+import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.PRESS_RECOGNITION;
+import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.PROPAGANDA_REEL;
+import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.TAKING_NOTICE;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -52,8 +56,10 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.IUnitGenerator;
+import mekhq.gui.dialog.NewsDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionAccoladeConfirmationDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionAccoladeDialog;
+import mekhq.gui.dialog.factionStanding.factionJudgment.FactionAccoladePropagandaDialog;
 
 /**
  * Handles events where a campaign receives a faction accolade, such as adoption.
@@ -68,6 +74,7 @@ import mekhq.gui.dialog.factionStanding.factionJudgment.FactionAccoladeDialog;
  */
 public class FactionAccoladeEvent {
     private static final MMLogger LOGGER = MMLogger.create(FactionAccoladeEvent.class);
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionAccoladeDialog";
 
     final Campaign campaign;
     final String factionCode;
@@ -91,12 +98,26 @@ public class FactionAccoladeEvent {
         this.campaign = campaign;
         this.factionCode = faction.getShortName();
 
+        // This is a silent accolade level, it gets logged internally, but the player isn't made aware of it
+        if (accoladeLevel.is(TAKING_NOTICE)) {
+            return;
+        }
+
         Person commander = campaign.getCommander();
 
+        if (accoladeLevel.is(PRESS_RECOGNITION)) {
+            new FactionAccoladePropagandaDialog(campaign, faction, commander, true);
+            return;
+        }
+
+        if (accoladeLevel.is(PROPAGANDA_REEL)) {
+            new FactionAccoladePropagandaDialog(campaign, faction, commander, false);
+            return;
+        }
+
         FactionAccoladeDialog initialDialog = new FactionAccoladeDialog(campaign,
-              factionCode,
+              faction,
               accoladeLevel,
-              isSameFaction,
               commander);
 
         if ((accoladeLevel.is(ADOPTION_OR_LANCE))) {
@@ -120,6 +141,12 @@ public class FactionAccoladeEvent {
                 campaign.addNewUnit(entity, false, 0);
             }
         }
+    }
+
+    private void processPressRecognition(Faction faction, Person commander) {
+        String article = getFormattedTextAt(RESOURCE_BUNDLE, commander.getFullTitle(), campaign.getName(),
+              faction.getFullName(campaign.getGameYear()));
+        new NewsDialog(campaign, article);
     }
 
     /**

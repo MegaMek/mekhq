@@ -53,15 +53,15 @@ public enum FactionAccoladeLevel {
     NO_ACCOLADE(0, FactionStandingLevel.STANDING_LEVEL_0.getStandingLevel()),
     /** The faction has taken an interest in the campaign. */
     TAKING_NOTICE(1, FactionStandingLevel.STANDING_LEVEL_5.getStandingLevel()),
-    /** Quiet acknowledgment for services rendered. */
-    FIELD_COMMENDATION(2, FactionStandingLevel.STANDING_LEVEL_6.getStandingLevel()),
     /** Minor achievement noted in internal faction records. */
-    OFFICIAL_COMMENDATION(3, FactionStandingLevel.STANDING_LEVEL_6.getStandingLevel()),
+    APPEARING_IN_SEARCHES(2, FactionStandingLevel.STANDING_LEVEL_6.getStandingLevel()),
     /** Public acknowledgement via a faction-wide news outlet. */
-    PRESS_RECOGNITION(4, FactionStandingLevel.STANDING_LEVEL_6.getStandingLevel()),
-    /** Personal thanks issued from a senior commander or noble. */
-    LETTER_OF_DISTINCTION(5, FactionStandingLevel.STANDING_LEVEL_6.getStandingLevel()),
-    /** Offer of adoption into the faction (or a lance of units) */
+    PRESS_RECOGNITION(3, FactionStandingLevel.STANDING_LEVEL_6.getStandingLevel()),
+    /** A c-bill reward in recognition of services rendered */
+    CASH_BONUS(4, FactionStandingLevel.STANDING_LEVEL_6.getStandingLevel()),
+    /** The campaign appears in a state-sponsored propaganda reel */
+    PROPAGANDA_REEL(5, FactionStandingLevel.STANDING_LEVEL_6.getStandingLevel()),
+    /** Offer of adoption into the faction (sweetened with a lance of units) */
     ADOPTION_OR_LANCE(6, FactionStandingLevel.STANDING_LEVEL_7.getStandingLevel()),
     /** High-profile celebration or parade in the unit's honor or entered into the remembrance. */
     TRIUMPH_OR_REMEMBRANCE(7, FactionStandingLevel.STANDING_LEVEL_7.getStandingLevel()),

@@ -32,6 +32,15 @@
  */
 package mekhq.gui.dialog.factionStanding.factionJudgment;
 
+import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.ADOPTION_OR_LANCE;
+import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.APPEARING_IN_SEARCHES;
+import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.CASH_BONUS;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
@@ -48,19 +57,13 @@ import mekhq.campaign.universe.factionStanding.FactionAccoladeLevel;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.utilities.MHQInternationalization;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.ADOPTION_OR_LANCE;
-import static mekhq.utilities.MHQInternationalization.*;
-
 public class FactionAccoladeDialog {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionAccoladeDialog";
 
-    private final static String BUTTON_KEY = "FactionAccoladeDialog.message.";
-    private final static String BUTTON_AFFIX_POSITIVE = ".positive";
-    private final static String BUTTON_AFFIX_NEUTRAL = ".neutral";
-    private final static String BUTTON_AFFIX_NEGATIVE = ".negative";
+    private final static String BUTTON_KEY = "FactionAccoladeDialog.button.";
+    private final static String BUTTON_AFFIX_POSITIVE = "positive.";
+    private final static String BUTTON_AFFIX_NEUTRAL = "neutral.";
+    private final static String BUTTON_AFFIX_NEGATIVE = "negative.";
 
     private final static String DIALOG_KEY_MESSAGE = "FactionAccoladeDialog.message.";
     private final static String DIALOG_AFFIX_INNER_SPHERE = "innerSphere";
@@ -72,17 +75,19 @@ public class FactionAccoladeDialog {
     private final static int DIALOG_CHOICE_REFUSE = 2;
 
     private final Campaign campaign;
-    private final String factionCode;
+    private final Faction faction;
     private final boolean wasRefused;
 
     public boolean wasRefused() {
         return wasRefused;
     }
 
-    public FactionAccoladeDialog(Campaign campaign, String factionCode, FactionAccoladeLevel accoladeLevel,
-          boolean isSameFaction, Person commander) {
+    public FactionAccoladeDialog(Campaign campaign, Faction faction, FactionAccoladeLevel accoladeLevel,
+          Person commander) {
         this.campaign = campaign;
-        this.factionCode = factionCode;
+        this.faction = faction;
+
+        boolean isSameFaction = campaign.getFaction().equals(faction);
 
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
                 getSpeaker(accoladeLevel),
@@ -97,19 +102,17 @@ public class FactionAccoladeDialog {
     }
 
     private @Nullable Person getSpeaker(FactionAccoladeLevel accoladeLevel) {
-        Faction faction = Factions.getInstance().getFaction(factionCode);
-        if (faction == null) {
-            return null;
+        if (accoladeLevel.is(APPEARING_IN_SEARCHES)) {
+            return campaign.getSecondInCommand();
         }
 
-        PersonnelRole primaryRole = faction.isClan() ? PersonnelRole.MEKWARRIOR : switch (accoladeLevel) {
-            case LETTER_OF_DISTINCTION,
-                 ADOPTION_OR_LANCE,
-                 TRIUMPH_OR_REMEMBRANCE,
-                 STATUE_OR_SIBKO,
-                 LETTER_FROM_HEAD_OF_STATE -> PersonnelRole.NOBLE;
-            default -> PersonnelRole.MILITARY_LIAISON;
-        };
+        String factionCode = faction.getShortName();
+
+        PersonnelRole primaryRole = faction.isClan()
+                                          ? PersonnelRole.MEKWARRIOR
+                                          : (accoladeLevel.is(CASH_BONUS)
+                                                   ? PersonnelRole.MILITARY_LIAISON
+                                                   : PersonnelRole.NOBLE);
 
         Person speaker = campaign.newPerson(primaryRole, factionCode, Gender.RANDOMIZE);
 
@@ -119,8 +122,6 @@ public class FactionAccoladeDialog {
             if (bloodname != null) {
                 speaker.setBloodname(bloodname.getName());
             }
-        } else {
-            speaker.setSecondaryRole(PersonnelRole.MEKWARRIOR);
         }
 
         // Determine rank system
@@ -143,10 +144,13 @@ public class FactionAccoladeDialog {
 
     private String getInCharacterMessage(FactionAccoladeLevel accoladeLevel, boolean isSameFaction) {
         String messageKey = getMessageKey(accoladeLevel, isSameFaction);
-        return getFormattedTextAt(RESOURCE_BUNDLE, messageKey);
+        return getFormattedTextAt(RESOURCE_BUNDLE, messageKey, campaign.getCommanderAddress(false),
+              faction.getFullName(campaign.getGameYear()));
     }
 
     private String getMessageKey(FactionAccoladeLevel accoladeLevel, boolean isSameFaction) {
+        String factionCode = faction.getShortName();
+
         String key = DIALOG_KEY_MESSAGE + accoladeLevel.name() + '.' + factionCode;
         if (accoladeLevel.is(ADOPTION_OR_LANCE)) {
             key += isSameFaction ? DIALOG_AFFIX_LANCE : DIALOG_AFFIX_ADOPTION;
@@ -174,16 +178,23 @@ public class FactionAccoladeDialog {
     private List<String> getButtons(FactionAccoladeLevel accoladeLevel, boolean isSameFaction) {
         List<String> buttonLabels = new ArrayList<>();
 
-        String baseKey = BUTTON_KEY + accoladeLevel.name();
-
         String affix = "";
         if (accoladeLevel.is(ADOPTION_OR_LANCE)) {
             affix = isSameFaction ? DIALOG_AFFIX_LANCE : DIALOG_AFFIX_ADOPTION;
         }
 
-        buttonLabels.add(getFormattedText(RESOURCE_BUNDLE, baseKey + affix + BUTTON_AFFIX_POSITIVE));
-        buttonLabels.add(getFormattedText(RESOURCE_BUNDLE, baseKey + affix + BUTTON_AFFIX_NEUTRAL));
-        buttonLabels.add(getFormattedText(RESOURCE_BUNDLE, baseKey + affix + BUTTON_AFFIX_NEGATIVE));
+        buttonLabels.add(getTextAt(RESOURCE_BUNDLE, BUTTON_KEY +
+                                                          BUTTON_AFFIX_POSITIVE +
+                                                          accoladeLevel.name() +
+                                                          affix));
+        buttonLabels.add(getTextAt(RESOURCE_BUNDLE, BUTTON_KEY +
+                                                          BUTTON_AFFIX_NEUTRAL +
+                                                          accoladeLevel.name() +
+                                                          affix));
+        buttonLabels.add(getTextAt(RESOURCE_BUNDLE, BUTTON_KEY +
+                                                          BUTTON_AFFIX_NEGATIVE +
+                                                          accoladeLevel.name() +
+                                                          affix));
 
         return buttonLabels;
     }
