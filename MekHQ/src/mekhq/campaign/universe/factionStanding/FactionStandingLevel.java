@@ -393,7 +393,7 @@ public enum FactionStandingLevel {
      * @since 0.50.07
      */
     public String getDescription(Faction relevantFaction) {
-        String label = " ";
+        String label;
 
         String key = "factionStandingLevel." + name() + '.' + relevantFaction.getShortName() + ".description";
         label = getTextAt(RESOURCE_BUNDLE, key);
@@ -401,17 +401,10 @@ public enum FactionStandingLevel {
         if (isResourceKeyValid(label)) {
             return label;
         } else {
-            // If the key is invalid, we don't want to return an empty string as that will mess with gui spacing.
-            // Instead, we return a placeholder white space.
-            label = " "; // This can be removed if we ever decide to use the fallback code below.
+            String fallbackSuffix = getFallbackSuffix(relevantFaction);
+            key = "factionStandingLevel." + name() + '.' + fallbackSuffix + ".description";
+            label = getTextAt(RESOURCE_BUNDLE, key);
         }
-
-        // For descriptions, we don't want to use the fallback because the description becomes quickly repetitive, and
-        // it detracts from the overall experience. However, if we change our mind, the following code can be used.
-        //        // Use Fallback
-        //        String fallbackSuffix = getFallbackSuffix(relevantFaction);
-        //        key = "factionStandingLevel." + name() + '.' + fallbackSuffix + ".description";
-        //        label = getTextAt(RESOURCE_BUNDLE, key);
 
         return label;
     }
