@@ -58,15 +58,15 @@ public enum FactionAccoladeLevel {
     /** Public acknowledgement via a faction-wide news outlet. */
     PRESS_RECOGNITION(3, FactionStandingLevel.STANDING_LEVEL_6.getStandingLevel()),
     /** A c-bill reward in recognition of services rendered */
-    CASH_BONUS(4, FactionStandingLevel.STANDING_LEVEL_6.getStandingLevel()),
+    CASH_BONUS(4, FactionStandingLevel.STANDING_LEVEL_7.getStandingLevel()),
     /** The campaign appears in a state-sponsored propaganda reel */
-    PROPAGANDA_REEL(5, FactionStandingLevel.STANDING_LEVEL_6.getStandingLevel()),
+    PROPAGANDA_REEL(5, FactionStandingLevel.STANDING_LEVEL_7.getStandingLevel()),
     /** Offer of adoption into the faction (sweetened with a lance of units) */
     ADOPTION_OR_LANCE(6, FactionStandingLevel.STANDING_LEVEL_7.getStandingLevel()),
     /** High-profile celebration or parade in the unit's honor or entered into the remembrance. */
-    TRIUMPH_OR_REMEMBRANCE(7, FactionStandingLevel.STANDING_LEVEL_7.getStandingLevel()),
+    TRIUMPH_OR_REMEMBRANCE(7, FactionStandingLevel.STANDING_LEVEL_8.getStandingLevel()),
     /** Statue made in the unit’s honor or a sibko founded from their bloodline */
-    STATUE_OR_SIBKO(8, FactionStandingLevel.STANDING_LEVEL_7.getStandingLevel()),
+    STATUE_OR_SIBKO(8, FactionStandingLevel.STANDING_LEVEL_8.getStandingLevel()),
     /** Formal recognition from the faction head of state. */
     LETTER_FROM_HEAD_OF_STATE(9, FactionStandingLevel.STANDING_LEVEL_8.getStandingLevel());
 
