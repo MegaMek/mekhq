@@ -223,11 +223,11 @@ public class RetirementDefectionTracker {
                 int modifier = campaign.getCampaignOptions().getManagementSkillPenalty();
 
                 if (campaign.getCampaignOptions().isUseCommanderLeadershipOnly()) {
-                    Person flaggedCommander = campaign.getFlaggedCommander();
-                    if (flaggedCommander != null && flaggedCommander.hasSkill((SkillType.S_LEADER))) {
-                        modifier -= flaggedCommander.getSkill(SkillType.S_LEADER)
-                                          .getFinalSkillValue(flaggedCommander.getOptions(),
-                                                flaggedCommander.getATOWAttributes());
+                    Person commander = campaign.getCommander();
+                    if (commander != null && commander.hasSkill((SkillType.S_LEADER))) {
+                        modifier -= commander.getSkill(SkillType.S_LEADER)
+                                          .getFinalSkillValue(commander.getOptions(),
+                                                commander.getATOWAttributes());
                     }
                 } else {
                     modifier -= getManagementSkillModifier(person);

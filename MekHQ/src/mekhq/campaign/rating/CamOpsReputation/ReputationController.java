@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.rating.CamOpsReputation;
 
@@ -143,7 +148,7 @@ public class ReputationController {
         atbModifier = averageSkillLevel.ordinal();
 
         // step two: calculate command rating
-        commanderMap = calculateCommanderRating(campaign, campaign.getFlaggedCommander());
+        commanderMap = calculateCommanderRating(campaign, campaign.getCommander());
         commanderRating = commanderMap.get("total");
 
         // step three: calculate combat record rating
@@ -253,7 +258,7 @@ public class ReputationController {
               commanderRating));
 
         description.append("<table>");
-        Person commander = campaign.getFlaggedCommander();
+        Person commander = campaign.getCommander();
 
         String commanderName = resources.getString("commanderNone.text");
         if (commander != null) {

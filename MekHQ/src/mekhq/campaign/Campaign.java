@@ -3600,6 +3600,74 @@ public class Campaign implements ITechManager {
     }
 
     /**
+     * Determines the commander of the unit.
+     *
+     * <p>If a flagged commander exists, that person is returned. Otherwise, the highest-ranking member among the
+     * unit's active personnel is selected as commander. In case of a rank tie, a skill-based tiebreaker is used to
+     * determine precedence.</p>
+     *
+     * @return the {@link Person} serving as commander, or {@code null} if no eligible personnel are found.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public @Nullable Person getCommander() {
+        Person commander = getFlaggedCommander();
+
+        if (commander != null) {
+            return commander;
+        }
+
+        for (Person person : getActivePersonnel(false)) {
+            if (commander == null) {
+                commander = person;
+                continue;
+            }
+
+            if (person.outRanksUsingSkillTiebreaker(this, commander)) {
+                commander = person;
+            }
+        }
+
+        return commander;
+    }
+
+    /**
+     * Retrieves the second-in-command among the unit's active personnel.
+     *
+     * <p>The second-in-command is determined as the highest-ranking active personnel member who is not the flagged
+     * commander. If more than one candidate has the same rank, a skill-based tiebreaker is used to determine which
+     * person outranks the others.</p>
+     *
+     * @return the {@link Person} who is considered the second-in-command, or {@code null} if there are no suitable
+     *       candidates.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public @Nullable Person getSecondInCommand() {
+        Person commander = getCommander();
+
+        Person secondInCommand = null;
+        for (Person person : getActivePersonnel(false)) {
+            if (person.equals(commander)) {
+                continue;
+            }
+
+            if (secondInCommand == null) {
+                secondInCommand = person;
+                continue;
+            }
+
+            if (person.outRanksUsingSkillTiebreaker(this, secondInCommand)) {
+                secondInCommand = person;
+            }
+        }
+
+        return secondInCommand;
+    }
+
+    /**
      * Retrieves a list of eligible logistics personnel who can perform procurement actions based on the current
      * campaign options. If acquisitions are set to automatically succeed, an empty list is returned.
      *
@@ -5161,7 +5229,7 @@ public class Campaign implements ITechManager {
         int peopleWhoCelebrateCommandersDay = 0;
         int commanderDayTargetNumber = 5;
         boolean isCommandersDay = isCommandersDay(currentDay) &&
-                                        getFlaggedCommander() != null &&
+                                        getCommander() != null &&
                                         campaignOptions.isShowLifeEventDialogCelebrations();
         for (Person person : personnel) {
             if (person.getStatus().isDepartedUnit()) {
@@ -5955,11 +6023,9 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * return the probable commander. If we find a flagged commander, return that. Otherwise, return person with most
-     * senior rank. Ties go to the first in the queue.
-     *
-     * @return Person object of the commander
+     * Use {@link #getCommander()} instead
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public Person getSeniorCommander() {
         Person commander = null;
         for (Person p : getActivePersonnel(true)) {
@@ -8312,7 +8378,7 @@ public class Campaign implements ITechManager {
      */
     public int getCommanderStrategy() {
         int commanderStrategy = 0;
-        Person commander = getFlaggedCommander();
+        Person commander = getCommander();
 
         if (commander == null || !commander.hasSkill(S_STRATEGY)) {
             return commanderStrategy;
@@ -9832,7 +9898,7 @@ public class Campaign implements ITechManager {
      * @return A {@link String} representing the appropriate address for the commander, either formal or informal.
      */
     public String getCommanderAddress(boolean isInformal) {
-        Person commander = getFlaggedCommander();
+        Person commander = getCommander();
 
         if (commander == null) {
             if (isInformal) {
