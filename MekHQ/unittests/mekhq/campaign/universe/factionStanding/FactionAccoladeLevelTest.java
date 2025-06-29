@@ -54,7 +54,7 @@ class FactionAccoladeLevelTest {
         for (FactionAccoladeLevel accoladeLevel : FactionAccoladeLevel.values()) {
             int currentLevel = accoladeLevel.getRecognition();
             assertFalse(accoladeLevels.contains(currentLevel),
-                  "The accolade level of " + accoladeLevel.name() + " is not exclusive.");
+                  "The accolade level of " + accoladeLevel.getLookupName() + " is not exclusive.");
             accoladeLevels.add(currentLevel);
         }
     }
@@ -66,7 +66,7 @@ class FactionAccoladeLevelTest {
             int currentLevel = accoladeLevel.getRecognition();
             int expectedLevel = lastLevel + 1;
             assertEquals(expectedLevel, currentLevel,
-                  "The accolade level of " + accoladeLevel.name() + " should be " + expectedLevel + ".");
+                  "The accolade level of " + accoladeLevel.getLookupName() + " should be " + expectedLevel + ".");
             lastLevel = currentLevel;
         }
     }
@@ -83,7 +83,7 @@ class FactionAccoladeLevelTest {
         return Stream.of(
               // Valid enum name strings
               Arguments.of("NONE", FactionAccoladeLevel.NO_ACCOLADE),
-              Arguments.of("CASH_BONUS", FactionAccoladeLevel.CASH_BONUS),
+              Arguments.of("CASH_BONUS", FactionAccoladeLevel.CASH_BONUS_1),
               Arguments.of("APPEARING_IN_SEARCHES", FactionAccoladeLevel.APPEARING_IN_SEARCHES),
               // Valid numeric strings
               Arguments.of("0", FactionAccoladeLevel.NO_ACCOLADE),

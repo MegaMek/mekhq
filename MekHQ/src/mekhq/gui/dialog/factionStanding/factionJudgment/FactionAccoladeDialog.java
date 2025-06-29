@@ -37,13 +37,7 @@ import static megamek.common.enums.Gender.RANDOMIZE;
 import static mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR;
 import static mekhq.campaign.personnel.enums.PersonnelRole.MILITARY_LIAISON;
 import static mekhq.campaign.personnel.enums.PersonnelRole.NOBLE;
-import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.ADOPTION_OR_MEKS;
-import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.APPEARING_IN_SEARCHES;
-import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.CASH_BONUS;
-import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.PRESS_RECOGNITION;
-import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.PROPAGANDA_REEL;
-import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.STATUE_OR_SIBKO;
-import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.TRIUMPH_OR_REMEMBRANCE;
+import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.*;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -88,6 +82,7 @@ public class FactionAccoladeDialog {
     private final static String MOC_SPECIAL_CASE_FIRST_NAME = "Mia";
     private final static String MOC_SPECIAL_CASE_SURNAME = "Meklove";
 
+    private final static int CASH_MULTIPLIER = 5;
     private final static int DIALOG_CHOICE_REFUSE = 2;
 
     private final Campaign campaign;
@@ -107,7 +102,6 @@ public class FactionAccoladeDialog {
         processMessageIntroductionIfApplicable(accoladeLevel);
 
         boolean isSameFaction = campaign.getFaction().equals(faction);
-        boolean isUseNarrowDisplay = accoladeLevel.is(APPEARING_IN_SEARCHES) || accoladeLevel.is(CASH_BONUS);
 
         // Some accolades use a news article format
         if (processNewsArticleIfApplicable(accoladeLevel, isSameFaction, commander)) {
@@ -119,10 +113,16 @@ public class FactionAccoladeDialog {
         String inCharacterMessage = getInCharacterMessage(accoladeLevel, isSameFaction, commander);
         List<String> buttons = getButtons(accoladeLevel, isSameFaction);
         String outOfCharacterMessage = getOutOfCharacterMessage(accoladeLevel, isSameFaction);
+        boolean isUseNarrowDisplay = accoladeLevel.is(APPEARING_IN_SEARCHES)
+                                           || accoladeLevel.is(CASH_BONUS_0)
+                                           || accoladeLevel.is(CASH_BONUS_1)
+                                           || accoladeLevel.is(CASH_BONUS_2)
+                                           || accoladeLevel.is(CASH_BONUS_3)
+                                           || accoladeLevel.is(CASH_BONUS_4);
         ImmersiveDialogWidth width = isUseNarrowDisplay ? ImmersiveDialogWidth.MEDIUM : ImmersiveDialogWidth.LARGE;
 
         ImmersiveDialogSimple accoladeDialog = new ImmersiveDialogSimple(campaign, speaker, null, inCharacterMessage,
-              buttons, outOfCharacterMessage, null, true, ImmersiveDialogWidth.LARGE);
+              buttons, outOfCharacterMessage, null, true, width);
 
         wasRefused = accoladeDialog.getDialogChoice() == DIALOG_CHOICE_REFUSE;
     }
@@ -157,13 +157,13 @@ public class FactionAccoladeDialog {
               TRIUMPH_OR_REMEMBRANCE, STATUE_OR_SIBKO);
         if (accoladeLevelsWithIntroductions.contains(accoladeLevel)) {
             String dialogKey = MESSAGE_KEY +
-                                     accoladeLevel.name() +
+                                     accoladeLevel.getLookupName() +
                                      AFFIX_INTRO +
                                      (faction.isClan() ? AFFIX_CLAN : AFFIX_INNER_SPHERE);
             String message = getFormattedTextAt(RESOURCE_BUNDLE, dialogKey, campaign.getCommanderAddress(false),
                   faction.getFullName(campaign.getGameYear()));
 
-            String buttonKey = BUTTON_KEY + accoladeLevel.name() + AFFIX_INTRO;
+            String buttonKey = BUTTON_KEY + accoladeLevel.getLookupName() + AFFIX_INTRO;
             String buttonLabel = getTextAt(RESOURCE_BUNDLE, buttonKey);
 
             new ImmersiveDialogSimple(campaign, campaign.getSecondInCommand(), null, message, List.of(buttonLabel),
@@ -177,7 +177,7 @@ public class FactionAccoladeDialog {
         return switch (accoladeLevel) {
             case NO_ACCOLADE, TAKING_NOTICE, PRESS_RECOGNITION, PROPAGANDA_REEL -> null;
             case APPEARING_IN_SEARCHES -> campaign.getSecondInCommand();
-            case CASH_BONUS, ADOPTION_OR_MEKS -> {
+            case CASH_BONUS_0, CASH_BONUS_1, CASH_BONUS_2, CASH_BONUS_3, CASH_BONUS_4, ADOPTION_OR_MEKS -> {
                 if (isClan) {
                     yield generateClanCharacter(true, true);
                 } else {
@@ -320,17 +320,19 @@ public class FactionAccoladeDialog {
         final String currentSystem = campaign.getLocation().getPlanet().getName(campaign.getLocalDate());
         // {12} = Campaign Name
         final String campaignName = campaign.getName();
+        // {13} = Cash Value
+        final int cashValue = accoladeLevel.getRecognition() * CASH_MULTIPLIER;
 
         return getFormattedTextAt(RESOURCE_BUNDLE, messageKey, commanderHyperlinkedFullTitle, commanderFirstName,
               commanderHeSheTheyCapitalized, commanderHeSheTheyLowercase, commanderHimHerThemCapitalized,
               commanderHimHerThemLowercase, commanderHisHerTheirCapitalized, commanderHisHerTheirLowercase,
-              commanderPluralizer, commanderAddress, factionName, currentSystem, campaignName);
+              commanderPluralizer, commanderAddress, factionName, currentSystem, campaignName, cashValue);
     }
 
     private String getMessageKey(FactionAccoladeLevel accoladeLevel, boolean isSameFaction) {
         String factionCode = faction.getShortName();
 
-        String key = MESSAGE_KEY + accoladeLevel.name() + '.' + factionCode;
+        String key = MESSAGE_KEY + accoladeLevel.getLookupName() + '.' + factionCode;
         if (accoladeLevel.is(ADOPTION_OR_MEKS)) {
             key += isSameFaction ? AFFIX_COMPANY : AFFIX_ADOPTION;
         }
@@ -350,8 +352,8 @@ public class FactionAccoladeDialog {
             }
         }
 
-        return key.replace(accoladeLevel.name() + '.' + factionCode,
-              accoladeLevel.name() + affix);
+        return key.replace(accoladeLevel.getLookupName() + '.' + factionCode,
+              accoladeLevel.getLookupName() + affix);
     }
 
     private List<String> getButtons(FactionAccoladeLevel accoladeLevel, boolean isSameFaction) {
@@ -364,22 +366,22 @@ public class FactionAccoladeDialog {
 
         buttonLabels.add(getTextAt(RESOURCE_BUNDLE, BUTTON_KEY +
                                                           AFFIX_POSITIVE +
-                                                          accoladeLevel.name() +
+                                                          accoladeLevel.getLookupName() +
                                                           affix));
         buttonLabels.add(getTextAt(RESOURCE_BUNDLE, BUTTON_KEY +
                                                           AFFIX_NEUTRAL +
-                                                          accoladeLevel.name() +
+                                                          accoladeLevel.getLookupName() +
                                                           affix));
         buttonLabels.add(getTextAt(RESOURCE_BUNDLE, BUTTON_KEY +
                                                           AFFIX_NEGATIVE +
-                                                          accoladeLevel.name() +
+                                                          accoladeLevel.getLookupName() +
                                                           affix));
 
         return buttonLabels;
     }
 
     private String getOutOfCharacterMessage(FactionAccoladeLevel accoladeLevel, boolean isSameFaction) {
-        String messageKey = MESSAGE_KEY + accoladeLevel.name() + AFFIX_OOC;
+        String messageKey = MESSAGE_KEY + accoladeLevel.getLookupName() + AFFIX_OOC;
 
         if (accoladeLevel.is(ADOPTION_OR_MEKS)) {
             messageKey += isSameFaction ? AFFIX_COMPANY : AFFIX_ADOPTION;

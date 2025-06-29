@@ -34,7 +34,11 @@ package mekhq.campaign.universe.factionStanding;
 
 import static mekhq.campaign.rating.IUnitRating.DRAGOON_A;
 import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.ADOPTION_OR_MEKS;
-import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.CASH_BONUS;
+import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.CASH_BONUS_0;
+import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.CASH_BONUS_1;
+import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.CASH_BONUS_2;
+import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.CASH_BONUS_3;
+import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.CASH_BONUS_4;
 import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.TAKING_NOTICE;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -77,7 +81,7 @@ public class FactionAccoladeEvent {
     private static final MMLogger LOGGER = MMLogger.create(FactionAccoladeEvent.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionAccoladeDialog";
 
-    private static final double C_BILL_REWARD = 25000000.0;
+    static final double C_BILL_MULTIPLIER = 5000000.0;
 
     final Campaign campaign;
     final String factionCode;
@@ -141,9 +145,14 @@ public class FactionAccoladeEvent {
             return;
         }
 
-        if (accoladeLevel.is(CASH_BONUS)) {
+        if (accoladeLevel.is(CASH_BONUS_0) ||
+                  accoladeLevel.is(CASH_BONUS_1) ||
+                  accoladeLevel.is(CASH_BONUS_2) ||
+                  accoladeLevel.is(CASH_BONUS_3) ||
+                  accoladeLevel.is(CASH_BONUS_4)) {
             campaign.getFinances().credit(TransactionType.MISCELLANEOUS, campaign.getLocalDate(),
-                  Money.of(C_BILL_REWARD), getTextAt(RESOURCE_BUNDLE, "FactionAccoladeDialog.credit"));
+                  Money.of(accoladeLevel.getRecognition() * C_BILL_MULTIPLIER),
+                  getTextAt(RESOURCE_BUNDLE, "FactionAccoladeDialog.credit"));
         }
     }
 

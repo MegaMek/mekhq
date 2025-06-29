@@ -50,47 +50,70 @@ import megamek.logging.MMLogger;
  */
 public enum FactionAccoladeLevel {
     /** No accolade awarded. */
-    NO_ACCOLADE(0, FactionStandingLevel.STANDING_LEVEL_0.getStandingLevel()),
+    NO_ACCOLADE("NO_ACCOLADE", 0, FactionStandingLevel.STANDING_LEVEL_0.getStandingLevel()),
     /** The faction has taken an interest in the campaign. */
-    TAKING_NOTICE(1, FactionStandingLevel.STANDING_LEVEL_5.getStandingLevel()),
+    TAKING_NOTICE("TAKING_NOTICE", 1, FactionStandingLevel.STANDING_LEVEL_5.getStandingLevel()),
     /** Minor achievement noted in internal faction records. */
-    APPEARING_IN_SEARCHES(2, FactionStandingLevel.STANDING_LEVEL_6.getStandingLevel()),
-    /** Public acknowledgement via a faction-wide news outlet. */
-    PRESS_RECOGNITION(3, FactionStandingLevel.STANDING_LEVEL_6.getStandingLevel()),
+    APPEARING_IN_SEARCHES("APPEARING_IN_SEARCHES", 2, FactionStandingLevel.STANDING_LEVEL_6.getStandingLevel()),
     /** A c-bill reward in recognition of services rendered */
-    CASH_BONUS(4, FactionStandingLevel.STANDING_LEVEL_6.getStandingLevel()),
+    CASH_BONUS_0("CASH_BONUS", 3, FactionStandingLevel.STANDING_LEVEL_6.getStandingLevel()),
+    /** Public acknowledgement via a faction-wide news outlet. */
+    PRESS_RECOGNITION("PRESS_RECOGNITION", 4, FactionStandingLevel.STANDING_LEVEL_6.getStandingLevel()),
+    /** A c-bill reward in recognition of services rendered */
+    CASH_BONUS_1("CASH_BONUS", 5, FactionStandingLevel.STANDING_LEVEL_6.getStandingLevel()),
     /** The campaign appears in a state-sponsored propaganda reel */
-    PROPAGANDA_REEL(5, FactionStandingLevel.STANDING_LEVEL_7.getStandingLevel()),
+    PROPAGANDA_REEL("PROPAGANDA_REEL", 6, FactionStandingLevel.STANDING_LEVEL_6.getStandingLevel()),
     /** Offer of adoption into the faction (sweetened with free units) */
-    ADOPTION_OR_MEKS(6, FactionStandingLevel.STANDING_LEVEL_6.getStandingLevel()),
+    ADOPTION_OR_MEKS("ADOPTION_OR_MEKS", 7, FactionStandingLevel.STANDING_LEVEL_6.getStandingLevel()),
+    /** A c-bill reward in recognition of services rendered */
+    CASH_BONUS_2("CASH_BONUS", 8, FactionStandingLevel.STANDING_LEVEL_7.getStandingLevel()),
     /** High-profile celebration or parade in the unit's honor or entered into the remembrance. */
-    TRIUMPH_OR_REMEMBRANCE(7, FactionStandingLevel.STANDING_LEVEL_7.getStandingLevel()),
+    TRIUMPH_OR_REMEMBRANCE("TRIUMPH_OR_REMEMBRANCE", 9, FactionStandingLevel.STANDING_LEVEL_7.getStandingLevel()),
+    /** A c-bill reward in recognition of services rendered */
+    CASH_BONUS_3("CASH_BONUS", 10, FactionStandingLevel.STANDING_LEVEL_7.getStandingLevel()),
     /** Statue made in the unit’s honor or a sibko founded from their bloodline */
-    STATUE_OR_SIBKO(8, FactionStandingLevel.STANDING_LEVEL_8.getStandingLevel()),
+    STATUE_OR_SIBKO("STATUE_OR_SIBKO", 11, FactionStandingLevel.STANDING_LEVEL_8.getStandingLevel()),
+    /** A c-bill reward in recognition of services rendered */
+    CASH_BONUS_4("CASH_BONUS", 12, FactionStandingLevel.STANDING_LEVEL_8.getStandingLevel()),
     /** Formal recognition from the faction head of state. */
-    LETTER_FROM_HEAD_OF_STATE(9, FactionStandingLevel.STANDING_LEVEL_8.getStandingLevel());
+    LETTER_FROM_HEAD_OF_STATE("LETTER_FROM_HEAD_OF_STATE", 13,
+          FactionStandingLevel.STANDING_LEVEL_8.getStandingLevel());
 
     /** The minimum possible accolade recognition (inclusive). */
     public static final int MIN_ACCOLADE_RECOGNITION = NO_ACCOLADE.getRecognition();
     /** The maximum possible accolade recognition (inclusive). */
     public static final int MAX_ACCOLADE_RECOGNITION = STATUE_OR_SIBKO.getRecognition();
 
-    /** The integer representation of the accolade recognition. */
+    private final String lookupName;
     private final int recognition;
     private final int requiredStandingLevel;
 
     /**
      * Constructs a new {@link FactionAccoladeLevel} constant.
      *
+     * @param lookupName       the string value used to fetch information about this accolade
      * @param recognition      the integer value associated with this accolade recognition
      * @param requiredStandingLevel the minimum Faction Standing required for the accolade
      *
      * @author Illiani
      * @since 0.50.07
      */
-    FactionAccoladeLevel(int recognition, int requiredStandingLevel) {
+    FactionAccoladeLevel(String lookupName, int recognition, int requiredStandingLevel) {
+        this.lookupName = lookupName;
         this.recognition = recognition;
         this.requiredStandingLevel = requiredStandingLevel;
+    }
+
+    /**
+     * Retrieves the string value used to fetch information about this accolade.
+     *
+     * @return lookup name associated with this accolade recognition
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String getLookupName() {
+        return lookupName;
     }
 
     /**
