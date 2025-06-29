@@ -177,12 +177,14 @@ public class GoingRogue {
                 continue;
             }
 
-            // Political roles always become homicide victims in rogue events
-            if (POLITICAL_ROLES.contains(person.getPrimaryRole())
-                      || POLITICAL_ROLES.contains(person.getSecondaryRole())) {
-                person.changeStatus(campaign, today, PersonnelStatus.HOMICIDE);
-                processGenealogicallyLinkedPersonnel(campaign, person, today, preProcessedPersonnel);
-                continue;
+            // Political roles always become homicide victims in defection events
+            if (isDefection) {
+                if (POLITICAL_ROLES.contains(person.getPrimaryRole())
+                          || POLITICAL_ROLES.contains(person.getSecondaryRole())) {
+                    person.changeStatus(campaign, today, PersonnelStatus.HOMICIDE);
+                    processGenealogicallyLinkedPersonnel(campaign, person, today, preProcessedPersonnel);
+                    continue;
+                }
             }
 
             // Loyalty check: personnel with low loyalty may leave or be killed (homicide/deserted), others remain

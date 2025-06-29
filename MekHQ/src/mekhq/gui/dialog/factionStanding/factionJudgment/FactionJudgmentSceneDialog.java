@@ -52,6 +52,7 @@ import mekhq.campaign.personnel.PronounData;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.factionStanding.FactionJudgmentSceneType;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.utilities.MHQInternationalization;
 
 /**
@@ -101,7 +102,8 @@ public class FactionJudgmentSceneDialog {
               getButtonLabels(sceneType),
               null,
               null,
-              false);
+              false,
+              ImmersiveDialogWidth.MEDIUM);
     }
 
     /**

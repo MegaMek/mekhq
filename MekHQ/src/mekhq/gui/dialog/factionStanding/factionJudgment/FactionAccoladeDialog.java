@@ -62,6 +62,15 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.dialog.NewsDialog;
 import mekhq.utilities.MHQInternationalization;
 
+/**
+ * Dialog for presenting faction accolade events to the player.
+ *
+ * <p>This dialog displays a series of prompts and messages associated with receiving or refusing faction accolades
+ * and manages in-character and out-of-character communications, button selections, and related campaign updates.</p>
+ *
+ * @author Illiani
+ * @since 0.50.07
+ */
 public class FactionAccoladeDialog {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionAccoladeDialog";
 
@@ -89,10 +98,29 @@ public class FactionAccoladeDialog {
     private final Faction faction;
     private boolean wasRefused = false;
 
+    /**
+     * Returns whether the user has refused the accolade event.
+     *
+     * @return {@code true} if the user refused the accolade; {@code false} otherwise.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     public boolean wasRefused() {
         return wasRefused;
     }
 
+    /**
+     * Constructs a new dialog for a specific faction accolade event.
+     *
+     * @param campaign      the current campaign context
+     * @param faction       the involved faction
+     * @param accoladeLevel the level of the accolade offered
+     * @param commander     the person receiving or interacting with the accolade
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     public FactionAccoladeDialog(Campaign campaign, Faction faction, FactionAccoladeLevel accoladeLevel,
           Person commander) {
         this.campaign = campaign;
@@ -127,6 +155,18 @@ public class FactionAccoladeDialog {
         wasRefused = accoladeDialog.getDialogChoice() == DIALOG_CHOICE_REFUSE;
     }
 
+    /**
+     * Processes the creation and publication of a news article related to the accolade, if applicable.
+     *
+     * @param accoladeLevel the level of the accolade
+     * @param isSameFaction whether the faction is the same as the recipient's
+     * @param commander     the campaign's commander
+     *
+     * @return {@code true} if a news article was processed; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private boolean processNewsArticleIfApplicable(FactionAccoladeLevel accoladeLevel, boolean isSameFaction,
           Person commander) {
         boolean isClan = faction.isClan();
@@ -152,6 +192,14 @@ public class FactionAccoladeDialog {
         return false;
     }
 
+    /**
+     * Processes an introductory message for the accolade dialog, if appropriate for the context.
+     *
+     * @param accoladeLevel the level of the accolade
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private void processMessageIntroductionIfApplicable(FactionAccoladeLevel accoladeLevel) {
         List<FactionAccoladeLevel> accoladeLevelsWithIntroductions = List.of(PRESS_RECOGNITION, PROPAGANDA_REEL,
               TRIUMPH_OR_REMEMBRANCE, STATUE_OR_SIBKO);
@@ -171,6 +219,17 @@ public class FactionAccoladeDialog {
         }
     }
 
+    /**
+     * Returns the {@link Person} to serve as the speaker for the in-character accolade message, depending on the
+     * accolade context and faction.
+     *
+     * @param accoladeLevel the level of the accolade
+     * @param isSameFaction whether the speaker is from the same faction
+     * @return the speaker {@link Person}, or {@code null} if none is available
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private @Nullable Person getSpeaker(FactionAccoladeLevel accoladeLevel, boolean isSameFaction) {
         boolean isClan = faction.isClan();
 
@@ -230,6 +289,18 @@ public class FactionAccoladeDialog {
         };
     }
 
+    /**
+     * Generates a persona to represent an Inner Sphere character for in-character communication.
+     *
+     * @param accoladeLevel the level of the accolade
+     * @param isSameFaction whether the speaker and recipient are part of the same faction
+     * @param includeRank   whether to include a rank in the generated persona
+     * @param isNoble       whether the persona should be a noble
+     * @return a new {@link Person} representing the appropriate character
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private Person generateInnerSphereCharacter(FactionAccoladeLevel accoladeLevel, boolean isSameFaction,
           boolean includeRank, boolean isNoble) {
         String factionCode = faction.getShortName();
@@ -265,6 +336,16 @@ public class FactionAccoladeDialog {
         return speaker;
     }
 
+    /**
+     * Generates a persona to represent a Clan character for in-character communication.
+     *
+     * @param includeBloodname whether a Clan bloodname should be included
+     * @param includeRank      whether the persona should have a rank
+     * @return a new {@link Person} representing the Clan character
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private Person generateClanCharacter(boolean includeBloodname, boolean includeRank) {
         String factionCode = faction.getShortName();
         Person character = campaign.newPerson(MEKWARRIOR, factionCode, RANDOMIZE);
@@ -289,6 +370,17 @@ public class FactionAccoladeDialog {
         return character;
     }
 
+    /**
+     * Retrieves the in-character message to display for the accolade dialog.
+     *
+     * @param accoladeLevel the level of the accolade
+     * @param isSameFaction whether the speaker and recipient are from the same faction
+     * @param commander     the campaign's commander
+     * @return the message text suitable for in-character display
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private String getInCharacterMessage(FactionAccoladeLevel accoladeLevel, boolean isSameFaction, Person commander) {
         String messageKey = getMessageKey(accoladeLevel, isSameFaction);
 
@@ -329,6 +421,16 @@ public class FactionAccoladeDialog {
               commanderPluralizer, commanderAddress, factionName, currentSystem, campaignName, cashValue);
     }
 
+    /**
+     * Computes the message key used for looking up message templates or resources for the current dialog and context.
+     *
+     * @param accoladeLevel the level of the accolade
+     * @param isSameFaction whether the accolade is offered by the recipient's own faction
+     * @return the constructed message key string
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private String getMessageKey(FactionAccoladeLevel accoladeLevel, boolean isSameFaction) {
         String factionCode = faction.getShortName();
 
@@ -356,6 +458,16 @@ public class FactionAccoladeDialog {
               accoladeLevel.getLookupName() + affix);
     }
 
+    /**
+     * Retrieves a list of button labels suitable for the dialogue, based on the accolade level and context.
+     *
+     * @param accoladeLevel the level of the accolade
+     * @param isSameFaction whether the dialog represents the same faction
+     * @return a list of button label strings
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private List<String> getButtons(FactionAccoladeLevel accoladeLevel, boolean isSameFaction) {
         List<String> buttonLabels = new ArrayList<>();
 
@@ -380,6 +492,17 @@ public class FactionAccoladeDialog {
         return buttonLabels;
     }
 
+    /**
+     * Retrieves an out-of-character message for the accolade event, providing additional context or explanation to
+     * the user.
+     *
+     * @param accoladeLevel the level of the accolade
+     * @param isSameFaction whether the message is from the same faction
+     * @return a string containing the out-of-character message
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     private String getOutOfCharacterMessage(FactionAccoladeLevel accoladeLevel, boolean isSameFaction) {
         String messageKey = MESSAGE_KEY + accoladeLevel.getLookupName() + AFFIX_OOC;
 
