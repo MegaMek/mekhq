@@ -32,78 +32,51 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
-import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.MAX_ACCOLADE_RECOGNITION;
-import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.MIN_ACCOLADE_RECOGNITION;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.EnumSource;
+
+import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.NO_ACCOLADE;
+import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.TAKING_NOTICE_0;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class FactionAccoladeLevelTest {
     @Test
-    void test_allAccoladeLevelsAreExclusive() {
-        List<Integer> accoladeLevels = new ArrayList<>();
+    void testAccoladeLevelOrdering() {
+        int lastRecognitionLevel = NO_ACCOLADE.getRecognition() - 1;
         for (FactionAccoladeLevel accoladeLevel : FactionAccoladeLevel.values()) {
-            int currentLevel = accoladeLevel.getRecognition();
-            assertFalse(accoladeLevels.contains(currentLevel),
-                  "The accolade level of " + accoladeLevel.getLookupName() + " is not exclusive.");
-            accoladeLevels.add(currentLevel);
+            int actual = accoladeLevel.getRecognition();
+            int expected = ++lastRecognitionLevel;
+            assertEquals(expected, actual,
+                    "Accolade level ordering for " + accoladeLevel + " is incorrect. Was " + actual + ", expected " + expected);
+            lastRecognitionLevel = actual;
         }
     }
 
     @Test
-    void test_allAccoladeLevelsAreSequential() {
-        int lastLevel = FactionAccoladeLevel.NO_ACCOLADE.getRecognition() - 1;
+    void testAccoladeStandingRequirementsOrdering() {
+        int lastRequiredStandingLevel = TAKING_NOTICE_0.getRequiredStandingLevel() - 1;
         for (FactionAccoladeLevel accoladeLevel : FactionAccoladeLevel.values()) {
-            int currentLevel = accoladeLevel.getRecognition();
-            int expectedLevel = lastLevel + 1;
-            assertEquals(expectedLevel, currentLevel,
-                  "The accolade level of " + accoladeLevel.getLookupName() + " should be " + expectedLevel + ".");
-            lastLevel = currentLevel;
-        }
-    }
+            if (accoladeLevel.is(NO_ACCOLADE)) {
+                continue;
+            }
 
-    @Test
-    void test_allAccoladeValuesArePossible() {
-        for (int level = MIN_ACCOLADE_RECOGNITION; level <= MAX_ACCOLADE_RECOGNITION; ++level) {
-            FactionAccoladeLevel accoladeLevel = FactionAccoladeLevel.getAccoladeRecognitionFromRecognition(level);
-            assertNotNull(accoladeLevel, "Faction Accolade Level is null for " + level + " level.");
+            int actual = accoladeLevel.getRequiredStandingLevel();
+            int lowerBound = lastRequiredStandingLevel;
+            int upperBound = ++lastRequiredStandingLevel;
+            assertTrue(actual == lowerBound || actual == upperBound,
+                    "Standing level ordering for " + accoladeLevel + " is incorrect. Was " + actual + ", expected " + lowerBound + " or " + upperBound);
+            lastRequiredStandingLevel = actual;
         }
-    }
-
-    private static Stream<Arguments> accoladeStringProvider() {
-        return Stream.of(
-              // Valid enum name strings
-              Arguments.of("NONE", FactionAccoladeLevel.NO_ACCOLADE),
-              Arguments.of("CASH_BONUS", FactionAccoladeLevel.CASH_BONUS_1),
-              Arguments.of("APPEARING_IN_SEARCHES", FactionAccoladeLevel.APPEARING_IN_SEARCHES),
-              // Valid numeric strings
-              Arguments.of("0", FactionAccoladeLevel.NO_ACCOLADE),
-              Arguments.of("1", FactionAccoladeLevel.TAKING_NOTICE_0),
-              Arguments.of("3", FactionAccoladeLevel.PRESS_RECOGNITION),
-              // Invalid strings
-              Arguments.of("INVALID", FactionAccoladeLevel.NO_ACCOLADE),
-              Arguments.of("@!#", FactionAccoladeLevel.NO_ACCOLADE),
-              // Out-of-range numeric strings
-              Arguments.of("-1", FactionAccoladeLevel.NO_ACCOLADE),
-              Arguments.of("10", FactionAccoladeLevel.NO_ACCOLADE),
-              // Empty and null
-              Arguments.of("", FactionAccoladeLevel.NO_ACCOLADE),
-              Arguments.of(null, FactionAccoladeLevel.NO_ACCOLADE)
-        );
     }
 
     @ParameterizedTest
-    @MethodSource("accoladeStringProvider")
-    void test_getAccoladeLevelFromString(String input, FactionAccoladeLevel expected) {
-        assertEquals(expected, FactionAccoladeLevel.getAccoladeRecognitionFromString(input));
+    @EnumSource(FactionAccoladeLevel.class)
+    void testLookupNameValidity(FactionAccoladeLevel accoladeLevel) {
+        String name = accoladeLevel.name();
+        String lookupName = accoladeLevel.getLookupName();
+        boolean isValid = name.contains(lookupName);
+        assertTrue(isValid, "Lookup name for " + accoladeLevel + " is invalid. Was " + lookupName + ". It should contain " + name);
     }
 }

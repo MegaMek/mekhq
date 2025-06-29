@@ -32,14 +32,10 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
-import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_0;
-import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_5;
-import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_6;
-import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_7;
-import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_8;
-
 import megamek.codeUtilities.MathUtility;
 import megamek.logging.MMLogger;
+
+import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.*;
 
 /**
  * Represents the various accolade recognitions that can be awarded by a faction.
@@ -129,11 +125,6 @@ public enum FactionAccoladeLevel {
      * A highly prestigious honor indicating direct recognition from the faction’s leader.
      */
     LETTER_FROM_HEAD_OF_STATE("LETTER_FROM_HEAD_OF_STATE", 14, STANDING_LEVEL_8.getStandingLevel());
-
-    /** The minimum possible accolade recognition (inclusive). */
-    public static final int MIN_ACCOLADE_RECOGNITION = NO_ACCOLADE.getRecognition();
-    /** The maximum possible accolade recognition (inclusive). */
-    public static final int MAX_ACCOLADE_RECOGNITION = LETTER_FROM_HEAD_OF_STATE.getRecognition();
 
     private final String lookupName;
     private final int recognition;

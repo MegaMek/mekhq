@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
-import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.MAX_ACCOLADE_RECOGNITION;
+import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.LETTER_FROM_HEAD_OF_STATE;
 
 import java.time.LocalDate;
 
@@ -68,7 +68,7 @@ public record AccoladeEntry(FactionAccoladeLevel level, LocalDate issueDate) {
      * @since 0.50.07
      */
     public boolean canImprove(LocalDate today, FactionStandingLevel currentFactionStanding) {
-        if (level.getRecognition() >= MAX_ACCOLADE_RECOGNITION) {
+        if (level.getRecognition() >= LETTER_FROM_HEAD_OF_STATE.getRecognition()) {
             return false;
         }
         LocalDate cooldownDate = issueDate.plusMonths(COOLDOWN_PERIOD);
