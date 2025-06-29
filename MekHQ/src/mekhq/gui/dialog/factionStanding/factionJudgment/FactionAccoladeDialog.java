@@ -168,7 +168,7 @@ public class FactionAccoladeDialog {
      */
     private boolean processNewsArticleIfApplicable(FactionAccoladeLevel accoladeLevel, boolean isSameFaction,
           Person commander) {
-        boolean isClan = faction.isClan();
+        boolean isClan = faction.isClan() && !faction.isMercenary();
         boolean isPressRecognition = accoladeLevel.is(PRESS_RECOGNITION);
         boolean isPropagandaReel = accoladeLevel.is(PROPAGANDA_REEL);
         boolean isTriumphOrRemembrance = accoladeLevel.is(TRIUMPH_OR_REMEMBRANCE);
@@ -203,10 +203,14 @@ public class FactionAccoladeDialog {
         List<FactionAccoladeLevel> accoladeLevelsWithIntroductions = List.of(PRESS_RECOGNITION, PROPAGANDA_REEL,
               TRIUMPH_OR_REMEMBRANCE, STATUE_OR_SIBKO);
         if (accoladeLevelsWithIntroductions.contains(accoladeLevel)) {
+            String affix = faction.isClan() ? AFFIX_CLAN : AFFIX_INNER_SPHERE;
+            if (faction.isMercenary()) {
+                affix = AFFIX_INNER_SPHERE;
+            }
             String dialogKey = MESSAGE_KEY +
                                      accoladeLevel.getLookupName() +
                                      AFFIX_INTRO +
-                                     (faction.isClan() ? AFFIX_CLAN : AFFIX_INNER_SPHERE);
+                                     affix;
             String message = getFormattedTextAt(RESOURCE_BUNDLE, dialogKey, campaign.getCommanderAddress(false),
                   faction.getFullName(campaign.getGameYear()));
 

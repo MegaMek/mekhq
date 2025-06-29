@@ -43,6 +43,7 @@ import java.util.Map;
 
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
+import mekhq.campaign.universe.Faction;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -252,7 +253,7 @@ public class FactionJudgment {
      *     <li>Otherwise, increments the accolade level and updates the entry.</li>
      * </ul>
      *
-     * @param factionCode                the code identifying the faction
+     * @param faction                    the faction issuing the accolade
      * @param today                      the current date for consideration in improvement logic
      * @param currentStandingWithFaction the current standing level with the faction, which may affect eligibility
      * @param hasActiveContract          {@code true} if the campaign has an active contract, otherwise {@code false}
@@ -260,8 +261,9 @@ public class FactionJudgment {
      * @author Illiani
      * @since 0.50.07
      */
-    public @Nullable FactionAccoladeLevel increaseAccoladeForFaction(final String factionCode, final LocalDate today,
+    public @Nullable FactionAccoladeLevel increaseAccoladeForFaction(final Faction faction, final LocalDate today,
           FactionStandingLevel currentStandingWithFaction, boolean hasActiveContract) {
+        String factionCode = faction.getShortName();
         AccoladeEntry accoladeEntry = factionAccolades.get(factionCode);
 
         if (accoladeEntry == null) {
@@ -280,14 +282,21 @@ public class FactionJudgment {
         currentRecognition++;
         FactionAccoladeLevel updatedAccoladeLevel = FactionAccoladeLevel.getAccoladeRecognitionFromRecognition(
               currentRecognition);
-        LOGGER.debug("Increasing accolade level for faction {} to {}", factionCode, updatedAccoladeLevel);
 
-        // This accolade requires an active contract
-        if (updatedAccoladeLevel.is(FactionAccoladeLevel.TRIUMPH_OR_REMEMBRANCE) && !hasActiveContract) {
+        if (faction.isMercenary() && !updatedAccoladeLevel.isMercenarySuitable()) {
+            LOGGER.debug("Faction {} cannot improve accolade due to mercenary suitability", factionCode);
             return null;
         }
 
+        // This accolade requires an active contract
+        if (updatedAccoladeLevel.is(FactionAccoladeLevel.TRIUMPH_OR_REMEMBRANCE) && !hasActiveContract) {
+            LOGGER.debug("Faction {} cannot improve accolade due to lack of active contract", factionCode);
+            return null;
+        }
+
+        LOGGER.debug("Increasing accolade level for faction {} to {}", factionCode, updatedAccoladeLevel);
         setAccoladeForFaction(factionCode, updatedAccoladeLevel, today);
+
         return updatedAccoladeLevel;
     }
 

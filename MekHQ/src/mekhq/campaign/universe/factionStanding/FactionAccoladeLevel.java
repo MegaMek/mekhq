@@ -32,10 +32,14 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
+import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_0;
+import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_5;
+import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_6;
+import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_7;
+import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_8;
+
 import megamek.codeUtilities.MathUtility;
 import megamek.logging.MMLogger;
-
-import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.*;
 
 /**
  * Represents the various accolade recognitions that can be awarded by a faction.
@@ -54,81 +58,82 @@ public enum FactionAccoladeLevel {
     /**
      * No accolade awarded.
      */
-    NO_ACCOLADE("NO_ACCOLADE", 0, STANDING_LEVEL_0.getStandingLevel()),
+    NO_ACCOLADE("NO_ACCOLADE", 0, STANDING_LEVEL_0.getStandingLevel(), true),
 
     /**
      * Typically signifies the first recognition by a faction.
      */
-    TAKING_NOTICE_0("TAKING_NOTICE", 1, STANDING_LEVEL_5.getStandingLevel()),
+    TAKING_NOTICE_0("TAKING_NOTICE", 1, STANDING_LEVEL_5.getStandingLevel(), true),
 
     /**
      * Represents later recognition by a faction at higher standing.
      */
-    TAKING_NOTICE_1("TAKING_NOTICE", 2, STANDING_LEVEL_5.getStandingLevel()),
+    TAKING_NOTICE_1("TAKING_NOTICE", 2, STANDING_LEVEL_5.getStandingLevel(), true),
 
     /**
      * The unit or individual becomes notable enough to be indexed by faction or public searches.
      */
-    APPEARING_IN_SEARCHES("APPEARING_IN_SEARCHES", 3, STANDING_LEVEL_6.getStandingLevel()),
+    APPEARING_IN_SEARCHES("APPEARING_IN_SEARCHES", 3, STANDING_LEVEL_6.getStandingLevel(), true),
 
     /**
      * The recipient is awarded a monetary reward based on their standing.
      */
-    CASH_BONUS_0("CASH_BONUS", 4, STANDING_LEVEL_6.getStandingLevel()),
+    CASH_BONUS_0("CASH_BONUS", 4, STANDING_LEVEL_6.getStandingLevel(), true),
 
     /**
      * The unit or individual receives media attention for their achievements.
      */
-    PRESS_RECOGNITION("PRESS_RECOGNITION", 5, STANDING_LEVEL_6.getStandingLevel()),
+    PRESS_RECOGNITION("PRESS_RECOGNITION", 5, STANDING_LEVEL_6.getStandingLevel(), true),
 
     /**
      * An additional or higher monetary reward recognizing continued accomplishments.
      */
-    CASH_BONUS_1("CASH_BONUS", 6, STANDING_LEVEL_6.getStandingLevel()),
+    CASH_BONUS_1("CASH_BONUS", 6, STANDING_LEVEL_6.getStandingLevel(), true),
 
     /**
      * The unit or individual is featured in promotional or morale-boosting media.
      */
-    PROPAGANDA_REEL("PROPAGANDA_REEL", 7, STANDING_LEVEL_6.getStandingLevel()),
+    PROPAGANDA_REEL("PROPAGANDA_REEL", 7, STANDING_LEVEL_6.getStandingLevel(), true),
 
     /**
      * Recognizes significant honor through factional adoption or Mek gift.
      */
-    ADOPTION_OR_MEKS("ADOPTION_OR_MEKS", 8, STANDING_LEVEL_6.getStandingLevel()),
+    ADOPTION_OR_MEKS("ADOPTION_OR_MEKS", 8, STANDING_LEVEL_6.getStandingLevel(), false),
 
     /**
      * Reflects further increased monetary rewards at higher standing.
      */
-    CASH_BONUS_2("CASH_BONUS", 9, STANDING_LEVEL_7.getStandingLevel()),
+    CASH_BONUS_2("CASH_BONUS", 9, STANDING_LEVEL_7.getStandingLevel(), false),
 
     /**
      * Granted in recognition of major victories or in memorial of distinguished service.
      */
-    TRIUMPH_OR_REMEMBRANCE("TRIUMPH_OR_REMEMBRANCE", 10, STANDING_LEVEL_7.getStandingLevel()),
+    TRIUMPH_OR_REMEMBRANCE("TRIUMPH_OR_REMEMBRANCE", 10, STANDING_LEVEL_7.getStandingLevel(), false),
 
     /**
      * An even more significant monetary reward corresponding to greater achievements.
      */
-    CASH_BONUS_3("CASH_BONUS", 11, STANDING_LEVEL_7.getStandingLevel()),
+    CASH_BONUS_3("CASH_BONUS", 11, STANDING_LEVEL_7.getStandingLevel(), false),
 
     /**
      * Represents one of the highest honors, signifying legendary status.
      */
-    STATUE_OR_SIBKO("STATUE_OR_SIBKO", 12, STANDING_LEVEL_8.getStandingLevel()),
+    STATUE_OR_SIBKO("STATUE_OR_SIBKO", 12, STANDING_LEVEL_8.getStandingLevel(), false),
 
     /**
      * The highest level of monetary recognition afforded by the awarding faction.
      */
-    CASH_BONUS_4("CASH_BONUS", 13, STANDING_LEVEL_8.getStandingLevel()),
+    CASH_BONUS_4("CASH_BONUS", 13, STANDING_LEVEL_8.getStandingLevel(), false),
 
     /**
      * A highly prestigious honor indicating direct recognition from the faction’s leader.
      */
-    LETTER_FROM_HEAD_OF_STATE("LETTER_FROM_HEAD_OF_STATE", 14, STANDING_LEVEL_8.getStandingLevel());
+    LETTER_FROM_HEAD_OF_STATE("LETTER_FROM_HEAD_OF_STATE", 14, STANDING_LEVEL_8.getStandingLevel(), false);
 
     private final String lookupName;
     private final int recognition;
     private final int requiredStandingLevel;
+    private final boolean mercenarySuitable;
 
     /**
      * Constructs a new {@link FactionAccoladeLevel} constant.
@@ -136,14 +141,16 @@ public enum FactionAccoladeLevel {
      * @param lookupName       the string value used to fetch information about this accolade
      * @param recognition      the integer value associated with this accolade recognition
      * @param requiredStandingLevel the minimum Faction Standing required for the accolade
+     * @param mercenarySuitable whether the accolade level is suitable for mercenary factions
      *
      * @author Illiani
      * @since 0.50.07
      */
-    FactionAccoladeLevel(String lookupName, int recognition, int requiredStandingLevel) {
+    FactionAccoladeLevel(String lookupName, int recognition, int requiredStandingLevel, boolean mercenarySuitable) {
         this.lookupName = lookupName;
         this.recognition = recognition;
         this.requiredStandingLevel = requiredStandingLevel;
+        this.mercenarySuitable = mercenarySuitable;
     }
 
     /**
@@ -180,6 +187,15 @@ public enum FactionAccoladeLevel {
      */
     public int getRequiredStandingLevel() {
         return requiredStandingLevel;
+    }
+
+    /**
+     * Determines whether this accolade is suitable for a mercenary faction.
+     *
+     * @return {@code true} if the accolade is deemed suitable for mercenaries, {@code false} otherwise.
+     */
+    public boolean isMercenarySuitable() {
+        return mercenarySuitable;
     }
 
     /**

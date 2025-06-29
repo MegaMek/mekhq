@@ -492,6 +492,7 @@ public class FactionStandingUtilities {
      * @param activeMissions     list of all currently active missions
      * @param factionCode        the code identifying the relevant faction
      * @param currentSystem      the planetary system in which the campaign is currently located
+     * @param ignoreEmployer     whether the contract employer faction should be ignored
      *
      * @return {@code true} if the campaign is on a qualifying mission for the given faction; {@code false} otherwise
      *
@@ -499,20 +500,22 @@ public class FactionStandingUtilities {
      * @since 0.50.07
      */
     public static boolean isIsOnMission(boolean isOnPlanet, List<AtBContract> activeAtBContracts,
-          List<Mission> activeMissions, String factionCode, PlanetarySystem currentSystem) {
+          List<Mission> activeMissions, String factionCode, PlanetarySystem currentSystem, boolean ignoreEmployer) {
         if (!isOnPlanet) {
             return false;
         }
 
         // Check if there are any active missions
-        if (activeAtBContracts.isEmpty()) {
+        if (activeMissions.isEmpty()) {
             return false;
         }
 
         // Check if AtB contracts are not disabled and at least one matches the current system
         for (AtBContract contract : activeAtBContracts) {
-            if (!contract.getEmployerCode().equals(factionCode)) {
-                continue;
+            if (!ignoreEmployer) {
+                if (!contract.getEmployerCode().equals(factionCode)) {
+                    continue;
+                }
             }
 
             if (contract.getSystem().equals(currentSystem)) {
