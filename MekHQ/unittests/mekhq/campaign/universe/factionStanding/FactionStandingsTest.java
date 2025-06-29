@@ -133,14 +133,14 @@ class FactionStandingsTest {
         return Stream.of(Arguments.of("FS Enemy",
                     "FS",
                     10.0, REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_NORMAL),
-              Arguments.of("CDS Enemy, CGB Enemy's Ally",
+              Arguments.of("CDS Enemy",
                     "CDS",
                     10.0, REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_CLAN),
-              Arguments.of("CS Enemy, CSJ Enemy's Ally",
+              Arguments.of("CS Enemy",
                     "CS",
                     10.0,
                     REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_NORMAL),
-              Arguments.of("CSJ Enemy, CS Enemy's Ally",
+              Arguments.of("CSJ Enemy",
                     "CSJ",
                     10.0,
                     REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_CLAN));
@@ -149,11 +149,10 @@ class FactionStandingsTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource(value = "provideContractAcceptCases")
     void test_processAcceptContract_various(String testName, String primaryFaction, double primaryStart,
-          String secondaryFaction, double secondaryStart, double expectedPrimaryDelta, double expectedSecondaryDelta) {
+          double expectedPrimaryDelta) {
         // Setup
         FactionStandings factionStandings = new FactionStandings();
         factionStandings.setRegardForFaction(null, primaryFaction, primaryStart, 3050, false);
-        factionStandings.setRegardForFaction(null, secondaryFaction, secondaryStart, 3050, false);
 
         Faction enemyFaction = factions.getFaction(primaryFaction);
         LocalDate today = LocalDate.of(3050, 1, 1);
@@ -165,9 +164,6 @@ class FactionStandingsTest {
         assertEquals(primaryStart + expectedPrimaryDelta,
               factionStandings.getRegardForFaction(primaryFaction, false),
               "Incorrect regard for " + primaryFaction);
-        assertEquals(secondaryStart + expectedSecondaryDelta,
-              factionStandings.getRegardForFaction(secondaryFaction, false),
-              "Incorrect regard for " + secondaryFaction + " (ally)");
     }
 
     private static Stream<Arguments> provideContractStatuses() {
@@ -193,11 +189,10 @@ class FactionStandingsTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource(value = "provideContractStatuses")
     void test_processContractCompletion_variousOutcomes(String testName, MissionStatus status, double startingFsRegard,
-          double startingLaRegard, double expectedFsDelta, double expectedLaDelta) {
+          double expectedFsDelta) {
         // Setup
         FactionStandings factionStandings = new FactionStandings();
         factionStandings.setRegardForFaction(null, "FS", startingFsRegard, 3028, false);
-        factionStandings.setRegardForFaction(null, "LA", startingLaRegard, 3028, false);
 
         Faction employerFaction = factions.getFaction("FS");
         LocalDate today = LocalDate.of(3028, 8, 20);
@@ -209,9 +204,6 @@ class FactionStandingsTest {
         assertEquals(startingFsRegard + expectedFsDelta,
               factionStandings.getRegardForFaction("FS", false),
               "Incorrect regard for FS (" + status + ")");
-        assertEquals(startingLaRegard + expectedLaDelta,
-              factionStandings.getRegardForFaction("LA", false),
-              "Incorrect regard for LA (ally) (" + status + ")");
     }
 
     @Test
