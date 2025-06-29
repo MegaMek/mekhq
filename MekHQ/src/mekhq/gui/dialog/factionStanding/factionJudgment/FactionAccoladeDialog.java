@@ -32,9 +32,17 @@
  */
 package mekhq.gui.dialog.factionStanding.factionJudgment;
 
+import static megamek.common.enums.Gender.FEMALE;
+import static megamek.common.enums.Gender.RANDOMIZE;
+import static mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR;
+import static mekhq.campaign.personnel.enums.PersonnelRole.MILITARY_LIAISON;
+import static mekhq.campaign.personnel.enums.PersonnelRole.NOBLE;
 import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.ADOPTION_OR_MEKS;
 import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.APPEARING_IN_SEARCHES;
 import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.CASH_BONUS;
+import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.PRESS_RECOGNITION;
+import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.PROPAGANDA_REEL;
+import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.STATUE_OR_SIBKO;
 import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.TRIUMPH_OR_REMEMBRANCE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -43,35 +51,38 @@ import java.util.ArrayList;
 import java.util.List;
 
 import megamek.common.annotations.Nullable;
-import megamek.common.enums.Gender;
+import megamek.common.universe.FactionLeaderData;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PronounData;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
-import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.factionStanding.FactionAccoladeLevel;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.gui.dialog.NewsDialog;
 import mekhq.utilities.MHQInternationalization;
 
 public class FactionAccoladeDialog {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionAccoladeDialog";
 
     private final static String BUTTON_KEY = "FactionAccoladeDialog.button.";
-    private final static String BUTTON_AFFIX_POSITIVE = "positive.";
-    private final static String BUTTON_AFFIX_NEUTRAL = "neutral.";
-    private final static String BUTTON_AFFIX_NEGATIVE = "negative.";
+    private final static String AFFIX_POSITIVE = "positive.";
+    private final static String AFFIX_NEUTRAL = "neutral.";
+    private final static String AFFIX_NEGATIVE = "negative.";
 
-    private final static String DIALOG_KEY_MESSAGE = "FactionAccoladeDialog.message.";
-    private final static String DIALOG_AFFIX_INNER_SPHERE = "innerSphere";
-    private final static String DIALOG_AFFIX_CLAN = "clan";
-    private final static String DIALOG_AFFIX_PERIPHERY = "periphery";
-    private final static String DIALOG_AFFIX_ADOPTION = ".adoption";
-    private final static String DIALOG_AFFIX_COMPANY = ".company";
+    private final static String MESSAGE_KEY = "FactionAccoladeDialog.message.";
+    private final static String AFFIX_OOC = ".ooc";
+    private final static String AFFIX_INNER_SPHERE = ".innerSphere";
+    private final static String AFFIX_CLAN = ".clan";
+    private final static String AFFIX_PERIPHERY = ".periphery";
+    private final static String AFFIX_ADOPTION = ".adoption";
+    private final static String AFFIX_COMPANY = ".company";
+    private final static String AFFIX_INTRO = ".intro";
 
     private final static String MOC_SPECIAL_CASE_FIRST_NAME = "Mia";
     private final static String MOC_SPECIAL_CASE_SURNAME = "Meklove";
@@ -80,96 +91,246 @@ public class FactionAccoladeDialog {
 
     private final Campaign campaign;
     private final Faction faction;
-    private final boolean wasRefused;
+    private boolean wasRefused = false;
 
     public boolean wasRefused() {
         return wasRefused;
     }
 
-    public FactionAccoladeDialog(Campaign campaign, Faction faction, FactionAccoladeLevel accoladeLevel) {
+    public FactionAccoladeDialog(Campaign campaign, Faction faction, FactionAccoladeLevel accoladeLevel,
+          Person commander) {
         this.campaign = campaign;
         this.faction = faction;
 
+        // First we check for an introduction message
+        processMessageIntroductionIfApplicable(accoladeLevel);
+
         boolean isSameFaction = campaign.getFaction().equals(faction);
+        boolean isUseWideDisplay = !(accoladeLevel.is(APPEARING_IN_SEARCHES) || accoladeLevel.is(CASH_BONUS));
 
-        ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
-              getSpeaker(accoladeLevel, isSameFaction),
-                null,
-                getInCharacterMessage(accoladeLevel, isSameFaction),
-                getButtons(accoladeLevel, isSameFaction),
-              null,
-              null,
-              true);
+        // Some accolades use a news article format
+        if (processNewsArticleIfApplicable(accoladeLevel, isSameFaction, commander)) {
+            return;
+        }
 
-        wasRefused = dialog.getDialogChoice() == DIALOG_CHOICE_REFUSE;
+        // Otherwise, we display a normal communication
+        Person speaker = getSpeaker(accoladeLevel, isSameFaction);
+        String inCharacterMessage = getInCharacterMessage(accoladeLevel, isSameFaction, commander);
+        List<String> buttons = getButtons(accoladeLevel, isSameFaction);
+        String outOfCharacterMessage = getOutOfCharacterMessage(accoladeLevel, isSameFaction);
+
+        ImmersiveDialogSimple accoladeDialog = new ImmersiveDialogSimple(campaign, speaker, null, inCharacterMessage,
+              buttons, outOfCharacterMessage, null, true, isUseWideDisplay);
+
+        wasRefused = accoladeDialog.getDialogChoice() == DIALOG_CHOICE_REFUSE;
+    }
+
+    private boolean processNewsArticleIfApplicable(FactionAccoladeLevel accoladeLevel, boolean isSameFaction,
+          Person commander) {
+        boolean isClan = faction.isClan();
+        boolean isPressRecognition = accoladeLevel.is(PRESS_RECOGNITION);
+        boolean isPropagandaReel = accoladeLevel.is(PROPAGANDA_REEL);
+        boolean isTriumphOrRemembrance = accoladeLevel.is(TRIUMPH_OR_REMEMBRANCE);
+        boolean isStatueOrSibko = accoladeLevel.is(STATUE_OR_SIBKO);
+        boolean isMOC = faction.getShortName().equals("MOC");
+        boolean isComStarOrWoB = faction.isComStarOrWoB();
+
+        boolean triggerNewsArticle =
+              (!isClan && isPressRecognition)
+                    || isPropagandaReel
+                    || (isTriumphOrRemembrance && !isMOC)
+                    || (isStatueOrSibko && !isMOC && !isComStarOrWoB);
+
+        if (triggerNewsArticle) {
+            String message = getInCharacterMessage(accoladeLevel, isSameFaction, commander);
+            new NewsDialog(campaign, message);
+            return true;
+        }
+
+        return false;
+    }
+
+    private void processMessageIntroductionIfApplicable(FactionAccoladeLevel accoladeLevel) {
+        List<FactionAccoladeLevel> accoladeLevelsWithIntroductions = List.of(PRESS_RECOGNITION, PROPAGANDA_REEL,
+              TRIUMPH_OR_REMEMBRANCE, STATUE_OR_SIBKO);
+        if (accoladeLevelsWithIntroductions.contains(accoladeLevel)) {
+            String dialogKey = MESSAGE_KEY +
+                                     accoladeLevel.name() +
+                                     AFFIX_INTRO +
+                                     (faction.isClan() ? AFFIX_CLAN : AFFIX_INNER_SPHERE);
+            String message = getFormattedTextAt(RESOURCE_BUNDLE, dialogKey, campaign.getCommanderAddress(false),
+                  faction.getFullName(campaign.getGameYear()));
+
+            String buttonKey = BUTTON_KEY + accoladeLevel.name() + AFFIX_INTRO;
+            String buttonLabel = getTextAt(RESOURCE_BUNDLE, buttonKey);
+
+            new ImmersiveDialogSimple(campaign, campaign.getSecondInCommand(), null, message, List.of(buttonLabel),
+                  null, null, false);
+        }
     }
 
     private @Nullable Person getSpeaker(FactionAccoladeLevel accoladeLevel, boolean isSameFaction) {
-        if (accoladeLevel.is(APPEARING_IN_SEARCHES)) {
-            return campaign.getSecondInCommand();
-        }
+        boolean isClan = faction.isClan();
 
+        return switch (accoladeLevel) {
+            case NO_ACCOLADE, TAKING_NOTICE, PRESS_RECOGNITION, PROPAGANDA_REEL -> null;
+            case APPEARING_IN_SEARCHES -> campaign.getSecondInCommand();
+            case CASH_BONUS, ADOPTION_OR_MEKS -> {
+                if (isClan) {
+                    yield generateClanCharacter(true, true);
+                } else {
+                    yield generateInnerSphereCharacter(accoladeLevel, isSameFaction, true, false);
+                }
+            }
+            case TRIUMPH_OR_REMEMBRANCE, STATUE_OR_SIBKO -> {
+                if (isClan) {
+                    yield generateClanCharacter(true, true);
+                } else {
+                    if (faction.getShortName().equals("MOC")) {
+                        yield generateInnerSphereCharacter(accoladeLevel, isSameFaction, true, false);
+                    } else {
+                        yield null;
+                    }
+                }
+            }
+            case LETTER_FROM_HEAD_OF_STATE -> {
+                Person speaker;
+                if (faction.isClan()) {
+                    speaker = generateClanCharacter(false, false);
+                } else {
+                    speaker = generateInnerSphereCharacter(accoladeLevel, isSameFaction, false, true);
+                }
+
+                FactionLeaderData leaderData = faction.getLeaderForYear(campaign.getGameYear());
+                if (leaderData == null) {
+                    RankSystem rankSystem = faction.getRankSystem();
+
+                    RankValidator rankValidator = new RankValidator();
+                    if (rankValidator.validate(rankSystem, false)) {
+                        speaker.setRankSystem(rankValidator, rankSystem);
+                        speaker.setRank(48);
+                    }
+                } else {
+                    speaker.setGivenName(leaderData.title() + ' ' + leaderData.firstName());
+
+                    String surname = leaderData.surname() + ' ' + leaderData.honorific();
+                    if (isClan) {
+                        speaker.setBloodname(surname);
+                    } else {
+                        speaker.setSurname(surname);
+                    }
+
+                    speaker.setGender(leaderData.gender());
+                }
+
+                yield speaker;
+            }
+        };
+    }
+
+    private Person generateInnerSphereCharacter(FactionAccoladeLevel accoladeLevel, boolean isSameFaction,
+          boolean includeRank, boolean isNoble) {
         String factionCode = faction.getShortName();
 
-        PersonnelRole primaryRole = faction.isClan()
-                                          ? PersonnelRole.MEKWARRIOR
-                                          : (accoladeLevel.is(CASH_BONUS)
-                                                   ? PersonnelRole.MILITARY_LIAISON
-                                                   : PersonnelRole.NOBLE);
-        boolean isMOCSpecialCase = faction.getShortName().equals("MOC")
-                                         && accoladeLevel.is(ADOPTION_OR_MEKS) ||
-                                         accoladeLevel.is(TRIUMPH_OR_REMEMBRANCE)
-                                               && isSameFaction;
+        boolean isMOCSpecialCase = factionCode.equals("MOC") &&
+                                         isSameFaction &&
+                                         (accoladeLevel.is(ADOPTION_OR_MEKS) ||
+                                                accoladeLevel.is(TRIUMPH_OR_REMEMBRANCE) ||
+                                                accoladeLevel.is(STATUE_OR_SIBKO));
 
-        if (isMOCSpecialCase) {
-            primaryRole = PersonnelRole.HOLO_STAR;
+        PersonnelRole personnelRole = isMOCSpecialCase ? MILITARY_LIAISON : MEKWARRIOR;
+        if (isNoble) {
+            personnelRole = NOBLE;
         }
 
-        Person speaker = campaign.newPerson(primaryRole, factionCode, Gender.RANDOMIZE);
+        Person speaker = campaign.newPerson(personnelRole, factionCode, isMOCSpecialCase ? FEMALE : RANDOMIZE);
+
         if (isMOCSpecialCase) {
             speaker.setGivenName(MOC_SPECIAL_CASE_FIRST_NAME);
             speaker.setSurname(MOC_SPECIAL_CASE_SURNAME);
         }
 
-        // Clan-specific attributes
-        if (faction.isClan()) {
-            Bloodname bloodname = Bloodname.randomBloodname(factionCode, Phenotype.MEKWARRIOR, campaign.getGameYear());
-            if (bloodname != null) {
-                speaker.setBloodname(bloodname.getName());
+        if (includeRank) {
+            RankSystem rankSystem = faction.getRankSystem();
+
+            RankValidator rankValidator = new RankValidator();
+            if (rankValidator.validate(rankSystem, false)) {
+                speaker.setRankSystem(rankValidator, rankSystem);
+                speaker.setRank(38);
             }
-        }
-
-        // Determine rank system
-        RankSystem rankSystem;
-        if (faction.isClan()) {
-            rankSystem = Ranks.getRankSystemFromCode("CLAN");
-        } else {
-            rankSystem = faction.getRankSystem();
-        }
-
-        // Validate and set the rank system
-        RankValidator rankValidator = new RankValidator();
-        if (rankValidator.validate(rankSystem, false)) {
-            speaker.setRankSystem(rankValidator, rankSystem);
-            speaker.setRank(38);
         }
 
         return speaker;
     }
 
-    private String getInCharacterMessage(FactionAccoladeLevel accoladeLevel, boolean isSameFaction) {
+    private Person generateClanCharacter(boolean includeBloodname, boolean includeRank) {
+        String factionCode = faction.getShortName();
+        Person character = campaign.newPerson(MEKWARRIOR, factionCode, RANDOMIZE);
+
+        if (includeBloodname) {
+            Bloodname bloodname = Bloodname.randomBloodname(factionCode, Phenotype.MEKWARRIOR, campaign.getGameYear());
+            if (bloodname != null) {
+                character.setBloodname(bloodname.getName());
+            }
+        }
+
+        if (includeRank) {
+            RankSystem rankSystem = faction.getRankSystem();
+
+            RankValidator rankValidator = new RankValidator();
+            if (rankValidator.validate(rankSystem, false)) {
+                character.setRankSystem(rankValidator, rankSystem);
+                character.setRank(38);
+            }
+        }
+
+        return character;
+    }
+
+    private String getInCharacterMessage(FactionAccoladeLevel accoladeLevel, boolean isSameFaction, Person commander) {
         String messageKey = getMessageKey(accoladeLevel, isSameFaction);
-        return getFormattedTextAt(RESOURCE_BUNDLE, messageKey, campaign.getCommanderAddress(false),
-              campaign.getName(), faction.getFullName(campaign.getGameYear()),
-              campaign.getLocation().getPlanet().getName(campaign.getLocalDate()));
+
+        final PronounData commanderPronounData = new PronounData(commander.getGender());
+
+        // {0} hyperlinked full title
+        final String commanderHyperlinkedFullTitle = commander.getHyperlinkedFullTitle();
+        // {1} first name
+        final String commanderFirstName = commander.getGivenName();
+        // {2} = He/She/They
+        final String commanderHeSheTheyCapitalized = commanderPronounData.subjectPronoun();
+        // {3} = he/she/they
+        final String commanderHeSheTheyLowercase = commanderPronounData.subjectPronounLowerCase();
+        // {4} = Him/Her/Them
+        final String commanderHimHerThemCapitalized = commanderPronounData.objectPronoun();
+        // {5} = him/her/them
+        final String commanderHimHerThemLowercase = commanderPronounData.objectPronounLowerCase();
+        // {6} = His/Her/Their
+        final String commanderHisHerTheirCapitalized = commanderPronounData.possessivePronoun();
+        // {7} = his/her/their
+        final String commanderHisHerTheirLowercase = commanderPronounData.possessivePronounLowerCase();
+        // {8} = Gender Neutral = 0, Otherwise 1 (used to determine whether to use a plural case)
+        final int commanderPluralizer = commanderPronounData.pluralizer();
+        // {9} = Commander Address
+        final String commanderAddress = campaign.getCommanderAddress(false);
+        // {10} = Faction Name
+        final String factionName = faction.getFullName(campaign.getGameYear());
+        // {11} = Current System
+        final String currentSystem = campaign.getLocation().getPlanet().getName(campaign.getLocalDate());
+        // {12} = Campaign Name
+        final String campaignName = campaign.getName();
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, messageKey, commanderHyperlinkedFullTitle, commanderFirstName,
+              commanderHeSheTheyCapitalized, commanderHeSheTheyLowercase, commanderHimHerThemCapitalized,
+              commanderHimHerThemLowercase, commanderHisHerTheirCapitalized, commanderHisHerTheirLowercase,
+              commanderPluralizer, commanderAddress, factionName, currentSystem, campaignName);
     }
 
     private String getMessageKey(FactionAccoladeLevel accoladeLevel, boolean isSameFaction) {
         String factionCode = faction.getShortName();
 
-        String key = DIALOG_KEY_MESSAGE + accoladeLevel.name() + '.' + factionCode;
+        String key = MESSAGE_KEY + accoladeLevel.name() + '.' + factionCode;
         if (accoladeLevel.is(ADOPTION_OR_MEKS)) {
-            key += isSameFaction ? DIALOG_AFFIX_COMPANY : DIALOG_AFFIX_ADOPTION;
+            key += isSameFaction ? AFFIX_COMPANY : AFFIX_ADOPTION;
         }
 
         String testReturn = getTextAt(RESOURCE_BUNDLE, key);
@@ -178,17 +339,17 @@ public class FactionAccoladeDialog {
         }
 
         Faction faction = Factions.getInstance().getFaction(factionCode);
-        String affix = DIALOG_AFFIX_INNER_SPHERE;
+        String affix = AFFIX_INNER_SPHERE;
         if (faction != null) {
             if (faction.isClan()) {
-                affix = DIALOG_AFFIX_CLAN;
+                affix = AFFIX_CLAN;
             } else if (faction.isPeriphery()) {
-                affix = DIALOG_AFFIX_PERIPHERY;
+                affix = AFFIX_PERIPHERY;
             }
         }
 
         return key.replace(accoladeLevel.name() + '.' + factionCode,
-              accoladeLevel.name() + '.' + affix);
+              accoladeLevel.name() + affix);
     }
 
     private List<String> getButtons(FactionAccoladeLevel accoladeLevel, boolean isSameFaction) {
@@ -196,22 +357,32 @@ public class FactionAccoladeDialog {
 
         String affix = "";
         if (accoladeLevel.is(ADOPTION_OR_MEKS)) {
-            affix = isSameFaction ? DIALOG_AFFIX_COMPANY : DIALOG_AFFIX_ADOPTION;
+            affix = isSameFaction ? AFFIX_COMPANY : AFFIX_ADOPTION;
         }
 
         buttonLabels.add(getTextAt(RESOURCE_BUNDLE, BUTTON_KEY +
-                                                          BUTTON_AFFIX_POSITIVE +
+                                                          AFFIX_POSITIVE +
                                                           accoladeLevel.name() +
                                                           affix));
         buttonLabels.add(getTextAt(RESOURCE_BUNDLE, BUTTON_KEY +
-                                                          BUTTON_AFFIX_NEUTRAL +
+                                                          AFFIX_NEUTRAL +
                                                           accoladeLevel.name() +
                                                           affix));
         buttonLabels.add(getTextAt(RESOURCE_BUNDLE, BUTTON_KEY +
-                                                          BUTTON_AFFIX_NEGATIVE +
+                                                          AFFIX_NEGATIVE +
                                                           accoladeLevel.name() +
                                                           affix));
 
         return buttonLabels;
+    }
+
+    private String getOutOfCharacterMessage(FactionAccoladeLevel accoladeLevel, boolean isSameFaction) {
+        String messageKey = MESSAGE_KEY + accoladeLevel.name() + AFFIX_OOC;
+
+        if (accoladeLevel.is(ADOPTION_OR_MEKS)) {
+            messageKey += isSameFaction ? AFFIX_COMPANY : AFFIX_ADOPTION;
+        }
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, messageKey, faction.getFullName(campaign.getGameYear()));
     }
 }

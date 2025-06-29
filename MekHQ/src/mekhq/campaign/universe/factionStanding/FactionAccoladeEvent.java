@@ -34,10 +34,9 @@ package mekhq.campaign.universe.factionStanding;
 
 import static mekhq.campaign.rating.IUnitRating.DRAGOON_A;
 import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.ADOPTION_OR_MEKS;
-import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.PRESS_RECOGNITION;
-import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.PROPAGANDA_REEL;
+import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.CASH_BONUS;
 import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.TAKING_NOTICE;
-import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.TRIUMPH_OR_REMEMBRANCE;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -52,13 +51,16 @@ import megamek.common.loaders.EntityLoadingException;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.AtBStaticWeightGenerator;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.force.CombatTeam;
+import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionAccoladeConfirmationDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionAccoladeDialog;
-import mekhq.gui.dialog.factionStanding.factionJudgment.FactionAccoladePropagandaDialog;
 
 /**
  * Handles events where a campaign receives a faction accolade, such as adoption.
@@ -74,6 +76,8 @@ import mekhq.gui.dialog.factionStanding.factionJudgment.FactionAccoladePropagand
 public class FactionAccoladeEvent {
     private static final MMLogger LOGGER = MMLogger.create(FactionAccoladeEvent.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionAccoladeDialog";
+
+    private static final double C_BILL_REWARD = 25000000.0;
 
     final Campaign campaign;
     final String factionCode;
@@ -102,24 +106,6 @@ public class FactionAccoladeEvent {
             return;
         }
 
-        Person commander = campaign.getCommander();
-
-        if (accoladeLevel.is(PRESS_RECOGNITION)) {
-            new FactionAccoladePropagandaDialog(campaign, faction, commander, PRESS_RECOGNITION);
-            return;
-        }
-
-        if (accoladeLevel.is(PROPAGANDA_REEL)) {
-            new FactionAccoladePropagandaDialog(campaign, faction, commander, PROPAGANDA_REEL);
-            return;
-        }
-
-
-        if (accoladeLevel.is(TRIUMPH_OR_REMEMBRANCE) && !faction.isClan() && !faction.getShortName().equals("MOC")) {
-            new FactionAccoladePropagandaDialog(campaign, faction, commander, TRIUMPH_OR_REMEMBRANCE);
-            return;
-        }
-
         // If the faction isn't playable, we don't want to give the player a chance to join.
         boolean isAdoptionOrLance = accoladeLevel.is(ADOPTION_OR_MEKS);
         if (isAdoptionOrLance) {
@@ -128,7 +114,9 @@ public class FactionAccoladeEvent {
             }
         }
 
-        FactionAccoladeDialog initialDialog = new FactionAccoladeDialog(campaign, faction, accoladeLevel);
+        Person commander = campaign.getCommander();
+
+        FactionAccoladeDialog initialDialog = new FactionAccoladeDialog(campaign, faction, accoladeLevel, commander);
 
         if (isAdoptionOrLance) {
             FactionAccoladeConfirmationDialog confirmationDialog = new FactionAccoladeConfirmationDialog(campaign,
@@ -150,6 +138,12 @@ public class FactionAccoladeEvent {
             for (Entity entity : generatedEntities) {
                 campaign.addNewUnit(entity, false, 0);
             }
+            return;
+        }
+
+        if (accoladeLevel.is(CASH_BONUS)) {
+            campaign.getFinances().credit(TransactionType.MISCELLANEOUS, campaign.getLocalDate(),
+                  Money.of(C_BILL_REWARD), getTextAt(RESOURCE_BUNDLE, "FactionAccoladeDialog.credit"));
         }
     }
 
@@ -173,7 +167,7 @@ public class FactionAccoladeEvent {
 
         Faction faction = Factions.getInstance().getFaction(factionCode);
         boolean factionIsClan = faction.isClan();
-        int formationSize = faction.getFormationBaseSize();
+        int formationSize = CombatTeam.getStandardForceSize(faction, FormationLevel.COMPANY.getDepth());
 
         int gameYear = campaign.getGameYear();
 
