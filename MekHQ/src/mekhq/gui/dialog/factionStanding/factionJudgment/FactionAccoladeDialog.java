@@ -55,7 +55,6 @@ import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.factionStanding.FactionAccoladeLevel;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
@@ -444,14 +443,11 @@ public class FactionAccoladeDialog {
             return key;
         }
 
-        Faction faction = Factions.getInstance().getFaction(factionCode);
         String affix = AFFIX_INNER_SPHERE;
-        if (faction != null) {
-            if (faction.isClan()) {
-                affix = AFFIX_CLAN;
-            } else if (faction.isPeriphery()) {
-                affix = AFFIX_PERIPHERY;
-            }
+        if (faction.isClan()) {
+            affix = AFFIX_CLAN;
+        } else if (faction.isPeriphery()) {
+            affix = AFFIX_PERIPHERY;
         }
 
         return key.replace(accoladeLevel.getLookupName() + '.' + factionCode,
