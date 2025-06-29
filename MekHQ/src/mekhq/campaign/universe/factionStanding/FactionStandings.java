@@ -117,22 +117,25 @@ public class FactionStandings {
     /**
      * The starting regard for the campaign's faction
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     static final double STARTING_REGARD_SAME_FACTION = FactionStandingLevel.STANDING_LEVEL_5.getMaximumRegard() / 2;
 
     /**
      * The starting regard for factions that are allies of the campaign faction.
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     static final double STARTING_REGARD_ALLIED_FACTION = STARTING_REGARD_SAME_FACTION / 2;
 
     /**
      * The starting regard for factions that are at war with the campaign faction.
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     static final double STARTING_REGARD_ENEMY_FACTION_AT_WAR = FactionStandingLevel.STANDING_LEVEL_3.getMinimumRegard() /
                                                                      2;
-
     /**
      * The starting regard for factions that are rivals of the campaign faction.
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     static final double STARTING_REGARD_ENEMY_FACTION_RIVAL = STARTING_REGARD_ENEMY_FACTION_AT_WAR / 2;
 
     /**
@@ -265,7 +268,6 @@ public class FactionStandings {
      * separately.</p>
      *
      * <p>If we're starting a new campaign, we should follow up object construction with a call to
-     * {@link #initializeStartingRegardValues(Faction, LocalDate)} and
      * {@link #updateClimateRegard(Faction, LocalDate)}</p>
      *
      * @author Illiani

@@ -107,7 +107,7 @@ public class FactionAccoladeDialog {
         processMessageIntroductionIfApplicable(accoladeLevel);
 
         boolean isSameFaction = campaign.getFaction().equals(faction);
-        boolean isUseWideDisplay = !(accoladeLevel.is(APPEARING_IN_SEARCHES) || accoladeLevel.is(CASH_BONUS));
+        boolean isUseNarrowDisplay = accoladeLevel.is(APPEARING_IN_SEARCHES) || accoladeLevel.is(CASH_BONUS);
 
         // Some accolades use a news article format
         if (processNewsArticleIfApplicable(accoladeLevel, isSameFaction, commander)) {
@@ -119,10 +119,10 @@ public class FactionAccoladeDialog {
         String inCharacterMessage = getInCharacterMessage(accoladeLevel, isSameFaction, commander);
         List<String> buttons = getButtons(accoladeLevel, isSameFaction);
         String outOfCharacterMessage = getOutOfCharacterMessage(accoladeLevel, isSameFaction);
-        ImmersiveDialogWidth width = isUseWideDisplay ? ImmersiveDialogWidth.LARGE : ImmersiveDialogWidth.MEDIUM;
+        ImmersiveDialogWidth width = isUseNarrowDisplay ? ImmersiveDialogWidth.MEDIUM : ImmersiveDialogWidth.LARGE;
 
         ImmersiveDialogSimple accoladeDialog = new ImmersiveDialogSimple(campaign, speaker, null, inCharacterMessage,
-              buttons, outOfCharacterMessage, null, true, width);
+              buttons, outOfCharacterMessage, null, true, ImmersiveDialogWidth.LARGE);
 
         wasRefused = accoladeDialog.getDialogChoice() == DIALOG_CHOICE_REFUSE;
     }
