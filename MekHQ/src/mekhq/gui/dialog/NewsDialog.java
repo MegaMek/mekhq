@@ -34,6 +34,7 @@ package mekhq.gui.dialog;
 
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -78,7 +79,7 @@ public class NewsDialog extends ImmersiveDialogSimple {
     public NewsDialog(Campaign campaign, String centerMessage) {
         super(campaign, new Person(campaign), // empty person to trick immersive dialog into showing the speaker panel
               null, centerMessage,
-              null,
+              List.of(getTextAt(RESOURCE_BUNDLE, "newsReport.button")),
               null,
               null, false);
     }
@@ -227,7 +228,7 @@ public class NewsDialog extends ImmersiveDialogSimple {
         NewsNetwork chatterweb = new NewsNetwork(CHATTERWEB_NETWORK_NAME,
               0,
               0,
-              "data/images/universe/factions/logo_star_league.png");
+              "data/images/universe/factions/logo_clan_generic.png");
         NewsNetwork affiliateNewsNetworks = new NewsNetwork(AFFILIATE_NETWORK_NAME,
               0,
               0,
