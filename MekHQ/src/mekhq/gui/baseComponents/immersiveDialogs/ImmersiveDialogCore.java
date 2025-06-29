@@ -101,7 +101,7 @@ public class ImmersiveDialogCore extends JDialog {
 
     private Campaign campaign;
 
-    private int CENTER_WIDTH = scaleForGUI(600);
+    private int CENTER_WIDTH = scaleForGUI(400);
 
     private final int PADDING = scaleForGUI(5);
     protected static final int IMAGE_WIDTH = scaleForGUI(200);

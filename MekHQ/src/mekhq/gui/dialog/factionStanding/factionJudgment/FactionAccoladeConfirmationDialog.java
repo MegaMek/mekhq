@@ -101,8 +101,7 @@ public class FactionAccoladeConfirmationDialog {
               getDialogOptions(),
               accoladeLevel.is(FactionAccoladeLevel.ADOPTION_OR_MEKS) ? getOutOfCharacterText() : null,
               null,
-              false,
-              true);
+              false);
 
         wasConfirmed = dialog.getDialogChoice() == CONFIRMED_DIALOG_INDEX;
     }

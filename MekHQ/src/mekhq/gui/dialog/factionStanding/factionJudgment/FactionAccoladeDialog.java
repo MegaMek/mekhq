@@ -64,6 +64,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.factionStanding.FactionAccoladeLevel;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.dialog.NewsDialog;
 import mekhq.utilities.MHQInternationalization;
 
@@ -118,9 +119,10 @@ public class FactionAccoladeDialog {
         String inCharacterMessage = getInCharacterMessage(accoladeLevel, isSameFaction, commander);
         List<String> buttons = getButtons(accoladeLevel, isSameFaction);
         String outOfCharacterMessage = getOutOfCharacterMessage(accoladeLevel, isSameFaction);
+        ImmersiveDialogWidth width = isUseWideDisplay ? ImmersiveDialogWidth.LARGE : ImmersiveDialogWidth.MEDIUM;
 
         ImmersiveDialogSimple accoladeDialog = new ImmersiveDialogSimple(campaign, speaker, null, inCharacterMessage,
-              buttons, outOfCharacterMessage, null, true, isUseWideDisplay);
+              buttons, outOfCharacterMessage, null, true, width);
 
         wasRefused = accoladeDialog.getDialogChoice() == DIALOG_CHOICE_REFUSE;
     }

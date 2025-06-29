@@ -122,18 +122,18 @@ public class ImmersiveDialogSimple extends ImmersiveDialogCore {
      *                              visual cue.
      * @param useVerticalLayout     A boolean flag indicating whether to use a vertical layout. If {@code true}, the
      *                              buttons are stacked vertically; otherwise, they are arranged side-by-side.
-     * @param useExtraWide          A boolean flag indicating whether to use a 800px width display ({Code true}).
+     * @param width                 A {@link ImmersiveDialogWidth} object used to dictate non-default widths
      */
     public ImmersiveDialogSimple(Campaign campaign, @Nullable Person leftSpeaker, @Nullable Person rightSpeaker,
           String centerMessage, @Nullable List<String> buttonLabels, @Nullable String outOfCharacterMessage,
-          @Nullable ImageIcon imageIcon, boolean useVerticalLayout, boolean useExtraWide) {
+          @Nullable ImageIcon imageIcon, boolean useVerticalLayout, ImmersiveDialogWidth width) {
         super(campaign,
               leftSpeaker,
               rightSpeaker,
               centerMessage,
               createButtons(buttonLabels),
               outOfCharacterMessage,
-              useExtraWide ? 800 : null,
+              width.getWidth(),
               useVerticalLayout,
               null,
               imageIcon,
