@@ -72,46 +72,6 @@ class FactionStandingsTest {
         assertFalse(factions.getFactions().isEmpty(), "Factions list is empty");
     }
 
-    static Stream<Arguments> initializeStartingRegardValuesProvider() {
-        return Stream.of( // targetFaction, expectedRegard, expectedStanding
-              // Federated Suns (same faction)
-              Arguments.of("FS", STARTING_REGARD_SAME_FACTION, STANDING_LEVEL_5),
-              // Lyran Commonwealth (allied faction)
-              Arguments.of("LA", STARTING_REGARD_ALLIED_FACTION, STANDING_LEVEL_4),
-              // Capellan Confederation (enemy faction)
-              Arguments.of("CC", STARTING_REGARD_ENEMY_FACTION_AT_WAR, STANDING_LEVEL_3),
-              // ComStar (neutral faction)
-              Arguments.of("CS", DEFAULT_REGARD, STANDING_LEVEL_4));
-    }
-
-    @ParameterizedTest(name = "{0}")
-    @MethodSource(value = "initializeStartingRegardValuesProvider")
-    void test_initializeStartingRegardValues(String targetFaction, double expectedRegard,
-          FactionStandingLevel expectedStanding) {
-        // Setup
-        FactionStandings factionStandings = getStartingFactionStandings();
-
-        // Act
-        double actualRegard = factionStandings.getRegardForFaction(targetFaction, false);
-        FactionStandingLevel actualStanding = calculateFactionStandingLevel(actualRegard);
-
-        // Assert
-        assertEquals(expectedRegard, actualRegard, "Expected regard of " + expectedRegard + " but got " + actualRegard);
-        assertEquals(expectedStanding,
-              actualStanding,
-              "Expected regard level of " + expectedStanding.name() + " but got " + actualStanding.name());
-    }
-
-    private static FactionStandings getStartingFactionStandings() {
-        Faction campaignFaction = factions.getFaction("FS"); // Federated Suns
-        LocalDate today = LocalDate.of(3028, 8, 20); // Start of the 4th Succession War
-
-        FactionStandings factionStandings = new FactionStandings();
-        factionStandings.initializeStartingRegardValues(campaignFaction, today);
-
-        return factionStandings;
-    }
-
     static Stream<Arguments> initializeDynamicRegardValuesProvider() {
         return Stream.of( // targetFaction, expectedRegard, expectedStanding
               // Federated Suns (same faction)
@@ -170,36 +130,29 @@ class FactionStandingsTest {
     }
 
     private static Stream<Arguments> provideContractAcceptCases() {
-        return Stream.of(Arguments.of("FS Enemy, LA Enemy's Ally",
+        return Stream.of(Arguments.of("FS Enemy",
                     "FS",
-                    10.0,
-                    "LA",
-                    5.0, REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_NORMAL, REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_ALLY_NORMAL),
-              Arguments.of("CDS Enemy, CGB Enemy's Ally",
+                    10.0, REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_NORMAL),
+              Arguments.of("CDS Enemy",
                     "CDS",
-                    10.0,
-                    "CGB",
-                    5.0, REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_CLAN, REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_ALLY_CLAN),
-              Arguments.of("CS Enemy, CSJ Enemy's Ally",
+                    10.0, REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_CLAN),
+              Arguments.of("CS Enemy",
                     "CS",
                     10.0,
-                    "CSJ",
-                    5.0, REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_NORMAL, REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_ALLY_CLAN),
-              Arguments.of("CSJ Enemy, CS Enemy's Ally",
+                    REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_NORMAL),
+              Arguments.of("CSJ Enemy",
                     "CSJ",
                     10.0,
-                    "CS",
-                    5.0, REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_CLAN, REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_ALLY_NORMAL));
+                    REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_CLAN));
     }
 
     @ParameterizedTest(name = "{0}")
     @MethodSource(value = "provideContractAcceptCases")
     void test_processAcceptContract_various(String testName, String primaryFaction, double primaryStart,
-          String secondaryFaction, double secondaryStart, double expectedPrimaryDelta, double expectedSecondaryDelta) {
+          double expectedPrimaryDelta) {
         // Setup
         FactionStandings factionStandings = new FactionStandings();
         factionStandings.setRegardForFaction(null, primaryFaction, primaryStart, 3050, false);
-        factionStandings.setRegardForFaction(null, secondaryFaction, secondaryStart, 3050, false);
 
         Faction enemyFaction = factions.getFaction(primaryFaction);
         LocalDate today = LocalDate.of(3050, 1, 1);
@@ -211,9 +164,6 @@ class FactionStandingsTest {
         assertEquals(primaryStart + expectedPrimaryDelta,
               factionStandings.getRegardForFaction(primaryFaction, false),
               "Incorrect regard for " + primaryFaction);
-        assertEquals(secondaryStart + expectedSecondaryDelta,
-              factionStandings.getRegardForFaction(secondaryFaction, false),
-              "Incorrect regard for " + secondaryFaction + " (ally)");
     }
 
     private static Stream<Arguments> provideContractStatuses() {
@@ -221,29 +171,28 @@ class FactionStandingsTest {
               Arguments.of("Mission Success",
                     MissionStatus.SUCCESS,
                     10.0,
-                    5.0, REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER, REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER_ALLY),
+                    REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER),
               Arguments.of("Mission Partial Success",
                     MissionStatus.PARTIAL,
                     10.0,
-                    5.0, REGARD_DELTA_CONTRACT_PARTIAL_EMPLOYER, REGARD_DELTA_CONTRACT_PARTIAL_EMPLOYER_ALLY),
+                    REGARD_DELTA_CONTRACT_PARTIAL_EMPLOYER),
               Arguments.of("Mission Failed",
                     MissionStatus.FAILED,
                     10.0,
-                    5.0, REGARD_DELTA_CONTRACT_FAILURE_EMPLOYER, REGARD_DELTA_CONTRACT_FAILURE_EMPLOYER_ALLY),
+                    REGARD_DELTA_CONTRACT_FAILURE_EMPLOYER),
               Arguments.of("Mission Contract Breached",
                     MissionStatus.BREACH,
                     10.0,
-                    5.0, REGARD_DELTA_CONTRACT_BREACH_EMPLOYER, REGARD_DELTA_CONTRACT_BREACH_EMPLOYER_ALLY));
+                    REGARD_DELTA_CONTRACT_BREACH_EMPLOYER));
     }
 
     @ParameterizedTest(name = "{0}")
     @MethodSource(value = "provideContractStatuses")
     void test_processContractCompletion_variousOutcomes(String testName, MissionStatus status, double startingFsRegard,
-          double startingLaRegard, double expectedFsDelta, double expectedLaDelta) {
+          double expectedFsDelta) {
         // Setup
         FactionStandings factionStandings = new FactionStandings();
         factionStandings.setRegardForFaction(null, "FS", startingFsRegard, 3028, false);
-        factionStandings.setRegardForFaction(null, "LA", startingLaRegard, 3028, false);
 
         Faction employerFaction = factions.getFaction("FS");
         LocalDate today = LocalDate.of(3028, 8, 20);
@@ -255,9 +204,6 @@ class FactionStandingsTest {
         assertEquals(startingFsRegard + expectedFsDelta,
               factionStandings.getRegardForFaction("FS", false),
               "Incorrect regard for FS (" + status + ")");
-        assertEquals(startingLaRegard + expectedLaDelta,
-              factionStandings.getRegardForFaction("LA", false),
-              "Incorrect regard for LA (ally) (" + status + ")");
     }
 
     @Test

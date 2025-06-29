@@ -30,32 +30,60 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.dialog.factionStanding.gmToolsDialog;
+package mekhq.campaign.universe.factionStanding;
 
 /**
- * Enum representing the types of actions that can be performed on faction standings through GM (Game Master) tools.
+ * Enum representing the various judgment scene types that can occur during a faction censure event. Each constant is
+ * associated with a unique lookup name.
+ *
+ * <p>This enum is used to identify different narrative or functional scenes that may be presented to the player,
+ * such as disbanding a unit, going rogue, or seppuku.</p>
  *
  * @author Illiani
  * @since 0.50.07
  */
-public enum FactionStandingsGMToolsActionType {
+public enum FactionJudgmentSceneType {
     /**
-     * Resets all faction regard values to their default state, as defined by the campaign faction and game date.
+     * Scene type representing the disbanding of a unit or force.
      */
-    RESET_ALL_REGARD,
+    DISBAND("DISBAND"),
+
     /**
-     * Sets all faction regard values to zero.
+     * Scene type where the player goes rogue.
      */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    ZERO_ALL_REGARD,
+    GO_ROGUE("GO_ROGUE"),
+
     /**
-     * Updates the regard value for a specific faction. This action is typically performed to adjust the standings of a
-     * particular faction to a desired value.
+     * Scene type where the player responded to a {@link FactionCensureEvent} by committing seppuku
      */
-    SET_SPECIFIC_REGARD,
+    SEPPUKU("SEPPUKU");
+
     /**
-     * Updates faction standings based on historical contract data (i.e., completed
-     * {@link mekhq.campaign.mission.Mission} objects).
+     * The unique lookup name associated with this scene type.
      */
-    UPDATE_HISTORIC_CONTRACTS
+    private final String lookUpName;
+
+    /**
+     * Constructs a {@link FactionJudgmentSceneType} with the specified lookup name.
+     *
+     * @param lookUp the lookup name associated with the scene type
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    FactionJudgmentSceneType(String lookUp) {
+        this.lookUpName = lookUp;
+    }
+
+    /**
+     * Returns the lookup name for this scene type.
+     *
+     * @return the lookup name associated with the enum constant
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String getLookUpName() {
+        return lookUpName;
+    }
 }

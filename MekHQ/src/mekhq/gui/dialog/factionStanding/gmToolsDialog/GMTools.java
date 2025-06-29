@@ -36,6 +36,7 @@ import static java.lang.Integer.MAX_VALUE;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
+import static mekhq.gui.dialog.factionStanding.gmToolsDialog.FactionStandingsGMToolsActionType.ZERO_ALL_REGARD;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
@@ -223,6 +224,10 @@ public class GMTools extends JDialog {
         pnlParent.setLayout(new BoxLayout(pnlParent, BoxLayout.Y_AXIS));
 
         for (FactionStandingsGMToolsActionType actionType : FactionStandingsGMToolsActionType.values()) {
+            if (actionType == ZERO_ALL_REGARD) {
+                continue;
+            }
+            
             JPanel pnlTool = populateGMToolOption(actionType);
             pnlParent.add(Box.createVerticalStrut(PADDING));
             pnlParent.add(pnlTool);
@@ -315,14 +320,7 @@ public class GMTools extends JDialog {
             new StandingUpdateConfirmationDialog(this, campaignIcon, true);
 
             switch (actionType) {
-                case RESET_ALL_REGARD -> {
-                    reports.add(getTextAt(RESOURCE_BUNDLE, "gmTools.ZERO_ALL_REGARD.report"));
-                    factionStandings.resetAllFactionStandings();
-                    factionStandings.updateClimateRegard(campaignFaction, today);
-
-                    reports.addAll(factionStandings.initializeStartingRegardValues(campaignFaction, today));
-                }
-                case ZERO_ALL_REGARD -> {
+                case RESET_ALL_REGARD, ZERO_ALL_REGARD -> {
                     reports.add(getTextAt(RESOURCE_BUNDLE, "gmTools.ZERO_ALL_REGARD.report"));
                     factionStandings.resetAllFactionStandings();
                     factionStandings.updateClimateRegard(campaignFaction, today);

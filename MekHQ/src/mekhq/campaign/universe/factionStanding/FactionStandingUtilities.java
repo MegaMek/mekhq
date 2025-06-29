@@ -40,6 +40,7 @@ import java.util.Set;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.Mission;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.FactionHints;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -51,8 +52,8 @@ public class FactionStandingUtilities {
     /**
      * Determines the {@link FactionStandingLevel} corresponding to the given regard value.
      *
-     * <p>Iterates through all defined standing levels and returns the one whose regard range (exclusive of minimum,
-     * and inclusive of maximum) contains the provided regard value.</p>
+     * <p>Iterates through all defined standing levels and returns the one whose regard range (inclusive of the minimum
+     * and maximum regard) contains the provided regard value.</p>
      *
      * <p>If the regard value does not fall within any defined standing level range, this method logs a warning and
      * returns {@link FactionStandingLevel#STANDING_LEVEL_4} as a default.</p>
@@ -67,12 +68,20 @@ public class FactionStandingUtilities {
      */
     public static FactionStandingLevel calculateFactionStandingLevel(double regard) {
         for (FactionStandingLevel standingLevel : FactionStandingLevel.values()) {
-            if (regard > standingLevel.getMinimumRegard() && regard <= standingLevel.getMaximumRegard()) {
+            if (regard >= standingLevel.getMinimumRegard() && regard <= standingLevel.getMaximumRegard()) {
                 return standingLevel;
             }
         }
 
-        // I'm not expecting this to happen given we already accept all values between Integer#MIN_VALUE and
+        if (regard > FactionStandingLevel.STANDING_LEVEL_8.getMaximumRegard()) {
+            return FactionStandingLevel.STANDING_LEVEL_8;
+        }
+
+        if (regard < FactionStandingLevel.STANDING_LEVEL_0.getMinimumRegard()) {
+            return FactionStandingLevel.STANDING_LEVEL_0;
+        }
+
+        // I'm not expecting this to happen, given we already accept all values between Integer#MIN_VALUE and
         // Integer#MAX_VALUE. But if it somehow does, we'll just return STANDING_LEVEL_4 as a default.
         LOGGER.warn("Regard value {} is outside of the faction standing level range. Returning STANDING_LEVEL_4.",
               FactionStandingLevel.STANDING_LEVEL_4);
@@ -302,17 +311,17 @@ public class FactionStandingUtilities {
     }
 
     /**
-     * Determines whether command circuit access should be granted based on campaign settings, game master mode, current
+     * Determines whether command circuit access should be granted based on campaign settings, GM mode, current
      * faction standings, and a list of active contracts.
      *
-     * <p>Access is immediately granted if both command circuit requirements are overridden and game master mode is
+     * <p>Access is immediately granted if both command circuit requirements are overridden and GM mode is
      * active. If not, and if faction standing is used as a criterion, the method evaluates the player's highest faction
      * regard across all active contracts, granting access if this level meets the threshold.</p>
      *
      * <p>If there are no active contracts, access is denied.</p>
      *
      * @param overridingCommandCircuitRequirements {@code true} if command circuit requirements are overridden
-     * @param isGM                                 {@code true} if game master mode is enabled
+     * @param isGM                                 {@code true} if GM mode is enabled
      * @param useFactionStandingCommandCircuit     {@code true} if faction standing is used to determine access
      * @param factionStandings                     player faction standing data
      * @param activeContracts                      list of currently active contracts to evaluate for access
@@ -460,5 +469,62 @@ public class FactionStandingUtilities {
         }
 
         return isOutlawed(highestRegard);
+    }
+
+    /**
+     * Checks whether the campaign is presently undertaking a mission for the specified faction.
+     *
+     * <p>This method verifies all the following conditions to determine mission status:</p>
+     * <ul>
+     *     <li>The campaign must currently be located on a planet.</li>
+     *     <li>There must be at least one active AtB (Against the Bot) contract.</li>
+     *     <li>At least one such AtB contract must have both an employer code matching the specified faction and a
+     *     system matching the current location.</li>
+     *     <li>Alternatively, the presence of any active mission also qualifies as being on a mission for the
+     *     faction. This is to ensure compatibility with non-AtB campaigns.</li>
+     * </ul>
+     *
+     * <p>Returns {@code true} if these checks indicate the campaign is actively on a mission or contract
+     * corresponding to the specified faction.</p>
+     *
+     * @param isOnPlanet         whether the campaign is currently on a planet
+     * @param activeAtBContracts list of all currently active AtB contracts
+     * @param activeMissions     list of all currently active missions
+     * @param factionCode        the code identifying the relevant faction
+     * @param currentSystem      the planetary system in which the campaign is currently located
+     *
+     * @return {@code true} if the campaign is on a qualifying mission for the given faction; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public static boolean isIsOnMission(boolean isOnPlanet, List<AtBContract> activeAtBContracts,
+          List<Mission> activeMissions, String factionCode, PlanetarySystem currentSystem) {
+        if (!isOnPlanet) {
+            return false;
+        }
+
+        // Check if there are any active missions
+        if (activeAtBContracts.isEmpty()) {
+            return false;
+        }
+
+        // Check if AtB contracts are not disabled and at least one matches the current system
+        for (AtBContract contract : activeAtBContracts) {
+            if (!contract.getEmployerCode().equals(factionCode)) {
+                continue;
+            }
+
+            if (contract.getSystem().equals(currentSystem)) {
+                return true;
+            }
+        }
+
+        if (!activeAtBContracts.isEmpty()) {
+            return false;
+        }
+
+        // Check if there are any active missions
+        return !activeMissions.isEmpty();
     }
 }

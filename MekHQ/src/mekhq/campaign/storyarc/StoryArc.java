@@ -40,11 +40,6 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.Version;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
@@ -64,6 +59,10 @@ import mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint;
 import mekhq.campaign.storyarc.storypoint.TravelStoryPoint;
 import mekhq.campaign.storyarc.storypoint.WaitStoryPoint;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * The Story Arc class manages a given story arc campaign.
@@ -554,7 +553,7 @@ public class StoryArc {
         }
 
         // get commander information
-        Person commander = c.getSeniorCommander();
+        Person commander = c.getCommander();
         if (null == commander) {
             // shouldn't happen unless there are no personnel, but just in case
             replacementTokens.put("\\{commanderCallsign\\}", "callsign(?)");

@@ -34,7 +34,7 @@ package mekhq.campaign.universe.factionStanding;
 
 import static megamek.codeUtilities.MathUtility.clamp;
 import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_0;
-import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_7;
+import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_6;
 import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_8;
 import static mekhq.gui.dialog.factionStanding.manualMissionDialogs.SimulateMissionDialog.handleFactionRegardUpdates;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -97,12 +97,12 @@ public class FactionStandings {
     /**
      * The maximum regard value a campaign can have with a faction other than the campaign's faction
      */
-    static final double MAXIMUM_OTHER_FACTION_REGARD = STANDING_LEVEL_7.getMinimumRegard();
+    static final double MAXIMUM_OTHER_FACTION_REGARD = STANDING_LEVEL_6.getMaximumRegard();
 
     /**
      * A constant representing the minimum regard a campaign can have with any faction.
      */
-    static final double MINIMUM_REGARD = STANDING_LEVEL_0.getMinimumRegard() - 10;
+    static final double MINIMUM_REGARD = STANDING_LEVEL_0.getMinimumRegard();
 
     /**
      * The base regard value for all factions.
@@ -117,22 +117,25 @@ public class FactionStandings {
     /**
      * The starting regard for the campaign's faction
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     static final double STARTING_REGARD_SAME_FACTION = FactionStandingLevel.STANDING_LEVEL_5.getMaximumRegard() / 2;
 
     /**
      * The starting regard for factions that are allies of the campaign faction.
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     static final double STARTING_REGARD_ALLIED_FACTION = STARTING_REGARD_SAME_FACTION / 2;
 
     /**
      * The starting regard for factions that are at war with the campaign faction.
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     static final double STARTING_REGARD_ENEMY_FACTION_AT_WAR = FactionStandingLevel.STANDING_LEVEL_3.getMinimumRegard() /
                                                                      2;
-
     /**
      * The starting regard for factions that are rivals of the campaign faction.
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     static final double STARTING_REGARD_ENEMY_FACTION_RIVAL = STARTING_REGARD_ENEMY_FACTION_AT_WAR / 2;
 
     /**
@@ -163,6 +166,7 @@ public class FactionStandings {
     /**
      * Regard increase for successfully completing a contract for factions allied with the employer.
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     static final double REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER_ALLY = DEFAULT_REGARD_DEGRADATION * 2;
 
     /**
@@ -173,6 +177,7 @@ public class FactionStandings {
     /**
      * Regard increase for completing a 'partial success' contract for factions allied with the employer.
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     static final double REGARD_DELTA_CONTRACT_PARTIAL_EMPLOYER_ALLY = REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER_ALLY / 3;
 
     /**
@@ -183,6 +188,7 @@ public class FactionStandings {
     /**
      * Regard penalty for completing a 'partial success' contract for factions allied with the employer.
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     static final double REGARD_DELTA_CONTRACT_FAILURE_EMPLOYER_ALLY = -REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER_ALLY;
 
     /**
@@ -193,6 +199,7 @@ public class FactionStandings {
     /**
      * Regard penalty for breaching a contract (employer's allies).
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     static final double REGARD_DELTA_CONTRACT_BREACH_EMPLOYER_ALLY = -(REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER_ALLY * 2);
 
     /**
@@ -203,17 +210,18 @@ public class FactionStandings {
     /**
      * Regard decrease when accepting a contract against a Clan enemy.
      */
-    static final double REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_CLAN = REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER_ALLY / 2;
+    static final double REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_CLAN = REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER / 2;
 
     /**
      * Regard decrease when accepting a contract for non-Clan factions allied with the enemy.
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     static final double REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_ALLY_NORMAL = -(REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_NORMAL /
                                                                                  2);
-
     /**
      * Regard decrease when accepting a contract for Clan factions allied with the enemy.
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     static final double REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_ALLY_CLAN = REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_CLAN / 2;
 
     /**
@@ -247,13 +255,19 @@ public class FactionStandings {
     private Map<String, Double> climateRegard = new HashMap<>();
 
     /**
+     * Holds information relating to faction judgment activities.
+     *
+     * <p>This variable is used to store and track any actions a faction may have taken for or against the campaign.</p>
+     */
+    private FactionJudgment factionJudgment = new FactionJudgment();
+
+    /**
      * Constructs an empty standings map. No initial relationships or regard values are set.
      *
      * <p><b>Usage:</b> this does not populate the 'standing' map with any values. That has to be handled
      * separately.</p>
      *
      * <p>If we're starting a new campaign, we should follow up object construction with a call to
-     * {@link #initializeStartingRegardValues(Faction, LocalDate)} and
      * {@link #updateClimateRegard(Faction, LocalDate)}</p>
      *
      * @author Illiani
@@ -319,6 +333,7 @@ public class FactionStandings {
      * @author Illiani
      * @since 0.50.07
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public List<String> initializeStartingRegardValues(final Faction campaignFaction, final LocalDate today) {
         List<String> regardChangeReports = new ArrayList<>();
 
@@ -326,6 +341,9 @@ public class FactionStandings {
 
         Collection<Faction> allFactions = Factions.getInstance().getFactions();
         FactionHints factionHints = FactionHints.defaultFactionHints();
+
+        boolean isMercenary = campaignFaction.isMercenary();
+        boolean isPirate = campaignFaction.isPirate();
 
         String report;
         for (Faction otherFaction : allFactions) {
@@ -349,7 +367,8 @@ public class FactionStandings {
                 continue;
             }
 
-            if (factionHints.isAlliedWith(campaignFaction, otherFaction, today)) {
+            if ((isPirate && otherFaction.isPirate())
+                      || factionHints.isAlliedWith(campaignFaction, otherFaction, today)) {
                 report = changeRegardForFaction(campaignFactionCode, otherFactionCode, STARTING_REGARD_ALLIED_FACTION,
                       gameYear);
                 if (!report.isBlank()) {
@@ -358,7 +377,8 @@ public class FactionStandings {
                 }
             }
 
-            if (factionHints.isAtWarWith(campaignFaction, otherFaction, today)) {
+            if ((isPirate && !otherFaction.isPirate())
+                      || factionHints.isAtWarWith(campaignFaction, otherFaction, today)) {
                 report = changeRegardForFaction(campaignFactionCode, otherFactionCode,
                       STARTING_REGARD_ENEMY_FACTION_AT_WAR, gameYear);
                 if (!report.isBlank()) {
@@ -372,10 +392,11 @@ public class FactionStandings {
                       STARTING_REGARD_ENEMY_FACTION_RIVAL, gameYear);
                 if (!report.isBlank()) {
                     regardChangeReports.add(report);
+                    continue;
                 }
             }
 
-            if (campaignFaction.isMercenary()) {
+            if (isMercenary) {
                 double mercenaryRelationsModifier = MercenaryRelations.getMercenaryRelationsModifier(otherFaction,
                       today);
 
@@ -437,7 +458,6 @@ public class FactionStandings {
         this.factionRegard = factionRegard;
     }
 
-
     /**
      * Replaces the current map of faction standings with the provided map.
      *
@@ -450,6 +470,20 @@ public class FactionStandings {
      */
     public void setClimateRegard(Map<String, Double> climateRegard) {
         this.climateRegard = climateRegard;
+    }
+
+    /**
+     * Replaces the current {@link FactionJudgment} with the provided object.
+     *
+     * <p>Existing contents are discarded. After this call, only the entries in the given object remain.</p>
+     *
+     * @param factionJudgment the new {@link FactionJudgment} object
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public void setFactionJudgment(FactionJudgment factionJudgment) {
+        this.factionJudgment = factionJudgment;
     }
 
     /**
@@ -474,6 +508,21 @@ public class FactionStandings {
      */
     public Map<String, Double> getAllClimateRegard() {
         return climateRegard;
+    }
+
+    /**
+     * Returns the {@link FactionJudgment} instance associated with this object.
+     * <p>
+     * The {@link FactionJudgment} provides information and operations related to the judgement actions (censures)
+     * imposed due to faction standing or rule violations.</p>
+     *
+     * @return the {@link FactionJudgment} for this instance
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public FactionJudgment getFactionJudgments() {
+        return factionJudgment;
     }
 
     /**
@@ -588,6 +637,100 @@ public class FactionStandings {
     }
 
     /**
+     * Checks if the specified faction should receive a new or escalated censure based on its latest standing,
+     * and applies the appropriate censure level if necessary.
+     * <p>
+     * This method computes the current regard value for the given faction and determines the corresponding standing level.
+     * If the calculated standing level is at or below the threshold for censure, the faction's censure level
+     * will be increased for the provided date. The updated censure level is then returned; if no change is needed,
+     * {@code null} is returned.
+     * </p>
+     *
+     * @param faction the {@link Faction} object to check against
+     * @param today the date to use when recording a possible censure escalation
+     * @return the new {@link FactionCensureLevel} if a censure change occurred, or {@code null} if there was no change
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public @Nullable FactionCensureLevel checkForCensure(Faction faction, LocalDate today) {
+        if (faction.isAggregate()) {
+            return null;
+        }
+
+        String factionCode = faction.getShortName();
+        double regard = getRegardForFaction(factionCode, true);
+        FactionStandingLevel newFactionStanding = FactionStandingUtilities.calculateFactionStandingLevel(regard);
+
+        if (newFactionStanding.getStandingLevel() <= FactionJudgment.THRESHOLD_FOR_CENSURE) {
+            // This will return null if no change has taken place
+            return factionJudgment.increaseCensureForFaction(factionCode, today);
+        }
+
+        return null;
+    }
+
+    /**
+     * Processes all tracked faction censures to determine if any have expired as of the provided date, and
+     * automatically degrades (reduces) the censure level for any faction whose censure has expired.
+     * <p>
+     * Iterates through all current censure entries, checking if each entry's expiration date has passed. If so, it
+     * triggers a decrease in censure for the corresponding faction effective on the given day.
+     * </p>
+     *
+     * @param today the date to use when checking for censure expiration and applying any degradation
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public void processCensureDegradation(final LocalDate today) {
+        factionJudgment.processCensureDegradation(today);
+    }
+
+    /**
+     * Checks if the specified faction should receive a new or escalated accolade based on its latest standing, and
+     * applies the appropriate accolade level if necessary.
+     *
+     * <p>This method computes the current regard value for the given faction and determines the corresponding
+     * standing level. If the calculated standing level is at or below the threshold for accolade, the faction's
+     * accolade level will be increased for the provided date. The updated accolade level is then returned; if no change
+     * is needed, {@code null} is returned.</p>
+     *
+     * @param faction the {@link Faction} object to check against
+     * @param today   the date to use when recording a possible accolade improvement
+     * @param hasActiveContract          {@code true} if the campaign has an active contract, otherwise {@code false}
+     *
+     * @return the new {@link FactionAccoladeLevel} if an accolade change occurred, or {@code null} if there was no
+     *       change
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public @Nullable FactionAccoladeLevel checkForAccolade(Faction faction, LocalDate today,
+          boolean hasActiveContract) {
+        if (faction.isAggregate()) {
+            return null;
+        }
+
+        String factionCode = faction.getShortName();
+        if (factionJudgment.factionHasCensure(factionCode)) {
+            LOGGER.debug("Faction {} has a censure, so accolade improvement is impossible.", factionCode);
+            return null;
+        }
+
+        double regard = getRegardForFaction(factionCode, true);
+        FactionStandingLevel factionStanding = FactionStandingUtilities.calculateFactionStandingLevel(regard);
+
+        if (factionStanding.getStandingLevel() >= FactionJudgment.THRESHOLD_FOR_ACCOLADE) {
+            LOGGER.debug("Faction {} has sufficient standing for accolade improvement.", factionCode);
+            // This will return null if no change has taken place
+            return factionJudgment.increaseAccoladeForFaction(factionCode, today, factionStanding, hasActiveContract);
+        }
+
+        return null;
+    }
+
+    /**
      * Updates the internal map representing the "climate regard"—an attitude or relationship level—between the
      * specified campaign faction and all other factions for the given date.
      *
@@ -631,18 +774,6 @@ public class FactionStandings {
                 continue;
             }
 
-            if ((isPirate && otherFaction.isPirate()) ||
-                      factionHints.isAlliedWith(campaignFaction, otherFaction, today)) {
-                climateRegard.put(otherFactionCode, CLIMATE_REGARD_ALLIED_FACTION);
-                continue;
-            }
-
-            if ((isPirate && !otherFaction.isPirate()) ||
-                      factionHints.isAtWarWith(campaignFaction, otherFaction, today)) {
-                climateRegard.put(otherFactionCode, CLIMATE_REGARD_ENEMY_FACTION_AT_WAR);
-                continue;
-            }
-
             if (factionHints.isRivalOf(campaignFaction, otherFaction, today)) {
                 climateRegard.put(otherFactionCode, CLIMATE_REGARD_ENEMY_FACTION_RIVAL);
             }
@@ -654,6 +785,17 @@ public class FactionStandings {
                 if (mercenaryRelationsModifier != DEFAULT_REGARD) {
                     climateRegard.put(otherFactionCode, mercenaryRelationsModifier);
                 }
+            }
+
+            if ((isPirate && otherFaction.isPirate()) ||
+                      factionHints.isAlliedWith(campaignFaction, otherFaction, today)) {
+                climateRegard.put(otherFactionCode, CLIMATE_REGARD_ALLIED_FACTION);
+                continue;
+            }
+
+            if ((isPirate && !otherFaction.isPirate()) ||
+                      factionHints.isAtWarWith(campaignFaction, otherFaction, today)) {
+                climateRegard.put(otherFactionCode, CLIMATE_REGARD_ENEMY_FACTION_AT_WAR);
             }
         }
 
@@ -923,7 +1065,6 @@ public class FactionStandings {
         int gameYear = today.getYear();
 
         Collection<Faction> allFactions = Factions.getInstance().getFactions();
-        FactionHints factionHints = FactionHints.defaultFactionHints();
 
         String report;
         double regardDelta;
@@ -944,21 +1085,6 @@ public class FactionStandings {
                 } else {
 
                     regardDelta = REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_NORMAL;
-                }
-
-                report = changeRegardForFaction(campaignFactionCode, otherFactionCode, regardDelta, gameYear);
-                if (!report.isBlank()) {
-                    regardChangeReports.add(report);
-                }
-                continue;
-            }
-
-            if (factionHints.isAlliedWith(enemyFaction, otherFaction, today)) {
-                if (otherFaction.isClan()) {
-                    regardDelta = REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_ALLY_CLAN;
-                } else {
-
-                    regardDelta = REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_ALLY_NORMAL;
                 }
 
                 report = changeRegardForFaction(campaignFactionCode, otherFactionCode, regardDelta, gameYear);
@@ -999,31 +1125,15 @@ public class FactionStandings {
             return new ArrayList<>();
         }
 
-        double regardDeltaEmployer = 0.0;
+        double regardDeltaEmployer;
         double regardDeltaEmployerAlly = 0.0;
-        switch (missionStatus) {
-            case SUCCESS -> {
-                regardDeltaEmployer = REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER;
-                regardDeltaEmployerAlly = REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER_ALLY;
-            }
-            case PARTIAL -> {
-                regardDeltaEmployer = REGARD_DELTA_CONTRACT_PARTIAL_EMPLOYER;
-                regardDeltaEmployerAlly = REGARD_DELTA_CONTRACT_PARTIAL_EMPLOYER_ALLY;
-            }
-            case FAILED -> {
-                regardDeltaEmployer = REGARD_DELTA_CONTRACT_FAILURE_EMPLOYER;
-                regardDeltaEmployerAlly = REGARD_DELTA_CONTRACT_FAILURE_EMPLOYER_ALLY;
-            }
-            case BREACH -> {
-                regardDeltaEmployer = REGARD_DELTA_CONTRACT_BREACH_EMPLOYER;
-                regardDeltaEmployerAlly = REGARD_DELTA_CONTRACT_BREACH_EMPLOYER_ALLY;
-            }
-        }
-
-        // If there is no change to make, we exit early so as not to process faction data needlessly
-        if ((regardDeltaEmployer + regardDeltaEmployerAlly) == 0.0) {
-            return new ArrayList<>();
-        }
+        regardDeltaEmployer = switch (missionStatus) {
+            case SUCCESS -> REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER;
+            case PARTIAL -> REGARD_DELTA_CONTRACT_PARTIAL_EMPLOYER;
+            case FAILED -> REGARD_DELTA_CONTRACT_FAILURE_EMPLOYER;
+            case BREACH -> REGARD_DELTA_CONTRACT_BREACH_EMPLOYER;
+            default -> throw new IllegalStateException("Unexpected value: " + missionStatus);
+        };
 
         List<String> regardChangeReports = new ArrayList<>();
 
@@ -1194,6 +1304,10 @@ public class FactionStandings {
             MHQXMLUtility.writeSimpleXMLTag(writer, indent, factionCode, climateRegard.get(factionCode).toString());
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "climateRegard");
+
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "factionJudgment");
+        factionJudgment.writeFactionJudgmentToXML(writer, indent);
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "factionJudgment");
     }
 
     /**
@@ -1231,6 +1345,8 @@ public class FactionStandings {
                     standings.setFactionRegard(processRegardNode(childNode, nodeName));
                 } else if (nodeName.equalsIgnoreCase("climateRegard")) {
                     standings.setClimateRegard(processRegardNode(childNode, nodeName));
+                } else if (nodeName.equalsIgnoreCase("factionJudgment")) {
+                    standings.setFactionJudgment(FactionJudgment.generateInstanceFromXML(childNode));
                 }
             }
         } catch (Exception ex) {
@@ -1272,13 +1388,29 @@ public class FactionStandings {
         return regard;
     }
 
+    /**
+     * Updates the campaign status for a list of past missions, adjusting faction standings, applying campaign icon and
+     * faction, and generating a report of changes.
+     *
+     * <p>The method resets all faction standings, initializes regard values, sorts missions by date and class,
+     * groups them by year, and processes each mission to handle standing updates and degradation if needed.</p>
+     *
+     * @param missions        the list of missions (including {@code Contract} and {@code AtBContract} types) to
+     *                        process
+     * @param campaignIcon    the icon that represents the campaign visually
+     * @param campaignFaction the main faction for the campaign
+     * @param today           the current in-campaign date
+     *
+     * @return a list of {@link String} objects representing reports or logs of actions performed during the update
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
     public List<String> updateCampaignForPastMissions(List<Mission> missions, ImageIcon campaignIcon,
           Faction campaignFaction, LocalDate today) {
         List<String> reports = new ArrayList<>();
 
         resetAllFactionStandings();
-
-        initializeStartingRegardValues(campaignFaction, today);
 
         sortMissionsBasedOnStartDateAndClass(missions);
 
@@ -1338,6 +1470,14 @@ public class FactionStandings {
         return reports;
     }
 
+    /**
+     * Sorts the provided list of missions, ordering contract missions before non-contract missions. If both missions
+     * are contracts, they are ordered by their start dates.
+     *
+     * <p>This ensures contracts are prioritized chronologically, while other missions retain their relative order.</p>
+     *
+     * @param missions the list of missions to sort in-place
+     */
     private static void sortMissionsBasedOnStartDateAndClass(List<Mission> missions) {
         missions.sort((mission1, mission2) -> {
             boolean m1IsContract = mission1 instanceof Contract;
