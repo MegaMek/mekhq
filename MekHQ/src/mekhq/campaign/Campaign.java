@@ -5849,7 +5849,8 @@ public class Campaign implements ITechManager {
 
                 if (relevantFaction != null) {
                     FactionAccoladeLevel newAccoladeLevel = factionStandings.checkForAccolade(relevantFaction,
-                          currentDay);
+                          currentDay, isIsOnMission());
+
                     logger.debug("Accolade level: {} for faction: {}", newAccoladeLevel,
                           relevantFaction.getShortName());
 
@@ -5862,6 +5863,47 @@ public class Campaign implements ITechManager {
                 }
             }
         }
+    }
+
+    /**
+     * Checks if the campaign is currently on a mission for Faction Standing.
+     *
+     * <p>The method considers the following conditions:</p>
+     * <ul>
+     *     <li>The current location must be on a planet.</li>
+     *     <li>There must be at least one active mission.</li>
+     *     <li>If AtB (Against the Bot) contracts are enabled, at least one active AtB contract must match the
+     *     current system.</li>
+     *     <li>Alternatively, there must be at least one active non-AtB contract.</li>
+     * </ul>
+     * <p>The method returns {@code true} if any of these contractual or mission status conditions are met.</p>
+     *
+     * @return {@code true} if on a mission; {@code false} otherwise.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private boolean isIsOnMission() {
+        if (!location.isOnPlanet()) {
+            return false;
+        }
+
+        // Check if there are any active missions
+        if (getActiveMissions(false).isEmpty()) {
+            return false;
+        }
+
+        // Check if AtB contracts are not disabled and at least one matches current system
+        if (!campaignOptions.isUseAtB()) {
+            for (AtBContract contract : getActiveAtBContracts()) {
+                if (contract.getSystem().equals(location.getCurrentSystem())) {
+                    return true;
+                }
+            }
+        }
+
+        // Check if there are any active non-AtB contracts
+        return !getActiveContracts().isEmpty();
     }
 
     public void refreshPersonnelMarkets() {

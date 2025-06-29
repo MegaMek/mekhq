@@ -61,8 +61,8 @@ public enum FactionAccoladeLevel {
     CASH_BONUS(4, FactionStandingLevel.STANDING_LEVEL_7.getStandingLevel()),
     /** The campaign appears in a state-sponsored propaganda reel */
     PROPAGANDA_REEL(5, FactionStandingLevel.STANDING_LEVEL_7.getStandingLevel()),
-    /** Offer of adoption into the faction (sweetened with a lance of units) */
-    ADOPTION_OR_LANCE(6, FactionStandingLevel.STANDING_LEVEL_7.getStandingLevel()),
+    /** Offer of adoption into the faction (sweetened with free units) */
+    ADOPTION_OR_MEKS(6, FactionStandingLevel.STANDING_LEVEL_7.getStandingLevel()),
     /** High-profile celebration or parade in the unit's honor or entered into the remembrance. */
     TRIUMPH_OR_REMEMBRANCE(7, FactionStandingLevel.STANDING_LEVEL_8.getStandingLevel()),
     /** Statue made in the unit’s honor or a sibko founded from their bloodline */

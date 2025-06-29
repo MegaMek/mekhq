@@ -255,14 +255,13 @@ public class FactionJudgment {
      * @param factionCode                the code identifying the faction
      * @param today                      the current date for consideration in improvement logic
      * @param currentStandingWithFaction the current standing level with the faction, which may affect eligibility
-     *
+     * @param hasActiveContract          {@code true} if the campaign has an active contract, otherwise {@code false}
      * @return the new {@link FactionAccoladeLevel} if increased, or {@code null} if no increase was made
-     *
      * @author Illiani
      * @since 0.50.07
      */
     public @Nullable FactionAccoladeLevel increaseAccoladeForFaction(final String factionCode, final LocalDate today,
-          FactionStandingLevel currentStandingWithFaction) {
+          FactionStandingLevel currentStandingWithFaction, boolean hasActiveContract) {
         AccoladeEntry accoladeEntry = factionAccolades.get(factionCode);
 
         if (accoladeEntry == null) {
@@ -282,6 +281,11 @@ public class FactionJudgment {
         FactionAccoladeLevel updatedAccoladeLevel = FactionAccoladeLevel.getAccoladeRecognitionFromRecognition(
               currentRecognition);
         LOGGER.debug("Increasing accolade level for faction {} to {}", factionCode, updatedAccoladeLevel);
+
+        // This accolade requires an active contract
+        if (updatedAccoladeLevel.is(FactionAccoladeLevel.TRIUMPH_OR_REMEMBRANCE) && !hasActiveContract) {
+            return null;
+        }
 
         setAccoladeForFaction(factionCode, updatedAccoladeLevel, today);
         return updatedAccoladeLevel;

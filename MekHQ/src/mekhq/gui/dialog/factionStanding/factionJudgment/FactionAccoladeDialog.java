@@ -32,9 +32,10 @@
  */
 package mekhq.gui.dialog.factionStanding.factionJudgment;
 
-import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.ADOPTION_OR_LANCE;
+import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.ADOPTION_OR_MEKS;
 import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.APPEARING_IN_SEARCHES;
 import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.CASH_BONUS;
+import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.TRIUMPH_OR_REMEMBRANCE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -70,7 +71,10 @@ public class FactionAccoladeDialog {
     private final static String DIALOG_AFFIX_CLAN = "clan";
     private final static String DIALOG_AFFIX_PERIPHERY = "periphery";
     private final static String DIALOG_AFFIX_ADOPTION = ".adoption";
-    private final static String DIALOG_AFFIX_LANCE = ".lance";
+    private final static String DIALOG_AFFIX_COMPANY = ".company";
+
+    private final static String MOC_SPECIAL_CASE_FIRST_NAME = "Mia";
+    private final static String MOC_SPECIAL_CASE_SURNAME = "Meklove";
 
     private final static int DIALOG_CHOICE_REFUSE = 2;
 
@@ -82,15 +86,14 @@ public class FactionAccoladeDialog {
         return wasRefused;
     }
 
-    public FactionAccoladeDialog(Campaign campaign, Faction faction, FactionAccoladeLevel accoladeLevel,
-          Person commander) {
+    public FactionAccoladeDialog(Campaign campaign, Faction faction, FactionAccoladeLevel accoladeLevel) {
         this.campaign = campaign;
         this.faction = faction;
 
         boolean isSameFaction = campaign.getFaction().equals(faction);
 
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
-                getSpeaker(accoladeLevel),
+              getSpeaker(accoladeLevel, isSameFaction),
                 null,
                 getInCharacterMessage(accoladeLevel, isSameFaction),
                 getButtons(accoladeLevel, isSameFaction),
@@ -101,7 +104,7 @@ public class FactionAccoladeDialog {
         wasRefused = dialog.getDialogChoice() == DIALOG_CHOICE_REFUSE;
     }
 
-    private @Nullable Person getSpeaker(FactionAccoladeLevel accoladeLevel) {
+    private @Nullable Person getSpeaker(FactionAccoladeLevel accoladeLevel, boolean isSameFaction) {
         if (accoladeLevel.is(APPEARING_IN_SEARCHES)) {
             return campaign.getSecondInCommand();
         }
@@ -113,8 +116,20 @@ public class FactionAccoladeDialog {
                                           : (accoladeLevel.is(CASH_BONUS)
                                                    ? PersonnelRole.MILITARY_LIAISON
                                                    : PersonnelRole.NOBLE);
+        boolean isMOCSpecialCase = faction.getShortName().equals("MOC")
+                                         && accoladeLevel.is(ADOPTION_OR_MEKS) ||
+                                         accoladeLevel.is(TRIUMPH_OR_REMEMBRANCE)
+                                               && isSameFaction;
+
+        if (isMOCSpecialCase) {
+            primaryRole = PersonnelRole.HOLO_STAR;
+        }
 
         Person speaker = campaign.newPerson(primaryRole, factionCode, Gender.RANDOMIZE);
+        if (isMOCSpecialCase) {
+            speaker.setGivenName(MOC_SPECIAL_CASE_FIRST_NAME);
+            speaker.setSurname(MOC_SPECIAL_CASE_SURNAME);
+        }
 
         // Clan-specific attributes
         if (faction.isClan()) {
@@ -145,15 +160,16 @@ public class FactionAccoladeDialog {
     private String getInCharacterMessage(FactionAccoladeLevel accoladeLevel, boolean isSameFaction) {
         String messageKey = getMessageKey(accoladeLevel, isSameFaction);
         return getFormattedTextAt(RESOURCE_BUNDLE, messageKey, campaign.getCommanderAddress(false),
-              faction.getFullName(campaign.getGameYear()));
+              campaign.getName(), faction.getFullName(campaign.getGameYear()),
+              campaign.getLocation().getPlanet().getName(campaign.getLocalDate()));
     }
 
     private String getMessageKey(FactionAccoladeLevel accoladeLevel, boolean isSameFaction) {
         String factionCode = faction.getShortName();
 
         String key = DIALOG_KEY_MESSAGE + accoladeLevel.name() + '.' + factionCode;
-        if (accoladeLevel.is(ADOPTION_OR_LANCE)) {
-            key += isSameFaction ? DIALOG_AFFIX_LANCE : DIALOG_AFFIX_ADOPTION;
+        if (accoladeLevel.is(ADOPTION_OR_MEKS)) {
+            key += isSameFaction ? DIALOG_AFFIX_COMPANY : DIALOG_AFFIX_ADOPTION;
         }
 
         String testReturn = getTextAt(RESOURCE_BUNDLE, key);
@@ -179,8 +195,8 @@ public class FactionAccoladeDialog {
         List<String> buttonLabels = new ArrayList<>();
 
         String affix = "";
-        if (accoladeLevel.is(ADOPTION_OR_LANCE)) {
-            affix = isSameFaction ? DIALOG_AFFIX_LANCE : DIALOG_AFFIX_ADOPTION;
+        if (accoladeLevel.is(ADOPTION_OR_MEKS)) {
+            affix = isSameFaction ? DIALOG_AFFIX_COMPANY : DIALOG_AFFIX_ADOPTION;
         }
 
         buttonLabels.add(getTextAt(RESOURCE_BUNDLE, BUTTON_KEY +

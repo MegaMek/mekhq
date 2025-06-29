@@ -99,9 +99,10 @@ public class FactionAccoladeConfirmationDialog {
               null,
               getInCharacterText(),
               getDialogOptions(),
-              accoladeLevel.is(FactionAccoladeLevel.ADOPTION_OR_LANCE) ? getOutOfCharacterText() : null,
+              accoladeLevel.is(FactionAccoladeLevel.ADOPTION_OR_MEKS) ? getOutOfCharacterText() : null,
               null,
-              false);
+              false,
+              true);
 
         wasConfirmed = dialog.getDialogChoice() == CONFIRMED_DIALOG_INDEX;
     }
