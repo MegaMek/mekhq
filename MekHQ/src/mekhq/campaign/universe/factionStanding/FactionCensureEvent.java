@@ -35,8 +35,8 @@ package mekhq.campaign.universe.factionStanding;
 import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
-import static mekhq.campaign.universe.factionStanding.FactionStandings.STARTING_REGARD_ALLIED_FACTION;
-import static mekhq.campaign.universe.factionStanding.FactionStandings.STARTING_REGARD_SAME_FACTION;
+import static mekhq.campaign.universe.factionStanding.FactionStandings.REGARD_DELTA_CONTRACT_PARTIAL_EMPLOYER;
+import static mekhq.campaign.universe.factionStanding.FactionStandings.REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -237,7 +237,7 @@ public class FactionCensureEvent {
      * @since 0.50.07
      */
     private void processFactionStandingChange(boolean isMajor) {
-        double delta = isMajor ? STARTING_REGARD_SAME_FACTION : STARTING_REGARD_ALLIED_FACTION;
+        double delta = isMajor ? REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER : REGARD_DELTA_CONTRACT_PARTIAL_EMPLOYER;
         Faction faction = campaign.getFaction();
         String factionCode = faction.getShortName();
         FactionStandings factionStandings = campaign.getFactionStandings();
