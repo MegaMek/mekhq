@@ -265,9 +265,9 @@ public class FactionJudgment {
         AccoladeEntry accoladeEntry = factionAccolades.get(factionCode);
 
         if (accoladeEntry == null) {
-            setAccoladeForFaction(factionCode, FactionAccoladeLevel.TAKING_NOTICE, today);
+            setAccoladeForFaction(factionCode, FactionAccoladeLevel.TAKING_NOTICE_0, today);
             LOGGER.debug("Faction {} has no accolade entry, assigning TAKING_NOTICE", factionCode);
-            return FactionAccoladeLevel.TAKING_NOTICE;
+            return FactionAccoladeLevel.TAKING_NOTICE_0;
         }
 
         if (!accoladeEntry.canImprove(today, currentStandingWithFaction)) {

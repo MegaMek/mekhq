@@ -32,6 +32,12 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
+import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_0;
+import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_5;
+import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_6;
+import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_7;
+import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_8;
+
 import megamek.codeUtilities.MathUtility;
 import megamek.logging.MMLogger;
 
@@ -42,47 +48,92 @@ import megamek.logging.MMLogger;
  * increasingly significant honors (such as money or units).</p>
  *
  * <p>Each enum constant corresponds to a specific accolade recognition, represented by an integer value. Provides
- * utility
- * methods for retrieving an accolade recognition from its numeric value or string name, as well as for comparison.</p>
+ * utility methods for retrieving an accolade recognition from its numeric value or string name, as well as for
+ * comparison.</p>
  *
  * @author Illiani
  * @since 0.50.07
  */
 public enum FactionAccoladeLevel {
-    /** No accolade awarded. */
-    NO_ACCOLADE("NO_ACCOLADE", 0, FactionStandingLevel.STANDING_LEVEL_0.getStandingLevel()),
-    /** The faction has taken an interest in the campaign. */
-    TAKING_NOTICE("TAKING_NOTICE", 1, FactionStandingLevel.STANDING_LEVEL_5.getStandingLevel()),
-    /** Minor achievement noted in internal faction records. */
-    APPEARING_IN_SEARCHES("APPEARING_IN_SEARCHES", 2, FactionStandingLevel.STANDING_LEVEL_6.getStandingLevel()),
-    /** A c-bill reward in recognition of services rendered */
-    CASH_BONUS_0("CASH_BONUS", 3, FactionStandingLevel.STANDING_LEVEL_6.getStandingLevel()),
-    /** Public acknowledgement via a faction-wide news outlet. */
-    PRESS_RECOGNITION("PRESS_RECOGNITION", 4, FactionStandingLevel.STANDING_LEVEL_6.getStandingLevel()),
-    /** A c-bill reward in recognition of services rendered */
-    CASH_BONUS_1("CASH_BONUS", 5, FactionStandingLevel.STANDING_LEVEL_6.getStandingLevel()),
-    /** The campaign appears in a state-sponsored propaganda reel */
-    PROPAGANDA_REEL("PROPAGANDA_REEL", 6, FactionStandingLevel.STANDING_LEVEL_6.getStandingLevel()),
-    /** Offer of adoption into the faction (sweetened with free units) */
-    ADOPTION_OR_MEKS("ADOPTION_OR_MEKS", 7, FactionStandingLevel.STANDING_LEVEL_6.getStandingLevel()),
-    /** A c-bill reward in recognition of services rendered */
-    CASH_BONUS_2("CASH_BONUS", 8, FactionStandingLevel.STANDING_LEVEL_7.getStandingLevel()),
-    /** High-profile celebration or parade in the unit's honor or entered into the remembrance. */
-    TRIUMPH_OR_REMEMBRANCE("TRIUMPH_OR_REMEMBRANCE", 9, FactionStandingLevel.STANDING_LEVEL_7.getStandingLevel()),
-    /** A c-bill reward in recognition of services rendered */
-    CASH_BONUS_3("CASH_BONUS", 10, FactionStandingLevel.STANDING_LEVEL_7.getStandingLevel()),
-    /** Statue made in the unit’s honor or a sibko founded from their bloodline */
-    STATUE_OR_SIBKO("STATUE_OR_SIBKO", 11, FactionStandingLevel.STANDING_LEVEL_8.getStandingLevel()),
-    /** A c-bill reward in recognition of services rendered */
-    CASH_BONUS_4("CASH_BONUS", 12, FactionStandingLevel.STANDING_LEVEL_8.getStandingLevel()),
-    /** Formal recognition from the faction head of state. */
-    LETTER_FROM_HEAD_OF_STATE("LETTER_FROM_HEAD_OF_STATE", 13,
-          FactionStandingLevel.STANDING_LEVEL_8.getStandingLevel());
+    /**
+     * No accolade awarded.
+     */
+    NO_ACCOLADE("NO_ACCOLADE", 0, STANDING_LEVEL_0.getStandingLevel()),
+
+    /**
+     * Typically signifies the first recognition by a faction.
+     */
+    TAKING_NOTICE_0("TAKING_NOTICE", 1, STANDING_LEVEL_5.getStandingLevel()),
+
+    /**
+     * Represents later recognition by a faction at higher standing.
+     */
+    TAKING_NOTICE_1("TAKING_NOTICE", 2, STANDING_LEVEL_5.getStandingLevel()),
+
+    /**
+     * The unit or individual becomes notable enough to be indexed by faction or public searches.
+     */
+    APPEARING_IN_SEARCHES("APPEARING_IN_SEARCHES", 3, STANDING_LEVEL_6.getStandingLevel()),
+
+    /**
+     * The recipient is awarded a monetary reward based on their standing.
+     */
+    CASH_BONUS_0("CASH_BONUS", 4, STANDING_LEVEL_6.getStandingLevel()),
+
+    /**
+     * The unit or individual receives media attention for their achievements.
+     */
+    PRESS_RECOGNITION("PRESS_RECOGNITION", 5, STANDING_LEVEL_6.getStandingLevel()),
+
+    /**
+     * An additional or higher monetary reward recognizing continued accomplishments.
+     */
+    CASH_BONUS_1("CASH_BONUS", 6, STANDING_LEVEL_6.getStandingLevel()),
+
+    /**
+     * The unit or individual is featured in promotional or morale-boosting media.
+     */
+    PROPAGANDA_REEL("PROPAGANDA_REEL", 7, STANDING_LEVEL_6.getStandingLevel()),
+
+    /**
+     * Recognizes significant honor through factional adoption or Mek gift.
+     */
+    ADOPTION_OR_MEKS("ADOPTION_OR_MEKS", 8, STANDING_LEVEL_6.getStandingLevel()),
+
+    /**
+     * Reflects further increased monetary rewards at higher standing.
+     */
+    CASH_BONUS_2("CASH_BONUS", 9, STANDING_LEVEL_7.getStandingLevel()),
+
+    /**
+     * Granted in recognition of major victories or in memorial of distinguished service.
+     */
+    TRIUMPH_OR_REMEMBRANCE("TRIUMPH_OR_REMEMBRANCE", 10, STANDING_LEVEL_7.getStandingLevel()),
+
+    /**
+     * An even more significant monetary reward corresponding to greater achievements.
+     */
+    CASH_BONUS_3("CASH_BONUS", 11, STANDING_LEVEL_7.getStandingLevel()),
+
+    /**
+     * Represents one of the highest honors, signifying legendary status.
+     */
+    STATUE_OR_SIBKO("STATUE_OR_SIBKO", 12, STANDING_LEVEL_8.getStandingLevel()),
+
+    /**
+     * The highest level of monetary recognition afforded by the awarding faction.
+     */
+    CASH_BONUS_4("CASH_BONUS", 13, STANDING_LEVEL_8.getStandingLevel()),
+
+    /**
+     * A highly prestigious honor indicating direct recognition from the faction’s leader.
+     */
+    LETTER_FROM_HEAD_OF_STATE("LETTER_FROM_HEAD_OF_STATE", 14, STANDING_LEVEL_8.getStandingLevel());
 
     /** The minimum possible accolade recognition (inclusive). */
     public static final int MIN_ACCOLADE_RECOGNITION = NO_ACCOLADE.getRecognition();
     /** The maximum possible accolade recognition (inclusive). */
-    public static final int MAX_ACCOLADE_RECOGNITION = STATUE_OR_SIBKO.getRecognition();
+    public static final int MAX_ACCOLADE_RECOGNITION = LETTER_FROM_HEAD_OF_STATE.getRecognition();
 
     private final String lookupName;
     private final int recognition;

@@ -39,7 +39,8 @@ import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.CASH_
 import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.CASH_BONUS_2;
 import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.CASH_BONUS_3;
 import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.CASH_BONUS_4;
-import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.TAKING_NOTICE;
+import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.TAKING_NOTICE_0;
+import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.TAKING_NOTICE_1;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.util.ArrayList;
@@ -106,7 +107,7 @@ public class FactionAccoladeEvent {
         this.factionCode = faction.getShortName();
 
         // This is a silent accolade level, it gets logged internally, but the player isn't made aware of it
-        if (accoladeLevel.is(TAKING_NOTICE)) {
+        if (accoladeLevel.is(TAKING_NOTICE_0) || accoladeLevel.is(TAKING_NOTICE_1)) {
             return;
         }
 

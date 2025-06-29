@@ -175,7 +175,7 @@ public class FactionAccoladeDialog {
         boolean isClan = faction.isClan();
 
         return switch (accoladeLevel) {
-            case NO_ACCOLADE, TAKING_NOTICE, PRESS_RECOGNITION, PROPAGANDA_REEL -> null;
+            case NO_ACCOLADE, TAKING_NOTICE_0, TAKING_NOTICE_1, PRESS_RECOGNITION, PROPAGANDA_REEL -> null;
             case APPEARING_IN_SEARCHES -> campaign.getSecondInCommand();
             case CASH_BONUS_0, CASH_BONUS_1, CASH_BONUS_2, CASH_BONUS_3, CASH_BONUS_4, ADOPTION_OR_MEKS -> {
                 if (isClan) {

@@ -87,7 +87,7 @@ class FactionAccoladeLevelTest {
               Arguments.of("APPEARING_IN_SEARCHES", FactionAccoladeLevel.APPEARING_IN_SEARCHES),
               // Valid numeric strings
               Arguments.of("0", FactionAccoladeLevel.NO_ACCOLADE),
-                Arguments.of("1", FactionAccoladeLevel.TAKING_NOTICE),
+              Arguments.of("1", FactionAccoladeLevel.TAKING_NOTICE_0),
               Arguments.of("3", FactionAccoladeLevel.PRESS_RECOGNITION),
               // Invalid strings
               Arguments.of("INVALID", FactionAccoladeLevel.NO_ACCOLADE),
