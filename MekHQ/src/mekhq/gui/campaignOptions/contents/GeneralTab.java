@@ -186,7 +186,7 @@ public class GeneralTab {
         // Generate new random campaign name
         btnNameGenerator = new CampaignOptionsButton("NameGenerator");
         btnNameGenerator.addActionListener(e -> txtName.setText(BackgroundsController.randomMercenaryCompanyNameGenerator(
-              campaign.getFlaggedCommander())));
+              campaign.getCommander())));
 
         // Campaign faction
         lblFaction = new CampaignOptionsLabel("Faction");

@@ -180,7 +180,7 @@ public class ComingOfAgeAnnouncement {
      */
     private @Nullable Person getSpeaker() {
         Genealogy genealogy = birthdayHaver.getGenealogy();
-        Person commander = campaign.getFlaggedCommander();
+        Person commander = campaign.getCommander();
 
         if (genealogy == null) {
             logger.debug("No genealogy found for {}. Using fallback speaker.", birthdayHaver.getFullName());

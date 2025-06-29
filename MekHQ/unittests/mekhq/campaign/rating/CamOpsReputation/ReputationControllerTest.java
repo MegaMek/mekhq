@@ -24,8 +24,24 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.rating.CamOpsReputation;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
@@ -33,13 +49,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
-
-import java.util.*;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.when;
 
 class ReputationControllerTest {
     private ReputationController reputation;
@@ -57,7 +66,7 @@ class ReputationControllerTest {
     void setUp() {
         reputation = new ReputationController();
         campaign = mock(Campaign.class);
-        when(campaign.getFlaggedCommander()).thenReturn(null);
+        when(campaign.getCommander()).thenReturn(null);
         when(campaign.getFinances()).thenReturn(null);
         when(campaign.getDateOfLastCrime()).thenReturn(null);
         averageExperienceRating = mockStatic(AverageExperienceRating.class);

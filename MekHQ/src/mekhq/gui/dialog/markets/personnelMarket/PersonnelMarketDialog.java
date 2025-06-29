@@ -539,7 +539,7 @@ public class PersonnelMarketDialog extends JDialog {
         if (campaignFaction.isClan()) {
             setTitle(getTextAt(RESOURCE_BUNDLE, "title.personnelMarket.clan"));
         } else if (campaignFaction.isComStarOrWoB()) {
-            Person commander = campaign.getFlaggedCommander();
+            Person commander = campaign.getCommander();
             String address = commander != null ? commander.getTitleAndSurname() : campaign.getCommanderAddress(false);
             setTitle(getFormattedTextAt(RESOURCE_BUNDLE,
                   "title.personnelMarket.comStarOrWoB",
