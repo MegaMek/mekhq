@@ -243,6 +243,9 @@ public class MercenaryRelations {
         }
 
         double defaultModifier = faction.isClan() ? CLAN_FALLBACK_VALUE : INNER_SPHERE_FALLBACK_VALUE;
+        if (faction.isMercenary()) {
+            defaultModifier = INNER_SPHERE_FALLBACK_VALUE;
+        }
 
         String factionCode = faction.getShortName();
         List<MercenaryRelation> mercenaryRelations = CLIMATE_FACTION_STANDING_MODIFIERS.get(factionCode);

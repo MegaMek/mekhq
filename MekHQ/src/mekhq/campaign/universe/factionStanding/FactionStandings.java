@@ -210,7 +210,7 @@ public class FactionStandings {
     /**
      * Regard decrease when accepting a contract against a Clan enemy.
      */
-    static final double REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_CLAN = REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER / 2;
+    static final double REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_CLAN = -(REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER / 2);
 
     /**
      * Regard decrease when accepting a contract for non-Clan factions allied with the enemy.
@@ -724,7 +724,7 @@ public class FactionStandings {
         if (factionStanding.getStandingLevel() >= FactionJudgment.THRESHOLD_FOR_ACCOLADE) {
             LOGGER.debug("Faction {} has sufficient standing for accolade improvement.", factionCode);
             // This will return null if no change has taken place
-            return factionJudgment.increaseAccoladeForFaction(factionCode, today, factionStanding, hasActiveContract);
+            return factionJudgment.increaseAccoladeForFaction(faction, today, factionStanding, hasActiveContract);
         }
 
         return null;
@@ -1030,34 +1030,28 @@ public class FactionStandings {
     }
 
     /**
-     * Processes the acceptance of a contract against a specified enemy faction and applies regard changes to all relevant
-     * factions.
+     * Processes the acceptance of a contract against a specified enemy faction and applies the appropriate regard
+     * changes for the campaign faction.
      *
-     * <p>This method iterates through all factions in the game, adjusting their regard values based on relationships to
-     * the specified enemy faction and the contract's context. Regard deltas are applied for the enemy faction itself, as
-     * well as any factions allied with the enemy. The changes vary depending on whether the factions are clans or
-     * non-clans, and different regard penalties are applied accordingly.</p>
+     * <p>This method determines the correct regard penalty based on whether the enemy faction is classified as a
+     * clan or not. The penalty is then applied to the regard value between the campaign's faction and the enemy
+     * faction. If the enemy faction is null or is an aggregate (grouping rather than a true faction), the method
+     * takes no action and an appropriate report is returned or null.</p>
      *
-     * <p>For each application of a regard delta, a report string is generated and included in the result list if it is
-     * not blank.</p>
-     *
-     * @param campaignFactionCode The unique identifier for the current campaign faction
-     * @param enemyFaction The {@link Faction} representing the enemy against whom the contract is accepted.
-     * @param today        The {@link LocalDate} representing the game date on which the contract is accepted.
-     *
-     * @return A {@link List} of {@link String} objects summarizing any regard changes that occurred as a result of
-     *       accepting the contract.
+     * @param campaignFactionCode the unique code for the campaign's faction
+     * @param enemyFaction the {@link Faction} representing the targeted enemy against whom the contract is accepted
+     * @param today the current in-game date of contract acceptance
+     * @return a summary {@link String} describing the regard changes applied, or the result from
+     * {@link #getMissingFactionReport()} if the enemy is missing, or {@code null} if the enemy faction is an aggregate
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public List<String> processContractAccept(@Nullable final String campaignFactionCode,
+    public @Nullable String processContractAccept(@Nullable final String campaignFactionCode,
           @Nullable final Faction enemyFaction, final LocalDate today) {
         // If we're missing the relevant faction, alert the player and abort
         if (enemyFaction == null) {
-            String report = getMissingFactionReport();
-
-            return List.of(report);
+            return getMissingFactionReport();
         }
 
         List<String> regardChangeReports = new ArrayList<>();
@@ -1066,35 +1060,18 @@ public class FactionStandings {
 
         Collection<Faction> allFactions = Factions.getInstance().getFactions();
 
-        String report;
-        double regardDelta;
-        for (Faction otherFaction : allFactions) {
-            if (!otherFaction.validIn(gameYear)) {
-                continue;
-            }
-
-            String otherFactionCode = otherFaction.getShortName();
-
-            if (otherFaction.isAggregate()) {
-                continue;
-            }
-
-            if (otherFaction.equals(enemyFaction)) {
-                if (otherFaction.isClan()) {
-                    regardDelta = REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_CLAN;
-                } else {
-
-                    regardDelta = REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_NORMAL;
-                }
-
-                report = changeRegardForFaction(campaignFactionCode, otherFactionCode, regardDelta, gameYear);
-                if (!report.isBlank()) {
-                    regardChangeReports.add(report);
-                }
-            }
+        if (enemyFaction.isAggregate()) {
+            return null;
         }
 
-        return regardChangeReports;
+        double regardDelta;
+        if (enemyFaction.isClan()) {
+            regardDelta = REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_CLAN;
+        } else {
+            regardDelta = REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_NORMAL;
+        }
+
+        return changeRegardForFaction(campaignFactionCode, enemyFaction.getShortName(), regardDelta, gameYear);
     }
 
     /**
@@ -1109,7 +1086,7 @@ public class FactionStandings {
      * <p>Regard changes are applied to the employer and all allied factions, and corresponding report strings are
      * returned for each regard change applied.</p>
      *
-     * @param campaignFactionCode The unique identifier for the current campaign faction.
+     * @param campaignFaction The current campaign faction.
      * @param employerFaction The {@link Faction} that employed the contract, or {@code null} if unavailable.
      * @param today           The {@link LocalDate} representing the date of contract completion.
      * @param missionStatus   The {@link MissionStatus} of the contract upon completion.
@@ -1117,16 +1094,14 @@ public class FactionStandings {
      * @author Illiani
      * @since 0.50.07
      */
-    public List<String> processContractCompletion(@Nullable final String campaignFactionCode,
-          @Nullable final Faction employerFaction, final LocalDate today,
-                                                  final MissionStatus missionStatus) {
+    public List<String> processContractCompletion(@Nullable final Faction campaignFaction,
+          @Nullable final Faction employerFaction, final LocalDate today, final MissionStatus missionStatus) {
         // If the mission is still active, there is nothing to process, so abort
         if (missionStatus == MissionStatus.ACTIVE) {
             return new ArrayList<>();
         }
 
         double regardDeltaEmployer;
-        double regardDeltaEmployerAlly = 0.0;
         regardDeltaEmployer = switch (missionStatus) {
             case SUCCESS -> REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER;
             case PARTIAL -> REGARD_DELTA_CONTRACT_PARTIAL_EMPLOYER;
@@ -1137,35 +1112,44 @@ public class FactionStandings {
 
         List<String> regardChangeReports = new ArrayList<>();
 
+        String campaignFactionCode = campaignFaction.getShortName();
         int gameYear = today.getYear();
 
-        Collection<Faction> allFactions = Factions.getInstance().getFactions();
-        FactionHints factionHints = FactionHints.defaultFactionHints();
+        String report = changeRegardForFaction(campaignFactionCode,
+              employerFaction.getShortName(),
+              regardDeltaEmployer,
+              gameYear);
+        if (!report.isBlank()) {
+            regardChangeReports.add(report);
+        }
 
-        String report;
-        for (Faction otherFaction : allFactions) {
-            String otherFactionCode = otherFaction.getShortName();
+        if (campaignFaction.isMercenary()) {
+            Factions factions = Factions.getInstance();
+            Faction mercenaryGuild = factions.getFaction("MG");
+            Faction mercenaryReviewBoard = factions.getFaction("MRB");
+            Faction mercenaryReviewBondingCommission = factions.getFaction("MRBC");
+            Faction mercenaryBondingAssociation = factions.getFaction("MBA");
 
-            if (isNotValidForTracking(otherFaction, gameYear)) {
-                continue;
+            String mercenaryAuthority = "";
+            if (mercenaryGuild.validIn(gameYear)) {
+                mercenaryAuthority = mercenaryGuild.getShortName();
+            } else if (mercenaryReviewBoard.validIn(gameYear)) {
+                mercenaryAuthority = mercenaryReviewBoard.getShortName();
+            } else if (mercenaryReviewBondingCommission.validIn(gameYear)) {
+                mercenaryAuthority = mercenaryReviewBondingCommission.getShortName();
+            } else if (mercenaryBondingAssociation.validIn(gameYear)) {
+                mercenaryAuthority = mercenaryBondingAssociation.getShortName();
             }
 
-            if (otherFaction.equals(employerFaction)) {
-                report = changeRegardForFaction(campaignFactionCode, otherFactionCode, regardDeltaEmployer, gameYear);
-                if (!report.isBlank()) {
-                    regardChangeReports.add(report);
-                }
-                continue;
-            }
-
-            if (factionHints.isAlliedWith(employerFaction, otherFaction, today)) {
+            if (!mercenaryAuthority.isBlank()) {
                 report = changeRegardForFaction(campaignFactionCode,
-                      otherFactionCode,
-                      regardDeltaEmployerAlly,
+                      mercenaryAuthority,
+                      regardDeltaEmployer,
                       gameYear);
-                if (!report.isBlank()) {
-                    regardChangeReports.add(report);
-                }
+            }
+
+            if (!report.isBlank()) {
+                regardChangeReports.add(report);
             }
         }
 
@@ -1435,10 +1419,13 @@ public class FactionStandings {
                 MissionStatus missionStatus = mission.getStatus();
 
                 if (mission instanceof AtBContract atbContract) {
-                    reports.addAll(processContractAccept(campaignFactionCode, atbContract.getEnemy(), today));
+                    String report = processContractAccept(campaignFactionCode, atbContract.getEnemy(), today);
+                    if (report != null) {
+                        reports.add(report);
+                    }
 
                     if (missionStatus != MissionStatus.ACTIVE) {
-                        reports.addAll(processContractCompletion(campaignFactionCode, atbContract.getEmployerFaction(),
+                        reports.addAll(processContractCompletion(campaignFaction, atbContract.getEmployerFaction(),
                               today, missionStatus));
                     }
                 } else {
@@ -1455,7 +1442,7 @@ public class FactionStandings {
                         Faction enemyChoice = dialog.getEnemyChoice();
                         MissionStatus statusChoice = dialog.getStatusChoice();
 
-                        reports.addAll(handleFactionRegardUpdates(campaignFaction.getShortName(), employerChoice,
+                        reports.addAll(handleFactionRegardUpdates(campaignFaction, employerChoice,
                               enemyChoice, statusChoice, today, this));
                     }
                 }

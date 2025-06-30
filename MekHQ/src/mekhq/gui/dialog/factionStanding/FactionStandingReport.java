@@ -439,8 +439,8 @@ public class FactionStandingReport extends JDialog {
         Faction enemyChoice = dialog.getEnemyChoice();
         MissionStatus statusChoice = dialog.getStatusChoice();
 
-        reports.addAll(handleFactionRegardUpdates(campaignFaction.getShortName(), employerChoice, enemyChoice,
-              statusChoice, today, factionStandings));
+        reports.addAll(handleFactionRegardUpdates(campaignFaction, employerChoice, enemyChoice, statusChoice, today,
+              factionStandings));
     }
 
     /**

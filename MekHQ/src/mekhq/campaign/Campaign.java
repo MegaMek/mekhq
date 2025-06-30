@@ -5850,9 +5850,10 @@ public class Campaign implements ITechManager {
                 Faction relevantFaction = Factions.getInstance().getFaction(standing.getKey());
 
                 if (relevantFaction != null) {
+                    boolean ignoreEmployer = relevantFaction.isMercenary();
                     boolean isOnMission = FactionStandingUtilities.isIsOnMission(location.isOnPlanet(),
                           getActiveAtBContracts(), activeMissions, relevantFaction.getShortName(),
-                          location.getCurrentSystem());
+                          location.getCurrentSystem(), ignoreEmployer);
 
                     FactionAccoladeLevel newAccoladeLevel = factionStandings.checkForAccolade(relevantFaction,
                           currentDay, isOnMission);
