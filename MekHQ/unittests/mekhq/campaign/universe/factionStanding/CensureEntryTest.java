@@ -34,6 +34,7 @@ package mekhq.campaign.universe.factionStanding;
 
 import static mekhq.campaign.universe.factionStanding.CensureEntry.COOLDOWN_PERIOD;
 import static mekhq.campaign.universe.factionStanding.CensureEntry.EXPIRY_PERIOD;
+import static mekhq.campaign.universe.factionStanding.FactionCensureLevel.CENSURE_LEVEL_1;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -43,7 +44,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 class CensureEntryTest {
-    private final FactionCensureLevel censureLevel = FactionCensureLevel.WARNING;
+    private final FactionCensureLevel censureLevel = CENSURE_LEVEL_1;
     private final LocalDate issueDate = LocalDate.of(3151, 1, 1);
 
     @ParameterizedTest(name = "hasExpired: monthsToAdd={0}, expectedExpired={1}")
@@ -67,14 +68,14 @@ class CensureEntryTest {
 
     @ParameterizedTest(name = "canEscalate: monthsToAdd={0}, censureLevel={1}, expectedCanEscalate={2}")
     @CsvSource({
-          // Normal escalation cases for WARNING (allowed to escalate)
-          "0,WARNING,false",
-          "1,WARNING,false",
-          COOLDOWN_PERIOD + ",WARNING,false",
-          (COOLDOWN_PERIOD - 1) + ",WARNING,false",
-          (COOLDOWN_PERIOD + 1) + ",WARNING,true",
-          // Escalation should be false for DISBAND even after cooldown
-          (COOLDOWN_PERIOD + 1) + ",DISBAND,false"
+          // Normal escalation cases for CENSURE_LEVEL_1 (allowed to escalate)
+          "0,CENSURE_LEVEL_1,false",
+          "1,CENSURE_LEVEL_1,false",
+          COOLDOWN_PERIOD + ",CENSURE_LEVEL_1,false",
+          (COOLDOWN_PERIOD - 1) + ",CENSURE_LEVEL_1,false",
+          (COOLDOWN_PERIOD + 1) + ",CENSURE_LEVEL_1,true",
+          // Escalation should be false for CENSURE_LEVEL_5 even after cooldown
+          (COOLDOWN_PERIOD + 1) + ",CENSURE_LEVEL_5,false"
     })
     void testCanEscalate_param(int monthsToAdd, FactionCensureLevel censureLv, boolean expectedCanEscalate) {
         LocalDate currentDate = issueDate.plusMonths(monthsToAdd);

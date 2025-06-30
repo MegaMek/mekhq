@@ -243,7 +243,7 @@ public class MercenaryRelations {
         }
 
         double defaultModifier = faction.isClan() ? CLAN_FALLBACK_VALUE : INNER_SPHERE_FALLBACK_VALUE;
-        if (faction.isMercenary()) {
+        if (faction.isMercenaryOrganization()) {
             defaultModifier = INNER_SPHERE_FALLBACK_VALUE;
         }
 

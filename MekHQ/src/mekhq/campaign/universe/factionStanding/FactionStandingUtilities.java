@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
@@ -39,8 +41,11 @@ import java.util.Set;
 
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.FactionHints;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -48,6 +53,15 @@ import mekhq.campaign.universe.PlanetarySystem;
 
 public class FactionStandingUtilities {
     private static final MMLogger LOGGER = MMLogger.create(FactionStandingUtilities.class);
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionCensureDialog";
+
+    /**
+     * List of personnel roles considered political in the context of censure effects.
+     */
+    final static List<PersonnelRole> POLITICAL_ROLES = List.of(
+          PersonnelRole.MORALE_OFFICER,
+          PersonnelRole.LOYALTY_MONITOR,
+          PersonnelRole.LOYALTY_AUDITOR);
 
     /**
      * Determines the {@link FactionStandingLevel} corresponding to the given regard value.
@@ -529,5 +543,83 @@ public class FactionStandingUtilities {
 
         // Check if there are any active missions
         return !activeMissions.isEmpty();
+    }
+
+    /**
+     * Processes a mass change in loyalty for all relevant personnel, typically in response to a major positive or
+     * negative censure outcome.
+     *
+     * @param campaign         the campaign instance
+     * @param isMajor          whether this is a major change
+     * @param isPositiveChange {@code true} for positive, {@code false} for negative shifts
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    static void processMassLoyaltyChange(Campaign campaign, boolean isMajor, boolean isPositiveChange) {
+        LocalDate today = campaign.getLocalDate();
+        for (Person person : campaign.getPersonnel()) {
+            if (isExempt(person, today)) {
+                continue;
+            }
+
+            person.performForcedDirectionLoyaltyChange(campaign, isPositiveChange, isMajor, false);
+        }
+    }
+
+    /**
+     * Determines if a person is exempt from certain censure actions on the given date.
+     *
+     * @param person the person to evaluate
+     * @param today  the current date
+     *
+     * @return {@code true} if the person is exempt, {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    static boolean isExempt(Person person, LocalDate today) {
+        if (person.getStatus().isDepartedUnit()) {
+            return true;
+        }
+
+        if (person.isChild(today)) {
+            return true;
+        }
+
+        if (!person.isEmployed()) {
+            return true;
+        }
+
+        return person.getPrisonerStatus().isFreeOrBondsman();
+    }
+
+    /**
+     * Returns the formatted full name of a {@link Faction} for the specified game year.
+     *
+     * <p>If the faction's name starts with the localized "clan" prefix, the method returns the full name as-is.
+     * Otherwise, the localized "the" article is prefixed to the base name. This helps ensure proper grammatical usage
+     * for varying factions based on localization and faction naming conventions.</p>
+     *
+     * @param faction  the {@link Faction} whose name should be formatted
+     * @param gameYear the year for which the faction's full name is relevant
+     *
+     * @return the formatted faction name, including the appropriate localized prefix if necessary
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public static String getFactionName(Faction faction, int gameYear) {
+        final String CLAN = getTextAt(RESOURCE_BUNDLE, "FactionStandingUtilities.clan");
+        final String THE = getTextAt(RESOURCE_BUNDLE, "FactionStandingUtilities.the");
+
+        String baseName = faction.getFullName(gameYear);
+        if (baseName.startsWith(CLAN)) {
+            return baseName;
+        }
+
+        // Add additional conditionals here as necessary.
+
+        return THE + ' ' + baseName;
     }
 }

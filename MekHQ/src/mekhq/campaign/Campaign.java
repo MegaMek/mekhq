@@ -5813,15 +5813,20 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Performs a series of faction standing checks that may impact campaign relations.
+     * Performs all daily and periodic standing checks for factions relevant to this campaign.
      *
-     * <p>On the first day of the month, this method updates the standing climate and regard for the current faction
-     * and records a report. Regular checks include running censure evaluations and processing any necessary censure
-     * degradation if there are no active missions, ensuring that key leadership changes do not occur while deployed.
-     * Additionally, on the first day of the month, the method evaluates accolade status for all relevant factions.</p>
+     * <p>On the first day of the month, this method updates the climate regard for the active campaign faction,
+     * storing a summary report. It then iterates once through all faction standings and, for each faction:</p>
      *
-     * @param isFirstOfMonth {@code true} if this method is being called on the first day of the month, enabling
-     *                       climate, regard, and accolade checks; otherwise {@code false}.
+     * <ul>
+     *     <li>Checks for new censure actions and handles the creation of related events.</li>
+     *     <li>Evaluates for new accolade levels, creating corresponding events.</li>
+     *     <li>Warns if any referenced faction cannot be resolved.</li>
+     * </ul>
+     *
+     * <p>Finally, at the end of the checks, it processes censure degradation for all factions.</p>
+     *
+     * @param isFirstOfMonth {@code true} if called on the first day of the month.
      *
      * @author Illiani
      * @since 0.50.07
@@ -5833,43 +5838,48 @@ public class Campaign implements ITechManager {
         }
 
         List<Mission> activeMissions = getActiveMissions(false);
+        boolean isInTransit = location.isOnPlanet();
+        Factions factions = Factions.getInstance();
 
-        // We only check when the campaign doesn't have an active Mission. This is so we don't have to deal with
-        // leadership personnel becoming unavailable while on active deployment.
-        if (activeMissions.isEmpty()) {
-            FactionCensureLevel newCensureLevel = factionStandings.checkForCensure(faction, currentDay);
-            if (newCensureLevel != null) {
-                new FactionCensureEvent(this, newCensureLevel);
+        for (Entry<String, Double> standing : factionStandings.getAllFactionStandings().entrySet()) {
+            String factionCode = standing.getKey();
+            Faction relevantFaction = factions.getFaction(factionCode);
+            if (relevantFaction == null) {
+                logger.warn("Unable to fetch faction standing for faction: {}", factionCode);
+                continue;
             }
 
-            factionStandings.processCensureDegradation(currentDay);
-        }
-
-        if (isFirstOfMonth) {
-            for (Entry<String, Double> standing : factionStandings.getAllFactionStandings().entrySet()) {
-                Faction relevantFaction = Factions.getInstance().getFaction(standing.getKey());
-
-                if (relevantFaction != null) {
-                    boolean ignoreEmployer = relevantFaction.isMercenary();
-                    boolean isOnMission = FactionStandingUtilities.isIsOnMission(location.isOnPlanet(),
-                          getActiveAtBContracts(), activeMissions, relevantFaction.getShortName(),
-                          location.getCurrentSystem(), ignoreEmployer);
-
-                    FactionAccoladeLevel newAccoladeLevel = factionStandings.checkForAccolade(relevantFaction,
-                          currentDay, isOnMission);
-
-                    logger.debug("Accolade level: {} for faction: {}", newAccoladeLevel,
-                          relevantFaction.getShortName());
-
-                    if (newAccoladeLevel != null) {
-                        new FactionAccoladeEvent(this, relevantFaction, newAccoladeLevel,
-                              faction.equals(relevantFaction));
-                    }
-                } else {
-                    logger.warn("Unable to fetch faction standing for faction: {}", standing.getKey());
+            // Censure check
+            if (relevantFaction.equals(faction)
+                      || (faction.getShortName().equals("MERC") && relevantFaction.isMercenaryOrganization())) {
+                FactionCensureLevel newCensureLevel = factionStandings.checkForCensure(
+                      relevantFaction, currentDay, activeMissions, isInTransit);
+                if (newCensureLevel != null) {
+                    new FactionCensureEvent(this, newCensureLevel, relevantFaction);
                 }
             }
+
+            // Accolade check
+            boolean ignoreEmployer = relevantFaction.isMercenaryOrganization();
+            boolean isOnMission = FactionStandingUtilities.isIsOnMission(
+                  !isInTransit,
+                  getActiveAtBContracts(),
+                  activeMissions,
+                  relevantFaction.getShortName(),
+                  location.getCurrentSystem(),
+                  ignoreEmployer);
+
+            FactionAccoladeLevel newAccoladeLevel = factionStandings.checkForAccolade(
+                  relevantFaction, currentDay, isOnMission);
+
+            if (newAccoladeLevel != null) {
+                new FactionAccoladeEvent(this, relevantFaction, newAccoladeLevel,
+                      faction.equals(relevantFaction));
+            }
         }
+
+        // Censure degradation
+        factionStandings.processCensureDegradation(currentDay);
     }
 
     public void refreshPersonnelMarkets() {

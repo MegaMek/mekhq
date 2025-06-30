@@ -33,16 +33,17 @@
 package mekhq.campaign.universe.factionStanding;
 
 import static mekhq.campaign.universe.factionStanding.FactionCensureLevel.MIN_CENSURE_SEVERITY;
-import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_4;
 import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_5;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
+import mekhq.campaign.mission.Mission;
 import mekhq.campaign.universe.Faction;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -64,7 +65,7 @@ import org.w3c.dom.NodeList;
 public class FactionJudgment {
     private static final MMLogger LOGGER = MMLogger.create(FactionJudgment.class);
 
-    static final int THRESHOLD_FOR_CENSURE = STANDING_LEVEL_4.getStandingLevel();
+    static final int THRESHOLD_FOR_CENSURE = 0;
     static final int THRESHOLD_FOR_ACCOLADE = STANDING_LEVEL_5.getStandingLevel();
 
     private final Map<String, CensureEntry> factionCensures = new HashMap<>();
@@ -178,36 +179,47 @@ public class FactionJudgment {
     /**
      * Raises the censure level for the specified faction if escalation is permitted.
      *
-     * <p>If the faction does not have a current censure entry, sets the level to {@link FactionCensureLevel#WARNING}.
-     * If an escalation is possible (not blocked by time or rules), increases the severity by one.</p>
+     * <p>If the faction does not have a current censure entry, sets the level to
+     * {@link FactionCensureLevel#CENSURE_LEVEL_1}. If an escalation is possible (not blocked by time or rules),
+     * increases the severity by one.</p>
      *
-     * @param factionCode the faction's code
-     * @param today       the current date for issue date/escalation check
+     * @param faction        the faction performing the censure
+     * @param today          the current date for issue date/escalation check
+     * @param activeMissions a list of active missions, used to determine whether a censure level increase is possible
      *
      * @return the new censure level if increased, {@code null} if no escalation occurred
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public @Nullable FactionCensureLevel increaseCensureForFaction(final String factionCode, final LocalDate today) {
+    public @Nullable FactionCensureLevel increaseCensureForFaction(final Faction faction, final LocalDate today,
+          final List<Mission> activeMissions, final boolean campaignInTransit) {
+        String factionCode = faction.getShortName();
         CensureEntry censureEntry = factionCensures.get(factionCode);
 
+        // Determine the new censure level and check escalation
+        FactionCensureLevel newCensureLevel;
+
         if (censureEntry == null) {
-            setCensureForFaction(factionCode, FactionCensureLevel.WARNING, today);
-            return FactionCensureLevel.WARNING;
+            newCensureLevel = FactionCensureLevel.CENSURE_LEVEL_1;
+        } else {
+            if (!censureEntry.canEscalate(today)) {
+                return null;
+            }
+            int nextSeverity = censureEntry.level().getSeverity() + 1;
+            newCensureLevel = FactionCensureLevel.getCensureLevelFromSeverity(nextSeverity);
         }
 
-        if (!censureEntry.canEscalate(today)) {
-            return null;
+        FactionCensureAction censureAction = newCensureLevel.getFactionAppropriateAction(faction);
+        boolean validOnContract = censureAction.isValidOnContract() || activeMissions.isEmpty();
+        boolean validInTransit = censureAction.isValidInTransit() || !campaignInTransit;
+
+        if (validOnContract && validInTransit) {
+            setCensureForFaction(factionCode, newCensureLevel, today);
+            return newCensureLevel;
         }
 
-        FactionCensureLevel currentCensureLevel = censureEntry.level();
-        int currentSeverity = currentCensureLevel.getSeverity();
-        currentSeverity++;
-        FactionCensureLevel newCensureLevel = FactionCensureLevel.getCensureLevelFromSeverity(currentSeverity);
-
-        setCensureForFaction(factionCode, newCensureLevel, today);
-        return newCensureLevel;
+        return null;
     }
 
     /**
@@ -283,7 +295,7 @@ public class FactionJudgment {
         FactionAccoladeLevel updatedAccoladeLevel = FactionAccoladeLevel.getAccoladeRecognitionFromRecognition(
               currentRecognition);
 
-        if (faction.isMercenary() && !updatedAccoladeLevel.isMercenarySuitable()) {
+        if (faction.isMercenaryOrganization() && !updatedAccoladeLevel.isMercenarySuitable()) {
             LOGGER.debug("Faction {} cannot improve accolade due to mercenary suitability", factionCode);
             return null;
         }
@@ -403,7 +415,7 @@ public class FactionJudgment {
      * @since 0.50.07
      */
     private static CensureEntry readCensureEntryFromFactionNode(Node codeNode) {
-        FactionCensureLevel level = FactionCensureLevel.NO_CENSURE;
+        FactionCensureLevel level = FactionCensureLevel.CENSURE_LEVEL_0;
         LocalDate issueDate = LocalDate.MIN;
 
         NodeList props = codeNode.getChildNodes();

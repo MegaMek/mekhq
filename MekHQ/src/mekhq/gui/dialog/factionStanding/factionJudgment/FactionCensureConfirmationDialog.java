@@ -42,7 +42,7 @@ import java.util.List;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.universe.factionStanding.FactionCensureLevel;
+import mekhq.campaign.universe.factionStanding.FactionCensureAction;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
 /**
@@ -84,16 +84,16 @@ public class FactionCensureConfirmationDialog {
      * <p>The dialog content is dynamically generated based on the specified campaign and its commander.</p>
      *
      * @param campaign     the campaign context in which censure is being performed
-     * @param censureLevel the severity of the censure event
-     * @param mostSeniorCharacter the target of the censure event
+     * @param censureAction the severity of the censure event
+     * @param commander the target of the censure event
      * @param isSeppuku {@code true} if the character is considering Seppuku, otherwise {@code false}
      * @param isGoingRogue {@code true} if the campaign is considering going rogue, otherwise {@code false}
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public FactionCensureConfirmationDialog(Campaign campaign, FactionCensureLevel censureLevel,
-          Person mostSeniorCharacter, boolean isSeppuku, boolean isGoingRogue) {
+    public FactionCensureConfirmationDialog(Campaign campaign, FactionCensureAction censureAction, Person commander,
+            boolean isSeppuku, boolean isGoingRogue) {
         Person speaker = campaign.getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND);
 
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(
@@ -102,7 +102,7 @@ public class FactionCensureConfirmationDialog {
               null,
               getInCharacterText(campaign),
               getDialogOptions(),
-              getOutOfCharacterText(censureLevel, isSeppuku, isGoingRogue, mostSeniorCharacter),
+                getOutOfCharacterText(censureAction, isSeppuku, isGoingRogue, commander),
               null,
               false);
 
@@ -140,7 +140,7 @@ public class FactionCensureConfirmationDialog {
     /**
      * Returns the out-of-character explanatory text shown in the dialog.
      *
-     * @param censureLevel        The severity of the current ongoing censure
+     * @param censureAction        The severity of the current ongoing censure
      * @param isSeppuku           Whether the character is considering seppuku
      * @param isGoingRogue        Whether the campaign is considering going rogue
      * @param mostSeniorCharacter the target of the censure (if applicable)
@@ -150,7 +150,7 @@ public class FactionCensureConfirmationDialog {
      * @author Illiani
      * @since 0.50.07
      */
-    public String getOutOfCharacterText(FactionCensureLevel censureLevel, boolean isSeppuku, boolean isGoingRogue,
+    public String getOutOfCharacterText(FactionCensureAction censureAction, boolean isSeppuku, boolean isGoingRogue,
           Person mostSeniorCharacter) {
         String dialog;
         if (isGoingRogue) {
@@ -158,7 +158,7 @@ public class FactionCensureConfirmationDialog {
                   mostSeniorCharacter.getHyperlinkedFullTitle());
 
         } else {
-            dialog = getFormattedTextAt(RESOURCE_BUNDLE, OUT_OF_CHARACTER_KEY + censureLevel.name(),
+            dialog = getFormattedTextAt(RESOURCE_BUNDLE, OUT_OF_CHARACTER_KEY + censureAction.getLookupName(),
                   mostSeniorCharacter.getHyperlinkedFullTitle());
 
             if (isSeppuku) {

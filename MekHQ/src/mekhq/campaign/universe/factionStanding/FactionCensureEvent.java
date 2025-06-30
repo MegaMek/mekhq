@@ -35,24 +35,33 @@ package mekhq.campaign.universe.factionStanding;
 import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
+import static mekhq.campaign.universe.factionStanding.FactionCensureAction.NO_ACTION;
+import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.POLITICAL_ROLES;
+import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.isExempt;
+import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.processMassLoyaltyChange;
 import static mekhq.campaign.universe.factionStanding.FactionStandings.REGARD_DELTA_CONTRACT_PARTIAL_EMPLOYER;
 import static mekhq.campaign.universe.factionStanding.FactionStandings.REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.time.LocalDate;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Finances;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionCensureConfirmationDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionCensureDialog;
+import mekhq.gui.dialog.factionStanding.factionJudgment.FactionCensureNewsArticle;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentSceneDialog;
 
 /**
@@ -67,165 +76,210 @@ import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentSceneDial
  * @since 0.50.07
  */
 public class FactionCensureEvent {
+    private static final MMLogger LOGGER = MMLogger.create(FactionCensureEvent.class);
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionCensureDialog";
+
     private final static int GO_ROGUE_DIALOG_CHOICE_INDEX = 3;
     private final static int SEPPUKU_DIALOG_CHOICE_INDEX = 4;
 
     /**
-     * List of personnel roles considered political in the context of censure effects.
+     * Represents the minimum fine amount imposed during a faction censure event.
      */
-    final static List<PersonnelRole> POLITICAL_ROLES = List.of(
-          PersonnelRole.MORALE_OFFICER,
-          PersonnelRole.LOYALTY_MONITOR,
-          PersonnelRole.LOYALTY_AUDITOR);
+    private final static Money MINIMUM_FINE = Money.of(10000000);
 
     private final Campaign campaign;
-    private final Person commander;
-    private final Person secondInCommand;
+    private final Faction censuringFaction;
+    private Person commander;
+    private Person secondInCommand;
 
     /**
-     * Constructs a new FactionCensureEvent for the given campaign and censure level.
+     * Constructs a new {@link FactionCensureEvent} for the given campaign and censure level.
      *
      * @param campaign     the campaign in which the event takes place
      * @param censureLevel the censure level triggering this event
+     * @param censuringFaction the {@link Faction} performing the censure
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public FactionCensureEvent(Campaign campaign, FactionCensureLevel censureLevel) {
+    public FactionCensureEvent(Campaign campaign, FactionCensureLevel censureLevel, Faction censuringFaction) {
         this.campaign = campaign;
-        commander = campaign.getCommander();
-        secondInCommand = campaign.getSecondInCommand();
+        this.censuringFaction = censuringFaction;
 
-        // There is nobody to censure
+        FactionCensureAction censureAction = censureLevel.getFactionAppropriateAction(censuringFaction);
+        if (censureAction == NO_ACTION) {
+            // There isn't anything to do. Assuming I've done my job properly, this shouldn't trigger. Which is why
+            // we have a warning if it does.
+            LOGGER.warn("NO_ACTION censureAction passed into FactionCensureEvent");
+            return;
+        }
+
+        commander = campaign.getCommander(); // Can be null if the campaign is effectively empty
         if (commander == null) {
-            return;
+            // If there isn't a commander in the campaign, we're going to invent someone. This avoids us needing to
+            // add null protection throughout this class (and the dialogs it spawns). This clause should only trigger
+            // in the event the campaign is effectively empty. So it shouldn't come up during normal play.
+            commander = campaign.newPerson(PersonnelRole.MEKWARRIOR);
+            LOGGER.warn("Commander was null in FactionCensureEvent. Using a fallback commander: {}.",
+                  commander.getFullName());
         }
 
-        FactionCensureDialog initialDialog = new FactionCensureDialog(campaign, censureLevel, commander);
-        int choiceIndex = initialDialog.getDialogChoiceIndex();
-        boolean isSeppuku = choiceIndex == SEPPUKU_DIALOG_CHOICE_INDEX;
-        boolean isGoingRogue = choiceIndex == GO_ROGUE_DIALOG_CHOICE_INDEX;
-
-        FactionCensureConfirmationDialog confirmationDialog = new FactionCensureConfirmationDialog(campaign,
-              censureLevel, commander, isSeppuku, isGoingRogue);
-        if (!confirmationDialog.wasConfirmed()) {
-            new FactionCensureEvent(campaign, censureLevel);
-            return;
+        secondInCommand = campaign.getSecondInCommand(); // Can be null if the campaign is effectively empty
+        if (secondInCommand == null) {
+            // See comments for the 'commander == null' clause
+            secondInCommand = campaign.newPerson(PersonnelRole.MEKWARRIOR);
+            LOGGER.warn("Second in command was null in FactionCensureEvent. Using a fallback secondInCommand: {}.",
+                  secondInCommand.getFullName());
         }
 
-        boolean committedSeppuku = false;
+        int dialogChoice;
+        boolean isGoingRogue = false;
+        boolean isSeppuku = false;
+        switch (censureAction) {
+            case BARRED, COMMANDER_REMOVAL, COMMANDER_RETIREMENT, DISBAND, FINE, FORMAL_WARNING,
+                 LEADERSHIP_REPLACEMENT -> {
+                // We keep presenting the user with the dialog until they confirm their choice
+                while (true) {
+                    FactionCensureDialog censureDialog = new FactionCensureDialog(campaign, censureAction, commander,
+                          censuringFaction);
+
+                    dialogChoice = censureDialog.getDialogChoiceIndex();
+                    isGoingRogue = dialogChoice == GO_ROGUE_DIALOG_CHOICE_INDEX;
+                    isSeppuku = dialogChoice == SEPPUKU_DIALOG_CHOICE_INDEX;
+
+                    FactionCensureConfirmationDialog confirmationDialog = new FactionCensureConfirmationDialog(campaign,
+                          censureAction, commander, isSeppuku, isGoingRogue);
+                    if (confirmationDialog.wasConfirmed()) {
+                        break;
+                    }
+                }
+            }
+            case CHATTERWEB_DISCUSSION, CLAN_LEADERSHIP_TRIAL_UNSUCCESSFUL, LEGAL_CHALLENGE -> {
+                FactionJudgmentSceneType sceneType = switch (censureAction) {
+                    case CHATTERWEB_DISCUSSION -> FactionJudgmentSceneType.CHATTERWEB_DISCUSSION;
+                    case CLAN_LEADERSHIP_TRIAL_UNSUCCESSFUL ->
+                          FactionJudgmentSceneType.CLAN_LEADERSHIP_TRIAL_UNSUCCESSFUL;
+                    case LEGAL_CHALLENGE -> FactionJudgmentSceneType.LEGAL_CHALLENGE;
+                    default -> throw new IllegalStateException("Unexpected value: " + censureAction);
+                };
+
+                new FactionJudgmentSceneDialog(campaign, commander, secondInCommand, sceneType, censuringFaction);
+            }
+            case COMMANDER_MURDERED, COMMANDER_IMPRISONMENT, LEADERSHIP_IMPRISONED, NEWS_ARTICLE ->
+                  new FactionCensureNewsArticle(campaign, commander, secondInCommand, censureAction, censuringFaction);
+        }
+
         if (isGoingRogue) {
-            processGoingRogue(censureLevel);
+            processGoingRogue(campaign, censureLevel, censuringFaction);
             return;
-        } else if (isSeppuku) {
-            processPerformingSeppuku();
-            committedSeppuku = true;
-            // Seppuku doesn't prevent what comes next, so don't add a return here.
         }
 
-        handleCensureEffects(censureLevel, committedSeppuku);
+        if (isSeppuku) {
+            processPerformingSeppuku(campaign, censuringFaction);
+        }
+
+        handleCensureEffects(censureAction, isSeppuku);
     }
 
     /**
-     * Handles the mechanical and narrative consequences when a character performs seppuku.
+     * Processes the event where the commander chooses to perform seppuku as a result of a faction censure.
+     *
+     * <p>This method displays the seppuku judgment scene to the player, updates the commander's status to seppuku,
+     * and applies loyalty changes across the affected personnel.</p>
+     *
+     * @param campaign          the current {@link Campaign} instance
+     * @param censuringFaction  the {@link Faction} initiating the censure
      *
      * @author Illiani
      * @since 0.50.07
      */
-    private void processPerformingSeppuku() {
-        new FactionJudgmentSceneDialog(campaign,
-              commander,
-              secondInCommand,
-              FactionJudgmentSceneType.SEPPUKU);
+    private void processPerformingSeppuku(Campaign campaign, Faction censuringFaction) {
+        new FactionJudgmentSceneDialog(campaign, commander, secondInCommand, FactionJudgmentSceneType.SEPPUKU,
+              censuringFaction);
         commander.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.SEPPUKU);
+        processMassLoyaltyChange(campaign, true, true);
     }
 
     /**
-     * Handles the consequences and procedures when the force chooses to go rogue as a result of a faction censure.
+     * Handles the scenario in which the commander chooses to go rogue in response to a faction censure.
      *
-     * @param censureLevel the current censure level
+     * <p>Presents the going rogue dialog, and if the action is canceled, falls back to a standard censure event.</p>
+     *
+     * @param campaign          the current {@link Campaign} instance
+     * @param censureLevel      the {@link FactionCensureLevel} for the event
+     * @param censuringFaction  the {@link Faction} issuing the censure
      *
      * @author Illiani
      * @since 0.50.07
      */
-    private void processGoingRogue(FactionCensureLevel censureLevel) {
+    private void processGoingRogue(Campaign campaign, FactionCensureLevel censureLevel, Faction censuringFaction) {
         GoingRogue goingRogueDialog = new GoingRogue(campaign, commander, secondInCommand);
-        if (!goingRogueDialog.wasConfirmed()) {
-            new FactionCensureEvent(campaign, censureLevel);
+        if (goingRogueDialog.wasCanceled()) {
+            new FactionCensureEvent(campaign, censureLevel, censuringFaction);
         }
     }
 
-    /**
-     * Applies the effects of a censure to the campaign and personnel, based on the level of censure and whether
-     * seppuku was performed.
-     *
-     * @param censureLevel the level of censure
-     * @param committedSeppuku {@code true} if seppuku was performed
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    private void handleCensureEffects(FactionCensureLevel censureLevel,
-          boolean committedSeppuku) {
-        switch (censureLevel) {
-            case NO_CENSURE -> {
+    private void handleCensureEffects(FactionCensureAction censureAction, boolean isSeppuku) {
+        switch (censureAction) {
+            case NO_ACTION -> {
                 return;
             }
-            case WARNING -> {
-                if (committedSeppuku) {
-                    processMassLoyaltyChange(campaign, false, true);
+            case BARRED -> {}
+            case CHATTERWEB_DISCUSSION, CLAN_LEADERSHIP_TRIAL_UNSUCCESSFUL, LEGAL_CHALLENGE, NEWS_ARTICLE,
+                 FORMAL_WARNING -> processMassLoyaltyChange(campaign, false, false);
+            case COMMANDER_MURDERED -> {
+                if (!isSeppuku) {
+                    // The loyalty change is wrapped into the status change handling
+                    commander.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.HOMICIDE);
+                }
+                secondInCommand.setCommander(true);
+            }
+            case COMMANDER_IMPRISONMENT -> {
+                if (!isSeppuku) {
+                    // The loyalty change is wrapped into the status change handling
+                    commander.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.IMPRISONED);
+                }
+            }
+            case COMMANDER_REMOVAL -> {
+                if (!isSeppuku) {
+                    // The loyalty change is wrapped into the status change handling
+                    commander.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.DISHONORABLY_DISCHARGED);
                 }
             }
             case COMMANDER_RETIREMENT -> {
-                if (committedSeppuku) {
-                    processMassLoyaltyChange(campaign, false, true);
+                if (!isSeppuku) {
+                    // The loyalty change is wrapped into the status change handling
+                    commander.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.RETIRED);
                 }
-                processCensureCommanderRetirement();
             }
-            case COMMANDER_IMPRISONMENT -> {
-                processMassLoyaltyChange(campaign, false, committedSeppuku);
-                processCensureCommanderImprisonment();
+            case DISBAND -> new FactionJudgmentSceneDialog(campaign, commander, secondInCommand,
+                  FactionJudgmentSceneType.DISBAND, censuringFaction);
+            case FINE -> {
+                Finances finances = campaign.getFinances();
+
+                Money fine = finances.getProfits().multipliedBy(0.1);
+                if (fine.isLessThan(MINIMUM_FINE)) {
+                    fine = MINIMUM_FINE;
+                }
+                // TODO fine reason
+                finances.debit(TransactionType.FINE,
+                      campaign.getLocalDate(),
+                      fine,
+                      getTextAt(RESOURCE_BUNDLE, "fine_reason"));
+
+                processMassLoyaltyChange(campaign, false, false);
             }
             case LEADERSHIP_REPLACEMENT -> {
-                processMassLoyaltyChange(campaign, true, committedSeppuku);
-                processCensureLeadershipReplacement();
+                processMassLoyaltyChange(campaign, true, false);
+                processSeniorPersonnelConsequences(false);
             }
-            case DISBAND -> processCensureDisband();
+            case LEADERSHIP_IMPRISONED -> {
+                processMassLoyaltyChange(campaign, true, false);
+                processSeniorPersonnelConsequences(true);
+            }
         }
 
-        processFactionStandingChange(committedSeppuku);
-    }
-
-    /**
-     * Handles the process of a forced retirement of the commander as a result of censure.
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    private void processCensureCommanderRetirement() {
-        commander.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.RETIRED);
-    }
-
-    /**
-     * Processes a mass change in loyalty for all relevant personnel, typically in response to a major positive or
-     * negative censure outcome.
-     *
-     * @param campaign the campaign instance
-     * @param isMajor whether this is a major change
-     * @param isPositiveChange {@code true} for positive, {@code false} for negative shifts
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    static void processMassLoyaltyChange(Campaign campaign, boolean isMajor, boolean isPositiveChange) {
-        LocalDate today = campaign.getLocalDate();
-        for (Person person : campaign.getPersonnel()) {
-            if (isExempt(person, today)) {
-                continue;
-            }
-
-            person.performForcedDirectionLoyaltyChange(campaign, isPositiveChange, isMajor, false);
-        }
+        processFactionStandingChange(isSeppuku);
     }
 
     /**
@@ -247,27 +301,42 @@ public class FactionCensureEvent {
         campaign.addReport(report);
     }
 
-    /**
-     * Handles the consequences when the commander is imprisoned as a result of censure.
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    private void processCensureCommanderImprisonment() {
-        commander.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.IMPRISONED);
+    private void processSeniorPersonnelConsequences(boolean isImprisoned) {
+        LocalDate today = campaign.getLocalDate();
+        Set<Person> seniorPersonnel = getSeniorPersonnel(today);
+
+        for (Person seniorPerson : seniorPersonnel) {
+            // We shouldn't end up with any exempt people, but in case we do...
+            if (isExempt(seniorPerson, today)) {
+                continue;
+            }
+
+            final int level = seniorPerson.getRankLevel();
+            final int rank = seniorPerson.getRankNumeric();
+
+            seniorPerson.changeStatus(campaign, today, isImprisoned
+                                                             ? PersonnelStatus.IMPRISONED
+                                                             : PersonnelStatus.DISHONORABLY_DISCHARGED);
+
+            if (!isImprisoned) {
+                Person replacement = getReplacementCharacter(seniorPerson);
+                replacement.changeRank(campaign, rank, level, false);
+                campaign.recruitPerson(replacement, true, true);
+            }
+        }
     }
 
-    /**
-     * Manages leadership replacement due to a censure event.
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    private void processCensureLeadershipReplacement() {
-        Set<Person> replacedPersonnel = new HashSet<>();
-        replacedPersonnel.add(commander);
+    private Set<Person> getSeniorPersonnel(LocalDate today) {
+        Set<Person> seniorPersonnel = new HashSet<>();
 
-        LocalDate today = campaign.getLocalDate();
+        if (commander != null) {
+            seniorPersonnel.add(commander);
+        }
+
+        if (secondInCommand != null) {
+            seniorPersonnel.add(secondInCommand);
+        }
+
         for (Person officer : campaign.getPersonnel()) {
             if (isExempt(officer, today)) {
                 continue;
@@ -277,24 +346,10 @@ public class FactionCensureEvent {
                 continue;
             }
 
-            replacedPersonnel.add(officer);
+            seniorPersonnel.add(officer);
         }
 
-        for (Person seniorPerson : replacedPersonnel) {
-            // We shouldn't end up with any exempt people, but in case we do...
-            if (isExempt(seniorPerson, today)) {
-                continue;
-            }
-
-            final int level = seniorPerson.getRankLevel();
-            final int rank = seniorPerson.getRankNumeric();
-
-            seniorPerson.changeStatus(campaign, today, PersonnelStatus.DISHONORABLY_DISCHARGED);
-
-            Person replacement = getReplacementCharacter(seniorPerson);
-            replacement.changeRank(campaign, rank, level, false);
-            campaign.recruitPerson(replacement, true, true);
-        }
+        return seniorPersonnel;
     }
 
     /**
@@ -329,48 +384,5 @@ public class FactionCensureEvent {
      */
     private PersonnelRole getPoliticalRole() {
         return ObjectUtility.getRandomItem(POLITICAL_ROLES);
-    }
-
-    /**
-     * Handles the complete disbanding of the force as an effect of censure.
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    private void processCensureDisband() {
-        new FactionJudgmentSceneDialog(campaign,
-              commander,
-              secondInCommand,
-              FactionJudgmentSceneType.DISBAND);
-    }
-
-    /**
-     * Determines if a person is exempt from certain censure actions on the given date.
-     *
-     * @param person the person to evaluate
-     * @param today the current date
-     * @return {@code true} if the person is exempt, {@code false} otherwise
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    private static boolean isExempt(Person person, LocalDate today) {
-        if (person.getStatus().isDepartedUnit()) {
-            return true;
-        }
-
-        if (person.isChild(today)) {
-            return true;
-        }
-
-        if (!person.isEmployed()) {
-            return true;
-        }
-
-        if (!person.getPrisonerStatus().isFreeOrBondsman()) {
-            return false;
-        }
-
-        return person.isDependent();
     }
 }

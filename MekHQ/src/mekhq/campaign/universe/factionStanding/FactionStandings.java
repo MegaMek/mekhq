@@ -60,6 +60,7 @@ import javax.swing.ImageIcon;
 
 import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
+import megamek.common.universe.FactionTag;
 import megamek.logging.MMLogger;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
@@ -88,6 +89,14 @@ import org.w3c.dom.NodeList;
 public class FactionStandings {
     private static final MMLogger LOGGER = MMLogger.create(FactionStandings.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionStandings";
+
+    /**
+     * The unique identifier for the mercenary faction.
+     *
+     * <p>We can't use {@link Faction#isMercenary()} because we only want the specific, agnostic, Mercenary faction.
+     * Not all factions with the {@link FactionTag#MERC} tag.</p>
+     */
+    static final String MERCENARY_FACTION = "MERC";
 
     /**
      * This value defines the upper limit of Regard a campaign can achieve with the campaign's faction.
@@ -342,7 +351,7 @@ public class FactionStandings {
         Collection<Faction> allFactions = Factions.getInstance().getFactions();
         FactionHints factionHints = FactionHints.defaultFactionHints();
 
-        boolean isMercenary = campaignFaction.isMercenary();
+        boolean isMercenary = campaignFaction.isMercenaryOrganization();
         boolean isPirate = campaignFaction.isPirate();
 
         String report;
@@ -637,34 +646,37 @@ public class FactionStandings {
     }
 
     /**
-     * Checks if the specified faction should receive a new or escalated censure based on its latest standing,
-     * and applies the appropriate censure level if necessary.
+     * Checks if the specified faction should receive a new or escalated censure based on its latest standing, and
+     * applies the appropriate censure level if necessary.
      * <p>
-     * This method computes the current regard value for the given faction and determines the corresponding standing level.
-     * If the calculated standing level is at or below the threshold for censure, the faction's censure level
+     * This method computes the current regard value for the given faction and determines the corresponding standing
+     * level. If the calculated standing level is at or below the threshold for censure, the faction's censure level
      * will be increased for the provided date. The updated censure level is then returned; if no change is needed,
      * {@code null} is returned.
      * </p>
      *
-     * @param faction the {@link Faction} object to check against
-     * @param today the date to use when recording a possible censure escalation
+     * @param faction        the {@link Faction} object to check against
+     * @param today          the date to use when recording a possible censure escalation
+     * @param activeMissions a list of the campaign's current active missions
+     * @param campaignInTransit {@code true} if the campaign is currently in transit
+     *
      * @return the new {@link FactionCensureLevel} if a censure change occurred, or {@code null} if there was no change
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public @Nullable FactionCensureLevel checkForCensure(Faction faction, LocalDate today) {
+    public @Nullable FactionCensureLevel checkForCensure(Faction faction, LocalDate today,
+          List<Mission> activeMissions, boolean campaignInTransit) {
         if (faction.isAggregate()) {
             return null;
         }
 
         String factionCode = faction.getShortName();
         double regard = getRegardForFaction(factionCode, true);
-        FactionStandingLevel newFactionStanding = FactionStandingUtilities.calculateFactionStandingLevel(regard);
 
-        if (newFactionStanding.getStandingLevel() <= FactionJudgment.THRESHOLD_FOR_CENSURE) {
+        if (regard < FactionJudgment.THRESHOLD_FOR_CENSURE) {
             // This will return null if no change has taken place
-            return factionJudgment.increaseCensureForFaction(factionCode, today);
+            return factionJudgment.increaseCensureForFaction(faction, today, activeMissions, campaignInTransit);
         }
 
         return null;
@@ -778,7 +790,7 @@ public class FactionStandings {
                 climateRegard.put(otherFactionCode, CLIMATE_REGARD_ENEMY_FACTION_RIVAL);
             }
 
-            if (campaignFaction.isMercenary()) {
+            if (campaignFaction.getShortName().equals(MERCENARY_FACTION)) {
                 double mercenaryRelationsModifier = MercenaryRelations.getMercenaryRelationsModifier(otherFaction,
                       today);
 
@@ -847,7 +859,7 @@ public class FactionStandings {
                 continue;
             }
 
-            factionName = faction.getFullName(today.getYear());
+            factionName = FactionStandingUtilities.getFactionName(faction, today.getYear());
             String color = regard >= 0 ? getPositiveColor() : getNegativeColor();
 
             report.append(String.format(reportFormat, factionName, color, regard));
@@ -937,7 +949,7 @@ public class FactionStandings {
             deltaDirection = getTextAt(RESOURCE_BUNDLE, "factionStandings.change.decreased");
         }
 
-        String factionName = relevantFaction.getFullName(gameYear);
+        String factionName = FactionStandingUtilities.getFactionName(relevantFaction, gameYear);
         if (!factionName.contains(getTextAt(RESOURCE_BUNDLE, "factionStandings.change.report.clan.check"))) {
             factionName = getTextAt(RESOURCE_BUNDLE, "factionStandings.change.report.clan.prefix") + ' ' + factionName;
         }
@@ -1123,30 +1135,8 @@ public class FactionStandings {
             regardChangeReports.add(report);
         }
 
-        if (campaignFaction.isMercenary()) {
-            Factions factions = Factions.getInstance();
-            Faction mercenaryGuild = factions.getFaction("MG");
-            Faction mercenaryReviewBoard = factions.getFaction("MRB");
-            Faction mercenaryReviewBondingCommission = factions.getFaction("MRBC");
-            Faction mercenaryBondingAssociation = factions.getFaction("MBA");
-
-            String mercenaryAuthority = "";
-            if (mercenaryGuild.validIn(gameYear)) {
-                mercenaryAuthority = mercenaryGuild.getShortName();
-            } else if (mercenaryReviewBoard.validIn(gameYear)) {
-                mercenaryAuthority = mercenaryReviewBoard.getShortName();
-            } else if (mercenaryReviewBondingCommission.validIn(gameYear)) {
-                mercenaryAuthority = mercenaryReviewBondingCommission.getShortName();
-            } else if (mercenaryBondingAssociation.validIn(gameYear)) {
-                mercenaryAuthority = mercenaryBondingAssociation.getShortName();
-            }
-
-            if (!mercenaryAuthority.isBlank()) {
-                report = changeRegardForFaction(campaignFactionCode,
-                      mercenaryAuthority,
-                      regardDeltaEmployer,
-                      gameYear);
-            }
+        if (campaignFactionCode.equals(MERCENARY_FACTION)) {
+            report = processMercenaryOrganizationRegardUpdate(gameYear, campaignFactionCode, regardDeltaEmployer);
 
             if (!report.isBlank()) {
                 regardChangeReports.add(report);
@@ -1154,6 +1144,94 @@ public class FactionStandings {
         }
 
         return regardChangeReports;
+    }
+
+    /**
+     * Updates the regard for relevant mercenary organizations upon the completion of a contract.
+     *
+     * <p>This method checks for the presence and temporal validity (for the given game year) of several distinct
+     * mercenary authority factions, including:</p>
+     *
+     * <ul>
+     *     <li>The Mercenary Guild (MG)</li>
+     *     <li>The Mercenary Review Board (MRB)</li>
+     *     <li>The Mercenary Review and Bonding Commission (MRBC)</li>
+     *     <li>The Mercenary Bonding Authority (MBA)</li>
+     * </ul>
+     *
+     * <p></p>It updates the regard value for the first valid authority found for the specified year and adjusts the
+     * campaign's standing with that mercenary organization by the supplied delta value. If no valid organization is
+     * found, no changes occur and warnings are logged as appropriate.</p>
+     *
+     * @param gameYear            the current game year, used to determine each organization's validity
+     * @param campaignFactionCode the short code for the campaign's faction whose standing is to be updated
+     * @param regardDeltaEmployer the amount to adjust the regard by (positive or negative)
+     *
+     * @return the updated report {@link String}, including any log or status messages from the regard update
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private String processMercenaryOrganizationRegardUpdate(int gameYear, String campaignFactionCode,
+          double regardDeltaEmployer) {
+        final String MERCENARY_GUILD = "MG";
+        final String MERCENARY_REVIEW_BOARD = "MRB";
+        final String MERCENARY_REVIEW_AND_BONDING_COMMISSION = "MRBC";
+        final String MERCENARY_BONDING_AUTHORITY = "MBA";
+
+        Factions factions = Factions.getInstance();
+        Faction mercenaryGuild = factions.getFaction(MERCENARY_GUILD);
+        if (mercenaryGuild == null) {
+            LOGGER.warn("Faction {} did not return valid faction data for Mercenary Guild. Skipping. This " +
+                              "needs to be investigated. The most likely cause is that we have changed the faction " +
+                              "code for this faction.",
+                  MERCENARY_GUILD);
+        }
+
+        Faction mercenaryReviewBoard = factions.getFaction(MERCENARY_REVIEW_BOARD);
+        if (mercenaryReviewBoard == null) {
+            LOGGER.warn("Faction {} did not return valid faction data for Mercenary Review Board. Skipping." +
+                              " This needs to be investigated. The most likely cause is that we have changed the " +
+                              "faction code for this faction.",
+                  MERCENARY_REVIEW_BOARD);
+        }
+
+        Faction mercenaryReviewBondingCommission = factions.getFaction(MERCENARY_REVIEW_AND_BONDING_COMMISSION);
+        if (mercenaryReviewBondingCommission == null) {
+            LOGGER.warn("Faction {} did not return valid faction data for Mercenary Review and Bonding " +
+                              "Commission. Skipping. This needs to be investigated. The most likely cause is that we " +
+                              "have changed the faction code for this faction.",
+                  MERCENARY_REVIEW_AND_BONDING_COMMISSION);
+        }
+
+        Faction mercenaryBondingAssociation = factions.getFaction(MERCENARY_BONDING_AUTHORITY);
+        if (mercenaryBondingAssociation == null) {
+            LOGGER.warn("Faction {} did not return valid faction data for Mercenary Bonding Association. " +
+                              "Skipping. This needs to be investigated. The most likely cause is that we have changed" +
+                              " the faction code for this faction.",
+                  MERCENARY_BONDING_AUTHORITY);
+        }
+
+        String mercenaryAuthority = "";
+        if (mercenaryGuild != null && mercenaryGuild.validIn(gameYear)) {
+            mercenaryAuthority = mercenaryGuild.getShortName();
+        } else if (mercenaryReviewBoard != null && mercenaryReviewBoard.validIn(gameYear)) {
+            mercenaryAuthority = mercenaryReviewBoard.getShortName();
+        } else if (mercenaryReviewBondingCommission != null && mercenaryReviewBondingCommission.validIn(gameYear)) {
+            mercenaryAuthority = mercenaryReviewBondingCommission.getShortName();
+        } else if (mercenaryBondingAssociation != null && mercenaryBondingAssociation.validIn(gameYear)) {
+            mercenaryAuthority = mercenaryBondingAssociation.getShortName();
+        }
+
+        String report = "";
+        if (!mercenaryAuthority.isBlank()) {
+            report = changeRegardForFaction(campaignFactionCode,
+                  mercenaryAuthority,
+                  regardDeltaEmployer,
+                  gameYear);
+        }
+
+        return report;
     }
 
     /**

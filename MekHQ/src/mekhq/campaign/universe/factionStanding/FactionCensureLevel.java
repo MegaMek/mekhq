@@ -32,8 +32,11 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
+import static mekhq.campaign.universe.factionStanding.FactionCensureAction.*;
+
 import megamek.codeUtilities.MathUtility;
 import megamek.logging.MMLogger;
+import mekhq.campaign.universe.Faction;
 
 /**
  * Enumerates the possible types of disciplinary actions (censures) that can be imposed by a faction due to low Faction
@@ -46,35 +49,42 @@ import megamek.logging.MMLogger;
  * @since 0.50.07
  */
 public enum FactionCensureLevel {
-    /** The absence of any censure or disciplinary action. */
-    NO_CENSURE(0),
-    /** A warning imposed as a form of censure. */
-    WARNING(1),
-    /** Mandatory retirement imposed on the campaign commander as censure. */
-    COMMANDER_RETIREMENT(2),
-    /** Imprisonment of the campaign commander as a disciplinary action. */
-    COMMANDER_IMPRISONMENT(3),
-    /** Replacement of all officers as a punitive measure. */
-    LEADERSHIP_REPLACEMENT(4),
-    /** Forcible disbanding of the campaign as a disciplinary action. */
-    DISBAND(5);
+    CENSURE_LEVEL_0(0, NO_ACTION, NO_ACTION, NO_ACTION, NO_ACTION),
+    CENSURE_LEVEL_1(1, NEWS_ARTICLE, CHATTERWEB_DISCUSSION, NEWS_ARTICLE, NEWS_ARTICLE),
+    CENSURE_LEVEL_2(2, FORMAL_WARNING, CLAN_LEADERSHIP_TRIAL_UNSUCCESSFUL, LEGAL_CHALLENGE, COMMANDER_IMPRISONMENT),
+    CENSURE_LEVEL_3(3, COMMANDER_RETIREMENT, COMMANDER_REMOVAL, FORMAL_WARNING, COMMANDER_MURDERED),
+    CENSURE_LEVEL_4(4, LEADERSHIP_REPLACEMENT, LEADERSHIP_REPLACEMENT, FINE, COMMANDER_MURDERED),
+    CENSURE_LEVEL_5(5, DISBAND, DISBAND, BARRED, LEADERSHIP_IMPRISONED);
 
-    public static final int MIN_CENSURE_SEVERITY = NO_CENSURE.getSeverity();
-    public static final int MAX_CENSURE_SEVERITY = DISBAND.getSeverity();
+    public static final int MIN_CENSURE_SEVERITY = CENSURE_LEVEL_0.getSeverity();
+    public static final int MAX_CENSURE_SEVERITY = CENSURE_LEVEL_5.getSeverity();
 
     /** The severity level of this censure. Higher values indicate more severe censures. */
     private final int severity;
+    private final FactionCensureAction innerSphereAction;
+    private final FactionCensureAction clanAction;
+    private final FactionCensureAction mercenaryAction;
+    private final FactionCensureAction pirateAction;
 
     /**
-     * Constructs a FactionStandingCensure with the specified severity.
+     * Constructs a {@link FactionCensureLevel} with the specified severity.
      *
      * @param severity the numeric severity level of this censure
+     * @param innerSphereAction the censure action taken at this level for normal Inner Sphere factions
+     * @param clanAction the censure action taken at this level for normal Clan factions
+     * @param mercenaryAction the censure action taken at this level for Mercenary factions
+     * @param pirateAction the censure action taken at this level for the pirate factions
      *
      * @author Illiani
      * @since 0.50.07
      */
-    FactionCensureLevel(int severity) {
+    FactionCensureLevel(int severity, FactionCensureAction innerSphereAction, FactionCensureAction clanAction,
+          FactionCensureAction mercenaryAction, FactionCensureAction pirateAction) {
         this.severity = severity;
+        this.innerSphereAction = innerSphereAction;
+        this.clanAction = clanAction;
+        this.mercenaryAction = mercenaryAction;
+        this.pirateAction = pirateAction;
     }
 
     /**
@@ -87,6 +97,59 @@ public enum FactionCensureLevel {
      */
     public int getSeverity() {
         return severity;
+    }
+
+    /**
+     * Determines the {@link FactionCensureAction} appropriate for the given faction.
+     *
+     * <p>The type of action is selected based on special logic for mercenary, pirate, clan, or inner sphere
+     * factions:</p>
+     * <ul>
+     *   <li>If the faction is mercenary, returns the action designated for mercenaries.</li>
+     *   <li>If the faction has the short name {@code PIR}, returns the pirate-specific action.</li>
+     *   <li>If the faction is a Clan faction, returns the action specified for clans.</li>
+     *   <li>Otherwise, returns the default action for inner sphere factions.</li>
+     * </ul>
+     *
+     * @param censuringFaction the {@link Faction} issuing the censure
+     *
+     * @return the appropriate {@link FactionCensureAction} for the given faction
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public FactionCensureAction getFactionAppropriateAction(Faction censuringFaction) {
+        if (censuringFaction.isMercenaryOrganization()) {
+            return mercenaryAction;
+        }
+
+        if (censuringFaction.getShortName().equals("PIR")) {
+            return pirateAction;
+        }
+
+        if (censuringFaction.isClan()) {
+            return clanAction;
+        }
+
+        return innerSphereAction;
+    }
+
+    /**
+     * Resolves and returns the string lookup name for the censure action most appropriate for a given faction.
+     *
+     * <p>Internally, this method calls {@link #getFactionAppropriateAction(Faction)} to select the correct action,
+     * then returns its lookup name.</p>
+     *
+     * @param censuringFaction the {@link Faction} issuing the censure
+     *
+     * @return a {@link String} representing the lookup name of the censure action appropriate for this faction
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String getLookupNameForFactionCensureAction(Faction censuringFaction) {
+        FactionCensureAction censureAction = getFactionAppropriateAction(censuringFaction);
+        return censureAction.getLookupName();
     }
 
     /**
@@ -123,7 +186,7 @@ public enum FactionCensureLevel {
                 return censureLevel;
             }
         }
-        return NO_CENSURE;
+        return CENSURE_LEVEL_0;
     }
 
     /**
@@ -133,11 +196,11 @@ public enum FactionCensureLevel {
      * value from the {@link FactionCensureLevel} enum. If that fails, it then attempts to parse the text by its
      * name.</p>
      *
-     * <p>If neither parsing attempt succeeds, it logs a warning and returns {@link FactionCensureLevel#NO_CENSURE}.</p>
+     * <p>If neither parsing attempt succeeds, it logs a warning and returns {@link #CENSURE_LEVEL_0}.</p>
      *
      * @param text the {@link String} to parse, representing either an enum ordinal or name
      *
-     * @return the matching {@link FactionCensureLevel}, or {@code FactionCensureLevel#NONE} if parsing fails
+     * @return the matching {@link FactionCensureLevel}, or {@link #CENSURE_LEVEL_0} if parsing fails
      *
      * @author Illiani
      * @since 0.50.07
@@ -149,14 +212,14 @@ public enum FactionCensureLevel {
         }
 
         try {
-            int severity = MathUtility.parseInt(text, NO_CENSURE.getSeverity());
+            int severity = MathUtility.parseInt(text, CENSURE_LEVEL_0.getSeverity());
             return getCensureLevelFromSeverity(severity);
         } catch (Exception ignored) {
         }
 
         MMLogger.create(FactionCensureLevel.class)
-              .warn("Unable to parse {} into an FactionCensureLevel. Returning NONE.",
+              .warn("Unable to parse {} into an FactionCensureLevel. Returning CENSURE_LEVEL_0.",
                     text);
-        return NO_CENSURE;
+        return CENSURE_LEVEL_0;
     }
 }

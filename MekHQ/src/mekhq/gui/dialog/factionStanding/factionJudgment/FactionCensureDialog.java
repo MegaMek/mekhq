@@ -47,9 +47,8 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
-import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.factionStanding.FactionCensureLevel;
+import mekhq.campaign.universe.factionStanding.FactionCensureAction;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.utilities.MHQInternationalization;
@@ -82,7 +81,8 @@ public class FactionCensureDialog {
     private static final String DRACONIS_COMBINE = "DC";
 
     private final Campaign campaign;
-    private final FactionCensureLevel censureLevel;
+    private final FactionCensureAction censureAction;
+    private final Faction censuringFaction;
     private int dialogChoiceIndex = 0;
 
     /**
@@ -103,23 +103,27 @@ public class FactionCensureDialog {
      * Constructs and shows a new FactionCensureDialog for the specified campaign, censure level, and character.
      *
      * @param campaign            the current campaign context
-     * @param censureLevel        the censure level event being presented
-     * @param mostSeniorCharacter the campaign's most senior character (can be used for special options)
+     * @param censureAction       the censure action being taken
+     * @param commander           the campaign commander
+     * @param censuringFaction    the faction performing the censure
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public FactionCensureDialog(final Campaign campaign, final FactionCensureLevel censureLevel,
-          Person mostSeniorCharacter) {
+    public FactionCensureDialog(final Campaign campaign, final FactionCensureAction censureAction, Person commander,
+          Faction censuringFaction) {
         this.campaign = campaign;
-        this.censureLevel = censureLevel;
+        this.censureAction = censureAction;
+        this.censuringFaction = censuringFaction;
+
+        String contextKey = censureAction.getLookupName();
 
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(
               campaign,
-              getSpeaker(campaign),
+              getSpeaker(),
               null,
-              getInCharacterMessage(),
-              getDialogOptions(mostSeniorCharacter),
+              getInCharacterMessage(contextKey),
+              getDialogOptions(contextKey, commander),
               getOutOfCharacterMessage(),
               null,
               true,
@@ -134,21 +138,16 @@ public class FactionCensureDialog {
      *
      * <p>Generates a new person with an appropriate role, gender, and, if applicable, bloodname and rank.</p>
      *
-     * @param campaign the campaign context used to determine the speaker's attributes
      * @return the generated speaker {@link Person}
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public Person getSpeaker(Campaign campaign) {
-        Faction faction = campaign.getFaction();
-        String factionCode = faction.getShortName();
-
+    public Person getSpeaker() {
+        String factionCode = censuringFaction.getShortName();
         Person speaker = campaign.newPerson(PersonnelRole.MEKWARRIOR, factionCode, Gender.RANDOMIZE);
-        String rankSystemCode = "SLDF";
-        if (faction.isClan()) {
-            rankSystemCode = "CLAN";
 
+        if (censuringFaction.isClan()) {
             Bloodname bloodname = Bloodname.randomBloodname(factionCode, Phenotype.MEKWARRIOR, campaign.getGameYear());
 
             if (bloodname != null) {
@@ -156,8 +155,7 @@ public class FactionCensureDialog {
             }
         }
 
-        final RankSystem rankSystem = Ranks.getRankSystemFromCode(rankSystemCode);
-
+        RankSystem rankSystem = censuringFaction.getRankSystem();
         final RankValidator rankValidator = new RankValidator();
         if (!rankValidator.validate(rankSystem, false)) {
             return speaker;
@@ -180,15 +178,14 @@ public class FactionCensureDialog {
      * @author Illiani
      * @since 0.50.07
      */
-    public String getInCharacterMessage() {
+    public String getInCharacterMessage(String contextKey) {
         String commanderAddress = campaign.getCommanderAddress(false);
         String campaignName = campaign.getName();
         Faction campaignFaction = campaign.getFaction();
-        String campaignFactionCode = campaignFaction.getShortName();
-        String contextKey = censureLevel.name();
+        String censuringFactionCode = censuringFaction.getShortName();
 
         String dialog = getFormattedTextAt(RESOURCE_BUNDLE,
-              DIALOG_KEY_IN_CHARACTER + contextKey + '.' + campaignFactionCode, commanderAddress, campaignName);
+              DIALOG_KEY_IN_CHARACTER + contextKey + '.' + censuringFactionCode, commanderAddress, campaignName);
 
         if (MHQInternationalization.isResourceKeyValid(dialog)) {
             return dialog;
@@ -213,15 +210,15 @@ public class FactionCensureDialog {
      * <p>Option text is localized and based on the current censure level. Includes a special "Seppuku" option if the
      * campaign faction is Draconis Combine and a senior character is specified.</p>
      *
+     * @param contextKey
      * @param mostSeniorCharacter the most senior character (required for some special options)
+     *
      * @return a list of localized option strings
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public List<String> getDialogOptions(Person mostSeniorCharacter) {
-        String contextKey = censureLevel.name();
-
+    public List<String> getDialogOptions(String contextKey, Person mostSeniorCharacter) {
         List<String> options = new ArrayList<>();
         options.add(getTextAt(RESOURCE_BUNDLE, BUTTON_KEY_POSITIVE + contextKey));
         options.add(getTextAt(RESOURCE_BUNDLE, BUTTON_KEY_NEUTRAL + contextKey));
@@ -245,6 +242,6 @@ public class FactionCensureDialog {
      * @since 0.50.07
      */
     public String getOutOfCharacterMessage() {
-        return getFormattedTextAt(RESOURCE_BUNDLE, DIALOG_KEY_OUT_OF_CHARACTER + censureLevel.name());
+        return getFormattedTextAt(RESOURCE_BUNDLE, DIALOG_KEY_OUT_OF_CHARACTER + censureAction.getLookupName());
     }
 }

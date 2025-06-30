@@ -33,8 +33,8 @@
 package mekhq.campaign.universe.factionStanding;
 
 import static megamek.common.Compute.randomInt;
-import static mekhq.campaign.universe.factionStanding.FactionCensureEvent.POLITICAL_ROLES;
-import static mekhq.campaign.universe.factionStanding.FactionCensureEvent.processMassLoyaltyChange;
+import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.POLITICAL_ROLES;
+import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.processMassLoyaltyChange;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -56,7 +56,7 @@ import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentSceneDial
  * Handles the "going rogue" event for a campaign, where a force defects or leaves its current faction.
  *
  * <p>This class orchestrates the campaign logic when a player chooses to go rogue, possibly changing their campaign's
- * faction, modifying personnel statuses, and updating inter-faction standings. It utilizes a dialog to confirm and
+ * faction, modifying personnel statuses, and updating inter-faction standings. It uses a dialog to confirm and
  * process the event and performs all necessary changes to campaign data.</p>
  *
  * @author Illiani
@@ -68,21 +68,19 @@ public class GoingRogue {
     /** Die size used to resolve chances of homicide in defection scenarios. */
     private final static int MURDER_DIE_SIZE = 10;
 
-    /** The campaign context where the event is processed. */
-    private final Campaign campaign;
     /** Stores whether the user confirmed the "going rogue" action. */
     private final boolean wasConfirmed;
 
     /**
-     * Returns whether the "going rogue" event was confirmed and applied.
+     * Returns whether the "going rogue" event was canceled.
      *
-     * @return {@code true} if the event was confirmed; {@code false} otherwise.
+     * @return {@code true} if the event was canceled; {@code false} otherwise.
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public boolean wasConfirmed() {
-        return wasConfirmed;
+    public boolean wasCanceled() {
+        return !wasConfirmed;
     }
 
     /**
@@ -100,8 +98,6 @@ public class GoingRogue {
      * @since 0.50.07
      */
     public GoingRogue(Campaign campaign, Person commander, @Nullable Person second) {
-        this.campaign = campaign;
-
         FactionCensureGoingRogueDialog dialog = new FactionCensureGoingRogueDialog(campaign);
         wasConfirmed = dialog.wasConfirmed();
         if (!wasConfirmed) {
@@ -116,7 +112,8 @@ public class GoingRogue {
         new FactionJudgmentSceneDialog(campaign,
               commander,
               second,
-              FactionJudgmentSceneType.GO_ROGUE);
+              FactionJudgmentSceneType.GO_ROGUE,
+              campaign.getFaction());
 
         processGoingRogue(campaign, chosenFaction, commander, second);
     }

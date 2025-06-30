@@ -32,8 +32,10 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
-import static mekhq.campaign.universe.factionStanding.FactionCensureLevel.DISBAND;
-import static mekhq.campaign.universe.factionStanding.FactionCensureLevel.NO_CENSURE;
+import static mekhq.campaign.universe.factionStanding.FactionCensureLevel.CENSURE_LEVEL_0;
+import static mekhq.campaign.universe.factionStanding.FactionCensureLevel.CENSURE_LEVEL_3;
+import static mekhq.campaign.universe.factionStanding.FactionCensureLevel.CENSURE_LEVEL_4;
+import static mekhq.campaign.universe.factionStanding.FactionCensureLevel.CENSURE_LEVEL_5;
 import static mekhq.campaign.universe.factionStanding.FactionCensureLevel.getCensureLevelFromSeverity;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -62,7 +64,7 @@ class FactionCensureLevelTest {
 
     @Test
     void test_allSeverityLevelsAreSequential() {
-        int lastSeverityLevel = NO_CENSURE.getSeverity() - 1;
+        int lastSeverityLevel = CENSURE_LEVEL_0.getSeverity() - 1;
         for (FactionCensureLevel censureLevel : FactionCensureLevel.values()) {
             int currentLevel = censureLevel.getSeverity();
             int expectedLevel = lastSeverityLevel + 1;
@@ -74,8 +76,8 @@ class FactionCensureLevelTest {
 
     @Test
     void test_allSeverityValuesArePossible() {
-        int minimumSeverity = NO_CENSURE.getSeverity();
-        int maximumSeverity = DISBAND.getSeverity();
+        int minimumSeverity = CENSURE_LEVEL_0.getSeverity();
+        int maximumSeverity = CENSURE_LEVEL_5.getSeverity();
         for (int severity = minimumSeverity; severity <= maximumSeverity; ++severity) {
             FactionCensureLevel censureLevel = getCensureLevelFromSeverity(severity);
             assertNotNull(censureLevel, "Faction Censure Level is null for " + severity + " severity.");
@@ -85,22 +87,22 @@ class FactionCensureLevelTest {
     private static Stream<Arguments> censureStringProvider() {
         return Stream.of(
               // Valid enum name strings
-              Arguments.of("NO_CENSURE", FactionCensureLevel.NO_CENSURE),
-              Arguments.of("WARNING", FactionCensureLevel.WARNING),
-              Arguments.of("DISBAND", FactionCensureLevel.DISBAND),
+              Arguments.of("NO_CENSURE", CENSURE_LEVEL_0),
+              Arguments.of("CENSURE_LEVEL_3", CENSURE_LEVEL_3),
+              Arguments.of("CENSURE_LEVEL_4", CENSURE_LEVEL_4),
               // Valid numeric strings
-              Arguments.of("0", FactionCensureLevel.NO_CENSURE),
-              Arguments.of("1", FactionCensureLevel.WARNING),
-              Arguments.of("5", FactionCensureLevel.DISBAND),
+              Arguments.of("0", CENSURE_LEVEL_0),
+              Arguments.of("3", CENSURE_LEVEL_3),
+              Arguments.of("4", CENSURE_LEVEL_4),
               // Invalid strings
-              Arguments.of("INVALID", FactionCensureLevel.NO_CENSURE),
-              Arguments.of("@!#", FactionCensureLevel.NO_CENSURE),
+              Arguments.of("INVALID", CENSURE_LEVEL_0),
+              Arguments.of("@!#", CENSURE_LEVEL_0),
               // Out-of-range numeric strings
-              Arguments.of("-1", FactionCensureLevel.NO_CENSURE),
-              Arguments.of("10", FactionCensureLevel.NO_CENSURE),
+              Arguments.of("-1", CENSURE_LEVEL_0),
+              Arguments.of("10", CENSURE_LEVEL_0),
               // Empty and null
-              Arguments.of("", FactionCensureLevel.NO_CENSURE),
-              Arguments.of(null, FactionCensureLevel.NO_CENSURE)
+              Arguments.of("", CENSURE_LEVEL_0),
+              Arguments.of(null, CENSURE_LEVEL_0)
         );
     }
 

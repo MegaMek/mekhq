@@ -56,6 +56,7 @@ import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.factionStanding.FactionAccoladeLevel;
+import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.dialog.NewsDialog;
@@ -113,22 +114,22 @@ public class FactionAccoladeDialog {
      * Constructs a new dialog for a specific faction accolade event.
      *
      * @param campaign      the current campaign context
-     * @param faction       the involved faction
+     * @param accoladingFaction       the involved faction
      * @param accoladeLevel the level of the accolade offered
      * @param commander     the person receiving or interacting with the accolade
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public FactionAccoladeDialog(Campaign campaign, Faction faction, FactionAccoladeLevel accoladeLevel,
+    public FactionAccoladeDialog(Campaign campaign, Faction accoladingFaction, FactionAccoladeLevel accoladeLevel,
           Person commander) {
         this.campaign = campaign;
-        this.faction = faction;
+        this.faction = accoladingFaction;
 
         // First we check for an introduction message
         processMessageIntroductionIfApplicable(accoladeLevel);
 
-        boolean isSameFaction = campaign.getFaction().equals(faction);
+        boolean isSameFaction = campaign.getFaction().equals(accoladingFaction);
 
         // Some accolades use a news article format
         if (processNewsArticleIfApplicable(accoladeLevel, isSameFaction, commander)) {
@@ -168,7 +169,8 @@ public class FactionAccoladeDialog {
      */
     private boolean processNewsArticleIfApplicable(FactionAccoladeLevel accoladeLevel, boolean isSameFaction,
           Person commander) {
-        boolean isClan = faction.isClan() && !faction.isMercenary();
+        // The mercenary bonding authority is a Clan faction with the Mercenary tag
+        boolean isClan = faction.isClan() && !faction.isMercenaryOrganization();
         boolean isPressRecognition = accoladeLevel.is(PRESS_RECOGNITION);
         boolean isPropagandaReel = accoladeLevel.is(PROPAGANDA_REEL);
         boolean isTriumphOrRemembrance = accoladeLevel.is(TRIUMPH_OR_REMEMBRANCE);
@@ -204,6 +206,8 @@ public class FactionAccoladeDialog {
               TRIUMPH_OR_REMEMBRANCE, STATUE_OR_SIBKO);
         if (accoladeLevelsWithIntroductions.contains(accoladeLevel)) {
             String affix = faction.isClan() ? AFFIX_CLAN : AFFIX_INNER_SPHERE;
+            // We want to purposefully assign the Mercenary Bonding Authority the inner sphere affix here, despite
+            // that faction having the Clan faction tag (and therefore using the first clause above).
             if (faction.isMercenary()) {
                 affix = AFFIX_INNER_SPHERE;
             }
@@ -410,7 +414,7 @@ public class FactionAccoladeDialog {
         // {9} = Commander Address
         final String commanderAddress = campaign.getCommanderAddress(false);
         // {10} = Faction Name
-        final String factionName = faction.getFullName(campaign.getGameYear());
+        final String factionName = FactionStandingUtilities.getFactionName(faction, campaign.getGameYear());
         // {11} = Current System
         final String currentSystem = campaign.getLocation().getPlanet().getName(campaign.getLocalDate());
         // {12} = Campaign Name
