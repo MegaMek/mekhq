@@ -85,7 +85,7 @@ public class FactionCensureGoingRogueDialog {
     /**
      * Returns true if the user confirmed their choice in the dialog.
      *
-     * @return true if the player confirmed; false if cancelled.
+     * @return true if the player confirmed; false if canceled.
      *
      * @author Illiani
      * @since 0.50.07

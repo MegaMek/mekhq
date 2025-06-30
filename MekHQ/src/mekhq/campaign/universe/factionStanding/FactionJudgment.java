@@ -34,6 +34,7 @@ package mekhq.campaign.universe.factionStanding;
 
 import static mekhq.campaign.universe.factionStanding.FactionCensureLevel.MIN_CENSURE_SEVERITY;
 import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_4;
+import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_5;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
@@ -63,8 +64,10 @@ public class FactionJudgment {
     private static final MMLogger LOGGER = MMLogger.create(FactionJudgment.class);
 
     static final int THRESHOLD_FOR_CENSURE = STANDING_LEVEL_4.getStandingLevel();
+    static final int THRESHOLD_FOR_ACCOLADE = STANDING_LEVEL_5.getStandingLevel();
 
     private final Map<String, CensureEntry> factionCensures = new HashMap<>();
+    private final Map<String, AccoladeEntry> factionAccolades = new HashMap<>();
 
     /**
      * Constructs a new, empty {@code FactionJudgment} instance.
@@ -86,6 +89,20 @@ public class FactionJudgment {
     public void setFactionCensures(final Map<String, CensureEntry> factionCensures) {
         this.factionCensures.clear();
         this.factionCensures.putAll(factionCensures);
+    }
+
+    /**
+     * Checks whether the specified faction currently has an active censure.
+     *
+     * @param factionCode the unique code identifying the faction to check
+     *
+     * @return {@code true} if the faction has an active censure; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public boolean factionHasCensure(final String factionCode) {
+        return factionCensures.containsKey(factionCode);
     }
 
     /**
@@ -193,6 +210,88 @@ public class FactionJudgment {
     }
 
     /**
+     * Replaces the current map of faction accolades with the provided map.
+     *
+     * @param factionAccolades a map where the key is the faction code and the value is the corresponding
+     *                         {@link AccoladeEntry} for that faction
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public void setFactionAccolades(final Map<String, AccoladeEntry> factionAccolades) {
+        this.factionAccolades.clear();
+        this.factionAccolades.putAll(factionAccolades);
+    }
+
+    /**
+     * Sets the accolade level for a specific faction.
+     *
+     * <p>Creates a new {@link AccoladeEntry} with the given accolade level and date, replacing any existing entry
+     * for the faction.</p>
+     *
+     * @param factionCode   the code identifying the faction
+     * @param accoladeLevel the accolade level to assign to the faction
+     * @param today         the date of the accolade assignment
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public void setAccoladeForFaction(final String factionCode, final FactionAccoladeLevel accoladeLevel,
+          final LocalDate today) {
+        AccoladeEntry accoladeEntry = new AccoladeEntry(accoladeLevel, today);
+        factionAccolades.put(factionCode, accoladeEntry);
+    }
+
+    /**
+     * Increases the accolade level for the specified faction if it is eligible for improvement.
+     *
+     * <ul>
+     *     <li>If the faction does not have an existing accolade entry, a new entry with {@code FIELD_COMMENDATION}
+     *     is added.</li>
+     *     <li>If the accolade cannot be improved (due to date or standing), returns {@code null}.</li>
+     *     <li>Otherwise, increments the accolade level and updates the entry.</li>
+     * </ul>
+     *
+     * @param factionCode                the code identifying the faction
+     * @param today                      the current date for consideration in improvement logic
+     * @param currentStandingWithFaction the current standing level with the faction, which may affect eligibility
+     * @param hasActiveContract          {@code true} if the campaign has an active contract, otherwise {@code false}
+     * @return the new {@link FactionAccoladeLevel} if increased, or {@code null} if no increase was made
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public @Nullable FactionAccoladeLevel increaseAccoladeForFaction(final String factionCode, final LocalDate today,
+          FactionStandingLevel currentStandingWithFaction, boolean hasActiveContract) {
+        AccoladeEntry accoladeEntry = factionAccolades.get(factionCode);
+
+        if (accoladeEntry == null) {
+            setAccoladeForFaction(factionCode, FactionAccoladeLevel.TAKING_NOTICE_0, today);
+            LOGGER.debug("Faction {} has no accolade entry, assigning TAKING_NOTICE", factionCode);
+            return FactionAccoladeLevel.TAKING_NOTICE_0;
+        }
+
+        if (!accoladeEntry.canImprove(today, currentStandingWithFaction)) {
+            LOGGER.debug("Faction {} cannot improve accolade, skipping", factionCode);
+            return null;
+        }
+
+        FactionAccoladeLevel currentAccoladeLevel = accoladeEntry.level();
+        int currentRecognition = currentAccoladeLevel.getRecognition();
+        currentRecognition++;
+        FactionAccoladeLevel updatedAccoladeLevel = FactionAccoladeLevel.getAccoladeRecognitionFromRecognition(
+              currentRecognition);
+        LOGGER.debug("Increasing accolade level for faction {} to {}", factionCode, updatedAccoladeLevel);
+
+        // This accolade requires an active contract
+        if (updatedAccoladeLevel.is(FactionAccoladeLevel.TRIUMPH_OR_REMEMBRANCE) && !hasActiveContract) {
+            return null;
+        }
+
+        setAccoladeForFaction(factionCode, updatedAccoladeLevel, today);
+        return updatedAccoladeLevel;
+    }
+
+    /**
      * Writes the current faction censure data as XML to the given writer.
      *
      * @param writer the {@link PrintWriter} to write to
@@ -214,6 +313,19 @@ public class FactionJudgment {
             }
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "factionCensures");
+
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "factionAccolades");
+        for (String factionCode : factionAccolades.keySet()) {
+            AccoladeEntry accoladeEntry = factionAccolades.get(factionCode);
+
+            if (accoladeEntry != null) {
+                MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, factionCode);
+                MHQXMLUtility.writeSimpleXMLTag(writer, indent, "level", accoladeEntry.level().toString());
+                MHQXMLUtility.writeSimpleXMLTag(writer, indent, "issueDate", accoladeEntry.issueDate().toString());
+                MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, factionCode);
+            }
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "factionAccolades");
     }
 
     /**
@@ -236,6 +348,9 @@ public class FactionJudgment {
 
                 if (nodeName.equalsIgnoreCase("factionCensures")) {
                     judgements.setFactionCensures(processCensureEntries(childNode));
+                }
+                if (nodeName.equalsIgnoreCase("factionAccolades")) {
+                    judgements.setFactionAccolades(processAccoladeEntries(childNode));
                 }
             }
         } catch (Exception ex) {
@@ -262,7 +377,7 @@ public class FactionJudgment {
             Node node = childNodes.item(i);
             if (node.getNodeType() == Node.ELEMENT_NODE) {
                 String factionCode = node.getNodeName();
-                CensureEntry entry = readFromFactionNode(node);
+                CensureEntry entry = readCensureEntryFromFactionNode(node);
                 entries.put(factionCode, entry);
             }
         }
@@ -278,7 +393,7 @@ public class FactionJudgment {
      * @author Illiani
      * @since 0.50.07
      */
-    private static CensureEntry readFromFactionNode(Node codeNode) {
+    private static CensureEntry readCensureEntryFromFactionNode(Node codeNode) {
         FactionCensureLevel level = FactionCensureLevel.NO_CENSURE;
         LocalDate issueDate = LocalDate.MIN;
 
@@ -298,5 +413,62 @@ public class FactionJudgment {
         }
 
         return new CensureEntry(level, issueDate);
+    }
+
+    /**
+     * Reads all faction accolade entries from the given XML node and returns them as a map.
+     *
+     * @param parentNode the XML node containing child nodes for each faction's accolade entry
+     *
+     * @return a map of faction code to {@link AccoladeEntry} read from the XML
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    static Map<String, AccoladeEntry> processAccoladeEntries(Node parentNode) {
+        Map<String, AccoladeEntry> entries = new HashMap<>();
+        NodeList childNodes = parentNode.getChildNodes();
+
+        for (int i = 0; i < childNodes.getLength(); i++) {
+            Node node = childNodes.item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                String factionCode = node.getNodeName();
+                AccoladeEntry entry = readAccoladeEntryFromFactionNode(node);
+                entries.put(factionCode, entry);
+            }
+        }
+        return entries;
+    }
+
+    /**
+     * Creates a {@link AccoladeEntry} by reading accolade data from the given XML node.
+     *
+     * @param codeNode the XML node containing "level" and "issueDate" elements
+     *
+     * @return a {@link AccoladeEntry} populated from the node's content
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private static AccoladeEntry readAccoladeEntryFromFactionNode(Node codeNode) {
+        FactionAccoladeLevel level = FactionAccoladeLevel.NO_ACCOLADE;
+        LocalDate issueDate = LocalDate.MIN;
+
+        NodeList props = codeNode.getChildNodes();
+        for (int i = 0; i < props.getLength(); i++) {
+            Node propNode = props.item(i);
+            if (propNode.getNodeType() == Node.ELEMENT_NODE) {
+                String name = propNode.getNodeName();
+                String value = propNode.getTextContent().trim();
+
+                if (name.equalsIgnoreCase("level")) {
+                    level = FactionAccoladeLevel.getAccoladeRecognitionFromString(value);
+                } else if (name.equalsIgnoreCase("issueDate")) {
+                    issueDate = LocalDate.parse(value);
+                }
+            }
+        }
+
+        return new AccoladeEntry(level, issueDate);
     }
 }

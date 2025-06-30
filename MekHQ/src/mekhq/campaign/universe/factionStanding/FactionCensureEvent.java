@@ -32,6 +32,17 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
+import static megamek.common.Compute.randomInt;
+import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
+import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
+import static mekhq.campaign.universe.factionStanding.FactionStandings.REGARD_DELTA_CONTRACT_PARTIAL_EMPLOYER;
+import static mekhq.campaign.universe.factionStanding.FactionStandings.REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER;
+
+import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
@@ -43,18 +54,6 @@ import mekhq.campaign.universe.Faction;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionCensureConfirmationDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionCensureDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentSceneDialog;
-
-import java.time.LocalDate;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import static megamek.common.Compute.randomInt;
-import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
-import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
-import static mekhq.campaign.universe.factionStanding.FactionStandings.STARTING_REGARD_ALLIED_FACTION;
-import static mekhq.campaign.universe.factionStanding.FactionStandings.STARTING_REGARD_SAME_FACTION;
 
 /**
  * Represents a faction censure event within a campaign, handling the narrative and mechanical consequences associated
@@ -80,8 +79,8 @@ public class FactionCensureEvent {
           PersonnelRole.LOYALTY_AUDITOR);
 
     private final Campaign campaign;
-    private final Person mostSeniorCharacter;
-    private final Person secondCharacter;
+    private final Person commander;
+    private final Person secondInCommand;
 
     /**
      * Constructs a new FactionCensureEvent for the given campaign and censure level.
@@ -94,21 +93,21 @@ public class FactionCensureEvent {
      */
     public FactionCensureEvent(Campaign campaign, FactionCensureLevel censureLevel) {
         this.campaign = campaign;
-        mostSeniorCharacter = getMostSeniorCharacter();
-        secondCharacter = getSecondCharacter(mostSeniorCharacter);
+        commander = campaign.getCommander();
+        secondInCommand = campaign.getSecondInCommand();
 
         // There is nobody to censure
-        if (mostSeniorCharacter == null) {
+        if (commander == null) {
             return;
         }
 
-        FactionCensureDialog initialDialog = new FactionCensureDialog(campaign, censureLevel, mostSeniorCharacter);
+        FactionCensureDialog initialDialog = new FactionCensureDialog(campaign, censureLevel, commander);
         int choiceIndex = initialDialog.getDialogChoiceIndex();
         boolean isSeppuku = choiceIndex == SEPPUKU_DIALOG_CHOICE_INDEX;
         boolean isGoingRogue = choiceIndex == GO_ROGUE_DIALOG_CHOICE_INDEX;
 
         FactionCensureConfirmationDialog confirmationDialog = new FactionCensureConfirmationDialog(campaign,
-              censureLevel, mostSeniorCharacter, isSeppuku, isGoingRogue);
+              censureLevel, commander, isSeppuku, isGoingRogue);
         if (!confirmationDialog.wasConfirmed()) {
             new FactionCensureEvent(campaign, censureLevel);
             return;
@@ -135,10 +134,10 @@ public class FactionCensureEvent {
      */
     private void processPerformingSeppuku() {
         new FactionJudgmentSceneDialog(campaign,
-              mostSeniorCharacter,
-              secondCharacter,
+              commander,
+              secondInCommand,
               FactionJudgmentSceneType.SEPPUKU);
-        mostSeniorCharacter.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.SEPPUKU);
+        commander.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.SEPPUKU);
     }
 
     /**
@@ -150,7 +149,7 @@ public class FactionCensureEvent {
      * @since 0.50.07
      */
     private void processGoingRogue(FactionCensureLevel censureLevel) {
-        GoingRogue goingRogueDialog = new GoingRogue(campaign, mostSeniorCharacter, secondCharacter);
+        GoingRogue goingRogueDialog = new GoingRogue(campaign, commander, secondInCommand);
         if (!goingRogueDialog.wasConfirmed()) {
             new FactionCensureEvent(campaign, censureLevel);
         }
@@ -204,7 +203,7 @@ public class FactionCensureEvent {
      * @since 0.50.07
      */
     private void processCensureCommanderRetirement() {
-        mostSeniorCharacter.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.RETIRED);
+        commander.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.RETIRED);
     }
 
     /**
@@ -238,7 +237,7 @@ public class FactionCensureEvent {
      * @since 0.50.07
      */
     private void processFactionStandingChange(boolean isMajor) {
-        double delta = isMajor ? STARTING_REGARD_SAME_FACTION : STARTING_REGARD_ALLIED_FACTION;
+        double delta = isMajor ? REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER : REGARD_DELTA_CONTRACT_PARTIAL_EMPLOYER;
         Faction faction = campaign.getFaction();
         String factionCode = faction.getShortName();
         FactionStandings factionStandings = campaign.getFactionStandings();
@@ -255,7 +254,7 @@ public class FactionCensureEvent {
      * @since 0.50.07
      */
     private void processCensureCommanderImprisonment() {
-        mostSeniorCharacter.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.IMPRISONED);
+        commander.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.IMPRISONED);
     }
 
     /**
@@ -266,7 +265,7 @@ public class FactionCensureEvent {
      */
     private void processCensureLeadershipReplacement() {
         Set<Person> replacedPersonnel = new HashSet<>();
-        replacedPersonnel.add(mostSeniorCharacter);
+        replacedPersonnel.add(commander);
 
         LocalDate today = campaign.getLocalDate();
         for (Person officer : campaign.getPersonnel()) {
@@ -340,45 +339,9 @@ public class FactionCensureEvent {
      */
     private void processCensureDisband() {
         new FactionJudgmentSceneDialog(campaign,
-              mostSeniorCharacter,
-              secondCharacter,
+              commander,
+              secondInCommand,
               FactionJudgmentSceneType.DISBAND);
-    }
-
-    /**
-     * Returns the most senior character involved in this censure event.
-     *
-     * @return the most senior {@link Person}
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    public Person getMostSeniorCharacter() {
-        Person flaggedCommander = campaign.getFlaggedCommander();
-        if (flaggedCommander != null) {
-            return flaggedCommander;
-        }
-
-        LocalDate today = campaign.getLocalDate();
-
-        Collection<Person> personnel = campaign.getPersonnel();
-        Person highestRankedPerson = null;
-        for (Person person : personnel) {
-            if (isExempt(person, today)) {
-                continue;
-            }
-
-            if (highestRankedPerson == null) {
-                highestRankedPerson = person;
-                continue;
-            }
-
-            if (person.outRanksUsingSkillTiebreaker(campaign, highestRankedPerson)) {
-                highestRankedPerson = person;
-            }
-        }
-
-        return highestRankedPerson;
     }
 
     /**
@@ -409,33 +372,5 @@ public class FactionCensureEvent {
         }
 
         return person.isDependent();
-    }
-
-    /**
-     * Finds and returns a suitable "second" character for a given commander.
-     *
-     * @param commander the commander for whom a second character is sought
-     * @return the selected {@link Person}, or {@code null} if none is found
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    private @Nullable Person getSecondCharacter(Person commander) {
-        Person second = campaign.getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND);
-        if (second != null && !second.equals(commander)) {
-            return second;
-        }
-
-        for (Person person : campaign.getActivePersonnel(false)) {
-            if (person == commander) {
-                continue;
-            }
-
-            if (second == null || person.outRanksUsingSkillTiebreaker(campaign, second)) {
-                second = person;
-            }
-        }
-
-        return second;
     }
 }

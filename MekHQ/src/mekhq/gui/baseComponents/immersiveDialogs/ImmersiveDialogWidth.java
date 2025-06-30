@@ -30,32 +30,54 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.dialog.factionStanding.gmToolsDialog;
+package mekhq.gui.baseComponents.immersiveDialogs;
+
+import megamek.client.ui.util.UIUtil;
 
 /**
- * Enum representing the types of actions that can be performed on faction standings through GM (Game Master) tools.
+ * Specifies width presets for immersive dialog windows in the user interface.
+ *
+ * <p>Each enum constant is associated with a specific pixel width (scaled for GUI) that can be used to control the
+ * layout and appearance of dialogs throughout the application.</p>
  *
  * @author Illiani
  * @since 0.50.07
  */
-public enum FactionStandingsGMToolsActionType {
+public enum ImmersiveDialogWidth {
     /**
-     * Resets all faction regard values to their default state, as defined by the campaign faction and game date.
+     * Small preset width, suitable for most immersive dialogs.
      */
-    RESET_ALL_REGARD,
+    SMALL(400),
+
     /**
-     * Sets all faction regard values to zero.
+     * Medium preset width, intended for larger dialogs.
      */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    ZERO_ALL_REGARD,
+    MEDIUM(600),
+
     /**
-     * Updates the regard value for a specific faction. This action is typically performed to adjust the standings of a
-     * particular faction to a desired value.
+     * Large preset width, intended for dialogs that require significantly more space.
      */
-    SET_SPECIFIC_REGARD,
+    LARGE(800);
+
+    /** The scaled pixel width for this dialog size. */
+    private final int width;
+
     /**
-     * Updates faction standings based on historical contract data (i.e., completed
-     * {@link mekhq.campaign.mission.Mission} objects).
+     * Constructs an {@code ImmersiveDialogWidth} with the given pixel width.
+     *
+     * @param width the base width in pixels before scaling
      */
-    UPDATE_HISTORIC_CONTRACTS
+    ImmersiveDialogWidth(int width) {
+        this.width = width;
+    }
+
+    /**
+     * Returns the pixel width (scaled for GUI) of this dialog size.
+     *
+     * @return the width in pixels after scaling
+     */
+    public int getWidth() {
+        return UIUtil.scaleForGUI(width);
+    }
 }
+

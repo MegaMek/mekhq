@@ -32,6 +32,16 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
+import static megamek.common.Compute.randomInt;
+import static mekhq.campaign.universe.factionStanding.FactionCensureEvent.POLITICAL_ROLES;
+import static mekhq.campaign.universe.factionStanding.FactionCensureEvent.processMassLoyaltyChange;
+
+import java.time.LocalDate;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
@@ -41,16 +51,6 @@ import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionCensureGoingRogueDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentSceneDialog;
-
-import java.time.LocalDate;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import static megamek.common.Compute.randomInt;
-import static mekhq.campaign.universe.factionStanding.FactionCensureEvent.POLITICAL_ROLES;
-import static mekhq.campaign.universe.factionStanding.FactionCensureEvent.processMassLoyaltyChange;
 
 /**
  * Handles the "going rogue" event for a campaign, where a force defects or leaves its current faction.
@@ -118,7 +118,7 @@ public class GoingRogue {
               second,
               FactionJudgmentSceneType.GO_ROGUE);
 
-        processGoingRogue(chosenFaction, commander, second);
+        processGoingRogue(campaign, chosenFaction, commander, second);
     }
 
     /**
@@ -126,6 +126,7 @@ public class GoingRogue {
      *
      * <p>Changes personnel statuses, mass-loyalty, and adjusts faction standings.</p>
      *
+     * @param campaign      the current campaign context
      * @param chosenFaction the new faction may be the same or a new one
      * @param commander     the force commander
      * @param second        secondary command personnel
@@ -133,13 +134,13 @@ public class GoingRogue {
      * @author Illiani
      * @since 0.50.07
      */
-    private void processGoingRogue(Faction chosenFaction, Person commander, Person second) {
-        boolean isDefection = !chosenFaction.isAggregate();
-        processPersonnel(isDefection, commander, second);
+    static void processGoingRogue(Campaign campaign, Faction chosenFaction, Person commander, Person second) {
+        boolean isDefection = !chosenFaction.isAggregate() && !campaign.getFaction().isAggregate();
+        processPersonnel(campaign, isDefection, commander, second);
         processMassLoyaltyChange(campaign, true, true);
 
-        processFactionStandingChangeForOldFaction();
-        processFactionStandingChangeForNewFaction(chosenFaction);
+        processFactionStandingChangeForOldFaction(campaign);
+        processFactionStandingChangeForNewFaction(campaign, chosenFaction);
 
         campaign.setFaction(chosenFaction);
     }
@@ -148,6 +149,7 @@ public class GoingRogue {
      * Evaluates and updates all personnel in the campaign for defection, murder, or leaving statuses, based on
      * political roles and loyalty checks. The commander and second-in-command are exempted.
      *
+     * @param campaign    the current campaign context
      * @param isDefection whether this event counts as a defection to a new faction
      * @param commander   the commanding officer
      * @param second      the second-in-command
@@ -155,12 +157,16 @@ public class GoingRogue {
      * @author Illiani
      * @since 0.50.07
      */
-    private void processPersonnel(boolean isDefection, Person commander, Person second) {
+    private static void processPersonnel(Campaign campaign, boolean isDefection, Person commander,
+          @Nullable Person second) {
         final LocalDate today = campaign.getLocalDate();
         Collection<Person> allPersonnel = campaign.getPersonnel();
         Set<Person> preProcessedPersonnel = new HashSet<>();
+
         preProcessedPersonnel.add(commander);
-        preProcessedPersonnel.add(second);
+        if (second != null) {
+            preProcessedPersonnel.add(second);
+        }
 
         for (Person person : allPersonnel) {
             if (isExempt(person, today)) {
@@ -171,12 +177,14 @@ public class GoingRogue {
                 continue;
             }
 
-            // Political roles always become homicide victims in rogue events
-            if (POLITICAL_ROLES.contains(person.getPrimaryRole())
-                      || POLITICAL_ROLES.contains(person.getSecondaryRole())) {
-                person.changeStatus(campaign, today, PersonnelStatus.HOMICIDE);
-                processGenealogicallyLinkedPersonnel(person, today, preProcessedPersonnel);
-                continue;
+            // Political roles always become homicide victims in defection events
+            if (isDefection) {
+                if (POLITICAL_ROLES.contains(person.getPrimaryRole())
+                          || POLITICAL_ROLES.contains(person.getSecondaryRole())) {
+                    person.changeStatus(campaign, today, PersonnelStatus.HOMICIDE);
+                    processGenealogicallyLinkedPersonnel(campaign, person, today, preProcessedPersonnel);
+                    continue;
+                }
             }
 
             // Loyalty check: personnel with low loyalty may leave or be killed (homicide/deserted), others remain
@@ -195,7 +203,7 @@ public class GoingRogue {
                 }
             }
 
-            processGenealogicallyLinkedPersonnel(person, today, preProcessedPersonnel);
+            processGenealogicallyLinkedPersonnel(campaign, person, today, preProcessedPersonnel);
         }
     }
 
@@ -215,6 +223,7 @@ public class GoingRogue {
      *   <li>All children processed are added to {@code preProcessedPersonnel}.</li>
      * </ul>
      *
+     * @param campaign              the current campaign context
      * @param person                the {@link Person} whose genealogical relations are to be processed
      * @param today                 the current {@link LocalDate} for age/status determination
      * @param preProcessedPersonnel a set of {@link Person} objects already processed during this operation
@@ -222,7 +231,7 @@ public class GoingRogue {
      * @author Illiani
      * @since 0.50.07
      */
-    private void processGenealogicallyLinkedPersonnel(Person person, LocalDate today,
+    private static void processGenealogicallyLinkedPersonnel(Campaign campaign, Person person, LocalDate today,
           Set<Person> preProcessedPersonnel) {
         Genealogy genealogy = person.getGenealogy();
         Person spouse = genealogy.getSpouse();
@@ -257,10 +266,12 @@ public class GoingRogue {
      * Adjusts the campaign's standing with the old faction, if leaving, reducing regard to the minimum allowed for
      * {@link FactionStandingLevel#STANDING_LEVEL_1} if necessary.
      *
+     * @param campaign the current campaign context
+     *
      * @author Illiani
      * @since 0.50.07
      */
-    private void processFactionStandingChangeForOldFaction() {
+    private static void processFactionStandingChangeForOldFaction(Campaign campaign) {
         Faction faction = campaign.getFaction();
 
         if (faction.isAggregate()) {
@@ -284,12 +295,13 @@ public class GoingRogue {
      * Improves the campaign's standing with the new faction (if applicable), raising regard to at least the minimum
      * allowed for {@link FactionStandingLevel#STANDING_LEVEL_5}.
      *
+     * @param campaign the current campaign context
      * @param newFaction the faction now joined
      *
      * @author Illiani
      * @since 0.50.07
      */
-    private void processFactionStandingChangeForNewFaction(Faction newFaction) {
+    private static void processFactionStandingChangeForNewFaction(Campaign campaign, Faction newFaction) {
         if (newFaction.isAggregate()) {
             return;
         }

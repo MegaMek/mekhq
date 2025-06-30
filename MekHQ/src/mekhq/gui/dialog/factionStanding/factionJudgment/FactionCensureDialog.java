@@ -51,6 +51,7 @@ import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.factionStanding.FactionCensureLevel;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.utilities.MHQInternationalization;
 
 /**
@@ -121,7 +122,8 @@ public class FactionCensureDialog {
               getDialogOptions(mostSeniorCharacter),
               getOutOfCharacterMessage(),
               null,
-              true
+              true,
+              ImmersiveDialogWidth.MEDIUM
         );
         dialogChoiceIndex = dialog.getDialogChoice();
     }
