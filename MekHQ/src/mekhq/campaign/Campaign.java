@@ -3600,6 +3600,81 @@ public class Campaign implements ITechManager {
     }
 
     /**
+     * Retrieves the current campaign commander.
+     *
+     * <p>If a commander is specifically flagged, that person will be returned. Otherwise, the highest-ranking member
+     * among the unit's active personnel is selected.</p>
+     *
+     * @return the {@link Person} who is the commander, or {@code null} if there are no suitable candidates.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public @Nullable Person getCommander() {
+        return findTopCommanders()[0];
+    }
+
+    /**
+     * Retrieves the second-in-command among the unit's active personnel.
+     *
+     * <p>The second-in-command is determined as the highest-ranking active personnel member who is not the flagged
+     * commander (if one exists). If multiple candidates have the same rank, a skill-based tiebreaker is used.</p>
+     *
+     * @return the {@link Person} who is considered the second-in-command, or {@code null} if there are no suitable
+     * candidates.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public @Nullable Person getSecondInCommand() {
+        return findTopCommanders()[1];
+    }
+
+    /**
+     * Finds the current top two candidates for command among active personnel.
+     *
+     * <p>In a single pass, this method determines the commander and the second-in-command using a flagged commander
+     * if one is specified, otherwise relying on rank and skill tiebreakers.</p>
+     *
+     * @return an array where index 0 is the commander (may be the flagged commander), and index 1 is the
+     *       second-in-command; either or both may be {@code null} if no suitable personnel are available.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private Person[] findTopCommanders() {
+        Person flaggedCommander = getFlaggedCommander();
+        Person commander = flaggedCommander;
+        Person secondInCommand = null;
+
+        for (Person person : getActivePersonnel(false)) {
+            // If we have a flagged commander, skip them
+            if (flaggedCommander != null) {
+                if (person.equals(flaggedCommander)) {
+                    continue;
+                }
+                // Second in command is best among non-flagged
+                if (secondInCommand == null || person.outRanksUsingSkillTiebreaker(this, secondInCommand)) {
+                    secondInCommand = person;
+                }
+            } else {
+                if (commander == null) {
+                    commander = person;
+                } else if (person.outRanksUsingSkillTiebreaker(this, commander)) {
+                    secondInCommand = commander;
+                    commander = person;
+                } else if (secondInCommand == null || person.outRanksUsingSkillTiebreaker(this, secondInCommand)) {
+                    if (!person.equals(commander)) {
+                        secondInCommand = person;
+                    }
+                }
+            }
+        }
+
+        return new Person[] { commander, secondInCommand};
+    }
+
+    /**
      * Retrieves a list of eligible logistics personnel who can perform procurement actions based on the current
      * campaign options. If acquisitions are set to automatically succeed, an empty list is returned.
      *
@@ -5161,7 +5236,7 @@ public class Campaign implements ITechManager {
         int peopleWhoCelebrateCommandersDay = 0;
         int commanderDayTargetNumber = 5;
         boolean isCommandersDay = isCommandersDay(currentDay) &&
-                                        getFlaggedCommander() != null &&
+                                        getCommander() != null &&
                                         campaignOptions.isShowLifeEventDialogCelebrations();
         for (Person person : personnel) {
             if (person.getStatus().isDepartedUnit()) {
@@ -5955,11 +6030,9 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * return the probable commander. If we find a flagged commander, return that. Otherwise, return person with most
-     * senior rank. Ties go to the first in the queue.
-     *
-     * @return Person object of the commander
+     * Use {@link #getCommander()} instead
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public Person getSeniorCommander() {
         Person commander = null;
         for (Person p : getActivePersonnel(true)) {
@@ -6994,6 +7067,23 @@ public class Campaign implements ITechManager {
     }
 
     /**
+     * Calculates and returns a {@code JumpPath} between two planetary systems, using default parameters for jump range
+     * and travel safety.
+     *
+     * <p>This method provides a convenient way to compute the most likely or optimal jump path from the specified
+     * starting system to the destination system. Internal behavior and constraints are determined by the method's
+     * default parameter settings.</p>
+     *
+     * @param start the starting {@link PlanetarySystem}
+     * @param end   the destination {@link PlanetarySystem}
+     *
+     * @return the calculated {@link JumpPath} between the two systems
+     */
+    public JumpPath calculateJumpPath(PlanetarySystem start, PlanetarySystem end) {
+        return calculateJumpPath(start, end, true, true);
+    }
+
+    /**
      * Calculates the optimal jump path between two planetary systems using the A* algorithm.
      *
      * <p>This implementation minimizes a combination of jump counts and recharge times to find the most efficient
@@ -7008,12 +7098,18 @@ public class Campaign implements ITechManager {
      *
      * @param start The starting planetary system
      * @param end   The destination planetary system
+     * @param skipAccessCheck   {@code true} to skip checking for Outlaw status in system, {@code false} otherwise.
+     *                                      Should be {@code false} when determining contract-related jump paths as
+     *                                      system access is guaranteed for contract target systems.
+     * @param skipEmptySystemCheck   {@code true} to skip checking for empty system status, {@code false} otherwise.
+     *                                      Should be {@code false} when determining contract-related jump paths.
      *
      * @return A {@link JumpPath} containing the sequence of systems to traverse, or {@code null} if no valid path
      *       exists between the systems. If start and end are the same system, returns a path containing only that
      *       system.
      */
-    public JumpPath calculateJumpPath(PlanetarySystem start, PlanetarySystem end) {
+    public JumpPath calculateJumpPath(PlanetarySystem start, PlanetarySystem end, boolean skipAccessCheck,
+          boolean skipEmptySystemCheck) {
         // Handle edge cases
         if (null == start) {
             return new JumpPath();
@@ -7026,7 +7122,9 @@ public class Campaign implements ITechManager {
         }
 
         // Shortcuts to ensure we're not processing a lot of data when we're unable to reach the target system
-        if (isAvoidingEmptySystems && end.getPopulation(currentDay) == 0) {
+        if (!skipEmptySystemCheck
+                  && isAvoidingEmptySystems
+                  && end.getPopulation(currentDay) == 0) {
             new ImmersiveDialogSimple(this, getSeniorAdminPerson(AdministratorSpecialization.TRANSPORT), null,
                   String.format(resources.getString("unableToEnterSystem.abandoned.ic"), getCommanderAddress(false)),
                   null, resources.getString("unableToEnterSystem.abandoned.ooc"), null, false);
@@ -7036,9 +7134,11 @@ public class Campaign implements ITechManager {
 
         List<AtBContract> activeAtBContracts = getActiveAtBContracts();
 
-        if (campaignOptions.isUseFactionStandingOutlawedSafe()) {
+        if (!skipAccessCheck
+                  && campaignOptions.isUseFactionStandingOutlawedSafe()) {
+            FactionHints factionHints = FactionHints.defaultFactionHints();
             boolean canAccessSystem = FactionStandingUtilities.canEnterTargetSystem(faction, factionStandings,
-                  getCurrentSystem(), end, currentDay, activeAtBContracts);
+                  getCurrentSystem(), end, currentDay, activeAtBContracts, factionHints);
             if (!canAccessSystem) {
                 new ImmersiveDialogSimple(this, getSeniorAdminPerson(AdministratorSpecialization.TRANSPORT), null,
                       String.format(resources.getString("unableToEnterSystem.outlawed.ic"), getCommanderAddress(false)),
@@ -7072,6 +7172,8 @@ public class Campaign implements ITechManager {
         scoreG.put(current, 0.0);
         closed.add(current);
 
+        FactionHints factionHints = FactionHints.defaultFactionHints();
+
         // A* search
         final int MAX_JUMPS = 10000;
         for (int jumps = 0; jumps < MAX_JUMPS; jumps++) {
@@ -7095,9 +7197,10 @@ public class Campaign implements ITechManager {
                 }
 
                 // Skip systems where the campaign is outlawed
-                if (campaignOptions.isUseFactionStandingOutlawedSafe()) {
+                if (!skipAccessCheck
+                          && campaignOptions.isUseFactionStandingOutlawedSafe()) {
                     boolean canAccessSystem = FactionStandingUtilities.canEnterTargetSystem(faction, factionStandings,
-                          getCurrentSystem(), neighborSystem, currentDay, activeAtBContracts);
+                          getCurrentSystem(), neighborSystem, currentDay, activeAtBContracts, factionHints);
                     if (!canAccessSystem) {
                         return;
                     }
@@ -8282,7 +8385,7 @@ public class Campaign implements ITechManager {
      */
     public int getCommanderStrategy() {
         int commanderStrategy = 0;
-        Person commander = getFlaggedCommander();
+        Person commander = getCommander();
 
         if (commander == null || !commander.hasSkill(S_STRATEGY)) {
             return commanderStrategy;
@@ -9802,7 +9905,7 @@ public class Campaign implements ITechManager {
      * @return A {@link String} representing the appropriate address for the commander, either formal or informal.
      */
     public String getCommanderAddress(boolean isInformal) {
-        Person commander = getFlaggedCommander();
+        Person commander = getCommander();
 
         if (commander == null) {
             if (isInformal) {
