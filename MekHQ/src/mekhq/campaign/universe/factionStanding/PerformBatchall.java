@@ -92,7 +92,7 @@ public class PerformBatchall {
         standingLevel = getFactionStandingLevel(campaign.getFactionStandings());
         batchallVersion = randomInt(BATCHALL_OPTIONS_COUNT);
 
-        if (campaign.getCampaignOptions().isUseFactionStandingBatchallRestrictions()) {
+        if (campaign.getCampaignOptions().isUseFactionStandingBatchallRestrictionsSafe()) {
             if (!standingLevel.isBatchallAllowed()) {
                 getBatchallStandingTooLowDialog();
                 isBatchallAccepted = false;
