@@ -773,7 +773,7 @@ public class Resupply {
         negotiatorSkill = NONE.ordinal();
 
         if (contract.getContractType().isGuerrillaWarfare()) {
-            negotiator = campaign.getFlaggedCommander();
+            negotiator = campaign.getCommander();
         } else {
             negotiator = null;
 
